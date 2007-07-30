@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<gsh:script
+	xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
+	xmlns:genii="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+	
+	<genii:login>
+		<gsh:param>security/keys.pfx</gsh:param>
+		<gsh:param>PKCS12</gsh:param>
+		<gsh:param>keys</gsh:param>
+	</genii:login>
+	
+	<genii:bootstrap>
+		<gsh:param>context.xml</gsh:param>
+		<gsh:param>https://localhost:18080</gsh:param>
+	</genii:bootstrap>
+	
+	<genii:mkdir>
+		<gsh:param>/users</gsh:param>
+	</genii:mkdir>
+	
+	<genii:mkdir>
+		<gsh:param>/home</gsh:param>
+	</genii:mkdir>
+	
+	<genii:gaml-chmod>
+		<gsh:param>/home</gsh:param>
+		<gsh:param>+r+x</gsh:param>
+		<gsh:param>--everyone</gsh:param>
+	</genii:gaml-chmod>
+	
+	<genii:gaml-chmod>
+		<gsh:param>/users</gsh:param>
+		<gsh:param>+r+x</gsh:param>
+		<gsh:param>--everyone</gsh:param>
+	</genii:gaml-chmod>
+	
+	<gsh:echo message="Adding users"/>
+	
+	<gsh:foreach param-name="FILE" source-dir="certs"
+		filter="^.*\.cer$">
+		
+		<gsh:define name="USER" source="${FILE}"
+			pattern="\.cer" replacement="" global="true"/>
+		
+		<gsh:echo message="Adding user ${USER}"/>
+					
+		<genii:cp>
+			<gsh:param>--local-src</gsh:param>
+			<gsh:param>certs/${FILE}</gsh:param>
+			<gsh:param>/users/${USER}</gsh:param>
+		</genii:cp>
+		
+		<genii:mkdir>
+			<gsh:param>/home/${USER}</gsh:param>
+		</genii:mkdir>
+		
+		<genii:gaml-chmod>
+			<gsh:param>/home</gsh:param>
+			<gsh:param>+r+w+x</gsh:param>
+			<gsh:param>/users/${USER}</gsh:param>
+		</genii:gaml-chmod>
+	</gsh:foreach>
+	
+	<gsh:echo message="Adding machines"/>
+	<gsh:foreach param-name="MACHINE" source-file="machines">
+		<gsh:echo message="Adding machine ${MACHINE}"/>
+		<genii:attach-container>
+			<gsh:param>${MACHINE}</gsh:param>
+		</genii:attach-container>
+	</gsh:foreach>
+	
+	<gsh:foreach param-name="CONTAINER" source-rns="/containers">
+		<genii:gaml-chmod>
+			<gsh:param>+r</gsh:param>
+			<gsh:param>/containers/${CONTAINER}</gsh:param>
+		</genii:gaml-chmod>
+	</gsh:foreach>
+</gsh:script>

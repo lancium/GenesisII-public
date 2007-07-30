@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="gen.sbyteio" name="sbyteio.build">
+
+	<condition property="gen.sbyteio.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${codegen-dir}/wsdl/sbyteio.flag"/>
+			<uptodate targetfile="${codegen-dir}/wsdl/sbyteio.flag">
+				<srcfiles dir="${wsdl-dir}/byteio">
+					<include name="sbyteio.gwsdl"/>
+					<include name="sbyteio.xsd"/>
+					<include name="byteio.xsd"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.sbyteio" unless="gen.sbyteio.uptodate">
+		<copy todir="${codegen-dir}/wsdl">
+			<fileset refid="common.source.files"/>
+			<fileset dir="${wsdl-dir}/byteio">
+				<include name="sbyteio.gwsdl"/>
+				<include name="sbyteio.xsd"/>
+				<include name="byteio.xsd"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${codegen-dir}/wsdl/sbyteio.gwsdl"
+			target="${codegen-dir}/wsdl/sbyteio-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${codegen-dir}/wsdl/sbyteio-generated.wsdl"
+			target="${codegen-dir}/wsdl/sbyteio-service.wsdl"
+			portType="{http://schemas.ggf.org/byteio/2005/10/streamable-access}StreamableByteIOPortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${codegen-dir}/sbyteio"/>
+			<param name="stub.gen.source-wsdl"
+				value="${codegen-dir}/wsdl/sbyteio-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${codegen-dir}/wsdl/sbyteio.flag"/>
+		</antcall>
+		<move file="${codegen-dir}/sbyteio/org/ggf/sbyteio/deploy.wsdd"
+			tofile="${wsdd-dir}/sbyteio.deploy.wsdd"/>
+		<replace file="${wsdd-dir}/sbyteio.deploy.wsdd"
+			token="org.ggf.sbyteio.StreamableByteIOSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.byteio.StreamableByteIOServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd-dir}/sbyteio.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>

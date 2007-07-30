@@ -1,0 +1,37 @@
+CC		=		gcc
+CFLAGS	=		-Wall -I$(JAVA_HOME)/include								\
+	-I$(JAVA_HOME)/include/linux -fpic
+LFLAGS	=
+
+OBJDIR	=		Release
+LIBDIR	=		$(INSTALL_PATH)/jni-lib
+
+OBJECTS	=		$(OBJDIR)/ExceptionUtils.o									\
+				$(OBJDIR)/FileSystemUtils.o								\
+				$(OBJDIR)/GetPassword.o
+
+LIBRARIES	=	$(LIBDIR)/libVcgrClientLib.so
+
+##########################################################################
+
+all:	$(LIBRARIES)
+
+clean:
+	/bin/rm -f -r $(OBJECTS) $(LIBRARIES)
+
+##########################################################################
+
+$(OBJDIR)/ExceptionUtils.o:	ExceptionUtils.h ExceptionUtils.c
+	$(CC) $(CFLAGS) ExceptionUtils.c -c -o $(OBJDIR)/ExceptionUtils.o
+
+$(OBJDIR)/GetPassword.o:	GetPassword.jh GetPassword.c
+	$(CC) $(CFLAGS) GetPassword.c -c -o $(OBJDIR)/GetPassword.o
+
+$(OBJDIR)/FileSystemUtils.o:	FileSystemUtils.jh FileSystemUtils.c		\
+		ExceptionUtils.h
+	$(CC) $(CFLAGS) FileSystemUtils.c -c -o $(OBJDIR)/FileSystemUtils.o
+
+##########################################################################
+
+$(LIBDIR)/libVcgrClientLib.so:	$(OBJECTS)
+	$(CC) $(CFLAGS) -shared $(OBJECTS) -o $(LIBDIR)/libVcgrClientLib.so

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<wsdl:definitions
+	name="ApplicationDescription"
+	xmlns="http://vcgr.cs.virginia.edu/genii/application-description"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:gdesc="http://vcgr.cs.virginia.edu/genii/application-description"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+	xmlns:genii-resource="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+    xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:sfact="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory"
+	xmlns:rns="http://schemas.ggf.org/rns/2006/05/rns"
+	targetNamespace="http://vcgr.cs.virginia.edu/genii/application-description">
+
+    <wsdl:import
+        namespace="http://schemas.ggf.org/rns/2006/05/rns"
+        location="./rns-generated.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+		location="./resource.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple"
+		location="./resource-simple.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
+		location="./resource-factory.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-lifetime"
+		location="./resource-lifetime.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
+		location="./resource-attributes.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-authz"
+		location="./resource-authz.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+        location="./common-generated.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
+        location="./notification.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory"
+        location="./sbyteio-factory.wsdl"/>
+
+
+	<wsdl:types>
+		<xsd:schema
+			xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			attributeFormDefault="unqualified"
+			elementFormDefault="qualified"
+			targetNamespace="http://vcgr.cs.virginia.edu/genii/application-description">
+
+			<xsd:import
+				namespace="http://vcgr.cs.virginia.edu/genii/application-description"
+				schemaLocation="./gapp-description.xsd"/>
+
+		</xsd:schema>
+	</wsdl:types>
+
+	<wsdl:message name="CreateDeploymentDocumentRequest">
+		<wsdl:part name="CreateDeploymentDocumentRequest"
+			element="gdesc:CreateDeploymentDocumentRequestType"/>
+	</wsdl:message>
+
+	<wsdl:message name="CreateDeploymentDocumentResponse">
+		<wsdl:part name="CreateDeploymentDocumentResponse"
+			element="gdesc:CreateDeploymentDocumentResponseType"/>
+	</wsdl:message>
+
+	<wsdl:message name="DeploymentExistsFault">
+        <wsdl:part name="DeploymentExistsFault"
+			element="gdesc:DeploymentExistsFaultType"/>
+    </wsdl:message>
+
+	<wsdl:portType name="ApplicationDescriptionPortType">
+		<genii-ext:extend portType="genii-common:GeniiCommon"/>
+		<genii-ext:extend portType="sfact:StreamableByteIOFactory"/>
+		<genii-ext:extend portType="rns:RNSPortType"/>
+
+		<wsdl:operation name="createDeploymentDocument">
+			<wsdl:input message="gdesc:CreateDeploymentDocumentRequest"/>
+			<wsdl:output message="gdesc:CreateDeploymentDocumentResponse"/>
+			<wsdl:fault name="DeploymentExistsFault"
+				message="gdesc:DeploymentExistsFault"/>
+		</wsdl:operation>
+	</wsdl:portType>
+
+</wsdl:definitions>

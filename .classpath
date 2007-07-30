@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="edu/virginia/vcgr/genii/container/factory/GeniiFactoryServiceImpl.java" kind="src" path="src"/>
+	<classpathentry kind="src" path="genned-src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="ext/axis/ext/activation.jar"/>
+	<classpathentry kind="lib" path="ext/axis/ext/mail.jar"/>
+	<classpathentry kind="lib" path="ext/axis/ext/tools.jar"/>
+	<classpathentry kind="lib" path="ext/axis/ext/xalan.jar"/>
+	<classpathentry kind="lib" path="ext/axis/ext/xercesImpl.jar"/>
+	<classpathentry kind="lib" path="ext/axis/ext/xml-apis.jar"/>
+	<classpathentry kind="lib" path="ext/axis/ext/xmlParserAPIs.jar"/>
+	<classpathentry kind="lib" path="ext/axis/ext/xmlsec-1.4.Beta2.jar"/>
+	<classpathentry kind="lib" path="ext/bouncycastle/bcprov-jdk15-133.jar"/>
+	<classpathentry kind="lib" path="ext/jetty/ext/ant.jar"/>
+	<classpathentry kind="lib" path="ext/jetty/ext/commons-el.jar"/>
+	<classpathentry kind="lib" path="ext/jetty/ext/commons-logging.jar"/>
+	<classpathentry kind="lib" path="ext/jetty/ext/jasper-compiler.jar"/>
+	<classpathentry kind="lib" path="ext/jetty/ext/jasper-runtime.jar"/>
+	<classpathentry kind="lib" path="ext/jetty/ext/mx4j.jar"/>
+	<classpathentry kind="lib" path="ext/jetty/ext/mx4j-remote.jar"/>
+	<classpathentry kind="lib" path="ext/jetty/ext/mx4j-tools.jar"/>
+	<classpathentry kind="lib" path="ext/jetty/ext/xercesImpl.jar"/>
+	<classpathentry kind="lib" path="ext/jetty/ext/xml-apis.jar"/>
+	<classpathentry kind="lib" path="ext/jetty/ext/xmlParserAPIs.jar"/>
+	<classpathentry kind="lib" path="ext/jetty/lib/javax.servlet.jar"/>
+	<classpathentry kind="lib" path="ext/jetty/lib/org.mortbay.jetty.jar"/>
+	<classpathentry kind="lib" path="ext/jetty/lib/org.mortbay.jmx.jar"/>
+	<classpathentry kind="lib" path="ext/axis/lib/axis.jar"/>
+	<classpathentry kind="lib" path="ext/axis/lib/axis-ant.jar"/>
+	<classpathentry kind="lib" path="ext/axis/lib/commons-discovery-0.2.jar"/>
+	<classpathentry kind="lib" path="ext/axis/lib/commons-logging-1.0.4.jar"/>
+	<classpathentry kind="lib" path="ext/axis/lib/jaxrpc.jar"/>
+	<classpathentry kind="lib" path="ext/axis/lib/log4j-1.2.8.jar"/>
+	<classpathentry kind="lib" path="ext/axis/lib/saaj.jar"/>
+	<classpathentry kind="lib" path="ext/axis/lib/wsdl4j-1.5.1.jar"/>
+	<classpathentry kind="lib" path="ext/hypersonic/hsqldb.jar"/>
+	<classpathentry kind="lib" path="lib"/>
+	<classpathentry kind="lib" path="security"/>
+	<classpathentry kind="lib" path="ext/wss4j/wss4j-1.5.1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="ext/derby/derby.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

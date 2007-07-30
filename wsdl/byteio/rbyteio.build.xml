@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="gen.rbyteio" name="rbyteio.build">
+
+	<condition property="gen.rbyteio.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${codegen-dir}/wsdl/rbyteio.flag"/>
+			<uptodate targetfile="${codegen-dir}/wsdl/rbyteio.flag">
+				<srcfiles dir="${wsdl-dir}/byteio">
+					<include name="rbyteio.xsd"/>
+					<include name="byteio.xsd"/>
+					<include name="rbyteio.gwsdl"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.rbyteio" unless="gen.rbyteio.uptodate">
+		<copy todir="${codegen-dir}/wsdl">
+			<fileset refid="common.source.files"/>
+			<fileset dir="${wsdl-dir}/byteio">
+				<include name="rbyteio.gwsdl"/>
+				<include name="rbyteio.xsd"/>
+				<include name="byteio.xsd"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${codegen-dir}/wsdl/rbyteio.gwsdl"
+			target="${codegen-dir}/wsdl/rbyteio-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${codegen-dir}/wsdl/rbyteio-generated.wsdl"
+			target="${codegen-dir}/wsdl/rbyteio-service.wsdl"
+			portType="{http://schemas.ggf.org/byteio/2005/10/random-access}RandomByteIOPortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${codegen-dir}/rbyteio"/>
+			<param name="stub.gen.source-wsdl"
+				value="${codegen-dir}/wsdl/rbyteio-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${codegen-dir}/wsdl/rbyteio.flag"/>
+		</antcall>
+		<move file="${codegen-dir}/rbyteio/org/ggf/rbyteio/deploy.wsdd"
+			tofile="${wsdd-dir}/rbyteio.deploy.wsdd"/>
+		<replace file="${wsdd-dir}/rbyteio.deploy.wsdd"
+			token="org.ggf.rbyteio.RandomByteIOSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.byteio.RandomByteIOServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd-dir}/rbyteio.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>

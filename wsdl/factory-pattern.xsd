@@ -1,0 +1,61 @@
+<xsd:schema
+	targetNamespace="http://vcgr.cs.virginia.edu/genii/2006/12/factory-pattern"
+	xmlns="http://vcgr.cs.virginia.edu/genii/2006/12/factory-pattern"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:fact-pat="http://vcgr.cs.virginia.edu/genii/2006/12/factory-pattern"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified">
+
+	<xsd:import
+		namespace="http://www.w3.org/2005/08/addressing"
+		schemaLocation="./ws-addr.xsd"/>
+
+	<xsd:complexType name="CSGInformationType">
+		<xsd:sequence>
+			<xsd:any namespace="##other" processContents="lax"
+				minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="csg-type" type="xsd:anyURI" use="optional"/>
+	</xsd:complexType>
+	<xsd:element name="CSGInformationType"
+		type="fact-pat:CSGInformationType"/>
+
+	<xsd:complexType name="SchedulerInformationType">
+		<xsd:sequence>
+			<xsd:any namespace="##other" processContents="lax"
+				minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="scheduler-type" type="xsd:anyURI" use="optional"/>
+	</xsd:complexType>
+	<xsd:element name="SchedulerInformationType"
+		type="fact-pat:SchedulerInformationType"/>
+
+	<xsd:complexType name="FactoryParametersType">
+		<xsd:sequence>
+			<xsd:element name="candidate-set-generation"
+				type="fact-pat:CSGInformationType"
+				minOccurs="0" maxOccurs="1" nillable="true"/>
+			<xsd:element name="scheduler"
+				type="fact-pat:SchedulerInformationType"
+				minOccurs="0" maxOccurs="1" nillable="true"/>
+			<xsd:element name="restriction-set"
+				type="wsa:EndpointReferenceType"
+				minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+      		<xsd:any namespace="##other" processContents="lax"
+				minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="FactoryParametersType"
+		type="fact-pat:FactoryParametersType"/>
+
+	<xsd:complexType name="ConstructionParametersType">
+		<xsd:sequence>
+      		<xsd:any namespace="##other" processContents="lax"
+				minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="ConstructionParametersType"
+		type="fact-pat:ConstructionParametersType"/>
+
+</xsd:schema>

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<wsdl:definitions
+	name="Queue"
+	xmlns="http://vcgr.cs.virginia.edu/genii/queue"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:queue="http://vcgr.cs.virginia.edu/genii/queue"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+	xmlns:genii-resource="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+    xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
+    xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:rns="http://schemas.ggf.org/rns/2006/05/rns"
+	targetNamespace="http://vcgr.cs.virginia.edu/genii/queue">
+
+    <wsdl:import
+        namespace="http://schemas.ggf.org/rns/2006/05/rns"
+        location="./rns-generated.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+		location="./resource.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple"
+		location="./resource-simple.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
+		location="./resource-factory.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-lifetime"
+		location="./resource-lifetime.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
+		location="./resource-attributes.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-authz"
+		location="./resource-authz.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+        location="./common-generated.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
+        location="./notification.wsdl"/>
+
+	<wsdl:types>
+		<xsd:schema
+			xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			attributeFormDefault="unqualified"
+			elementFormDefault="qualified"
+			targetNamespace="http://vcgr.cs.virginia.edu/genii/queue">
+
+			<xsd:import
+				namespace="http://vcgr.cs.virginia.edu/genii/queue"
+				schemaLocation="./queue.xsd"/>
+
+		</xsd:schema>
+	</wsdl:types>
+
+	<wsdl:message name="SubmitJobRequest">
+		<wsdl:part name="SubmitJobRequest"
+			element="queue:SubmitJobRequestType"/>
+	</wsdl:message>
+
+	<wsdl:message name="SubmitJobResponse">
+		<wsdl:part name="SubmitJobResponse"
+			element="queue:SubmitJobResponseType"/>
+	</wsdl:message>
+	
+	<wsdl:message name="GetStatusRequest">
+		<wsdl:part name="GetStatusRequest"
+			element="queue:GetStatusRequestType"/>
+	</wsdl:message>
+
+	<wsdl:message name="GetStatusResponse">
+		<wsdl:part name="GetStatusResponse"
+			element="queue:GetStatusResponseType"/>
+	</wsdl:message>
+	
+	<wsdl:message name="ListRequest">
+		<wsdl:part name="ListRequest"
+			element="queue:ListRequest"/>
+	</wsdl:message>
+
+	<wsdl:message name="ListResponse">
+		<wsdl:part name="ListResponse"
+			element="queue:ListResponseType"/>
+	</wsdl:message>
+	
+	<wsdl:message name="KillRequest">
+		<wsdl:part name="KillRequest"
+			element="queue:KillRequestType"/>
+	</wsdl:message>
+
+	<wsdl:message name="KillResponse">
+		<wsdl:part name="KillResponse"
+			element="queue:KillResponse"/>
+	</wsdl:message>
+
+	<wsdl:message name="CompleteRequest">
+		<wsdl:part name="CompleteRequest"
+			element="queue:CompleteRequestType"/>
+	</wsdl:message>
+
+	<wsdl:message name="CompleteResponse">
+		<wsdl:part name="CompleteResponse"
+			element="queue:CompleteResponse"/>
+	</wsdl:message>
+	
+	<wsdl:message name="ConfigureRequest">
+		<wsdl:part name="ConfigureRequest"
+			element="queue:ConfigureRequestType"/>
+	</wsdl:message>
+
+	<wsdl:message name="ConfigureResponse">
+		<wsdl:part name="ConfigureResponse"
+			element="queue:ConfigureResponse"/>
+	</wsdl:message>
+	
+	<wsdl:portType name="QueuePortType">
+		<genii-ext:extend portType="genii-common:GeniiCommon"/>
+		<genii-ext:extend portType="rns:RNSPortType"/>
+
+		<wsdl:operation name="submitJob">
+			<wsdl:input message="queue:SubmitJobRequest"/>
+			<wsdl:output message="queue:SubmitJobResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="getStatus">
+			<wsdl:input message="queue:GetStatusRequest"/>
+			<wsdl:output message="queue:GetStatusResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="listJobs">
+			<wsdl:input message="queue:ListRequest"/>
+			<wsdl:output message="queue:ListResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="killJobs">
+			<wsdl:input message="queue:KillRequest"/>
+			<wsdl:output message="queue:KillResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="completeJobs">
+			<wsdl:input message="queue:CompleteRequest"/>
+			<wsdl:output message="queue:CompleteResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="configureResource">
+			<wsdl:input message="queue:ConfigureRequest"/>
+			<wsdl:output message="queue:ConfigureResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+
+</wsdl:definitions>

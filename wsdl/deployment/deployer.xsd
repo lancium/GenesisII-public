@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+	xmlns="http://vcgr.cs.virginia.edu/genii/application-deployer"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:deployer="http://vcgr.cs.virginia.edu/genii/application-deployer"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
+	xmlns:jsdl-posix="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"
+	xmlns:jsdl-hpcp="http://schemas.ggf.org/jsdl/2006/07/jsdl-hpcp"
+	targetNamespace="http://vcgr.cs.virginia.edu/genii/application-deployer"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"
+		schemaLocation="./wsrf/basefaults.xsd"/>
+
+	<xsd:import
+		namespace="http://www.w3.org/2005/08/addressing"
+		schemaLocation="./ws-addr.xsd"/>
+
+	<xsd:import
+		namespace="http://schemas.ggf.org/jsdl/2005/11/jsdl"
+		schemaLocation="./jsdl.xsd"/>
+
+	<xsd:import
+		namespace="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"
+		schemaLocation="./jsdl-posix.xsd"/>
+
+	<xsd:import
+		namespace="http://schemas.ggf.org/jsdl/2006/07/jsdl-hpcp"
+		schemaLocation="./jsdl-hpcp.xsd"/>
+
+<!-- Messace Types -->
+	<xsd:complexType name="CreateDeploymentRequestType">
+		<xsd:sequence>
+			<xsd:element name="deployment-description"
+				type="wsa:EndpointReferenceType"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="CreateDeploymentRequestType"
+		type="deployer:CreateDeploymentRequestType"/>
+
+	<xsd:complexType name="CreateDeploymentResponseType">
+		<xsd:sequence>
+			<xsd:element name="deployment"
+				type="wsa:EndpointReferenceType"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="CreateDeploymentResponseType"
+		type="deployer:CreateDeploymentResponseType"/>
+		
+	<xsd:complexType name="ReifyJSDLRequestType">
+		<xsd:sequence>
+			<xsd:element name="unreified-document"
+				type="jsdl:JobDefinition_Type"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="ReifyJSDLRequestType"
+		type="deployer:ReifyJSDLRequestType"/>
+		
+	<xsd:complexType name="ReifyJSDLResponseType">
+		<xsd:sequence>
+			<xsd:element name="reified-document"
+				type="jsdl:JobDefinition_Type"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="ReifyJSDLResponseType"
+		type="deployer:ReifyJSDLResponseType"/>
+</xsd:schema>

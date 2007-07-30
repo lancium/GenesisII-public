@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<wsdl:definitions name="RandomByteIO"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http:/www.w3.org/2001/XMLSchema-instance"
+    xmlns:wsa="http://www.w3.org/2005/08/addressing"
+    xmlns:byteio="http://schemas.ggf.org/byteio/2005/10/byte-io"
+    xmlns:rbyteio="http://schemas.ggf.org/byteio/2005/10/random-access"
+	xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+	xmlns:genii-resource="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+    xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
+    targetNamespace="http://schemas.ggf.org/byteio/2005/10/random-access">
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+		location="./resource.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple"
+		location="./resource-simple.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
+		location="./resource-factory.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-lifetime"
+		location="./resource-lifetime.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
+		location="./resource-attributes.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-authz"
+		location="./resource-authz.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+        location="./common-generated.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
+        location="./notification.wsdl"/>
+
+<!-- ===== Types Definitions ==== -->
+    <wsdl:types>
+
+        <xsd:schema
+            targetNamespace="http://schemas.ggf.org/byteio/2005/10/random-access"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+            <xsd:import
+            	namespace="http://schemas.ggf.org/byteio/2005/10/byte-io"
+            	schemaLocation="./byteio.xsd"/>
+
+            <xsd:import
+            	namespace="http://schemas.ggf.org/byteio/2005/10/random-access"
+            	schemaLocation="./rbyteio.xsd"/>
+
+<!-- Message Helper Types -->
+            
+			<xsd:element name="read">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="start-offset"
+                            type="xsd:long"
+                            minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="bytes-per-block"
+                            type="xsd:int"
+                            minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="num-blocks"
+                            type="xsd:int"
+                            minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="stride"
+                            type="xsd:long"
+                            minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="transfer-information"
+                            type="byteio:transfer-information-type"
+                            minOccurs="1" maxOccurs="1"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="readResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="transfer-information"
+                            type="byteio:transfer-information-type"
+                            minOccurs="1" maxOccurs="1"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="write">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="start-offset"
+                            type="xsd:long"
+                            minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="bytes-per-block"
+                            type="xsd:int"
+                            minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="stride"
+                            type="xsd:long"
+                            minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="transfer-information"
+                            type="byteio:transfer-information-type"
+                            minOccurs="1" maxOccurs="1"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="writeResponse">
+			<xsd:complexType>
+			    <xsd:sequence>
+				<xsd:element name="transfer-information"
+					type="byteio:transfer-information-type"
+					minOccurs="1" maxOccurs="1"/>
+			    </xsd:sequence>
+			</xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="append">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="transfer-information"
+                            type="byteio:transfer-information-type"
+                            minOccurs="1" maxOccurs="1"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="appendResponse">
+		<xsd:complexType>
+		    <xsd:sequence>
+			<xsd:element name="transfer-information"
+				type="byteio:transfer-information-type"
+				minOccurs="1" maxOccurs="1"/>
+		    </xsd:sequence>
+		</xsd:complexType>
+		</xsd:element>
+
+            <xsd:element name="truncAppend">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="offset"
+                            type="xsd:long"
+                            minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="transfer-information"
+                            type="byteio:transfer-information-type"
+                            minOccurs="1" maxOccurs="1"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="truncAppendResponse">
+			<xsd:complexType>
+			    <xsd:sequence>
+		<xsd:element name="transfer-information"
+                            type="byteio:transfer-information-type"
+                            minOccurs="1" maxOccurs="1"/>
+			    </xsd:sequence>
+			</xsd:complexType>
+		</xsd:element>
+        </xsd:schema>
+    </wsdl:types>
+
+    <!-- Fault Messages -->
+    <wsdl:message name="UnsupportedTransferFault">
+        <wsdl:part name="UnsupportedTransferFault"
+            element="byteio:UnsupportedTransferFault"/>
+    </wsdl:message>
+
+    <wsdl:message name="WriteNotPermittedFault">
+        <wsdl:part name="WriteNotPermittedFault"
+            element="byteio:WriteNotPermittedFault"/>
+    </wsdl:message>
+
+    <wsdl:message name="ReadNotPermittedFault">
+        <wsdl:part name="ReadNotPermittedFault"
+            element="byteio:ReadNotPermittedFault"/>
+    </wsdl:message>
+
+    <wsdl:message name="TruncateNotPermittedFault">
+        <wsdl:part name="TruncateNotPermittedFault"
+            element="rbyteio:TruncateNotPermittedFault"/>
+    </wsdl:message>
+
+    <wsdl:message name="CustomFault">
+        <wsdl:part name="CustomFault"
+            element="byteio:CustomFault"/>
+    </wsdl:message>
+
+    <!-- RandomByteIO::read -->
+    <wsdl:message name="readRequest">
+        <wsdl:part name="readRequest"
+            element="rbyteio:read"/>
+    </wsdl:message>
+
+    <wsdl:message name="readResponse">
+        <wsdl:part name="readResponse"
+            element="rbyteio:readResponse"/>
+    </wsdl:message>
+
+    <!-- RandomByteIO::write -->
+    <wsdl:message name="writeRequest">
+        <wsdl:part name="writeRequest"
+            element="rbyteio:write"/>
+    </wsdl:message>
+
+    <wsdl:message name="writeResponse">
+        <wsdl:part name="writeResponse"
+            element="rbyteio:writeResponse"/>
+    </wsdl:message>
+
+    <!-- RandomByteIO::append -->
+    <wsdl:message name="appendRequest">
+        <wsdl:part name="appendRequest"
+            element="rbyteio:append"/>
+    </wsdl:message>
+
+    <wsdl:message name="appendResponse">
+        <wsdl:part name="appendResponse"
+            element="rbyteio:appendResponse"/>
+    </wsdl:message>
+
+    <!-- RandomByteIO::truncAppend -->
+    <wsdl:message name="truncAppendRequest">
+        <wsdl:part name="truncAppendRequest"
+            element="rbyteio:truncAppend"/>
+    </wsdl:message>
+
+    <wsdl:message name="truncAppendResponse">
+        <wsdl:part name="truncAppendResponse"
+            element="rbyteio:truncAppendResponse"/>
+    </wsdl:message>
+
+<!-- Port Type Definitions -->
+
+	<wsdl:portType name="RandomByteIOPortType">
+		<genii-ext:extend portType="genii-common:GeniiCommon"/>
+
+    	<wsdl:operation name="read">
+        	<wsdl:input message="rbyteio:readRequest"
+        	wsa:Action="http://schemas.ggf.org/byteio/2005/10/random-access/read"/>
+        	<wsdl:output message="rbyteio:readResponse"
+        	wsa:Action="http://schemas.ggf.org/byteio/2005/10/random-access/readResponse"/>
+        	<wsdl:fault name="ResourceUnknownFault"
+            	message="genii-resource:ResourceUnknownFault"
+            	wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+        	<wsdl:fault name="UnsupportedTransferFault"
+            	message="rbyteio:UnsupportedTransferFault"
+            	wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+        	<wsdl:fault name="ReadNotPermittedFault"
+            	message="rbyteio:ReadNotPermittedFault"
+            	wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+        	<wsdl:fault name="CustomFault"
+            	message="rbyteio:CustomFault"
+            	wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+    	</wsdl:operation>
+
+    	<wsdl:operation name="write">
+        	<wsdl:input message="rbyteio:writeRequest"
+        	wsa:Action="http://schemas.ggf.org/byteio/2005/10/random-access/write"/>
+        	<wsdl:output message="rbyteio:writeResponse"
+        	wsa:Action="http://schemas.ggf.org/byteio/2005/10/random-access/writeResponse"/>
+        	<wsdl:fault name="ResourceUnknownFault"
+            	message="genii-resource:ResourceUnknownFault"
+            	wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+        	<wsdl:fault name="UnsupportedTransferFault"
+            	message="rbyteio:UnsupportedTransferFault"
+            	wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+        	<wsdl:fault name="WriteNotPermittedFault"
+            	message="rbyteio:WriteNotPermittedFault"
+            	wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+        	<wsdl:fault name="CustomFault"
+            	message="rbyteio:CustomFault"
+            	wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+    	</wsdl:operation>
+
+    	<wsdl:operation name="append">
+        	<wsdl:input message="rbyteio:appendRequest"
+        	wsa:Action="http://schemas.ggf.org/byteio/2005/10/random-access/append"/>
+        	<wsdl:output message="rbyteio:appendResponse"
+        	wsa:Action="http://schemas.ggf.org/byteio/2005/10/random-access/appendResponse"/>
+        	<wsdl:fault name="ResourceUnknownFault"
+            	message="genii-resource:ResourceUnknownFault"
+            	wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+        	<wsdl:fault name="UnsupportedTransferFault"
+            	message="rbyteio:UnsupportedTransferFault"
+            	wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+        	<wsdl:fault name="WriteNotPermittedFault"
+            	message="rbyteio:WriteNotPermittedFault"
+            	wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+        	<wsdl:fault name="CustomFault"
+            	message="rbyteio:CustomFault"
+            	wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+    	</wsdl:operation>
+
+    	<wsdl:operation name="truncAppend">
+        	<wsdl:input message="rbyteio:truncAppendRequest"
+        	wsa:Action="http://schemas.ggf.org/byteio/2005/10/random-access/truncAppend"/>
+        	<wsdl:output message="rbyteio:truncAppendResponse"
+        	wsa:Action="http://schemas.ggf.org/byteio/2005/10/random-access/truncAppendResponse"/>
+        	<wsdl:fault name="ResourceUnknownFault"
+            	message="genii-resource:ResourceUnknownFault"
+            	wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+        	<wsdl:fault name="UnsupportedTransferFault"
+            	message="rbyteio:UnsupportedTransferFault"
+            	wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+        	<wsdl:fault name="TruncateNotPermittedFault"
+            	message="rbyteio:TruncateNotPermittedFault"
+            	wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+        	<wsdl:fault name="WriteNotPermittedFault"
+            	message="rbyteio:WriteNotPermittedFault"
+            	wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+        	<wsdl:fault name="CustomFault"
+            	message="rbyteio:CustomFault"
+            	wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
+    	</wsdl:operation>
+	</wsdl:portType>
+</wsdl:definitions>

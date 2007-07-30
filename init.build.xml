@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="init" name="GenesisII.init">
+
+	<target name="gen.stub-generation">
+		<echo message="Generating source stubs."/>
+		<mkdir dir="${stub.gen.target-dir}"/>
+		<axis-wsdl2java
+			nowrapped="true"
+			output="${stub.gen.target-dir}"
+			url="${stub.gen.source-wsdl}"
+			serverside="true"
+			quiet="true"
+			namespacemappingfile="${basedir}/mappings.properties"/>
+		<copy todir="${gennedsrc-dir}">
+			<fileset dir="${stub.gen.target-dir}">
+				<include name="**/*.java"/>
+				<exclude name="**/*SOAPBindingImpl.java"/>
+			</fileset>
+		</copy>
+
+		<touch file="${stub.gen.target-flag-file}"/>
+	</target>
+
+	<target name="init">
+		<mkdir dir="${wsdd-dir}"/>
+		<mkdir dir="${codegen-dir}"/>
+		<mkdir dir="${codegen-dir}/wsdl"/>
+		<mkdir dir="${gennedsrc-dir}"/>
+		<mkdir dir="${gennedobj-dir}"/>
+		<mkdir dir="${obj-dir}"/>
+	</target>
+	
+</project>

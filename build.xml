@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="build" name="GenesisII">
+
+	<!-- Properties -->
+	<property environment="env"/>
+	<property file="${basedir}/build.properties"/>
+
+	<!-- Static Class paths -->
+	<path id="axis.classpath">
+		<fileset dir="${axis-home}" includes="**/*.jar"/>
+	</path>
+
+	<path id="jetty.classpath">
+		<fileset dir="${jetty-home}" includes="**/*.jar"/>
+	</path>
+
+	<path id="junit.classpath">
+		<fileset dir="${junit-home}" includes="**/*.jar"/>
+	</path>
+
+	<path id="hypersonic.classpath">
+		<fileset dir="${hypersonic-home}" includes="**/*.jar"/>
+	</path>
+
+	<path id="bouncycastle.classpath">
+		<fileset dir="${bouncycastle-home}" includes="**/*.jar"/>
+	</path>
+
+	<path id="wss4j.classpath">
+		<fileset dir="${wss4j-home}" includes="**/*.jar"/>
+	</path>
+
+	<path id="project.classpath">
+		<pathelement location="${obj-dir}"/>
+		<pathelement location="${gennedobj-dir}"/>
+		<path refid="axis.classpath"/>
+		<path refid="jetty.classpath"/>
+		<path refid="junit.classpath"/>
+		<path refid="hypersonic.classpath"/>
+		<path refid="bouncycastle.classpath"/>
+		<path refid="wss4j.classpath"/>
+	</path>
+			
+	<!-- Static Task Defs -->
+	<taskdef resource="axis-tasks.properties"
+		classpathref="axis.classpath"/>
+
+	<!-- Imports -->	
+	<import file="${basedir}/init.build.xml"/>
+	<import file="${scripts.dir}/scripts.build.xml"/>
+
+	<import file="${wsdl-dir}/common.build.xml"/>
+	<import file="${src-dir}/jni/vcgrJniLibs.build.xml"/>
+	<import file="${wsdl-dir}/notification-consumer.build.xml"/>
+	<import file="${wsdl-dir}/subscription.build.xml"/>
+	<import file="${wsdl-dir}/counter/counter.build.xml"/>
+	<import file="${wsdl-dir}/rns/rns.build.xml"/>
+	<import file="${wsdl-dir}/deployment/gapp-description.build.xml"/>
+	<import file="${wsdl-dir}/deployment/deployer.build.xml"/>
+	<import file="${wsdl-dir}/byteio/rbyteio.build.xml"/>
+	<import file="${wsdl-dir}/byteio/interop/rbyteiointerop.build.xml"/>
+	<import file="${wsdl-dir}/byteio/sbyteio.build.xml"/>
+	<import file="${wsdl-dir}/byteio/interop/sbyteiointerop.build.xml"/>
+	<import file="${wsdl-dir}/byteio/sbyteio-factory.build.xml"/>
+	<import file="${wsdl-dir}/container/container.build.xml"/>
+	<import file="${wsdl-dir}/bes/bes-activity.build.xml"/>
+	<import file="${wsdl-dir}/bes/bes.build.xml"/>
+	<import file="${wsdl-dir}/scheduler/basic-scheduler.build.xml"/>
+	<import file="${wsdl-dir}/exported/exported-file.build.xml"/>
+	<import file="${wsdl-dir}/exported/exported-dir.build.xml"/>
+	<import file="${wsdl-dir}/exported/exported-root.build.xml"/>
+	<import file="${wsdl-dir}/naming.build.xml"/>
+	<import file="${wsdl-dir}/resolver/simple-resolver.build.xml"/>
+	<import file="${wsdl-dir}/resolver/simple-resolver-factory.build.xml"/>
+	<import file="${wsdl-dir}/queue/queue.build.xml"/>
+
+	<!-- Build Targets -->
+	<target name="morganu.jar" depends="init">
+		<javac destdir="${obj-dir}" debug="true">
+			<src path="${src-dir}"/>
+			<classpath refid="junit.classpath"/>
+			<include name="org/morgan/**/*.java"/>
+		</javac>
+		<copy todir="${obj-dir}">
+			<fileset dir="${src-dir}">
+				<include name="org/morgan/**/*.xml"/>
+				<include name="org/morgan/**/*.properties"/>
+				<include name="org/morgan/**/*.html"/>
+				<include name="org/morgan/**/*.jpg"/>
+				<include name="org/morgan/**/*.gif"/>
+				<include name="org/morgan/**/*.bmp"/>
+				<include name="org/morgan/**/*.ver"/>
+				<include name="org/morgan/**/*.txt"/>
+				<include name="org/morgan/**/*.config"/>
+			</fileset>
+		</copy>
+		<jar destfile="${lib-dir}/morgan-utilities.jar">
+			<fileset dir="${obj-dir}">
+				<include name="org/morgan/**/*"/>
+			</fileset>
+		</jar>
+		<path id="morganu.classpath" path="${lib-dir}/morgan-utilities.jar"/>
+	</target>
+
+	<target name="genesisII.wsdl.jar" depends="init">
+		<javac destdir="${obj-dir}" debug="true">
+			<src path="${src-dir}"/>
+			<classpath refid="morganu.classpath"/>
+			<classpath refid="junit.classpath"/>
+			<include name="edu/virginia/vcgr/genii/wsdl/**/*.java"/>
+		</javac>
+		<copy todir="${obj-dir}">
+			<fileset dir="${src-dir}">
+				<include name="edu/virginia/vcgr/genii/wsdl/**/*.xml"/>
+				<include name="edu/virginia/vcgr/genii/wsdl/**/*.properties"/>
+				<include name="edu/virginia/vcgr/genii/wsdl/**/*.html"/>
+				<include name="edu/virginia/vcgr/genii/wsdl/**/*.jpg"/>
+				<include name="edu/virginia/vcgr/genii/wsdl/**/*.gif"/>
+				<include name="edu/virginia/vcgr/genii/wsdl/**/*.bmp"/>
+				<include name="edu/virginia/vcgr/genii/wsdl/**/*.ver"/>
+				<include name="edu/virginia/vcgr/genii/wsdl/**/*.config"/>
+				<include name="edu/virginia/vcgr/genii/wsdl/**/*.txt"/>
+			</fileset>
+		</copy>
+		<jar destfile="${lib-dir}/genii-wsdl.jar">
+			<fileset dir="${obj-dir}">
+				<include name="edu/virginia/vcgr/genii/wsdl/**/*"/>
+			</fileset>
+		</jar>
+		<path id="genii-wsdl.classpath" path="${lib-dir}/genii-wsdl.jar"/>
+	</target>
+
+	<target name="wsdl-tools" depends="morganu.jar,genesisII.wsdl.jar">
+		<path id="wsdl-tools.classpath">
+			<path refid="morganu.classpath"/>
+			<path refid="genii-wsdl.classpath"/>
+		</path>
+		<taskdef
+			resource="edu/virginia/vcgr/genii/wsdl/ant/ant-tasks.properties"
+			classpathref="wsdl-tools.classpath"/>
+	</target>
+
+	<target name="generate-code" depends="init,wsdl-tools">
+		<antcall target="gen.common"/>
+		<antcall target="gen.notification-consumer"/>
+		<antcall target="gen.subscription"/>
+		<antcall target="gen.counter"/>
+		<antcall target="gen.rns"/>
+		<antcall target="gen.gapp-description"/>
+		<antcall target="gen.deployer"/>
+		<antcall target="gen.rbyteio"/>
+		<antcall target="gen.rbyteiointerop"/>
+		<antcall target="gen.sbyteio"/>
+		<antcall target="gen.sbyteiointerop"/>
+		<antcall target="gen.sbyteio-factory"/>
+		<antcall target="gen.container"/>
+		<antcall target="gen.bes-activity"/>
+		<antcall target="gen.bes"/>
+		<antcall target="gen.bsched"/>
+		<antcall target="gen.exported-file"/>
+		<antcall target="gen.exported-dir"/>
+		<antcall target="gen.exported-root"/>
+		<antcall target="gen.naming"/>
+		<antcall target="gen.simple-resolver"/>
+		<antcall target="gen.simple-resolver-factory"/>
+		<antcall target="gen.queue"/>
+	</target>
+
+	<target name="gen.compile" depends="generate-code">
+		<javac destdir="${gennedobj-dir}" debug="true">
+			<src path="${gennedsrc-dir}"/>
+			<classpath refid="project.classpath"/>
+		</javac>
+	</target>
+
+	<target name="gen" depends="gen.compile"/>
+
+	<target name="genii.compile">
+		<javac debug="true" destdir="${obj-dir}">
+			<src path="${src-dir}"/>
+			<classpath refid="project.classpath"/>
+			<include name="**/*.java"/>
+			<exclude name="**/edu/virginia/vcgr/genii/container/factory/**/*.java"/>
+		</javac>
+		<copy todir="${obj-dir}">
+			<fileset dir="${src-dir}">
+				<include name="**/*.xml"/>
+				<include name="**/*.properties"/>
+				<include name="**/*.html"/>
+				<include name="**/*.jpg"/>
+				<include name="**/*.gif"/>
+				<include name="**/*.bmp"/>
+				<include name="**/*.ver"/>
+				<include name="**/*.txt"/>
+				<include name="**/*.config"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="compile">
+		<antcall target="gen.compile"/>
+		<antcall target="genii.compile"/>
+	</target>
+
+	<target name="GenesisII-client-jar" depends="compile">
+		<jar destfile="${lib-dir}/GenesisII-client.jar">
+			<fileset dir="${obj-dir}">
+				<include name="edu/virginia/vcgr/genii/client/**/*"/>
+				<include name="edu/virginia/vcgr/genii/ftp/**/*"/>
+				<include name="edu/virginia/vcgr/genii/testing/**/*"/>
+			</fileset>
+			<fileset dir="${gennedobj-dir}">
+				<include name="**/*"/>
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="GenesisII-container-jar" depends="compile">
+		<jar destfile="${lib-dir}/GenesisII-container.jar">
+			<fileset dir="${obj-dir}">
+				<include name="edu/virginia/vcgr/genii/container/**/*"/>
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="security-jar" depends="compile">
+		<jar destfile="${lib-dir}/GenesisII-security.jar">
+			<fileset dir="${obj-dir}">
+				<include name="edu/virginia/vcgr/genii/client/GenesisIIConstants.class"/>
+				<include name="edu/virginia/vcgr/genii/client/io/PreferredFiles.class"/>
+				<include name="edu/virginia/vcgr/genii/client/configuration/ConfigurationManager.class"/>
+				<include name="edu/virginia/vcgr/genii/client/comm/axis/security/VcgrSslSocketFactory.class"/>
+				<include name="edu/virginia/vcgr/genii/client/security/x509/*.class"/>
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="jars" depends="morganu.jar,genesisII.wsdl.jar,GenesisII-client-jar,GenesisII-container-jar,security-jar"/>
+
+	<target name="build" depends="jars,scripts"/>
+
+	<target name="wipestate">
+		<delete dir="${user.home}/.genesisII"/>
+	</target>
+
+	<target name="clean" depends="wipestate">
+		<delete dir="${codegen-dir}"/>
+		<delete dir="${wsdd-dir}"/>
+		<delete dir="${gennedsrc-dir}"/>
+		<delete dir="${gennedobj-dir}"/>
+		<delete dir="${obj-dir}"/>
+		<delete>
+			<fileset dir="${lib-dir}" includes="**/*.jar"/>
+		</delete>
+		<delete dir="${services.dir}"/>
+		<delete file="${basedir}/runContainer.sh"/>
+		<delete file="${basedir}/runContainer.bat"/>
+		<delete file="${basedir}/grid"/>
+		<delete file="${basedir}/grid.bat"/>
+		<delete file="${basedir}/cert-tool"/>
+		<delete file="${basedir}/cert-tool.bat"/>
+		<delete file="${basedir}/jar-desc.xml"/>
+	</target>
+
+	<target name="jdoc" depends="jars">
+		<javadoc destdir="${basedir}/doc/api"
+			classpathref="project.classpath"
+			WindowTitle="Genesis II Documentation"
+			verbose="false">
+			<doctitle><![CDATA[<H1>Genesis II Documentation</H1>]]></doctitle>
+			<link href="http://java.sun.com/j2se/1.5.0/docs/api"/>
+			<link href="http://ws.apache.org/axis/java/apiDocs"/>
+			<fileset dir="${src-dir}" includes="**/*.java"/>
+			<fileset dir="${gennedsrc-dir}" includes="**/*.java"/>
+		</javadoc>
+	</target>
+</project>

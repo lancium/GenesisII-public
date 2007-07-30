@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="gen.factory-pattern" name="factory-pattern.build">
+
+	<condition property="gen.factory-pattern.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${codegen-dir}/wsdl/factory-pattern.flag"/>
+			<uptodate targetfile="${codegen-dir}/wsdl/factory-pattern.flag">
+				<srcfiles dir="${wsdl-dir}">
+					<include name="factory-pattern.xsd"/>
+					<include name="factory-pattern.gwsdl"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.factory-pattern" unless="gen.factory-pattern.uptodate">
+		<copy todir="${codegen-dir}/wsdl">
+			<fileset refid="common.source.files"/>
+			<fileset dir="${wsdl-dir}">
+				<include name="factory-pattern.gwsdl"/>
+				<include name="factory-pattern.xsd"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${codegen-dir}/wsdl/factory-pattern.gwsdl"
+			target="${codegen-dir}/wsdl/factory-pattern-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${codegen-dir}/wsdl/factory-pattern-generated.wsdl"
+			target="${codegen-dir}/wsdl/factory-pattern-service.wsdl"
+			portType="{http://vcgr.cs.virginia.edu/genii/2006/12/factory-pattern}GeniiFactory"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${codegen-dir}/factory-pattern"/>
+			<param name="stub.gen.source-wsdl"
+				value="${codegen-dir}/wsdl/factory-pattern-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${codegen-dir}/wsdl/factory-pattern.flag"/>
+		</antcall>
+		<move file="${codegen-dir}/factory-pattern/edu/virginia/vcgr/genii/factory/deploy.wsdd"
+			tofile="${wsdd-dir}/factory-pattern.deploy.wsdd"/>
+		<replace file="${wsdd-dir}/factory-pattern.deploy.wsdd"
+			token="edu.virginia.vcgr.genii.factory.GeniiFactorySOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.factory.GeniiFactoryServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd-dir}/factory-pattern.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>

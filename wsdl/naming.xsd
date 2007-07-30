@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+	xmlns="http://schemas.ogf.org/naming/2006/08/naming"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:naming="http://schemas.ogf.org/naming/2006/08/naming"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	targetNamespace="http://schemas.ogf.org/naming/2006/08/naming"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"
+		schemaLocation="./wsrf/basefaults.xsd"/>
+
+	<xsd:import
+		namespace="http://www.w3.org/2005/08/addressing"
+		schemaLocation="./ws-addr.xsd"/>
+
+<!-- Types -->
+	<xsd:element name="EndpointIdentifier" type="xsd:anyURI"/>
+	<xsd:element name="ReferenceResolver" type="wsa:EndpointReferenceType"/>
+
+<!-- Fault Types -->
+	<!-- ====  naming:ResolveFailedFault   ====  -->
+
+	<xsd:complexType name="ResolveFailedFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="wsbf:BaseFaultType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:element name="ResolveFailedFault"
+		type="naming:ResolveFailedFaultType"/>
+
+	<!-- ====  naming:ResolveFailedWithReferralFault   ====  -->
+	<xsd:complexType name="ResolveFailedWithReferralFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="naming:ResolveFailedFaultType">
+				<xsd:sequence>
+					<xsd:element 
+						ref="ReferenceResolver"  
+						minOccurs="0"  
+						maxOccurs="unbounded"/>
+					<xsd:element 
+						ref="EndpointIdentifier"
+						minOccurs="0"
+						maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:element name="ResolveFailedWithReferralFault"
+		type="naming:ResolveFailedWithReferralFaultType"/>
+
+</xsd:schema>

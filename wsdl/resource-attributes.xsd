@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+	xmlns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:genii-rattrs="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	targetNamespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"
+		schemaLocation="./wsrf/basefaults.xsd"/>
+
+<!-- Common Faults -->
+		<xsd:complexType name="IncorrectAttributeCardinalityFaultType">
+			<xsd:complexContent>
+				<xsd:extension base="wsbf:BaseFaultType"/>
+			</xsd:complexContent>
+		</xsd:complexType>
+		<xsd:element name="IncorrectAttributeCardinalityFaultType"
+			type="genii-rattrs:IncorrectAttributeCardinalityFaultType"/>
+		
+		<xsd:complexType name="AttributeUnknownFaultType">
+			<xsd:complexContent>
+				<xsd:extension base="wsbf:BaseFaultType"/>
+			</xsd:complexContent>
+		</xsd:complexType>
+		<xsd:element name="AttributeUnknownFaultType"
+			type="genii-rattrs:AttributeUnknownFaultType"/>
+
+		<xsd:complexType name="AttributeNotSettableFaultType">
+			<xsd:complexContent>
+				<xsd:extension base="wsbf:BaseFaultType"/>
+			</xsd:complexContent>
+		</xsd:complexType>
+		<xsd:element name="AttributeNotSettableFaultType"
+			type="genii-rattrs:AttributeNotSettableFaultType"/>
+
+</xsd:schema>

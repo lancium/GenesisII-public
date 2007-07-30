@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="gen.rns" name="rns.build">
+
+	<condition property="gen.rns.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${codegen-dir}/wsdl/rns.flag"/>
+			<uptodate targetfile="${codegen-dir}/wsdl/rns.flag">
+				<srcfiles dir="${wsdl-dir}/rns">
+					<include name="rns.xsd"/>
+					<include name="rns.gwsdl"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.rns" unless="gen.rns.uptodate">
+		<copy todir="${codegen-dir}/wsdl">
+			<fileset refid="common.source.files"/>
+			<fileset dir="${wsdl-dir}/rns">
+				<include name="rns.gwsdl"/>
+				<include name="rns.xsd"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${codegen-dir}/wsdl/rns.gwsdl"
+			target="${codegen-dir}/wsdl/rns-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${codegen-dir}/wsdl/rns-generated.wsdl"
+			target="${codegen-dir}/wsdl/rns-service.wsdl"
+			portType="{http://schemas.ggf.org/rns/2006/05/rns}RNSPortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${codegen-dir}/rns"/>
+			<param name="stub.gen.source-wsdl"
+				value="${codegen-dir}/wsdl/rns-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${codegen-dir}/wsdl/rns.flag"/>
+		</antcall>
+		<move file="${codegen-dir}/rns/org/ggf/rns/deploy.wsdd"
+			tofile="${wsdd-dir}/rns.deploy.wsdd"/>
+		<replace file="${wsdd-dir}/rns.deploy.wsdd"
+			token="org.ggf.rns.RNSSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.rns.RNSServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd-dir}/rns.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>

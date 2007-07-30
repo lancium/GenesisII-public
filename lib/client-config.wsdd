@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deployment name="defaultClientConfig"
+            xmlns="http://xml.apache.org/axis/wsdd/"
+            xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+ <globalConfiguration>
+   <parameter name="disablePrettyXML" value="true"/>
+   <parameter name="enableNamespacePrefixOptimization" value="false"/>
+  <requestFlow>
+   <handler type="java:edu.virginia.vcgr.genii.client.comm.axis.AxisClientHeaderHandler"/>
+   <handler type="java:edu.virginia.vcgr.genii.client.comm.axis.security.ClientUsernameTokenSender"/>
+   <handler type="java:edu.virginia.vcgr.genii.client.comm.axis.security.ClientMessageSecuritySender">
+    <parameter name="encryptionParts" value="{Element}{http://vcgr.cs.virginia.edu/Genesis-II}calling-context;{}{}Body"/>
+   </handler>
+  </requestFlow>
+  <responseFlow>
+   <handler type="java:edu.virginia.vcgr.genii.client.comm.axis.security.ClientMessageSecurityReceiver"/>
+  </responseFlow>
+ </globalConfiguration>
+ <transport name="http" pivot="java:org.apache.axis.transport.http.HTTPSender"/>
+ <transport name="local" pivot="java:org.apache.axis.transport.local.LocalSender"/>
+ <transport name="java" pivot="java:org.apache.axis.transport.java.JavaSender"/>
+</deployment>

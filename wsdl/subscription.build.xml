@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="gen.subscription" name="subscription.build">
+
+	<condition property="gen.subscription.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${codegen-dir}/wsdl/subscription.flag"/>
+			<uptodate targetfile="${codegen-dir}/wsdl/subscription.flag">
+				<srcfiles dir="${wsdl-dir}">
+					<include name="notification.xsd"/>
+					<include name="subscription.gwsdl"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.subscription" unless="gen.subscription.uptodate">
+		<copy todir="${codegen-dir}/wsdl">
+			<fileset refid="common.source.files"/>
+			<fileset dir="${wsdl-dir}">
+				<include name="subscription.gwsdl"/>
+				<include name="notification.xsd"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${codegen-dir}/wsdl/subscription.gwsdl"
+			target="${codegen-dir}/wsdl/subscription-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${codegen-dir}/wsdl/subscription-generated.wsdl"
+			target="${codegen-dir}/wsdl/subscription-service.wsdl"
+			portType="{http://vcgr.cs.virginia.edu/genii/2006/12/notification/subscription}GeniiSubscriptionPortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${codegen-dir}/subscription"/>
+			<param name="stub.gen.source-wsdl"
+				value="${codegen-dir}/wsdl/subscription-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${codegen-dir}/wsdl/subscription.flag"/>
+		</antcall>
+		<move file="${codegen-dir}/subscription/edu/virginia/vcgr/genii/common/notification/deploy.wsdd"
+			tofile="${wsdd-dir}/subscription.deploy.wsdd"/>
+		<replace file="${wsdd-dir}/subscription.deploy.wsdd"
+			token="edu.virginia.vcgr.genii.common.notification.GeniiSubscriptionSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.common.notification.GeniiSubscriptionServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd-dir}/subscription.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>

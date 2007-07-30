@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions name="GeniiNaming"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:wsa="http://www.w3.org/2005/08/addressing"
+    xmlns:naming-w="http://schemas.ogf.org/naming/2006/08/naming/wsdl"
+    xmlns:naming="http://schemas.ogf.org/naming/2006/08/naming"
+    xmlns:genii-resource="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+    targetNamespace="http://schemas.ogf.org/naming/2006/08/naming/wsdl">
+
+<!-- imports -->
+		namespace="http://www.w3.org/2005/08/addressing"
+		location="./ws-addr.xsd"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+		location="./resource.wsdl"/>
+
+
+<!-- ===== Types Definitions ==== -->
+    <wsdl:types>
+
+        <xsd:schema
+            targetNamespace="http://schemas.ogf.org/naming/2006/08/naming/wsdl"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+			<xsd:import
+				namespace="http://schemas.ogf.org/naming/2006/08/naming"
+				schemaLocation="./naming.xsd"/>
+
+<!-- Message Helper Types -->
+			<xsd:element name="resolve"/>
+
+        </xsd:schema>
+    </wsdl:types>
+
+	<!-- Messages -->
+	<wsdl:message name="ResolveEPI">
+		<wsdl:part name="EPI"
+			element="naming:EndpointIdentifier"/>
+	</wsdl:message>
+
+	<wsdl:message name="Resolve">
+    	<wsdl:part name="resolveRequest"
+    		element="naming-w:resolve"/>
+	</wsdl:message>
+
+	<wsdl:message name="ResolveResponse">
+		<wsdl:part name="resolved-epr"
+			element="wsa:EndpointReference"/>
+	</wsdl:message>
+
+	<!-- Faults -->
+	<wsdl:message name="ResolveFailedFault">
+		<wsdl:part name="ResolveFailedFault"
+			element="naming:ResolveFailedFault"/>
+	</wsdl:message>
+	
+	<wsdl:message name="ResolveFailedWithReferralFault">
+		<wsdl:part name="ResolveFailedWithReferralFault"
+			element="naming:ResolveFailedWithReferralFault"/>
+	</wsdl:message>
+
+	
+    <wsdl:message name="ResourceUnknownFault">
+        <wsdl:part name="ResourceUnknownFault"
+            element="genii-resource:ResourceUnknownFaultType"/>
+    </wsdl:message>
+
+
+	<!-- Port Type Definitions -->
+	<wsdl:portType name="EndpointIdentifierResolver">
+		<wsdl:operation name="resolveEPI">
+			<wsdl:input message="naming-w:ResolveEPI"/>
+			<wsdl:output message="naming-w:ResolveResponse"/>
+        	<wsdl:fault name="ResolveFailedFault"
+            	message="naming-w:ResolveFailedFault"/>
+		</wsdl:operation>
+	</wsdl:portType>
+
+	<wsdl:portType name="ReferenceResolver">
+		<wsdl:operation name="resolve">
+			<wsdl:input message="naming-w:Resolve"/>
+			<wsdl:output message="naming-w:ResolveResponse"/>
+        	<wsdl:fault name="ResolveFailedFault"
+            	message="naming-w:ResolveFailedFault"/>
+        	<wsdl:fault name="ResolveFailedWithReferralFault"
+            	message="naming-w:ResolveFailedWithReferralFault"/>
+		</wsdl:operation>
+	</wsdl:portType>
+
+</wsdl:definitions>

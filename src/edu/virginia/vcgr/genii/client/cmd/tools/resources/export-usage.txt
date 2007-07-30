@@ -1,0 +1,6 @@
+export --create { --url <export-service-url> | <export-service-rns-path> } 
+	<local-path> [new-rns-path]
+	
+	OR
+	
+export --quit { --url <export-root-url> | <export-root-rns-path> }

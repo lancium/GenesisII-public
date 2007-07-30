@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="gen.exported-root" name="exported-root.build">
+
+	<condition property="gen.exported-root.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${codegen-dir}/wsdl/exported-root.flag"/>
+			<uptodate targetfile="${codegen-dir}/wsdl/exported-root.flag">
+				<srcfiles dir="${wsdl-dir}/rns">
+					<include name="rns.xsd"/>
+					<include name="rns.gwsdl"/>
+				</srcfiles>
+				<srcfiles dir="${wsdl-dir}/exported">
+					<include name="exported-dir.gwsdl"/>
+					<include name="exported-root.gwsdl"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.exported-root" unless="gen.exported-root.uptodate">
+		<copy todir="${codegen-dir}/wsdl">
+			<fileset refid="common.source.files"/>
+			<fileset dir="${wsdl-dir}/rns">
+				<include name="rns.xsd"/>
+				<include name="rns.gwsdl"/>
+			</fileset>
+			<fileset dir="${wsdl-dir}/exported">
+				<include name="exported-dir.gwsdl"/>
+				<include name="exported-root.gwsdl"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${codegen-dir}/wsdl/exported-root.gwsdl"
+			target="${codegen-dir}/wsdl/exported-root-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${codegen-dir}/wsdl/exported-root-generated.wsdl"
+			target="${codegen-dir}/wsdl/exported-root-service.wsdl"
+    		portType="{http://vcgr.cs.virginia.edu/rns/2006/08/exported-root}ExportedRootPortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${codegen-dir}/exported-root"/>
+			<param name="stub.gen.source-wsdl"
+				value="${codegen-dir}/wsdl/exported-root-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${codegen-dir}/wsdl/exported-root.flag"/>
+		</antcall>
+		<move file="${codegen-dir}/exported-root/edu/virginia/vcgr/genii/exportdir/deploy.wsdd"
+			tofile="${wsdd-dir}/exported-root.deploy.wsdd"/>
+		<replace file="${wsdd-dir}/exported-root.deploy.wsdd"
+			token="edu.virginia.vcgr.genii.exportdir.ExportedRootSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.exportdir.ExportedRootServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd-dir}/exported-root.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>

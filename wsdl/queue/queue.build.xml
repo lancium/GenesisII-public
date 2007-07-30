@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="gen.queue" name="queue.build">
+
+	<condition property="gen.queue.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${codegen-dir}/wsdl/queue.flag"/>
+			<uptodate targetfile="${codegen-dir}/wsdl/queue.flag">
+				<srcfiles dir="${wsdl-dir}/queue">
+					<include name="queue.xsd"/>
+					<include name="queue.gwsdl"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.queue" unless="gen.queue.uptodate">
+		<copy todir="${codegen-dir}/wsdl">
+			<fileset refid="common.source.files"/>
+			<fileset dir="${wsdl-dir}/queue">
+				<include name="queue.gwsdl"/>
+				<include name="queue.xsd"/>
+				<include name="jsdl.xsd"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${codegen-dir}/wsdl/queue.gwsdl"
+			target="${codegen-dir}/wsdl/queue-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${codegen-dir}/wsdl/queue-generated.wsdl"
+			target="${codegen-dir}/wsdl/queue-service.wsdl"
+			portType="{http://vcgr.cs.virginia.edu/genii/queue}QueuePortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${codegen-dir}/queue"/>
+			<param name="stub.gen.source-wsdl"
+				value="${codegen-dir}/wsdl/queue-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${codegen-dir}/wsdl/queue.flag"/>
+		</antcall>
+		<move file="${codegen-dir}/queue/edu/virginia/vcgr/genii/queue/deploy.wsdd"
+			tofile="${wsdd-dir}/queue.deploy.wsdd"/>
+		<replace file="${wsdd-dir}/queue.deploy.wsdd"
+			token="edu.virginia.vcgr.genii.queue.QueueSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.queue.QueueServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd-dir}/queue.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>

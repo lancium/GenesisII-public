@@ -1,0 +1,241 @@
+<wsdl:definitions name="BESFactory"
+	targetNamespace="http://schemas.ggf.org/bes/2006/08/bes-factory"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:bes-factory="http://schemas.ggf.org/bes/2006/08/bes-factory"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" > 
+
+<wsdl:types>
+  <xsd:schema
+      xmlns:wsa="http://www.w3.org/2005/08/addressing"
+      attributeFormDefault="unqualified"
+      elementFormDefault="qualified"
+      targetNamespace="http://schemas.ggf.org/bes/2006/08/bes-factory">
+
+      <xsd:include schemaLocation="bes-factory.xsd"/>
+
+      <!-- Message Types -->
+      <xsd:complexType name="CreateActivityType">
+        <xsd:sequence>
+          <xsd:element ref="bes-factory:ActivityDocument"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="CreateActivityResponseType">
+        <xsd:sequence>
+          <xsd:element ref="bes-factory:ActivityIdentifier"/>
+          <xsd:element ref="bes-factory:ActivityDocument" minOccurs="0"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="GetActivityStatusesType">
+         <xsd:sequence>
+           <xsd:element name="ActivityIdentifier"
+               type="wsa:EndpointReferenceType"
+               maxOccurs="unbounded"/>
+         </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="GetActivityStatusesResponseType">
+         <xsd:sequence>
+           <xsd:element name="Response"
+               type="bes-factory:GetActivityStatusResponseType"
+               maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="TerminateActivitiesType">
+        <xsd:sequence>
+          <xsd:element name="ActivityIdentifier"
+			  ref="bes-factory:ActivityIdentifier"
+              minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="TerminateActivitiesResponseType">
+        <xsd:sequence>
+          <xsd:element name="Response"
+              type="bes-factory:TerminateActivityResponseType"
+              minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="GetActivityDocumentsType">
+        <xsd:sequence>
+          <xsd:element name="ActivityIdentifier"
+			  ref="bes-factory:ActivityIdentifier"
+              minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="GetActivityDocumentsResponseType">
+        <xsd:sequence>
+          <xsd:element name="Response"
+              type="bes-factory:GetActivityDocumentResponseType"
+              minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="GetFactoryAttributesDocumentType"/>
+
+      <xsd:complexType name="GetFactoryAttributesDocumentResponseType">
+        <xsd:sequence>
+          <xsd:element
+              ref="bes-factory:FactoryResourceAttributesDocument"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <!-- Fault Types  -->
+      <xsd:complexType name="NotAcceptingNewActivitiesFaultType"/>
+
+      <xsd:complexType name="UnsupportedJSDLVersionFaultType"/>
+
+      <xsd:complexType name="UnsupportedFeatureFaultType">
+        <xsd:sequence>
+          <xsd:element name="Feature" type="xsd:string"
+            minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <!-- Message Elements -->
+      <xsd:element name="CreateActivity"
+        type="bes-factory:CreateActivityType"/>
+      <xsd:element name="CreateActivityResponse"
+        type="bes-factory:CreateActivityResponseType"/>
+      <xsd:element name="GetActivityStatuses"
+        type="bes-factory:GetActivityStatusesType"/>
+      <xsd:element name="GetActivityStatusesResponse"
+        type="bes-factory:GetActivityStatusesResponseType"/>
+      <xsd:element name="TerminateActivities"
+        type="bes-factory:TerminateActivitiesType"/>
+      <xsd:element name="TerminateActivitiesResponse"
+        type="bes-factory:TerminateActivitiesResponseType"/>
+      <xsd:element name="GetActivityDocuments"
+        type="bes-factory:GetActivityDocumentsType"/>
+      <xsd:element name="GetActivityDocumentsResponse"
+        type="bes-factory:GetActivityDocumentsResponseType"/>
+      <xsd:element name="GetFactoryAttributesDocument"
+        type="bes-factory:GetFactoryAttributesDocumentType"/>
+      <xsd:element name="GetFactoryAttributesDocumentResponse"
+        type="bes-factory:GetFactoryAttributesDocumentResponseType"/>
+
+      <!-- Fault Elements -->
+      <xsd:element name="NotAcceptingNewActivitiesFault"
+        type="bes-factory:NotAcceptingNewActivitiesFaultType"/>
+      <xsd:element name="UnsupportedJSDLVersionFault"
+        type="bes-factory:UnsupportedJSDLVersionFaultType"/>
+      <xsd:element name="UnsupportedFeatureFault"
+        type="bes-factory:UnsupportedFeatureFaultType"/>
+      <xsd:element name="CreateActivityFaultMessage"
+        type="xsd:anyType"/>
+    
+  </xsd:schema>
+</wsdl:types>
+
+  <!-- Messages -->
+  <wsdl:message name="CreateActivityRequest">
+      <wsdl:part name="CreateActivityRequest"
+          element="bes-factory:CreateActivity"/>
+  </wsdl:message>
+
+  <wsdl:message name="CreateActivityResponse">
+      <wsdl:part name="CreateActivityResponse"
+          element="bes-factory:CreateActivityResponse"/>
+  </wsdl:message>
+  
+  <wsdl:message name="CreateActivityFaultMessage">
+      <wsdl:part name="CreateActivityFaultMessage"
+          element="bes-factory:CreateActivityFaultMessage"/>
+  </wsdl:message>
+
+  <wsdl:message name="GetActivityStatusesRequest">
+      <wsdl:part name="GetActivityStatusesRequest"
+          element="bes-factory:GetActivityStatuses"/>
+  </wsdl:message>
+
+  <wsdl:message name="GetActivityStatusesResponse">
+      <wsdl:part name="GetActivityStatusesResponse"
+          element="bes-factory:GetActivityStatusesResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="TerminateActivitiesRequest">
+      <wsdl:part name="TerminateActivitiesRequest"
+          element="bes-factory:TerminateActivities"/>
+  </wsdl:message>
+
+  <wsdl:message name="TerminateActivitiesResponse">
+      <wsdl:part name="TerminateActivitiesResponse"
+          element="bes-factory:TerminateActivitiesResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="GetActivityDocumentsRequest">
+      <wsdl:part name="GetActivityDocumentsRequest"
+          element="bes-factory:GetActivityDocuments"/>
+  </wsdl:message>
+
+  <wsdl:message name="GetActivityDocumentsResponse">
+      <wsdl:part name="GetActivityDocumentsResponse"
+          element="bes-factory:GetActivityDocumentsResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="GetFactoryAttributesDocumentRequest">
+      <wsdl:part name="GetFactoryAttributesDocumentRequest"
+          element="bes-factory:GetFactoryAttributesDocument"/>
+  </wsdl:message>
+
+  <wsdl:message name="GetFactoryAttributesDocumentResponse">
+      <wsdl:part name="GetFactoryAttributesDocumentResponse"
+          element="bes-factory:GetFactoryAttributesDocumentResponse"/>
+  </wsdl:message>
+
+  <!-- Port Types -->
+  <wsdl:portType name="BESFactoryPortType">
+
+    <wsdl:operation name="CreateActivity">
+        <wsdl:input 
+          message="bes-factory:CreateActivityRequest"
+          wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/CreateActivity"/>
+        <wsdl:output
+          message="bes-factory:CreateActivityResponse"
+          wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/CreateActivityResponse"/>
+        <wsdl:fault name="CreateActivityFault" message="bes-factory:CreateActivityFaultMessage"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="GetActivityStatuses">
+        <wsdl:input
+            message="bes-factory:GetActivityStatusesRequest"
+            wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/GetActivityStatuses"/>
+        <wsdl:output
+            message="bes-factory:GetActivityStatusesResponse"
+            wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/GetActivityStatusesResponse"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="TerminateActivities">
+        <wsdl:input
+            message="bes-factory:TerminateActivitiesRequest"
+            wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/TerminateActivities"/>
+        <wsdl:output
+            message="bes-factory:TerminateActivitiesResponse"
+            wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/TerminateActivitiesResponse"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="GetActivityDocuments">
+        <wsdl:input
+            message="bes-factory:GetActivityDocumentsRequest"
+            wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/GetActivityDocuments"/>
+        <wsdl:output
+            message="bes-factory:GetActivityDocumentsResponse"
+            wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/GetActivityDocumentsResponse"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="GetFactoryAttributesDocument">
+        <wsdl:input
+            message="bes-factory:GetFactoryAttributesDocumentRequest"
+            wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/GetFactoryAttributesDocument"/>
+        <wsdl:output
+            message="bes-factory:GetFactoryAttributesDocumentResponse"
+            wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/GetFactoryAttributesDocumentResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>

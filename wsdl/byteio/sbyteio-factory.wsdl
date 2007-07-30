@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions name="StreamableByteIOFactory"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+	xmlns:genii-rfact="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
+	xmlns:genii-resource="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+    xmlns:sfact="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory"
+    targetNamespace="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory">
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+		location="./resource.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple"
+		location="./resource-simple.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
+		location="./resource-factory.wsdl"/>
+
+	<!-- ===== Types Definitions ==== -->
+    <wsdl:types>
+        <xsd:schema
+            targetNamespace="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+            <xsd:import
+            	namespace="http://www.w3.org/2005/08/addressing"
+            	schemaLocation="./ws-addr.xsd"/>
+
+<!-- Message Helper Types -->
+			<xsd:element name="openStream"/>
+			<xsd:element name="openStreamResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="endpoint"
+							type="wsa:EndpointReferenceType"
+							minOccurs="1" maxOccurs="1" nillable="false"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+        </xsd:schema>
+    </wsdl:types>
+
+	<!-- Factory Ops -->
+	<wsdl:message name="openStreamRequest">
+		<wsdl:part name="openStreamRequest"
+			element="sfact:openStream"/>
+	</wsdl:message>
+
+	<wsdl:message name="openStreamResponse">
+		<wsdl:part name="openStreamResponse"
+			element="sfact:openStreamResponse"/>
+	</wsdl:message>
+
+	<!-- Port Type Definitions -->
+	<wsdl:portType name="StreamableByteIOFactory">
+		<wsdl:operation name="openStream">
+			<wsdl:input message="sfact:openStreamRequest"/>
+			<wsdl:output message="sfact:openStreamResponse"/>
+			<wsdl:fault name="ResourceUnknownFault"
+				message="genii-resource:ResourceUnknownFault"/>
+			<wsdl:fault name="ResourceCreationFault"
+				message="genii-rfact:ResourceCreationFault"/>
+		</wsdl:operation>
+	</wsdl:portType>
+
+</wsdl:definitions>

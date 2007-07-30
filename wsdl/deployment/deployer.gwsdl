@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<wsdl:definitions
+	name="ApplicationDeployer"
+	xmlns="http://vcgr.cs.virginia.edu/genii/application-deployer"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:deployer="http://vcgr.cs.virginia.edu/genii/application-deployer"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+	xmlns:genii-resource="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+    xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	targetNamespace="http://vcgr.cs.virginia.edu/genii/application-deployer">
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+		location="./resource.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple"
+		location="./resource-simple.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
+		location="./resource-factory.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-lifetime"
+		location="./resource-lifetime.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
+		location="./resource-attributes.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-authz"
+		location="./resource-authz.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+        location="./common-generated.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
+        location="./notification.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory"
+        location="./sbyteio-factory.wsdl"/>
+
+	<wsdl:types>
+		<xsd:schema
+			xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			attributeFormDefault="unqualified"
+			elementFormDefault="qualified"
+			targetNamespace="http://vcgr.cs.virginia.edu/genii/application-deployer">
+
+			<xsd:import
+				namespace="http://vcgr.cs.virginia.edu/genii/application-deployer"
+				schemaLocation="./deployer.xsd"/>
+		</xsd:schema>
+	</wsdl:types>
+
+	<wsdl:message name="CreateDeploymentRequest">
+		<wsdl:part name="CreateDeploymentRequest"
+			element="deployer:CreateDeploymentRequestType"/>
+	</wsdl:message>
+
+	<wsdl:message name="CreateDeploymentResponse">
+		<wsdl:part name="CreateDeploymentResponse"
+			element="deployer:CreateDeploymentResponseType"/>
+	</wsdl:message>
+	
+	<wsdl:message name="ReifyJSDLRequest">
+		<wsdl:part name="ReifyJSDLRequest"
+			element="deployer:ReifyJSDLRequestType"/>
+	</wsdl:message>
+	
+	<wsdl:message name="ReifyJSDLResponse">
+		<wsdl:part name="ReifyJSDLResponse"
+			element="deployer:ReifyJSDLResponseType"/>
+	</wsdl:message>
+	
+	<wsdl:portType name="ApplicationDeployerPortType">
+		<genii-ext:extend portType="genii-common:GeniiCommon"/>
+
+		<wsdl:operation name="createDeployment">
+			<wsdl:input message="deployer:CreateDeploymentRequest"/>
+			<wsdl:output message="deployer:CreateDeploymentResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="reifyJSDL">
+		    <wsdl:input message="deployer:ReifyJSDLRequest"/>
+		    <wsdl:output message="deployer:ReifyJSDLResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+
+</wsdl:definitions>

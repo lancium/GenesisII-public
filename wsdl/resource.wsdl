@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions name="GeniiResource"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:genii-resource="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+    targetNamespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource">
+
+<!-- ===== Types Definitions ==== -->
+    <wsdl:types>
+
+        <xsd:schema
+            targetNamespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+			<xsd:import
+				namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+				schemaLocation="./resource.xsd"/>
+
+		</xsd:schema>
+
+    </wsdl:types>
+
+    <!-- Fault Messages -->
+    <wsdl:message name="ResourceUnknownFault">
+        <wsdl:part name="ResourceUnknownFault"
+            element="genii-resource:ResourceUnknownFaultType"/>
+    </wsdl:message>
+
+</wsdl:definitions>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="gen.bes-activity" name="bes-activity.build">
+
+	<condition property="gen.bes-activity.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${codegen-dir}/wsdl/bes-activity.flag"/>
+			<uptodate targetfile="${codegen-dir}/wsdl/bes-activity.flag">
+				<srcfiles dir="${wsdl-dir}/byteio">
+					<include name="sbyteio-factory.gwsdl"/>
+				</srcfiles>
+				<srcfiles dir="${wsdl-dir}/bes">
+					<include name="bes-activity.gwsdl"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.bes-activity" unless="gen.bes-activity.uptodate">
+		<copy todir="${codegen-dir}/wsdl">
+			<fileset refid="common.source.files"/>
+			<fileset dir="${wsdl-dir}/byteio">
+				<include name="sbyteio-factory.gwsdl"/>
+			</fileset>
+			<fileset dir="${wsdl-dir}/bes">
+				<include name="bes-activity.gwsdl"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${codegen-dir}/wsdl/bes-activity.gwsdl"
+			target="${codegen-dir}/wsdl/bes-activity-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${codegen-dir}/wsdl/bes-activity-generated.wsdl"
+			target="${codegen-dir}/wsdl/bes-activity-service.wsdl"
+			portType="{http://vcgr.cs.virginia.edu/bes/2006/06/bes-activity}BESActivityPortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${codegen-dir}/bes-activity"/>
+			<param name="stub.gen.source-wsdl"
+				value="${codegen-dir}/wsdl/bes-activity-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${codegen-dir}/wsdl/bes-activity.flag"/>
+		</antcall>
+		<move file="${codegen-dir}/bes-activity/edu/virginia/vcgr/genii/bes/activity/deploy.wsdd"
+			tofile="${wsdd-dir}/bes-activity.deploy.wsdd"/>
+		<replace file="${wsdd-dir}/bes-activity.deploy.wsdd"
+			token="edu.virginia.vcgr.genii.bes.activity.BESActivitySOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.bes.activity.BESActivityServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd-dir}/bes-activity.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>

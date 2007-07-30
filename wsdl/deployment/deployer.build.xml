@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="gen.deployer" name="deployer.build">
+
+	<condition property="gen.deployer.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${codegen-dir}/wsdl/deployer.flag"/>
+			<uptodate targetfile="${codegen-dir}/wsdl/deployer.flag">
+				<srcfiles dir="${wsdl-dir}/deployment">
+					<include name="deployer.xsd"/>
+					<include name="deployer.gwsdl"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.deployer" unless="gen.deployer.uptodate">
+		<copy todir="${codegen-dir}/wsdl">
+			<fileset refid="common.source.files"/>
+			<fileset dir="${wsdl-dir}/deployment">
+				<include name="deployer.gwsdl"/>
+				<include name="deployer.xsd"/>
+			</fileset>
+			<fileset dir="${wsdl-dir}/jsdl">
+				<include name="jsdl.xsd"/>
+				<include name="jsdl-posix.xsd"/>
+				<include name="jsdl-hpcp.xsd"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${codegen-dir}/wsdl/deployer.gwsdl"
+			target="${codegen-dir}/wsdl/deployer-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${codegen-dir}/wsdl/deployer-generated.wsdl"
+			target="${codegen-dir}/wsdl/deployer-service.wsdl"
+			portType="{http://vcgr.cs.virginia.edu/genii/application-deployer}ApplicationDeployerPortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${codegen-dir}/deployer"/>
+			<param name="stub.gen.source-wsdl"
+				value="${codegen-dir}/wsdl/deployer-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${codegen-dir}/wsdl/deployer.flag"/>
+		</antcall>
+		<move file="${codegen-dir}/deployer/edu/virginia/vcgr/genii/deployer/deploy.wsdd"
+			tofile="${wsdd-dir}/deployer.deploy.wsdd"/>
+		<replace file="${wsdd-dir}/deployer.deploy.wsdd"
+			token="edu.virginia.vcgr.genii.deployer.ApplicationDeployerSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.deployer.ApplicationDeployerServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd-dir}/deployer.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>

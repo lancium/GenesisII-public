@@ -1,0 +1,38 @@
+<xsd:schema
+    targetNamespace="http://vcgr.cs.virginia.edu/genii/2007/01/scheduler"
+    xmlns="http://vcgr.cs.virginia.edu/genii/2007/01/scheduler"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:wsa="http://www.w3.org/2005/08/addressing"
+    xmlns:sched="http://vcgr.cs.virginia.edu/genii/2007/01/scheduler"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+
+
+	<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"
+		schemaLocation="./wsrf/basefaults.xsd"/>
+
+	<xsd:import
+		namespace="http://www.w3.org/2005/08/addressing"
+		schemaLocation="./ws-addr.xsd"/>
+
+	<xsd:complexType name="ScheduleCriteriaType">
+		<xsd:sequence>
+			<xsd:any namespace="##any" processContents="lax" 
+				minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:anyAttribute namespace="##other" processContents="lax"/>
+	</xsd:complexType>
+	<xsd:element name="ScheduleCriteriaType"
+		type="sched:ScheduleCriteriaType"/>
+
+<!-- Fault Types -->
+	<xsd:complexType name="NoMatchingScheduleFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="wsbf:BaseFaultType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="NoMatchingScheduleFaultType"
+		type="sched:NoMatchingScheduleFaultType"/>
+
+</xsd:schema>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="gen.bes" name="bes.build">
+
+	<condition property="gen.bes.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${codegen-dir}/wsdl/bes.flag"/>
+			<uptodate targetfile="${codegen-dir}/wsdl/bes.flag">
+				<srcfiles dir="${wsdl-dir}/rns">
+					<include name="rns.xsd"/>
+					<include name="rns.gwsdl"/>
+				</srcfiles>
+				<srcfiles dir="${wsdl-dir}/bes">
+					<include name="bes.gwsdl"/>
+					<include name="bes-factory.wsdl"/>
+					<include name="bes-factory.xsd"/>
+				</srcfiles>
+				<srcfiles dir="${wsdl-dir}/jsdl">
+					<include name="jsdl.xsd"/>
+					<include name="jsdl-hpcp.xsd"/>
+					<include name="jsdl-posix.xsd"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.bes" unless="gen.bes.uptodate">
+		<copy todir="${codegen-dir}/wsdl">
+			<fileset refid="common.source.files"/>
+			<fileset dir="${wsdl-dir}/bes">
+				<include name="bes.gwsdl"/>
+				<include name="bes-factory.wsdl"/>
+				<include name="bes-factory.xsd"/>
+			</fileset>
+			<fileset dir="${wsdl-dir}/jsdl">
+				<include name="jsdl.xsd"/>
+				<include name="jsdl-hpcp.xsd"/>
+				<include name="jsdl-posix.xsd"/>
+			</fileset>
+			<fileset dir="${wsdl-dir}/rns">
+				<include name="rns.xsd"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${codegen-dir}/wsdl/bes.gwsdl"
+			target="${codegen-dir}/wsdl/bes-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${codegen-dir}/wsdl/bes-generated.wsdl"
+			target="${codegen-dir}/wsdl/bes-service.wsdl"
+    		portType="{http://schemas.ggf.org/bes/2006/08/bes}BESPortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${codegen-dir}/bes"/>
+			<param name="stub.gen.source-wsdl"
+				value="${codegen-dir}/wsdl/bes-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${codegen-dir}/wsdl/bes.flag"/>
+		</antcall>
+		<move file="${codegen-dir}/bes/org/ggf/bes/deploy.wsdd"
+			tofile="${wsdd-dir}/bes.deploy.wsdd"/>
+		<replace file="${wsdd-dir}/bes.deploy.wsdd"
+			token="org.ggf.bes.BESSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.bes.BESServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd-dir}/bes.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>

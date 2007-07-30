@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:rbyteio="http://schemas.ggf.org/byteio/2005/10/random-access"
+    targetNamespace="http://schemas.ggf.org/byteio/2005/10/random-access"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+
+    <xsd:import
+        namespace="http://docs.oasis-open.org/wsrf/rp-2"
+        schemaLocation="./wsrf/wsResourceProperties.xsd"/>
+
+	<!-- Resource Property Related -->
+	<!-- Resource Properties for RandomByteIO -->
+	
+	<xsd:element name="Size" type="xsd:unsignedLong"/>
+	<xsd:element name="Readable" type="xsd:boolean"/>
+	<xsd:element name="Writeable" type="xsd:boolean"/>
+	<xsd:element name="TransferMechanism" type="xsd:anyURI"/>
+	<xsd:element name="CreateTime" type="xsd:dateTime" nillable="true"/>
+	<xsd:element name="ModificationTime" type="xsd:dateTime" nillable="true"/>
+	<xsd:element name="AccessTime" type="xsd:dateTime" nillable="true"/>
+
+</xsd:schema>

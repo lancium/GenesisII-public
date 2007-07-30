@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="gen.naming" name="naming.build">
+
+	<fileset id="naming.source.files" dir="${wsdl-dir}">
+		<include name="naming.xsd"/>
+		<include name="naming.wsdl"/>
+	</fileset>
+
+	<presetdef name="naming.source.files.uptodate">
+		<uptodate targetfile="${flag.name}">
+			<srcfiles dir="${wsdl-dir}">
+				<include name="naming.xsd"/>
+				<include name="naming.wsdl"/>
+			</srcfiles>
+		</uptodate>
+	</presetdef>
+
+	<condition property="gen.naming.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${codegen-dir}/wsdl/naming.flag"/>
+			<naming.source.files.uptodate
+				targetfile="${codegen-dir}/wsdl/naming.flag"/>
+		</and>
+	</condition>
+
+	<target name="gen.naming" unless="gen.naming.uptodate">
+		<copy todir="${codegen-dir}/wsdl">
+			<fileset refid="naming.source.files"/>
+		</copy>
+
+		<genii-service-generator
+			source="${codegen-dir}/wsdl/naming.wsdl"
+			target="${codegen-dir}/wsdl/endpoint-resolver-service.wsdl"
+			portType="{http://schemas.ogf.org/naming/2006/08/naming/wsdl}EndpointIdentifierResolver"/>
+
+		<genii-service-generator
+			source="${codegen-dir}/wsdl/naming.wsdl"
+			target="${codegen-dir}/wsdl/reference-resolver-service.wsdl"
+			portType="{http://schemas.ogf.org/naming/2006/08/naming/wsdl}ReferenceResolver"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${codegen-dir}/naming"/>
+			<param name="stub.gen.source-wsdl"
+				value="${codegen-dir}/wsdl/reference-resolver-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${codegen-dir}/wsdl/naming.flag"/>
+		</antcall>
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${codegen-dir}/naming"/>
+			<param name="stub.gen.source-wsdl"
+				value="${codegen-dir}/wsdl/endpoint-resolver-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${codegen-dir}/wsdl/naming.flag"/>
+		</antcall>
+	</target>
+
+</project>

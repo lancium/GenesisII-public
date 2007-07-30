@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+    xmlns="http://vcgr.cs.virginia.edu/genii/application-description"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:gdesc="http://vcgr.cs.virginia.edu/genii/application-description"
+    xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+    targetNamespace="http://vcgr.cs.virginia.edu/genii/application-description"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+
+	<xsd:import
+		namespace="http://www.w3.org/2005/08/addressing"
+		schemaLocation="./ws-addr.xsd"/>
+
+	<xsd:import
+		namespace="http://schemas.ggf.org/jsdl/2005/11/jsdl"
+		schemaLocation="./jsdl.xsd"/>
+
+	<xsd:simpleType name="VersionType">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[0-9]+(\.[0-9]+)*"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:complexType name="PlatformDescriptionType">
+		<xsd:sequence>
+			<xsd:element ref="jsdl:CPUArchitecture"
+				minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="jsdl:OperatingSystem"
+				minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:any namespace="##other" processContents="lax"
+				minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:anyAttribute namespace="##other" processContents="lax"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="DeploymentDocumentType">
+		<xsd:sequence>
+			<xsd:element ref="gdesc:PlatformDescription"
+				minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:any namespace="##other" processContents="lax"
+				minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:anyAttribute namespace="##other" processContents="lax"/>
+	</xsd:complexType>
+	
+	<xsd:complexType name="CommonDeploymentDescriptionType">
+		<xsd:sequence>
+				<xsd:element name="relative-cwd" type="xsd:string"
+					minOccurs="0" maxOccurs="1" nillable="true"/>
+				<xsd:element name="binary-name" type="xsd:string"
+					minOccurs="1" maxOccurs="1" nillable="false"/>
+				<xsd:any namespace="##other" processContents="lax"
+					minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:anyAttribute namespace="##other" processContents="lax"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="SourceElementType">
+		<xsd:sequence>
+			<xsd:any namespace="##other" processContents="lax"
+				minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:anyAttribute namespace="##other" processContents="lax"/>
+	</xsd:complexType>
+	
+	<xsd:complexType name="SupportDocumentType">
+		<xsd:sequence>
+			<xsd:element ref="gdesc:PlatformDescription"
+				minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+			<xsd:any namespace="##other" processContents="lax"
+				minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="deployment-type" type="xsd:anyURI"
+			use="required"/>
+		<xsd:anyAttribute namespace="##other" processContents="lax"/>
+	</xsd:complexType>
+
+	<xsd:element name="PlatformDescription"
+		type="gdesc:PlatformDescriptionType"/>
+	<xsd:element name="SupportDocument"
+		type="gdesc:SupportDocumentType"/>
+
+</xsd:schema>

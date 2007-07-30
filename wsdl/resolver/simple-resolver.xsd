@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+	xmlns="http://vcgr.cs.virginia.edu/naming/2006/12/simple-resolver"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	xmlns:simple-resolver="http://vcgr.cs.virginia.edu/naming/2006/12/simple-resolver"
+	targetNamespace="http://vcgr.cs.virginia.edu/naming/2006/12/simple-resolver"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"
+		schemaLocation="./wsrf/basefaults.xsd"/>
+
+	<xsd:import
+		namespace="http://www.w3.org/2005/08/addressing"
+		schemaLocation="./ws-addr.xsd"/>
+
+	<xsd:complexType name="UpdateRequestType">
+		<xsd:sequence>
+			<xsd:element
+				name="new_EPR" type="wsa:EndpointReferenceType"
+				minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="UpdateRequest"
+		type="simple-resolver:UpdateRequestType"/>
+
+	<xsd:complexType name="UpdateResponseType">
+		<xsd:sequence>
+			<xsd:element
+				name="resolution_EPR" type="wsa:EndpointReferenceType"
+				minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="UpdateResponse"
+		type="simple-resolver:UpdateResponseType"/>
+
+<!-- Fault Types -->
+	<xsd:complexType name="InvalidWSNameFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="wsbf:BaseFaultType">
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="InvalidWSNameFault"
+		type="simple-resolver:InvalidWSNameFaultType"/>
+
+</xsd:schema>

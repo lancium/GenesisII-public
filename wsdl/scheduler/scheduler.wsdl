@@ -1,0 +1,73 @@
+<wsdl:definitions name="Scheduler"
+	targetNamespace="http://vcgr.cs.virginia.edu/genii/2007/01/scheduler"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:sched="http://vcgr.cs.virginia.edu/genii/2007/01/scheduler"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" > 
+
+<wsdl:types>
+  <xsd:schema
+      xmlns:wsa="http://www.w3.org/2005/08/addressing"
+      attributeFormDefault="unqualified"
+      elementFormDefault="qualified"
+      targetNamespace="http://vcgr.cs.virginia.edu/genii/2007/01/scheduler">
+
+		<xsd:include schemaLocation="./scheduler.xsd"/>
+
+      <!-- Message Types -->
+      <xsd:complexType name="ScheduleActivitiesType">
+        <xsd:sequence>
+			<xsd:element name="schedule-criteria"
+				type="sched:ScheduleCriteriaType"
+				minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="ScheduleActivitiesResponseType">
+        <xsd:sequence>
+          <xsd:element name="placement"
+				type="wsa:EndpointReferenceType"
+				minOccurs="0" maxOccurs="unbounded" nullable="false"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <!-- Message Elements -->
+      <xsd:element name="ScheduleActivities"
+        type="sched:ScheduleActivitiesType"/>
+      <xsd:element name="ScheduleActivitiesResponse"
+        type="sched:ScheduleActivitiesResponseType"/>
+    
+  </xsd:schema>
+</wsdl:types>
+
+  <!-- Messages -->
+  <wsdl:message name="ScheduleActivitiesRequest">
+      <wsdl:part name="ScheduleActivitiesRequest"
+          element="sched:ScheduleActivities"/>
+  </wsdl:message>
+
+  <wsdl:message name="ScheduleActivitiesResponse">
+      <wsdl:part name="ScheduleActivitiesResponse"
+          element="sched:ScheduleActivitiesResponse"/>
+  </wsdl:message>
+
+	<!-- Faults -->
+	<wsdl:message name="NoMatchingScheduleFault">
+		<wsdl:part name="NoMatchingScheduleFault"
+			element="sched:NoMatchingScheduleFaultType"/>
+	</wsdl:message>
+
+  <!-- Port Types -->
+  <wsdl:portType name="SchedulerPortType">
+    <wsdl:operation name="ScheduleActivities">
+        <wsdl:input 
+			message="sched:ScheduleActivitiesRequest"/>
+        <wsdl:output
+			message="sched:ScheduleActivitiesResponse"/>
+        <wsdl:fault name="NoMatchingScheduleFault"
+			message="sched:NoMatchingScheduleFault"/>
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>

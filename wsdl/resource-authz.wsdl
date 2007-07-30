@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions name="GeniiResourceAttrs"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:wsa="http://www.w3.org/2005/08/addressing"
+    xmlns:genii-security="http://vcgr.cs.virginia.edu/genii/2006/12/security"
+    xmlns:genii-authz="http://vcgr.cs.virginia.edu/genii/2006/12/resource-authz"
+    xmlns:genii-resource="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+    targetNamespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-authz">
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+		location="./resource.wsdl"/>
+		
+<!-- ===== Types Definitions ==== -->
+    <wsdl:types>
+
+        <xsd:schema
+            targetNamespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-authz"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+            <xsd:import
+            	namespace="http://www.w3.org/2005/08/addressing"
+            	schemaLocation="./ws-addr.xsd"/>
+
+			<xsd:import
+				namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+				schemaLocation="./resource.xsd"/>
+
+			<xsd:import
+				namespace="http://vcgr.cs.virginia.edu/genii/2006/12/security"
+				schemaLocation="./security.xsd"/>
+				
+			<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"
+				schemaLocation="./wsrf/basefaults.xsd"/>				
+
+<!-- PRESENTLY COMMENTED OUT: AUTHZ configuration is done at the moment via ATTRIBUTES
+
+< ! - - Common Faults - - >
+			<xsd:complexType name="ACLCertNotFoundFaultType">
+				<xsd:complexContent>
+					<xsd:extension base="wsbf:BaseFaultType"/>
+				</xsd:complexContent>
+			</xsd:complexType>
+			<xsd:element name="ACLCertNotFoundFaultType"
+				type="genii-authz:ACLCertNotFoundFaultType"/>
+			
+< ! - - Message Helper Types - - >
+			<xsd:element name="getACLCerts"/>
+			<xsd:element name="getACLCertsResponse" type="genii-security:CertificateChainType"/>
+			
+            <xsd:element name="addAclCert" type="xsd:base64Binary" nillable="false"/>
+            <xsd:element name="addAclCertResponse"/>
+
+            <xsd:element name="removeAclCert" type="xsd:base64Binary" nillable="false"/>
+            <xsd:element name="removeAclCertResponse"/>
+-->
+
+        </xsd:schema>
+    </wsdl:types>
+
+
+<!-- PRESENTLY COMMENTED OUT: AUTHZ configuration is done at the moment via ATTRIBUTES
+
+    < ! - - Fault Messages - - >
+	<wsdl:message name="ACLCertNotFoundFault">
+		<wsdl:part name="ACLCertNotFoundFault"
+			element="genii-authz:ACLCertNotFoundFaultType"/>
+	</wsdl:message>
+
+
+    < ! - - AuthZ::getAcls - - >
+    <wsdl:message name="getACLCertsRequest">
+        <wsdl:part name="getACLCertsRequest"
+            element="genii-authz:getACLCerts"/>
+    </wsdl:message>
+
+    <wsdl:message name="getACLCertsResponse">
+        <wsdl:part name="getACLCertsResponse"
+            element="genii-authz:getACLCertsResponse"/>
+    </wsdl:message>
+
+    < ! - - AuthZ::addAclCert - - >
+    <wsdl:message name="addAclCertRequest">
+        <wsdl:part name="addAclCertRequest"
+            element="genii-authz:addAclCert"/>
+    </wsdl:message>
+
+    <wsdl:message name="addAclCertResponse">
+        <wsdl:part name="addAclCertResponse"
+            element="genii-authz:addAclCertResponse"/>
+    </wsdl:message>
+    
+    < ! - - AuthZ::removeAclCert - - >
+    <wsdl:message name="removeAclCertRequest">
+        <wsdl:part name="removeAclCertRequest"
+            element="genii-authz:removeAclCert"/>
+    </wsdl:message>
+
+    <wsdl:message name="removeAclCertResponse">
+        <wsdl:part name="removeAclCertResponse"
+            element="genii-authz:removeAclCertResponse"/>
+    </wsdl:message>    
+
+
+-->
+
+<!-- Port Type Definitions -->
+	<wsdl:portType name="GeniiResourceAuthz">
+    <!-- PRESENTLY COMMENTED OUT: AUTHZ configuration is done at the moment via ATTRIBUTES
+    
+    	<wsdl:operation name="getACLCerts">
+        	<wsdl:input message="genii-authz:getACLCertsRequest"/>
+        	<wsdl:output message="genii-authz:getACLCertsResponse"/>
+        	<wsdl:fault name="ResourceUnknownFault"
+            	message="genii-resource:ResourceUnknownFault"/>
+    	</wsdl:operation>
+
+    	<wsdl:operation name="addAclCert">
+        	<wsdl:input message="genii-authz:addAclCertRequest"/>
+        	<wsdl:output message="genii-authz:addAclCertResponse"/>
+        	<wsdl:fault name="ResourceUnknownFault"
+            	message="genii-resource:ResourceUnknownFault"/>
+    	</wsdl:operation>
+
+    	<wsdl:operation name="removeAclCertCert">
+        	<wsdl:input message="genii-authz:removeAclCertRequest"/>
+        	<wsdl:output message="genii-authz:removeAclCertResponse"/>
+        	<wsdl:fault name="ResourceUnknownFault"
+            	message="genii-resource:ResourceUnknownFault"/>
+        	<wsdl:fault name="ACLCertNotFoundFault"
+        		message="genii-authz:ACLCertNotFoundFault"/>
+    	</wsdl:operation>
+-->      
+	</wsdl:portType>
+</wsdl:definitions>

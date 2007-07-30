@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+	xmlns="http://schemas.ggf.org/rns/2006/05/rns"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:rns="http://schemas.ggf.org/rns/2006/05/rns"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	targetNamespace="http://schemas.ggf.org/rns/2006/05/rns"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"
+		schemaLocation="./wsrf/basefaults.xsd"/>
+
+	<xsd:import
+		namespace="http://www.w3.org/2005/08/addressing"
+		schemaLocation="./ws-addr.xsd"/>
+
+	<xsd:complexType name="EntryType">
+		<xsd:sequence>
+			<xsd:element
+				name="entry_name" type="xsd:string"
+				minOccurs="1" maxOccurs="1"/>
+			<xsd:any namespace="##any" processContents="lax" 
+				minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element
+				name="entry_reference" type="wsa:EndpointReferenceType"
+				minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="EntryType"
+		type="rns:EntryType"/>
+
+	<xsd:complexType name="EntryListType">
+		<xsd:sequence>
+			<xsd:element
+				name="entry" type="rns:EntryType"
+				minOccurs="0" maxOccurs="unbounded"
+				nillable="true"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="EntryListType"
+		type="rns:EntryListType"/>
+
+	<xsd:complexType name="EntryPropertiesType">
+		<xsd:sequence>
+			<xsd:element
+				name="entry_parent" type="wsa:EndpointReferenceType"
+				minOccurs="1" maxOccurs="1"/>
+			<xsd:element
+				name="entry_name" type="xsd:string"
+				minOccurs="1" maxOccurs="1"/>
+			<xsd:any namespace="##any" processContents="lax" 
+				minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element
+				name="entry_reference" type="wsa:EndpointReferenceType"
+				minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="EntryPropertiesType"
+		type="rns:EntryPropertiesType"/>
+
+<!-- Fault Types -->
+	<xsd:complexType name="RNSFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="wsbf:BaseFaultType">
+				<xsd:sequence>
+					<xsd:element
+						name="Path" type="xsd:string"
+						minOccurs="1" maxOccurs="1"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="RNSFaultType"
+		type="rns:RNSFaultType"/>
+
+	<xsd:complexType name="RNSDirectoryNotEmptyFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="rns:RNSFaultType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="RNSDirectoryNotEmptyFaultType"
+		type="rns:RNSDirectoryNotEmptyFaultType"/>
+
+	<xsd:complexType name="RNSEntryExistsFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="rns:RNSFaultType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="RNSEntryExistsFaultType"
+		type="rns:RNSEntryExistsFaultType"/>
+
+	<xsd:complexType name="RNSEntryNotDirectoryFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="rns:RNSFaultType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="RNSEntryNotDirectoryFaultType"
+		type="rns:RNSEntryNotDirectoryFaultType"/>
+
+	<xsd:complexType name="RNSOperationNotAllowedFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="rns:RNSFaultType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="RNSOperationNotAllowedFaultType"
+		type="rns:RNSOperationNotAllowedFaultType"/>
+
+</xsd:schema>

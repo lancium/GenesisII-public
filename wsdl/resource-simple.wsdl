@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions name="GeniiResourceSimple"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:genii-rsimple="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple"
+    targetNamespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple">
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+		location="./resource.wsdl"/>
+
+<!-- ===== Types Definitions ==== -->
+    <wsdl:types>
+
+        <xsd:schema
+            targetNamespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+<!-- Message Helper Types -->
+			<xsd:element name="ping" type="xsd:string">
+			</xsd:element>
+
+			<xsd:element name="pingResponse" type="xsd:string">
+			</xsd:element>
+
+        </xsd:schema>
+    </wsdl:types>
+
+	<!-- Creation -->
+	<wsdl:message name="pingRequest">
+		<wsdl:part name="pingRequest"
+			element="genii-rsimple:ping"/>
+	</wsdl:message>
+
+	<wsdl:message name="pingResponse">
+		<wsdl:part name="pingResponse"
+			element="genii-rsimple:pingResponse"/>
+	</wsdl:message>
+
+	<!-- Port Type Definitions -->
+	<wsdl:portType name="GeniiResourceSimple">
+
+		<wsdl:operation name="ping">
+			<wsdl:input message="genii-rsimple:pingRequest"/>
+			<wsdl:output message="genii-rsimple:pingResponse"/>
+		</wsdl:operation>
+
+	</wsdl:portType>
+
+</wsdl:definitions>

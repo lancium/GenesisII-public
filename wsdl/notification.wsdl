@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions name="GeniiNotification"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:wsa="http://www.w3.org/2005/08/addressing"
+    xmlns:genii-not="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
+    xmlns:genii-resource="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+    targetNamespace="http://vcgr.cs.virginia.edu/genii/2006/12/notification">
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+		location="./resource.wsdl"/>
+		
+<!-- ===== Types Definitions ==== -->
+    <wsdl:types>
+
+        <xsd:schema
+            targetNamespace="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+            <xsd:import
+            	namespace="http://www.w3.org/2005/08/addressing"
+            	schemaLocation="./ws-addr.xsd"/>
+
+            <xsd:import
+            	namespace="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
+            	schemaLocation="./notification.xsd"/>
+
+<!-- Message Helper Types -->
+			<xsd:element name="subscribe">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="topic" type="genii-not:topic-type"
+							minOccurs="0" maxOccurs="1"/>
+						<xsd:element name="time-to-live"
+							type="xsd:unsignedLong"
+							minOccurs="0" maxOccurs="1"/>
+						<xsd:element name="target"
+							type="wsa:EndpointReferenceType"
+							minOccurs="1" maxOccurs="1"/>
+						<xsd:element name="user-data"
+							type="genii-not:user-data-type"
+							minOccurs="0" maxOccurs="1" nillable="true"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="subscribeResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="subscription"
+							type="wsa:EndpointReferenceType"
+							minOccurs="1" maxOccurs="1" nillable="false"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="notify">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="topic" type="genii-not:topic-type"
+							minOccurs="1" maxOccurs="1" nillable="false"/>
+						<xsd:element name="source"
+							type="wsa:EndpointReferenceType"
+							minOccurs="1" maxOccurs="1" nillable="false"/>
+						<xsd:element name="user-data"
+							type="genii-not:user-data-type"
+							minOccurs="0" maxOccurs="1" nillable="true"/>
+						<xsd:any namespace="##any" processContents="lax"
+							minOccurs="0" maxOccurs="unbounded"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+        </xsd:schema>
+    </wsdl:types>
+
+	<!-- Messages -->
+	<wsdl:message name="subscribeRequest">
+		<wsdl:part name="subscribeRequest"
+			element="genii-not:subscribe"/>
+	</wsdl:message>
+
+	<wsdl:message name="subscribeResponse">
+		<wsdl:part name="subscribeResponse"
+			element="genii-not:subscribeResponse"/>
+	</wsdl:message>
+
+	<wsdl:message name="notify">
+		<wsdl:part name="notify"
+			element="genii-not:notify"/>
+	</wsdl:message>
+
+	<!-- Port Type Definitions -->
+	<wsdl:portType name="GeniiNotificationProducerPortType">
+		<wsdl:operation name="subscribe">
+			<wsdl:input message="genii-not:subscribeRequest"/>
+			<wsdl:output message="genii-not:subscribeResponse"/>
+        	<wsdl:fault name="ResourceUnknownFault"
+            	message="genii-resource:ResourceUnknownFault"/>
+		</wsdl:operation>
+	</wsdl:portType>
+
+	<wsdl:portType name="GeniiNotificationConsumerPortType">
+		<wsdl:operation name="notify">
+			<wsdl:input message="genii-not:notify"/>
+        	<wsdl:fault name="ResourceUnknownFault"
+            	message="genii-resource:ResourceUnknownFault"/>
+		</wsdl:operation>
+	</wsdl:portType>
+
+</wsdl:definitions>

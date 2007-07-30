@@ -1,0 +1,85 @@
+/*
+ * Copyright 2006 University of Virginia
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ */
+package edu.virginia.vcgr.genii.client.context;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import org.morgan.util.configuration.ConfigurationException;
+
+import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
+import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.context.ContextType;
+
+public class ContextManager
+{
+	static private IContextResolver _resolver = null;
+	static private final String _CONTEXT_RESOLVER_NAME = "context-resolver";
+	
+	static public ICallingContext getCurrentContext()
+		throws ConfigurationException, FileNotFoundException, IOException
+	{
+		return getResolver().load();
+	}
+	
+	static public void storeCurrentContext(ICallingContext context)
+		throws ConfigurationException, FileNotFoundException, IOException
+	{
+		getResolver().store(context);
+	}
+	
+	static public ICallingContext bootstrap(RNSPath root) throws IOException, ConfigurationException
+	{
+		ICallingContext bootContext = new CallingContextImpl(root);
+		
+		// we may have a dummy context that contains login information necesary to boot
+		ICallingContext current = getCurrentContext();
+		if (current != null) {
+			ContextType t = bootContext.getSerialized();
+			return current.deriveNewContext(t);
+		}
+		
+		return bootContext;
+	}
+	
+	@SuppressWarnings("unchecked")
+	static private IContextResolver getResolver() throws ConfigurationException
+	{
+		synchronized(ContextManager.class)
+		{
+			if (_resolver != null)
+				return _resolver;
+		
+			_resolver = 
+				(IContextResolver)NamedInstances.getRoleBasedInstances().lookup(
+					_CONTEXT_RESOLVER_NAME);
+			if (_resolver != null)
+				return _resolver;
+		}
+		
+		throw new ConfigurationException(
+			"Unable to locate a \"" + _CONTEXT_RESOLVER_NAME + 
+			"\" resolver in the config file.");
+	}
+	
+	static public void setResolver(IContextResolver resolver)
+	{
+		synchronized(ContextManager.class)
+		{
+			_resolver = resolver;
+		}
+	}
+}

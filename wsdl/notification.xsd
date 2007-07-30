@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema
+    xmlns="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:genii-not="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
+    xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+    targetNamespace="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+
+    <xsd:import
+        namespace="http://docs.oasis-open.org/wsrf/bf-2"
+        schemaLocation="./wsrf/basefaults.xsd"/>
+
+    <!-- Topic Type -->
+    <xsd:simpleType name="topic-type">
+		<xsd:restriction base="xsd:token">
+			<xsd:annotation>
+				<xsd:documentation>
+					topic-type		::= TopicElement ( '.' TopicElement ) *
+					TopicElement	::= NCName
+				</xsd:documentation>
+			</xsd:annotation>
+			<xsd:pattern value="[-a-zA-Z0-9_]+(\.[-a-zA-Z0-9_]+)*"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:element name="topic-type" type="genii-not:topic-type"/>
+	
+	<!-- User Data Type -->
+	<xsd:complexType name="user-data-type">
+		<xsd:sequence>
+			<xsd:any namespace="##any" processContents="lax"
+				minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="user-data-type" type="genii-not:user-data-type"/>
+
+</xsd:schema>

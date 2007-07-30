@@ -1,0 +1,94 @@
+/*
+ * Copyright 2006 University of Virginia
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ */
+
+package edu.virginia.vcgr.genii.container.security.authz.handlers;
+
+import java.lang.reflect.Method;
+import java.security.cert.X509Certificate;
+
+import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.container.resource.IResource;
+import edu.virginia.vcgr.genii.client.security.MessageLevelSecurity;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.AuthZSecurityException;
+import edu.virginia.vcgr.genii.common.security.AuthZConfig;
+
+public abstract class AuthZHandler {
+
+	static public final String CALLING_CONTEXT_CALLER_CERT = 
+		"genii.container.security.authz.caller-cert";
+	
+	static private final AuthZHandler handler = new GamlAuthZHandler();
+	
+	
+	/**
+	 * Configures the resource with default access control state.
+	 * This configuration may be based upon informatin within the 
+	 * specified working context   
+	 */
+	public abstract void setDefaultAccess(
+			ICallingContext callingContext, 
+			IResource resource,
+			X509Certificate[] serviceCertChain) 
+				throws AuthZSecurityException, ResourceException;
+	
+	/**
+	 * Returns whether or not an invocation of the specified method 
+	 * on the target resource is allowable with the given working 
+	 * context 
+	 */
+	public abstract boolean checkAccess(
+			ICallingContext callingContext, 
+			IResource resource,
+			Method operation) throws AuthZSecurityException, ResourceException;
+	
+	/**
+	 * Returns the minimum level of incoming message level security required
+	 * for the specified resource  
+	 */
+	public abstract MessageLevelSecurity getMinIncomingMsgLevelSecurity(IResource resource) 
+		throws AuthZSecurityException, ResourceException;
+
+	/**
+	 * Returns the entire AuthZ configuration for the resource  
+	 */
+	public abstract AuthZConfig getAuthZConfig(IResource resource) throws AuthZSecurityException, ResourceException;
+	
+	/**
+	 * Sets the entire AuthZ configuration for the resource 
+	 */
+	public abstract void setAuthZConfig(AuthZConfig config, IResource resource) 
+		throws AuthZSecurityException, ResourceException;
+
+	/**
+	 * Prepare newly incoming calling contexts.  This should be invoked before
+	 * any calls to checkAccess().  (This may be necessary to prepare delegation 
+	 * credentials, remove non-delgatable credentials so they are not sent 
+	 * in future messages, etc.)
+	 */
+	public abstract void prepareContexts(ICallingContext callingContext) throws AuthZSecurityException;
+	
+	/**
+	 * Stub for possibly having different authz handlers per-resource
+	 * @param resource
+	 */
+	public static AuthZHandler getAuthZHandler(IResource resource) {
+		// currently return the GAML authz handler
+		return handler;
+	}
+	
+	
+}

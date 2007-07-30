@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions name="GeniiCommon"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:genii-rfactory="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
+    xmlns:genii-rlifetime="http://vcgr.cs.virginia.edu/genii/2006/12/resource-lifetime"
+    xmlns:genii-rattrs="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
+    xmlns:genii-authz="http://vcgr.cs.virginia.edu/genii/2006/12/resource-authz"
+    xmlns:genii-rsimple="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple"
+    xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
+	xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+	xmlns:genii-not="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
+    targetNamespace="http://vcgr.cs.virginia.edu/genii/2006/12/common">
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple"
+		location="./resource-simple.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+		location="./resource.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
+		location="./resource-factory.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-lifetime"
+		location="./resource-lifetime.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-authz"
+		location="./resource-authz.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
+		location="./resource-attributes.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
+		location="./notification.wsdl"/>
+
+<!-- Port Type Definitions -->
+
+	<wsdl:portType name="GeniiCommon">
+		<genii-ext:extend portType="genii-rsimple:GeniiResourceSimple"/>
+		<genii-ext:extend portType="genii-rfactory:GeniiResourceFactory"/>
+		<genii-ext:extend portType="genii-rlifetime:GeniiResourceLifetime"/>
+		<genii-ext:extend portType="genii-rattrs:GeniiResourceAttrs"/>
+		<genii-ext:extend portType="genii-authz:GeniiResourceAuthz"/>
+		<genii-ext:extend portType="genii-not:GeniiNotificationProducerPortType"/>
+	</wsdl:portType>
+
+</wsdl:definitions>

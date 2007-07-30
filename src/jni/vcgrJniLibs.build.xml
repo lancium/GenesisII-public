@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="VcgrClientLib" name="vcgrJniLibs-build">
+
+	<import file="../../init.build.xml"/>
+
+	<target name="jni-dirs" depends="init">
+		<mkdir dir="${basedir}/jni-lib"/>
+		<mkdir dir="${src-dir}/jni/VcgrClientLib/Release"/>
+		<mkdir dir="${src-dir}/jni/VcgrContainerLib/Release"/>
+	</target>
+
+	<target name="jni-generate-headers" depends="jni-dirs">
+		<javah outputFile="${src-dir}/jni/VcgrClientLib/WinCryptoLib.jh"
+			classpath="${basedir}/obj">
+			<class name="edu.virginia.vcgr.genii.client.security.wincrypto.WinCryptoLib"/>
+		</javah>
+
+		<javah outputFile="${src-dir}/jni/VcgrClientLib/FileSystemUtils.jh"
+			classpath="${basedir}/obj">
+			<class name="edu.virginia.vcgr.genii.client.io.FileSystemUtils"/>
+		</javah>
+
+		<javah outputFile="${src-dir}/jni/VcgrClientLib/GetPassword.jh"
+			classpath="${basedir}/obj">
+			<class name="edu.virginia.vcgr.genii.client.io.GetPassword"/>
+		</javah>
+
+		<javah outputFile="${src-dir}/jni/VcgrContainerLib/WindowsProvider.jh"
+			classpath="${basedir}/obj">
+			<class name="edu.virginia.vcgr.genii.container.sysinfo.WindowsProvider"/>
+		</javah>
+
+	</target>
+
+	<target name="jni-native-build" depends="jni-generate-headers">
+		<exec dir="${src-dir}/jni/VcgrClientLib/" executable="vcbuild"
+			os="Windows 2000,Windows XP">
+			<arg line="VcgrClientLib.vcproj Release" />
+		</exec>
+
+		<exec dir="${src-dir}/jni/VcgrClientLib/" executable="make"
+			os="Linux">
+			<arg line="-f makefile.linux"/>
+			<env key="INSTALL_PATH" value="${basedir}"/>
+		</exec>
+	</target>
+
+	<target name="VcgrClientLib" depends="jni-native-build"/>
+</project>

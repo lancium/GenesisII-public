@@ -1,0 +1,216 @@
+/*
+ * Copyright 2006 University of Virginia
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ */
+package edu.virginia.vcgr.genii.client.resource;
+
+import javax.xml.namespace.QName;
+
+import org.ggf.rbyteio.RandomByteIOPortType;
+import org.ws.addressing.EndpointReferenceType;
+
+import edu.virginia.vcgr.genii.byteio.streamable.factory.StreamableByteIOFactory;
+import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
+import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
+import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.common.GeniiCommon;
+
+public class TypeInformation
+{
+	@SuppressWarnings("unused")
+	private EndpointReferenceType _epr;
+	
+	private boolean _pureURL;
+	private QName []_implementedPortTypes;
+	
+	public TypeInformation(EndpointReferenceType epr)
+	{
+		_epr = epr;
+		_pureURL = false;
+		_implementedPortTypes = EPRUtils.getImplementedPortTypes(epr);
+		
+		if (_implementedPortTypes == null)
+		{
+			_implementedPortTypes = new QName[0];
+			if (epr.getAddress() != null &&
+				epr.getAddress().get_value() != null &&
+				epr.get_any() == null &&
+				epr.getMetadata() == null &&
+				epr.getReferenceParameters() == null)
+				_pureURL = true;
+		}
+	}
+	
+	public QName[] getImplementedPortTypes()
+	{
+		return _implementedPortTypes;
+	}
+	
+	public boolean hasPortType(QName targetPortType)
+	{
+		for (QName portType : _implementedPortTypes)
+		{
+			if (portType.equals(targetPortType))
+				return true;
+		}
+		
+		return false;
+	}
+
+	public boolean isScheduler()
+	{
+		return hasPortType(WellKnownPortTypes.SCHEDULER_PORT_TYPE);
+	}
+	
+	public boolean isBESContainer()
+	{
+		return hasPortType(
+			WellKnownPortTypes.BES_SERVICE_PORT_TYPE);
+	}
+	
+	public boolean isBESActivity()
+	{
+		return hasPortType(
+			WellKnownPortTypes.VCGR_BES_ACTIVITY_SERVICE_PORT_TYPE);
+	}
+
+	public boolean isBES()
+	{
+		return hasPortType(WellKnownPortTypes.BES_SERVICE_PORT_TYPE);
+	}
+	
+	public boolean isContainer()
+	{
+		return hasPortType(WellKnownPortTypes.VCGR_CONTAINER_SERVICE_PORT_TYPE);
+	}
+	
+	public boolean isRByteIO()
+	{
+		return hasPortType(WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE);
+	}
+	
+	public boolean isSByteIO()
+	{
+		return hasPortType(WellKnownPortTypes.SBYTEIO_SERVICE_PORT_TYPE);
+	}
+	
+	public boolean isSByteIOFactory()
+	{
+		return hasPortType(WellKnownPortTypes.SBYTEIO_FACTORY_PORT_TYPE);
+	}
+	
+	public boolean isByteIO()
+	{
+		return isRByteIO() || isSByteIO() || isSByteIOFactory();
+	}
+	
+	public boolean isRNS()
+	{
+		return hasPortType(WellKnownPortTypes.RNS_SERVICE_PORT_TYPE);
+	}
+	
+	public boolean isCounter()
+	{
+		return hasPortType(WellKnownPortTypes.COUNTER_PORT_TYPE);
+	}
+	
+	public boolean isUnknown()
+	{
+		return (_implementedPortTypes == null)	||
+			(_implementedPortTypes.length == 0);
+	}
+	
+	public boolean isPureURL()
+	{
+		return _pureURL;
+	}
+	
+	public String getTypeDescription()
+	{
+		if (isBESActivity())
+			return "BES Activity";
+		else if (isBES())
+			return "BES";
+		else if (isContainer())
+			return "Container";
+		else if (isCounter())
+			return "Counter";
+		else if (isRNS())
+			return "RNS";
+		else if (isPureURL())
+			return "pure-url";
+		else if (isByteIO())
+			return describeByteIO();
+		else
+			return null;
+	}
+
+	public long getByteIOSize()
+	{
+		EndpointReferenceType epr = _epr;
+		
+		try
+		{
+			if (isSByteIOFactory())
+			{
+				StreamableByteIOFactory factory =
+					ClientUtils.createProxy(StreamableByteIOFactory.class, _epr);
+				epr = factory.openStream(null).getEndpoint();
+			}
+			
+			RandomByteIOPortType rpt =
+				ClientUtils.createProxy(RandomByteIOPortType.class, epr);
+			
+			QName sizeAttr;
+			if (isRByteIO())
+				sizeAttr = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, 
+					ByteIOConstants.SIZE_ATTR_NAME);
+			else
+				sizeAttr = new QName(ByteIOConstants.STREAMABLE_BYTEIO_NS,
+					ByteIOConstants.SIZE_ATTR_NAME);
+			
+			return Long.parseLong(rpt.getAttributes(
+				new QName[] { sizeAttr}).get_any()[0].getValue());
+		}
+		catch (Throwable t)
+		{
+			return -1L;
+		}
+		finally
+		{
+			if (epr != _epr)
+			{
+				try
+				{
+					GeniiCommon common = ClientUtils.createProxy(
+						GeniiCommon.class, epr);
+					common.immediateTerminate(null);
+				}
+				catch (Throwable t)
+				{
+				}
+			}
+		}
+	}
+	
+	public String describeByteIO()
+	{
+		long size = getByteIOSize();
+		if (size < 0)
+			return "[file(non-rsp.)]";
+		
+		return Long.toString(size);
+	}
+}
