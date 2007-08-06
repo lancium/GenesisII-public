@@ -45,8 +45,6 @@ public class CertTool {
 
 	static boolean loaded = false;
 
-	static X509V1CertificateGenerator  v1CertGen = new X509V1CertificateGenerator();
-    static X509V3CertificateGenerator  v3CertGen = new X509V3CertificateGenerator();
     static Random serialNumRandomness = new Random(System.currentTimeMillis());
 
     static final int SERIAL_NUM_BITS = 128;
@@ -84,6 +82,7 @@ public class CertTool {
         //
         // create the certificate - version 1
         //
+        X509V1CertificateGenerator  v1CertGen = new X509V1CertificateGenerator();
 
         v1CertGen.setSerialNumber(new BigInteger(SERIAL_NUM_BITS, serialNumRandomness));
         v1CertGen.setIssuerDN(new X509Principal(issuer));
@@ -129,7 +128,7 @@ public class CertTool {
         //
         // create the certificate - version 3
         //
-        v3CertGen.reset();
+        X509V3CertificateGenerator  v3CertGen = new X509V3CertificateGenerator();
 
         v3CertGen.setSerialNumber(new BigInteger(SERIAL_NUM_BITS, serialNumRandomness));
         v3CertGen.setIssuerDN(PrincipalUtil.getSubjectX509Principal(caCert));

@@ -113,6 +113,18 @@ public class GamlMessageSendHandler {
 				SignedAssertion signedAssertion = new SignedAttributeAssertion( 
 						myIdentityAttr, 
 						clientKeyMaterial._clientPrivateKey);
+				
+				if (resourceCertChain != null) {
+					// Because we know an identity for the remote resource, delegate the 
+					// current credential assertion to it
+					DelegatedAttribute delegatedAttribute = new DelegatedAttribute(
+							signedAssertion, 
+							resourceCertChain);
+					signedAssertion = new DelegatedAssertion(
+						delegatedAttribute, 
+						clientKeyMaterial._clientPrivateKey);
+				}
+				
 				toSerialize.add(signedAssertion);
 			}
 

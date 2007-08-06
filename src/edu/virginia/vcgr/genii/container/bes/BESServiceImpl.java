@@ -86,6 +86,7 @@ import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.sysinfo.SystemInfoUtils;
+import edu.virginia.vcgr.genii.common.GeniiCommon;
 
 public class BESServiceImpl extends GenesisIIBase 
 	implements BESPortType
@@ -99,6 +100,8 @@ public class BESServiceImpl extends GenesisIIBase
 	
 	static private final long _DEFAULT_TIME_TO_LIVE = 1000L * 60 * 60;
 	static final String _IS_ACCEPTING_PROPERTY = "is-accepting-jobs";
+	
+	static protected EndpointReferenceType _localActivityServiceEpr = null;
 	
 	protected void setAttributeHandlers() throws NoSuchMethodException
 	{
@@ -146,9 +149,16 @@ public class BESServiceImpl extends GenesisIIBase
 		
 		try
 		{
+			if (_localActivityServiceEpr == null) { 
+				// only need to make this epr from scratch once (which involves
+				// a get-attr rpc to the service to get its full epr)
+				_localActivityServiceEpr = 
+					EPRUtils.makeEPR(Container.getServiceURL("BESActivityPortType"));
+			}
+			
 			BESActivityPortType activity = ClientUtils.createProxy(
 				BESActivityPortType.class,
-				EPRUtils.makeEPR(Container.getServiceURL("BESActivityPortType")));
+				_localActivityServiceEpr);
 			
 			VcgrCreateResponse resp = activity.vcgrCreate(
 				new VcgrCreate(
@@ -262,17 +272,22 @@ public class BESServiceImpl extends GenesisIIBase
 		{
 			try
 			{
-				ResourceKey aKey = ResourceManager.getTargetResource(
-					terminateActivitiesRequest[lcv]);
-				IBESActivityResource activity = (IBESActivityResource)aKey.dereference();
-				ret[lcv] = new TerminateActivityResponseType(
-					terminateActivitiesRequest[lcv],
-					activity.terminateActivity(), null);
+				// call immediate-terminate on the activity
+                GeniiCommon common = ClientUtils.createProxy(
+                        GeniiCommon.class,
+                        terminateActivitiesRequest[lcv]);
+
+                common.immediateTerminate(null);
 			}
 			catch (BaseFaultType buft)
 			{
 				ret[lcv] = new TerminateActivityResponseType(
 					terminateActivitiesRequest[lcv], false, buft);
+			}
+			catch (ConfigurationException cfe)
+			{
+				ret[lcv] = new TerminateActivityResponseType(
+					terminateActivitiesRequest[lcv], false, cfe);
 			}
 		}
 		

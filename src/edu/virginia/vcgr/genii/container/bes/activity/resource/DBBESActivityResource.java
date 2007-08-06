@@ -65,7 +65,7 @@ public class DBBESActivityResource extends BasicDBResource implements
 	static private final String _BASE_DIRECTORY_PROPERTY = "job-directory";
 	static private final String _EPR_PROPERTY = "resource-epr";
 	
-	static private SimpleExecutionProvider _provider = null;
+	private transient SimpleExecutionProvider _provider = null;
 	
 	static private HashMap<String, SimpleExecutionProvider> _providers =
 		new HashMap<String, SimpleExecutionProvider>();

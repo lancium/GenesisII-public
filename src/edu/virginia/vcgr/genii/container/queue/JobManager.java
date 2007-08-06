@@ -37,7 +37,12 @@ public class JobManager implements Runnable
 	static private Log _logger = LogFactory.getLog(JobManager.class);
 	
 	static private final long _DEFAULT_UPDATE_CYCLE = 1000L * 30;
-	static private final int _NUM_OUTSTANDING_THREADS = 8;
+	static private final int _NUM_OUTSTANDING_THREADS = 1;  // TODO: fix the horriblenes  
+															// (e.g., NPEs from accessing
+															// state while its being destroyed
+															// out from under you) that result
+															// when increasing the degree of 
+															// mulitprogramming > 1
 	static private final int _MAX_FAILED_ATTEMPTS = 10;
 	
 	static private DatabaseConnectionPool _connectionPool = null;

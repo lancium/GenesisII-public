@@ -9,11 +9,11 @@
  */
 JNIEXPORT jlong JNICALL Java_edu_virginia_vcgr_genii_container_sysinfo_WindowsProvider_getIndividualCPUSpeed (JNIEnv *env, jobject obj)
 {
-	long ret = 0;
+	unsigned long ret = 0;
 	LONG Result;
 
-    unsigned long tmp;
-    unsigned char Buffer[16];
+    DWORD speed;
+    DWORD bufferSize = sizeof(speed);
 
     DWORD lpType;
 
@@ -49,7 +49,7 @@ JNIEXPORT jlong JNICALL Java_edu_virginia_vcgr_genii_container_sysinfo_WindowsPr
 		goto done;
 
     Result = RegQueryValueEx(RegistryKey_0, L"~MHz",
-        NULL, &lpType, Buffer, &tmp);
+        NULL, &lpType, (LPBYTE) &speed, &bufferSize);
     if (Result != ERROR_SUCCESS)
 		goto done;
     else
@@ -58,7 +58,7 @@ JNIEXPORT jlong JNICALL Java_edu_virginia_vcgr_genii_container_sysinfo_WindowsPr
 			goto done;
     }
 
-	ret = (*((DWORD*)Buffer)) * 1024 * 1024;
+	ret = speed * 1024 * 1024;
 
 done:
 	if (RegistryKey_0 != NULL)
