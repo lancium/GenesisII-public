@@ -16,6 +16,7 @@ import org.ggf.bes.BESPortType;
 import org.ggf.bes.factory.ActivityDocumentType;
 import org.ggf.bes.factory.CreateActivityType;
 import org.ggf.bes.factory.GetActivityStatusResponseType;
+import org.ggf.bes.factory.ActivityStatusType;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
@@ -663,8 +664,15 @@ public class JobManager implements Runnable
 				GetActivityStatusResponseType []statuses = 
 					bes.getActivityStatuses(
 						new EndpointReferenceType[] { _activityEndpoint });
-				ActivityState state = ActivityState.fromActivityStatus(
-					statuses[0].getActivityStatus());
+				
+				ActivityStatusType status = statuses[0].getActivityStatus();
+				if ((status == null) || (status.get_any() == null) || (status.get_any().length == 0)) {
+					// no status
+					return;
+				}
+				
+				ActivityState state = ActivityState.fromActivityStatus(status);
+				
 				if (state.isTerminalState())
 				{
 					if (state.isInState(ActivityState.FAILED))
