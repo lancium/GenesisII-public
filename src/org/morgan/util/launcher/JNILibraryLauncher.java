@@ -81,11 +81,11 @@ public class JNILibraryLauncher
 		return (Boolean)invoke(myClass, myMethod, argTypes, args);					
 	}
 	
-	public static boolean login(String keystorePath, String password){
+	public static boolean login(String keystorePath, String password, String certPath){
 		String myClass = JNI_PACKAGE + ".JNILoginTool";
 		String myMethod = "login";
-		Class[] argTypes = new Class[] {String.class, String.class };
-		Object[] args = new Object[] { keystorePath , password };
+		Class[] argTypes = new Class[] {String.class, String.class , String.class };
+		Object[] args = new Object[] { keystorePath , password , certPath };
 		
 		return (Boolean)invoke(myClass, myMethod, argTypes, args);			
 	}

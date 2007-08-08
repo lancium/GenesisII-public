@@ -5,7 +5,7 @@
 #include "MakeGenesisIICalls.h"
 
 /* Static variables for library to keep track of JVM */
-static int DEBUG = 0;
+static int DEBUG = 1;
 static JNIEnv *env;
 static JavaVM *jvm;
 static jclass jni_launcher;
@@ -68,21 +68,22 @@ DllExport char* genesisII_get_working_directory(){
 	return NULL;	
 }
 
-DllExport int genesisII_login(char * keystore_path, char * password){
+DllExport int genesisII_login(char * keystore_path, char * password, char * cert_pattern){
 	jmethodID mid;
 
 	if(keystore_path == NULL || password == NULL){
 		return JNI_ERR;
 	}
 
-	if(get_static_method(&jni_launcher, "login", "(Ljava/lang/String;Ljava/lang/String;)Z", &mid) != JNI_ERR)
+	if(get_static_method(&jni_launcher, "login", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z", &mid) != JNI_ERR)
 	{
 		/* Build arguments */
 		jstring j_arg1 = NewPlatformString(env, keystore_path, -1);
 		jstring j_arg2 = NewPlatformString(env, password, -1);		
+		jstring j_arg3 = NewPlatformString(env, cert_pattern, -1);		
 
 		/* Invoke Method */
-		jboolean if_success = (*env)->CallStaticBooleanMethod(env, jni_launcher, mid, j_arg1, j_arg2);					
+		jboolean if_success = (*env)->CallStaticBooleanMethod(env, jni_launcher, mid, j_arg1, j_arg2, j_arg3);					
 
 		/* Convert to char** and return */
 		return (if_success - 1);

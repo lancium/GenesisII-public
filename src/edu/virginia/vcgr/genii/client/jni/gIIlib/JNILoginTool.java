@@ -1,8 +1,6 @@
 package edu.virginia.vcgr.genii.client.jni.gIIlib;
 
-import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 
-/*
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
@@ -20,14 +18,14 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.RenewableCli
 import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.RenewableIdentityAttribute;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.X509Identity;
 import edu.virginia.vcgr.genii.context.ContextType;
-*/
+
 
 public class JNILoginTool extends JNILibraryBase 
 {
-/*
+
 	private static boolean useGui = false; 
 	
-	public static Boolean login(String keystorePath, String password){
+	public static Boolean login(String keystorePath, String password, String certPattern){
 		if(!isInitialized){
 			initialize();
 		}
@@ -43,7 +41,7 @@ public class JNILoginTool extends JNILibraryBase
 						new BufferedReader(new InputStreamReader(System.in)));
 			
 			GamlLoginTool.CertEntry certEntry = handler.selectCert(keystorePath, null, 
-					password);
+					password, certPattern);
 			
 			if (certEntry == null)
 				return false;
@@ -51,7 +49,7 @@ public class JNILoginTool extends JNILibraryBase
 			// Create identitiy assertion
 			RenewableIdentityAttribute identityAttr = new RenewableIdentityAttribute(
 				System.currentTimeMillis() - (1000L * 60 * 15), // 15 minutes ago
-				GenesisIIConstants.CredentialExpirationMillis,	// valid 24 hours
+				1000 * 60 * 60 * 2,								// valid 2 hours
 				10,
 				new X509Identity(certEntry._certChain));
 			RenewableAttributeAssertion identityAssertion =
@@ -81,5 +79,5 @@ public class JNILoginTool extends JNILibraryBase
 			return false;			
 		}
 	}	
-	*/
+	
 }

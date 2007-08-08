@@ -39,7 +39,7 @@ DllExport char* genesisII_get_working_directory();
 /*
 	Performs a text-based login to the specified keystore with the given password
 */
-DllExport int genesisII_login(char * keystore_path, char * password);
+DllExport int genesisII_login(char * keystore_path, char * password, char * cert_pattern);
 
 /*
 	Logs out of genesisII
