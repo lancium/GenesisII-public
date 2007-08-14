@@ -43,7 +43,7 @@
 		<antcall target="gen.stub-generation">
 			<param name="stub.gen.target-dir" value="${codegen-dir}/exported-file"/>
 			<param name="stub.gen.source-wsdl"
-				value="${codegen-dir}/wsdl/exported-file-service.wsdl"/>
+				value="file:///${codegen-dir}/wsdl/exported-file-service.wsdl"/>
 			<param name="stub.gen.target-flag-file"
 				value="${codegen-dir}/wsdl/exported-file.flag"/>
 		</antcall>

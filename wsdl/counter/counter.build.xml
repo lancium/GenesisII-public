@@ -31,7 +31,7 @@
 		<antcall target="gen.stub-generation">
 			<param name="stub.gen.target-dir" value="${codegen-dir}/counter"/>
 			<param name="stub.gen.source-wsdl"
-				value="${codegen-dir}/wsdl/counter-service.wsdl"/>
+				value="file:///${codegen-dir}/wsdl/counter-service.wsdl"/>
 			<param name="stub.gen.target-flag-file"
 				value="${codegen-dir}/wsdl/counter.flag"/>
 		</antcall>
