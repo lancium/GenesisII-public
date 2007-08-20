@@ -25,7 +25,7 @@
 	</mconf:config-sections>
 	
 	
-<!-- Message security section.  Contains properties that impact the 
+<!-- Message security section.  Contains properties that impact the  
      message-level security of outgoing and response messages.
 -->     
 	<genii:message-security>
