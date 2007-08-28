@@ -20,11 +20,21 @@ extern "C" {
 */
 
 /* 
-	Gets the directory listing of the current directory   
+	Gets the directory listing of the directory specified and the target specified
+	from the directory.
 	Listing - a pointer to the array of strings to be used
-	Does it's own memeory allocation    
+	Directory - target Directory (relative path to get directory listing
+	Target - Optional path (can be * or something.* etc))
+	Method Does it's own memory allocation. Returns number of items in listing
+	Note:  The number of items in the listing = 2*size.  Every other is the type
+	of file {F,text.txt,D, containers}
 */
-DllExport int genesisII_directory_listing(char *** listing);
+DllExport int genesisII_directory_listing(char *** listing, char * directory, char * target);
+
+/*
+	Return information about an object in the same style as directory listing
+*/
+DllExport int genesisII_get_information(char *** info, char * path);
 
 /*	
 	Changes the current directory to the new_directory given

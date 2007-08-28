@@ -5,6 +5,7 @@ import edu.virginia.vcgr.genii.client.ApplicationBase;
 public abstract class JNILibraryBase extends ApplicationBase {
 
 	public static boolean isInitialized = false;
+	public static final boolean DEBUG = true;
 	
 	public static void initialize(){
 		try{

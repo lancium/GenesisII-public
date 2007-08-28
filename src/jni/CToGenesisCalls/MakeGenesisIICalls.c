@@ -14,16 +14,42 @@ static jclass jni_launcher;
 int initializeJavaVM();
 int get_static_method(jclass *my_class, char* method, char* method_type, jmethodID *mid);
 
-DllExport int genesisII_directory_listing(char *** listing){		
+DllExport int genesisII_directory_listing(char *** listing, char * directory, char * target){		
 	jmethodID mid;
 
-	if(get_static_method(&jni_launcher, "getDirectoryListing", "()[Ljava/lang/Object;", &mid) != JNI_ERR)
+	if(get_static_method(&jni_launcher, "getDirectoryListing", "(Ljava/lang/String;Ljava/lang/String;)[Ljava/lang/Object;", &mid) != JNI_ERR)
 	{
+		/* Build arguments */
+		jstring j_arg1 = directory == NULL ? NULL : NewPlatformString(env, directory, -1);
+		jstring j_arg2 = target == NULL ? NULL : NewPlatformString(env, target, -1);		
+
 		/* Invoke Method */
-		jarray jlisting = (*env)->CallStaticObjectMethod(env, jni_launcher, mid);						
+		jarray jlisting = (*env)->CallStaticObjectMethod(env, jni_launcher, mid, 
+			j_arg1, j_arg2);						
 
 		/* Convert to char** and return */
 		return convert_listing(env, listing, jlisting);
+	}
+	else{
+		printf("GenesisII Error:  Could not find the method specified for this call\n");
+	}	
+	return JNI_ERR;
+}
+
+DllExport int genesisII_get_information(char *** info, char * path){		
+	jmethodID mid;
+
+	if(get_static_method(&jni_launcher, "getInformation", "(Ljava/lang/String;)[Ljava/lang/Object;", &mid) != JNI_ERR)
+	{
+		/* Build arguments */
+		jstring j_arg1 = path == NULL ? NULL : NewPlatformString(env, path, -1);		
+
+		/* Invoke Method */
+		jarray jlisting = (*env)->CallStaticObjectMethod(env, jni_launcher, mid, 
+			j_arg1);						
+
+		/* Convert to char** and return */
+		return convert_listing(env, info, jlisting);
 	}
 	else{
 		printf("GenesisII Error:  Could not find the method specified for this call\n");
@@ -263,13 +289,13 @@ DllExport int initializeJavaVM(char * genesis_directory){
 
 	/* default directory */
 	if(genesis_directory == NULL){
-		genesis_directory = "C:/Program\ Files/Genesis\ II";
+		genesis_directory = "'C:/Program Files/Genesis II'";
 	}
 
 	sprintf_s(op0, 512, "-Djava.class.path=%s/ext/bouncycastle/bcprov-jdk15-133.jar;%s/lib/GenesisII-security.jar;%s/lib/morgan-utilities.jar;%s/lib;%s/security;", genesis_directory, genesis_directory, genesis_directory, genesis_directory, genesis_directory);	
 	sprintf_s(op1, 255, "-Dlog4j.configuration=genesisII.log4j.properties");
 	sprintf_s(op2, 255, "-Djava.library.path=%s/jni-lib", genesis_directory);
-	sprintf_s(op3, 255, "-Dedu.virginia.vcgr.genii.client.configuration.base-dir=%s/", genesis_directory);	
+	sprintf_s(op3, 255, "-Dedu.virginia.vcgr.genii.install-base-dir=%s", genesis_directory);	
 
 	options[0].optionString = op0;
 	options[1].optionString = op1;

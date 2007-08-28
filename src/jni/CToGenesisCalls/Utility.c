@@ -18,11 +18,15 @@ int convert_listing(JNIEnv *env, char *** clisting, jarray listing){
 		*clisting = ((char**)malloc(size * sizeof(char**)));	
 		string_array = *clisting;
 
-		for(i = 0; i < size; i++){		
-			jstring item = (*env)->GetObjectArrayElement(env, listing, (jsize)i);
-			string_array[i] = convert_jstring(env, item);
+		for(i = 0; i < size; i+=3){		
+			jstring type = (*env)->GetObjectArrayElement(env, listing, (jsize)i);
+			jstring length =  (*env)->GetObjectArrayElement(env, listing, (jsize)i+1);
+			jstring name = (*env)->GetObjectArrayElement(env, listing, (jsize)i+2);
+			string_array[i] = convert_jstring(env, type);
+			string_array[i+1] = convert_jstring(env, length);			
+			string_array[i+2] = convert_jstring(env, name);			
 		}	
-		return size;
+		return (size/3);
 	}
 	else{
 		return JNI_ERR;

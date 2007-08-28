@@ -27,7 +27,7 @@ public class JNILibraryLauncher
 	private final static String JNI_IO_PACKAGE = 
 		"edu.virginia.vcgr.genii.client.jni.gIIlib.io";
 	private static final String BASE_DIR_SYSTEM_PROPERTY = 
-		"edu.virginia.vcgr.genii.client.configuration.base-dir";
+		"edu.virginia.vcgr.genii.install-base-dir";
 	
 	public static void initialize()
 	{
@@ -44,11 +44,21 @@ public class JNILibraryLauncher
 		}
 	}	
 	
-	public static Object[] getDirectoryListing(){		
-		String myClass = JNI_PACKAGE + ".JNILsTool";
+	public static Object[] getInformation(String path){
+		String myClass = JNI_PACKAGE + ".JNIGetInformationTool";										 
+		String myMethod = "getInformation";
+		Class[] argTypes = new Class[] {String.class};
+		Object[] args = new Object[] {path};
+				
+		ArrayList toReturn = (ArrayList)invoke(myClass, myMethod, argTypes, args);
+		return ((toReturn != null) ? toReturn.toArray() : null);
+	}
+	
+	public static Object[] getDirectoryListing(String directory, String target){		
+		String myClass = JNI_PACKAGE + ".JNIDirectoryListingTool";
 		String myMethod = "getDirectoryListing";
-		Class[] argTypes = null;
-		Object[] args = null;
+		Class[] argTypes = new Class[] {String.class, String.class};
+		Object[] args = new Object[] { directory, target };
 				
 		ArrayList toReturn = (ArrayList)invoke(myClass, myMethod, argTypes, args);
 		return ((toReturn != null) ? toReturn.toArray() : null);
