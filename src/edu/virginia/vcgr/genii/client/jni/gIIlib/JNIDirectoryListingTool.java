@@ -13,9 +13,8 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 public class JNIDirectoryListingTool extends JNILibraryBase
 {
 	public static ArrayList getDirectoryListing(String directory, String target) {
-		if(!isInitialized){
-			initialize();
-		}
+		tryToInitialize();
+		
 		
 		JNICacheManager manager = JNICacheManager.getInstance();
 		JNICacheEntry forDirectory; 

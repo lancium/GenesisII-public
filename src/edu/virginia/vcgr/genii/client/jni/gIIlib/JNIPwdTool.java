@@ -8,9 +8,8 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 public class JNIPwdTool extends JNILibraryBase{
 	
 	public static String getCurrentDirectory(){
-		if(!isInitialized){
-			initialize();
-		}
+		tryToInitialize();
+		
 		try {
 			return RNSPath.getCurrent().getName();
 		} catch (ConfigurationException e) {			

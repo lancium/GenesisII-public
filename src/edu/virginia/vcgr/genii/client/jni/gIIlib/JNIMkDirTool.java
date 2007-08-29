@@ -12,9 +12,8 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 public class JNIMkDirTool extends JNILibraryBase {
 	
 	public static Boolean makeDirectory(String sPath){
-		if(!isInitialized){
-			initialize();
-		}
+		tryToInitialize();
+		
 		try{
 		
 			boolean createParents = false;

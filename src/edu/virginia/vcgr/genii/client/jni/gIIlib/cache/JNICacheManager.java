@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.client.jni.gIIlib.cache;
 
 import java.util.Hashtable;
+import java.util.concurrent.locks.ReentrantLock;
 
 import edu.virginia.vcgr.genii.client.jni.gIIlib.JNILibraryBase;
 
@@ -8,14 +9,15 @@ import edu.virginia.vcgr.genii.client.jni.gIIlib.JNILibraryBase;
 public class JNICacheManager {
 	
 	private static JNICacheManager myManager = null;
-
+	private ReentrantLock cacheLock;
 	private Hashtable <String, JNICacheEntry> myCache = null;
 	
 	public JNICacheManager(){
 		myCache = new Hashtable <String, JNICacheEntry>();
+		cacheLock = new ReentrantLock();
 	}
 	
-	public static JNICacheManager getInstance(){
+	synchronized public static JNICacheManager getInstance(){
 		if(myManager == null){
 			myManager = new JNICacheManager();			
 		}
@@ -23,7 +25,9 @@ public class JNICacheManager {
 	}
 	
 	public JNICacheEntry getCacheEntry(String path){
+		cacheLock.lock();
 		JNICacheEntry entry = myCache.get(path);
+		cacheLock.unlock();
 		if(JNILibraryBase.DEBUG)
 		{
 			if(entry == null){			
@@ -36,7 +40,9 @@ public class JNICacheManager {
 		return entry;		
 	}
 	public void putCacheEntry(String path, JNICacheEntry entry){
+		cacheLock.lock();
 		JNICacheEntry old = myCache.put(path, entry);
+		cacheLock.unlock();
 		if(JNILibraryBase.DEBUG && old != null){
 			System.out.println("Replaced: " + old + "with " + entry);
 		}		

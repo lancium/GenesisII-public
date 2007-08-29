@@ -11,10 +11,8 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 /* Gets the information related to a resource i.e. a Cache Entry */
 public class JNIGetInformationTool extends JNILibraryBase {
 	public static ArrayList getInformation(String path){		
+		tryToInitialize();
 		
-		if(!isInitialized){
-			initialize();
-		}
 		if(path.contains(":") || path.contains("desktop.ini")){
 			if(JNILibraryBase.DEBUG)
 				System.out.println("No Info for bogus file: " + path);

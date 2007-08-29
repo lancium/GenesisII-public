@@ -26,9 +26,8 @@ public class JNILoginTool extends JNILibraryBase
 	private static boolean useGui = false; 
 	
 	public static Boolean login(String keystorePath, String password, String certPattern){
-		if(!isInitialized){
-			initialize();
-		}
+		tryToInitialize();
+		
 		
 		try{
 			AbstractGamlLoginHandler handler = null;

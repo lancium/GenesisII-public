@@ -10,9 +10,8 @@ public class JNIRmTool extends JNILibraryBase {
 
 	public static Boolean remove(String target, Boolean recursive, Boolean force){
 		
-		if(!isInitialized){
-			initialize();
-		}
+		tryToInitialize();
+		
 		try{
 			RNSPath path = RNSPath.getCurrent();				
 			return rm(path, target, recursive, force);

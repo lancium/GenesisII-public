@@ -3,8 +3,6 @@ package edu.virginia.vcgr.genii.client.jni.gIIlib.io;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import edu.virginia.vcgr.genii.client.jni.gIIlib.JNILibraryBase;
-
 
 public class JNIWrite {
 	public static Integer write(Integer fileHandle, String data, Integer offset){

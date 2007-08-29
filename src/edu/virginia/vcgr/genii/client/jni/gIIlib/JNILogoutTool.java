@@ -8,9 +8,8 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.TransientCredentials;
 public class JNILogoutTool extends JNILibraryBase {
 	
 	public static void logout(){
-		if(!isInitialized){
-			initialize();
-		}
+		tryToInitialize();
+		
 		try{					
 			ICallingContext callContext = ContextManager.getCurrentContext();
 			if (callContext != null) {

@@ -27,6 +27,7 @@ public class JNICpTool extends JNILibraryBase {
 	public static Boolean copy(String source, String destination, 
 			Boolean srcLocal, Boolean dstLocal){		
 		try{
+			tryToInitialize();
 			copy(source, srcLocal, destination, dstLocal);			
 		}catch(Exception e){
 			e.printStackTrace();

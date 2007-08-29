@@ -29,9 +29,8 @@ public class JNIOpen extends JNILibraryBase{
 				System.out.println("File already open");			
 			}
 			else{
-				if(!isInitialized){
-					initialize();
-				}				
+				tryToInitialize();
+				
 				RNSPath current = RNSPath.getCurrent();
 				RNSPath filePath; 
 				if(create){

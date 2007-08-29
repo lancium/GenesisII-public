@@ -8,9 +8,8 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 public class JNICdTool extends JNILibraryBase {
 	
 	public static Boolean changeDirectory(String targetDirectory){
-		if(!isInitialized){
-			initialize();
-		}
+		tryToInitialize();
+		
 		try{
 			ICallingContext ctxt = ContextManager.getCurrentContext();
 			RNSPath path = ctxt.getCurrentPath().lookup(targetDirectory, RNSPathQueryFlags.MUST_EXIST);			
