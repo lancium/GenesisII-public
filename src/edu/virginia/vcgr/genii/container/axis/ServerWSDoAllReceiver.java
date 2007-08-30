@@ -290,8 +290,14 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			ICallingContext callingContext = extractCallingContextPostDecrytpion(messageContext, workingContext);
 
 			// Grab the operation method from the message context 
-    		Method operation = 
-    			((MessageContext) reqData.getMsgContext()).getOperation().getMethod();
+			MessageContext context = (MessageContext) reqData.getMsgContext();
+			org.apache.axis.description.OperationDesc desc = context.getOperation();
+			if (desc == null) {
+				// pretend security doesn't exist -- axis will do what it does when 
+				// it can't figure out how to dispatch to a non-existant method
+				return true;
+			}
+    		Method operation = desc.getMethod();
     		
     		// put the caller cert in the working context
     		callingContext.setTransientProperty(AuthZHandler.CALLING_CONTEXT_CALLER_CERT, cert);
