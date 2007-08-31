@@ -11,7 +11,7 @@ public class JNILogoutTool extends JNILibraryBase {
 		tryToInitialize();
 		
 		try{					
-			ICallingContext callContext = ContextManager.getCurrentContext();
+			ICallingContext callContext = ContextManager.getCurrentContext(false);
 			if (callContext != null) {
 				TransientCredentials.globalLogout(callContext);
 				ClientUtils.setClientKeyAndCertMaterial(callContext, null);

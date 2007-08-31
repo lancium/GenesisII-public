@@ -370,7 +370,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 					.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
 			if ((targetCertChain != null) && (targetCertChain.length > 0)) {
 				ClientUtils.setClientKeyAndCertMaterial(ContextManager
-						.getCurrentContext(), new KeyAndCertMaterial(
+						.getCurrentContext(false), new KeyAndCertMaterial(
 						(X509Certificate[]) targetCertChain, _serverPrivateKey));
 			}
 		

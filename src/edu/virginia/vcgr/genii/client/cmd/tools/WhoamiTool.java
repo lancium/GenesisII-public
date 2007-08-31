@@ -23,7 +23,7 @@ public class WhoamiTool extends BaseGridTool
 	protected int runCommand() throws Throwable
 	{
 		// get the signed GAML assertion 
-		ICallingContext callingContext = ContextManager.getCurrentContext();
+		ICallingContext callingContext = ContextManager.getCurrentContext(false);
 		if (callingContext == null) {
 			stdout.println("Not logged in");
 		} else {

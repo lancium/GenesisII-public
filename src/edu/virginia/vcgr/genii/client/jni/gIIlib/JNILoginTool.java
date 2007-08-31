@@ -55,7 +55,7 @@ public class JNILoginTool extends JNILibraryBase
 				new RenewableAttributeAssertion(identityAttr, certEntry._privateKey);
 			
 			// get the calling context (or create one if necessary)
-			ICallingContext callContext = ContextManager.getCurrentContext();
+			ICallingContext callContext = ContextManager.getCurrentContext(false);
 			if (callContext == null)
 				callContext = new CallingContextImpl(new ContextType());
 			

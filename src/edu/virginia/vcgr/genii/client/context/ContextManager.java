@@ -32,7 +32,19 @@ public class ContextManager
 	static public ICallingContext getCurrentContext()
 		throws ConfigurationException, FileNotFoundException, IOException
 	{
-		return getResolver().load();
+		return getCurrentContext(true);
+	}
+	
+	static public ICallingContext getCurrentContext(boolean mustExist)
+		throws ConfigurationException, FileNotFoundException, IOException
+	{
+		ICallingContext ctxt = getResolver().load();
+		if (ctxt == null && mustExist)
+		{
+			throw new ConfigurationException("Unable to locate calling context information.");
+		}
+		
+		return ctxt;
 	}
 	
 	static public void storeCurrentContext(ICallingContext context)
@@ -46,7 +58,7 @@ public class ContextManager
 		ICallingContext bootContext = new CallingContextImpl(root);
 		
 		// we may have a dummy context that contains login information necesary to boot
-		ICallingContext current = getCurrentContext();
+		ICallingContext current = getCurrentContext(false);
 		if (current != null) {
 			ContextType t = bootContext.getSerialized();
 			return current.deriveNewContext(t);

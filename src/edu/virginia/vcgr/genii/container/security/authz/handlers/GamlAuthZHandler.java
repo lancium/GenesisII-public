@@ -242,7 +242,7 @@ public class GamlAuthZHandler extends AuthZHandler {
 
 			// get the destination certificate from the calling context
 			X509Certificate[] targetCertChain = 
-				ClientUtils.getActiveKeyAndCertMaterial(ContextManager.getCurrentContext())._clientCertChain;
+				ClientUtils.getActiveKeyAndCertMaterial(ContextManager.getCurrentContext(false))._clientCertChain;
 
 			// try each identity in the transient credentials
 			boolean allowed = false;

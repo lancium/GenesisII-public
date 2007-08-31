@@ -22,7 +22,7 @@ public class LogoutTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		ICallingContext callContext = ContextManager.getCurrentContext();
+		ICallingContext callContext = ContextManager.getCurrentContext(false);
 		if (callContext != null) {
 			TransientCredentials.globalLogout(callContext);
 			ClientUtils.setClientKeyAndCertMaterial(callContext, null);

@@ -86,7 +86,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 			JobDefinition_Type jsdl = submitJobRequest.getJobDefinition();
 			int priority = (int)submitJobRequest.getPriority();
 			String jobTicket = (new GUID()).toString();
-			ICallingContext callingContext = ContextManager.getCurrentContext();
+			ICallingContext callingContext = ContextManager.getCurrentContext(false);
 			Collection<Identity> identities = QueueSecurity.getCallerIdentities();
 			
 			IQueueResource resource = 

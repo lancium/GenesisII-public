@@ -23,7 +23,7 @@ public class QueueSecurity
 		try
 		{
 			Collection<Identity> ret = new ArrayList<Identity>();
-			ICallingContext callingContext = ContextManager.getCurrentContext();
+			ICallingContext callingContext = ContextManager.getCurrentContext(false);
 			
 			if (callingContext == null)
 				throw new AuthZSecurityException(

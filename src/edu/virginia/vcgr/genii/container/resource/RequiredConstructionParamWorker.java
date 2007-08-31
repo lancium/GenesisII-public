@@ -41,7 +41,7 @@ public class RequiredConstructionParamWorker
 				AuthZHandler handler = AuthZHandler.getAuthZHandler(resource);
 				ICallingContext context = null;
 				try {
-						context = ContextManager.getCurrentContext();
+						context = ContextManager.getCurrentContext(false);
 				}
 				catch (Throwable t) {
 					// No current context

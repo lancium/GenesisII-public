@@ -88,7 +88,7 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 		{
 			resource.associateWithContainer(activityEPR, initInfo.getContainerID());
 				
-			ICallingContext ctxt = ContextManager.getCurrentContext();
+			ICallingContext ctxt = ContextManager.getCurrentContext(false);
 			if (ctxt != null)
 				resource.setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME,
 					ctxt);

@@ -262,7 +262,7 @@ public class ClientUtils
 			
 			try
 			{
-				context = ContextManager.getCurrentContext();
+				context = ContextManager.getCurrentContext(false);
 			}
 			catch (Throwable t)
 			{
@@ -295,7 +295,7 @@ public class ClientUtils
 	{
 		try
 		{
-			return createProxy(loader, iface, epr, ContextManager.getCurrentContext());
+			return createProxy(loader, iface, epr, ContextManager.getCurrentContext(false));
 		}
 		catch (IOException ioe)
 		{
