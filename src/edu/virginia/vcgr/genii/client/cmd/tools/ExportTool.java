@@ -14,6 +14,7 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.rcreate.CreationException;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -39,7 +40,7 @@ public class ExportTool extends BaseGridTool
 	
 	public ExportTool()
 	{
-		super(_DESCRIPTION, _USAGE_RESOURCE, false);
+		super(_DESCRIPTION, new FileResource(_USAGE_RESOURCE), false);
 	}
 	
 	public void setCreate()
