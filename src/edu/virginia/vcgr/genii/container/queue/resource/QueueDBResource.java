@@ -391,8 +391,64 @@ public class QueueDBResource extends BasicDBResource implements IQueueResource
 	static final private String _GET_OWNERS_STMT =
 		"SELECT owner FROM queuejobowners WHERE jobid = ?";
 	
+	private JobInformationType[] getStatus() throws ResourceException
+	{
+		ArrayList<JobInformationType> ret = new ArrayList<JobInformationType>();
+		PreparedStatement getJobInfoStatement = null;
+		PreparedStatement stmt = null;
+		PreparedStatement getJobOwners = null;
+		ResultSet rs = null;
+		Connection conn = getConnection();
+		
+		try
+		{
+			stmt = conn.prepareStatement(_LIST_JOBS_STMT);
+			getJobOwners = conn.prepareStatement(_GET_OWNERS_STMT);
+			getJobInfoStatement = conn.prepareStatement(_GET_JOB_INFO_STMT);
+			
+			
+			stmt.setString(1, _resourceKey);
+			rs = stmt.executeQuery();
+			
+			while (rs.next())
+			{
+				int jobID = rs.getInt(1);
+				String ticket = rs.getString(3);
+				if (QueueSecurity.isOwner(getJobOwners(getJobOwners, jobID)))
+				{
+					ret.add(getStatus(
+							getJobInfoStatement, getJobOwners, ticket));
+				}
+			}
+			
+			return ret.toArray(new JobInformationType[0]);
+		}
+		catch (IOException ioe)
+		{
+			throw new ResourceException("Unable to serialize/deserialize owners.", ioe);
+		}
+		catch (ClassNotFoundException cnfe)
+		{
+			throw new ResourceException("Unable to serialize/deserialize owners.", cnfe);
+		}
+		catch (SQLException sqe)
+		{
+			throw new ResourceException("Error querying the database.", sqe);
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+			StreamUtils.close(getJobInfoStatement);
+			StreamUtils.close(getJobOwners);
+			StreamUtils.close(stmt);
+		}
+	}
+	
 	public JobInformationType[] getStatus(String []jobTickets) throws ResourceException
 	{
+		if (jobTickets == null || jobTickets.length == 0)
+			return getStatus();
+		
 		JobInformationType []ret = new JobInformationType[jobTickets.length];
 		PreparedStatement getJobInfoStatement = null;
 		PreparedStatement getOwnersStmt = null;
