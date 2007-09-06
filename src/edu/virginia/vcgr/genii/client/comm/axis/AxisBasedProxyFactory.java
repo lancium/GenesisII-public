@@ -70,7 +70,7 @@ public class AxisBasedProxyFactory implements IProxyFactory
 	}
 	
 	private Object createClientProxy(ClassLoader loader, 
-		Class []locatorClasses, EndpointReferenceType targetEPR, 
+		Class<?> []locatorClasses, EndpointReferenceType targetEPR, 
 		ICallingContext callContext) throws ResourceException, GenesisIISecurityException
 	{
 		return Proxy.newProxyInstance(loader, 

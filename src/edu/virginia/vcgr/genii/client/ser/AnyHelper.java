@@ -178,7 +178,7 @@ public class AnyHelper {
         object.set_any(me);
     }
 
-    public static void setAny(AnyContentType object, List values) {
+    public static void setAny(AnyContentType object, List<?> values) {
         if (values == null) {
             return;
         }

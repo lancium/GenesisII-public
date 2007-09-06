@@ -8,13 +8,11 @@ import org.apache.axis.MessageContext;
 import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
-import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.container.axis.WSAddressingExtractor;
 
 public class WSAddressingHandler implements IAroundInvoker

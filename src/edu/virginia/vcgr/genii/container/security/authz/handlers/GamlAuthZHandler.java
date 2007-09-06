@@ -384,7 +384,7 @@ public class GamlAuthZHandler extends AuthZHandler {
 		TransientCredentials transientCredentials = 
 			TransientCredentials.getTransientCredentials(callingContext); 
 		if (signedAssertions != null) {
-			Iterator itr = signedAssertions.iterator();
+			Iterator<Serializable> itr = signedAssertions.iterator();
 			while (itr.hasNext()) {
 				SignedAssertion signedAssertion = (SignedAssertion) itr.next();
 				transientCredentials._credentials.add(signedAssertion);

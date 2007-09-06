@@ -20,7 +20,6 @@ import javax.xml.namespace.QName;
 import org.apache.axis.types.URI;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
-import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 
 public class ByteIOConstants
 {

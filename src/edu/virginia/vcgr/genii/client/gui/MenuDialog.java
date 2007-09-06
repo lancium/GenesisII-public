@@ -33,6 +33,8 @@ static final long serialVersionUID = 0L;
 	
 	static String title = "";
 	static String prompt = "";
+	
+	@SuppressWarnings("unchecked")
 	static Collection entries;
 	
 	static SynchronousQueue<Object> waitingQueue = new SynchronousQueue<Object>();

@@ -68,7 +68,7 @@ public class WSAddressingExtractor extends BasicHandler {
 		} catch (SOAPException se) {
 			throw new AxisFault(se.getLocalizedMessage(), se);
 		}
-		Iterator iter = header.examineAllHeaderElements();
+		Iterator<?> iter = header.examineAllHeaderElements();
 		while (iter.hasNext()) {
 			SOAPHeaderElement he = (SOAPHeaderElement) iter.next();
 			QName heName = new QName(he.getNamespaceURI(), he.getLocalName());

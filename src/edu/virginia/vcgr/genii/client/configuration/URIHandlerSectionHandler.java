@@ -58,12 +58,12 @@ public class URIHandlerSectionHandler
 				
 				try
 				{
-					Class cl = Class.forName(className, true, loader);
+					Class<?> cl = Class.forName(className, true, loader);
 					if (!IURIHandler.class.isAssignableFrom(cl))
 						throw new ConfigurationException("Class \"" + 
 							className + 
 							"\" does not implement the IURIHandler interface.");
-					Constructor cons = cl.getConstructor(new Class[0]);
+					Constructor<?> cons = cl.getConstructor(new Class[0]);
 					handlers.add((IURIHandler)cons.newInstance(new Object[0]));
 				}
 				catch (NoSuchMethodException nsme)

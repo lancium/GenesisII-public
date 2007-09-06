@@ -149,6 +149,7 @@ public class DefaultAttributeManipulator implements IAttributeManipulator
 		return createManipulator(target, attributeName, getMethodName, null);
 	}
 	
+	@SuppressWarnings("unchecked")
 	static public IAttributeManipulator createManipulator(
 		Object target, QName attributeName, 
 		String getMethodName, String setMethodName) throws NoSuchMethodException

@@ -177,7 +177,7 @@ public class ClientUtils
 	}	
 	
 	
-	static public Method getLocatorPortTypeMethod(Class locator)
+	static public Method getLocatorPortTypeMethod(Class<?> locator)
 		throws ResourceException
 	{	
 		Method []methods = locator.getMethods();
@@ -185,7 +185,7 @@ public class ClientUtils
 		
 		for (Method m : methods)
 		{
-			Class []parmTypes = m.getParameterTypes();
+			Class<?> []parmTypes = m.getParameterTypes();
 			if (parmTypes.length == 1)
 			{
 				if (URL.class.isAssignableFrom(parmTypes[0]))
@@ -209,16 +209,16 @@ public class ClientUtils
 		return targetMethod;
 	}
 	
-	static private Class getLocatorPortType(Class locator)
+	static private Class<?> getLocatorPortType(Class<?> locator)
 		throws ResourceException
 	{
 		return getLocatorPortTypeMethod(locator).getReturnType();
 	}
 	
-	static public Class[] getLocatorPortTypes(Class []locators)
+	static public Class<?>[] getLocatorPortTypes(Class<?> []locators)
 		throws ResourceException
 	{
-		Class []ret = new Class[locators.length];
+		Class<?> []ret = new Class[locators.length];
 		for (int lcv = 0; lcv < locators.length; lcv++)
 		{
 			ret[lcv] = getLocatorPortType(locators[lcv]);

@@ -26,10 +26,8 @@ import org.apache.axis.server.AxisServer;
 import org.apache.axis.transport.http.AxisServletBase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.morgan.util.alarm.AlarmManager;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
-import org.morgan.util.event.EventManager;
 import org.mortbay.http.HttpContext;
 import org.mortbay.http.SocketListener;
 import org.mortbay.http.SslListener;
@@ -41,12 +39,10 @@ import edu.virginia.vcgr.genii.client.ApplicationBase;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
-import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 import edu.virginia.vcgr.genii.container.configuration.ContainerConfiguration;
 import edu.virginia.vcgr.genii.container.deployment.ServiceDeployer;
 import edu.virginia.vcgr.genii.container.invoker.GAroundInvokerFactory;
-import edu.virginia.vcgr.genii.container.lifetime.LifetimeVulture;
 import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver;
 import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllSender;
 
@@ -136,7 +132,7 @@ public class Container extends ApplicationBase
 	
 	static private org.apache.axis.Handler getHandler(
 			SimpleChain handlerChain, 
-			Class handlerClass) {
+			Class<?> handlerClass) {
 
 		if (handlerChain == null) {
 			return null;
@@ -239,16 +235,16 @@ public class Container extends ApplicationBase
         	sender.configure(_containerPrivateKey);
 			
 			// configure the services individually
-        	Iterator iter = _axisServer.getConfig().getDeployedServices();
+        	Iterator<?> iter = _axisServer.getConfig().getDeployedServices();
 			while (iter.hasNext())
 			{
 				Object obj = iter.next();
 				if (obj instanceof JavaServiceDesc)
 				{
-					Class implClass = ((JavaServiceDesc)obj).getImplClass();
+					Class<?> implClass = ((JavaServiceDesc)obj).getImplClass();
 					if (IContainerManaged.class.isAssignableFrom(implClass))
 					{
-						Constructor cons = implClass.getConstructor(new Class[0]);
+						Constructor<?> cons = implClass.getConstructor(new Class[0]);
 						IContainerManaged base =
 							(IContainerManaged)cons.newInstance(new Object[0]);
 						base.startup();
@@ -357,7 +353,7 @@ public class Container extends ApplicationBase
 		ArrayList<JavaServiceDesc> installedServices = 
 			new ArrayList<JavaServiceDesc>();
 		
-		Iterator iter = null;
+		Iterator<?> iter = null;
 		try
 		{
         	iter = _axisServer.getConfig().getDeployedServices();

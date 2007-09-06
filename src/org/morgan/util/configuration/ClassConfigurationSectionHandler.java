@@ -45,7 +45,7 @@ public class ClassConfigurationSectionHandler implements
 	
 	public Object parse(Node n) throws ConfigurationException
 	{
-		HashMap<String, Class> ret = new HashMap<String, Class>();
+		HashMap<String, Class<?>> ret = new HashMap<String, Class<?>>();
 		
 		NodeList children = n.getChildNodes();
 		int length = children.getLength();

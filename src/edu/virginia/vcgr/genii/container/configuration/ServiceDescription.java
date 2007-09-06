@@ -21,6 +21,7 @@ import org.morgan.util.configuration.ConfigurationException;
 
 import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
 import edu.virginia.vcgr.genii.container.Container;
+import edu.virginia.vcgr.genii.container.resolver.IResolverFactoryProxy;
 import edu.virginia.vcgr.genii.container.resource.IResourceProvider;
 
 public class ServiceDescription
@@ -36,7 +37,7 @@ public class ServiceDescription
 	private Long _serviceCertificateLifetime = null;
 	private Long _resourceCertificateLifetime = null;
 	private Properties _defaultResolverFactoryProps = null;
-	private Class _defaultResolverFactoryProxyClass = null;
+	private Class<? extends IResolverFactoryProxy> _defaultResolverFactoryProxyClass = null;
 	
 	@SuppressWarnings("unchecked")
 	public ServiceDescription(String providerName, Properties securityProperties, Properties defaultResolverFactoryProps)
@@ -63,7 +64,9 @@ public class ServiceDescription
 				try
 				{
 					/* TODO: check if this is the right way to create proxy class from name */
-					_defaultResolverFactoryProxyClass = Thread.currentThread().getContextClassLoader().loadClass(tmp);
+					_defaultResolverFactoryProxyClass = 
+						(Class<? extends IResolverFactoryProxy>)Thread.currentThread().getContextClassLoader(
+							).loadClass(tmp);
 				}
 				catch(ClassNotFoundException cnfe)
 				{
@@ -109,7 +112,7 @@ public class ServiceDescription
 		return _defaultResolverFactoryProps;
 	}
 
-	public Class getDefaultResolverFactoryProxyClass()
+	public Class<? extends IResolverFactoryProxy> getDefaultResolverFactoryProxyClass()
 	{
 		return _defaultResolverFactoryProxyClass;
 	}

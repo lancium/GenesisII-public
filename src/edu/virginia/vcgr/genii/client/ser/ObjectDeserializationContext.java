@@ -38,7 +38,7 @@ public class ObjectDeserializationContext extends DeserializationContext {
     }
 
     public ObjectDeserializationContext(MessageElement element,
-                                        Class javaClass)
+                                        Class<?> javaClass)
         throws ResourceException {
         super(Config.mooch(), new SOAPHandler());
 
@@ -53,7 +53,7 @@ public class ObjectDeserializationContext extends DeserializationContext {
         this(element, null);
     }
 
-    public ObjectDeserializationContext(Element element, Class javaClass)
+    public ObjectDeserializationContext(Element element, Class<?> javaClass)
         throws ResourceException {
         super(Config.mooch(), new SOAPHandler());
 
@@ -73,14 +73,14 @@ public class ObjectDeserializationContext extends DeserializationContext {
         inputSource = new InputSource(new StringReader(inputString));
     }
 
-    public ObjectDeserializationContext(InputSource input, Class javaClass)
+    public ObjectDeserializationContext(InputSource input, Class<?> javaClass)
         throws ResourceException {
         super(Config.mooch(), new SOAPHandler());
         init(null, javaClass);
         this.inputSource = input;
     }
 
-    private void setDeserializer(QName type, Class javaClass) 
+    private void setDeserializer(QName type, Class<?> javaClass) 
         throws ResourceException {
         if (type == null && javaClass == null) {
             throw new ResourceException("Type or class required.");
@@ -99,7 +99,7 @@ public class ObjectDeserializationContext extends DeserializationContext {
         }
     }
 
-    private void init(QName type, Class javaClass)
+    private void init(QName type, Class<?> javaClass)
         throws ResourceException {
         msgContext.setEncodingStyle("");
         popElementHandler();

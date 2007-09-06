@@ -6,7 +6,6 @@ import java.io.IOException;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
 
-import edu.virginia.vcgr.genii.client.io.PreferredFiles;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 
 public class ConfigurationManager

@@ -247,12 +247,12 @@ public class VCGRContainerServiceImpl extends GenesisIIBase
 		return retval;
 	}
 	
-	private QName[] findImplementedPortTypes(Class jClass)
+	private QName[] findImplementedPortTypes(Class<?> jClass)
 		throws ResourceException
 	{
 		try
 		{
-			Constructor cons = jClass.getConstructor(new Class[0]);
+			Constructor<?> cons = jClass.getConstructor(new Class[0]);
 			Object obj = cons.newInstance(new Object[0]);
 			GenesisIIBase base = (GenesisIIBase)obj;
 			return base.getImplementedPortTypes();

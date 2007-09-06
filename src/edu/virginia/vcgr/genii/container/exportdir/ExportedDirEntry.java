@@ -18,8 +18,6 @@ package edu.virginia.vcgr.genii.container.exportdir;
 import org.apache.axis.message.MessageElement;
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.naming.EPRUtils;
-
 class ExportedDirEntry
 {
 	private String _dirId;

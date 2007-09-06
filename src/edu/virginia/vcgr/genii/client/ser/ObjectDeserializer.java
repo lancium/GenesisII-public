@@ -52,7 +52,7 @@ public class ObjectDeserializer {
      * <br><b>Note:</b> This operation is slow as it converts the DOM Element
      * into a string which then is deserialized into a Java object.
      */
-    public static Object toObject(Element element, Class javaClass)
+    public static Object toObject(Element element, Class<?> javaClass)
         throws ResourceException {
         ObjectDeserializationContext deserializer
             = new ObjectDeserializationContext(element, javaClass);
@@ -165,7 +165,7 @@ public class ObjectDeserializer {
      *
      * @see #toObject(SOAPElement, Class)
      */
-    public static Object[] toObject(AnyContentType any, Class javaClass)
+    public static Object[] toObject(AnyContentType any, Class<?> javaClass)
         throws ResourceException {
         if (any == null) {
             return null;
@@ -207,7 +207,7 @@ public class ObjectDeserializer {
      * representation. This operation could be seen as the instanceof
      * equivalent for xsd:any types
      */
-    public static boolean contains(SOAPElement element, Class javaClass) {
+    public static boolean contains(SOAPElement element, Class<?> javaClass) {
         if (element == null || javaClass == null) {
             throw new IllegalArgumentException();
         }
@@ -230,7 +230,7 @@ public class ObjectDeserializer {
     /**
      * Deserializes input with XML into a Java object of the given type.
      */
-    public static Object deserialize(InputSource input, Class javaClass)
+    public static Object deserialize(InputSource input, Class<?> javaClass)
         throws ResourceException {
         ObjectDeserializationContext deserializer
             = new ObjectDeserializationContext(input, javaClass);

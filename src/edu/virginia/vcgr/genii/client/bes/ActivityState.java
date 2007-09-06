@@ -102,7 +102,7 @@ public class ActivityState implements Serializable
 		while (message != null)
 		{
 			_state.add(message.getQName());
-			Iterator iter = message.getChildElements();
+			Iterator<?> iter = message.getChildElements();
 			message = null;
 			if (iter != null)
 			{

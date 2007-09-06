@@ -69,19 +69,19 @@ public class ServerWSDoAllSender extends WSDoAllSender
 
 
 	    // get the incoming security actions 
-	    Vector results = (Vector) msgContext.getProperty(
+	    Vector<?> results = (Vector<?>) msgContext.getProperty(
         	WSHandlerConstants.RECV_RESULTS);
 	    if (results == null) {
 	    	// no security results
 	    	return;
 	    }
     	WSHandlerResult rResult = (WSHandlerResult) results.get(0);
-    	Vector securityResults = rResult.getResults();
+    	Vector<?> securityResults = rResult.getResults();
 
     	// formulate the outgoing security actions based upon the incoming 
     	// security actions
 	    String action = "";
-    	Iterator itr = securityResults.iterator();
+    	Iterator<?> itr = securityResults.iterator();
     	while (itr.hasNext()) {
     		WSSecurityEngineResult r = (WSSecurityEngineResult) itr.next();
     		switch (r.getAction()) {

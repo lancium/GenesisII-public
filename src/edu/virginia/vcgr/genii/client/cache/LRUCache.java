@@ -33,7 +33,7 @@ public class LRUCache<KeyType, DataType> extends LinkedHashMap<KeyType, DataType
      * with the opportunity to remove the eldest entry each time a new one
      * is added.  
      */
-	protected boolean removeEldestEntry(Map.Entry eldest) {
+	protected boolean removeEldestEntry(Map.Entry<KeyType, DataType> eldest) {
 		return size() > _maxElements;
 	}
 	

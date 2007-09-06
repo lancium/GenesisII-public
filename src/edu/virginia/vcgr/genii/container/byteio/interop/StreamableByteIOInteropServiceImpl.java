@@ -29,7 +29,6 @@ import org.apache.axis.message.MessageElement;
 import org.ggf.byteio.CustomFaultType;
 import org.ggf.sbyteio.*;
 import org.ggf.schemas.byteio._2006._07.interop.*;
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.GuaranteedDirectory;
 import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.r_2.*;

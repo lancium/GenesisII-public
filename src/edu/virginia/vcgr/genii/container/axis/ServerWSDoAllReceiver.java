@@ -149,7 +149,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
         super.invoke(msgContext);
 	}
 	
-    protected boolean checkReceiverResults(Vector wsResult, Vector actions) {
+    @SuppressWarnings("unchecked")
+	protected boolean checkReceiverResults(Vector wsResult, Vector actions) {
 
     	// checks to see if the security operations performed meet the minimum
     	// required (as per the resource's authZ module)
@@ -339,6 +340,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
      * may contain stateful resource context information.) 
      * 
      */
+	@SuppressWarnings("unchecked")
 	protected ICallingContext extractCallingContextPostDecrytpion(MessageContext msgContext,
 			WorkingContext workingContext) throws AxisFault,
 			AuthZSecurityException {
@@ -350,7 +352,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			SOAPMessage m = msgContext.getMessage();
 			SOAPHeader header = m.getSOAPHeader();
 
-			Iterator iter = header.examineAllHeaderElements();
+			Iterator<? extends SOAPHeaderElement> iter = header.examineAllHeaderElements();
 			while (iter.hasNext()) {
 				SOAPHeaderElement he = (SOAPHeaderElement) iter.next();
 				QName heName = new QName(he.getNamespaceURI(), he.getLocalName());

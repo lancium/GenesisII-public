@@ -35,8 +35,8 @@ public class MethodDescription
 	{
 		if (other._method.getName().equals(_method.getName()))
 		{
-			Class []otherParameterTypes = other._method.getParameterTypes();
-			Class []myParameterTypes = _method.getParameterTypes();
+			Class<?> []otherParameterTypes = other._method.getParameterTypes();
+			Class<?> []myParameterTypes = _method.getParameterTypes();
 			
 			if (otherParameterTypes.length == myParameterTypes.length)
 			{

@@ -86,11 +86,11 @@ public class XMLConfiguration
 		try
 		{
 			ClassLoader loader = Thread.currentThread().getContextClassLoader();
-			Class cl = loader.loadClass(clazz);
+			Class<?> cl = loader.loadClass(clazz);
 			if (!IXMLConfigurationSectionHandler.class.isAssignableFrom(cl))
 				throw new ConfigurationException("Class \"" + clazz + 
 					"\" does not implement IXMLConfigurationSectionHandler.");
-			Constructor cons = cl.getConstructor(new Class[0]);
+			Constructor<?> cons = cl.getConstructor(new Class[0]);
 			return (IXMLConfigurationSectionHandler)cons.newInstance(
 				new Object[0]);
 		}

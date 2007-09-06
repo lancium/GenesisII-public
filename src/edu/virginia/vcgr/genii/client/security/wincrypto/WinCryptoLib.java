@@ -43,6 +43,7 @@ public class WinCryptoLib extends JNIClientBaseClass {
 	 * @param certStore
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	private native ArrayList getByteArrayAliases(String certStore)  
 			throws WinCryptoException;
 
@@ -55,6 +56,7 @@ public class WinCryptoLib extends JNIClientBaseClass {
 	private native byte[] getCertFromByteAlias(String certStore, byte[] alias)
 		throws WinCryptoException;
 	
+	@SuppressWarnings("unchecked")
 	private native ArrayList getCertChain(String certStore, byte[] alias)
 		throws WinCryptoException, WinCryptoChainInvalidException;
 	
@@ -90,7 +92,7 @@ public class WinCryptoLib extends JNIClientBaseClass {
 
 		ArrayList<String> retval = new ArrayList<String>();
 
-		Iterator itr = getByteArrayAliases(certStore).iterator();
+		Iterator<?> itr = getByteArrayAliases(certStore).iterator();
 		while (itr.hasNext()) {
 			byte[] byteAlias = (byte[]) itr.next();
 			retval.add(Base64.byteArrayToBase64(byteAlias));
@@ -144,10 +146,11 @@ public class WinCryptoLib extends JNIClientBaseClass {
 		return cert;
 	}
 
+	@SuppressWarnings("unchecked")
 	public X509Certificate[] getCertificateChain(String certStore, String alias)
 			throws WinCryptoChainInvalidException, WinCryptoException, CertificateException {
 
-		ArrayList certBlobs = getCertChain(certStore, Base64.base64ToByteArray(alias));
+		ArrayList<byte[]> certBlobs = getCertChain(certStore, Base64.base64ToByteArray(alias));
 		if (certBlobs == null) {
 			return null;
 		}
@@ -155,7 +158,7 @@ public class WinCryptoLib extends JNIClientBaseClass {
 		CertificateFactory cf = CertificateFactory.getInstance("X.509");
 
 		X509Certificate[] chain = new X509Certificate[certBlobs.size()];
-		Iterator itr = certBlobs.iterator();
+		Iterator<byte[]> itr = certBlobs.iterator();
 		int i = 0;
 		while (itr.hasNext()) {
 			byte[] certblob = (byte[]) itr.next();

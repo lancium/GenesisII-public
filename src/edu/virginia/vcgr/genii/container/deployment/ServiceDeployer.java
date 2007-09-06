@@ -236,7 +236,7 @@ public class ServiceDeployer extends Thread
 					Class<?> cl = info._loader.loadClass(className);
 					if (IContainerManaged.class.isAssignableFrom(cl))
 	        		{
-	        			Constructor cons = cl.getConstructor(new Class[0]);
+	        			Constructor<?> cons = cl.getConstructor(new Class[0]);
 	        			IContainerManaged base = 
 	        				(IContainerManaged)cons.newInstance(new Object[0]);
 	        			base.startup();

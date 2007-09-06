@@ -223,11 +223,11 @@ public class AxisClientInvocationHandler implements InvocationHandler
 	private HashMap<MethodDescription, Object> _portMethods =
 		new HashMap<MethodDescription, Object>();
 
-	private Class [] _locators = null;
+	private Class<?> [] _locators = null;
 	private AxisClientInvocationHandler _parentHandler = null;
 	
 	public AxisClientInvocationHandler(
-			Class locator, 
+			Class<?> locator, 
 			EndpointReferenceType epr,
 			ICallingContext callContext) 
 			throws ResourceException, GenesisIISecurityException {
@@ -236,7 +236,7 @@ public class AxisClientInvocationHandler implements InvocationHandler
 		
 		
 	public AxisClientInvocationHandler(
-			Class []locators, 
+			Class<?> []locators, 
 			EndpointReferenceType epr,
 			ICallingContext callContext) 
 		throws ResourceException, GenesisIISecurityException {
@@ -306,7 +306,7 @@ public class AxisClientInvocationHandler implements InvocationHandler
 			}
 
 			// create the locator and add the methods
-			for (Class locator : locators) {
+			for (Class<?> locator : locators) {
 				Object locatorInstance = createLocatorInstance(
 						locator,
 						_callContext);
@@ -335,13 +335,13 @@ public class AxisClientInvocationHandler implements InvocationHandler
 	}
 	
 	static private Object createLocatorInstance(
-			Class loc,
+			Class<?> loc,
 			ICallingContext callingContext)
 		throws ResourceException
 	{
 		try
 		{
-			Constructor cons = loc.getConstructor(org.apache.axis.EngineConfiguration.class);
+			Constructor<?> cons = loc.getConstructor(org.apache.axis.EngineConfiguration.class);
 			FileProvider config = new FileProvider("client-config.wsdd");
 			Object retval = cons.newInstance(config);
 

@@ -95,7 +95,7 @@ public class GenesisIIBase implements GeniiCommon, IContainerManaged
 	private AttributePackage _attributePackage = new AttributePackage();
 	
 	private Properties _defaultResolverFactoryProperties = null;
-	private Class _defaultResolverFactoryProxyClass = null;
+	private Class<? extends IResolverFactoryProxy> _defaultResolverFactoryProxyClass = null;
 
 	protected AttributePackage getAttributePackage()
 	{
@@ -497,7 +497,7 @@ public class GenesisIIBase implements GeniiCommon, IContainerManaged
 		/* parse config info for service to see if there is a default resolver service */
 		try
 		{
-			Class resolverFactoryProxyClass = getDefaultResolverFactoryProxyClass();
+			Class<? extends IResolverFactoryProxy> resolverFactoryProxyClass = getDefaultResolverFactoryProxyClass();
 		
 			if (resolverFactoryProxyClass != null)
 			{
@@ -879,7 +879,8 @@ public class GenesisIIBase implements GeniiCommon, IContainerManaged
 	}
 
 	
-	protected Class getDefaultResolverFactoryProxyClass() throws ConfigurationException
+	protected Class<? extends IResolverFactoryProxy> getDefaultResolverFactoryProxyClass()
+		throws ConfigurationException
 	{
 		setDefaultResolverFactoryDescription();
 		return _defaultResolverFactoryProxyClass;
