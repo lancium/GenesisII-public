@@ -41,6 +41,7 @@ public class XScriptRunner
 	
 	static private final String SCRIPT_ELEMENT_NAME = "script";
 	static private final String FOREACH_ELEMENT_NAME = "foreach";
+	static private final String FOR_ELEMENT_NAME = "for";
 	static private final String PARAM_ELEMENT_NAME = "param";
 	static private final String DEFINE_ELEMENT_NAME = "define";
 	static private final String ECHO_ELEMENT_NAME = "echo";
@@ -51,6 +52,10 @@ public class XScriptRunner
 	static private final String SOURCE_FILE_ATTRIBUTE_NAME = "source-file";
 	static private final String SOURCE_RNS_ATTRIBUTE_NAME = "source-rns";
 	static private final String FILTER_ATTRIBUTE_NAME = "filter";
+	static private final String INITIAL_VALUE_ATTRIBUTE_NAME = "initial-value";
+	static private final String INCLUSIVE_LIMIT_ATTRIBUTE_NAME = "inclusive-limit";
+	static private final String EXCLUSIVE_LIMIT_ATTRIBUTE_NAME = "exclusive-limit";
+	static private final String INCREMENT_VALUE_ATTRIBUTE_NAME = "increment-value";
 	static private final String NAME_ATTRIBUTE_NAME = "name";
 	static private final String SOURCE_ATTRIBUTE_NAME = "source";
 	static private final String PATTERN_ATTTRIBUTE_NAME = "pattern";
@@ -61,6 +66,8 @@ public class XScriptRunner
 		GSH_NS, SCRIPT_ELEMENT_NAME);
 	static private QName FOREACH_ELEMENT = new QName(
 		GSH_NS, FOREACH_ELEMENT_NAME);
+	static private QName FOR_ELEMENT = new QName(
+		GSH_NS, FOR_ELEMENT_NAME);
 	static private QName PARAM_ELEMENT = new QName(
 		GSH_NS, PARAM_ELEMENT_NAME);
 	static private QName DEFINE_ELEMENT = new QName(
@@ -186,6 +193,10 @@ public class XScriptRunner
 			} else if (nodeName.equals(FOREACH_ELEMENT))
 			{
 				result = handleForeach(variables, n,
+					handler, out, err, in);
+			} else if (nodeName.equals(FOR_ELEMENT))
+			{
+				result = handleFor(variables, n,
 					handler, out, err, in);
 			} else if (nodeName.equals(DEFINE_ELEMENT))
 			{
@@ -318,6 +329,96 @@ public class XScriptRunner
 		for (String value : list)
 		{
 			variables.setValue(paramName, value);
+			if (parseScope(variables, n, handler, out, err, in) != 0)
+				return 1;
+		}
+		
+		return 0;
+	}
+
+	static private int handleFor(ScopedVariables variables, 
+		Node n, IXScriptHandler handler,
+		PrintStream out, PrintStream err, BufferedReader in)
+		throws Throwable
+	{
+		long initialValue = 0;
+		long inclusiveLimit = 0;
+		long exclusiveLimit = 0;
+		long incrementValue = 0;
+		String error = null;
+		
+		NamedNodeMap attributes = n.getAttributes();
+		String paramName = getAttribute(attributes, PARAM_NAME_ATTRIBUTE_NAME);
+		String initialValueString = getAttribute(attributes, INITIAL_VALUE_ATTRIBUTE_NAME);
+		String inclusiveLimitString = getAttribute(attributes, INCLUSIVE_LIMIT_ATTRIBUTE_NAME);
+		String exclusiveLimitString = getAttribute(attributes, EXCLUSIVE_LIMIT_ATTRIBUTE_NAME);
+		String incrementValueString = getAttribute(attributes, INCREMENT_VALUE_ATTRIBUTE_NAME);
+		
+		if (paramName == null)
+			error = "Required attribute \"" + PARAM_NAME_ATTRIBUTE_NAME +
+				"\" is missing in " + FOREACH_ELEMENT + " element.";
+		
+		try
+		{
+			initialValue = Long.parseLong(initialValueString);
+		}
+		catch (NumberFormatException nfe)
+		{
+			error = "Expected an integer, but saw \"" + initialValueString + "\".";
+		}
+		
+		if (incrementValueString == null)
+			incrementValueString = "1";
+		
+		try
+		{
+			incrementValue = Long.parseLong(incrementValueString);
+		}
+		catch (NumberFormatException nfe)
+		{
+			error = "Expected an integer, but saw \"" + incrementValueString + "\".";
+		}
+		
+		if (inclusiveLimitString != null)
+		{
+			try
+			{
+				inclusiveLimit = Long.parseLong(inclusiveLimitString);
+				if (exclusiveLimitString != null)
+					error = "Cannot specify both an " + INCLUSIVE_LIMIT_ATTRIBUTE_NAME + " attribute and an " +
+						EXCLUSIVE_LIMIT_ATTRIBUTE_NAME + " attribute in a for loop.";
+			}
+			catch (NumberFormatException nfe)
+			{
+				error = "Expected an integer, but saw \"" + inclusiveLimitString + "\"";
+			}
+		} else if (exclusiveLimitString != null)
+		{
+			try
+			{
+				exclusiveLimit = Long.parseLong(exclusiveLimitString);
+			}
+			catch (NumberFormatException nfe)
+			{
+				error = "Expected an integer, but saw \"" + exclusiveLimitString + "\"";
+			}
+		} else
+		{
+			error = "One of (" + INCLUSIVE_LIMIT_ATTRIBUTE_NAME + ", " + EXCLUSIVE_LIMIT_ATTRIBUTE_NAME 
+				+ ") must be specified on for loops.";
+		}
+		
+		if (error != null)
+		{
+			err.println(error);
+			return 1;
+		}
+		
+		long limit = (inclusiveLimitString != null) ? inclusiveLimit : exclusiveLimit + 1;
+		variables = variables.deriveSubScope();	
+		for (long value = initialValue; value < limit; value += incrementValue)
+		{
+			variables.setValue(paramName, Long.toString(value));
 			if (parseScope(variables, n, handler, out, err, in) != 0)
 				return 1;
 		}
