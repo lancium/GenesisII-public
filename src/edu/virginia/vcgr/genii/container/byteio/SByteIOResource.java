@@ -31,9 +31,9 @@ public class SByteIOResource extends RByteIOResource implements
 		throws ResourceException
 	{
 		MessageElement fileAny;
-		//MessageElement deleteAny;
+		MessageElement deleteAny;
 		//String fileAny;
-		Boolean deleteAny;
+		//Boolean deleteAny;
 		File file = null;
 		Boolean mustDelete = null;
 		
@@ -47,7 +47,8 @@ public class SByteIOResource extends RByteIOResource implements
 			throw new ResourceException(
 				"StreamableByteIO Instances MUST have a file path " +
 				"element creation property.");
-		deleteAny = (Boolean)creationProperties.get(MUST_DESTROY_PROPERTY);
+		deleteAny = (MessageElement)creationProperties.get(MUST_DESTROY_PROPERTY);
+		//deleteAny = (Boolean)creationProperties.get(MUST_DESTROY_PROPERTY);
 		if (deleteAny == null)
 			throw new ResourceException(
 				"StreamableByteIO Instances MUST have a must destroy " +
@@ -56,7 +57,7 @@ public class SByteIOResource extends RByteIOResource implements
 		{
 			file = new File(fileAny.getValue());
 			//file = new File(fileAny);
-			mustDelete = deleteAny;
+			mustDelete = Boolean.parseBoolean(deleteAny.getValue());
 		}
 		catch (Exception e)
 		{
