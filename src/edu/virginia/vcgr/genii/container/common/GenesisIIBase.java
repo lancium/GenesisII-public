@@ -1,7 +1,6 @@
 package edu.virginia.vcgr.genii.container.common;
 
 import java.io.IOException;
-import java.net.URI;
 import java.rmi.RemoteException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -482,6 +481,8 @@ public class GenesisIIBase implements GeniiCommon, IContainerManaged
 			myEPR.getAddress().get_value().toString(), getImplementedPortTypes());
 		postCreate(rKey, epr, constructionParameters);
 		rKey.dereference().commit();
+		_logger.debug("Created resource \"" + rKey.getKey() + "\" for service \"" +
+			rKey.getServiceName() + "\".");
 		EndpointReferenceType resolveEPR = addResolvers(rKey, epr, constructionParameters);
 		
 		return new VcgrCreateResponse(resolveEPR);

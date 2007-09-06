@@ -17,6 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.GUID;
 import org.morgan.util.io.StreamUtils;
+import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
@@ -140,7 +141,10 @@ public class BasicDBResource implements IResource
 			stmt.setString(1, _resourceKey);
 			rs = stmt.executeQuery();
 			if (!rs.next())
-				throw FaultManipulator.fillInFault(new ResourceUnknownFaultType());
+				throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(
+					null, null, null, null, new BaseFaultTypeDescription[] {
+						new BaseFaultTypeDescription("Resource \"" + _resourceKey + "\" is unknown.")
+					}, null));
 		}
 		catch (SQLException sqe)
 		{
