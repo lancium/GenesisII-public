@@ -6,6 +6,8 @@ import java.util.HashMap;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axis.message.MessageElement;
+
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
@@ -28,9 +30,9 @@ public class SByteIOResource extends RByteIOResource implements
 	public File chooseFile(HashMap<QName, Object> creationProperties)
 		throws ResourceException
 	{
-		//MessageElement fileAny;
+		MessageElement fileAny;
 		//MessageElement deleteAny;
-		String fileAny;
+		//String fileAny;
 		Boolean deleteAny;
 		File file = null;
 		Boolean mustDelete = null;
@@ -39,8 +41,8 @@ public class SByteIOResource extends RByteIOResource implements
 			throw new ResourceException(
 				"StreamableByteIO Instances MUST have a file path.");
 		
-		//fileAny = (MessageElement)creationProperties.get(FILE_PATH_PROPERTY);
-		fileAny = (String)creationProperties.get(FILE_PATH_PROPERTY);
+		fileAny = (MessageElement)creationProperties.get(FILE_PATH_PROPERTY);
+		//fileAny = (String)creationProperties.get(FILE_PATH_PROPERTY);
 		if (fileAny == null)
 			throw new ResourceException(
 				"StreamableByteIO Instances MUST have a file path " +
@@ -52,8 +54,8 @@ public class SByteIOResource extends RByteIOResource implements
 				"element creation property.");
 		try
 		{
-			//file = new File(fileAny.getValue());
-			file = new File(fileAny);
+			file = new File(fileAny.getValue());
+			//file = new File(fileAny);
 			mustDelete = deleteAny;
 		}
 		catch (Exception e)
