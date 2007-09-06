@@ -179,18 +179,21 @@ DllExport int genesisII_remove(PGII_JNI_INFO info, char * path, int recursive, i
 	return JNI_ERR;
 }
 
-DllExport GII_FILE_HANDLE genesisII_open(PGII_JNI_INFO info, char * target, 
-		int create, int read, int write){
+DllExport int genesisII_open(PGII_JNI_INFO info, char * target, 
+		int create, int read, int write, char *** returnArray){
 	jmethodID mid;
 
-	if(get_static_method(info,&(info->jni_launcher), "open", "(Ljava/lang/String;ZZZ)I", &mid) != JNI_ERR)
+	if(get_static_method(info,&(info->jni_launcher), "open", "(Ljava/lang/String;ZZZ)[Ljava/lang/Object;", &mid) != JNI_ERR)
 	{		
 		/* Build argument */
-		jstring j_argument = NewPlatformString(info->env, target, -1);
+		jstring j_argument = NewPlatformString(info->env, target, -1);		
 
-		GII_FILE_HANDLE handle = (*info->env)->CallStaticIntMethod(info->env, info->jni_launcher, mid, j_argument, create, 
-			read, write);
-		return handle;
+		/* Invoke Method */
+		jarray jlisting = (*info->env)->CallStaticObjectMethod(info->env, info->jni_launcher, mid, j_argument, create, 
+			read, write);								
+
+		/* Convert to char** and return */
+		return convert_listing(info->env, returnArray, jlisting);
 	}
 	else{
 		printf("GenesisII Error:  Could not find the method specified for this call\n");

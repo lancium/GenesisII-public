@@ -2,58 +2,69 @@ package edu.virginia.vcgr.genii.client.jni.gIIlib.io;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOInputStream;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOOutputStream;
+import edu.virginia.vcgr.genii.client.jni.gIIlib.JNIGetInformationTool;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.JNILibraryBase;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 
 public class JNIOpen extends JNILibraryBase{
 	
-	public static Integer open(String fileName, Boolean create, Boolean read, 
+	public static ArrayList<String> open(String fileName, Boolean create, Boolean read, 
 			Boolean write){
-		int fileHandle = fileName.hashCode();
 		InputStream theRData = null;
 		OutputStream theWData = null;
+		ArrayList<String> toReturn = new ArrayList<String>();
+		DataTracker tracker = DataTracker.getInstance();
+		int fileHandle = -1;
 		
-		if(read){		
-			theRData = DataTracker.getInstance().getReadStream(fileHandle);
-		}
-		if(write){
-			theWData = DataTracker.getInstance().getWriteStream(fileHandle);						
+		//Check if path is valid
+		if(!JNIGetInformationTool.checkIfValidPath(fileName)){
+			return null;
 		}
 				
 		try{
-			if(theRData != null || theWData != null){
-				System.out.println("File already open");			
+			
+			tryToInitialize();				
+			
+			RNSPath current = RNSPath.getCurrent();
+			RNSPath filePath;			
+			
+			if(create){
+				filePath =  current.lookup(fileName, RNSPathQueryFlags.DONT_CARE);									
 			}
 			else{
-				tryToInitialize();
-				
-				RNSPath current = RNSPath.getCurrent();
-				RNSPath filePath; 
-				if(create){
-					filePath =  current.lookup(fileName, RNSPathQueryFlags.DONT_CARE);									
-				}
-				else{
-					filePath = current.lookup(fileName, RNSPathQueryFlags.MUST_EXIST);
-				}
-				if(write){
-					theWData = new ByteIOOutputStream(filePath);
-					DataTracker.getInstance().putStream(fileHandle, theWData);
-				}
-				if(read){
-					theRData = new ByteIOInputStream(filePath);
-					DataTracker.getInstance().putStream(fileHandle, theRData);
-				}								
+				filePath = current.lookup(fileName, RNSPathQueryFlags.MUST_EXIST);
 			}
-			return fileHandle;	
+			
+			//Can't read directories
+			if(filePath != null && filePath.exists() && 
+					filePath.isDirectory()){
+				read = false;
+			}
+			
+			fileHandle = tracker.atomicGetAndIncrementHandle();
+			
+			if(write){
+				theWData = new ByteIOOutputStream(filePath);
+				tracker.putStream(fileHandle, theWData);
+			}
+			if(read){
+				theRData = new ByteIOInputStream(filePath);
+				tracker.putStream(fileHandle, theRData);
+			}
+			toReturn.add(String.valueOf(fileHandle));
+			toReturn.addAll(JNIGetInformationTool.getInformation(fileName));
+			
+			return toReturn;	
 		}
 		catch(Exception e){
 			e.printStackTrace();
-			DataTracker.getInstance().removeStream(fileHandle);
-			return -1;						
+			tracker.removeStream(fileHandle);
+			return null;						
 		}				
 	}
 }

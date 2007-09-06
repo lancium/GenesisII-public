@@ -10,16 +10,18 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 
 /* Gets the information related to a resource i.e. a Cache Entry */
 public class JNIGetInformationTool extends JNILibraryBase {
-	public static ArrayList getInformation(String path){		
+	public static ArrayList<String> getInformation(String path){		
 		tryToInitialize();
 		
-		if(path.contains(":") || path.contains("desktop.ini")){
-			if(JNILibraryBase.DEBUG)
-				System.out.println("No Info for bogus file: " + path);
-			return null;
-		}
+		System.out.println("Genesis is getting information for file: " + path);
 		
-		path = (path == null || path.equals("") || path.equals("/")) ? "" : path;		
+		//Make sure path is valid
+		if(!checkIfValidPath(path))
+			return null;
+		
+		//All paths are absolute (cleanup)
+		path = (path == null || path.equals("") || path.equals("/")) ? "" : path;
+		path = (path.length() > 0 && !path.startsWith("/")) ? "/" + path : path;
 		
 		JNICacheManager cacheManager = JNICacheManager.getInstance();		
 		JNICacheEntry cacheEntry = cacheManager.getCacheEntry(path);
@@ -35,7 +37,7 @@ public class JNIGetInformationTool extends JNILibraryBase {
 					parent = path.substring(0, slashIdx);
 				}
 				if(parent != null){		
-					ArrayList parentEntries;
+					ArrayList<String> parentEntries;
 					//Should fill cache here with parent DL
 					parentEntries = 
 						JNIDirectoryListingTool.getDirectoryListing(parent, "");
@@ -97,31 +99,17 @@ public class JNIGetInformationTool extends JNILibraryBase {
 			return cacheEntry.getFileInformation();
 		}
 	}
+	
+	public static boolean checkIfValidPath(String path){
+		if(path.contains(":") || 
+				path.matches(".*[Dd][Ee][Ss][Kk][Tt][Oo][Pp].[Ii][Nn][Ii]")){
+			if(JNILibraryBase.DEBUG)
+				System.out.println("GENESIS:  Path filtered out: " + path);
+			return false;
+		}		
+		else{
+			return true;
+		}
+	}
 }
 
-//OLD CODE
-////Last chance (if we still couldn't get it)
-//if(parent!= null && cacheEntry == null){				
-//	boolean isDirectory = false;
-//	long fileSize;
-//	RNSPath current = RNSPath.getCurrent();			
-//	RNSPath filePath = current.lookup(path, RNSPathQueryFlags.MUST_EXIST);
-//	String name;
-//	
-//	//Fill in directory information
-//	if(filePath.isDirectory()){ 
-//		isDirectory = true;
-//		fileSize = 0;
-//	}
-//	else{
-//		TypeInformation type = new TypeInformation(
-//				filePath.getEndpoint());						
-//		fileSize = type.getByteIOSize();																		
-//	}
-//	name = filePath.getName();
-//	
-//	cacheEntry = new JNICacheEntry(path, isDirectory, fileSize, name, null);
-//	
-//	//Add it to the cache!
-//	cacheManager.putCacheEntry(path, cacheEntry);
-//}

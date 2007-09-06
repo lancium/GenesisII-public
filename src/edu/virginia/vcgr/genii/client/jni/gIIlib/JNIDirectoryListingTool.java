@@ -12,19 +12,21 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 
 public class JNIDirectoryListingTool extends JNILibraryBase
 {
-	public static ArrayList getDirectoryListing(String directory, String target) {
+	public static ArrayList<String> getDirectoryListing(String directory, String target) {
 		tryToInitialize();
-		
-		
+				
 		JNICacheManager manager = JNICacheManager.getInstance();
 		JNICacheEntry forDirectory; 
 		JNICacheEntry toAdd = null;
 		ArrayList <JNICacheEntry> cacheEntries = null;
 		ArrayList<String> directoryListing = new ArrayList<String>();
 		
-		//If target is null then query current directory		
+		//If target is null then query current directory
+		//All paths are absolute (cleanup)
 		directory = (directory != null && !directory.equals("") && !directory.equals("/")) 
 			? directory + '/' : "";		
+		directory = (directory.length() > 0 && !directory.startsWith("/")) ? 
+				"/" + directory : directory;
 		
 		//Check cache first
 		forDirectory = manager.getCacheEntry(directory);
@@ -40,6 +42,7 @@ public class JNIDirectoryListingTool extends JNILibraryBase
 		//Check to see if entries are in the cache yet
 		if(cacheEntries != null){
 			for(JNICacheEntry entry : cacheEntries){
+				directoryListing.add(String.valueOf(-1));
 				directoryListing.addAll(entry.getFileInformation());
 			}			
 		}
@@ -71,6 +74,9 @@ public class JNIDirectoryListingTool extends JNILibraryBase
 							//Add to cache and then to return listing
 							manager.putCacheEntry(entryPath, toAdd);
 							cacheEntries.add(toAdd);
+							
+							//Always return -1 first as file handle
+							directoryListing.add(String.valueOf(-1));
 							directoryListing.addAll(toAdd.getFileInformation());
 						}
 						else{
@@ -84,6 +90,9 @@ public class JNIDirectoryListingTool extends JNILibraryBase
 							//Add to cache and then to return listing
 							manager.putCacheEntry(entryPath, toAdd);
 							cacheEntries.add(toAdd);
+							
+							//Always return -1 first as file handle
+							directoryListing.add(String.valueOf(-1));
 							directoryListing.addAll(toAdd.getFileInformation());																					
 						}
 					}

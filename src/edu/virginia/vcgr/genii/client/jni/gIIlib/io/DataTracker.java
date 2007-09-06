@@ -11,12 +11,14 @@ public class DataTracker {
 	private Hashtable<Integer, OutputStream> writeFiles;
 	private ReentrantLock readLock;
 	private ReentrantLock writeLock;
+	private int nextFileHandle;
 	
 	private DataTracker(){
 		readFiles = new Hashtable<Integer, InputStream>();
 		writeFiles = new Hashtable<Integer, OutputStream>();
 		readLock = new ReentrantLock();
 		writeLock = new ReentrantLock();
+		nextFileHandle = 0;
 	}
 	
 	public static DataTracker getInstance(){
@@ -24,6 +26,12 @@ public class DataTracker {
 			myInstance = new DataTracker();			
 		}
 		return myInstance;				
+	}
+	
+	public synchronized int atomicGetAndIncrementHandle(){		
+		int lastFileHandle = nextFileHandle;
+		nextFileHandle++;
+		return lastFileHandle;
 	}
 	
 	public InputStream getReadStream(Integer fileHandle){

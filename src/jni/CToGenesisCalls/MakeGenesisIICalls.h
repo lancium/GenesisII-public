@@ -93,7 +93,7 @@ DllExport int genesisII_move(PGII_JNI_INFO info, char *src, char * dst);
 	If the user does not have permissions for any property of the resource that he/she is requesting, the 
 	entire operation will abort.
 */
-DllExport GII_FILE_HANDLE genesisII_open(PGII_JNI_INFO info, char * target, int create, int read, int write);
+DllExport int genesisII_open(PGII_JNI_INFO info, char * target,	int create, int read, int write, char *** returnArray);
 
 /*
 	Tries to read up to length bytes starting at the offset for the specified file located at the target.  

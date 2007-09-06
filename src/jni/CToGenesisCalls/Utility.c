@@ -11,22 +11,24 @@ void print_listing(char** listing, int size){
 }
 
 int convert_listing(JNIEnv *env, char *** clisting, jarray listing){
-	int i;
+	int i;	
 	if(listing != NULL){
 		jsize size = (*env)->GetArrayLength(env, listing);	
 		char ** string_array;	
 		*clisting = ((char**)malloc(size * sizeof(char**)));	
 		string_array = *clisting;
 
-		for(i = 0; i < size; i+=3){		
-			jstring type = (*env)->GetObjectArrayElement(env, listing, (jsize)i);
-			jstring length =  (*env)->GetObjectArrayElement(env, listing, (jsize)i+1);
-			jstring name = (*env)->GetObjectArrayElement(env, listing, (jsize)i+2);
-			string_array[i] = convert_jstring(env, type);
-			string_array[i+1] = convert_jstring(env, length);			
-			string_array[i+2] = convert_jstring(env, name);			
+		for(i = 0; i < size; i+=4){
+			jstring fileid = (*env)->GetObjectArrayElement(env, listing, (jsize)i);
+			jstring type = (*env)->GetObjectArrayElement(env, listing, (jsize)i+1);
+			jstring length =  (*env)->GetObjectArrayElement(env, listing, (jsize)i+2);
+			jstring name = (*env)->GetObjectArrayElement(env, listing, (jsize)i+3);
+			string_array[i] =  convert_jstring(env, fileid);
+			string_array[i+1] = convert_jstring(env, type);
+			string_array[i+2] = convert_jstring(env, length);			
+			string_array[i+3] = convert_jstring(env, name);			
 		}	
-		return (size/3);
+		return (size/4);
 	}
 	else{
 		return JNI_ERR;

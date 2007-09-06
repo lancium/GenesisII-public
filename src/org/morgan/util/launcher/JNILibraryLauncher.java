@@ -44,23 +44,27 @@ public class JNILibraryLauncher
 		}
 	}	
 	
+	@SuppressWarnings("unchecked")
 	public static Object[] getInformation(String path){
 		String myClass = JNI_PACKAGE + ".JNIGetInformationTool";										 
 		String myMethod = "getInformation";
 		Class[] argTypes = new Class[] {String.class};
 		Object[] args = new Object[] {path};
 				
-		ArrayList toReturn = (ArrayList)invoke(myClass, myMethod, argTypes, args);
+		ArrayList<String> toReturn = (ArrayList<String>)
+			invoke(myClass, myMethod, argTypes, args);
 		return ((toReturn != null) ? toReturn.toArray() : null);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static Object[] getDirectoryListing(String directory, String target){		
 		String myClass = JNI_PACKAGE + ".JNIDirectoryListingTool";
 		String myMethod = "getDirectoryListing";
 		Class[] argTypes = new Class[] {String.class, String.class};
 		Object[] args = new Object[] { directory, target };
-				
-		ArrayList toReturn = (ArrayList)invoke(myClass, myMethod, argTypes, args);
+						
+		ArrayList<String> toReturn = (ArrayList<String>)
+			invoke(myClass, myMethod, argTypes, args);
 		return ((toReturn != null) ? toReturn.toArray() : null);
 	}
 	
@@ -142,7 +146,8 @@ public class JNILibraryLauncher
 	
 	/* ************************* IO Functions**************************** */
 	
-	public static int open(String fileName, boolean create, boolean read, 
+	@SuppressWarnings("unchecked")
+	public static Object[] open(String fileName, boolean create, boolean read, 
 			boolean write){
 		String myClass = JNI_IO_PACKAGE + ".JNIOpen";
 		String myMethod = "open";
@@ -151,7 +156,9 @@ public class JNILibraryLauncher
 		Object[] args = new Object[] {fileName, new Boolean(create), 
 				new Boolean(read), new Boolean(write)};
 		
-		return (Integer)invoke(myClass, myMethod, argTypes, args);				
+		ArrayList<String> toReturn = (ArrayList<String>)
+			invoke(myClass, myMethod, argTypes, args);
+		return ((toReturn != null) ? toReturn.toArray() : null);
 	}
 	
 	

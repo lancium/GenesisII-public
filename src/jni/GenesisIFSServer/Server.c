@@ -1,0 +1,514 @@
+#include <tchar.h>
+#include <stdio.h>
+#include <windows.h>
+
+#include <MakeGenesisIICalls.h>
+#include "nulmrx.h"
+#include <winioctl.h>
+
+//-----------------------------------------------------------------------------
+// Local structures
+
+#define DEBUG			 0x00000000
+#define NUMBER_OF_THREADS			 1
+                                                
+HANDLE sem_handle;
+HANDLE GenesisControlHandle;		//Device handle	
+
+int loggedin = 0;
+
+typedef struct _WORKER{
+	HANDLE thread;
+	struct _WORKER *nextWorker;
+}*PWORKER, WORKER;
+
+
+typedef struct _CommRequest {
+
+    GENII_CONTROL_REQUEST    ControlRequest;
+    char                     ControlRequestBuffer[65536];
+
+} COMMREQUEST, *PCOMMREQUEST;
+
+typedef struct _CommResponse {
+
+    GENII_CONTROL_RESPONSE  ControlResponse;
+	
+	//Max 128 entries (65536 / 512) in QD
+    char                    ControlResponseBuffer[65536];
+
+} COMMRESPONSE, *PCOMMRESPONSE;
+
+
+void printListing(char * listing, int size){
+	int i;	
+	ULONG length;
+	ULONG fileid;
+	for(i =0; i< size; i++){		
+		memcpy(&fileid, listing, sizeof(ULONG));
+		printf("File ID: %d ", fileid);
+		listing += sizeof(ULONG);
+
+		printf("File Type: %s ", listing);		
+		listing += strlen(listing) + 1;
+
+		memcpy(&length, listing, sizeof(ULONG));
+		printf("Size: %d ", length);
+		listing += sizeof(ULONG);
+
+		printf("Name: %s\n", listing);
+		listing += strlen(listing) + 1;		
+	}
+}
+
+//Copy listing and return total bytes saved
+int copyListing(char * buffer, char ** listing, int size){
+
+	char * pointer = buffer;
+	
+	//Max 64 bit length
+	char lengthBuffer[9];
+	long length;
+
+	int i;
+	int bytesCopied = 0;
+
+	__try{
+
+		//Copy as F\0taco.txt\0
+		for(i =0; i < 4*size; i+=4){
+			//Copy file id
+			memcpy(lengthBuffer, listing[i], strlen(listing[i]));
+			lengthBuffer[strlen(listing[i])] = '\0';
+			length = atol(lengthBuffer);
+			memcpy(pointer, &length, sizeof(long));
+			
+			bytesCopied += sizeof(long);
+			pointer += sizeof(long);
+
+			//Copy type of File F | D
+			memcpy(pointer, listing[i+1], strlen(listing[i+1]));
+			pointer[strlen(listing[i+1])] = '\0';		
+
+			bytesCopied += (int)strlen(listing[i+1]) + 1;
+			pointer += strlen(listing[i+1]) + 1;		
+
+			//Copy file length
+			memcpy(lengthBuffer, listing[i+2], strlen(listing[i+2]));
+			lengthBuffer[strlen(listing[i+2])] = '\0';
+			length = atol(lengthBuffer);
+			memcpy(pointer, &length, sizeof(long));
+
+			bytesCopied += sizeof(long);
+			pointer += sizeof(long);
+			
+			//Copy file name
+			memcpy(pointer, listing[i+3], strlen(listing[i+3]));
+			pointer[strlen(listing[i+3])] = '\0';		
+			
+			bytesCopied += (int)strlen(listing[i+3]) + 1;
+			pointer += strlen(listing[i+3]) + 1;
+		}
+	}
+	__finally{
+		if((bytesCopied == 0) && (size > 0)){
+			printf("Some error occurred on copy (no bytes copied)\n");
+		}
+	}
+	return bytesCopied;
+}
+
+BOOL GetRequest(PGENII_CONTROL_REQUEST PRequest,LPOVERLAPPED POverlapped)
+{
+    BOOL    status;
+    DWORD   bytesReturned;    
+
+	WaitForSingleObject(sem_handle, INFINITE);	
+	status = DeviceIoControl(GenesisControlHandle,GENII_CONTROL_GET_REQUEST,
+                             PRequest,sizeof(GENII_CONTROL_REQUEST),
+                             PRequest,sizeof(GENII_CONTROL_REQUEST),
+                             &bytesReturned,
+                             POverlapped);
+	ReleaseSemaphore(sem_handle, 1, NULL);
+
+    if(!status) {
+        DWORD error = GetLastError();
+        if(error != ERROR_IO_PENDING) {
+			printf("Something went wrong:  GetRequest - Status %x",GetLastError());
+            return FALSE;
+        }
+    }    
+
+    return TRUE;                             
+}
+
+BOOL SendResponse(PGENII_CONTROL_RESPONSE PResponse,LPOVERLAPPED POverlapped)
+{
+    BOOL    status;
+    DWORD   bytesReturned;    
+
+
+	WaitForSingleObject(sem_handle, INFINITE);	
+	status = DeviceIoControl(GenesisControlHandle,GENII_CONTROL_SEND_RESPONSE,
+                             PResponse,sizeof(GENII_CONTROL_RESPONSE),
+                             NULL,0,
+                             &bytesReturned,
+                             POverlapped);
+	ReleaseSemaphore(sem_handle, 1, NULL);
+
+    if(!status) {
+        DWORD error = GetLastError();
+        if(error != ERROR_IO_PENDING) {
+            printf("Something went wrong:  SendResponse - Status %x",GetLastError());
+            return FALSE;
+        }
+    }        
+
+    return TRUE;                             
+}
+
+//Prepares a response 
+void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request, 
+		PGENII_CONTROL_RESPONSE response){		
+
+	response->RequestID = request->RequestID;
+    response->ResponseType = request->RequestType;	
+
+	//WaitForSingleObject(sem_handle, INFINITE);
+	//if(!loggedin){
+	//	printf("Logging In to Genesis\n");
+	//	genesisII_login(pMyInfo, "security/keys.pfx", "keys", "skynet1");
+	//	printf("Login successful\n");
+	//	loggedin = 1;
+	//}
+	//ReleaseSemaphore(sem_handle, 1, NULL);
+
+	switch(request->RequestType){
+		case GENII_QUERYDIRECTORY:
+		{			
+			//Status code in Query Directory = # of entries
+			char *directory;
+			char *target;
+			char *bufPtr = (char*) request->RequestBuffer;
+			char ** directoryListing;
+
+			//Get Directory
+			if(request->RequestBufferLength && strlen(bufPtr) > 0){
+				directory = (char*) malloc(strlen(bufPtr) + 1);
+				memcpy(directory, bufPtr, strlen(bufPtr));
+				directory[strlen(bufPtr)] = '\0';				
+			}else{
+				directory = "";
+			}			
+
+			bufPtr += (request->RequestBufferLength > 0) ? strlen(bufPtr) + 1 : 0;
+
+			if(request->RequestBufferLength && strlen(bufPtr) > 0){
+				target = (char*) malloc(strlen(bufPtr) + 1);
+				memcpy(target, bufPtr, strlen(bufPtr));
+				target[strlen(bufPtr)] = '\0';
+			}else{
+				target = "";
+			}
+
+			printf("Directory: %s Target: %s for Query Directory\n", directory, target);			
+			response->StatusCode = genesisII_directory_listing(pMyInfo, &directoryListing, directory, target);
+			printf("Got actual listing\n");
+			//If an error, no copy is done
+			response->ResponseBufferLength = response->StatusCode == -1 ? 0 : 
+				copyListing(response->ResponseBuffer, directoryListing, response->StatusCode);
+
+			printf("Listing Copied successful\n");					
+			break;
+		}	
+		case GENII_QUERYFILEINFO:{
+			//Status code in Query Directory = # of entries
+			char * path;			
+			char *bufPtr = (char*) request->RequestBuffer;
+			char ** listing;
+
+			//Get Directory
+			if(request->RequestBufferLength && strlen(bufPtr) > 0){
+				path = (char*) malloc(strlen(bufPtr) + 1);
+				memcpy(path, bufPtr, strlen(bufPtr));
+				path[strlen(bufPtr)] = '\0';				
+			}else{
+				path = "";
+			}						
+
+			printf("Path: %s for Query Info\n", path);			
+			response->StatusCode = genesisII_get_information(pMyInfo, &listing, path);
+			printf("Got Info!\n");
+			//If an error, no copy is done
+			response->ResponseBufferLength = response->StatusCode == -1 ? 0 : 
+				copyListing(response->ResponseBuffer, listing, response->StatusCode);
+
+			printf("Information Copied successful\n");								 
+			break;						 
+		}
+		case GENII_CREATE:{
+			//Status code in Query Directory = # of entries
+			char * path;			
+			char *bufPtr = (char*) request->RequestBuffer;
+			char ** listing;
+
+			//Get Directory
+			if(request->RequestBufferLength && strlen(bufPtr) > 0){
+				path = (char*) malloc(strlen(bufPtr) + 1);
+				memcpy(path, bufPtr, strlen(bufPtr));
+				path[strlen(bufPtr)] = '\0';				
+			}else{
+				path = "";
+			}						
+
+			printf("Path: %s for Create\n", path);			
+
+			response->StatusCode = genesisII_open(pMyInfo, path, 0, 1, 0, &listing);
+			printf("Create finished on Genesis side!\n");
+			//If an error, no copy is done
+			response->ResponseBufferLength = response->StatusCode == -1 ? 0 : 
+				copyListing(response->ResponseBuffer, listing, response->StatusCode);
+
+			printListing(response->ResponseBuffer, response->StatusCode);
+
+			printf("Information Copied successful\n");		
+
+			break;
+		}
+		default:
+			//default action just copies request buff into response buff
+            response->ResponseBufferLength = request->RequestBufferLength;
+
+            memcpy(response->ResponseBuffer,
+                   request->RequestBuffer,
+                   request->RequestBufferLength);
+		
+			break;
+	}
+}
+
+DWORD WINAPI TestThread(LPVOID parameter){	
+	char ** directoryListing;
+	char buffer[8192];
+	int StatusCode;
+	GII_JNI_INFO myInfo;
+
+	if(initializeJavaVMForThread(&myInfo) == -1){
+		printf("Thread initialization failed\n");
+		return -1;
+	}
+
+	//Log in!
+	WaitForSingleObject(sem_handle, INFINITE);
+	if(!loggedin){
+		printf("Logging In to Genesis\n");
+		genesisII_login(&myInfo, "security/keys.pfx", "keys", "skynet1");
+		printf("Login successful\n");
+		loggedin = 1;
+	}
+	ReleaseSemaphore(sem_handle, 1, NULL);
+
+	StatusCode = genesisII_directory_listing(&myInfo, &directoryListing, "", "");
+	copyListing(buffer, directoryListing, StatusCode);
+	printListing(buffer, StatusCode);
+
+	Sleep(300000);
+	return 0 ;
+}
+
+/*	
+	Server thread with inverted calls
+*/
+DWORD WINAPI ServerThread(LPVOID parameter){
+	BOOL			connected = TRUE;
+	BOOL			isRunning = TRUE;    
+    OVERLAPPED      GeniiRequestOverlapped;
+    COMMREQUEST     GeniiRequest;
+    COMMRESPONSE    GeniiResponse;
+    BOOL            ret;	
+	GII_JNI_INFO myInfo;	
+
+	if(initializeJavaVMForThread(&myInfo) == -1){
+		printf("Thread initialization failed\n");
+		return -1;
+	}
+	
+	//For this, we'll assume driver stays connected
+	while(isRunning && connected){		        
+		DWORD bytesTransferred;
+
+		//Don't run ALL the time
+		Sleep(200);
+
+        //Tell device you are ready to process 
+        memset(&GeniiRequestOverlapped,0,sizeof(GeniiRequestOverlapped));
+        GeniiRequestOverlapped.hEvent = CreateEvent(NULL,TRUE,FALSE,NULL);
+        
+		if(GeniiRequestOverlapped.hEvent == INVALID_HANDLE_VALUE) {
+			//try to acquire one next time around
+            continue;
+        }
+
+        memset(&GeniiRequest,0,sizeof(GeniiRequest));
+
+        GeniiRequest.ControlRequest.RequestBuffer = &(GeniiRequest.ControlRequestBuffer[0]);
+        GeniiRequest.ControlRequest.RequestBufferLength = sizeof(GeniiRequest.ControlRequestBuffer);
+
+		printf("Notication sent to Kernel Driver\n");
+
+        ret = GetRequest(&(GeniiRequest.ControlRequest),&GeniiRequestOverlapped);
+        if(!ret) {
+            CloseHandle(GeniiRequestOverlapped.hEvent);
+            continue;
+        } 			
+
+		//Wait to be alerted by the device that IO is waiting
+        while(!HasOverlappedIoCompleted(&GeniiRequestOverlapped)) {
+            if(!isRunning) {
+                goto exitStageLeft;                    
+            } 
+            Sleep(100);
+        }
+
+		//Get the request				                                 
+		ret = GetOverlappedResult(GenesisControlHandle,&GeniiRequestOverlapped,&bytesTransferred,FALSE);                        
+        
+        printf("Request from Kernel Driver Received : Id= %x, Type = %x, Length %x\n", 
+                 GeniiRequest.ControlRequest.RequestID,
+                 GeniiRequest.ControlRequest.RequestType,                 
+                 GeniiRequest.ControlRequest.RequestBufferLength);
+
+		//This must be done before preparing the Response
+		GeniiResponse.ControlResponse.ResponseBuffer = &(GeniiResponse.ControlResponseBuffer[0]);
+		      
+		//PREPARE GENESIS RESPONSE depending on RequestID
+		prepareResponse(&myInfo, &(GeniiRequest.ControlRequest), &(GeniiResponse.ControlResponse));
+
+		//Send response
+        ResetEvent(GeniiRequestOverlapped.hEvent);
+        printf("Sending Response to Kernel Driver: Id= %x, Type = %x, Length %x\n", 
+                 GeniiResponse.ControlResponse.RequestID,
+                 GeniiResponse.ControlResponse.ResponseType,                 
+                 GeniiResponse.ControlResponse.ResponseBufferLength);
+
+        ret = SendResponse(&(GeniiResponse.ControlResponse),&GeniiRequestOverlapped);
+        if(!ret) {              
+            CloseHandle(GeniiRequestOverlapped.hEvent);
+            continue;
+        } 
+        while(!HasOverlappedIoCompleted(&GeniiRequestOverlapped)) {
+            if(!isRunning) {
+                goto exitStageLeft;                    
+            } 
+            Sleep(100);
+        }        
+        CloseHandle(GeniiRequestOverlapped.hEvent);
+	}
+
+exitStageLeft:
+	return 0;
+}
+
+int runMultiThreaded(){
+	
+	PWORKER head, last=NULL, current;
+    DWORD dwThreadId;	
+	int i;	
+
+	sem_handle = CreateSemaphore(NULL, 1, 1, NULL); 	
+
+	//Open device that deals with inverted calls
+	GenesisControlHandle = CreateFile(DD_GENII_CONTROL_DEVICE_USER_NAME,
+									GENERIC_READ|GENERIC_WRITE,
+                                    FILE_SHARE_READ | FILE_SHARE_WRITE,NULL,OPEN_EXISTING,
+                                    FILE_ATTRIBUTE_NORMAL|FILE_FLAG_OVERLAPPED,NULL);
+
+	// We cannot continue if we cannot find the device
+	if(GenesisControlHandle == INVALID_HANDLE_VALUE) {
+		DWORD error = GetLastError();
+		printf("\n%x\n", error);
+		_tprintf(_T("\nGenesis Control device not located.  Please reinstall the Genesis Driver\n"));
+		return 0; 
+	}
+
+	head = (PWORKER) malloc(sizeof(WORKER));
+
+	// Run both threads testing small LPC messages   
+	head->thread = CreateThread(NULL, 0, ServerThread, NULL, 0, &dwThreadId);
+	head->nextWorker = NULL;
+	current = head;
+
+	for(i=1; i < NUMBER_OF_THREADS; i++){
+		last = current;
+		current = (PWORKER) malloc(sizeof(WORKER));
+		current->thread = CreateThread(NULL, 0, ServerThread, NULL, 0, &dwThreadId);
+		current->nextWorker = NULL;
+		last->nextWorker = current;
+	}
+
+	//Wait for last node
+	WaitForSingleObject(current->thread, INFINITE);
+
+	//Clean up
+	current = head;
+	while(current != NULL){
+		last = current;
+		current = current->nextWorker;		
+		CloseHandle(last->thread);
+		free(last);
+	}	
+
+	if(GenesisControlHandle != INVALID_HANDLE_VALUE) {
+
+        CloseHandle(GenesisControlHandle);
+        GenesisControlHandle = INVALID_HANDLE_VALUE;
+    }
+
+	//Delete semaphore
+	CloseHandle(sem_handle);
+	return 0;
+}
+
+int main(int argc, char* argv[])
+{
+	int status = 0;
+	GII_JNI_INFO rootInfo;		
+
+	/*int StatusCode, bytes;
+	char ** directoryListing;
+	char buffer[8192];	*/
+
+	//Initialize in root thread
+	if(initializeJavaVM("C:/GenesisIIDevelopment/GenesisII", &rootInfo) == -1){
+		printf("Initialization Failed!\n ");
+		return 0;
+	}
+	
+	if(!loggedin){
+		printf("Logging In to Genesis\n");
+		genesisII_login(&rootInfo, "security/keys.pfx", "keys", "skynet1");
+		printf("Login successful\n");
+		loggedin = 1;
+	}
+	
+	status = runMultiThreaded();		
+
+	//printf("Creating file aFile.xml \n");
+
+	//StatusCode = genesisII_open(&rootInfo, "aFile.xml", 0, 1, 0, &directoryListing);
+	//printf("Got Create Info\n");
+	//bytes = copyListing(buffer, directoryListing, StatusCode);
+	//printListing(buffer, StatusCode);
+
+	//printf("Creating file aFile.xml \n");
+
+	//StatusCode = genesisII_open(&rootInfo, "aFile.xml", 0, 1, 0, &directoryListing);
+	//printf("Got Create Info\n");
+	//bytes = copyListing(buffer, directoryListing, StatusCode);
+	//printListing(buffer, StatusCode);
+
+	//genesisII_logout(&rootInfo);
+	
+	return status;
+}
+
