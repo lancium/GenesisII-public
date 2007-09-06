@@ -61,6 +61,7 @@ import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.client.context.*;
 
 import org.morgan.util.configuration.*;
+import org.oasis_open.wsrf.basefaults.BaseFaultType;
 
 import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
 import edu.virginia.vcgr.genii.container.security.authz.handlers.*;
@@ -266,11 +267,21 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
     		
     		return crypto;
 
-        } catch (IOException e) {
+        }
+        catch (BaseFaultType bft)
+        {
+        	throw new WSSecurityException(bft.dumpToString(), bft);
+        }
+        catch (IOException e)
+        {
     		throw new WSSecurityException(e.getMessage(), e);
-        } catch (java.security.GeneralSecurityException e) {
+        }
+        catch (java.security.GeneralSecurityException e) 
+        {
     		throw new WSSecurityException(e.getMessage(), e);
-		} catch (org.apache.ws.security.components.crypto.CredentialException e) {
+		}
+        catch (org.apache.ws.security.components.crypto.CredentialException e) 
+        {
 			throw new WSSecurityException(e.getMessage(), e);
 		}
     }	
