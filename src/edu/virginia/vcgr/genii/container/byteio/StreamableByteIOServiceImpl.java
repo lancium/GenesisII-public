@@ -100,6 +100,7 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements
 		{
 			WorkingContext ctxt = WorkingContext.getCurrentWorkingContext();
 			ResourceKey key = (ResourceKey)ctxt.getProperty(WorkingContext.CURRENT_RESOURCE_KEY);
+			key.dereference().commit();
 			ctxt.setProperty(WorkingContext.CURRENT_RESOURCE_KEY, rKey);
 			try
 			{
@@ -115,7 +116,9 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements
 			}
 			finally
 			{
+				rKey.dereference().commit();
 				ctxt.setProperty(WorkingContext.CURRENT_RESOURCE_KEY, key);
+				key.dereference().commit();
 			}
 		}
 	}
