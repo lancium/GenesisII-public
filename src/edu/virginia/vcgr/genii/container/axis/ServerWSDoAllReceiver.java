@@ -62,6 +62,7 @@ import edu.virginia.vcgr.genii.client.context.*;
 
 import org.morgan.util.configuration.*;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
+import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 
 import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
 import edu.virginia.vcgr.genii.container.security.authz.handlers.*;
@@ -270,7 +271,11 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
         }
         catch (BaseFaultType bft)
         {
-        	throw new WSSecurityException(bft.dumpToString(), bft);
+        	BaseFaultTypeDescription []desc = bft.getDescription();
+        	if (desc != null && desc.length >= 1)
+        		throw new WSSecurityException(desc[0].get_value(), bft);
+        	else
+        		throw new WSSecurityException(bft.dumpToString(), bft);
         }
         catch (IOException e)
         {
