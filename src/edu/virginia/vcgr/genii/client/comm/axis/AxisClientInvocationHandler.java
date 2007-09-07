@@ -64,6 +64,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.MessageLevelSecurity;
 import edu.virginia.vcgr.genii.client.security.x509.*;
+import edu.virginia.vcgr.genii.client.utils.deployment.DeploymentRelativeFile;
 import edu.virginia.vcgr.genii.client.naming.EPIResolutionCache;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.NameResolutionFailedException;
@@ -166,7 +167,8 @@ public class AxisClientInvocationHandler implements InvocationHandler
 			if (trustStorePass != null) {
 				trustStorePassChars = trustStorePass.toCharArray();
 			}
-			__trustStore = CertTool.openStoreDirectPath(trustStoreLoc, trustStoreType, trustStorePassChars);
+			__trustStore = CertTool.openStoreDirectPath(
+				new DeploymentRelativeFile(trustStoreLoc), trustStoreType, trustStorePassChars);
 			return __trustStore;
 
 		} catch (ConfigurationException e) { 

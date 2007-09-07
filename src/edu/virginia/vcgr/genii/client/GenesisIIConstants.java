@@ -11,6 +11,9 @@ public class GenesisIIConstants
 	static public final String INSTALL_DIR_SYSTEM_PROPERTY = 
 		"edu.virginia.vcgr.genii.install-base-dir";
 	
+	static public final String DEPLOYMENT_NAME_PROPERTY =
+		"edu.virginia.vcgr.genii.client.deployment-name";
+	
 	static public final long CredentialExpirationMillis = 1000 * 60 * 60 * 24; // valid 24 hours
  
 	

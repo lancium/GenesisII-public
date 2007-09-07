@@ -7,6 +7,7 @@ import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.utils.deployment.DeploymentRelativeFile;
 
 public class ConfigurationManager
 {
@@ -22,9 +23,7 @@ public class ConfigurationManager
 	
 	// Place to remember the user directory for holding things like session state
 	private File _userDir;
-	// Place where config files are located
-	private File _configDir;
-
+	
 	// Client and Container configuration files
 	private XMLConfiguration _clientConf;
 	private XMLConfiguration _serverConf;
@@ -70,11 +69,6 @@ public class ConfigurationManager
 		}
 	}		
 	
-	static public ConfigurationManager initializeConfiguration(String userDir)
-	{
-		return initializeConfiguration(null, userDir);
-	}		
-
 	/**
 	 * Creates a configuration manager.  Can only be called once. 
 	 * @param configurationDir Place to where client/container config files
@@ -85,14 +79,8 @@ public class ConfigurationManager
 	 * 		things like session state
 	 * @return
 	 */
-	static public ConfigurationManager initializeConfiguration(
-			String configurationDir, 
-			String userDir)
+	static public ConfigurationManager initializeConfiguration(String userDir)
 	{
-		if (configurationDir == null) {
-			configurationDir = getDefaultConfigDir();			
-		}
-		
 		synchronized (ConfigurationManager.class)
 		{
 			if (_manager != null)
@@ -101,7 +89,7 @@ public class ConfigurationManager
 			}
 			
 			try {
-				_manager = new ConfigurationManager(configurationDir, userDir);
+				_manager = new ConfigurationManager(userDir);
 			}
 			catch (ConfigurationException ce)
 			{
@@ -111,18 +99,19 @@ public class ConfigurationManager
 		}
 	}		
 
-	protected ConfigurationManager(String configurationDir, String userDir)
+	protected ConfigurationManager(String userDir)
 		throws ConfigurationException
 	{
-		_configDir = new File(configurationDir);
 		_userDir = new File(userDir);
 		
 		System.setProperty(_USER_DIR_PROPERTY, _userDir.getAbsolutePath());
 		
 		try
 		{
-			_clientConf = new XMLConfiguration(new File(configurationDir, _CLIENT_CONF_FILENAME));
-			_serverConf = new XMLConfiguration(new File(configurationDir, _SERVER_CONF_FILENAME));
+			_clientConf = new XMLConfiguration(new DeploymentRelativeFile(
+				"configuration/" + _CLIENT_CONF_FILENAME));
+			_serverConf = new XMLConfiguration(new DeploymentRelativeFile(
+				"configuration/" + _SERVER_CONF_FILENAME));
 		}
 		catch (IOException ioe)
 		{
@@ -144,10 +133,6 @@ public class ConfigurationManager
 		return _userDir;
 	}
 	
-	public File getConfigDirectory() {
-		return _configDir;
-	}
-
 	synchronized private void setRole(Boolean isClient)
 	{
 		if (_isClient != null)

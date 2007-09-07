@@ -258,7 +258,7 @@ public class CertTool {
 	 * @param password
 	 * @return Returns the keystore loaded from the given location.
 	 */
-	public static KeyStore openStoreDirectPath(String location, String type, 
+	public static KeyStore openStoreDirectPath(File location, String type, 
 			char[] password) throws GeneralSecurityException, IOException  {
 		// try both providers (BC and the default SunJCE)
 		KeyStore ks = null;

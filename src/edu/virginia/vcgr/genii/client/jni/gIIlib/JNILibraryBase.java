@@ -15,7 +15,7 @@ public abstract class JNILibraryBase extends ApplicationBase {
 	
 	public static void initialize(){
 		try{
-			prepareClientApplication(null);
+			prepareClientApplication();
 			isInitialized = true;
 		}catch(RuntimeException e){
 			System.out.println("Application already started");

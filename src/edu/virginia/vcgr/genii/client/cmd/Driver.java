@@ -3,46 +3,35 @@ package edu.virginia.vcgr.genii.client.cmd;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.StringTokenizer;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.ApplicationBase;
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 
 public class Driver extends ApplicationBase
 {
-	static public void usage() {
-		System.out.println("Container [--config-dir=<config dir>]");
+	static private Log _logger = LogFactory.getLog(Driver.class);
+	
+	static public void usage() 
+	{
+		System.out.println("Driver");
 	}
 
 	static public void main(String []args)
 	{
-		String explicitConfigDir = null;
-		
-		while (args.length > 0) {
-			String arg = args[0];
-			
-			StringTokenizer st = new StringTokenizer(arg, "=");
-			String option = st.nextToken();
-			
-			if (option.equals("--config-dir")) {
-				if (!st.hasMoreElements()) {
-					usage();
-					return;
-				}
-				explicitConfigDir = st.nextToken();
-				
-				// strip off the arg 
-				String[] newArgs = new String[args.length - 1];
-				System.arraycopy(args, 1, newArgs, 0, newArgs.length);
-				args = newArgs;
-				
-			} else {
-				// dont recognize arg, assume it and all subsequent args 
-				// are for the tool
-				break;
-			}
+		String deploymentName = System.getenv("GENII_DEPLOYMENT_NAME");
+		if (deploymentName != null)
+		{
+			_logger.debug("Using Deployment \"" + deploymentName + "\".");
+			System.setProperty(GenesisIIConstants.DEPLOYMENT_NAME_PROPERTY, deploymentName);
+		} else
+		{
+			_logger.debug("Using Deployment \"default\".");
 		}
 		
-		prepareClientApplication(explicitConfigDir);
+		prepareClientApplication();
 		
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		

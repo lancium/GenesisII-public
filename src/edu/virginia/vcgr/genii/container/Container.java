@@ -40,6 +40,7 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
+import edu.virginia.vcgr.genii.client.utils.deployment.DeploymentRelativeFile;
 import edu.virginia.vcgr.genii.container.configuration.ContainerConfiguration;
 import edu.virginia.vcgr.genii.container.deployment.ServiceDeployer;
 import edu.virginia.vcgr.genii.container.invoker.GAroundInvokerFactory;
@@ -68,30 +69,21 @@ public class Container extends ApplicationBase
 	static private long _defaultCertificateLifetime = 1000L * 60L * 60L * 24L * 365L;
 	
 	static public void usage() {
-		System.out.println("Container [--config-dir=<config dir>]");
+		System.out.println("Container [deployment-name]");
 	}
 	
 	static public void main(String []args)
 	{	
-		String explicitConfigDir = null;
-		
-		for (String arg : args) {
-			StringTokenizer st = new StringTokenizer(arg, "=");
-			String option = st.nextToken();
-			
-			if (option.equals("--config-dir")) {
-				if (!st.hasMoreElements()) {
-					usage();
-					return;
-				}
-				explicitConfigDir = st.nextToken();
-			} else {
-				usage();
-				return;
-			}
+		if (args.length > 1)
+		{
+			usage();
+			System.exit(1);
 		}
 		
-		prepareServerApplication(explicitConfigDir);
+		if (args.length == 1)
+			System.setProperty(GenesisIIConstants.DEPLOYMENT_NAME_PROPERTY, args[0]);
+		
+		prepareServerApplication();
 		
 		try
 		{
@@ -199,7 +191,7 @@ public class Container extends ApplicationBase
 		// ServiceDeployer.startServiceDeployer(_axisServer,
 		//	new File(getConfigurationManager().getConfigDirectory(), "services"));
 		ServiceDeployer.startServiceDeployer(_axisServer,
-			new File(ConfigurationManager.getInstallDir(), "services"));
+			new DeploymentRelativeFile("services"));
 	}
 	
 	static private void initializeServices(WebApplicationContext ctxt)
@@ -325,7 +317,8 @@ public class Container extends ApplicationBase
 		if (keyPassword != null)
 			keyPassChars = keyPassword.toCharArray();
 
-		KeyStore ks = CertTool.openStoreDirectPath(keyStoreLoc, keyStoreType, keyStorePassChars);
+		KeyStore ks = CertTool.openStoreDirectPath(new DeploymentRelativeFile(keyStoreLoc),
+			keyStoreType, keyStorePassChars);
 	
 		// load the container private key and certificate
 		_containerPrivateKey = (PrivateKey) ks.getKey(
@@ -343,7 +336,7 @@ public class Container extends ApplicationBase
 		if (defaultOwnerCertPath != null) {
 			CertificateFactory cf = CertificateFactory.getInstance("X.509");
 			_defaultInitialResourceOwner = (X509Certificate) 
-				cf.generateCertificate(new FileInputStream(defaultOwnerCertPath));
+				cf.generateCertificate(new FileInputStream(new DeploymentRelativeFile(defaultOwnerCertPath)));
 		}
 		
 	}

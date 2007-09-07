@@ -33,6 +33,7 @@ import org.morgan.util.configuration.XMLConfiguration;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
+import edu.virginia.vcgr.genii.client.utils.deployment.DeploymentRelativeFile;
 
 public class VcgrSslSocketFactory extends SSLSocketFactory 
 {
@@ -61,8 +62,8 @@ public class VcgrSslSocketFactory extends SSLSocketFactory
 			
 			if (trustStoreLoc != null)
 			{
-				KeyStore ks = CertTool.openStoreDirectPath(trustStoreLoc, trustStoreType, 
-					trustStorePassChars);
+				KeyStore ks = CertTool.openStoreDirectPath(new DeploymentRelativeFile(trustStoreLoc),
+					trustStoreType, trustStorePassChars);
 		    	tmf.init(ks);
 
 		    	// create the ssl context with the new trust manager factory

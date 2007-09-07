@@ -6,6 +6,7 @@ import org.morgan.util.configuration.ConfigurationException;
 import org.mortbay.http.SslListener;
 
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
+import edu.virginia.vcgr.genii.client.utils.deployment.DeploymentRelativeFile;
 
 public class SslInformation
 {
@@ -41,7 +42,7 @@ public class SslInformation
 	
 	public void configure(ConfigurationManager manager, SslListener listener)
 	{
-		listener.setKeystore(_keystoreFilename);
+		listener.setKeystore((new DeploymentRelativeFile(_keystoreFilename)).getAbsolutePath());
 		listener.setKeystoreType(_keystoreType);
 		listener.setPassword(_keystorePassword);
 		listener.setKeyPassword(_keyPassword);

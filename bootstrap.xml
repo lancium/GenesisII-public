@@ -8,7 +8,7 @@
 	
 	<geniix:login>
 		<gsh:param>--no-gui</gsh:param>
-		<gsh:param>--file=security/keys.pfx</gsh:param>
+		<gsh:param>--file=deployments/default/security/keys.pfx</gsh:param>
 		<gsh:param>--password=keys</gsh:param>
 		<gsh:param>skynet</gsh:param>
 	</geniix:login>

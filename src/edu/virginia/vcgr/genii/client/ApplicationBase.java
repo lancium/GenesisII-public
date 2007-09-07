@@ -21,32 +21,16 @@ public class ApplicationBase
 		return value;
 	}
 	
-	static private String getConfigDirFromEnvironment()
+	static private void prepareApplication(boolean isClient)
 	{
-		String value = System.getenv(CONFIG_DIR_ENVIRONMENT_VARIABLE);
-		if (value == null || value.length() == 0)
-			return null;
-		
-		return value;
-	}
-
-	static private void prepareApplication(boolean isClient, String explicitConfigDir)
-	{
-		if (explicitConfigDir == null) {
-			explicitConfigDir = getConfigDirFromEnvironment();
-		}
-		
 		String userDir = getUserDirFromEnvironment();
 		if (userDir == null) 
-		{
 			userDir = System.getProperty("user.home") + "/.genesisII";
-		}
 		
 		ConfigurationManager configurationManager = 
-			ConfigurationManager.initializeConfiguration(explicitConfigDir, userDir);
+			ConfigurationManager.initializeConfiguration(userDir);
 
 		setupUserDir(configurationManager.getUserDirectory());
-		setupConfigDir(configurationManager.getConfigDirectory());
 		
 		if (isClient)
 			configurationManager.setRoleClient();
@@ -68,15 +52,12 @@ public class ApplicationBase
 				+ "\" is not a directory.");
 	}
 	
-	static private void setupConfigDir(File basedir)
+	/**
+	 * Prepares the static configuration manager
+	 */
+	static protected void prepareServerApplication()
 	{
-		if (!basedir.exists())
-			throw new RuntimeException("Path \"" + basedir.getAbsolutePath()
-				+ "\" does not exist.");
-		
-		if (!basedir.isDirectory())
-			throw new RuntimeException("Path \"" + basedir.getAbsolutePath()
-				+ "\" is not a directory.");
+		prepareApplication(false);
 	}
 	
 	/**
@@ -88,22 +69,8 @@ public class ApplicationBase
 	 * 
 	 * @param explicitConfigDir
 	 */
-	static protected void prepareServerApplication(String explicitConfigDir)
+	static protected void prepareClientApplication()
 	{
-		prepareApplication(false, explicitConfigDir);
-	}
-	
-	/**
-	 * Prepares the static configuration manager (using the config files in the 
-	 * explicitConfigDir).  If explicitConfigDir is null, the GENII_CONFIG_DIR is
-	 * inspected.  If that is not present (or empty), the default configuration location
-	 * located in a well-known spot from the installation directory (as per the
-	 * installation system property) is used;
-	 * 
-	 * @param explicitConfigDir
-	 */
-	static protected void prepareClientApplication(String explicitConfigDir)
-	{
-		prepareApplication(true, explicitConfigDir);
+		prepareApplication(true);
 	}
 }
