@@ -71,7 +71,7 @@ public class JNILibraryLauncher
 	public static boolean changeDirectory(String targetDirectory){				
 		String myClass = JNI_PACKAGE + ".JNICdTool";
 		String myMethod = "changeDirectory";
-		Class[] argTypes = new Class[] {String.class };
+		Class<?>[] argTypes = new Class[] {String.class };
 		Object[] args = new Object[] { targetDirectory};
 		
 		return (Boolean)invoke(myClass, myMethod, argTypes, args);				
@@ -80,7 +80,7 @@ public class JNILibraryLauncher
 	public static String getCurrentDirectory(){
 		String myClass = JNI_PACKAGE + ".JNIPwdTool";
 		String myMethod = "getCurrentDirectory";
-		Class[] argTypes = null;
+		Class<?>[] argTypes = null;
 		Object[] args = null;
 		
 		return (String)invoke(myClass, myMethod, argTypes, args);				
@@ -89,7 +89,7 @@ public class JNILibraryLauncher
 	public static boolean makeDirectory(String newDirectory){
 		String myClass = JNI_PACKAGE + ".JNIMkDirTool";
 		String myMethod = "makeDirectory";
-		Class[] argTypes = new Class[] {String.class };
+		Class<?>[] argTypes = new Class[] {String.class };
 		Object[] args = new Object[] { newDirectory};
 		
 		return (Boolean)invoke(myClass, myMethod, argTypes, args);					
@@ -98,7 +98,7 @@ public class JNILibraryLauncher
 	public static boolean login(String keystorePath, String password, String certPath){
 		String myClass = JNI_PACKAGE + ".JNILoginTool";
 		String myMethod = "login";
-		Class[] argTypes = new Class[] {String.class, String.class , String.class };
+		Class<?>[] argTypes = new Class[] {String.class, String.class , String.class };
 		Object[] args = new Object[] { keystorePath , password , certPath };
 		
 		return (Boolean)invoke(myClass, myMethod, argTypes, args);			
@@ -107,7 +107,7 @@ public class JNILibraryLauncher
 	public static void logout(){
 		String myClass = JNI_PACKAGE + ".JNILogoutTool";
 		String myMethod = "logout";
-		Class[] argTypes = null;
+		Class<?>[] argTypes = null;
 		Object[] args = null;
 		
 		invoke(myClass, myMethod, argTypes, args);				
@@ -116,7 +116,7 @@ public class JNILibraryLauncher
 	public static boolean remove(String target, boolean recursive, boolean force){
 		String myClass = JNI_PACKAGE + ".JNIRmTool";
 		String myMethod = "remove";
-		Class[] argTypes = new Class[] {String.class, 
+		Class<?>[] argTypes = new Class[] {String.class, 
 				Boolean.class, Boolean.class};
 		Object[] args = new Object[] {target, 
 				new Boolean(recursive), new Boolean(force)};
@@ -127,7 +127,7 @@ public class JNILibraryLauncher
 	public static boolean copy(String source, String destination,boolean srcLocal, boolean dstLocal){
 		String myClass = JNI_PACKAGE + ".JNICpTool";
 		String myMethod = "copy";
-		Class[] argTypes = new Class[] {String.class, String.class, 
+		Class<?>[] argTypes = new Class[] {String.class, String.class, 
 					Boolean.class, Boolean.class};
 		Object[] args = new Object[] {source, destination, 
 				new Boolean(srcLocal), new Boolean(dstLocal)};
@@ -138,7 +138,7 @@ public class JNILibraryLauncher
 	public static boolean move(String source, String destination){
 		String myClass = JNI_PACKAGE + ".JNIMvTool";
 		String myMethod = "move";
-		Class[] argTypes = new Class[] {String.class, String.class};
+		Class<?>[] argTypes = new Class[] {String.class, String.class};
 		Object[] args = new Object[] {source, destination};
 		
 		return (Boolean)invoke(myClass, myMethod, argTypes, args);				
@@ -165,7 +165,7 @@ public class JNILibraryLauncher
 	public static String read(int fileHandle, int offset, int length){
 		String myClass = JNI_IO_PACKAGE + ".JNIRead";
 		String myMethod = "read";
-		Class[] argTypes = new Class[] {Integer.class, Integer.class, Integer.class};
+		Class<?>[] argTypes = new Class[] {Integer.class, Integer.class, Integer.class};
 		Object[] args = new Object[] {new Integer(fileHandle), 
 				new Integer(offset), new Integer(length)};
 		
@@ -175,7 +175,7 @@ public class JNILibraryLauncher
 	public static int write(int fileHandle, String data, int offset){
 		String myClass = JNI_IO_PACKAGE + ".JNIWrite";
 		String myMethod = "write";
-		Class[] argTypes = new Class[] {Integer.class, String.class, Integer.class};
+		Class<?>[] argTypes = new Class[] {Integer.class, String.class, Integer.class};
 		Object[] args = new Object[] {new Integer(fileHandle), 
 				new String(data), new Integer(offset)};
 		
@@ -185,13 +185,13 @@ public class JNILibraryLauncher
 	public static boolean close(int fileHandle){
 		String myClass = JNI_IO_PACKAGE + ".JNIClose";
 		String myMethod = "close";
-		Class[] argTypes = new Class[] {Integer.class};
+		Class<?>[] argTypes = new Class[] {Integer.class};
 		Object[] args = new Object[] {new Integer(fileHandle)};
 		
 		return (Boolean)invoke(myClass, myMethod, argTypes, args);				
 	}
 	
-	private static Object invoke(String cls, String mtd, Class[] argTypes, Object[] args){
+	private static Object invoke(String cls, String mtd, Class<?>[] argTypes, Object[] args){
 		if(!isLoaded){
 			initialize();
 		}		
