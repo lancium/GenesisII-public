@@ -164,6 +164,7 @@
 		<antcall target="gen.simple-resolver"/>
 		<antcall target="gen.simple-resolver-factory"/>
 		<antcall target="gen.queue"/>
+		<antcall target="deployments"/>
 	</target>
 
 	<target name="gen.compile" depends="generate-code">
@@ -240,6 +241,19 @@
 
 	<target name="build" depends="jars,scripts"/>
 
+	<target name="deployments">
+		<copy todir="${basedir}/deployments/default-secure/services">
+			<fileset dir="${basedir}/services">
+				<include name="**/*.wsdd"/>
+			</fileset>
+		</copy>
+		<copy todir="${basedir}/deployments/default/services">
+			<fileset dir="${basedir}/services">
+				<include name="**/*.wsdd"/>
+			</fileset>
+		</copy>
+	</target>
+
 	<target name="wipestate">
 		<delete dir="${user.home}/.genesisII"/>
 	</target>
@@ -250,6 +264,8 @@
 		<delete dir="${gennedsrc-dir}"/>
 		<delete dir="${gennedobj-dir}"/>
 		<delete dir="${obj-dir}"/>
+		<delete dir="${basedir}/deployments/default/services"/>
+		<delete dir="${basedir}/deployments/default-secure/services"/>
 		<delete>
 			<fileset dir="${lib-dir}" includes="**/*.jar"/>
 		</delete>
