@@ -13,8 +13,8 @@ public class NamingUtils
 	{
 		try
 		{
-			Boolean b = (Boolean)ContextManager.getCurrentContext().getSingleValueProperty(
-				GenesisIIConstants.NAMING_CLIENT_CONFORMANCE_PROPERTY);
+			Boolean b = Boolean.parseBoolean((String)ContextManager.getCurrentContext().getSingleValueProperty(
+				GenesisIIConstants.NAMING_CLIENT_CONFORMANCE_PROPERTY));
 			return (b != null && b.booleanValue());
 		}
 		catch (IOException fnfe)
