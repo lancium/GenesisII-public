@@ -16,6 +16,7 @@ public class GenesisIIConstants
 	
 	static public final long CredentialExpirationMillis = 1000 * 60 * 60 * 24; // valid 24 hours
  
+	static public final String NAMING_CLIENT_CONFORMANCE_PROPERTY = "IsWSNamingClient";
 	
 	static public final String REGISTERED_TOPICS_ATTR =
 		"registered-topic";

@@ -3,6 +3,8 @@ package edu.virginia.vcgr.genii.container.invoker;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.container.naming.NamingUtils;
+
 public class DebugInvoker implements IAroundInvoker
 {
 	static private Log _logger = LogFactory.getLog(DebugInvoker.class);
@@ -14,7 +16,9 @@ public class DebugInvoker implements IAroundInvoker
 			" on class " + 
 			invocationContext.getTarget().getClass().getName() + ".";
 		
-		_logger.debug("Calling " + description);
+		_logger.debug("Calling " + description + " from a "
+			+ (NamingUtils.isWSNamingAwareClient() ? "" : "non-") + "WS-Naming aware client.");
+		
 		try
 		{
 			Object obj = invocationContext.proceed();

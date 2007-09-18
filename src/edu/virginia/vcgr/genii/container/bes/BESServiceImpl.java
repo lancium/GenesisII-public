@@ -431,7 +431,7 @@ public class BESServiceImpl extends GenesisIIBase
 		throw new RemoteException("\"remove\" not applicable.");
 	}
 
-	@RWXMapping(RWXCategory.EXECUTE)
+	@RWXMapping(RWXCategory.OPEN)
 	public void notify(Notify notify) throws RemoteException, ResourceUnknownFaultType
 	{
 		try

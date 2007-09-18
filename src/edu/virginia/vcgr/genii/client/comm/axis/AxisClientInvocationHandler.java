@@ -250,7 +250,8 @@ public class AxisClientInvocationHandler implements InvocationHandler
 			if (callContext == null) {
 				callContext = new CallingContextImpl(new ContextType());
 			}
-			_callContext = callContext;
+			_callContext = callContext.deriveNewContext();
+			_callContext.setSingleValueProperty(GenesisIIConstants.NAMING_CLIENT_CONFORMANCE_PROPERTY, "true");
 			_locators = locators;
 
 			X509Certificate[] chain = EPRUtils.extractCertChain(epr);
