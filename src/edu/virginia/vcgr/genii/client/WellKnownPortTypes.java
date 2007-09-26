@@ -118,4 +118,8 @@ public class WellKnownPortTypes
 	static public QName GENII_FACTORY_PORT_TYPE =
 		new QName("http://vcgr.cs.virginia.edu/genii/2006/12/factory-pattern",
 			"GeniiFactoryPortType");
+	
+	static public QName CERT_GENERATOR_SERVICE_PORT_TYPE =
+		new QName("http://vcgr.cs.virginia.edu/genii/2007/08/certGenerator",
+			"CertGeneratorPortType");
 }

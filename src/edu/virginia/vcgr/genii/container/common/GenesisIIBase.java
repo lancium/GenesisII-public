@@ -652,7 +652,7 @@ public class GenesisIIBase implements GeniiCommon, IContainerManaged
 	}
 	
 	// Returns null if security is turned off.
-	// If we decided to make the resource certificates children of the service sertificate
+	// If we decided to make the resource certificates children of the service certificate
 	// we would revisit this spot.
 	protected CertCreationSpec getChildCertSpec() 
 		throws ResourceException, ConfigurationException

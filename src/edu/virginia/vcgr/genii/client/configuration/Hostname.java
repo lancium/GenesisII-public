@@ -127,7 +127,7 @@ public class Hostname
 		return addr.getHostAddress();
 	}
 	
-	static private InetAddress getMostGlobal() throws SocketException
+	static public InetAddress getMostGlobal() throws SocketException
 	{
 		ArrayList<InetAddress> tmp = new ArrayList<InetAddress>();
 		Enumeration<NetworkInterface> interfaces =

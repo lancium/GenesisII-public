@@ -28,6 +28,8 @@
 		<mkdir dir="${gennedsrc-dir}"/>
 		<mkdir dir="${gennedobj-dir}"/>
 		<mkdir dir="${obj-dir}"/>
+		<mkdir dir="${deployments.default.dir}"/>
+		<mkdir dir="${deployments.default-secure.dir}/services"/>
 	</target>
 	
 </project>

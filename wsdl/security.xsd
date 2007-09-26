@@ -98,5 +98,19 @@
 	</xsd:complexType>
 	<xsd:element name="security:RequiredMessageSecurityType"/>
 	
+	<!-- Public Key Type -->
+	<xsd:complexType name="PublicKeyType" >
+		<xsd:sequence>
+			<xsd:element name="publicKey" type="xsd:base64Binary" minOccurs="1" maxOccurs="1" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<!-- X509 Name Type -->
+	<xsd:complexType name="X509NameType" >
+		<xsd:sequence>
+			<xsd:element name="X509Name" type="xsd:string" minOccurs="1" maxOccurs="1" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
 
 </xsd:schema>

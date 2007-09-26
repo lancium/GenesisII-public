@@ -15,6 +15,7 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.genii.client.cmd.ITool;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.io.FileResource;
+import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 
 public abstract class BaseGridTool implements ITool
 {
@@ -65,8 +66,17 @@ public abstract class BaseGridTool implements ITool
 			stdout = out;
 			stderr = err;
 			stdin = in;
-			verify();
-			return runCommand();
+			try
+			{
+				verify();
+				return runCommand();
+			}
+			catch(InvalidToolUsageException itue)
+			{
+				err.print(itue.getLocalizedMessage());
+				err.print(usage());
+				return -1;
+			}
 		}
 		finally
 		{

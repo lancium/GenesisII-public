@@ -73,6 +73,7 @@
 	<import file="${wsdl-dir}/resolver/simple-resolver.build.xml"/>
 	<import file="${wsdl-dir}/resolver/simple-resolver-factory.build.xml"/>
 	<import file="${wsdl-dir}/queue/queue.build.xml"/>
+	<import file="${wsdl-dir}/certGenerator/certGenerator.build.xml"/>
 
 	<!-- Build Targets -->
 	<target name="morganu.jar" depends="init">
@@ -164,6 +165,7 @@
 		<antcall target="gen.simple-resolver"/>
 		<antcall target="gen.simple-resolver-factory"/>
 		<antcall target="gen.queue"/>
+		<antcall target="gen.certGenerator"/>
 		<antcall target="deployments"/>
 	</target>
 
@@ -264,9 +266,9 @@
 		<delete dir="${gennedsrc-dir}"/>
 		<delete dir="${gennedobj-dir}"/>
 		<delete dir="${obj-dir}"/>
-		<delete dir="${basedir}/deployments/default/services"/>
-		<delete dir="${basedir}/deployments/default-secure/services"/>
-		<delete>
+		<delete dir="${basedir}/deployments/default/services" quiet="true"/>
+		<delete dir="${basedir}/deployments/default-secure/services" quiet="true"/>
+		<delete quiet="true">
 			<fileset dir="${lib-dir}" includes="**/*.jar"/>
 		</delete>
 		<delete dir="${services.dir}"/>
@@ -291,4 +293,6 @@
 			<fileset dir="${gennedsrc-dir}" includes="**/*.java"/>
 		</javadoc>
 	</target>
+
+	
 </project>

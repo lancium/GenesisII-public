@@ -149,6 +149,8 @@
 			locator-type="edu.virginia.vcgr.genii.deployer.ApplicationDeployerServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.queue.QueuePortType"
 			locator-type="edu.virginia.vcgr.genii.queue.QueueServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.certGenerator.CertGeneratorPortType"
+			locator-type="edu.virginia.vcgr.genii.certGenerator.CertGeneratorServiceLocator"/>
 	</genii:locator-registry>
 	
 	<genii:configured-instances>
@@ -253,5 +255,7 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.queue.QSubTool</mconf:class>
 		<mconf:class name="get-bes-attributes"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.GetBESFactoryAttributesTool</mconf:class>
+		<mconf:class name="cert-generator"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CertGeneratorTool</mconf:class>
 	</genii:tools>
 </mconf:configuration>
