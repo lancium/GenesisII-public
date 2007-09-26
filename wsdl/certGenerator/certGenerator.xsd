@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+	xmlns="http://vcgr.cs.virginia.edu/genii/2007/08/certGenerator"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:genii-rattrs="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
+	xmlns:security="http://vcgr.cs.virginia.edu/genii/2006/12/security"
+	xmlns:genii-cert-generator="http://vcgr.cs.virginia.edu/genii/2007/08/certGenerator"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	targetNamespace="http://vcgr.cs.virginia.edu/genii/2007/08/certGenerator"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"
+		schemaLocation="./wsrf/basefaults.xsd"/>
+
+	<xsd:import namespace="http://vcgr.cs.virginia.edu/genii/2006/12/security"
+		schemaLocation="./security.xsd"/>
+		
+	<!-- combined parameter for certificate request -->
+	<xsd:complexType name="generateX509V3CertificateChainRequestType">
+		<xsd:sequence>
+			<xsd:element
+				name="X509Name" type="security:X509NameType"
+				minOccurs="1" maxOccurs="1"/>
+			<xsd:element
+				name="PublicKey" type="security:PublicKeyType"
+				minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="generateX509V3CertificateChainRequest"
+		type="genii-cert-generator:generateX509V3CertificateChainRequestType"/>
+
+	<!-- type def for response to certificate request -->
+	<xsd:complexType name="generateX509V3CertificateChainResponseType">
+		<xsd:sequence>
+			<xsd:element
+				name="CertificateChain" type="security:CertificateChainType"
+				minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="generateX509V3CertificateChainResponse"
+		type="genii-cert-generator:generateX509V3CertificateChainResponseType"/>
+
+	<!-- Faults -->
+	<xsd:complexType name="InvalidCertificateRequestFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="wsbf:BaseFaultType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="InvalidCertificateRequestFault"
+		type="genii-cert-generator:InvalidCertificateRequestFaultType"/>
+</xsd:schema>

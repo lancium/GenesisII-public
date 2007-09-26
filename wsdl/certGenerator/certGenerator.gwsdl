@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<wsdl:definitions
+	name="CertGenerator"
+	targetNamespace="http://vcgr.cs.virginia.edu/genii/2007/08/certGenerator"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+	xmlns:genii-resource="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+    xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
+	xmlns:genii-not="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
+    xmlns:genii-security="http://vcgr.cs.virginia.edu/genii/2006/12/security"
+	xmlns:genii-cert-generator="http://vcgr.cs.virginia.edu/genii/2007/08/certGenerator"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+		location="./resource.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple"
+		location="./resource-simple.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
+		location="./resource-factory.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-lifetime"
+		location="./resource-lifetime.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
+		location="./resource-attributes.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+        location="./common-generated.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
+		location="./notification.wsdl"/>
+
+    <wsdl:import
+        namespace="http://schemas.ogf.org/naming/2006/08/naming/wsdl"
+        location="./naming.wsdl"/>
+
+	<wsdl:types>
+		<xsd:schema
+			xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			attributeFormDefault="unqualified"
+			elementFormDefault="qualified"
+			targetNamespace="http://vcgr.cs.virginia.edu/genii/2007/08/certGenerator">
+
+            <xsd:import
+        		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/security"
+            	schemaLocation="./security.xsd"/>
+
+            <xsd:import
+        		namespace="http://vcgr.cs.virginia.edu/genii/2007/08/certGenerator"
+            	schemaLocation="./certGenerator.xsd"/>
+
+		</xsd:schema>
+	</wsdl:types>
+
+	<wsdl:message name="generateX509V3CertificateChainRequest">
+		<wsdl:part name="generateX509V3CertificateChainRequest" element="genii-cert-generator:generateX509V3CertificateChainRequest"/>
+	</wsdl:message>
+
+	<wsdl:message name="generateX509V3CertificateChainResponse">
+		<wsdl:part name="generateX509V3CertificateChainResponse" element="genii-cert-generator:generateX509V3CertificateChainResponse"/>
+	</wsdl:message>
+
+    <wsdl:message name="InvalidCertificateRequestFault">
+        <wsdl:part name="InvalidCertificateRequestFault" element="genii-cert-generator:InvalidCertificateRequestFault"/>
+    </wsdl:message>
+
+	<wsdl:portType name="CertGeneratorPortType">
+		<genii-ext:extend portType="genii-common:GeniiCommon"/>
+
+		<wsdl:operation name="generateX509V3CertificateChain">
+			<wsdl:input message="genii-cert-generator:generateX509V3CertificateChainRequest"/>
+			<wsdl:output message="genii-cert-generator:generateX509V3CertificateChainResponse"/>
+			<wsdl:fault name="ResourceUnknownFault"
+				message="genii-resource:ResourceUnknownFault"/>
+			<wsdl:fault name="InvalidCertificateRequestFault"
+				message="genii-cert-generator:InvalidCertificateRequestFault"/>
+		</wsdl:operation>
+	</wsdl:portType>
+
+</wsdl:definitions>

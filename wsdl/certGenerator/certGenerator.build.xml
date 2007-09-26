@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="gen.certGenerator" name="certGenerator.build">
+
+	<presetdef name="certGenerator.source.files.uptodate">
+		<uptodate targetfile="${flag.name}">
+			<srcfiles dir="${wsdl-dir}/certGenerator">
+				<include name="certGenerator.xsd"/>
+				<include name="certGenerator.gwsdl"/>
+			</srcfiles>
+		</uptodate>
+	</presetdef>
+
+	<condition property="gen.certGenerator.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${codegen-dir}/wsdl/certGenerator.flag"/>
+			<naming.source.files.uptodate
+				targetfile="${codegen-dir}/wsdl/certGenerator.flag"/>
+			<simple-resolver.source.files.uptodate
+				targetfile="${codegen-dir}/wsdl/certGenerator.flag"/>
+		</and>
+	</condition>
+
+	<target name="gen.certGenerator" unless="gen.certGenerator.uptodate">
+		<copy todir="${codegen-dir}/wsdl">
+			<fileset refid="common.source.files"/>
+			<fileset dir="${wsdl-dir}/certGenerator">
+				<include name="certGenerator.gwsdl"/>
+				<include name="certGenerator.xsd"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${codegen-dir}/wsdl/certGenerator.gwsdl"
+			target="${codegen-dir}/wsdl/certGenerator-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${codegen-dir}/wsdl/certGenerator-generated.wsdl"
+			target="${codegen-dir}/wsdl/certGenerator-service.wsdl"
+			portType="{http://vcgr.cs.virginia.edu/genii/2007/08/certGenerator}CertGeneratorPortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${codegen-dir}/certGenerator"/>
+			<param name="stub.gen.source-wsdl"
+				value="file:///${codegen-dir}/wsdl/certGenerator-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${codegen-dir}/wsdl/certGenerator.flag"/>
+		</antcall>
+		<move file="${codegen-dir}/certGenerator/edu/virginia/vcgr/genii/certGenerator/deploy.wsdd"
+			tofile="${wsdd-dir}/certGenerator.deploy.wsdd"/>
+		<replace file="${wsdd-dir}/certGenerator.deploy.wsdd"
+			token="edu.virginia.vcgr.genii.certGenerator.CertGeneratorSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.certGenerator.CertGeneratorServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd-dir}/certGenerator.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>
