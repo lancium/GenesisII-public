@@ -167,7 +167,7 @@ public class JNILibraryLauncher
 		String myMethod = "read";
 		Class<?>[] argTypes = new Class[] {Integer.class, Integer.class, Integer.class};
 		Object[] args = new Object[] {new Integer(fileHandle), 
-				new Integer(offset), new Integer(length)};
+				new Integer(Math.abs(offset)), new Integer(Math.abs(length))};
 		
 		return (String)invoke(myClass, myMethod, argTypes, args);				
 	}

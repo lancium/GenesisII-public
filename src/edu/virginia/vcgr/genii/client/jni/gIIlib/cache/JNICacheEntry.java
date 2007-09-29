@@ -10,6 +10,7 @@ public class JNICacheEntry {
 	private boolean exists = true;
 	private long fileSize=0;
 	private long timeOfEntry;
+	protected JNICacheEntry previous, next;
 	
 	/* This field is only valid if isDirectory == true */
 	private ArrayList<JNICacheEntry> directoryEntries = new ArrayList<JNICacheEntry>();
@@ -22,11 +23,14 @@ public class JNICacheEntry {
 		this.directoryEntries = entries;
 		this.timeOfEntry = System.currentTimeMillis();
 		this.name = name;
+		System.out.println("Creating " + this.toString());
+		previous = next = null;
 	}
 	
 	public static JNICacheEntry createNonExistingEntry(String path){
 		JNICacheEntry dummy = new JNICacheEntry(path, false, 0, null, null);
-		dummy.exists = false;	
+		dummy.exists = false;
+		System.out.println("Creating non-existent for " + path);
 		return dummy;
 	}
 	
@@ -40,6 +44,10 @@ public class JNICacheEntry {
 	
 	public long getTimeOfEntry(){
 		return timeOfEntry;
+	}
+	
+	public String getName(){
+		return name;
 	}
 	
 	public ArrayList<JNICacheEntry> getDirectoryEntries(){
@@ -64,5 +72,9 @@ public class JNICacheEntry {
 	
 	public boolean exists(){
 		return exists;
+	}
+
+	public String getPath() {
+		return path;
 	}
 }

@@ -14,19 +14,22 @@ public class JNIDirectoryListingTool extends JNILibraryBase
 {
 	public static ArrayList<String> getDirectoryListing(String directory, String target) {
 		tryToInitialize();
-				
+							
 		JNICacheManager manager = JNICacheManager.getInstance();
 		JNICacheEntry forDirectory; 
 		JNICacheEntry toAdd = null;
 		ArrayList <JNICacheEntry> cacheEntries = null;
-		ArrayList<String> directoryListing = new ArrayList<String>();
+		ArrayList<String> directoryListing = new ArrayList<String>();		
 		
 		//If target is null then query current directory
 		//All paths are absolute (cleanup)
 		directory = (directory != null && !directory.equals("") && !directory.equals("/")) 
-			? directory + '/' : "";		
+			? directory : "";		
 		directory = (directory.length() > 0 && !directory.startsWith("/")) ? 
 				"/" + directory : directory;
+		
+		//Default .* behavior or replace all * with .*
+		target = ((target=="" || target == null) ? ".*" : target.replace("*", ".*")); 
 		
 		//Check cache first
 		forDirectory = manager.getCacheEntry(directory);
@@ -39,34 +42,28 @@ public class JNIDirectoryListingTool extends JNILibraryBase
 			}
 		}
 		
-		//Check to see if entries are in the cache yet
-		if(cacheEntries != null){
-			for(JNICacheEntry entry : cacheEntries){
-				directoryListing.add(String.valueOf(-1));
-				directoryListing.addAll(entry.getFileInformation());
-			}			
-		}
-		else{
-		
+		//Not in the cache (parent might be found)
+		if(cacheEntries == null)
+		{		
 			//We have to do it the hard way :-(						
-			cacheEntries = new ArrayList<JNICacheEntry>();
-			
-			target = target == null ? "." : target;
+			cacheEntries = new ArrayList<JNICacheEntry>();			
 					
+			//Mostly borrowed from LSTool
 			try
 			{											
 				ICallingContext ctxt = ContextManager.getCurrentContext();													
 	
-				RNSPath path = ctxt.getCurrentPath().lookup((directory + 
-						target), RNSPathQueryFlags.MUST_EXIST);												
+				RNSPath path = ctxt.getCurrentPath().lookup(directory, 
+						RNSPathQueryFlags.MUST_EXIST);												
 					
+				//ALWAYS get all entries
 				RNSPath []entries = path.list(".*", RNSPathQueryFlags.DONT_CARE);
 		
 				if (entries.length > 1 || entries[0].exists())
 				{
 					for (RNSPath entry : entries)
 					{
-						if(entry.isDirectory()){
+						if(entry.isDirectory()){							
 							String entryPath = directory + "/" + entry.getName();
 							toAdd = new JNICacheEntry(entryPath, 
 									true, -1, entry.getName(), null);
@@ -74,10 +71,6 @@ public class JNIDirectoryListingTool extends JNILibraryBase
 							//Add to cache and then to return listing
 							manager.putCacheEntry(entryPath, toAdd);
 							cacheEntries.add(toAdd);
-							
-							//Always return -1 first as file handle
-							directoryListing.add(String.valueOf(-1));
-							directoryListing.addAll(toAdd.getFileInformation());
 						}
 						else{
 							TypeInformation type = new TypeInformation(
@@ -89,11 +82,7 @@ public class JNIDirectoryListingTool extends JNILibraryBase
 							
 							//Add to cache and then to return listing
 							manager.putCacheEntry(entryPath, toAdd);
-							cacheEntries.add(toAdd);
-							
-							//Always return -1 first as file handle
-							directoryListing.add(String.valueOf(-1));
-							directoryListing.addAll(toAdd.getFileInformation());																					
+							cacheEntries.add(toAdd);																				
 						}
 					}
 				}												
@@ -117,6 +106,15 @@ public class JNIDirectoryListingTool extends JNILibraryBase
 				directoryListing = null;
 			}
 		}		
+		
+		//Match against the target		
+		for(JNICacheEntry entry : cacheEntries){
+			if(entry.getName().matches(target)){
+				directoryListing.add(String.valueOf(-1));
+				directoryListing.addAll(entry.getFileInformation());
+			}
+		}					
+		
 		return directoryListing;
 	}
 }

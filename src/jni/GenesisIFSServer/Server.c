@@ -10,7 +10,7 @@
 // Local structures
 
 #define DEBUG			 0x00000000
-#define NUMBER_OF_THREADS			 1
+#define NUMBER_OF_THREADS			 5
                                                 
 HANDLE sem_handle;
 HANDLE GenesisControlHandle;		//Device handle	
@@ -57,8 +57,13 @@ void printListing(char * listing, int size){
 		listing += sizeof(ULONG);
 
 		printf("Name: %s\n", listing);
-		listing += strlen(listing) + 1;		
+		listing += strlen(listing) + 1;				
 	}
+}
+
+void printListing2(char * listing, int bytes){
+	listing[bytes] = '\0';
+	printf_s("%s\n", listing);
 }
 
 //Copy listing and return total bytes saved
@@ -174,15 +179,6 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 	response->RequestID = request->RequestID;
     response->ResponseType = request->RequestType;	
 
-	//WaitForSingleObject(sem_handle, INFINITE);
-	//if(!loggedin){
-	//	printf("Logging In to Genesis\n");
-	//	genesisII_login(pMyInfo, "security/keys.pfx", "keys", "skynet1");
-	//	printf("Login successful\n");
-	//	loggedin = 1;
-	//}
-	//ReleaseSemaphore(sem_handle, 1, NULL);
-
 	switch(request->RequestType){
 		case GENII_QUERYDIRECTORY:
 		{			
@@ -272,6 +268,27 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 			printListing(response->ResponseBuffer, response->StatusCode);
 
 			printf("Information Copied successful\n");		
+
+			break;
+		}
+		case GENII_READ:
+		{			
+			char *bufPtr = (char*) request->RequestBuffer;		
+			long fileID, offset, length;			
+
+			//Get all three parameters
+			if(request->RequestBufferLength == sizeof(long) * 3){
+				memcpy(&fileID, bufPtr, sizeof(long));
+				bufPtr += sizeof(int);
+				memcpy(&offset, bufPtr, sizeof(long));
+				bufPtr += sizeof(int);
+				memcpy(&length, bufPtr, sizeof(long));
+			}
+			printf("Read started for file with fileID: %d, offset: %d, length %d\n", fileID, offset, length);
+
+			response->ResponseBufferLength = genesisII_read(pMyInfo, fileID, response->ResponseBuffer, offset, length);
+			//printListing2(response->ResponseBuffer, response->ResponseBufferLength);
+			printf("Read finished on Genesis side!\n");	
 
 			break;
 		}
@@ -474,9 +491,9 @@ int main(int argc, char* argv[])
 	int status = 0;
 	GII_JNI_INFO rootInfo;		
 
-	/*int StatusCode, bytes;
-	char ** directoryListing;
-	char buffer[8192];	*/
+	//int StatusCode, bytes, fileid;
+	//char ** directoryListing;
+	//char buffer[8192];	
 
 	//Initialize in root thread
 	if(initializeJavaVM("C:/GenesisIIDevelopment/GenesisII", &rootInfo) == -1){
@@ -493,22 +510,23 @@ int main(int argc, char* argv[])
 	
 	status = runMultiThreaded();		
 
-	//printf("Creating file aFile.xml \n");
+	//printf("Creating file somefile.txt\n");
 
-	//StatusCode = genesisII_open(&rootInfo, "aFile.xml", 0, 1, 0, &directoryListing);
+	//StatusCode = genesisII_open(&rootInfo, "/somefile.txt", 0, 1, 0, &directoryListing);
 	//printf("Got Create Info\n");
 	//bytes = copyListing(buffer, directoryListing, StatusCode);
 	//printListing(buffer, StatusCode);
 
-	//printf("Creating file aFile.xml \n");
+	//memcpy(&fileid, buffer, sizeof(ULONG));
 
-	//StatusCode = genesisII_open(&rootInfo, "aFile.xml", 0, 1, 0, &directoryListing);
-	//printf("Got Create Info\n");
-	//bytes = copyListing(buffer, directoryListing, StatusCode);
-	//printListing(buffer, StatusCode);
+	//printf("Reading 3468 from offset 4000 bytes from %d \n", fileid);
+
+	//StatusCode = genesisII_read(&rootInfo,fileid, buffer, 4000, 3468);
+	//printf("Got Data\n");
+	//printListing2(buffer, StatusCode);
 
 	//genesisII_logout(&rootInfo);
-	
-	return status;
+	//
+	//return status;
 }
 

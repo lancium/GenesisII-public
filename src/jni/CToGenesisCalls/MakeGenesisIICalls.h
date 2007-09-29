@@ -8,7 +8,7 @@
 /*
 	File handle for Genesis II resources
 */
-#define GII_FILE_HANDLE int
+#define GII_FILE_HANDLE long
 
 #ifdef __cplusplus
 extern "C" {
@@ -100,13 +100,13 @@ DllExport int genesisII_open(PGII_JNI_INFO info, char * target,	int create, int 
 	The data parameter must be initialized to hold up to length bytes.  Returns the number of bytes read or -1 
 	if an error occurred.  
 */
-DllExport int genesisII_read(PGII_JNI_INFO info, GII_FILE_HANDLE file, char* data, int offset, int length);
+DllExport int genesisII_read(PGII_JNI_INFO info, GII_FILE_HANDLE file, char* data, long offset, long length);
 
 /*
 	This method writes the data array to the file at the given offset.  The length field should be the 
 	size of the data array.
 */
-DllExport int genesisII_write(PGII_JNI_INFO info, GII_FILE_HANDLE file, char* data, int offset, int length);
+DllExport int genesisII_write(PGII_JNI_INFO info, GII_FILE_HANDLE file, char* data, long offset, long length);
 
 /*
 	This method closes a file.  Data is only committed when a file is properly closed.  

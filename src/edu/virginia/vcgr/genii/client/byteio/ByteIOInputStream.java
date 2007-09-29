@@ -137,4 +137,16 @@ public class ByteIOInputStream extends InputStream implements ByteIOStream
 	{
 		((ByteIOStream)_handler).setTransferMechanism(transferMechanism);
 	}
+	
+	public boolean markSupported(){
+		return _handler.markSupported();
+	}
+	
+	public void mark(int readlimit) {
+		_handler.mark(readlimit);
+	}
+	
+	public void reset() throws IOException { 
+		_handler.reset();
+	}	
 }
