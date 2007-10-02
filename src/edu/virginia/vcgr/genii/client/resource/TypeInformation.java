@@ -137,6 +137,11 @@ public class TypeInformation
 		return _pureURL;
 	}
 	
+	public boolean isTool()
+	{
+		return isPureURL() && _epr.getAddress().get_value().toString().startsWith("urn:genii-tool:");
+	}
+	
 	public String getTypeDescription()
 	{
 		if (isBESActivity())
