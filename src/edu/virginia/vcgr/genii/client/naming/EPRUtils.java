@@ -5,8 +5,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -62,7 +64,18 @@ public class EPRUtils
 				new AttributedURITypeSmart(serviceURL),
 				null, null, null);
 		
-		if (!retrieveFromObject) {
+		try
+		{
+			new URL(serviceURL);
+		}
+		catch (MalformedURLException mue)
+		{
+			// Not a URL
+			retrieveFromObject = false;
+		}
+		
+		if (!retrieveFromObject) 
+		{
 			return epr;
 		}
 		
