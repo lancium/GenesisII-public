@@ -36,9 +36,11 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
+import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
+import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType;
 
 /**
@@ -651,18 +653,26 @@ public class RNSPath implements Externalizable  {
 	 * @throws RNSException
 	 *             If some other RNS exception occurs.
 	 */
-	public void delete() throws RNSPathDoesNotExistException, RNSException {
-		try {
-			TypeInformation ti = new TypeInformation(getEndpoint());
+	public void delete() throws RNSPathDoesNotExistException, RNSException 
+	{
+		EndpointReferenceType epr = getEndpoint();
+		
+		try 
+		{
+			TypeInformation ti = new TypeInformation(epr);
+			if (ti.isRNS())
+			{
+				RNSPortType rpt = ClientUtils.createProxy(RNSPortType.class, epr);
 
-			RNSPortType rpt = ClientUtils.createProxy(RNSPortType.class,
-					getEndpoint());
+				if (rpt.list(new List(".*")).getEntryList().length > 0)
+					throw new RNSException("Path \"" + pwd() + "\" is not empty.");
+			}
 
-			if (ti.isRNS()
-					&& rpt.list(new List(".*")).getEntryList().length > 0)
-				throw new RNSException("Path \"" + pwd() + "\" is not empty.");
-
-			rpt.immediateTerminate(null);
+			if (EPRUtils.isCommunicable(epr))
+			{
+				GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, epr);
+				common.immediateTerminate(null);
+			}
 			unlink();
 		} catch (BaseFaultType bft) {
 			throw new RNSException(bft);

@@ -27,6 +27,7 @@ import org.apache.ws.security.components.crypto.CredentialException;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.morgan.util.io.StreamUtils;
+import org.ws.addressing.AttributedURIType;
 import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.MetadataType;
 import org.xml.sax.InputSource;
@@ -350,5 +351,21 @@ public class EPRUtils
 				epr.getReferenceParameters(),
 				epr.getMetadata(),
 				epr.get_any());
+	}
+	
+	static public boolean isCommunicable(EndpointReferenceType epr)
+	{
+		AttributedURIType auri = epr.getAddress();
+		org.apache.axis.types.URI uri = auri.get_value();
+		
+		try
+		{
+			new URL(uri.toString());
+			return true;
+		}
+		catch (MalformedURLException mue)
+		{
+			return false;
+		}
 	}
 }
