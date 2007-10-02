@@ -232,8 +232,13 @@ public class Hostname
 	{
 		Matcher urlMatcher = _URL_PATTERN.matcher(url);
 		if (!urlMatcher.matches())
+		{
+			/* This doesn't allow for URI's in the name
 			throw new IllegalArgumentException(
 				"url \"" + url + "\" does not appear valid.");
+			*/
+			return url;
+		}
 		
 		try
 		{
