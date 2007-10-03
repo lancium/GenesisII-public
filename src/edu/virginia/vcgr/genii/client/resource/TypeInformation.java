@@ -53,6 +53,11 @@ public class TypeInformation
 		}
 	}
 	
+	public EndpointReferenceType getEndpoint()
+	{
+		return _epr;
+	}
+	
 	public QName[] getImplementedPortTypes()
 	{
 		return _implementedPortTypes;
