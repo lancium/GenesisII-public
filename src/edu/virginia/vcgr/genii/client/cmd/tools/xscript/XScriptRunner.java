@@ -45,6 +45,7 @@ public class XScriptRunner
 	static private final String FOR_ELEMENT_NAME = "for";
 	static private final String PARAM_ELEMENT_NAME = "param";
 	static private final String DEFINE_ELEMENT_NAME = "define";
+	static private final String DEFAULT_ELEMENT_NAME = "default";
 	static private final String ECHO_ELEMENT_NAME = "echo";
 	
 	static private final String MESSAGE_ATTRIBUTE_NAME = "message";
@@ -62,6 +63,7 @@ public class XScriptRunner
 	static private final String PATTERN_ATTTRIBUTE_NAME = "pattern";
 	static private final String REPLACEMENT_ATTRIBUTE_NAME = "replacement";
 	static private final String GLOBAL_ATTRIBUTE_NAME = "global";
+	static private final String VALUE_ATTRIBUTE_NAME = "value";
 	
 	static private QName SCRIPT_ELEMENT = new QName(
 		GSH_NS, SCRIPT_ELEMENT_NAME);
@@ -73,6 +75,8 @@ public class XScriptRunner
 		GSH_NS, PARAM_ELEMENT_NAME);
 	static private QName DEFINE_ELEMENT = new QName(
 		GSH_NS, DEFINE_ELEMENT_NAME);
+	static private QName DEFAULT_ELEMENT = new QName(
+		GSH_NS, DEFAULT_ELEMENT_NAME);
 	static private QName ECHO_ELEMENT = new QName(
 		GSH_NS, ECHO_ELEMENT_NAME);
 	
@@ -204,6 +208,9 @@ public class XScriptRunner
 			} else if (nodeName.equals(DEFINE_ELEMENT))
 			{
 				result = handleDefine(variables, n, handler, out, err, in);
+			} else if (nodeName.equals(DEFAULT_ELEMENT))
+			{
+				result = handleDefault(variables, n, handler, out, err, in);
 			} else if (nodeName.equals(ECHO_ELEMENT))
 			{
 				result = handleEcho(variables, n, out, err, in);
@@ -213,6 +220,7 @@ public class XScriptRunner
 					nodeName + "\".  Valid nodes are:");
 				err.println("\t" + FOREACH_ELEMENT);
 				err.println("\t" + DEFINE_ELEMENT);
+				err.println("\t" + DEFAULT_ELEMENT);
 				err.println("\tor any Genesis II command node.");
 				result = 1;
 			}
@@ -482,6 +490,34 @@ public class XScriptRunner
 		}
 		
 		variables.setValue(varName, value);
+		return 0;
+	}
+	
+	static private int handleDefault(ScopedVariables variables, 
+		Node n, IXScriptHandler handler,
+		PrintStream out, PrintStream err, BufferedReader in)
+	{
+		String error = null;
+		NamedNodeMap attributes = n.getAttributes();
+		String varName = getAttribute(attributes, NAME_ATTRIBUTE_NAME);
+		String value = getAttribute(attributes, VALUE_ATTRIBUTE_NAME);
+		
+		if (varName == null)
+			error = "Default element missing required attribute \"" 
+				+ NAME_ATTRIBUTE_NAME + "\".";
+		if (value == null)
+			error = "Default element missing required attribute \""
+				+ VALUE_ATTRIBUTE_NAME + "\".";
+		
+		if (error != null)
+		{
+			err.println(error);
+			return 1;
+		}
+		
+		if (variables.getValue(varName) == null)
+			variables.setValue(varName, replaceMacros(variables, value));
+		
 		return 0;
 	}
 	
