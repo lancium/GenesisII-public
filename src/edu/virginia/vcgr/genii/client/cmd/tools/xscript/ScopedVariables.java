@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.client.cmd.tools.xscript;
 
 import java.util.HashMap;
+import java.util.Properties;
 
 public class ScopedVariables
 {
@@ -8,9 +9,14 @@ public class ScopedVariables
 		new HashMap<String, String>();
 	private ScopedVariables _parent = null;
 	
-	public ScopedVariables()
+	public ScopedVariables(Properties initialProps)
 	{
-		this(null);
+		_parent = null;
+		for (Object key : initialProps.keySet())
+		{
+			String sKey = (String)key;
+			_variables.put(sKey, initialProps.getProperty(sKey));
+		}
 	}
 	
 	private ScopedVariables(ScopedVariables parent)

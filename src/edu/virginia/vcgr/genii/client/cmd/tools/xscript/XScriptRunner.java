@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Properties;
 import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
@@ -80,7 +81,8 @@ public class XScriptRunner
 		IXScriptHandler handler,
 		PrintStream out,
 		PrintStream err,
-		BufferedReader in)
+		BufferedReader in,
+		Properties initialProperties)
 	{
 		InputStream fin = null;
 		
@@ -91,7 +93,7 @@ public class XScriptRunner
 			factory.setNamespaceAware(true);
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			Document doc = builder.parse(fin);
-			return parseDocument(doc, handler, out, err, in);
+			return parseDocument(doc, handler, out, err, in, initialProperties);
 		}
 		catch (FileNotFoundException fnfe)
 		{
@@ -134,9 +136,9 @@ public class XScriptRunner
 		}
 	}
 	
-	static private ScopedVariables createInitialVariableScope()
+	static private ScopedVariables createInitialVariableScope(Properties initialProperties)
 	{
-		return new ScopedVariables();
+		return new ScopedVariables(initialProperties);
 	}
 	
 	static private QName getQName(Node node)
@@ -155,7 +157,8 @@ public class XScriptRunner
 	static private int parseDocument(
 		Document doc,
 		IXScriptHandler handler,
-		PrintStream out, PrintStream err, BufferedReader in)
+		PrintStream out, PrintStream err, BufferedReader in,
+		Properties initialProperties)
 		throws Throwable
 	{
 		Element el = doc.getDocumentElement();
@@ -168,7 +171,7 @@ public class XScriptRunner
 		}
 		
 		return parseScope(
-			createInitialVariableScope(), el, handler, out, err, in);
+			createInitialVariableScope(initialProperties), el, handler, out, err, in);
 	}
 	
 	static private int parseScope(
