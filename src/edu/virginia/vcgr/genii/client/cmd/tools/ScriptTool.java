@@ -68,7 +68,7 @@ public class ScriptTool extends BaseGridTool
 	@Override
 	protected void verify() throws ToolException
 	{
-		if (numArguments() > 1)
+		if (numArguments() < 1)
 			throw new InvalidToolUsageException();
 	}
 }
