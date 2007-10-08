@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -209,11 +210,32 @@ public class JarDescription
 		}
 	}
 	
-	public ClassLoader createClassLoader()
+	public ClassLoader createClassLoader() throws IOException
 	{
+		/*
 		URL []jars = new URL[_jarFiles.size()];
 		_jarFiles.toArray(jars);
 		return new URLClassLoader(jars,
 			Thread.currentThread().getContextClassLoader());
+		*/
+		
+		URLClassLoader sysloader = (URLClassLoader)ClassLoader.getSystemClassLoader();
+		Class<URLClassLoader> sysclass = URLClassLoader.class;
+		
+		try
+		{
+			Method method = sysclass.getDeclaredMethod("addURL", new Class<?> [] { URL.class} );
+			method.setAccessible(true);
+			for (URL u : _jarFiles)
+			{
+				method.invoke(sysloader, new Object[] { u });
+			}
+			
+			return sysloader;
+		} catch (Throwable t)
+		{
+			t.printStackTrace(System.err);
+			throw new IOException("Unable to modify system class loader.");
+		}
 	}
 }
