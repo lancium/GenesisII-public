@@ -526,6 +526,20 @@ public class ExportedDirDBResource extends BasicDBResource implements
 				{
 					results.add(nextKnown);
 				}
+			} else
+			{
+				/* remove entry from directory data */
+				try 
+				{
+					removeEntry(nextKnown, false);
+				}
+				catch (ResourceUnknownFaultType ruft)
+				{
+					_logger.debug("ResourceUnknownFaultType encountered while cleaning " +
+						"up entry in ExportedDirDBResource.syncEntries " +
+						"-- probably normal");
+				}
+				nextKnownIter.remove();
 			}
 		}
 		
@@ -719,7 +733,7 @@ public class ExportedDirDBResource extends BasicDBResource implements
 			
 			resource.destroy(hardDestroy);
 		}
-		catch (ResourceUnknownFaultType ruft)
+		catch (ResourceException ruft)
 		{
 			// Ignore so we can keep cleaning up.
 			_logger.debug(ruft);
