@@ -19,6 +19,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
+import org.oasis_open.docs.wsrf.r_2.ResourceUnavailableFaultType;
+import org.oasis_open.docs.wsrf.rp_2.GetMultipleResourcePropertiesResponse;
+import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyResponse;
+import org.oasis_open.docs.wsrf.rp_2.InvalidResourcePropertyQNameFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
@@ -331,7 +335,30 @@ public class GenesisIIBase implements GeniiCommon, IContainerManaged
 		document.toArray(ret);
 		return new GetAttributesResponse(ret);
 	}
+	
+	@RWXMapping(RWXCategory.READ)
+	public GetMultipleResourcePropertiesResponse getMultipleResourceProperties(
+			QName[] getMultipleResourcePropertiesRequest)
+			throws RemoteException, InvalidResourcePropertyQNameFaultType,
+			ResourceUnavailableFaultType, ResourceUnknownFaultType {
 
+		return new GetMultipleResourcePropertiesResponse(
+				getAttributes(getMultipleResourcePropertiesRequest).get_any());
+	}
+
+	@RWXMapping(RWXCategory.READ)
+	public GetResourcePropertyResponse getResourceProperty(
+			QName getResourcePropertyRequest) throws RemoteException,
+			InvalidResourcePropertyQNameFaultType,
+			ResourceUnavailableFaultType, ResourceUnknownFaultType {
+
+		QName []request = new QName[1];
+		request[0] = getResourcePropertyRequest;
+				
+		return new GetResourcePropertyResponse(
+				getAttributes(request).get_any());	
+	}
+	
 	@RWXMapping(RWXCategory.READ)
 	public final GetAttributesDocumentResponse getAttributesDocument(
 			Object getAttributesDocumentRequest) throws RemoteException,
