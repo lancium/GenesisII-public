@@ -3,12 +3,15 @@ package edu.virginia.vcgr.genii.client.naming;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.sql.Blob;
+import javax.sql.rowset.serial.SerialBlob;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -284,9 +287,7 @@ public class EPRUtils
 		try
 		{
 			bais = new ByteArrayInputStream(data);
-			return (EndpointReferenceType)ObjectDeserializer.deserialize(
-				new InputSource(bais),
-				EndpointReferenceType.class);
+			return fromInputStream(bais);
 		}
 		finally
 		{
@@ -294,6 +295,48 @@ public class EPRUtils
 		}
 	}
 	
+	static public EndpointReferenceType fromInputStream(InputStream in)
+		throws ResourceException
+	{
+		return (EndpointReferenceType)ObjectDeserializer.deserialize(
+			new InputSource(in),
+			EndpointReferenceType.class);
+	}
+
+	static public Blob toBlob(EndpointReferenceType epr)
+		throws ResourceException
+	{
+		try 
+		{
+			return new SerialBlob(toBytes(epr));
+		}
+		catch (Throwable t)
+		{
+			throw new ResourceException("Could not serialze epr to BLOB", t);
+		}
+	}
+
+	static public EndpointReferenceType fromBlob(Blob blob)
+		throws ResourceException
+
+	{
+		InputStream in = null;
+		
+		try
+		{
+			in = blob.getBinaryStream();
+			return fromInputStream(in);
+		}
+		catch(Throwable t)
+		{
+			throw new ResourceException("Could not deserialize EPR from BLOB", t);
+		}
+		finally
+		{
+			StreamUtils.close(in);
+		}
+	}
+
 	static public QName[] getImplementedPortTypes(
 		EndpointReferenceType epr)
 	{

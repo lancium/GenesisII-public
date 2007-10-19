@@ -186,7 +186,7 @@ public class BasicDBResource implements IResource
 					+ "128K space.");
 			}
 			
-			stmt.setBlob(3, DBSerializer.toBlob(value));
+			stmt.setBlob(3, b);
 			if (stmt.executeUpdate() != 1)
 				throw new ResourceException("Unable to update property \"" +
 					propertyName + "\".");

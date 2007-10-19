@@ -121,7 +121,7 @@ public class ResourceMatcher implements Closeable
 				{
 					int resourceID = _results.getInt(1);
 					EndpointReferenceType endpoint =
-						EPRUtils.fromBytes(_results.getBytes(2));
+						EPRUtils.fromBlob(_results.getBlob(2));
 					int slotsAvail = _results.getInt(1);
 					
 					_current = new ResourceSlot(resourceID, endpoint);
@@ -150,7 +150,7 @@ public class ResourceMatcher implements Closeable
 			{
 				int resourceID = _results.getInt(1);
 				EndpointReferenceType endpoint =
-					EPRUtils.fromBytes(_results.getBytes(2));
+					EPRUtils.fromBlob(_results.getBlob(2));
 				int slotsAvail = _results.getInt(1);
 				
 				_current = new ResourceSlot(resourceID, endpoint);

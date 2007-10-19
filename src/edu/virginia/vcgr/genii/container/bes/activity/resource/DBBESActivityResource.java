@@ -95,7 +95,7 @@ public class DBBESActivityResource extends BasicDBResource implements
 			stmt = _connection.prepareStatement(_ADD_CONTAINER_ASSOCIATION_STMT);
 			stmt.setString(1, containerID);
 			stmt.setString(2, (String)getKey());
-			stmt.setBytes(3, EPRUtils.toBytes(activityEPR));
+			stmt.setBlob(3, EPRUtils.toBlob(activityEPR));
 			if (stmt.executeUpdate() != 1)
 				throw new ResourceException("Unable to update database.");
 		}

@@ -80,7 +80,7 @@ public class DBSubscriptionResource
 			stmt.setString(1, _resourceKey);
 			stmt.setString(2, sourcekey);
 			stmt.setString(3, topic);
-			stmt.setObject(4, EPRUtils.toBytes(targetendpoint));
+			stmt.setBlob(4, EPRUtils.toBlob(targetendpoint));
 			stmt.setObject(5, ObjectSerializer.toBytes(userData,
 				ISubscriptionResource.USER_DATA_CONSTRUCTION_PARAMETER));
 
@@ -174,7 +174,7 @@ public class DBSubscriptionResource
 				ret.add(new SubscriptionInformation(
 					result.getString(1),
 					result.getString(2),
-					EPRUtils.fromBytes((byte[])result.getObject(3)),
+					EPRUtils.fromBlob(result.getBlob(3)),
 					userData));
 			}
 			

@@ -47,7 +47,7 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 			stmt = _connection.prepareStatement(_ADD_ENTRY_STATEMENT);
 			stmt.setString(1, this._resourceKey);
 			stmt.setString(2, entry.getName());
-			stmt.setBytes(3, EPRUtils.toBytes(entry.getEntryReference()));
+			stmt.setBlob(3, EPRUtils.toBlob(entry.getEntryReference()));
 			stmt.setString(4, attrKey);
 			stmt.setBytes(5, ObjectSerializer.anyToBytes(entry.getAttributes()));
 			if (stmt.executeUpdate() != 1)
@@ -155,8 +155,8 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 			while (rs.next())
 			{
 				InternalEntry entry = new InternalEntry(
-					rs.getString(1), EPRUtils.fromBytes(rs.getBytes(2)),
-					ObjectDeserializer.anyFromBytes(rs.getBytes(4)));
+						rs.getString(1), EPRUtils.fromBlob(rs.getBlob(2)),
+						ObjectDeserializer.anyFromBytes(rs.getBytes(4)));
 				if (p.matcher(entry.getName()).matches())
 					ret.add(entry);
 			}

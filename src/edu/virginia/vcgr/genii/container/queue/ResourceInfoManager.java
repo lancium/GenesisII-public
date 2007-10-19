@@ -202,7 +202,7 @@ public class ResourceInfoManager implements Runnable
 				
 				try
 				{
-					resourceEndpoint = EPRUtils.fromBytes(rs.getBytes(3));
+					resourceEndpoint = EPRUtils.fromBlob(rs.getBlob(3));
 					resourceName = rs.getString(1);
 				}
 				catch (Throwable cause)

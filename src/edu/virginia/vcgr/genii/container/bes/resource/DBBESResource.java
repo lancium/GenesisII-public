@@ -55,7 +55,7 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 			rs = stmt.executeQuery();
 			while (rs.next())
 			{
-				tmpRet.add(EPRUtils.fromBytes(rs.getBytes(1)));
+				tmpRet.add(EPRUtils.fromBlob(rs.getBlob(1)));
 			}
 			
 			ret = new EndpointReferenceType[tmpRet.size()];

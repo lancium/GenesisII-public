@@ -228,8 +228,8 @@ public class JobManager implements Runnable
 				{
 					checkJobStatus(conn, 
 						rs.getInt(1), rs.getInt(2), 
-						EPRUtils.fromBytes(rs.getBytes(3)),
-						EPRUtils.fromBytes(rs.getBytes(4)));
+						EPRUtils.fromBlob(rs.getBlob(3)),
+						EPRUtils.fromBlob(rs.getBlob(4)));
 				}
 				catch (ResourceException re)
 				{
@@ -443,7 +443,7 @@ public class JobManager implements Runnable
 			{
 				pStmt = conn.prepareStatement(
 					"UPDATE queueactivejobs SET jobendpoint = ? WHERE jobid = ?");
-				pStmt.setBytes(1, EPRUtils.toBytes(activity));
+				pStmt.setBlob(1, EPRUtils.toBlob(activity));
 				pStmt.setInt(2, request.getJobID());
 				pStmt.executeUpdate();
 				stmt.executeUpdate("UPDATE queuejobinfo SET state = '" +

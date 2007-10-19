@@ -11,7 +11,7 @@ public class SharedBESTableBase extends BasicDBResourceFactory
 {
 	static private final String _CREATE_ACTIVITY_ENTRY_TABLE_STMT =
 		"CREATE TABLE besactivities (containerkey VARCHAR(128)," +
-		" activitykey VARCHAR(128) PRIMARY KEY, activityepr VARCHAR(8192) FOR BIT DATA)";
+		" activitykey VARCHAR(128) PRIMARY KEY, activityepr BLOB (128K))";
 	
 	protected SharedBESTableBase(DatabaseConnectionPool pool)
 		throws SQLException

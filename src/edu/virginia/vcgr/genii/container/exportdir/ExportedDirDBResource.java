@@ -401,7 +401,7 @@ public class ExportedDirDBResource extends BasicDBResource implements
 			stmt = _connection.prepareStatement(_ADD_ENTRY_STMT);
 			stmt.setString(1, getId());
 			stmt.setString(2, entryName);
-			stmt.setBytes(3, EPRUtils.toBytes(entryReference));
+			stmt.setBlob(3, EPRUtils.toBlob(entryReference));
 			stmt.setString(4, entryID);
 			stmt.setString(5, entryType);
 			if (stmt.executeUpdate() != 1)
@@ -673,7 +673,7 @@ public class ExportedDirDBResource extends BasicDBResource implements
 			{
 				ExportedDirEntry entry = new ExportedDirEntry(
 					rs.getString(1), rs.getString(2),
-					EPRUtils.fromBytes(rs.getBytes(3)),
+					EPRUtils.fromBlob(rs.getBlob(3)),
 					rs.getString(4), rs.getString(5), null);
 				ret.add(entry);
 			}

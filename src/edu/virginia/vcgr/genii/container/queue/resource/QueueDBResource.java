@@ -78,7 +78,7 @@ public class QueueDBResource extends BasicDBResource implements IQueueResource
 		{
 			stmt = conn.prepareStatement(_ADD_RESOURCE_TO_QUEUE_RESOURCE_INFO);
 			stmt.setString(1, resourceName);
-			stmt.setBytes(2, EPRUtils.toBytes(resourceEndpoint));
+			stmt.setBlob(2, EPRUtils.toBlob(resourceEndpoint));
 			if (stmt.executeUpdate() != 1)
 				throw new ResourceException("Unable to update database.");
 			stmt.close();
@@ -172,7 +172,7 @@ public class QueueDBResource extends BasicDBResource implements IQueueResource
 			{
 				String entryName = rs.getString(1);
 				EndpointReferenceType resourceEndpoint =
-					EPRUtils.fromBytes(rs.getBytes(2));
+					EPRUtils.fromBlob(rs.getBlob(2));
 				int totalSlots = rs.getInt(3);
 				Matcher matcher = pattern.matcher(entryName);
 				if (matcher.matches())
@@ -824,8 +824,8 @@ public class QueueDBResource extends BasicDBResource implements IQueueResource
 				if (rs.next())
 				{
 					killJob(jobs.get(jobid),
-						EPRUtils.fromBytes(rs.getBytes(1)),
-						EPRUtils.fromBytes(rs.getBytes(2)));
+						EPRUtils.fromBlob(rs.getBlob(1)),
+						EPRUtils.fromBlob(rs.getBlob(2)));
 				}
 				
 				rs.close();
