@@ -253,6 +253,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.queue.QSubTool</mconf:class>
 		<mconf:class name="get-bes-attributes"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.GetBESFactoryAttributesTool</mconf:class>
+		<mconf:class name="get-resourceProps"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.GetResourcePropertiesTool</mconf:class>
 		<mconf:class name="cert-generator"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CertGeneratorTool</mconf:class>
 	</genii:tools>
