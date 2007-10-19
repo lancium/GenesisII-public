@@ -10,6 +10,8 @@
     xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
     xmlns:byteio="http://schemas.ggf.org/byteio/2005/10/byte-io"
     xmlns:sbyteio="http://schemas.ggf.org/byteio/2005/10/streamable-access"
+    xmlns:rpw-2="http://docs.oasis-open.org/wsrf/rpw-2"
+    xmlns:rw-2="http://docs.oasis-open.org/wsrf/rw-2"
     targetNamespace="http://schemas.ggf.org/byteio/2005/10/streamable-access">
 
 	<wsdl:import
@@ -24,6 +26,14 @@
 		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
 		location="./resource-factory.wsdl"/>
 
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rw-2"
+		location="./wsrf/wsResourceFaults.wsdl"/>
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rpw-2"
+		location="./wsrf/wsResourceProperties.wsdl"/>
+	
 	<wsdl:import
 		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-lifetime"
 		location="./resource-lifetime.wsdl"/>
@@ -169,6 +179,8 @@
 <!-- Port Type Definitions -->
 
 	<wsdl:portType name="StreamableByteIOPortType">
+		<genii-ext:extend portType="rpw-2:GetResourceProperty"/>
+		<genii-ext:extend portType="rpw-2:GetMultipleResourceProperties"/>
 		<genii-ext:extend portType="genii-common:GeniiCommon"/>
 
     	<wsdl:operation name="seekRead">

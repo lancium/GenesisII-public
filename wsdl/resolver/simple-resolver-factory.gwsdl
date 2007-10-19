@@ -6,7 +6,9 @@
 	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
 	xmlns:wsa="http://www.w3.org/2005/08/addressing"
 	xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common"
-	xmlns:genii-resource="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+	xmlns:rpw-2="http://docs.oasis-open.org/wsrf/rpw-2"
+    xmlns:rw-2="http://docs.oasis-open.org/wsrf/rw-2"
+    xmlns:genii-resource="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
     xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
 	xmlns:genii-not="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
     xmlns:naming-w="http://schemas.ogf.org/naming/2006/08/naming/wsdl"
@@ -14,6 +16,14 @@
 	xmlns:simple-resolver="http://vcgr.cs.virginia.edu/naming/2006/12/simple-resolver"
 	xmlns:simple-resolver-factory="http://vcgr.cs.virginia.edu/naming/2006/12/simple-resolver-factory"
 	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rw-2"
+		location="./wsrf/wsResourceFaults.wsdl"/>
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rpw-2"
+		location="./wsrf/wsResourceProperties.wsdl"/>
 
 	<wsdl:import
 		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource"

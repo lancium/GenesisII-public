@@ -14,8 +14,18 @@
 	xmlns:jsdl-posix="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"
 	xmlns:jsdl-hpcp="http://schemas.ggf.org/jsdl/2006/07/jsdl-hpcp"
 	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" > 
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"  
+	xmlns:rpw-2="http://docs.oasis-open.org/wsrf/rpw-2"
+    xmlns:rw-2="http://docs.oasis-open.org/wsrf/rw-2">
 
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rw-2"
+		location="./wsrf/wsResourceFaults.wsdl"/>
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rpw-2"
+		location="./wsrf/wsResourceProperties.wsdl"/>
+	
 	<wsdl:import namespace="http://schemas.ggf.org/bes/2006/08/bes-factory"
 		location="./bes-factory.wsdl"/>
 
@@ -79,6 +89,8 @@
 		<genii-ext:extend portType="genii-common:GeniiCommon"/>
 		<genii-ext:extend portType="rns:RNSPortType"/>
 		<genii-ext:extend portType="bes-factory:BESFactoryPortType"/>
+		<genii-ext:extend portType="rpw-2:GetResourceProperty"/>
+		<genii-ext:extend portType="rpw-2:GetMultipleResourceProperties"/>
 		<genii-ext:extend portType="genii-not:GeniiNotificationConsumerPortType"/>
 	</wsdl:portType>
 </wsdl:definitions>
