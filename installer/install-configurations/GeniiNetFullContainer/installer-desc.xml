@@ -52,7 +52,6 @@
 		<pack name="Core" required="yes">
 			<description>Genesis II Core System</description>
 			<file src="../../common/resources/License.txt" targetdir="$INSTALL_PATH"/>
-			<file src="../../../bootstrap.xml" targetdir="$INSTALL_PATH"/>
 			<file src="../../../bootstrap-container.xml" targetdir="$INSTALL_PATH"/>
 			<fileset dir="../../../webapps" targetdir="$INSTALL_PATH/webapps"/>
 			<file src="../../../scripts/jar-desc.xml"
@@ -110,6 +109,8 @@
 				targetdir="$INSTALL_PATH/Java/windows-i586" os="windows"/>
 			<fileset dir="../../../Java/linux-i586/" includes="**/*"
 				targetdir="$INSTALL_PATH/Java/linux-i586" os="unix"/>
+			<file src="../../../scripts/initialize-new-net-security.bat"
+				targetdir="$INSTALL_PATH" os="windows"/>
 			<executable targetfile="$INSTALL_PATH/runContainer.sh"
 				stage="never"/>
 			<executable targetfile="$INSTALL_PATH/grid"
@@ -210,7 +211,7 @@
 		<pack name="StartGeniiNetFullContainer" required="no" preselected="no">
 		    <depends packname="Core"/>
 			<description>Start New Genesis II Container from deployment GeniiNetFullContainer</description>
-			<executable targetfile="$INSTALL_PATH/windows-start-wrapper.bat"
+			<executable targetfile="$INSTALL_PATH/windows-start-wrapper"
 				stage="postinstall" keep="true">
 				<args>
 					<arg value="Configure and Install New Container"/>

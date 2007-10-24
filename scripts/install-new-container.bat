@@ -5,13 +5,6 @@ REM set install directory - by default, re-written by izpack (or you can set man
 set _INC_GENII_INSTALL_DIR=$INSTALL_PATH
 set _INC_LOCAL_JAVA_DIR=%_INC_GENII_INSTALL_DIR%\Java\windows-i586\jre
 
-REM if "%JAVA_HOME%"=="" goto emptyjavahome
-REM goto getargs
-REM :emptyjavahome
-REM echo "You must have the environment variable JAVA_HOME set to your home Java folder."
-REM goto usage_exit
-
-:getargs
 REM set vars for inputs
 set _DEPLOYMENT_NAME=%1
 set _CONTAINER_NAME=%2
@@ -103,14 +96,13 @@ REM setup rest of container stuff - use script.
 echo setting up container using %_INC_GENII_INSTALL_DIR%\bootstrap-container.xml
 call "%_INC_GENII_INSTALL_DIR%\grid.bat" script "DEPLOYMENT_NAME=%_DEPLOYMENT_NAME%" "INC_GENII_INSTALL_DIR=%_INC_GENII_INSTALL_DIR%" "CONTAINER_NAME=%_HOST_NAME%" "CONTAINER_ADDR=https://localhost:%_HOST_PORT%" "%_INC_GENII_INSTALL_DIR%\bootstrap-container.xml"
  
-echo install-new-container finished successfully
+echo "install-new-container finished successfully"
 pause
-
 
 goto end
 
 :usage_exit
-echo Usage: install-new-container.bat <deployment name> <container name> <connect URL>
+echo "Usage: install-new-container.bat <deployment name> <container name> <connect URL>"
 
 :end
 set _INC_GENII_INSTALL_DIR=
