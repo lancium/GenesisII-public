@@ -2,13 +2,13 @@
 
 usageExit()
 {
-	echo usage is uninstall-container.bat <deployment name> <container name>
+	echo "Usage: is uninstall-container <deployment name> <container name>"
 	exit -1
 }
 
 # set vars for inputs
-_DEPLOYMENT_NAME=$1
-_CONTAINER_NAME=$2
+_DEPLOYMENT_NAME="$1"
+_CONTAINER_NAME="$2"
 
 if [ "x$_DEPLOYMENT_NAME" = "x" ] 
 then
@@ -23,20 +23,20 @@ then
 fi
 
 # set install directory - by default, re-written by izpack (or you can set manually to test)
-_UC_GENII_INSTALL_DIR=%{INSTALL_PATH}
+_UC_GENII_INSTALL_DIR="%{INSTALL_PATH}"
 
-_DEPLOY_DIR=$_UC_GENII_INSTALL_DIR/deployments/$_DEPLOYMENT_NAME
-_CONTAINER_CERT_STORE=$_DEPLOY_DIR/security/container.pfx
-_CONTAINER_CERT_FILE=$_DEPLOY_DIR/security/container.cer
+_DEPLOY_DIR="$_UC_GENII_INSTALL_DIR/deployments/$_DEPLOYMENT_NAME"
+_CONTAINER_CERT_STORE="$_DEPLOY_DIR/security/container.pfx"
+_CONTAINER_CERT_FILE="$_DEPLOY_DIR/security/container.cer"
 
 # install container as a service
-echo Uninstalling container as a windows service...  
+echo "Cleaning up container..."  
 "$_UC_GENII_INSTALL_DIR/UninstallContainerWrapper" $_CONTAINER_NAME
 
 # remove cert for container
-echo Removing cert store $_CONTAINER_CERT_STORE
+echo "Removing cert store $_CONTAINER_CERT_STORE"
 rm -f "$_CONTAINER_CERT_STORE"
-echo Removing cert file $_CONTAINER_CERT_FILE
+echo "Removing cert file $_CONTAINER_CERT_FILE"
 rm -f "$_CONTAINER_CERT_FILE"
 
 exit 0
