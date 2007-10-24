@@ -1,3 +1,10 @@
 @ECHO OFF
 
-java -Xms32M -Xmx128M -classpath "C:\Program Files\Genesis II\ext\bouncycastle\bcprov-jdk15-133.jar;C:\Program Files\Genesis II\lib\GenesisII-security.jar;C:\Program Files\Genesis II\lib\morgan-utilities.jar;C:\Program Files\Genesis II\lib;C:\Program Files\Genesis II\security" -Dlog4j.configuration=genesisII.log4j.properties "-Djava.library.path=C:\Program Files\Genesis II\jni-lib" "-Dedu.virginia.vcgr.genii.install-base-dir=C:\Program Files\Genesis II" org.morgan.util.launcher.Launcher "C:\Program Files\Genesis II\jar-desc.xml" %*
+set _SC_GENII_INSTALL_DIR=$INSTALL_PATH
+set _SC_LOCAL_JAVA_DIR=%_SC_GENII_INSTALL_DIR%\Java\windows-i586\jre
+
+"%_SC_LOCAL_JAVA_DIR%\bin\java.exe" -Xms32M -Xmx128M -classpath "$INSTALL_PATH\ext\bouncycastle\bcprov-jdk15-133.jar;$INSTALL_PATH\lib\GenesisII-security.jar;$INSTALL_PATH\lib\morgan-utilities.jar;$INSTALL_PATH\lib;$INSTALL_PATH\security;$INSTALL_PATH\lib\GenesisII-client.jar" -Dlog4j.configuration=genesisII.log4j.properties "-Djava.library.path=$INSTALL_PATH\jni-lib" "-Dedu.virginia.vcgr.genii.install-base-dir=$INSTALL_PATH" org.morgan.util.launcher.Launcher "$INSTALL_PATH\jar-desc.xml" %*
+
+set _SC_GENII_INSTALL_DIR=
+set _SC_LOCAL_JAVA_DIR=
+

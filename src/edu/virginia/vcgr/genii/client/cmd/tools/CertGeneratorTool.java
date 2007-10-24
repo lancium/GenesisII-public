@@ -50,7 +50,8 @@ public class CertGeneratorTool extends BaseGridTool
 		"Creates and uses CertGenerator services.";
 	static private final String _USAGE_RESOURCE =
 		"edu/virginia/vcgr/genii/client/cmd/tools/resources/cert-generator-usage.txt";
-	static private final String _LOCAL_MACHINE_CN = "LOCAL_MACHINE_NAME";
+	static private final String _LOCAL_MACHINE_NAME_CN = "LOCAL_MACHINE_NAME";
+	static private final String _LOCAL_MACHINE_IP_CN = "LOCAL_MACHINE_IP";
 
 	private boolean _create_generator = false;
 	private boolean _gen_cert = false;
@@ -63,11 +64,12 @@ public class CertGeneratorTool extends BaseGridTool
 	private Long _default_validity = new Long(1000L * 60 * 60 * 24 * (365 * 12 + 3));
 	private String _path_for_cert_generator_factory = null;
 	private String _path_for_cert_generator = null;
-	private String _cn = _LOCAL_MACHINE_CN;
+	private String _cn = _LOCAL_MACHINE_NAME_CN;
 	private String _c = "US";
 	private String _st = "Virginia";
 	private String _l = null;
 	private String _o = null;
+	private String _ou = null;
 	private String _email= null;
 
 	public CertGeneratorTool()
@@ -140,6 +142,11 @@ public class CertGeneratorTool extends BaseGridTool
 		_o = o;
 	}
 	
+	public void setOu(String ou)
+	{
+		_ou = ou;
+	}
+	
 	public void setEmail(String email)
 	{
 		_email = email;
@@ -162,7 +169,7 @@ public class CertGeneratorTool extends BaseGridTool
 			_path_for_cert_generator = getArgument(0);
 			
 			KeyPair newKeyPair = CertTool.generateKeyPair();
-			X509Certificate [] certChain = createCert(newKeyPair, _path_for_cert_generator, _cn, _c, _st, _l, _o, _email);
+			X509Certificate [] certChain = createCert(newKeyPair, _path_for_cert_generator, _cn, _c, _st, _l, _o, _ou, _email);
 			storeCert(newKeyPair, certChain, _ks_path, _ks_password, _ks_alias, _entry_password);
 		}
 		
@@ -286,6 +293,7 @@ public class CertGeneratorTool extends BaseGridTool
 		String st, 
 		String l, 
 		String o, 
+		String ou, 
 		String email) 
 		throws IOException, ConfigurationException, 
 			RNSException, CreationException, GeneralSecurityException
@@ -294,7 +302,7 @@ public class CertGeneratorTool extends BaseGridTool
 		path = path.lookup(generatorPath, RNSPathQueryFlags.MUST_EXIST);
 		CertGeneratorPortType certGenerator = ClientUtils.createProxy(CertGeneratorPortType.class, path.getEndpoint());
 		GenerateX509V3CertificateChainRequestType request = new GenerateX509V3CertificateChainRequestType();
-		X509Name name = generateX509Name(cn, c, st, l, o, email);
+		X509Name name = generateX509Name(cn, c, st, l, o, ou, email);
 		X509NameType nameType = new X509NameType(name.toString());
 		request.setX509Name(nameType);
 		PublicKey newPublicKey = newKeyPair.getPublic();
@@ -349,12 +357,14 @@ public class CertGeneratorTool extends BaseGridTool
 	}
 	
 	
-	static public X509Name generateX509Name(String cn, String c, String st, String l, String o, String email) throws SocketException
+	static public X509Name generateX509Name(String cn, String c, String st, String l, String o, String ou, String email) throws SocketException
 	{
 		String nameString = "";
 		
-		if (cn.equals(_LOCAL_MACHINE_CN))
+		if (cn.equals(_LOCAL_MACHINE_NAME_CN))
 			cn = determineLocalMachineName();
+		else if (cn.equals(_LOCAL_MACHINE_IP_CN))
+			cn = determineLocalMachineIP();
 
 		nameString += "CN=" + cn;
 		
@@ -370,6 +380,9 @@ public class CertGeneratorTool extends BaseGridTool
 		if (o != null && o != "")
 			nameString += ", O=" + o;
 		
+		if (ou != null && ou != "")
+			nameString += ", OU=" + ou;
+		
 		if (email != null && email != "")
 			nameString += ", EMAIL=" + email;
 		
@@ -377,6 +390,11 @@ public class CertGeneratorTool extends BaseGridTool
 	}
 	
 	static private String determineLocalMachineName() throws SocketException
+	{
+		return Hostname.getMostGlobal().getCanonicalHostName();		
+	}
+
+	static private String determineLocalMachineIP() throws SocketException
 	{
 		return Hostname.getMostGlobal().getHostAddress();		
 	}

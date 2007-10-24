@@ -85,6 +85,11 @@ public class GenesisIIConstants
 	static public final String BOOTSTRAP_OWNER_CERTPATH = 
 		"genii.security.authz.bootstrapOwnerCertPath";
 	
-	
 	static public final String CONTAINER_CERT_ALIAS = "VCGR Container";
+	
+	static public final String USER_CONFIG_ENVIRONMENT_VARIABLE =
+		"GENII_USER_CONFIG_DIR";
+	static public final String DEPLOYMENT_NAME_ENVIRONMENT_VARIABLE =
+		"GENII_DEPLOYMENT_NAME";
+
 }

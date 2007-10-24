@@ -10,6 +10,7 @@ import org.xml.sax.SAXException;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.context.ContextFileSystem;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
@@ -78,15 +79,15 @@ public class CreateRNSRootTool extends BaseGridTool
 				"Protocol must be either http or https");
 	}
 	
-
 	public void createRNSRoot(String filename, String baseURL)
 		throws SAXException, ParserConfigurationException, IOException,
 			ConfigurationException
 	{
 		RNSPath root = RNSSpace.createNewSpace(baseURL + "/RNSPortType");
 		ICallingContext ctxt = ContextManager.bootstrap(root);
+		String userConfigDir = ConfigurationManager.getUserConfigDir();
 		ConnectTool connect = new ConnectTool();
-		connect.connect(ctxt);
+		connect.connect(ctxt, userConfigDir);
 		stdout.println("Storing configuration to \"" +
 			filename + "\".");
 		ContextFileSystem.store(new File(filename), null, ctxt);

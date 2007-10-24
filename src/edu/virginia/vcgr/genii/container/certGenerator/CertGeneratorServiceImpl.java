@@ -112,7 +112,14 @@ public class CertGeneratorServiceImpl extends GenesisIIBase implements CertGener
 			X509Certificate issuerCert = issuerChain[0];
 			issuerCert.checkValidity(new Date());
 		
-			PublicKey issuerPK = issuerCert.getPublicKey();
+			PublicKey issuerPK = null;
+			if (issuerChain.length == 1)
+				issuerPK = issuerCert.getPublicKey();
+			else
+			{
+				X509Certificate parentCert = issuerChain[1];
+				issuerPK = parentCert.getPublicKey();
+			}
 			issuerCert.verify(issuerPK);
 		}
 		catch(Exception e)
@@ -173,10 +180,15 @@ public class CertGeneratorServiceImpl extends GenesisIIBase implements CertGener
 
 			X509Certificate issuerCert = certChain[0];
 			issuerCert.checkValidity(new Date());
-			
-			PublicKey pk = issuerCert.getPublicKey();
+			PublicKey pk = null;
+			if (certChain.length == 1)
+				pk = issuerCert.getPublicKey();
+			else
+			{
+				X509Certificate parentCert = certChain[1];
+				pk = parentCert.getPublicKey();
+			}
 			issuerCert.verify(pk);
-
 			
 			return certChain;
 		}

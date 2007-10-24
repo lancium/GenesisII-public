@@ -122,7 +122,7 @@ public abstract class AbstractGamlLoginHandler implements CallbackHandler
 	
 	public GamlLoginTool.CertEntry selectCert(
 		String storePath, String storeType, String password,
-		String entryPattern)
+		boolean isAliasPattern, String entryPattern)
 		throws GeneralSecurityException, IOException
 	{
 		Collection<GamlLoginTool.CertEntry> entries =
@@ -131,16 +131,23 @@ public abstract class AbstractGamlLoginHandler implements CallbackHandler
 		
 		if (entryPattern != null)
 		{
+			int flags = 0;
+			if (isAliasPattern)
+				flags = Pattern.CASE_INSENSITIVE;
 			Pattern p = Pattern.compile(
-				"^.*" + Pattern.quote(entryPattern) + ".*$");
+				"^.*" + Pattern.quote(entryPattern) + ".*$", flags);
 			
 			int numMatched = 0;
 			GamlLoginTool.CertEntry selectedEntry = null;
 			for (GamlLoginTool.CertEntry iter : entries)
 			{
-				String name = 
-					((X509Certificate)(iter._certChain[0])).getSubjectDN().getName();
-				Matcher matcher = p.matcher(name);
+				String toMatch = null; 
+				if (!isAliasPattern)
+					toMatch = ((X509Certificate)(iter._certChain[0])).getSubjectDN().getName();
+				else
+					toMatch = iter._alias;
+				
+				Matcher matcher = p.matcher(toMatch);
 				if (matcher.matches())
 				{
 					selectedEntry = iter;

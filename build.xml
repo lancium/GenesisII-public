@@ -235,6 +235,7 @@
 				<include name="edu/virginia/vcgr/genii/client/utils/deployment/DeploymentRelativeFile.class"/>
 				<include name="edu/virginia/vcgr/genii/client/comm/axis/security/VcgrSslSocketFactory.class"/>
 				<include name="edu/virginia/vcgr/genii/client/security/x509/*.class"/>
+                                <include name="edu/virginia/vcgr/genii/client/configuration/UserConfig.class"/>
 			</fileset>
 		</jar>
 	</target>
@@ -260,7 +261,9 @@
 		<delete dir="${user.home}/.genesisII"/>
 	</target>
 
-	<target name="clean" depends="wipestate">
+	<target name="cleanall" depends="clean, wipestate"/>
+
+	<target name="clean" depends="clean-all-scripts">
 		<delete dir="${codegen-dir}"/>
 		<delete dir="${wsdd-dir}"/>
 		<delete dir="${gennedsrc-dir}"/>

@@ -1,0 +1,60 @@
+# Copyright (c) 1999, 2006 Tanuki Software Inc.
+#
+# Java Service Wrapper Linux install script
+#
+
+usageExit()
+{
+	echo Usage: UninstallContainerWrapper <deployment name> <container service name>
+	exit -1
+}
+
+
+_UCW_GENII_INSTALL_DIR=%{INSTALL_PATH}
+_UCW_LOCAL_JAVA_DIR=$_UCW_GENII_INSTALL_DIR/Java/linux-i586/jre
+
+# get user's data directory...
+_GENII_USER_DIR=`$_UCW_LOCAL_JAVA_DIR/bin/java -classpath "$_UCW_GENII_INSTALL_DIR/lib/GenesisII-client.jar" edu.virginia.vcgr.genii.client.cmd.GetUserDir`
+echo _GENII_USER_DIR is now set to ....     $_GENII_USER_DIR
+
+# check if deployment name arg was passed in
+_DEPLOYMENT_NAME=$1
+if [ "x$_DEPLOYMENT_NAME" = "x" ] 
+then
+	echo Missing deployment name argument
+	usageExit
+fi
+
+# check if container name arg was passed in
+_CONTAINER_NAME=$2
+if [ "x$_CONTAINER_NAME" = "x" ] 
+then
+	echo Missing container name argument
+	usageExit
+fi
+
+_CONTAINER_DIR=$_GENII_USER_DIR/$_CONTAINER_NAME
+_WRAPPER_EXE=$_ICW_GENII_INSTALL_DIR/ext/JavaServiceWrapper/bin/wrapper
+
+#
+# Find the config file.
+#
+_CONFIG_DIR=$_UCW_GENII_INSTALL_DIR/deployments/$_DEPLOYMENT_NAME
+_WRAPPER_CONF=$_UCW_GENII_INSTALL_DIR/ext/JavaServiceWrapper/conf/runContainer.conf
+echo wrapper config file is $_WRAPPER_CONF
+
+#
+# Install the Wrapper as Linux daemon.
+#
+echo ""
+echo "$_WRAPPER_EXE" -r "$_WRAPPER_CONF" wrapper.daemonize=TRUE "set.LOCAL_JAVA_DIR=$_UCW_LOCAL_JAVA_DIR" "set.DEPLOYMENT_NAME=$_DEPLOYMENT_NAME" "set.CONTAINER_NAME=$_CONTAINER_NAME" "set.GENII_INSTALL_DIR=$_UCW_GENII_INSTALL_DIR" "set.GENII_USER_DIR=$_CONTAINER_DIR"
+echo ""
+
+"$_WRAPPER_EXE" -r "$_WRAPPER_CONF" "set.LOCAL_JAVA_DIR=$_UCW_LOCAL_JAVA_DIR" "set.DEPLOYMENT_NAME=$_DEPLOYMENT_NAME" "set.CONTAINER_NAME=$_CONTAINER_NAME" "set.GENII_INSTALL_DIR=$_UCW_GENII_INSTALL_DIR" "set.GENII_USER_DIR=$_CONTAINER_DIR"
+
+RET_CODE=$?
+if [ $RET_CODE -ne 0 ] then
+	echo Removal of Linux daemon seems to have failed.
+	exit -1
+fi
+

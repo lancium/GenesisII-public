@@ -1,6 +1,8 @@
 @ECHO OFF
-
 set _TITLE=%1
 shift
 
-start "%_TITLE%" /wait "$INSTALL_PATH\windows-cmd-runner.bat" %*
+cd $INSTALL_PATH
+start %_TITLE% /wait windows-cmd-runner.bat %~s1 %2 %3 %4 %5 %6 %7 %8 %9
+
+set _TITLE=

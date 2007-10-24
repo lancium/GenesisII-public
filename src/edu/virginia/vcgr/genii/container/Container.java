@@ -80,8 +80,13 @@ public class Container extends ApplicationBase
 			System.exit(1);
 		}
 		
-		if (args.length == 1)
+		if (args.length == 1) {
 			System.setProperty(GenesisIIConstants.DEPLOYMENT_NAME_PROPERTY, args[0]);
+			_logger.info("Container deployment is " + args[0]);
+		} 
+		else {
+			_logger.info("Container deployment is default");
+		}
 		
 		prepareServerApplication();
 		
@@ -94,7 +99,7 @@ public class Container extends ApplicationBase
 			WSDDProvider.registerProvider(
 				GAroundInvokerFactory.PROVIDER_QNAME,
 				new GAroundInvokerFactory());
-			
+
 			runContainer();
 			System.out.println("Container Started");
 		}
@@ -319,7 +324,6 @@ public class Container extends ApplicationBase
 
 		KeyStore ks = CertTool.openStoreDirectPath(new DeploymentRelativeFile(keyStoreLoc),
 			keyStoreType, keyStorePassChars);
-	
 		// load the container private key and certificate
 		_containerPrivateKey = (PrivateKey) ks.getKey(
 				containerAlias, keyPassChars);

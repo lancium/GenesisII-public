@@ -1,0 +1,90 @@
+#!/bin/sh
+
+# usage is install-new-container.bat <deployment name> <container name> <net connect URL>
+
+usageExit()
+{
+	echo "usage is install-new-container.bat <deployment name> <container name> <net connect URL>"
+	exit -1
+}
+
+
+# set install directory - by default, re-written by izpack (or you can set manually to test)
+_INC_GENII_INSTALL_DIR=%{INSTALL_PATH}
+_INC_LOCAL_JAVA_DIR=$_INC_GENII_INSTALL_DIR/Java/linux-i586/jre
+
+# set vars for inputs
+_DEPLOYMENT_NAME=$1
+_CONTAINER_NAME=$2
+_CONNECT_URL=$3
+
+if [ "x$_DEPLOYMENT_NAME" = "x" ]
+then
+	echo "Missing deployment name argument"
+	usageExit
+fi
+
+if [ "x$_CONTAINER_NAME" = "x" ] 
+then
+	echo "Missing container name argument"
+	usageExit
+fi
+
+if [ "x$_CONNECT_URL" = "x" ] 
+then
+	echo "Missing connect URL argument"
+	usageExit
+fi
+
+_DEPLOY_DIR=$_INC_GENII_INSTALL_DIR/deployments/$_DEPLOYMENT_NAME
+
+# figure out name of host
+_HOST_NAME=`$_INC_GENII_INSTALL_DIR/simple-command edu.virginia.vcgr.genii.client.cmd.GetHostName`
+echo _HOST_NAME is now set to ....     $_HOST_NAME
+
+# figure out port being used by container
+_HOST_PORT=`$_INC_GENII_INSTALL_DIR/simple-command edu.virginia.vcgr.genii.client.cmd.GetServerPort $_DEPLOYMENT_NAME`
+
+# connect to net
+echo connecting to $_CONNECT_URL...
+$_INC_GENII_INSTALL_DIR/grid connect "$_CONNECT_URL" "$_DEPLOY_DIR"
+
+# login as installer
+echo Logging in as installer.  Please type in password at prompt...
+$_INC_GENII_INSTALL_DIR/grid login --no-gui "--file=$_DEPLOY_DIR/security/installer.pfx" --storetype=PKCS12 Installer
+
+# generate new CA cert for new container
+echo Generating certificate for new container...
+_CONTAINER_CERT_STORE=$_DEPLOY_DIR/security/container.pfx
+_CERT_GEN_RNS_PATH=/etc/ContainerGroupCertGenerator
+_CONTAINER_CERT_ALIAS="VCGR Container"
+rm -f "$_CONTAINER_CERT_STORE"
+echo Creating container cert.  Command is $_INC_GENII_INSTALL_DIR/grid cert-generator --gen-cert $_CERT_GEN_RNS_PATH "--ks-path=$_CONTAINER_CERT_STORE" --ks-pword=container --ks-alias=$_CONTAINER_CERT_ALIAS --cn=LOCAL_MACHINE_NAME
+$_INC_GENII_INSTALL_DIR/grid cert-generator --gen-cert "$_CERT_GEN_RNS_PATH" "--ks-path=$_CONTAINER_CERT_STORE" --ks-pword=container "--ks-alias=$_CONTAINER_CERT_ALIAS" --cn=LOCAL_MACHINE_NAME --ou=VCGR --o=UVA --l=Charlottesville --c=US --st=VA
+
+# export .cer for container
+echo Exporting container.cer.
+rm -f "$_DEPLOY_DIR/security/container.cer"
+"$_INC_LOCAL_JAVA_DIR/bin/keytool" -export -file "$_DEPLOY_DIR/security/container.cer" -keystore "$_CONTAINER_CERT_STORE" -storepass container -alias "$_CONTAINER_CERT_ALIAS" -storetype "PKCS12" 
+
+# logout as installer
+echo Logging out as installer...
+$_INC_GENII_INSTALL_DIR/grid logout
+
+# install container as a service
+echo Installing new container as a windows service...  Use command "$_INC_GENII_INSTALL_DIR/ext/JavaServiceWrapper/bin/UninstallContainerWrapper $_CONTAINER_NAME" to remove container from being a windows service
+$_INC_GENII_INSTALL_DIR/InstallContainerWrapper "$_DEPLOYMENT_NAME" $_CONTAINER_NAME
+
+# Add Container to RNS space using _HOST_NAME
+
+# sleep for a while waiting for server to come up
+echo Sleeping for 60 seconds to wait for server to start...
+sleep 60
+
+# setup rest of container stuff - use script.
+echo setting up container using $_INC_GENII_INSTALL_DIR/bootstrap-container.xml
+$_INC_GENII_INSTALL_DIR/grid script "DEPLOYMENT_NAME=$_DEPLOYMENT_NAME" "GENII_INSTALL_DIR=$_INC_GENII_INSTALL_DIR" "CONTAINER_NAME=$_HOST_NAME" "CONTAINER_ADDR=https://localhost:$_HOST_PORT" "$_INC_GENII_INSTALL_DIR/bootstrap-container.xml"
+ 
+echo install-new-container finished successfully
+
+exit 0

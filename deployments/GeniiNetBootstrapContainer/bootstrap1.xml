@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<gsh:script
+	xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
+	xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+
+	<gsh:define name="BOOT_SRVS"
+		source="/containers/BootstrapContainer/Services"/>
+	
+	<gsh:default name="GENII_INSTALL_DIR" value="."/>
+	<gsh:default name="DEPLOYMENT_NAME" value="default"/>
+	
+	<gsh:echo
+		message="GENII_INSTALL_DIR is ${GENII_INSTALL_DIR}"/>
+	<gsh:echo
+		message="DEPLOYMENT_NAME is ${DEPLOYMENT_NAME}"/>
+
+	<geniix:login>
+		<gsh:param>--no-gui</gsh:param>
+		<gsh:param>--file=${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/admin.pfx</gsh:param>
+		<gsh:param>--password=admin</gsh:param>
+		<gsh:param>Admin</gsh:param>
+	</geniix:login>
+	
+
+	<gsh:echo message="Creating Certificate Generator for ${DEPLOYMENT_NAME}."/>
+	<geniix:cert-generator>
+		<gsh:param>--create-generator</gsh:param>
+		<gsh:param>${BOOT_SRVS}/CertGeneratorPortType</gsh:param>
+		<gsh:param>--ks-path=${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/net-root-ca.pfx</gsh:param>
+		<gsh:param>--ks-pword=netroot</gsh:param>
+		<gsh:param>--ks-alias=GenesisII Net Root CA Cert</gsh:param>
+		<gsh:param>/etc/NetRootCertGenerator</gsh:param>
+	</geniix:cert-generator>
+
+	<geniix:gaml-chmod>
+		<gsh:param>/etc/NetRootCertGenerator</gsh:param>
+		<gsh:param>+r+x</gsh:param>
+		<gsh:param>--local-src</gsh:param>
+		<gsh:param>${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/installer.cer</gsh:param>
+	</geniix:gaml-chmod>
+	
+	
+	<gsh:echo message="Logging out"/>
+	<geniix:logout/>
+</gsh:script>

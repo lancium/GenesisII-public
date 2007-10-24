@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mconf:configuration
+	xmlns:mconf="http://www.mark-morgan.net/org/morgan/util/configuration"
+	xmlns:genii="http://vcgr.cs.virginia.edu/Genesis-II">
+
+	<mconf:config-sections>
+		<mconf:config-section name="genii:message-security"
+			class="org.morgan.util.configuration.PropertiesConfigurationSectionHandler"/>
+		<mconf:config-section name="genii:resource-identity"
+			class="org.morgan.util.configuration.PropertiesConfigurationSectionHandler"/>
+		<mconf:config-section name="genii:ssl-properties"
+			class="org.morgan.util.configuration.PropertiesConfigurationSectionHandler"/>
+		<mconf:config-section name="genii:gaml-keystore"
+			class="org.morgan.util.configuration.PropertiesConfigurationSectionHandler"/>
+		<mconf:config-section name="genii:locator-registry"
+			class="edu.virginia.vcgr.genii.client.configuration.LocatorRegistrySectionHandler"/>
+		<mconf:config-section name="genii:uri-handlers"
+			class="edu.virginia.vcgr.genii.client.configuration.URIHandlerSectionHandler"/>
+		<mconf:config-section name="genii:smtp-properties"
+			class="org.morgan.util.configuration.PropertiesConfigurationSectionHandler"/>
+		<mconf:config-section name="genii:configured-instances"
+			class="org.morgan.util.configuration.InstanceConfigurationSectionHandler"/>
+		<mconf:config-section name="genii:tools"
+			class="org.morgan.util.configuration.ClassConfigurationSectionHandler"/>
+		<mconf:config-section name="genii:global-properties"
+			class="org.morgan.util.configuration.PropertiesConfigurationSectionHandler"/>
+	</mconf:config-sections>
+	
+	<genii:global-properties>
+		<mconf:property 
+			name="edu.virginia.vcgr.genii.container.epr-addressing-mode"
+			value="ip"/>
+	</genii:global-properties>
+
+	
+<!-- Message security section.  Contains properties that impact the  
+     message-level security of outgoing and response messages.
+-->     
+	<genii:message-security>
+		<!-- Property that sets the minimum configuration for outgoing and 
+		     response message-level security.  Acceptable values are 
+		       "NONE" : The client does not require a minimum configuration 
+		         message-level communication.  (The client will auto-upgrade
+		         to the level of message-level security required by the 
+		         remote container.)
+		       "SIGN" : Provides (for outgoing messages) and requires (for 
+		         response messages) proof of data integrity. (The client will
+		         often auto-upgrade as needed to this configuration to accomodate 
+		         AuthZ within certain containers.)
+		       "ENCRYPT" : Provides (for outgoing messages) and requires (for 
+		         response messages) confidentiality.  (When set, this value
+		         necessitates proper resource AuthN, which requires that the 
+		         edu.virginia.vcgr.genii.client.security.resource-identity.authn-tolerance
+		         property below be set to "FAIL".)
+		       "WARN" : Allows the client to communicate with resources that cannot 
+		         be authenticated -->
+		<mconf:property 
+			name="edu.virginia.vcgr.genii.client.security.message.min-config"
+			value="SIGN|WARN"/>
+	</genii:message-security>
+	
+<!-- Resource identity properties section.  This section contains properties
+     that indicate what trust store to use for verification of resource 
+     identity 
+-->
+	<genii:resource-identity>
+		<!-- The following three properties specify the trust store to
+		     be used in verifying resource identity -->
+		<mconf:property 
+			name="edu.virginia.vcgr.genii.client.security.resource-identity.trust-store-location"
+			value="security/trusted.pfx"/>
+		<mconf:property 
+			name="edu.virginia.vcgr.genii.client.security.resource-identity.trust-store-type"
+			value="PKCS12"/>
+		<mconf:property 
+			name="edu.virginia.vcgr.genii.client.security.resource-identity.trust-store-password"
+			value="trusted"/>
+	</genii:resource-identity>	
+	
+	
+<!-- SSL properties section.  Presently contains properties that identify the 
+     trust-store that should be used to authenticate server SSL certificates.
+-->
+	<genii:ssl-properties>
+		<mconf:property 
+			name="edu.virginia.vcgr.genii.client.security.ssl.trust-store-location"
+			value="security/trusted.pfx"/>
+		<mconf:property 
+			name="edu.virginia.vcgr.genii.client.security.ssl.trust-store-type"
+			value="PKCS12"/>
+		<mconf:property 
+			name="edu.virginia.vcgr.genii.client.security.ssl.trust-store-password"
+			value="trusted"/>
+	</genii:ssl-properties>
+	
+	<genii:smtp-properties>
+		<mconf:property name="mail.smtp.auth" value="false"/>
+		<mconf:property name="mail.smtp.host" value="localhost"/>
+<!--
+		<mconf:property name="mail.smtp.from" value="somone@somewhere.edu"/>
+		<mconf:property name="mail.smtp.user" value="someone"/>
+		<mconf:property name="edu.virginia.vcgr.htc.smtp.password" value="unknown"/>
+-->
+	</genii:smtp-properties>
+	
+	<genii:uri-handlers>
+		<genii:uri-handler>edu.virginia.vcgr.genii.client.io.JavaURIAsURLHandler</genii:uri-handler>
+		<genii:uri-handler>edu.virginia.vcgr.genii.client.io.MailtoURIHandler</genii:uri-handler>
+		<genii:uri-handler>edu.virginia.vcgr.genii.client.io.RNSURIHandler</genii:uri-handler>
+	</genii:uri-handlers>
+	
+	<genii:locator-registry>
+		<locator
+			interface="edu.virginia.vcgr.genii.container.VCGRContainerPortType"
+			locator-type="edu.virginia.vcgr.genii.container.VCGRContainerServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.counter.CounterPortType"
+			locator-type="edu.virginia.vcgr.genii.counter.CounterServiceLocator"/>
+		<locator interface="org.ggf.rns.RNSPortType"
+			locator-type="org.ggf.rns.RNSServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.scheduler.basic.BasicSchedulerPortType"
+			locator-type="edu.virginia.vcgr.genii.scheduler.basic.BasicSchedulerServiceLocator"/>
+		<locator interface="org.ggf.bes.BESPortType"
+			locator-type="org.ggf.bes.BESServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.bes.activity.BESActivityPortType"
+			locator-type="edu.virginia.vcgr.genii.bes.activity.BESActivityServiceLocator"/>
+		<locator interface="org.ggf.rbyteio.RandomByteIOPortType"
+			locator-type="org.ggf.rbyteio.RandomByteIOServiceLocator"/>
+		<locator interface="org.ggf.sbyteio.StreamableByteIOPortType"
+			locator-type="org.ggf.sbyteio.StreamableByteIOServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.byteio.streamable.factory.StreamableByteIOFactory"
+			locator-type="edu.virginia.vcgr.genii.byteio.streamable.factory.StreamableByteIOFactoryServiceLocator"/>
+		<locator interface="org.ggf.rbyteio.RandomByteIOInteropPortType"
+			locator-type="org.ggf.rbyteio.RandomByteIOInteropServiceLocator"/>
+		<locator interface="org.ggf.sbyteio.StreamableByteIOInteropPortType"
+			locator-type="org.ggf.sbyteio.StreamableByteIOInteropServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.common.GeniiCommon"
+			locator-type="edu.virginia.vcgr.genii.common.GeniiCommonServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.exportdir.ExportedRootPortType"
+			locator-type="edu.virginia.vcgr.genii.exportdir.ExportedRootServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.exportdir.ExportedDirPortType"
+			locator-type="edu.virginia.vcgr.genii.exportdir.ExportedDirServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.exportdir.ExportedFilePortType"
+			locator-type="edu.virginia.vcgr.genii.exportdir.ExportedFileServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.common.notification.GeniiNotificationConsumerPortType"
+			locator-type="edu.virginia.vcgr.genii.common.notification.GeniiNotificationConsumerServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.common.notification.GeniiSubscriptionPortType"
+			locator-type="edu.virginia.vcgr.genii.common.notification.GeniiSubscriptionServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.naming.ReferenceResolver"
+			locator-type="edu.virginia.vcgr.genii.naming.ReferenceResolverServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.resolver.simple.SimpleResolverPortType"
+			locator-type="edu.virginia.vcgr.genii.resolver.simple.SimpleResolverServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.resolver.simple.SimpleResolverFactoryPortType"
+			locator-type="edu.virginia.vcgr.genii.resolver.simple.SimpleResolverFactoryServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.appdesc.ApplicationDescriptionPortType"
+			locator-type="edu.virginia.vcgr.genii.appdesc.ApplicationDescriptionServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.deployer.ApplicationDeployerPortType"
+			locator-type="edu.virginia.vcgr.genii.deployer.ApplicationDeployerServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.queue.QueuePortType"
+			locator-type="edu.virginia.vcgr.genii.queue.QueueServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.certGenerator.CertGeneratorPortType"
+			locator-type="edu.virginia.vcgr.genii.certGenerator.CertGeneratorServiceLocator"/>
+	</genii:locator-registry>
+	
+	<genii:configured-instances>
+		<mconf:instance name="proxy-factory-instance" 
+			type="edu.virginia.vcgr.genii.client.comm.axis.AxisBasedProxyFactory"
+			base="edu.virginia.vcgr.genii.client.comm.IProxyFactory"/>
+		<mconf:instance name="context-resolver" 
+			type="edu.virginia.vcgr.genii.client.context.ClientContextResolver"
+			base="edu.virginia.vcgr.genii.client.context.IContextResolver"/>
+		<mconf:instance name="exception-handler"
+			type="edu.virginia.vcgr.genii.client.cmd.DebugExceptionHandler"
+			base="edu.virginia.vcgr.genii.client.cmd.IExceptionHandler"/>
+<!--			
+		<mconf:instance name="exception-handler"
+			type="edu.virginia.vcgr.genii.client.cmd.SimpleExceptionHandler"
+			base="edu.virginia.vcgr.genii.client.cmd.IExceptionHandler"/>
+-->
+	</genii:configured-instances>
+
+	<genii:tools>
+		<mconf:class name="authz"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.AuthZTool</mconf:class>
+		<mconf:class name="notification-listener"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.NotificationListenerTool</mconf:class>
+		<mconf:class name="create-rns-root"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CreateRNSRootTool</mconf:class>
+		<mconf:class name="connect"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ConnectTool</mconf:class>
+		<mconf:class name="ls"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.LsTool</mconf:class>
+		<mconf:class name="pwd"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.PwdTool</mconf:class>
+		<mconf:class name="login"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.GamlLoginTool</mconf:class>
+		<mconf:class name="whoami"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.WhoamiTool</mconf:class>
+		<mconf:class name="gaml-chmod"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.GamlChmodTool</mconf:class>
+<!--			
+		<mconf:class name="ut-login"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.UTLoginTool</mconf:class>
+-->
+		<mconf:class name="logout"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.LogoutTool</mconf:class>
+		<mconf:class name="cd"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CdTool</mconf:class>		
+		<mconf:class name="mkdir"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.MkdirTool</mconf:class>
+		<mconf:class name="ping"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.PingTool</mconf:class>
+		<mconf:class name="byteio"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ByteIOInteropTool</mconf:class>
+		<mconf:class name="ln"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.LnTool</mconf:class>
+		<mconf:class name="unlink"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.UnlinkTool</mconf:class>
+		<mconf:class name="cp"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CopyTool</mconf:class>
+		<mconf:class name="cat"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CatTool</mconf:class>
+		<mconf:class name="rm"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.RmTool</mconf:class>
+		<mconf:class name="ftpd"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.FtpdTool</mconf:class>
+		<mconf:class name="schedule-termination"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.TerminationScheduleTool</mconf:class>
+		<mconf:class name="get-attributes"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.GetAttributesDocumentTool</mconf:class>
+		<mconf:class name="attach-host"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.AttachHostTool</mconf:class>
+		<mconf:class name="run"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.RunTool</mconf:class>
+		<mconf:class name="create-resource"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CreateResourceTool</mconf:class>
+		<mconf:class name="export"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ExportTool</mconf:class>
+		<mconf:class name="script"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ScriptTool</mconf:class>
+		<mconf:class name="perf"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ByteIOPerformanceTool</mconf:class>
+		<mconf:class name="app-description-tool"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ApplicationDescriptionTool</mconf:class>
+		<mconf:class name="browser"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.BrowserTool</mconf:class>
+		<mconf:class name="set-deployers"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.SetDeployersTool</mconf:class>
+		<mconf:class name="replicated-file"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ReplicatedFileTool</mconf:class>
+		<mconf:class name="time-file"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.TimeReplicatedFile</mconf:class>
+		<mconf:class name="qcomplete"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.queue.QCompleteTool</mconf:class>
+		<mconf:class name="qconfigure"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.queue.QConfigureTool</mconf:class>
+		<mconf:class name="qkill"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.queue.QKillTool</mconf:class>
+		<mconf:class name="qlist"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.queue.QListTool</mconf:class>
+		<mconf:class name="qstat"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.queue.QStatTool</mconf:class>
+		<mconf:class name="qsub"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.queue.QSubTool</mconf:class>
+		<mconf:class name="get-bes-attributes"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.GetBESFactoryAttributesTool</mconf:class>
+		<mconf:class name="cert-generator"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CertGeneratorTool</mconf:class>
+		<mconf:class name="set-user-config"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.SetUserConfigTool</mconf:class>
+	</genii:tools>
+</mconf:configuration>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<gsh:script
+	xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
+	xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+	<gsh:define name="BOOT_SRVS"
+		source="/containers/BootstrapContainer/Services"/>
+	
+	<gsh:default name="GENII_INSTALL_DIR" value="."/>
+	<gsh:default name="DEPLOYMENT_NAME" value="default"/>
+	
+	<gsh:echo
+		message="GENII_INSTALL_DIR is ${GENII_INSTALL_DIR}"/>
+	<gsh:echo
+		message="DEPLOYMENT_NAME is ${DEPLOYMENT_NAME}"/>
+	<gsh:echo
+		message="CONTAINER_NAME is ${CONTAINER_NAME}"/>
+	<gsh:echo
+		message="CONTAINER_ADDR is ${CONTAINER_ADDR}"/>
+
+	<gsh:echo
+		message="Logging in using container cert - ${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/container.pfx."/>
+	<geniix:login>
+		<gsh:param>--no-gui</gsh:param>
+		<gsh:param>--file=${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/container.pfx</gsh:param>
+		<gsh:param>--password=container</gsh:param>
+		<gsh:param>--alias</gsh:param>
+		<gsh:param>Container</gsh:param>
+	</geniix:login>
+
+	<gsh:echo message="Attaching host as ${CONTAINER_NAME}"/>
+	<geniix:attach-host>
+		<gsh:param>${CONTAINER_ADDR}/axis/services/VCGRContainerPortType</gsh:param>
+		<gsh:param>/containers/${CONTAINER_NAME}</gsh:param>
+	</geniix:attach-host>
+
+	<gsh:echo message="Setting security on containers/services"/>	
+	<gsh:echo message="Setting security on container ${CONTAINER_NAME}"/>	
+	<geniix:gaml-chmod>
+		<gsh:param>/containers/${CONTAINER_NAME}</gsh:param>
+		<gsh:param>+r</gsh:param>
+		<gsh:param>--everyone</gsh:param>
+	</geniix:gaml-chmod>
+
+	<geniix:gaml-chmod>
+		<gsh:param>/containers/${CONTAINER_NAME}/Services</gsh:param>
+		<gsh:param>+r</gsh:param>
+		<gsh:param>--everyone</gsh:param>
+	</geniix:gaml-chmod>
+
+	<gsh:foreach param-name="SERVICE"
+		source-rns="/containers/${CONTAINER_NAME}/Services">
+		<gsh:echo message="Setting security on ${SERVICE} in container ${CONTAINER_NAME}"/>
+		<geniix:gaml-chmod>
+			<gsh:param>/containers/${CONTAINER_NAME}/Services/${SERVICE}</gsh:param>
+			<gsh:param>+r</gsh:param>
+			<gsh:param>--everyone</gsh:param>
+		</geniix:gaml-chmod>
+		<gsh:foreach param-name="GROUP" source-rns="/groups">
+			<geniix:gaml-chmod>
+				<gsh:param>/containers/${CONTAINER_NAME}/Services/${SERVICE}</gsh:param>
+				<gsh:param>+r+x</gsh:param>
+				<gsh:param>/groups/${GROUP}</gsh:param>
+			</geniix:gaml-chmod>
+		</gsh:foreach>
+	</gsh:foreach>
+
+	<gsh:echo message="Creating BES resource for ${CONTAINER_NAME}."/>
+	<geniix:create-resource>
+		<gsh:param>/containers/${CONTAINER_NAME}/Services/BESPortType</gsh:param>
+		<gsh:param>/bes-containers/${CONTAINER_NAME}</gsh:param>
+	</geniix:create-resource>
+
+	<geniix:gaml-chmod>
+		<gsh:param>/bes-containers/${CONTAINER_NAME}</gsh:param>
+		<gsh:param>+r</gsh:param>
+		<gsh:param>--everyone</gsh:param>
+	</geniix:gaml-chmod>
+
+	<gsh:echo message="Linking bes ${CONTAINER_NAME} into scheduler"/>
+	<geniix:ln>
+		<gsh:param>/bes-containers/${CONTAINER_NAME}</gsh:param>
+		<gsh:param>/schedulers/BootstrapScheduler/${CONTAINER_NAME}</gsh:param>
+	</geniix:ln>
+		
+	<gsh:echo message="Setting deployer for bes ${CONTAINER_NAME}."/>
+	<geniix:set-deployers>
+		<gsh:param>/bes-containers/${CONTAINER_NAME}</gsh:param>
+		<gsh:param>/containers/${CONTAINER_NAME}/Services/ApplicationDeployerPortType</gsh:param>
+	</geniix:set-deployers>
+
+	<gsh:foreach param-name="GROUP" source-rns="/groups">
+		<geniix:gaml-chmod>
+			<gsh:param>/bes-containers/${CONTAINER_NAME}</gsh:param>
+			<gsh:param>+r+x</gsh:param>
+			<gsh:param>/groups/${GROUP}</gsh:param>
+		</geniix:gaml-chmod>
+	</gsh:foreach>
+
+	<gsh:echo message="Logging out"/>
+	<geniix:logout/>
+</gsh:script>

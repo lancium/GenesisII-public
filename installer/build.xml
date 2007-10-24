@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all-installers" name="genii-release">
+
+	<!-- import all environment variables -->
+	<property environment="env"/>
+	
+	<property file="release.properties"/>
+	<property file="build.properties"/>
+
+	<taskdef name="izpack" classpath="${basedir}/IzPack/lib/compiler.jar"
+		classname="com.izforge.izpack.ant.IzPackTask"/>
+
+	<target name="all-installers" depends="all-cleanup">
+		<antcall target="build-installer">
+			<param name="install-config-dir" value="GeniiNetFullContainer"/>
+		</antcall>
+	</target>
+		
+	<target name="all-cleanup">
+		<antcall target="cleanup-install">
+			<param name="install-config-dir" value="GeniiNetFullContainer"/>
+		</antcall>
+	</target>
+
+	<target name="cleanup-install">
+		<delete file="${basedir}/installers/GenesisII-${install-config-dir}-installer-${genesisII.version}.jar" quiet="true"/>
+	</target>
+
+	<target name="build-installer" depends="compile-code, init">
+		<izpack input="${basedir}/install-configurations/${install-config-dir}/installer-desc.xml"
+			output="${basedir}/installers/GenesisII-${install-config-dir}-installer-${genesisII.version}.jar"
+			installerType="standard" basedir="${basedir}/install-configurations/${install-config-dir}"
+			izPackDir="${basedir}/IzPack"/>
+	</target>
+
+	<target name="init">
+		<mkdir dir="${basedir}/installers"/>
+	</target>
+	
+	<target name="compile-code">
+		<ant antfile="build.xml" dir="${basedir}/.." inheritAll="false">
+			<target name="build"/>
+<!--			<target name="jdoc"/> -->
+			<target name="deployments"/>
+<!--			<target name="scripts"/> -->
+		</ant>
+	</target>
+
+</project>

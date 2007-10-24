@@ -1,0 +1,237 @@
+<installation version="1.0">
+	<properties>
+		<property file="release.properties"/>
+		<property file="build.number"/>
+	</properties>
+
+	<info>
+		<appname>Genesis II</appname>
+		<appversion>@{genesisII.version} Build @{build.number}</appversion>
+		<authors>
+			<author name="Andrew Grimshaw" email="grimshaw@cs.virginia.edu"/>
+			<author name="Mark Morgan" email="mmm2a@cs.virginia.edu"/>
+			<author name="John Karpovich" email="jfk3w@cs.virginia.edu"/>
+			<author name="Duane Merrill" email="dgm4d@cs.virginia.edu"/>
+			<author name="Howie Huang" email="hh4z@cs.virginia.edu"/>
+			<author name="Krasimira Kapitanova" email="kkk5z@cs.virginia.edu"/>
+			<author name="Karolina Sarnowska" email="kas9ud@cs.virginia.edu"/>
+			<author name="Chris Sosa" email="cbs6n@cs.virginia.edu"/>
+			<author name="Dan Wasserman" email="daw9f@cs.virginia.edu"/>
+		</authors>
+		<url>http://vcgr.cs.virginia.edu</url>
+		<javaversion>1.5</javaversion>
+	</info>
+
+	<guiprefs height="600" resizable="yes" width="900">
+		<laf name="metouia">
+			<os family="unix"/>
+		</laf>
+	</guiprefs>
+
+	<locale>
+		<langpack iso3="eng"/>
+	</locale>
+
+	<resources>
+		<res src="../../common/resources/install-readme.html"
+			id="HTMLInfoPanel.info"/>
+		<res src="../../common/resources/License.txt" id="LicencePanel.licence"/>
+	</resources>
+
+	<panels>
+		<panel classname="HelloPanel"/>
+		<panel classname="HTMLInfoPanel"/>
+		<panel classname="LicencePanel"/>
+		<panel classname="PacksPanel"/>
+		<panel classname="TargetPanel"/>
+		<panel classname="InstallPanel"/>
+		<panel classname="FinishPanel"/>
+	</panels>
+
+	<packs>
+		<pack name="Core" required="yes">
+			<description>Genesis II Core System</description>
+			<file src="../../common/resources/License.txt" targetdir="$INSTALL_PATH"/>
+			<file src="../../../bootstrap.xml" targetdir="$INSTALL_PATH"/>
+			<file src="../../../bootstrap-container.xml" targetdir="$INSTALL_PATH"/>
+			<fileset dir="../../../webapps" targetdir="$INSTALL_PATH/webapps"/>
+			<file src="../../../scripts/jar-desc.xml"
+				targetdir="$INSTALL_PATH"/>
+			<file src="../../../RELEASE" targetdir="$INSTALL_PATH"/>
+			<fileset dir="../../../deployments" targetdir="$INSTALL_PATH/deployments"/>
+			<fileset dir="../../../ext/jce" includes="**/*"
+				targetdir="$INSTALL_PATH/jce-policies"/>
+			<fileset dir="../../../ext" targetdir="$INSTALL_PATH/ext"/>
+			<fileset dir="../../../lib" targetdir="$INSTALL_PATH/lib"/>
+			<file src="../../../scripts/runContainer.sh"
+				targetdir="$INSTALL_PATH" os="unix"/>
+			<file src="../../../scripts/grid"
+				targetdir="$INSTALL_PATH" os="unix"/>
+			<file src="../../../scripts/simple-command"
+				targetdir="$INSTALL_PATH" os="unix"/>
+			<file src="../../../scripts/cert-tool"
+				targetdir="$INSTALL_PATH" os="unix"/>
+			<file src="../../../scripts/install-new-container"
+				targetdir="$INSTALL_PATH" os="unix"/>
+			<file src="../../../scripts/uninstall-container"
+				targetdir="$INSTALL_PATH" os="unix"/>
+			<file src="../../../ext/JavaServiceWrapper/bin/InstallContainerWrapper"
+				targetdir="$INSTALL_PATH" os="unix"/>
+			<file src="../../../ext/JavaServiceWrapper/bin/UninstallContainerWrapper"
+				targetdir="$INSTALL_PATH" os="unix"/>
+			<file src="../../../scripts/initialize-new-net-security"
+				targetdir="$INSTALL_PATH" os="unix"/>
+			<file src="../../../scripts/linux-cmd-wrapper"
+				targetdir="$INSTALL_PATH" os="unix"/>
+			<file src="../../../scripts/VCGRContainerDaemon"
+				targetdir="$INSTALL_PATH" os="unix"/>
+			<file src="../../../scripts/runContainer.bat"
+				targetdir="$INSTALL_PATH" os="windows"/>
+			<file src="../../../scripts/grid.bat"
+				targetdir="$INSTALL_PATH" os="windows"/>
+			<file src="../../../scripts/simple-command.bat"
+				targetdir="$INSTALL_PATH" os="windows"/>
+			<file src="../../../scripts/cert-tool.bat"
+				targetdir="$INSTALL_PATH" os="windows"/>
+			<file src="../../../scripts/install-new-container.bat"
+				targetdir="$INSTALL_PATH" os="windows"/>
+			<file src="../../../scripts/uninstall-container.bat"
+				targetdir="$INSTALL_PATH" os="windows"/>
+			<file src="../../../ext/JavaServiceWrapper/bin/InstallContainerWrapper.bat"
+				targetdir="$INSTALL_PATH" os="windows"/>
+			<file src="../../../ext/JavaServiceWrapper/bin/UninstallContainerWrapper.bat"
+				targetdir="$INSTALL_PATH" os="windows"/>
+			<file src="../../../scripts/windows-cmd-runner.bat"
+				targetdir="$INSTALL_PATH" os="windows"/>
+			<file src="../../../scripts/windows-start-wrapper.bat"
+				targetdir="$INSTALL_PATH" os="windows"/>
+			<fileset dir="../../../jni-lib" targetdir="$INSTALL_PATH/jni-lib"/>
+			<fileset dir="../../../Java/windows-i586/" includes="**/*"
+				targetdir="$INSTALL_PATH/Java/windows-i586" os="windows"/>
+			<fileset dir="../../../Java/linux-i586/" includes="**/*"
+				targetdir="$INSTALL_PATH/Java/linux-i586" os="unix"/>
+			<executable targetfile="$INSTALL_PATH/runContainer.sh"
+				stage="never"/>
+			<executable targetfile="$INSTALL_PATH/grid"
+				stage="never"/>
+			<executable targetfile="$INSTALL_PATH/simple-command"
+				stage="never"/>
+			<executable targetfile="$INSTALL_PATH/cert-tool"
+				stage="never"/>
+			<executable targetfile="$INSTALL_PATH/InstallContainerWrapper"
+				stage="never"/>
+			<executable targetfile="$INSTALL_PATH/UninstallContainerWrapper"
+				stage="never"/>
+			<executable targetfile="$INSTALL_PATH/ext/JavaServiceWrapper/bin/wrapper"
+				stage="never"/>
+			<executable targetfile="$INSTALL_PATH/initialize-new-net-security"
+				stage="never"/>
+			<executable targetfile="$INSTALL_PATH/linux-cmd-wrapper"
+				stage="never"/>
+			<executable targetfile="$INSTALL_PATH/VCGRContainerDaemon"
+				stage="never"/>
+			<executable targetfile="$INSTALL_PATH/uninstall-container.bat" stage="uninstall" os="windows">
+				<args>
+					<arg value="GeniiNetFullContainer"/>
+					<arg value="GeniiNetContainer"/>
+				</args>
+			</executable>
+			<executable targetfile="$INSTALL_PATH/uninstall-container" stage="uninstall" os="unix">
+				<args>
+					<arg value="GeniiNetFullContainer"/>
+					<arg value="GeniiNetContainer"/>
+				</args>
+			</executable>
+			<parsable type="plain"
+				targetfile="$INSTALL_PATH/RELEASE"/>
+			<parsable type="xml"
+				targetfile="$INSTALL_PATH/jar-desc.xml"/>
+			<parsable type="shell"
+				targetfile="$INSTALL_PATH/runContainer.sh" os="unix"/>
+			<parsable type="shell"
+				targetfile="$INSTALL_PATH/grid" os="unix"/>
+			<parsable type="shell"
+				targetfile="$INSTALL_PATH/simple-command" os="unix"/>
+			<parsable type="shell"
+				targetfile="$INSTALL_PATH/cert-tool" os="unix"/>
+			<parsable type="shell"
+				targetfile="$INSTALL_PATH/install-new-container" os="unix"/>
+			<parsable type="shell"
+				targetfile="$INSTALL_PATH/uninstall-container" os="unix"/>
+			<parsable type="shell"
+				targetfile="$INSTALL_PATH/InstallContainerWrapper" os="unix"/>
+			<parsable type="shell"
+				targetfile="$INSTALL_PATH/UninstallContainerWrapper" os="unix"/>
+			<parsable type="shell"
+				targetfile="$INSTALL_PATH/initialize-new-net-security" os="unix"/>
+			<parsable type="shell"
+				targetfile="$INSTALL_PATH/linux-cmd-wrapper" os="unix"/>
+			<parsable type="shell"
+				targetfile="$INSTALL_PATH/VCGRContainerDaemon" os="unix"/>
+			<parsable type="plain"
+				targetfile="$INSTALL_PATH/runContainer.bat" os="windows"/>
+			<parsable type="plain"
+				targetfile="$INSTALL_PATH/grid.bat" os="windows"/>
+			<parsable type="plain"
+				targetfile="$INSTALL_PATH/simple-command.bat" os="windows"/>
+			<parsable type="plain"
+				targetfile="$INSTALL_PATH/cert-tool.bat" os="windows"/>
+			<parsable type="plain"
+				targetfile="$INSTALL_PATH/install-new-container.bat" os="windows"/>
+			<parsable type="plain"
+				targetfile="$INSTALL_PATH/uninstall-container.bat" os="windows"/>
+			<parsable type="plain"
+				targetfile="$INSTALL_PATH/InstallContainerWrapper.bat" os="windows"/>
+			<parsable type="plain"
+				targetfile="$INSTALL_PATH/UninstallContainerWrapper.bat" os="windows"/>
+			<parsable type="shell"
+				targetfile="$INSTALL_PATH/initialize-new-net-security.bat" os="windows"/>
+			<parsable type="plain"
+				targetfile="$INSTALL_PATH/windows-start-wrapper.bat" os="windows"/>
+			<parsable type="plain"
+				targetfile="$INSTALL_PATH/windows-cmd-runner.bat" os="windows"/>
+		</pack>
+
+		<pack name="Example JSDL Documents" required="no" preselected="no">
+			<description>Example JSDL Documents</description>
+			<fileset dir="../../../example-jsdl" targetdir="$INSTALL_PATH/example-jsdl"/>
+		</pack>
+
+		<pack name="Example Deployment Documents" required="no" preselected="no">
+			<description>Example Deployment Documents</description>
+			<fileset dir="../../../example-dep" targetdir="$INSTALL_PATH/example-dep"/>
+		</pack>
+
+		<pack name="Documentation" required="no" preselected="yes">
+			<description>Documentation for Genesis II</description>
+			<fileset dir="../../../doc" targetdir="$INSTALL_PATH/doc"/>
+		</pack>
+
+		<pack name="StartGeniiNetFullContainer" required="no" preselected="no">
+		    <depends packname="Core"/>
+			<description>Start New Genesis II Container from deployment GeniiNetFullContainer</description>
+			<executable targetfile="$INSTALL_PATH/windows-start-wrapper.bat"
+				stage="postinstall" keep="true">
+				<args>
+					<arg value="Configure and Install New Container"/>
+					<arg value="$INSTALL_PATH/install-new-container"/>
+					<arg value="GeniiNetFullContainer"/>
+					<arg value="GeniiNetContainer"/>
+					<arg value="http:\/\/www.cs.virginia.edu\/~vcgr\/GeniiNet\/root.xml"/>
+				</args>
+			</executable>
+		</pack>
+
+		<pack name="Source Distribution" required="no" preselected="no">
+			<description>Source Distribution of Genesis II</description>
+			<file src="../../../build.properties" targetdir="$INSTALL_PATH"/>
+			<file src="../../../build.xml" targetdir="$INSTALL_PATH"/>
+			<file src="../../../init.build.xml" targetdir="$INSTALL_PATH"/>
+			<file src="../../../mappings.properties" targetdir="$INSTALL_PATH"/>
+			<fileset dir="../../../scripts" targetdir="$INSTALL_PATH/scripts"/>
+			<fileset dir="../../../src" targetdir="$INSTALL_PATH/src"/>
+			<fileset dir="../../../wsdl" targetdir="$INSTALL_PATH/wsdl"/>
+			<fileset dir="../../../deployments" targetdir="$INSTALL_PATH/deployments"/>
+		</pack>
+	</packs>
+</installation>

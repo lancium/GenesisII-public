@@ -28,11 +28,12 @@ public class GamlLoginTool extends BaseGridTool
 	static private final String _DESCRIPTION =
 		"Inserts GAML authentication information into the user's context.";
 	static private final String _USAGE =
-		"login [--file=<keystore-file>] [--storetype=<PKCS12|JKS>] [--password=<keystore-password>] [<certificate-pattern>]";
+		"login [--file=<keystore-file>] [--storetype=<PKCS12|JKS>] [--password=<keystore-password>] [--alias] [<certificate-pattern>]";
 	
 	private String _keystoreFile = null;
 	private String _password = null;
 	private String _storeType = null;
+	private boolean _aliasPatternFlag = false;
 	
 	public GamlLoginTool()
 	{
@@ -54,6 +55,11 @@ public class GamlLoginTool extends BaseGridTool
 		_password = password;
 	}
 		
+	public void setAlias()
+	{
+		_aliasPatternFlag = true;
+	}
+		
 	@Override
 	protected int runCommand() throws Throwable
 	{
@@ -64,7 +70,7 @@ public class GamlLoginTool extends BaseGridTool
 			handler = new GuiGamlLoginHandler(stdout, stderr, stdin);
 		
 		CertEntry certEntry = handler.selectCert(
-			_keystoreFile, _storeType, _password, getArgument(0));
+			_keystoreFile, _storeType, _password, _aliasPatternFlag, getArgument(0));
 		if (certEntry == null)
 			return 0;
 		

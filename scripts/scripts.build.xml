@@ -1,58 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="scripts" name="GenesisII.scripts">
 
-	<target name="container-script.win" if="windows.scripts">
-		<copy file="${scripts.dir}/runContainer.bat"
-			tofile="${basedir}/runContainer.bat"/>
-		<replace file="${basedir}/runContainer.bat"
+	<target name="build-script-win" if="windows.scripts">
+		<copy file="${win-script-src-dir}/${win-script-base-name}.bat"
+			tofile="${basedir}/${win-script-base-name}.bat"/>
+		<replace file="${basedir}/${win-script-base-name}.bat"
 			token="$INSTALL_PATH" value="${basedir}" summary="yes"/>
 	</target>
 
-	<target name="container-script.unix" if="unix.scripts">
-		<copy file="${scripts.dir}/runContainer.sh"
-			tofile="${basedir}/runContainer.sh"/>
-		<replace file="${basedir}/runContainer.sh"
+	<target name="build-script-unix" if="unix.scripts">
+		<copy file="${unix-script-src-dir}/${unix-script-base-name}"
+			tofile="${basedir}/${unix-script-base-name}"/>
+		<replace file="${basedir}/${unix-script-base-name}"
 			token="%{INSTALL_PATH}" value="${basedir}" summary="yes"/>
-		<chmod file="${basedir}/runContainer.sh" perm="755"/>
+		<chmod file="${basedir}/${unix-script-base-name}" perm="755"/>
 	</target>
 
-	<target name="grid-script.win" if="windows.scripts">
-		<copy file="${scripts.dir}/grid.bat"
-			tofile="${basedir}/grid.bat"/>
-		<replace file="${basedir}/grid.bat"
-			token="$INSTALL_PATH" value="${basedir}" summary="yes"/>
+	<target name="build-script">
+		<antcall target="build-script-win">
+			<param name="win-script-src-dir" value="${script-src-dir}"/>
+			<param name="win-script-base-name" value="${script-base-name}"/>
+		</antcall>
+		<antcall target="build-script-unix">
+			<param name="unix-script-src-dir" value="${script-src-dir}"/>
+			<param name="unix-script-base-name" value="${script-base-name}"/>
+		</antcall>
 	</target>
-
-	<target name="grid-script.unix" if="unix.scripts">
-		<copy file="${scripts.dir}/grid"
-			tofile="${basedir}/grid"/>
-		<replace file="${basedir}/grid"
-			token="%{INSTALL_PATH}" value="${basedir}" summary="yes"/>
-		<chmod file="${basedir}/grid" perm="755"/>
+	
+	<target name="clean-all-scripts">
+		<delete quiet="true">
+			<fileset dir="${basedir}">
+				<include name="runContainer.*"/>
+				<include name="grid*"/>
+				<include name="simple-command*"/>
+				<include name="cert-tool*"/>
+				<include name="initialize-new-net-security*"/>
+				<include name="install-new-container*"/>
+				<include name="uninstall-container*"/>
+				<include name="InstallContainerWrapper*"/>
+				<include name="UninstallContainerWrapper*"/>
+				<include name="windows-start-wrapper.bat"/>
+				<include name="windows-cmd-runner.bat"/>
+				<include name="VCGRContainerDaemon"/>
+				<include name="linux-cmd-wrapper"/>
+			</fileset>
+		</delete>
 	</target>
-
-	<target name="cert-tool-script.win" if="windows.scripts">
-		<copy file="${scripts.dir}/cert-tool.bat"
-			tofile="${basedir}/cert-tool.bat"/>
-		<replace file="${basedir}/cert-tool.bat"
-			token="$INSTALL_PATH" value="${basedir}" summary="yes"/>
-	</target>
-
-	<target name="cert-tool-script.unix" if="unix.scripts">
-		<copy file="${scripts.dir}/cert-tool"
-			tofile="${basedir}/cert-tool"/>
-		<replace file="${basedir}/cert-tool"
-			token="%{INSTALL_PATH}" value="${basedir}" summary="yes"/>
-		<chmod file="${basedir}/cert-tool" perm="755"/>
-	</target>
-
-	<target name="container-script"
-		depends="container-script.win,container-script.unix"/>
-	<target name="grid-script"
-		depends="grid-script.win,grid-script.unix"/>
-	<target name="cert-tool-script"
-		depends="cert-tool-script.win,cert-tool-script.unix"/>
-
+		
 	<target name="scripts">
 		<condition property="unix.scripts">
 			<os family="unix"/>
@@ -66,9 +60,62 @@
 		<replace file="${basedir}/jar-desc.xml"
 			token="$INSTALL_PATH" value="${basedir}" summary="yes"/>
 
-		<antcall target="container-script"/>
-		<antcall target="grid-script"/>
-		<antcall target="cert-tool-script"/>
+		<antcall target="build-script-win">
+			<param name="win-script-src-dir" value="${scripts.dir}"/>
+			<param name="win-script-base-name" value="runContainer"/>
+		</antcall>
+		<antcall target="build-script-unix">
+			<param name="unix-script-src-dir" value="${scripts.dir}"/>
+			<param name="unix-script-base-name" value="runContainer.sh"/>
+		</antcall>
+		<antcall target="build-script">
+			<param name="script-src-dir" value="${scripts.dir}"/>
+			<param name="script-base-name" value="grid"/>
+		</antcall>
+		<antcall target="build-script">
+			<param name="script-src-dir" value="${scripts.dir}"/>
+			<param name="script-base-name" value="simple-command"/>
+		</antcall>
+		<antcall target="build-script">
+			<param name="script-src-dir" value="${scripts.dir}"/>
+			<param name="script-base-name" value="cert-tool"/>
+		</antcall>
+		<antcall target="build-script">
+			<param name="script-src-dir" value="${scripts.dir}"/>
+			<param name="script-base-name" value="initialize-new-net-security"/>
+		</antcall>
+		<antcall target="build-script">
+			<param name="script-src-dir" value="${scripts.dir}"/>
+			<param name="script-base-name" value="install-new-container"/>
+		</antcall>
+		<antcall target="build-script">
+			<param name="script-src-dir" value="${scripts.dir}"/>
+			<param name="script-base-name" value="uninstall-container"/>
+		</antcall>
+		<antcall target="build-script">
+			<param name="script-src-dir" value="${basedir}/ext/JavaServiceWrapper/bin"/>
+			<param name="script-base-name" value="InstallContainerWrapper"/>
+		</antcall>
+		<antcall target="build-script">
+			<param name="script-src-dir" value="${basedir}/ext/JavaServiceWrapper/bin"/>
+			<param name="script-base-name" value="UninstallContainerWrapper"/>
+		</antcall>
+		<antcall target="build-script-win">
+			<param name="win-script-src-dir" value="${scripts.dir}"/>
+			<param name="win-script-base-name" value="windows-start-wrapper"/>
+		</antcall>
+		<antcall target="build-script-win">
+			<param name="win-script-src-dir" value="${scripts.dir}"/>
+			<param name="win-script-base-name" value="windows-cmd-runner"/>
+		</antcall>
+		<antcall target="build-script-unix">
+			<param name="unix-script-src-dir" value="${scripts.dir}"/>
+			<param name="unix-script-base-name" value="VCGRContainerDaemon"/>
+		</antcall>
+		<antcall target="build-script-unix">
+			<param name="unix-script-src-dir" value="${scripts.dir}"/>
+			<param name="unix-script-base-name" value="linux-cmd-wrapper"/>
+		</antcall>
 	</target>
 
 </project>

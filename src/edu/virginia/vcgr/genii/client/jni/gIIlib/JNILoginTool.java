@@ -40,7 +40,7 @@ public class JNILoginTool extends JNILibraryBase
 						new BufferedReader(new InputStreamReader(System.in)));
 			
 			GamlLoginTool.CertEntry certEntry = handler.selectCert(keystorePath, null, 
-					password, certPattern);
+					password, false, certPattern);
 			
 			if (certEntry == null)
 				return false;

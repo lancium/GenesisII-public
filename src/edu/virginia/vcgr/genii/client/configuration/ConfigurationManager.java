@@ -11,7 +11,7 @@ import edu.virginia.vcgr.genii.client.utils.deployment.DeploymentRelativeFile;
 
 public class ConfigurationManager
 {
-	static private final String _USER_DIR_PROPERTY =
+	static public final String _USER_DIR_PROPERTY =
 		"edu.virginia.vcgr.genii.client.configuration.user-dir";
 	
 	static private final String _CLIENT_CONF_FILENAME = "client-config.xml";
@@ -47,14 +47,50 @@ public class ConfigurationManager
 		return installDir;
 	}
 
+	static public String getUserConfigDir() {
+		// try USER_CONFIG_ENVIRONMENT_VARIABLE
+		String userConfigEnvVar = System.getenv(GenesisIIConstants.USER_CONFIG_ENVIRONMENT_VARIABLE);
+		if (userConfigEnvVar != null && userConfigEnvVar.length() != 0)
+			return userConfigEnvVar;
+
+		// try reading user's config file from USER_DIR
+		try
+		{	
+			UserConfig userConfig = UserConfigUtils.getCurrentUserConfig();
+			if (userConfig != null && userConfig.getDeploymentPath() != null)
+			{
+				return userConfig.getDeploymentPath();
+			}
+		}
+		catch(Throwable t)
+		{}
+		
+		String installDir = ConfigurationManager.getInstallDir();
+
+		// try INSTALL_DIR/DEPLOYMENT_NAME_PROPERTY.
+		String deploymentName = System.getProperty(GenesisIIConstants.DEPLOYMENT_NAME_PROPERTY);
+		if (deploymentName != null)
+			return new String(installDir + File.separator + deploymentName);
+
+		// try deployment environment variable
+		deploymentName = System.getenv(GenesisIIConstants.DEPLOYMENT_NAME_ENVIRONMENT_VARIABLE);
+		if (deploymentName != null)
+			return new String(installDir + File.separator + deploymentName);
+		
+		// last but not least.... use INSTALL_DIR/default
+		return new String(installDir + File.separator + "default");
+	}
+	
 	/**
 	 * Gets the default configuration directory, which is one directory below
 	 * wherever directory is indicated by the install-dir system property. 
 	 * @return
 	 */
+	/* jfk3w - 10/4/07.  Looks wrong and could not find a reference to it.  Commented out to test if really needed...
 	static protected String getDefaultConfigDir() {
 		return getInstallDir() + "/configuration";
 	}
+   */
 	
 	static public ConfigurationManager getCurrentConfiguration()
 	{
@@ -89,6 +125,27 @@ public class ConfigurationManager
 			}
 			
 			try {
+				_manager = new ConfigurationManager(userDir);
+			}
+			catch (ConfigurationException ce)
+			{
+				throw new RuntimeException(ce.getLocalizedMessage(), ce);
+			}
+			return _manager;
+		}
+	}		
+
+	/**
+	 * Creates new configuration manager and sets it as new _manager using the role and user directory from the current manager 
+	 * @return
+	 */
+	static public ConfigurationManager reloadConfiguration(String userDir)
+	{
+		synchronized (ConfigurationManager.class)
+		{
+			try {
+				if (_manager == null)
+					throw new RuntimeException("Cannot call reloadConfiguration() before initializing configuration manager first.");
 				_manager = new ConfigurationManager(userDir);
 			}
 			catch (ConfigurationException ce)

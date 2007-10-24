@@ -9,9 +9,6 @@ public class ApplicationBase
 	static public final String USER_DIR_ENVIRONMENT_VARIABLE =
 		"GENII_USER_DIR";
 
-	static public final String CONFIG_DIR_ENVIRONMENT_VARIABLE =
-		"GENII_CONFIG_DIR";
-	
 	static private String getUserDirFromEnvironment()
 	{
 		String value = System.getenv(USER_DIR_ENVIRONMENT_VARIABLE);
@@ -23,10 +20,7 @@ public class ApplicationBase
 	
 	static private void prepareApplication(boolean isClient)
 	{
-		String userDir = getUserDirFromEnvironment();
-		if (userDir == null) 
-			userDir = System.getProperty("user.home") + "/.genesisII";
-		
+		String userDir = getUserDir();
 		ConfigurationManager configurationManager = 
 			ConfigurationManager.initializeConfiguration(userDir);
 
@@ -72,5 +66,14 @@ public class ApplicationBase
 	static protected void prepareClientApplication()
 	{
 		prepareApplication(true);
+	}
+	
+	static public String getUserDir()
+	{
+		String userDir = getUserDirFromEnvironment();
+		if (userDir == null) 
+			userDir = System.getProperty("user.home") + "/.genesisII";
+
+		return userDir;
 	}
 }

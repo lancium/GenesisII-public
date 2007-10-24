@@ -1,7 +1,7 @@
 REM usage is uninstall-container.bat <deployment name> <container name>
 
 REM set install directory - by default, re-written by izpack (or you can set manually to test)
-set _GENII_INSTALL_DIR=C:\Program Files\Genesis II
+set _UC_GENII_INSTALL_DIR=$INSTALL_PATH
 
 REM set vars for inputs
 set _DEPLOYMENT_NAME=%1
@@ -21,14 +21,14 @@ echo "Invalid tool usage.  <container name> arg is empty"
 goto usage_exit
 
 :setdeploydir
-set _DEPLOY_DIR=%_GENII_INSTALL_DIR%\deployments\%_DEPLOYMENT_NAME%
+set _DEPLOY_DIR=%_UC_GENII_INSTALL_DIR%\deployments\%_DEPLOYMENT_NAME%
 set _CONTAINER_CERT_STORE=%_DEPLOY_DIR%\security\container.pfx
 
 :douninstall
 
 REM install container as a service
-echo Uninstalling new container as a windows service...  Use command "%_GENII_INSTALL_DIR%\ext\JavaServiceWrapper\bin\UninstallContainerWrapper.bat %_CONTAINER_NAME%" to remove container from being a windows service
-call "%_GENII_INSTALL_DIR%\UninstallContainerWrapper.bat" %_CONTAINER_NAME%
+echo Uninstalling new container as a windows service...  Use command "%_UC_GENII_INSTALL_DIR%\ext\JavaServiceWrapper\bin\UninstallContainerWrapper.bat %_CONTAINER_NAME%" to remove container from being a windows service
+call "%_UC_GENII_INSTALL_DIR%\UninstallContainerWrapper.bat" %_CONTAINER_NAME%
 
 REM remove cert for container
 echo Removing cert %_CONTAINER_CERT_STORE%
@@ -40,7 +40,9 @@ goto end
 echo Usage: uninstall-container.bat <deployment name> <container name>
 
 :end
-set _GENII_INSTALL_DIR=
+set _UC_GENII_INSTALL_DIR=
 set _CONTAINER_NAME=
+set _DEPLOYMENT_NAME=
+set _DEPLOY_DIR=
 set _CONTAINER_CERT_STORE=
 :mainEnd

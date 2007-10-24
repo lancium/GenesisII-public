@@ -257,5 +257,7 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.GetResourcePropertiesTool</mconf:class>
 		<mconf:class name="cert-generator"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CertGeneratorTool</mconf:class>
+		<mconf:class name="set-user-config"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.SetUserConfigTool</mconf:class>
 	</genii:tools>
 </mconf:configuration>
