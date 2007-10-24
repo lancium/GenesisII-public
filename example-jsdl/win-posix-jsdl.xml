@@ -48,7 +48,7 @@
 			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
 			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
 			<jsdl:Target>
-				<jsdl:URI>rns:/home/karp/job1.stdout</jsdl:URI>
+				<jsdl:URI>rns:/home/morgan/job1.stdout</jsdl:URI>
 			</jsdl:Target>
 		</jsdl:DataStaging>
 	</jsdl:JobDescription>
