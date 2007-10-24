@@ -277,41 +277,6 @@
 		<gsh:param>/etc/ContainerGroupCertGenerator</gsh:param>
 	</geniix:cert-generator>
 
-	<gsh:echo message="Setting access control on cert generator to include installer.cer."/>
-	<geniix:gaml-chmod>
-		<gsh:param>/etc/ContainerGroupCertGenerator</gsh:param>
-		<gsh:param>+r+x</gsh:param>
-		<gsh:param>--local-src</gsh:param>
-		<gsh:param>${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/installer.cer</gsh:param>
-	</geniix:gaml-chmod>
-	
-	<gsh:echo
-		message="Giving containers group permission to update /containers"/>
-	<geniix:gaml-chmod>
-		<gsh:param>/containers</gsh:param>
-		<gsh:param>+r+w+x</gsh:param>
-		<gsh:param>--local-src</gsh:param>
-		<gsh:param>${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/containergrp.cer</gsh:param>
-	</geniix:gaml-chmod>
-
-	<gsh:echo
-		message="Giving containers group permission to update /bes-containers"/>
-	<geniix:gaml-chmod>
-		<gsh:param>/bes-containers</gsh:param>
-		<gsh:param>+r+w+x</gsh:param>
-		<gsh:param>--local-src</gsh:param>
-		<gsh:param>${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/containergrp.cer</gsh:param>
-	</geniix:gaml-chmod>
-
-	<gsh:echo
-		message="Giving containers group permission to update /schedulers/BootstrapScheduler"/>
-	<geniix:gaml-chmod>
-		<gsh:param>/schedulers/BootstrapScheduler</gsh:param>
-		<gsh:param>+r+w+x</gsh:param>
-		<gsh:param>--local-src</gsh:param>
-		<gsh:param>${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/containergrp.cer</gsh:param>
-	</geniix:gaml-chmod>
-
 	<gsh:echo message="Logging out"/>
 	<geniix:logout/>
 </gsh:script>
