@@ -8,7 +8,7 @@ usageExit()
 
 # usage is initialize_new_net_security <deployment path> <net root CA pass> <container group CA pass> <admin pass> <installer pass> <container pass> <trust store pass>
 
-_INNS_GENII_INSTALL_DIR="%{INSTALL_PATH}"
+_INNS_GENII_INSTALL_DIR="/af12/jfk3w/Genesis II"
 _INNS_LOCAL_JAVA_DIR="$_INNS_GENII_INSTALL_DIR/Java/linux-i586/jre"
 BIN_DIR="$_INNS_GENII_INSTALL_DIR"
 
@@ -131,15 +131,26 @@ echo "Exporting installer cert to $DEPLOY_DIR/security/installer.cer"
 
 # create trusted.pfx to store trusted certs
 rm -f "$DEPLOY_DIR/security/trusted.pfx"
-for CERT_FILE in "$DEPLOY_DIR/security/certs/trusted/*.cer"
+
+ls -1 "$DEPLOY_DIR/security/certs/trusted" | /bin/grep ".*cer$"  |
+while read CERT_FILE
 do
-	OUTPUT_ALIAS=`basename $CERT_FILE .cer`
-	"$BIN_DIR/cert-tool" import -output-keystore="$DEPLOY_DIR/security/trusted.pfx" -output-keystore-pass="$TRUSTED_PASS" -base64-cert-file="$CERT_FILE" -output-alias="$OUTPUT_ALIAS"
+    echo "next cert file is $CERT_FILE"
+    OUTPUT_ALIAS=`basename "$CERT_FILE" .cer`
+   "$BIN_DIR/cert-tool" import -output-keystore="$DEPLOY_DIR/security/trusted.pfx" -output-keystore-pass="$TRUSTED_PASS" -base64-cert-file="$DEPLOY_DIR/security/certs/trusted/$CERT_FILE" -output-alias="$OUTPUT_ALIAS"
 done
+
+
+#for CERT_FILE in $DEPLOY_DIR/security/certs/trusted/*.cer
+#do
+#echo "CERT_FILE is $CERT_FILE"
+#	OUTPUT_ALIAS=`basename "$CERT_FILE" .cer`
+#	"$BIN_DIR/cert-tool" import -output-keystore="$DEPLOY_DIR/security/trusted.pfx" -output-keystore-pass="$TRUSTED_PASS" -base64-cert-file="$CERT_FILE" -output-alias="$OUTPUT_ALIAS"
+#done
 
 # make new container cert from net root cert (for bootstrap container)
 rm -f "$DEPLOY_DIR/security/container.pfx"
-_MACHINE_NAME=`$BIN_DIR/simple-command edu.virginia.vcgr.genii.client.cmd.GetHostName`
+_MACHINE_NAME=`"$BIN_DIR/simple-command" edu.virginia.vcgr.genii.client.cmd.GetHostName`
 echo "Making container cert and placing in store $DEPLOY_DIR/security/container.pfx"
 "$BIN_DIR/cert-tool" gen -dn="C=US, ST=Virginia, L=Charlottesville, O=UVA, OU=VCGR, CN=$_MACHINE_NAME" -output-storetype="PKCS12" -output-entry-pass="$CONTAINER_PASS" -output-keystore="$DEPLOY_DIR/security/container.pfx" -output-keystore-pass="$CONTAINER_PASS" -output-alias="VCGR Container" -input-keystore="$DEPLOY_DIR/security/net-root-ca.pfx" -input-keystore-pass="$NET_ROOT_CA_PASS" -input-storetype="PKCS12" -input-entry-pass="$NET_ROOT_CA_PASS" -input-alias="GenesisII Net Root CA Cert"
 
