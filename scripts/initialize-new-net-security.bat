@@ -87,6 +87,7 @@ REM export .cer for admin
 echo Exporting admin cert to %DEPLOY_DIR%\security\admin.cer
 del "%DEPLOY_DIR%\security\admin.cer"
 "%_INNS_LOCAL_JAVA_DIR%\bin\keytool" -export -file "%DEPLOY_DIR%\security\admin.cer" -keystore "%DEPLOY_DIR%\security\admin.pfx" -storepass "%ADMIN_PASS%" -alias "GenesisII Admin Cert" -storetype "PKCS12" 
+copy "%DEPLOY_DIR%\security\admin.cer" /B "%DEPLOY_DIR%\security\certs\users\admin.cer" /B
 
 REM make new installer cert from net root cert
 del "%DEPLOY_DIR%\security\installer.pfx"

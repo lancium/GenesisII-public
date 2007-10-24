@@ -70,16 +70,16 @@ then
 fi
 
 # make directory for deployment
-mkdir $DEPLOY_DIR
+mkdir -p $DEPLOY_DIR
 
 # make sure directory for trusted certs exists
-echo Creating $DEPLOY_DIR/security/certs/trusted directory (if it does not exist)
-mkdir $DEPLOY_DIR/security/certs/trusted
+echo "Creating $DEPLOY_DIR/security/certs/trusted directory (if it does not exist)"
+mkdir -p $DEPLOY_DIR/security/certs/trusted
 
 NET_ROOT_CA_PATH=$DEPLOY_DIR/net-root-ca.pfx
 
 # make new net root cert (self signed)
-echo Making net-root-ca cert and placing in store $DEPLOY_DIR/security/net-root-ca.pfx
+echo "Making net-root-ca cert and placing in store $DEPLOY_DIR/security/net-root-ca.pfx"
 rm -f $DEPLOY_DIR/security/net-root-ca.pfx
 $BIN_DIR/cert-tool gen -dn="C=US, ST=Virginia, L=Charlottesville, O=UVA, OU=VCGR, CN=GenesisII Net Root CA Cert" -output-storetype="PKCS12" -output-entry-pass="$NET_ROOT_CA_PASS" -output-keystore=$DEPLOY_DIR/security/net-root-ca.pfx -output-keystore-pass="$NET_ROOT_CA_PASS" -output-alias="GenesisII Net Root CA Cert"
 
@@ -88,10 +88,10 @@ echo Exporting net-root-ca cert to $DEPLOY_DIR/security/net-root-ca.cer
 rm -f $DEPLOY_DIR/security/net-root-ca.cer
 $_INNS_LOCAL_JAVA_DIR/bin/keytool -export -file $DEPLOY_DIR/security/net-root-ca.cer -keystore $DEPLOY_DIR/security/net-root-ca.pfx -storepass $NET_ROOT_CA_PASS -alias "GenesisII Net Root CA Cert" -storetype "PKCS12" 
 
-# copy net-root-cert cert to $DEPLOY_DIR/security/certs/trusted
-echo copying new net-root-cert.cer to $DEPLOY_DIR/security/certs/trusted/net-root-cert.cer
-rm -f $DEPLOY_DIR/security/certs/trusted/net-root-cert.cer
-cp $DEPLOY_DIR/security/net-root-cert.cer $DEPLOY_DIR/security/certs/trusted/net-root-cert.cer
+# copy net-root-ca cert to $DEPLOY_DIR/security/certs/trusted
+echo copying new net-root-ca.cer to $DEPLOY_DIR/security/certs/trusted/net-root-ca.cer
+rm -f $DEPLOY_DIR/security/certs/trusted/net-root-ca.cer
+cp $DEPLOY_DIR/security/net-root-ca.cer $DEPLOY_DIR/security/certs/trusted/net-root-ca.cer
 
 # make new container group CA cert from net root cert
 echo Making new container group CA cert and placing in store $DEPLOY_DIR/security/containergrp.pfx
@@ -117,6 +117,7 @@ $BIN_DIR/cert-tool gen -dn="C=US, ST=Virginia, L=Charlottesville, O=UVA, OU=VCGR
 echo Exporting admin cert to $DEPLOY_DIR/security/admin.cer
 rm -f $DEPLOY_DIR/security/admin.cer
 $_INNS_LOCAL_JAVA_DIR/bin/keytool -export -file $DEPLOY_DIR/security/admin.cer -keystore $DEPLOY_DIR/security/admin.pfx -storepass $ADMIN_PASS -alias "GenesisII Admin Cert" -storetype "PKCS12" 
+cp $DEPLOY_DIR/security/admin.cer $DEPLOY_DIR/security/certs/users/admin.cer
 
 # make new installer cert from net root cert
 rm -f $DEPLOY_DIR/security/installer.pfx
@@ -132,14 +133,16 @@ $_INNS_LOCAL_JAVA_DIR/bin/keytool -export -file $DEPLOY_DIR/security/installer.c
 rm -f $DEPLOY_DIR/security/trusted.pfx
 for CERT_FILE in $DEPLOY_DIR/security/certs/trusted/*.cer
 do
-	$BIN_DIR/cert-tool import -output-keystore=$DEPLOY_DIR/security/trusted.pfx -output-keystore-pass="$TRUSTED_PASS" -base64-cert-file=$DEPLOY_DIR/security/certs/trusted/$CERT_FILE
+	echo "$BIN_DIR/cert-tool import -output-keystore=$DEPLOY_DIR/security/trusted.pfx -output-keystore-pass="$TRUSTED_PASS" -base64-cert-file=$CERT_FILE"
+	OUTPUT_ALIAS=`basename $CERT_FILE .cer`
+	$BIN_DIR/cert-tool import -output-keystore=$DEPLOY_DIR/security/trusted.pfx -output-keystore-pass="$TRUSTED_PASS" -base64-cert-file=$CERT_FILE -output-alias=$OUTPUT_ALIAS
 done
 
 # make new container cert from net root cert (for bootstrap container)
 rm -f $DEPLOY_DIR/security/container.pfx
-_MACHINE_NAME=$BIN_DIR/simple-command edu.virginia.vcgr.genii.client.cmd.GetHostName
+_MACHINE_NAME=`$BIN_DIR/simple-command edu.virginia.vcgr.genii.client.cmd.GetHostName`
 echo Making container cert and placing in store $DEPLOY_DIR/security/container.pfx
-$BIN_DIR/cert-tool.bat gen -dn="C=US, ST=Virginia, L=Charlottesville, O=UVA, OU=VCGR, CN=$_MACHINE_NAME" -output-storetype="PKCS12" -output-entry-pass="$CONTAINER_PASS" -output-keystore=$DEPLOY_DIR/security/container.pfx -output-keystore-pass="$CONTAINER_PASS" -output-alias="VCGR Container" -input-keystore=$DEPLOY_DIR/security/net-root-ca.pfx -input-keystore-pass="$NET_ROOT_CA_PASS" -input-storetype="PKCS12" -input-entry-pass="$NET_ROOT_CA_PASS" -input-alias="GenesisII Net Root CA Cert"
+$BIN_DIR/cert-tool gen -dn="C=US, ST=Virginia, L=Charlottesville, O=UVA, OU=VCGR, CN=$_MACHINE_NAME" -output-storetype="PKCS12" -output-entry-pass="$CONTAINER_PASS" -output-keystore=$DEPLOY_DIR/security/container.pfx -output-keystore-pass="$CONTAINER_PASS" -output-alias="VCGR Container" -input-keystore=$DEPLOY_DIR/security/net-root-ca.pfx -input-keystore-pass="$NET_ROOT_CA_PASS" -input-storetype="PKCS12" -input-entry-pass="$NET_ROOT_CA_PASS" -input-alias="GenesisII Net Root CA Cert"
 
 # export .cer for container
 rm -f $DEPLOY_DIR/security/container.cer
