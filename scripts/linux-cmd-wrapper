@@ -1,3 +1,6 @@
 #!/bin/sh
 
-xterm -e "$0" "$@"
+TITLE="$0"
+shift
+
+xterm -T "$TITLE" -e "$@"

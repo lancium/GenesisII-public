@@ -113,6 +113,20 @@
 				targetdir="$INSTALL_PATH" os="windows"/>
 			<executable targetfile="$INSTALL_PATH/runContainer.sh"
 				stage="never"/>
+			<executable targetfile="$INSTALL_PATH/Java/linux-i586/jre/bin/java"
+				os="unix" stage="never"/>
+			<executable
+				targetfile="$INSTALL_PATH/Java/linux-i586/jre/bin/java_vm"
+				os="unix" stage="never"/>
+			<executable
+				targetfile="$INSTALL_PATH/Java/linux-i586/jre/bin/javaws"
+				os="unix" stage="never"/>
+			<executable
+				targetfile="$INSTALL_PATH/Java/linux-i586/jre/bin/jcontrol"
+				os="unix" stage="never"/>
+			<executable
+				targetfile="$INSTALL_PATH/Java/linux-i586/jre/bin/keytool"
+				os="unix" stage="never"/>
 			<executable targetfile="$INSTALL_PATH/grid"
 				stage="never"/>
 			<executable targetfile="$INSTALL_PATH/simple-command"
@@ -128,7 +142,7 @@
 			<executable targetfile="$INSTALL_PATH/initialize-new-net-security"
 				stage="never"/>
 			<executable targetfile="$INSTALL_PATH/linux-cmd-wrapper"
-				stage="never"/>
+				os="unix" stage="never"/>
 			<executable targetfile="$INSTALL_PATH/VCGRContainerDaemon"
 				stage="never"/>
 			<executable targetfile="$INSTALL_PATH/uninstall-container.bat" stage="uninstall" os="windows">
@@ -143,6 +157,8 @@
 					<arg value="GeniiNetContainer"/>
 				</args>
 			</executable>
+			<executable targetfile="$INSTALL_PATH/install-new-container"
+				stage="never" os="unix"/>
 			<parsable type="plain"
 				targetfile="$INSTALL_PATH/RELEASE"/>
 			<parsable type="xml"
@@ -212,7 +228,17 @@
 		    <depends packname="Core"/>
 			<description>Start New Genesis II Container from deployment GeniiNetFullContainer</description>
 			<executable targetfile="$INSTALL_PATH/windows-start-wrapper"
-				stage="postinstall" keep="true">
+				os="windows" stage="postinstall" keep="true">
+				<args>
+					<arg value="Configure and Install New Container"/>
+					<arg value="$INSTALL_PATH/install-new-container"/>
+					<arg value="GeniiNetFullContainer"/>
+					<arg value="GeniiNetContainer"/>
+					<arg value="http:\/\/www.cs.virginia.edu\/~vcgr\/GeniiNet\/root.xml"/>
+				</args>
+			</executable>
+			<executable targetfile="$INSTALL_PATH/linux-cmd-wrapper"
+				os="unix" stage="postinstall" keep="true">
 				<args>
 					<arg value="Configure and Install New Container"/>
 					<arg value="$INSTALL_PATH/install-new-container"/>

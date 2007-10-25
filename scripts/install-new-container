@@ -72,7 +72,7 @@ echo Logging out as installer...
 "$_INC_GENII_INSTALL_DIR/grid" logout
 
 # generate scripts to install container in init.d and start it on console
-echo "Starting container in background and generating init.d script...  Use command $_INC_GENII_INSTALL_DIR/ext/JavaServiceWrapper/bin/UninstallContainerWrapper $_CONTAINER_NAME.
+echo "Starting container in background and generating init.d script...  Use command $_INC_GENII_INSTALL_DIR/ext/JavaServiceWrapper/bin/UninstallContainerWrapper $_CONTAINER_NAME."
 "$_INC_GENII_INSTALL_DIR/InstallContainerWrapper" "$_DEPLOYMENT_NAME" "$_CONTAINER_NAME"
 
 # Add Container to RNS space using _HOST_NAME

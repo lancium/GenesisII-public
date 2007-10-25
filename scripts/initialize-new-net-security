@@ -2,13 +2,13 @@
 
 usageExit()
 {
-	echo ""
+	echo "USAGE:  initialize_new_net_security <deployment path> <net root CA pass> <container group CA pass> <admin pass> <installer pass> <container pass> <trust store pass>"
 	exit -1
 }
 
 # usage is initialize_new_net_security <deployment path> <net root CA pass> <container group CA pass> <admin pass> <installer pass> <container pass> <trust store pass>
 
-_INNS_GENII_INSTALL_DIR="/af12/jfk3w/Genesis II"
+_INNS_GENII_INSTALL_DIR="%{INSTALL_PATH}"
 _INNS_LOCAL_JAVA_DIR="$_INNS_GENII_INSTALL_DIR/Java/linux-i586/jre"
 BIN_DIR="$_INNS_GENII_INSTALL_DIR"
 
