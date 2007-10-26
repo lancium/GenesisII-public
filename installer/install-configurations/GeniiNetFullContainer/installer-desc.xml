@@ -234,7 +234,7 @@
 					<arg value="$INSTALL_PATH/install-new-container"/>
 					<arg value="GeniiNetFullContainer"/>
 					<arg value="GeniiNetContainer"/>
-					<arg value="http:\/\/www.cs.virginia.edu\/~vcgr\/GeniiNet\/root.xml"/>
+					<arg value="http:\/\/www.cs.virginia.edu\/~mmm2a\/IrtahkNet\/root.xml"/>
 				</args>
 			</executable>
 			<executable targetfile="$INSTALL_PATH/linux-cmd-wrapper"
@@ -244,7 +244,7 @@
 					<arg value="$INSTALL_PATH/install-new-container"/>
 					<arg value="GeniiNetFullContainer"/>
 					<arg value="GeniiNetContainer"/>
-					<arg value="http:\/\/www.cs.virginia.edu\/~vcgr\/GeniiNet\/root.xml"/>
+					<arg value="http:\/\/www.cs.virginia.edu\/~mmm2a\/IrtahkNet\/root.xml"/>
 				</args>
 			</executable>
 		</pack>

@@ -44,6 +44,7 @@ import edu.virginia.vcgr.genii.client.security.SecurityUtils;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
+import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.common.security.PublicKeyType;
 import edu.virginia.vcgr.genii.common.security.X509NameType;
 import edu.virginia.vcgr.genii.common.security.CertificateChainType;
@@ -79,14 +80,16 @@ public class CertGeneratorServiceImpl extends GenesisIIBase implements CertGener
 		
 		if (request == null)
 		{
-			throw new InvalidCertificateRequestFaultType();
+			throw FaultManipulator.fillInFault(
+				new InvalidCertificateRequestFaultType());
 		}
 		
 		PublicKeyType pkt = request.getPublicKey();
 		X509NameType x509Name = request.getX509Name();
 		if (x509Name == null)
 		{
-			throw new InvalidCertificateRequestFaultType();
+			throw FaultManipulator.fillInFault(
+				new InvalidCertificateRequestFaultType());
 		}
 
 		PublicKey pk = null;
@@ -96,7 +99,9 @@ public class CertGeneratorServiceImpl extends GenesisIIBase implements CertGener
 		}
 		catch(Throwable t)
 		{
-			throw new InvalidCertificateRequestFaultType();
+			_logger.error("Invalid Certificate Request", t);
+			throw FaultManipulator.fillInFault(
+				new InvalidCertificateRequestFaultType());
 		}
 
 		ResourceKey rKey = ResourceManager.getCurrentResource();
@@ -144,8 +149,10 @@ public class CertGeneratorServiceImpl extends GenesisIIBase implements CertGener
 		}
 		catch(GeneralSecurityException gse)
 		{
+			_logger.error("A security exception occurred.", gse);
 			// TODO:  Add a better exception for these types of failures...
-			throw new InvalidCertificateRequestFaultType();
+			throw FaultManipulator.fillInFault(
+				new InvalidCertificateRequestFaultType());
 		}
 		
 		return response;

@@ -39,11 +39,11 @@ fi
 _DEPLOY_DIR="$_INC_GENII_INSTALL_DIR/deployments/$_DEPLOYMENT_NAME"
 
 # figure out name of host
-_HOST_NAME=`$_INC_GENII_INSTALL_DIR/simple-command edu.virginia.vcgr.genii.client.cmd.GetHostName`
+_HOST_NAME=`"$_INC_GENII_INSTALL_DIR/simple-command" edu.virginia.vcgr.genii.client.cmd.GetHostName`
 echo _HOST_NAME is now set to ....     $_HOST_NAME
 
 # figure out port being used by container
-_HOST_PORT=`$_INC_GENII_INSTALL_DIR/simple-command edu.virginia.vcgr.genii.client.cmd.GetServerPort $_DEPLOYMENT_NAME`
+_HOST_PORT=`"$_INC_GENII_INSTALL_DIR/simple-command" edu.virginia.vcgr.genii.client.cmd.GetServerPort $_DEPLOYMENT_NAME`
 
 # connect to net
 echo connecting to $_CONNECT_URL...

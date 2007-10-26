@@ -13,7 +13,7 @@ _ICW_GENII_INSTALL_DIR="%{INSTALL_PATH}"
 _ICW_LOCAL_JAVA_DIR="$_ICW_GENII_INSTALL_DIR/Java/linux-i586/jre"
 
 # get user's data directory...
-_GENII_USER_DIR=`$_ICW_LOCAL_JAVA_DIR/bin/java -classpath "$_ICW_GENII_INSTALL_DIR/lib/GenesisII-client.jar" edu.virginia.vcgr.genii.client.cmd.GetUserDir`
+_GENII_USER_DIR=`"$_ICW_LOCAL_JAVA_DIR/bin/java" -classpath "$_ICW_GENII_INSTALL_DIR/lib/GenesisII-client.jar" edu.virginia.vcgr.genii.client.cmd.GetUserDir`
 echo "_GENII_USER_DIR is now set to ....     $_GENII_USER_DIR"
 
 # check if deployment name arg was passed in
@@ -47,7 +47,7 @@ echo "# auto generated script to manage VCGR Container $_CONTAINER_NAME using de
 echo "# To enable auto start of container daemon, add this script to /etc/init.d and the proper /etc/rcX.d directories" >> "$_MANAGE_CONTAINER_SCRIPT_PATH"
 echo "#" >> "$_MANAGE_CONTAINER_SCRIPT_PATH"
 echo "" >> "$_MANAGE_CONTAINER_SCRIPT_PATH"
-echo "DEPLOYMENT_NAME=$_DEPLOYMENT_NAME CONTAINER_NAME=$_CONTAINER_NAME GENII_INSTALL_DIR=$_ICW_GENII_INSTALL_DIR LOCAL_JAVA_DIR=$_ICW_LOCAL_JAVA_DIR GENII_USER_DIR=$_CONTAINER_DIR $_ICW_GENII_INSTALL_DIR/VCGRContainerDaemon \$1" >> "$_MANAGE_CONTAINER_SCRIPT_PATH"
+echo "DEPLOYMENT_NAME=\"$_DEPLOYMENT_NAME\" CONTAINER_NAME=\"$_CONTAINER_NAME\" GENII_INSTALL_DIR=\"$_ICW_GENII_INSTALL_DIR\" LOCAL_JAVA_DIR=\"$_ICW_LOCAL_JAVA_DIR\" GENII_USER_DIR=\"$_CONTAINER_DIR\" \"$_ICW_GENII_INSTALL_DIR/VCGRContainerDaemon\" \"\$1\"" >> "$_MANAGE_CONTAINER_SCRIPT_PATH"
 chmod 744 "$_MANAGE_CONTAINER_SCRIPT_PATH"
 
 
@@ -59,4 +59,4 @@ echo ""
 echo "Starting container manually with output piped to file $_CONTAINER_OUTPUT_PATH ..."
 echo ""
 
-"$_MANAGE_CONTAINER_SCRIPT_PATH" console > "$_CONTAINER_OUTPUT_PATH" 2>&1 &
+"$_MANAGE_CONTAINER_SCRIPT_PATH" start > "$_CONTAINER_OUTPUT_PATH" 2>&1 &
