@@ -233,6 +233,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ApplicationDescriptionTool</mconf:class>
 		<mconf:class name="browser"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.BrowserTool</mconf:class>
+		<mconf:class name="list-installations"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.InstallationTool</mconf:class>
 		<mconf:class name="set-deployers"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.SetDeployersTool</mconf:class>
 		<mconf:class name="replicated-file"
