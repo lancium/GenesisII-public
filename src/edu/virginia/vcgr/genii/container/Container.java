@@ -39,8 +39,10 @@ import edu.virginia.vcgr.genii.client.ApplicationBase;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
+import edu.virginia.vcgr.genii.client.install.InstallationState;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 import edu.virginia.vcgr.genii.client.utils.deployment.DeploymentRelativeFile;
+import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 import edu.virginia.vcgr.genii.container.configuration.ContainerConfiguration;
 import edu.virginia.vcgr.genii.container.deployment.ServiceDeployer;
 import edu.virginia.vcgr.genii.container.invoker.GAroundInvokerFactory;
@@ -85,6 +87,7 @@ public class Container extends ApplicationBase
 			_logger.info("Container deployment is " + args[0]);
 		} 
 		else {
+			System.setProperty(GenesisIIConstants.DEPLOYMENT_NAME_PROPERTY, "default");
 			_logger.info("Container deployment is default");
 		}
 		
@@ -187,6 +190,10 @@ public class Container extends ApplicationBase
 		webAppCtxt = server.addWebApplication(
 				"/axis",
 				new File(ConfigurationManager.getInstallDir(),"webapps/axis").getAbsolutePath());
+		
+		recordInstallationState(System.getProperty(
+			GenesisIIConstants.DEPLOYMENT_NAME_PROPERTY, "default"),
+			_containerConfiguration.getListenPort());
 		
 		server.start();
 		initializeServices(webAppCtxt);
@@ -428,5 +435,38 @@ public class Container extends ApplicationBase
 	static public long getDefaultCertificateLifetime()
 	{
 		return _defaultCertificateLifetime;
+	}
+	
+	static private void recordInstallationState(String deploymentName, int port)
+		throws IOException, FileLockException
+	{
+		Thread th = new Thread(new InstallationStateEraser(deploymentName));
+		th.setDaemon(false);
+		th.setName("Installation Eraser Thread");
+		Runtime.getRuntime().addShutdownHook(th);
+		InstallationState.addRunningContainer(deploymentName, port);
+	}
+	
+	static private class InstallationStateEraser implements Runnable
+	{
+		private String _deploymentName;
+		
+		public InstallationStateEraser(String deploymentName)
+		{
+			_deploymentName = deploymentName;
+		}
+		
+		@Override
+		public void run()
+		{
+			try
+			{
+				InstallationState.removeRunningContainer(_deploymentName);
+			}
+			catch (Throwable cause)
+			{
+				_logger.fatal("Unable to remove container state.", cause);
+			}
+		}
 	}
 }
