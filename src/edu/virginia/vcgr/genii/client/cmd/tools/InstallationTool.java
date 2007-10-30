@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.install.ContainerInformation;
 import edu.virginia.vcgr.genii.client.install.InstallationState;
 
 public class InstallationTool extends BaseGridTool
@@ -21,10 +22,10 @@ public class InstallationTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		HashMap<String, Integer> runningContainers = InstallationState.getRunningContainers();
+		HashMap<String, ContainerInformation> runningContainers = InstallationState.getRunningContainers();
 		for (String deploymentName : runningContainers.keySet())
 		{
-			stdout.println("Container \"" + deploymentName + "\" is running on port " 
+			stdout.println("Container \"" + deploymentName + "\" is running at " 
 				+ runningContainers.get(deploymentName));
 		}
 		

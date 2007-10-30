@@ -192,8 +192,8 @@ public class Container extends ApplicationBase
 				new File(ConfigurationManager.getInstallDir(),"webapps/axis").getAbsolutePath());
 		
 		recordInstallationState(System.getProperty(
-			GenesisIIConstants.DEPLOYMENT_NAME_PROPERTY, "default"),
-			_containerConfiguration.getListenPort());
+			GenesisIIConstants.DEPLOYMENT_NAME_PROPERTY, "default"), 
+			new URL(_containerURL));
 		
 		server.start();
 		initializeServices(webAppCtxt);
@@ -437,14 +437,14 @@ public class Container extends ApplicationBase
 		return _defaultCertificateLifetime;
 	}
 	
-	static private void recordInstallationState(String deploymentName, int port)
+	static private void recordInstallationState(String deploymentName, URL containerURL)
 		throws IOException, FileLockException
 	{
 		Thread th = new Thread(new InstallationStateEraser(deploymentName));
 		th.setDaemon(false);
 		th.setName("Installation Eraser Thread");
 		Runtime.getRuntime().addShutdownHook(th);
-		InstallationState.addRunningContainer(deploymentName, port);
+		InstallationState.addRunningContainer(deploymentName, containerURL);
 	}
 	
 	static private class InstallationStateEraser implements Runnable

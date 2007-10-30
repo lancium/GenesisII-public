@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.net.URL;
 import java.util.HashMap;
 
 import org.apache.commons.logging.Log;
@@ -24,11 +25,11 @@ public class InstallationState implements Serializable
 
 	static private Log _logger = LogFactory.getLog(InstallationState.class);
 	
-	private HashMap<String, Integer> _runningContainers;	// Map of deployment name to port
+	private HashMap<String, ContainerInformation> _runningContainers;	// Map of deployment name to port
 	
 	private InstallationState()
 	{
-		_runningContainers = new HashMap<String, Integer>();
+		_runningContainers = new HashMap<String, ContainerInformation>();
 	}
 	
 	static private FileLock acquireLock(File installFile)
@@ -98,7 +99,7 @@ public class InstallationState implements Serializable
 		}
 	}
 	
-	static public HashMap<String, Integer> getRunningContainers()
+	static public HashMap<String, ContainerInformation> getRunningContainers()
 		throws FileLockException
 	{
 		File installFile = new File(
@@ -116,7 +117,7 @@ public class InstallationState implements Serializable
 		}
 	}
 	
-	static public void addRunningContainer(String deploymentName, int port)
+	static public void addRunningContainer(String deploymentName, URL containerURL)
 		throws IOException, FileLockException
 	{
 		File installFile = new File(
@@ -127,7 +128,7 @@ public class InstallationState implements Serializable
 		{
 			flock = acquireLock(installFile);
 			InstallationState state = readState(installFile);
-			state._runningContainers.put(deploymentName, new Integer(port));
+			state._runningContainers.put(deploymentName, new ContainerInformation(deploymentName, containerURL));
 			writeState(installFile, state);
 		}
 		finally
