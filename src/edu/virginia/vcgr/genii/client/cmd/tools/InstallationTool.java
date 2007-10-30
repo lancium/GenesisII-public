@@ -26,7 +26,7 @@ public class InstallationTool extends BaseGridTool
 		for (String deploymentName : runningContainers.keySet())
 		{
 			stdout.println("Container \"" + deploymentName + "\" is running at " 
-				+ runningContainers.get(deploymentName));
+				+ runningContainers.get(deploymentName).getContainerURL());
 		}
 		
 		return 0;
