@@ -25,4 +25,9 @@ public class ContainerInformation implements Serializable
 	{
 		return _containerURL;
 	}
+	
+	public String toString()
+	{
+		return _deploymentName;
+	}
 }

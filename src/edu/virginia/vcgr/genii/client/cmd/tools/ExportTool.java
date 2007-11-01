@@ -14,6 +14,8 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
+import edu.virginia.vcgr.genii.client.gui.GuiUtils;
+import edu.virginia.vcgr.genii.client.gui.exportdir.ExportDirDialog;
 import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.rcreate.CreationException;
@@ -95,7 +97,7 @@ public class ExportTool extends BaseGridTool
 			}
 			
 			return 0;
-		} else
+		} else if (_quit)
 		{
 			String exportedRootLocation = getArgument(0);
 			/* get EPR for target export service that will create exported root */
@@ -104,6 +106,13 @@ public class ExportTool extends BaseGridTool
 			else
 				quitExportedRootFromRNS(exportedRootLocation);
 			stdout.println("Exported root stopped successfully");
+			return 0;
+		} else
+		{
+			ExportDirDialog dialog = new ExportDirDialog();
+			dialog.pack();
+			GuiUtils.centerComponent(dialog);
+			dialog.setVisible(true);
 			return 0;
 		}
 	}
@@ -127,7 +136,10 @@ public class ExportTool extends BaseGridTool
 			if (numArgs != 1)
 				throw new InvalidToolUsageException();
 		} else
-			throw new InvalidToolUsageException();
+		{
+			if (numArgs != 0)
+				throw new InvalidToolUsageException();
+		}
 	}
 	
 	static public EndpointReferenceType createExportedRoot(
