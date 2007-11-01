@@ -48,7 +48,7 @@ public class ExportDirDialog extends JDialog
 		container.add(button, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		
-		button = new JButton(new QuitExportAction(_table.getSelectionModel()));
+		button = new JButton(new QuitExportAction(_table));
 		container.add(button, new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 	}

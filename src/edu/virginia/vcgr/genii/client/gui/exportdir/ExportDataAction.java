@@ -79,6 +79,7 @@ class ExportDataAction extends AbstractAction
 	private void createExport(ExportCreationInformation creationInfo)
 		throws ConfigurationException, RNSException, FileLockException, IOException
 	{
+		// TODO
 		EndpointReferenceType rootEndpoint = RNSPath.getCurrent().getEndpoint();
 		ExportDirState.addExport(creationInfo.getContainerInformation().getDeploymentName(),
 			new ExportDirInformation(rootEndpoint, creationInfo.getRNSPath(), 

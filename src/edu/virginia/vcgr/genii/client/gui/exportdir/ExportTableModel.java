@@ -124,4 +124,9 @@ public class ExportTableModel extends AbstractTableModel implements IExportChang
 				JOptionPane.ERROR_MESSAGE);
 		}
 	}
+	
+	public ExportDirInformation getRow(int rowNumber)
+	{
+		return _rowData.get(rowNumber).getExportDirInformation();
+	}
 }

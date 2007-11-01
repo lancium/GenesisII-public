@@ -19,6 +19,13 @@ public class ExportDirInformation implements Externalizable
 	private String _rnsPath;
 	private File _localPath;
 	
+	public ExportDirInformation()
+	{
+		_rootEndpoint = null;
+		_rnsPath = null;
+		_localPath = null;
+	}
+	
 	public ExportDirInformation(EndpointReferenceType rootEndpoint, String rnsPath, File localPath)
 	{
 		_rootEndpoint = new WSName(rootEndpoint);
@@ -54,7 +61,16 @@ public class ExportDirInformation implements Externalizable
 		
 		size = in.readInt();
 		data = new byte[size];
-		in.read(data);
+		int position = 0;
+		while (size > 0)
+		{
+			int read = in.read(data, position, size);
+			if (read <= 0)
+				throw new IOException("Unable to read EPR from object stream.");
+			size -= read;
+			position += read;
+		}
+		
 		_rootEndpoint = new WSName(EPRUtils.fromBytes(data));
 		_rnsPath = in.readUTF();
 		_localPath = (File)in.readObject();
