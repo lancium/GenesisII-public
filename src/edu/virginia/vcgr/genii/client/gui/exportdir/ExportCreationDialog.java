@@ -1,16 +1,21 @@
 package edu.virginia.vcgr.genii.client.gui.exportdir;
 
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 
 import edu.virginia.vcgr.genii.client.install.ContainerInformation;
+import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 
 public class ExportCreationDialog extends JDialog
@@ -85,9 +90,21 @@ public class ExportCreationDialog extends JDialog
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
-			_information = new ExportCreationInformation(_deployments.getSelectedDeployment(),
-				_paths.getLocalPath(), _paths.getRNSPath());
-			setVisible(false);
+			try
+			{
+				File localPath = new File(_paths.getLocalPath());
+				ExportManipulator.validate(localPath);
+				RNSPath rnsPath = RNSPath.getCurrent().lookup(_paths.getRNSPath(), RNSPathQueryFlags.MUST_NOT_EXIST);
+				ExportManipulator.validate(rnsPath);
+				_information = new ExportCreationInformation(_deployments.getSelectedDeployment(),
+					_paths.getLocalPath(), _paths.getRNSPath());
+				setVisible(false);
+			}
+			catch (Throwable cause)
+			{
+				JOptionPane.showMessageDialog((Component)e.getSource(), cause.getLocalizedMessage(),
+					"Export Creation Error", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 
 		@Override

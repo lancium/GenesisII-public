@@ -4,6 +4,8 @@ import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.rmi.RemoteException;
+import java.rmi.server.ExportException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -14,9 +16,10 @@ import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
+import edu.virginia.vcgr.genii.client.rcreate.CreationException;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
-import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
+import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 
 class ExportDataAction extends AbstractAction
 {
@@ -77,13 +80,15 @@ class ExportDataAction extends AbstractAction
 	}
 	
 	private void createExport(ExportCreationInformation creationInfo)
-		throws ConfigurationException, RNSException, FileLockException, IOException
+		throws FileLockException, IOException, ExportException, RNSException, ConfigurationException,
+		CreationException, ResourceCreationFaultType, RemoteException
 	{
-		// TODO
-		EndpointReferenceType rootEndpoint = RNSPath.getCurrent().getEndpoint();
+		String rnsPath = creationInfo.getRNSPath();
+		File localPath = new File(creationInfo.getLocalPath());
+		EndpointReferenceType rootEndpoint = ExportManipulator.createExport(
+			creationInfo.getContainerInformation().getContainerURL(), localPath, rnsPath);
 		ExportDirState.addExport(creationInfo.getContainerInformation().getDeploymentName(),
-			new ExportDirInformation(rootEndpoint, creationInfo.getRNSPath(), 
-				new File(creationInfo.getLocalPath())));
+			new ExportDirInformation(rootEndpoint, rnsPath, localPath));
 		fireExportChanged();
 	}
 }
