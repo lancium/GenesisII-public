@@ -97,7 +97,7 @@ public class ExportDirState
 		throws FileLockException
 	{
 		File installFile = new File(
-			ConfigurationManager.getUserConfigDir(), _KNOWN_EXPORTS_FILENAME);
+			ConfigurationManager.getCurrentConfiguration().getUserDirectory(), _KNOWN_EXPORTS_FILENAME);
 		FileLock flock = null;
 		
 		try
@@ -115,7 +115,7 @@ public class ExportDirState
 		throws FileLockException, IOException
 	{
 		File installFile = new File(
-			ConfigurationManager.getUserConfigDir(), _KNOWN_EXPORTS_FILENAME);
+			ConfigurationManager.getCurrentConfiguration().getUserDirectory(), _KNOWN_EXPORTS_FILENAME);
 		FileLock flock = null;
 		
 		try
@@ -142,7 +142,7 @@ public class ExportDirState
 		throws FileLockException, IOException
 	{
 		File installFile = new File(
-			ConfigurationManager.getUserConfigDir(), _KNOWN_EXPORTS_FILENAME);
+			ConfigurationManager.getCurrentConfiguration().getUserDirectory(), _KNOWN_EXPORTS_FILENAME);
 		FileLock flock = null;
 		
 		try

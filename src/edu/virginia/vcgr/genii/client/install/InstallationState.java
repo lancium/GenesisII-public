@@ -103,7 +103,7 @@ public class InstallationState implements Serializable
 		throws FileLockException
 	{
 		File installFile = new File(
-			ConfigurationManager.getUserConfigDir(), "installation-state");
+			ConfigurationManager.getCurrentConfiguration().getUserDirectory(), "installation-state");
 		FileLock flock = null;
 		
 		try
@@ -121,7 +121,7 @@ public class InstallationState implements Serializable
 		throws IOException, FileLockException
 	{
 		File installFile = new File(
-			ConfigurationManager.getUserConfigDir(), "installation-state");
+			ConfigurationManager.getCurrentConfiguration().getUserDirectory(), "installation-state");
 		FileLock flock = null;
 		
 		try
@@ -141,7 +141,7 @@ public class InstallationState implements Serializable
 		throws IOException, FileLockException
 	{
 		File installFile = new File(
-			ConfigurationManager.getUserConfigDir(), "installation-state");
+			ConfigurationManager.getCurrentConfiguration().getUserDirectory(), "installation-state");
 		FileLock flock = null;
 		
 		try
