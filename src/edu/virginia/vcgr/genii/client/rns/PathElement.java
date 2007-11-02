@@ -18,12 +18,7 @@ package edu.virginia.vcgr.genii.client.rns;
 import org.ws.addressing.EndpointReferenceType;
 import java.io.*;
 
-import org.xml.sax.InputSource;
-
-import javax.xml.namespace.QName;
-
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
-import edu.virginia.vcgr.genii.client.ser.*;
 
 public class PathElement implements Externalizable 
 {	

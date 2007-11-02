@@ -10,14 +10,14 @@ import java.util.Collection;
 import java.util.Vector;
 
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import edu.virginia.vcgr.genii.client.install.ContainerInformation;
 import edu.virginia.vcgr.genii.client.install.InstallationState;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 
-public class DeploymentsWidget extends JPanel
+public class DeploymentsWidget extends JComponent
 {
 	static final long serialVersionUID = 0L;
 	
@@ -28,8 +28,9 @@ public class DeploymentsWidget extends JPanel
 	
 	public DeploymentsWidget() throws FileLockException, NoContainersException
 	{
-		super(new GridBagLayout());
+		super();
 		
+		setLayout(new GridBagLayout());
 		add(new JLabel(_DEPLOYMENTS), new GridBagConstraints(
 			0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST,
 			GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));

@@ -8,13 +8,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
-public class ExportPathsWidget extends JPanel
+public class ExportPathsWidget extends JComponent
 {
 	static final long serialVersionUID = 0L;
 	
@@ -28,8 +28,9 @@ public class ExportPathsWidget extends JPanel
 	
 	public ExportPathsWidget()
 	{
-		super(new GridBagLayout());
+		super();
 		
+		setLayout(new GridBagLayout());
 		add(new JLabel(_LOCAL_LABEL),
 			new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
 				new Insets(5, 5, 5, 5), 5, 5));

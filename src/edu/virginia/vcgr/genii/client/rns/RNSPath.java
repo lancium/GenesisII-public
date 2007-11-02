@@ -718,4 +718,8 @@ public class RNSPath implements Externalizable  {
     	}
     }	
 	
+    public String toString()
+    {
+    	return pwd();
+    }
 }
