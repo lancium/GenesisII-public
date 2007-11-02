@@ -5,11 +5,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.swing.AbstractAction;
-import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 
 public class QuitExportAction extends AbstractAction implements ListSelectionListener
 {
@@ -58,17 +59,13 @@ public class QuitExportAction extends AbstractAction implements ListSelectionLis
 			
 			ExportDirInformation info = model.getRow(selectedRow);
 	
-			// TODO
-			/*
-			ExportManipulator.quitExport(info.getRootEndpoint());
-			*/
+			ExportManipulator.quitExport(info.getRNSPath());
 			ExportDirState.removeExport(info);
 			fireExportsChanged();
 		}
 		catch (Throwable cause)
 		{
-			JOptionPane.showMessageDialog(_table, cause.getLocalizedMessage(), "Export Exception",
-				JOptionPane.ERROR_MESSAGE);
+			GuiUtils.displayError(_table, "Export Exception", cause);
 		}
 	}
 

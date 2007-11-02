@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
@@ -42,8 +41,7 @@ public class BrowseRNSPathAction extends AbstractAction
 		}
 		catch (Throwable t)
 		{
-			JOptionPane.showMessageDialog(_parent, t.getLocalizedMessage(), "RNS Browse Exception",
-				JOptionPane.ERROR_MESSAGE);
+			GuiUtils.displayError(_parent, "RNS Browse Exception", t);
 		}
 	}
 }

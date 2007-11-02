@@ -8,7 +8,6 @@ import java.rmi.RemoteException;
 import java.rmi.server.ExportException;
 
 import org.morgan.util.configuration.ConfigurationException;
-import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cmd.tools.ExportTool;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
@@ -20,7 +19,7 @@ import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 
 public class ExportManipulator
 {
-	static public EndpointReferenceType createExport(
+	static public RNSPath createExport(
 		URL containerURL, File localPath, String rnsPath)
 			throws FileNotFoundException, ExportException,
 				RNSException, ConfigurationException, CreationException,
@@ -31,9 +30,10 @@ public class ExportManipulator
 		RNSPath target = RNSPath.getCurrent().lookup(rnsPath, RNSPathQueryFlags.MUST_NOT_EXIST);
 		validate(target);
 		
-		return ExportTool.createExportedRoot(EPRUtils.makeEPR(containerURL.toString() 
+		ExportTool.createExportedRoot(EPRUtils.makeEPR(containerURL.toString() 
 			+ "/axis/services/ExportedRootPortType"),
 			localPath.getAbsolutePath(), rnsPath);
+		return RNSPath.getCurrent().lookup(rnsPath, RNSPathQueryFlags.MUST_EXIST);
 	}
 	
 	static public void validate(File localPath)

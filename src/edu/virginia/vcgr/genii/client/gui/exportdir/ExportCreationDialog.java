@@ -11,8 +11,8 @@ import java.io.File;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 
+import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.client.install.ContainerInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
@@ -102,8 +102,7 @@ public class ExportCreationDialog extends JDialog
 			}
 			catch (Throwable cause)
 			{
-				JOptionPane.showMessageDialog((Component)e.getSource(), cause.getLocalizedMessage(),
-					"Export Creation Error", JOptionPane.ERROR_MESSAGE);
+				GuiUtils.displayError((Component)e.getSource(), "Export Creation Error", cause);
 			}
 		}
 

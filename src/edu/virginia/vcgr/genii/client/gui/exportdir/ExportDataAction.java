@@ -10,14 +10,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.swing.AbstractAction;
-import javax.swing.JOptionPane;
 
 import org.morgan.util.configuration.ConfigurationException;
-import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.client.rcreate.CreationException;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
+import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 
@@ -74,8 +73,7 @@ class ExportDataAction extends AbstractAction
 		}
 		catch (Throwable cause)
 		{
-			JOptionPane.showMessageDialog(_owner, cause.getLocalizedMessage(), "Export Error",
-				JOptionPane.ERROR_MESSAGE);
+			GuiUtils.displayError(_owner, "Export Error", cause);
 		}
 	}
 	
@@ -85,10 +83,10 @@ class ExportDataAction extends AbstractAction
 	{
 		String rnsPath = creationInfo.getRNSPath();
 		File localPath = new File(creationInfo.getLocalPath());
-		EndpointReferenceType rootEndpoint = ExportManipulator.createExport(
+		RNSPath rPath = ExportManipulator.createExport(
 			creationInfo.getContainerInformation().getContainerURL(), localPath, rnsPath);
 		ExportDirState.addExport(creationInfo.getContainerInformation().getDeploymentName(),
-			new ExportDirInformation(rootEndpoint, rnsPath, localPath));
+			new ExportDirInformation(rPath, localPath));
 		fireExportChanged();
 	}
 }

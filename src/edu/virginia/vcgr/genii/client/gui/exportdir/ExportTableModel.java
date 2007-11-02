@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
+import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 
 public class ExportTableModel extends AbstractTableModel implements IExportChangeListener
@@ -120,8 +120,7 @@ public class ExportTableModel extends AbstractTableModel implements IExportChang
 		}
 		catch (FileLockException fle)
 		{
-			JOptionPane.showMessageDialog(null, fle.getLocalizedMessage(), "Export Exception", 
-				JOptionPane.ERROR_MESSAGE);
+			GuiUtils.displayError(null, "Export Exception", fle);
 		}
 	}
 	

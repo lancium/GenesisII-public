@@ -8,15 +8,16 @@ import java.io.ObjectOutput;
 
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
+import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 
 public class ExportDirInformation implements Externalizable
 {
 	static final long serialVersionUID = 0L;
 	
 	private WSName _rootEndpoint;
-	private String _rnsPath;
+	private RNSPath _rnsPath;
 	private File _localPath;
 	
 	public ExportDirInformation()
@@ -26,9 +27,10 @@ public class ExportDirInformation implements Externalizable
 		_localPath = null;
 	}
 	
-	public ExportDirInformation(EndpointReferenceType rootEndpoint, String rnsPath, File localPath)
+	public ExportDirInformation(RNSPath rnsPath, File localPath)
+		throws RNSPathDoesNotExistException
 	{
-		_rootEndpoint = new WSName(rootEndpoint);
+		_rootEndpoint = new WSName(rnsPath.getEndpoint());
 		_rnsPath = rnsPath;
 		_localPath = localPath;
 		if (!_rootEndpoint.isValidWSName())
@@ -42,7 +44,7 @@ public class ExportDirInformation implements Externalizable
 		return _rootEndpoint.getEndpoint();
 	}
 	
-	public String getRNSPath()
+	public RNSPath getRNSPath()
 	{
 		return _rnsPath;
 	}
@@ -56,39 +58,28 @@ public class ExportDirInformation implements Externalizable
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException
 	{
-		int size;
-		byte []data;
-		
-		size = in.readInt();
-		data = new byte[size];
-		int position = 0;
-		while (size > 0)
+		try
 		{
-			int read = in.read(data, position, size);
-			if (read <= 0)
-				throw new IOException("Unable to read EPR from object stream.");
-			size -= read;
-			position += read;
+			_rnsPath = (RNSPath)in.readObject();
+			_rootEndpoint = new WSName(_rnsPath.getEndpoint());
+			_localPath = (File)in.readObject();
+			
+			if (!_rootEndpoint.isValidWSName())
+			{
+				throw new IllegalArgumentException("All exports MUST support WS-Naming.");
+			}
 		}
-		
-		_rootEndpoint = new WSName(EPRUtils.fromBytes(data));
-		_rnsPath = in.readUTF();
-		_localPath = (File)in.readObject();
-		
-		if (!_rootEndpoint.isValidWSName())
+		catch (RNSPathDoesNotExistException dne)
 		{
-			throw new IllegalArgumentException("All exports MUST support WS-Naming.");
+			// This shouldn't happen
+			throw new IOException("Unknown exception occured trying to parse an RNS path.", dne);
 		}
 	}
 
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException
 	{
-		byte []data = EPRUtils.toBytes(_rootEndpoint.getEndpoint());
-		
-		out.writeInt(data.length);
-		out.write(data);
-		out.writeUTF(_rnsPath);
+		out.writeObject(_rnsPath);
 		out.writeObject(_localPath);
 	}
 	
