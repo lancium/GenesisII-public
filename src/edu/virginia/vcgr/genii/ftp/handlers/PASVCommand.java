@@ -74,9 +74,22 @@ public class PASVCommand extends AbstractHandler
 	
 	synchronized public void close() throws IOException
 	{
-		if (_channel != null)
+		try
 		{
-			_channel.close();
+			if (_channel != null)
+				_channel.close();
+		}
+		catch (IOException ioe)
+		{
+			_logger.warn("IOException occurred.");
+			throw ioe;
+		}
+		catch (Throwable cause)
+		{
+			_logger.error("Unknown exception occurred.", cause);
+		}
+		finally
+		{
 			_channel = null;
 		}
 	}
