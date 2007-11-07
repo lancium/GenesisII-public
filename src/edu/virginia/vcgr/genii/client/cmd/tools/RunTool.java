@@ -239,6 +239,17 @@ public class RunTool extends BaseGridTool
 				if (numArguments() < 2 || _name == null)
 					throw new InvalidToolUsageException();
 			}
+		} else if (_jsdl != null)
+		{
+			if (numArguments() != 1)
+				throw new InvalidToolUsageException("No BES container specified.");
+		} else if (_name != null)
+		{
+			if (numArguments() < 2)
+				throw new InvalidToolUsageException("No BES container or executable specified.");
+		} else
+		{
+			throw new InvalidToolUsageException("Missing required flags --check-status, --jsdl, or --name");
 		}
 	}
 	

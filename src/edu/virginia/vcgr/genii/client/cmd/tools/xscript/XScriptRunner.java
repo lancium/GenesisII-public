@@ -150,12 +150,15 @@ public class XScriptRunner
 		return new QName(node.getNamespaceURI(), node.getLocalName());
 	}
 	
-	static public String getAttribute(NamedNodeMap map, String attr)
+	static public String getAttribute(NamedNodeMap map, String attr, ScopedVariables variables)
 	{
 		Node n = map.getNamedItem(attr);
 		if (n == null)
 			return null;
-		return n.getNodeValue();
+		String val = n.getNodeValue();
+		if (val == null)
+			return null;
+		return replaceMacros(variables, val);
 	}
 	
 	static private int parseDocument(
@@ -274,11 +277,11 @@ public class XScriptRunner
 		String error = null;
 		
 		NamedNodeMap attributes = n.getAttributes();
-		String paramName = getAttribute(attributes, PARAM_NAME_ATTRIBUTE_NAME);
-		String sourceDir = getAttribute(attributes, SOURCE_DIR_ATTRIBUTE_NAME);
-		String sourceFile = getAttribute(attributes, SOURCE_FILE_ATTRIBUTE_NAME);
-		String sourceRNS = getAttribute(attributes, SOURCE_RNS_ATTRIBUTE_NAME);
-		String filter = getAttribute(attributes, FILTER_ATTRIBUTE_NAME);
+		String paramName = getAttribute(attributes, PARAM_NAME_ATTRIBUTE_NAME, variables);
+		String sourceDir = getAttribute(attributes, SOURCE_DIR_ATTRIBUTE_NAME, variables);
+		String sourceFile = getAttribute(attributes, SOURCE_FILE_ATTRIBUTE_NAME, variables);
+		String sourceRNS = getAttribute(attributes, SOURCE_RNS_ATTRIBUTE_NAME, variables);
+		String filter = getAttribute(attributes, FILTER_ATTRIBUTE_NAME, variables);
 		
 		if (paramName == null)
 			error = "Required attribute \"" + PARAM_NAME_ATTRIBUTE_NAME +
@@ -359,15 +362,18 @@ public class XScriptRunner
 		String error = null;
 		
 		NamedNodeMap attributes = n.getAttributes();
-		String paramName = getAttribute(attributes, PARAM_NAME_ATTRIBUTE_NAME);
-		String initialValueString = getAttribute(attributes, INITIAL_VALUE_ATTRIBUTE_NAME);
-		String inclusiveLimitString = getAttribute(attributes, INCLUSIVE_LIMIT_ATTRIBUTE_NAME);
-		String exclusiveLimitString = getAttribute(attributes, EXCLUSIVE_LIMIT_ATTRIBUTE_NAME);
-		String incrementValueString = getAttribute(attributes, INCREMENT_VALUE_ATTRIBUTE_NAME);
+		String paramName = getAttribute(attributes, PARAM_NAME_ATTRIBUTE_NAME, variables);
+		String initialValueString = getAttribute(attributes, INITIAL_VALUE_ATTRIBUTE_NAME, variables);
+		String inclusiveLimitString = getAttribute(attributes, INCLUSIVE_LIMIT_ATTRIBUTE_NAME, variables);
+		String exclusiveLimitString = getAttribute(attributes, EXCLUSIVE_LIMIT_ATTRIBUTE_NAME, variables);
+		String incrementValueString = getAttribute(attributes, INCREMENT_VALUE_ATTRIBUTE_NAME, variables);
 		
 		if (paramName == null)
 			error = "Required attribute \"" + PARAM_NAME_ATTRIBUTE_NAME +
 				"\" is missing in " + FOREACH_ELEMENT + " element.";
+		
+		if (initialValueString == null)
+			initialValueString = "0";
 		
 		try
 		{
@@ -443,11 +449,11 @@ public class XScriptRunner
 	{
 		String error = null;
 		NamedNodeMap attributes = n.getAttributes();
-		String varName = getAttribute(attributes, NAME_ATTRIBUTE_NAME);
-		String source = getAttribute(attributes, SOURCE_ATTRIBUTE_NAME);
-		String pattern = getAttribute(attributes, PATTERN_ATTTRIBUTE_NAME);
-		String replacement = getAttribute(attributes, REPLACEMENT_ATTRIBUTE_NAME);
-		String global = getAttribute(attributes, GLOBAL_ATTRIBUTE_NAME);
+		String varName = getAttribute(attributes, NAME_ATTRIBUTE_NAME, variables);
+		String source = getAttribute(attributes, SOURCE_ATTRIBUTE_NAME, variables);
+		String pattern = getAttribute(attributes, PATTERN_ATTTRIBUTE_NAME, variables);
+		String replacement = getAttribute(attributes, REPLACEMENT_ATTRIBUTE_NAME, variables);
+		String global = getAttribute(attributes, GLOBAL_ATTRIBUTE_NAME, variables);
 		boolean isGlobal = false;
 		
 		if (varName == null)
@@ -499,8 +505,8 @@ public class XScriptRunner
 	{
 		String error = null;
 		NamedNodeMap attributes = n.getAttributes();
-		String varName = getAttribute(attributes, NAME_ATTRIBUTE_NAME);
-		String value = getAttribute(attributes, VALUE_ATTRIBUTE_NAME);
+		String varName = getAttribute(attributes, NAME_ATTRIBUTE_NAME, variables);
+		String value = getAttribute(attributes, VALUE_ATTRIBUTE_NAME, variables);
 		
 		if (varName == null)
 			error = "Default element missing required attribute \"" 
@@ -525,7 +531,7 @@ public class XScriptRunner
 		PrintStream out, PrintStream err, BufferedReader in)
 	{
 		String message = getAttribute(n.getAttributes(), 
-			MESSAGE_ATTRIBUTE_NAME);
+			MESSAGE_ATTRIBUTE_NAME, variables);
 		if (message == null)
 		{
 			err.println("Required attribute \"" + MESSAGE_ATTRIBUTE_NAME 
