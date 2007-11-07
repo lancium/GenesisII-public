@@ -42,7 +42,15 @@ public class QueueDBResourceFactory extends BasicDBResourceFactory
 		"CREATE TABLE queuedynamicresourceinfo " +
 			"(resourceid INTEGER, available INTEGER," +
 			"CONSTRAINT queueconstraint7 PRIMARY KEY (resourceid))",
-		"CREATE VIEW queuebigquerypiece1 AS SELECT res.resourceid, res.endpoint, (res.totalslots - active.used) AS slotsavail FROM queueresourceinfo AS res INNER JOIN (SELECT resourceid, COUNT(*) AS used FROM queueactivejobs GROUP BY resourceid) AS active ON res.resourceid = active.resourceid UNION SELECT res.resourceid, res.endpoint, res.totalslots AS slotsavail FROM queueresourceinfo AS res LEFT JOIN queueactivejobs as active ON res.resourceid = active.resourceid WHERE active.resourceid IS NULL"
+		"CREATE VIEW queuebigquerypiece1 AS SELECT res.resourceid, res.endpoint, " +
+				"(res.totalslots - active.used) AS slotsavail FROM queueresourceinfo AS res " +
+			"INNER JOIN " +
+				"(SELECT resourceid, COUNT(*) AS used FROM queueactivejobs GROUP BY resourceid) AS active " +
+			"ON res.resourceid = active.resourceid " +
+			"UNION " +
+				"SELECT res.resourceid, res.endpoint, res.totalslots AS slotsavail FROM queueresourceinfo AS res " +
+			"LEFT JOIN queueactivejobs as active " +
+			"ON res.resourceid = active.resourceid WHERE active.resourceid IS NULL"
 	};
 	
 	public QueueDBResourceFactory(DatabaseConnectionPool connectionPool)
