@@ -172,7 +172,7 @@ public class FtpSession extends Thread implements Closeable, IdleReapable
 						out);
 					out.flush();
 					
-					if (_lastCommand != null)
+					if (_lastCommand != null && _lastCommand != handler)
 						try { _lastCommand.close(); } 
 							catch (IOException ioe) {}
 										
