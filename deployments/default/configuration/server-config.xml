@@ -244,6 +244,12 @@
 				value="connection-pool"/>
 		</mconf:instance>
 		
+		<mconf:instance name="is-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.informationService.resource.ISDBResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
+		
 	</genii:configured-instances>
 	
 	<genii:services>
@@ -375,6 +381,10 @@
 
 		<genii:service name="CertGeneratorPortType">
 			<genii:resource-provider name="cert-generator-db-resource-provider"/>
+		</genii:service>
+		
+		<genii:service name="InformationServicePortType">
+			<genii:resource-provider name="is-db-resource-provider"/>
 		</genii:service>
 	</genii:services>
 	
