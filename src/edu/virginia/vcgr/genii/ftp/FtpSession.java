@@ -127,9 +127,6 @@ public class FtpSession extends Thread implements Closeable, IdleReapable
 	
 	public void run()
 	{
-		IFTPCommandHandler handler = null;
-		IFTPCommandHandler _lastHandler = null;
-		
 		BufferedReader reader = null;
 		PrintStream out = null;
 		
@@ -162,7 +159,7 @@ public class FtpSession extends Thread implements Closeable, IdleReapable
 				String verb = matcher.group(1);
 				String parameters = matcher.group(2);
 				
-				handler = _commands.get(verb);
+				IFTPCommandHandler handler = _commands.get(verb);
 				
 				try
 				{
@@ -172,10 +169,10 @@ public class FtpSession extends Thread implements Closeable, IdleReapable
 						out);
 					out.flush();
 					
-					if (_lastCommand != null && _lastCommand != handler)
+					if (_lastCommand != null)
 						try { _lastCommand.close(); } 
 							catch (IOException ioe) {}
-										
+							
 					_lastCommand = handler;
 				}
 				catch (FTPException ftpe)
@@ -191,15 +188,8 @@ public class FtpSession extends Thread implements Closeable, IdleReapable
 		{
 			_logger.warn("Unknown IO Exception in FTP Session.", ioe);
 		}
-		catch (Throwable cause)
-		{
-			_logger.error("Unknown error occurred in FTP Session.", cause);
-		}
 		finally
 		{
-			StreamUtils.close(_lastHandler);
-			StreamUtils.close(handler);
-			
 			_logger.info("Closing FTP Session.");
 			
 			StreamUtils.close(out);

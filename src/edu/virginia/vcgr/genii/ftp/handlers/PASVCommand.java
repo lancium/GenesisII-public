@@ -20,7 +20,6 @@ import java.io.PrintStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.ftp.DataChannel;
 import edu.virginia.vcgr.genii.ftp.FTPException;
@@ -34,27 +33,25 @@ public class PASVCommand extends AbstractHandler
 	
 	static final private String _VERB = "PASV";
 	
-	private DataChannel _channel;
+	private DataChannel _channel = null;
 	
 	public PASVCommand(FtpSession ftpSession)
 	{
 		super(ftpSession, _VERB);
-		
-		_channel = null;
 	}
 	
 	public void handleCommand(IFTPCommandHandler previousHandler, 
 		String verb, String parameters, PrintStream out)
 			throws FTPException
 	{
+		if (_channel != null)
+		{
+			_logger.warn("Cleaning up unused data connection.");
+			try { _channel.close(); } catch (Throwable t) {}
+		}
+		
 		try
 		{
-			if (_channel != null)
-			{
-				StreamUtils.close(_channel);
-				_channel = null;
-			}
-			
 			_channel = new DataChannel(
 				_ftpSession.getConfiguration(
 					).getDataConnectionTimeoutSeconds());
@@ -76,9 +73,12 @@ public class PASVCommand extends AbstractHandler
 		return _channel;
 	}
 	
-	synchronized public void close() throws IOException
+	public void close() throws IOException
 	{
-		StreamUtils.close(_channel);
-		_channel = null;
+		if (_channel != null)
+		{
+			_channel.close();
+			_channel = null;
+		}
 	}
 }

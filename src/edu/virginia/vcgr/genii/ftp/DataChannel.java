@@ -101,7 +101,6 @@ public class DataChannel extends Thread implements Closeable
 		}
 		catch (InterruptedException ie)
 		{
-			isInterrupted();
 			_logger.debug("Interrupted the FTP Data Channel.");
 		}
 		finally
@@ -126,17 +125,11 @@ public class DataChannel extends Thread implements Closeable
 		StreamUtils.close(_out);
 		StreamUtils.close(_in);
 		
-		try
+		if (_socket != null)
 		{
-			if (_socket != null)
-			{
-				_socket.shutdownOutput();
-				_socket.shutdownInput();
-				_socket.close();
-			}
-		}
-		finally
-		{
+			_socket.shutdownOutput();
+			_socket.shutdownInput();
+			_socket.close();
 			_socket = null;
 		}
 	}
@@ -182,9 +175,7 @@ public class DataChannel extends Thread implements Closeable
 		
 		String response = String.format("=%1$s,%2$d,%3$d",
 			Hostname.getLocalHostname().getAddress().getHostAddress().replace(
-				'.', ','), port >> 8, port & 0xFF);
-		
-		_logger.debug("Sending responze \"" + response + "\" for port " + port);
+				'.', ','), port/256, port%256);
 		return response;
 	}
 }
