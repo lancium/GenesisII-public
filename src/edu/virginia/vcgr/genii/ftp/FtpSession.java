@@ -187,9 +187,6 @@ public class FtpSession extends Thread implements Closeable, IdleReapable
 					ftpe.communicate(out);
 				}
 				
-				if (_lastCommand != null)
-					_lastCommand.close();
-				
 				startReadline();
 			}
 		}
