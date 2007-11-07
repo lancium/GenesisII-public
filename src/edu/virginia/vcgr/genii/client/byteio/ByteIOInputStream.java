@@ -43,26 +43,38 @@ public class ByteIOInputStream extends InputStream implements ByteIOStream
 	public ByteIOInputStream(EndpointReferenceType epr)
 		throws RemoteException, IOException, ConfigurationException
 	{
-		TransferUtils transUtils = new TransferUtils(epr);
-		int blockSize = transUtils.getPreferredBlockSize();
-		URI transType = transUtils.getPreferredTransferType();
-		
-		_logger.debug("Selecting transfer mechanism \"" + transType + "\".");
-		
 		TypeInformation ti = new TypeInformation(epr);
+		URI transType = null;
+		int blockSize = 0;
+		
 		if (ti.isRByteIO())
+		{
+			TransferUtils transUtils = new TransferUtils(epr);
+			blockSize = transUtils.getPreferredBlockSize();
+			transType = transUtils.getPreferredTransferType();
+				
 			_handler = new RandomByteIOInputStream(epr, transType);
-		else if (ti.isSByteIO())
+		} else if (ti.isSByteIO())
+		{
+			TransferUtils transUtils = new TransferUtils(epr);
+			blockSize = transUtils.getPreferredBlockSize();
+			transType = transUtils.getPreferredTransferType();
+			
 			_handler = new StreamableByteIOInputStream(epr, transType);
-		else if (ti.isSByteIOFactory())
+		} else if (ti.isSByteIOFactory())
 		{
 			StreamableByteIOFactory factory = ClientUtils.createProxy(
 				StreamableByteIOFactory.class, epr);
-			_handler = new StreamableByteIOInputStream(
-				factory.openStream(null).getEndpoint(), transType);
+			epr = factory.openStream(null).getEndpoint();
+			TransferUtils transUtils = new TransferUtils(epr);
+			blockSize = transUtils.getPreferredBlockSize();
+			transType = transUtils.getPreferredTransferType();
+			
+			_handler = new StreamableByteIOInputStream(epr, transType);
 		} else
 			throw new IOException("Endpoint does not appear to support ByteIO.");
 		
+		_logger.debug("Selecting transfer mechanism \"" + transType + "\".");
 		_handler = new BufferedInputStream(_handler, blockSize);
 	}
 	
@@ -83,27 +95,40 @@ public class ByteIOInputStream extends InputStream implements ByteIOStream
 				path.pwd() + "\".");
 
 		EndpointReferenceType epr = path.getEndpoint();
-
-		TransferUtils transUtils = new TransferUtils(epr);
-		int blockSize = transUtils.getPreferredBlockSize();
-		URI transType = transUtils.getPreferredTransferType();
+		URI transType = null;
+		int blockSize = 0;
 		
 		_logger.debug("Selecting transfer mechanism \"" + transType + "\".");
 		
 		TypeInformation ti = new TypeInformation(epr);
 		if (ti.isRByteIO())
+		{
+			TransferUtils transUtils = new TransferUtils(epr);
+			blockSize = transUtils.getPreferredBlockSize();
+			transType = transUtils.getPreferredTransferType();
+				
 			_handler = new RandomByteIOInputStream(epr, transType);
-		else if (ti.isSByteIO())
+		} else if (ti.isSByteIO())
+		{
+			TransferUtils transUtils = new TransferUtils(epr);
+			blockSize = transUtils.getPreferredBlockSize();
+			transType = transUtils.getPreferredTransferType();
+				
 			_handler = new StreamableByteIOInputStream(epr, transType);
-		else if (ti.isSByteIOFactory())
+		} else if (ti.isSByteIOFactory())
 		{
 			StreamableByteIOFactory factory = ClientUtils.createProxy(
 				StreamableByteIOFactory.class, epr);
-			_handler = new StreamableByteIOInputStream(
-				factory.openStream(null).getEndpoint(), transType);
+			epr = factory.openStream(null).getEndpoint();
+			TransferUtils transUtils = new TransferUtils(epr);
+			blockSize = transUtils.getPreferredBlockSize();
+			transType = transUtils.getPreferredTransferType();
+			
+			_handler = new StreamableByteIOInputStream(epr, transType);
 		} else
 			throw new IOException("Endpoint does not appear to support ByteIO.");
 		
+		_logger.debug("Selecting transfer mechanism \"" + transType + "\".");
 		_handler = new BufferedInputStream(_handler, blockSize);
 	}
 	

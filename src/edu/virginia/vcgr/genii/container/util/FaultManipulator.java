@@ -45,8 +45,8 @@ public class FaultManipulator
 		}
 		if (bft.getDescription() == null)
 			bft.setDescription(new BaseFaultTypeDescription[] {
-				new BaseFaultTypeDescription(bft.toString())});
-		
+				new BaseFaultTypeDescription(bft.getClass().getName() + ":  " + bft.toString())});
+				
 		return bft;
 	}
 }
