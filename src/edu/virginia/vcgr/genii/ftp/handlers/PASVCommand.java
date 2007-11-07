@@ -49,13 +49,16 @@ public class PASVCommand extends AbstractHandler
 	{
 		try
 		{
-			if (_channel == null)
+			if (_channel != null)
 			{
-				_channel = new DataChannel(
-					_ftpSession.getConfiguration(
-						).getDataConnectionTimeoutSeconds());
-				_channel.start();
+				StreamUtils.close(_channel);
+				_channel = null;
 			}
+			
+			_channel = new DataChannel(
+				_ftpSession.getConfiguration(
+					).getDataConnectionTimeoutSeconds());
+			_channel.start();
 			
 			out.println("227 " + _channel.ftpDescribe());
 		}
