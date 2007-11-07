@@ -151,6 +151,8 @@
 			locator-type="edu.virginia.vcgr.genii.queue.QueueServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.certGenerator.CertGeneratorPortType"
 			locator-type="edu.virginia.vcgr.genii.certGenerator.CertGeneratorServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.informationService.InformationServicePortType"
+			locator-type="edu.virginia.vcgr.genii.informationService.InformationServiceServiceLocator"/>
 	</genii:locator-registry>
 	
 	<genii:configured-instances>
@@ -261,5 +263,7 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CertGeneratorTool</mconf:class>
 		<mconf:class name="set-user-config"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.SetUserConfigTool</mconf:class>
+		<mconf:class name="xmldb-query"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.InfoSQueryTool</mconf:class>
 	</genii:tools>
 </mconf:configuration>
