@@ -33,29 +33,28 @@ public class PASVCommand extends AbstractHandler
 	
 	static final private String _VERB = "PASV";
 	
-	private DataChannel _channel = null;
+	private DataChannel _channel;
 	
 	public PASVCommand(FtpSession ftpSession)
 	{
 		super(ftpSession, _VERB);
+		
+		_channel = null;
 	}
 	
 	public void handleCommand(IFTPCommandHandler previousHandler, 
 		String verb, String parameters, PrintStream out)
 			throws FTPException
 	{
-		if (_channel != null)
-		{
-			_logger.warn("Cleaning up unused data connection.");
-			try { _channel.close(); } catch (Throwable t) {}
-		}
-		
 		try
 		{
-			_channel = new DataChannel(
-				_ftpSession.getConfiguration(
-					).getDataConnectionTimeoutSeconds());
-			_channel.start();
+			if (_channel == null)
+			{
+				_channel = new DataChannel(
+					_ftpSession.getConfiguration(
+						).getDataConnectionTimeoutSeconds());
+				_channel.start();
+			}
 			
 			out.println("227 " + _channel.ftpDescribe());
 		}
