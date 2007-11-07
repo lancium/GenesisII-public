@@ -73,6 +73,7 @@
 	<import file="${wsdl-dir}/resolver/simple-resolver.build.xml"/>
 	<import file="${wsdl-dir}/resolver/simple-resolver-factory.build.xml"/>
 	<import file="${wsdl-dir}/queue/queue.build.xml"/>
+	<import file="${wsdl-dir}/informationService/informationService.build.xml"/>
 	<import file="${wsdl-dir}/certGenerator/certGenerator.build.xml"/>
 
 	<!-- Build Targets -->
@@ -165,6 +166,7 @@
 		<antcall target="gen.simple-resolver"/>
 		<antcall target="gen.simple-resolver-factory"/>
 		<antcall target="gen.queue"/>
+		<antcall target="gen.informationService"/>
 		<antcall target="gen.certGenerator"/>
 		<antcall target="deployments"/>
 	</target>
