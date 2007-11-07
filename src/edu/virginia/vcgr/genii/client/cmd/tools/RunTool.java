@@ -220,10 +220,14 @@ public class RunTool extends BaseGridTool
 			stdout.println("Status:  " + state);
 			if (state.isTerminalState())
 			{
+				Throwable error = null;
+				if (state.isInState(ActivityState.FAILED))
+					error = getError(activity);
 				GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, activity);
 				common.immediateTerminate(null);
-				if (state.isInState(ActivityState.FAILED))
-					throw getError(activity);
+
+				if (error != null)
+					throw error;
 				return 0;
 			}
 
