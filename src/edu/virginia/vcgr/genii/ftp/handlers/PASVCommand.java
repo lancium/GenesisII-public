@@ -72,7 +72,7 @@ public class PASVCommand extends AbstractHandler
 		return _channel;
 	}
 	
-	public void close() throws IOException
+	synchronized public void close() throws IOException
 	{
 		if (_channel != null)
 		{

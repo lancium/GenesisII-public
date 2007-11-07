@@ -101,6 +101,7 @@ public class DataChannel extends Thread implements Closeable
 		}
 		catch (InterruptedException ie)
 		{
+			isInterrupted();
 			_logger.debug("Interrupted the FTP Data Channel.");
 		}
 		finally

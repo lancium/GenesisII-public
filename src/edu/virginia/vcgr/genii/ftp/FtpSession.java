@@ -175,10 +175,7 @@ public class FtpSession extends Thread implements Closeable, IdleReapable
 					if (_lastCommand != null)
 						try { _lastCommand.close(); } 
 							catch (IOException ioe) {}
-						
-					if (_lastCommand != null)
-						_lastCommand.close();
-					
+										
 					_lastCommand = handler;
 				}
 				catch (FTPException ftpe)
