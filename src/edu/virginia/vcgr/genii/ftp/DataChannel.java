@@ -126,11 +126,17 @@ public class DataChannel extends Thread implements Closeable
 		StreamUtils.close(_out);
 		StreamUtils.close(_in);
 		
-		if (_socket != null)
+		try
 		{
-			_socket.shutdownOutput();
-			_socket.shutdownInput();
-			_socket.close();
+			if (_socket != null)
+			{
+				_socket.shutdownOutput();
+				_socket.shutdownInput();
+				_socket.close();
+			}
+		}
+		finally
+		{
 			_socket = null;
 		}
 	}

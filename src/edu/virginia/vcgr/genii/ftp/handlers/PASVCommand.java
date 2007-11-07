@@ -20,6 +20,7 @@ import java.io.PrintStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.ftp.DataChannel;
 import edu.virginia.vcgr.genii.ftp.FTPException;
@@ -74,23 +75,7 @@ public class PASVCommand extends AbstractHandler
 	
 	synchronized public void close() throws IOException
 	{
-		try
-		{
-			if (_channel != null)
-				_channel.close();
-		}
-		catch (IOException ioe)
-		{
-			_logger.warn("IOException occurred.", ioe);
-			throw ioe;
-		}
-		catch (Throwable cause)
-		{
-			_logger.error("Unknown exception occurred.", cause);
-		}
-		finally
-		{
-			_channel = null;
-		}
+		StreamUtils.close(_channel);
+		_channel = null;
 	}
 }
