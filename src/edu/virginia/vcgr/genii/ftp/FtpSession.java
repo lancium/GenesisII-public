@@ -194,6 +194,10 @@ public class FtpSession extends Thread implements Closeable, IdleReapable
 		{
 			_logger.warn("Unknown IO Exception in FTP Session.", ioe);
 		}
+		catch (Throwable cause)
+		{
+			_logger.error("Unknown error occurred in FTP Session.", cause);
+		}
 		finally
 		{
 			StreamUtils.close(_lastHandler);
