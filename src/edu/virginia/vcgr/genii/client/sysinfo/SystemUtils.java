@@ -1,8 +1,11 @@
 package edu.virginia.vcgr.genii.client.sysinfo;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.CPUArchitecture_Type;
 import org.ggf.jsdl.OperatingSystemTypeEnumeration;
 import org.ggf.jsdl.OperatingSystemType_Type;
@@ -10,8 +13,13 @@ import org.ggf.jsdl.OperatingSystem_Type;
 import org.ggf.jsdl.ProcessorArchitectureEnumeration;
 import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.genii.client.utils.SystemExec;
+import edu.virginia.vcgr.genii.container.sysinfo.ProcFilesystemProvider;
+
 public class SystemUtils
 {	
+	static private Log _logger = LogFactory.getLog(SystemUtils.class);
+	
 	static final private String _OS_ARCH_PREFIX = "os.arch.";
 	static final private String _OS_NAME_PREFIX = "os.name.";
 	static private Properties _propertyMap;
@@ -40,14 +48,39 @@ public class SystemUtils
 	
 	static public CPUArchitecture_Type[] getSupportedArchitectures()
 	{
-		ProcessorArchitectureEnumeration archName;
+		ProcessorArchitectureEnumeration primaryArchName = null;
+		ProcessorArchitectureEnumeration secondaryArchName = null;
+		
 		String osarch = System.getProperty("os.arch");
 		
-		archName = ProcessorArchitectureEnumeration.fromString(
+		primaryArchName = ProcessorArchitectureEnumeration.fromString(
 			_propertyMap.getProperty(_OS_ARCH_PREFIX + osarch));
 		
+		if (primaryArchName == ProcessorArchitectureEnumeration.x86_64)
+			secondaryArchName = ProcessorArchitectureEnumeration.x86;
+		else
+		{
+			try
+			{
+				String osName = System.getProperty("os.name");
+				if (osName.equals("Linux"))
+					secondaryArchName = ProcessorArchitectureEnumeration.fromString(
+						SystemExec.executeForOutput(new String[] { "uname", "-m" }));
+			}
+			catch (IOException ioe)
+			{
+				_logger.warn("Unable to determine whether or not this JVM is running on a 64 bit machine.", ioe);
+			}
+		}
+		
+		if (secondaryArchName != null)
+			return new CPUArchitecture_Type[] {
+				new CPUArchitecture_Type(primaryArchName, null),
+				new CPUArchitecture_Type(secondaryArchName, null)
+			};
+		
 		return new CPUArchitecture_Type[] {
-			new CPUArchitecture_Type(archName, null)
+			new CPUArchitecture_Type(primaryArchName, null)
 		};
 	}
 	
