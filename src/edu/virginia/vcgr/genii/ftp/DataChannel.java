@@ -176,7 +176,9 @@ public class DataChannel extends Thread implements Closeable
 		
 		String response = String.format("=%1$s,%2$d,%3$d",
 			Hostname.getLocalHostname().getAddress().getHostAddress().replace(
-				'.', ','), port/256, port%256);
+				'.', ','), port >> 8, port & 0xFF);
+		
+		_logger.debug("Sending responze \"" + response + "\" for port " + port);
 		return response;
 	}
 }
