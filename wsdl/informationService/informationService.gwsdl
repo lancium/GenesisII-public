@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<wsdl:definitions
+	name="InformationService"
+	targetNamespace="http://vcgr.cs.virginia.edu/genii/informationService"
+	xmlns:informationService="http://vcgr.cs.virginia.edu/genii/informationService"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	xmlns:rpw-2="http://docs.oasis-open.org/wsrf/rpw-2"
+    xmlns:rw-2="http://docs.oasis-open.org/wsrf/rw-2"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+	xmlns:genii-resource="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+    xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:rns="http://schemas.ggf.org/rns/2006/05/rns">
+	
+    <wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rw-2"
+		location="./wsrf/wsResourceFaults.wsdl"/>
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rpw-2"
+		location="./wsrf/wsResourceProperties.wsdl"/>
+    
+    <wsdl:import
+        namespace="http://schemas.ggf.org/rns/2006/05/rns"
+        location="./rns-generated.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+		location="./resource.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple"
+		location="./resource-simple.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
+		location="./resource-factory.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-lifetime"
+		location="./resource-lifetime.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
+		location="./resource-attributes.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-authz"
+		location="./resource-authz.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+        location="./common-generated.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
+        location="./notification.wsdl"/>
+
+	<wsdl:types>
+		<xsd:schema
+			xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			attributeFormDefault="unqualified"
+			elementFormDefault="qualified"
+			targetNamespace="http://vcgr.cs.virginia.edu/genii/informationService">
+
+			<xsd:import
+				namespace="http://vcgr.cs.virginia.edu/genii/informationService"
+				schemaLocation="./informationService.xsd"/>
+
+		</xsd:schema>
+	</wsdl:types>
+
+	<wsdl:message name="AddContainerRequest">
+		<wsdl:part name="AddContainerRequest"
+			element="informationService:AddContainerRequestType"/>
+	</wsdl:message>
+
+	<wsdl:message name="AddContainerResponse">
+		<wsdl:part name="AddContainerResponse"
+			element="informationService:AddContainerResponseType"/>
+	</wsdl:message>
+	
+	<wsdl:message name="RemoveContainerRequest">
+		<wsdl:part name="RemoveContainerRequest"
+			element="informationService:RemoveContainerRequestType"/>
+	</wsdl:message>
+
+	<wsdl:message name="RemoveContainerResponse">
+		<wsdl:part name="RemoveContainerResponse"
+			element="informationService:RemoveContainerResponseType"/>
+	</wsdl:message>
+	
+	<wsdl:message name="QueryRequest">
+		<wsdl:part name="QueryRequest"
+			element="informationService:QueryRequestType"/>
+	</wsdl:message>
+
+	<wsdl:message name="QueryResponse">
+		<wsdl:part name="QueryResponse"
+			element="informationService:QueryResponseType"/>
+	</wsdl:message>
+	
+	<wsdl:message name="BESAttributesDocumentRequest">
+		<wsdl:part name="BESAttributesDocumentRequest"
+			element="informationService:BESAttributesDocumentRequestType"/>
+	</wsdl:message>
+
+	<wsdl:message name="BESAttributesDocumentResponse">
+		<wsdl:part name="BESAttributesDocumentResponse"
+			element="informationService:BESAttributesDocumentResponseType"/>
+	</wsdl:message>
+
+	<wsdl:portType name="InformationServicePortType">
+		<genii-ext:extend portType="genii-common:GeniiCommon"/>
+		<genii-ext:extend portType="rpw-2:GetResourceProperty"/>
+		<genii-ext:extend portType="rpw-2:GetMultipleResourceProperties"/>
+		<genii-ext:extend portType="rns:RNSPortType"/>
+
+		<wsdl:operation name="AddContainer">
+			<wsdl:input message="informationService:AddContainerRequest"/>
+			<wsdl:output message="informationService:AddContainerResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="DeleteContainer">
+			<wsdl:input message="informationService:RemoveContainerRequest"/>
+			<wsdl:output message="informationService:RemoveContainerResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="QueryForProperties">
+			<wsdl:input message="informationService:QueryRequest"/>
+			<wsdl:output message="informationService:QueryResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="GetBESAttributesDocument">
+			<wsdl:input message="informationService:BESAttributesDocumentRequest"/>
+			<wsdl:output message="informationService:BESAttributesDocumentResponse"/>
+		</wsdl:operation>
+				
+	</wsdl:portType>
+
+</wsdl:definitions>

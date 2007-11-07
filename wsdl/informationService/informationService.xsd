@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+	xmlns:informationService="http://vcgr.cs.virginia.edu/genii/informationService"
+	targetNamespace="http://vcgr.cs.virginia.edu/genii/informationService"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:rns="http://schemas.ggf.org/rns/2006/05/rns"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	xmlns:genii-is="http;//vcgr.cs.virginia.edu/genii/informationService"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"
+		schemaLocation="./wsrf/basefaults.xsd"/>
+
+	<xsd:import
+		namespace="http://www.w3.org/2005/08/addressing"
+		schemaLocation="./ws-addr.xsd"/>
+	
+	
+	<!-- Adding a Document Types -->	
+
+	<xsd:complexType name="AddContainerRequestType">
+		<xsd:sequence>
+			<xsd:element
+				name="EPRofContainerToAdd" type="wsa:EndpointReferenceType"
+				minOccurs="1" maxOccurs="1"/>
+				<xsd:element
+				name="NameofContainerToAdd" type="xsd:string"
+				minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="AddContainerRequestType"
+		type="informationService:AddContainerRequestType"/>
+	
+	<xsd:element name="AddContainerResponseType"/>
+	
+	
+	<!-- Removing a Document Types -->
+	
+	<xsd:complexType name="RemoveContainerRequestType">
+		<xsd:sequence>
+			<xsd:element
+				name="pathToContainer" type="xsd:string"
+				minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="RemoveContainerRequestType"
+		type="informationService:RemoveContainerRequestType"/>
+		
+	<xsd:complexType name="RemoveContainerResponseType">
+		<xsd:sequence>
+			<xsd:element
+				name="result" type="xsd:string"
+				minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="RemoveContainerResponseType"
+		type="informationService:RemoveContainerResponseType"/>
+	
+	<!-- Query for properties Types -->
+	
+	<xsd:complexType name="QueryRequestType">
+		<xsd:sequence>
+			<xsd:element
+				name="queryString" type="xsd:string"
+				minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="QueryRequestType"
+		type="informationService:QueryRequestType"/>
+		
+	<xsd:complexType name="QueryResponseType">
+		<xsd:sequence>
+			<xsd:element
+				name="result" type="xsd:string"
+				minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="QueryResponseType"
+		type="informationService:QueryResponseType"/>
+		
+	
+	<!-- Get BES attributes document Types -->	
+		
+	<xsd:complexType name="BESAttributesDocumentRequestType">
+        <xsd:sequence>
+          <xsd:element 
+          	name="resourceEndpoint" type="wsa:EndpointReferenceType"
+            minOccurs="1" maxOccurs="1"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="BESAttributesDocumentRequestType"
+		type="informationService:BESAttributesDocumentRequestType"/>
+		
+	<xsd:complexType name = "BESAttributesDocumentResponseType">
+        <xsd:sequence>
+          <xsd:element 
+          	name="result" type="xsd:string"
+            minOccurs="1" maxOccurs="1"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="BESAttributesDocumentResponseType"
+		type="informationService:BESAttributesDocumentResponseType"/>
+		
+</xsd:schema>
