@@ -25,4 +25,9 @@ public interface IStateSaveCallback
 		throws ResourceUnknownFaultType, ResourceException;
 	public ActivityState getSavedStatus() 
 		throws ResourceException, ResourceUnknownFaultType;
+	
+	public void noteError(Throwable cause)
+		throws ResourceUnknownFaultType, ResourceException;
+	public Throwable getError(Throwable cause)
+		throws ResourceUnknownFaultType, ResourceException;
 }

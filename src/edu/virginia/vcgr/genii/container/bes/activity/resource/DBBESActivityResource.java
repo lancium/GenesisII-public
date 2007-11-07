@@ -367,5 +367,30 @@ public class DBBESActivityResource extends BasicDBResource implements
 				return (ActivityState)resource.getProperty(_STATE_PROPERTY);
 			}
 		}
+
+		@Override
+		public Throwable getError(Throwable cause)
+				throws ResourceUnknownFaultType, ResourceException
+		{
+			ResourceKey rKey = ResourceManager.getTargetResource(_target);
+			IResource resource = rKey.dereference();
+			synchronized(rKey.getLockObject())
+			{
+				return (Throwable)resource.getProperty(ERROR_PROPERTY);
+			}
+		}
+
+		@Override
+		public void noteError(Throwable cause) throws ResourceUnknownFaultType,
+				ResourceException
+		{
+			ResourceKey rKey = ResourceManager.getTargetResource(_target);
+			IResource resource = rKey.dereference();
+			synchronized(rKey.getLockObject())
+			{
+				resource.setProperty(ERROR_PROPERTY, cause);
+				resource.commit();
+			}
+		}
 	}
 }

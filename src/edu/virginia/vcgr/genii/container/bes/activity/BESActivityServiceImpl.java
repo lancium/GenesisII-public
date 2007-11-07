@@ -32,6 +32,7 @@ import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.bes.activity.BESActivityGetErrorResponseType;
 import edu.virginia.vcgr.genii.bes.activity.BESActivityPortType;
 import edu.virginia.vcgr.genii.byteio.streamable.factory.OpenStreamResponse;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
@@ -42,6 +43,7 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
+import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivityUtils.BESActivityInitInfo;
@@ -190,6 +192,32 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 		finally
 		{
 			StreamUtils.close(factory);
+		}
+	}
+
+	@Override
+	public BESActivityGetErrorResponseType getError(
+			Object BESActivityGetErrorRequest) throws RemoteException,
+			ResourceUnknownFaultType
+	{
+		try
+		{
+			byte []serializedFault = null;
+			IBESActivityResource resource = 
+				(IBESActivityResource)ResourceManager.getCurrentResource().dereference();
+			Throwable cause = (Throwable)resource.getProperty(IBESActivityResource.ERROR_PROPERTY);
+			if (cause != null)
+				serializedFault = DBSerializer.serialize(cause);
+			
+			return new BESActivityGetErrorResponseType(serializedFault);
+		}
+		catch (IOException ioe)
+		{
+			throw FaultManipulator.fillInFault(
+				new ResourceCreationFaultType(null, null, null, null,
+					new BaseFaultTypeDescription[] {
+						new BaseFaultTypeDescription(ioe.getLocalizedMessage()) },
+					null));
 		}
 	}
 }

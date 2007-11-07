@@ -34,6 +34,7 @@ import org.xml.sax.InputSource;
 
 import edu.virginia.vcgr.genii.appdesc.ApplicationDescriptionPortType;
 import edu.virginia.vcgr.genii.appdesc.SupportDocumentType;
+import edu.virginia.vcgr.genii.bes.activity.BESActivityPortType;
 import edu.virginia.vcgr.genii.client.appdesc.Matching;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.BESActivityConstants;
@@ -52,6 +53,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.run.JSDLFormer;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
@@ -166,7 +168,13 @@ public class RunTool extends BaseGridTool
 		
 		if (_checkStatus)
 		{
-			stdout.println("Status:  " + checkStatus(getArgument(0)));
+			RNSPath path = RNSPath.getCurrent();
+			path = path.lookup(getArgument(0), RNSPathQueryFlags.MUST_EXIST);
+			
+			ActivityState state = checkStatus(path.getEndpoint());
+			stdout.println("Status:  " + state);
+			if (state.isInState(ActivityState.FAILED))
+				throw getError(path.getEndpoint());
 			return 0;
 		} else if (_jsdl != null)
 		{
@@ -215,7 +223,7 @@ public class RunTool extends BaseGridTool
 				GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, activity);
 				common.immediateTerminate(null);
 				if (state.isInState(ActivityState.FAILED))
-					return 1;
+					throw getError(activity);
 				return 0;
 			}
 
@@ -577,5 +585,15 @@ public class RunTool extends BaseGridTool
 		}
 		
 		return ret;
+	}
+	
+	static private Throwable getError(EndpointReferenceType activity)
+		throws RemoteException, ConfigurationException, IOException, ClassNotFoundException
+	{
+		BESActivityPortType act = ClientUtils.createProxy(BESActivityPortType.class, activity);
+		byte []serializedFault = act.getError(null).getSerializedFault();
+		if (serializedFault == null)
+			throw new IOException("BES Activity in unknown state.");
+		return (Throwable)DBSerializer.deserialize(serializedFault);
 	}
 }

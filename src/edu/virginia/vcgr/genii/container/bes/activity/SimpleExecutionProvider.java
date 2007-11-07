@@ -230,6 +230,7 @@ public class SimpleExecutionProvider extends ThreadAwareExecutionProvider
 		{
 			t.printStackTrace(System.err);
 			_logger.debug(t);
+			_stateSaveCallback.noteError(t);
 			transitionState(ActivityState.ERROR);
 		}
 	}

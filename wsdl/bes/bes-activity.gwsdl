@@ -58,6 +58,32 @@
         namespace="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
         location="./notification.wsdl"/>
 
+	<wsdl:types>
+		<xsd:schema
+			attributeFormDefault="unqualified"
+			elementFormDefault="qualified"
+			targetNamespace="http://vcgr.cs.virginia.edu/bes/2006/06/bes-activity">
+
+			<xsd:include schemaLocation="bes-activity.xsd"/>
+			
+			<xsd:element name="BESActivityGetError"/>
+			<xsd:element name="BESActivityGetErrorResponse"
+				type="bes-activity:BESActivityGetErrorResponseType"/>
+				
+		</xsd:schema>
+	</wsdl:types>
+	
+	<!-- Messages -->
+	<wsdl:message name="BESActivityGetErrorRequest">
+		<wsdl:part name="BESActivityGetErrorRequest"
+			element="bes-activity:BESActivityGetError"/>
+	</wsdl:message>
+	
+	<wsdl:message name="BESActivityGetErrorResponse">
+		<wsdl:part name="BESActivityGetErrorResponse"
+			element="bes-activity:BESActivityGetErrorResponse"/>
+	</wsdl:message>
+
 	<wsdl:portType name="BESActivityPortType">
 		<genii-ext:extend portType="genii-common:GeniiCommon"/>
 		<genii-ext:extend portType="sfact:StreamableByteIOFactory"/>
@@ -71,6 +97,13 @@
 				message="genii-resource:ResourceUnknownFault"/>
 			<wsdl:fault name="ResourceCreationFault"
 				message="genii-rfact:ResourceCreationFault"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="getError">
+			<wsdl:input message="bes-activity:BESActivityGetErrorRequest"/>
+			<wsdl:output message="bes-activity:BESActivityGetErrorResponse"/>
+			<wsdl:fault name="ResourceUnknownFault"
+				message="genii-resource:ResourceUnknownFault"/>
 		</wsdl:operation>
 	</wsdl:portType>
 </wsdl:definitions>

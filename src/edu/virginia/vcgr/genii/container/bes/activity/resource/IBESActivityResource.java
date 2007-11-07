@@ -29,6 +29,7 @@ import edu.virginia.vcgr.genii.container.resource.IResource;
 public interface IBESActivityResource extends IResource
 {
 	static public final String ACTIVITY_NAME_PROPERTY = "activity-name";
+	static public final String ERROR_PROPERTY = "bes-activity:error";
 	
 	public void createProcess(EndpointReferenceType activityEPR,
 		File basedir, JobDefinition_Type jobDef)

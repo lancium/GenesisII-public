@@ -120,7 +120,6 @@ public class Driver extends ApplicationBase
 			}
 			catch (Throwable cause)
 			{
-				cause.printStackTrace(System.err);
 				exceptionHandler.handleException(cause, System.err);
 			}
 		}
