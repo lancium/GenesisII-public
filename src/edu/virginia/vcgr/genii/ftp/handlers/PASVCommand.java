@@ -81,7 +81,7 @@ public class PASVCommand extends AbstractHandler
 		}
 		catch (IOException ioe)
 		{
-			_logger.warn("IOException occurred.");
+			_logger.warn("IOException occurred.", ioe);
 			throw ioe;
 		}
 		catch (Throwable cause)
