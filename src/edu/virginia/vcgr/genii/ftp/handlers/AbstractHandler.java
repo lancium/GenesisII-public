@@ -33,6 +33,11 @@ public abstract class AbstractHandler implements IFTPCommandHandler
 		_handledCommands = handledCommands;
 	}
 	
+	protected void finalize() throws Throwable
+	{
+		close();
+	}
+	
 	public String[] getHandledCommands()
 	{
 		return _handledCommands;
