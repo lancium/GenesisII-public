@@ -44,6 +44,9 @@ public class ListCommand extends AbstractHandler
 				"Data connection not established.");
 		
 		PASVCommand pasv = (PASVCommand)previousHandler;
+		if (pasv == null)
+			throw new FTPException(435,
+				"Data connection not established.");
 		
 		out.println("150 Beginning Directory Listing.");
 		out.flush();
