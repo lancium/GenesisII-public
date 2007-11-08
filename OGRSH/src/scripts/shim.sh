@@ -6,7 +6,7 @@ then
 	exit 1
 fi
 
-JSERVER_LOCATION="$OGRSH_HOME/jserver"
+JSERVER_LOCATION="%{OGRSH_HOME}/.."
 
 TMP_FILENAME=/tmp/$USER.shim.$RANDOM
 while [ -e $TMP_FILENAME ]
@@ -37,8 +37,8 @@ export OGRSH_JSERVER_SECRET=`echo $LINE | sed -e 's/^Server.//' | sed -e 's/].*/
 export OGRSH_JSERVER_PORT=`echo $LINE | sed -e 's/^.*port //'`
 export LINE=
 export HOME="/home/mmm2a"
-export OGRSH_CONFIG="$OGRSH_HOME/config/example.xml"
-export LD_LIBRARY_PATH="$OGRSH_HOME/lib/$OGRSH_ARCH:$LD_LIBRARY_PATH"
+export OGRSH_CONFIG="%{OGRSH_HOME}/config/example.xml"
+export LD_LIBRARY_PATH="%{OGRSH_HOME}/lib/%{OGRSH_ARCH}:$LD_LIBRARY_PATH"
 export LD_PRELOAD=libOGRSH.so
 
 PROGRAM="$1"

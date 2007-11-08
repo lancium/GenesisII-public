@@ -314,5 +314,8 @@
 		</javadoc>
 	</target>
 
+	<target name="OGRSH" depends="jars">
+		<ant dir="${basedir}/OGRSH"/>
+	</target>
 	
 </project>
