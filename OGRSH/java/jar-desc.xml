@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<vcgr:jars
-	xmlns:vcgr="http://vcgr.cs.virginia.edu">
-	<vcgr:jar-files basedir="@JSERVER_DIRECTORY@">
-		<vcgr:jar-file>lib/OGRSH.jar</vcgr:jar-file>
-	</vcgr:jar-files>
-	
-	<vcgr:jar-dir recursive="true">@JSERVER_DIRECTORY@/ext</vcgr:jar-dir>
-</vcgr:jars>

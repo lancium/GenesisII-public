@@ -212,6 +212,14 @@
 		<antcall target="genii.compile"/>
 	</target>
 
+	<target name="OGRSH-jar" depends="compile">
+		<jar destfile="${lib-dir}/OGRSH.jar">
+			<fileset dir="${obj-dir}">
+				<include name="edu/virginia/vcgr/ogrsh/**/*"/>
+			</fileset>
+		</jar>
+	</target>
+
 	<target name="GenesisII-client-jar" depends="compile">
 		<jar destfile="${lib-dir}/GenesisII-client.jar">
 			<fileset dir="${obj-dir}">
@@ -247,7 +255,7 @@
 		</jar>
 	</target>
 
-	<target name="jars" depends="morganu.jar,genesisII.wsdl.jar,GenesisII-client-jar,GenesisII-container-jar,security-jar"/>
+	<target name="jars" depends="morganu.jar,genesisII.wsdl.jar,GenesisII-client-jar,GenesisII-container-jar,security-jar,OGRSH-jar"/>
 
 	<target name="build" depends="jars,scripts"/>
 
@@ -282,6 +290,7 @@
 			<fileset dir="${lib-dir}" includes="**/*.jar"/>
 		</delete>
 		<delete dir="${services.dir}"/>
+		<delete file="${basedir}/jserver.sh"/>
 		<delete file="${basedir}/runContainer.sh"/>
 		<delete file="${basedir}/runContainer.bat"/>
 		<delete file="${basedir}/grid"/>
@@ -289,6 +298,7 @@
 		<delete file="${basedir}/cert-tool"/>
 		<delete file="${basedir}/cert-tool.bat"/>
 		<delete file="${basedir}/jar-desc.xml"/>
+		<delete file="${basedir}/jserver-jar-desc.xml"/>
 	</target>
 
 	<target name="jdoc" depends="jars">

@@ -30,6 +30,7 @@
 	<target name="clean-all-scripts">
 		<delete quiet="true">
 			<fileset dir="${basedir}">
+				<include name="jserver.*"/>
 				<include name="runContainer.*"/>
 				<include name="grid*"/>
 				<include name="simple-command*"/>
@@ -60,6 +61,11 @@
 		<replace file="${basedir}/jar-desc.xml"
 			token="$INSTALL_PATH" value="${basedir}" summary="yes"/>
 
+		<copy file="${scripts.dir}/jserver-jar-desc.xml"
+			tofile="${basedir}/jserver-jar-desc.xml"/>
+		<replace file="${basedir}/jserver-jar-desc.xml"
+			token="$INSTALL_PATH" value="${basedir}" summary="yes"/>
+
 		<antcall target="build-script-win">
 			<param name="win-script-src-dir" value="${scripts.dir}"/>
 			<param name="win-script-base-name" value="runContainer"/>
@@ -67,6 +73,10 @@
 		<antcall target="build-script-unix">
 			<param name="unix-script-src-dir" value="${scripts.dir}"/>
 			<param name="unix-script-base-name" value="runContainer.sh"/>
+		</antcall>
+		<antcall target="build-script-unix">
+			<param name="unix-script-src-dir" value="${scripts.dir}"/>
+			<param name="unix-script-base-name" value="jserver.sh"/>
 		</antcall>
 		<antcall target="build-script">
 			<param name="script-src-dir" value="${scripts.dir}"/>
