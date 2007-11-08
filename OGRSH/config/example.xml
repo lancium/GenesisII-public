@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ogrsh:configuration
+	xmlns:ogrsh="http://vcgr.cs.virginia.edu/ogrsh"
+	xmlns:genii="http://vcgr.cs.virginia.edu/Genesis-II/fs-provider">
+
+<!--
+	<ogrsh:global-config>
+		<ogrsh:home-dir>/home/mark-morgan</ogrsh:home-dir>
+	</ogrsh:global-config>
+-->
+	<ogrsh:global-config>
+		<ogrsh:home-dir>/home/mmm2a</ogrsh:home-dir>
+	</ogrsh:global-config>
+
+	<ogrsh:fs-provider name="local-fs-provider"
+		provider-library="libLocalOGRSHProvider.so"
+		provider-creator="createLocalOGRSHProvider">
+
+		<ogrsh:session name="local-fs-session"/>
+
+	</ogrsh:fs-provider>
+
+	<ogrsh:fs-provider name="genesisII-fs-provider"
+		provider-library="libGenesisIIOGRSHProvider.so"
+		provider-creator="createGenesisIIOGRSHProvider">
+
+		<ogrsh:session name="uva-geniinet-session"
+			credential-file="/home/mmm2a/Work/Workspace/GenesisII/security/keys.pfx"
+			credential-pattern="skynet" password="keys"
+			root-rns-url="http://www.cs.virginia.edu/~mmm2a/IrtahkNet/root.xml"/>
+	</ogrsh:fs-provider>
+
+<!--
+	<ogrsh:mount location="/home/mark-morgan" provider="local-fs-provider"
+		session="local-fs-session">
+		<ogrsh:root-directory>/home/mmm2a</ogrsh:root-directory>
+	</ogrsh:mount>
+-->
+	<ogrsh:mount location="/home/mmm2a" provider="local-fs-provider"
+		session="local-fs-session">
+		<ogrsh:root-directory>/home/mmm2a</ogrsh:root-directory>
+	</ogrsh:mount>
+
+	<ogrsh:mount location="/bin" provider="local-fs-provider"
+		session="local-fs-session">
+		<ogrsh:root-directory>/bin</ogrsh:root-directory>
+	</ogrsh:mount>
+
+	<ogrsh:mount location="/proc" provider="local-fs-provider"
+		session="local-fs-session">
+		<ogrsh:root-directory>/proc</ogrsh:root-directory>
+	</ogrsh:mount>
+
+	<ogrsh:mount location="/sbin" provider="local-fs-provider"
+		session="local-fs-session">
+		<ogrsh:root-directory>/sbin</ogrsh:root-directory>
+	</ogrsh:mount>
+
+	<ogrsh:mount location="/dev" provider="local-fs-provider"
+		session="local-fs-session">
+		<ogrsh:root-directory>/dev</ogrsh:root-directory>
+	</ogrsh:mount>
+
+	<ogrsh:mount location="/usr" provider="local-fs-provider"
+		session="local-fs-session">
+		<ogrsh:root-directory>/usr</ogrsh:root-directory>
+	</ogrsh:mount>
+
+	<ogrsh:mount location="/tmp" provider="local-fs-provider"
+		session="local-fs-session">
+		<ogrsh:root-directory>/tmp</ogrsh:root-directory>
+	</ogrsh:mount>
+
+	<ogrsh:mount location="/etc" provider="local-fs-provider"
+		session="local-fs-session">
+		<ogrsh:root-directory>/etc</ogrsh:root-directory>
+	</ogrsh:mount>
+
+	<ogrsh:mount location="/var" provider="local-fs-provider"
+		session="local-fs-session">
+		<ogrsh:root-directory>/var</ogrsh:root-directory>
+	</ogrsh:mount>
+
+	<ogrsh:mount location="/uva-genii" provider="genesisII-fs-provider"
+		session="uva-geniinet-session">
+		<ogrsh:root-directory>/</ogrsh:root-directory>
+	</ogrsh:mount>
+
+</ogrsh:configuration>

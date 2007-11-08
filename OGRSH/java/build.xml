@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="OGRSH.jserver" name="GenesisII">
+
+	<!-- Properties -->
+	<property file="${basedir}/build.properties"/>
+
+	<!-- Static Class paths -->
+	<path id="external.classpath">
+		<fileset dir="${ext-dir}" includes="**/*.jar"/>
+	</path>
+
+	<path id="project.classpath">
+		<pathelement location="${obj-dir}"/>
+		<path refid="external.classpath"/>
+	</path>
+			
+	<!-- Build Targets -->
+	<target name="OGRSH.compile" depends="OGRSH.compile.dir">
+		<javac destdir="${obj-dir}" debug="true">
+			<src path="${src-dir}"/>
+			<classpath refid="external.classpath"/>
+			<exclude name="edu/virginia/vcgr/ogrsh/testing/**/*"/>
+		</javac>
+		<copy todir="${obj-dir}">
+			<fileset dir="${src-dir}">
+				<include name="**/*.xml"/>
+				<include name="**/*.properties"/>
+				<include name="**/*.html"/>
+				<include name="**/*.jpg"/>
+				<include name="**/*.gif"/>
+				<include name="**/*.bmp"/>
+				<include name="**/*.ver"/>
+				<include name="**/*.txt"/>
+				<include name="**/*.config"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="OGRSH.jar" depends="OGRSH.compile, OGRSH.jar.dir">
+		<jar destfile="${lib-dir}/OGRSH.jar">
+			<fileset dir="${obj-dir}">
+				<include name="edu/virginia/vcgr/ogrsh/**/*"/>
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="OGRSH.compile.dir">
+		<mkdir dir="${obj-dir}"/>
+	</target>
+
+	<target name="OGRSH.jar.dir">
+		<mkdir dir="${lib-dir}"/>
+	</target>
+
+	<target name="OGRSH.jserver" depends="OGRSH.jar">
+		<mkdir dir="${jserv-dir}"/>
+		<copy todir="${jserv-dir}/ext">
+			<fileset dir="${ext-dir}">
+				<include name="**/*.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="${jserv-dir}/lib">
+			<fileset dir="${lib-dir}">
+				<include name="**/*.jar"/>
+				<include name="**/*.wsdd"/>
+				<include name="**/*.properties"/>
+			</fileset>
+		</copy>
+		<copy todir="${jserv-dir}/deployments">
+			<fileset dir="${basedir}/deployments">
+				<include name="**/*.pfx"/>
+				<include name="**/*.xml"/>
+			</fileset>
+		</copy>
+		<copy file="${basedir}/jar-desc.xml"
+			tofile="${jserv-dir}/jar-desc.xml">
+			<filterset>
+				<filter token="JSERVER_DIRECTORY" value="${jserv-dir}"/>
+			</filterset>
+		</copy>
+		<copy file="${basedir}/jserver.sh"
+			tofile="${jserv-dir}/jserver.sh">
+			<filterset>
+				<filter token="JSERVER_DIRECTORY" value="${jserv-dir}"/>
+			</filterset>
+		</copy>
+		<chmod file="${jserv-dir}/jserver.sh" perm="755"/>
+	</target>
+
+	<target name="clean">
+		<delete dir="${obj-dir}"/>
+		<delete dir="${jserv-dir}"/>
+		<delete file="${lib-dir}/OGRSH.jar"/>
+	</target>
+
+	<target name="jdoc" depends="OGRSH.jar">
+		<javadoc destdir="${basedir}/doc/api"
+			classpathref="project.classpath"
+			WindowTitle="OGRSH Documentation"
+			verbose="false">
+			<doctitle><![CDATA[<H1>OGRSH Documentation</H1>]]></doctitle>
+			<link href="http://java.sun.com/j2se/1.5.0/docs/api"/>
+			<link href="http://ws.apache.org/axis/java/apiDocs"/>
+			<fileset dir="${src-dir}" includes="**/*.java"/>
+		</javadoc>
+	</target>
+
+	<target name="OGRSH.run" depends="OGRSH.jar">
+		<java classname="edu.virginia.vcgr.ogrsh.server.OGRSHServer"
+			classpathref="project.classpath" fork="true">
+			<env key="OGRSH_SERVER_SECRET" value="cafe"/>
+			<env key="OGRSH_SERVER_PORT" value="5555"/>
+		</java>
+	</target>
+</project>

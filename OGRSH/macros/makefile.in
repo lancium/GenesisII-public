@@ -1,0 +1,20 @@
+CC			=			gcc
+CPP			=			g++
+
+INC_DIR		=			$(OGRSH_HOME)/include
+OBJ_DIR		=			$(OGRSH_HOME)/obj/$(OGRSH_ARCH)
+LIB_DIR		=			$(OGRSH_HOME)/lib/$(OGRSH_ARCH)
+BIN_DIR		=			$(OGRSH_HOME)/bin
+JSERV_DIR	=			$(OGRSH_HOME)/jserver
+
+OGRSH_LEVEL_TRACE=0
+OGRSH_LEVEL_DEBUG=1
+OGRSH_LEVEL_INFO=2
+OGRSH_LEVEL_WARN=3
+OGRSH_LEVEL_ERROR=4
+OGRSH_LEVEL_FATAL=5
+
+DFLAGS		=			-DOGRSH_DEBUG_LEVEL=$(OGRSH_LEVEL_WARN)
+CFLAGS		=			-Wall -g -fPIC -rdynamic -I$(INC_DIR) $(DFLAGS)
+CPPFLAGS	=			-Wall -g -fPIC -rdynamic -I$(INC_DIR) $(DFLAGS)
+LFLAGS		=			-lc -ldl -lxerces-c -L$(LIB_DIR)

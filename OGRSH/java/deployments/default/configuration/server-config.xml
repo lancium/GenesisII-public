@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mconf:configuration
+	xmlns:mconf="http://www.mark-morgan.net/org/morgan/util/configuration"
+	xmlns:genii="http://vcgr.cs.virginia.edu/Genesis-II">
+
+	<mconf:config-sections>
+		<mconf:config-section name="genii:global-properties"
+			class="org.morgan.util.configuration.PropertiesConfigurationSectionHandler"/>
+		<mconf:config-section name="genii:message-security"
+			class="org.morgan.util.configuration.PropertiesConfigurationSectionHandler"/>
+		<mconf:config-section name="genii:resource-identity"
+			class="org.morgan.util.configuration.PropertiesConfigurationSectionHandler"/>
+		<mconf:config-section name="genii:authorization"
+			class="org.morgan.util.configuration.PropertiesConfigurationSectionHandler"/>
+		<mconf:config-section name="genii:ssl-properties"
+			class="org.morgan.util.configuration.PropertiesConfigurationSectionHandler"/>
+		<mconf:config-section name="genii:configured-instances"
+			class="org.morgan.util.configuration.InstanceConfigurationSectionHandler"/>
+		<mconf:config-section name="genii:services"
+			class="edu.virginia.vcgr.genii.container.configuration.ServicesConfigurationHandler"/>
+		<mconf:config-section name="genii:deployment-configuration"
+			class="org.morgan.util.configuration.PropertiesConfigurationSectionHandler"/>
+	</mconf:config-sections>
+	
+	<genii:global-properties>
+		<mconf:property name="edu.virginia.vcgr.genii.container.listen-port"
+			value="18080"/>
+		<mconf:property 
+			name="edu.virginia.vcgr.genii.container.production.bes.thread-pool-size"
+			value="20"/>
+		<mconf:property 
+			name="edu.virginia.vcgr.genii.container.notification.work-pool-size"
+			value="5"/>
+	</genii:global-properties>
+
+
+<!-- Resource identity properties section.  This section contains properties
+     relevant to the generation of resource identities to be used for AuthN
+     of resources to clients.
+-->
+	<genii:resource-identity>
+		<!-- The following four properties are used for specifying which CA 
+		     certificate/keypair to use for generating resource identity 
+		     certificates -->
+		<mconf:property 
+			name="edu.virginia.vcgr.genii.container.security.resource-identity.key-store"
+			value="security/keys.pfx"/>
+		<mconf:property 
+			name="edu.virginia.vcgr.genii.container.security.resource-identity.key-store-type"
+			value="PKCS12"/>
+		<mconf:property 
+			name="edu.virginia.vcgr.genii.container.security.resource-identity.key-password"
+			value="keys"/>
+		<mconf:property 
+			name="edu.virginia.vcgr.genii.container.security.resource-identity.key-store-password"
+			value="keys"/>
+		<mconf:property 
+			name="edu.virginia.vcgr.genii.container.security.resource-identity.container-alias"
+			value="VCGR Container"/>
+
+		<mconf:property 
+			name="edu.virginia.vcgr.genii.container.security.resource-identity.default-certificate-lifetime"
+			value="31536000000"/>	<!-- Default to 1 year -->
+	</genii:resource-identity>
+
+
+<!-- AuthZ properties section.  This section contains properties that impact 
+     the authorization of clients to resources.  
+-->
+	<genii:authorization>
+		<!-- Denotes whether *new* resources are created with authorization enabled -->
+		<mconf:property 
+			name="genii.security.authz.authz-enabled"
+			value="true"/>
+		
+		<!-- Denotes the X.509 identity to be used for *new* resources are created 
+		     without the presence of a caller credential (e.g., service resources
+		     that are created upon container-startup).  If not specified, then 
+		     the identity of the container will be used in these circumstances. 
+		<mconf:property 
+			name="genii.security.authz.bootstrapOwnerCertPath"
+			value="security/admin.cer"/>
+		-->			
+	</genii:authorization>
+
+
+<!-- SSL properties section.  Presently contains properties that identify the 
+     certificate and keypair that the container should use for incoming SSL 
+     connections.  Comment out this section to turn off SSL/HTTPS.
+-->
+	<genii:ssl-properties>
+		<mconf:property 
+			name="edu.virginia.vcgr.genii.container.security.ssl.key-store"
+			value="security/keys.pfx"/>
+		<mconf:property 
+			name="edu.virginia.vcgr.genii.container.security.ssl.key-store-type"
+			value="PKCS12"/>
+		<mconf:property 
+			name="edu.virginia.vcgr.genii.container.security.ssl.key-password"
+			value="keys"/>
+		<mconf:property 
+			name="edu.virginia.vcgr.genii.container.security.ssl.key-store-password"
+			value="keys"/>
+	</genii:ssl-properties>
+	
+	
+	<genii:configured-instances>
+		<mconf:instance name="context-resolver" 
+			type="edu.virginia.vcgr.genii.container.context.AxisBasedContextResolver"
+			base="edu.virginia.vcgr.genii.client.context.IContextResolver"/>
+			
+		<mconf:instance name="connection-pool"
+			type="edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool">
+			<mconf:property name="edu.virginia.vcgr.genii.container.db.db-class-name"
+				value="org.apache.derby.jdbc.EmbeddedDriver"/>
+			<mconf:property name="edu.virginia.vcgr.genii.container.db.db-connect-string"
+				value="jdbc:derby:${edu.virginia.vcgr.genii.client.configuration.user-dir}/derby-db;create=true"/>
+			<mconf:property name="edu.virginia.vcgr.genii.container.db.db-user"
+				value="sa"/>
+			<mconf:property name="edu.virginia.vcgr.genii.container.db.db-password"
+				value=""/>
+			<mconf:property name="edu.virginia.vcgr.genii.container.db.pool-size"
+				value="8"/>
+		</mconf:instance>
+		
+		<!--
+		<mconf:instance name="connection-pool"
+			type="edu.virginia.vcgr.genii.container.db.HypersonicDatabaseConnectionPool">
+			<mconf:property name="edu.virginia.vcgr.genii.container.db.db-class-name"
+				value="org.hsqldb.jdbcDriver"/>
+			<mconf:property name="edu.virginia.vcgr.genii.container.db.db-connect-string"
+				value="jdbc:hsqldb:file:${edu.virginia.vcgr.genii.client.configuration.user-dir}/database"/>
+			<mconf:property name="edu.virginia.vcgr.genii.container.db.db-user"
+				value="sa"/>
+			<mconf:property name="edu.virginia.vcgr.genii.container.db.db-password"
+				value=""/>
+			<mconf:property name="edu.virginia.vcgr.genii.container.db.pool-size"
+				value="8"/>
+		</mconf:instance>
+		-->
+		
+		<mconf:instance name="basic-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
+		
+		<mconf:instance name="rns-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.rns.RNSDBResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
+		
+		<mconf:instance name="queue-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.queue.resource.QueueDBResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
+		
+		<mconf:instance name="basic-scheduler-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.scheduler.basic.BasicSchedulerDBResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
+		
+		<mconf:instance name="rbyteio-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.byteio.RByteIOResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
+
+		<mconf:instance name="sbyteio-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.byteio.SByteIOResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
+		
+		<mconf:instance name="bes-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.bes.resource.BESDBResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
+		
+		<mconf:instance name="bes-activity-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.bes.activity.resource.BESActivityDBResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
+		
+		<mconf:instance name="exported-file-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.exportdir.ExportedFileDBResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
+
+		<mconf:instance name="exported-dir-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.exportdir.ExportedDirDBResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
+		
+		<mconf:instance name="exported-root-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.exportdir.ExportedRootDBResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
+		
+		<mconf:instance name="subscription-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.common.notification.DBSubscriptionResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
+
+		<mconf:instance name="simple-resolver-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.resolver.SimpleResolverDBResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
+
+		<mconf:instance name="simple-resolver-factory-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.resolver.SimpleResolverFactoryDBResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
+		
+		<mconf:instance name="application-description-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.rns.RNSDBResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
+		
+		<mconf:instance name="application-deployer-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
+	</genii:configured-instances>
+	
+	<genii:services>
+		<genii:service name="CounterPortType">
+			<genii:resource-provider name="basic-db-resource-provider"/>
+			<genii:security-settings>
+				<mconf:property 
+					name="edu.virginia.vcgr.genii.container.security.service-certificate-lifetime"
+					value="6000000"/>	<!-- 100 minutes -->
+				<mconf:property
+					name="edu.virginia.vcgr.genii.container.security.resource-certificate-lifetime"
+					value="600000"/>	<!-- 10 minutes -->
+			</genii:security-settings>
+<!--  turns on making resolver for new instances of this type
+			<genii:default-resolver-factory-settings>
+				<mconf:property 
+					name="edu.virginia.vcgr.genii.container.resolver.default-resolver-factory-proxy-class"
+					value="edu.virginia.vcgr.genii.container.resolver.SimpleResolverFactoryProxy"/>
+				<mconf:property
+					name="edu.virginia.vcgr.genii.container.resolver.simple.test-property"
+					value="TESTING"/>
+			</genii:default-resolver-factory-settings>
+-->
+		</genii:service>
+		
+		<genii:service name="RNSPortType">
+			<genii:resource-provider name="rns-db-resource-provider"/>
+<!--  turns on making resolver for new instances of this type
+			<genii:default-resolver-factory-settings>
+				<mconf:property 
+					name="edu.virginia.vcgr.genii.container.resolver.default-resolver-factory-proxy-class"
+					value="edu.virginia.vcgr.genii.container.resolver.SimpleResolverFactoryProxy"/>
+				<mconf:property
+					name="edu.virginia.vcgr.genii.container.resolver.simple.test-property"
+					value="TESTING"/>
+			</genii:default-resolver-factory-settings>
+-->
+		</genii:service>
+		
+		<genii:service name="BasicSchedulerPortType">
+			<genii:resource-provider name="basic-scheduler-db-resource-provider"/>
+		</genii:service>
+		
+		<genii:service name="RandomByteIOPortType">
+			<genii:resource-provider name="rbyteio-db-resource-provider"/>
+<!--  turns on making resolver for new instances of this type
+			<genii:default-resolver-factory-settings>
+				<mconf:property 
+					name="edu.virginia.vcgr.genii.container.resolver.default-resolver-factory-proxy-class"
+					value="edu.virginia.vcgr.genii.container.resolver.SimpleResolverFactoryProxy"/>
+				<mconf:property
+					name="edu.virginia.vcgr.genii.container.resolver.simple.test-property"
+					value="TESTING"/>
+			</genii:default-resolver-factory-settings>
+-->
+		</genii:service>
+
+		<genii:service name="StreamableByteIOPortType">
+			<genii:resource-provider name="sbyteio-db-resource-provider"/>
+<!--  turns on making resolver for new instances of this type
+			<genii:default-resolver-factory-settings>
+				<mconf:property 
+					name="edu.virginia.vcgr.genii.container.resolver.default-resolver-factory-proxy-class"
+					value="edu.virginia.vcgr.genii.container.resolver.SimpleResolverFactoryProxy"/>
+				<mconf:property
+					name="edu.virginia.vcgr.genii.container.resolver.simple.test-property"
+					value="TESTING"/>
+			</genii:default-resolver-factory-settings>
+-->
+		</genii:service>
+		
+		<genii:service name="BESPortType">
+			<genii:resource-provider name="bes-db-resource-provider"/>
+		</genii:service>
+		
+		<genii:service name="BESActivityPortType">
+			<genii:resource-provider name="bes-activity-db-resource-provider"/>
+		</genii:service>
+		
+		<genii:service name="VCGRContainerPortType">
+			<genii:resource-provider name="basic-db-resource-provider"/>
+		</genii:service>
+		
+		<genii:service name="ExportedFilePortType">
+			<genii:resource-provider name="exported-file-db-resource-provider"/>
+		</genii:service>
+		
+		<genii:service name="ExportedDirPortType">
+			<genii:resource-provider name="exported-dir-db-resource-provider"/>
+		</genii:service>
+		
+		<genii:service name="ExportedRootPortType">
+			<genii:resource-provider name="exported-root-db-resource-provider"/>
+		</genii:service>
+		
+		<genii:service name="GeniiSubscriptionPortType">
+			<genii:resource-provider name="subscription-db-resource-provider"/>
+		</genii:service>
+
+		<genii:service name="SimpleResolverPortType">
+			<genii:resource-provider name="simple-resolver-db-resource-provider"/>
+		</genii:service>
+
+		<genii:service name="SimpleResolverFactoryPortType">
+			<genii:resource-provider name="simple-resolver-factory-db-resource-provider"/>
+		</genii:service>
+		
+		<genii:service name="ApplicationDescriptionPortType">
+			<genii:resource-provider name="application-description-db-resource-provider"/>
+		</genii:service>
+		
+		<genii:service name="ApplicationDeployerPortType">
+			<genii:resource-provider name="application-deployer-db-resource-provider"/>
+		</genii:service>
+		
+		<genii:service name="QueuePortType">
+			<genii:resource-provider name="queue-db-resource-provider"/>
+		</genii:service>
+	</genii:services>
+	
+	<genii:deployment-configuration>
+		<mconf:property name="edu.virginia.vcgr.genii.container.deployment.connection-pool"
+			value="connection-pool"/>
+	</genii:deployment-configuration>
+	
+</mconf:configuration>
