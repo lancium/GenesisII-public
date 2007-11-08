@@ -79,8 +79,11 @@ InformationServicePortType {
 
 		private EndpointReferenceType resourceEPR;
 		private String targetedServiceName;
+		
+		@SuppressWarnings("unused")
 		private Thread executingThread;
-	//	private RNSPath myPath;
+
+		//	private RNSPath myPath;
 	//	private ICallingContext callingContext;
 		private InformationServiceImpl myParent;
 

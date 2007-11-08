@@ -14,7 +14,6 @@ import org.ggf.jsdl.ProcessorArchitectureEnumeration;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.utils.SystemExec;
-import edu.virginia.vcgr.genii.container.sysinfo.ProcFilesystemProvider;
 
 public class SystemUtils
 {	
