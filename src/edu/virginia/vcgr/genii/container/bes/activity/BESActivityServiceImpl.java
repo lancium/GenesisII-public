@@ -196,6 +196,7 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 	}
 
 	@Override
+	@RWXMapping(RWXCategory.READ)
 	public BESActivityGetErrorResponseType getError(
 			Object BESActivityGetErrorRequest) throws RemoteException,
 			ResourceUnknownFaultType
