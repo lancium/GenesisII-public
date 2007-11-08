@@ -172,7 +172,7 @@ public class JSDLFormer
 	{
 		HashMap<String, DataStaging_Type> stages =
 			new HashMap<String, DataStaging_Type>();
-			
+		// Here is Andrew's first "code"	
 		for (String stage : _stageIn.keySet())
 		{
 			stages.put(stage, new DataStaging_Type(
