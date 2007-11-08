@@ -29,6 +29,10 @@
 	<path id="wss4j.classpath">
 		<fileset dir="${wss4j-home}" includes="**/*.jar"/>
 	</path>
+	
+	<path id="xmldb.classpath">
+			<fileset dir="${xmldb-home}" includes="**/*.jar"/>
+		</path>
 
 	<path id="project.classpath">
 		<pathelement location="${obj-dir}"/>
@@ -39,6 +43,7 @@
 		<path refid="hypersonic.classpath"/>
 		<path refid="bouncycastle.classpath"/>
 		<path refid="wss4j.classpath"/>
+		<path refid="xmldb.classpath"/>
 	</path>
 			
 	<!-- Static Task Defs -->
