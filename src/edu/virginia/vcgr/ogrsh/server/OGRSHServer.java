@@ -11,6 +11,7 @@ import org.morgan.util.GUID;
 
 import edu.virginia.vcgr.genii.client.ApplicationBase;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.ogrsh.server.session.OGRSHContextResolver;
 import edu.virginia.vcgr.ogrsh.server.session.SessionManager;
@@ -23,8 +24,7 @@ public class OGRSHServer extends ApplicationBase
 	{
 		prepareClientApplication();
 		
-		System.err.println("deployment is \"" + System.getProperty(GenesisIIConstants.DEPLOYMENT_NAME_PROPERTY)
-				+ "\".");
+		System.err.println("deployment is \"" + ConfigurationManager.getUserConfigDir() + "\".");
 		
 		boolean _done = false;
 		ServerSocketChannel serverChannel = null;
