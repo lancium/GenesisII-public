@@ -17,9 +17,6 @@ namespace ogrsh
 	namespace geniifs
 	{
 		static const char* _ROOT_RNS_URL_ATTR_NAME = "root-rns-url";
-		static const char* _CREDENTIAL_FILE_ATTR_NAME = "credential-file";
-		static const char* _CREDENTIAL_PATTERN_ATTR_NAME = "credential-pattern";
-		static const char* _CREDENTIAL_PASSWORD_ATTR_NAME = "password";
 
 		ogrsh::Session* GeniiFSProvider::createSession(
 			const std::string &sessionName,
@@ -38,30 +35,10 @@ namespace ogrsh
 				ogrsh::shims::real_exit(1);
 			}
 
-			std::string credFile = ogrsh::getAttribute(
-				(xercesc_2_8::DOMElement*)(&configElement),
-				_CREDENTIAL_FILE_ATTR_NAME);
-			std::string credPattern = ogrsh::getAttribute(
-				(xercesc_2_8::DOMElement*)(&configElement),
-				_CREDENTIAL_PATTERN_ATTR_NAME);
-			std::string credPassword = ogrsh::getAttribute(
-				(xercesc_2_8::DOMElement*)(&configElement),
-				_CREDENTIAL_PASSWORD_ATTR_NAME);
-
-			if (credPattern.length() == 0)
-			{
-				OGRSH_FATAL("Configuration for session \""
-					<< sessionName
-					<< "\" is invalid.  Missing required attribute \""
-					<< _CREDENTIAL_PATTERN_ATTR_NAME << "\".");
-				ogrsh::shims::real_exit(1);
-			}
-
 			OGRSH_TRACE("Creating a GeniiFSSession with sessionName = "
 				<< sessionName
 				<< ", and root RNS URL = " << rootRNSUrl << ".");
-			return new GeniiFSSession(sessionName, rootRNSUrl,
-				credFile, credPassword, credPattern);
+			return new GeniiFSSession(sessionName, rootRNSUrl);
 		}
 
 		GeniiFSProvider::GeniiFSProvider(const std::string &providerName)

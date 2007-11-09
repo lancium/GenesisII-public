@@ -1,9 +1,12 @@
 #include <errno.h>
 
 #include "jcomm/SessionClient.hpp"
+#include "jcomm/OGRSHException.hpp"
 
 #include "ogrsh/Logging.hpp"
 #include "ogrsh/XMLUtilities.hpp"
+
+#include "ogrsh/shims/File.hpp"
 
 #include "providers/geniifs/GeniiFSSession.hpp"
 #include "providers/geniifs/GeniiFSMount.hpp"
@@ -18,6 +21,14 @@ namespace ogrsh
 {
 	namespace geniifs
 	{
+		static std::string prompt(const std::string &prmpt,
+			const char *defaultValue) throw (jcomm::OGRSHException);
+
+		static std::string getCredentialFile(const std::string &sessionName)
+			throw (jcomm::OGRSHException);
+		static std::string getPassword();
+		static std::string getPattern();
+
 		static const char *_OGRSH_JSERVER_ADDRESS_VAR = "OGRSH_JSERVER_ADDRESS";
 		static const char *_OGRSH_JSERVER_PORT_VAR = "OGRSH_JSERVER_PORT";
 		static const char *_OGRSH_JSERVER_SECRET_VAR = "OGRSH_JSERVER_SECRET";
@@ -76,12 +87,43 @@ namespace ogrsh
 					<< _rootRNSUrl << "\".");
 				sessionClient.connectNet(_rootRNSUrl);
 
-				// We also need to log in to it.
-				OGRSH_DEBUG("Attempting to log in to the Genesis II net.");
-				sessionClient.loginSession(
-					(_credFile.length() == 0) ? NULL : _credFile.c_str(),
-					_credPassword, _credPattern);
-				_credPassword = "";
+				std::string credentialFile;
+				std::string password;
+				std::string pattern;
+
+				while (1)
+				{
+					try
+					{
+						credentialFile = getCredentialFile(
+							getSessionName());
+						password = getPassword();
+						pattern = getPattern();
+					}
+					catch (jcomm::OGRSHException oe)
+					{
+						// The log in was cancelled.
+						ogrsh::shims::uber_real_fprintf(stderr,
+							"Log in cancelled.  Exiting.\n");
+						ogrsh::shims::real_exit(0);
+					}
+
+					// We also need to log in to it.
+					OGRSH_DEBUG("Attempting to log in to the Genesis II net.");
+
+					try
+					{
+						sessionClient.loginSession(
+							credentialFile.c_str(), password, pattern);
+						password = "";
+						break;
+					}
+					catch (jcomm::OGRSHException oe)
+					{
+						ogrsh::shims::uber_real_fprintf(stderr,
+							"%s\n\n", oe.what());
+					}
+				}
 			}
 		}
 
@@ -140,11 +182,8 @@ namespace ogrsh
 		}
 
 		GeniiFSSession::GeniiFSSession(const std::string  &sessionName,
-			const std::string &rootRNSUrl, const std::string &credFile,
-			const std::string &credPassword, const std::string &credPattern)
-			: ogrsh::Session(sessionName), _rootRNSUrl(rootRNSUrl),
-				_credFile(credFile), _credPassword(credPassword),
-				_credPattern(credPattern)
+			const std::string &rootRNSUrl)
+			: ogrsh::Session(sessionName), _rootRNSUrl(rootRNSUrl)
 		{
 			_socket = NULL;
 		}
@@ -153,6 +192,76 @@ namespace ogrsh
 		{
 			if (_socket != NULL)
 				delete _socket;
+		}
+
+		std::string getCredentialFile(const std::string &sessionName)
+			throw (jcomm::OGRSHException)
+		{
+			ogrsh::shims::uber_real_fprintf(stdout, "Session \"%s\"\n",
+				sessionName.c_str());
+			return prompt(
+				"Please enter the path to your PKCS12 keystore:  ",
+				NULL);
+		}
+
+		std::string getPassword()
+		{
+			try
+			{
+				return getpass("Keystore password?  ");
+			}
+			catch (jcomm::OGRSHException oe)
+			{
+				// can't happen
+				return "";
+			}
+		}
+
+		std::string getPattern()
+		{
+			try
+			{
+				return prompt("Certificate Pattern?  ", "");
+			}
+			catch (jcomm::OGRSHException oe)
+			{
+				// can't happen
+				return "";
+			}
+		}
+
+		std::string prompt(const std::string &prmpt, const char *defaultValue)
+			throw (jcomm::OGRSHException)
+		{
+			char *buffer = new char[512];
+			ogrsh::shims::uber_real_fprintf(stdout, "%s", prmpt.c_str());
+			ogrsh::shims::real_fgets(buffer, 512, stdin);
+
+			int len = strlen(buffer);
+			while (1)
+			{
+				len--;
+				if (len < 0)
+					break;
+				if (isspace(buffer[len]))
+					buffer[len] = '\0';
+				else
+					break;
+			}
+	
+			std::string str(buffer);
+			delete []buffer;
+
+			if (str.empty())
+			{
+				if (defaultValue != NULL)
+					return defaultValue;
+				else
+					throw jcomm::OGRSHException("No answer selected.");
+			} else
+			{
+				return str;
+			}
 		}
 	}
 }

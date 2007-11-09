@@ -25,8 +25,6 @@
 		provider-creator="createGenesisIIOGRSHProvider">
 
 		<ogrsh:session name="uva-geniinet-session"
-			credential-file="/home/mmm2a/Work/Workspace/GenesisII/security/keys.pfx"
-			credential-pattern="skynet" password="keys"
 			root-rns-url="http://www.cs.virginia.edu/~mmm2a/IrtahkNet/root.xml"/>
 	</ogrsh:fs-provider>
 

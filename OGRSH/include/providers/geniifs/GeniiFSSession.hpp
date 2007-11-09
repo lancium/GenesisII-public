@@ -16,9 +16,6 @@ namespace ogrsh
 			private:
 				std::string _rootRNSUrl;
 				jcomm::Socket *_socket;
-				std::string _credFile;
-				std::string _credPassword;
-				std::string _credPattern;
 
 			protected:
 				virtual void startSession();
@@ -30,10 +27,7 @@ namespace ogrsh
 
 			public:
 				GeniiFSSession(const std::string &sessionName,
-					const std::string &rootRNSUrl,
-					const std::string &credFile,
-					const std::string &credPassword,
-					const std::string &credPattern);
+					const std::string &rootRNSUrl);
 				virtual ~GeniiFSSession();
 
 				jcomm::Socket *getSocket();
