@@ -151,7 +151,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
         	keyStore.load(null, null);
         	
         	// set the client's key material
-        	KeyAndCertMaterial keyMaterial = ClientUtils.getActiveKeyAndCertMaterial(_callContext);
+        	KeyAndCertMaterial keyMaterial = _callContext.getActiveKeyAndCertMaterial();
             keyStore.setKeyEntry(
             		CRYPTO_ALIAS, 
             		keyMaterial._clientPrivateKey, 
@@ -193,7 +193,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
             KeyStore keyStore = KeyStore.getInstance("JKS");
         	keyStore.load(null, null);
 
-        	KeyAndCertMaterial keyMaterial = ClientUtils.getActiveKeyAndCertMaterial(_callContext);
+        	KeyAndCertMaterial keyMaterial = _callContext.getActiveKeyAndCertMaterial();
             keyStore.setKeyEntry(
             		CRYPTO_ALIAS, 
             		keyMaterial._clientPrivateKey, 

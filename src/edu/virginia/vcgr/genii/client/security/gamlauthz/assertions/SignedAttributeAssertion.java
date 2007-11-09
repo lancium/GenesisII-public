@@ -71,12 +71,11 @@ public class SignedAttributeAssertion extends SignedAssertion {
 	
 	/**
 	 * Checks that the assertion is time-valid with respect to the supplied 
-	 * date and any delegation depth requirements are met by the supplied
-	 * delegationDepth.
+	 * date
 	 */
-	public void checkValidity(int delegationDepth, Date date) throws AttributeInvalidException {
+	public void checkValidity(Date date) throws AttributeInvalidException {
  		// check the validity of the attribute
-		_attribute.checkValidity(delegationDepth, date);
+		_attribute.checkValidity(0, date);
 	}
 		
 	/**

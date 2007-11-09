@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.GamlCredential;
@@ -22,11 +23,15 @@ public class WhoamiTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		// get the signed GAML assertion 
+		
 		ICallingContext callingContext = ContextManager.getCurrentContext(false);
+
 		if (callingContext == null) {
 			stdout.println("Not logged in");
 		} else {
+			// remove/renew stale creds/attributes
+			ClientUtils.checkAndRenewCredentials(callingContext);
+
 			TransientCredentials transientCredentials = 
 				TransientCredentials.getTransientCredentials(callingContext);
 			if (transientCredentials._credentials.isEmpty()) {

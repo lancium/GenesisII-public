@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.security.cert.X509Certificate;
+import java.util.Date;
+
 import edu.virginia.vcgr.genii.client.security.gamlauthz.GamlCredential;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.AttributeInvalidException;
 
 public class UsernameTokenIdentity implements Identity, GamlCredential {
 
@@ -51,6 +54,9 @@ public class UsernameTokenIdentity implements Identity, GamlCredential {
 
 	public String getToken() {
 		return _token;
+	}
+	
+	public void checkValidity(Date date) throws AttributeInvalidException {
 	}
 	
 	public void writeExternal(ObjectOutput out) throws IOException {

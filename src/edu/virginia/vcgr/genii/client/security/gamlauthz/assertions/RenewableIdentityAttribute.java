@@ -28,7 +28,7 @@ public class RenewableIdentityAttribute extends IdentityAttribute
 	/**
 	 * Rewew this assertion
 	 */
-	public void rewew() {
+	public void renew() {
 		_notValidBeforeMillis = 
 			System.currentTimeMillis() - (1000L * 60 * 15); // 15 minutes ago
 	}

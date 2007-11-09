@@ -22,8 +22,9 @@ public class RenewableClientAttribute extends DelegatedAttribute implements Rene
 		
 		_callingContext = callingContext;
 
-		// grab the delegatee identity from the calling context
-		KeyAndCertMaterial clientKeyMaterial = ClientUtils.getActiveKeyAndCertMaterial(
+		// grab the delegatee identity from the calling context (renewing it 
+		// if necesssary -- dont want to sign to stale creds
+		KeyAndCertMaterial clientKeyMaterial = ClientUtils.checkAndRenewCredentials(
 				_callingContext);
 		
 		if ((assertion == null) || (clientKeyMaterial._clientCertChain == null)) {
@@ -38,13 +39,12 @@ public class RenewableClientAttribute extends DelegatedAttribute implements Rene
 	/**
 	 * Rewew this attribute
 	 */
-	public void rewew() throws GeneralSecurityException {
+	public void renew() throws GeneralSecurityException {
 		// rewew the wrapped assertion
 		((RenewableAttributeAssertion) _assertion).renew();	
 		
 		// grab the delegatee identity from the calling context
-		KeyAndCertMaterial clientKeyMaterial = ClientUtils.getActiveKeyAndCertMaterial(
-				_callingContext);
+		KeyAndCertMaterial clientKeyMaterial = _callingContext.getActiveKeyAndCertMaterial();
 		_delegateeIdentity = clientKeyMaterial._clientCertChain;
 	}
 	

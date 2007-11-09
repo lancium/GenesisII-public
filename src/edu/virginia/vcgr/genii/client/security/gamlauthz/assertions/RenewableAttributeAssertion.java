@@ -27,7 +27,7 @@ public class RenewableAttributeAssertion extends SignedAttributeAssertion
 	 */
 	public void renew() throws GeneralSecurityException {
 		// renew the attribute
-		((RenewableAttribute) _attribute).rewew();
+		((RenewableAttribute) _attribute).renew();
 
 		// re-sign the attribute
 		_signature = sign(_attribute, _privateKey);

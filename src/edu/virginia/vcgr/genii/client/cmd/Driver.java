@@ -37,12 +37,17 @@ public class Driver extends ApplicationBase
 		
 		if (args.length == 0 || (
 			args.length == 1 && args[0].equals("shell")))
-			doShell(in);
+			while(true) {
+				try {
+					doShell(in);
+					break;
+				} catch (ReloadShellException e) {}
+			}
 		else
 			doNonShell(in, args);
 	}
 	
-	static private void doShell(BufferedReader in)
+	static private void doShell(BufferedReader in) throws ReloadShellException
 	{
 		CommandLineRunner runner = new CommandLineRunner();
 		IExceptionHandler exceptionHandler =
@@ -100,7 +105,9 @@ public class Driver extends ApplicationBase
 				long startTime = System.currentTimeMillis();
 				String []passArgs = new String[args.length - firstArg];
 				System.arraycopy(args, firstArg, passArgs, 0, passArgs.length);
+
 				runner.runCommand(passArgs, System.out, System.err, in);
+				
 				long elapsed = System.currentTimeMillis() - startTime;
 				
 				if (displayElapsed)
@@ -117,9 +124,9 @@ public class Driver extends ApplicationBase
 					System.out.println("Elapsed time: " + hours + "h:" 
 						+ minutes + "m:" + seconds + "s." + elapsed + "ms");
 				}
-			}
-			catch (Throwable cause)
-			{
+			} catch (ReloadShellException e) {
+				throw e;
+			} catch (Throwable cause) {
 				exceptionHandler.handleException(cause, System.err);
 			}
 		}

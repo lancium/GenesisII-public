@@ -7,21 +7,21 @@ import java.net.URL;
 
 import org.morgan.util.configuration.ConfigurationException;
 
-import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
-import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.cmd.*;
 import edu.virginia.vcgr.genii.client.configuration.UserConfig;
 import edu.virginia.vcgr.genii.client.configuration.UserConfigUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ContextStreamUtils;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 
 public class ConnectTool extends BaseGridTool
 {
 	static private final String _DESCRIPTION =
 		"Connects to an existing net.";
 	static private final String _USAGE =
-		"connect <connect-url> [<user config dir>]";
+		"connect <connect-url> [<deployment dir>]";
 	
 	public ConnectTool()
 	{
@@ -32,23 +32,24 @@ public class ConnectTool extends BaseGridTool
 	protected int runCommand() throws Throwable
 	{
 		String connectURL = getArgument(0);
-		String userConfigDir = null;
+		String deploymentDir = null;
 		if (numArguments() > 1)
 		{
-			userConfigDir = getArgument(1);
-			File testUserDir = new File(userConfigDir);
+			deploymentDir = getArgument(1);
+			File testUserDir = new File(deploymentDir);
 			if (!testUserDir.exists())
-				throw new ConfigurationException("User configuration directory " + userConfigDir + " does not exist.");
+				throw new ConfigurationException("Deployment directory " + deploymentDir + " does not exist.");
 			if (!testUserDir.isDirectory())
-				throw new ConfigurationException("User configuration path " + userConfigDir + " is not a directory.");
+				throw new ConfigurationException("Deployment path " + deploymentDir + " is not a directory.");
 			if (!testUserDir.canRead())
-				throw new ConfigurationException("User configuration directory " + userConfigDir + " is not readable - check permissions.");
+				throw new ConfigurationException("Deployment directory " + deploymentDir + " is not readable - check permissions.");
 		}
 //		else
 //			userConfigDir = ConfigurationManager.getUserConfigDir();
 
-		connect(connectURL, userConfigDir);
-		return 0;
+		connect(connectURL, deploymentDir);
+		
+		throw new ReloadShellException();
 	}
 
 	@Override
@@ -73,23 +74,38 @@ public class ConnectTool extends BaseGridTool
 		connect(ContextStreamUtils.load(url), null);
 	}
 
-	public void connect(ICallingContext ctxt, String userConfigDir)
+	public void connect(ICallingContext ctxt, String deploymentDir)
 		throws ConfigurationException, ResourceException, IOException
 	{
 		ContextManager.storeCurrentContext(ctxt);
-		if (userConfigDir != null)
+		if (deploymentDir != null)
 		{
-			UserConfig userConfig = new UserConfig(userConfigDir);
+			UserConfig userConfig = new UserConfig(deploymentDir);
 			UserConfigUtils.setCurrentUserConfig(userConfig);
+			
+			// reload the configuration manager so that all
+			// config options are loaded from the specified deployment dir
+			// (instead of likely the "default" deployment)
+			UserConfigUtils.reloadConfiguration();
+/*			
+			File sessionDir = ConfigurationManager.getCurrentConfiguration().getUserDirectory();
+			boolean clientRole = ConfigurationManager.getCurrentConfiguration().isClientRole();
+			ConfigurationManager.reloadConfiguration(sessionDir.getPath());
+			if (clientRole) {
+				ConfigurationManager.getCurrentConfiguration().setRoleClient();
+			} else {
+				ConfigurationManager.getCurrentConfiguration().setRoleServer();
+			}
+*/			
 		}
 	}
 	
-	public void connect(String connectURL, String userConfigDir)
+	public void connect(String connectURL, String deploymentDir)
 		throws ResourceException, MalformedURLException, IOException,
 			ConfigurationException
 	{
 		URL url = new URL(connectURL);
-		connect(ContextStreamUtils.load(url), userConfigDir);
+		connect(ContextStreamUtils.load(url), deploymentDir);
 	}
 
 }

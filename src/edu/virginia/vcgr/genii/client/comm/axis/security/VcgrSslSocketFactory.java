@@ -31,18 +31,23 @@ import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
-import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
+import edu.virginia.vcgr.genii.client.configuration.*;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 import edu.virginia.vcgr.genii.client.utils.deployment.DeploymentRelativeFile;
 
-public class VcgrSslSocketFactory extends SSLSocketFactory 
+public class VcgrSslSocketFactory extends SSLSocketFactory implements ConfigurationUnloadedListener
 {
-	private SSLSocketFactory factory;
+	private SSLSocketFactory _factory;
 
-	public VcgrSslSocketFactory() 
-	{
-		try
-		{
+	public VcgrSslSocketFactory() {
+		_factory = createDelegateFactory();
+		ConfigurationManager.addConfigurationUnloadListener(this);
+	}
+
+	protected static SSLSocketFactory createDelegateFactory() { 
+		SSLSocketFactory retval = null;
+		
+		try {
 			TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
 
 			// open the trust store and init the trust manager factory, if possible
@@ -57,11 +62,11 @@ public class VcgrSslSocketFactory extends SSLSocketFactory
 			
 			char[] trustStorePassChars = null;
 			
-			if (trustStorePass != null)
+			if (trustStorePass != null) {
 				trustStorePassChars = trustStorePass.toCharArray();
+			}
 			
-			if (trustStoreLoc != null)
-			{
+			if (trustStoreLoc != null) {
 				KeyStore ks = CertTool.openStoreDirectPath(new DeploymentRelativeFile(trustStoreLoc),
 					trustStoreType, trustStorePassChars);
 		    	tmf.init(ks);
@@ -71,18 +76,22 @@ public class VcgrSslSocketFactory extends SSLSocketFactory
 				sslcontext.init(null, tmf.getTrustManagers(), null);
 				
 				// get the factory from the context
-				factory = (SSLSocketFactory) sslcontext.getSocketFactory();
-			} else 
-			{
+				retval = (SSLSocketFactory) sslcontext.getSocketFactory();
+			} else {
 				// no trust store provided, use the default ssl socket factory
-				factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+				retval = (SSLSocketFactory) SSLSocketFactory.getDefault();
 			}
-		} catch (Exception ex)
-		{
+		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+		
+		return retval;
 	}
 
+	public synchronized void notifyUnloaded() {
+		_factory = createDelegateFactory();
+	}
+	
 	public static SocketFactory getDefault()
 	{
 		return new VcgrSslSocketFactory();
@@ -91,39 +100,39 @@ public class VcgrSslSocketFactory extends SSLSocketFactory
 	public Socket createSocket(Socket socket, String s, int i, boolean flag)
 		throws IOException 
 	{
-		return factory.createSocket(socket, s, i, flag);
+		return _factory.createSocket(socket, s, i, flag);
 	}
 
 	public Socket createSocket(InetAddress inaddr, int i, InetAddress inaddr1,
 		int j) throws IOException
 	{
-		return factory.createSocket(inaddr, i, inaddr1, j);
+		return _factory.createSocket(inaddr, i, inaddr1, j);
 	}
 
 	public Socket createSocket(InetAddress inaddr, int i) throws IOException 
 	{
-		return factory.createSocket(inaddr, i);
+		return _factory.createSocket(inaddr, i);
 	}
 
 	public Socket createSocket(String s, int i, InetAddress inaddr, int j)
 		throws IOException 
 	{
-		return factory.createSocket(s, i, inaddr, j);
+		return _factory.createSocket(s, i, inaddr, j);
 	}
 
 	public Socket createSocket(String s, int i) throws IOException 
 	{
-		return factory.createSocket(s, i);
+		return _factory.createSocket(s, i);
 	}
 
 	public String[] getDefaultCipherSuites() 
 	{
-		return factory.getSupportedCipherSuites();
+		return _factory.getSupportedCipherSuites();
 	}
 
 	public String[] getSupportedCipherSuites() 
 	{
-		return factory.getSupportedCipherSuites();
+		return _factory.getSupportedCipherSuites();
 	}
 	
 	static private Properties getSSLProperties()

@@ -57,7 +57,7 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.CommConstants;
 import edu.virginia.vcgr.genii.client.comm.MethodDescription;
 import edu.virginia.vcgr.genii.client.comm.ResolutionContext;
-import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
+import edu.virginia.vcgr.genii.client.configuration.*;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -127,6 +127,20 @@ public class AxisClientInvocationHandler implements InvocationHandler
 	static private KeyStore __trustStore = null;
 	static private MessageLevelSecurity __minClientMessageSec = null;
 
+	/**
+	 * Class to wipe our loaded config stuff in the event the config manager
+	 * reloads. 
+	 */
+	public static class ConfigUnloadListener implements ConfigurationUnloadedListener {
+		public void notifyUnloaded() {
+			synchronized(AxisClientInvocationHandler.class) { 
+				__trustStore = null;
+				__minClientMessageSec = null;
+			}
+		}
+	}
+	
+	
 	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(AxisClientInvocationHandler.class);
 
@@ -135,6 +149,12 @@ public class AxisClientInvocationHandler implements InvocationHandler
 	static {
 		java.security.Security.setProperty("ssl.SocketFactory.provider", 
 			VcgrSslSocketFactory.class.getName());
+		ConfigurationManager.addConfigurationUnloadListener(new ConfigUnloadListener());
+	}
+	
+	static public synchronized void configurationUnloaded() {
+		__trustStore = null;
+		__minClientMessageSec = null;
 	}
 	
 	/**

@@ -26,6 +26,7 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
+import java.security.GeneralSecurityException;
 import java.util.*;
 
 import org.morgan.util.io.StreamUtils;
@@ -33,6 +34,7 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.genii.client.cache.LRUCache;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.SignedAssertion;
+import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.client.ser.Base64;
 import edu.virginia.vcgr.genii.context.ContextNameValuePairType;
 import edu.virginia.vcgr.genii.context.ContextType;
@@ -46,6 +48,9 @@ public class CallingContextImpl implements ICallingContext, Serializable
 
 	static protected LRUCache<String, Serializable> incomingBase64cache = 
 		new LRUCache<String, Serializable>(SERIALIZATION_CACHE_SIZE);
+
+	protected static final String CLIENT_KEY_MATERIAL_CALL_CONTEXT_DATA = 
+		"edu.virginia.vcgr.genii.client.security.client-key-material-call-context-data";
 	
 	static protected Serializable retrieveBase64Decoded(String encoded) throws IOException {
 		synchronized (incomingBase64cache) {
@@ -193,6 +198,22 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		_transientProperties.remove(name);
 		if (_parent != null)
 			_parent.removeTransientProperty(name);
+	}
+
+	public synchronized void setActiveKeyAndCertMaterial(KeyAndCertMaterial clientKeyMaterial) throws GeneralSecurityException {
+		// this transient property always gets put in the top parent context
+		if (_parent != null) {
+			_parent.setActiveKeyAndCertMaterial(clientKeyMaterial);
+			return;
+		}
+		
+		setTransientProperty(CLIENT_KEY_MATERIAL_CALL_CONTEXT_DATA, clientKeyMaterial);
+		
+	}
+	
+	public synchronized KeyAndCertMaterial getActiveKeyAndCertMaterial() throws GeneralSecurityException {
+		return (KeyAndCertMaterial)	getTransientProperty(
+				CLIENT_KEY_MATERIAL_CALL_CONTEXT_DATA);
 	}
 
 	public synchronized RNSPath getCurrentPath() {

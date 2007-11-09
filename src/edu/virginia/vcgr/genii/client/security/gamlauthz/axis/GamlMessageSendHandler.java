@@ -47,8 +47,7 @@ public class GamlMessageSendHandler {
 		// get key and cert material used to authenticate our messages
 		KeyAndCertMaterial clientKeyMaterial;
 		try {
-			clientKeyMaterial = ClientUtils.getActiveKeyAndCertMaterial(
-					callingContext);
+			clientKeyMaterial = callingContext.getActiveKeyAndCertMaterial();
 		} catch (GeneralSecurityException e) {
 			throw new GenesisIISecurityException("Could not prepare outgoing calling context: " + e.getMessage(), e);
 		}

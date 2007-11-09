@@ -7,5 +7,5 @@ public interface RenewableAttribute extends Attribute {
 	/**
 	 * Rewew this attribute
 	 */
-	public void rewew() throws GeneralSecurityException;
+	public void renew() throws GeneralSecurityException;
 }

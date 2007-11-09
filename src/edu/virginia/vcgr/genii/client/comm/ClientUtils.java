@@ -45,6 +45,7 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.TransientCredentials;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
+import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 
 /**
  * A utility class which allows users to create dynamic, client side proxies for talking
@@ -59,9 +60,6 @@ public class ClientUtils
 
 	static private final String _PROXY_FACTORY_INSTANCE_NAME =
 		"proxy-factory-instance";
-
-	public static final String CLIENT_KEY_MATERIAL_CALL_CONTEXT_DATA = 
-		"edu.virginia.vcgr.genii.client.security.client-key-material-call-context-data";
 	
 	static private Pattern _PORT_PATTERN = Pattern.compile(
 	"^get.+");
@@ -81,61 +79,81 @@ public class ClientUtils
 	    return new KeyAndCertMaterial(clientCertChain, keyPair.getPrivate());
 	}
 
-	public static void checkAndRenewCredentials(ICallingContext callContext) throws GeneralSecurityException {
+	/**
+	 * @param callContext The calling context containing the 
+	 * @return The client's key and cert material, re-generated if necessary.  (Upon refresh, 
+	 *   all previous attributes will be renewed if possible, discarded otherwise)  
+	 * @throws GeneralSecurityException
+	 */
+	public static KeyAndCertMaterial checkAndRenewCredentials(ICallingContext callContext) throws GeneralSecurityException {
 
 		boolean updated = false;
-
+		KeyAndCertMaterial retval = callContext.getActiveKeyAndCertMaterial();
 		ArrayList <GamlCredential> credentials = 
 			TransientCredentials.getTransientCredentials(callContext)._credentials;
-		
-		KeyAndCertMaterial clientKeyMaterial = getActiveKeyAndCertMaterial(callContext);
-		
+
+		// Ensure client identity is valid
 		try {
-			// check the time validity of our message signing creds
-			for (X509Certificate cert : clientKeyMaterial._clientCertChain) {
+			if (retval == null) {
+				// we never had any client identity
+				throw new CertificateExpiredException();
+			}
+				
+			// check the time validity of our client identity
+			for (X509Certificate cert : retval._clientCertChain) {
 				// (Check 10 seconds into the future so as to avoid the credential
 				// expiring in-flight)
 				cert.checkValidity(new Date(System.currentTimeMillis() + (10 * 1000)));
 			}
+		} catch (CertificateExpiredException e) {
+
+			if (!ConfigurationManager.getCurrentConfiguration().isClientRole()) {
+				// We're a resource operating inside this container with 
+				// a specific identity that has now expired.
+				throw e;
 			
-			// if we got here, now we need to check the time validity of our
-			// assertion creds
-			Iterator<GamlCredential> itr = credentials.iterator();
-			while (itr.hasNext()) {
-				GamlCredential cred = itr.next();
-				if (cred instanceof SignedAssertion) {
-					SignedAssertion sa = (SignedAssertion) cred;
-					try {
-						// (Check 10 seconds into the future so as to avoid the credential
-						// expiring in-flight)
-						sa.checkValidity(new Date(System.currentTimeMillis() + (10 * 1000)));
-					} catch (AttributeExpiredException e) {
-						updated = true;
-						if (sa instanceof RenewableAssertion) {
-							_logger.warn(e.getMessage() + " : Attempting to renew");
-							((RenewableAssertion) sa).renew();
-						} else {
-							_logger.warn(e.getMessage() + " : Discarding");
-						}
+			} else {	
+				// We're in the client role, meaning we can generate our own 
+				// new client identity.
+
+				_logger.warn("Renewing client tool identity.");
+				retval = generateKeyAndCertMaterial();
+				callContext.setActiveKeyAndCertMaterial(retval);
+				updated = true;
+				
+				// Any delegated credentials must be discarded or renewed
+				Iterator<GamlCredential> itr = credentials.iterator();
+				while (itr.hasNext()) {
+					GamlCredential cred = itr.next();
+					if (cred instanceof DelegatedAssertion) {
+							if (cred instanceof RenewableAssertion) {
+								_logger.warn(e.getMessage() + " : Attempting to renew credential " + cred);
+								((RenewableAssertion) cred).renew();
+							} else {
+								_logger.warn("Discarding non-renewable delegated credential " + cred);
+								itr.remove();
+							}
 					}
 				}
 			}
-
-		} catch (CertificateExpiredException e) {
-			// renew the transient message signing creds
-			_logger.warn("Renewing transient message signature credentials and renewable assertions, shedding non-renewable credentials.");
-			setClientKeyAndCertMaterial(callContext, clientKeyMaterial = generateKeyAndCertMaterial());
-			
-			// renew signatures for any signed attribute credentials (otherwise toss 'em)
-			Iterator<GamlCredential> itr = credentials.iterator();
-			while (itr.hasNext()) {
-				GamlCredential cred = itr.next();
+		}
+		
+		// remove stale credentials
+		Iterator<GamlCredential> itr = credentials.iterator();
+		while (itr.hasNext()) {
+			GamlCredential cred = itr.next();
+			try {
+				// (Check 10 seconds into the future so as to avoid the credential
+				// expiring in-flight)
+				cred.checkValidity(new Date(System.currentTimeMillis() + (10 * 1000)));
+			} catch (AttributeExpiredException e) {
+				updated = true;
 				if (cred instanceof RenewableAssertion) {
+					_logger.warn(e.getMessage() + " : Attempting to renew credential " + cred);
 					((RenewableAssertion) cred).renew();
-					updated = true;						
-				} else if (cred instanceof SignedAssertion) {
+				} else {
+					_logger.warn(e.getMessage() + " : Discarding credential " + cred);
 					itr.remove();
-					updated = true;						
 				}
 			}
 		}
@@ -148,34 +166,9 @@ public class ClientUtils
 		} catch (Exception ex) {
 			_logger.warn(ex, ex);
 		}
+		
+		return retval;
 	}
-	
-	/**
-	 * Retrieves the well known key and certificate material in the specified 
-	 * calling context that is to be used for outgoing message security.
-	 * If none has been explicity set, new material is generated.  
-	 */
-	synchronized public static KeyAndCertMaterial getActiveKeyAndCertMaterial(ICallingContext callContext) throws GeneralSecurityException {
-
-		KeyAndCertMaterial clientKeyMaterial = (KeyAndCertMaterial) 
-		callContext.getTransientProperty(CLIENT_KEY_MATERIAL_CALL_CONTEXT_DATA);
-		if (clientKeyMaterial == null) {
-			setClientKeyAndCertMaterial(callContext, clientKeyMaterial = generateKeyAndCertMaterial());
-		}
-		return clientKeyMaterial;
-	}
-	
-	/**
-	 * Explicitly sets the well-known key and certificate material in the 
-	 * specified calling context that is to be used for outgoing message 
-	 * security. 
-	 */
-	public static void setClientKeyAndCertMaterial(
-			ICallingContext callContext, 
-			KeyAndCertMaterial clientKeyMaterial) throws GeneralSecurityException {
-		callContext.setTransientProperty(CLIENT_KEY_MATERIAL_CALL_CONTEXT_DATA, clientKeyMaterial);
-	}	
-	
 	
 	static public Method getLocatorPortTypeMethod(Class<?> locator)
 		throws ResourceException

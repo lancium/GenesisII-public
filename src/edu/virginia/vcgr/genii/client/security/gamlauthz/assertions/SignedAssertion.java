@@ -54,21 +54,6 @@ public abstract class SignedAssertion implements Externalizable, GamlCredential 
 	public abstract X509Certificate[] getAuthorizedIdentity();
 
 	/**
-	 * Checks that the attribute time-valid with respect to the supplied 
-	 * date
-	 */
-	public void checkValidity(Date date) throws AttributeInvalidException {
-		checkValidity(0, date);
-	}
-	
-	/**
-	 * Checks that the assertion is time-valid with respect to the supplied 
-	 * date and any delegation depth requirements are met by the supplied
-	 * delegationDepth.
-	 */
-	abstract public void checkValidity(int delegationDepth, Date date) throws AttributeInvalidException;
-	
-	/**
 	 * Verify the assertion.  It is verified if all signatures successfully
 	 * authenticate the signed-in authorizing identities
 	 */	

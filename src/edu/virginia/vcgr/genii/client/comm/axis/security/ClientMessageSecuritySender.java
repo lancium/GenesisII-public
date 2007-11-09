@@ -149,7 +149,7 @@ public class ClientMessageSecuritySender extends WSDoAllSender implements ISecur
 
     	AbstractCrypto crypto = null;
         try {
-        	KeyAndCertMaterial keyMaterial = ClientUtils.getActiveKeyAndCertMaterial(_callContext);
+        	KeyAndCertMaterial keyMaterial = _callContext.getActiveKeyAndCertMaterial();
         	
         	// create an in-memory keystore for the client's key material
             KeyStore keyStore = KeyStore.getInstance("JKS");

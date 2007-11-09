@@ -25,7 +25,7 @@ public class LogoutTool extends BaseGridTool
 		ICallingContext callContext = ContextManager.getCurrentContext(false);
 		if (callContext != null) {
 			TransientCredentials.globalLogout(callContext);
-			ClientUtils.setClientKeyAndCertMaterial(callContext, null);
+			callContext.setActiveKeyAndCertMaterial(null);
 			ContextManager.storeCurrentContext(callContext);
 		}
 		

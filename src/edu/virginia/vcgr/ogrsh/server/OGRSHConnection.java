@@ -251,7 +251,7 @@ public class OGRSHConnection implements Runnable
 		{
 			ICallingContext ctxt = ContextStreamUtils.load(new URL(rootRNSUrl));
 			_mySession.setCallingContext(ctxt);
-			ClientUtils.getActiveKeyAndCertMaterial(ctxt);
+			ctxt.getActiveKeyAndCertMaterial();
 			return 0;
 		}
 		catch (GeneralSecurityException gse)

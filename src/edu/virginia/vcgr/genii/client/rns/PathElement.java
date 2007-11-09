@@ -59,6 +59,7 @@ public class PathElement implements Externalizable
 	
     public void writeExternal(ObjectOutput out) throws IOException
     {
+    	/** TODO: Possibly make faster/space-efficient */
     	out.writeObject(_nameFromParent);
     	
     	byte []data = EPRUtils.toBytes(_endpoint);

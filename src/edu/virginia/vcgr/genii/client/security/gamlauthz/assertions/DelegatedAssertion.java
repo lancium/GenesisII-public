@@ -90,6 +90,14 @@ public class DelegatedAssertion extends SignedAssertion {
 	public Attribute getAttribute() {
 		return _delegatedAttribute.getSignedAssertion().getAttribute();
 	}
+
+	/**
+	 * Checks that the attribute time-valid with respect to the supplied 
+	 * date
+	 */
+	public void checkValidity(Date date) throws AttributeInvalidException {
+		checkValidity(0, date);
+	}
 	
 	/**
 	 * Checks that the assertion is time-valid with respect to the supplied 

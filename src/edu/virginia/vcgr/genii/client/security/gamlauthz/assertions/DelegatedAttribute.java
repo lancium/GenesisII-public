@@ -88,7 +88,11 @@ public class DelegatedAttribute implements Attribute {
 	 * delegationDepth.
 	 */
 	public void checkValidity(int delegationDepth, Date date) throws AttributeInvalidException {
-		_assertion.checkValidity(delegationDepth + 1, date);
+		if (_assertion instanceof DelegatedAssertion) {
+			((DelegatedAssertion) _assertion).checkValidity(delegationDepth + 1, date);
+		} else {
+			_assertion.checkValidity(date);
+		}
 
 		try {
 			for (X509Certificate cert : _delegateeIdentity) {

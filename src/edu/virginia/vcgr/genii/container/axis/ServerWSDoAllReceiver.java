@@ -387,9 +387,9 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			Certificate[] targetCertChain = (Certificate[]) resource
 					.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
 			if ((targetCertChain != null) && (targetCertChain.length > 0)) {
-				ClientUtils.setClientKeyAndCertMaterial(ContextManager
-						.getCurrentContext(false), new KeyAndCertMaterial(
-						(X509Certificate[]) targetCertChain, _serverPrivateKey));
+				ContextManager.getCurrentContext(false).setActiveKeyAndCertMaterial(
+						new KeyAndCertMaterial((X509Certificate[]) targetCertChain, 
+								_serverPrivateKey));
 			}
 		
 			

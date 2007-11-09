@@ -159,7 +159,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 		} else {
 			// update any stale creds
 			try { 
-				ClientUtils.checkAndRenewCredentials(callContext);
+				ClientUtils.checkAndRenewCredentials(callContext); 
 			} catch (GeneralSecurityException e) {
 				throw new GenesisIISecurityException("Could not prepare outgoing calling context: " + e.getMessage(), e);
 			}	

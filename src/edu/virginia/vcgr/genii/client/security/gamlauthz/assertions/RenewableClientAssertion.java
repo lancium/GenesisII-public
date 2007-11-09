@@ -26,7 +26,7 @@ public class RenewableClientAssertion extends DelegatedAssertion implements Rene
 	 */
 	public void renew() throws GeneralSecurityException {
 		// renew the attribute
-		((RenewableAttribute) _delegatedAttribute).rewew();
+		((RenewableAttribute) _delegatedAttribute).renew();
 
 		// re-sign the attribute
 		_delegatorSignature = SignedAttributeAssertion.sign(_delegatedAttribute, _privateKey);

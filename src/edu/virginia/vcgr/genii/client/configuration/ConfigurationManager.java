@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.client.configuration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
@@ -19,6 +20,9 @@ public class ConfigurationManager
 	
 	// initialized configuration manager (cannot be re-initialized)
 	static private ConfigurationManager _manager = null;
+	
+	static private ArrayList<ConfigurationUnloadedListener> _unloadListeners = 
+		new ArrayList<ConfigurationUnloadedListener>();
 
 	
 	// Place to remember the user directory for holding things like session state
@@ -32,6 +36,16 @@ public class ConfigurationManager
 	private Boolean _isClient = null;
 	
 
+	/** 
+	 * Add a listener to be notified when the current configuration is unloaded
+	 * @param listener
+	 */
+	static synchronized public void addConfigurationUnloadListener(
+			ConfigurationUnloadedListener listener) {
+		
+		_unloadListeners.add(listener);
+	}
+	
 	/**
 	 * Gets the default configuration directory, which is one directory below
 	 * wherever directory is indicated by the install-dir system property. 
@@ -77,8 +91,8 @@ public class ConfigurationManager
 		if (deploymentName != null)
 			return new String(installDir + File.separator + deploymentName);
 		
-		// last but not least.... use INSTALL_DIR/default
-		return new String(installDir + File.separator + "default");
+		// last but not least.... use INSTALL_DIR/deployments/default
+		return new String(installDir + File.separator + "deployments" + File.separator + "default");
 	}
 	
 	/**
@@ -146,6 +160,13 @@ public class ConfigurationManager
 			try {
 				if (_manager == null)
 					throw new RuntimeException("Cannot call reloadConfiguration() before initializing configuration manager first.");
+
+				// notify interested parties that they might want to unload
+				// any cached items from the configuration(s)
+				for (ConfigurationUnloadedListener listener : _unloadListeners) {
+					listener.notifyUnloaded();
+				}
+				
 				_manager = new ConfigurationManager(userDir);
 			}
 			catch (ConfigurationException ce)

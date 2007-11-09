@@ -49,6 +49,7 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
 import edu.virginia.vcgr.genii.container.resource.*;
 import edu.virginia.vcgr.genii.client.resource.*;
 import edu.virginia.vcgr.genii.container.Container;
+import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 
 
 
@@ -241,8 +242,12 @@ public class GamlAuthZHandler extends AuthZHandler {
 					.getTransientProperty(AuthZHandler.CALLING_CONTEXT_CALLER_CERT);
 
 			// get the destination certificate from the calling context
-			X509Certificate[] targetCertChain = 
-				ClientUtils.getActiveKeyAndCertMaterial(ContextManager.getCurrentContext(false))._clientCertChain;
+			KeyAndCertMaterial targetKeyMaterial = 
+				ContextManager.getCurrentContext(false).getActiveKeyAndCertMaterial();
+			X509Certificate[] targetCertChain = null;
+			if (targetKeyMaterial != null) {
+				targetCertChain = targetKeyMaterial._clientCertChain;
+			}
 
 			// try each identity in the transient credentials
 			boolean allowed = false;
@@ -267,7 +272,8 @@ public class GamlAuthZHandler extends AuthZHandler {
 					SignedAssertion.verifyAssertion(signedAssertion);
 
 					// if the assertion is pre-authorized for us, unwrap one layer
-					if (signedAssertion.getAuthorizedIdentity()[0].equals(targetCertChain[0])) {
+					if ((targetCertChain != null) && 
+							(signedAssertion.getAuthorizedIdentity()[0].equals(targetCertChain[0]))) {
 						if (!(signedAssertion instanceof DelegatedAssertion)) {
 							throw new AuthZSecurityException("GAML credential \"" + signedAssertion + "\" does not match the incoming message sender");
 						}	
