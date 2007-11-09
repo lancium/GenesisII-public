@@ -14,7 +14,6 @@ do
 	TMP_FILENAME=/tmp/$USER.shim.$RANDOM
 done
 
-export GENII_USER_DIR=$HOME/.genesisII-jserver
 cd "$JSERVER_LOCATION"
 "./jserver.sh" > $TMP_FILENAME &
 JSERVER_PID=$!
