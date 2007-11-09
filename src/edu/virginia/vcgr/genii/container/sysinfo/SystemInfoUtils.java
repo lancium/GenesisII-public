@@ -24,7 +24,7 @@ public class SystemInfoUtils
 		
 		if (osName.equals("Linux"))
 			_provider = new ProcFilesystemProvider();
-		else if (osName.equals("Windows XP"))
+		else if ((osName.equals("Windows XP")|| osName.equals("Windows 2003")))
 			_provider = new WindowsProvider();
 		else
 			throw new RuntimeException(
