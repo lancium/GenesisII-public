@@ -68,7 +68,6 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
 import edu.virginia.vcgr.genii.container.security.authz.handlers.*;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.security.x509.*;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 
