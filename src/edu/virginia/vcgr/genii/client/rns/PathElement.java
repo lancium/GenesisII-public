@@ -17,8 +17,11 @@ package edu.virginia.vcgr.genii.client.rns;
 
 import org.ws.addressing.EndpointReferenceType;
 import java.io.*;
+import edu.virginia.vcgr.genii.client.ser.*;
 
-import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import org.xml.sax.InputSource;
+
+import javax.xml.namespace.QName;
 
 public class PathElement implements Externalizable 
 {	
@@ -56,34 +59,20 @@ public class PathElement implements Externalizable
 	{
 		return (_nameFromParent == null);
 	}
-	
+
     public void writeExternal(ObjectOutput out) throws IOException
     {
     	/** TODO: Possibly make faster/space-efficient */
     	out.writeObject(_nameFromParent);
-    	
-    	byte []data = EPRUtils.toBytes(_endpoint);
-    	out.writeInt(data.length);
-    	out.write(data);
+    	OutputStreamWriter osw = new OutputStreamWriter((ObjectOutputStream) out);
+    	ObjectSerializer.serialize(osw, _endpoint, new QName("http://vcgr.cs.virginia.edu/Genesis-II", "epr"), true);
+    	osw.flush();
     }
 
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException
-    {
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     	_nameFromParent = (String) in.readObject();
-    	byte []data;
-    	int length = in.readInt();
-    	data = new byte[length];
-    	int position = 0;
-    	int read;
-    	
-    	while (length > 0)
-    	{
-    		read = in.read(data, position, length);
-    		if (read <= 0)
-    			throw new IOException("Unable to read EPR from input stream.");
-    		position += read;
-    		length -= read;
-    	}
-    	_endpoint = EPRUtils.fromBytes(data);
+    	InputStreamReader oir = new InputStreamReader((ObjectInputStream) in);
+    	_endpoint = (EndpointReferenceType) ObjectDeserializer.deserialize(new InputSource(oir), EndpointReferenceType.class);
     }	
+	
 }
