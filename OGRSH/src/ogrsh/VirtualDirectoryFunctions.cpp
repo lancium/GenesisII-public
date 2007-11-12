@@ -110,7 +110,7 @@ namespace ogrsh
 			if (mount != NULL)
 			{
 				// We have another provider, call it.
-				return mount->getDirectoryFunctions()->mkdir(
+				return mount->getDirectoryFunctions()->chmod(
 					subRelativePath, mode);
 			} else
 			{
