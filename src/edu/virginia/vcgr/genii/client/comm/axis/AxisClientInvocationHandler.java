@@ -48,6 +48,7 @@ import java.security.cert.PKIXParameters;
 
 import javax.activation.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
+import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 
 import org.apache.axis.SimpleChain;
@@ -65,6 +66,8 @@ import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.MessageLevelSecurity;
 import edu.virginia.vcgr.genii.client.security.x509.*;
 import edu.virginia.vcgr.genii.client.utils.deployment.DeploymentRelativeFile;
+import edu.virginia.vcgr.genii.client.invoke.IFinalInvoker;
+import edu.virginia.vcgr.genii.client.invoke.InvocationInterceptorManager;
 import edu.virginia.vcgr.genii.client.naming.EPIResolutionCache;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.NameResolutionFailedException;
@@ -79,7 +82,7 @@ import edu.virginia.vcgr.genii.client.comm.axis.security.VcgrSslSocketFactory;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.naming.ReferenceResolver;
 
-public class AxisClientInvocationHandler implements InvocationHandler
+public class AxisClientInvocationHandler implements InvocationHandler, IFinalInvoker
 {
 	
 //----------------------------------------------------------------------------
@@ -471,9 +474,42 @@ public class AxisClientInvocationHandler implements InvocationHandler
 		}
 	}
 	
+	static private InvocationInterceptorManager _manager = null;
+	synchronized static private InvocationInterceptorManager getManager()
+	{
+		try
+		{
+			if (_manager == null)
+			{
+				_manager = (InvocationInterceptorManager)ConfigurationManager.getCurrentConfiguration(
+					).getClientConfiguration().retrieveSection(
+							new QName("http://vcgr.cs.virginia.edu/Genesis-II", "client-pipeline"));
+			}
+			
+			if (_manager == null)
+			{
+				_logger.error("Couldn't find client pipeline configuration.");
+				return new InvocationInterceptorManager();
+			}
+			
+			return _manager;
+		}
+		catch (ConfigurationException ce)
+		{
+			_logger.error("Couldn't find client pipeline configuration.", ce);
+			return new InvocationInterceptorManager();
+		}
+			
+	}
+	public Object invoke(Object target, Method m, Object []params) throws Throwable
+	{
+		InvocationInterceptorManager mgr = getManager();
+		return mgr.invoke(getTargetEPR(), _callContext, this, m, params);
+	}
+	
 	// added resolution code - 1/07 - jfk3w
 	// revamped resolution code 4/11/07 - jfk3w.
-	public Object invoke(Object arg0, Method arg1, Object[] arg2)
+	public Object finalInvoke(Object arg0, Method arg1, Object[] arg2)
 			throws Throwable 
 	{
 		EndpointReferenceType origEPR = getTargetEPR();
