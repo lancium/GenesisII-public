@@ -37,31 +37,39 @@ public class SByteIOResource extends RByteIOResource implements
 		File file = null;
 		Boolean mustDelete = null;
 		
-		if (creationProperties == null)
-			throw new ResourceException(
-				"StreamableByteIO Instances MUST have a file path.");
-		
-		fileAny = (MessageElement)creationProperties.get(FILE_PATH_PROPERTY);
-		//fileAny = (String)creationProperties.get(FILE_PATH_PROPERTY);
-		if (fileAny == null)
-			throw new ResourceException(
-				"StreamableByteIO Instances MUST have a file path " +
-				"element creation property.");
-		deleteAny = (MessageElement)creationProperties.get(MUST_DESTROY_PROPERTY);
-		//deleteAny = (Boolean)creationProperties.get(MUST_DESTROY_PROPERTY);
-		if (deleteAny == null)
-			throw new ResourceException(
-				"StreamableByteIO Instances MUST have a must destroy " +
-				"element creation property.");
-		try
+		if (!isServiceResource())
 		{
-			file = new File(fileAny.getValue());
-			//file = new File(fileAny);
-			mustDelete = Boolean.parseBoolean(deleteAny.getValue());
-		}
-		catch (Exception e)
+			if (creationProperties == null)
+				throw new ResourceException(
+					"StreamableByteIO Instances MUST have a file path.");
+			
+			fileAny = (MessageElement)creationProperties.get(FILE_PATH_PROPERTY);
+			//fileAny = (String)creationProperties.get(FILE_PATH_PROPERTY);
+			if (fileAny == null)
+				throw new ResourceException(
+					"StreamableByteIO Instances MUST have a file path " +
+					"element creation property.");
+			deleteAny = (MessageElement)creationProperties.get(MUST_DESTROY_PROPERTY);
+			//deleteAny = (Boolean)creationProperties.get(MUST_DESTROY_PROPERTY);
+			if (deleteAny == null)
+				throw new ResourceException(
+					"StreamableByteIO Instances MUST have a must destroy " +
+					"element creation property.");
+			try
+			{
+				file = new File(fileAny.getValue());
+				//file = new File(fileAny);
+				mustDelete = Boolean.parseBoolean(deleteAny.getValue());
+			}
+			catch (Exception e)
+			{
+				throw new ResourceException(e.getLocalizedMessage(), e);
+			}
+
+		} else
 		{
-			throw new ResourceException(e.getLocalizedMessage(), e);
+			mustDelete = true;
+			file = super.chooseFile(null);
 		}
 		
 		if (!file.exists())
