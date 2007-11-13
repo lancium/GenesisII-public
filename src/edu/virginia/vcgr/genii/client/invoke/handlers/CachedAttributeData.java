@@ -42,6 +42,13 @@ public class CachedAttributeData
 		this(resp.get_any(), true);
 	}
 	
+	@SuppressWarnings("unchecked")
+	public CachedAttributeData(MessageElement uberDoc)
+	{
+		this((MessageElement[])uberDoc.getChildren().toArray(
+			new MessageElement[0]), true);
+	}
+	
 	public boolean isFull()
 	{
 		return _isFull;

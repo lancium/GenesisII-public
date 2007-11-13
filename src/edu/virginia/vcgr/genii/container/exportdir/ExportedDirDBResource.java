@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
@@ -24,17 +25,21 @@ import org.morgan.util.GUID;
 import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedFileUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.MessageElementUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
+import edu.virginia.vcgr.genii.common.rattrs.GetAttributesDocumentResponse;
 import edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
 import edu.virginia.vcgr.genii.container.Container;
+import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -186,7 +191,12 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		for (ExportedDirEntry nextEntry : syncedEntries)
 		{
 			if (p.matcher(nextEntry.getName()).matches())
+			{
+				// We are going to pre-fill in the attributes document for this entry
+				// so that we can send it back for pre-fetching.
+				fillInAttributes(nextEntry);
 				ret.add(nextEntry);
+			}
 		}
 		
 		return ret;
@@ -841,6 +851,56 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		{
 			close(rs);
 			close(stmt);
+		}
+	}
+	
+	static private void fillInAttributes(ExportedDirEntry entry)
+		throws ContextException
+	{
+		EndpointReferenceType entryTarget = entry.getEntryReference();
+		
+		try
+		{
+			WorkingContext.temporarilyAssumeNewIdentity(entryTarget);
+			ExportedFileServiceImpl fileService = new ExportedFileServiceImpl();
+			GetAttributesDocumentResponse resp = fileService.getAttributesDocument(null);
+			MessageElement []newAttrs = resp.get_any();
+			if (newAttrs == null || newAttrs.length == 0)
+				return;
+			
+			MessageElement metaData = new MessageElement(GenesisIIConstants.RNS_CACHED_METADATA_DOCUMENT_QNAME);
+			for (MessageElement child : newAttrs)
+			{
+				metaData.addChild(child);
+			}
+			
+			MessageElement []attrs = entry.getAttributes();
+			if (attrs == null || attrs.length == 0)
+				entry.setAttributes(new MessageElement[] { metaData } );
+			else
+			{
+				MessageElement []ret = new MessageElement[attrs.length + 1];
+				ret[0] = metaData;
+				System.arraycopy(attrs, 0, ret, 1, attrs.length);
+				entry.setAttributes(ret);
+			}
+		}
+		catch (SOAPException se)
+		{
+			// Something is seriously wrong, but we'll continue on because 
+			// this is just for caching right now anyways.
+			_logger.warn("Unknown exception occurred while trying to " +
+				"insert ExportedFile metadata into cache return.", se);
+		}
+		catch (RemoteException re)
+		{
+			// Something is seriously wrong, but we'll continue on because 
+			// this is just for caching right now anyways.
+			_logger.warn("Exception occurred while trying to get ExportedFile metadata for caching purposes.", re);
+		}
+		finally
+		{
+			WorkingContext.releaseAssumedIdentity();
 		}
 	}
 }

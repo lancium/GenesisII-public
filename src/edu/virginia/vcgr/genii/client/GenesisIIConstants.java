@@ -92,4 +92,6 @@ public class GenesisIIConstants
 	static public final String DEPLOYMENT_NAME_ENVIRONMENT_VARIABLE =
 		"GENII_DEPLOYMENT_NAME";
 
+	static public QName RNS_CACHED_METADATA_DOCUMENT_QNAME =
+		new QName(GENESISII_NS, "rns-cached-metadata");
 }

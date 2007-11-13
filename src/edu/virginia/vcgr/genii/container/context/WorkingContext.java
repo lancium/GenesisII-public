@@ -3,10 +3,12 @@ package edu.virginia.vcgr.genii.container.context;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Stack;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
+import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -24,34 +26,74 @@ public class WorkingContext implements Closeable, Cloneable
 	static public final String CERT_CHAIN_KEY = "cert-chain-key"; 
 	static public final String EPI_KEY = "epi-key"; 
 		
-	static private ThreadLocal<WorkingContext> _currentWorkingContext =
-		new ThreadLocal<WorkingContext>();
+	static private ThreadLocal<Stack<WorkingContext>> _currentWorkingContext =
+		new ThreadLocal<Stack<WorkingContext>>();
 	
 	private boolean _closed = false;
 	private boolean _succeeded = true;
 	
 	static public boolean hasCurrentWorkingContext()
 	{
-		return _currentWorkingContext.get() != null;
+		return (_currentWorkingContext.get() != null)
+			&& (!_currentWorkingContext.get().isEmpty());
 	}
 	
 	static public WorkingContext getCurrentWorkingContext()
 		throws ContextException
 	{
-		WorkingContext ret = _currentWorkingContext.get();
-		if (ret == null)
+		Stack<WorkingContext> stack = _currentWorkingContext.get();
+		if (stack == null || stack.isEmpty())
 			throw new ContextException("Working context is null.");
+		
+		WorkingContext ret = stack.peek();
 		
 		return ret;
 	}
 	
 	static public void setCurrentWorkingContext(WorkingContext ctxt)
 	{
-		WorkingContext ret = _currentWorkingContext.get();
-		_currentWorkingContext.set(ctxt);
+		Stack<WorkingContext> stack = _currentWorkingContext.get();
+		Stack<WorkingContext> newStack = new Stack<WorkingContext>();
+		_currentWorkingContext.set(newStack);
+		newStack.push(ctxt);
 		
-		if (ret != null)
-			StreamUtils.close(ret);
+		if (stack != null)
+		{
+			while (!stack.isEmpty())
+			{
+				StreamUtils.close(stack.pop());
+			}
+		}
+	}
+	
+	static public void temporarilyAssumeNewIdentity(EndpointReferenceType newTarget)
+		throws ContextException
+	{
+		Stack<WorkingContext> stack = _currentWorkingContext.get();
+		if (stack == null || stack.isEmpty())
+			throw new ContextException("Working context is null.");
+		
+		String serviceName = newTarget.getAddress().get_value().toString();
+		int index = serviceName.lastIndexOf('/');
+		if (index < 0)
+			throw new ContextException("Couldn't determine service name for service at URI \"" +
+				serviceName + "\".");
+		serviceName = serviceName.substring(index + 1);
+		WorkingContext newContext = (WorkingContext)stack.peek().clone();
+		newContext.setProperty(EPR_PROPERTY_NAME, newTarget);
+		newContext.setProperty(TARGETED_SERVICE_NAME, serviceName);
+		stack.push(newContext);
+	}
+	
+	static public void releaseAssumedIdentity() throws ContextException
+	{
+		Stack<WorkingContext> stack = _currentWorkingContext.get();
+		if (stack == null || stack.isEmpty())
+			throw new ContextException("Working context is null.");
+		WorkingContext old = stack.pop();
+		StreamUtils.close(old);
+		if (stack.isEmpty())
+			throw new ContextException("Working context stack underflow.");
 	}
 	
 	private HashMap<String, Object> _properties = new HashMap<String, Object>();
