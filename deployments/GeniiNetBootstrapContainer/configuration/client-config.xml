@@ -24,6 +24,8 @@
 			class="org.morgan.util.configuration.ClassConfigurationSectionHandler"/>
 		<mconf:config-section name="genii:global-properties"
 			class="org.morgan.util.configuration.PropertiesConfigurationSectionHandler"/>
+		<mconf:config-section name="genii:client-pipeline"
+			class="edu.virginia.vcgr.genii.client.invoke.ClientPipelineSectionHandler"/>
 	</mconf:config-sections>
 	
 	<genii:global-properties>
@@ -178,6 +180,13 @@
 		<mconf:instance name="exception-handler"
 			type="edu.virginia.vcgr.genii.client.cmd.SimpleExceptionHandler"
 			base="edu.virginia.vcgr.genii.client.cmd.IExceptionHandler"/>
+			
+		<mconf:instance name="debug-list-handler"
+			type="edu.virginia.vcgr.genii.client.invoke.handlers.DebugListHandler"
+			base="java.lang.Object"/>
+		<mconf:instance name="attribute-cache"
+			type="edu.virginia.vcgr.genii.client.invoke.handlers.AttributeCacheHandler"
+			base="java.lang.Object"/>
 	</genii:configured-instances>
 
 	<genii:tools>
@@ -274,4 +283,8 @@
 		<mconf:class name="xmldb-query"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.InfoSQueryTool</mconf:class>
 	</genii:tools>
+	
+	<genii:client-pipeline>
+		<genii:pipeline-handler>attribute-cache</genii:pipeline-handler>
+	</genii:client-pipeline>
 </mconf:configuration>
