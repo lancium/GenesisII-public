@@ -89,7 +89,7 @@ public class TimedOutLRUCache<KeyType, DataType>
 		}
 		
 		if (_timeoutTail._invalidationDate.before(
-			node._invalidationDate) || _timeoutTail._invalidationDate.equals(node._invalidationDate)))
+			node._invalidationDate) || _timeoutTail._invalidationDate.equals(node._invalidationDate))
 		{
 			node._timeoutPrev = _timeoutTail;
 			node._timeoutNext = null;
