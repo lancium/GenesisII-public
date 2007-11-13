@@ -44,11 +44,6 @@ public class TimedOutLRUCache<KeyType, DataType>
 			_invalidationDate = new Date(
 				new Date().getTime() + timeoutMS);
 		}
-		
-		protected void setInvalidationDate(Date newDate)
-		{
-			_invalidationDate = newDate;
-		}
 	}
 	
 	private int _maxElements;
@@ -76,6 +71,8 @@ public class TimedOutLRUCache<KeyType, DataType>
 		}
 		
 		// hook it back in at the tail
+		if (_lruTail != null)
+			_lruTail._lruNext = node;
 		node._lruPrev = _lruTail;
 		node._lruNext = null;
 		_lruTail = node;
@@ -112,7 +109,7 @@ public class TimedOutLRUCache<KeyType, DataType>
 		Node<KeyType, DataType> preElement = _timeoutTail;
 		while (true)
 		{
-			preElement = _timeoutTail._timeoutPrev;
+			preElement = preElement._timeoutPrev;
 			if (preElement._invalidationDate.before(
 				node._invalidationDate))
 			{
