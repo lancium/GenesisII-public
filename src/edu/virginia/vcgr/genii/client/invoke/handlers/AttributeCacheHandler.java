@@ -31,7 +31,7 @@ public class AttributeCacheHandler
 {
 	static private Log _logger = LogFactory.getLog(AttributeCacheHandler.class);
 	
-	static private final int _MAX_CACHE_ELEMENTS = 256;
+	static private final int _MAX_CACHE_ELEMENTS = 64;
 	static private final long _DEFAULT_TIMEOUT_MS = 1000 * 45;
 	
 	private TimedOutLRUCache<WSName, CachedAttributeData> _attrCache =
