@@ -95,7 +95,18 @@ public class OGRSHListingCache
 			if (ret != null)
 				return new ListResponse(new EntryType[] { ret } );
 			
-			return (ListResponse)ctxt.proceed();
+			ListResponse resp = (ListResponse)ctxt.proceed();
+			EntryType []entries = resp.getEntryList();
+			
+			if ((entries != null) && (entries.length == 1))
+			{
+				synchronized(_entryCache)
+				{
+					_entryCache.put(key, entries[0]);
+				}
+			}
+			
+			return resp;
 		}
 	}
 }
