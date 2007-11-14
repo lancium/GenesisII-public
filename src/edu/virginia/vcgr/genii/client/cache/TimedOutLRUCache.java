@@ -27,6 +27,7 @@ public class TimedOutLRUCache<KeyType, DataType>
 	
 	private int _maxElements;
 	private long _defaultTimeoutMS;
+	private Thread _activeTimeoutThread = null;
 	
 	public TimedOutLRUCache(int maxElements, long defaultTimeoutMS)
 	{
@@ -40,32 +41,53 @@ public class TimedOutLRUCache<KeyType, DataType>
 		_timeoutList = new TimeoutList<KeyType, DataType>();
 	}
 	
+	public void activelyTimeoutElements(boolean activelyTimeout)
+	{
+		synchronized(_map)
+		{
+			if (_activeTimeoutThread == null)
+			{
+				if (activelyTimeout)
+					startActiveTimeout();
+			} else
+			{
+				if (!activelyTimeout)
+					stopActiveTimeout();
+			}
+		}
+	}
+	
 	public void put(KeyType key, DataType data, long timeoutMS)
 	{
 		RoleBasedCacheNode<KeyType, DataType> newNode =
 			new RoleBasedCacheNode<KeyType, DataType>(key, data, 
 				new Date(System.currentTimeMillis() + timeoutMS));
 		
-		RoleBasedCacheNode<KeyType, DataType> oldNode = _map.remove(key);
-		if (oldNode != null)
+		synchronized(_map)
 		{
-			_lruList.remove(oldNode);
-			_timeoutList.remove(oldNode);
+			RoleBasedCacheNode<KeyType, DataType> oldNode = _map.remove(key);
+			if (oldNode != null)
+			{
+				_lruList.remove(oldNode);
+				_timeoutList.remove(oldNode);
+			}
+			
+			if (_map.size() >= _maxElements)
+				clearStale();
+			
+			while (_map.size() >= _maxElements)
+			{
+				RoleBasedCacheNode<KeyType, DataType> node = _lruList.removeFirst();
+				_timeoutList.remove(node);
+				_map.remove(node.getKey());
+			}
+			
+			_map.put(key, newNode);
+			_lruList.insert(newNode);
+			_timeoutList.insert(newNode);
+			
+			_map.notify();
 		}
-		
-		if (_map.size() >= _maxElements)
-			clearStale();
-		
-		while (_map.size() >= _maxElements)
-		{
-			RoleBasedCacheNode<KeyType, DataType> node = _lruList.removeFirst();
-			_timeoutList.remove(node);
-			_map.remove(node.getKey());
-		}
-		
-		_map.put(key, newNode);
-		_lruList.insert(newNode);
-		_timeoutList.insert(newNode);
 	}
 	
 	public void put(KeyType key, DataType data)
@@ -76,60 +98,124 @@ public class TimedOutLRUCache<KeyType, DataType>
 	public DataType get(KeyType key)
 	{
 		Date now = new Date();
-		RoleBasedCacheNode<KeyType, DataType> node = _map.get(key);
-		if (node == null)
-			return null;
 		
-		_lruList.remove(node);
-		
-		if (node.getInvalidationDate().before(now))
+		synchronized(_map)
 		{
-			// stale
-			_map.remove(key);
-			_timeoutList.remove(node);
-			return null;
-		}
+			RoleBasedCacheNode<KeyType, DataType> node = _map.get(key);
+			if (node == null)
+				return null;
+			
+			_lruList.remove(node);
+			
+			if (node.getInvalidationDate().before(now))
+			{
+				// stale
+				_map.remove(key);
+				_timeoutList.remove(node);
+				return null;
+			}
+			
+			_lruList.insert(node);
 		
-		_lruList.insert(node);
-		return node.getData();
+			return node.getData();
+		}
 	}
 	
 	public void clearStale()
 	{
 		Date now = new Date();
 		
-		while (true)
+		synchronized(_map)
 		{
-			RoleBasedCacheNode<KeyType, DataType> node = _timeoutList.peekFirst();
-			if (node == null)
-				break;
-			
-			if (node.getInvalidationDate().compareTo(now) <= 0)
+			while (true)
 			{
-				_map.remove(node.getKey());
-				_timeoutList.removeFirst();
-				_lruList.remove(node);
-			} else
-			{
-				break;
+				RoleBasedCacheNode<KeyType, DataType> node = _timeoutList.peekFirst();
+				if (node == null)
+					break;
+				
+				if (node.getInvalidationDate().compareTo(now) <= 0)
+				{
+					_map.remove(node.getKey());
+					_timeoutList.removeFirst();
+					_lruList.remove(node);
+				} else
+				{
+					break;
+				}
 			}
 		}
 	}
 	
 	public void remove(KeyType key)
 	{
-		RoleBasedCacheNode<KeyType, DataType> node = _map.remove(key);
-		if (node != null)
+		synchronized(_map)
 		{
-			_lruList.remove(node);
-			_timeoutList.remove(node);
+			RoleBasedCacheNode<KeyType, DataType> node = _map.remove(key);
+			if (node != null)
+			{
+				_lruList.remove(node);
+				_timeoutList.remove(node);
+			}
 		}
 	}
 	
 	public void clear()
 	{
-		_map.clear();
-		_lruList.clear();
-		_timeoutList.clear();
+		synchronized(_map)
+		{
+			_map.clear();
+			_lruList.clear();
+			_timeoutList.clear();
+		}
+	}
+	
+	public void startActiveTimeout()
+	{
+		_activeTimeoutThread = new Thread(
+			new ActiveTimeoutWorker(), "Active Cache Timeout Thread");
+		_activeTimeoutThread.setDaemon(true);
+		_activeTimeoutThread.start();
+	}
+	
+	public void stopActiveTimeout()
+	{
+		Thread tmp = _activeTimeoutThread;
+		_activeTimeoutThread = null;
+		synchronized(_map)
+		{
+			_map.notify();
+		}
+		
+		try { tmp.join(); } catch (InterruptedException cause) {}
+	}
+	
+	private class ActiveTimeoutWorker implements Runnable
+	{
+		public void run()
+		{
+			synchronized(_map)
+			{
+				while (_activeTimeoutThread != null)
+				{
+					try
+					{
+						clearStale();
+						RoleBasedCacheNode<KeyType, DataType> firstNode = _timeoutList.peekFirst();
+						if (firstNode == null)
+							_map.wait();
+						else
+						{
+							Date nextStale = firstNode.getInvalidationDate();
+							long timeout = nextStale.getTime() - System.currentTimeMillis();
+							if (timeout > 0)
+								_map.wait(timeout);
+						}
+					}
+					catch (InterruptedException ie)
+					{
+					}
+				}
+			}
+		}
 	}
 }
