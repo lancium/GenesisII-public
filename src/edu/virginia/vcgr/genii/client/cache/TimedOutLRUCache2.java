@@ -100,6 +100,16 @@ public class TimedOutLRUCache2<KeyType, DataType>
 		}
 	}
 	
+	public void remove(KeyType key)
+	{
+		RoleBasedCacheNode<KeyType, DataType> node = _map.remove(key);
+		if (node != null)
+		{
+			_lruList.remove(node);
+			_timeoutList.remove(node);
+		}
+	}
+	
 	public void clear()
 	{
 		_map.clear();
