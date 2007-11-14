@@ -16,7 +16,6 @@ import org.oasis_open.docs.wsrf.rp_2.GetMultipleResourcePropertiesResponse;
 import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyResponse;
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.invoke.InvocationContext;
@@ -32,7 +31,7 @@ public class AttributeCacheHandler
 {
 	static private Log _logger = LogFactory.getLog(AttributeCacheHandler.class);
 	
-	static private final int _MAX_CACHE_ELEMENTS = 64;
+	static private final int _MAX_CACHE_ELEMENTS = 1024;
 	static private final long _DEFAULT_TIMEOUT_MS = 1000 * 45;
 	
 	private TimedOutLRUCache<WSName, CachedAttributeData> _attrCache =
