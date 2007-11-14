@@ -44,7 +44,7 @@ public class OGRSHListingCache
 		{
 			return (_hashCode == other._hashCode) &&
 				_dirName.equals(other._dirName) &&
-				(_entryName == other._entryName);
+				(_entryName.equals(other._entryName));
 		}
 		
 		public boolean equals(Object other)
