@@ -49,6 +49,11 @@ public class CachedAttributeData
 			new MessageElement[0]), true);
 	}
 	
+	public CachedAttributeData(Collection<MessageElement> attrs)
+	{
+		this(attrs.toArray(new MessageElement[0]), false);
+	}
+	
 	public boolean isFull()
 	{
 		return _isFull;

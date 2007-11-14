@@ -17,6 +17,7 @@ import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyResponse;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.invoke.InvocationContext;
 import edu.virginia.vcgr.genii.client.invoke.PipelineProcessor;
@@ -172,6 +173,10 @@ public class AttributeCacheHandler
 		// We're going to let the list proceed, and then see if any meta data came back with it.
 		ListResponse resp = (ListResponse)ctxt.proceed();
 		
+		QName xferMechs = new QName(ByteIOConstants.RANDOM_BYTEIO_NS,
+			ByteIOConstants.XFER_MECHS_ATTR_NAME);
+		QName size = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.SIZE_ATTR_NAME);
+		
 		for (EntryType entry : resp.getEntryList())
 		{
 			WSName name = new WSName(entry.getEntry_reference());
@@ -180,16 +185,20 @@ public class AttributeCacheHandler
 				MessageElement []any = entry.get_any();
 				if (any != null)
 				{
+					ArrayList<MessageElement> cachedAttrs = new ArrayList<MessageElement>();
 					for (MessageElement elem : any)
 					{
-						if (elem.getQName().equals(GenesisIIConstants.RNS_CACHED_METADATA_DOCUMENT_QNAME))
+						QName elemName = elem.getQName();
+						if (elemName.equals(xferMechs) || elemName.equals(size))
 						{
-							CachedAttributeData data = new CachedAttributeData(elem);
-							synchronized(_attrCache)
-							{
-								_attrCache.put(name, data);
-							}
+							cachedAttrs.add(elem);
 						}
+					}
+					
+					CachedAttributeData data = new CachedAttributeData(cachedAttrs);
+					synchronized(_attrCache)
+					{
+						_attrCache.put(name, data);
 					}
 				}
 			}

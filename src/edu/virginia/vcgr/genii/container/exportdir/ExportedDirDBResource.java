@@ -15,7 +15,6 @@ import java.util.Iterator;
 import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPException;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
@@ -25,21 +24,19 @@ import org.morgan.util.GUID;
 import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
-import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedFileUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.MessageElementUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
-import edu.virginia.vcgr.genii.common.rattrs.GetAttributesDocumentResponse;
 import edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
 import edu.virginia.vcgr.genii.container.Container;
-import edu.virginia.vcgr.genii.container.context.WorkingContext;
+import edu.virginia.vcgr.genii.container.byteio.RandomByteIOAttributeHandlers;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -854,9 +851,36 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		}
 	}
 	
-	static private void fillInAttributes(ExportedDirEntry entry)
-		throws ContextException
+	private void fillInAttributes(ExportedDirEntry entry)
+		throws ResourceException
 	{
+		File entryFile = new File(getLocalPath(), entry.getName());
+		if (!entryFile.exists())
+			return;
+		
+		ArrayList<MessageElement> attrs = new ArrayList<MessageElement>();
+		MessageElement []attrsA = entry.getAttributes();
+		if (attrsA != null)
+		{
+			for (MessageElement attr : attrsA)
+				attrs.add(attr);
+		}
+		
+		QName transMechName = new QName(RandomByteIOAttributeHandlers.RANDOM_BYTEIO_NS,
+			"TransferMechanism");
+		attrs.add(new MessageElement(
+			new QName(ByteIOConstants.RANDOM_BYTEIO_NS, 
+				ByteIOConstants.SIZE_ATTR_NAME), entryFile.length()));
+		attrs.add(new MessageElement(transMechName,
+			ByteIOConstants.TRANSFER_TYPE_SIMPLE_URI));
+		attrs.add(new MessageElement(transMechName,
+			ByteIOConstants.TRANSFER_TYPE_DIME_URI));
+		attrs.add(new MessageElement(transMechName,
+			ByteIOConstants.TRANSFER_TYPE_MTOM_URI));
+		
+		entry.setAttributes(attrs.toArray(new MessageElement[0]));
+		
+		/* This would get the entire attributes document which is TOO BIG for now.
 		EndpointReferenceType entryTarget = entry.getEntryReference();
 		
 		try
@@ -902,5 +926,6 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		{
 			WorkingContext.releaseAssumedIdentity();
 		}
+		*/
 	}
 }
