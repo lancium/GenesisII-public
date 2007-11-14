@@ -37,6 +37,11 @@ public class AttributeCacheHandler
 	private TimedOutLRUCache<WSName, CachedAttributeData> _attrCache =
 		new TimedOutLRUCache<WSName, CachedAttributeData>(_MAX_CACHE_ELEMENTS, _DEFAULT_TIMEOUT_MS);
 	
+	public AttributeCacheHandler()
+	{
+		_attrCache.activelyTimeoutElements(true);
+	}
+	
 	private Collection<MessageElement> findAttributes(QName []attrs, CachedAttributeData data)
 	{
 		Collection<MessageElement> ret = new ArrayList<MessageElement>();
