@@ -1,5 +1,7 @@
 package edu.virginia.vcgr.genii.client.invoke.handlers;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.EntryType;
 import org.ggf.rns.List;
 import org.ggf.rns.ListResponse;
@@ -13,6 +15,8 @@ import edu.virginia.vcgr.genii.client.naming.WSName;
 
 public class OGRSHListingCache
 {
+	static private Log _logger = LogFactory.getLog(OGRSHListingCache.class);
+	
 	static private final int _MAX_CACHE_ELEMENTS = 1024;
 	static private final long _DEFAULT_TIMEOUT_MS = 1000 * 5;
 	
@@ -50,6 +54,11 @@ public class OGRSHListingCache
 			
 			return equals((EntryKey)other);
 		}
+		
+		public String toString()
+		{
+			return "[" + _dirName.getEndpointIdentifier() + ":" + _entryName + "]";
+		}
 	}
 	
 	private TimedOutLRUCache<EntryKey, EntryType> _entryCache =
@@ -71,10 +80,13 @@ public class OGRSHListingCache
 		String exp = listRequest.getEntry_name_regexp();
 		if (exp.equals(".*"))
 		{
+			_logger.info("Looking up all entries of directory \"" + dirName.getEndpointIdentifier() + "\".");
+			
 			ListResponse resp = (ListResponse)ctxt.proceed();
 			for (EntryType entry : resp.getEntryList())
 			{
 				EntryKey key = new EntryKey(dirName, entry.getEntry_name());
+				_logger.info("Putting entry " + key + " into the cache.");
 				synchronized(_entryCache)
 				{
 					_entryCache.put(key, entry);
@@ -87,19 +99,25 @@ public class OGRSHListingCache
 			EntryKey key = new EntryKey(dirName, exp);
 			EntryType ret;
 			
+			_logger.info("Looking for " + key + " in the cache.");
 			synchronized(_entryCache)
 			{
 				ret = _entryCache.get(key);
 			}
 			
 			if (ret != null)
+			{
+				_logger.info("Found entry " + key + " in the cache.");
 				return new ListResponse(new EntryType[] { ret } );
+			}
 			
+			_logger.info("Lookup up entry \"" + exp + "\" in directory \"" + dirName.getEndpointIdentifier() + "\".");
 			ListResponse resp = (ListResponse)ctxt.proceed();
 			EntryType []entries = resp.getEntryList();
 			
 			if ((entries != null) && (entries.length == 1))
 			{
+				_logger.info("Adding entry " + key + " to the cache.");
 				synchronized(_entryCache)
 				{
 					_entryCache.put(key, entries[0]);
