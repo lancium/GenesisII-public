@@ -17,7 +17,7 @@ import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyResponse;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
-import edu.virginia.vcgr.genii.client.cache.TimedOutLRUCache2;
+import edu.virginia.vcgr.genii.client.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.invoke.InvocationContext;
 import edu.virginia.vcgr.genii.client.invoke.PipelineProcessor;
 import edu.virginia.vcgr.genii.client.naming.WSName;
@@ -34,8 +34,8 @@ public class AttributeCacheHandler
 	static private final int _MAX_CACHE_ELEMENTS = 64;
 	static private final long _DEFAULT_TIMEOUT_MS = 1000 * 45;
 	
-	private TimedOutLRUCache2<WSName, CachedAttributeData> _attrCache =
-		new TimedOutLRUCache2<WSName, CachedAttributeData>(_MAX_CACHE_ELEMENTS, _DEFAULT_TIMEOUT_MS);
+	private TimedOutLRUCache<WSName, CachedAttributeData> _attrCache =
+		new TimedOutLRUCache<WSName, CachedAttributeData>(_MAX_CACHE_ELEMENTS, _DEFAULT_TIMEOUT_MS);
 	
 	private Collection<MessageElement> findAttributes(QName []attrs, CachedAttributeData data)
 	{

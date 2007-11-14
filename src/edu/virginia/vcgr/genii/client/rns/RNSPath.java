@@ -33,7 +33,7 @@ import org.morgan.util.configuration.ConfigurationException;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.cache.TimedOutLRUCache2;
+import edu.virginia.vcgr.genii.client.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
@@ -59,7 +59,7 @@ public class RNSPath implements Externalizable  {
 
 	static private Log _logger = LogFactory.getLog(RNSPath.class);
 
-	static private TimedOutLRUCache2<LookupKey, EntryType[]> _lookupCache = new TimedOutLRUCache2<LookupKey, EntryType[]>(
+	static private TimedOutLRUCache<LookupKey, EntryType[]> _lookupCache = new TimedOutLRUCache<LookupKey, EntryType[]>(
 			1024, 0);
 
 	static private EntryType[] lookupContents(EndpointReferenceType epr,

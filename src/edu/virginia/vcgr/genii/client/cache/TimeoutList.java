@@ -1,6 +1,6 @@
 package edu.virginia.vcgr.genii.client.cache;
 
-public class TimeoutList<KeyType, DataType> extends CacheList<KeyType, DataType>
+class TimeoutList<KeyType, DataType> extends CacheList<KeyType, DataType>
 {
 	public TimeoutList()
 	{

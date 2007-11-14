@@ -20,7 +20,7 @@ import java.net.URI;
 
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.cache.TimedOutLRUCache2;
+import edu.virginia.vcgr.genii.client.cache.TimedOutLRUCache;
 
 /**
  * The EPIResolutionCache class to maintain a cache of resolved EPRs for EPIs.  The methods
@@ -30,8 +30,8 @@ import edu.virginia.vcgr.genii.client.cache.TimedOutLRUCache2;
  */
 public class EPIResolutionCache
 {
-	static private TimedOutLRUCache2<URI, EndpointReferenceType>
-		_cache = new TimedOutLRUCache2<URI, EndpointReferenceType>(
+	static private TimedOutLRUCache<URI, EndpointReferenceType>
+		_cache = new TimedOutLRUCache<URI, EndpointReferenceType>(
 			1024, 1000*60*60*24);
 		
 	

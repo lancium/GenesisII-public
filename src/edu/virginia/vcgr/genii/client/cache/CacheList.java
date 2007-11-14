@@ -1,6 +1,6 @@
 package edu.virginia.vcgr.genii.client.cache;
 
-public abstract class CacheList<KeyType, DataType>
+abstract class CacheList<KeyType, DataType>
 {
 	protected int _myRole;
 	

@@ -1,6 +1,6 @@
 package edu.virginia.vcgr.genii.client.cache;
 
-public class LRUList<KeyType, DataType> extends CacheList<KeyType, DataType>
+class LRUList<KeyType, DataType> extends CacheList<KeyType, DataType>
 {
 	public LRUList()
 	{

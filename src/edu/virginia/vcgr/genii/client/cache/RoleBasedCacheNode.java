@@ -2,7 +2,7 @@ package edu.virginia.vcgr.genii.client.cache;
 
 import java.util.Date;
 
-public class RoleBasedCacheNode<KeyType, DataType>
+class RoleBasedCacheNode<KeyType, DataType>
 {
 	static public final int ROLE_LRU = 0;
 	static public final int ROLE_TIMEOUT = 1;
