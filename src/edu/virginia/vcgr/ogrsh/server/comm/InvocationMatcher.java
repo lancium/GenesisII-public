@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
+import java.util.Date;
 import java.util.HashMap;
 
 import org.apache.commons.logging.Log;
@@ -74,10 +75,12 @@ public class InvocationMatcher
 	public Object invoke(ByteBuffer request) throws OGRSHException
 	{
 		DefaultOGRSHReadBuffer requestReader = new DefaultOGRSHReadBuffer(request);
+		StringBuilder builder = new StringBuilder(512);
 		
 		try
 		{
 			String invocationName = String.class.cast(requestReader.readObject());
+			builder.append(invocationName + " [" + new Date() + ", ");
 			HandlerInformation hInfo = _handlers.get(invocationName);
 			if (hInfo == null)
 				throw new OGRSHException("Requested function \"" + invocationName 
@@ -115,6 +118,11 @@ public class InvocationMatcher
 			_logger.error("Invalid handler found.", iae);
 			throw new OGRSHException("Invalid handler found.",
 				OGRSHException.EXCEPTION_UNKNOWN);
+		}
+		finally
+		{
+			builder.append(new Date().toString() + "]");
+			System.err.println(builder);
 		}
 	}
 }
