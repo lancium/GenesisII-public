@@ -75,12 +75,13 @@ public class InvocationMatcher
 	public Object invoke(ByteBuffer request) throws OGRSHException
 	{
 		DefaultOGRSHReadBuffer requestReader = new DefaultOGRSHReadBuffer(request);
-		StringBuilder builder = new StringBuilder(512);
+		String invocationName = null;
+		long startTime = 0L;
 		
 		try
 		{
-			String invocationName = String.class.cast(requestReader.readObject());
-			builder.append(invocationName + " [" + new Date() + ", ");
+			invocationName = String.class.cast(requestReader.readObject());
+			startTime = System.currentTimeMillis();
 			HandlerInformation hInfo = _handlers.get(invocationName);
 			if (hInfo == null)
 				throw new OGRSHException("Requested function \"" + invocationName 
@@ -121,8 +122,7 @@ public class InvocationMatcher
 		}
 		finally
 		{
-			builder.append(new Date().toString() + "]");
-			System.err.println(builder);
+			System.err.println(invocationName + ":  " + (System.currentTimeMillis() - startTime) + " ms.");
 		}
 	}
 }
