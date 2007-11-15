@@ -72,6 +72,7 @@ public class InvocationMatcher
 		}
 	}
 	
+	private long _lastEndTime = 0;
 	public Object invoke(ByteBuffer request) throws OGRSHException
 	{
 		DefaultOGRSHReadBuffer requestReader = new DefaultOGRSHReadBuffer(request);
@@ -82,6 +83,9 @@ public class InvocationMatcher
 		{
 			invocationName = String.class.cast(requestReader.readObject());
 			startTime = System.currentTimeMillis();
+			if (_lastEndTime > 0)
+				System.err.println("\t\t" + (startTime - _lastEndTime) + " ms.");
+			
 			HandlerInformation hInfo = _handlers.get(invocationName);
 			if (hInfo == null)
 				throw new OGRSHException("Requested function \"" + invocationName 
@@ -122,7 +126,8 @@ public class InvocationMatcher
 		}
 		finally
 		{
-			System.err.println(invocationName + ":  " + (System.currentTimeMillis() - startTime) + " ms.");
+			_lastEndTime = System.currentTimeMillis();
+			System.err.println(invocationName + ":\t" + (_lastEndTime - startTime) + " ms.");
 		}
 	}
 }
