@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
-import java.util.Date;
 import java.util.HashMap;
 
 import org.apache.commons.logging.Log;
@@ -84,7 +83,7 @@ public class InvocationMatcher
 			invocationName = String.class.cast(requestReader.readObject());
 			startTime = System.currentTimeMillis();
 			if (_lastEndTime > 0)
-				System.err.println("\t\t" + (startTime - _lastEndTime) + " ms.");
+				_logger.debug("\t\t" + (startTime - _lastEndTime) + " ms.");
 			
 			HandlerInformation hInfo = _handlers.get(invocationName);
 			if (hInfo == null)
@@ -127,7 +126,7 @@ public class InvocationMatcher
 		finally
 		{
 			_lastEndTime = System.currentTimeMillis();
-			System.err.println(invocationName + ":\t" + (_lastEndTime - startTime) + " ms.");
+			_logger.debug(invocationName + ":\t" + (_lastEndTime - startTime) + " ms.");
 		}
 	}
 }
