@@ -202,7 +202,7 @@ public class DirectoryHandler
 			RNSPath full = currentPath.lookup(fullpath, RNSPathQueryFlags.MUST_EXIST);
 			_logger.debug("lookup too " + watch.lap() + " seconds.");
 			TypeInformation ti = new TypeInformation(full.getEndpoint());
-			_logger.debug("TypeInformation.[init] took " + watch.lap() " + seconds.");
+			_logger.debug("TypeInformation.[init] took " + watch.lap() + " + seconds.");
 			StatBuffer ret = StatBuffer.fromTypeInformation(ti);
 			_logger.debug("StatBuffer.fromTypeInformation took " + watch.lap() + " seconds.");
 			return ret;
