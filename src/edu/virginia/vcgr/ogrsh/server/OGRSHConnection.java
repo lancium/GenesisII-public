@@ -99,13 +99,14 @@ public class OGRSHConnection implements Runnable
 			_byteOrder);
 		
 		writeBuffer.writeRaw(new byte[4], 0, 4);
+		ByteBuffer ret = null;
+
 		try
 		{
-			Object ret = _matcher.invoke(request);
+			Object oRet = _matcher.invoke(request);
 			writeBuffer.writeObject(_RESPONSE);
-			writeBuffer.writeObject(ret);
-			return writeBuffer.compact();
-			
+			writeBuffer.writeObject(oRet);
+			ret = writeBuffer.compact();
 		}
 		catch (OGRSHException oe)
 		{
@@ -115,11 +116,16 @@ public class OGRSHConnection implements Runnable
 		{
 			exception = new OGRSHException(cause);
 		}
-		
-		writeBuffer = new DefaultOGRSHWriteBuffer(_byteOrder);
-		writeBuffer.writeObject(_EXCEPTION);
-		writeBuffer.writeObject(exception);
-		ByteBuffer ret = writeBuffer.compact();
+	
+		if (ret == null)
+		{	
+			writeBuffer = new DefaultOGRSHWriteBuffer(_byteOrder);
+			writeBuffer.writeRaw(new byte[4], 0, 4);
+			writeBuffer.writeObject(_EXCEPTION);
+			writeBuffer.writeObject(exception);
+			ret = writeBuffer.compact();
+		}
+
 		ret.flip();
 		ret.putInt(ret.remaining() - 4);
 		ret.rewind();
