@@ -33,7 +33,6 @@ import edu.virginia.vcgr.ogrsh.server.handlers.DirectoryHandler;
 import edu.virginia.vcgr.ogrsh.server.handlers.FileHandler;
 import edu.virginia.vcgr.ogrsh.server.handlers.TestingHandler;
 import edu.virginia.vcgr.ogrsh.server.packing.DefaultOGRSHWriteBuffer;
-import edu.virginia.vcgr.ogrsh.server.packing.IOGRSHWriteBuffer;
 import edu.virginia.vcgr.ogrsh.server.session.Session;
 import edu.virginia.vcgr.ogrsh.server.session.SessionManager;
 
@@ -120,7 +119,11 @@ public class OGRSHConnection implements Runnable
 		writeBuffer = new DefaultOGRSHWriteBuffer(_byteOrder);
 		writeBuffer.writeObject(_EXCEPTION);
 		writeBuffer.writeObject(exception);
-		return writeBuffer.compact();
+		ByteBuffer ret = writeBuffer.compact();
+		ret.flip();
+		ret.putInt(ret.remaining() - 4);
+		ret.rewind();
+		return ret;
 	}
 	
 	public OGRSHConnection(SessionManager sessionManager,
@@ -178,9 +181,6 @@ public class OGRSHConnection implements Runnable
 						CommUtils.readFully(_socketChannel, messageBuffer);
 						messageBuffer.flip();
 						ByteBuffer responseBuffer = handleInvocation(messageBuffer);
-						responseBuffer.flip();
-						int size = responseBuffer.remaining();
-						responseBuffer.putInt(size - 4);
 						responseBuffer.rewind();
 						CommUtils.writeFully(_socketChannel, responseBuffer);
 					}
@@ -200,11 +200,6 @@ public class OGRSHConnection implements Runnable
 				_sessionManager.releaseSession(_mySession);
 			}
 		}
-	}
-	
-	public IOGRSHWriteBuffer createWriteBuffer()
-	{
-		return new DefaultOGRSHWriteBuffer(_byteOrder);
 	}
 	
 	private void addHandlers()
