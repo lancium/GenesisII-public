@@ -33,6 +33,7 @@ import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 import org.apache.axis.configuration.FileProvider;
 
+import org.morgan.util.StopWatch;
 import org.morgan.util.configuration.XMLConfiguration;
 import org.morgan.util.configuration.ConfigurationException;
 import org.ogf.schemas.naming._2006._08.naming.ResolveFailedWithReferralFaultType;
@@ -264,19 +265,23 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			Class<?> []locators, 
 			EndpointReferenceType epr,
 			ICallingContext callContext) 
-		throws ResourceException, GenesisIISecurityException {
-
+		throws ResourceException, GenesisIISecurityException 
+	{
+		StopWatch watch = new StopWatch();
+		
 		try {
 
 			_epr = epr;
 			
+			watch.start();
 			if (callContext == null) {
 				callContext = new CallingContextImpl(new ContextType());
 			}
 			_callContext = callContext.deriveNewContext();
 			_callContext.setSingleValueProperty(GenesisIIConstants.NAMING_CLIENT_CONFORMANCE_PROPERTY, "true");
 			_locators = locators;
-
+			_logger.debug("A:  " + watch.lap());
+			
 			X509Certificate[] chain = EPRUtils.extractCertChain(epr);
 			URI epi = EPRUtils.extractEndpointIdentifier(epr);
 
@@ -284,7 +289,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			MessageLevelSecurity minClientMessageSec = getMinClientMessageSec();
 			MessageLevelSecurity minResourceSec = EPRUtils.extractMinMessageSecurity(epr);
 			MessageLevelSecurity neededMsgSec = minClientMessageSec.computeUnion(minResourceSec); 
-
+			_logger.debug("B:  " + watch.lap());
+			
 			// perform resource-AuthN as specified in the client config file
 			try {
 				if (chain == null) {
@@ -310,7 +316,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		        PKIXParameters param = new PKIXParameters(getTrustStore());
 		        param.setRevocationEnabled(false);
 		        cpv.validate(cp, param);
-				
+		        _logger.debug("C:  " + watch.lap());
 			} catch (Exception e) {
 				if (minClientMessageSec.isWarn()) {
 					Exception ex = new GenesisIISecurityException(
@@ -321,6 +327,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 				}
 			}
 
+			watch.start();
 			// prepare a message security datastructure for the message context
 			// if needed
 			MessageSecurityData msgSecData = null;
@@ -330,7 +337,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 						chain,
 						epi);
 			}
-
+			_logger.debug("D:  " + watch.lap());
+			
 			// create the locator and add the methods
 			for (Class<?> locator : locators) {
 				Object locatorInstance = createLocatorInstance(
@@ -338,6 +346,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 						_callContext);
 				addMethods(locatorInstance, epr, msgSecData);
 			}
+			_logger.debug("E:  " + watch.lap());
 		} catch (IOException ioe) {
 			throw new ResourceException(
 				"Error creating secure client stub.", ioe);

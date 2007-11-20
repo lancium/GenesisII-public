@@ -24,7 +24,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.morgan.util.StopWatch;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
 import org.ws.addressing.EndpointReferenceType;
@@ -41,6 +40,7 @@ import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 
 public class AxisBasedProxyFactory implements IProxyFactory
 {
+	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(AxisBasedProxyFactory.class);
 	
 	static public QName LOCATOR_REGISTRY_QNAME =
@@ -78,18 +78,11 @@ public class AxisBasedProxyFactory implements IProxyFactory
 		Class<?> []locatorClasses, EndpointReferenceType targetEPR, 
 		ICallingContext callContext) throws ResourceException, GenesisIISecurityException
 	{
-		StopWatch watch = new StopWatch();
-		watch.start();
 		Class<?> []portTypes = ClientUtils.getLocatorPortTypes(locatorClasses);
-		_logger.debug("getLocatorPortTypes took " + watch.lap() + " seconds.");
 		AxisClientInvocationHandler handler = new AxisClientInvocationHandler(
 			locatorClasses, targetEPR, callContext);
-		_logger.debug("AxisClientInvocationHandler.[init] took " + watch.lap() + " seconds.");
 		
-		Object obj = Proxy.newProxyInstance(loader, portTypes, handler);
-		_logger.debug("Proxy.newProxyInstance took " + watch.lap() + " seconds.");
-		
-		return obj;
+		return Proxy.newProxyInstance(loader, portTypes, handler);
 	}
 	
 	private AxisClientInvocationHandler 
