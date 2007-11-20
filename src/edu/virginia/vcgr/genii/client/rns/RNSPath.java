@@ -29,6 +29,7 @@ import org.ggf.rns.List;
 import org.ggf.rns.RNSEntryNotDirectoryFaultType;
 import org.ggf.rns.RNSPortType;
 import org.ggf.rns.Remove;
+import org.morgan.util.StopWatch;
 import org.morgan.util.configuration.ConfigurationException;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.ws.addressing.EndpointReferenceType;
@@ -42,7 +43,6 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType;
-import edu.virginia.vcgr.ogrsh.server.util.StopWatch;
 
 /**
  * The RNSPath class is the main client side interface between developers and
