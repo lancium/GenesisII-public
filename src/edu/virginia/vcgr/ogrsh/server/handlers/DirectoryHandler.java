@@ -25,6 +25,7 @@ import edu.virginia.vcgr.ogrsh.server.exceptions.OGRSHException;
 import edu.virginia.vcgr.ogrsh.server.packing.IOGRSHReadBuffer;
 import edu.virginia.vcgr.ogrsh.server.packing.IOGRSHWriteBuffer;
 import edu.virginia.vcgr.ogrsh.server.packing.IPackable;
+import edu.virginia.vcgr.ogrsh.server.util.StopWatch;
 
 public class DirectoryHandler
 {
@@ -189,14 +190,22 @@ public class DirectoryHandler
 	public StatBuffer xstat(String fullpath)
 		throws OGRSHException
 	{
+		StopWatch watch = new StopWatch();
+		
 		_logger.debug("xstat'ing path \"" + fullpath + "\".");
 		
 		try
 		{
+			watch.start();
 			RNSPath currentPath = RNSPath.getCurrent();
+			_logger.debug("getCurrent took " + watch.lap() + " seconds.");
 			RNSPath full = currentPath.lookup(fullpath, RNSPathQueryFlags.MUST_EXIST);
+			_logger.debug("lookup too " + watch.lap() + " seconds.");
 			TypeInformation ti = new TypeInformation(full.getEndpoint());
-			return StatBuffer.fromTypeInformation(ti);
+			_logger.debug("TypeInformation.[init] took " + watch.lap() " + seconds.");
+			StatBuffer ret = StatBuffer.fromTypeInformation(ti);
+			_logger.debug("StatBuffer.fromTypeInformation took " + watch.lap() + " seconds.");
+			return ret;
 		}
 		catch (Throwable cause)
 		{
