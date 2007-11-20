@@ -29,7 +29,6 @@ import org.ggf.rns.List;
 import org.ggf.rns.RNSEntryNotDirectoryFaultType;
 import org.ggf.rns.RNSPortType;
 import org.ggf.rns.Remove;
-import org.morgan.util.StopWatch;
 import org.morgan.util.configuration.ConfigurationException;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.ws.addressing.EndpointReferenceType;
@@ -71,33 +70,21 @@ public class RNSPath implements Externalizable  {
 	{
 		EntryType[] ret = null;
 
-		StopWatch watch = new StopWatch();
 		WSName name = new WSName(epr);
-		_logger.debug("WSName.[init] took " + watch.lap() + " seconds.");
 		if (name.isValidWSName()) {
-			_logger.debug("isValidWSName took " + watch.lap() + " seconds.");
 			LookupKey lKey = new LookupKey(name, entryExpression);
-			_logger.debug("LookupKey.[init] took " + watch.lap() + " seconds.");
 			synchronized (_lookupCache) {
-				_logger.debug("synchronize took " + watch.lap() + " seconds.");
 				ret = _lookupCache.get(lKey);
-				_logger.debug("lookupCache.get took " + watch.lap() + " seconds.");
 				if (ret == null) {
 					RNSPortType rpt = ClientUtils.createProxy(
 							RNSPortType.class, epr);
-					_logger.debug("ClientUtils.createProxy took " + watch.lap() + " seconds.");
 					ret = rpt.list(new List(entryExpression)).getEntryList();
-					_logger.debug("RNS list took " + watch.lap() + " seconds.");
 					_lookupCache.put(lKey, ret);
-					_logger.debug("lookupCache.put took " + watch.lap() + " seconds.");
 				}
 			}
 		} else {
-			_logger.debug("Failing isValidWSName() took " + watch.lap() + " seconds.");
 			RNSPortType rpt = ClientUtils.createProxy(RNSPortType.class, epr);
-			_logger.debug("ClientUtils.createProxy took " + watch.lap() + " seconds.");
 			ret = rpt.list(new List(entryExpression)).getEntryList();
-			_logger.debug("RNS list took " + watch.lap() + " seconds.");
 		}
 
 		return ret;
