@@ -33,7 +33,6 @@ import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 import org.apache.axis.configuration.FileProvider;
 
-import org.morgan.util.StopWatch;
 import org.morgan.util.configuration.XMLConfiguration;
 import org.morgan.util.configuration.ConfigurationException;
 import org.ogf.schemas.naming._2006._08.naming.ResolveFailedWithReferralFaultType;
@@ -267,8 +266,6 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			ICallingContext callContext) 
 		throws ResourceException, GenesisIISecurityException 
 	{
-		StopWatch watch = new StopWatch();
-		
 		try {
 
 			_epr = epr;
@@ -280,57 +277,40 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			_callContext.setSingleValueProperty(GenesisIIConstants.NAMING_CLIENT_CONFORMANCE_PROPERTY, "true");
 			_locators = locators;
 			
-			watch.start();
 			X509Certificate[] chain = EPRUtils.extractCertChain(epr);
-			_logger.debug("A:  " + watch.lap());
 			
 			URI epi = EPRUtils.extractEndpointIdentifier(epr);
-			_logger.debug("B:  " + watch.lap());
 			
 			// deterimine the level of message security we need
 			MessageLevelSecurity minClientMessageSec = getMinClientMessageSec();
-			_logger.debug("C:  " + watch.lap());
 			MessageLevelSecurity minResourceSec = EPRUtils.extractMinMessageSecurity(epr);
-			_logger.debug("D:  " + watch.lap());
 			MessageLevelSecurity neededMsgSec = minClientMessageSec.computeUnion(minResourceSec); 
-			_logger.debug("E:  " + watch.lap());
 			
 			// perform resource-AuthN as specified in the client config file
 			try {
-				watch.start();
 				if (chain == null) {
 					throw new GenesisIISecurityException("EPR for " + epr.getAddress().toString() + " does not contain a certificate chain.");
 				}
-				_logger.debug("F:  " + watch.lap());
 				_resourceCert = chain[0];
-				_logger.debug("G:  " + watch.lap());
 				
 				// make sure the epi's match
 				String certEpi = CertTool.getUID(chain[0]);
-				_logger.debug("H:  " + watch.lap());
 				if (!certEpi.equals(epi.toString())) {
 					throw new GenesisIISecurityException("EPI for " + epr.getAddress().toString() + " (" + epi.toString() + ") does not match that in the certificate (" + certEpi + ")");
 				}
-				_logger.debug("I:  " + watch.lap());
-
+				
 				// run it through the trust manager
 				ArrayList<X509Certificate> certList = new ArrayList<X509Certificate>();
 				for (int i = 0; i < chain.length - 1; i++) {
 					certList.add(chain[i]);
 				}
-				_logger.debug("J:  " + watch.lap());
-		        CertPath cp = CertificateFactory.getInstance("X.509", "BC").
+				CertPath cp = CertificateFactory.getInstance("X.509", "BC").
 		        	generateCertPath(certList);
-		        _logger.debug("K:  " + watch.lap());
 		        CertPathValidator cpv = CertPathValidator.getInstance(
 		        		"PKIX", "BC");
-		        _logger.debug("L:  " + watch.lap());
 		        PKIXParameters param = new PKIXParameters(getTrustStore());
-		        _logger.debug("M:  " + watch.lap());
 		        param.setRevocationEnabled(false);
-		        _logger.debug("N:  " + watch.lap());
 		        cpv.validate(cp, param);
-		        _logger.debug("O:  " + watch.lap());
 			} catch (Exception e) {
 				if (minClientMessageSec.isWarn()) {
 					Exception ex = new GenesisIISecurityException(

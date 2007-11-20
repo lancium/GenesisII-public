@@ -17,7 +17,7 @@ public class StopWatch
 	public double lap()
 	{
 		long elapsed = System.nanoTime() - _start;
-		double ret = elapsed / 1000000.0;
+		double ret = elapsed / 1000000000.0;
 		_start = System.nanoTime();
 		return ret;
 	}
