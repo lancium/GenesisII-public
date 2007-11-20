@@ -51,26 +51,19 @@ public class AxisBasedProxyFactory implements IProxyFactory
 		EndpointReferenceType epr, ICallingContext callContext) 
 		throws ConfigurationException, ResourceException, GenesisIISecurityException
 	{
-		StopWatch watch = new StopWatch();
-		watch.start();
 		XMLConfiguration conf = 
 			ConfigurationManager.getCurrentConfiguration().getClientConfiguration();
-		_logger.debug("getClientConfiguration took " + watch.lap() + " seconds.");
 		HashMap<String, Class> _locators;
 		
 		synchronized(conf)
 		{
-			watch.start();
 			_locators = (HashMap<String, Class>)conf.retrieveSection(
 				LOCATOR_REGISTRY_QNAME);
-			_logger.debug("retrieveSection took " + watch.lap() + " seconds.");
 		}
 		
 		Class []locators = new Class[1];
 		
-		watch.start();
 		locators[0] = _locators.get(iface.getName());
-		_logger.debug("_locaters.get took " + watch.lap() + " seconds.");
 		if (locators[0] == null)
 		{
 			throw new ConfigurationException(
@@ -85,9 +78,18 @@ public class AxisBasedProxyFactory implements IProxyFactory
 		Class<?> []locatorClasses, EndpointReferenceType targetEPR, 
 		ICallingContext callContext) throws ResourceException, GenesisIISecurityException
 	{
-		return Proxy.newProxyInstance(loader, 
-			ClientUtils.getLocatorPortTypes(locatorClasses),
-			new AxisClientInvocationHandler(locatorClasses, targetEPR, callContext));
+		StopWatch watch = new StopWatch();
+		watch.start();
+		Class<?> []portTypes = ClientUtils.getLocatorPortTypes(locatorClasses);
+		_logger.debug("getLocatorPortTypes took " + watch.lap() + " seconds.");
+		AxisClientInvocationHandler handler = new AxisClientInvocationHandler(
+			locatorClasses, targetEPR, callContext);
+		_logger.debug("AxisClientInvocationHandler.[init] took " + watch.lap() + " seconds.");
+		
+		Object obj = Proxy.newProxyInstance(loader, portTypes, handler);
+		_logger.debug("Proxy.newProxyInstance took " + watch.lap() + " seconds.");
+		
+		return obj;
 	}
 	
 	private AxisClientInvocationHandler 
