@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="gen.x509-authn" name="x509-authn.build">
+
+	<condition property="gen.x509-authn.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${codegen-dir}/wsdl/x509-authn.flag"/>
+			<uptodate targetfile="${codegen-dir}/wsdl/x509-authn.flag">
+				<srcfiles dir="${wsdl-dir}/authn">
+					<include name="ws-trust-1.3.xsd"/>
+					<include name="ws-trust-1.3.wsdl"/>
+					<include name="x509-authn.gwsdl"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.x509-authn" unless="gen.authn.uptodate">
+		<copy todir="${codegen-dir}/wsdl">
+			<fileset refid="common.source.files"/>
+			<fileset dir="${wsdl-dir}/authn">
+				<include name="ws-trust-1.3.xsd"/>
+				<include name="ws-trust-1.3.wsdl"/>
+				<include name="x509-authn.gwsdl"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${codegen-dir}/wsdl/x509-authn.gwsdl"
+			target="${codegen-dir}/wsdl/x509-authn-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${codegen-dir}/wsdl/x509-authn-generated.wsdl"
+			target="${codegen-dir}/wsdl/x509-authn-service.wsdl"
+			portType="{http://vcgr.cs.virginia.edu/container/2007/11/x509-authn}X509AuthnPortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${codegen-dir}/x509-authn"/>
+			<param name="stub.gen.source-wsdl"
+				value="file:///${codegen-dir}/wsdl/x509-authn-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${codegen-dir}/wsdl/x509-authn.flag"/>
+		</antcall>
+		<move file="${codegen-dir}/x509-authn/edu/virginia/vcgr/genii/x509authn/deploy.wsdd"
+			tofile="${wsdd-dir}/x509authn.deploy.wsdd"/>
+		<replace file="${wsdd-dir}/x509authn.deploy.wsdd"
+			token="edu.virginia.vcgr.genii.x509authn.X509AuthnSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.x509authn.X509AuthnServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd-dir}/x509authn.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>
