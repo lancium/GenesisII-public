@@ -98,6 +98,8 @@ public class OGRSHConnection implements Runnable
 		OGRSHException exception = null;
 		DefaultOGRSHWriteBuffer writeBuffer = new DefaultOGRSHWriteBuffer(
 			_byteOrder);
+		
+		writeBuffer.writeRaw(new byte[4], 0, 4);
 		try
 		{
 			Object ret = _matcher.invoke(request);
@@ -156,7 +158,6 @@ public class OGRSHConnection implements Runnable
 					try
 					{
 						CommUtils.readFully(_socketChannel, _intBuffer);
-						_logger.debug("Read size from the socket:  " + System.currentTimeMillis());
 					}
 					catch (IOException ioe)
 					{
@@ -167,7 +168,6 @@ public class OGRSHConnection implements Runnable
 					}
 					_intBuffer.flip();
 					int messageSize = _intBuffer.getInt();
-					_logger.debug("Size is " + messageSize);
 					if (messageSize < 0)
 					{
 						_done = true;
@@ -176,20 +176,13 @@ public class OGRSHConnection implements Runnable
 						ByteBuffer messageBuffer = ByteBuffer.allocate(messageSize);
 						messageBuffer.order(_byteOrder);
 						CommUtils.readFully(_socketChannel, messageBuffer);
-						_logger.debug("Read message from the socket:  " + System.currentTimeMillis());
 						messageBuffer.flip();
-						_logger.debug("Starting invocation:  " + System.currentTimeMillis());
 						ByteBuffer responseBuffer = handleInvocation(messageBuffer);
-						_logger.debug("Finishing invocation:  " + System.currentTimeMillis());
 						responseBuffer.flip();
 						int size = responseBuffer.remaining();
-						_intBuffer.rewind();
-						_intBuffer.putInt(size);
-						_intBuffer.flip();
-						_logger.debug("Writing to the channel:  " + System.currentTimeMillis());
-						CommUtils.writeFully(_socketChannel, _intBuffer);
+						responseBuffer.putInt(size - 4);
+						responseBuffer.rewind();
 						CommUtils.writeFully(_socketChannel, responseBuffer);
-						_logger.debug("Finished writing to the channel:  " + System.currentTimeMillis());
 					}
 				}
 			}

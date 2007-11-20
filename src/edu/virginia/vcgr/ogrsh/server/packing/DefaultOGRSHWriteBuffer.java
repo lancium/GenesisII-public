@@ -83,6 +83,12 @@ public class DefaultOGRSHWriteBuffer implements IOGRSHWriteBuffer
 		return ret;
 	}
 	
+	public void writeRaw(byte []data, int offset, int length) throws IOException
+	{
+		ensure(length);
+		_current.put(data, offset, length);
+	}
+	
 	public void writeObject(Object object) throws IOException
 	{
 		if (object == null)
