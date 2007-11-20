@@ -22,6 +22,9 @@ import java.util.HashMap;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.morgan.util.StopWatch;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
 import org.ws.addressing.EndpointReferenceType;
@@ -38,6 +41,8 @@ import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 
 public class AxisBasedProxyFactory implements IProxyFactory
 {
+	static private Log _logger = LogFactory.getLog(AxisBasedProxyFactory.class);
+	
 	static public QName LOCATOR_REGISTRY_QNAME =
 		new QName(GenesisIIConstants.GENESISII_NS, "locator-registry");
 	
@@ -46,19 +51,26 @@ public class AxisBasedProxyFactory implements IProxyFactory
 		EndpointReferenceType epr, ICallingContext callContext) 
 		throws ConfigurationException, ResourceException, GenesisIISecurityException
 	{
+		StopWatch watch = new StopWatch();
+		watch.start();
 		XMLConfiguration conf = 
 			ConfigurationManager.getCurrentConfiguration().getClientConfiguration();
+		_logger.debug("getClientConfiguration took " + watch.lap() + " seconds.");
 		HashMap<String, Class> _locators;
 		
 		synchronized(conf)
 		{
+			watch.start();
 			_locators = (HashMap<String, Class>)conf.retrieveSection(
 				LOCATOR_REGISTRY_QNAME);
+			_logger.debug("retrieveSection took " + watch.lap() + " seconds.");
 		}
 		
 		Class []locators = new Class[1];
 		
+		watch.start();
 		locators[0] = _locators.get(iface.getName());
+		_logger.debug("_locaters.get took " + watch.lap() + " seconds.");
 		if (locators[0] == null)
 		{
 			throw new ConfigurationException(

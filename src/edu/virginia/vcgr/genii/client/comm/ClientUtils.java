@@ -29,7 +29,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.GUID;
-import org.morgan.util.StopWatch;
 import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -250,17 +249,13 @@ public class ClientUtils
 		EndpointReferenceType epr) 
 		throws ResourceException, ConfigurationException, GenesisIISecurityException
 	{
-		StopWatch watch = new StopWatch();
-		
 		try
 		{
 			ICallingContext context = null;
 			
 			try
 			{
-				watch.start();
 				context = ContextManager.getCurrentContext(false);
-				_logger.debug("getCurrentContext took " + watch.lap() + " seconds.");
 			}
 			catch (Throwable t)
 			{
@@ -341,12 +336,8 @@ public class ClientUtils
 		Class<IFace> iface, EndpointReferenceType epr, ICallingContext callContext)
 			throws ResourceException, ConfigurationException, GenesisIISecurityException
 	{
-		StopWatch watch = new StopWatch();
-		watch.start();
 		IProxyFactory factory = getProxyFactory();
-		_logger.debug("getProxyFactory took " + watch.lap() + " seconds.");
 		IFace face = factory.createProxy(loader, iface, epr, callContext);
-		_logger.debug("factory.createProxy took " + watch.lap() + " seconds.");
 		
 		return face;
 	}
