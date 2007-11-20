@@ -91,25 +91,33 @@ public class RNSPath implements Externalizable  {
 
 	static private LinkedList<LinkedList<PathElement>> lookupRemainder(
 			EndpointReferenceType parentEPR, String[] newPath, int nextIndex)
-			throws RemoteException, ConfigurationException {
+			throws RemoteException, ConfigurationException 
+	{
+		StopWatch watch = new StopWatch();
+		watch.start();
 		EntryType[] entries = lookupContents(parentEPR, newPath[nextIndex]);
+		_logger.debug("lookupContents took " + watch.lap() + " seconds.");
+		
 		if (entries == null || entries.length == 0)
 			return null;
 
 		LinkedList<LinkedList<PathElement>> ret = new LinkedList<LinkedList<PathElement>>();
 
 		if (nextIndex + 1 >= newPath.length) {
+			watch.start();
 			for (EntryType entry : entries) {
 				LinkedList<PathElement> tmp = new LinkedList<PathElement>();
 				tmp.addLast(new PathElement(entry.getEntry_name(), entry
 						.getEntry_reference()));
 				ret.addLast(tmp);
 			}
+			_logger.debug("Loop A took " + watch.lap() + " seconds.");
 
 			return ret;
 		}
 
 		// We haven't reached the end, so we have to keep searching.
+		watch.start();
 		for (EntryType entry : entries) {
 			LinkedList<LinkedList<PathElement>> nextPart = lookupRemainder(
 					entry.getEntry_reference(), newPath, nextIndex + 1);
@@ -122,7 +130,8 @@ public class RNSPath implements Externalizable  {
 				ret.addLast(tailPath);
 			}
 		}
-
+		_logger.debug("Loop B took " + watch.lap() + " seconds.");
+		
 		if (ret != null && ret.size() == 0)
 			return null;
 
@@ -497,10 +506,7 @@ public class RNSPath implements Externalizable  {
 
 	private RNSPath[] internalList(String pathExpression) throws RNSException 
 	{
-		StopWatch watch = new StopWatch();
-		watch.start();
 		String[] newPath = PathUtils.normalizePath(pwd(), pathExpression);
-		_logger.debug("normalizePath took " + watch.lap() + " seconds.");
 		int newPathIndex = -1;
 		LinkedList<PathElement> newPathList = new LinkedList<PathElement>();
 
@@ -520,8 +526,6 @@ public class RNSPath implements Externalizable  {
 			newPathIndex++;
 		}
 		
-		_logger.debug("loop took " + watch.lap() + " seconds.");
-
 		if (newPathIndex >= newPath.length)
 			return new RNSPath[] { new RNSPath(newPathList) };
 
@@ -530,9 +534,7 @@ public class RNSPath implements Externalizable  {
 			LinkedList<LinkedList<PathElement>> subPaths;
 
 			try {
-				watch.start();
 				subPaths = lookupRemainder(epr, newPath, newPathIndex);
-				_logger.debug("lookupREmainder took " + watch.lap() + " seconds.");
 			} catch (BaseFaultType bft) {
 				throw new RNSException(bft);
 			} catch (Throwable t) {
@@ -557,7 +559,6 @@ public class RNSPath implements Externalizable  {
 			}
 		}
 
-		watch.start();
 		for (; newPathIndex < newPath.length; newPathIndex++) {
 			EndpointReferenceType parent = newPathList.getLast().getEndpoint();
 			if (parent == null)
@@ -582,7 +583,6 @@ public class RNSPath implements Externalizable  {
 			}
 		}
 
-		_logger.debug("Second loop took " + watch.lap() + " seconds.");
 		return new RNSPath[] { new RNSPath(newPathList) };
 	}
 
