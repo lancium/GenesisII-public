@@ -506,7 +506,10 @@ public class GenesisIIBase implements GeniiCommon, IContainerManaged
 		ResourceKey rKey = createResource(constructionParameters);
 		EndpointReferenceType epr = ResourceManager.createEPR(rKey, 
 			myEPR.getAddress().get_value().toString(), getImplementedPortTypes());
+
+		// allow subclasses to do creation work
 		postCreate(rKey, epr, constructionParameters);
+		
 		rKey.dereference().commit();
 		_logger.debug("Created resource \"" + rKey.getKey() + "\" for service \"" +
 			rKey.getServiceName() + "\".");

@@ -60,6 +60,7 @@
 	<import file="${wsdl-dir}/subscription.build.xml"/>
 	<import file="${wsdl-dir}/counter/counter.build.xml"/>
 	<import file="${wsdl-dir}/rns/rns.build.xml"/>
+	<import file="${wsdl-dir}/authn/x509-authn.build.xml"/>
 	<import file="${wsdl-dir}/deployment/gapp-description.build.xml"/>
 	<import file="${wsdl-dir}/deployment/deployer.build.xml"/>
 	<import file="${wsdl-dir}/byteio/rbyteio.build.xml"/>
@@ -160,6 +161,7 @@
 		<antcall target="gen.sbyteio"/>
 		<antcall target="gen.sbyteiointerop"/>
 		<antcall target="gen.sbyteio-factory"/>
+		<antcall target="gen.x509-authn"/>
 		<antcall target="gen.container"/>
 		<antcall target="gen.bes-activity"/>
 		<antcall target="gen.bes"/>

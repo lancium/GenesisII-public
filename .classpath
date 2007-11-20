@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry excluding="edu/virginia/vcgr/genii/container/factory/GeniiFactoryServiceImpl.java" kind="src" path="src"/>
-	<classpathentry kind="src" path="genned-src"/>
+	<classpathentry excluding="edu/virginia/vcgr/genii/x509-authn/|edu/virginia/vcgr/genii/x509-authn/" kind="src" path="genned-src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="ext/axis/ext/activation.jar"/>
 	<classpathentry kind="lib" path="ext/axis/ext/mail.jar"/>
@@ -26,7 +26,7 @@
 	<classpathentry kind="lib" path="ext/jetty/lib/javax.servlet.jar"/>
 	<classpathentry kind="lib" path="ext/jetty/lib/org.mortbay.jetty.jar"/>
 	<classpathentry kind="lib" path="ext/jetty/lib/org.mortbay.jmx.jar"/>
-	<classpathentry kind="lib" path="ext/axis/lib/axis.jar"/>
+	<classpathentry kind="lib" path="ext/axis/lib/axis.jar" sourcepath="/Axis1.4/src"/>
 	<classpathentry kind="lib" path="ext/axis/lib/axis-ant.jar"/>
 	<classpathentry kind="lib" path="ext/axis/lib/commons-discovery-0.2.jar"/>
 	<classpathentry kind="lib" path="ext/axis/lib/commons-logging-1.0.4.jar"/>

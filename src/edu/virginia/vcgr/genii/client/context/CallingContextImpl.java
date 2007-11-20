@@ -109,12 +109,11 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	private HashMap<String, Serializable> _transientProperties = 
 		new HashMap<String, Serializable>();
 
-	private CallingContextImpl(CallingContextImpl parent) {
+	public CallingContextImpl(CallingContextImpl parent) {
 		_parent = parent;
 	}
 
-	private CallingContextImpl(ContextType ct, CallingContextImpl parent) throws IOException {
-		this(parent);
+	public CallingContextImpl(ContextType ct) throws IOException {
 
 		// load the properties from the ContextType
 		ContextNameValuePairType[] pairs = ct.getProperty();
@@ -130,14 +129,6 @@ public class CallingContextImpl implements ICallingContext, Serializable
 				multiValue.add(retrieveBase64Decoded(pair.getValue()));
 			}
 		}
-
-		if (parent != null) {
-			_transientProperties.putAll(parent._transientProperties);
-		}
-	}
-
-	public CallingContextImpl(ContextType ct) throws IOException {
-		this(ct, null);
 	}
 
 	public CallingContextImpl(RNSPath root) {
@@ -239,7 +230,7 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		ContextType ct = new ContextType();
 
 		ArrayList<ContextNameValuePairType> pairs = new ArrayList<ContextNameValuePairType>();
-		addProperties(pairs);
+		accumulateProperties(pairs);
 		ContextNameValuePairType[] pairsArray = 
 			new ContextNameValuePairType[pairs.size()];
 		pairs.toArray(pairsArray);
@@ -253,22 +244,29 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	}
 
 	public ICallingContext deriveNewContext(ContextType serializedInformation) throws IOException  {
-		return new CallingContextImpl(serializedInformation, this);
-	}
-
-	/** Similar to above, but with a parentless context */
-	public ICallingContext deriveNewContext(CallingContextImpl parentlessContext) {
 		CallingContextImpl retval = new CallingContextImpl(this);
-		retval._properties.putAll(parentlessContext._properties);
-		retval._transientProperties
-				.putAll(parentlessContext._transientProperties);
 
+		// load the properties from the ContextType
+		ContextNameValuePairType[] pairs = serializedInformation.getProperty();
+		if (pairs != null) {
+			for (ContextNameValuePairType pair : serializedInformation.getProperty()) {
+				String name = pair.getName();
+				ArrayList<Serializable> multiValue = _properties.get(name);
+				if (multiValue == null) {
+					multiValue = new ArrayList<Serializable>();
+					_properties.put(name, multiValue);
+				}
+				
+				multiValue.add(retrieveBase64Decoded(pair.getValue()));
+			}
+		}
+		
 		return retval;
 	}
 
-	private synchronized void addProperties(ArrayList<ContextNameValuePairType> pairs) throws IOException {
+	private synchronized void accumulateProperties(ArrayList<ContextNameValuePairType> pairs) throws IOException {
 		if (_parent != null) {
-			_parent.addProperties(pairs);
+			_parent.accumulateProperties(pairs);
 		}
 
 		for (String name : _properties.keySet()) {

@@ -56,7 +56,7 @@ public class AxisBasedContextResolver implements IContextResolver
 			if (callingContext == null) {
 				retval = resourceContext.deriveNewContext();
 			} else {
-				retval = resourceContext.deriveNewContext(callingContext);
+				retval = new CallingContextImpl(callingContext);
 			}
 		}
 		

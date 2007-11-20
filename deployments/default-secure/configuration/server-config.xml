@@ -378,6 +378,10 @@
 			<genii:resource-provider name="queue-db-resource-provider"/>
 		</genii:service>
 
+		<genii:service name="X509AuthnPortType">
+			<genii:resource-provider name="basic-db-resource-provider"/>
+		</genii:service>
+
 		<genii:service name="CertGeneratorPortType">
 			<genii:resource-provider name="cert-generator-db-resource-provider"/>
 		</genii:service>

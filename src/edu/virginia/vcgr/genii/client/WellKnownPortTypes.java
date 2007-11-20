@@ -102,6 +102,10 @@ public class WellKnownPortTypes
 		new QName("http://vcgr.cs.virginia.edu/container/2006/07/container",
 			"VCGRContainerPortType");
 
+	static public QName X509_AUTHN_SERVICE_PORT_TYPE =
+		new QName("http://vcgr.cs.virginia.edu/container/2007/11/x509-authn",
+			"X509AuthnPortType");
+
 	static public QName ENDPOINT_IDENTIFIER_RESOLVER_SERVICE_PORT_TYPE =
 		new QName("http://schemas.ogf.org/naming/2006/08/naming/wsdl/EndpointIdentifierResolver",
 			"EndpointIdentifierResolverPortType");

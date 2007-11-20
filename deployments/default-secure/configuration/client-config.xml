@@ -155,6 +155,8 @@
 			locator-type="edu.virginia.vcgr.genii.certGenerator.CertGeneratorServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.informationService.InformationServicePortType"
 			locator-type="edu.virginia.vcgr.genii.informationService.InformationServiceServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.x509authn.X509AuthnPortType"
+			locator-type="edu.virginia.vcgr.genii.x509authn.X509AuthnServiceLocator"/>
 	</genii:locator-registry>
 	
 	<genii:configured-instances>
@@ -185,6 +187,10 @@
 	</genii:configured-instances>
 
 	<genii:tools>
+<!--			
+		<mconf:class name="idp"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.IdpTool</mconf:class>
+-->
 		<mconf:class name="authz"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.AuthZTool</mconf:class>
 		<mconf:class name="notification-listener"
