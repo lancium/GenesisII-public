@@ -42,6 +42,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType;
+import edu.virginia.vcgr.ogrsh.server.util.StopWatch;
 
 /**
  * The RNSPath class is the main client side interface between developers and
@@ -494,8 +495,12 @@ public class RNSPath implements Externalizable  {
 		return ret;
 	}
 
-	private RNSPath[] internalList(String pathExpression) throws RNSException {
+	private RNSPath[] internalList(String pathExpression) throws RNSException 
+	{
+		StopWatch watch = new StopWatch();
+		watch.start();
 		String[] newPath = PathUtils.normalizePath(pwd(), pathExpression);
+		_logger.debug("normalizePath took " + watch.lap() + " seconds.");
 		int newPathIndex = -1;
 		LinkedList<PathElement> newPathList = new LinkedList<PathElement>();
 
@@ -514,6 +519,8 @@ public class RNSPath implements Externalizable  {
 
 			newPathIndex++;
 		}
+		
+		_logger.debug("loop took " + watch.lap() + " seconds.");
 
 		if (newPathIndex >= newPath.length)
 			return new RNSPath[] { new RNSPath(newPathList) };
@@ -523,7 +530,9 @@ public class RNSPath implements Externalizable  {
 			LinkedList<LinkedList<PathElement>> subPaths;
 
 			try {
+				watch.start();
 				subPaths = lookupRemainder(epr, newPath, newPathIndex);
+				_logger.debug("lookupREmainder took " + watch.lap() + " seconds.");
 			} catch (BaseFaultType bft) {
 				throw new RNSException(bft);
 			} catch (Throwable t) {
@@ -548,6 +557,7 @@ public class RNSPath implements Externalizable  {
 			}
 		}
 
+		watch.start();
 		for (; newPathIndex < newPath.length; newPathIndex++) {
 			EndpointReferenceType parent = newPathList.getLast().getEndpoint();
 			if (parent == null)
@@ -572,6 +582,7 @@ public class RNSPath implements Externalizable  {
 			}
 		}
 
+		_logger.debug("Second loop took " + watch.lap() + " seconds.");
 		return new RNSPath[] { new RNSPath(newPathList) };
 	}
 

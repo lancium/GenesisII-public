@@ -190,22 +190,14 @@ public class DirectoryHandler
 	public StatBuffer xstat(String fullpath)
 		throws OGRSHException
 	{
-		StopWatch watch = new StopWatch();
-		
 		_logger.debug("xstat'ing path \"" + fullpath + "\".");
 		
 		try
 		{
-			watch.start();
 			RNSPath currentPath = RNSPath.getCurrent();
-			_logger.debug("getCurrent took " + watch.lap() + " seconds.");
 			RNSPath full = currentPath.lookup(fullpath, RNSPathQueryFlags.MUST_EXIST);
-			_logger.debug("lookup too " + watch.lap() + " seconds.");
 			TypeInformation ti = new TypeInformation(full.getEndpoint());
-			_logger.debug("TypeInformation.[init] took " + watch.lap() + " + seconds.");
-			StatBuffer ret = StatBuffer.fromTypeInformation(ti);
-			_logger.debug("StatBuffer.fromTypeInformation took " + watch.lap() + " seconds.");
-			return ret;
+			return StatBuffer.fromTypeInformation(ti);
 		}
 		catch (Throwable cause)
 		{
