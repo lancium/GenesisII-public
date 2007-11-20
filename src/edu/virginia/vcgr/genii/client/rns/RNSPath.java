@@ -60,30 +60,44 @@ public class RNSPath implements Externalizable  {
 
 	static private Log _logger = LogFactory.getLog(RNSPath.class);
 
-	static private TimedOutLRUCache<LookupKey, EntryType[]> _lookupCache = new TimedOutLRUCache<LookupKey, EntryType[]>(
-			1024, 0);
+	static private TimedOutLRUCache<LookupKey, EntryType[]> _lookupCache = 
+		new TimedOutLRUCache<LookupKey, EntryType[]>(
+		1024, 0);
 
 	static private EntryType[] lookupContents(EndpointReferenceType epr,
 			String entryExpression) throws ConfigurationException,
 			ResourceException, RNSEntryNotDirectoryFaultType,
-			ResourceUnknownFaultType, RemoteException {
+			ResourceUnknownFaultType, RemoteException
+	{
 		EntryType[] ret = null;
 
+		StopWatch watch = new StopWatch();
 		WSName name = new WSName(epr);
+		_logger.debug("WSName.[init] took " + watch.lap() + " seconds.");
 		if (name.isValidWSName()) {
+			_logger.debug("isValidWSName took " + watch.lap() + " seconds.");
 			LookupKey lKey = new LookupKey(name, entryExpression);
+			_logger.debug("LookupKey.[init] took " + watch.lap() + " seconds.");
 			synchronized (_lookupCache) {
+				_logger.debug("synchronize took " + watch.lap() + " seconds.");
 				ret = _lookupCache.get(lKey);
+				_logger.debug("lookupCache.get took " + watch.lap() + " seconds.");
 				if (ret == null) {
 					RNSPortType rpt = ClientUtils.createProxy(
 							RNSPortType.class, epr);
+					_logger.debug("ClientUtils.createProxy took " + watch.lap() + " seconds.");
 					ret = rpt.list(new List(entryExpression)).getEntryList();
+					_logger.debug("RNS list took " + watch.lap() + " seconds.");
 					_lookupCache.put(lKey, ret);
+					_logger.debug("lookupCache.put took " + watch.lap() + " seconds.");
 				}
 			}
 		} else {
+			_logger.debug("Failing isValidWSName() took " + watch.lap() + " seconds.");
 			RNSPortType rpt = ClientUtils.createProxy(RNSPortType.class, epr);
+			_logger.debug("ClientUtils.createProxy took " + watch.lap() + " seconds.");
 			ret = rpt.list(new List(entryExpression)).getEntryList();
+			_logger.debug("RNS list took " + watch.lap() + " seconds.");
 		}
 
 		return ret;
@@ -93,10 +107,7 @@ public class RNSPath implements Externalizable  {
 			EndpointReferenceType parentEPR, String[] newPath, int nextIndex)
 			throws RemoteException, ConfigurationException 
 	{
-		StopWatch watch = new StopWatch();
-		watch.start();
 		EntryType[] entries = lookupContents(parentEPR, newPath[nextIndex]);
-		_logger.debug("lookupContents took " + watch.lap() + " seconds.");
 		
 		if (entries == null || entries.length == 0)
 			return null;
@@ -104,20 +115,17 @@ public class RNSPath implements Externalizable  {
 		LinkedList<LinkedList<PathElement>> ret = new LinkedList<LinkedList<PathElement>>();
 
 		if (nextIndex + 1 >= newPath.length) {
-			watch.start();
 			for (EntryType entry : entries) {
 				LinkedList<PathElement> tmp = new LinkedList<PathElement>();
 				tmp.addLast(new PathElement(entry.getEntry_name(), entry
 						.getEntry_reference()));
 				ret.addLast(tmp);
 			}
-			_logger.debug("Loop A took " + watch.lap() + " seconds.");
-
+			
 			return ret;
 		}
 
 		// We haven't reached the end, so we have to keep searching.
-		watch.start();
 		for (EntryType entry : entries) {
 			LinkedList<LinkedList<PathElement>> nextPart = lookupRemainder(
 					entry.getEntry_reference(), newPath, nextIndex + 1);
@@ -130,7 +138,6 @@ public class RNSPath implements Externalizable  {
 				ret.addLast(tailPath);
 			}
 		}
-		_logger.debug("Loop B took " + watch.lap() + " seconds.");
 		
 		if (ret != null && ret.size() == 0)
 			return null;
