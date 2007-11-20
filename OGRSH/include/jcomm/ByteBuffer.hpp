@@ -32,6 +32,7 @@ namespace jcomm
 			ByteBuffer& rewind();
 
 			int position() const;
+			void position(int newPosition);
 			int limit() const;
 			ByteBuffer duplicate() const;
 			int remaining() const;
@@ -92,6 +93,11 @@ namespace jcomm
 	inline int ByteBuffer::position() const
 	{
 		return _position;
+	}
+
+	inline void ByteBuffer::position(int position)
+	{
+		_position = position;
 	}
 
 	inline int ByteBuffer::limit() const

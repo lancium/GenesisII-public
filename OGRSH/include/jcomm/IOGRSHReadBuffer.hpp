@@ -15,6 +15,8 @@ namespace jcomm
 			virtual IOGRSHReadBuffer& operator= (
 				const IOGRSHReadBuffer&);
 
+			virtual void readRaw(char *data, int offset, int length)
+				throw (IOException) = 0;
 			virtual void readBoolean(bool&) throw (IOException) = 0;
 			virtual void readChar(char&) throw (IOException) = 0;
 			virtual void readShort(short&) throw (IOException) = 0;

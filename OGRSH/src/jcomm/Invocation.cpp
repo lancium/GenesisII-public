@@ -21,6 +21,10 @@ namespace jcomm
 		: _socket(socket), _invocationName(invocationName)
 	{
 		_writeBuffer = new DefaultOGRSHWriteBuffer();
+
+		int fake = 0;
+		_writeBuffer->writeRaw((char*)(&fake), 0, sizeof(int));
+
 		_writeBuffer->writeString(_invocationName);
 	}
 
@@ -48,7 +52,10 @@ namespace jcomm
 		ByteBuffer bb = _writeBuffer->compact();
 		bb.flip();
 		int remaining = bb.remaining();
-		_socket.write((char*)&remaining, 4);
+
+		bb.putInt(remaining - 4);
+		bb.rewind();
+
 		_socket.write(bb);
 
 		int size;

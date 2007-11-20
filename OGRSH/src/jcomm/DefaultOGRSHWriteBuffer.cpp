@@ -92,6 +92,13 @@ namespace jcomm
 		return ret;
 	}
 
+	void DefaultOGRSHWriteBuffer::writeRaw(char *data,
+		int offset, int length) throw (IOException)
+	{
+		ensure(length);
+		_current->put(data, offset, length);
+	}
+
 	void DefaultOGRSHWriteBuffer::writeBoolean(bool b) throw (IOException)
 	{
 		writeUTF("java.lang.Boolean");

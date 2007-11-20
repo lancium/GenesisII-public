@@ -167,6 +167,7 @@ public class OGRSHConnection implements Runnable
 					}
 					_intBuffer.flip();
 					int messageSize = _intBuffer.getInt();
+					_logger.debug("Size is " + messageSize);
 					if (messageSize < 0)
 					{
 						_done = true;

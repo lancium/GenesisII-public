@@ -18,6 +18,8 @@ namespace jcomm
 
 			virtual ByteBuffer compact() = 0;
 
+			virtual void writeRaw(char *data, int offset, int length)
+				throw (IOException) = 0;
 			virtual void writeBoolean(bool b)
 				throw (IOException) = 0;
 			virtual void writeChar(char c)

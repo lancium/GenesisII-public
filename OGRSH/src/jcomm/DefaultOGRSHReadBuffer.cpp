@@ -44,6 +44,12 @@ namespace jcomm
 	{
 	}
 
+	void DefaultOGRSHReadBuffer::readRaw(char *data, int offset, int length)
+		throw (IOException)
+	{
+		_buffer.get(data, offset, length);
+	}
+
 	void DefaultOGRSHReadBuffer::readBoolean(bool &target)
 		throw (IOException)
 	{

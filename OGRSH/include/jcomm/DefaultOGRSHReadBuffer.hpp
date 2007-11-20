@@ -22,6 +22,8 @@ namespace jcomm
 		public:
 			DefaultOGRSHReadBuffer(ByteBuffer &buffer);
 
+			virtual void readRaw(char *data, int offset, int length)
+				throw (IOException);
 			virtual void readBoolean(bool&) throw (IOException);
 			virtual void readChar(char&) throw (IOException);
 			virtual void readShort(short&) throw (IOException);
