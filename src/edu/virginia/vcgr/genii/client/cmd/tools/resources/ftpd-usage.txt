@@ -4,3 +4,7 @@ ftpd [options] <port> [network-constraints ...]
 		--data-connection-timeout=<secs>
 		--max-auth-attempts=<number>
 		--sandbox=<path>
+		
+OR
+
+ftpd stop

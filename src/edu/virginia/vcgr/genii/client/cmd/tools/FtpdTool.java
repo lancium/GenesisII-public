@@ -22,6 +22,8 @@ public class FtpdTool extends BaseGridTool
 	private int _maxAuthAttempts = -1;
 	private String _sandbox = null;
 	
+	static private FTPDaemon _daemon = null;
+	
 	public FtpdTool()
 	{
 		super(_DESCRIPTION, new FileResource(_USAGE_RESOURCE), false);
@@ -52,32 +54,61 @@ public class FtpdTool extends BaseGridTool
 	{
 		GeniiBackendConfiguration backConf = new GeniiBackendConfiguration();
 		
-		FTPConfiguration conf = new FTPConfiguration(
-			Integer.parseInt(getArgument(0)));
-		if (_idleTimeout >= 0)
-			conf.setIdleTimeoutSeconds(_idleTimeout);
-		if (_dataConnectionTimeout >= 0)
-			conf.setDataConnectionTimeoutSeconds(_dataConnectionTimeout);
-		if (_maxAuthAttempts >= 0)
-			conf.setMissedAuthenticationsLimit(_maxAuthAttempts);
+		String arg = getArgument(0);
 		
-		if (_sandbox != null)
-			backConf.setSandboxPath(_sandbox);
-		
-		if (numArguments() > 1)
+		if (arg.equals("stop"))
 		{
-			NetworkConstraint []constraints =
-				new NetworkConstraint[numArguments() - 1];
+			synchronized(FtpdTool.class)
+			{
+				if (_daemon == null)
+				{
+					stderr.println("There is no ftpd currently running.");
+					return 1;
+				}
+				
+				_daemon.stop();
+				_daemon = null;
+			}
 			
-			for (int lcv = 1; lcv < numArguments(); lcv++)
-				constraints[lcv - 1] = new NetworkConstraint(
-					getArgument(lcv));
-			
-			conf.setNetworkConstraints(constraints);
+			return 0;
 		}
 		
-		FTPDaemon daemon = new FTPDaemon(new GeniiBackendFactory(backConf), conf);
-		daemon.start();
+		synchronized(FtpdTool.class)
+		{
+			if (_daemon != null)
+			{
+				this.stderr.println("An ftpd is already running on port " + _daemon.getPort());
+				return 1;
+			}
+			
+			FTPConfiguration conf = new FTPConfiguration(
+				Integer.parseInt(arg));
+			if (_idleTimeout >= 0)
+				conf.setIdleTimeoutSeconds(_idleTimeout);
+			if (_dataConnectionTimeout >= 0)
+				conf.setDataConnectionTimeoutSeconds(_dataConnectionTimeout);
+			if (_maxAuthAttempts >= 0)
+				conf.setMissedAuthenticationsLimit(_maxAuthAttempts);
+			
+			if (_sandbox != null)
+				backConf.setSandboxPath(_sandbox);
+			
+			if (numArguments() > 1)
+			{
+				NetworkConstraint []constraints =
+					new NetworkConstraint[numArguments() - 1];
+				
+				for (int lcv = 1; lcv < numArguments(); lcv++)
+					constraints[lcv - 1] = new NetworkConstraint(
+						getArgument(lcv));
+				
+				conf.setNetworkConstraints(constraints);
+			}
+			
+			_daemon = new FTPDaemon(new GeniiBackendFactory(backConf), conf);
+			_daemon.start();
+		}
+		
 		return 0;
 	}
 

@@ -33,6 +33,11 @@ public class FTPDaemon
 		_listenerManager.addFTPListener(_vulture);
 	}
 	
+	public int getPort()
+	{
+		return _configuration.getListenPort();
+	}
+	
 	public void addFTPListener(FTPListener listener)
 	{
 		_listenerManager.addFTPListener(listener);
