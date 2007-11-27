@@ -1,9 +1,14 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import org.morgan.ftp.FTPConfiguration;
+import org.morgan.ftp.FTPDaemon;
+import org.morgan.ftp.NetworkConstraint;
+
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
-import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.io.FileResource;
+import edu.virginia.vcgr.genii.ftp.GeniiBackendConfiguration;
+import edu.virginia.vcgr.genii.ftp.GeniiBackendFactory;
 
 public class FtpdTool extends BaseGridTool
 {
@@ -45,7 +50,8 @@ public class FtpdTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		/*
+		GeniiBackendConfiguration backConf = new GeniiBackendConfiguration();
+		
 		FTPConfiguration conf = new FTPConfiguration(
 			Integer.parseInt(getArgument(0)));
 		if (_idleTimeout >= 0)
@@ -53,9 +59,10 @@ public class FtpdTool extends BaseGridTool
 		if (_dataConnectionTimeout >= 0)
 			conf.setDataConnectionTimeoutSeconds(_dataConnectionTimeout);
 		if (_maxAuthAttempts >= 0)
-			conf.setMissedAuthentiationsLimit(_maxAuthAttempts);
+			conf.setMissedAuthenticationsLimit(_maxAuthAttempts);
+		
 		if (_sandbox != null)
-			conf.setSandboxPath(_sandbox);
+			backConf.setSandboxPath(_sandbox);
 		
 		if (numArguments() > 1)
 		{
@@ -69,11 +76,8 @@ public class FtpdTool extends BaseGridTool
 			conf.setNetworkConstraints(constraints);
 		}
 		
-		FTPDaemon daemon = new FTPDaemon(
-			ContextManager.getCurrentContext(), conf);
-		daemon.addFTPListener(new FTPLogListener());
-		daemon.run();
-		*/
+		FTPDaemon daemon = new FTPDaemon(new GeniiBackendFactory(backConf), conf);
+		daemon.start();
 		return 0;
 	}
 

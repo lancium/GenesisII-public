@@ -19,6 +19,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.Socket;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -87,6 +88,18 @@ public class StreamUtils
 				rs.close();
 		}
 		catch (Throwable sqe)
+		{
+		}
+	}
+	
+	static public void close(Socket socket)
+	{
+		try
+		{
+			if (socket != null)
+				socket.close();
+		}
+		catch (Throwable cause)
 		{
 		}
 	}
