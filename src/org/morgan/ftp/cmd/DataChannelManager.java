@@ -4,7 +4,6 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -14,27 +13,18 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 import org.morgan.util.io.StreamUtils;
 
-import edu.virginia.vcgr.genii.client.configuration.Hostname;
-
 public class DataChannelManager
 {
 	static private Logger _logger = Logger.getLogger(DataChannelManager.class);
 	
 	static private String describeSocket(ServerSocket ss) throws SocketException
 	{
-		try
-		{
-			int port = ss.getLocalPort();
+		int port = ss.getLocalPort();
 			
-			_logger.info("Describing socket port " + port);
-			return String.format("=%s,%d,%d",
-					Hostname.getLocalHostname().getAddress().getHostAddress().replace(
-					'.', ','), port/256, port%256);
-		}
-		catch (UnknownHostException uhe)
-		{
-			throw new SocketException("Unknown host.");
-		}
+		_logger.info("Describing socket port " + port);
+		return String.format("=%s,%d,%d",
+			FTPHostname.getLocalHost(FTPHostname.HostFormats.IP_ADDR).replace(
+				'.', ','), port/256, port%256);
 	}
 	
 	static public DataChannelKey acquireDataChannel(long timeoutSeconds)
