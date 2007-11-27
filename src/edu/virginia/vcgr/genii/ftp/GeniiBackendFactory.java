@@ -15,6 +15,6 @@ public class GeniiBackendFactory implements IBackendFactory
 	@Override
 	public IBackend newBackendInstance()
 	{
-		return new GeniiBackend(_configuration);
+		return new GeniiBackend((GeniiBackendConfiguration)_configuration.clone());
 	}
 }

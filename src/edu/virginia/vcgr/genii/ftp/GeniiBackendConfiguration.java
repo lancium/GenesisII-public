@@ -10,10 +10,16 @@ import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 
-public class GeniiBackendConfiguration
+public class GeniiBackendConfiguration implements Cloneable
 {
 	private ICallingContext _callingContext;
 	private RNSPath _root;
+	
+	private GeniiBackendConfiguration(ICallingContext callingContext, RNSPath root)
+	{
+		_callingContext = callingContext;
+		_root = root;
+	}
 	
 	public GeniiBackendConfiguration(ICallingContext callingContext)
 	{
@@ -42,5 +48,10 @@ public class GeniiBackendConfiguration
 	public ICallingContext getCallingContext()
 	{
 		return _callingContext;
+	}
+	
+	public Object clone()
+	{
+		return new GeniiBackendConfiguration(_callingContext.deriveNewContext(), _root);
 	}
 }
