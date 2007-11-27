@@ -4,10 +4,6 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.io.FileResource;
-import edu.virginia.vcgr.genii.ftp.FTPConfiguration;
-import edu.virginia.vcgr.genii.ftp.FTPDaemon;
-import edu.virginia.vcgr.genii.ftp.FTPLogListener;
-import edu.virginia.vcgr.genii.ftp.NetworkConstraint;
 
 public class FtpdTool extends BaseGridTool
 {
@@ -49,6 +45,7 @@ public class FtpdTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
+		/*
 		FTPConfiguration conf = new FTPConfiguration(
 			Integer.parseInt(getArgument(0)));
 		if (_idleTimeout >= 0)
@@ -76,7 +73,7 @@ public class FtpdTool extends BaseGridTool
 			ContextManager.getCurrentContext(), conf);
 		daemon.addFTPListener(new FTPLogListener());
 		daemon.run();
-		
+		*/
 		return 0;
 	}
 
