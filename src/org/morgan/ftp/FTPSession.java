@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -101,24 +100,6 @@ public class FTPSession implements Runnable, Closeable
 		close();
 	}
 
-	public Date getLastActivity()
-	{
-		RollingCommandHistory history = _sessionState.getHistory();
-		
-		synchronized(history)
-		{
-			FTPAction action = history.lastCommand();
-			if (action == null)
-				return null;
-			
-			Date completed = action.completed();
-			if (completed == null)
-				return new Date();
-			
-			return completed;
-		}
-	}
-	
 	@Override
 	public void run()
 	{

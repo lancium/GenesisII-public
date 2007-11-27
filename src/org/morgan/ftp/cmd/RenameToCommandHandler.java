@@ -19,7 +19,7 @@ public class RenameToCommandHandler extends AbstractCommandHandler
 	public void handleCommand(FTPSessionState sessionState, String verb,
 			String parameters, PrintStream out) throws FTPException
 	{
-		FTPAction action = sessionState.getHistory().lastCompleted();
+		FTPAction action = sessionState.getHistory().lastCompleted(null);
 		if (action == null || !(action.getHandler() instanceof RenameFromCommandHandler))
 			out.println("503 Must have RNFR first.");
 		

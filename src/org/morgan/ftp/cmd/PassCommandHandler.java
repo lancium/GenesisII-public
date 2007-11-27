@@ -22,7 +22,7 @@ public class PassCommandHandler extends AbstractCommandHandler
 	public void handleCommand(FTPSessionState sessionState, String verb,
 			String parameters, PrintStream out) throws FTPException
 	{
-		FTPAction action = sessionState.getHistory().lastCompleted();
+		FTPAction action = sessionState.getHistory().lastCompleted(null);
 		if (action != null)
 		{
 			ICommandHandler handler = action.getHandler();

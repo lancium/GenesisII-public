@@ -42,20 +42,17 @@ public class RollingCommandHistory implements Iterable<FTPAction>, Closeable
 		return _history.iterator();
 	}
 	
-	public FTPAction lastCommand()
-	{
-		if (_history.size() <= 0)
-			return null;
-		
-		return _history.getFirst();
-	}
-	
-	public FTPAction lastCompleted()
+	public FTPAction lastCompleted(Class<? extends ICommandHandler> handlerType)
 	{
 		for (FTPAction action : _history)
 		{
 			if (action.completed() != null)
-				return action;
+			{
+				if (handlerType == null)
+					return action;
+				if (handlerType.isAssignableFrom(action.getHandler().getClass()))
+					return action;
+			}
 		}
 		
 		return null;

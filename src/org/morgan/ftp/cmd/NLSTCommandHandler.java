@@ -32,7 +32,7 @@ public class NLSTCommandHandler extends AbstractCommandHandler
 			String parameters, PrintStream out) throws FTPException
 	{
 		RollingCommandHistory history = sessionState.getHistory();
-		FTPAction lastCompletedAction = history.lastCompleted();
+		FTPAction lastCompletedAction = history.lastCompleted(PASVCommandHandler.class);
 		
 		ICommandHandler handler = lastCompletedAction.getHandler();
 		if (!(handler instanceof PASVCommandHandler))
