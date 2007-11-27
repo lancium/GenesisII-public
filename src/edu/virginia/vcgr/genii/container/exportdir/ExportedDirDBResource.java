@@ -393,7 +393,7 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		catch (IOException ioe)
 		{
 			throw new ResourceException("Unable to create file/directory at path " +
-				fullPath);
+				fullPath, ioe);
 		}
 	}
 	
