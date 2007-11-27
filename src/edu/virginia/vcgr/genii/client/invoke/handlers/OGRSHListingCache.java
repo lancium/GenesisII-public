@@ -6,6 +6,7 @@ import org.ggf.rns.EntryType;
 import org.ggf.rns.List;
 import org.ggf.rns.ListResponse;
 import org.ggf.rns.RNSPortType;
+import org.ggf.rns.Remove;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cache.TimedOutLRUCache;
@@ -126,5 +127,28 @@ public class OGRSHListingCache
 			
 			return resp;
 		}
+	}
+	
+	@PipelineProcessor(portType = RNSPortType.class)
+	public String[] remove(InvocationContext ctxt, Remove remove) throws Throwable
+	{
+		EndpointReferenceType dirEPR = ctxt.getTarget();
+		WSName dirName = new WSName(dirEPR);
+		
+		String []ret = (String[])ctxt.proceed();
+		
+		if (dirName.isValidWSName())
+		{
+			// Can only cache WSNames
+			synchronized(_entryCache)
+			{
+				for (String name : ret)
+				{
+					_entryCache.remove(new EntryKey(dirName, name));
+				}
+			}
+		}
+		
+		return ret;
 	}
 }
