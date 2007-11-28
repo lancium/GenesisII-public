@@ -373,6 +373,9 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		throws ResourceException
 	{
 		String fullPath = ExportedFileUtils.createFullPath(getLocalPath(), entryName);
+		
+		_logger.info("Export Dir asked to create \"[" + entryType + "] " + fullPath + "\" on disk");
+		
 		try
 		{
 			if (entryType.equals(ExportedDirEntry._FILE_TYPE))

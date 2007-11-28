@@ -124,7 +124,6 @@ public class ExportedDirUtils
 	 *         False if dir exists.  Pass through IOExceptions from create.
 	 */
 	static public boolean createLocalDir(String path)
-		throws IOException
 	{
 		File newFile = new File(path);
 		
