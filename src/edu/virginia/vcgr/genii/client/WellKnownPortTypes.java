@@ -126,4 +126,8 @@ public class WellKnownPortTypes
 	static public QName CERT_GENERATOR_SERVICE_PORT_TYPE =
 		new QName("http://vcgr.cs.virginia.edu/genii/2007/08/certGenerator",
 			"CertGeneratorPortType");
+	
+	static public QName INFORMATION_SERVICE_PORT_TYPE =
+		new QName("http://vcgr.cs.virginia.edu/genii/informationService",
+			"InformationServicePortType");
 }

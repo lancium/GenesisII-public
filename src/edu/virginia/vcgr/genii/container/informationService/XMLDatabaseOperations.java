@@ -7,8 +7,8 @@ import com.sleepycat.db.DatabaseException;
 import com.sleepycat.db.Environment;
 import com.sleepycat.db.EnvironmentConfig;
 import com.sleepycat.dbxml.XmlContainer;
+import com.sleepycat.dbxml.XmlContainerConfig;
 import com.sleepycat.dbxml.XmlDocument;
-import com.sleepycat.dbxml.XmlDocumentConfig;
 import com.sleepycat.dbxml.XmlException;
 import com.sleepycat.dbxml.XmlManager;
 import com.sleepycat.dbxml.XmlManagerConfig;
@@ -22,38 +22,23 @@ public class XMLDatabaseOperations {
 	
 	private void setup(EnvironmentConfig config)
 	{
-	    config.setCacheSize(50 * 1024 * 1024);
 	    config.setAllowCreate(true);			// if the environment does not exist, create it
 	    config.setInitializeCache(true);		// required for multithreaded applications; 
 												// this is turning on shared memory
-		config.setInitializeLogging(true);
+	    config.setCacheSize(4 * 1024 * 1024);	// 4 MB
+	    config.setInitializeLogging(true);
+	    config.setInitializeLocking(true);
 		config.setTransactional(true);
-		
-		//for setting up the XmlManager properties
-		XmlManagerConfig managerConfig = new XmlManagerConfig();
-		managerConfig.setAdoptEnvironment(true);		// can reference unopened containers
-		managerConfig.setAllowExternalAccess(true);		// XQuery can access external sources 
-														//(files, URLs, etc) 
+		config.setVerboseRecovery(true);
+		config.setThreaded(true);
 		
 		// for setting up the container properties
 		// XmlContainerConfig containerConfig = new XmlContainerConfig();
 	}
 	
-	private static void cleanup(XmlContainer openedContainer, XmlManager openedManager) 
-    {
-		try 
-		{
-		    if (openedContainer != null) openedContainer.close();
-		    if (openedManager != null) openedManager.close();
-		} 
-		catch (Exception e) 
-		{
-		    // ignore exceptions on close
-		}
-    }
-	
+
 	public String addBESContainer(String document, String name, String serviceName)
-	{ 	
+	{
 		EnvironmentConfig config = new EnvironmentConfig();
 		setup(config);
 		
@@ -65,58 +50,70 @@ public class XMLDatabaseOperations {
 		 *GuaranteedDirectory(Container.getConfigurationManager().getUserDirectory(), "collection");
 		 *String environmentPath = collectionDir.getPath();
 		 */
-			
+		
 		String environmentPath = "C:/dbxml-2.3.10/MyStuff";
 		
-		Environment env =  null; 
+		Environment env =  null;
 		XmlManager myManager = null;
 		XmlContainer container = null;
-		XmlDocument myDoc = null;
 		XmlTransaction trn = null;
+		XmlDocument myDoc = null;
 		String success = "the document is not added";
-		
-		try
-		{    
-			env = new Environment(new File(environmentPath), config);
-			//Create XmlManager using that environment, no DBXML flags
-			myManager = new XmlManager(env, null);
-		    myManager.setDefaultContainerType(XmlContainer.NodeContainer);
-
-			String theContainer = (serviceName.toString() + ".dbxml");
-			
-			if (document.toString() != null)
-			{
-				//starting the transaction
-				trn = myManager.createTransaction();
+		 if (document.toString()!=null)
+		 {
+			try
+			{    
+				env = new Environment(new File(environmentPath), config);	
 				
-				XmlUpdateContext theContext = myManager.createUpdateContext();
+				XmlManagerConfig managerConfig = new XmlManagerConfig();
+				managerConfig.setAdoptEnvironment(true);
+				managerConfig.setAllowExternalAccess(true);
 				
-			    myDoc = myManager.createDocument();
-			    myDoc.setName(name);			
+				myManager = new XmlManager(env, managerConfig);
+				myManager.setDefaultContainerType(XmlContainer.NodeContainer);
+				
+				XmlContainerConfig cconfig = new XmlContainerConfig();
+				cconfig.setNodeContainer(true);
+				cconfig.setIndexNodes(true);
+				cconfig.setTransactional(true);
+				
+				String containerName = serviceName.toString() + ".bdbxml";
+				if (myManager.existsContainer(containerName)==0)
+				{
+					container = myManager.createContainer(containerName, cconfig);	
+				}
+				else container = myManager.openContainer(containerName, cconfig);
+				
+				myDoc = myManager.createDocument();
+				myDoc.setName(name);
 				myDoc.setContent(document.toString());
 				
-			    // check if the container is already existing
-				if (myManager.existsContainer(theContainer) == 0)
-				{ container = myManager.createContainer(theContainer); }
-				else
-				{ container = myManager.openContainer(theContainer); }
-				container.putDocument ( myDoc, theContext);
+				trn = myManager.createTransaction();
+				XmlUpdateContext theContext = myManager.createUpdateContext();
+				container.putDocument(myDoc, theContext);
 				trn.commit();
 				success = "the document is added";
 				trn.delete();
-				theContext.delete();
-			}			
-		}
-		catch (XmlException e) { System.err.println("The error in addBESContainer() is: " +e.getMessage());}
-		catch (DatabaseException de){System.err.println("A database exception has occured in addBESContainer()") ;} 
-		catch (FileNotFoundException e) 
-		{
-			System.err.println("The error is: " +e.getMessage());
-			e.printStackTrace();
-		}
-		
-		finally { cleanup(container, myManager);}
-		return success;	
+			}
+			catch (XmlException e) { System.err.println("The error in addBESContainer() is: " +e.getMessage());}
+			catch (DatabaseException de){System.err.println("A database exception has occured in addBESContainer()") ;} 
+			catch (FileNotFoundException e) 
+			{
+				System.err.println("The error is: " +e.getMessage());
+				e.printStackTrace();
+			}
+			
+			finally { 
+				try
+				{
+					if (myDoc!=null) {myDoc.delete();}
+					if (container !=null){container.close();}
+					if (myManager !=null){myManager.close();}	
+				}
+				catch (DatabaseException de){System.err.println("A database exception has occured in addBESContainer()") ;}
+				}
+		 }
+		return success;			
 	}
 
 	public String queryForProperties(String query, String serviceName)
@@ -128,71 +125,106 @@ public class XMLDatabaseOperations {
 		 *GuaranteedDirectory(Container.getConfigurationManager().getUserDirectory(), "collection");
 		 *String environmentPath = collectionDir.getPath();
 		 */
-		String environmentPath = "C:/dbxml-2.3.10/MyStuff";
 		EnvironmentConfig config = new EnvironmentConfig();
 		setup(config);
-    
-	    //for setting the document properties
-	    XmlDocumentConfig documentConfig = new XmlDocumentConfig();
-	    documentConfig.setGenerateName(true);
-	        
-	    Environment env = null;
-	    XmlManager myManager = null;
-	    XmlContainer container = null;
-	    XmlTransaction trn = null;
+		
+		/*
+		 *for creating the collection in the same place as the container
+		 *
+		 *String environmentPath = ENVIRONMENT_PATH_SYSTEM_PROPERTY;
+		 *File collectionDir = new 
+		 *GuaranteedDirectory(Container.getConfigurationManager().getUserDirectory(), "collection");
+		 *String environmentPath = collectionDir.getPath();
+		 */
+	
+		String environmentPath = "C:/dbxml-2.3.10/MyStuff";
+		
+		Environment env =  null;
+		XmlManager myManager = null;
+		XmlContainer container = null;
+		XmlTransaction trn = null;
+	    XmlResults results = null;
+	    XmlQueryExpression qe=  null;
 	    String result = "";
 	    
 	    String internalQuery = "" ;
-	    
+		
+		
 		try
 		{    
-		    env = new Environment(new File(environmentPath), config);
-			//Create XmlManager using that environment, no DBXML flags
-			myManager = new XmlManager(env, null);
+			env = new Environment(new File(environmentPath), config);	
+			
+			XmlManagerConfig managerConfig = new XmlManagerConfig();
+			managerConfig.setAdoptEnvironment(true);		// can reference unopened containers
+			managerConfig.setAllowExternalAccess(true);		// XQuery can access external sources 
+															//(files, URLs, etc)
+	
+			myManager = new XmlManager(env, managerConfig);
 		    myManager.setDefaultContainerType(XmlContainer.NodeContainer);
 
-			String theContainer = (serviceName.toString() + ".dbxml");
-			internalQuery = internalQuery.concat("collection('"+ theContainer+"')");
+		    /**
+		     * setting up the container configuration
+		     */
+		    XmlContainerConfig cconfig = new XmlContainerConfig();
+		    cconfig.setNodeContainer(true);
+		    cconfig.setIndexNodes(true);
+		    cconfig.setTransactional(true);
+
+			String theContainer = (serviceName.toString() + ".bdbxml");
+//			String myQuery = "collection('newContainer.dbxml')/string()";
+			internalQuery = internalQuery.concat("collection('"+ theContainer+"')/string()");
 			internalQuery = internalQuery.concat(query);
 			
-			//starting the transaction
-			trn = myManager.createTransaction();			
-		    // check if the container is already existing
-			if (myManager.existsContainer(theContainer) == 0)
-			{ System.err.println("This container does not exist");}
-			else
-			{ 
-				container = myManager.openContainer(theContainer); 
-		
-				XmlQueryContext qContext = myManager.createQueryContext();
-				//String myQuery = "collection('newContainer.dbxml')/string()";
-				XmlQueryExpression qe = myManager.prepare(internalQuery, qContext);
-				XmlResults results = null;
-				if (internalQuery.toString() != null)
+			if (internalQuery.toString()!= null)
+			{
+				if (myManager.existsContainer(theContainer) == 0)
+				{ System.err.println("This container does not exist");}
+				else
+				{ 
+					container = myManager.openContainer(theContainer, cconfig); 
+				
+					trn = myManager.createTransaction();
+					XmlQueryContext qContext = myManager.createQueryContext();
+					
+					qe = myManager.prepare(internalQuery, qContext);
 					results = qe.execute(qContext);
-			
-				if (results.hasNext() ) 
-					result += results.peek().asString() + "\n";
-				while (results.hasNext())
-				{
-					result +=(results.next().asString() + "\n");
+					String docNumber = "Number of documents found: " +String.valueOf(results.size());
+					System.out.println(docNumber);
+					
+					 if (results.next()!= null) 
+					 {
+						result += results.peek().asString().toString() + "\n";
+						
+						results.next();
+					 }
+				
+					trn.commit();
+					trn.delete();
+					qContext.delete();
 				}
-				trn.commit();
-				trn.delete();
-				qContext.delete();
 			}
 		}
+		catch (XmlException e) { System.err.println("The error in addBESContainer() is: " +e.getMessage());}
+		catch (DatabaseException de){System.err.println("A database exception has occured in addBESContainer()") ;} 
+		catch (FileNotFoundException e) 
+		{
+			System.err.println("The error is: " +e.getMessage());
+			e.printStackTrace();
+		}
 		
-		catch (XmlException e) { System.err.println("The error is queryForProperties: " +e.getMessage());}
-		catch (DatabaseException de){ System.err.println("A Database Exception has occured in queryForProperties()");}
-		catch (FileNotFoundException fnfe){System.err.println("A Database Exception has occured in queryForProperties()");}
+		finally { 
+			try
+			{
+				if (results != null) {results.delete();}
+				if (qe != null) {qe.delete();}
+				if (container !=null){container.close();}
+				if (myManager !=null){myManager.close();}	
+			}
+			catch (DatabaseException de){System.err.println("A database exception has occured in addBESContainer()") ;}
+			}
 		
-		finally { cleanup(container, myManager);}
 		return result;	
 	}
-	
-	
-	
 	
 	/*
 	 * deletes an XML document if it already exists in the database
@@ -205,55 +237,82 @@ public class XMLDatabaseOperations {
 		 
 		EnvironmentConfig config = new EnvironmentConfig();
 		setup(config);
+		
+		/*
+		 *for creating the collection in the same place as the container
+		 *
+		 *String environmentPath = ENVIRONMENT_PATH_SYSTEM_PROPERTY;
+		 *File collectionDir = new 
+		 *GuaranteedDirectory(Container.getConfigurationManager().getUserDirectory(), "collection");
+		 *String environmentPath = collectionDir.getPath();
+		 */
 		String environmentPath = "C:/dbxml-2.3.10/MyStuff";
-		Environment env =  null; 
+		
+		Environment env =  null;
 		XmlManager myManager = null;
 		XmlContainer container = null;
-		XmlDocument myDoc = null;
 		XmlTransaction trn = null;
+		XmlDocument myDoc = null;
+		
 		try
 		{    
-			env = new Environment(new File(environmentPath), config);
-			//Create XmlManager using that environment, no DBXML flags
-			myManager = new XmlManager(env, null);
-		    myManager.setDefaultContainerType(XmlContainer.NodeContainer);
-
-			String theContainer = (serviceName.toString() + ".dbxml");
+			env = new Environment(new File(environmentPath), config);	
 			
-			if (elementToAdd != null)
+			XmlManagerConfig managerConfig = new XmlManagerConfig();
+			managerConfig.setAdoptEnvironment(true);
+			managerConfig.setAllowExternalAccess(true);
+			
+			myManager = new XmlManager(env, managerConfig);
+			myManager.setDefaultContainerType(XmlContainer.NodeContainer);
+			
+			XmlContainerConfig cconfig = new XmlContainerConfig();
+			cconfig.setNodeContainer(true);
+			cconfig.setIndexNodes(true);
+			cconfig.setTransactional(true);
+			
+			String containerName = serviceName.toString() + ".bdbxml";
+			if (myManager.existsContainer(containerName)==0)
 			{
+				container = myManager.createContainer(containerName, cconfig);
 				
-//				 check if the container is already existing
-				if (myManager.existsContainer(theContainer) == 0)
-				{ container = myManager.createContainer(theContainer); }
-				else
-				{ container = myManager.openContainer(theContainer); }
-				
-//				starting the transaction
+			}
+			else container = myManager.openContainer(containerName, cconfig);
+			
+			if (elementToAdd !=null)
+			{
 				trn = myManager.createTransaction();
-				
 				XmlUpdateContext theContext = myManager.createUpdateContext();
-				
-			    myDoc = container.getDocument(elementToAdd);
-			    if (myDoc != null)			   
-			    {
-			    	container.deleteDocument(elementToAdd, theContext);
-			    }
+				try {
+				myDoc = container.getDocument(elementToAdd);
+				}
+				catch (XmlException e)
+				{
+					//ignore
+				}
+				if (myDoc!= null)
+					container.deleteDocument(elementToAdd, theContext);
 				trn.commit();
 				trn.delete();
-				theContext.delete();
-			}			
+			}
+
 		}
-		
-		catch (XmlException e) {}
-		catch (DatabaseException de){System.err.println("A database exception has occured in preexist()") ;} 
+		catch (XmlException e) { System.err.println("The error in addBESContainer() is: " +e.getMessage());}
+		catch (DatabaseException de){System.err.println("A database exception has occured in addBESContainer()") ;} 
 		catch (FileNotFoundException e) 
 		{
 			System.err.println("The error is: " +e.getMessage());
 			e.printStackTrace();
 		}
 		
-		finally { cleanup(container, myManager);}
+		finally { 
+			try
+			{
+				if (myDoc !=null) {myDoc.delete();}
+				if (container !=null){container.close();}
+				if (myManager !=null){myManager.close();}	
+			}
+			catch (DatabaseException de){System.err.println("A database exception has occured in addBESContainer()") ;}
+			}		
 	}
 
 }

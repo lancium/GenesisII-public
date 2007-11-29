@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.regex.Pattern;
@@ -41,12 +42,6 @@ import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.rns.RNSException;
-import edu.virginia.vcgr.genii.client.rns.RNSMultiLookupResultException;
-import edu.virginia.vcgr.genii.client.rns.RNSPath;
-import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
-import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
-import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
@@ -57,6 +52,7 @@ import edu.virginia.vcgr.genii.container.informationService.resource.IISResource
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rns.IRNSResource;
+
 import edu.virginia.vcgr.genii.container.rns.RNSServiceImpl;
 import edu.virginia.vcgr.genii.informationService.AddContainerRequestType;
 import edu.virginia.vcgr.genii.informationService.BESAttributesDocumentRequestType;
@@ -69,6 +65,8 @@ import edu.virginia.vcgr.genii.informationService.RemoveContainerResponseType;
 
 public class InformationServiceImpl extends RNSServiceImpl implements
 InformationServicePortType {
+	
+	private ICallingContext _serviceCallingContext = null;
 	
 	
 	/**
@@ -84,16 +82,13 @@ InformationServicePortType {
 		private Thread executingThread;
 
 		//	private RNSPath myPath;
-	//	private ICallingContext callingContext;
+		
 		private InformationServiceImpl myParent;
 
 	
-		public Updates( EndpointReferenceType EPR, RNSPath servicePath, ICallingContext callingCtxt, 
-				InformationServiceImpl myParent) 
+		public Updates( EndpointReferenceType EPR, InformationServiceImpl myParent) 
 		{
 			resourceEPR = EPR;
-		//	myPath = servicePath;
-		//	callingContext = callingCtxt;
 			this.myParent = myParent;
             }
 		public void run() 
@@ -110,7 +105,8 @@ InformationServicePortType {
 					WorkingContext.EPR_PROPERTY_NAME, resourceEPR);
 				WorkingContext.getCurrentWorkingContext().setProperty(
 					WorkingContext.TARGETED_SERVICE_NAME, targetedServiceName);
-	
+					
+				
 				synchronized(this)
 				{
 					executingThread = Thread.currentThread();
@@ -128,10 +124,11 @@ InformationServicePortType {
 		{
 			for (int i=0; i< 100000 ; i++)
 			{
+				System.out.println("iteration number: " + i);
 				// the thread will be checking for updates every 5 min (30000)
 				try 
 				{
-					Thread.sleep(3000);
+					Thread.sleep(500);
 				} 
 				catch (InterruptedException e) {e.printStackTrace();}
 				Collection<EntryType> entries;
@@ -153,11 +150,11 @@ InformationServicePortType {
 					{
 						EndpointReferenceType entryEPR = ServiceEntries[j].getEntry_reference();
 						String entryName = ServiceEntries[j].getEntry_name().toString();
-						try {
+						try 
+						{
 							request.setEPRofContainerToAdd(entryEPR);
 							request.setNameofContainerToAdd(entryName);
-							myParent.addContainer(request);
-										
+							myParent.addContainer(request);				
 						} 
 						catch (GenesisIISecurityException e1) {e1.printStackTrace();} 
 						catch (RemoteException e) {e.printStackTrace();}
@@ -170,10 +167,10 @@ InformationServicePortType {
 	
 	
 	
-	public InformationServiceImpl() throws RemoteException {
+	public InformationServiceImpl() throws RemoteException 
+	{
 		super("InformationServicePortType");
 		addImplementedPortType(WellKnownPortTypes.RNS_SERVICE_PORT_TYPE);
-		
 	}
 	
 	
@@ -278,17 +275,35 @@ InformationServicePortType {
 	public BESAttributesDocumentResponseType getBESAttributesDocument
 	(BESAttributesDocumentRequestType BESAttributesDocumentRequest) throws RemoteException 
 	{
+		ICallingContext callingContext = null;
+		try {
+			callingContext = ContextManager.getCurrentContext();
+			} 
+		catch (FileNotFoundException e1) {e1.printStackTrace();} 
+		catch (ConfigurationException e1) {e1.printStackTrace();} 
+		catch (IOException e1) {e1.printStackTrace();}
 		
 		String result = new String();
 		
 		if (BESAttributesDocumentRequest.toString() == null ) 
 			return null;
 	
+		
 		EndpointReferenceType myEPR = new EndpointReferenceType();
 		myEPR=BESAttributesDocumentRequest.getResourceEndpoint();
+		
 		try 
 		{
-			BESPortType bes = ClientUtils.createProxy(BESPortType.class, myEPR);
+			BESPortType bes = null;
+			
+			if (_serviceCallingContext != null)
+			{
+				bes = ClientUtils.createProxy(BESPortType.class, myEPR, _serviceCallingContext);
+			}
+			else 
+			{
+				bes = ClientUtils.createProxy(BESPortType.class, myEPR, callingContext);
+			}
 			GetFactoryAttributesDocumentResponseType resp =
 				bes.getFactoryAttributesDocument(new GetFactoryAttributesDocumentType());
 			
@@ -332,9 +347,20 @@ InformationServicePortType {
     	
     	entries = resource.listResources(pattern);
     	
-    	ListResponse resp = new ListResponse (entries.toArray(new EntryType[0]));
+    	ArrayList<EntryType> aRet = new ArrayList<EntryType>(entries.size());
+    	for (EntryType entry : entries)
+    	{
+    		String name = entry.getEntry_name().toString();
+    		if (pattern.matcher(name).matches())
+    		{
+    		aRet.add(new EntryType(
+    				entry.getEntry_name(), entry.get_any(), entry.getEntry_reference()));
+    		}
+    	}
     	
-		return resp;
+    	EntryType []ret = new EntryType[aRet.size()];
+    	aRet.toArray(ret);
+    	return new ListResponse(ret);
     }
 	
 	
@@ -345,68 +371,55 @@ InformationServicePortType {
 	@RWXMapping(RWXCategory.INHERITED)
 	public AddResponse add(Add addRequest) 
 		throws RemoteException, RNSEntryExistsFaultType, 
-			ResourceUnknownFaultType, 
-			RNSEntryNotDirectoryFaultType, RNSFaultType
+			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType, RNSFaultType
 	{
-	
 		return add(addRequest, null);
 	}
 	
 	/**
 	 * the overwritten add method
 	 */
-	protected AddResponse add(Add addRequest, MessageElement []attributes) 
-	throws RemoteException, RNSEntryExistsFaultType, 
-		ResourceUnknownFaultType, 
-		RNSEntryNotDirectoryFaultType, RNSFaultType
-		{
-		String resourceName =addRequest.getEntry_name();
-		EndpointReferenceType resourceEndpoint = addRequest.getEntry_reference();
-		
-		EndpointReferenceType myEPR = 
-			(EndpointReferenceType)WorkingContext.getCurrentWorkingContext().getProperty(
-				WorkingContext.EPR_PROPERTY_NAME);
-		IISResource resource = (IISResource)ResourceManager.getCurrentResource().dereference();
-		
-		ICallingContext callingContext = null;
-		try 
-		{
-			callingContext = ContextManager.getCurrentContext();
-		} 
-		catch (FileNotFoundException e1) {e1.printStackTrace();} 
-		catch (ConfigurationException e1) {e1.printStackTrace();} 
-		catch (IOException e1) {e1.printStackTrace();}
-		
-		resource.addResource(resourceName, resourceEndpoint, callingContext);
-		AddContainerRequestType newEntry = new AddContainerRequestType();
-		newEntry.setEPRofContainerToAdd(resourceEndpoint);
-		newEntry.setNameofContainerToAdd(resourceName);
-		
-		RNSPath servicePath = null;
-		String pathExpression = "/containers/BootstrapContainer/Services/InformationServicePortType";
-		try 
-		{
-			servicePath = RNSPath.getCurrent();
-			servicePath = servicePath.lookup(pathExpression, RNSPathQueryFlags.MUST_EXIST);
-		} 
-		catch (ConfigurationException e) {e.printStackTrace();}
-		catch (RNSPathDoesNotExistException e) {e.printStackTrace();} 
-		catch (RNSPathAlreadyExistsException e) {e.printStackTrace();} 
-		catch (RNSMultiLookupResultException e) {e.printStackTrace();} 
-		catch (RNSException e) {e.printStackTrace();}
-		
-		addContainer(newEntry);
 	
-		//		starting the thread
-		int resourceNumber = resource.listEntries().size();
-		if (resourceNumber==0)
-		{	
-			Thread t = new Thread(new Updates(myEPR, servicePath, callingContext, this));			
-			t.setName(resource.getKey().toString());
-			t.start();
-		}
+	protected AddResponse add(Add addRequest, MessageElement []attributes) 
+		throws RemoteException, RNSEntryExistsFaultType, 
+		ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType, RNSFaultType
+		{
+			String resourceName =addRequest.getEntry_name();
+			EndpointReferenceType resourceEndpoint = addRequest.getEntry_reference();
+			
+			EndpointReferenceType myEPR = 
+				(EndpointReferenceType)WorkingContext.getCurrentWorkingContext().getProperty(
+					WorkingContext.EPR_PROPERTY_NAME);
+			IISResource resource = (IISResource)ResourceManager.getCurrentResource().dereference();
+			
+			ICallingContext callingContext = null;
+			try 
+			{
+				callingContext = ContextManager.getCurrentContext();
+			} 
+			catch (FileNotFoundException e1) {e1.printStackTrace();} 
+			catch (ConfigurationException e1) {e1.printStackTrace();} 
+			catch (IOException e1) {e1.printStackTrace();}
+			_serviceCallingContext = callingContext;
+			
+			resource.addResource(resourceName, resourceEndpoint, callingContext);
+			AddContainerRequestType newEntry = new AddContainerRequestType();
+			newEntry.setEPRofContainerToAdd(resourceEndpoint);
+			newEntry.setNameofContainerToAdd(resourceName);
+	
+			addContainer(newEntry);
 		
-		return new AddResponse (resourceEndpoint);
+			//		starting the thread
+			Pattern pattern = null;
+			int resourceNumber = resource.listResources(pattern).size();
+			if (resourceNumber==1)
+			{	
+				Thread t = new Thread(new Updates(myEPR, this));			
+				t.setName(resource.getKey().toString());
+				t.start();
+			}
+			
+			return new AddResponse (resourceEndpoint);
 		
 		}
 	
@@ -450,6 +463,5 @@ InformationServicePortType {
 	
 	    return ret;
 	}
-
 
 }

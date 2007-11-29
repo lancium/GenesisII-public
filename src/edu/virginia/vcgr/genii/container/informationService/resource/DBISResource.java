@@ -98,8 +98,25 @@ public class DBISResource extends RNSDBResource implements IISResource{
 		}
 		catch (SQLException sqe)
 		{
+			
+			if (sqe.getErrorCode() == -104)
+			{
+				// Uniqueness problem
+				RNSEntryExistsFaultType fault = new RNSEntryExistsFaultType();
+				fault.setPath(resourceName);
+				try {
+					throw FaultManipulator.fillInFault(fault);
+				} catch (RNSEntryExistsFaultType e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} 
+			else
+		
 			throw new ResourceException("Unable to update database.", sqe);
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
 			throw new ResourceException ("Couldn't update database." , e);
 		}
 		finally

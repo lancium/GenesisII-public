@@ -22,7 +22,6 @@ public interface IISResource extends IRNSResource{
 		throws ResourceException;
 	public Collection<String> removeEntries(String regex)
 		throws ResourceException;
-	public Collection<String> listEntries() throws ResourceException;
 	public ICallingContext getContextInformation(String name) throws ResourceException;
 
 }

@@ -96,7 +96,7 @@ public class ClientUtils
 		try {
 			if (retval == null) {
 				// we never had any client identity
-				throw new CertificateExpiredException();
+				throw new CertificateExpiredException("Could not find caller's identity and key material.");
 			}
 				
 			// check the time validity of our client identity

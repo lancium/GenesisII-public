@@ -15,7 +15,7 @@ public class InfoSQueryTool extends BaseGridTool {
 	static private final String _DESCRIPTION =
 		"allows you to query the XML database";
 	static private final String _USAGE1 =
-		"query-dbxml <Berkley DB query> <informationService-service-path>";
+		"xmldb-query <Berkeley DB query> <informationService-service-path>";
 
 	public InfoSQueryTool() {
 		super(_DESCRIPTION, _USAGE1, false);
@@ -36,14 +36,14 @@ public class InfoSQueryTool extends BaseGridTool {
 
 	}
 
-	private void query(String str1, String servicePath) throws Throwable
+	private void query(String query, String servicePath) throws Throwable
 	{
 		RNSPath path = RNSPath.getCurrent().lookup(servicePath, RNSPathQueryFlags.MUST_EXIST);
 		InformationServicePortType informationService = ClientUtils.createProxy(
 				InformationServicePortType.class, path.getEndpoint());
-		QueryResponseType rs =informationService.queryForProperties(new QueryRequestType(str1));
+		QueryResponseType rs =informationService.queryForProperties(new QueryRequestType(query));
 		
-		System.err.println("Your query: " + str1 + "\n" + "The results are:" + "\n" + rs.getResult());
+		System.err.println("Your query: " + query + "\n" + "The results are:" + "\n" + rs.getResult());
 	}
 
 }
