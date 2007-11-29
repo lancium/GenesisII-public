@@ -14,6 +14,8 @@ namespace ogrsh
 {
 	namespace shims
 	{
+		SHIM_DECL(int, creat, (const char *path, mode_t mode));
+		SHIM_DECL(int, creat64, (const char *path, mode_t mode));
 		SHIM_DECL(int, open, (const char *path, int flags, mode_t mode));
 		SHIM_DECL(int, open64, (const char *path, int flags, mode_t mode));
 		SHIM_DECL(int, openat,

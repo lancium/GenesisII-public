@@ -7,6 +7,8 @@
 #include "ogrsh/DirectoryStream.hpp"
 #include "ogrsh/DirectoryFunctions.hpp"
 
+#include "ogrsh/shims/File.hpp"
+
 #include "providers/geniifs/GeniiFSDirectoryFunctions.hpp"
 #include "providers/geniifs/GeniiFSDirectoryStream.hpp"
 #include "providers/geniifs/GeniiFSMount.hpp"
@@ -24,6 +26,38 @@ namespace ogrsh
 		{
 			_session = session;
 			_mount = mount;
+		}
+
+		int GeniiFSDirectoryFunctions::utime(const ogrsh::Path &relativePath,
+			const struct utimbuf *buf)
+		{
+			OGRSH_DEBUG("GeniiFSDirectoryFunctions::utime(\""
+				<< (const std::string&)relativePath << "\", ...) called.");
+	
+			std::string fullPath =
+				(relativePath.length() == 0) ? _rnsSource :
+					_rnsSource + (const std::string&)relativePath;
+
+			ogrsh::shims::uber_real_fprintf(
+				stderr, "Haven't implemented GENII utime yet\n");
+
+			return 0;
+		}
+
+		int GeniiFSDirectoryFunctions::utimes(const ogrsh::Path &relativePath,
+			const struct timeval *times)
+		{
+			OGRSH_DEBUG("GeniiFSDirectoryFunctions::utimes(\""
+				<< (const std::string&)relativePath << "\", ...) called.");
+	
+			std::string fullPath =
+				(relativePath.length() == 0) ? _rnsSource :
+					_rnsSource + (const std::string&)relativePath;
+
+			ogrsh::shims::uber_real_fprintf(
+				stderr, "Haven't implemented GENII utimes yet\n");
+
+			return 0;
 		}
 
 		int GeniiFSDirectoryFunctions::chdir(const ogrsh::Path &relativePath)

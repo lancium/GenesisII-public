@@ -117,26 +117,6 @@ extern "C" {
 		return 0;
 	}
 
-	int creat(const char *pathname, mode_t mode)
-	{
-		OGRSH_FATAL(
-			"Attempt to use un-intercepted method creat(\""
-			<< pathname << "\", " << mode << ")");
-		ogrsh::shims::real_exit(1);
-
-		return 0;
-	}
-
-	int creat64(const char *pathname, mode_t mode)
-	{
-		OGRSH_FATAL(
-			"Attempt to use un-intercepted method creat64(\""
-			<< pathname << "\", " << mode << ")");
-		ogrsh::shims::real_exit(1);
-
-		return 0;
-	}
-
 	int truncate(const char *path, off_t length)
 	{
 		OGRSH_FATAL(

@@ -15,6 +15,27 @@ namespace ogrsh
 {
 	namespace shims
 	{
+		SHIM_DEF(int, utime, (const char *filename, const struct utimbuf *buf),
+			(filename, buf))
+		{
+			OGRSH_TRACE("utime(\"" << filename << "\", ...) called.");
+
+			Path fullPath = Path::getCurrentWorkingDirectory().lookup(filename);
+			Mount *rootMount = Configuration::getConfiguration().getRootMount();
+			return rootMount->getDirectoryFunctions()->utime(fullPath, buf);
+		}
+
+		SHIM_DEF(int, utimes,
+			(const char *filename, const struct timeval *times),
+			(filename, times))
+		{
+			OGRSH_TRACE("utimes(\"" << filename << "\", ...) called.");
+
+			Path fullPath = Path::getCurrentWorkingDirectory().lookup(filename);
+			Mount *rootMount = Configuration::getConfiguration().getRootMount();
+			return rootMount->getDirectoryFunctions()->utimes(fullPath, times);
+		}
+
 		SHIM_DEF(int, chmod, (const char *path, mode_t mode), (path, mode))
 		{
 			OGRSH_TRACE("chmod(\"" << path << "\", " << mode << ") called.");
@@ -410,6 +431,8 @@ namespace ogrsh
 
 		void startDirectoryShims()
 		{
+			START_SHIM(utime);
+			START_SHIM(utimes);
 			START_SHIM(rename);
 			START_SHIM(chdir);
 			START_SHIM(fchdir);
@@ -462,6 +485,8 @@ namespace ogrsh
 			STOP_SHIM(link);
 			STOP_SHIM(readlink);
 			STOP_SHIM(rename);
+			STOP_SHIM(utime);
+			STOP_SHIM(utimes);
 		}
 	}
 }

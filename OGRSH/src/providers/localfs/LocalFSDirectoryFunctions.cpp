@@ -18,6 +18,32 @@ namespace ogrsh
 		{
 		}
 
+		int LocalFSDirectoryFunctions::utime(const ogrsh::Path &relativePath,
+			const struct utimbuf *buf)
+		{
+			OGRSH_DEBUG("LocalFSDirectoryFunctions::utime(\""
+				<< (const std::string&)relativePath << "\", ...) called.");
+	
+			std::string fullPath =
+				(relativePath.length() == 0) ? _localSource :
+					_localSource + (const std::string&)relativePath;
+
+			return ogrsh::shims::real_utime(fullPath.c_str(), buf);
+		}
+
+		int LocalFSDirectoryFunctions::utimes(const ogrsh::Path &relativePath,
+			const struct timeval *times)
+		{
+			OGRSH_DEBUG("LocalFSDirectoryFunctions::utimes(\""
+				<< (const std::string&)relativePath << "\", ...) called.");
+	
+			std::string fullPath =
+				(relativePath.length() == 0) ? _localSource :
+					_localSource + (const std::string&)relativePath;
+
+			return ogrsh::shims::real_utimes(fullPath.c_str(), times);
+		}
+
 		int LocalFSDirectoryFunctions::chdir(const ogrsh::Path &relativePath)
 		{
 			OGRSH_DEBUG("LocalFSDirectoryFunctions::chdir(\""

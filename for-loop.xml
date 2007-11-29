@@ -3,8 +3,20 @@
 	xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
 	xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
 
-	<gsh:for param-name="COUNT" initial-value="0" exclusive-limit="20"
+	<gsh:for param-name="OUTER" initial-value="0" exclusive-limit="15"
 		increment-value="1">
-		<gsh:echo message="Count is ${COUNT}"/>
+		<geniix:mkdir>
+			<gsh:param>dir.${OUTER}</gsh:param>
+		</geniix:mkdir>
+
+		<gsh:for param-name="COUNT" initial-value="0" exclusive-limit="20"
+			increment-value="1">
+			<gsh:echo message="Copying file ${COUNT} into dir ${OUTER}"/>
+			<geniix:cp>
+				<gsh:param>--local-src</gsh:param>
+				<gsh:param>/etc/passwd</gsh:param>
+				<gsh:param>/dir.${OUTER}/passwd.${COUNT}</gsh:param>
+			</geniix:cp>
+		</gsh:for>
 	</gsh:for>
 </gsh:script>

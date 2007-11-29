@@ -17,6 +17,11 @@ namespace ogrsh
 		public:
 			VirtualDirectoryFunctions(MountTree *mountTree);
 
+			virtual int utime(const Path &relativePath,
+				const struct utimbuf *buf);
+			virtual int utimes(const Path &relativePath,
+				const struct timeval *times);
+
 			virtual int chdir(const Path &relativePath);
 			virtual int mkdir(const Path &relativePath, mode_t mode);
 			virtual int rmdir(const Path &relativePath);

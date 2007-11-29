@@ -6,6 +6,10 @@
 	<property file="${basedir}/build.properties"/>
 
 	<!-- Static Class paths -->
+	<path id="log4j.classpath">
+		<fileset dir="${axis-home}" includes="**/log4j*.jar"/>
+	</path>
+
 	<path id="axis.classpath">
 		<fileset dir="${axis-home}" includes="**/*.jar"/>
 	</path>
@@ -87,6 +91,7 @@
 		<javac destdir="${obj-dir}" debug="true">
 			<src path="${src-dir}"/>
 			<classpath refid="junit.classpath"/>
+			<classpath refid="log4j.classpath"/>
 			<include name="org/morgan/**/*.java"/>
 		</javac>
 		<copy todir="${obj-dir}">

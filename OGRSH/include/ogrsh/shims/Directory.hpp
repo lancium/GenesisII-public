@@ -12,6 +12,10 @@ namespace ogrsh
 {
 	namespace shims
 	{
+		SHIM_DECL(int, utime, (const char *filename,
+			const struct utimbuf *buf));
+		SHIM_DECL(int, utimes, (const char *filename,
+			const struct timeval *times));
 		SHIM_DECL(int, chdir, (const char *path));
 		SHIM_DECL(int, fchdir, (int fd));
 		SHIM_DECL(int, mkdir, (const char *pathname, mode_t mode));

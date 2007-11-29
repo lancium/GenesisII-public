@@ -17,6 +17,18 @@ namespace ogrsh
 {
 	namespace shims
 	{
+		SHIM_DEF(int, creat, (const char *pathname, mode_t mode),
+			(pathname, mode))
+		{
+			return open(pathname, O_CREAT | O_WRONLY | O_TRUNC, mode);
+		}
+
+		SHIM_DEF(int, creat64, (const char *pathname, mode_t mode),
+			(pathname, mode))
+		{
+			return open64(pathname, O_CREAT | O_WRONLY | O_TRUNC, mode);
+		}
+
 		SHIM_DEF(int, openat,
 			(int fd, const char *pathname, int flags, mode_t mode),
 			(fd, pathname, flags, mode))
@@ -766,6 +778,8 @@ extern "C" {
 			START_SHIM(openat64);
 			START_SHIM(open);
 			START_SHIM(open64);
+			START_SHIM(creat);
+			START_SHIM(creat64);
 			START_SHIM(close);
 			START_SHIM(unlink);
 			START_SHIM(unlinkat);
@@ -833,6 +847,8 @@ extern "C" {
 
 			STOP_SHIM(write);
 			STOP_SHIM(read);
+			STOP_SHIM(creat64);
+			STOP_SHIM(creat);
 			STOP_SHIM(open64);
 			STOP_SHIM(open);
 			STOP_SHIM(openat64);

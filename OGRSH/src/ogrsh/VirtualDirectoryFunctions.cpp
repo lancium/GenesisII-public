@@ -19,6 +19,68 @@ namespace ogrsh
 		_mountTree = mountTree;
 	}
 
+	int VirtualDirectoryFunctions::utime(const Path &relativePath,
+		const struct utimbuf *buf)
+	{
+		Path subRelativePath = relativePath;
+		MountTree *tree = findMount(_mountTree, subRelativePath);
+
+		if (tree == NULL)
+		{
+			// Couldn't find the path
+			errno = ENOENT;
+			return -1;
+		} else
+		{
+			Mount *mount = tree->getMount();
+			if (mount != NULL)
+			{
+				// We have another provider, call it.
+				return mount->getDirectoryFunctions()->utime(
+					subRelativePath, buf);
+			} else
+			{
+				// It's an internal entry
+				errno = EROFS;
+				return -1;
+			}
+		}
+
+		// Shouldn't get here.
+		return -1;
+	}
+
+	int VirtualDirectoryFunctions::utimes(const Path &relativePath,
+		const struct timeval *times)
+	{
+		Path subRelativePath = relativePath;
+		MountTree *tree = findMount(_mountTree, subRelativePath);
+
+		if (tree == NULL)
+		{
+			// Couldn't find the path
+			errno = ENOENT;
+			return -1;
+		} else
+		{
+			Mount *mount = tree->getMount();
+			if (mount != NULL)
+			{
+				// We have another provider, call it.
+				return mount->getDirectoryFunctions()->utimes(
+					subRelativePath, times);
+			} else
+			{
+				// It's an internal entry
+				errno = EROFS;
+				return -1;
+			}
+		}
+
+		// Shouldn't get here.
+		return -1;
+	}
+
 	int VirtualDirectoryFunctions::chdir(
 		const Path &relativePath)
 	{

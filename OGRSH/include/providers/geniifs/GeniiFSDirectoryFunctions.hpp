@@ -25,6 +25,11 @@ namespace ogrsh
 				GeniiFSDirectoryFunctions(GeniiFSSession *session,
 					GeniiFSMount *mount, const std::string &rnsSource);
 
+				virtual int utime(const Path &relativePath,
+					const struct utimbuf *buf);
+				virtual int utimes(const Path &relativePath,
+					const struct timeval *times);
+
 				virtual int chdir(const ogrsh::Path &relativePath);
 				virtual int mkdir(const ogrsh::Path &relativePath, mode_t mode);
 				virtual int rmdir(const ogrsh::Path &relativePath);

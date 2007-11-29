@@ -22,12 +22,12 @@ public class OGRSHContextResolver implements IContextResolver
 	
 	public ICallingContext load() throws IOException, FileNotFoundException
 	{
-		return _localCallingContext.get().deriveNewContext();
+		return _localCallingContext.get();
 	}
 
 	public void store(ICallingContext ctxt) throws FileNotFoundException,
 			IOException
 	{
-		_localCallingContext.set(ctxt.deriveNewContext());
+		_localCallingContext.set(ctxt);
 	}
 }

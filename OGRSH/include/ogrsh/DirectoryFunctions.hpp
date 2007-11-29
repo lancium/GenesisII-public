@@ -24,6 +24,10 @@ namespace ogrsh
 		public:
 			virtual ~DirectoryFunctions();
 
+			virtual int utime(const Path &relativePath,
+				const struct utimbuf *buf) = 0;
+			virtual int utimes(const Path &relativePath,
+				const struct timeval *times) = 0;
 			virtual int chdir(const Path &relativePath) = 0;
 			virtual int mkdir(const Path &relativePath, mode_t mode) = 0;
 			virtual int rmdir(const Path &relativePath) = 0;
