@@ -193,6 +193,8 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 				}, null, null));
 		}
 		
+		_logger.debug("ExportDir asked to add \"" + name + "\".");
+		
 		IExportedDirResource resource;
 		ResourceKey rKey = ResourceManager.getCurrentResource();
 		
@@ -220,6 +222,9 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 			RNSFaultType
 	{
 		String entry_name_regexp = listRequest.getEntry_name_regexp();
+		
+		_logger.debug("ExportDir asked to lookup \"" + entry_name_regexp + "\".");
+		
 		IExportedDirResource resource = 
 			(IExportedDirResource)ResourceManager.getCurrentResource().dereference();
 		Collection<ExportedDirEntry> entries;
