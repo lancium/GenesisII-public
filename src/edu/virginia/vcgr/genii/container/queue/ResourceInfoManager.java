@@ -249,7 +249,7 @@ public class ResourceInfoManager implements Runnable
 		}
 		catch (Throwable t)
 		{
-			_logger.debug("Unable to talk to resource -- assuming it's unavailable.");
+			_logger.debug("Unable to talk to resource -- assuming it's unavailable.", t);
 			return false;
 		}
 	}

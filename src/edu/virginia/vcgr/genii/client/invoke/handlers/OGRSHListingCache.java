@@ -18,7 +18,7 @@ public class OGRSHListingCache
 {
 	static private Log _logger = LogFactory.getLog(OGRSHListingCache.class);
 	
-	static private final int _MAX_CACHE_ELEMENTS = 1024;
+	static private final int _MAX_CACHE_ELEMENTS = 64;
 	static private final long _DEFAULT_TIMEOUT_MS = 1000 * 15;
 	
 	static private class EntryKey
