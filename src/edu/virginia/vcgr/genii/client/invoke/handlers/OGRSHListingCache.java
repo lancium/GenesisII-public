@@ -35,6 +35,7 @@ public class OGRSHListingCache
 	
 	static private void cleanse(EndpointReferenceType epr)
 	{
+		/* TODO
 		cleanse(epr.get_any());
 		MetadataType mt = epr.getMetadata();
 		if (mt != null)
@@ -42,15 +43,18 @@ public class OGRSHListingCache
 		ReferenceParametersType rpt = epr.getReferenceParameters();
 		if (rpt != null)
 			cleanse(rpt.get_any());
+		*/
 	}
 	
 	static private void cleanse(EntryType entry)
 	{
+		/* TODO
 		if (entry != null)
 		{
 			cleanse(entry.get_any());
 			cleanse(entry.getEntry_reference());
 		}
+		*/
 	}
 	
 	static private class EntryKey

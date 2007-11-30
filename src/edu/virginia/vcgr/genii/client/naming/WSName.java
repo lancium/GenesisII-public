@@ -26,6 +26,8 @@ import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.GUID;
+import org.w3c.dom.Node;
+import org.w3c.dom.Text;
 import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.MetadataType;
 
@@ -168,15 +170,20 @@ public class WSName implements Comparable<WSName>
 			{
 				if (element.getQName().equals(WSName.ENDPOINT_IDENTIFIER_QNAME))
 				{
-					String s = element.getValue().toString();
-					try
+					Node n = element.getFirstChild();
+					if (n instanceof Text)
 					{
-						_endpointIdentifier = new URI(s);
-					}
-					catch (URISyntaxException e)
-					{
-						_logger.warn("Found EPR with WSName \"" +
-							s + "\" which isn't a URI.");
+						String s = ((Text)n).getWholeText();
+						
+						try
+						{
+							_endpointIdentifier = new URI(s);
+						}
+						catch (URISyntaxException e)
+						{
+							_logger.warn("Found EPR with WSName \"" +
+								s + "\" which isn't a URI.");
+						}
 					}
 				}
 				else if (element.getQName().equals(WSName.REFERENCE_RESOLVER_QNAME))
