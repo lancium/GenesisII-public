@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.invoke.handlers;
 
+import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.EntryType;
@@ -8,6 +9,8 @@ import org.ggf.rns.ListResponse;
 import org.ggf.rns.RNSPortType;
 import org.ggf.rns.Remove;
 import org.ws.addressing.EndpointReferenceType;
+import org.ws.addressing.MetadataType;
+import org.ws.addressing.ReferenceParametersType;
 
 import edu.virginia.vcgr.genii.client.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.invoke.InvocationContext;
@@ -21,6 +24,35 @@ public class OGRSHListingCache
 	static private final int _MAX_CACHE_ELEMENTS = 64;
 	static private final long _DEFAULT_TIMEOUT_MS = 1000 * 15;
 	
+	static private void cleanse(MessageElement []any)
+	{
+		if (any != null)
+		{
+			for (int lcv = 0; lcv < any.length; lcv++)
+				any[lcv] = (MessageElement)any[lcv].cloneNode(true);
+		}
+	}
+	
+	static private void cleanse(EndpointReferenceType epr)
+	{
+		cleanse(epr.get_any());
+		MetadataType mt = epr.getMetadata();
+		if (mt != null)
+			cleanse(mt.get_any());
+		ReferenceParametersType rpt = epr.getReferenceParameters();
+		if (rpt != null)
+			cleanse(rpt.get_any());
+	}
+	
+	static private void cleanse(EntryType entry)
+	{
+		if (entry != null)
+		{
+			cleanse(entry.get_any());
+			cleanse(entry.getEntry_reference());
+		}
+	}
+	
 	static private class EntryKey
 	{
 		private WSName _dirName;
@@ -30,6 +62,8 @@ public class OGRSHListingCache
 		
 		public EntryKey(WSName dirName, String entryName)
 		{
+			cleanse(dirName.getEndpoint());
+			
 			_dirName = dirName;
 			_entryName = entryName;
 			
@@ -88,6 +122,7 @@ public class OGRSHListingCache
 			{
 				EntryKey key = new EntryKey(dirName, entry.getEntry_name());
 				_logger.debug("Putting entry " + key + " into the cache.");
+				cleanse(entry);
 				synchronized(_entryCache)
 				{
 					_entryCache.put(key, entry);
@@ -119,6 +154,7 @@ public class OGRSHListingCache
 			if ((entries != null) && (entries.length == 1))
 			{
 				_logger.debug("Adding entry " + key + " to the cache.");
+				cleanse(entries[0]);
 				synchronized(_entryCache)
 				{
 					_entryCache.put(key, entries[0]);
