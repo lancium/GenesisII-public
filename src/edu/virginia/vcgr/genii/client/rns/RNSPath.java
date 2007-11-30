@@ -59,10 +59,6 @@ public class RNSPath implements Externalizable  {
 
 	static private Log _logger = LogFactory.getLog(RNSPath.class);
 
-	static private TimedOutLRUCache<LookupKey, EntryType[]> _lookupCache = 
-		new TimedOutLRUCache<LookupKey, EntryType[]>(
-		1024, 0);
-
 	static private EntryType[] lookupContents(EndpointReferenceType epr,
 			String entryExpression) throws ConfigurationException,
 			ResourceException, RNSEntryNotDirectoryFaultType,
@@ -70,22 +66,8 @@ public class RNSPath implements Externalizable  {
 	{
 		EntryType[] ret = null;
 
-		WSName name = new WSName(epr);
-		if (name.isValidWSName()) {
-			LookupKey lKey = new LookupKey(name, entryExpression);
-			synchronized (_lookupCache) {
-				ret = _lookupCache.get(lKey);
-				if (ret == null) {
-					RNSPortType rpt = ClientUtils.createProxy(
-							RNSPortType.class, epr);
-					ret = rpt.list(new List(entryExpression)).getEntryList();
-					_lookupCache.put(lKey, ret);
-				}
-			}
-		} else {
-			RNSPortType rpt = ClientUtils.createProxy(RNSPortType.class, epr);
-			ret = rpt.list(new List(entryExpression)).getEntryList();
-		}
+		RNSPortType rpt = ClientUtils.createProxy(RNSPortType.class, epr);
+		ret = rpt.list(new List(entryExpression)).getEntryList();
 
 		return ret;
 	}
@@ -341,9 +323,6 @@ public class RNSPath implements Externalizable  {
 			_path.getLast().setEndpoint(
 					rpt.add(new Add(getName(), null, null))
 							.getEntry_reference());
-			synchronized (_lookupCache) {
-				_lookupCache.clear();
-			}
 		} catch (BaseFaultType t) {
 			throw new RNSException(t);
 		} catch (Throwable t) {
@@ -379,9 +358,6 @@ public class RNSPath implements Externalizable  {
 			_path.getLast().setEndpoint(
 					rpt.add(new Add(getName(), null, null))
 							.getEntry_reference());
-			synchronized (_lookupCache) {
-				_lookupCache.clear();
-			}
 		} catch (BaseFaultType t) {
 			throw new RNSException(t);
 		} catch (Throwable t) {
@@ -610,9 +586,6 @@ public class RNSPath implements Externalizable  {
 			RNSPortType rpt = ClientUtils.createProxy(RNSPortType.class, parent
 					.getEndpoint());
 			rpt.add(new Add(getName(), epr, null));
-			synchronized (_lookupCache) {
-				_lookupCache.clear();
-			}
 			_path.getLast().setEndpoint(epr);
 		} catch (BaseFaultType bft) {
 			throw new RNSException(bft);
@@ -639,9 +612,6 @@ public class RNSPath implements Externalizable  {
 			RNSPortType rpt = ClientUtils.createProxy(RNSPortType.class, parent
 					.getEndpoint());
 			rpt.remove(new Remove(getName()));
-			synchronized (_lookupCache) {
-				_lookupCache.clear();
-			}
 		} catch (BaseFaultType bft) {
 			throw new RNSException(bft);
 		} catch (Throwable t) {
