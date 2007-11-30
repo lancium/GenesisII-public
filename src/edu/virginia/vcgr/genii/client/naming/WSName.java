@@ -173,7 +173,7 @@ public class WSName implements Comparable<WSName>
 					Node n = element.getFirstChild();
 					if (n instanceof Text)
 					{
-						String s = ((Text)n).getWholeText();
+						String s = n.toString();
 						
 						try
 						{
