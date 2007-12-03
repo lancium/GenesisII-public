@@ -88,6 +88,7 @@ import org.ws.addressing.EndpointReferenceType;
 public class X509AuthnServiceImpl extends GenesisIIBase implements
 		X509AuthnPortType {
 	
+	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(X509AuthnServiceImpl.class);
 
 	public X509AuthnServiceImpl() throws RemoteException {

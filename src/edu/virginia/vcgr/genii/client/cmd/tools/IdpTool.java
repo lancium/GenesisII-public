@@ -63,6 +63,8 @@ public class IdpTool extends BaseGridTool {
 
 		String idpServiceRelPath = this.getArgument(0);
 		String username = this.getArgument(1);
+		
+		@SuppressWarnings("unused")
 		String password = this.getArgument(2);
 
 		// get rns path to idp service
