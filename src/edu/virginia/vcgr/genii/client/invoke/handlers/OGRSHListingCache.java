@@ -9,7 +9,6 @@ import org.ggf.rns.List;
 import org.ggf.rns.ListResponse;
 import org.ggf.rns.RNSPortType;
 import org.ggf.rns.Remove;
-import org.morgan.util.StopWatch;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cache.TimedOutLRUCache;
@@ -29,11 +28,8 @@ public class OGRSHListingCache
 	
 	static private EndpointReferenceType cleanse(EndpointReferenceType epr)
 	{	
-		StopWatch watch = new StopWatch();
-		
 		try
 		{
-			watch.start();
 			return EPRUtils.fromBytes(EPRUtils.toBytes(epr));
 		}
 		catch (ResourceException re)
@@ -41,29 +37,18 @@ public class OGRSHListingCache
 			_logger.error("Unable to \"cleanse\" epr.", re);
 			return epr;
 		}
-		finally
-		{
-			System.err.println("Cleansing an EPR took " + watch.lap() + " seconds.");
-		}
 	}
 	
 	static private EntryType cleanse(EntryType entry)
 	{
-		StopWatch watch = new StopWatch();
-		
 		try
 		{
-			watch.start();
 			return DBSerializer.xmlDeserialize(EntryType.class, DBSerializer.xmlSerialize(entry));
 		}
 		catch (IOException ioe)
 		{
 			_logger.error("Unable to \"cleanse\" entry type.", ioe);
 			return entry;
-		}
-		finally
-		{
-			System.err.println("Cleansing an entry type took " + watch.lap() + " seconds.");
 		}
 	}
 	
