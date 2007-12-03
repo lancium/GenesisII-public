@@ -21,7 +21,7 @@ public class OGRSHListingCache
 {
 	static private Log _logger = LogFactory.getLog(OGRSHListingCache.class);
 	
-	static private final int _MAX_CACHE_ELEMENTS = 64;
+	static private final int _MAX_CACHE_ELEMENTS = 1024;
 	static private final long _DEFAULT_TIMEOUT_MS = 1000 * 15;
 	
 	static private void cleanse(MessageElement []any)
@@ -29,13 +29,12 @@ public class OGRSHListingCache
 		if (any != null)
 		{
 			for (int lcv = 0; lcv < any.length; lcv++)
-				any[lcv] = (MessageElement)any[lcv].cloneNode(true);
+				any[lcv].detachNode();
 		}
 	}
 	
 	static private void cleanse(EndpointReferenceType epr)
 	{
-		/* TODO
 		cleanse(epr.get_any());
 		MetadataType mt = epr.getMetadata();
 		if (mt != null)
@@ -43,18 +42,15 @@ public class OGRSHListingCache
 		ReferenceParametersType rpt = epr.getReferenceParameters();
 		if (rpt != null)
 			cleanse(rpt.get_any());
-		*/
 	}
 	
 	static private void cleanse(EntryType entry)
 	{
-		/* TODO
 		if (entry != null)
 		{
 			cleanse(entry.get_any());
 			cleanse(entry.getEntry_reference());
 		}
-		*/
 	}
 	
 	static private class EntryKey
@@ -66,7 +62,9 @@ public class OGRSHListingCache
 		
 		public EntryKey(WSName dirName, String entryName)
 		{
+			/* TODO
 			cleanse(dirName.getEndpoint());
+			*/
 			
 			_dirName = dirName;
 			_entryName = entryName;
@@ -126,7 +124,9 @@ public class OGRSHListingCache
 			{
 				EntryKey key = new EntryKey(dirName, entry.getEntry_name());
 				_logger.debug("Putting entry " + key + " into the cache.");
+				/* TODO
 				cleanse(entry);
+				*/
 				synchronized(_entryCache)
 				{
 					_entryCache.put(key, entry);
@@ -158,7 +158,9 @@ public class OGRSHListingCache
 			if ((entries != null) && (entries.length == 1))
 			{
 				_logger.debug("Adding entry " + key + " to the cache.");
+				/* TODO
 				cleanse(entries[0]);
+				*/
 				synchronized(_entryCache)
 				{
 					_entryCache.put(key, entries[0]);
