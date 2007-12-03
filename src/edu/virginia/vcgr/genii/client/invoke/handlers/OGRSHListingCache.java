@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.client.invoke.handlers;
 
-import org.apache.axis.message.MessageElement;
+import java.io.IOException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.EntryType;
@@ -9,13 +10,14 @@ import org.ggf.rns.ListResponse;
 import org.ggf.rns.RNSPortType;
 import org.ggf.rns.Remove;
 import org.ws.addressing.EndpointReferenceType;
-import org.ws.addressing.MetadataType;
-import org.ws.addressing.ReferenceParametersType;
 
 import edu.virginia.vcgr.genii.client.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.invoke.InvocationContext;
 import edu.virginia.vcgr.genii.client.invoke.PipelineProcessor;
+import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
+import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 
 public class OGRSHListingCache
 {
@@ -24,32 +26,29 @@ public class OGRSHListingCache
 	static private final int _MAX_CACHE_ELEMENTS = 1024;
 	static private final long _DEFAULT_TIMEOUT_MS = 1000 * 15;
 	
-	static private void cleanse(MessageElement []any)
-	{
-		if (any != null)
+	static private EndpointReferenceType cleanse(EndpointReferenceType epr)
+	{	
+		try
 		{
-			for (int lcv = 0; lcv < any.length; lcv++)
-				any[lcv].detachNode();
+			return EPRUtils.fromBytes(EPRUtils.toBytes(epr));
+		}
+		catch (ResourceException re)
+		{
+			_logger.error("Unable to \"cleanse\" epr.", re);
+			return epr;
 		}
 	}
 	
-	static private void cleanse(EndpointReferenceType epr)
+	static private EntryType cleanse(EntryType entry)
 	{
-		cleanse(epr.get_any());
-		MetadataType mt = epr.getMetadata();
-		if (mt != null)
-			cleanse(mt.get_any());
-		ReferenceParametersType rpt = epr.getReferenceParameters();
-		if (rpt != null)
-			cleanse(rpt.get_any());
-	}
-	
-	static private void cleanse(EntryType entry)
-	{
-		if (entry != null)
+		try
 		{
-			cleanse(entry.get_any());
-			cleanse(entry.getEntry_reference());
+			return DBSerializer.xmlDeserialize(EntryType.class, DBSerializer.xmlSerialize(entry));
+		}
+		catch (IOException ioe)
+		{
+			_logger.error("Unable to \"cleanse\" entry type.", ioe);
+			return entry;
 		}
 	}
 	
@@ -62,9 +61,7 @@ public class OGRSHListingCache
 		
 		public EntryKey(WSName dirName, String entryName)
 		{
-			/* TODO
-			cleanse(dirName.getEndpoint());
-			*/
+			_dirName = new WSName(cleanse(dirName.getEndpoint()));
 			
 			_dirName = dirName;
 			_entryName = entryName;
@@ -124,9 +121,7 @@ public class OGRSHListingCache
 			{
 				EntryKey key = new EntryKey(dirName, entry.getEntry_name());
 				_logger.debug("Putting entry " + key + " into the cache.");
-				/* TODO
-				cleanse(entry);
-				*/
+				entry = cleanse(entry);
 				synchronized(_entryCache)
 				{
 					_entryCache.put(key, entry);
@@ -158,9 +153,7 @@ public class OGRSHListingCache
 			if ((entries != null) && (entries.length == 1))
 			{
 				_logger.debug("Adding entry " + key + " to the cache.");
-				/* TODO
-				cleanse(entries[0]);
-				*/
+				entries[0] = cleanse(entries[0]);
 				synchronized(_entryCache)
 				{
 					_entryCache.put(key, entries[0]);
