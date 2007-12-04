@@ -184,7 +184,8 @@ public class JobManager implements Runnable
 				checkJobs();
 				synchronized(_schedulingOpportunity)
 				{
-					_schedulingOpportunity.wait(_DEFAULT_UPDATE_CYCLE);
+					if (!_schedulingOpportunity.haveOpportunity())
+						_schedulingOpportunity.wait(_DEFAULT_UPDATE_CYCLE);
 				}
 			}
 			catch (InterruptedException ie)
@@ -196,6 +197,8 @@ public class JobManager implements Runnable
 	
 	public void jobSchedulingOpportunity()
 	{
+		_logger.debug("Queue is indicating that there is an opportunity to schedule more jobs.");
+		
 		_schedulingOpportunity.haveOpportunity(true);
 		synchronized(_schedulingOpportunity)
 		{
@@ -256,10 +259,22 @@ public class JobManager implements Runnable
 	
 	private void handleSchedulingOpportunity()
 	{
-		if (_schedulingOpportunity.haveOpportunity())
+		boolean shouldSchedule;
+		
+		synchronized(_schedulingOpportunity)
 		{
+			if (_schedulingOpportunity.haveOpportunity())
+			{
+				shouldSchedule = true;
+				_schedulingOpportunity.haveOpportunity(false);
+			} else
+				shouldSchedule = false;
+		}
+		
+		if (shouldSchedule)
+		{
+			_logger.debug("Queue is scheduling more jobs to run.");
 			scheduleJobs();
-			_schedulingOpportunity.haveOpportunity(false);
 		}
 	}
 
@@ -294,11 +309,19 @@ public class JobManager implements Runnable
 			
 			while (rs.next())
 			{
+				_logger.debug("Queue trying to find slot for a job to run in.");
+				
 				JobRequest request = new JobRequest(rs);
 				ResourceSlot matchingSlot = rMatcher.match(request);
 				
 				if (matchingSlot == null)
+				{
+					_logger.debug("No slot could be found for job.");
 					break;
+				} else
+				{
+					_logger.debug("Found a slot for the job -- starting it.");
+				}
 				
 				startJob(conn, request, matchingSlot);
 			}
