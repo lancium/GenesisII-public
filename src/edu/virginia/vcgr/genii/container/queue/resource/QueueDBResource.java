@@ -38,7 +38,9 @@ import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.queue.QueueSecurity;
 import edu.virginia.vcgr.genii.container.queue.ResourceInfoManager;
+import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
+import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 import edu.virginia.vcgr.genii.queue.JobInformationType;
 import edu.virginia.vcgr.genii.queue.JobStateEnumerationType;
@@ -102,7 +104,9 @@ public class QueueDBResource extends BasicDBResource implements IQueueResource
 			ThreadFactory factory = (ThreadFactory)NamedInstances.getRoleBasedInstances(
 				).lookup("thread-factory");
 			factory.newThread(new UpdateWorker(
-				resourceName, rs.getInt(1), resourceEndpoint)).start();
+				resourceName, 
+				rs.getInt(1), 
+				resourceEndpoint)).start();
 		}
 		catch (SQLException sqe)
 		{
@@ -122,8 +126,10 @@ public class QueueDBResource extends BasicDBResource implements IQueueResource
 		private int _resourceID;
 		private EndpointReferenceType _resourceEndpoint;
 		
-		public UpdateWorker(String resourceName, int resourceID, 
-			EndpointReferenceType resourceEndpoint)
+		public UpdateWorker(
+				String resourceName, 
+				int resourceID, 
+				EndpointReferenceType resourceEndpoint)
 		{
 			_resourceName = resourceName;
 			_resourceID = resourceID;
@@ -135,7 +141,11 @@ public class QueueDBResource extends BasicDBResource implements IQueueResource
 			try
 			{
 				ResourceInfoManager.getManager(getKey().toString()).updateResource(
-					_resourceName, _resourceID, _resourceEndpoint, null);
+					_resourceName, 
+					_resourceID, 
+					_resourceEndpoint, 
+					null, 
+					(ICallingContext) getProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME));
 			}
 			catch (ResourceException re)
 			{

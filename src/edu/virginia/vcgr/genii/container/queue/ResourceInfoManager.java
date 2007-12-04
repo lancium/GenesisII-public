@@ -19,9 +19,13 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.utils.BoundedBlockingQueue;
 import edu.virginia.vcgr.genii.client.utils.BoundedThreadPool;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.resource.IResource;
+import edu.virginia.vcgr.genii.client.context.ICallingContext;
+
 
 public class ResourceInfoManager implements Runnable
 {
@@ -173,13 +177,26 @@ public class ResourceInfoManager implements Runnable
 	}
 	
 	static private final String _LIST_RESOURCES_STMT =
+		"SELECT qri.resourcename, qri.resourceid, qri.endpoint, qr2.propvalue FROM " + 
+			"((SELECT propvalue, resourceid FROM properties WHERE resourceid = ? AND propname = ?) "
+				+ "AS prop " + 
+			"INNER JOIN " +
+			"(SELECT resourceid, queueid FROM queueresources WHERE queueid = ?) AS qr " +
+			"ON prop.resourceid = qr.queueid) AS qr2 " +
+		"INNER JOIN " +
+		"(SELECT resourcename, resourceid, endpoint FROM queueresourceinfo WHERE totalslots > 0) " +
+			"AS qri " +
+		"ON qr2.resourceid = qri.resourceid";
+
+/* Old statement
 		"SELECT qri.resourcename, qri.resourceid, qri.endpoint FROM " +
 			"(SELECT resourceid FROM queueresources WHERE queueid = ?) AS qr " +
 				"INNER JOIN " +
 			"(SELECT resourcename, resourceid, endpoint FROM queueresourceinfo " +
 				"WHERE totalslots > 0) " +
 				"AS qri ON qr.resourceid = qri.resourceid";
-	
+*/
+
 	private int updateResources()
 		throws InterruptedException
 	{
@@ -187,12 +204,15 @@ public class ResourceInfoManager implements Runnable
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
+		ICallingContext callingContext = null;
 		
 		try
 		{
 			conn = _connectionPool.acquire();
 			stmt = conn.prepareStatement(_LIST_RESOURCES_STMT);
 			stmt.setString(1, _queueID);
+			stmt.setString(2, IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME);
+			stmt.setString(3, _queueID);
 			rs = stmt.executeQuery();
 			while (rs.next())
 			{
@@ -204,12 +224,15 @@ public class ResourceInfoManager implements Runnable
 				{
 					resourceEndpoint = EPRUtils.fromBlob(rs.getBlob(3));
 					resourceName = rs.getString(1);
+					callingContext = (ICallingContext)DBSerializer.fromBlob(rs.getBlob(4));
 				}
 				catch (Throwable cause)
 				{
 				}
 				
-				updateResource(resourceName, resourceID, resourceEndpoint, null);
+				// need to get me from the db using a join
+				
+				updateResource(resourceName, resourceID, resourceEndpoint, null, callingContext);
 				numResources++;
 			}
 			
@@ -228,12 +251,21 @@ public class ResourceInfoManager implements Runnable
 		}
 	}
 	
-	public void updateResource(String resourceName, int resourceID, 
-		EndpointReferenceType resourceEndpoint, Boolean available)
+	public void updateResource(
+		String resourceName, 
+		int resourceID, 
+		EndpointReferenceType resourceEndpoint, 
+		Boolean available, 
+		ICallingContext callingContext)
 			throws InterruptedException
 	{
 		_threadPool.enqueue(
-			new UpdateWorker(resourceName, resourceID, resourceEndpoint, available));
+			new UpdateWorker(
+					resourceName, 
+					resourceID, 
+					resourceEndpoint, 
+					available, 
+					callingContext));
 	}
 	
 	static private boolean updateResource(EndpointReferenceType endpoint)
@@ -301,14 +333,20 @@ public class ResourceInfoManager implements Runnable
 		private int _resourceID;
 		private EndpointReferenceType _endpoint;
 		private Boolean _available;
+		private ICallingContext _callingContext;
 		
-		public UpdateWorker(String resourceName, 
-			int resourceID, EndpointReferenceType endpoint, Boolean available)
+		public UpdateWorker(
+			String resourceName, 
+			int resourceID, 
+			EndpointReferenceType endpoint, 
+			Boolean available, 
+			ICallingContext callingContext)
 		{
 			_resourceName = resourceName;
 			_resourceID = resourceID;
 			_endpoint = endpoint;
 			_available = available;
+			_callingContext = callingContext;
 		}
 		
 		public void run()
