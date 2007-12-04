@@ -259,6 +259,7 @@ public class ClientUtils
 			}
 			catch (Throwable t)
 			{
+				_logger.warn("Unknown exception occurred trying to create a client proxy.", t);
 			}
 			
 			return createProxy(iface, epr, context);

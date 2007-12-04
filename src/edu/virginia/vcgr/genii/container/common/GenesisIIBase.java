@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.container.common;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -33,6 +34,7 @@ import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.comm.ClientConstructionParameters;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
+import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
@@ -41,6 +43,7 @@ import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.x509.CertCreationSpec;
+import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.notification.GeniiSubscriptionPortType;
 import edu.virginia.vcgr.genii.common.notification.Subscribe;
@@ -507,6 +510,22 @@ public class GenesisIIBase implements GeniiCommon, IContainerManaged
 		EndpointReferenceType epr = ResourceManager.createEPR(rKey, 
 			myEPR.getAddress().get_value().toString(), getImplementedPortTypes());
 
+		try
+		{
+			CallingContextImpl context = new CallingContextImpl((CallingContextImpl)null);
+			context.setActiveKeyAndCertMaterial(new KeyAndCertMaterial(
+				(X509Certificate[])constructionParameters.get(IResource.CERTIFICATE_CHAIN_CONSTRUCTION_PARAM),
+				Container.getContainerPrivateKey()));
+			rKey.dereference().setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME, context);
+		}
+		catch (GeneralSecurityException gse)
+		{
+			throw FaultManipulator.fillInFault(
+				new ResourceCreationFaultType(null, null, null, null, new BaseFaultTypeDescription[] {
+					new BaseFaultTypeDescription("Security error while initializing new resource's calling context."),
+					new BaseFaultTypeDescription(gse.getLocalizedMessage()) }, null));
+		}
+		
 		// allow subclasses to do creation work
 		postCreate(rKey, epr, constructionParameters);
 		

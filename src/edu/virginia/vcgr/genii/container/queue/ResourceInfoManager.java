@@ -276,11 +276,11 @@ public class ResourceInfoManager implements Runnable
 					callingContext));
 	}
 	
-	static private boolean updateResource(EndpointReferenceType endpoint)
+	static private boolean updateResource(ICallingContext context, EndpointReferenceType endpoint)
 	{
 		try
 		{
-			BESPortType bes = ClientUtils.createProxy(BESPortType.class, endpoint);
+			BESPortType bes = ClientUtils.createProxy(BESPortType.class, endpoint, context);
 			GetFactoryAttributesDocumentResponseType resp =
 				bes.getFactoryAttributesDocument(
 					new GetFactoryAttributesDocumentType());
@@ -341,6 +341,7 @@ public class ResourceInfoManager implements Runnable
 		private int _resourceID;
 		private EndpointReferenceType _endpoint;
 		private Boolean _available;
+		private ICallingContext _callingContext;
 		
 		public UpdateWorker(
 			String resourceName, 
@@ -353,6 +354,7 @@ public class ResourceInfoManager implements Runnable
 			_resourceID = resourceID;
 			_endpoint = endpoint;
 			_available = available;
+			_callingContext = callingContext;
 		}
 		
 		public void run()
@@ -367,7 +369,7 @@ public class ResourceInfoManager implements Runnable
 				_logger.debug("Updating resource " + _resourceName + 
 					" for queue " + _queueID);
 				_available = new Boolean(
-					updateResource(_endpoint));
+					updateResource(_callingContext, _endpoint));
 			}
 			
 			boolean available = _available.booleanValue();
