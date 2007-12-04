@@ -220,6 +220,10 @@ public class BasicDBResource implements IResource
 				return null;
 			}
 			
+			Blob blob = rs.getBlob(1);
+			if (blob == null)
+				return null;
+			
 			return DBSerializer.fromBlob(rs.getBlob(1));
 		}
 		catch (IOException ioe)

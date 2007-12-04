@@ -40,7 +40,6 @@ import edu.virginia.vcgr.genii.container.queue.QueueSecurity;
 import edu.virginia.vcgr.genii.container.queue.ResourceInfoManager;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
-import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 import edu.virginia.vcgr.genii.queue.JobInformationType;
 import edu.virginia.vcgr.genii.queue.JobStateEnumerationType;
@@ -140,12 +139,15 @@ public class QueueDBResource extends BasicDBResource implements IQueueResource
 		{
 			try
 			{
+				ICallingContext context = (ICallingContext)getProperty(
+					IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME);
+				System.err.println("Caling context is : " + context);
 				ResourceInfoManager.getManager(getKey().toString()).updateResource(
 					_resourceName, 
 					_resourceID, 
 					_resourceEndpoint, 
 					null, 
-					(ICallingContext) getProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME));
+					context);
 			}
 			catch (ResourceException re)
 			{

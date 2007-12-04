@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.container.queue;
 
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -177,16 +178,16 @@ public class ResourceInfoManager implements Runnable
 	}
 	
 	static private final String _LIST_RESOURCES_STMT =
-		"SELECT qri.resourcename, qri.resourceid, qri.endpoint, qr2.propvalue FROM " + 
+		"SELECT qri.resourcename, qri.resourceid, qri.endpoint, prop.propvalue FROM " + 
 			"((SELECT propvalue, resourceid FROM properties WHERE resourceid = ? AND propname = ?) "
 				+ "AS prop " + 
-			"INNER JOIN " +
+			"RIGHT JOIN " +
 			"(SELECT resourceid, queueid FROM queueresources WHERE queueid = ?) AS qr " +
-			"ON prop.resourceid = qr.queueid) AS qr2 " +
+			"ON prop.resourceid = qr.queueid) " +
 		"INNER JOIN " +
 		"(SELECT resourcename, resourceid, endpoint FROM queueresourceinfo WHERE totalslots > 0) " +
 			"AS qri " +
-		"ON qr2.resourceid = qri.resourceid";
+		"ON qr.resourceid = qri.resourceid";
 
 /* Old statement
 		"SELECT qri.resourcename, qri.resourceid, qri.endpoint FROM " +
@@ -224,15 +225,22 @@ public class ResourceInfoManager implements Runnable
 				{
 					resourceEndpoint = EPRUtils.fromBlob(rs.getBlob(3));
 					resourceName = rs.getString(1);
-					callingContext = (ICallingContext)DBSerializer.fromBlob(rs.getBlob(4));
+					Blob blob = rs.getBlob(4);
+					if (blob == null)
+						callingContext = null;
+					else
+						callingContext = (ICallingContext)DBSerializer.fromBlob(blob);
+					System.err.println("Calling context is : " + callingContext);
 				}
 				catch (Throwable cause)
 				{
+					_logger.error("Unexpected error querying the database.", cause);
 				}
 				
 				// need to get me from the db using a join
 				
 				updateResource(resourceName, resourceID, resourceEndpoint, null, callingContext);
+				
 				numResources++;
 			}
 			
@@ -333,7 +341,6 @@ public class ResourceInfoManager implements Runnable
 		private int _resourceID;
 		private EndpointReferenceType _endpoint;
 		private Boolean _available;
-		private ICallingContext _callingContext;
 		
 		public UpdateWorker(
 			String resourceName, 
@@ -346,7 +353,6 @@ public class ResourceInfoManager implements Runnable
 			_resourceID = resourceID;
 			_endpoint = endpoint;
 			_available = available;
-			_callingContext = callingContext;
 		}
 		
 		public void run()
