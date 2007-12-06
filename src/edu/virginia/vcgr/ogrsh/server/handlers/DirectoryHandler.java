@@ -243,6 +243,10 @@ public class DirectoryHandler
 			
 			return 0;
 		}
+		catch (OGRSHException oe)
+		{
+			throw oe;
+		}
 		catch (Throwable cause)
 		{
 			throw new OGRSHException(cause);
