@@ -47,18 +47,14 @@ public class ByteIOConstants
 		"http://schemas.ggf.org/byteio/2005/10/streamable-access";
 	
 	//Shared Random/Streamable Attr
-	static public String SIZE_ATTR_NAME = "Size";
-	static public String READABLE_ATTR_NAME = "Readable";
-	static public String WRITEABLE_ATTR_NAME = "Writeable";
-	static public String XFER_MECHS_ATTR_NAME = "TransferMechanism";
+	static public final String SIZE_ATTR_NAME = "Size";
+	static public final String READABLE_ATTR_NAME = "Readable";
+	static public final String WRITEABLE_ATTR_NAME = "Writeable";
+	static public final String XFER_MECHS_ATTR_NAME = "TransferMechanism";
 	
-	//Random Byte IO Attr
-	static public QName CREATTIME_ATTR_NAME =
-		new QName(RANDOM_BYTEIO_NS, "CreateTime");
-	static public QName MODTIME_ATTR_NAME =
-		new QName(RANDOM_BYTEIO_NS, "ModificationTime");
-	static public QName ACCESSTIME_ATTR_NAME =
-		new QName(RANDOM_BYTEIO_NS, "AccessTime");
+	static public final String CREATTIME_ATTR_NAME = "CreateTime";
+	static public final String ACCESSTIME_ATTR_NAME = "AccessTime";
+	static public final String MODTIME_ATTR_NAME = "ModificationTime";
 	
 	//Streamable Attr
 	static public QName POSITION_ATTR_NAME =

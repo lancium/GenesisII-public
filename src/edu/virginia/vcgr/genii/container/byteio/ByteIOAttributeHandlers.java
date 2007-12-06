@@ -30,6 +30,7 @@ import javax.xml.namespace.QName;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.io.ChecksumStream;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
@@ -192,6 +193,19 @@ public abstract class ByteIOAttributeHandlers
 		return null;
 	}
 	
+	private void setModificationTime(Calendar c)
+		throws ResourceException, ResourceUnknownFaultType
+	{
+		IRByteIOResource resource = null;
+		resource = (IRByteIOResource)(ResourceManager.getCurrentResource().dereference());
+		if (resource.isServiceResource())
+			return;
+		
+		File f = resource.getCurrentFile();
+		if (f.exists())
+			f.setLastModified(c.getTimeInMillis());
+	}
+	
 	private Calendar getAccessTime()
 		throws ResourceException, ResourceUnknownFaultType
 	{
@@ -203,6 +217,17 @@ public abstract class ByteIOAttributeHandlers
 			return null;
 		}
 		return resource.getAccessTime();
+	}
+	
+	private void setAccessTime(Calendar c)
+		throws ResourceException, ResourceUnknownFaultType
+	{
+		IRByteIOResource resource = null;
+		resource = (IRByteIOResource)(ResourceManager.getCurrentResource().dereference());
+		if (resource.isServiceResource())
+			return;
+		
+		resource.setAccessTime(c);
 	}
 	
 	public MessageElement getChecksumAttr() 
@@ -258,11 +283,24 @@ public abstract class ByteIOAttributeHandlers
 			getModificationTime());
 	}
 	
+	public void setModificationTimeAttr(MessageElement element)
+		throws ResourceException, ResourceUnknownFaultType
+	{
+		setModificationTime(ObjectDeserializer.toObject(
+			element, Calendar.class));
+	}
+	
 	public MessageElement getAccessTimeAttr()
 		throws ResourceUnknownFaultType, ResourceException
 	{
 		return new MessageElement(GetAccessTimeNamespace(),
 			getAccessTime());
+	}
+	
+	public void setAccessTimeAttr(MessageElement element)
+		throws ResourceException, ResourceUnknownFaultType
+	{
+		setAccessTime(ObjectDeserializer.toObject(element, Calendar.class));
 	}
 	
 	@Override
@@ -283,8 +321,8 @@ public abstract class ByteIOAttributeHandlers
 		addHandler(GetWriteableNamespace(), "getWriteableAttr");
 		addHandler(GetTransferMechanismNamespace(), "getTransferMechsAttr");
 		addHandler(GetCreateTimeNamespace(), "getCreateTimeAttr");
-		addHandler(GetModificationTimeNamespace(), "getModificationTimeAttr");
-		addHandler(GetAccessTimeNamespace(), "getAccessTimeAttr");
+		addHandler(GetModificationTimeNamespace(), "getModificationTimeAttr", "setModificationTimeAttr");
+		addHandler(GetAccessTimeNamespace(), "getAccessTimeAttr", "setAccessTimeAttr");
 	}
 
 	protected abstract QName GetSizeNamespace();

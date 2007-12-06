@@ -174,7 +174,7 @@ public abstract class AbstractDeploymentProvider implements IDeployerProvider
 			GeniiCommon common = ClientUtils.createProxy(
 				GeniiCommon.class, target);
 			GetAttributesResponse resp = common.getAttributes(
-				new QName[] { ByteIOConstants.MODTIME_ATTR_NAME } );
+				new QName[] { new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME) } );
 			
 			MessageElement []any = resp.get_any();
 			if (any == null || any.length != 1)

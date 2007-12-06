@@ -1,10 +1,14 @@
 package edu.virginia.vcgr.ogrsh.server.handlers;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import javax.xml.namespace.QName;
+
+import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.EntryType;
@@ -12,15 +16,21 @@ import org.ggf.rns.List;
 import org.ggf.rns.ListResponse;
 import org.ggf.rns.RNSPortType;
 import org.morgan.util.GUID;
+import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.byteio.streamable.factory.StreamableByteIOFactory;
+import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.common.GeniiCommon;
+import edu.virginia.vcgr.genii.common.rattrs.SetAttributes;
 import edu.virginia.vcgr.ogrsh.server.comm.OGRSHOperation;
 import edu.virginia.vcgr.ogrsh.server.dir.StatBuffer;
+import edu.virginia.vcgr.ogrsh.server.dir.TimeValStructure;
 import edu.virginia.vcgr.ogrsh.server.exceptions.OGRSHException;
 import edu.virginia.vcgr.ogrsh.server.packing.IOGRSHReadBuffer;
 import edu.virginia.vcgr.ogrsh.server.packing.IOGRSHWriteBuffer;
@@ -182,6 +192,75 @@ public class DirectoryHandler
 		catch (Throwable cause)
 		{
 			throw new OGRSHException(cause);
+		}
+	}
+	
+	@OGRSHOperation
+	public int utimes(String fullpath, TimeValStructure accessTime, TimeValStructure modTime)
+		throws OGRSHException
+	{
+		EndpointReferenceType epr = null;
+		GeniiCommon proxy = null;
+		
+		_logger.debug("utime'ing path \"" + fullpath + "\".");
+	
+		try
+		{
+			RNSPath currentPath = RNSPath.getCurrent();
+			RNSPath full = currentPath.lookup(fullpath, RNSPathQueryFlags.MUST_EXIST);
+			TypeInformation ti = new TypeInformation(full.getEndpoint());
+			if (!ti.isByteIO())
+			{
+				// Can't set times on non-byte-ios
+				throw new OGRSHException(OGRSHException.IO_EXCEPTION, "Cannot change timestamps on non-files.");
+			}
+			
+			if (ti.isSByteIOFactory())
+			{
+				StreamableByteIOFactory proxy2 = ClientUtils.createProxy(
+					StreamableByteIOFactory.class, ti.getEndpoint());
+				epr = proxy2.openStream(null).getEndpoint();
+				ti = new TypeInformation(epr);
+				proxy = ClientUtils.createProxy(GeniiCommon.class, epr);
+			} else
+			{
+				proxy = ClientUtils.createProxy(GeniiCommon.class, full.getEndpoint());
+			}
+			
+			String ns = (ti.isRByteIO() ? 
+				ByteIOConstants.RANDOM_BYTEIO_NS : ByteIOConstants.STREAMABLE_BYTEIO_NS);
+			
+			Calendar aTime = Calendar.getInstance();
+			Calendar mTime = Calendar.getInstance();
+			
+			aTime.setTimeInMillis(accessTime.getSeconcds() * 1000L + accessTime.getMicroSeconds() / 1000L);
+			mTime.setTimeInMillis(modTime.getSeconcds() * 1000L + modTime.getMicroSeconds() / 1000L);
+			
+			proxy.setAttributes(new SetAttributes(new MessageElement[] {
+				new MessageElement(new QName(ns, ByteIOConstants.ACCESSTIME_ATTR_NAME), aTime),
+				new MessageElement(new QName(ns, ByteIOConstants.MODTIME_ATTR_NAME), mTime)
+			}));
+			
+			return 0;
+		}
+		catch (Throwable cause)
+		{
+			throw new OGRSHException(cause);
+		}
+		finally
+		{
+			if (epr != null)
+			{
+				try
+				{
+					GeniiCommon common = ClientUtils.createProxy(
+						GeniiCommon.class, epr);
+					common.immediateTerminate(null);
+				}
+				catch (Throwable t)
+				{
+				}
+			}
 		}
 	}
 	

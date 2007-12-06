@@ -15,9 +15,15 @@
  */
 package edu.virginia.vcgr.genii.client.resource;
 
+import java.rmi.RemoteException;
+import java.util.Calendar;
+import java.util.Date;
+
 import javax.xml.namespace.QName;
 
+import org.apache.axis.message.MessageElement;
 import org.ggf.rbyteio.RandomByteIOPortType;
+import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.byteio.streamable.factory.StreamableByteIOFactory;
@@ -25,7 +31,9 @@ import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
+import edu.virginia.vcgr.genii.common.rattrs.GetAttributesResponse;
 
 public class TypeInformation
 {
@@ -212,6 +220,144 @@ public class TypeInformation
 				{
 				}
 			}
+		}
+	}
+	
+	private Date getTimeAttribute(String attrName)
+		throws RemoteException, ConfigurationException
+	{
+		QName attrQName = new QName(
+			(isRByteIO() ? ByteIOConstants.RANDOM_BYTEIO_NS : ByteIOConstants.STREAMABLE_BYTEIO_NS),
+			attrName);
+		GeniiCommon proxy = ClientUtils.createProxy(GeniiCommon.class, _epr);
+		GetAttributesResponse resp = proxy.getAttributes(new QName[] { attrQName } );
+		
+		MessageElement []any = resp.get_any();
+		if (any == null || any.length != 1)
+			return new Date();
+		
+		Calendar time = ObjectDeserializer.toObject(
+			any[0], Calendar.class);
+		return time.getTime();
+	}
+	
+	public Date getByteIOCreateTime()
+	{
+		try
+		{
+			if (isSByteIOFactory())
+			{
+				EndpointReferenceType epr = null;
+				StreamableByteIOFactory factory =
+					ClientUtils.createProxy(StreamableByteIOFactory.class, _epr);
+				try
+				{
+					epr = factory.openStream(null).getEndpoint();
+					TypeInformation proxy = new TypeInformation(epr);
+					return proxy.getByteIOCreateTime();
+				}
+				finally
+				{
+					if (epr != null)
+					{
+						try
+						{
+							GeniiCommon common = ClientUtils.createProxy(
+								GeniiCommon.class, epr);
+							common.immediateTerminate(null);
+						}
+						catch (Throwable t)
+						{
+						}
+					}
+				}
+			}
+			
+			return getTimeAttribute(ByteIOConstants.CREATTIME_ATTR_NAME);
+		}
+		catch (Throwable t)
+		{
+			return new Date();
+		}
+	}
+	
+	public Date getByteIOAccessTime()
+	{
+		try
+		{
+			if (isSByteIOFactory())
+			{
+				EndpointReferenceType epr = null;
+				StreamableByteIOFactory factory =
+					ClientUtils.createProxy(StreamableByteIOFactory.class, _epr);
+				try
+				{
+					epr = factory.openStream(null).getEndpoint();
+					TypeInformation proxy = new TypeInformation(epr);
+					return proxy.getByteIOCreateTime();
+				}
+				finally
+				{
+					if (epr != null)
+					{
+						try
+						{
+							GeniiCommon common = ClientUtils.createProxy(
+								GeniiCommon.class, epr);
+							common.immediateTerminate(null);
+						}
+						catch (Throwable t)
+						{
+						}
+					}
+				}
+			}
+			
+			return getTimeAttribute(ByteIOConstants.ACCESSTIME_ATTR_NAME);
+		}
+		catch (Throwable t)
+		{
+			return new Date();
+		}
+	}
+	
+	public Date getByteIOModificationTime()
+	{
+		try
+		{
+			if (isSByteIOFactory())
+			{
+				EndpointReferenceType epr = null;
+				StreamableByteIOFactory factory =
+					ClientUtils.createProxy(StreamableByteIOFactory.class, _epr);
+				try
+				{
+					epr = factory.openStream(null).getEndpoint();
+					TypeInformation proxy = new TypeInformation(epr);
+					return proxy.getByteIOCreateTime();
+				}
+				finally
+				{
+					if (epr != null)
+					{
+						try
+						{
+							GeniiCommon common = ClientUtils.createProxy(
+								GeniiCommon.class, epr);
+							common.immediateTerminate(null);
+						}
+						catch (Throwable t)
+						{
+						}
+					}
+				}
+			}
+			
+			return getTimeAttribute(ByteIOConstants.MODTIME_ATTR_NAME);
+		}
+		catch (Throwable t)
+		{
+			return new Date();
 		}
 	}
 	
