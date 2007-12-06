@@ -1,10 +1,14 @@
 #ifndef __DIRECTORY_CLIENT_HPP__
 #define __DIRECTORY_CLIENT_HPP__
 
+#include <sys/types.h>
+#include <utime.h>
+
 #include "jcomm/Socket.hpp"
 #include "jcomm/IOException.hpp"
 #include "jcomm/OGRSHException.hpp"
 #include "jcomm/StatBuffer.hpp"
+#include "jcomm/TimeValStructure.hpp"
 #include "jcomm/DirectoryEntry.hpp"
 
 namespace jcomm
@@ -24,6 +28,10 @@ namespace jcomm
 			int closedir(const std::string &directorySession)
 				throw (OGRSHException, IOException);
 			StatBuffer xstat(const std::string &fullPath)
+				throw (OGRSHException, IOException);
+			int utimes(const std::string &fullPath,
+				const TimeValStructure &accessTime,
+				const TimeValStructure &modTime)
 				throw (OGRSHException, IOException);
 
 			int link(const std::string &oldPath,

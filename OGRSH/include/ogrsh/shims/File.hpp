@@ -31,11 +31,13 @@ namespace ogrsh
 
 		SHIM_DECL(ssize_t, read, (int fd, void *buf, size_t count));
 		SHIM_DECL(ssize_t, write, (int fd, const void *buf, size_t count));
+		SHIM_DECL(int, fsync, (int fd));
 
 		SHIM_DECL(FILE*, fopen, (const char *path, const char *modes));
 		SHIM_DECL(FILE*, fdopen, (int fd, const char *modes));
 		SHIM_DECL(int, fclose, (FILE *stream));
 		SHIM_DECL(char*, fgets, (char *s, int n, FILE *stream));
+		SHIM_DECL(int, fputs, (const char *s, FILE *stream));
 		SHIM_DECL(char*, fgets_unlocked, (char *s, int n, FILE *stream));
 
 		extern "C" {

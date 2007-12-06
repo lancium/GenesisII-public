@@ -17,6 +17,7 @@ OBJECTS			=		$(OOBJ_DIR)/IOException.o						\
 						$(OOBJ_DIR)/DirectoryClient.o					\
 						$(OOBJ_DIR)/FileClient.o						\
 						$(OOBJ_DIR)/StatBuffer.o						\
+						$(OOBJ_DIR)/TimeValStructure.o					\
 						$(OOBJ_DIR)/DirectoryEntry.o
 
 LIBRARY			=		$(LIB_DIR)/libJComm.so
@@ -84,6 +85,9 @@ $(OOBJ_DIR)/FileClient.o:	FileClient.cpp
 
 $(OOBJ_DIR)/StatBuffer.o:	StatBuffer.cpp
 		$(CPP) $(CPPFLAGS) -c StatBuffer.cpp -o $@
+
+$(OOBJ_DIR)/TimeValStructure.o:	TimeValStructure.cpp
+		$(CPP) $(CPPFLAGS) -c TimeValStructure.cpp -o $@
 
 $(OOBJ_DIR)/DirectoryEntry.o:	DirectoryEntry.cpp
 		$(CPP) $(CPPFLAGS) -c DirectoryEntry.cpp -o $@

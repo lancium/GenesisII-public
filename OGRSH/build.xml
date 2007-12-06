@@ -30,12 +30,20 @@
 	<target name="scripts" if="supports-ogrsh" depends="checkenv">
 		<copy file="${basedir}/src/scripts/shim.sh"
 			tofile="${basedir}/shim.sh"/>
+		<copy file="${basedir}/src/scripts/debug-shim.sh"
+			tofile="${basedir}/debug-shim.sh"/>
 		<replace file="${basedir}/shim.sh"
+			token="%{OGRSH_HOME}" value="${basedir}" summary="yes"/>
+		<replace file="${basedir}/debug-shim.sh"
 			token="%{OGRSH_HOME}" value="${basedir}" summary="yes"/>
 		<replace file="${basedir}/shim.sh"
 			token="%{OGRSH_ARCH}" value="${environment.OGRSH_ARCH}"
 				summary="yes"/>
+		<replace file="${basedir}/debug-shim.sh"
+			token="%{OGRSH_ARCH}" value="${environment.OGRSH_ARCH}"
+				summary="yes"/>
 		<chmod file="${basedir}/shim.sh" perm="755"/>
+		<chmod file="${basedir}/debug-shim.sh" perm="755"/>
 	</target>
 
 	<target name="compile" if="supports-ogrsh" depends="checkenv">

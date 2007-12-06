@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -148,6 +149,15 @@ namespace ogrsh
 			}
 
 			return -1;
+		}
+
+		int GeniiFSFileDescriptor::fsync()
+		{
+			OGRSH_TRACE("GeniiFSFileDescriptor::fsync(" <<
+				_fileDesc << ") called.");
+
+			// Genesis II files are automatically flushed at this level.
+			return 0;
 		}
 
 		ogrsh::DirectoryStream* GeniiFSFileDescriptor::opendir()

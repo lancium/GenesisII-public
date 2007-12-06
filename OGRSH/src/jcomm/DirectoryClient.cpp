@@ -116,6 +116,24 @@ namespace jcomm
 		return result;
 	}
 
+	int DirectoryClient::utimes(const std::string &fullPath,
+		const TimeValStructure &accessTime,
+		const TimeValStructure &modTime)
+		throw (OGRSHException, IOException)
+	{
+		Invocation inv(_socket, "utimes");
+
+		inv.addString(fullPath);
+		inv.addPackable(accessTime);
+		inv.addPackable(modTime);
+
+		int result;
+		IOGRSHReadBuffer *buffer = inv.invoke();
+		buffer->readInt(result);
+		delete buffer;
+		return result;
+	}
+
 	int DirectoryClient::link(const std::string &oldPath,
 		const std::string &newPath)
 		throw (OGRSHException, IOException)

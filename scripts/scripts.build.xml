@@ -31,6 +31,7 @@
 		<delete quiet="true">
 			<fileset dir="${basedir}">
 				<include name="jserver.*"/>
+				<include name="jserver-debug.*"/>
 				<include name="runContainer.*"/>
 				<include name="grid*"/>
 				<include name="simple-command*"/>
@@ -77,6 +78,10 @@
 		<antcall target="build-script-unix">
 			<param name="unix-script-src-dir" value="${scripts.dir}"/>
 			<param name="unix-script-base-name" value="jserver.sh"/>
+		</antcall>
+		<antcall target="build-script-unix">
+			<param name="unix-script-src-dir" value="${scripts.dir}"/>
+			<param name="unix-script-base-name" value="jserver-debug.sh"/>
 		</antcall>
 		<antcall target="build-script">
 			<param name="script-src-dir" value="${scripts.dir}"/>

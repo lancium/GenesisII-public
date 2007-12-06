@@ -1,6 +1,7 @@
 #include <string>
 
 #include <errno.h>
+#include <utime.h>
 
 #include "ogrsh/Logging.hpp"
 
@@ -33,15 +34,14 @@ namespace ogrsh
 		{
 			OGRSH_DEBUG("GeniiFSDirectoryFunctions::utime(\""
 				<< (const std::string&)relativePath << "\", ...) called.");
-	
-			std::string fullPath =
-				(relativePath.length() == 0) ? _rnsSource :
-					_rnsSource + (const std::string&)relativePath;
 
-			ogrsh::shims::uber_real_fprintf(
-				stderr, "Haven't implemented GENII utime yet\n");
+			struct timeval times[2];
+			times[0].tv_sec = buf->actime;
+			times[0].tv_usec = 0;
+			times[1].tv_sec = buf->modtime;
+			times[1].tv_usec = 0;
 
-			return 0;
+			return this->utimes(relativePath, times);
 		}
 
 		int GeniiFSDirectoryFunctions::utimes(const ogrsh::Path &relativePath,
@@ -54,10 +54,24 @@ namespace ogrsh
 				(relativePath.length() == 0) ? _rnsSource :
 					_rnsSource + (const std::string&)relativePath;
 
-			ogrsh::shims::uber_real_fprintf(
-				stderr, "Haven't implemented GENII utimes yet\n");
+			jcomm::TimeValStructure actime;
+			jcomm::TimeValStructure modtime;
 
-			return 0;
+			actime.seconds = times[0].tv_sec;
+			actime.microseconds = times[0].tv_usec;
+			modtime.seconds = times[1].tv_sec;
+			modtime.microseconds = times[1].tv_usec;
+			jcomm::DirectoryClient dc(*_session->getSocket());
+
+			try
+			{
+				return dc.utimes(fullPath, actime, modtime);
+			}
+			catch (jcomm::OGRSHException oe)
+			{
+				oe.setErrno();
+				return -1;
+			}
 		}
 
 		int GeniiFSDirectoryFunctions::chdir(const ogrsh::Path &relativePath)

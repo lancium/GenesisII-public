@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -143,6 +144,15 @@ namespace ogrsh
 					ogrsh::shims::real_exit(1);
 			}
 
+			return -1;
+		}
+
+		int GeniiFSDirectoryDescriptor::fsync()
+		{
+			OGRSH_TRACE("GeniiFSDirectoryDescriptor::fsync(" << _fullpath
+				<< ") called.");
+
+			errno = EINVAL;
 			return -1;
 		}
 

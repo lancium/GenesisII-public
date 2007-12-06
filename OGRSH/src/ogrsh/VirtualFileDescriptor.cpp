@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -86,6 +87,12 @@ namespace ogrsh
 			"Not allowed to call fcntl on VirtualFileDescriptor instanecs.");
 		ogrsh::shims::real_exit(1);
 
+		return -1;
+	}
+
+	int VirtualFileDescriptor::fsync()
+	{
+		errno = EROFS;
 		return -1;
 	}
 

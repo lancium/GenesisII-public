@@ -76,6 +76,17 @@ namespace ogrsh
 			return ret;
 		}
 
+		int LocalFSFileDescriptor::fsync()
+		{
+			int fd = getFD();
+
+			OGRSH_TRACE("LocalFSFileDescriptor::fsync(" << fd << ") called.");
+
+			int ret = ogrsh::shims::real_fsync(fd);
+			OGRSH_TRACE("LocalFSFileDescriptor::fsync returning " << ret);
+			return ret;
+		}
+
 		ogrsh::DirectoryStream* LocalFSFileDescriptor::opendir()
 		{
 			OGRSH_TRACE("LocalFSFileDescriptor::opendir() called.");

@@ -37,6 +37,7 @@ public class OGRSHException extends Exception implements IPackable
 	static public final int ENOTDIR = NOT_A_DIRECTORY;
 	static public final int EBADF = 12;
 	static public final int EISDIR = 13;
+	static public final int EROFS = 14;
 	
 	private int _exceptionNumber;
 	

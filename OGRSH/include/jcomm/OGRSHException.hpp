@@ -25,6 +25,7 @@ namespace jcomm
 			static const int DIRECTORY_NOT_EMPTY;
 			static const int _EBADF;
 			static const int _EISDIR;
+			static const int _EROFS;
 				
 		private:
 			std::string _message;

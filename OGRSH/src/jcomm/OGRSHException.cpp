@@ -28,6 +28,7 @@ namespace jcomm
 	const int OGRSHException::DIRECTORY_NOT_EMPTY = 11;
 	const int OGRSHException::_EBADF = 12;
 	const int OGRSHException::_EISDIR = 13;
+	const int OGRSHException::_EROFS = 14;
 
 	OGRSHException::OGRSHException(IOGRSHReadBuffer &readBuffer)
 		: IPackable(_TYPE_NAME)
@@ -133,6 +134,9 @@ namespace jcomm
 				break;
 			case OGRSHException::_EBADF :
 				errno = EBADF;
+				break;
+			case OGRSHException::_EROFS :
+				errno = EROFS;
 				break;
 		}
 	}

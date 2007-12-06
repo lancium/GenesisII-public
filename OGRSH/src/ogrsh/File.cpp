@@ -275,6 +275,21 @@ namespace ogrsh
 			return desc->fcntl(cmd, arg);
 		}
 
+		SHIM_DEF(int, fsync, (int fd), (fd))
+		{
+			OGRSH_TRACE("fsync(" << fd << ") called.");
+
+			FileDescriptor *desc = FileDescriptorTable::getInstance().lookup(
+				fd);
+			if (desc == NULL)
+			{
+				// It's not one we have control of -- pass it through
+				return ogrsh::shims::real_fsync(fd);
+			}
+
+			return desc->fsync();
+		}
+
 		SHIM_DEF(int, setvbuf, (FILE *stream, char *buf, int mode, size_t size),
 			(stream, buf, mode, size))
 		{
@@ -523,6 +538,28 @@ namespace ogrsh
 			{
 				errno = EBADF;
 				return NULL;
+			}
+		}
+
+		SHIM_DEF(int, fputs, (const char *s, FILE *stream), (s, stream))
+		{
+			OGRSH_TRACE("fputs(...) called.");
+
+			if (stream != NULL)
+			{
+				FileStream *fStream = (FileStream*)stream;
+
+				if (fStream->_magicNumber == FILE_STREAM_MAGIC_NUMBER)
+				{
+					return fStream->fwrite(s, 1, strlen(s));
+				} else
+				{
+					return real_fputs(s, stream);
+				}
+			} else
+			{
+				errno = EBADF;
+				return -1;
 			}
 		}
 
@@ -785,6 +822,8 @@ extern "C" {
 			START_SHIM(unlinkat);
 			START_SHIM(read);
 			START_SHIM(write);
+			START_SHIM(lseek64);
+			START_SHIM(lseek);
 
 			START_SHIM(clearerr);
 			START_SHIM(setvbuf);
@@ -792,6 +831,7 @@ extern "C" {
 			START_SHIM(fdopen);
 			START_SHIM(fclose);
 			START_SHIM(fgets);
+			START_SHIM(fputs);
 			START_SHIM(vfprintf);
 			START_SHIM(fflush);
 			START_SHIM(ftell);
@@ -813,10 +853,12 @@ extern "C" {
 			START_SHIM(fflush_unlocked);
 			START_SHIM(fgets_unlocked);
 			START_SHIM(fcntl);
+			START_SHIM(fsync);
 		}
 
 		void stopFileShims()
 		{
+			STOP_SHIM(fsync);
 			STOP_SHIM(fcntl);
 			STOP_SHIM(fgets_unlocked);
 			STOP_SHIM(fflush_unlocked);
@@ -838,6 +880,7 @@ extern "C" {
 			STOP_SHIM(ftell);
 			STOP_SHIM(fflush);
 			STOP_SHIM(vfprintf);
+			STOP_SHIM(fputs);
 			STOP_SHIM(fgets);
 			STOP_SHIM(fclose);
 			STOP_SHIM(fdopen);
@@ -845,6 +888,8 @@ extern "C" {
 			STOP_SHIM(setvbuf);
 			STOP_SHIM(clearerr);
 
+			STOP_SHIM(lseek);
+			STOP_SHIM(lseek64);
 			STOP_SHIM(write);
 			STOP_SHIM(read);
 			STOP_SHIM(creat64);

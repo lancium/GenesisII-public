@@ -212,7 +212,7 @@ public class DirectoryHandler
 			if (!ti.isByteIO())
 			{
 				// Can't set times on non-byte-ios
-				throw new OGRSHException(OGRSHException.IO_EXCEPTION, "Cannot change timestamps on non-files.");
+				throw new OGRSHException(OGRSHException.EROFS, "Cannot change timestamps on non-files.");
 			}
 			
 			if (ti.isSByteIOFactory())

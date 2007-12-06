@@ -42,6 +42,7 @@ namespace ogrsh
 			virtual int __fxstat64(int version, struct stat64 *statbuf) = 0;
 
 			virtual int fcntl(int cmd, long arg) = 0;
+			virtual int fsync() = 0;
 
 			virtual DirectoryStream* opendir() = 0;
 	};
