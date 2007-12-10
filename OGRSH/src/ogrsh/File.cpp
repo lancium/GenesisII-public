@@ -260,6 +260,29 @@ namespace ogrsh
 			return desc->lseek64(offset, whence);
 		}
 
+		SHIM_DEF(int, _llseek, (unsigned int fd, unsigned long offsethigh,
+			unsigned long offsetlow, loff_t *result, unsigned int whence),
+			(fd, offsethigh, offsetlow, result, whence))
+		{
+			off64_t offset;
+			off64_t res;
+
+			OGRSH_TRACE("_llseek(" << fd << ", " << offsethigh << ", "
+				<< offsetlow << ", ..., " << whence << ") called.");
+
+			offset = offsethigh;
+			offset <<= 32;
+			offset |= offsetlow;
+			res = lseek64((int)fd, offset, (int)whence);
+			if (res >= 0)
+			{
+				*result = res;
+				return 0;
+			}
+
+			return -1;
+		}
+
 		SHIM_DEF(int, fcntl, (int fd, int cmd, long arg), (fd, cmd, arg))
 		{
 			OGRSH_TRACE("fcntl(" << fd << ", " << cmd << ", ...) called.");
@@ -344,6 +367,22 @@ namespace ogrsh
 			(path, mode))
 		{
 			OGRSH_TRACE("fopen(\"" << path << "\", \"" << mode
+				<< "\") called.");
+
+			FileStream *ret = new FileStream(path, mode);
+			if (ret != NULL && (ret->fileno() < 0))
+			{
+				delete ret;
+				ret = NULL;
+			}
+
+			return (FILE*)ret;
+		}
+
+		SHIM_DEF(FILE*, fopen64, (const char *path, const char *mode),
+			(path, mode))
+		{
+			OGRSH_TRACE("fopen64(\"" << path << "\", \"" << mode
 				<< "\") called.");
 
 			FileStream *ret = new FileStream(path, mode);
@@ -454,6 +493,9 @@ namespace ogrsh
 		SHIM_DEF(int, fseek, (FILE *fptr, long offset, int whence),
 			(fptr, offset, whence))
 		{
+			OGRSH_TRACE("fseek(..., " << offset << ", " << whence
+				<< ") called.");
+
 			if (fptr != NULL)
 			{
 				FileStream *fStream = (FileStream*)fptr;
@@ -795,6 +837,18 @@ extern "C" {
 
 		return result;
 	}
+
+	int __fprintf_chk(FILE *stream, int flag, const char *format, ...)
+	{
+		int result;
+		va_list ap;
+
+		va_start(ap, format);
+		result = vfprintf(stream, format, ap);
+		va_end(ap);
+
+		return result;
+	}
 }
 
 		int uber_real_fprintf(FILE *file, const char *format, ...)
@@ -822,12 +876,14 @@ extern "C" {
 			START_SHIM(unlinkat);
 			START_SHIM(read);
 			START_SHIM(write);
+			START_SHIM(_llseek);
 			START_SHIM(lseek64);
 			START_SHIM(lseek);
 
 			START_SHIM(clearerr);
 			START_SHIM(setvbuf);
 			START_SHIM(fopen);
+//			START_SHIM(fopen64);
 			START_SHIM(fdopen);
 			START_SHIM(fclose);
 			START_SHIM(fgets);
@@ -884,12 +940,14 @@ extern "C" {
 			STOP_SHIM(fgets);
 			STOP_SHIM(fclose);
 			STOP_SHIM(fdopen);
+//			STOP_SHIM(fopen64);
 			STOP_SHIM(fopen);
 			STOP_SHIM(setvbuf);
 			STOP_SHIM(clearerr);
 
 			STOP_SHIM(lseek);
 			STOP_SHIM(lseek64);
+			STOP_SHIM(_llseek);
 			STOP_SHIM(write);
 			STOP_SHIM(read);
 			STOP_SHIM(creat64);

@@ -26,6 +26,8 @@ namespace ogrsh
 		SHIM_DECL(int, unlink, (const char *path));
 		SHIM_DECL(int, unlinkat, (int dirfd, const char *path, int flags));
 
+		SHIM_DECL(int, _llseek, (unsigned int fd, unsigned long offsethigh,
+			unsigned long offsetlow, loff_t *result, unsigned int whence));
 		SHIM_DECL(off_t, lseek, (int fd, off_t offset, int whence));
 		SHIM_DECL(off64_t, lseek64, (int fd, off64_t offset, int whence));
 
@@ -34,6 +36,7 @@ namespace ogrsh
 		SHIM_DECL(int, fsync, (int fd));
 
 		SHIM_DECL(FILE*, fopen, (const char *path, const char *modes));
+		SHIM_DECL(FILE*, fopen64, (const char *path, const char *modes));
 		SHIM_DECL(FILE*, fdopen, (int fd, const char *modes));
 		SHIM_DECL(int, fclose, (FILE *stream));
 		SHIM_DECL(char*, fgets, (char *s, int n, FILE *stream));
@@ -42,6 +45,7 @@ namespace ogrsh
 
 		extern "C" {
 			int fprintf(FILE*, const char *, ...);
+			int __fprintf_chk(FILE*, int, const char *, ...);
 		}		
 
 		SHIM_DECL(int, vfprintf, (FILE*, const char *format, va_list ap));
