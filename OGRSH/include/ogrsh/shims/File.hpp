@@ -74,6 +74,9 @@ namespace ogrsh
 		SHIM_DECL(int, _IO_putc, (int c, FILE *stream));
 		SHIM_DECL(int, _IO_feof, (FILE *stream));
 		SHIM_DECL(int, _IO_ferror, (FILE *stream));
+		SHIM_DECL(int, fchmod, (int fd, mode_t mode));
+		SHIM_DECL(int, __fsetlocking, (FILE *stream, int type));
+		SHIM_DECL(int, __fpending, (FILE *stream));
 
 		int uber_real_fprintf(FILE*, const char *format, ...);
 

@@ -40,6 +40,8 @@ namespace ogrsh
 			int feof();
 			int ferror();
 			int fileno();
+
+			int pending();
 	};
 }
 

@@ -2,6 +2,8 @@
 #include <dlfcn.h>
 #include <sys/types.h>
 #include <dirent.h>
+#include <stdio.h>
+#include <stdio_ext.h>
 
 #include "ogrsh/Configuration.hpp"
 #include "ogrsh/FileDescriptorTable.hpp"
@@ -311,6 +313,21 @@ namespace ogrsh
 			}
 
 			return desc->fsync();
+		}
+
+		SHIM_DEF(int, fchmod, (int fd, mode_t mode), (fd, mode))
+		{
+			OGRSH_TRACE("fchmod(" << fd << ", " << mode << ") called.");
+
+			FileDescriptor *desc = FileDescriptorTable::getInstance().lookup(
+				fd);
+			if (desc == NULL)
+			{
+				// It's not one we have control of -- pass it through
+				return ogrsh::shims::real_fchmod(fd, mode);
+			}
+
+			return desc->fchmod(mode);
 		}
 
 		SHIM_DEF(int, setvbuf, (FILE *stream, char *buf, int mode, size_t size),
@@ -652,6 +669,73 @@ namespace ogrsh
 			}
 		}
 
+		SHIM_DEF(int, __fsetlocking, (FILE *stream, int type), (stream, type))
+		{
+			const char *typeStr;
+
+			switch (type)
+			{
+				case FSETLOCKING_INTERNAL :
+					typeStr = "FSETLOCKING_INTERNAL";
+					break;
+				case FSETLOCKING_BYCALLER :
+                    typeStr = "FSETLOCKING_BYCALLER";
+                    break;
+				case FSETLOCKING_QUERY :
+                    typeStr = "FSETLOCKING_QUERY";
+					OGRSH_FATAL("__fsetlocking(..., \""
+						<< typeStr << "\") is not implemented.");
+					ogrsh::shims::real_exit(1);
+                    break;
+				default :
+					typeStr = "<Unknown>";
+					break;
+			}
+
+			OGRSH_TRACE("__fsetlocking(..., \""
+				<< typeStr << "\") called.");
+
+			if (stream != NULL)
+			{
+				FileStream *fStream = (FileStream*)stream;
+
+				if (fStream->_magicNumber == FILE_STREAM_MAGIC_NUMBER)
+				{
+					OGRSH_DEBUG("For now, we don't really handle the __fsetlocking function call.");
+					return 0;
+				} else
+				{
+					return real___fsetlocking(stream, type);
+				}
+			} else
+			{
+				errno = EBADF;
+				return 0;
+			}
+		}
+
+		SHIM_DEF(int, __fpending, (FILE *stream), (stream))
+		{
+			OGRSH_TRACE("__fpending(...) called.");
+
+			if (stream != NULL)
+			{
+				FileStream *fStream = (FileStream*)stream;
+
+				if (fStream->_magicNumber == FILE_STREAM_MAGIC_NUMBER)
+				{
+					return fStream->pending();
+				} else
+				{
+					return real___fpending(stream);
+				}
+			} else
+			{
+				errno = EBADF;
+				return 0;
+			}
+		}
+
 		SHIM_DEF(size_t, fwrite, (const void *ptr, size_t size, size_t nmemb,
 			FILE *stream), (ptr, size, nmemb, stream))
 		{
@@ -910,10 +994,16 @@ extern "C" {
 			START_SHIM(fgets_unlocked);
 			START_SHIM(fcntl);
 			START_SHIM(fsync);
+			START_SHIM(fchmod);
+			START_SHIM(__fsetlocking);
+			START_SHIM(__fpending);
 		}
 
 		void stopFileShims()
 		{
+			STOP_SHIM(__fpending);
+			STOP_SHIM(__fsetlocking);
+			STOP_SHIM(fchmod);
 			STOP_SHIM(fsync);
 			STOP_SHIM(fcntl);
 			STOP_SHIM(fgets_unlocked);

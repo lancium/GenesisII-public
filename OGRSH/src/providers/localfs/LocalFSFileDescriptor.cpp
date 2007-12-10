@@ -87,6 +87,16 @@ namespace ogrsh
 			return ret;
 		}
 
+		int LocalFSFileDescriptor::fchmod(mode_t mode)
+		{
+			int fd = getFD();
+
+			OGRSH_TRACE("LocalFSFileDescriptor::fchmod(" << mode
+				<< ") called.");
+
+			return ogrsh::shims::real_fchmod(fd, mode);
+		}
+
 		ogrsh::DirectoryStream* LocalFSFileDescriptor::opendir()
 		{
 			OGRSH_TRACE("LocalFSFileDescriptor::opendir() called.");

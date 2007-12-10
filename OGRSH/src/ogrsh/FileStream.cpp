@@ -154,4 +154,9 @@ namespace ogrsh
 	{
 		return _fd;
 	}
+
+	int FileStream::pending()
+	{
+		return _stream->pending();
+	}
 }

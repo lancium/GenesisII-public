@@ -160,6 +160,16 @@ namespace ogrsh
 			return 0;
 		}
 
+		int GeniiFSFileDescriptor::fchmod(mode_t mode)
+		{
+			// TODO We probalby ought to implement this in genesis II.
+			OGRSH_TRACE("GeniiFSFileDescriptor::fchmod(" << _fileDesc
+				<< ", " << mode << ") called.");
+
+			errno = EPERM;
+			return -1;
+		}
+
 		ogrsh::DirectoryStream* GeniiFSFileDescriptor::opendir()
 		{
 			OGRSH_FATAL("GeniiFSFileDescriptor::opendir() -- This operation "

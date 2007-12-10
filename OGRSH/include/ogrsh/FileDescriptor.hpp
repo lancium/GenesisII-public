@@ -43,6 +43,7 @@ namespace ogrsh
 
 			virtual int fcntl(int cmd, long arg) = 0;
 			virtual int fsync() = 0;
+			virtual int fchmod(mode_t mode) = 0;
 
 			virtual DirectoryStream* opendir() = 0;
 	};

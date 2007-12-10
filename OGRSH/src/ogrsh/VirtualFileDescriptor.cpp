@@ -96,6 +96,12 @@ namespace ogrsh
 		return -1;
 	}
 
+	int VirtualFileDescriptor::fchmod(mode_t mode)
+	{
+		errno = EROFS;
+		return -1;
+	}
+
 	DirectoryStream* VirtualFileDescriptor::opendir()
 	{
 		OGRSH_FATAL(

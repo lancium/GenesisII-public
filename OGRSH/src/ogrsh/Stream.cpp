@@ -326,4 +326,12 @@ namespace ogrsh
 
 		return 0;
 	}
+
+	int Stream::pending()
+	{
+		if (_readBuffer != NULL)
+			return 0;
+
+		return _bufferPtr;
+	}
 }

@@ -74,34 +74,11 @@ extern "C" {
 		return 0;
 	}
 
-	int fchown(int fd, uid_t owner, gid_t group)
-	{
-/* MOOCH
-		OGRSH_FATAL(
-			"Attempt to use un-intercepted method fchown("
-			<< fd << ", " << owner << ", " << group
-			<< ") -- going to fail silently");
-		ogrsh::shims::real_exit(1);
-*/
-
-		return 0;
-	}
-
 	int lchown(const char *path, uid_t owner, gid_t group)
 	{
 		OGRSH_FATAL(
 			"Attempt to use un-intercepted method lchown(\""
 			<< path << "\", ...)");
-		ogrsh::shims::real_exit(1);
-
-		return 0;
-	}
-
-	int fchmod(int fildes, mode_t mode)
-	{
-		OGRSH_FATAL(
-			"Attempt to use un-intercepted method fchmod(\""
-			<< fildes << "\", ...)");
 		ogrsh::shims::real_exit(1);
 
 		return 0;
@@ -347,5 +324,93 @@ extern "C" {
 		ogrsh::shims::real_exit(1);
 
 		return NULL;
+	}
+
+	size_t __fbufsize(FILE *stream)
+	{
+		OGRSH_FATAL("Attempting to use un-intercepted method __fbufsize(...).");
+		ogrsh::shims::real_exit(1);
+
+		return 0;
+	}
+
+	int __flbf(FILE *stream)
+	{
+		OGRSH_FATAL("Attempting to use un-intercepted method __flbf(...).");
+		ogrsh::shims::real_exit(1);
+
+		return 0;
+	}
+
+	int __freadable(FILE *stream)
+	{
+		OGRSH_FATAL("Attempting to use un-intercepted method __freadable(...).");
+		ogrsh::shims::real_exit(1);
+
+		return 0;
+	}
+
+	int __fwritable(FILE *stream)
+	{
+		OGRSH_FATAL("Attempting to use un-intercepted method __fwriteable(...).");
+		ogrsh::shims::real_exit(1);
+
+		return 0;
+	}
+
+	int __freading(FILE *stream)
+	{
+		OGRSH_FATAL("Attempting to use un-intercepted method __freading(...).");
+		ogrsh::shims::real_exit(1);
+
+		return 0;
+	}
+
+	int __fwriting(FILE *stream)
+	{
+		OGRSH_FATAL("Attempting to use un-intercepted method __fwriting(...).");
+		ogrsh::shims::real_exit(1);
+
+		return 0;
+	}
+
+	void _flushlbf(void)
+	{
+		OGRSH_FATAL("Attempting to use un-intercepted method __flushlbf(...).");
+		ogrsh::shims::real_exit(1);
+	}
+
+	void __fpurge(FILE *stream)
+	{
+		OGRSH_FATAL("Attempting to use un-intercepted method __fpurge(...).");
+		ogrsh::shims::real_exit(1);
+	}
+
+	void flockfile(FILE *filehandle)
+	{
+		OGRSH_FATAL("Attempting to use un-intercepted method flockfile(...).");
+		ogrsh::shims::real_exit(1);
+	}
+
+	int ftrylockfile(FILE *filehandle)
+	{
+		OGRSH_FATAL("Attempting to use un-intercepted method ftrylockfile(...).");
+		ogrsh::shims::real_exit(1);
+
+		return -1;
+	}
+
+	void funlockfile(FILE *filehandle)
+	{
+		OGRSH_FATAL("Attempting to use un-intercepted method funlockfile(...).");
+		ogrsh::shims::real_exit(1);
+	}
+
+	int fpurge(FILE *stream)
+	{
+		OGRSH_FATAL("Attempting to use un-intercepted method fpurge(...).");
+		ogrsh::shims::real_exit(1);
+
+		return 1;
 	}
 }

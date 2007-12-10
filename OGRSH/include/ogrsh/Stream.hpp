@@ -58,6 +58,8 @@ namespace ogrsh
 			int fgetc();
 			int feof();
 			int ferror();
+
+			int pending();
 	};
 }
 
