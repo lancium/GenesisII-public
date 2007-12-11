@@ -29,20 +29,17 @@ import org.ggf.rns.RNSEntryNotDirectoryFaultType;
 import org.ggf.rns.RNSFaultType;
 import org.ggf.rns.Remove;
 import org.morgan.util.GUID;
-import org.morgan.util.configuration.ConfigurationException;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
-import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedFileUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
-import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
@@ -142,17 +139,29 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 			resource.getParentIds(), resource.getId());
 		try
 		{
+			/*
 			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class,
 					EPRUtils.makeEPR(Container.getServiceURL("ExportedFilePortType")));
 			entryReference = 
 				common.vcgrCreate(new VcgrCreate(
 					ExportedFileUtils.createCreationProperties(
 					fullPath, parentIds))).getEndpoint();
+			*/
+			WorkingContext.temporarilyAssumeNewIdentity(
+				EPRUtils.makeEPR(Container.getServiceURL("ExportedFilePortType")));
+			entryReference = new ExportedFileServiceImpl().vcgrCreate(new VcgrCreate(
+				ExportedFileUtils.createCreationProperties(fullPath, parentIds))).getEndpoint();
 		}
+		finally
+		{
+			WorkingContext.releaseAssumedIdentity();
+		}
+		/*
 		catch (ConfigurationException ce)
 		{
 			throw new ResourceException(ce.getLocalizedMessage(), ce);
 		}
+		*/
 		
 		String newEntryId = (new GUID()).toString();
 		ExportedDirEntry newEntry = new ExportedDirEntry(
