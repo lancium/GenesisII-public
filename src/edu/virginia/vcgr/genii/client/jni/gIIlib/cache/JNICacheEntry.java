@@ -12,6 +12,7 @@ public class JNICacheEntry {
 	private long timeOfEntry;
 	protected JNICacheEntry previous, next;
 	
+	//REMOVE SOON AND REPLACE WITH myresource
 	/* This field is only valid if isDirectory == true */
 	private ArrayList<JNICacheEntry> directoryEntries = new ArrayList<JNICacheEntry>();
 	
@@ -55,9 +56,18 @@ public class JNICacheEntry {
 	}
 	
 	public void addDirectoryEntries(ArrayList<JNICacheEntry> entries){
-		this.directoryEntries = entries;		
+		this.directoryEntries = entries;
 	}
 	
+	public void addDirectoryEntry(JNICacheEntry entry){
+		if(this.directoryEntries == null){
+			this.directoryEntries = new ArrayList<JNICacheEntry>();
+		}
+		this.directoryEntries.remove(entry);		
+		this.directoryEntries.add(entry);
+	}
+	
+	@Override
 	public String toString(){
 		long age = System.currentTimeMillis() - timeOfEntry;
 		if(exists){
@@ -76,5 +86,18 @@ public class JNICacheEntry {
 
 	public String getPath() {
 		return path;
+	}
+	
+	@Override
+	public boolean equals(Object obj2){
+		boolean toReturn = false;
+		if(obj2 instanceof JNICacheEntry){
+			JNICacheEntry entry2 = (JNICacheEntry) obj2;
+			if(this.path.equals(entry2.path) &&
+					this.isDirectory == entry2.isDirectory){
+				toReturn = true;
+			}
+		}
+		return toReturn;				
 	}
 }

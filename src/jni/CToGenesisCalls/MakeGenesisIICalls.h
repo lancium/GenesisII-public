@@ -93,20 +93,26 @@ DllExport int genesisII_move(PGII_JNI_INFO info, char *src, char * dst);
 	If the user does not have permissions for any property of the resource that he/she is requesting, the 
 	entire operation will abort.
 */
-DllExport int genesisII_open(PGII_JNI_INFO info, char * target,	int create, int read, int write, char *** returnArray);
+DllExport int genesisII_open(PGII_JNI_INFO info, char * target,	int requestedDeposition, 
+	int desiredAccess, int isDirectory, char *** returnArray);
 
 /*
 	Tries to read up to length bytes starting at the offset for the specified file located at the target.  
 	The data parameter must be initialized to hold up to length bytes.  Returns the number of bytes read or -1 
 	if an error occurred.  
 */
-DllExport int genesisII_read(PGII_JNI_INFO info, GII_FILE_HANDLE file, char* data, long offset, long length);
+DllExport int genesisII_read(PGII_JNI_INFO info, GII_FILE_HANDLE file, char* data, int offset, int length);
 
 /*
 	This method writes the data array to the file at the given offset.  The length field should be the 
 	size of the data array.
 */
-DllExport int genesisII_write(PGII_JNI_INFO info, GII_FILE_HANDLE file, char* data, long offset, long length);
+DllExport int genesisII_write(PGII_JNI_INFO info, GII_FILE_HANDLE file, char* data, int offset, int length);
+
+/*
+	This method truncates a file to the given size and appends the optional data if specified.
+*/
+DllExport int genesisII_truncate_append(PGII_JNI_INFO info, GII_FILE_HANDLE file, char* data, int offset, int length);
 
 /*
 	This method closes a file.  Data is only committed when a file is properly closed.  

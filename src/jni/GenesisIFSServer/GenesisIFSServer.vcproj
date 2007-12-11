@@ -118,7 +118,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="C:\GenesisIIDevelopment\GenesisII\src\jni\CToGenesisCalls;&quot;$(JAVA_HOME)\include\win32&quot;;&quot;$(JAVA_HOME)\include&quot;;C:\WINDDK\3790.1830\src\filesys\nulmrx\wxp\sys;"
+				AdditionalIncludeDirectories="C:\GenesisIIDevelopment\GenesisII\src\jni\CToGenesisCalls;&quot;$(JAVA_HOME2)\include\win32&quot;;&quot;$(JAVA_HOME2)\include&quot;;C:\WINDDK\3790.1830\src\filesys\nulmrx\wxp\sys;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"

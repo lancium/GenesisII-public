@@ -1,27 +1,23 @@
 package edu.virginia.vcgr.genii.client.jni.gIIlib.io;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import org.morgan.util.io.StreamUtils;
+import edu.virginia.vcgr.genii.client.jni.gIIlib.io.file.WindowsIFSFile;
 
 
 public class JNIClose {
 	public static Boolean close(Integer fileHandle){		
-		InputStream theRData = DataTracker.getInstance().getReadStream(fileHandle);
-		OutputStream theWData = DataTracker.getInstance().getWriteStream(fileHandle);			
+		WindowsIFSFile file = DataTracker.getInstance().getFile(fileHandle);
 		
-		if(theRData == null && theWData == null){
-			System.out.println("Invalid file handle");			
+		if(file == null){
+			System.out.println("Invalid file handle or a directory being closed");			
 			return false;
 		}
 		else{
-			if(theRData != null) 
-				StreamUtils.close(theRData);							
-			if(theWData != null) 
-				StreamUtils.close(theWData);
-			
-			DataTracker.getInstance().removeStream(fileHandle);
+			try{
+				file.close();
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+			DataTracker.getInstance().removeFile(fileHandle);			
 			return true;
 		}				
 	}

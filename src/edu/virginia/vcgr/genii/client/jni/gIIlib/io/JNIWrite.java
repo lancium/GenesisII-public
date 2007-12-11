@@ -1,24 +1,41 @@
 package edu.virginia.vcgr.genii.client.jni.gIIlib.io;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import edu.virginia.vcgr.genii.client.jni.gIIlib.io.file.WindowsIFSFile;
 
 
-public class JNIWrite {
+public class JNIWrite{
 	public static Integer write(Integer fileHandle, String data, Integer offset){
-		OutputStream out = DataTracker.getInstance().getWriteStream(fileHandle);		
+		WindowsIFSFile file = DataTracker.getInstance().getFile(fileHandle);
+		int toReturn = -1;
 		
-		if(out == null){
-			System.out.println("Invalid file handle");			
-			return -1;
+		if(file == null){
+			System.out.println("Invalid file handle");						
 		}
-		try
-		{			
-			out.write(data.getBytes(), offset, data.length());			
-		}catch (IOException e) {			
-			e.printStackTrace();
-			return -1;
+		else{		
+			try{
+				file.lseek64(offset);
+				toReturn = file.write(data.getBytes());	
+			}catch(Exception e){
+				e.printStackTrace();
+			}
 		}
-		return data.length();
+		return toReturn;
+	}
+	
+	public static Integer truncateAppend(Integer fileHandle, String data, Integer offset){
+		WindowsIFSFile file = DataTracker.getInstance().getFile(fileHandle);
+		int toReturn = -1;
+
+		if(file == null){
+			System.out.println("Invalid file handle");						
+		}
+		else{
+			try{
+				toReturn = file.truncateAppend(offset.longValue(), data.getBytes());							
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+		return toReturn;
 	}
 }

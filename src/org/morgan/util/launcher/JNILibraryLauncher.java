@@ -147,14 +147,14 @@ public class JNILibraryLauncher
 	/* ************************* IO Functions**************************** */
 	
 	@SuppressWarnings("unchecked")
-	public static Object[] open(String fileName, boolean create, boolean read, 
-			boolean write){
+	public static Object[] open(String fileName, int requestedDeposition,
+			int DesiredAccess, boolean isDirectory){
 		String myClass = JNI_IO_PACKAGE + ".JNIOpen";
 		String myMethod = "open";
-		Class[] argTypes = new Class[] {String.class, Boolean.class, 
-				Boolean.class, Boolean.class};
-		Object[] args = new Object[] {fileName, new Boolean(create), 
-				new Boolean(read), new Boolean(write)};
+		Class[] argTypes = new Class[] {String.class, Integer.class, 
+				Integer.class, Boolean.class};
+		Object[] args = new Object[] {fileName, new Integer(requestedDeposition), 
+				new Integer(DesiredAccess), new Boolean(isDirectory)};
 		
 		ArrayList<String> toReturn = (ArrayList<String>)
 			invoke(myClass, myMethod, argTypes, args);
@@ -175,6 +175,16 @@ public class JNILibraryLauncher
 	public static int write(int fileHandle, String data, int offset){
 		String myClass = JNI_IO_PACKAGE + ".JNIWrite";
 		String myMethod = "write";
+		Class<?>[] argTypes = new Class[] {Integer.class, String.class, Integer.class};
+		Object[] args = new Object[] {new Integer(fileHandle), 
+				new String(data), new Integer(offset)};
+		
+		return (Integer)invoke(myClass, myMethod, argTypes, args);				
+	}
+	
+	public static int truncateAppend(int fileHandle, String data, int offset){
+		String myClass = JNI_IO_PACKAGE + ".JNIWrite";
+		String myMethod = "truncateAppend";
 		Class<?>[] argTypes = new Class[] {Integer.class, String.class, Integer.class};
 		Object[] args = new Object[] {new Integer(fileHandle), 
 				new String(data), new Integer(offset)};

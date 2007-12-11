@@ -24,7 +24,7 @@ public class JNIDirectoryListingTool extends JNILibraryBase
 		//If target is null then query current directory
 		//All paths are absolute (cleanup)
 		directory = (directory != null && !directory.equals("") && !directory.equals("/")) 
-			? directory : "";		
+			? directory : "/";		
 		directory = (directory.length() > 0 && !directory.startsWith("/")) ? 
 				"/" + directory : directory;
 		
@@ -63,25 +63,23 @@ public class JNIDirectoryListingTool extends JNILibraryBase
 				{
 					for (RNSPath entry : entries)
 					{
-						if(entry.isDirectory()){							
-							String entryPath = directory + "/" + entry.getName();
-							toAdd = new JNICacheEntry(entryPath, 
+						if(entry.isDirectory()){														
+							toAdd = new JNICacheEntry(entry.pwd(), 
 									true, -1, entry.getName(), null);
 							
 							//Add to cache and then to return listing
-							manager.putCacheEntry(entryPath, toAdd);
+							manager.putCacheEntry(entry.pwd(), toAdd);
 							cacheEntries.add(toAdd);
 						}
 						else{
 							TypeInformation type = new TypeInformation(
-									entry.getEndpoint());
-							String entryPath = directory + "/" + entry.getName();
+									entry.getEndpoint());							
 							
-							toAdd = new JNICacheEntry(entryPath, 
+							toAdd = new JNICacheEntry(entry.pwd(), 
 									false, type.getByteIOSize(), entry.getName(), null);
 							
 							//Add to cache and then to return listing
-							manager.putCacheEntry(entryPath, toAdd);
+							manager.putCacheEntry(entry.pwd(), toAdd);
 							cacheEntries.add(toAdd);																				
 						}
 					}

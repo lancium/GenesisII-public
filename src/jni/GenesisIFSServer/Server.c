@@ -44,6 +44,11 @@ void printListing(char * listing, int size){
 	int i;	
 	ULONG length;
 	ULONG fileid;
+
+	if(size == JNI_ERR){
+		printf("Error occurred while processing request\n");
+	}
+
 	for(i =0; i< size; i++){		
 		memcpy(&fileid, listing, sizeof(ULONG));
 		printf("File ID: %d ", fileid);
@@ -62,8 +67,14 @@ void printListing(char * listing, int size){
 }
 
 void printListing2(char * listing, int bytes){
-	listing[bytes] = '\0';
-	printf_s("%s\n", listing);
+
+	if(bytes == JNI_ERR){
+		printf("Error occurred while processing request\n");
+	}
+	else{
+		listing[bytes] = '\0';
+		printf_s("%s\n", listing);
+	}
 }
 
 //Copy listing and return total bytes saved
@@ -230,7 +241,7 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 				path[strlen(bufPtr)] = '\0';				
 			}else{
 				path = "";
-			}						
+			}					
 
 			printf("Path: %s for Query Info\n", path);			
 			response->StatusCode = genesisII_get_information(pMyInfo, &listing, path);
@@ -247,6 +258,12 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 			char * path;			
 			char *bufPtr = (char*) request->RequestBuffer;
 			char ** listing;
+			BOOLEAN isMalformed = TRUE;
+
+			//Create parameters
+			int requestedDeposition;
+			int desiredAccess;
+			int isDirectory;
 
 			//Get Directory
 			if(request->RequestBufferLength && strlen(bufPtr) > 0){
@@ -256,19 +273,36 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 			}else{
 				path = "";
 			}						
+			
+			bufPtr += (request->RequestBufferLength > 0) ? strlen(bufPtr) + 1 : 0;
 
-			printf("Path: %s for Create\n", path);			
+			__try{			
+				memcpy(&requestedDeposition, bufPtr, sizeof(int));
+				bufPtr += sizeof(int);
+				memcpy(&desiredAccess, bufPtr, sizeof(int));
+				bufPtr += sizeof(int);
+				memcpy(&isDirectory, bufPtr, sizeof(int));
+				bufPtr += sizeof(int);
 
-			response->StatusCode = genesisII_open(pMyInfo, path, 0, 1, 0, &listing);
-			printf("Create finished on Genesis side!\n");
-			//If an error, no copy is done
-			response->ResponseBufferLength = response->StatusCode == -1 ? 0 : 
-				copyListing(response->ResponseBuffer, listing, response->StatusCode);
+				isMalformed = FALSE;
+						
+				printf("Path: %s for Create\n", path);
+				printf("Options: %d, %d, %d\n", requestedDeposition, desiredAccess, isDirectory);
 
-			printListing(response->ResponseBuffer, response->StatusCode);
+				response->StatusCode = genesisII_open(pMyInfo, path, requestedDeposition, desiredAccess, 
+					isDirectory, &listing);
+				printf("Create finished on Genesis side!\n");
+				
+				//If an error, no copy is done
+				response->ResponseBufferLength = (response->StatusCode == -1) ? 0 : 
+					copyListing(response->ResponseBuffer, listing, response->StatusCode);
 
-			printf("Information Copied successful\n");		
-
+				printListing(response->ResponseBuffer, response->StatusCode);
+			}__finally{
+				if(isMalformed){
+					response->StatusCode = -1;
+				}
+			}				
 			break;
 		}
 		case GENII_READ:
@@ -290,6 +324,64 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 			//printListing2(response->ResponseBuffer, response->ResponseBufferLength);
 			printf("Read finished on Genesis side!\n");	
 
+			break;
+		}
+		case GENII_WRITE:
+		{
+			char *bufPtr = (char*) request->RequestBuffer;		
+			long fileID, offset, length;			
+
+			response->ResponseBufferLength = 0;
+
+			//Get all three parameters
+			__try{
+				memcpy(&fileID, bufPtr, sizeof(long));
+				bufPtr += sizeof(long);
+				memcpy(&offset, bufPtr, sizeof(long));
+				bufPtr += sizeof(long);
+				memcpy(&length, bufPtr, sizeof(long));
+				bufPtr += sizeof(long);
+				
+				printf("Write started for file with fileID: %d, offset: %d, length %d\n", fileID, offset, length);
+
+				if(DEBUG){
+					printf("Data: %s\n", bufPtr);
+				}
+
+				response->ResponseBufferLength = genesisII_write(pMyInfo, fileID, bufPtr, offset, length);
+				printf("Write finished on Genesis side!\n");	
+			}			
+			__finally{			
+			}
+			break;				
+		}
+		case GENII_TRUNCATEAPPEND:
+		{
+			char *bufPtr = (char*) request->RequestBuffer;		
+			long fileID, offset, length;			
+
+			response->ResponseBufferLength = 0;
+
+			//Get all three parameters
+			__try{
+				memcpy(&fileID, bufPtr, sizeof(long));
+				bufPtr += sizeof(long);
+				memcpy(&offset, bufPtr, sizeof(long));
+				bufPtr += sizeof(long);
+				memcpy(&length, bufPtr, sizeof(long));
+				bufPtr += sizeof(long);
+				
+				printf("TruncateAppend started for file with fileID: %d, offset: %d, length %d\n", fileID, offset, length);
+
+				if(DEBUG){
+					printf("Data: %s\n", bufPtr);
+				}
+
+				response->ResponseBufferLength = genesisII_truncate_append(pMyInfo, fileID, bufPtr, offset, length);
+				printf("TruncateAppend finished on Genesis side!\n");	
+			}			
+			__finally{			
+			}
 			break;
 		}
 		default:
@@ -319,7 +411,7 @@ DWORD WINAPI TestThread(LPVOID parameter){
 	WaitForSingleObject(sem_handle, INFINITE);
 	if(!loggedin){
 		printf("Logging In to Genesis\n");
-		genesisII_login(&myInfo, "security/keys.pfx", "keys", "skynet1");
+		genesisII_login(&myInfo, "deployments/default/security/keys.pfx", "keys", "skynet1");
 		printf("Login successful\n");
 		loggedin = 1;
 	}
@@ -489,11 +581,16 @@ int runMultiThreaded(){
 int main(int argc, char* argv[])
 {
 	int status = 0;
+	
+	int desiredAccess = GENESIS_FILE_READ_DATA | GENESIS_FILE_WRITE_DATA;						
+	char requestedDeposition = GENESIS_FILE_CREATE;
+	int isDirectory = TRUE;
+
 	GII_JNI_INFO rootInfo;		
 
-	//int StatusCode, bytes, fileid;
-	//char ** directoryListing;
-	//char buffer[8192];	
+	int StatusCode, bytes, fileid;
+	char ** directoryListing;
+	char buffer[8192];	
 
 	//Initialize in root thread
 	if(initializeJavaVM("C:/GenesisIIDevelopment/GenesisII", &rootInfo) == -1){
@@ -501,32 +598,56 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 	
+	/*if(!loggedin){
+		printf("Logging In to Genesis\n");
+		genesisII_login(&rootInfo, "sosa.pfx", "sosa", "cbs");
+		printf("Login successful\n");
+		loggedin = 1;
+	}*/
+
 	if(!loggedin){
 		printf("Logging In to Genesis\n");
-		genesisII_login(&rootInfo, "security/keys.pfx", "keys", "skynet1");
+		genesisII_login(&rootInfo, "deployments/default/security/keys.pfx", "keys", "sky");
 		printf("Login successful\n");
 		loggedin = 1;
 	}
 	
 	status = runMultiThreaded();		
 
-	//printf("Creating file somefile.txt\n");
+	//fileid=0;
 
-	//StatusCode = genesisII_open(&rootInfo, "/somefile.txt", 0, 1, 0, &directoryListing);
+	//printf("Creating directory SOME_DIRECTORY\n");
+
+	//StatusCode = genesisII_open(&rootInfo, "/SOME_DIRECTORY", requestedDeposition, desiredAccess, isDirectory, &directoryListing);
 	//printf("Got Create Info\n");
 	//bytes = copyListing(buffer, directoryListing, StatusCode);
 	//printListing(buffer, StatusCode);
+
+	///*StatusCode = genesisII_write(&rootInfo,fileid, "IlikeTacos", 10, 20);
+	//printf("Wrote data %d\n", StatusCode);
+	//
+	//StatusCode = genesisII_read(&rootInfo,fileid, buffer, 0, 10);
+	//printf("Got Data\n");
+	//printListing2(buffer, StatusCode);*/
+
+	//StatusCode = genesisII_close(&rootInfo,fileid);
 
 	//memcpy(&fileid, buffer, sizeof(ULONG));
 
 	//printf("Reading 3468 from offset 4000 bytes from %d \n", fileid);
 
-	//StatusCode = genesisII_read(&rootInfo,fileid, buffer, 4000, 3468);
+	//StatusCode = genesisII_read(&rootInfo,fileid, buffer, 0, 4096);
 	//printf("Got Data\n");
 	//printListing2(buffer, StatusCode);
 
-	//genesisII_logout(&rootInfo);
-	//
-	//return status;
+	//StatusCode = genesisII_truncate_append(&rootInfo,fileid, "IlikeTacos", 100, 10);
+	//printf("Wrote data %d\n", StatusCode);
+
+	///*StatusCode = genesisII_write(&rootInfo,fileid, "IlikeTacos", 8000, 10);
+	//printf("Wrote data %d\n", StatusCode);*/
+
+	genesisII_logout(&rootInfo);
+	
+	return status;
 }
 

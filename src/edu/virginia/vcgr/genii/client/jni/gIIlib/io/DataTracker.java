@@ -1,23 +1,19 @@
 package edu.virginia.vcgr.genii.client.jni.gIIlib.io;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Hashtable;
 import java.util.concurrent.locks.ReentrantLock;
 
+import edu.virginia.vcgr.genii.client.jni.gIIlib.io.file.WindowsIFSFile;
+
 public class DataTracker {
 	private static DataTracker myInstance = null;
-	private Hashtable<Integer, InputStream> readFiles;
-	private Hashtable<Integer, OutputStream> writeFiles;
-	private ReentrantLock readLock;
-	private ReentrantLock writeLock;
+	private Hashtable<Integer, WindowsIFSFile> openFiles;	
+	private ReentrantLock lock;
 	private int nextFileHandle;
 	
 	private DataTracker(){
-		readFiles = new Hashtable<Integer, InputStream>();
-		writeFiles = new Hashtable<Integer, OutputStream>();
-		readLock = new ReentrantLock();
-		writeLock = new ReentrantLock();
+		openFiles = new Hashtable<Integer, WindowsIFSFile>();		
+		lock = new ReentrantLock();
 		nextFileHandle = 0;
 	}
 	
@@ -34,43 +30,19 @@ public class DataTracker {
 		return lastFileHandle;
 	}
 	
-	public InputStream getReadStream(Integer fileHandle){
-		InputStream stream;
-		readLock.lock();
-		stream = readFiles.get(fileHandle);
-		readLock.unlock();
-		return stream;
-	}
-	public OutputStream getWriteStream(Integer fileHandle){
-		OutputStream stream;
-		writeLock.lock();
-		stream = writeFiles.get(fileHandle);
-		writeLock.unlock();
-		return stream;
+	public WindowsIFSFile getFile(Integer fileHandle){
+		return openFiles.get(fileHandle);
 	}
 	
-	public void putStream(Integer fileHandle, Object stream){		
-		if(stream instanceof InputStream){
-			readLock.lock();
-			readFiles.put(fileHandle, (InputStream)stream);
-			readLock.unlock();
-		}
-		else if(stream instanceof OutputStream){
-			writeLock.lock();
-			writeFiles.put(fileHandle, (OutputStream)stream);
-			writeLock.unlock();
-		}
-		else{
-			System.out.println("Invalid usage of putStream");
-		}
+	public void putFile(Integer fileHandle, WindowsIFSFile file){		
+		lock.lock();
+		openFiles.put(fileHandle, file);
+		lock.unlock();
 	}
 	
-	public void removeStream(Integer fileHandle){	
-		readLock.lock(); 
-		writeLock.lock();
-		readFiles.remove(fileHandle);		
-		writeFiles.remove(fileHandle);
-		writeLock.unlock(); 
-		readLock.unlock(); 
+	public void removeFile(Integer fileHandle){	
+		lock.lock();
+		openFiles.remove(fileHandle); 
+		lock.unlock(); 
 	}
 }

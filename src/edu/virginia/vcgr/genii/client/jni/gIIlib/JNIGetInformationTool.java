@@ -20,7 +20,7 @@ public class JNIGetInformationTool extends JNILibraryBase {
 			return null;
 		
 		//All paths are absolute (cleanup)
-		path = (path == null || path.equals("") || path.equals("/")) ? "" : path;
+		path = (path == null || path.equals("") || path.equals("/")) ? "/" : path;
 		path = (path.length() > 0 && !path.startsWith("/")) ? "/" + path : path;
 		
 		JNICacheManager cacheManager = JNICacheManager.getInstance();		
@@ -89,6 +89,75 @@ public class JNIGetInformationTool extends JNILibraryBase {
 			//Put into cache that this path does not exist
 			cacheEntry = JNICacheEntry.createNonExistingEntry(path);
 			cacheManager.putCacheEntry(path, cacheEntry);
+		}
+		
+		//We cache non existent resources to speed up lookups
+		if(!cacheEntry.exists()){
+			return null;
+		}
+		else{
+			return cacheEntry.getFileInformation();
+		}
+	}
+	
+	public static ArrayList<String> getInformationFromRNS(RNSPath path){		
+		tryToInitialize();		
+		
+		System.out.println("Genesis is getting information for file that has been opened: " + path.pwd());
+				
+		RNSPath parent = null;
+		JNICacheManager cacheManager = JNICacheManager.getInstance();		
+		JNICacheEntry cacheEntry = cacheManager.getCacheEntry(path.pwd());
+		JNICacheEntry parentCacheEntry = null;
+		
+		if(!path.isRoot()){
+			parent = path.getParent();			
+			parentCacheEntry = cacheManager.getCacheEntry(parent.pwd());
+		}
+				
+		try{					
+			//Cache Miss
+			if(cacheEntry == null){			
+				boolean isDirectory;
+				long fileSize;
+				String name;	
+				
+				if(!path.exists())
+				{
+					cacheEntry = JNICacheEntry.createNonExistingEntry(path.pwd());
+				}
+				else{				
+					//Fill in directory information
+					if(path.isDirectory()){ 
+						isDirectory = true;
+						fileSize = -1;
+					}
+					else{
+						TypeInformation type = new TypeInformation(
+								path.getEndpoint());						
+						fileSize = type.getByteIOSize();																		
+					}
+					
+					name = path.getName();
+					cacheEntry = new JNICacheEntry(path.pwd(), path.isDirectory(), fileSize, name, null);
+				}
+				
+				//Add it to the cache!
+				cacheManager.putCacheEntry(path.pwd(), cacheEntry);								
+			}
+			
+			if(parent != null)
+				System.out.println("Parent's path = " + parent.pwd());
+			
+			if(parentCacheEntry != null){				
+				
+				//Replace /Add entry if parent exists
+				parentCacheEntry.addDirectoryEntry(cacheEntry);							
+			}
+		}catch(Exception e){
+			//Put into cache that this path does not exist
+			cacheEntry = JNICacheEntry.createNonExistingEntry(path.pwd());
+			cacheManager.putCacheEntry(path.pwd(), cacheEntry);			
 		}
 		
 		//We cache non existent resources to speed up lookups
