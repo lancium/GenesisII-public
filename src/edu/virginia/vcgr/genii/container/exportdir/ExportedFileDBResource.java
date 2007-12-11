@@ -136,7 +136,7 @@ public class ExportedFileDBResource extends RByteIOResource
 		{
 			_logger.error("Local file does not exist for ExportedFileResource.");
 			
-			destroy(false);
+			destroy(_connection, false);
 			throw FaultManipulator.fillInFault(new ResourceUnknownFaultType());
 		}
 	}
@@ -165,15 +165,20 @@ public class ExportedFileDBResource extends RByteIOResource
 	
 	public void destroy() throws ResourceException
 	{
-		destroy(true);
+		destroy(_connection, true);
 	}
 	
-	public void destroy(boolean hardDestroy) throws ResourceException
+	public void destroy(boolean hardDestroy) throws ResourceException, ResourceUnknownFaultType
+	{
+		destroy(_connection, hardDestroy);
+	}
+	
+	public void destroy(Connection connection, boolean hardDestroy) throws ResourceException
 	{
 		PreparedStatement stmt = null;
 		try
 		{
-			stmt = _connection.prepareStatement(_DELETE_EXPORTED_FILE_STMT);
+			stmt = connection.prepareStatement(_DELETE_EXPORTED_FILE_STMT);
 			stmt.setString(1, getId());
 			stmt.executeUpdate();
 			super.destroy();

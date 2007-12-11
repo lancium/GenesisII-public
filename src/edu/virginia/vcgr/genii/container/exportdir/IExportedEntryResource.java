@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.container.exportdir;
 
+import java.sql.Connection;
 import java.util.Calendar;
 
 import javax.xml.namespace.QName;
@@ -20,7 +21,9 @@ public interface IExportedEntryResource extends IResource
 	public String getId() throws ResourceException;
 	public String getParentIds() throws ResourceException;
 	
-	public void destroy(boolean hardDestroy) 
+	public void destroy(boolean hardDestroy)
+		throws ResourceException, ResourceUnknownFaultType;
+	public void destroy(Connection connection, boolean hardDestroy) 
 		throws ResourceException, ResourceUnknownFaultType;
 	
 	public void setCreateTime(Calendar c) throws ResourceException;

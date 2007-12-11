@@ -133,7 +133,7 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		{
 			_logger.error("Local file does not exist for ExportedFileResource.");
 			
-			destroy(false);
+			destroy(_connection, false);
 			throw FaultManipulator.fillInFault(new ResourceUnknownFaultType());
 		}
 	}
@@ -221,31 +221,36 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		return ret;
 	}
 
-	public void destroy(boolean hardDestroy) throws ResourceException,
+	public void destroy(boolean hardDestroy) throws ResourceException, ResourceUnknownFaultType
+	{
+		destroy(_connection, hardDestroy);
+	}
+	
+	public void destroy(Connection connection, boolean hardDestroy) throws ResourceException,
 			ResourceUnknownFaultType
 	{
-		dirDestroyAllForParentDir(_connection, getId(), false);
+		dirDestroyAllForParentDir(connection, getId(), false);
 		ExportedFileDBResource.fileDestroyAllForParentDir(_connection, getId(), false);
 		
 		/* Delete information related directly to parent exported dri */
 		PreparedStatement stmt = null;
 		try
 		{
-			stmt = _connection.prepareStatement(_DELETE_EXPORTED_DIR_ENTRY_ATTR);
+			stmt = connection.prepareStatement(_DELETE_EXPORTED_DIR_ENTRY_ATTR);
 			stmt.setString(1, getId());
 			stmt.executeUpdate();
 			
 			close(stmt);
 			stmt = null;
 			
-			stmt = _connection.prepareStatement(_DELETE_EXPORTED_DIR_ENTRIES_STMT);
+			stmt = connection.prepareStatement(_DELETE_EXPORTED_DIR_ENTRIES_STMT);
 			stmt.setString(1, getId());
 			stmt.executeUpdate();
 			
 			close(stmt);
 			stmt = null;
 			
-			stmt = _connection.prepareStatement(_DELETE_EXPORTED_DIR_STMT);
+			stmt = connection.prepareStatement(_DELETE_EXPORTED_DIR_STMT);
 			stmt.setString(1, getId());
 			stmt.executeUpdate();
 			
@@ -742,12 +747,12 @@ public class ExportedDirDBResource extends BasicDBResource implements
 			ResourceKey rKey = ResourceManager.getTargetResource(entry.getEntryReference());
 			IExportedEntryResource resource = (IExportedEntryResource)rKey.dereference();
 			
-			resource.destroy(hardDestroy);
+			resource.destroy(_connection, hardDestroy);
 		}
 		catch (ResourceException ruft)
 		{
 			// Ignore so we can keep cleaning up.
-			_logger.debug(ruft);
+			_logger.error("Unable to destroy resource.", ruft);
 		}
 			
 		/* remove entry information */

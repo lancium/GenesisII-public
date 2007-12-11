@@ -345,7 +345,7 @@ public class DirectoryHandler
 			if (resp.getEntryList().length != 0)
 				throw new OGRSHException(OGRSHException.DIRECTORY_NOT_EMPTY,
 					"Directory \"" + fullpath + "\" is not empty.");
-			full.delete();
+			full.unlink();
 		}
 		catch (Throwable cause)
 		{
