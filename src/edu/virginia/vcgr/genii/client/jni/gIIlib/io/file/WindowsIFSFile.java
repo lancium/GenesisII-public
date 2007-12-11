@@ -1,0 +1,58 @@
+package edu.virginia.vcgr.genii.client.jni.gIIlib.io.file;
+
+import java.io.IOException;
+
+import edu.virginia.vcgr.genii.client.rns.RNSPath;
+
+public abstract class WindowsIFSFile extends WindowsIFSResource
+{
+	private boolean _readable;
+	private boolean _writeable;
+	private boolean _isAppend;
+	
+	protected final boolean isAppend()
+	{
+		return _isAppend;
+	}
+	
+	protected abstract byte[] doRead(int length) throws IOException;
+	protected abstract int doWrite(byte []data) throws IOException;
+	protected abstract int doTruncateAppend(long offset,byte []data) throws IOException;	
+	
+	public WindowsIFSFile(RNSPath path, boolean isReadable,
+		boolean isWriteable, boolean isAppend)
+	{
+		super(path);
+		_readable = isReadable;
+		_writeable = isWriteable;
+		_isAppend = isAppend;
+	}
+	
+	public abstract long lseek64(long offset) throws IOException;
+	
+	public void close() throws IOException
+	{
+		// By default, I don't need to do anything.
+	}
+	
+	public byte[] read(int length) throws IOException
+	{
+		if (_readable)
+			return doRead(length);		
+		throw new IOException("File is not open for reading.");
+	}
+	
+	public int write(byte []data) throws IOException
+	{
+		if (_writeable)
+			return doWrite(data);
+		throw new IOException("File is not open for writing.");
+	}
+	
+	public int truncateAppend(long offset, byte []data) throws IOException
+	{
+		if(_writeable)
+			return doTruncateAppend(offset, data);
+		throw new IOException("File is not open for writing.");
+	}
+}
