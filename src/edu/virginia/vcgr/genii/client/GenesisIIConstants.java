@@ -7,6 +7,9 @@ public class GenesisIIConstants
 	static public final String GENESISII_NS =
 		"http://vcgr.cs.virginia.edu/Genesis-II";
 	
+	static public final String OGSA_BP_NS =
+		"http://schemas.ggc.org/ogsa/2006/05/wsrf-bp";
+	
 	/// System property to indicate the installtion location 
 	static public final String INSTALL_DIR_SYSTEM_PROPERTY = 
 		"edu.virginia.vcgr.genii.install-base-dir";
@@ -40,7 +43,9 @@ public class GenesisIIConstants
 		new QName(GENESISII_NS, SCHED_TERM_TIME_PROPERTY_NAME);
 	
 	static public QName RESOURCE_ENDPOINT_ATTR_QNAME =
-		new QName(GENESISII_NS, "resource-endpoint");
+		new QName(OGSA_BP_NS, "ResourceEndpointReference");
+	static public QName RESOURCE_PROPERTY_NAMES_QNAME =
+		new QName(OGSA_BP_NS, "ResourcePropertyNames");
 	
 	static public QName GLOBAL_PROPERTY_SECTION_NAME =
 		new QName(GenesisIIConstants.GENESISII_NS, "global-properties");
