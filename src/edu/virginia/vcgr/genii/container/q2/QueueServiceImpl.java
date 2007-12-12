@@ -4,8 +4,6 @@ import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
@@ -26,7 +24,6 @@ import org.ggf.rns.RNSEntryExistsFaultType;
 import org.ggf.rns.RNSEntryNotDirectoryFaultType;
 import org.ggf.rns.RNSFaultType;
 import org.ggf.rns.Remove;
-import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
@@ -73,7 +70,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		try
 		{
 			QueueManager mgr = QueueManager.getManager((String)rKey.getKey());
-			mgr.addBESContainer(addRequest.getEntry_name(), addRequest.getEntry_reference());
+			mgr.addNewBES(addRequest.getEntry_name(), addRequest.getEntry_reference());
 			return new AddResponse(addRequest.getEntry_reference());
 		}
 		catch (SQLException sqe)
@@ -95,8 +92,19 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 	public Object configureResource(ConfigureRequestType configureRequest)
 			throws RemoteException
 	{
-		// TODO Auto-generated method stub
-		return null;
+		ResourceKey rKey = ResourceManager.getCurrentResource();
+		
+		try
+		{
+			QueueManager mgr = QueueManager.getManager((String)rKey.getKey());
+			mgr.configureBES(configureRequest.getQueueResource(), 
+				configureRequest.getNumSlots().intValue());
+			return null;
+		}
+		catch (SQLException sqe)
+		{
+			throw new RemoteException("Unable to add bes container.", sqe);
+		}
 	}
 
 	@Override
@@ -134,22 +142,12 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 	{
 		ResourceKey rKey = ResourceManager.getCurrentResource();
 		Pattern pattern = Pattern.compile(listRequest.getEntry_name_regexp());
-		HashMap<String, EndpointReferenceType> ret;
 		Collection<EntryType> entries = new ArrayList<EntryType>();
 		
 		try
 		{
 			QueueManager mgr = QueueManager.getManager((String)rKey.getKey());
-			ret = mgr.listEntries();
-			for (String name : ret.keySet())
-			{
-				Matcher matcher = pattern.matcher(name);
-				if (matcher.matches())
-				{
-					entries.add(new EntryType(name, null, ret.get(name)));
-				}
-			}
-			
+			entries = mgr.listBESs(pattern);
 			return new ListResponse(entries.toArray(new EntryType[0]));
 		}
 		catch (SQLException sqe)
@@ -163,7 +161,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 	public ReducedJobInformationType[] listJobs(Object listRequest)
 			throws RemoteException
 	{
-		// TODO Auto-generated method stub
+		// TODO
 		return null;
 	}
 
@@ -193,22 +191,12 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 	{
 		Pattern pattern = Pattern.compile(removeRequest.getEntry_name());
 		ResourceKey rKey = ResourceManager.getCurrentResource();
-		HashMap<String, EndpointReferenceType> ret;
 		Collection<String> entries = new ArrayList<String>();
 		
 		try
 		{
 			QueueManager mgr = QueueManager.getManager((String)rKey.getKey());
-			ret = mgr.listEntries();
-			for (String name : ret.keySet())
-			{
-				Matcher matcher = pattern.matcher(name);
-				if (matcher.matches())
-				{
-					mgr.removeBESContainer(name);
-					entries.add(name);
-				}
-			}
+			entries = mgr.removeBESs(pattern);
 			
 			return entries.toArray(new String[0]);
 		}
@@ -223,7 +211,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 	public SubmitJobResponseType submitJob(SubmitJobRequestType submitJobRequest)
 			throws RemoteException
 	{
-		// TODO Auto-generated method stub
+		// TODO
 		return null;
 	}
 

@@ -26,13 +26,19 @@ public class QueueDBResourceFactory extends BasicDBResourceFactory
 			"CONSTRAINT q2resourcesnamecnst UNIQUE (resourcename, queueid))",
 		"CREATE TABLE q2jobs (" +
 			"jobid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
-			"jobticket VARCHAR(256) NOT NULL, queueid VARCHAR(256) NOT NULL, " +
-			"callingcontext BLOB(128K) NOT NULL, jsdl BLOB(128K) NOT NULL, " +
+			"jobticket VARCHAR(256) NOT NULL, " +
+			"queueid VARCHAR(256) NOT NULL, " +
+			"callingcontext BLOB(128K) NOT NULL, " +
+			"jsdl BLOB(128K) NOT NULL, " +
 			"owners BLOB(128K) NOT NULL," +
 			"priority SMALLINT NOT NULL," +
-			"state VARCHAR(64) NOT NULL, submittime TIMESTAMP NOT NULL, " +
-			"starttime TIMESTAMP, finishtime TIMESTAMP, " +
-			"jobendpoint BLOB(128K), resourceid BIGINT, " +
+			"state VARCHAR(64) NOT NULL, " +
+			"submittime TIMESTAMP NOT NULL, " +
+			"starttime TIMESTAMP, " +
+			"finishtime TIMESTAMP, " +
+			"runattempts SMALLINT NOT NULL, " +
+			"jobendpoint BLOB(128K), " +
+			"resourceid BIGINT, " +
 			"resourceendpoint BLOB(128K), " +
 			"CONSTRAINT q2jobsticket UNIQUE (jobticket, queueid))"
 	};

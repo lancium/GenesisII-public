@@ -128,4 +128,39 @@ public class DBSerializer
 			StreamUtils.close(bais);
 		}
 	}
+	
+	static public Blob xmlToBlob(Object obj)
+		throws IOException
+	{
+		try
+		{
+			byte []data = xmlSerialize(obj);
+			return new SerialBlob(data);
+		}
+		catch (SQLException sqe)
+		{
+			throw new IOException(sqe.getLocalizedMessage());
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	static public <Type> Type xmlFromBlob(Class<Type> type, Blob blob) 
+		throws IOException, ClassNotFoundException
+	{
+		InputStream in = null;
+		
+		try
+		{
+			in = blob.getBinaryStream();
+			return (Type)ObjectDeserializer.deserialize(new InputSource(in), type);
+		}
+		catch (SQLException sqe)
+		{
+			throw new IOException("Unable to deserialize object.", sqe);
+		}
+		finally
+		{
+			StreamUtils.close(in);
+		}
+	}
 }
