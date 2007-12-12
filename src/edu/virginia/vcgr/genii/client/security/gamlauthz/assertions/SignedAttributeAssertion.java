@@ -23,8 +23,6 @@ import java.security.Signature;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
-import edu.virginia.vcgr.genii.client.ser.Base64;
-
 
 /**
  * Signed Attribute Assertion.  If you trust the asserting identity, 
@@ -107,8 +105,7 @@ public class SignedAttributeAssertion extends SignedAssertion {
 	}	
 	
 	public String toString() {
-		return "(SignedAttributeAssertion) signature: " + Base64.byteArrayToBase64(_signature) + 
-			"\n attribute : [" + _attribute + "]";
+		return "(SignedAttributeAssertion)\n attribute : [" + _attribute + "]";
 	}	
 	
 	

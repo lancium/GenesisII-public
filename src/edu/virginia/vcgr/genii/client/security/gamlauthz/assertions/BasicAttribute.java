@@ -30,17 +30,13 @@ public abstract class BasicAttribute implements Attribute {
 
 	static public final long serialVersionUID = 0L;
 
-	protected long _notValidBeforeMillis;
-	protected long _durationValidMillis;
-	protected long _maxDelegationDepth;
+	protected AttributeConstraints _constraints;
 	
 	// zero-arg contstructor for externalizable use only!
 	public BasicAttribute() {}
 	
-	public BasicAttribute(long notValidBeforeMillis, long durationValidMillis, long maxDelegationDepth) {
-		_durationValidMillis = durationValidMillis;
-		_notValidBeforeMillis = notValidBeforeMillis;
-		_maxDelegationDepth = maxDelegationDepth;
+	public BasicAttribute(AttributeConstraints constraints) {
+		_constraints = constraints;
 	}
 	
 	/**
@@ -49,18 +45,9 @@ public abstract class BasicAttribute implements Attribute {
 	 * delegationDepth.
 	 */
 	public void checkValidity(int delegationDepth, Date date) throws AttributeInvalidException {
-		long currentTime = System.currentTimeMillis();
 		
-		if (currentTime < _notValidBeforeMillis) {
-			throw new AttributeNotYetValidException("Security attribute is not yet valid");
-		}
-
-		if (currentTime > _notValidBeforeMillis + _durationValidMillis) {
-			throw new AttributeExpiredException("Security attribute has expired");
-		}
-		
-		if (delegationDepth > _maxDelegationDepth) {
-			throw new AttributeInvalidException("Security attribute exceeds maximum delegation depth");
+		if (_constraints != null) {
+			_constraints.checkValidity(delegationDepth, date);
 		}
 		
 		try {
@@ -73,15 +60,11 @@ public abstract class BasicAttribute implements Attribute {
 	}
 	
 	public void writeExternal(ObjectOutput out) throws IOException {
-		out.writeLong(_durationValidMillis);
-		out.writeLong(_notValidBeforeMillis);
-		out.writeLong(_maxDelegationDepth);
+		out.writeObject(_constraints);
 	}
 
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-		_durationValidMillis = in.readLong();
-		_notValidBeforeMillis = in.readLong();
-		_maxDelegationDepth = in.readLong();
+		_constraints = (AttributeConstraints) in.readObject();
 	}
 	
 	

@@ -55,9 +55,16 @@ public class GamlMessageSendHandler {
 			// create an arrayList of Signed Assertions that are to be placed 
 			// in the serializable portion of the outgoing calling context
 			ArrayList<Serializable> toSerialize = new ArrayList<Serializable>();
-			for (GamlCredential cred : credentials) {
+			
+			Iterator<GamlCredential> itr = credentials.iterator();
+			while (itr.hasNext()) {
+				GamlCredential cred = itr.next();
 		
-				if (cred instanceof SignedAssertion) {
+				if (cred instanceof UsernameTokenIdentity) {
+					// Do nothing: do not serialize UT tokens: we will be sending
+					// it in its own header the old fashioned way.
+					
+				} else if (cred instanceof SignedAssertion) {
 					SignedAssertion signedAssertion = (SignedAssertion) cred;
 					
 					// Check if we are authorized to use this assertion in our 
@@ -72,6 +79,7 @@ public class GamlMessageSendHandler {
 							// Because we know an identity for the remote resource, delegate the 
 							// current credential assertion to it
 							DelegatedAttribute delegatedAttribute = new DelegatedAttribute(
+									null,
 									signedAssertion, 
 									resourceCertChain);
 							
@@ -101,9 +109,10 @@ public class GamlMessageSendHandler {
 				// We're not a temporary self-signed cert: create an identity 
 				// assertion about myself
 				IdentityAttribute myIdentityAttr = new IdentityAttribute (
-					System.currentTimeMillis() - (1000L * 60 * 15), // 15 minutes ago
-					GenesisIIConstants.CredentialExpirationMillis,	// valid 24 hours
-					10,												// 10 delegations
+					new BasicConstraints(
+						System.currentTimeMillis() - (1000L * 60 * 15), // 15 minutes ago
+						GenesisIIConstants.CredentialExpirationMillis,	// valid 24 hours
+						10),											// 10 delegations
 					new X509Identity(clientKeyMaterial._clientCertChain));
 				
 				// unlike incoming credentials that we have no control over, we don't cache 
@@ -116,6 +125,7 @@ public class GamlMessageSendHandler {
 					// Because we know an identity for the remote resource, delegate the 
 					// current credential assertion to it
 					DelegatedAttribute delegatedAttribute = new DelegatedAttribute(
+							null,
 							signedAssertion, 
 							resourceCertChain);
 					signedAssertion = new DelegatedAssertion(

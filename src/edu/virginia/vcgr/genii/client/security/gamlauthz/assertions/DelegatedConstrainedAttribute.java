@@ -32,7 +32,7 @@ import java.util.Date;
  *  
  * @author dmerrill
  */
-public class DelegatedAttribute implements Attribute {
+public class DelegatedConstrainedAttribute implements Attribute {
 
 	static public final long serialVersionUID = 0L;
 	
@@ -40,19 +40,15 @@ public class DelegatedAttribute implements Attribute {
 	protected SignedAssertion _assertion;
 	
 	// The certchain of the identity to be authorized for the above assertion
-	protected X509Certificate[] _delegateeIdentity = null;
-	
-	// The constraints placed upon this attribute
-	protected AttributeConstraints _constraints = null;
+	protected X509Certificate[] _delegateeIdentity = null;	
 
-	// Serialization of this attribute for hashcode and comparison purposes
+	// serialization of this attribute for hashcode and comparison purposes
 	protected transient String _encodedValue = null;
 
 	// zero-arg contstructor for externalizable use only!
-	public DelegatedAttribute() {}
+	public DelegatedConstrainedAttribute() {}
 	
-	public DelegatedAttribute(
-			AttributeConstraints constraints, 
+	public DelegatedConstrainedAttribute(
 			SignedAssertion assertion, 
 			X509Certificate[] delegateeIdentity) {
 		
@@ -63,7 +59,6 @@ public class DelegatedAttribute implements Attribute {
 		
 		_assertion = assertion;
 		_delegateeIdentity = delegateeIdentity;
-		_constraints = constraints;
 	}
 
 	/**
@@ -93,20 +88,12 @@ public class DelegatedAttribute implements Attribute {
 	 * delegationDepth.
 	 */
 	public void checkValidity(int delegationDepth, Date date) throws AttributeInvalidException {
-
-		// check constraints if they exist
-		if (_constraints != null) { 
-			_constraints.checkValidity(delegationDepth, date);
-		}
-		
-		// check the encapsulated assertion
 		if (_assertion instanceof DelegatedAssertion) {
 			((DelegatedAssertion) _assertion).checkValidity(delegationDepth + 1, date);
 		} else {
 			_assertion.checkValidity(date);
 		}
 
-		// make sure the delegatee's identity is still valid
 		try {
 			for (X509Certificate cert : _delegateeIdentity) {
 				cert.checkValidity();
@@ -126,13 +113,11 @@ public class DelegatedAttribute implements Attribute {
 	public String toString() {
 		return "(DelegatedAttribute) delegateeIdentity(" + _delegateeIdentity.length + "): " + 
 			_delegateeIdentity[0].getSubjectX500Principal().getName() + 
-			((_constraints == null) ? "" : _constraints.toString() + " ") +  
 			" subAssertion: [" + _assertion + "]";
 	}
 	
 	public void writeExternal(ObjectOutput out) throws IOException {
 		out.writeObject(_assertion);
-		out.writeObject(_constraints);
 		out.writeInt(_delegateeIdentity.length);
 		try {
 			for (int i = 0; i < _delegateeIdentity.length; i++) {
@@ -147,7 +132,6 @@ public class DelegatedAttribute implements Attribute {
 
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
 		_assertion = (SignedAssertion) in.readObject();
-		_constraints = (AttributeConstraints) in.readObject();
 		int numCerts = in.readInt();
 		_delegateeIdentity = new X509Certificate[numCerts];
 		try {
@@ -181,7 +165,7 @@ public class DelegatedAttribute implements Attribute {
 	}
 	
 	public boolean equals(Object o) {
-		DelegatedAttribute other = (DelegatedAttribute) o;
+		DelegatedConstrainedAttribute other = (DelegatedConstrainedAttribute) o;
 
 		// force encoded values to represent signed assertion
 		other.hashCode();

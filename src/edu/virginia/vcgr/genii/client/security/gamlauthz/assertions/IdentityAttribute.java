@@ -20,14 +20,9 @@ public class IdentityAttribute extends BasicAttribute {
 	public IdentityAttribute() {}
 	
 	public IdentityAttribute(
-			long notValidBeforeMillis, 
-			long durationValidMillis, 
-			long maxDelegationDepth,
+			AttributeConstraints constraints,
 			AssertableIdentity identity) {
-		super(
-				notValidBeforeMillis, 
-				durationValidMillis, 
-				maxDelegationDepth);
+		super(constraints);
 		_identity = identity;
 	}
 	
@@ -40,10 +35,10 @@ public class IdentityAttribute extends BasicAttribute {
 	}
 	
 	public String toString() {
-		return "(IdentityAttribute) beforeMillis: " + this._notValidBeforeMillis + 
-			" durationValidMillis: " + this._durationValidMillis + 
-			" maxDelegationDepth: " + this._maxDelegationDepth + 
-			" identity(" + _identity.getAssertingIdentityCertChain().length + "): [" + _identity + "]"; 
+		return "IdentityAttribute (" + 
+			((_constraints == null) ? "" : _constraints.toString() + " ") +  
+			((_identity == null) ? "" : _identity.toString() + " ") +  
+			")"; 
 	}
 	
 	public void writeExternal(ObjectOutput out) throws IOException {

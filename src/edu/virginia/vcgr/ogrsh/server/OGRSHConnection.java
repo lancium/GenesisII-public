@@ -1,6 +1,6 @@
 package edu.virginia.vcgr.ogrsh.server;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -13,17 +13,12 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.GUID;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
-import edu.virginia.vcgr.genii.client.cmd.tools.GamlLoginTool.CertEntry;
-import edu.virginia.vcgr.genii.client.cmd.tools.gamllogin.AbstractGamlLoginHandler;
-import edu.virginia.vcgr.genii.client.cmd.tools.gamllogin.GuiGamlLoginHandler;
+import edu.virginia.vcgr.genii.client.cmd.tools.gamllogin.*;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ContextStreamUtils;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.TransientCredentials;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.RenewableAttributeAssertion;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.RenewableClientAssertion;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.RenewableClientAttribute;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.RenewableIdentityAttribute;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.X509Identity;
 import edu.virginia.vcgr.ogrsh.server.comm.CommUtils;
 import edu.virginia.vcgr.ogrsh.server.comm.InvocationMatcher;
@@ -280,7 +275,7 @@ public class OGRSHConnection implements Runnable
 			AbstractGamlLoginHandler handler = null;
 			handler = new GuiGamlLoginHandler(null, null, null);
 			
-			CertEntry certEntry = handler.selectCert(file, null, password, false, credentialPattern);
+			CertEntry certEntry = handler.selectCert(new FileInputStream(file), null, password, false, credentialPattern);
 			if (certEntry == null)
 			{
 				throw new OGRSHException("Unable to log in as \"" +
@@ -289,9 +284,10 @@ public class OGRSHConnection implements Runnable
 			
 			// Create identitiy assertion
 			RenewableIdentityAttribute identityAttr = new RenewableIdentityAttribute(
-				System.currentTimeMillis() - (1000L * 60 * 15), // 15 minutes ago
-				GenesisIIConstants.CredentialExpirationMillis,	// valid 24 hours
-				10,
+				new BasicConstraints(
+						System.currentTimeMillis() - (1000L * 60 * 15), // 15 minutes ago
+						GenesisIIConstants.CredentialExpirationMillis,	// valid 24 hours
+						10),
 				new X509Identity(certEntry._certChain));
 			RenewableAttributeAssertion identityAssertion =
 				new RenewableAttributeAssertion(identityAttr, certEntry._privateKey);
@@ -305,7 +301,7 @@ public class OGRSHConnection implements Runnable
 			// Delegate the identity assertion to the temporary client
 			// identity
 			RenewableClientAttribute delegatedAttr = new RenewableClientAttribute(
-				identityAssertion, callContext);
+				null, identityAssertion, callContext);
 			RenewableClientAssertion delegatedAssertion = new RenewableClientAssertion(
 				delegatedAttr, certEntry._privateKey);
 			

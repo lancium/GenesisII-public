@@ -40,6 +40,10 @@ public class IDPIdentity implements AssertableIdentity {
 			return false;
 		}
 
+		if (!(other instanceof IDPIdentity)) {
+			return false;
+		}
+
 		if (!_name.equals(((IDPIdentity) other)._name)) {
 			return false;
 		}

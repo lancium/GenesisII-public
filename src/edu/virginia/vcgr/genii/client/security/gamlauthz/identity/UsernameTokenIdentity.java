@@ -25,7 +25,7 @@ public class UsernameTokenIdentity implements Identity, GamlCredential {
 	}
 
 	public String toString() {
-		return "[Username-Token] Username: " + _userName + ", Token: " + _token;
+		return "[Username-Token] Username: " + _userName; // + ", Token: " + _token;
 	}
 	
 	public X509Certificate[] getAssertingIdentityCertChain() {
@@ -38,6 +38,10 @@ public class UsernameTokenIdentity implements Identity, GamlCredential {
 			return false;
 		}
 
+		if (!(other instanceof UsernameTokenIdentity)) {
+			return false;
+		}
+		
 		if (!_userName.equals(((UsernameTokenIdentity) other)._userName)) {
 			return false;
 		}

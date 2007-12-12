@@ -1,161 +1,373 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
-import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
+import java.net.*;
+import java.io.*;
 
+import javax.xml.namespace.QName;
+
+import java.util.*;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.Text;
+import org.ws.addressing.EndpointReferenceType;
+
+import edu.virginia.vcgr.genii.client.byteio.ByteIOInputStream;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
+import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.TransientCredentials;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.RenewableAttributeAssertion;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.RenewableClientAssertion;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.RenewableClientAttribute;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.RenewableIdentityAttribute;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.UsernameTokenIdentity;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.X509Identity;
-import edu.virginia.vcgr.genii.client.cmd.tools.gamllogin.AbstractGamlLoginHandler;
-import edu.virginia.vcgr.genii.client.cmd.tools.gamllogin.GuiGamlLoginHandler;
-import edu.virginia.vcgr.genii.client.cmd.tools.gamllogin.TextGamlLoginHandler;
+import edu.virginia.vcgr.genii.client.security.SecurityConstants;
+import edu.virginia.vcgr.genii.client.cmd.tools.gamllogin.*;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.resource.*;
+import edu.virginia.vcgr.genii.x509authn.X509AuthnPortType;
 
-public class GamlLoginTool extends BaseGridTool
-{
-	static private final String _DESCRIPTION =
-		"Inserts GAML authentication information into the user's context.";
-	static private final String _USAGE =
-		"login [--file=<keystore-file>] [--storetype=<PKCS12|JKS>] [--password=<keystore-password>] [--alias] [<certificate-pattern>]";
+import org.oasis_open.docs.ws_sx.ws_trust._200512.*;
+import org.apache.axis.message.MessageElement;
+import org.apache.ws.security.message.token.BinarySecurity;
+import org.apache.ws.security.message.token.X509Security;
+import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_utility_1_0_xsd.*;
+
+public class GamlLoginTool extends BaseGridTool {
+
+	static public final String PKCS12 = "PKCS12";
+	static public final String JKS = "JKS";
+
+	static private final String _DESCRIPTION = "Inserts authentication information into the user's context.";
+	static private final String _USAGE = ""
+			+ "login "
+			+ "[--storetype=<PKCS12|JKS>] "
+			+ "[--password=<keystore-password>] " 
+			+ "[--alias] "
+			+ "[--pattern=<certificate/token pattern>] "
+			+ "[--validMillis=<valid milliseconds>] " 
+			+ "[--authn=<authentication source URL>]\n"
+			
+			+"login "
+			+ "--username=<username>  "
+			+ "--password=<password>";			
+
+	protected String _password = null;
+	protected String _storeType = "PKCS12";
+	protected long _validMillis = GenesisIIConstants.CredentialExpirationMillis;
+	protected boolean _aliasPatternFlag = false;
+	protected String _username = null;
+	protected String _pattern = null;
+	protected String _authnUri = null;
+
+	protected GamlLoginTool(String description, String usage, boolean isHidden) {
+		super(description, usage, isHidden);
+	}
 	
-	private String _keystoreFile = null;
-	private String _password = null;
-	private String _storeType = null;
-	private boolean _aliasPatternFlag = false;
-	
-	public GamlLoginTool()
-	{
+	public GamlLoginTool() {
 		super(_DESCRIPTION, _USAGE, false);
 	}
+
+	public void setAuthn(String uri) {
+		_authnUri = uri;
+	}
 	
-	public void setStoretype(String storeType)
-	{
+	public void setStoretype(String storeType) {
 		_storeType = storeType;
 	}
-	
-	public void setFile(String keystoreFile)
-	{
-		_keystoreFile = keystoreFile;
-	}
-	
-	public void setPassword(String password)
-	{
+
+	public void setPassword(String password) {
 		_password = password;
 	}
-		
-	public void setAlias()
-	{
+
+	public void setUsername(String username) {
+		_username = username;
+	}
+
+	public void setAlias() {
 		_aliasPatternFlag = true;
 	}
+
+	public void setPattern(String pattern) {
+		_pattern = pattern;
+	}
+
+	public void setValidMillis(String millis) {
+		_validMillis = Long.parseLong(millis);
+	}
+	
+	public static SignedAssertion extractAssertion(RequestSecurityTokenResponseType reponseMessage) 
+		throws Throwable {
+			
+		String tokenType = null;
+		SignedAssertion responseAssertion = null;
 		
-	@Override
-	protected int runCommand() throws Throwable
-	{
+		for (MessageElement element : reponseMessage.get_any()) {
+			if (element.getName().equals("TokenType")) {
+				// process TokenType element
+				tokenType = element.getValue();
+				
+			} else if (element.getName().equals("RequestedSecurityToken")) {
+				// process RequestedSecurityToken element
+				RequestedSecurityTokenType rstt = null;
+				try {
+					rstt = (RequestedSecurityTokenType) element.getObjectValue(RequestedSecurityTokenType.class);
+				} catch (Exception e) {}
+				if (rstt != null) {
+					for (MessageElement subElement : rstt.get_any()) {
+						if (subElement.getQName().equals(new QName(org.apache.ws.security.WSConstants.WSSE11_NS, "SecurityTokenReference"))) {
+							subElement = subElement.getChildElement(
+								new QName(org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
+							if (subElement != null) {
+								subElement = subElement.getChildElement(BinarySecurity.TOKEN_BST);
+								if (subElement != null) {
+									if (subElement.getAttributeValue("ValueType").equals(SecurityConstants.GAML_TOKEN_TYPE)) {
+
+								        Node text = subElement.getFirstChild();
+								        if ((text == null) || (!(text instanceof Text))) {
+											throw new Exception("Unknown response token type");
+								        }
+										String encodedAssertion = ((Text) text).getData();
+										responseAssertion = DelegatedAssertion.base64decodeAssertion(encodedAssertion);
+									} else {
+										throw new Exception("Unknown response token type");
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		// check requested token type
+		if ((tokenType == null) || !tokenType.equals(SecurityConstants.GAML_TOKEN_TYPE)) {
+			throw new Exception("Unknown response token type");
+		}
+		
+		return responseAssertion;
+	}
+
+	protected ArrayList<SignedAssertion> doIdpLogin(EndpointReferenceType idpEpr,
+			RenewableClientAttribute delegateAttribute) throws Throwable {
+
+		// assemble the request message
+		RequestSecurityTokenType request = new RequestSecurityTokenType();
+		MessageElement[] elements = new MessageElement[4];
+		request.set_any(elements);
+
+		// Add TokenType element
+		elements[0] = new MessageElement(new QName(
+				"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
+				"TokenType"), SecurityConstants.GAML_TOKEN_TYPE);
+		elements[0].setType(new QName("http://www.w3.org/2001/XMLSchema",
+				"anyURI"));
+
+		// Add RequestType element
+		elements[1] = new MessageElement(new QName(
+				"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
+				"RequestType"),
+				new RequestTypeOpenEnum(RequestTypeEnum._value1));
+		elements[1].setType(RequestTypeOpenEnum.getTypeDesc().getXmlType());
+
+		// Add Lifetime element
+		elements[2] = new MessageElement(
+				new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
+						"Lifetime"), new LifetimeType(new AttributedDateTime( // start time
+						new Date().toString()), new AttributedDateTime( // expiry time
+						new Date(System.currentTimeMillis() + _validMillis)
+								.toString())));
+		elements[2].setType(LifetimeType.getTypeDesc().getXmlType());
+
+		// Add DelegateTo
+		MessageElement binaryToken = new MessageElement(
+				BinarySecurity.TOKEN_BST);
+		binaryToken.setAttributeNS(null, "ValueType", X509Security.getType());
+		binaryToken.addTextNode("");
+		BinarySecurity bstToken = new X509Security(binaryToken);
+		((X509Security) bstToken).setX509Certificate(delegateAttribute.getDelegateeIdentity()[0]);
+
+		MessageElement embedded = new MessageElement(new QName(
+				org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
+		embedded.addChild(binaryToken);
+
+		MessageElement wseTokenRef = new MessageElement(new QName(
+				org.apache.ws.security.WSConstants.WSSE11_NS,
+				"SecurityTokenReference"));
+		wseTokenRef.addChild(embedded);
+
+		elements[3] = new MessageElement(new QName(
+				"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
+				"DelegateTo"), new DelegateToType(
+				new MessageElement[] { wseTokenRef }));
+		elements[3].setType(DelegateToType.getTypeDesc().getXmlType());
+
+		// create a proxy to the remote idp and invoke it
+		X509AuthnPortType idp = ClientUtils.createProxy(
+				X509AuthnPortType.class, idpEpr);
+		RequestSecurityTokenResponseType[] responses = idp
+				.requestSecurityToken2(request);
+		
+		ArrayList<SignedAssertion> retval = new ArrayList<SignedAssertion>();
+		
+		if (responses != null) {
+			for (RequestSecurityTokenResponseType response : responses) {
+				retval.add(extractAssertion(response));
+			}
+		}
+
+		return retval;
+	}
+
+	protected ArrayList<SignedAssertion> doKeystoreLogin(
+			InputStream keystoreInput, 
+			RenewableClientAttribute delegateAttribute)
+			throws Throwable {
+
+		ArrayList<SignedAssertion> retval = new ArrayList<SignedAssertion>();
+
 		AbstractGamlLoginHandler handler = null;
-		if (!useGui() || !GuiUtils.supportsGraphics())
+		if (!useGui() || !GuiUtils.supportsGraphics()) {
 			handler = new TextGamlLoginHandler(stdout, stderr, stdin);
-		else
+		} else {
 			handler = new GuiGamlLoginHandler(stdout, stderr, stdin);
-		
-		CertEntry certEntry = handler.selectCert(
-			_keystoreFile, _storeType, _password, _aliasPatternFlag, getArgument(0));
-		if (certEntry == null)
-			return 0;
-		
-		stdout.println("Logging in as \"" + 
-			certEntry._certChain[0].getSubjectDN().getName() + "\".");
-		
-		// Create identitiy assertion
+		}
+
+		CertEntry certEntry = handler.selectCert(keystoreInput, _storeType,
+				_password, _aliasPatternFlag, _pattern);
+		if (certEntry == null) {
+			return null;
+		}
+
+		stdout.println("Acquiring credentials for \""
+				+ certEntry._certChain[0].getSubjectDN().getName() + "\".");
+
+		// Create identity assertion
 		RenewableIdentityAttribute identityAttr = new RenewableIdentityAttribute(
-			System.currentTimeMillis() - (1000L * 60 * 15), // 15 minutes ago
-			GenesisIIConstants.CredentialExpirationMillis,	// valid 24 hours
-			10,
+			new BasicConstraints(
+				System.currentTimeMillis() - (1000L * 60 * 15), // 15 minutes ago
+				_validMillis, // valid 24 hours
+				10),
 			new X509Identity(certEntry._certChain));
-		RenewableAttributeAssertion identityAssertion =
-			new RenewableAttributeAssertion(identityAttr, certEntry._privateKey);
-		
+		RenewableAttributeAssertion identityAssertion = new RenewableAttributeAssertion(
+				identityAttr, certEntry._privateKey);
+
 		// get the calling context (or create one if necessary)
 		ICallingContext callContext = ContextManager.getCurrentContext(false);
-		if (callContext == null)
+		if (callContext == null) {
 			callContext = new CallingContextImpl(new ContextType());
-		
+		}
+
 		// Delegate the identity assertion to the temporary client
 		// identity
-		RenewableClientAttribute delegatedAttr = new RenewableClientAttribute(
-			identityAssertion, callContext);
-		RenewableClientAssertion delegatedAssertion = new RenewableClientAssertion(
-			delegatedAttr, certEntry._privateKey);
+		delegateAttribute.setAssertion(identityAssertion);
+		retval.add(new RenewableClientAssertion(delegateAttribute, certEntry._privateKey));
+
+		return retval;
+	}
+
+	protected ArrayList<SignedAssertion> delegateToIdentity(
+			URI authnUri, 
+			RenewableClientAttribute delegateAttribute)
+			throws Throwable {
+
+		String protocol = (authnUri == null) ? null : authnUri.getScheme();
+
+		if (authnUri == null) {
+			// login to keystore built into the user's OS
+			return doKeystoreLogin(null, delegateAttribute);
+		}
+
+		if ((protocol == null) || protocol.equals("file")) {
+			// log into keystore from a specific file
+			BufferedInputStream fis = new BufferedInputStream(new FileInputStream(authnUri.getSchemeSpecificPart()));
+			try {
+				return doKeystoreLogin(fis, delegateAttribute);
+			} finally {
+				fis.close();
+			}
+		}
+
+		if (protocol.equals("rns")) {
+			RNSPath authnPath = RNSPath.getCurrent().lookup(authnUri.getSchemeSpecificPart(),
+					RNSPathQueryFlags.MUST_EXIST);
+			EndpointReferenceType epr = authnPath.getEndpoint();
+			TypeInformation type = new TypeInformation(epr);
+			if (type.isIDP()) {
+				// we're going to use the WS-TRUST token-issue operation
+				// to log in to a security tokens service
+				return doIdpLogin(epr, delegateAttribute);
+			} else if (type.isByteIO()) {
+	
+				// log into keystore from rns path to keystore file
+				BufferedInputStream fis = new BufferedInputStream(new ByteIOInputStream(epr));
+				try {
+					return doKeystoreLogin(fis, delegateAttribute);
+				} finally {
+					fis.close();
+				}
+			}
+		}
+
+		throw new IOException("No such protocol handler");
+	}
+
+	@Override
+	protected int runCommand() throws Throwable {
+
+		// get the local identity's key material (or create one if necessary)
+		ICallingContext callContext = ContextManager.getCurrentContext(false);
+		if (callContext == null) {
+			callContext = new CallingContextImpl(new ContextType());
+		}
+
+		// handle username/token login
+		if (_username != null) {
+			if (_password == null) {
+				_password = "";
+			}
+			
+			TransientCredentials transientCredentials = TransientCredentials
+				.getTransientCredentials(callContext);
+			transientCredentials._credentials.add(new UsernameTokenIdentity(_username, _password));
+		
+			ContextManager.storeCurrentContext(callContext);
+			return 0;
+		}
+		
+		// create the delegateeAttribute
+		RenewableClientAttribute delegateeAttribute = 
+			new RenewableClientAttribute(null, callContext);
+		
+		// log in
+		URI authnSource = (_authnUri == null) ? null : new URI(_authnUri);
+		ArrayList<SignedAssertion> signedAssertions = 
+			delegateToIdentity(authnSource, delegateeAttribute);
+
+		if (signedAssertions == null) {
+			return 0;
+		}
 		
 		// insert the assertion into the calling context's transient creds
-		TransientCredentials transientCredentials =
-			TransientCredentials.getTransientCredentials(callContext);
-		transientCredentials._credentials.add(delegatedAssertion);
-		
+		TransientCredentials transientCredentials = TransientCredentials
+				.getTransientCredentials(callContext);
+		transientCredentials._credentials.addAll(signedAssertions);
+
 		ContextManager.storeCurrentContext(callContext);
+		
 		return 0;
 	}
 
 	@Override
-	protected void verify() throws ToolException
-	{
+	protected void verify() throws ToolException {
 		int numArgs = numArguments();
-		if (numArgs > 1)
+		if (numArgs > 0)
 			throw new InvalidToolUsageException();
 	}
-	
-	static public class CertEntry
-	{
-		public X509Certificate []_certChain;
-		public String _alias;
-		public PrivateKey _privateKey;
-		public KeyStore _keyStore;
-		public String _friendlyName;
-		
-		public CertEntry(X509Certificate []certChain, 
-			String alias, PrivateKey privateKey, String friendlyName)
-		{
-			_certChain = certChain;
-			_alias = alias;
-			_privateKey = privateKey;
-			_friendlyName = friendlyName;
-			
-			if (_friendlyName == null)
-				_friendlyName = _certChain[0].getSubjectDN().getName();
-		}
-		
-		public CertEntry(Certificate []certChain, 
-			String alias, KeyStore keyStore)
-		{
-			if (certChain != null)
-			{
-				_certChain = new X509Certificate[certChain.length];
-				for (int i = 0; i < certChain.length; i++)
-				{
-					_certChain[i] = (X509Certificate)certChain[i];
-				}
-			}
-			
-			_alias = alias;
-			_keyStore = keyStore;
-			
-			_friendlyName = alias;
-		}
-		
-		public String toString()
-		{
-			return _friendlyName;
-		}
-	}
+
 }

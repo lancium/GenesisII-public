@@ -65,6 +65,7 @@ import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 
 import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
 import edu.virginia.vcgr.genii.container.security.authz.handlers.*;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -80,7 +81,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 	
 	private static final String CRYTO_PASS = "pwd";
 
-	private PrivateKey _serverPrivateKey;
+	private static PrivateKey _serverPrivateKey;
 	
 	public ServerWSDoAllReceiver() {
 	}
@@ -306,8 +307,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			ICallingContext callingContext = extractCallingContextPostDecrytpion(messageContext, workingContext);
 
 			// Grab the operation method from the message context 
-			MessageContext context = (MessageContext) reqData.getMsgContext();
-			org.apache.axis.description.OperationDesc desc = context.getOperation();
+			org.apache.axis.description.OperationDesc desc = messageContext.getOperation();
 			if (desc == null) {
 				// pretend security doesn't exist -- axis will do what it does when 
 				// it can't figure out how to dispatch to a non-existant method
@@ -340,12 +340,17 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
      * 
      */
 	@SuppressWarnings("unchecked")
-	protected ICallingContext extractCallingContextPostDecrytpion(MessageContext msgContext,
+	protected static ICallingContext extractCallingContextPostDecrytpion(MessageContext msgContext,
 			WorkingContext workingContext) throws AxisFault,
 			AuthZSecurityException {
 
+		ICallingContext retval = null;
+		if ((retval = (ICallingContext) workingContext.getProperty(WorkingContext.CALLING_CONTEXT_KEY)) != null) {
+			// we've already extracted our calling context
+			return retval;
+		}
+
 		try {
-			ICallingContext retval = null;
 			IResource resource = ResourceManager.getCurrentResource().dereference();
 			
 			SOAPMessage m = msgContext.getMessage();
@@ -417,43 +422,40 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
     	 */
     	public void handle(Callback[] callbacks) throws IOException,
     			UnsupportedCallbackException {
+
+    		WorkingContext workingContext = WorkingContext.getCurrentWorkingContext();
+			MessageContext messageContext = (MessageContext) 
+				workingContext.getProperty(WorkingContext.MESSAGE_CONTEXT_KEY);
+
+			// we can now extract our calling context if necessary 
+			ICallingContext callContext = 
+				extractCallingContextPostDecrytpion(messageContext, workingContext);		   
+    		
     		for (int i = 0; i < callbacks.length; i++) {
     			if (callbacks[i] instanceof WSPasswordCallback) {
     				WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
     				
     				switch (pc.getUsage()) {
     				case WSPasswordCallback.USERNAME_TOKEN: 
-    				
+    					// broken 
+/*    					
     					// return password from file to make sure of match
-    					BufferedReader in = new BufferedReader(new InputStreamReader( 
-    						ClassLoader.getSystemClassLoader().getResourceAsStream("username-token.txt")));
-        					
-    					String line;
-    					while ((line = in.readLine()) != null) {
-    						String[] parts = line.split(":");
-    						if (parts[0].equals(pc.getIdentifer())) {
-    	    					pc.setPassword(parts[1]);
-    							return;
-    						}
-    					}
-
+    					pc.setPassword("mooch");
+						return;
+*/    					
     					break;
     					
     				case WSPasswordCallback.USERNAME_TOKEN_UNKNOWN: 
     					// check to make sure the username and password match
-    					
-    					BufferedReader in2 = new BufferedReader(new InputStreamReader( 
-    						ClassLoader.getSystemClassLoader().getResourceAsStream("username-token.txt")));
-    					
-    					String line2;
-    					while ((line2 = in2.readLine()) != null) {
-    						String[] parts = line2.split(":");
-    						if (parts[0].equals(pc.getIdentifer()) && parts[1].equals(pc.getPassword())) {
-    							return;
-    						}
-    					}
 
-    					throw new IOException("Invalid username or password");
+    					// add the identity to the calling context for future
+    					// checking
+    					
+    					UsernameTokenIdentity identity = 
+    						new UsernameTokenIdentity(pc.getIdentifer(), pc.getPassword());
+    					TransientCredentials transientCredentials = 
+    						TransientCredentials.getTransientCredentials(callContext);
+    					transientCredentials._credentials.add(identity);
     					
     				case WSPasswordCallback.DECRYPT: 
     				case WSPasswordCallback.SIGNATURE: 

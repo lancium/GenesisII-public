@@ -5,7 +5,7 @@ import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 
 public class RenewableAttributeAssertion extends SignedAttributeAssertion 
-		implements RenewableAssertion {
+		implements Renewable {
 
 	static public final long serialVersionUID = 0L;
 	
@@ -15,7 +15,7 @@ public class RenewableAttributeAssertion extends SignedAttributeAssertion
 	public RenewableAttributeAssertion() {}
 	
 	public RenewableAttributeAssertion(
-			RenewableAttribute attribute, 
+			Attribute attribute, 
 			PrivateKey privateKey) throws GeneralSecurityException {
 
 		super(attribute, privateKey);
@@ -23,12 +23,15 @@ public class RenewableAttributeAssertion extends SignedAttributeAssertion
 	}
 	
 	/**
-	 * Rewew this assertion
+	 * Renew this assertion
 	 */
 	public void renew() throws GeneralSecurityException {
-		// renew the attribute
-		((RenewableAttribute) _attribute).renew();
 
+		// renew the attribute
+		if ((_attribute != null) && (_attribute instanceof Renewable)) {
+			((Renewable) _attribute).renew(); 
+		}
+		
 		// re-sign the attribute
 		_signature = sign(_attribute, _privateKey);
 	}

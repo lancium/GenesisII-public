@@ -17,10 +17,11 @@
 package edu.virginia.vcgr.genii.client.comm.axis.security;
 
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import java.security.GeneralSecurityException;
 
 public interface ISecurityHandler extends org.apache.axis.Handler{
 
-	public void configure(ICallingContext callContext);	
-	public void configure(ICallingContext callContext, boolean serialize);	
+	public void configure(ICallingContext callContext) throws GeneralSecurityException;
+	public void configure(ICallingContext callContext, boolean serialize) throws GeneralSecurityException;	
 	
 }

@@ -41,10 +41,13 @@ This document and the information contained herein is provided on an AS IS basis
   </wsdl:message>
   
   <wsdl:portType name="SecurityTokenService">
+<!--   Not needed: This service performs issuance in one round,
+       By WS-Trust, RSTRC must be used on final round of token issuance   
 	<wsdl:operation name="RequestSecurityToken">
 	  <wsdl:input message="tns:RequestSecurityTokenMsg"/>
 	  <wsdl:output message="tns:RequestSecurityTokenResponseMsg"/>
 	</wsdl:operation>
+-->	
 	<wsdl:operation name="RequestSecurityToken2">
 	  <wsdl:input message="tns:RequestSecurityTokenMsg"/>
 	  <wsdl:output 

@@ -108,7 +108,7 @@ public class GamlChmodTool extends BaseGridTool
 		}
 		
 		config = clientTool.chmod(config,
-			_localSrc, _everyone, _permission, _user);
+			_localSrc, _everyone, _permission, _user, null);
 		
 		// upload new authz config to resource
 		elements = new MessageElement[1];

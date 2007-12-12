@@ -6,7 +6,7 @@ import java.util.Collection;
 
 import edu.virginia.vcgr.genii.client.gui.MenuDialog;
 import edu.virginia.vcgr.genii.client.gui.PasswordDialog;
-import edu.virginia.vcgr.genii.client.cmd.tools.GamlLoginTool.CertEntry;
+import edu.virginia.vcgr.genii.client.cmd.tools.gamllogin.CertEntry;
 
 public class GuiGamlLoginHandler extends AbstractGamlLoginHandler
 {

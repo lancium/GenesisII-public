@@ -3,13 +3,13 @@ package edu.virginia.vcgr.genii.client.security.gamlauthz.assertions;
 import java.security.GeneralSecurityException;
 
 /**
- * Interface indicating that this type of signed assertion can be renewed
+ * Interface indicating that this type of object can be renewed
  * @author dgm4d
  */
-public interface RenewableAssertion {
+public interface Renewable {
 
 	/**
-	 * Rewew this assertion
+	 * Renew this object 
 	 */
 	public void renew() throws GeneralSecurityException;
 }

@@ -46,7 +46,7 @@ public class GamlClientTool {
 	static private final int EXECUTE = 1;
 
 	static public final String CHMOD_SYNTAX = 
-		"( <[<+|->r][<+|->w][<+|->x]> | <octal mode> ) ( [--local-src] <cert-file> | --everyone )";
+		"( <[<+|->r][<+|->w][<+|->x]> | <octal mode> ) ( [--local-src] <cert-file> | --everyone | --username=<username> --password=<password>)";
 
 	static private void copy(InputStream in, OutputStream out)
 			throws IOException {
@@ -226,11 +226,21 @@ public class GamlClientTool {
 					}
 					break;
 				}
-				config = chmod(config,
-					cLine.hasFlag("local-src"),
-					cLine.hasFlag("everyone"),
-					cLine.getArgument(0),
-					cLine.getArgument(1));
+				if (cLine.hasOption("username")) {
+					config = chmod(config,
+							cLine.hasFlag("local-src"),
+							cLine.hasFlag("everyone"),
+							cLine.getArgument(0),
+							cLine.getOptionValue("username"), 
+							cLine.getOptionValue("password"));
+				} else {
+					config = chmod(config,
+							cLine.hasFlag("local-src"),
+							cLine.hasFlag("everyone"),
+							cLine.getArgument(0),
+							cLine.getArgument(1), 
+							null);
+				}
 				chosen = true;
 				break;
 			case 3:
@@ -246,6 +256,11 @@ public class GamlClientTool {
 		// make sure we have the new perms and the cert file
 		if (cLine.hasFlag("everyone")) {
 			if ((cLine.numArguments() != 1) || (cLine.hasOption("local-src"))) {
+				return false;
+			}
+		} else if (cLine.hasOption("username")) {
+			// make sure password also supplied
+			if (!cLine.hasOption("password")) {
 				return false;
 			}
 		} else {
@@ -271,7 +286,7 @@ public class GamlClientTool {
 	 * validateChmodSyntax())
 	 */
 	public AuthZConfig chmod(AuthZConfig config,
-		boolean localSrc, boolean everyone, String permission, String user)
+		boolean localSrc, boolean everyone, String permission, String user, String password)
 			throws IOException, AuthZSecurityException 
 	{
 		if (config.get_any() == null) {
@@ -283,37 +298,45 @@ public class GamlClientTool {
 		
 		mode = parseMode(permission);
 
-		X509Certificate cert = null;
-		if (!everyone)
-		{
-			target = user;
+		Identity identity = null;
 
-			try {
-				byte[] certBytes = readCertFile(target, localSrc);
-				InputStream inputStream = new ByteArrayInputStream(certBytes);
-				CertificateFactory cf = CertificateFactory.getInstance("X.509");
-				cert = (X509Certificate) cf.generateCertificate(inputStream);
+		X509Certificate cert = null;
+		if (password != null) {
+		
+			// username password
+			identity = new UsernameTokenIdentity(user, password);
+
+		} else {
+			
+			if (!everyone) {
 	
-			} catch (ConfigurationException e) {
-				throw new AuthZSecurityException(
-						"Could not load certificate file: " + e.getMessage(), e);
-			} catch (FileNotFoundException e) {
-				throw new AuthZSecurityException(
-						"Could not load certificate file: " + e.getMessage(), e);
-			} catch (RNSException e) {
-				throw new AuthZSecurityException(
-						"Could not load certificate file: " + e.getMessage(), e);
-			} catch (GeneralSecurityException e) {
-				throw new AuthZSecurityException(
-						"Could not load certificate file: " + e.getMessage(), e);
+				target = user;
+				try {
+					byte[] certBytes = readCertFile(target, localSrc);
+					InputStream inputStream = new ByteArrayInputStream(certBytes);
+					CertificateFactory cf = CertificateFactory.getInstance("X.509");
+					cert = (X509Certificate) cf.generateCertificate(inputStream);
+		
+				} catch (ConfigurationException e) {
+					throw new AuthZSecurityException(
+							"Could not load certificate file: " + e.getMessage(), e);
+				} catch (FileNotFoundException e) {
+					throw new AuthZSecurityException(
+							"Could not load certificate file: " + e.getMessage(), e);
+				} catch (RNSException e) {
+					throw new AuthZSecurityException(
+							"Could not load certificate file: " + e.getMessage(), e);
+				} catch (GeneralSecurityException e) {
+					throw new AuthZSecurityException(
+							"Could not load certificate file: " + e.getMessage(), e);
+				}
 			}
-		}
-		
-		
-		X509Identity identity = null;
-		if (cert != null) {
-			X509Certificate[] chain = {cert};
-			identity = new X509Identity(chain);
+			
+			
+			if (cert != null) {
+				X509Certificate[] chain = {cert};
+				identity = new X509Identity(chain);
+			}
 		}
 
 		GamlAcl acl = GamlAcl.decodeAcl(config);

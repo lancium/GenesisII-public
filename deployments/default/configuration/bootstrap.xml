@@ -25,9 +25,9 @@
 		message="Logging in as ${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/keys.pfx."/>
 	<geniix:login>
 		<gsh:param>--no-gui</gsh:param>
-		<gsh:param>--file=${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/keys.pfx</gsh:param>
 		<gsh:param>--password=keys</gsh:param>
-		<gsh:param>skynet</gsh:param>
+		<gsh:param>--pattern=skynet</gsh:param>
+		<gsh:param>--authn=${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/keys.pfx</gsh:param>
 	</geniix:login>
 	
 	<gsh:echo

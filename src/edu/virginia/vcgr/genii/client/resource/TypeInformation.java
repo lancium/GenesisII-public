@@ -134,6 +134,10 @@ public class TypeInformation
 		return hasPortType(WellKnownPortTypes.RNS_SERVICE_PORT_TYPE);
 	}
 	
+	public boolean isIDP() {
+		return hasPortType(WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE);
+	}
+	
 	public boolean isCounter()
 	{
 		return hasPortType(WellKnownPortTypes.COUNTER_PORT_TYPE);

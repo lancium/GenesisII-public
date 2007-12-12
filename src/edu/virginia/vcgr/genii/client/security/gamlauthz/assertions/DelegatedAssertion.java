@@ -27,8 +27,6 @@ import java.security.Signature;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
-import edu.virginia.vcgr.genii.client.ser.Base64;
-
 
 /**
  * A signed, delegated attribute assertion
@@ -151,8 +149,7 @@ public class DelegatedAssertion extends SignedAssertion {
 	}
 	
 	public String toString() {
-		return "(DelegatedAttribute) signature: " + Base64.byteArrayToBase64(_delegatorSignature) + 
-			"\n attribute : [" + _delegatedAttribute + "]";
+		return "(DelegatedAttribute)\n attribute : [" + _delegatedAttribute + "]";
 	}	
 	
 	public void writeExternal(ObjectOutput out) throws IOException {

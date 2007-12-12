@@ -126,9 +126,9 @@ public class ClientUtils
 				while (itr.hasNext()) {
 					GamlCredential cred = itr.next();
 					if (cred instanceof DelegatedAssertion) {
-							if (cred instanceof RenewableAssertion) {
+							if (cred instanceof Renewable) {
 								_logger.warn(e.getMessage() + " : Attempting to renew credential " + cred);
-								((RenewableAssertion) cred).renew();
+								((Renewable) cred).renew();
 							} else {
 								_logger.warn("Discarding non-renewable delegated credential " + cred);
 								itr.remove();
@@ -148,9 +148,9 @@ public class ClientUtils
 				cred.checkValidity(new Date(System.currentTimeMillis() + (10 * 1000)));
 			} catch (AttributeExpiredException e) {
 				updated = true;
-				if (cred instanceof RenewableAssertion) {
+				if (cred instanceof Renewable) {
 					_logger.warn(e.getMessage() + " : Attempting to renew credential " + cred);
-					((RenewableAssertion) cred).renew();
+					((Renewable) cred).renew();
 				} else {
 					_logger.warn(e.getMessage() + " : Discarding credential " + cred);
 					itr.remove();

@@ -6,7 +6,7 @@ import java.security.cert.X509Certificate;
 import java.util.Collection;
 
 import edu.virginia.vcgr.genii.client.io.GetPassword;
-import edu.virginia.vcgr.genii.client.cmd.tools.GamlLoginTool.CertEntry;
+import edu.virginia.vcgr.genii.client.cmd.tools.gamllogin.CertEntry;
 
 public class TextGamlLoginHandler extends AbstractGamlLoginHandler
 {

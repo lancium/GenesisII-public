@@ -3,9 +3,10 @@ package edu.virginia.vcgr.genii.client.security.gamlauthz.assertions;
 import java.io.ObjectStreamException;
 
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.AssertableIdentity;
+import java.security.GeneralSecurityException;
 
 public class RenewableIdentityAttribute extends IdentityAttribute 
-		implements RenewableAttribute {
+		implements Renewable {
 	
 	static public final long serialVersionUID = 0L;
 
@@ -13,31 +14,32 @@ public class RenewableIdentityAttribute extends IdentityAttribute
 	public RenewableIdentityAttribute() {}
 	
 	public RenewableIdentityAttribute(
-			long notValidBeforeMillis, 
-			long durationValidMillis, 
-			long maxDelegationDepth,
+			AttributeConstraints constraints, 
 			AssertableIdentity identity) {
 
 		super(
-				notValidBeforeMillis, 
-				durationValidMillis, 
-				maxDelegationDepth, 
+				constraints, 
 				identity);
 	}	
 
 	/**
-	 * Rewew this assertion
+	 * Renew this assertion
 	 */
-	public void renew() {
-		_notValidBeforeMillis = 
-			System.currentTimeMillis() - (1000L * 60 * 15); // 15 minutes ago
+	public void renew() throws GeneralSecurityException {
+		
+		// renew any constraints
+		if ((_constraints != null) && (_constraints instanceof Renewable)) {
+			((Renewable) _constraints).renew(); 
+		}
+		
+		if ((_identity != null) && (_identity instanceof Renewable)) {
+			((Renewable) _identity).renew(); 
+		}
 	}
 
 	public Object writeReplace() throws ObjectStreamException {
 		return new IdentityAttribute(
-				_notValidBeforeMillis, 
-				_durationValidMillis, 
-				_maxDelegationDepth, 
+				_constraints, 
 				_identity);
 	}	
 }

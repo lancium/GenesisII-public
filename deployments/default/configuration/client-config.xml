@@ -185,10 +185,8 @@
 	</genii:configured-instances>
 
 	<genii:tools>
-<!--			
 		<mconf:class name="idp"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.IdpTool</mconf:class>
--->
 		<mconf:class name="authz"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.AuthZTool</mconf:class>
 		<mconf:class name="notification-listener"

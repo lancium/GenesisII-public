@@ -36,6 +36,10 @@ public class X509Identity implements AssertableIdentity {
 		if (other == null) {
 			return false;
 		}
+
+		if (!(other instanceof X509Identity)) {
+			return false;
+		}
 		
 		if ((_identity == null) || (((X509Identity) other)._identity == null)) {
 			// one or the other is null
