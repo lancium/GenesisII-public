@@ -24,6 +24,7 @@ import org.ggf.rns.RNSEntryExistsFaultType;
 import org.ggf.rns.RNSEntryNotDirectoryFaultType;
 import org.ggf.rns.RNSFaultType;
 import org.ggf.rns.Remove;
+import org.morgan.util.configuration.ConfigurationException;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
@@ -72,6 +73,10 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 			QueueManager mgr = QueueManager.getManager((String)rKey.getKey());
 			mgr.addNewBES(addRequest.getEntry_name(), addRequest.getEntry_reference());
 			return new AddResponse(addRequest.getEntry_reference());
+		}
+		catch (ConfigurationException ce)
+		{
+			throw new RemoteException("Unable to add bes container.", ce);
 		}
 		catch (SQLException sqe)
 		{
@@ -142,7 +147,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 	{
 		ResourceKey rKey = ResourceManager.getCurrentResource();
 		Pattern pattern = Pattern.compile(listRequest.getEntry_name_regexp());
-		Collection<EntryType> entries = new ArrayList<EntryType>();
+		Collection<EntryType> entries;
 		
 		try
 		{
@@ -161,8 +166,19 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 	public ReducedJobInformationType[] listJobs(Object listRequest)
 			throws RemoteException
 	{
-		// TODO
-		return null;
+		ResourceKey rKey = ResourceManager.getCurrentResource();
+		Collection<ReducedJobInformationType> jobs;
+		
+		try
+		{
+			QueueManager mgr = QueueManager.getManager((String)rKey.getKey());
+			jobs = mgr.listJobs();
+			return jobs.toArray(new ReducedJobInformationType[0]);
+		}
+		catch (SQLException sqe)
+		{
+			throw new RemoteException("Unable to list jobs in queue.", sqe);
+		}
 	}
 
 	@Override
@@ -211,8 +227,24 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 	public SubmitJobResponseType submitJob(SubmitJobRequestType submitJobRequest)
 			throws RemoteException
 	{
-		// TODO
-		return null;
+		ResourceKey rKey = ResourceManager.getCurrentResource();
+		
+		try
+		{
+			QueueManager mgr = QueueManager.getManager((String)rKey.getKey());
+			String ticket = mgr.submitJob(submitJobRequest.getPriority(), 
+				submitJobRequest.getJobDefinition());
+			
+			return new SubmitJobResponseType(ticket);
+		}
+		catch (ConfigurationException ce)
+		{
+			throw new RemoteException("Unable to submit job to queue.", ce);
+		}
+		catch (SQLException sqe)
+		{
+			throw new RemoteException("Unable to submit job to queue.", sqe);
+		}
 	}
 
 	@Override

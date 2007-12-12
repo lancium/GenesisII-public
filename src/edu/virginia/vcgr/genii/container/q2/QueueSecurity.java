@@ -14,6 +14,7 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.TransientCredentials;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.IdentityAttribute;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.SignedAssertion;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.Identity;
+import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 
 public class QueueSecurity
 {
@@ -91,5 +92,18 @@ public class QueueSecurity
 			return true;
 		
 		return false;
+	}
+	
+	static public byte[][] convert(Collection<Identity> identities)
+		throws IOException
+	{
+		byte [][]ret = new byte[identities.size()][];
+		int lcv = 0;
+		for (Identity id : identities)
+		{
+			ret[lcv++] = DBSerializer.serialize(id);
+		}
+		
+		return ret;
 	}
 }

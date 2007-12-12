@@ -4,7 +4,9 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.regex.Matcher;
@@ -12,10 +14,15 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.ggf.bes.BESPortType;
 import org.ggf.rns.EntryType;
+import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 
 public class BESManager implements Closeable
 {
@@ -34,16 +41,25 @@ public class BESManager implements Closeable
 		new HashMap<String, BESData>();
 	private HashMap<Long, BESUpdateInformation> _updateInformation = 
 		new HashMap<Long, BESUpdateInformation>();
+			// Being on this list doesn't mean you have slots available, all it means is that you are responsive
 	private HashMap<Long, BESData> _scheduleableContainers = 
 		new HashMap<Long, BESData>();
+	private ThreadPool _outcallThreadPool;
 	
-	public BESManager(QueueDatabase database, SchedulingEvent schedulingEvent,
-		Connection connection) throws SQLException
+	private BESResourceUpdater _updater;
+	
+	public BESManager(ThreadPool outcallThreadPool, QueueDatabase database, SchedulingEvent schedulingEvent,
+		Connection connection, DatabaseConnectionPool connectionPool) 
+		throws SQLException, ResourceException, 
+			ConfigurationException, GenesisIISecurityException
 	{
 		_database = database;
 		_schedulingEvent = schedulingEvent;
+		_outcallThreadPool = outcallThreadPool;
 		
 		loadFromDatabase(connection);
+		
+		_updater = new BESResourceUpdater(connectionPool, this, _BES_UPDATE_CYCLE / 10);
 	}
 	
 	protected void finalize() throws Throwable
@@ -57,10 +73,12 @@ public class BESManager implements Closeable
 			return;
 		
 		_closed = true;
+		_updater.close();
 	}
 	
 	synchronized private void loadFromDatabase(Connection connection)
-		throws SQLException
+		throws SQLException, ResourceException, 
+			ConfigurationException, GenesisIISecurityException
 	{
 		Collection<BESData> allBESs = _database.loadAllBESs(connection);
 		
@@ -71,21 +89,32 @@ public class BESManager implements Closeable
 			_updateInformation.put(new Long(bes.getID()), 
 				new BESUpdateInformation(bes.getID(), _BES_UPDATE_CYCLE));
 		}
+		
+		updateResources(connection);
 	}
 	
 	synchronized public void addNewBES(Connection connection, String name,
-			EndpointReferenceType epr) throws SQLException, ResourceException
+			EndpointReferenceType epr)
+		throws SQLException, ResourceException, ConfigurationException,
+			GenesisIISecurityException
 	{
+		BESUpdateInformation updateInfo;
+		Collection<BESUpdateInformation> toUpdate = 
+			new ArrayList<BESUpdateInformation>(1);
+		
 		long id = _database.addNewBES(connection, name, epr);
 		connection.commit();
 		BESData data = new BESData(id, name, 1);
 		_containersByID.put(new Long(id), data);
 		_containersByName.put(name, data);
-		_updateInformation.put(new Long(id), new BESUpdateInformation(
+		_updateInformation.put(new Long(id), updateInfo = new BESUpdateInformation(
 			id, _BES_UPDATE_CYCLE));
+		toUpdate.add(updateInfo);
 		
 		_logger.debug("Added new bes container \"" + name + 
 			"\" into queue as resource " + id);
+		
+		updateResources(connection, toUpdate);
 	}
 	
 	synchronized public Collection<EntryType> listBESs(
@@ -167,5 +196,70 @@ public class BESManager implements Closeable
 		if (oldSlots < newSlots)
 			_schedulingEvent.notifySchedulingEvent();
 		
+	}
+	
+	synchronized private void updateResources(Connection connection,
+		Collection<BESUpdateInformation> resourcesToUpdate)
+		throws SQLException, ResourceException, ConfigurationException,
+			GenesisIISecurityException
+	{
+		for (BESUpdateInformation info : resourcesToUpdate)
+		{
+			HashMap<Long, EntryType> entries = new HashMap<Long, EntryType>();
+			EntryType entry = new EntryType();
+			entries.put(new Long(info.getBESID()), entry);
+			_database.fillInBESEPRs(connection, entries);
+			BESPortType clientStub = ClientUtils.createProxy(
+				BESPortType.class, entry.getEntry_reference(), 
+				_database.getQueueCallingContext(connection));
+			_outcallThreadPool.enqueue(new BESUpdateWorker(
+				this, info.getBESID(), clientStub));
+		}
+	}
+	
+	synchronized public void updateResources(Connection connection)
+		throws SQLException, ResourceException, ConfigurationException,
+			GenesisIISecurityException
+	{
+		Collection<BESUpdateInformation> resourcesToUpdate = 
+			new LinkedList<BESUpdateInformation>();
+		Date now = new Date();
+		
+		for (BESUpdateInformation updateInfo : _updateInformation.values())
+		{
+			if (updateInfo.timeForUpdate(now))
+			{
+				resourcesToUpdate.add(updateInfo);
+			}
+		}
+		
+		updateResources(connection, resourcesToUpdate);
+	}
+	
+	synchronized public void markBESAsAvailable(long besID)
+	{
+		BESUpdateInformation updateInfo = _updateInformation.get(
+			new Long(besID));
+		updateInfo.update(true);
+		if (!_scheduleableContainers.containsKey(new Long(besID)));
+		{
+			BESData data = _containersByID.get(new Long(besID));
+			_logger.info("Marking BES container \"" + data.getName() + "\" as available.");
+			
+			_scheduleableContainers.put(new Long(besID), data);
+			if (data.getTotalSlots() > 0)
+				_schedulingEvent.notifySchedulingEvent();
+		}
+	}
+	
+	synchronized public void markBESAsUnavailable(long besID)
+	{
+		BESUpdateInformation updateInfo = _updateInformation.get(
+			new Long(besID));
+		updateInfo.update(false);
+		_scheduleableContainers.remove(new Long(besID));
+		
+		BESData data = _containersByID.get(new Long(besID));
+		_logger.info("Marking BES container \"" + data.getName() + "\" as un-available.");
 	}
 }

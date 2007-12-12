@@ -45,7 +45,7 @@
 			tofile="${wsdd-dir}/queue.deploy.wsdd"/>
 		<replace file="${wsdd-dir}/queue.deploy.wsdd"
 			token="edu.virginia.vcgr.genii.queue.QueueSOAPBindingImpl"
-			value="edu.virginia.vcgr.genii.container.queue.QueueServiceImpl"
+			value="edu.virginia.vcgr.genii.container.q2.QueueServiceImpl"
 			summary="yes"/>
 		<copy file="${wsdd-dir}/queue.deploy.wsdd"
 			todir="${services.dir}"/>

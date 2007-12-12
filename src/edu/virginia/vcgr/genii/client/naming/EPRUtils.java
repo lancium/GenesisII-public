@@ -306,6 +306,9 @@ public class EPRUtils
 	static public Blob toBlob(EndpointReferenceType epr)
 		throws ResourceException
 	{
+		if (epr == null)
+			return null;
+		
 		try 
 		{
 			return new SerialBlob(toBytes(epr));
@@ -321,6 +324,9 @@ public class EPRUtils
 
 	{
 		InputStream in = null;
+	
+		if (blob == null)
+			return null;
 		
 		try
 		{

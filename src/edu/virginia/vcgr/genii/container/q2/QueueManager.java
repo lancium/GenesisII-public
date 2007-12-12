@@ -12,12 +12,16 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.rns.EntryType;
+import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.queue.ReducedJobInformationType;
 
 public class QueueManager implements Closeable
 {
@@ -34,7 +38,7 @@ public class QueueManager implements Closeable
 		new HashMap<String, QueueManager>(_DEFAULT_MANAGER_COUNT);
 	
 	static public void startAllManagers(DatabaseConnectionPool connectionPool)
-		throws SQLException
+		throws SQLException, ResourceException
 	{
 		Connection connection = null;
 		Statement stmt = null;
@@ -67,7 +71,8 @@ public class QueueManager implements Closeable
 		}
 	}
 	
-	static public QueueManager getManager(String queueid) throws SQLException
+	static public QueueManager getManager(String queueid) 
+		throws SQLException, ResourceException
 	{
 		QueueManager mgr;
 		
@@ -117,10 +122,12 @@ public class QueueManager implements Closeable
 	private String _queueid;
 	
 	private BESManager _besManager;
+	private JobManager _jobManager;
 	private QueueDatabase _database;
 	private SchedulingEvent _schedulingEvent;
 	
-	private QueueManager(String queueid) throws SQLException
+	private QueueManager(String queueid) 
+		throws SQLException, ResourceException
 	{
 		Connection connection = null;
 		_queueid = queueid;
@@ -130,7 +137,19 @@ public class QueueManager implements Closeable
 		try
 		{
 			connection = _connectionPool.acquire();
-			_besManager = new BESManager(_database, _schedulingEvent, connection);
+			_besManager = new BESManager(_outcallThreadPool,
+				_database, _schedulingEvent, 
+				connection, _connectionPool);
+			_jobManager = new JobManager(_outcallThreadPool,
+				_database, _schedulingEvent, connection, _connectionPool);;
+		}
+		catch (GenesisIISecurityException gse)
+		{
+			throw new ResourceException("UInable to create BES Manager.", gse);
+		}
+		catch (ConfigurationException ce)
+		{
+			throw new ResourceException("Unable to create BES Manager.", ce);
 		}
 		finally
 		{
@@ -149,11 +168,13 @@ public class QueueManager implements Closeable
 			return;
 		
 		_closed = true;
-		_besManager.close();
+		StreamUtils.close(_besManager);
+		StreamUtils.close(_jobManager);
 	}
 	
 	public void addNewBES(String name, EndpointReferenceType epr)
-		throws SQLException, ResourceException
+		throws SQLException, ResourceException, ConfigurationException,
+			GenesisIISecurityException
 	{
 		Connection connection = null;
 		
@@ -208,6 +229,38 @@ public class QueueManager implements Closeable
 		{
 			connection = _connectionPool.acquire();
 			return _besManager.removeBESs(connection, pattern);
+		}
+		finally
+		{
+			_connectionPool.release(connection);
+		}
+	}
+	
+	public String submitJob(short priority, JobDefinition_Type jsdl)
+		throws SQLException, ResourceException, ConfigurationException
+	{
+		Connection connection = null;
+		
+		try
+		{
+			connection = _connectionPool.acquire();
+			return _jobManager.submitJob(connection, jsdl, priority);
+		}
+		finally
+		{
+			_connectionPool.release(connection);
+		}
+	}
+	
+	Collection<ReducedJobInformationType> listJobs()
+		throws SQLException, ResourceException
+	{
+		Connection connection = null;
+		
+		try
+		{
+			connection = _connectionPool.acquire();
+			return _jobManager.listJobs(connection);
 		}
 		finally
 		{
