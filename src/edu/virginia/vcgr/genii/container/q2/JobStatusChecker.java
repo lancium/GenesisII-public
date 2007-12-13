@@ -61,12 +61,6 @@ public class JobStatusChecker
 					connection = _connectionPool.acquire();
 					_manager.checkJobStatuses(
 						_connectionPool, connection);
-					
-					Thread.sleep(_updateFrequency);
-				}
-				catch (InterruptedException ie)
-				{
-					Thread.interrupted();
 				}
 				catch (Throwable cause)
 				{
@@ -76,6 +70,15 @@ public class JobStatusChecker
 				finally
 				{
 					_connectionPool.release(connection);
+				}
+				
+				try
+				{
+					Thread.sleep(_updateFrequency);
+				}
+				catch (InterruptedException ie)
+				{
+					Thread.interrupted();
 				}
 			}
 		}

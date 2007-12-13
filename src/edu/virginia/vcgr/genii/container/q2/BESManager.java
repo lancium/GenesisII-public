@@ -20,6 +20,7 @@ import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
@@ -35,6 +36,7 @@ public class BESManager implements Closeable
 	
 	private QueueDatabase _database;
 	private SchedulingEvent _schedulingEvent;
+	private DatabaseConnectionPool _connectionPool;
 	
 	private HashMap<Long, BESData> _containersByID = 
 		new HashMap<Long, BESData>();
@@ -54,6 +56,7 @@ public class BESManager implements Closeable
 		throws SQLException, ResourceException, 
 			ConfigurationException, GenesisIISecurityException
 	{
+		_connectionPool = connectionPool;
 		_database = database;
 		_schedulingEvent = schedulingEvent;
 		_outcallThreadPool = outcallThreadPool;
@@ -206,15 +209,11 @@ public class BESManager implements Closeable
 	{
 		for (BESUpdateInformation info : resourcesToUpdate)
 		{
-			HashMap<Long, EntryType> entries = new HashMap<Long, EntryType>();
-			EntryType entry = new EntryType();
-			entries.put(new Long(info.getBESID()), entry);
-			_database.fillInBESEPRs(connection, entries);
-			BESPortType clientStub = ClientUtils.createProxy(
-				BESPortType.class, entry.getEntry_reference(), 
-				_database.getQueueCallingContext(connection));
-			_outcallThreadPool.enqueue(new BESUpdateWorker(
-				this, info.getBESID(), clientStub));
+			ICallingContext queueCallingContext = _database.getQueueCallingContext(connection);
+			IBESPortTypeResolver resolver = new BESPortTypeResolver(queueCallingContext);
+			
+			_outcallThreadPool.enqueue(new BESUpdateWorker(_connectionPool,
+				this, info.getBESID(), resolver));
 		}
 	}
 	
@@ -262,5 +261,32 @@ public class BESManager implements Closeable
 		
 		BESData data = _containersByID.get(new Long(besID));
 		_logger.info("Marking BES container \"" + data.getName() + "\" as un-available.");
+	}
+	
+	synchronized public Collection<BESData> getAvailableBESs()
+	{
+		return _scheduleableContainers.values();
+	}
+	
+	private class BESPortTypeResolver implements IBESPortTypeResolver
+	{
+		private ICallingContext _callingContext;
+		
+		public BESPortTypeResolver(ICallingContext callingContext)
+		{
+			_callingContext = callingContext;
+		}
+
+		@Override
+		public BESPortType createClientStub(Connection connection, long besID)
+			throws Throwable
+		{
+			EntryType entry = new EntryType();
+			HashMap<Long, EntryType> entries = new HashMap<Long, EntryType>();
+			entries.put(new Long(besID), entry);
+			_database.fillInBESEPRs(connection, entries);
+			return ClientUtils.createProxy(BESPortType.class, 
+				entry.getEntry_reference(), _callingContext);
+		}
 	}
 }

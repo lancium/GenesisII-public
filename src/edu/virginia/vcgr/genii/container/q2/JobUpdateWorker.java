@@ -15,31 +15,41 @@ public class JobUpdateWorker implements Runnable
 {
 	static private Log _logger = LogFactory.getLog(JobUpdateWorker.class);
 	
-	private BESPortType _clientStub;
+	private IBESPortTypeResolver _clientStubResolver;
 	private JobCommunicationInfo _jobInfo;
 	private JobManager _jobManager;
 	private DatabaseConnectionPool _connectionPool;
+	private IJobEndpointResolver _jobEndpointResolver;
 	
 	public JobUpdateWorker(JobManager jobManager,
-		BESPortType clientStub, DatabaseConnectionPool connectionPool,
+		IBESPortTypeResolver clientStubResolver,
+		IJobEndpointResolver jobEndpointResolver,
+		DatabaseConnectionPool connectionPool,
 		JobCommunicationInfo jobInfo)
 	{
 		_jobManager = jobManager;
-		_clientStub = clientStub;
+		_clientStubResolver = clientStubResolver;
 		_jobInfo = jobInfo;
 		_connectionPool = connectionPool;
+		_jobEndpointResolver = jobEndpointResolver;
 	}
 	
 	public void run()
 	{
+		Connection connection = null;
+		
 		try
 		{
 			_logger.debug("Checking status of job " + _jobInfo.getJobID());
 			
+			connection = _connectionPool.acquire();
+			EndpointReferenceType jobEndpoint = _jobEndpointResolver.getJobEndpoint(
+				connection, _jobInfo.getJobID());
+			BESPortType clientStub = _clientStubResolver.createClientStub(
+				connection, _jobInfo.getBESID());
 			GetActivityStatusResponseType []activityStatuses 
-				= _clientStub.getActivityStatuses(
-					new EndpointReferenceType[] { 
-						_jobInfo.getJobEndpoint() } );
+				= clientStub.getActivityStatuses(
+					new EndpointReferenceType[] { jobEndpoint });
 			if (activityStatuses == null || activityStatuses.length != 1)
 			{
 				_logger.error("Unable to get activity status for job " 
@@ -48,27 +58,15 @@ public class JobUpdateWorker implements Runnable
 			{
 				ActivityState state = ActivityState.fromActivityStatus(
 					activityStatuses[0].getActivityStatus());
-				Connection connection = null;
-				
-				try
+				if (state.isInState(ActivityState.FAILED))
 				{
-					if (state.isInState(ActivityState.FAILED))
-					{
-						connection = _connectionPool.acquire();
-						_jobManager.failJob(connection, _jobInfo.getJobID(), true);
-					} else if (state.isInState(ActivityState.CANCELLED))
-					{
-						connection = _connectionPool.acquire();
-						_jobManager.finishJob(connection, _jobInfo.getJobID());
-					} else if (state.isInState(ActivityState.FINISHED))
-					{
-						connection = _connectionPool.acquire();
-						_jobManager.finishJob(connection, _jobInfo.getJobID());
-					}
-				}
-				finally
+					_jobManager.failJob(connection, _jobInfo.getJobID(), true);
+				} else if (state.isInState(ActivityState.CANCELLED))
 				{
-					_connectionPool.release(connection);
+					_jobManager.finishJob(connection, _jobInfo.getJobID());
+				} else if (state.isInState(ActivityState.FINISHED))
+				{
+					_jobManager.finishJob(connection, _jobInfo.getJobID());
 				}
 			}
 		}
@@ -76,6 +74,10 @@ public class JobUpdateWorker implements Runnable
 		{
 			_logger.warn("Unable to update job status for job " 
 				+ _jobInfo.getJobID(), cause);
+		}
+		finally
+		{
+			_connectionPool.release(connection);
 		}
 	}
 }

@@ -15,9 +15,10 @@ public class SortableJobKey implements Comparable<SortableJobKey>
 		_submitTime = submitTime;
 	}
 	
-	public SortableJobKey(long jobID)
+	public SortableJobKey(JobData jobData)
 	{
-		this(jobID, 0, new Date());
+		this(jobData.getJobID(), 
+			jobData.getPriority(), jobData.getSubmitTime());
 	}
 	
 	public boolean equals(SortableJobKey other)

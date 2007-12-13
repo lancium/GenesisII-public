@@ -6,11 +6,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.rns.EntryType;
 import org.morgan.util.io.StreamUtils;
@@ -27,6 +30,8 @@ import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public class QueueDatabase
 {
+	static private Log _logger = LogFactory.getLog(QueueDatabase.class);
+	
 	private String _queueID;
 	
 	public QueueDatabase(String queueID)
@@ -276,7 +281,10 @@ public class QueueDatabase
 			stmt.setString(2, newState.name());
 			stmt.setTimestamp(3, new Timestamp(finishTime.getTime()));
 			stmt.setBlob(4, EPRUtils.toBlob(jobEndpoint));
-			stmt.setObject(5, besID);
+			if (besID != null)
+				stmt.setLong(5, besID.longValue());
+			else
+				stmt.setNull(5, Types.BIGINT);
 			stmt.setBlob(6, EPRUtils.toBlob(besEndpoint));
 			stmt.setLong(7, jobID);
 			
@@ -385,56 +393,185 @@ public class QueueDatabase
 		}
 	}
 	
-	public Collection<JobCommunicationInfo> loadJobCommunicationInfo(
-		Connection connection, Collection<JobData> jobData)
-			throws SQLException, ResourceException
+	public JobStatusInformation getJobStatusInformation(
+		Connection connection, long jobID) throws SQLException, ResourceException
 	{
-		Collection<JobCommunicationInfo> commInfo = 
-			new LinkedList<JobCommunicationInfo>();
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		
 		try
 		{
 			stmt = connection.prepareStatement(
-				"SELECT jobendpoint, resourceid, " +
-					"resourceendpoint, callingcontext FROM q2jobs " +
-				"WHERE jobid = ?");
+				"SELECT callingcontext, jobendpoint, resourceendpoint " +
+				"FROM q2jobs WHERE jobid = ?");
+			stmt.setLong(1, jobID);
+			rs = stmt.executeQuery();
 			
-			for (JobData data : jobData)
+			if (!rs.next())
+				throw new ResourceException("Unable to find job " 
+					+ jobID + " in database.");
+			
+			return new JobStatusInformation(
+				EPRUtils.fromBlob(rs.getBlob(2)),
+				EPRUtils.fromBlob(rs.getBlob(3)),
+				(ICallingContext)DBSerializer.fromBlob(rs.getBlob(1)));
+		}
+		catch (ClassNotFoundException cnfe)
+		{
+			throw new ResourceException(
+				"Unable to deserialize calling context form database.",
+				cnfe);
+		}
+		catch (IOException ioe)
+		{
+			throw new ResourceException(
+				"Unable to deserialize calling context form database.",
+				ioe);
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+	}
+	
+	public void markStarting(Connection connection, 
+		Collection<ResourceMatch> matches)
+			throws SQLException, ResourceException
+	{
+		PreparedStatement query = null;
+		ResultSet rs = null;
+		PreparedStatement stmt = null;
+		
+		try
+		{
+			query = connection.prepareStatement("SELECT resourceendpoint " +
+				"FROM q2resources WHERE resourceid = ?");
+			stmt = connection.prepareStatement(
+				"UPDATE q2jobs SET state = ?, starttime = ?, " +
+					"resourceid = ?, resourceendpoint = ? WHERE jobid = ?");
+			
+			for (ResourceMatch match : matches)
 			{
-				stmt.setLong(1, data.getJobID());
-				rs = stmt.executeQuery();
-				
+				query.setLong(1, match.getBESID());
+				rs = query.executeQuery();
 				if (!rs.next())
-					throw new ResourceException("Couldn't find job " 
-						+ data.getJobTicket() + " in database.");
-				
-				commInfo.add(new JobCommunicationInfo(
-					data.getJobID(), 
-					(ICallingContext)DBSerializer.fromBlob(rs.getBlob(4)),
-					EPRUtils.fromBlob(rs.getBlob(1)), rs.getLong(2),
-					EPRUtils.fromBlob(rs.getBlob(3))));
+				{
+					// BES doesn't exist any more
+					_logger.warn(
+						"Tried to schedule a job on a bes container " +
+						"that no longer exists.");
+				} else
+				{
+					EndpointReferenceType besEPR = EPRUtils.fromBlob(
+						rs.getBlob(1));
+					stmt.setString(1, QueueStates.STARTING.name());
+					stmt.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+					stmt.setLong(3, match.getBESID());
+					stmt.setBlob(4, EPRUtils.toBlob(besEPR));
+					stmt.setLong(5, match.getJobID());
+					
+					stmt.addBatch();
+				}
 				
 				rs.close();
 				rs = null;
 			}
 			
-			return commInfo;
-		}
-		catch (ClassNotFoundException cnfe)
-		{
-			throw new ResourceException(
-				"Unable to deserialize calling context in database.", cnfe);
-		}
-		catch (IOException ioe)
-		{
-			throw new ResourceException(
-				"Unable to deserialize calling context in database.", ioe);
+			stmt.executeBatch();
 		}
 		finally
 		{
 			StreamUtils.close(rs);
+			StreamUtils.close(query);
+			StreamUtils.close(stmt);
+		}
+	}
+	
+	public JobStartInformation getStartInformation(
+		Connection connection, long jobID)
+		throws SQLException, ResourceException
+	{
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try
+		{
+			stmt = connection.prepareStatement(
+				"SELECT callingcontext, jsdl FROM q2jobs WHERE jobid = ?");
+			stmt.setLong(1, jobID);
+			
+			rs = stmt.executeQuery();
+			if (!rs.next())
+				throw new ResourceException("Unable to find entry for job " + jobID);
+			
+			return new JobStartInformation(
+				(ICallingContext)DBSerializer.fromBlob(rs.getBlob(1)), 
+				DBSerializer.xmlFromBlob(
+					JobDefinition_Type.class, rs.getBlob(2)));
+		}
+		catch (ClassNotFoundException cnfe)
+		{
+			throw new ResourceException("Unable to deserialize calling " +
+				"context and jsdl for job " + jobID, cnfe);
+		}
+		catch (IOException ioe)
+		{
+			throw new ResourceException("Unable to deserialize calling " +
+				"context and jsdl for job " + jobID, ioe);
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+	}
+	
+	public void markRunning(Connection connection, 
+		long jobID, EndpointReferenceType jobEPR) 
+			throws SQLException, ResourceException
+	{
+		PreparedStatement stmt = null;
+		
+		try
+		{
+			stmt = connection.prepareStatement(
+				"UPDATE q2jobs SET state = ?, jobendpoint = ? " +
+				"WHERE jobid = ?");
+			stmt.setString(1, QueueStates.RUNNING.name());
+			stmt.setBlob(2, EPRUtils.toBlob(jobEPR));
+			stmt.setLong(3, jobID);
+			
+			if (stmt.executeUpdate() != 1)
+				throw new ResourceException(
+					"Unable to update database for running job " + jobID);
+		}
+		finally
+		{
+			StreamUtils.close(stmt);
+		}
+	}
+	
+	public void completeJobs(Connection connection, Collection<Long> jobIDs)
+		throws SQLException, ResourceException
+	{
+		PreparedStatement stmt = null;
+		
+		try
+		{
+			stmt = connection.prepareStatement(
+				"DELETE FROM q2jobs WHERE jobid = ?");
+			
+			for (Long jobID : jobIDs)
+			{
+				stmt.setLong(1, jobID.longValue());
+				stmt.addBatch();
+			}
+			
+			stmt.executeBatch();
+		}
+		finally
+		{
 			StreamUtils.close(stmt);
 		}
 	}

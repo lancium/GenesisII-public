@@ -35,4 +35,26 @@ public class SchedulingEvent
 			return false;
 		}
 	}
+	
+	public boolean waitSchedulingEvent()
+		throws InterruptedException
+	{
+		synchronized(_lock)
+		{
+			if (_schedulingEvent)
+			{
+				_schedulingEvent = false;
+				return true;
+			}
+			
+			_lock.wait();
+			if (_schedulingEvent)
+			{
+				_schedulingEvent = false;
+				return true;
+			}
+			
+			return false;
+		}
+}
 }

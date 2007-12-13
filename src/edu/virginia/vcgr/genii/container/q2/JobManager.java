@@ -14,9 +14,14 @@ import org.apache.axis.types.UnsignedShort;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.BESPortType;
+import org.ggf.bes.factory.ActivityDocumentType;
+import org.ggf.bes.factory.CreateActivityResponseType;
+import org.ggf.bes.factory.CreateActivityType;
 import org.ggf.jsdl.JobDefinition_Type;
+import org.ggf.rns.EntryType;
 import org.morgan.util.GUID;
 import org.morgan.util.configuration.ConfigurationException;
+import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
@@ -44,6 +49,7 @@ public class JobManager implements Closeable
 	private QueueDatabase _database;
 	private SchedulingEvent _schedulingEvent;
 	private JobStatusChecker _statusChecker;
+	private DatabaseConnectionPool _connectionPool;
 	
 	private HashMap<Long, JobData> _jobsByID = new HashMap<Long, JobData>();
 	private HashMap<String, JobData> _jobsByTicket = 
@@ -59,6 +65,7 @@ public class JobManager implements Closeable
 		throws SQLException, ResourceException, 
 			ConfigurationException, GenesisIISecurityException
 	{
+		_connectionPool = connectionPool;
 		_database = database;
 		_schedulingEvent = schedulingEvent;
 		_outcallThreadPool = outcallThreadPool;
@@ -164,6 +171,8 @@ public class JobManager implements Closeable
 		{
 			_logger.debug("Failing job " + jobID);
 		}
+		job.setJobState(newState);
+		job.clearBESID();
 		
 		_schedulingEvent.notifySchedulingEvent();
 	}
@@ -183,6 +192,7 @@ public class JobManager implements Closeable
 			job.getRunAttempts(), QueueStates.FINISHED,
 			new Date(), null, null, null);
 		connection.commit();
+		job.setJobState(QueueStates.FINISHED);
 		
 		_logger.debug("Finished job " + jobID);
 		_runningJobs.remove(new Long(jobID));
@@ -359,7 +369,20 @@ public class JobManager implements Closeable
 		Collection<Long> jobsToComplete)
 			throws SQLException, ResourceException
 	{
+		_database.completeJobs(connection, jobsToComplete);
+		connection.commit();
 		
+		for (Long jobID : jobsToComplete)
+		{
+			JobData data = _jobsByID.remove(jobID);
+			if (data != null)
+			{
+				_jobsByTicket.remove(data.getJobTicket());
+				_queuedJobs.remove(new SortableJobKey(
+					data));
+				_runningJobs.remove(jobID);
+			}
+		}
 	}
 	
 	synchronized public void completeJobs(Connection connection)
@@ -441,18 +464,166 @@ public class JobManager implements Closeable
 		throws SQLException, ResourceException, ConfigurationException,
 			GenesisIISecurityException
 	{
-		Collection<JobCommunicationInfo> commInfo;
-		
-		commInfo = _database.loadJobCommunicationInfo(
-			connection, _runningJobs.values());
-		
-		for (JobCommunicationInfo job : commInfo)
+		for (JobData job : _runningJobs.values())
 		{
-			BESPortType clientStub = ClientUtils.createProxy(
-				BESPortType.class, job.getBESEndpoint(), 
-				job.getCallingContext());
+			JobCommunicationInfo info = new JobCommunicationInfo(
+				job.getJobID(), job.getBESID().longValue());
+			
+			IBESPortTypeResolver portTypeResolver = null;
+			IJobEndpointResolver endpointResolver = null;
+			Resolver resolver = new Resolver();
+			
+			portTypeResolver = resolver;
+			endpointResolver = resolver;
+			
 			_outcallThreadPool.enqueue(new JobUpdateWorker(
-				this, clientStub, connectionPool, job));
+				this, portTypeResolver, endpointResolver, connectionPool, info));
+		}
+	}
+	
+	synchronized public boolean hasQueuedJobs()
+	{
+		return !_queuedJobs.isEmpty();
+	}
+	
+	synchronized public void recordUsedSlots(HashMap<Long, ResourceSlots> slots)
+		throws ResourceException
+	{
+		for (JobData job : _runningJobs.values())
+		{
+			Long besID = job.getBESID();
+			if (besID == null)
+				throw new ResourceException(
+					"A job is marked as running which isn't " +
+					"assigned to a BES container.");
+			
+			ResourceSlots rs = slots.get(besID);
+			if (rs != null)
+			{
+				rs.reserveSlot();
+				if (rs.slotsAvailable() <= 0)
+					slots.remove(besID);
+			}
+		}
+	}
+	
+	synchronized public Collection<JobData> getQueuedJobs()
+	{
+		return _queuedJobs.values();
+	}
+	
+	synchronized public void startJobs(Connection connection, 
+		Collection<ResourceMatch> matches) 
+			throws SQLException, ResourceException
+	{
+		_database.markStarting(connection, matches);
+		connection.commit();
+		
+		for (ResourceMatch match : matches)
+		{
+			JobData data = _jobsByID.get(new Long(match.getJobID()));
+			_queuedJobs.remove(new SortableJobKey(data));
+			data.setBESID(match.getBESID());
+			data.setJobState(QueueStates.STARTING);
+			_runningJobs.put(new Long(data.getJobID()), data);
+			
+			_outcallThreadPool.enqueue(new JobLauncher(this, match.getJobID(), 
+				match.getBESID()));
+		}
+	}
+	
+	private class Resolver implements IBESPortTypeResolver, IJobEndpointResolver
+	{
+		private BESPortType _portType = null;
+		private EndpointReferenceType _endpoint = null;
+		
+		private void resolve(Connection connection, long jobID) throws Throwable
+		{
+			JobStatusInformation info = _database.getJobStatusInformation(
+				connection, jobID);
+			
+			_endpoint = info.getJobEndpoint();
+			_portType = ClientUtils.createProxy(
+				BESPortType.class, info.getBESEndpoint(), 
+				info.getCallingContext());
+		}
+		
+		@Override
+		public BESPortType createClientStub(Connection connection, long besID)
+				throws Throwable
+		{
+			return _portType;
+		}
+
+		@Override
+		public EndpointReferenceType getJobEndpoint(Connection connection,
+				long jobID) throws Throwable
+		{
+			resolve(connection, jobID);
+			return _endpoint;
+		}	
+	}
+	
+	private class JobLauncher implements Runnable
+	{
+		private long _jobID;
+		private long _besID;
+		private JobManager _manager;
+		
+		public JobLauncher(JobManager manager, long jobID, long besID)
+		{
+			_manager = manager;
+			_jobID = jobID;
+			_besID = besID;
+		}
+		
+		public void run()
+		{
+			Connection connection = null;
+			EntryType entryType;
+			HashMap<Long, EntryType> entries = new HashMap<Long, EntryType>();
+			
+			try
+			{
+				connection = _connectionPool.acquire();
+				JobStartInformation startInfo = _database.getStartInformation(
+					connection, _jobID);
+				entries.put(new Long(_besID), entryType = new EntryType());
+				_database.fillInBESEPRs(connection, entries);
+				
+				BESPortType bes = ClientUtils.createProxy(BESPortType.class, 
+					entryType.getEntry_reference(), 
+					startInfo.getCallingContext());
+				CreateActivityResponseType resp = bes.createActivity(
+					new CreateActivityType(
+						new ActivityDocumentType(startInfo.getJSDL(), null)));
+				
+				synchronized(_manager)
+				{
+					_database.markRunning(connection, _jobID, 
+						resp.getActivityIdentifier());
+					connection.commit();
+					
+					_jobsByID.get(new Long(_jobID)).setJobState(
+						QueueStates.RUNNING);
+				}
+			}
+			catch (Throwable cause)
+			{
+				_logger.warn("Unable to start job " + _jobID, cause);
+				try 
+				{
+					failJob(connection, _jobID, true); 
+				}
+				catch (Throwable cause2)
+				{
+					_logger.error("Unable to fail a job.", cause2);
+				}
+			}
+			finally
+			{
+				_connectionPool.release(connection);
+			}
 		}
 	}
 }

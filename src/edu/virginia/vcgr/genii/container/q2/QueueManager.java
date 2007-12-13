@@ -124,6 +124,7 @@ public class QueueManager implements Closeable
 	
 	private BESManager _besManager;
 	private JobManager _jobManager;
+	private Scheduler _scheduler;
 	private QueueDatabase _database;
 	private SchedulingEvent _schedulingEvent;
 	
@@ -142,7 +143,9 @@ public class QueueManager implements Closeable
 				_database, _schedulingEvent, 
 				connection, _connectionPool);
 			_jobManager = new JobManager(_outcallThreadPool,
-				_database, _schedulingEvent, connection, _connectionPool);;
+				_database, _schedulingEvent, connection, _connectionPool);
+			_scheduler = new Scheduler(_schedulingEvent, _connectionPool,
+				_jobManager, _besManager);
 		}
 		catch (GenesisIISecurityException gse)
 		{
@@ -169,6 +172,7 @@ public class QueueManager implements Closeable
 			return;
 		
 		_closed = true;
+		StreamUtils.close(_scheduler);
 		StreamUtils.close(_besManager);
 		StreamUtils.close(_jobManager);
 	}
