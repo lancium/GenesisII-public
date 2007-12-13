@@ -156,13 +156,16 @@ public class JobManager implements Closeable
 			newState = QueueStates.REQUEUED;
 		}
 		
-		new JobKiller(jobID).run();
+		if (job.getJobState().equals(QueueStates.RUNNING))
+			new JobKiller(jobID).run();
 
 		_database.modifyJobState(connection, jobID,
 			attempts, newState, new Date(), null, null, null);
 		connection.commit();
 		
 		_runningJobs.remove(new Long(jobID));
+		_queuedJobs.remove(new Long(jobID));
+		
 		if (newState.equals(QueueStates.REQUEUED))
 		{
 			_logger.debug("Re-queing job " + jobID);
@@ -188,7 +191,8 @@ public class JobManager implements Closeable
 			return;
 		}
 		
-		new JobKiller(jobID).run();
+		if (job.getJobState().equals(QueueStates.RUNNING))
+			new JobKiller(jobID).run();
 		
 		job.incrementRunAttempts();
 		_database.modifyJobState(connection, jobID,
@@ -198,6 +202,7 @@ public class JobManager implements Closeable
 		job.setJobState(QueueStates.FINISHED);
 		
 		_logger.debug("Finished job " + jobID);
+		_queuedJobs.remove(new Long(jobID));
 		_runningJobs.remove(new Long(jobID));
 		_schedulingEvent.notifySchedulingEvent();
 	}
@@ -595,7 +600,7 @@ public class JobManager implements Closeable
 			{
 				if (!QueueSecurity.isOwner(pji.getOwners()))
 					throw new GenesisIISecurityException(
-						"Don't have permissino to complete ob \"" + 
+						"Don't have permissino to kill job \"" + 
 							jobData.getJobTicket() + "\".");
 			}
 			catch (GenesisIISecurityException gse)
@@ -607,6 +612,9 @@ public class JobManager implements Closeable
 			if (jobData.getJobState().equals(QueueStates.STARTING))
 				jobData.kill();
 			else if (jobData.getJobState().equals(QueueStates.RUNNING))
+			{
+				finishJob(connection, jobID);
+			} else if (!jobData.getJobState().isFinalState())
 			{
 				finishJob(connection, jobID);
 			}
