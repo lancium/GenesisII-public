@@ -156,29 +156,15 @@ public class JobManager implements Closeable
 			newState = QueueStates.REQUEUED;
 		}
 		
-		if (job.getJobState().equals(QueueStates.RUNNING))
-			new JobKiller(jobID).run();
-
-		_database.modifyJobState(connection, jobID,
-			attempts, newState, new Date(), null, null, null);
-		connection.commit();
-		
+		// This is one of the few times we are going to break our pattern and
+		// modify the in memory state before the database.  The reason for this
+		// is that we can't afford to forget that the BES container has a job
+		// on it that it's managing.  If we do, we will eventually leak memory
+		// on that container.
 		_runningJobs.remove(new Long(jobID));
 		_queuedJobs.remove(new SortableJobKey(job));
-		
-		if (newState.equals(QueueStates.REQUEUED))
-		{
-			_logger.debug("Re-queing job " + jobID);
-			_queuedJobs.put(new SortableJobKey(
-				jobID, job.getPriority(), job.getSubmitTime()), job);
-		} else
-		{
-			_logger.debug("Failing job " + jobID);
-		}
-		job.setJobState(newState);
-		job.clearBESID();
-		
-		_schedulingEvent.notifySchedulingEvent();
+
+		_outcallThreadPool.enqueue(new JobKiller(job, newState));
 	}
 	
 	synchronized public void finishJob(Connection connection, long jobID)
@@ -191,20 +177,18 @@ public class JobManager implements Closeable
 			return;
 		}
 		
-		if (job.getJobState().equals(QueueStates.RUNNING))
-			new JobKiller(jobID).run();
-		
-		job.incrementRunAttempts();
-		_database.modifyJobState(connection, jobID,
-			job.getRunAttempts(), QueueStates.FINISHED,
-			new Date(), null, null, null);
-		connection.commit();
-		job.setJobState(QueueStates.FINISHED);
-		
 		_logger.debug("Finished job " + jobID);
+		// This is one of the few times we are going to break our pattern and
+		// modify the in memory state before the database.  The reason for this
+		// is that we can't afford to forget that the BES container has a job
+		// on it that it's managing.  If we do, we will eventually leak memory
+		// on that container.
+		
 		_queuedJobs.remove(new SortableJobKey(job));
 		_runningJobs.remove(new Long(jobID));
-		_schedulingEvent.notifySchedulingEvent();
+		job.incrementRunAttempts();
+		
+		_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED));
 	}
 	
 	synchronized public String submitJob(Connection connection,
@@ -706,11 +690,35 @@ public class JobManager implements Closeable
 	
 	private class JobKiller implements Runnable
 	{
-		private long _jobID;
+		private JobData _jobData;
+		private QueueStates _newState;
 		
-		public JobKiller(long jobID)
+		public JobKiller(JobData jobData, QueueStates newState)
 		{
-			_jobID = jobID;
+			_jobData = jobData;
+			_newState = newState;
+		}
+		
+		private void terminateActivity(Connection connection)
+			throws SQLException, ResourceException
+		{
+			KillInformation killInfo = _database.getKillInfo(
+				connection, _jobData.getJobID());
+				
+			try
+			{
+				BESPortType bes = ClientUtils.createProxy(BESPortType.class, 
+					killInfo.getBESEndpoint(), 
+					killInfo.getCallingContext());
+				bes.terminateActivities(
+					new EndpointReferenceType[] {
+						killInfo.getJobEndpoint()
+					} );
+			}
+			catch (Throwable cause)
+			{
+				_logger.warn("Exception occurred while killing an activity.");
+			}
 		}
 		
 		public void run()
@@ -720,27 +728,31 @@ public class JobManager implements Closeable
 			try
 			{
 				connection = _connectionPool.acquire();
-				KillInformation killInfo = _database.getKillInfo(
-					connection, _jobID);
 				
-				try
+				if (_jobData.getJobState().equals(QueueStates.RUNNING))
+					terminateActivity(connection);
+				
+				_database.modifyJobState(connection, _jobData.getJobID(),
+					_jobData.getRunAttempts(), _newState, new Date(), null, null, null);
+				connection.commit();
+				
+				if (_newState.equals(QueueStates.REQUEUED))
 				{
-					BESPortType bes = ClientUtils.createProxy(BESPortType.class, 
-						killInfo.getBESEndpoint(), 
-						killInfo.getCallingContext());
-					bes.terminateActivities(
-						new EndpointReferenceType[] {
-							killInfo.getJobEndpoint()
-						} );
-				}
-				catch (Throwable cause)
+					_logger.debug("Re-queing job " + _jobData.getJobTicket());
+					_queuedJobs.put(new SortableJobKey(_jobData), _jobData);
+				} else
 				{
-					_logger.warn("Exception occurred while killing an activity.");
+					_logger.debug("Failing job " + _jobData.getJobTicket());
 				}
+				
+				_jobData.setJobState(_newState);
+				_jobData.clearBESID();
+				
+				_schedulingEvent.notifySchedulingEvent();
 			}
 			catch (Throwable cause)
 			{
-				_logger.error("Error killing job " + _jobID);
+				_logger.error("Error killing job " + _jobData.getJobTicket());
 			}
 			finally
 			{
