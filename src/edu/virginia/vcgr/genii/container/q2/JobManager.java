@@ -94,6 +94,7 @@ public class JobManager implements Closeable
 	synchronized private void loadFromDatabase(Connection connection)
 		throws SQLException, ResourceException
 	{
+		_logger.debug("Starting to reload jobs from the database.");
 		Collection<JobData> jobs = _database.loadAllJobs(connection);
 		LinkedList<JobData> starting = new LinkedList<JobData>();
 		
@@ -125,6 +126,7 @@ public class JobManager implements Closeable
 			}
 		}
 		
+		_logger.debug("Finished reloading jobs from the database.");
 		for (JobData job : starting)
 		{
 			failJob(connection, job.getJobID(), false);
