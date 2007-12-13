@@ -103,6 +103,8 @@ public class Scheduler implements Closeable
 				
 				if (slotIter == null)
 				{
+					if (slots.isEmpty())
+						break;
 					slotIter = slots.values().iterator();
 					match = findSlot(matcher, queuedJob, slotIter);
 				} else
@@ -110,6 +112,8 @@ public class Scheduler implements Closeable
 					match = findSlot(matcher, queuedJob, slotIter);
 					if (match == null)
 					{
+						if (slots.isEmpty())
+							break;
 						slotIter = slots.values().iterator();
 						match = findSlot(matcher, queuedJob, slotIter);
 					}
