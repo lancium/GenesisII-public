@@ -47,6 +47,16 @@ public class JobUpdateWorker implements Runnable
 				connection, _jobInfo.getJobID());
 			BESPortType clientStub = _clientStubResolver.createClientStub(
 				connection, _jobInfo.getBESID());
+			
+			if (jobEndpoint == null)
+			{
+				// Another thread has removed this from the database.
+				_logger.debug(
+					"Asked to check status on a job which is " +
+					"no longer running according to the database.");
+				return;
+			}
+			
 			GetActivityStatusResponseType []activityStatuses 
 				= clientStub.getActivityStatuses(
 					new EndpointReferenceType[] { jobEndpoint });
