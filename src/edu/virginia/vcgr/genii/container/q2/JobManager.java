@@ -164,7 +164,7 @@ public class JobManager implements Closeable
 		connection.commit();
 		
 		_runningJobs.remove(new Long(jobID));
-		_queuedJobs.remove(new Long(jobID));
+		_queuedJobs.remove(new SortableJobKey(job));
 		
 		if (newState.equals(QueueStates.REQUEUED))
 		{
@@ -202,7 +202,7 @@ public class JobManager implements Closeable
 		job.setJobState(QueueStates.FINISHED);
 		
 		_logger.debug("Finished job " + jobID);
-		_queuedJobs.remove(new Long(jobID));
+		_queuedJobs.remove(new SortableJobKey(job));
 		_runningJobs.remove(new Long(jobID));
 		_schedulingEvent.notifySchedulingEvent();
 	}
