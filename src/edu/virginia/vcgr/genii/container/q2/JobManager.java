@@ -742,7 +742,8 @@ public class JobManager implements Closeable
 					_queuedJobs.put(new SortableJobKey(_jobData), _jobData);
 				} else
 				{
-					_logger.debug("Failing job " + _jobData.getJobTicket());
+					_logger.debug("Moving job \"" + _jobData.getJobTicket()
+						+ "\" to the " + _newState + " state.");
 				}
 				
 				_jobData.setJobState(_newState);
