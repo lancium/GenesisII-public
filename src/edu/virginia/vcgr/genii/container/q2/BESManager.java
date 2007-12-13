@@ -27,6 +27,7 @@ import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 public class BESManager implements Closeable
 {
 	static private final long _BES_UPDATE_CYCLE = 1000L * 60 * 5;
+	static private final int _MISS_CAP = 10;
 	
 	static private Log _logger = LogFactory.getLog(BESManager.class);
 	
@@ -87,7 +88,7 @@ public class BESManager implements Closeable
 			_containersByID.put(new Long(bes.getID()), bes);
 			_containersByName.put(bes.getName(), bes);
 			_updateInformation.put(new Long(bes.getID()), 
-				new BESUpdateInformation(bes.getID(), _BES_UPDATE_CYCLE));
+				new BESUpdateInformation(bes.getID(), _BES_UPDATE_CYCLE, _MISS_CAP));
 		}
 		
 		updateResources(connection);
@@ -108,7 +109,7 @@ public class BESManager implements Closeable
 		_containersByID.put(new Long(id), data);
 		_containersByName.put(name, data);
 		_updateInformation.put(new Long(id), updateInfo = new BESUpdateInformation(
-			id, _BES_UPDATE_CYCLE));
+			id, _BES_UPDATE_CYCLE, _MISS_CAP));
 		toUpdate.add(updateInfo);
 		
 		_logger.debug("Added new bes container \"" + name + 

@@ -3,30 +3,31 @@ package edu.virginia.vcgr.genii.container.q2;
 import java.io.Closeable;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
+import org.apache.axis.types.UnsignedShort;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.ggf.bes.BESPortType;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.morgan.util.GUID;
 import org.morgan.util.configuration.ConfigurationException;
 
+import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.Identity;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
-import edu.virginia.vcgr.genii.container.queue.QueueSecurity;
+import edu.virginia.vcgr.genii.queue.JobInformationType;
 import edu.virginia.vcgr.genii.queue.JobStateEnumerationType;
 import edu.virginia.vcgr.genii.queue.ReducedJobInformationType;
 
@@ -34,6 +35,7 @@ public class JobManager implements Closeable
 {
 	static private Log _logger = LogFactory.getLog(BESManager.class);
 	
+	static final private long _STATUS_CHECK_FREQUENCY = 1000L * 30;
 	static final private short _MAX_RUN_ATTEMPTS = 10;
 	
 	volatile private boolean _closed = false;
@@ -41,6 +43,7 @@ public class JobManager implements Closeable
 	private ThreadPool _outcallThreadPool;
 	private QueueDatabase _database;
 	private SchedulingEvent _schedulingEvent;
+	private JobStatusChecker _statusChecker;
 	
 	private HashMap<Long, JobData> _jobsByID = new HashMap<Long, JobData>();
 	private HashMap<String, JobData> _jobsByTicket = 
@@ -61,6 +64,8 @@ public class JobManager implements Closeable
 		_outcallThreadPool = outcallThreadPool;
 		
 		loadFromDatabase(connection);
+		
+		_statusChecker = new JobStatusChecker(connectionPool, this, _STATUS_CHECK_FREQUENCY);
 	}
 	
 	protected void finalize() throws Throwable
@@ -76,6 +81,7 @@ public class JobManager implements Closeable
 			return;
 		
 		_closed = true;
+		_statusChecker.close();
 	}
 	
 	synchronized private void loadFromDatabase(Connection connection)
@@ -208,7 +214,7 @@ public class JobManager implements Closeable
 			_jobsByTicket.put(ticket, job);
 			_queuedJobs.put(new SortableJobKey(jobID, priority, submitTime),
 				job);
-			_schedulingEvent.notify();
+			_schedulingEvent.notifySchedulingEvent();
 			
 			return ticket;
 		}
@@ -224,23 +230,229 @@ public class JobManager implements Closeable
 		Collection<ReducedJobInformationType> ret = 
 			new LinkedList<ReducedJobInformationType>();
 		
+		HashMap<Long, PartialJobInfo> ownerMap =
+			_database.getPartialJobInfos(connection, _jobsByID.keySet());
+		
 		try
 		{
-			for (Long jobID : _jobsByID.keySet())
+			for (Long jobID : ownerMap.keySet())
 			{
-				ret.add(_database.getReducedInformation(
-					connection, jobID.longValue()));
+				JobData jobData = _jobsByID.get(jobID.longValue());
+				PartialJobInfo pji = ownerMap.get(jobID);
+				ret.add(new ReducedJobInformationType(
+					jobData.getJobTicket(), 
+					QueueSecurity.convert(pji.getOwners()),
+					JobStateEnumerationType.fromString(
+						jobData.getJobState().name())));
 			}
 			
 			return ret;
 		}
-		catch (ClassNotFoundException cnfe)
+		catch (IOException ioe)
 		{
-			throw new ResourceException("Unable to list jobs.", cnfe);
+			throw new ResourceException(
+				"Unable to serialize owner information.", ioe);
+		}
+	}
+	
+	synchronized public Collection<JobInformationType> getJobStatus(
+		Connection connection) throws SQLException, ResourceException
+	{
+		Collection<JobInformationType> ret = new LinkedList<JobInformationType>();
+		HashMap<Long, PartialJobInfo> ownerMap;
+		
+		ownerMap = _database.getPartialJobInfos(connection, _jobsByID.keySet());
+		for (Long jobID : ownerMap.keySet())
+		{
+			JobData jobData = _jobsByID.get(jobID);
+			
+			try
+			{
+				PartialJobInfo pji = ownerMap.get(jobID);
+				if (QueueSecurity.isOwner(pji.getOwners()))
+				{
+					ret.add(new JobInformationType(
+						jobData.getJobTicket(),
+						QueueSecurity.convert(pji.getOwners()),
+						JobStateEnumerationType.fromString(
+							jobData.getJobState().name()),
+						(byte)jobData.getPriority(),
+						QueueUtils.convert(jobData.getSubmitTime()),
+						QueueUtils.convert(pji.getStartTime()),
+						QueueUtils.convert(pji.getFinishTime()),
+						new UnsignedShort(jobData.getRunAttempts())));
+				}
+			}
+			catch (IOException ioe)
+			{
+				throw new ResourceException(
+					"Unable to get job status for job \"" +
+					jobData.getJobTicket() + "\".", ioe);
+					
+			}
+		}
+		
+		return ret;
+	}
+	
+	synchronized public Collection<JobInformationType> getJobStatus(
+		Connection connection, String []jobs)
+			throws SQLException, ResourceException
+	{
+		if (jobs == null || jobs.length == 0)
+			return getJobStatus(connection);
+		
+		Collection<JobInformationType> ret = 
+			new LinkedList<JobInformationType>();
+		
+		Collection<Long> jobIDs = new LinkedList<Long>();
+		for (String ticket : jobs)
+		{
+			JobData data = _jobsByTicket.get(ticket);
+			if (data == null)
+				throw new ResourceException("Job \"" + ticket 
+					+ "\" does not exist in queue.");
+			
+			jobIDs.add(new Long(data.getJobID()));
+		}
+		
+		HashMap<Long, PartialJobInfo> ownerMap =
+			_database.getPartialJobInfos(connection, jobIDs);
+		
+		try
+		{
+			for (Long jobID : ownerMap.keySet())
+			{
+				JobData jobData = _jobsByID.get(jobID.longValue());
+				PartialJobInfo pji = ownerMap.get(jobID);
+				
+				if (QueueSecurity.isOwner(pji.getOwners()))
+				{
+					ret.add(new JobInformationType(
+						jobData.getJobTicket(),
+						QueueSecurity.convert(pji.getOwners()),
+						JobStateEnumerationType.fromString(
+							jobData.getJobState().name()),
+						(byte)jobData.getPriority(),
+						QueueUtils.convert(jobData.getSubmitTime()),
+						QueueUtils.convert(pji.getStartTime()),
+						QueueUtils.convert(pji.getFinishTime()),
+						new UnsignedShort(jobData.getRunAttempts())));
+				} else
+				{
+					throw new GenesisIISecurityException(
+						"Not permitted to get status of job \"" 
+						+ jobData.getJobTicket() + "\".");
+				}
+			}
+			
+			return ret;
 		}
 		catch (IOException ioe)
 		{
-			throw new ResourceException("Unable to list jobs.", ioe);
+			throw new ResourceException(
+				"Unable to serialize owner information.", ioe);
+		}
+	}
+	
+	synchronized private void completeJobs(Connection connection, 
+		Collection<Long> jobsToComplete)
+			throws SQLException, ResourceException
+	{
+		
+	}
+	
+	synchronized public void completeJobs(Connection connection)
+		throws SQLException, ResourceException
+	{
+		// Find all jobs that caller owns AND that are in a final state
+		Collection<Long> jobsToComplete = new LinkedList<Long>();
+		HashMap<Long, PartialJobInfo> ownerMap;
+		
+		ownerMap = _database.getPartialJobInfos(connection, _jobsByID.keySet());
+		for (Long jobID : ownerMap.keySet())
+		{
+			JobData jobData = _jobsByID.get(jobID);
+			PartialJobInfo pji = ownerMap.get(jobID);
+			
+			try
+			{
+				if (jobData.getJobState().isFinalState() && 
+					QueueSecurity.isOwner(pji.getOwners()))
+				{
+					jobsToComplete.add(jobID);
+				}
+			}
+			catch (AuthZSecurityException azse)
+			{
+				_logger.warn(
+					"Security exception caused us not to complete a job.", 
+					azse);
+			}
+		}	
+		
+		// Go ahead and complete them
+		completeJobs(connection, jobsToComplete);
+	}
+	
+	synchronized public void completeJobs(Connection connection, String []jobs)
+		throws SQLException, ResourceException, GenesisIISecurityException
+	{
+		if (jobs == null || jobs.length == 0)
+		{
+			completeJobs(connection);
+			return;
+		}
+		
+		Collection<Long> jobsToComplete = new LinkedList<Long>();
+		HashMap<Long, PartialJobInfo> ownerMap;
+		
+		for (String jobTicket : jobs)
+		{
+			JobData data = _jobsByTicket.get(jobTicket);
+			if (data == null)
+				throw new ResourceException("Job \"" + jobTicket 
+					+ "\" does not exist.");
+			jobsToComplete.add(new Long(data.getJobID()));
+		}
+		
+		ownerMap = _database.getPartialJobInfos(connection, jobsToComplete);
+		for (Long jobID : ownerMap.keySet())
+		{
+			JobData jobData = _jobsByID.get(jobID);
+			PartialJobInfo pji = ownerMap.get(jobID);
+			
+			if (!jobData.getJobState().isFinalState())
+				throw new ResourceException("Job \"" + jobData.getJobTicket() 
+					+ "\" is not in a final state.");
+			
+			if (!QueueSecurity.isOwner(pji.getOwners()))
+				throw new GenesisIISecurityException(
+					"Don't have permissino to complete ob \"" + 
+						jobData.getJobTicket() + "\".");
+		}	
+		
+		// Go ahead and complete them
+		completeJobs(connection, jobsToComplete);
+	}
+	
+	synchronized public void checkJobStatuses(
+		DatabaseConnectionPool connectionPool, Connection connection)
+		throws SQLException, ResourceException, ConfigurationException,
+			GenesisIISecurityException
+	{
+		Collection<JobCommunicationInfo> commInfo;
+		
+		commInfo = _database.loadJobCommunicationInfo(
+			connection, _runningJobs.values());
+		
+		for (JobCommunicationInfo job : commInfo)
+		{
+			BESPortType clientStub = ClientUtils.createProxy(
+				BESPortType.class, job.getBESEndpoint(), 
+				job.getCallingContext());
+			_outcallThreadPool.enqueue(new JobUpdateWorker(
+				this, clientStub, connectionPool, job));
 		}
 	}
 }

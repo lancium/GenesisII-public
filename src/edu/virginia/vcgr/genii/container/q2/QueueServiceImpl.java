@@ -88,8 +88,18 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 	@RWXMapping(RWXCategory.OPEN)
 	public Object completeJobs(String[] completeRequest) throws RemoteException
 	{
-		// TODO Auto-generated method stub
-		return null;
+		ResourceKey rKey = ResourceManager.getCurrentResource();
+		
+		try
+		{
+			QueueManager mgr = QueueManager.getManager((String)rKey.getKey());
+			mgr.completeJobs(completeRequest);
+			return null;
+		}
+		catch (SQLException sqe)
+		{
+			throw new RemoteException("Unable to complete jobs in queue.", sqe);
+		}
 	}
 
 	@Override
@@ -127,8 +137,19 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 	public JobInformationType[] getStatus(String[] getStatusRequest)
 			throws RemoteException
 	{
-		// TODO Auto-generated method stub
-		return null;
+		ResourceKey rKey = ResourceManager.getCurrentResource();
+		Collection<JobInformationType> jobs;
+		
+		try
+		{
+			QueueManager mgr = QueueManager.getManager((String)rKey.getKey());
+			jobs = mgr.getJobStatus(getStatusRequest);
+			return jobs.toArray(new JobInformationType[0]);
+		}
+		catch (SQLException sqe)
+		{
+			throw new RemoteException("Unable to list jobs in queue.", sqe);
+		}
 	}
 
 	@Override

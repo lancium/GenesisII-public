@@ -21,6 +21,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.queue.JobInformationType;
 import edu.virginia.vcgr.genii.queue.ReducedJobInformationType;
 
 public class QueueManager implements Closeable
@@ -252,7 +253,7 @@ public class QueueManager implements Closeable
 		}
 	}
 	
-	Collection<ReducedJobInformationType> listJobs()
+	public Collection<ReducedJobInformationType> listJobs()
 		throws SQLException, ResourceException
 	{
 		Connection connection = null;
@@ -261,6 +262,39 @@ public class QueueManager implements Closeable
 		{
 			connection = _connectionPool.acquire();
 			return _jobManager.listJobs(connection);
+		}
+		finally
+		{
+			_connectionPool.release(connection);
+		}
+	}
+	
+	public Collection<JobInformationType> getJobStatus(String []jobs)
+		throws SQLException, ResourceException
+	{
+		Connection connection = null;
+		
+		try
+		{
+			connection = _connectionPool.acquire();
+			return _jobManager.getJobStatus(connection, jobs);
+		}
+		finally
+		{
+			_connectionPool.release(connection);
+		}
+	}
+	
+	public void completeJobs(String []jobs)
+		throws SQLException, ResourceException, 
+			GenesisIISecurityException
+	{
+		Connection connection = null;
+		
+		try
+		{
+			connection = _connectionPool.acquire();
+			_jobManager.completeJobs(connection, jobs);
 		}
 		finally
 		{

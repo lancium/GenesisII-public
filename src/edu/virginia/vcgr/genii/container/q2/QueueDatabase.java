@@ -24,8 +24,6 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.Identity;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.container.resource.IResource;
-import edu.virginia.vcgr.genii.queue.JobStateEnumerationType;
-import edu.virginia.vcgr.genii.queue.ReducedJobInformationType;
 
 public class QueueDatabase
 {
@@ -338,27 +336,101 @@ public class QueueDatabase
 	}
 	
 	@SuppressWarnings("unchecked")
-	public ReducedJobInformationType getReducedInformation(
-		Connection connection, long jobID) throws SQLException, IOException,
-			ClassNotFoundException
+	public HashMap<Long, PartialJobInfo> getPartialJobInfos(
+		Connection connection, Collection<Long> jobIDs)
+			throws SQLException, ResourceException
 	{
+		HashMap<Long, PartialJobInfo> ret = 
+			new HashMap<Long, PartialJobInfo>();
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		
 		try
 		{
 			stmt = connection.prepareStatement(
-				"SELECT jobticket, owners, state FROM q2jobs WHERE jobid = ?");
-			stmt.setLong(1, jobID);
-			rs = stmt.executeQuery();
+				"SELECT owners, starttime, finishtime FROM q2jobs WHERE jobid = ?");
 			
-			if (!rs.next())
-				throw new SQLException("Couldn't find job " + jobID);
+			for (Long jobID : jobIDs)
+			{
+				stmt.setLong(1, jobID.longValue());
+				rs = stmt.executeQuery();
+				
+				if (!rs.next())
+					throw new ResourceException("Unable to find job " + jobID + " in queue.");
+				
+				ret.put(jobID, new PartialJobInfo(
+					(Collection<Identity>)DBSerializer.fromBlob(rs.getBlob(1)),
+					rs.getTimestamp(2), rs.getTimestamp(3)));
+				
+				rs.close();
+				rs = null;
+			}
 			
-			return new ReducedJobInformationType(
-				rs.getString(1), QueueSecurity.convert(
-					(Collection<Identity>)DBSerializer.fromBlob(rs.getBlob(2))),
-				JobStateEnumerationType.fromString(rs.getString(3)));
+			return ret;
+		}
+		catch (IOException ioe)
+		{
+			throw new ResourceException(
+				"Unable to deserialize owners for job.", ioe);
+		}
+		catch (ClassNotFoundException cnfe)
+		{
+			throw new ResourceException(
+				"Unable to deserialize owners for job.", cnfe);
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+	}
+	
+	public Collection<JobCommunicationInfo> loadJobCommunicationInfo(
+		Connection connection, Collection<JobData> jobData)
+			throws SQLException, ResourceException
+	{
+		Collection<JobCommunicationInfo> commInfo = 
+			new LinkedList<JobCommunicationInfo>();
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try
+		{
+			stmt = connection.prepareStatement(
+				"SELECT jobendpoint, resourceid, " +
+					"resourceendpoint, callingcontext FROM q2jobs " +
+				"WHERE jobid = ?");
+			
+			for (JobData data : jobData)
+			{
+				stmt.setLong(1, data.getJobID());
+				rs = stmt.executeQuery();
+				
+				if (!rs.next())
+					throw new ResourceException("Couldn't find job " 
+						+ data.getJobTicket() + " in database.");
+				
+				commInfo.add(new JobCommunicationInfo(
+					data.getJobID(), 
+					(ICallingContext)DBSerializer.fromBlob(rs.getBlob(4)),
+					EPRUtils.fromBlob(rs.getBlob(1)), rs.getLong(2),
+					EPRUtils.fromBlob(rs.getBlob(3))));
+				
+				rs.close();
+				rs = null;
+			}
+			
+			return commInfo;
+		}
+		catch (ClassNotFoundException cnfe)
+		{
+			throw new ResourceException(
+				"Unable to deserialize calling context in database.", cnfe);
+		}
+		catch (IOException ioe)
+		{
+			throw new ResourceException(
+				"Unable to deserialize calling context in database.", ioe);
 		}
 		finally
 		{
