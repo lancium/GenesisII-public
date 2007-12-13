@@ -305,4 +305,20 @@ public class QueueManager implements Closeable
 			_connectionPool.release(connection);
 		}
 	}
+	
+	public void killJobs(String []jobs)
+		throws SQLException, ResourceException
+	{
+		Connection connection = null;
+		
+		try
+		{
+			connection = _connectionPool.acquire();
+			_jobManager.killJobs(connection, jobs);
+		}
+		finally
+		{
+			_connectionPool.release(connection);
+		}
+	}
 }

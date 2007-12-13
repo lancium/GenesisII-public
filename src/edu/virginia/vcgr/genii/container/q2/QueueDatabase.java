@@ -575,4 +575,47 @@ public class QueueDatabase
 			StreamUtils.close(stmt);
 		}
 	}
+	
+	public KillInformation getKillInfo(Connection connection, long jobID) 
+		throws SQLException, ResourceException
+	{
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try
+		{
+			stmt = connection.prepareStatement(
+				"SELECT callingcontext, jobendpoint, resourceendpoint " +
+				"FROM q2jobs WHERE jobid = ?");
+			stmt.setLong(1, jobID);
+			
+			rs = stmt.executeQuery();
+			if (!rs.next())
+				throw new ResourceException("Unable to find job " + jobID 
+					+ " in database.");
+			
+			try
+			{
+				return new KillInformation(
+					(ICallingContext)DBSerializer.fromBlob(rs.getBlob(1)),
+					EPRUtils.fromBlob(rs.getBlob(2)),
+					EPRUtils.fromBlob(rs.getBlob(3)));
+			}
+			catch (IOException ioe)
+			{
+				throw new ResourceException(
+					"Couldn't deserialize blob from database.", ioe);
+			}
+			catch (ClassNotFoundException cnfe)
+			{
+				throw new ResourceException(
+					"Couldn't deserialize blob from database.", cnfe);
+			}
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+	}
 }

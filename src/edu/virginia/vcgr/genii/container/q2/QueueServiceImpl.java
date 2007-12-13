@@ -128,8 +128,8 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 			throws RemoteException, RNSEntryExistsFaultType, RNSFaultType,
 			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType
 	{
-		// TODO Auto-generated method stub
-		return null;
+		throw new RemoteException(
+			"createFile operation not supported for Queues.");
 	}
 
 	@Override
@@ -156,8 +156,18 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 	@RWXMapping(RWXCategory.OPEN)
 	public Object killJobs(String[] killRequest) throws RemoteException
 	{
-		// TODO Auto-generated method stub
-		return null;
+		ResourceKey rKey = ResourceManager.getCurrentResource();
+		
+		try
+		{
+			QueueManager mgr = QueueManager.getManager((String)rKey.getKey());
+			mgr.killJobs(killRequest);
+			return null;
+		}
+		catch (SQLException sqe)
+		{
+			throw new RemoteException("Unable to list jobs in queue.", sqe);
+		}
 	}
 
 	@Override
@@ -207,8 +217,8 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 	public MoveResponse move(Move moveRequest) throws RemoteException,
 			RNSFaultType, ResourceUnknownFaultType
 	{
-		// TODO Auto-generated method stub
-		return null;
+		throw new RemoteException(
+			"Move operation not supported for queues.");
 	}
 
 	@Override
@@ -216,8 +226,8 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 	public QueryResponse query(Query queryRequest) throws RemoteException,
 			RNSFaultType, ResourceUnknownFaultType
 	{
-		// TODO Auto-generated method stub
-		return null;
+		throw new RemoteException(
+			"Query operation not supported for queues.");
 	}
 
 	@Override

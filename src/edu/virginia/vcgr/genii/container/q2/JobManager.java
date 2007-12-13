@@ -156,6 +156,7 @@ public class JobManager implements Closeable
 			newState = QueueStates.REQUEUED;
 		}
 		
+		new JobKiller(jobID).run();
 
 		_database.modifyJobState(connection, jobID,
 			attempts, newState, new Date(), null, null, null);
@@ -186,6 +187,8 @@ public class JobManager implements Closeable
 			// don't know where it went, but it's no longer our responsibility.
 			return;
 		}
+		
+		new JobKiller(jobID).run();
 		
 		job.incrementRunAttempts();
 		_database.modifyJobState(connection, jobID,
@@ -564,6 +567,52 @@ public class JobManager implements Closeable
 		}	
 	}
 	
+	synchronized public void killJobs(Connection connection, String []tickets)
+		throws SQLException, ResourceException
+	{
+		if (tickets == null || tickets.length == 0)
+			return;
+		
+		Collection<Long> jobsToKill = new LinkedList<Long>();
+		HashMap<Long, PartialJobInfo> ownerMap;
+		
+		for (String jobTicket : tickets)
+		{
+			JobData data = _jobsByTicket.get(jobTicket);
+			if (data == null)
+				throw new ResourceException("Job \"" + jobTicket 
+					+ "\" does not exist.");
+			jobsToKill.add(new Long(data.getJobID()));
+		}
+		
+		ownerMap = _database.getPartialJobInfos(connection, jobsToKill);
+		for (Long jobID : ownerMap.keySet())
+		{
+			JobData jobData = _jobsByID.get(jobID);
+			PartialJobInfo pji = ownerMap.get(jobID);
+			
+			try
+			{
+				if (!QueueSecurity.isOwner(pji.getOwners()))
+					throw new GenesisIISecurityException(
+						"Don't have permissino to complete ob \"" + 
+							jobData.getJobTicket() + "\".");
+			}
+			catch (GenesisIISecurityException gse)
+			{
+				_logger.warn("Error tryint to determine job ownership.", gse);
+				continue;
+			}
+			
+			if (jobData.getJobState().equals(QueueStates.STARTING))
+				jobData.kill();
+			else if (jobData.getJobState().equals(QueueStates.RUNNING))
+			{
+				finishJob(connection, jobID);
+			}
+		}
+	}
+	
 	private class JobLauncher implements Runnable
 	{
 		private long _jobID;
@@ -591,6 +640,23 @@ public class JobManager implements Closeable
 				entries.put(new Long(_besID), entryType = new EntryType());
 				_database.fillInBESEPRs(connection, entries);
 				
+				synchronized(_manager)
+				{
+					JobData data = _jobsByID.get(new Long(_jobID));
+					if (data == null)
+					{
+						_logger.warn("Job " + _jobID + 
+							" dissappeared before it could be started.");
+						return;
+					}
+					
+					if (data.killed())
+					{
+						finishJob(connection, _jobID);
+						return;
+					}
+				}
+				
 				BESPortType bes = ClientUtils.createProxy(BESPortType.class, 
 					entryType.getEntry_reference(), 
 					startInfo.getCallingContext());
@@ -604,8 +670,11 @@ public class JobManager implements Closeable
 						resp.getActivityIdentifier());
 					connection.commit();
 					
-					_jobsByID.get(new Long(_jobID)).setJobState(
+					JobData data = _jobsByID.get(new Long(_jobID));
+					data.setJobState(
 						QueueStates.RUNNING);
+					if (data.killed())
+						finishJob(connection, _jobID);
 				}
 			}
 			catch (Throwable cause)
@@ -619,6 +688,51 @@ public class JobManager implements Closeable
 				{
 					_logger.error("Unable to fail a job.", cause2);
 				}
+			}
+			finally
+			{
+				_connectionPool.release(connection);
+			}
+		}
+	}
+	
+	private class JobKiller implements Runnable
+	{
+		private long _jobID;
+		
+		public JobKiller(long jobID)
+		{
+			_jobID = jobID;
+		}
+		
+		public void run()
+		{
+			Connection connection = null;
+			
+			try
+			{
+				connection = _connectionPool.acquire();
+				KillInformation killInfo = _database.getKillInfo(
+					connection, _jobID);
+				
+				try
+				{
+					BESPortType bes = ClientUtils.createProxy(BESPortType.class, 
+						killInfo.getBESEndpoint(), 
+						killInfo.getCallingContext());
+					bes.terminateActivities(
+						new EndpointReferenceType[] {
+							killInfo.getJobEndpoint()
+						} );
+				}
+				catch (Throwable cause)
+				{
+					_logger.warn("Exception occurred while killing an activity.");
+				}
+			}
+			catch (Throwable cause)
+			{
+				_logger.error("Error killing job " + _jobID);
 			}
 			finally
 			{

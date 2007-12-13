@@ -6,6 +6,7 @@ import edu.virginia.vcgr.genii.client.queue.QueueStates;
 
 public class JobData
 {
+	private boolean _killed;
 	private short _runAttempts;
 	private long _jobID;
 	private String _jobTicket;
@@ -17,6 +18,7 @@ public class JobData
 	public JobData(long jobID, String jobTicket, short priority,
 		QueueStates jobState, Date submitTime, short runAttempts, Long besID)
 	{
+		_killed = false;
 		_jobID = jobID;
 		_jobTicket = jobTicket;
 		_priority = priority;
@@ -31,6 +33,16 @@ public class JobData
 	{
 		this(jobID, jobTicket, priority, jobState, submitTime, 
 			runAttempts, null);
+	}
+	
+	public boolean killed()
+	{
+		return _killed;
+	}
+	
+	public void kill()
+	{
+		_killed = true;
 	}
 	
 	public long getJobID()
