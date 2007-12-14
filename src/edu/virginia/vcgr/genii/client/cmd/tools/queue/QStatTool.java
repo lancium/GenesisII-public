@@ -69,6 +69,6 @@ public class QStatTool extends BaseGridTool
 	{
 		stdout.println(String.format(
 			_FORMAT, jobInfo.getTicket(), jobInfo.getSubmitTime(),
-			jobInfo.getJobState(), jobInfo.getFailedAttempts() + 1));
+			jobInfo.getJobState(), jobInfo.getFailedAttempts()));
 	}
 }
