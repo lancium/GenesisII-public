@@ -43,6 +43,11 @@ import edu.virginia.vcgr.genii.queue.ReducedJobInformationType;
 import edu.virginia.vcgr.genii.queue.SubmitJobRequestType;
 import edu.virginia.vcgr.genii.queue.SubmitJobResponseType;
 
+/**
+ * This is the service class that the container redirects SOAP messages to.
+ * 
+ * @author mmm2a
+ */
 public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 {
 	@SuppressWarnings("unused")
@@ -50,8 +55,12 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 	
 	public QueueServiceImpl() throws RemoteException
 	{
+		/* Indicate the port type name to the base class */
 		super("QueuePortType");
 		
+		/* Now we have to add our own port types to the list of port types
+		 * implemented by this service.
+		 */
 		addImplementedPortType(WellKnownPortTypes.QUEUE_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.RNS_SERVICE_PORT_TYPE);
 	}
@@ -278,6 +287,10 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		}
 	}
 
+	/*
+	 * This method is called automatically when the Web server first comes up.
+	 * We use it to restart the queue from where it left off.
+	 */
 	@Override
 	public boolean startup()
 	{
@@ -285,7 +298,13 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		
 		try
 		{
+			/* In order to make out calls, we have to have a working context
+			 * so we go ahead and create an empty one.
+			 */
 			WorkingContext.setCurrentWorkingContext(new WorkingContext());
+			
+			/* Now we get the database connection pool configured 
+			 * with this service */
 			DatabaseConnectionPool connectionPool =(
 				(QueueDBResourceFactory)ResourceManager.getServiceResource(_serviceName
 					).getProvider().getFactory()).getConnectionPool();

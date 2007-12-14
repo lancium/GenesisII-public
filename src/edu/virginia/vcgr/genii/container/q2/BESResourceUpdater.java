@@ -9,6 +9,12 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 
+/**
+ * This class is a worker class that is used by the BESResourceManager to
+ * automatically update the BES resources on a regular interval.
+ * 
+ * @author mmm2a
+ */
 public class BESResourceUpdater implements Closeable
 {
 	static private Log _logger = LogFactory.getLog(BESResourceUpdater.class);
@@ -26,6 +32,7 @@ public class BESResourceUpdater implements Closeable
 		_manager = manager;
 		_updateFrequency = updateFrequency;
 		
+		/* Start a new thread to regularly update (and sleep in between) */
 		_thread = new Thread(new UpdaterWorker());
 		_thread.setDaemon(true);
 		_thread.setName("BES Updater Worker");
@@ -49,6 +56,7 @@ public class BESResourceUpdater implements Closeable
 		_thread.interrupt();
 	}
 	
+	/* The update worker that the thread is using */
 	private class UpdaterWorker implements Runnable
 	{
 		public void run()
@@ -59,9 +67,13 @@ public class BESResourceUpdater implements Closeable
 				
 				try
 				{
+					/* Acquire a new connection from the pool */
 					connection = _connectionPool.acquire();
+					
+					/* Have the BES manager update the resources */
 					_manager.updateResources(connection);
 					
+					/* Wait for the next update cycle */
 					Thread.sleep(_updateFrequency);
 				}
 				catch (InterruptedException ie)

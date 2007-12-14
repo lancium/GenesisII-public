@@ -14,6 +14,12 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 
+/**
+ * The scheduler class is another manager used by the queue that actively
+ * looks for opportunities to match jobs to resources and then launches them.
+ * 
+ * @author mmm2a
+ */
 public class Scheduler implements Closeable
 {
 	static private Log _logger = LogFactory.getLog(Scheduler.class);
@@ -58,19 +64,38 @@ public class Scheduler implements Closeable
 		_schedulerThread.interrupt();
 	}
 	
+	/**
+	 * Match queued jobs against available slots.
+	 * 
+	 * @throws ResourceException
+	 */
 	private void scheduleJobs() throws ResourceException
 	{
 		HashMap<Long, ResourceSlots> slots = 
 			new HashMap<Long, ResourceSlots>();
 		
+		/* First, we have to find all bes managers that are
+		 * availble to accept jobs.  In this case, available simply means
+		 * that they are responsive to communication and accepting activities
+		 * and have more then 0 slots allocated.  It does NOT imply that the
+		 * slots aren't being used.  We determine that later.
+		 */
 		synchronized(_besManager)
 		{
+			/* Get all available resources */
 			Collection<BESData> availableResources = 
 				_besManager.getAvailableBESs();
+
+			/* If we didn't get any resources back, then there's no reason
+			 * to continue.
+			 */
 			if (availableResources.size() == 0)
 				return;
 			
-			for (BESData data : _besManager.getAvailableBESs())
+			/* Now we go through the list and get rid of all resources that
+			 * had no slots allocated.
+			 */
+			for (BESData data : availableResources)
 			{
 				ResourceSlots rs = new ResourceSlots(data);
 				if (rs.slotsAvailable() > 0)
@@ -78,57 +103,99 @@ public class Scheduler implements Closeable
 			}
 		}
 		
+		/* If there are no slots available, then we are done. */
+		if (slots.size() <= 0)
+			return;
+		
 		// We've left the synchronized block for BESs, so we have to keep in
 		// mind that they could dissapear out from under us during this time.
 		
 		synchronized(_jobManager)
 		{
+			/* If the job manager has no queued jobs, then we don't need to 
+			 * continue.
+			 */
 			if (!_jobManager.hasQueuedJobs())
 				return;
 			
+			/* Ask the job manager to remove all slots from the slot list that
+			 * are currently being used.
+			 */ 
 			_jobManager.recordUsedSlots(slots);
+			
+			/* If there are no slots left, we're done. */
 			if (slots.isEmpty())
 				return;
 			
 			// At this point, we have slots available (probably) and we have 
 			// jobs to run
+			
 			ResourceMatcher matcher = new ResourceMatcher();
 			Collection<ResourceMatch> matches = new LinkedList<ResourceMatch>();
 			Iterator<ResourceSlots> slotIter = null;
 			ResourceMatch match;
 			
+			/* We are now going to match as many jobs to as many slots as 
+			 * possible. To make this as efficient as possible, we keep track
+			 * of the iterator and continually re-iterate until we go through
+			 * all the jobs waiting for a slot, or we run out of resources to
+			 * scheduling against.
+			 */
 			for (JobData queuedJob : _jobManager.getQueuedJobs())
 			{
 				match = null;
 				
+				/* If we haven't created an iterator yet, do so now. */
 				if (slotIter == null)
 				{
+					/* If there aren't any slots, we're done */
 					if (slots.isEmpty())
 						break;
+					
 					slotIter = slots.values().iterator();
+					
+					/* Try to find a match */
 					match = findSlot(matcher, queuedJob, slotIter);
 				} else
 				{
+					/* If we got here, then we already had an iterator 
+					 * from before.  Try to find a match with it. */
 					match = findSlot(matcher, queuedJob, slotIter);
+					
+					/* If we couldn't find a match, it may have been the case
+					 * that we simply had already passed a potential match with
+					 * the iterator before getting here, so give the iterator
+					 * a new chance from the begining.
+					 */
 					if (match == null)
 					{
+						/* If there are no slots available, we're done. */
 						if (slots.isEmpty())
 							break;
+						
+						/* Create a new iterator and try to find 
+						 * a match again. */
 						slotIter = slots.values().iterator();
 						match = findSlot(matcher, queuedJob, slotIter);
 					}
 				}
 				
+				/* If we found a match, then go ahead and add it 
+				 * to our list. */
 				if (match != null)
-				{
 					matches.add(match);
-				}
 			}
 			
+			/* OK, now that we have a list of matches, go ahead and try to
+			 * start the jobs.
+			 */
 			Connection connection = null;
 			try
 			{
+				/* Acquire a new connection from the pool */
 				connection = _connectionPool.acquire();
+				
+				/* And start the jobs. */
 				_jobManager.startJobs(connection, matches);
 			}
 			catch (Throwable cause)
@@ -142,15 +209,31 @@ public class Scheduler implements Closeable
 		}
 	}
 	
+	/**
+	 * Find a resource that matches the given job.
+	 * 
+	 * @param matcher A resource matcher that determines whether or not
+	 * jobs match given resources.
+	 * @param queuedJob The job to match against.
+	 * @param slots The list of slots (iterator) against which to find a match.
+	 * 
+	 * @return The match (if one was found), otherwise null.
+	 */
 	private ResourceMatch findSlot(ResourceMatcher matcher, JobData queuedJob, 
 		Iterator<ResourceSlots> slots)
 	{
 		while (slots.hasNext())
 		{
 			ResourceSlots rSlots = slots.next();
+			
 			if (matcher.matches(queuedJob.getJobID(), rSlots.getBESID()))
 			{
+				/* If there was a match, reserve the slot */
 				rSlots.reserveSlot();
+				
+				/* If we just reserved the last available slot, take it out
+				 * of the list.
+				 */
 				if (rSlots.slotsAvailable() <= 0)
 					slots.remove();
 				return new ResourceMatch(queuedJob.getJobID(), rSlots.getBESID());
@@ -160,28 +243,41 @@ public class Scheduler implements Closeable
 		return null;
 	}
 	
+	/**
+	 * This class is used by the scheduler to wait on scheduling opportunities
+	 * and the start a scheduling process.
+	 * 
+	 * @author mmm2a
+	 */
 	private class SchedulerWorker implements Runnable
 	{
 		public void run()
 		{
+			/* A small hack, but go ahead and pre-notify ourselves that
+			 * there might be a scheduling opportunity.  This bootstraps
+			 * the scheduler for when it is first loaded.  If we just loaded
+			 * state from the database, this will start the scheduling process.
+			 */
 			_schedulingEvent.notifySchedulingEvent();
 			
 			while (!_closed)
 			{
 				try
 				{
-					if (_schedulingEvent.waitSchedulingEvent())
+					/* Wait until there is a scheduling opportunity */
+					_schedulingEvent.waitSchedulingEvent();
+					try
 					{
-						try
-						{
-							scheduleJobs();
-						}
-						catch (Throwable cause)
-						{
-							_logger.warn(
-								"An exception occurred while scheduling new " +
-								"jobs to run on the queue.", cause);
-						}
+						/* Now that we have an opportunity, go ahead and
+						 * schedule some jobs if we can.
+						 */
+						scheduleJobs();
+					}
+					catch (Throwable cause)
+					{
+						_logger.warn(
+							"An exception occurred while scheduling new " +
+							"jobs to run on the queue.", cause);
 					}
 				}
 				catch (InterruptedException ie)

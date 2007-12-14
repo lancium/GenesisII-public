@@ -28,10 +28,18 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.Identity;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 
+/**
+ * This class is a conduit for accessing all information from the database.
+ * It SHOULD be the only class that actually creates and executes SQL 
+ * statements.
+ * 
+ * @author mmm2a
+ */
 public class QueueDatabase
 {
 	static private Log _logger = LogFactory.getLog(QueueDatabase.class);
 	
+	/* The queue's key in the database */
 	private String _queueID;
 	
 	public QueueDatabase(String queueID)
@@ -39,6 +47,15 @@ public class QueueDatabase
 		_queueID = queueID;
 	}
 	
+	/**
+	 * Get a list of all BES containers registered with this queue.
+	 * 
+	 * @param connection The database connection to use.
+	 * @return The list of BES data (in-memory data) of all bes resources
+	 * registerd in this queue.
+	 * 
+	 * @throws SQLException
+	 */
 	public Collection<BESData> loadAllBESs(Connection connection)
 		throws SQLException
 	{
@@ -70,6 +87,18 @@ public class QueueDatabase
 		}
 	}
 	
+	/**
+	 * Add information about a BES resource into the database.
+	 * 
+	 * @param connection The database connection to use.
+	 * @param name The name of the resource in the queue.
+	 * @param epr The EPR of the resource.
+	 * 
+	 * @return The database key for the newly added resource.
+	 * 
+	 * @throws SQLException
+	 * @throws ResourceException
+	 */
 	public long addNewBES(Connection connection, String name,
 		EndpointReferenceType epr) throws SQLException, ResourceException
 	{
@@ -108,6 +137,15 @@ public class QueueDatabase
 		}
 	}
 		
+	/**
+	 * Modify the slots allocated to a resource in the database.
+	 * 
+	 * @param connection The database connection to use.
+	 * @param id The resource's db key.
+	 * @param totalSlots The number of slots the resource should have.
+	 * 
+	 * @throws SQLException
+	 */
 	public void configureResource(Connection connection, long id, int totalSlots)
 		throws SQLException
 	{
@@ -129,6 +167,14 @@ public class QueueDatabase
 		}
 	}
 	
+	/**
+	 * Remove the indicated resources from the database.
+	 * 
+	 * @param connection The database connection.
+	 * @param toRemove The list of resources to remove from the database.
+	 * 
+	 * @throws SQLException
+	 */
 	public void removeBESs(Connection connection, 
 		Collection<BESData> toRemove) throws SQLException
 	{
@@ -153,6 +199,16 @@ public class QueueDatabase
 		}
 	}
 	
+	/**
+	 * Given a list of entries (BES resources), fill in the EPRs for those
+	 * resources.
+	 * 
+	 * @param connection The database connection.
+	 * @param entries The list of entries to fill in.
+	 * 
+	 * @throws SQLException
+	 * @throws ResourceException
+	 */
 	public void fillInBESEPRs(Connection connection, 
 		HashMap<Long, EntryType> entries) 
 		throws SQLException, ResourceException
@@ -191,6 +247,16 @@ public class QueueDatabase
 		}
 	}
 	
+	/**
+	 * Get the calling context that the queue should use to "ping" resources.
+	 * 
+	 * @param connection The database connection.
+	 * 
+	 * @return The calling context for the queue.
+	 * 
+	 * @throws SQLException
+	 * @throws ResourceException
+	 */
 	public ICallingContext getQueueCallingContext(Connection connection)
 		throws SQLException, ResourceException
 	{
@@ -229,6 +295,15 @@ public class QueueDatabase
 		}
 	}
 	
+	/**
+	 * Load all jobs from the database for the given queue.
+	 * 
+	 * @param connection The Database connection.
+	 * 
+	 * @return The list of jobs (and in-memory information) for this queue.
+	 * 
+	 * @throws SQLException
+	 */
 	public Collection<JobData> loadAllJobs(Connection connection)
 		throws SQLException
 	{
@@ -263,6 +338,27 @@ public class QueueDatabase
 		}
 	}
 	
+	/**
+	 * MOdify the state of a job to match the new parameters given.
+	 * 
+	 * @param connection The database connection.
+	 * @param jobID The job's db key.
+	 * @param attempts The new number of attempts for the job.
+	 * @param newState The new state for the job.
+	 * @param finishTime THe new finish time for the job.
+	 * @param jobEndpoint The new job endpoint for the job.
+	 * @param besID The bes db key related to this job.
+	 * @param besEndpoint The endpoint of the bes associated with this
+	 * job.  The reason that we keep this endpoint here (even though we
+	 * probably also have it in the resources table) is that it is
+	 * technically possible for a bes resource to get removed from the
+	 * queue while jobs are still running on it.  If that is true, we will
+	 * need this epr so we can later call back into the bes to get the status
+	 * and kill/complete that job.
+	 * 
+	 * @throws SQLException
+	 * @throws ResourceException
+	 */
 	public void modifyJobState(Connection connection, long jobID,
 		short attempts, QueueStates newState, Date finishTime,
 		EndpointReferenceType jobEndpoint, Long besID, 
@@ -297,6 +393,24 @@ public class QueueDatabase
 		}
 	}
 	
+	/**
+	 * Submit a new job into the queue's database.
+	 * 
+	 * @param connection The database connection.
+	 * @param ticket The new job ticket
+	 * @param priority The job's priority.
+	 * @param jsdl The job's JSDL
+	 * @param callingContext THe calling context to use when making outcalls 
+	 * related to this job.
+	 * @param identities The owner identities associated with this job.
+	 * @param state The state of the job.
+	 * @param submitTime The submit time for the job.
+	 * 
+	 * @return THe job id assigned by the database for this job.
+	 * 
+	 * @throws SQLException
+	 * @throws IOException
+	 */
 	public long submitJob(
 		Connection connection, String ticket, short priority, 
 		JobDefinition_Type jsdl, ICallingContext callingContext, 
@@ -343,6 +457,18 @@ public class QueueDatabase
 		}
 	}
 	
+	/**
+	 * Get the partial large-memory information for a given list of jobs.
+	 * 
+	 * @param connection The database connection to use.
+	 * @param jobIDs The list of job keys to get information for.
+	 * 
+	 * @return A map of all job id's requested and their information 
+	 * structures.
+	 * 
+	 * @throws SQLException
+	 * @throws ResourceException
+	 */
 	@SuppressWarnings("unchecked")
 	public HashMap<Long, PartialJobInfo> getPartialJobInfos(
 		Connection connection, Collection<Long> jobIDs)
@@ -393,6 +519,18 @@ public class QueueDatabase
 		}
 	}
 	
+	/**
+	 * Get all information from the database necessary to outcall to a job to get
+	 * it's current job status.
+	 * 
+	 * @param connection The database connection.
+	 * @param jobID The job DB key.
+	 * 
+	 * @return THe job status information requested.
+	 * 
+	 * @throws SQLException
+	 * @throws ResourceException
+	 */
 	public JobStatusInformation getJobStatusInformation(
 		Connection connection, long jobID) throws SQLException, ResourceException
 	{
@@ -435,6 +573,16 @@ public class QueueDatabase
 		}
 	}
 	
+	/**
+	 * Mark a job as starting in the database.  This includes setting it's
+	 * state and noting the bes container that it's starting on.
+	 * 
+	 * @param connection The database connection.
+	 * @param matches The list of scheduling matches to note in the database.
+	 * 
+	 * @throws SQLException
+	 * @throws ResourceException
+	 */
 	public void markStarting(Connection connection, 
 		Collection<ResourceMatch> matches)
 			throws SQLException, ResourceException
@@ -488,6 +636,18 @@ public class QueueDatabase
 		}
 	}
 	
+	/**
+	 * Get the large memory information from the database necessary to start
+	 * a new job on a bes container.
+	 * 
+	 * @param connection The database connection to use.
+	 * @param jobID The DB key of the job to get information for.
+	 * 
+	 * @return The requested job start information.
+	 * 
+	 * @throws SQLException
+	 * @throws ResourceException
+	 */
 	public JobStartInformation getStartInformation(
 		Connection connection, long jobID)
 		throws SQLException, ResourceException
@@ -527,6 +687,17 @@ public class QueueDatabase
 		}
 	}
 	
+	/**
+	 * Mark in the database information about a job that is now running.  This
+	 * includes things like the state and the job's activity EPR.
+	 * 
+	 * @param connection The database connection to use.
+	 * @param jobID The database key of the job.
+	 * @param jobEPR The EPR of the job
+	 * 
+	 * @throws SQLException
+	 * @throws ResourceException
+	 */
 	public void markRunning(Connection connection, 
 		long jobID, EndpointReferenceType jobEPR) 
 			throws SQLException, ResourceException
@@ -552,6 +723,15 @@ public class QueueDatabase
 		}
 	}
 	
+	/**
+	 * Complete the listed jobs (remove them from the database).
+	 * 
+	 * @param connection The database connection to use.
+	 * @param jobIDs The list of job DB keys.
+	 * 
+	 * @throws SQLException
+	 * @throws ResourceException
+	 */
 	public void completeJobs(Connection connection, Collection<Long> jobIDs)
 		throws SQLException, ResourceException
 	{
@@ -576,6 +756,18 @@ public class QueueDatabase
 		}
 	}
 	
+	/**
+	 * Get all of the information from the database necessary to call out to a
+	 * BES container and kill a job (terminate it).
+	 * 
+	 * @param connection The database connection.
+	 * @param jobID The db key of the job to kill.
+	 * 
+	 * @return The kill information requested.
+	 * 
+	 * @throws SQLException
+	 * @throws ResourceException
+	 */
 	public KillInformation getKillInfo(Connection connection, long jobID) 
 		throws SQLException, ResourceException
 	{

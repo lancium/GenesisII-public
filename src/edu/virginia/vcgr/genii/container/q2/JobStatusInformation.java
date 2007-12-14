@@ -4,6 +4,12 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 
+/**
+ * A simple data structure for bundling together information necessary to get
+ * a job's status (EPRs and calling context).
+ * 
+ * @author mmm2a
+ */
 public class JobStatusInformation
 {
 	private EndpointReferenceType _jobEndpoint;

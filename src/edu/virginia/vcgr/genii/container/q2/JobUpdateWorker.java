@@ -11,6 +11,12 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 
+/**
+ * The asynchronous worker that actually makes the outcall to the bes container
+ * to see if a job has finished or failed.
+ * 
+ * @author mmm2a
+ */
 public class JobUpdateWorker implements Runnable
 {
 	static private Log _logger = LogFactory.getLog(JobUpdateWorker.class);
@@ -41,7 +47,11 @@ public class JobUpdateWorker implements Runnable
 		try
 		{
 			_logger.debug("Checking status of job " + _jobInfo.getJobID());
-			
+	
+			/* Get a connection from the connection pool and then ask the 
+			 * resolvers to get the memory "large" information from the
+			 * database.
+			 */
 			connection = _connectionPool.acquire();
 			EndpointReferenceType jobEndpoint = _jobEndpointResolver.getJobEndpoint(
 				connection, _jobInfo.getJobID());
@@ -57,25 +67,36 @@ public class JobUpdateWorker implements Runnable
 				return;
 			}
 			
+			/* call the BES container to get the activity's status. */
 			GetActivityStatusResponseType []activityStatuses 
 				= clientStub.getActivityStatuses(
 					new EndpointReferenceType[] { jobEndpoint });
+			
+			/* If we didn't get one back, then there was 
+			 * a weird internal error. */
 			if (activityStatuses == null || activityStatuses.length != 1)
 			{
 				_logger.error("Unable to get activity status for job " 
 					+ _jobInfo.getJobID());
 			} else
 			{
+				/* We have it's status, convert it to a more reasonable data
+				 * type (not the auto generated from WSDL one which is
+				 * worthless).
+				 */
 				ActivityState state = ActivityState.fromActivityStatus(
 					activityStatuses[0].getActivityStatus());
 				if (state.isInState(ActivityState.FAILED))
 				{
+					/* If the job failed in the BES, fail it in the queue */
 					_jobManager.failJob(connection, _jobInfo.getJobID(), true);
 				} else if (state.isInState(ActivityState.CANCELLED))
 				{
+					/* If the job was cancelled, then finish it here */
 					_jobManager.finishJob(connection, _jobInfo.getJobID());
 				} else if (state.isInState(ActivityState.FINISHED))
 				{
+					/* If the job finished on the bes, finish it here */
 					_jobManager.finishJob(connection, _jobInfo.getJobID());
 				}
 			}

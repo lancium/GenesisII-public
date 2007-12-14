@@ -8,6 +8,12 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 
+/**
+ * This is the asynchronous worker class that periodically checks the status
+ * of running jobs on a regular interval.
+ * 
+ * @author mmm2a
+ */
 public class JobStatusChecker
 {
 	static private Log _logger = LogFactory.getLog(JobStatusChecker.class);
@@ -24,7 +30,8 @@ public class JobStatusChecker
 		_connectionPool = connectionPool;
 		_manager = manager;
 		_updateFrequency = updateFrequency;
-		
+	
+		/* Start the thread */
 		_thread = new Thread(new UpdaterWorker());
 		_thread.setDaemon(true);
 		_thread.setName("Job Status Checker");
@@ -48,6 +55,10 @@ public class JobStatusChecker
 		_thread.interrupt();
 	}
 	
+	/**
+	 * This is an internal class that actually does the work for the thread.
+	 * @author mmm2a
+	 */
 	private class UpdaterWorker implements Runnable
 	{
 		public void run()
@@ -58,9 +69,11 @@ public class JobStatusChecker
 				
 				try
 				{
+					/* Acquire a connection from the connection pool and ask
+					 * the manager to check the job statuses.
+					 */
 					connection = _connectionPool.acquire();
-					_manager.checkJobStatuses(
-						_connectionPool, connection);
+					_manager.checkJobStatuses(connection);
 				}
 				catch (Throwable cause)
 				{
@@ -74,6 +87,7 @@ public class JobStatusChecker
 				
 				try
 				{
+					/* Now, wait an update cycle and repeat. */
 					Thread.sleep(_updateFrequency);
 				}
 				catch (InterruptedException ie)
