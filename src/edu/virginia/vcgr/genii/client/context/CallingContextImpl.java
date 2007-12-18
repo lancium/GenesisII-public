@@ -115,18 +115,20 @@ public class CallingContextImpl implements ICallingContext, Serializable
 
 	public CallingContextImpl(ContextType ct) throws IOException {
 
-		// load the properties from the ContextType
-		ContextNameValuePairType[] pairs = ct.getProperty();
-		if (pairs != null) {
-			for (ContextNameValuePairType pair : ct.getProperty()) {
-				String name = pair.getName();
-				ArrayList<Serializable> multiValue = _properties.get(name);
-				if (multiValue == null) {
-					multiValue = new ArrayList<Serializable>();
-					_properties.put(name, multiValue);
+		if (ct != null) {
+			// load the properties from the ContextType
+			ContextNameValuePairType[] pairs = ct.getProperty();
+			if (pairs != null) {
+				for (ContextNameValuePairType pair : ct.getProperty()) {
+					String name = pair.getName();
+					ArrayList<Serializable> multiValue = _properties.get(name);
+					if (multiValue == null) {
+						multiValue = new ArrayList<Serializable>();
+						_properties.put(name, multiValue);
+					}
+					
+					multiValue.add(retrieveBase64Decoded(pair.getValue()));
 				}
-				
-				multiValue.add(retrieveBase64Decoded(pair.getValue()));
 			}
 		}
 	}

@@ -124,8 +124,8 @@ public class DelegatedAttribute implements Attribute {
 	}
 	
 	public String toString() {
-		return "(DelegatedAttribute) delegateeIdentity(" + _delegateeIdentity.length + "): " + 
-			_delegateeIdentity[0].getSubjectX500Principal().getName() + 
+		return "(DelegatedAttribute) delegateeIdentity(" + _delegateeIdentity.length + "): \"" + 
+			_delegateeIdentity[0].getSubjectX500Principal().getName() + "\" " + 
 			((_constraints == null) ? "" : _constraints.toString() + " ") +  
 			" subAssertion: [" + _assertion + "]";
 	}

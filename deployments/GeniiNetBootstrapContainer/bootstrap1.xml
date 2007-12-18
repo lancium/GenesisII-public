@@ -17,7 +17,7 @@
 
 	<geniix:login>
 		<gsh:param>--no-gui</gsh:param>
-		<gsh:param>--file=${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/admin.pfx</gsh:param>
+		<gsh:param>${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/admin.pfx</gsh:param>
 		<gsh:param>--password=admin</gsh:param>
 		<gsh:param>Admin</gsh:param>
 	</geniix:login>
@@ -33,14 +33,16 @@
 		<gsh:param>/etc/NetRootCertGenerator</gsh:param>
 	</geniix:cert-generator>
 
-	<geniix:gaml-chmod>
+	<geniix:chmod>
 		<gsh:param>/etc/NetRootCertGenerator</gsh:param>
 		<gsh:param>+r+x</gsh:param>
 		<gsh:param>--local-src</gsh:param>
 		<gsh:param>${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/installer.cer</gsh:param>
-	</geniix:gaml-chmod>
+	</geniix:chmod>
 	
 	
 	<gsh:echo message="Logging out"/>
-	<geniix:logout/>
+	<geniix:logout>
+		<gsh:param>--all</gsh:param>
+	</geniix:logout>
 </gsh:script>

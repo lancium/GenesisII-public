@@ -22,7 +22,7 @@
 		message="Logging in using container cert - ${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/container.pfx."/>
 	<geniix:login>
 		<gsh:param>--no-gui</gsh:param>
-		<gsh:param>--file=${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/container.pfx</gsh:param>
+		<gsh:param>${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/container.pfx</gsh:param>
 		<gsh:param>--password=container</gsh:param>
 		<gsh:param>--alias</gsh:param>
 		<gsh:param>Container</gsh:param>
@@ -36,32 +36,32 @@
 
 	<gsh:echo message="Setting security on containers/services"/>	
 	<gsh:echo message="Setting security on container ${CONTAINER_NAME}"/>	
-	<geniix:gaml-chmod>
+	<geniix:chmod>
 		<gsh:param>/containers/${CONTAINER_NAME}</gsh:param>
 		<gsh:param>+r</gsh:param>
 		<gsh:param>--everyone</gsh:param>
-	</geniix:gaml-chmod>
+	</geniix:chmod>
 
-	<geniix:gaml-chmod>
+	<geniix:chmod>
 		<gsh:param>/containers/${CONTAINER_NAME}/Services</gsh:param>
 		<gsh:param>+r</gsh:param>
 		<gsh:param>--everyone</gsh:param>
-	</geniix:gaml-chmod>
+	</geniix:chmod>
 
 	<gsh:foreach param-name="SERVICE"
 		source-rns="/containers/${CONTAINER_NAME}/Services">
 		<gsh:echo message="Setting security on ${SERVICE} in container ${CONTAINER_NAME}"/>
-		<geniix:gaml-chmod>
+		<geniix:chmod>
 			<gsh:param>/containers/${CONTAINER_NAME}/Services/${SERVICE}</gsh:param>
 			<gsh:param>+r</gsh:param>
 			<gsh:param>--everyone</gsh:param>
-		</geniix:gaml-chmod>
+		</geniix:chmod>
 		<gsh:foreach param-name="GROUP" source-rns="/groups">
-			<geniix:gaml-chmod>
+			<geniix:chmod>
 				<gsh:param>/containers/${CONTAINER_NAME}/Services/${SERVICE}</gsh:param>
 				<gsh:param>+r+x</gsh:param>
 				<gsh:param>/groups/${GROUP}</gsh:param>
-			</geniix:gaml-chmod>
+			</geniix:chmod>
 		</gsh:foreach>
 	</gsh:foreach>
 
@@ -71,11 +71,11 @@
 		<gsh:param>/bes-containers/${CONTAINER_NAME}</gsh:param>
 	</geniix:create-resource>
 
-	<geniix:gaml-chmod>
+	<geniix:chmod>
 		<gsh:param>/bes-containers/${CONTAINER_NAME}</gsh:param>
 		<gsh:param>+r</gsh:param>
 		<gsh:param>--everyone</gsh:param>
-	</geniix:gaml-chmod>
+	</geniix:chmod>
 
 	<gsh:echo message="Linking bes ${CONTAINER_NAME} into scheduler"/>
 	<geniix:ln>
@@ -90,11 +90,11 @@
 	</geniix:set-deployers>
 
 	<gsh:foreach param-name="GROUP" source-rns="/groups">
-		<geniix:gaml-chmod>
+		<geniix:chmod>
 			<gsh:param>/bes-containers/${CONTAINER_NAME}</gsh:param>
 			<gsh:param>+r+x</gsh:param>
 			<gsh:param>/groups/${GROUP}</gsh:param>
-		</geniix:gaml-chmod>
+		</geniix:chmod>
 	</gsh:foreach>
 
 	<gsh:echo message="Logging out"/>

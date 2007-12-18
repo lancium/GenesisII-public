@@ -22,17 +22,17 @@
 		<gsh:param>/home</gsh:param>
 	</genii:mkdir>
 	
-	<genii:gaml-chmod>
+	<genii:chmod>
 		<gsh:param>/home</gsh:param>
 		<gsh:param>+r+x</gsh:param>
 		<gsh:param>--everyone</gsh:param>
-	</genii:gaml-chmod>
+	</genii:chmod>
 	
-	<genii:gaml-chmod>
+	<genii:chmod>
 		<gsh:param>/users</gsh:param>
 		<gsh:param>+r+x</gsh:param>
 		<gsh:param>--everyone</gsh:param>
-	</genii:gaml-chmod>
+	</genii:chmod>
 	
 	<gsh:echo message="Adding users"/>
 	
@@ -54,11 +54,11 @@
 			<gsh:param>/home/${USER}</gsh:param>
 		</genii:mkdir>
 		
-		<genii:gaml-chmod>
+		<genii:chmod>
 			<gsh:param>/home</gsh:param>
 			<gsh:param>+r+w+x</gsh:param>
 			<gsh:param>/users/${USER}</gsh:param>
-		</genii:gaml-chmod>
+		</genii:chmod>
 	</gsh:foreach>
 	
 	<gsh:echo message="Adding machines"/>
@@ -70,9 +70,9 @@
 	</gsh:foreach>
 	
 	<gsh:foreach param-name="CONTAINER" source-rns="/containers">
-		<genii:gaml-chmod>
+		<genii:chmod>
 			<gsh:param>+r</gsh:param>
 			<gsh:param>/containers/${CONTAINER}</gsh:param>
-		</genii:gaml-chmod>
+		</genii:chmod>
 	</gsh:foreach>
 </gsh:script>

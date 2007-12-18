@@ -12,6 +12,11 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.AttributeInv
  */
 public interface GamlCredential {
 
+	public static final String ENCODED_GAML_CREDENTIALS_PROPERTY = 
+		"genii.client.security.authz.encoded-gaml-credentials";
+	public static final String CALLER_CREDENTIALS_PROPERTY = 
+		"genii.client.security.authz.caller-credentials";
+
 	/**
 	 * Checks that the attribute time-valid with respect to the supplied 
 	 * date

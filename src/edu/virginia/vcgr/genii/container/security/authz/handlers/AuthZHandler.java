@@ -52,6 +52,7 @@ public abstract class AuthZHandler {
 	 */
 	public abstract boolean checkAccess(
 			ICallingContext callingContext, 
+			X509Certificate callerCert,
 			IResource resource,
 			Method operation) throws AuthZSecurityException, ResourceException;
 	
@@ -73,14 +74,6 @@ public abstract class AuthZHandler {
 	public abstract void setAuthZConfig(AuthZConfig config, IResource resource) 
 		throws AuthZSecurityException, ResourceException;
 
-	/**
-	 * Prepare newly incoming calling contexts.  This should be invoked before
-	 * any calls to checkAccess().  (This may be necessary to prepare delegation 
-	 * credentials, remove non-delgatable credentials so they are not sent 
-	 * in future messages, etc.)
-	 */
-	public abstract void prepareContexts(ICallingContext callingContext) throws AuthZSecurityException;
-	
 	/**
 	 * Stub for possibly having different authz handlers per-resource
 	 * @param resource

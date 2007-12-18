@@ -17,7 +17,7 @@ public class GuiGamlLoginHandler extends AbstractGamlLoginHandler
 	}
 	
 	@Override
-	protected char[] getPassword(String title, String prompt)
+	public char[] getPassword(String title, String prompt)
 	{
 		return PasswordDialog.getPassword(title, prompt);
 	}

@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import edu.virginia.vcgr.genii.client.cmd.tools.GamlLoginTool;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -45,7 +46,7 @@ public abstract class AbstractGamlLoginHandler implements CallbackHandler {
 
 		if (storeType == null) {
 			// try PKCS12
-			storeType = "PKCS12";
+			storeType = GamlLoginTool.PKCS12;
 		}
 
 		if (password != null) {
@@ -100,7 +101,7 @@ public abstract class AbstractGamlLoginHandler implements CallbackHandler {
 			throws GeneralSecurityException, IOException {
 		ArrayList<CertEntry> list = new ArrayList<CertEntry>();
 
-		if (storeInput == null) {
+		if ((storeType != null) && storeType.equals(GamlLoginTool.WINDOWS)) {
 			addEntriesFromWindows(list);
 		} else {
 			addEntriesFromFile(list, storeInput, storeType, password);
@@ -203,7 +204,7 @@ public abstract class AbstractGamlLoginHandler implements CallbackHandler {
 		}
 	}
 
-	protected abstract char[] getPassword(String title, String prompt);
+	public abstract char[] getPassword(String title, String prompt);
 
 	protected abstract CertEntry selectCert(
 			Collection<CertEntry> entries);

@@ -17,7 +17,7 @@ public class TextGamlLoginHandler extends AbstractGamlLoginHandler
 	}
 	
 	@Override
-	protected char[] getPassword(String title, String prompt)
+	public char[] getPassword(String title, String prompt)
 	{
 		return GetPassword.getPassword(prompt).toCharArray();
 	}

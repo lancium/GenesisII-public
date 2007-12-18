@@ -165,7 +165,10 @@ public class GamlAuthZHandler extends AuthZHandler {
 				return true;
 				
 			} else if (identity instanceof X509Identity) {
-				
+
+/*	DGM4D: We no longer use CA's and intermediate CA's as grouping mechanisms			
+ * 
+ * 
 				X509Certificate[] identityCertChain = 
 					((X509Identity) identity).getAssertingIdentityCertChain();
 
@@ -210,6 +213,7 @@ public class GamlAuthZHandler extends AuthZHandler {
 		        } catch (java.security.GeneralSecurityException e) {
 		    		throw new AuthZSecurityException(e.getMessage(), e);
 				}			
+*/			
 			}
 		}
 		
@@ -217,9 +221,12 @@ public class GamlAuthZHandler extends AuthZHandler {
 	}
 
 	
-	public boolean checkAccess(ICallingContext callingContext,
-			IResource resource, Method operation)
-			throws AuthZSecurityException, ResourceException {
+	public boolean checkAccess(
+			ICallingContext callingContext,
+			X509Certificate callerCert, 
+			IResource resource, 
+			Method operation)
+				throws AuthZSecurityException, ResourceException {
 
 		try {
 
@@ -236,10 +243,6 @@ public class GamlAuthZHandler extends AuthZHandler {
 						"Error processing GAML credential: No calling context");
 			}
 			
-			// get the caller's certificate from the calling context
-			X509Certificate callerCert = (X509Certificate) callingContext
-					.getTransientProperty(AuthZHandler.CALLING_CONTEXT_CALLER_CERT);
-
 			// get the destination certificate from the calling context
 			KeyAndCertMaterial targetKeyMaterial = 
 				ContextManager.getCurrentContext(false).getActiveKeyAndCertMaterial();
@@ -248,11 +251,11 @@ public class GamlAuthZHandler extends AuthZHandler {
 				targetCertChain = targetKeyMaterial._clientCertChain;
 			}
 
-			// try each identity in the transient credentials
+			// try each identity in the caller's credentials
 			boolean allowed = false;
-			TransientCredentials transientCredentials = 
-				TransientCredentials.getTransientCredentials(callingContext);
-			for (GamlCredential cred : transientCredentials._credentials) {
+			ArrayList<GamlCredential> callerCredentials = (ArrayList<GamlCredential>)
+				callingContext.getTransientProperty(GamlCredential.CALLER_CREDENTIALS_PROPERTY);
+			for (GamlCredential cred : callerCredentials) {
 				
 				if (cred instanceof Identity) {
 					
@@ -369,32 +372,6 @@ public class GamlAuthZHandler extends AuthZHandler {
 		GamlAcl acl = GamlAcl.decodeAcl(config);
 		resource.setProperty(GAML_ACL_PROPERTY_NAME, acl);
 		resource.commit();
-	}
-
-	/**
-	 * Prepare newly incoming calling contexts.  This should be invoked before
-	 * any calls to checkAccess().  (This may be necessary to prepare delegation 
-	 * credentials, remove non-delgatable credentials so they are not sent 
-	 * in future messages, etc.)
-	 */
-	public void prepareContexts(ICallingContext callingContext) throws AuthZSecurityException {
-		// get the signed GAML assertion from the calling context
-		ArrayList<Serializable> signedAssertions = 
-			callingContext.getProperty(SignedAssertion.ENCODED_GAML_ASSERTIONS_PROPERTY);
-
-		// remove it from the caller's calling context
-		callingContext.removeProperty(SignedAssertion.ENCODED_GAML_ASSERTIONS_PROPERTY);
-		
-		// place them in the transient credentials
-		TransientCredentials transientCredentials = 
-			TransientCredentials.getTransientCredentials(callingContext); 
-		if (signedAssertions != null) {
-			Iterator<Serializable> itr = signedAssertions.iterator();
-			while (itr.hasNext()) {
-				SignedAssertion signedAssertion = (SignedAssertion) itr.next();
-				transientCredentials._credentials.add(signedAssertion);
-			}
-		}
 	}
 
 }

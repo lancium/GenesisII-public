@@ -12,7 +12,7 @@ public class X509Identity implements AssertableIdentity {
 
 	static public final long serialVersionUID = 0L;
 	
-	private X509Certificate[] _identity;
+	protected X509Certificate[] _identity;
 	                
 	// zero-arg contstructor for externalizable use only!
 	public X509Identity() {}
@@ -28,7 +28,7 @@ public class X509Identity implements AssertableIdentity {
 	}
 	
 	public String toString() {
-		return "[X509Identity] " + _identity[0].getSubjectX500Principal();
+		return "[X509Identity] \"" + _identity[0].getSubjectX500Principal() + "\"";
 	}
 	
 	

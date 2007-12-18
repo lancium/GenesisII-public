@@ -138,7 +138,7 @@ public class GamlMessageSendHandler {
 
 			if (!toSerialize.isEmpty()) {
 				callingContext.setProperty(
-						SignedAssertion.ENCODED_GAML_ASSERTIONS_PROPERTY,
+						GamlCredential.ENCODED_GAML_CREDENTIALS_PROPERTY,
 						toSerialize);
 			}
 

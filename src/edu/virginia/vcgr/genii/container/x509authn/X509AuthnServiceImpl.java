@@ -76,6 +76,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.TransientCredentials;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
 import edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
@@ -94,6 +95,8 @@ import edu.virginia.vcgr.genii.client.comm.axis.security.FlexibleBouncyCrypto;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
+import edu.virginia.vcgr.genii.container.Container;
 
 
 import edu.virginia.vcgr.genii.x509authn.*;
@@ -123,7 +126,6 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 
 		addImplementedPortType(WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.RNS_SERVICE_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE);
 	}
 
 	protected Object translateConstructionParameter(MessageElement property)
@@ -135,6 +137,8 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 			return property.getValue();
 		} else if (name.equals(SecurityConstants.NEW_IDP_NAME_QNAME)) {
 			return property.getValue();
+		} else if (name.equals(SecurityConstants.IDP_VALID_MILLIS_QNAME)) {
+			return Long.decode(property.getValue());
 		} else {
 			return super.translateConstructionParameter(property);
 		}
@@ -159,13 +163,77 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 		serviceResource.addEntry(new InternalEntry(newIdpName, newEPR, null));
 		serviceResource.commit();
 
-		// store the delegated identity in the resource's state
+		// get the IDP resource's db resource 
+		IResource resource = rKey.dereference();
+		resource.setProperty(SecurityConstants.IDP_IDENITY_QNAME.getLocalPart(), newIdpName);
+
+		SignedAssertion identityAssertion = null;
 		String encodedAssertion = (String) constructionParameters
 				.get(SecurityConstants.IDP_DELEGATED_IDENITY_QNAME);
-		IResource resource = rKey.dereference();
-		resource.setProperty(SecurityConstants.IDP_DELEGATED_IDENITY_QNAME
-				.getLocalPart(), encodedAssertion);
+		X509Certificate[] resourceCertChain = 
+			(X509Certificate[])resource.getProperty(
+					IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
 
+		if (encodedAssertion != null) { 
+			// we're an authentication proxy for some delegated credentials
+			// that we're being supplied
+			
+			try {
+				identityAssertion = SignedAssertion.base64decodeAssertion(encodedAssertion);
+				
+				// Delegate from the service to the resource
+				DelegatedAttribute delegatedAttribute = new DelegatedAttribute(
+						null,
+						identityAssertion, 
+						resourceCertChain);
+				
+				identityAssertion = new DelegatedAssertion(
+					delegatedAttribute, 
+					Container.getContainerPrivateKey());
+
+			} catch (IOException e) {
+				throw new RemoteException(e.getMessage(), e);
+			} catch (ClassNotFoundException e) {
+				throw new RemoteException(e.getMessage(), e);
+			} catch (GeneralSecurityException e) {
+				throw new RemoteException(e.getMessage(), e);
+			}
+		} else {
+			// we're not an authentication proxy, create our own signed assertion
+			// to give out
+			
+			IDPIdentity identity = new IDPIdentity(newIdpName, resourceCertChain);
+			
+			Long validMillis = (Long) constructionParameters
+				.get(SecurityConstants.IDP_VALID_MILLIS_QNAME);
+			
+			try {
+				identityAssertion = new SignedAttributeAssertion(
+						new IdentityAttribute(
+							new BasicConstraints(
+								System.currentTimeMillis() - (1000L * 60 * 15), // 15 minutes ago
+								validMillis, // valid 24 hours
+								10), 
+							identity),
+						Container.getContainerPrivateKey());
+			
+			} catch (GeneralSecurityException e) {
+				throw new RemoteException(e.getMessage(), e);
+			}
+		}
+		
+		// add the identity to the resource's saved calling context
+		ICallingContext resourceContext = (ICallingContext) 
+			resource.getProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME);
+		TransientCredentials transientCredentials = 
+			TransientCredentials.getTransientCredentials(resourceContext);
+		transientCredentials._credentials.add(identityAssertion);
+		resource.setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME, resourceContext);
+			
+		// add the identity to our resource state
+		resource.setProperty(SecurityConstants.IDP_DELEGATED_IDENITY_QNAME
+			.getLocalPart(), identityAssertion);
+		
 		super.postCreate(rKey, newEPR, constructionParameters);
 	}
 
@@ -181,35 +249,35 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 		// load up the resource's assertion 
 		ResourceKey rKey = ResourceManager.getCurrentResource();
 		IResource resource = rKey.dereference();
-		String encodedAssertion = (String) resource
+		SignedAssertion signedAssertion = (SignedAssertion) resource
 				.getProperty(SecurityConstants.IDP_DELEGATED_IDENITY_QNAME
 						.getLocalPart());
+	
+		if (delegateToChain != null) {
+			// do delegation if necessary
 		
-		// Get this resource's assertion, key and cert material
-		SignedAssertion signedAssertion = null;
-		ICallingContext callingContext = null;
-		KeyAndCertMaterial resourceKeyMaterial = null;
-		try {
-			signedAssertion = SignedAssertion.base64decodeAssertion(encodedAssertion);
-			callingContext = ContextManager.getCurrentContext();
-			resourceKeyMaterial = callingContext.getActiveKeyAndCertMaterial();
-		} catch (ClassNotFoundException e) {
-	    	throw new GeneralSecurityException(e.getMessage(), e);	
-		} catch (IOException e) {
-	    	throw new GeneralSecurityException(e.getMessage(), e);	
+			// Get this resource's assertion, key and cert material
+			ICallingContext callingContext = null;
+			KeyAndCertMaterial resourceKeyMaterial = null;
+			try {
+				callingContext = ContextManager.getCurrentContext();
+				resourceKeyMaterial = callingContext.getActiveKeyAndCertMaterial();
+			} catch (IOException e) {
+		    	throw new GeneralSecurityException(e.getMessage(), e);	
+			}
+			
+			// Delegate the assertion to delegateTo 
+			DelegatedAttribute delegatedAttribute = new DelegatedAttribute(
+				new BasicConstraints(
+					created.getTime(), 
+					expiry.getTime() - created.getTime(), 
+					10), 
+				signedAssertion, 
+				delegateToChain);
+			signedAssertion = new DelegatedAssertion(
+				delegatedAttribute, 
+				resourceKeyMaterial._clientPrivateKey);
 		}
-		
-		// Delegate the assertion to delegateTo 
-		DelegatedAttribute delegatedAttribute = new DelegatedAttribute(
-			new BasicConstraints(
-				created.getTime(), 
-				expiry.getTime() - created.getTime(), 
-				10), 
-			signedAssertion, 
-			delegateToChain);
-		DelegatedAssertion delegatedAssertion = new DelegatedAssertion(
-			delegatedAttribute, 
-			resourceKeyMaterial._clientPrivateKey);
 		
 		
 		//----- assemble the response document -----------------------------------------
@@ -232,7 +300,7 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 		try {
 			binaryToken = new MessageElement(
 				BinarySecurity.TOKEN_BST, 
-				DelegatedAssertion.base64encodeAssertion(delegatedAssertion));
+				SignedAssertion.base64encodeAssertion(signedAssertion));
 			binaryToken.setAttributeNS(null, "ValueType", SecurityConstants.GAML_TOKEN_TYPE);
 		} catch (IOException e) {
 	    	throw new GeneralSecurityException(e.getMessage(), e);	
@@ -397,15 +465,6 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 					null, 
 					null);
 		}
-		
-		// check delegateTo element
-		if (delegateToChain == null) {
-			throw new AxisFault(
-					new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "InvalidRequest"), 
-					"No delegate-to token provided", 
-					null, 
-					null);
-		}
 
 		Date created = new Date(lifetime.getCreated().get_value());
 		Date expiry = new Date(lifetime.getExpires().get_value());
@@ -529,116 +588,10 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 	    removed.toArray(ret);
 	    resource.commit();
     
-	    return ret;	}
-
-	@RWXMapping(RWXCategory.READ)
-	public ReadResponse read(Read read) throws RemoteException,
-			CustomFaultType, ReadNotPermittedFaultType,
-			UnsupportedTransferFaultType, ResourceUnknownFaultType {
-
-		// load up the delegated assertion
-		byte[] backingData = null;
-		try {
-
-			ResourceKey rKey = ResourceManager.getCurrentResource();
-			IResource resource = rKey.dereference();
-			String encodedAssertion = (String) resource
-					.getProperty(SecurityConstants.IDP_DELEGATED_IDENITY_QNAME
-							.getLocalPart());
-			DelegatedAssertion delegatedAssertion = (DelegatedAssertion) DelegatedAssertion
-					.base64decodeAssertion(encodedAssertion);
-			X509Certificate[] assertingIdentity = delegatedAssertion
-					.getAssertingIdentityCertChain();
-
-			backingData = assertingIdentity[0].getEncoded();
-
-		} catch (IOException ioe) {
-			throw FaultManipulator
-					.fillInFault(new CustomFaultType(
-							null,
-							null,
-							null,
-							null,
-							new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
-									ioe.toString()) }, null));
-		} catch (ClassNotFoundException ioe) {
-			throw FaultManipulator
-					.fillInFault(new CustomFaultType(
-							null,
-							null,
-							null,
-							null,
-							new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
-									ioe.toString()) }, null));
-		} catch (CertificateEncodingException ioe) {
-			throw FaultManipulator
-					.fillInFault(new CustomFaultType(
-							null,
-							null,
-							null,
-							null,
-							new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
-									ioe.toString()) }, null));
-		}
-
-		int bytesPerBlock = read.getBytesPerBlock();
-		int numBlocks = read.getNumBlocks();
-		int startOffset = (int) read.getStartOffset();
-		int stride = (int) read.getStride();
-		TransferInformationType transferInformation = read
-				.getTransferInformation();
-		byte[] data = new byte[bytesPerBlock * numBlocks];
-
-		int amtRead = 0;
-		for (int block = 0; block < numBlocks; block++) {
-
-			int amtAvail = backingData.length
-					- (startOffset + (block * stride));
-			if (amtAvail <= 0) {
-				break;
-			} else if (amtAvail > bytesPerBlock) {
-				amtAvail = bytesPerBlock;
-			}
-
-			System.arraycopy(backingData, startOffset + (block * stride), data,
-					bytesPerBlock * block, amtAvail);
-
-			amtRead += amtAvail;
-		}
-
-		// resize data array if necessary
-		if (amtRead < data.length) {
-			byte[] tmp = data;
-			data = new byte[amtRead];
-			System.arraycopy(tmp, 0, data, 0, amtRead);
-		}
-
-		TransferAgent.sendData(data, transferInformation);
-
-		return new ReadResponse(transferInformation);
+	    return ret;	
 	}
 
-	@RWXMapping(RWXCategory.WRITE)
-	public WriteResponse write(Write write) throws RemoteException,
-			CustomFaultType, WriteNotPermittedFaultType,
-			UnsupportedTransferFaultType, ResourceUnknownFaultType {
-		throw new RemoteException("\"write\" not applicable.");
-	}
 
-	@RWXMapping(RWXCategory.WRITE)
-	public AppendResponse append(Append append) throws RemoteException,
-			CustomFaultType, WriteNotPermittedFaultType,
-			UnsupportedTransferFaultType, ResourceUnknownFaultType {
-		throw new RemoteException("\"append\" not applicable.");
-	}
-
-	@RWXMapping(RWXCategory.WRITE)
-	public TruncAppendResponse truncAppend(TruncAppend truncAppend)
-			throws RemoteException, CustomFaultType,
-			WriteNotPermittedFaultType, TruncateNotPermittedFaultType,
-			UnsupportedTransferFaultType, ResourceUnknownFaultType {
-		throw new RemoteException("\"truncAppend\" not applicable.");
-	}
 
 	static public class X509AuthnAttributeHandlers extends
 			AbstractAttributeHandler {

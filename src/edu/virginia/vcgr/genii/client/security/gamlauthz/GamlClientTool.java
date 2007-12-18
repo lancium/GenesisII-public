@@ -20,6 +20,7 @@ import java.io.*;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 
 import org.morgan.util.cmdline.*;
 import org.morgan.util.configuration.ConfigurationException;
@@ -31,8 +32,10 @@ import edu.virginia.vcgr.genii.client.rns.RNSMultiLookupResultException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
 import edu.virginia.vcgr.genii.common.security.*;
+import edu.virginia.vcgr.genii.client.cmd.tools.GamlLoginTool;
 
 public class GamlClientTool {
 
@@ -152,33 +155,52 @@ public class GamlClientTool {
 		return retval;
 	}
 
-	public byte[] readCertFile(String sourcePath, boolean isLocalSource)
+	public Identity downloadIdentity(String sourcePath, boolean isLocalSource)
 			throws ConfigurationException, FileNotFoundException, IOException,
-			RNSException {
+			RNSException, GeneralSecurityException {
 
-		InputStream in = null;
-		ByteArrayOutputStream out;
-		RNSPath current = RNSPath.getCurrent();
-		try {
-			if (isLocalSource) {
-				in = new FileInputStream(sourcePath);
-			} else {
-				RNSPath path = current.lookup(sourcePath,
-						RNSPathQueryFlags.MUST_EXIST);
-				in = new ByteIOInputStream(path);
+		
+		if (isLocalSource) {
+			InputStream in = new FileInputStream(sourcePath);;
+			try {
+				CertificateFactory cf = CertificateFactory.getInstance("X.509");
+				X509Certificate cert = (X509Certificate) cf.generateCertificate(in);
+				X509Certificate[] chain = {cert};
+				return new X509Identity(chain);
+			} finally {
+				StreamUtils.close(in);
 			}
-
-			out = new ByteArrayOutputStream();
-			copy(in, out);
-		} catch (RNSPathDoesNotExistException e) {
-			throw new FileNotFoundException(e.getMessage());
-		} catch (RNSMultiLookupResultException e) {
-			throw new IOException(e.getMessage());
-		} finally {
-			StreamUtils.close(in);
+		} 
+		
+		RNSPath current = RNSPath.getCurrent();
+		RNSPath path = current.lookup(sourcePath,
+				RNSPathQueryFlags.MUST_EXIST);
+		
+		if (path.isFile()) {
+			InputStream in = new ByteIOInputStream(path);
+			try {
+				CertificateFactory cf = CertificateFactory.getInstance("X.509");
+				X509Certificate cert = (X509Certificate) cf.generateCertificate(in);
+				X509Certificate[] chain = {cert};
+				return new X509Identity(chain);
+			} finally {
+				StreamUtils.close(in);
+			}
+		} else if (path.isIDP()) {
+			try {
+				ArrayList<SignedAssertion> identities = 
+					GamlLoginTool.doIdpLogin(path.getEndpoint(), null, 0);
+				Attribute firstAttr = identities.get(0).getAttribute();
+				if (firstAttr instanceof IdentityAttribute) {
+					IdentityAttribute identAttr = (IdentityAttribute) firstAttr;
+					return identAttr.getIdentity();
+				}
+			} catch (Throwable t) {
+				throw new GeneralSecurityException(t.getMessage(), t);
+			}
 		}
-
-		return out.toByteArray();
+		
+		throw new RNSException(sourcePath + " is not of a valid identity type.");
 	}
 
 	public AuthZConfig modifyAuthZConfig(AuthZConfig config, PrintStream out,
@@ -300,7 +322,6 @@ public class GamlClientTool {
 
 		Identity identity = null;
 
-		X509Certificate cert = null;
 		if (password != null) {
 		
 			// username password
@@ -312,10 +333,8 @@ public class GamlClientTool {
 	
 				target = user;
 				try {
-					byte[] certBytes = readCertFile(target, localSrc);
-					InputStream inputStream = new ByteArrayInputStream(certBytes);
-					CertificateFactory cf = CertificateFactory.getInstance("X.509");
-					cert = (X509Certificate) cf.generateCertificate(inputStream);
+					
+					identity = downloadIdentity(target, localSrc);
 		
 				} catch (ConfigurationException e) {
 					throw new AuthZSecurityException(
@@ -330,12 +349,6 @@ public class GamlClientTool {
 					throw new AuthZSecurityException(
 							"Could not load certificate file: " + e.getMessage(), e);
 				}
-			}
-			
-			
-			if (cert != null) {
-				X509Certificate[] chain = {cert};
-				identity = new X509Identity(chain);
 			}
 		}
 

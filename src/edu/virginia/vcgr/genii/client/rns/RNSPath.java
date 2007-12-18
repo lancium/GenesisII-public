@@ -274,6 +274,20 @@ public class RNSPath implements Externalizable  {
 		TypeInformation ti = new TypeInformation(epr);
 		return ti.isByteIO();
 	}
+	
+	/**
+	 * Indicates whether the current entry is an idp or not.
+	 * 
+	 * @return True if the current indicated entry is an idp, false otherwise.
+	 */
+	public boolean isIDP() {
+		PathElement last = _path.getLast();
+		EndpointReferenceType epr = last.getEndpoint();
+		if (epr == null)
+			return false;
+		TypeInformation ti = new TypeInformation(epr);
+		return ti.isIDP();
+	}	
 
 	/**
 	 * Indicates whether the current entry is an RNS Directory or not.

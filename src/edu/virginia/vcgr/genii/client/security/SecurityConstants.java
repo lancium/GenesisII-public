@@ -7,6 +7,14 @@ public class SecurityConstants {
 	static public final QName IDP_DELEGATED_IDENITY_QNAME = new QName(
 			"http://vcgr.cs.virginia.edu/security/2007/11/x509-authn",
 			"delegated-identity-param");
+
+	static public final QName IDP_IDENITY_QNAME = new QName(
+			"http://vcgr.cs.virginia.edu/security/2007/11/x509-authn",
+			"identity-param");
+	
+	static public final QName IDP_VALID_MILLIS_QNAME = new QName(
+			"http://vcgr.cs.virginia.edu/security/2007/11/x509-authn",
+			"valid-millis");
 	
 	static public final QName NEW_IDP_NAME_QNAME = new QName(
 			"http://vcgr.cs.virginia.edu/security/2007/11/x509-authn",

@@ -203,7 +203,7 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.GamlLoginTool</mconf:class>
 		<mconf:class name="whoami"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.WhoamiTool</mconf:class>
-		<mconf:class name="gaml-chmod"
+		<mconf:class name="chmod"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.GamlChmodTool</mconf:class>
 <!--			
 		<mconf:class name="ut-login"

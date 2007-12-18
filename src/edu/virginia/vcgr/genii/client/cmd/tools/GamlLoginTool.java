@@ -42,23 +42,29 @@ public class GamlLoginTool extends BaseGridTool {
 
 	static public final String PKCS12 = "PKCS12";
 	static public final String JKS = "JKS";
-
+	static public final String WINDOWS = "WIN";
+;
 	static private final String _DESCRIPTION = "Inserts authentication information into the user's context.";
 	static private final String _USAGE = ""
 			+ "login "
-			+ "[--storetype=<PKCS12|JKS>] "
+			+ "[--storetype=<PKCS12|JKS|WIN>] "
 			+ "[--password=<keystore-password>] " 
 			+ "[--alias] "
 			+ "[--pattern=<certificate/token pattern>] "
 			+ "[--validMillis=<valid milliseconds>] " 
-			+ "[--authn=<authentication source URL>]\n"
+			+ "[<keystore URL>]\n"
 			
+			+ "login "
+			+ "[--validMillis=<valid milliseconds>] " 
+			+ "[--username=<username> [--password=<password>] ] "			
+			+ "<identity provider URL>\n"
+
 			+"login "
 			+ "--username=<username>  "
-			+ "--password=<password>";			
+			+ "[--password=<password>]";			
 
 	protected String _password = null;
-	protected String _storeType = "PKCS12";
+	protected String _storeType = null;
 	protected long _validMillis = GenesisIIConstants.CredentialExpirationMillis;
 	protected boolean _aliasPatternFlag = false;
 	protected String _username = null;
@@ -73,10 +79,6 @@ public class GamlLoginTool extends BaseGridTool {
 		super(_DESCRIPTION, _USAGE, false);
 	}
 
-	public void setAuthn(String uri) {
-		_authnUri = uri;
-	}
-	
 	public void setStoretype(String storeType) {
 		_storeType = storeType;
 	}
@@ -152,61 +154,74 @@ public class GamlLoginTool extends BaseGridTool {
 		
 		return responseAssertion;
 	}
-
-	protected ArrayList<SignedAssertion> doIdpLogin(EndpointReferenceType idpEpr,
-			RenewableClientAttribute delegateAttribute) throws Throwable {
+	
+	
+	/**
+	 * Calls requestSecurityToken2() on the specified idp.  If delegateAttribute is
+	 * non-null, the returned tokens are delegated to that identity (the common-case).
+	 */
+	public static ArrayList<SignedAssertion> doIdpLogin(EndpointReferenceType idpEpr,
+			RenewableClientAttribute delegateAttribute, long validMillis) throws Throwable {
 
 		// assemble the request message
 		RequestSecurityTokenType request = new RequestSecurityTokenType();
-		MessageElement[] elements = new MessageElement[4];
-		request.set_any(elements);
+		ArrayList<MessageElement> elements = new ArrayList<MessageElement>();
 
 		// Add TokenType element
-		elements[0] = new MessageElement(new QName(
+		MessageElement element = new MessageElement(new QName(
 				"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
 				"TokenType"), SecurityConstants.GAML_TOKEN_TYPE);
-		elements[0].setType(new QName("http://www.w3.org/2001/XMLSchema",
+		element.setType(new QName("http://www.w3.org/2001/XMLSchema",
 				"anyURI"));
+		elements.add(element);
 
 		// Add RequestType element
-		elements[1] = new MessageElement(new QName(
+		element = new MessageElement(new QName(
 				"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
 				"RequestType"),
 				new RequestTypeOpenEnum(RequestTypeEnum._value1));
-		elements[1].setType(RequestTypeOpenEnum.getTypeDesc().getXmlType());
+		element.setType(RequestTypeOpenEnum.getTypeDesc().getXmlType());
+		elements.add(element);
 
 		// Add Lifetime element
-		elements[2] = new MessageElement(
+		element = new MessageElement(
 				new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
 						"Lifetime"), new LifetimeType(new AttributedDateTime( // start time
 						new Date().toString()), new AttributedDateTime( // expiry time
-						new Date(System.currentTimeMillis() + _validMillis)
+						new Date(System.currentTimeMillis() + validMillis)
 								.toString())));
-		elements[2].setType(LifetimeType.getTypeDesc().getXmlType());
+		element.setType(LifetimeType.getTypeDesc().getXmlType());
+		elements.add(element);
 
 		// Add DelegateTo
-		MessageElement binaryToken = new MessageElement(
-				BinarySecurity.TOKEN_BST);
-		binaryToken.setAttributeNS(null, "ValueType", X509Security.getType());
-		binaryToken.addTextNode("");
-		BinarySecurity bstToken = new X509Security(binaryToken);
-		((X509Security) bstToken).setX509Certificate(delegateAttribute.getDelegateeIdentity()[0]);
+		if (delegateAttribute != null) {
+			MessageElement binaryToken = new MessageElement(
+					BinarySecurity.TOKEN_BST);
+			binaryToken.setAttributeNS(null, "ValueType", X509Security.getType());
+			binaryToken.addTextNode("");
+			BinarySecurity bstToken = new X509Security(binaryToken);
+			((X509Security) bstToken).setX509Certificate(delegateAttribute.getDelegateeIdentity()[0]);
 
-		MessageElement embedded = new MessageElement(new QName(
-				org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
-		embedded.addChild(binaryToken);
+			MessageElement embedded = new MessageElement(new QName(
+					org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
+			embedded.addChild(binaryToken);
+	
+			MessageElement wseTokenRef = new MessageElement(new QName(
+					org.apache.ws.security.WSConstants.WSSE11_NS,
+					"SecurityTokenReference"));
+			wseTokenRef.addChild(embedded);
+	
+			element = new MessageElement(new QName(
+					"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
+					"DelegateTo"), new DelegateToType(
+					new MessageElement[] { wseTokenRef }));
+			element.setType(DelegateToType.getTypeDesc().getXmlType());
+			elements.add(element);
+		}
 
-		MessageElement wseTokenRef = new MessageElement(new QName(
-				org.apache.ws.security.WSConstants.WSSE11_NS,
-				"SecurityTokenReference"));
-		wseTokenRef.addChild(embedded);
-
-		elements[3] = new MessageElement(new QName(
-				"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
-				"DelegateTo"), new DelegateToType(
-				new MessageElement[] { wseTokenRef }));
-		elements[3].setType(DelegateToType.getTypeDesc().getXmlType());
-
+		MessageElement[] elemArray = new MessageElement[elements.size()];
+		request.set_any(elements.toArray(elemArray));
+		
 		// create a proxy to the remote idp and invoke it
 		X509AuthnPortType idp = ClientUtils.createProxy(
 				X509AuthnPortType.class, idpEpr);
@@ -301,7 +316,7 @@ public class GamlLoginTool extends BaseGridTool {
 			if (type.isIDP()) {
 				// we're going to use the WS-TRUST token-issue operation
 				// to log in to a security tokens service
-				return doIdpLogin(epr, delegateAttribute);
+				return doIdpLogin(epr, delegateAttribute, _validMillis);
 			} else if (type.isByteIO()) {
 	
 				// log into keystore from rns path to keystore file
@@ -320,6 +335,9 @@ public class GamlLoginTool extends BaseGridTool {
 	@Override
 	protected int runCommand() throws Throwable {
 
+		_authnUri = getArgument(0);
+		URI authnSource = (_authnUri == null) ? null : new URI(_authnUri);
+
 		// get the local identity's key material (or create one if necessary)
 		ICallingContext callContext = ContextManager.getCurrentContext(false);
 		if (callContext == null) {
@@ -327,25 +345,37 @@ public class GamlLoginTool extends BaseGridTool {
 		}
 
 		// handle username/token login
+		UsernameTokenIdentity utCredential = null;
 		if (_username != null) {
 			if (_password == null) {
-				_password = "";
+				AbstractGamlLoginHandler handler = null;
+				if (!useGui() || !GuiUtils.supportsGraphics()) {
+					handler = new TextGamlLoginHandler(stdout, stderr, stdin);
+				} else {
+					handler = new GuiGamlLoginHandler(stdout, stderr, stdin);
+				}
+				_password = new String(handler.getPassword(
+						"Username/Password Login", 
+						"Password for " + _username + ": "));
 			}
+			utCredential = new UsernameTokenIdentity(_username, _password);
 			
 			TransientCredentials transientCredentials = TransientCredentials
 				.getTransientCredentials(callContext);
-			transientCredentials._credentials.add(new UsernameTokenIdentity(_username, _password));
-		
-			ContextManager.storeCurrentContext(callContext);
-			return 0;
+			transientCredentials._credentials.add(utCredential);
+
+			if (_authnUri == null) { 
+				ContextManager.storeCurrentContext(callContext);
+				return 0;
+			}
 		}
+		
 		
 		// create the delegateeAttribute
 		RenewableClientAttribute delegateeAttribute = 
 			new RenewableClientAttribute(null, callContext);
 		
 		// log in
-		URI authnSource = (_authnUri == null) ? null : new URI(_authnUri);
 		ArrayList<SignedAssertion> signedAssertions = 
 			delegateToIdentity(authnSource, delegateeAttribute);
 
@@ -358,6 +388,11 @@ public class GamlLoginTool extends BaseGridTool {
 				.getTransientCredentials(callContext);
 		transientCredentials._credentials.addAll(signedAssertions);
 
+		if (utCredential != null) {
+			// the UT credential was used only to log into the IDP, remove it
+			transientCredentials._credentials.remove(utCredential);
+		}
+		
 		ContextManager.storeCurrentContext(callContext);
 		
 		return 0;
@@ -366,8 +401,13 @@ public class GamlLoginTool extends BaseGridTool {
 	@Override
 	protected void verify() throws ToolException {
 		int numArgs = numArguments();
-		if (numArgs > 0)
+		if (numArgs > 1) {
 			throw new InvalidToolUsageException();
+		} else if ((numArgs == 0) && 
+				(_username == null) && 
+				((_storeType == null) || (!_storeType.equals(WINDOWS)))) {
+			throw new InvalidToolUsageException();
+		}
 	}
 
 }

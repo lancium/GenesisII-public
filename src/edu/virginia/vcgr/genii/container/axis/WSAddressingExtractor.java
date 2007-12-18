@@ -42,8 +42,6 @@ import edu.virginia.vcgr.genii.container.Container;
 public class WSAddressingExtractor extends BasicHandler {
 	static public final String AXIS_MESSAGE_CTXT_EPR_PROPERTY = "edu.virginia.vcgr.genii.container.axis.epr-property";
 
-	static public final String AXIS_MESSAGE_CTXT_CALLING_CONTEXT_PROPERTY = "edu.virginia.vcgr.genii.container.axis.calling-context-property";
-
 	static final long serialVersionUID = 0L;
 
 	static private Log _logger = LogFactory.getLog(WSAddressingExtractor.class);

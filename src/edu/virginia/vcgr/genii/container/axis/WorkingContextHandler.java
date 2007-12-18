@@ -98,12 +98,7 @@ public class WorkingContextHandler extends BasicHandler
 				"\" property in message context.");
 		}
 		newContext.setProperty(WorkingContext.EPR_PROPERTY_NAME, epr);
-		
-		ContextType ct = (ContextType)ctxt.getProperty(
-			WSAddressingExtractor.AXIS_MESSAGE_CTXT_CALLING_CONTEXT_PROPERTY);
-		if (ct != null)
-			newContext.setProperty(WorkingContext.CALLING_CONTEXT_KEY, ct);
-		
+	
 		newContext.setProperty(WorkingContext.TARGETED_SERVICE_NAME, 
 			EPRUtils.extractServiceName(epr));
 

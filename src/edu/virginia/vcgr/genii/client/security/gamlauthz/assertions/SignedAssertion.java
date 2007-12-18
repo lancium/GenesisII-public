@@ -30,9 +30,6 @@ public abstract class SignedAssertion implements Externalizable, GamlCredential 
 	
 	static public final long serialVersionUID = 0L;
 	
-	public static final String ENCODED_GAML_ASSERTIONS_PROPERTY = 
-		"genii.client.security.authz.encoded-gaml-assertions";
-	
 	/** Cache of verified assertions, keyed by _encodedValues */
 	static protected int VERIFIED_CACHE_SIZE = 16;
 	static protected LRUCache<String, SignedAssertion> verifiedAssertionsCache = 

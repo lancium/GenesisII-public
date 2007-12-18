@@ -20,7 +20,6 @@ public class WorkingContext implements Closeable, Cloneable
 	static public final String TARGETED_SERVICE_NAME = "targeted-service-name";
 	static public final String EPR_PROPERTY_NAME = "endpoint-reference-type";
 	static public final String CURRENT_RESOURCE_KEY = "current-resource-key";
-	static public final String CALLING_CONTEXT_KEY = "calling-context-key";
 	static public final String CURRENT_CONTEXT_KEY = "current-context-key";
 	static public final String MESSAGE_CONTEXT_KEY = "message-context-key";
 	static public final String CERT_CHAIN_KEY = "cert-chain-key"; 

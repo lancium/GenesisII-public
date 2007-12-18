@@ -53,11 +53,16 @@ public class BasicConstraints implements AttributeConstraints {
 		_maxDelegationDepth = in.readLong();
 	}	
 	
+	
 	public String toString() {
 		return "Constraints (" + 
-			" beforeMillis: " + this._notValidBeforeMillis + 
-			" durationValidMillis: " + this._durationValidMillis + 
-			" maxDelegationDepth: " + this._maxDelegationDepth + ")"; 
+			" before: \"" + (new Date(_notValidBeforeMillis)) + 
+			"\" duration: \"" + 
+			(_durationValidMillis / (1000 * 60 * 60 * 24)) + " days, " +  
+			((_durationValidMillis % (1000 * 60 * 60 * 24)) / 24) + " hours, " +  
+			(((_durationValidMillis % (1000 * 60 * 60 * 24)) % 24) / 60) + " minutes, " +  
+			((((_durationValidMillis % (1000 * 60 * 60 * 24)) % 24) % 60) / 60) + " seconds" +  
+			"\" maxDelegationDepth: " + this._maxDelegationDepth + ")"; 
 	}
 	
 }

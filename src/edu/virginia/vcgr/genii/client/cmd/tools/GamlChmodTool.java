@@ -21,7 +21,7 @@ public class GamlChmodTool extends BaseGridTool
 	static final private String _DESCRIPTION =
 		"Sets read/write/execute GAML authZ permissions for a target.";
 	static final private String _USAGE =
-		"gaml-chmod <target> " + GamlClientTool.CHMOD_SYNTAX;
+		"chmod <target> " + GamlClientTool.CHMOD_SYNTAX;
 	
 	static final private int _NEXT_ELEMENT_TARGET = 0;
 	static final private int _NEXT_ELEMENT_PERMISSION = 1;
@@ -29,9 +29,10 @@ public class GamlChmodTool extends BaseGridTool
 	
 	private String _target = null;
 	private String _permission = null;
-	private String _user = null;
 	private boolean _localSrc = false;
 	private boolean _everyone = false;
+	private String _username = null;
+	private String _password = null;
 	
 	private int _nextElement = 0;
 	
@@ -50,6 +51,16 @@ public class GamlChmodTool extends BaseGridTool
 		_everyone = true;
 	}
 
+	public void setUsername(String username)
+	{
+		_username = username;
+	}
+
+	public void setPassword(String password)
+	{
+		_password = password;
+	}
+	
 	@Override
 	public void addArgument(String argument) throws ToolException
 	{
@@ -65,6 +76,18 @@ public class GamlChmodTool extends BaseGridTool
 			return;
 		}
 		
+		if (argument.contains("--username"))
+		{
+			setUsername(argument.substring(argument.indexOf('=') + 1));
+			return;
+		}
+
+		if (argument.contains("--password"))
+		{
+			setPassword(argument.substring(argument.indexOf('=') + 1));
+			return;
+		}
+
 		switch (_nextElement)
 		{
 			case _NEXT_ELEMENT_TARGET :
@@ -74,7 +97,7 @@ public class GamlChmodTool extends BaseGridTool
 				_permission = argument;
 				break;
 			case _NEXT_ELEMENT_SOURCE :
-				_user = argument;
+				_username = argument;
 				break;
 			default :
 				throw new InvalidToolUsageException();
@@ -108,7 +131,7 @@ public class GamlChmodTool extends BaseGridTool
 		}
 		
 		config = clientTool.chmod(config,
-			_localSrc, _everyone, _permission, _user, null);
+			_localSrc, _everyone, _permission, _username, _password);
 		
 		// upload new authz config to resource
 		elements = new MessageElement[1];
@@ -126,7 +149,7 @@ public class GamlChmodTool extends BaseGridTool
 			throw new InvalidToolUsageException("Target not specified.");
 		if (_permission == null)
 			throw new InvalidToolUsageException("Permissions not specified.");
-		if (_user == null && !_everyone)
+		if (_username == null && !_everyone)
 			throw new InvalidToolUsageException("No user given.");
 	}
 }

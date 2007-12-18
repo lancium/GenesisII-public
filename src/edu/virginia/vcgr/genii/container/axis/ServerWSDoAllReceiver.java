@@ -20,7 +20,6 @@ import org.apache.ws.axis.security.WSDoAllReceiver;
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
-import org.apache.axis.message.MessageElement;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
@@ -32,27 +31,18 @@ import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPHeader;
-import javax.xml.soap.SOAPHeaderElement;
-import javax.xml.soap.SOAPMessage;
 
 import java.io.*;
 import java.lang.reflect.Method;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.util.Iterator;
-import java.util.Vector;
+import java.util.*;
 
-import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.comm.axis.security.FlexibleBouncyCrypto;
 import edu.virginia.vcgr.genii.client.security.MessageLevelSecurity;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
@@ -67,10 +57,7 @@ import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
 import edu.virginia.vcgr.genii.container.security.authz.handlers.*;
-import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.x509.*;
-import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 
 
 public class ServerWSDoAllReceiver extends WSDoAllReceiver 
@@ -122,22 +109,12 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		        if (sm == null) {
 					// We did not receive anything...Usually happens when we get a 
 					// HTTP 202 message (with no content)
-
-		        	// since we're not doing any crypto, we can go ahead
-		        	// and access our calling context parts now
-        			WorkingContext workingContext = WorkingContext.getCurrentWorkingContext();
-        			extractCallingContextPostDecrytpion(msgContext, workingContext);		        	
 		        	return;
 		        }
 		       	Document doc = sm.getSOAPEnvelope().getAsDocument();
 		        String actor = (String) getOption(WSHandlerConstants.ACTOR);
 		        SOAPConstants sc = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
 		        if (WSSecurityUtil.getSecurityHeader(doc, actor, sc) == null) {
-
-		        	// since we're not doing any crypto, we can go ahead
-		        	// and access our calling context parts now
-        			WorkingContext workingContext = WorkingContext.getCurrentWorkingContext();
-        			extractCallingContextPostDecrytpion(msgContext, workingContext);		        	
 		        	return;
 		        }
 			}
@@ -304,7 +281,12 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			WorkingContext workingContext = WorkingContext.getCurrentWorkingContext();
 			MessageContext messageContext = (MessageContext) 
 				workingContext.getProperty(WorkingContext.MESSAGE_CONTEXT_KEY);
-			ICallingContext callingContext = extractCallingContextPostDecrytpion(messageContext, workingContext);
+			ICallingContext callContext = null;
+			try {
+				callContext = ContextManager.getCurrentContext();
+			} catch (ConfigurationException e) {
+				throw new IOException(e.getMessage());
+			}
 
 			// Grab the operation method from the message context 
 			org.apache.axis.description.OperationDesc desc = messageContext.getOperation();
@@ -315,16 +297,14 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			}
     		Method operation = desc.getMethod();
     		
-    		// put the caller cert in the working context
-    		callingContext.setTransientProperty(AuthZHandler.CALLING_CONTEXT_CALLER_CERT, cert);
-    		
 	    	// get the resource's authz handler
 	    	IResource resource = ResourceManager.getCurrentResource().dereference();
     		AuthZHandler authZHandler = AuthZHandler.getAuthZHandler(resource);
     		
     		// Let the authZ handler make the decision
     		return authZHandler.checkAccess(
-    				callingContext, 
+    				callContext, 
+    				cert,
     				resource, 
     				operation);
 
@@ -332,85 +312,6 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
     		throw new WSSecurityException(e.getMessage(), e);
     	}
     }
-    
-    
-    /**
-     * Returns the *calling* context, as opposed to the *current* context.  (The latter
-     * may contain stateful resource context information.) 
-     * 
-     */
-	@SuppressWarnings("unchecked")
-	protected static ICallingContext extractCallingContextPostDecrytpion(MessageContext msgContext,
-			WorkingContext workingContext) throws AxisFault,
-			AuthZSecurityException {
-
-		ICallingContext retval = null;
-		if ((retval = (ICallingContext) workingContext.getProperty(WorkingContext.CALLING_CONTEXT_KEY)) != null) {
-			// we've already extracted our calling context
-			return retval;
-		}
-
-		try {
-			IResource resource = ResourceManager.getCurrentResource().dereference();
-			
-			SOAPMessage m = msgContext.getMessage();
-			SOAPHeader header = m.getSOAPHeader();
-
-			Iterator<? extends SOAPHeaderElement> iter = header.examineAllHeaderElements();
-			while (iter.hasNext()) {
-				SOAPHeaderElement he = (SOAPHeaderElement) iter.next();
-				QName heName = new QName(he.getNamespaceURI(), he.getLocalName());
-				if (heName.equals(GenesisIIConstants.CONTEXT_INFORMATION_QNAME)) {
-					Element em = ((MessageElement) he).getRealElement();
-					ByteArrayOutputStream baos = new ByteArrayOutputStream();
-					PrintStream ps = new PrintStream(baos);
-					ps.println(em);
-					ps.close();
-					ByteArrayInputStream bais = new ByteArrayInputStream(baos
-							.toByteArray());
-					ContextType ct = (ContextType) ObjectDeserializer.deserialize(
-							new InputSource(bais), ContextType.class);
-					
-					retval = new CallingContextImpl(ct);
-					
-					// get the AuthZ handler and instruct it to prepare the calling context
-					// (e.g., it may prepare delegation credentials, remove 
-					// non-delgatable credentials, etc)
-					AuthZHandler authZHandler = AuthZHandler.getAuthZHandler(resource);
-					if (authZHandler != null) {
-						authZHandler.prepareContexts(retval);
-					}
-					
-					workingContext.setProperty(WorkingContext.CALLING_CONTEXT_KEY,
-							retval);
-				}
-			}
-	
-			// place the resource's key material in the transient calling context
-			// so that it may be properly used for outgoing messages
-			Certificate[] targetCertChain = (Certificate[]) resource
-					.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
-			if ((targetCertChain != null) && (targetCertChain.length > 0)) {
-				ContextManager.getCurrentContext(false).setActiveKeyAndCertMaterial(
-						new KeyAndCertMaterial((X509Certificate[]) targetCertChain, 
-								_serverPrivateKey));
-			}
-		
-			
-			return retval;
-
-		} catch (SOAPException se) {
-			throw new AxisFault(se.getLocalizedMessage(), se);
-		} catch (ConfigurationException e) {
-			throw new AuthZSecurityException(e.getMessage(), e);
-		} catch (IOException e) {
-			throw new AuthZSecurityException(e.getMessage(), e);
-		} catch (GeneralSecurityException e) {
-			throw new AuthZSecurityException(e.getMessage(), e);
-		}
-
-	}    
-    
     
     
     static public class ServerPWCallback implements CallbackHandler {
@@ -423,13 +324,12 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
     	public void handle(Callback[] callbacks) throws IOException,
     			UnsupportedCallbackException {
 
-    		WorkingContext workingContext = WorkingContext.getCurrentWorkingContext();
-			MessageContext messageContext = (MessageContext) 
-				workingContext.getProperty(WorkingContext.MESSAGE_CONTEXT_KEY);
-
-			// we can now extract our calling context if necessary 
-			ICallingContext callContext = 
-				extractCallingContextPostDecrytpion(messageContext, workingContext);		   
+			ICallingContext callContext = null;
+			try {
+				callContext = ContextManager.getCurrentContext();
+			} catch (ConfigurationException e) {
+				throw new IOException(e.getMessage());
+			}
     		
     		for (int i = 0; i < callbacks.length; i++) {
     			if (callbacks[i] instanceof WSPasswordCallback) {
@@ -448,14 +348,18 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
     				case WSPasswordCallback.USERNAME_TOKEN_UNKNOWN: 
     					// check to make sure the username and password match
 
-    					// add the identity to the calling context for future
-    					// checking
-    					
+    					// add the identity to the current calling context
     					UsernameTokenIdentity identity = 
     						new UsernameTokenIdentity(pc.getIdentifer(), pc.getPassword());
     					TransientCredentials transientCredentials = 
     						TransientCredentials.getTransientCredentials(callContext);
     					transientCredentials._credentials.add(identity);
+
+    					// add the identity to the caller's credential list
+    					ArrayList<GamlCredential> callerCredentials = (ArrayList<GamlCredential>)
+    						callContext.getTransientProperty(GamlCredential.CALLER_CREDENTIALS_PROPERTY);
+    					callerCredentials.add(identity);
+    					
     					
     				case WSPasswordCallback.DECRYPT: 
     				case WSPasswordCallback.SIGNATURE: 
