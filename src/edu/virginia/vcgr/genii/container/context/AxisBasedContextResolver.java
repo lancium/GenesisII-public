@@ -72,33 +72,35 @@ public class AxisBasedContextResolver implements IContextResolver
 			(MessageContext) workingContext.getProperty(WorkingContext.MESSAGE_CONTEXT_KEY);
 		ContextType ct = null;
 		
-		try {
-			SOAPMessage m = messageContext.getMessage();
-			SOAPHeader header = m.getSOAPHeader();
-
-			Iterator<? extends SOAPHeaderElement> iter = header.examineAllHeaderElements();
-			while (iter.hasNext()) {
-				SOAPHeaderElement he = (SOAPHeaderElement) iter.next();
-				QName heName = new QName(he.getNamespaceURI(), he.getLocalName());
-				if (heName.equals(GenesisIIConstants.CONTEXT_INFORMATION_QNAME)) {
-					Element em = ((MessageElement) he).getRealElement();
-					ByteArrayOutputStream baos = new ByteArrayOutputStream();
-					PrintStream ps = new PrintStream(baos);
-					ps.println(em);
-					ps.close();
-					ByteArrayInputStream bais = new ByteArrayInputStream(baos
-							.toByteArray());
-					ct = (ContextType) ObjectDeserializer.deserialize(
-							new InputSource(bais), ContextType.class);
-					break;
+		if (messageContext != null) {
+			try {
+				SOAPMessage m = messageContext.getMessage();
+				SOAPHeader header = m.getSOAPHeader();
+	
+				Iterator<? extends SOAPHeaderElement> iter = header.examineAllHeaderElements();
+				while (iter.hasNext()) {
+					SOAPHeaderElement he = (SOAPHeaderElement) iter.next();
+					QName heName = new QName(he.getNamespaceURI(), he.getLocalName());
+					if (heName.equals(GenesisIIConstants.CONTEXT_INFORMATION_QNAME)) {
+						Element em = ((MessageElement) he).getRealElement();
+						ByteArrayOutputStream baos = new ByteArrayOutputStream();
+						PrintStream ps = new PrintStream(baos);
+						ps.println(em);
+						ps.close();
+						ByteArrayInputStream bais = new ByteArrayInputStream(baos
+								.toByteArray());
+						ct = (ContextType) ObjectDeserializer.deserialize(
+								new InputSource(bais), ContextType.class);
+						break;
+					}
 				}
+			} catch (SOAPException se) {
+				throw new AxisFault(se.getLocalizedMessage(), se);
+			} catch (IOException e) {
+				throw new AuthZSecurityException(e.getMessage(), e);
 			}
-		} catch (SOAPException se) {
-			throw new AxisFault(se.getLocalizedMessage(), se);
-		} catch (IOException e) {
-			throw new AuthZSecurityException(e.getMessage(), e);
 		}
-		
+			
 		IResource resource = ResourceManager.getCurrentResource().dereference();
 		CallingContextImpl resourceContext = 
 			(CallingContextImpl) resource.getProperty(
