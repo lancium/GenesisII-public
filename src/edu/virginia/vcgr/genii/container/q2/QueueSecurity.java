@@ -10,7 +10,6 @@ import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.GamlCredential;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.TransientCredentials;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.IdentityAttribute;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.SignedAssertion;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.Identity;
@@ -34,6 +33,7 @@ public class QueueSecurity
 	 * 
 	 * @throws AuthZSecurityException
 	 */
+	@SuppressWarnings("unchecked")
 	static public Collection<Identity> getCallerIdentities() 
 		throws AuthZSecurityException
 	{

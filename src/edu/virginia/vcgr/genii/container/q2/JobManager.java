@@ -531,7 +531,7 @@ public class JobManager implements Closeable
 	 */
 	synchronized public Collection<JobInformationType> getJobStatus(
 		Connection connection, String []jobs)
-			throws SQLException, ResourceException
+			throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		/* Check to see if any tickets were passed and call the
 		 * "all jobs owned by me" version if none were.
@@ -599,6 +599,10 @@ public class JobManager implements Closeable
 			}
 			
 			return ret;
+		}
+		catch (GenesisIISecurityException gse)
+		{
+			throw gse;
 		}
 		catch (IOException ioe)
 		{
@@ -757,7 +761,7 @@ public class JobManager implements Closeable
 			/* If the job isn't owned by the caller, throw an exception. */
 			if (!QueueSecurity.isOwner(pji.getOwners()))
 				throw new GenesisIISecurityException(
-					"Don't have permissino to complete ob \"" + 
+					"Don't have permission to complete job \"" + 
 						jobData.getJobTicket() + "\".");
 		}	
 		
@@ -1000,7 +1004,7 @@ public class JobManager implements Closeable
 	 * @throws ResourceException
 	 */
 	synchronized public void killJobs(Connection connection, String []tickets)
-		throws SQLException, ResourceException
+		throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		/* If we weren't given any tickets, then just ignore */
 		if (tickets == null || tickets.length == 0)
@@ -1031,20 +1035,12 @@ public class JobManager implements Closeable
 			JobData jobData = _jobsByID.get(jobID);
 			PartialJobInfo pji = ownerMap.get(jobID);
 			
-			try
-			{
-				/* If the caller doesn't own the job, it's 
-				 * a security exception */
-				if (!QueueSecurity.isOwner(pji.getOwners()))
-					throw new GenesisIISecurityException(
-						"Don't have permissino to kill job \"" + 
-							jobData.getJobTicket() + "\".");
-			}
-			catch (GenesisIISecurityException gse)
-			{
-				_logger.warn("Error tryint to determine job ownership.", gse);
-				continue;
-			}
+			/* If the caller doesn't own the job, it's 
+			 * a security exception */
+			if (!QueueSecurity.isOwner(pji.getOwners()))
+				throw new GenesisIISecurityException(
+					"Don't have permission to kill job \"" + 
+						jobData.getJobTicket() + "\".");
 			
 			/* If the job is starting, we mark it as being killed.  Starting
 			 * implies that another thread is about to try and start the thing

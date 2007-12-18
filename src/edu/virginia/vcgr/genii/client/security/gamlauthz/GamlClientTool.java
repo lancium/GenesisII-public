@@ -28,9 +28,7 @@ import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOInputStream;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
-import edu.virginia.vcgr.genii.client.rns.RNSMultiLookupResultException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
-import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
@@ -38,8 +36,6 @@ import edu.virginia.vcgr.genii.common.security.*;
 import edu.virginia.vcgr.genii.client.cmd.tools.GamlLoginTool;
 
 public class GamlClientTool {
-
-	static private final int _BLOCK_SIZE = 1024 * 4;
 
 	static private final int NOT_READ = 32;
 	static private final int NOT_WRITE = 16;
@@ -50,16 +46,6 @@ public class GamlClientTool {
 
 	static public final String CHMOD_SYNTAX = 
 		"( <[<+|->r][<+|->w][<+|->x]> | <octal mode> ) ( [--local-src] <cert-file> | --everyone | --username=<username> --password=<password>)";
-
-	static private void copy(InputStream in, OutputStream out)
-			throws IOException {
-		byte[] data = new byte[_BLOCK_SIZE];
-		int r;
-
-		while ((r = in.read(data)) >= 0) {
-			out.write(data, 0, r);
-		}
-	}
 
 	public AuthZConfig getEmptyAuthZConfig() throws AuthZSecurityException {
 		return GamlAcl.encodeAcl(new GamlAcl());

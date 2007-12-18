@@ -36,18 +36,15 @@ import javax.xml.soap.SOAPMessage;
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
 import org.apache.axis.message.MessageElement;
-import org.morgan.util.configuration.ConfigurationException;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
-import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.IContextResolver;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.container.resource.IResource;
@@ -58,6 +55,7 @@ import edu.virginia.vcgr.genii.container.Container;
 public class AxisBasedContextResolver implements IContextResolver
 {
 	
+	@SuppressWarnings("unchecked")
 	public ICallingContext load() throws ResourceException, IOException,
 			FileNotFoundException
 	{

@@ -117,8 +117,8 @@ public class JNIGetInformationTool extends JNILibraryBase {
 				
 		try{					
 			//Cache Miss
-			if(cacheEntry == null){			
-				boolean isDirectory;
+			if(cacheEntry == null)
+			{	
 				long fileSize;
 				String name;	
 				
@@ -129,7 +129,6 @@ public class JNIGetInformationTool extends JNILibraryBase {
 				else{				
 					//Fill in directory information
 					if(path.isDirectory()){ 
-						isDirectory = true;
 						fileSize = -1;
 					}
 					else{

@@ -321,7 +321,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
     	 * @see javax.security.auth.callback.CallbackHandler#handle(javax.security.auth.callback.Callback[])
     	 * 
     	 */
-    	public void handle(Callback[] callbacks) throws IOException,
+    	@SuppressWarnings("unchecked")
+		public void handle(Callback[] callbacks) throws IOException,
     			UnsupportedCallbackException {
 
 			ICallingContext callContext = null;

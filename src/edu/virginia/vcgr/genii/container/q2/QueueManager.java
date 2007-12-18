@@ -372,7 +372,7 @@ public class QueueManager implements Closeable
 	}
 	
 	public Collection<JobInformationType> getJobStatus(String []jobs)
-		throws SQLException, ResourceException
+		throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		Connection connection = null;
 		
@@ -405,7 +405,7 @@ public class QueueManager implements Closeable
 	}
 	
 	public void killJobs(String []jobs)
-		throws SQLException, ResourceException
+		throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		Connection connection = null;
 		

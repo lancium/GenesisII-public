@@ -154,7 +154,15 @@ public class QueueManipulator
 	public void kill(Collection<JobTicket> jobs)
 		throws RemoteException, ConfigurationException
 	{
-		// TODO Still need to implement this
+		String []tickets = new String[jobs.size()];
+		int lcv = 0;
+		for (JobTicket ticket : jobs)
+		{
+			tickets[lcv++] = ticket.toString();
+		}
+		
+		QueuePortType queue = ClientUtils.createProxy(QueuePortType.class, _queue);
+		queue.killJobs(tickets);
 	}
 	
 	public void complete(Collection<JobTicket> jobs)

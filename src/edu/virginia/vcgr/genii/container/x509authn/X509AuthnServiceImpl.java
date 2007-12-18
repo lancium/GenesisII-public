@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.security.cert.CertificateEncodingException;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
@@ -37,22 +36,6 @@ import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.X509Security;
 
-
-
-import org.ggf.byteio.CustomFaultType;
-import org.ggf.byteio.ReadNotPermittedFaultType;
-import org.ggf.byteio.TransferInformationType;
-import org.ggf.byteio.UnsupportedTransferFaultType;
-import org.ggf.byteio.WriteNotPermittedFaultType;
-import org.ggf.rbyteio.Append;
-import org.ggf.rbyteio.AppendResponse;
-import org.ggf.rbyteio.Read;
-import org.ggf.rbyteio.ReadResponse;
-import org.ggf.rbyteio.TruncAppend;
-import org.ggf.rbyteio.TruncAppendResponse;
-import org.ggf.rbyteio.TruncateNotPermittedFaultType;
-import org.ggf.rbyteio.Write;
-import org.ggf.rbyteio.WriteResponse;
 import org.ggf.rns.Add;
 import org.ggf.rns.AddResponse;
 import org.ggf.rns.CreateFile;
@@ -81,7 +64,6 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
 import edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
-import edu.virginia.vcgr.genii.container.byteio.TransferAgent;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -103,7 +85,6 @@ import edu.virginia.vcgr.genii.x509authn.*;
 
 import org.oasis_open.docs.ws_sx.ws_trust._200512.*;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
-import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 
 import org.apache.axis.AxisFault;
