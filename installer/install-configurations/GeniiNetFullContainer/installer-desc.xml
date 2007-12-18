@@ -260,5 +260,17 @@
 			<fileset dir="../../../wsdl" targetdir="$INSTALL_PATH/wsdl"/>
 			<fileset dir="../../../deployments" targetdir="$INSTALL_PATH/deployments"/>
 		</pack>
+		
+		<pack name="IFS" required="no" preselected="no" os="windows">
+		  <description>Installable File System for Windows XP</description>
+		  <file src="../../../jni-lib/IFS/nulmrx.sys" targetdir="C:/Windows/system32/drivers"/>
+		  <file src="../../../jni-lib/IFS/nulmrxnp.dll" targetdir="C:/Windows/system32"/>
+		  <file src="../../../jni-lib/IFS/GenesisIFSServer.exe" targetdir="$INSTALL_PATH"/>		  		  
+		  <executable targetfile="$INSTALL_PATH/jni-lib/IFS/editRegistry.bat" stage="postinstall">
+		    <args>
+		      <arg value="$INSTALL_PATH"/>
+		    </args>
+		  </executable>		  		  
+		</pack>
 	</packs>
 </installation>

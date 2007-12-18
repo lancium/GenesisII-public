@@ -4,7 +4,7 @@ import edu.virginia.vcgr.genii.client.jni.gIIlib.io.file.WindowsIFSFile;
 
 
 public class JNIWrite{
-	public static Integer write(Integer fileHandle, String data, Integer offset){
+	public static Integer write(Integer fileHandle, byte[] data, Integer offset){
 		WindowsIFSFile file = DataTracker.getInstance().getFile(fileHandle);
 		int toReturn = -1;
 		
@@ -14,7 +14,7 @@ public class JNIWrite{
 		else{		
 			try{
 				file.lseek64(offset);
-				toReturn = file.write(data.getBytes());	
+				toReturn = file.write(data);	
 			}catch(Exception e){
 				e.printStackTrace();
 			}

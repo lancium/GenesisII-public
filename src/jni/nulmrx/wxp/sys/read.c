@@ -77,16 +77,18 @@ Return Value:
 {
     NTSTATUS Status = STATUS_SUCCESS;
     RxCaptureFcb;
-	RxCaptureFobx;              
+	RxCaptureFobx;
+	GenesisGetFcbExtension(capFcb, giiFcb);
+	GenesisGetCcbExtension(capFobx, giiCcb);
+
+
     BOOLEAN SynchronousIo = !BooleanFlagOn(RxContext->Flags,RX_CONTEXT_FLAG_ASYNC_OPERATION);        	
 	BOOLEAN PagingIo = BooleanFlagOn(RxContext->Flags, IRP_PAGING_IO);
 
 	/* Genesis Specific Read info */
 	LONG ByteOffset;
 	LONG ByteCount;
-
-	PGENESIS_CCB giiCCB;
-	PGENESIS_FCB giiFCB;
+	
 	PGENESIS_COMPLETION_CONTEXT pIoCompContext = GenesisGetMinirdrContext(RxContext);
 	PFILE_OBJECT FileObject = RxContext->CurrentIrpSp->FileObject;
 
@@ -97,13 +99,9 @@ Return Value:
 
 	PAGED_CODE();
 
-	DbgPrint("NulMRxRead:  Started for file: %wZ\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName);	
+	DbgPrint("NulMRxRead:  Started for file: %wZ\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName);
 
-	/* Get genesis Items */
-	giiCCB = (PGENESIS_CCB)capFobx->Context2;
-	giiFCB = (PGENESIS_FCB)capFcb->Context2;
-
-	if(giiFCB->isDirectory){
+	if(giiFcb->isDirectory){
 		Status = STATUS_INVALID_DEVICE_REQUEST;
 		DbgPrint("NulMRxRead:  Read attempted on directory!\n");
 		try_return(Status);
@@ -114,7 +112,8 @@ Return Value:
 	ByteCount = RxContext->LowIoContext.ParamsFor.ReadWrite.ByteCount;
 
     // If the read starts beyond End of File, return EOF.
-	if (((ByteOffset + ByteCount) > giiFCB->Size ) || (giiFCB->Size == -1)){
+	if (RtlLargeIntegerGreaterThan(RtlConvertLongToLargeInteger(ByteOffset + ByteCount), capFcb->Header.FileSize)
+			|| (giiFcb->State == GENII_STATE_NOT_INITIALIZED)){
         RxDbgTrace( 0, Dbg, ("End of File\n", 0 ));
 		DbgPrint("NulMRxRead:  End of file reached\n");
 
@@ -164,7 +163,7 @@ Return Value:
 
 	RxContext->LowIoContext.CompletionRoutine = FunnyCompletionRoutine;	
 
-	KeWaitForSingleObject(&(giiFCB->FcbPhore), Executive, KernelMode, FALSE, NULL);
+	KeWaitForSingleObject(&(giiFcb->FcbPhore), Executive, KernelMode, FALSE, NULL);
 
 	//Store read data here
 	pIoCompContext->Context = RxAllocatePoolWithTag(PagedPool, ByteCount, 'abcd');
@@ -175,8 +174,9 @@ Return Value:
 	if(SynchronousIo){
 		PVOID requestBuffer = NULL;
 
-		KeWaitForSingleObject(&(giiFCB->FcbPhore), Executive, KernelMode, FALSE, NULL);
-		KeReleaseSemaphore(&(giiFCB->FcbPhore), 0, 1, FALSE);
+		KeWaitForSingleObject(&(giiFcb->FcbPhore), Executive, KernelMode, FALSE, NULL);
+		KeReleaseSemaphore(&(giiFcb->FcbPhore), 0, 1, FALSE);
+		Status = STATUS_SUCCESS;
 
 		if(!PagingIo){
 			FileObject->CurrentByteOffset = 
@@ -199,23 +199,20 @@ try_exit:	NOTHING;
     return(Status);
 } 
 
-ULONG GenesisPrepareIOParams(PRX_CONTEXT RxContext, PVOID buffer){
+ULONG GenesisPrepareReadParams(PRX_CONTEXT RxContext, PVOID buffer){
     RxCaptureFcb;
 	RxCaptureFobx;    
-	PGENESIS_CCB giiCCB;
-	PGENESIS_FCB giiFCB;
+	GenesisGetFcbExtension(capFcb, giiFcb);
+	GenesisGetCcbExtension(capFobx, giiCcb);
+
 	LONG FileID, Length, Offset;		
 	LARGE_INTEGER ByteOffset;
 
 	char * myBuffer = (char *) buffer;	
 	BOOLEAN SynchronousIo = !BooleanFlagOn(RxContext->Flags,RX_CONTEXT_FLAG_ASYNC_OPERATION);     
 
-	/* Get genesis Items */
-	giiCCB = (PGENESIS_CCB)capFobx->Context2;
-	giiFCB = (PGENESIS_FCB)capFcb->Context2;
-
 	/* Get parameters */
-	FileID = giiCCB->GenesisFileID;			
+	FileID = giiCcb->GenesisFileID;			
 	ByteOffset = RxContext->CurrentIrpSp->Parameters.Read.ByteOffset;
 
 	//Fix byte offset
@@ -229,10 +226,10 @@ ULONG GenesisPrepareIOParams(PRX_CONTEXT RxContext, PVOID buffer){
 	Length = (RxContext->CurrentIrpSp->Parameters.Read.Length & 0x7FFFFFF);
     
     //  If the read extends beyond EOF, truncate the read (fixes length
-    if (Length + Offset > giiFCB->Size) {
-		RxContext->CurrentIrpSp->Parameters.Read.Length = (ULONG)(giiFCB->Size - Offset);
-		RxContext->LowIoContext.ParamsFor.ReadWrite.ByteCount = (ULONG)(giiFCB->Size - Offset);
-		Length = (ULONG)(giiFCB->Size - Offset);
+	if (RtlLargeIntegerGreaterThan(RtlConvertLongToLargeInteger(Length + Offset), capFcb->Header.FileSize)){
+		RxContext->CurrentIrpSp->Parameters.Read.Length = (ULONG)(capFcb->Header.FileSize.LowPart - Offset);
+		RxContext->LowIoContext.ParamsFor.ReadWrite.ByteCount = (ULONG)(capFcb->Header.FileSize.LowPart - Offset);
+		Length = (ULONG)(capFcb->Header.FileSize.LowPart - Offset);
     }
 
 	DbgPrint("FileID is %d, ByteOffset is %d, ByteLength is %d \n", FileID, Offset, Length);       

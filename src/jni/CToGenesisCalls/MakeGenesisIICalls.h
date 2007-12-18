@@ -98,7 +98,7 @@ DllExport int genesisII_open(PGII_JNI_INFO info, char * target,	int requestedDep
 
 /*
 	Tries to read up to length bytes starting at the offset for the specified file located at the target.  
-	The data parameter must be initialized to hold up to length bytes.  Returns the number of bytes read or -1 
+	The data parameter SHOULD NOT initialized.  Returns the number of bytes read or -1 
 	if an error occurred.  
 */
 DllExport int genesisII_read(PGII_JNI_INFO info, GII_FILE_HANDLE file, char* data, int offset, int length);

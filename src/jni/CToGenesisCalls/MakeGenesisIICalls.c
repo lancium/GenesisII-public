@@ -206,10 +206,19 @@ DllExport int genesisII_read(PGII_JNI_INFO info, GII_FILE_HANDLE target, char* d
 		int offset, int length){
 	jmethodID mid;
 
-	if(get_static_method(info,&(info->jni_launcher), "read", "(III)Ljava/lang/String;", &mid) != JNI_ERR)
-	{			
-		jstring my_read = (*info->env)->CallStaticObjectMethod(info->env, info->jni_launcher, mid, target, offset, length);
-		return convert_jstring_using_data(info->env, my_read, data);
+	if(get_static_method(info,&(info->jni_launcher), "read", "(III)[B", &mid) != JNI_ERR)
+	{							
+		jboolean isCopy;
+		int size = 0;
+		jbyteArray my_read = (*info->env)->CallStaticObjectMethod(info->env, info->jni_launcher, mid, target, offset, length);
+		if(my_read != NULL){
+			size = (*info->env)->GetArrayLength(info->env,my_read);
+			memcpy(data,(*info->env)->GetByteArrayElements(info->env, my_read, &isCopy), size); 
+		}
+		else{
+			size = JNI_ERR;
+		}
+		return size;
 	}
 	else{
 		printf("GenesisII Error:  Could not find the method specified for this call\n");
@@ -222,11 +231,19 @@ DllExport int genesisII_write(PGII_JNI_INFO info, GII_FILE_HANDLE target,
 	jmethodID mid;
 	int bytes_written;
 
-	if(get_static_method(info,&(info->jni_launcher), "write", "(ILjava/lang/String;I)I", &mid) != JNI_ERR)
-	{		
-		jstring j_data = NewPlatformString(info->env, data, length);		
-
-		bytes_written = (*info->env)->CallStaticIntMethod(info->env, info->jni_launcher, mid, target, j_data, offset);
+	if(get_static_method(info,&(info->jni_launcher), "write", "(I[BI)I", &mid) != JNI_ERR)
+	{	
+		jbyteArray myArray = (*info->env)->NewByteArray(info->env, length);
+		if(length == 0){
+			bytes_written = 0;
+		}
+		else if(myArray == NULL){
+			bytes_written = JNI_ERR;
+		}
+		else{
+			(*info->env)->SetByteArrayRegion(info->env, myArray, 0, length, data);
+			bytes_written = (*info->env)->CallStaticIntMethod(info->env, info->jni_launcher, mid, target, myArray, offset);
+		}
 		return bytes_written;
 	}
 	else{

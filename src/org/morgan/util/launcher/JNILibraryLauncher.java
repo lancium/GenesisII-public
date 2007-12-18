@@ -162,22 +162,21 @@ public class JNILibraryLauncher
 	}
 	
 	
-	public static String read(int fileHandle, int offset, int length){
+	public static byte[] read(int fileHandle, int offset, int length){
 		String myClass = JNI_IO_PACKAGE + ".JNIRead";
 		String myMethod = "read";
 		Class<?>[] argTypes = new Class[] {Integer.class, Integer.class, Integer.class};
 		Object[] args = new Object[] {new Integer(fileHandle), 
 				new Integer(Math.abs(offset)), new Integer(Math.abs(length))};
 		
-		return (String)invoke(myClass, myMethod, argTypes, args);				
+		return (byte[])invoke(myClass, myMethod, argTypes, args);				
 	}
 	
-	public static int write(int fileHandle, String data, int offset){
+	public static int write(int fileHandle, byte[] data, int offset){
 		String myClass = JNI_IO_PACKAGE + ".JNIWrite";
 		String myMethod = "write";
-		Class<?>[] argTypes = new Class[] {Integer.class, String.class, Integer.class};
-		Object[] args = new Object[] {new Integer(fileHandle), 
-				new String(data), new Integer(offset)};
+		Class<?>[] argTypes = new Class[] {Integer.class, byte[].class, Integer.class};
+		Object[] args = new Object[] {new Integer(fileHandle),data, new Integer(offset)};
 		
 		return (Integer)invoke(myClass, myMethod, argTypes, args);				
 	}

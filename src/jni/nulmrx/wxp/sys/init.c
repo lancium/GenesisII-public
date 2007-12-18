@@ -891,125 +891,162 @@ static NTSTATUS ProcessResponse(PIRP Irp)
 			//  - Indicate the results
 			//  - Complete the IRP
 			BOOLEAN isSynchronous = IoIsOperationSynchronous(dataRequest->Irp);
+			BOOLEAN hasReleasedRequest = FALSE;
 
 			RemoveEntryList(listEntry);
 
 			irpSp = IoGetCurrentIrpStackLocation(dataRequest->Irp);
+						
+			try{				
+				PMRX_FCB commonFcb = dataRequest->RxContext->pFcb;
+				GenesisGetFcbExtension(commonFcb, giiFcb);
 
-			switch(response->ResponseType){
+				switch(response->ResponseType){
 
-				case GENII_QUERYDIRECTORY:	
-				{
-					//Stores result into File Control Block (should have exclusive access)
-					GenesisSaveDirectoryListing(dataRequest->RxContext->pFcb->Context2, 
-						response->ResponseBuffer, response->StatusCode);
+					case GENII_QUERYDIRECTORY:	
+					{
+						//Stores result into File Control Block (should have exclusive access)
+						GenesisSaveDirectoryListing(giiFcb, response->ResponseBuffer, response->StatusCode);
 
-					//Release semaphore
-					KeReleaseSemaphore(&(((PGENESIS_FCB)dataRequest->RxContext->pFcb->Context2)->FcbPhore), 
-						0, 1, FALSE);					
+						//Release semaphore
+						KeReleaseSemaphore(&(giiFcb->FcbPhore),0, 1, FALSE);					
 
-					if(!isSynchronous){
-						status = GenesisCompleteQueryDirectory(dataRequest->RxContext);
-						DbgPrint("NulMRxQueryDirectory: Ended for file %wZ\n", dataRequest->RxContext->pRelevantSrvOpen->pAlreadyPrefixedName);
-						RxCompleteAsynchronousRequest(dataRequest->RxContext, status);						
+						if(!isSynchronous){
+							status = GenesisCompleteQueryDirectory(dataRequest->RxContext);
+							DbgPrint("NulMRxQueryDirectory: Ended for file %wZ\n", 
+								dataRequest->RxContext->pRelevantSrvOpen->pAlreadyPrefixedName);
+							RxCompleteAsynchronousRequest(dataRequest->RxContext, status);						
+						}
+											
+						//If it got here it is successful regardless
+						status = STATUS_SUCCESS;
+						break;
 					}
-										
-					//If it got here it is successful regardless
-					status = STATUS_SUCCESS;
-					break;
-				}
 
-				//Always synchronous
-				case GENII_QUERYFILEINFO:{
-
-					PGENESIS_FCB giiFCB = (PGENESIS_FCB)dataRequest->RxContext->pFcb->Context2;
+					//Always synchronous
+					case GENII_QUERYFILEINFO:
+					case GENII_CREATE:
+					{				
+						//SAVE INTO FCB here
+						GenesisSaveInfoIntoFCB(commonFcb, response->ResponseBuffer, response->StatusCode);										
 					
-					//SAVE INTO FCB here
-					GenesisSaveInfoIntoFCB(giiFCB, response->ResponseBuffer, response->StatusCode);
-				
-					//Release semaphore
-					KeReleaseSemaphore(&(((PGENESIS_FCB)dataRequest->RxContext->pFcb->Context2)->FcbPhore), 
-						0, 1, FALSE);										
+						//Release semaphore.  This should make the create finish
+						KeReleaseSemaphore(&(giiFcb->FcbPhore),0, 1, FALSE);												
 
-					//If it got here it is successful regardless
-					status = STATUS_SUCCESS;
-					break;
-				}
-				case GENII_CREATE:{
-					PGENESIS_FCB giiFCB = (PGENESIS_FCB)dataRequest->RxContext->pFcb->Context2;
+						//If it got here it is successful regardless
+						status = STATUS_SUCCESS;					
+						break;
+					}
+					case GENII_READ:			
+					{				
+						PGENESIS_COMPLETION_CONTEXT pIoCompContext = GenesisGetMinirdrContext(dataRequest->RxContext);
+						ULONG Information = 0;
+
+						if (response->ResponseBufferLength < irpSp->Parameters.Read.Length) {
+							bytesToCopy = response->ResponseBufferLength;
+						} else {
+							bytesToCopy = irpSp->Parameters.Read.Length;
+						}
+
+						DbgPrint("GeniiReadReturn:  Starting copy\n");
+
+						//Check to see if some error happened
+						if(response->ResponseBufferLength == -1){
+							status = STATUS_FILE_INVALID;
+							DbgPrint("GeniiReadReturn: Response buffer -1\n");
+						}
+
+						else{
+							buffer = pIoCompContext->Context;						
+								
+							__try { 
+								RtlCopyMemory(buffer, response->ResponseBuffer, bytesToCopy);							
+								DbgPrint("GeniiReadReturn:  Copy successful to temp buffer %d\n", bytesToCopy);
+								status = STATUS_SUCCESS;
+								Information = bytesToCopy;
+							} __except (EXCEPTION_EXECUTE_HANDLER) {
+								status = GetExceptionCode();							
+							}							
+						}
 					
-					//SAVE INTO FCB here
-					GenesisSaveInfoIntoFCB(giiFCB, response->ResponseBuffer, response->StatusCode);
-				
-					//Release semaphore.  This should make the create finish
-					KeReleaseSemaphore(&(((PGENESIS_FCB)dataRequest->RxContext->pFcb->Context2)->FcbPhore), 
-						0, 1, FALSE);												
+						//Complete Request
+						pIoCompContext->Status = status;
+						pIoCompContext->Information = Information;
+						
+						if(pIoCompContext->IoType == IO_TYPE_SYNCHRONOUS){
+							//Release semaphore.  This should make the synch read finish
+							KeReleaseSemaphore(&(giiFcb->FcbPhore),0, 1, FALSE);								
+						}
+						else{
+							RxSetIoStatusInfo(dataRequest->RxContext, Information);
+							RxSetIoStatusStatus(dataRequest->RxContext, status);
+							status = RxLowIoCompletion(dataRequest->RxContext);
+						}
 
-					//If it got here it is successful regardless
-					status = STATUS_SUCCESS;					
-					break;
-				}
-				case GENII_READ:			
-				{
-					PGENESIS_FCB giiFCB = (PGENESIS_FCB)dataRequest->RxContext->pFcb->Context2;		
-					PGENESIS_COMPLETION_CONTEXT pIoCompContext = GenesisGetMinirdrContext(dataRequest->RxContext);
-					ULONG Information = 0;
+						// The control operation was successful in any case
+						status = STATUS_SUCCESS;
 
-					if (response->ResponseBufferLength < irpSp->Parameters.Read.Length) {
-						bytesToCopy = response->ResponseBufferLength;
-					} else {
-						bytesToCopy = irpSp->Parameters.Read.Length;
+						// And break from the loop, no sense looking any farther
+						break;
 					}
+					case GENII_TRUNCATEAPPEND:
+					case GENII_WRITE:
+					{
+						PGENESIS_COMPLETION_CONTEXT pIoCompContext = GenesisGetMinirdrContext(dataRequest->RxContext);
+						ULONG Information = 0;
 
-					DbgPrint("GeniiReadReturn:  Starting copy\n");
+						if(response->ResponseType == GENII_TRUNCATEAPPEND){
+							DbgPrint("GeniiTruncateAppend returned!\n");
+						}else{
+							DbgPrint("GeniiWriteReturned\n");
+						}
 
-					//Check to see if some error happened
-					if(response->ResponseBufferLength == -1){
-						status = STATUS_FILE_INVALID;
-						DbgPrint("GeniiReadReturn: Response buffer -1\n");
-					}
-
-					else{
-						buffer = pIoCompContext->Context;						
-							
-						__try { 
-							RtlCopyMemory(buffer, response->ResponseBuffer, bytesToCopy);							
-							DbgPrint("GeniiReadReturn:  Copy successful to temp buffer %d\n", bytesToCopy);
+						//Check to see if some error happened
+						if(response->ResponseBufferLength == -1){
+							status = STATUS_ACCESS_DENIED;						
+						}
+						else{
+							Information = response->ResponseBufferLength;
 							status = STATUS_SUCCESS;
-							Information = bytesToCopy;
-						} __except (EXCEPTION_EXECUTE_HANDLER) {
-							status = GetExceptionCode();							
-						}							
-					}
-				
-					//Complete Request
-					pIoCompContext->Status = status;
-					pIoCompContext->Information = Information;
-					
-					if(pIoCompContext->IoType == IO_TYPE_SYNCHRONOUS){
-						//Release semaphore.  This should make the synch read finish
-						KeReleaseSemaphore(&(((PGENESIS_FCB)dataRequest->RxContext->pFcb->Context2)->FcbPhore), 
-							0, 1, FALSE);								
-					}
-					else{
-						RxSetIoStatusInfo(dataRequest->RxContext, Information);
-						RxSetIoStatusStatus(dataRequest->RxContext, status);
-						status = RxLowIoCompletion(dataRequest->RxContext);
-					}
-					
+						}
 
-					// The control operation was successful in any case
-					status = STATUS_SUCCESS;
+						pIoCompContext->Information = Information;
+						pIoCompContext->Status = status;
 
-					// And break from the loop, no sense looking any farther
-					break;
+						if(pIoCompContext->IoType == IO_TYPE_SYNCHRONOUS){
+							//Release semaphore.  This should make the synch read finish
+							KeReleaseSemaphore(&(giiFcb->FcbPhore),0, 1, FALSE);								
+						}
+						else{
+							RxSetIoStatusInfo(dataRequest->RxContext, Information);
+							RxSetIoStatusStatus(dataRequest->RxContext, status);
+							status = RxLowIoCompletion(dataRequest->RxContext);
+						}
+
+						status = STATUS_SUCCESS;
+						break;
+
+					}
+					case GENII_CLOSE:
+						//Release semaphore.  This should make the close finish
+						KeReleaseSemaphore(&(giiFcb->FcbPhore),0, 1, FALSE);		
+						break;
+					default:
+						DbgPrint("ProcessResponse:  Invalid Response Type!\n");
+						dataRequest->Irp->IoStatus.Status = STATUS_INVALID_PARAMETER;
+						dataRequest->Irp->IoStatus.Information = 0;
+						IoCompleteRequest(dataRequest->Irp, IO_NO_INCREMENT);					
 				}
-				default:
-					DbgPrint("ProcessResponse:  Invalid Response Type!\n");
+				hasReleasedRequest = TRUE;
+			}
+			finally{
+				if(!hasReleasedRequest){
+					DbgPrint("Unknown error occured in inverted response\n");	
 					dataRequest->Irp->IoStatus.Status = STATUS_INVALID_PARAMETER;
 					dataRequest->Irp->IoStatus.Information = 0;
-					IoCompleteRequest(dataRequest->Irp, IO_NO_INCREMENT);					
-			}
+					IoCompleteRequest(dataRequest->Irp, IO_NO_INCREMENT);	
+				}
+			}			
 		}
 	}
 	ExReleaseFastMutex(queueLock);
@@ -1040,7 +1077,7 @@ static NTSTATUS ProcessControlRequest(PIRP Irp)
 	PGENII_REQUEST dataRequest;
 	PIO_STACK_LOCATION irpSp;
 	PVOID dataBuffer;
-	ULONG bytesToCopy;
+	ULONG bytesToCopy;	
 
 	DbgPrint("ProcessControlRequest: Entered. \n");
 
@@ -1082,8 +1119,7 @@ static NTSTATUS ProcessControlRequest(PIRP Irp)
 		// We are going to use the request ID to match the response
 		controlRequest->RequestID = dataRequest->RequestID;	
 		
-		//Use buffer given
-		
+		//Use buffer given			
 		switch(irpSp->MajorFunction){
 			case IRP_MJ_DIRECTORY_CONTROL:
 			{
@@ -1112,6 +1148,17 @@ static NTSTATUS ProcessControlRequest(PIRP Irp)
 				}
 				break;
 			}
+			case IRP_MJ_CLEANUP:{
+				DbgPrint("Close being serviced in queue\n");
+				controlRequest->RequestType = GENII_CLOSE; 
+
+				//Copies Directory and Target info into buffer with length
+				controlRequest->RequestBufferLength = 
+					GenesisPrepareClose(dataRequest->RxContext, 
+						controlRequest->RequestBuffer);
+				status = STATUS_SUCCESS;
+				break;
+			}
 			case IRP_MJ_QUERY_INFORMATION:
 			{
 				//DbgPrint("QueryInformation being serviced\n");
@@ -1137,8 +1184,8 @@ static NTSTATUS ProcessControlRequest(PIRP Irp)
 
 				//Copies Directory and Target info into buffer with length
 				controlRequest->RequestBufferLength = 
-					GenesisPrepareDirectoryAndTarget(dataRequest->RxContext, 
-						controlRequest->RequestBuffer, FALSE);						
+					GenesisPrepareCreate(dataRequest->RxContext, 
+						controlRequest->RequestBuffer);						
 
 				// We've finished processing the request to this point.  Dispatch to the control application
 				// for further processing.
@@ -1146,40 +1193,22 @@ static NTSTATUS ProcessControlRequest(PIRP Irp)
 				break;
 			}
 			case IRP_MJ_WRITE:
-			{
+			{	
+				BOOLEAN isTruncateAppend=FALSE;
+				BOOLEAN isTruncateWrite=FALSE;
+
 				//DbgPrint("Write being serviced\n");
-				controlRequest->RequestType = GENII_WRITE_REQUEST; 
+				controlRequest->RequestType = GENII_WRITE; 
 
-				// We must copy the data from the user's address space to the control application's
-				// address space.
-				dataBuffer = MmGetSystemAddressForMdlSafe(dataRequest->Irp->MdlAddress, NormalPagePriority);
-				
-				if (NULL == dataBuffer) {			
-					// It failed.				
-					dataRequest->Irp->IoStatus.Status = STATUS_INSUFFICIENT_RESOURCES;
-					dataRequest->Irp->IoStatus.Information = 0;
-					IoCompleteRequest(dataRequest->Irp, IO_NO_INCREMENT);
-					ExFreePool(dataRequest);
-					return status;
-				}
-				
-				// Figure out how much data we are going to move.  Allow control app to set its
-				// own MAX size here...
-				if (irpSp->Parameters.Write.Length < controlRequest->RequestBufferLength) {
-					bytesToCopy = irpSp->Parameters.Write.Length;
-				} else {
-					bytesToCopy = controlRequest->RequestBufferLength;
+				//Copies Target info with other info
+				controlRequest->RequestBufferLength = 
+					GenesisPrepareWriteParams(dataRequest->RxContext, 
+						controlRequest->RequestBuffer, &isTruncateAppend, &isTruncateWrite);	
+
+				if(isTruncateAppend || isTruncateWrite){
+					controlRequest->RequestType = GENII_TRUNCATEAPPEND;
 				}
 
-				// Since the control application's address space is "naked" here we must protect our
-				// data copy.
-				__try {
-					RtlCopyMemory(controlRequest->RequestBuffer, dataBuffer, bytesToCopy);
-					controlRequest->RequestBufferLength = bytesToCopy;
-					status = STATUS_SUCCESS;
-				} __except(EXCEPTION_EXECUTE_HANDLER) {
-					status = GetExceptionCode();
-				}
 				break;
 			}
 			case IRP_MJ_READ:
@@ -1190,7 +1219,7 @@ static NTSTATUS ProcessControlRequest(PIRP Irp)
 
 				//Copies Target info with other info
 				controlRequest->RequestBufferLength = 
-					GenesisPrepareIOParams(dataRequest->RxContext, 
+					GenesisPrepareReadParams(dataRequest->RxContext, 
 						controlRequest->RequestBuffer);										
 				
 				status = STATUS_SUCCESS;
@@ -1199,7 +1228,7 @@ static NTSTATUS ProcessControlRequest(PIRP Irp)
 			default:
 				DbgPrint("Unsupported function placed in async queue %x\n",irpSp->MajorFunction);
 				break;
-		}		
+		}						
 	}
 
 	if(status == STATUS_SUCCESS) {

@@ -45,13 +45,26 @@ Return Value:
 --*/
 {
     NTSTATUS Status = STATUS_SUCCESS;
-    RxCaptureFcb;
-    NulMRxGetFcbExtension(capFcb,pFcbExtension);
-    PMRX_NET_ROOT pNetRoot = capFcb->pNetRoot;
-    NulMRxGetNetRootExtension(pNetRoot,pNetRootExtension);
+    RxCaptureFcb;	
+	GenesisGetFcbExtension(capFcb,giiFCB);    	
 
     RxTraceEnter("NulMRxTruncateFile");
+
+	PAGED_CODE();
+
     RxDbgTrace(0,  Dbg, ("NewFileSize is %d\n", pNewFileSize->LowPart));
+
+	DbgPrint("NulMRxTruncate:  Truncating file size to %d\n", pNewFileSize->LowPart);
+
+	capFcb->Header.FileSize = *pNewFileSize;	
+	capFcb->Header.AllocationSize = capFcb->Header.FileSize;
+
+	if (RtlLargeIntegerGreaterThan(capFcb->Header.ValidDataLength, *pNewFileSize)) {
+		// Decrease the valid data length value.
+		capFcb->Header.ValidDataLength = *pNewFileSize;
+	}	
+
+	pNewAllocationSize = &capFcb->Header.FileSize;
 
     RxTraceLeave(Status);
     return Status;
@@ -81,12 +94,25 @@ Return Value:
 {
     NTSTATUS Status = STATUS_SUCCESS;
     RxCaptureFcb;
-    NulMRxGetFcbExtension(capFcb,pFcbExtension);
-    PMRX_NET_ROOT pNetRoot = capFcb->pNetRoot;
-    NulMRxGetNetRootExtension(pNetRoot,pNetRootExtension);
+    GenesisGetFcbExtension(capFcb,giiFCB);      
 
     RxTraceEnter("NulMRxExtendFile");
+
+	PAGED_CODE();
+
     RxDbgTrace(0,  Dbg, ("NewFileSize is %d\n", pNewFileSize->LowPart));
+	    
+	DbgPrint("NulMRxExtend:  Extending file size to %d\n", pNewFileSize->LowPart);
+
+	capFcb->Header.FileSize = *pNewFileSize;	
+	capFcb->Header.AllocationSize = *pNewFileSize;
+
+	if (RtlLargeIntegerGreaterThan(capFcb->Header.ValidDataLength, *pNewFileSize)) {
+		// Decrease the valid data length value.
+		capFcb->Header.ValidDataLength = *pNewFileSize;
+	}	
+
+	pNewAllocationSize = &capFcb->Header.FileSize;
 
     RxTraceLeave(Status);
     return Status;

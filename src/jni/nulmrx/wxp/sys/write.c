@@ -16,10 +16,22 @@ Abstract:
 #include "precomp.h"
 #pragma hdrstop
 
-//
-//  The local debug trace level
-//
 
+NTSTATUS GenesisWriteCompletionRoutine(PRX_CONTEXT RxContext){
+	RxCaptureFcb;
+	PGENESIS_COMPLETION_CONTEXT pIoCompContext = GenesisGetMinirdrContext(RxContext);
+	PGENESIS_SRV_OPEN giiSrvOpen = (PGENESIS_SRV_OPEN)RxContext->pRelevantSrvOpen->Context2;
+
+	if(NT_SUCCESS(pIoCompContext->Status)){
+		giiSrvOpen->ServerFileSize = capFcb->Header.FileSize;
+	}
+
+	RxContext->IoStatusBlock.Information = pIoCompContext->Information;
+	RxContext->IoStatusBlock.Status = pIoCompContext->Status;
+	return pIoCompContext->Status;
+}
+
+//  The local debug trace level
 #define Dbg                              (DEBUG_TRACE_WRITE)
 
 NTSTATUS
@@ -43,52 +55,183 @@ Return Value:
 --*/
 
 {
-    NTSTATUS Status = STATUS_SUCCESS;
+	NTSTATUS Status = STATUS_SUCCESS;
     RxCaptureFcb;
-    PLOWIO_CONTEXT LowIoContext  = &RxContext->LowIoContext;
-    PVOID pbUserBuffer = NULL;
-    ULONG ByteCount = (LowIoContext->ParamsFor).ReadWrite.ByteCount;
-    RXVBO ByteOffset = (LowIoContext->ParamsFor).ReadWrite.ByteOffset;
-    LONGLONG FileSize = 0;
-    NulMRxGetFcbExtension(capFcb,pFcbExtension);
-    PMRX_NET_ROOT pNetRoot = capFcb->pNetRoot;
-    NulMRxGetNetRootExtension(pNetRoot,pNetRootExtension);
-    BOOLEAN SynchronousIo = !BooleanFlagOn(RxContext->Flags,RX_CONTEXT_FLAG_ASYNC_OPERATION);
-    PGENESIS_COMPLETION_CONTEXT pIoCompContext = GenesisGetMinirdrContext(RxContext);
-    PDEVICE_OBJECT deviceObject;
+	RxCaptureFobx;    	
+	GenesisGetFcbExtension(capFcb, giiFcb);
+	GenesisGetCcbExtension(capFobx, giiCcb);	
+    
+	BOOLEAN SynchronousIo = !BooleanFlagOn(RxContext->Flags,RX_CONTEXT_FLAG_ASYNC_OPERATION);        	
+	BOOLEAN PagingIo = BooleanFlagOn(RxContext->Flags, IRP_PAGING_IO);
+
+	/* Genesis Specific Read info */
+	LONG ByteOffset;
+	LONG ByteCount;
+
+	PGENESIS_COMPLETION_CONTEXT pIoCompContext = GenesisGetMinirdrContext(RxContext);
+	PFILE_OBJECT FileObject = RxContext->CurrentIrpSp->FileObject;
+
+	BOOLEAN CompleteIrp = FALSE;
+	BOOLEAN PostRequest = FALSE;
 
     RxTraceEnter("NulMRxWrite");
-    RxDbgTrace(0, Dbg, ("NetRoot is 0x%x Fcb is 0x%x\n", pNetRoot, capFcb));
-    
-    //
-    //  Lengths that are not sector aligned will be rounded up to
-    //  the next sector boundary. The rounded up length should be
-    //  < AllocationSize.
-    //
-    RxGetFileSizeWithLock((PFCB)capFcb,&FileSize);
-    
-    RxDbgTrace(0, Dbg, ("UserBuffer is0x%x\n", pbUserBuffer ));
-    RxDbgTrace(0, Dbg, ("ByteCount is %d ByteOffset is %d\n", ByteCount, ByteOffset ));
 
-    //
-    //  Initialize the completion context in the RxContext
-    //
+	PAGED_CODE();
+
+	DbgPrint("NulMRxWrite:  Started for file: %wZ\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName);	
+
+	if(giiFcb->isDirectory){
+		Status = STATUS_INVALID_DEVICE_REQUEST;
+		DbgPrint("NulMRxWrite:  Write attempted on directory!\n");
+		try_return(Status);
+	}
+
+	/* Get offset param */	
+	ByteOffset = ((LONG)RxContext->LowIoContext.ParamsFor.ReadWrite.ByteOffset & 0x000000007FFFFFFF);
+	ByteCount = RxContext->LowIoContext.ParamsFor.ReadWrite.ByteCount;  
+    
+    //Initialize the completion context in the RxContext
     ASSERT( sizeof(*pIoCompContext) == MRX_CONTEXT_SIZE );
     RtlZeroMemory( pIoCompContext, sizeof(*pIoCompContext) );
     
     if( SynchronousIo ) {
-        RxDbgTrace(0, Dbg, ("This I/O is sync\n"));
+        DbgPrint("This I/O is sync\n");
         pIoCompContext->IoType = IO_TYPE_SYNCHRONOUS;
     } else {
-        RxDbgTrace(0, Dbg, ("This I/O is async\n"));
+        DbgPrint("This I/O is async\n");
         pIoCompContext->IoType = IO_TYPE_ASYNC;
     }
-  
+
+	//// If this happens to be a MDL read complete request, then
+	//// there is not much processing that the FSD has to do.
+	if (RxContext->CurrentIrpSp->MinorFunction & IRP_MN_COMPLETE) {
+	//	// Caller wants to tell the Cache Manager that a previously
+	//	// allocated MDL can be freed.
+	//	GenesisMdlComplete(RxContext);
+	//	// The IRP has been completed.
+	//	CompleteIrp = FALSE;
+		DbgPrint("NulMrxWrite:  IRP_MN_COMPLETE Received");
+	//	try_return(Status = STATUS_SUCCESS);
+	}
+
+	//// If this is a request at IRQL DISPATCH_LEVEL, then post
+	//// the request (your FSD may choose to process it synchronously
+	//// if you implement the support correctly; obviously you will be
+	//// quite constrained in what you can do at such IRQL).
+	if (RxContext->CurrentIrpSp->MinorFunction & IRP_MN_DPC) {
+	//	CompleteIrp = FALSE;
+	//	PostRequest = TRUE;
+		DbgPrint("NulMrxWrite:  IRP_MN_DPC Received");
+	//	try_return(Status = STATUS_PENDING);
+	}
+
+	RxContext->LowIoContext.CompletionRoutine = GenesisWriteCompletionRoutine;	
+
+	KeWaitForSingleObject(&(giiFcb->FcbPhore), Executive, KernelMode, FALSE, NULL);
+
+	//Sends Genii read request
+	Status = GenesisSendInvertedCall(RxContext, GENII_WRITE, !SynchronousIo);
+
+	if(SynchronousIo){
+		PVOID requestBuffer = NULL;
+
+		KeWaitForSingleObject(&(giiFcb->FcbPhore), Executive, KernelMode, FALSE, NULL);
+		KeReleaseSemaphore(&(giiFcb->FcbPhore), 0, 1, FALSE);		
+
+		if(!PagingIo){
+			FileObject->CurrentByteOffset = 
+				RtlConvertLongToLargeInteger(ByteOffset + pIoCompContext->Information);
+		}
+		else{
+			DbgPrint("NulMrxWrite:  Paging IO Recv'd\n");
+		}
+	}
+
     RxDbgTrace(0, Dbg, ("Status = %x Info = %x\n",RxContext->IoStatusBlock.Status,RxContext->IoStatusBlock.Information));
+
+try_exit:	NOTHING;					
+
+	if(Status != STATUS_PENDING){
+		DbgPrint("NulMRxWrite:  Completed for file: %wZ\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName);
+	}
 
     RxTraceLeave(Status);
     return(Status);
-} // NulMRxWrite
+} 
+
+ULONG GenesisPrepareWriteParams(PRX_CONTEXT RxContext, PVOID buffer, PBOOLEAN isTruncateAppend, PBOOLEAN isTruncateWrite){
+    RxCaptureFcb;
+	RxCaptureFobx;    
+	GenesisGetFcbExtension(capFcb, giiFcb);
+	GenesisGetCcbExtension(capFobx, giiCcb);
+	GenesisGetSrvOpenExtension(RxContext->pRelevantSrvOpen, giiSrvOpen);
+
+	LONG FileID, Length, Offset;		
+	LARGE_INTEGER ByteOffset;
+	PVOID writeData;
+
+	char * myBuffer = (char *) buffer;	
+	BOOLEAN SynchronousIo = !BooleanFlagOn(RxContext->Flags,RX_CONTEXT_FLAG_ASYNC_OPERATION);     
+	
+	*isTruncateAppend = FALSE;
+	*isTruncateWrite = FALSE;
+
+	/* Get parameters */
+	FileID = giiCcb->GenesisFileID;			
+	ByteOffset = RxContext->CurrentIrpSp->Parameters.Read.ByteOffset;
+	writeData = RxLowIoGetBufferAddress(RxContext);
+
+	//Fix byte offset
+	if(SynchronousIo && (ByteOffset.LowPart == FILE_USE_FILE_POINTER_POSITION 
+		&& ByteOffset.HighPart == -1)){
+			//Continuing a previous write
+			ByteOffset = RxContext->CurrentIrpSp->FileObject->CurrentByteOffset;
+	}
+	else if(ByteOffset.LowPart == FILE_WRITE_TO_END_OF_FILE && ByteOffset.HighPart == -1){
+		//If append  
+		ByteOffset = capFcb->Header.FileSize;
+	}
+
+	//Fix length (checks if length + offset is bigger than valid data length)
+	if((RxContext->CurrentIrpSp->Parameters.Write.Length + ByteOffset.LowPart) > capFcb->Header.ValidDataLength.LowPart){	
+		Length = capFcb->Header.ValidDataLength.LowPart - ByteOffset.LowPart;
+		Length = Length >= 0 ? Length : 0;
+	}
+	else{
+		Length = RxContext->CurrentIrpSp->Parameters.Write.Length;
+	}
+
+	Length &= 0x7FFFFFFF;	
+
+	//Do we need to truncate before writing?
+	if(RtlLargeIntegerLessThan(capFcb->Header.FileSize, giiSrvOpen->ServerFileSize)){		
+		if((capFcb->Header.FileSize.LowPart + ByteOffset.LowPart) == capFcb->Header.FileSize.LowPart){		
+			*isTruncateAppend = TRUE;
+			DbgPrint("IsTruncateAppend!\n");
+		}
+		else{
+			*isTruncateWrite = TRUE;
+			DbgPrint("IsTruncateWrite!\n");
+		}
+	}
+
+	//Switch to ulong here (java can't use first bit)
+	Offset = (ByteOffset.LowPart & 0x7FFFFFFF);	
+
+	DbgPrint("GenesisWrite:  FileID is %d, ByteOffset is %d, ByteLength is %d \n", FileID, Offset, Length);       
+	
+
+	//Let's copy other params
+	RtlCopyMemory(myBuffer, &FileID, sizeof(LONG));
+	myBuffer += sizeof(LONG);
+	RtlCopyMemory(myBuffer, &Offset, sizeof(LONG));
+	myBuffer += sizeof(LONG);
+	RtlCopyMemory(myBuffer, &Length, sizeof(LONG));
+	myBuffer += sizeof(LONG);
+	RtlCopyMemory(myBuffer, writeData, Length);	
+
+	return ((sizeof(LONG) * 3) + Length);
+}
 
 
 

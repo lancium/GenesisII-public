@@ -8,6 +8,7 @@ import edu.virginia.vcgr.genii.client.jni.gIIlib.JNILibraryBase;
 /* Cache Manager for the JNI Library */
 public class JNICacheManager {
 	
+	private static final int CACHE_LIFE = 5;
 	private static final int MAX_SIZE = 300;
 	private static final float LOAD_FACTOR = (float)0.5;
 	private static JNICacheManager myManager = null;
@@ -38,7 +39,7 @@ public class JNICacheManager {
 			System.out.println("Cache Miss: " + path);
 		}
 		else{
-			if((currentTime - entry.getTimeOfEntry()) < (30 * 1000)){
+			if((currentTime - entry.getTimeOfEntry()) < (CACHE_LIFE * 1000)){
 				System.out.println("Cache Hit: " + entry.toString());					
 			}
 			else{					

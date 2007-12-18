@@ -134,13 +134,13 @@ public class JNIOpen extends JNILibraryBase{
 				{
 					throw new IOException("The path \"" + fileName + 
 						"\" refers to an object that isn't a file.");
-				}		
-				tracker.putFile(fileHandle, (WindowsIFSFile)resource);
+				}						
 			}							
 			
 			//Add information to return
 			toReturn.add(String.valueOf(fileHandle));
-			toReturn.addAll(JNIGetInformationTool.getInformationFromRNS(filePath));			
+			toReturn.addAll(JNIGetInformationTool.getInformationFromRNS(filePath));
+			tracker.putFile(fileHandle, (WindowsIFSFile)resource);
 			return toReturn;	
 		}
 		catch(Exception e){

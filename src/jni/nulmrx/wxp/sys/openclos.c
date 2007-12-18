@@ -46,8 +46,12 @@ NulMRxSetSrvOpenFlags (
     );
   
 void GenesisInitializeFCB(PGENESIS_FCB fcb){ 		
-	KeQuerySystemTime(&(fcb->OpenTime));	
-	fcb->Size = 0;
+	RtlZeroMemory(fcb, sizeof(GenesisFCB));
+
+	KeQuerySystemTime(&(fcb->OpenTime));
+	fcb->CreateTime = fcb->AccessedTime = fcb->ModifiedTime = fcb->OpenTime;
+
+	fcb->DirectorySize = 0;
 	fcb->DirectoryListing = NULL;
 	fcb->isDirectory = FALSE;			
 	fcb->State = GENII_STATE_NOT_INITIALIZED;	
@@ -61,6 +65,8 @@ void GenesisInitializeCCB(PGENESIS_CCB ccb, ULONG tempFileID){
 	buffer[0] = '*';
 	buffer[1] = '\0';
 
+	RtlZeroMemory(ccb, sizeof(GenesisCCB));
+
 	//Open, info, read and write
 	ccb->GenesisFileID = tempFileID;
 	ccb->CurrentByteOffset.QuadPart = 0;
@@ -73,6 +79,14 @@ void GenesisInitializeCCB(PGENESIS_CCB ccb, ULONG tempFileID){
 	ccb->Target.Length = 1;
 	ccb->Target.MaximumLength = 255;	
 }
+
+void GenesisInitializeSrvOpen(PGENESIS_SRV_OPEN srvOpen, PGENESIS_FCB relatedFcb){ 		
+	RtlZeroMemory(srvOpen, sizeof(GenesisSrvOpen));
+
+	srvOpen->ServerAccessedTime = srvOpen->ServerModifiedTime = srvOpen->ServerCreateTime = relatedFcb->OpenTime;	
+}
+
+
 
 #ifdef ALLOC_PRAGMA
 #pragma alloc_text(PAGE, NulMRxCreate)
@@ -165,6 +179,7 @@ Return Value:
 	/* END */
 
 	PGENESIS_FCB giiFCB;	
+	PGENESIS_SRV_OPEN giiSrvOpen;
 	FILE_BASIC_INFORMATION FileBasicInfo;
     FILE_STANDARD_INFORMATION FileStandardInfo;
 	BOOLEAN fMustRegainExclusiveResource=FALSE;
@@ -209,29 +224,6 @@ Return Value:
 
 		//File disposition is packed with user options
 		RequestedDisposition = ((PtrIoStackLocation->Parameters.Create.Options >> 24) && 0xFF);
-		
-		//Only can handle FILE_OPEN and half of the other
-		if(RequestedDisposition != FILE_OPEN && 
-			RequestedDisposition != FILE_OPEN_IF){
-				switch(RequestedDisposition){
-					case FILE_CREATE:
-						DbgPrint("NulMrxCreate:  Cannot handle FILE_CREATE\n");
-						break;
-					case FILE_SUPERSEDE:
-						DbgPrint("NulMrxCreate:  Cannot handle FILE_SUPERCEDE\n");
-						break;
-					case FILE_OVERWRITE:
-						DbgPrint("NulMrxCreate:  Cannot handle FILE_OVERWRITE\n");
-						break;
-					case FILE_OVERWRITE_IF:
-						DbgPrint("NulMrxCreate:  Cannot handle FILE_OVERWRITE_IF\n");
-						break;				
-				}
-				*ReturnedInformation = FILE_DOES_NOT_EXIST;
-				Status = STATUS_NOT_SUPPORTED;
-				DbgPrint("NulMrxCreate:  Failed! Wrong type of disposition\n");
-				try_return(Status);
-		}
 
 		//File attributes ... they don't mattah
 		FileAttributes = (UINT8)(PtrIoStackLocation->Parameters.Create.FileAttributes & FILE_ATTRIBUTE_VALID_FLAGS);
@@ -305,7 +297,7 @@ Return Value:
 
 		//We don't check the names at all cause of how we use names in Redirector
 
-		RxAcquireExclusiveFcbResourceInMRx(capFcb);
+		RxAcquireExclusiveFcbResourceInMRx(capFcb);		
 		
 		//Super check of DOOM to eliminate EAS and Desktop.ini files (let's use filename)
 		if(RemainingName != NULL && RemainingName->Length > 0 && 
@@ -341,10 +333,14 @@ Return Value:
 			//FCB->Context used as FCB extension for NulMrx
 			capFcb->Context2 = RxAllocatePoolWithTag(NonPagedPool, sizeof(GenesisFCB), MRXGEN_FCB_POOLTAG);
 			GenesisInitializeFCB((PGENESIS_FCB)capFcb->Context2);
+
+			SrvOpen->Context2 = RxAllocatePoolWithTag(NonPagedPool, sizeof(GenesisSrvOpen), MRXGEN_FCB_POOLTAG);
+			GenesisInitializeSrvOpen((PGENESIS_SRV_OPEN)SrvOpen->Context2, (PGENESIS_FCB)capFcb->Context2);
 			CreatedFCBX=TRUE;
 		}				
 
-		giiFCB = (PGENESIS_FCB)((PGENESIS_FCB)capFcb->Context2);
+		giiFCB = (PGENESIS_FCB)capFcb->Context2;
+		giiSrvOpen = (PGENESIS_SRV_OPEN)SrvOpen->Context2;
 
 		//On behalf of Sender
 		KeWaitForSingleObject(&(giiFCB->FcbPhore), Executive, KernelMode, FALSE, NULL);
@@ -368,17 +364,24 @@ Return Value:
 		{
 			*ReturnedInformation = FILE_DOES_NOT_EXIST;
 
-			//Don't have permission to create a file (yet)
-			if(RequestedDisposition == FILE_OPEN_IF){
+			//Don't have permission to create a file (only reason why this would fail with these dispos)
+			if(RequestedDisposition == FILE_OPEN_IF || RequestedDisposition == FILE_OVERWRITE_IF ||
+				RequestedDisposition == FILE_CREATE || RequestedDisposition == FILE_SUPERSEDE){
 				Status = STATUS_ACCESS_DENIED;
 			}
 			else{
 				//No file to open
 				Status = STATUS_NO_SUCH_FILE;
 			}
-			DbgPrint("NulMrxCreate: Failed!  Genesis did not find the file\n");
+			DbgPrint("NulMrxCreate: Genesis did not find the file\n");
 			try_return(Status);
 		}	
+		else{
+			//SrvOpen is valid now
+			if(giiSrvOpen != NULL){
+				giiSrvOpen->ServerFileSize = capFcb->Header.FileSize;
+			}
+		}
 
 		/*	Let's do some checks now */
 
@@ -408,19 +411,19 @@ Return Value:
 		
 		//Let's get these attributes
 		FileBasicInfo.FileAttributes = ((giiFCB->isDirectory) ? FILE_ATTRIBUTE_DIRECTORY : 
-			FILE_ATTRIBUTE_READONLY);
+			FILE_ATTRIBUTE_NORMAL);
 
 		//Doesn't matter (yet)		
-		FileBasicInfo.CreationTime = giiFCB->OpenTime;
-		FileBasicInfo.LastAccessTime = giiFCB->OpenTime;
-		FileBasicInfo.LastWriteTime = giiFCB->OpenTime;
-		FileBasicInfo.ChangeTime = giiFCB->OpenTime;
+		FileBasicInfo.CreationTime = giiFCB->CreateTime;
+		FileBasicInfo.LastAccessTime = giiFCB->AccessedTime;
+		FileBasicInfo.LastWriteTime = giiFCB->ModifiedTime;
+		FileBasicInfo.ChangeTime = giiFCB->ModifiedTime;
 		
 		FileStandardInfo.DeletePending = FALSE;
 		FileStandardInfo.Directory = giiFCB->isDirectory;
-		FileStandardInfo.AllocationSize.QuadPart = giiFCB->Size;
-		FileStandardInfo.EndOfFile.QuadPart = giiFCB->Size;
-		FileStandardInfo.NumberOfLinks = 0;
+		FileStandardInfo.AllocationSize = capFcb->Header.AllocationSize;
+		FileStandardInfo.EndOfFile = capFcb->Header.FileSize;
+		FileStandardInfo.NumberOfLinks = 0;		
 
 		//Creates FOBX and CCB structures
 		Status = NulMRxCreateFileSuccessTail (    
@@ -613,28 +616,15 @@ Return Value:
 
 --*/
 {
-    NTSTATUS Status;
-
-    RxCaptureFcb;
-    RxCaptureRequestPacket;
-
-    PMRX_SRV_OPEN SrvOpen = RxContext->pRelevantSrvOpen;
-    PMRX_SRV_CALL SrvCall = RxContext->Create.pSrvCall;
-    PMRX_NET_ROOT NetRoot = capFcb->pNetRoot;
+    NTSTATUS Status;        
 
     RxTraceEnter("NulMRxCollapseOpen");
-	DbgPrint("NulMrxCollapseOpen\n");
-    RxContext->pFobx = (PMRX_FOBX)RxCreateNetFobx( RxContext, SrvOpen);
+	DbgPrint("NulMrxCollapseOpen is being called\n");    
 
-    if (RxContext->pFobx != NULL) {
-       ASSERT  ( RxIsFcbAcquiredExclusive ( capFcb )  );
-       RxContext->pFobx->OffsetOfNextEaToReturn = 0;
-       capReqPacket->IoStatus.Information = FILE_OPENED;
-       Status = STATUS_SUCCESS;
-    } else {
-       Status = (STATUS_INSUFFICIENT_RESOURCES);       
-    }
-
+	//Create handles this (baby)
+	Status = NulMRxCreate(RxContext);
+    
+	DbgPrint("NulMrxCollapseOpen is finished\n");
     RxTraceLeave(Status);
     return Status;
 }
@@ -735,6 +725,8 @@ Return Value:
     NTSTATUS Status = STATUS_SUCCESS;
     PUNICODE_STRING RemainingName;
     RxCaptureFcb; RxCaptureFobx;
+	GenesisGetFcbExtension(capFcb, giiFCB);
+	GenesisGetCcbExtension(capFobx, geniiCCB);
 
     NODE_TYPE_CODE TypeOfOpen = NodeType(capFcb);
 
@@ -748,7 +740,19 @@ Return Value:
     ASSERT ( NodeTypeIsFcb(capFcb) );
 
     RxDbgTrace( 0, Dbg, ("NulMRxCleanupFobx\n"));
-	DbgPrint("NulMRxCleanupFobx\n");
+	DbgPrint("NulMRxCleanupFobx for %d\n", geniiCCB->GenesisFileID);	
+
+	////Only makes sense for files that were opened correctly
+	//if(giiFCB->State == GENII_STATE_HAVE_INFO && !giiFCB->isDirectory){
+
+	//	//Close this file handle on the Genesis Side
+	//	Status = GenesisSendInvertedCall(RxContext, GENII_CLOSE, FALSE);
+
+	//	//Waits for caller
+	//	KeWaitForSingleObject(&(giiFCB->FcbPhore), Executive, KernelMode, FALSE, NULL);
+
+	//	KeReleaseSemaphore(&(giiFCB->FcbPhore), IO_NO_INCREMENT, 1, FALSE);
+	//}
 
     if (FlagOn(capFcb->FcbState,FCB_STATE_ORPHANED)) {
        RxDbgTrace( 0, Dbg, ("File orphaned\n"));
@@ -760,7 +764,8 @@ Return Value:
        return (STATUS_SUCCESS);
     }
 
-    RxDbgTrace( 0, Dbg, ("NulMRxCleanup  exit with status=%08lx\n", Status ));
+	DbgPrint("NulMRxCleanupFobx for %d finished\n", geniiCCB->GenesisFileID);	
+    RxDbgTrace( 0, Dbg, ("NulMRxCleanup  exit with status=%08lx\n", Status ));	
 
     return(Status);
 }
@@ -791,9 +796,9 @@ Notes:
 	PGENESIS_FCB giiFCB;
 
     RxDbgTrace( 0, Dbg, ("NulMRxForcedClose\n"));
-	DbgPrint("NulMRxForcedClose\n");
 
 	giiFCB = (PGENESIS_FCB)pSrvOpen->pFcb->Context2;
+	DbgPrint("NulMRxForcedClose for %wZ\n", pSrvOpen->pAlreadyPrefixedName);
 
 	if(giiFCB != NULL){
 
@@ -848,7 +853,7 @@ Return Value:
 	giiFCB = (PGENESIS_FCB)capFcb->Context2;
 
     RxDbgTrace( 0, Dbg, ("NulMRxCloseSrvOpen \n"));
-	DbgPrint("NulMrxCloseSrvOpen\n");
+	DbgPrint("NulMrxCloseSrvOpen for %wZ\n", pSrvOpen->pAlreadyPrefixedName);
 
 	if(giiFCB != NULL){    
 		//Make sure no one else is trying to edit this
@@ -864,8 +869,11 @@ NulMRxDeallocateForFobx (
     IN OUT PMRX_FOBX pFobx
     )
 {
-    RxDbgTrace( 0, Dbg, ("NulMRxDeallocateForFobx\n"));
-	DbgPrint("NulMRxDeallocateForFobx\n");
+	GenesisGetCcbExtension(pFobx,geniiCCB);	
+
+    RxDbgTrace( 0, Dbg, ("NulMRxDeallocateForFobx\n"));		
+
+	DbgPrint("NulMRxDeallocateForFobx for fileid %d\n", geniiCCB->GenesisFileID);
 
     return(STATUS_SUCCESS);
 }

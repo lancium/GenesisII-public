@@ -26,7 +26,7 @@ typedef struct _WORKER{
 typedef struct _CommRequest {
 
     GENII_CONTROL_REQUEST    ControlRequest;
-    char                     ControlRequestBuffer[65536];
+    char                     ControlRequestBuffer[65536 + (3 * sizeof(long))];
 
 } COMMREQUEST, *PCOMMREQUEST;
 
@@ -35,7 +35,7 @@ typedef struct _CommResponse {
     GENII_CONTROL_RESPONSE  ControlResponse;
 	
 	//Max 128 entries (65536 / 512) in QD
-    char                    ControlResponseBuffer[65536];
+    char                    ControlResponseBuffer[65536 + (3 * sizeof(long))];
 
 } COMMRESPONSE, *PCOMMRESPONSE;
 
@@ -305,6 +305,20 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 			}				
 			break;
 		}
+		case GENII_CLOSE:{
+			char *bufPtr = (char*) request->RequestBuffer;				
+			long fileID;			
+			int returnCode;
+
+			memcpy(&fileID, bufPtr, sizeof(long));			
+			response->ResponseBufferLength = sizeof(int);
+			printf("Closing file with fileID: %d\n", fileID);
+			returnCode = genesisII_close(pMyInfo, fileID);
+			memcpy(response->ResponseBuffer, &returnCode, sizeof(int));	
+			printf("File %d closed\n", fileID);
+
+			break;
+		}
 		case GENII_READ:
 		{			
 			char *bufPtr = (char*) request->RequestBuffer;		
@@ -446,9 +460,6 @@ DWORD WINAPI ServerThread(LPVOID parameter){
 	while(isRunning && connected){		        
 		DWORD bytesTransferred;
 
-		//Don't run ALL the time
-		Sleep(200);
-
         //Tell device you are ready to process 
         memset(&GeniiRequestOverlapped,0,sizeof(GeniiRequestOverlapped));
         GeniiRequestOverlapped.hEvent = CreateEvent(NULL,TRUE,FALSE,NULL);
@@ -493,24 +504,25 @@ DWORD WINAPI ServerThread(LPVOID parameter){
 		//PREPARE GENESIS RESPONSE depending on RequestID
 		prepareResponse(&myInfo, &(GeniiRequest.ControlRequest), &(GeniiResponse.ControlResponse));
 
-		//Send response
-        ResetEvent(GeniiRequestOverlapped.hEvent);
-        printf("Sending Response to Kernel Driver: Id= %x, Type = %x, Length %x\n", 
-                 GeniiResponse.ControlResponse.RequestID,
-                 GeniiResponse.ControlResponse.ResponseType,                 
-                 GeniiResponse.ControlResponse.ResponseBufferLength);
+		//Send response (Closes are asynchronous)
+		
+		ResetEvent(GeniiRequestOverlapped.hEvent);
 
-        ret = SendResponse(&(GeniiResponse.ControlResponse),&GeniiRequestOverlapped);
-        if(!ret) {              
-            CloseHandle(GeniiRequestOverlapped.hEvent);
-            continue;
-        } 
-        while(!HasOverlappedIoCompleted(&GeniiRequestOverlapped)) {
-            if(!isRunning) {
-                goto exitStageLeft;                    
-            } 
-            Sleep(100);
-        }        
+		printf("Sending Response to Kernel Driver: Id= %x, Type = %x, Length %x\n", 
+				 GeniiResponse.ControlResponse.RequestID,
+				 GeniiResponse.ControlResponse.ResponseType,                 
+				 GeniiResponse.ControlResponse.ResponseBufferLength);
+		ret = SendResponse(&(GeniiResponse.ControlResponse),&GeniiRequestOverlapped);
+		if(!ret) {              
+			CloseHandle(GeniiRequestOverlapped.hEvent);
+			continue;
+		} 
+		while(!HasOverlappedIoCompleted(&GeniiRequestOverlapped)) {
+			if(!isRunning) {
+				goto exitStageLeft;                    
+			} 
+			Sleep(100);
+		}     		
         CloseHandle(GeniiRequestOverlapped.hEvent);
 	}
 
@@ -584,7 +596,7 @@ int main(int argc, char* argv[])
 	
 	int desiredAccess = GENESIS_FILE_READ_DATA | GENESIS_FILE_WRITE_DATA;						
 	char requestedDeposition = GENESIS_FILE_CREATE;
-	int isDirectory = TRUE;
+	int isDirectory = FALSE;
 
 	GII_JNI_INFO rootInfo;		
 
@@ -618,17 +630,19 @@ int main(int argc, char* argv[])
 
 	//printf("Creating directory SOME_DIRECTORY\n");
 
-	//StatusCode = genesisII_open(&rootInfo, "/SOME_DIRECTORY", requestedDeposition, desiredAccess, isDirectory, &directoryListing);
-	//printf("Got Create Info\n");
+	//genesisII_remove(&rootInfo, "/taco.txt", 0, 0);
+
+	//StatusCode = genesisII_open(&rootInfo, "/taco.txt", requestedDeposition, desiredAccess, isDirectory, &directoryListing);
+	//printf("Got Create Info for taco.txt\n");
 	//bytes = copyListing(buffer, directoryListing, StatusCode);
 	//printListing(buffer, StatusCode);
 
-	///*StatusCode = genesisII_write(&rootInfo,fileid, "IlikeTacos", 10, 20);
+	//StatusCode = genesisII_write(&rootInfo,fileid, "IlikeTacos", 0, 10);
 	//printf("Wrote data %d\n", StatusCode);
 	//
 	//StatusCode = genesisII_read(&rootInfo,fileid, buffer, 0, 10);
 	//printf("Got Data\n");
-	//printListing2(buffer, StatusCode);*/
+	//printListing2(buffer, StatusCode);
 
 	//StatusCode = genesisII_close(&rootInfo,fileid);
 
@@ -643,8 +657,8 @@ int main(int argc, char* argv[])
 	//StatusCode = genesisII_truncate_append(&rootInfo,fileid, "IlikeTacos", 100, 10);
 	//printf("Wrote data %d\n", StatusCode);
 
-	///*StatusCode = genesisII_write(&rootInfo,fileid, "IlikeTacos", 8000, 10);
-	//printf("Wrote data %d\n", StatusCode);*/
+	//*StatusCode = genesisII_write(&rootInfo,fileid, "IlikeTacos", 8000, 10);
+	//printf("Wrote data %d\n", StatusCode);
 
 	genesisII_logout(&rootInfo);
 	
