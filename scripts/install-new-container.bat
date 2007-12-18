@@ -62,7 +62,7 @@ call "%_INC_GENII_INSTALL_DIR%\grid.bat" connect "%_CONNECT_URL%" "%_DEPLOY_DIR%
 
 REM login as installer
 echo Logging in as installer.  Please type in password at prompt...
-call "%_INC_GENII_INSTALL_DIR%\grid.bat" login --no-gui "--file=%_DEPLOY_DIR%\security\installer.pfx" --storetype=PKCS12 Installer
+call "%_INC_GENII_INSTALL_DIR%\grid.bat" login --no-gui "%_DEPLOY_DIR%\security\installer.pfx" --storetype=PKCS12 --pattern=Installer
 
 REM generate new CA cert for new container
 echo Generating certificate for new container...
@@ -79,7 +79,7 @@ del "%_DEPLOY_DIR%\security\container.cer"
 
 REM logout as installer
 echo Logging out as installer...
-call "%_INC_GENII_INSTALL_DIR%\grid.bat" logout
+call "%_INC_GENII_INSTALL_DIR%\grid.bat" logout --all
 
 REM install container as a service
 echo Installing new container as a windows service...  Use command "%_INC_GENII_INSTALL_DIR%\ext\JavaServiceWrapper\bin\UninstallContainerWrapper.bat %_CONTAINER_NAME%" to remove container from being a windows service

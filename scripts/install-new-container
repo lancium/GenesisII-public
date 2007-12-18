@@ -51,7 +51,7 @@ echo connecting to $_CONNECT_URL...
 
 # login as installer
 echo Logging in as installer.  Please type in password at prompt...
-"$_INC_GENII_INSTALL_DIR/grid" login --no-gui "--file=$_DEPLOY_DIR/security/installer.pfx" --storetype=PKCS12 Installer
+"$_INC_GENII_INSTALL_DIR/grid" login --no-gui "$_DEPLOY_DIR/security/installer.pfx" --storetype=PKCS12 --pattern=Installer
 
 # generate new CA cert for new container
 echo Generating certificate for new container...
@@ -69,7 +69,7 @@ rm -f "$_DEPLOY_DIR/security/container.cer"
 
 # logout as installer
 echo Logging out as installer...
-"$_INC_GENII_INSTALL_DIR/grid" logout
+"$_INC_GENII_INSTALL_DIR/grid" logout --all
 
 # generate scripts to install container in init.d and start it on console
 echo "Starting container in background and generating init.d script...  Use command $_INC_GENII_INSTALL_DIR/ext/JavaServiceWrapper/bin/UninstallContainerWrapper $_CONTAINER_NAME."

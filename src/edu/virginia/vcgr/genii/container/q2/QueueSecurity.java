@@ -52,9 +52,9 @@ public class QueueSecurity
 			/* The caller's identities are kept in the "transient" credentials 
 			 * space for the calling context.
 			 */
-			TransientCredentials transientCredentials = 
-				TransientCredentials.getTransientCredentials(callingContext);
-			for (GamlCredential cred : transientCredentials._credentials) 
+			ArrayList<GamlCredential> callerCredentials = (ArrayList<GamlCredential>)
+				callingContext.getTransientProperty(GamlCredential.CALLER_CREDENTIALS_PROPERTY);
+			for (GamlCredential cred : callerCredentials) 
 			{
 				/* If the cred is an Identity, then we simply add that idendity
 				 * to our identity list.
