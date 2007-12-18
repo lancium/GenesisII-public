@@ -57,7 +57,7 @@ public class GamlLoginTool extends BaseGridTool {
 			+ "login "
 			+ "[--validMillis=<valid milliseconds>] " 
 			+ "[--username=<username> [--password=<password>] ] "			
-			+ "<identity provider URL>\n"
+			+ "rns:<identity provider path>\n"
 
 			+"login "
 			+ "--username=<username>  "
