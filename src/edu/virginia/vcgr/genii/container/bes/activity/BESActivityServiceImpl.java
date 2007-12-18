@@ -20,7 +20,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.rmi.RemoteException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.security.*;
 
 import javax.xml.namespace.QName;
 
@@ -38,14 +41,17 @@ import edu.virginia.vcgr.genii.byteio.streamable.factory.OpenStreamResponse;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
-import edu.virginia.vcgr.genii.client.context.ContextManager;
-import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.context.*;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
+import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivityUtils.BESActivityInitInfo;
 import edu.virginia.vcgr.genii.container.bes.activity.resource.IBESActivityResource;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
@@ -91,9 +97,49 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 			resource.associateWithContainer(activityEPR, initInfo.getContainerID());
 				
 			ICallingContext ctxt = ContextManager.getCurrentContext(false);
-			if (ctxt != null)
-				resource.setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME,
-					ctxt);
+			if (ctxt != null) {
+				
+				// delegate credentials inbound for me to the child resource so
+				// when he comes alive he can use them because they're his
+
+				X509Certificate[] activityCertChain = 
+					(X509Certificate[])resource.getProperty(
+							IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
+				
+				ArrayList<GamlCredential> credsToDelegate = 
+					TransientCredentials.getTransientCredentials(ctxt)._credentials;
+				ArrayList<GamlCredential> callerCredentials = (ArrayList<GamlCredential>)
+					ctxt.getTransientProperty(GamlCredential.CALLER_CREDENTIALS_PROPERTY);
+				for (GamlCredential cred : callerCredentials) {
+					
+					if (cred instanceof UsernameTokenIdentity) {
+						// Do nothing: do not serialize UT tokens: we will be sending
+						// it in its own header the old fashioned way.
+						credsToDelegate.add(cred);
+						
+					} else if (cred instanceof SignedAssertion) {
+						
+						// Because we know an identity for the remote resource, delegate the 
+						// current credential assertion to it
+						DelegatedAttribute delegatedAttribute = new DelegatedAttribute(
+								null,
+								(SignedAssertion) cred, 
+								activityCertChain);
+						
+						credsToDelegate.add(SignedCredentialCache.getCachedDelegateAssertion(
+								delegatedAttribute, 
+								Container.getContainerPrivateKey()));
+					}
+
+				}
+
+				// have the activity context inherit the current path from 
+				// the calling context
+				resource.setProperty(
+						IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME,
+						ctxt);
+			}
+				
 			
 			resource.createProcess(activityEPR, chooseDirectory(10), 
 					initInfo.getJobDefinition());
@@ -117,6 +163,15 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
                      }, null));
 		}
 		catch (ConfigurationException ce)
+		{
+			throw FaultManipulator.fillInFault(
+				new BaseFaultType(null, null, null, null,
+					new BaseFaultTypeDescription[]
+                     {
+						new BaseFaultTypeDescription(ce.getLocalizedMessage())
+                     }, null));
+		}
+		catch (GeneralSecurityException ce)
 		{
 			throw FaultManipulator.fillInFault(
 				new BaseFaultType(null, null, null, null,

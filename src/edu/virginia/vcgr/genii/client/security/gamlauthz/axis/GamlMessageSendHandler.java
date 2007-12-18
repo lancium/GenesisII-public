@@ -17,18 +17,11 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.TransientCredentials;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
-import edu.virginia.vcgr.genii.client.cache.LRUCache;
 
 public class GamlMessageSendHandler {
 
 	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(GamlMessageSendHandler.class);
-	
-	// cache of signed, serialized delegation assertions
-	static public int DELEGATION_CACHE_SIZE = 32;
-	static public LRUCache<DelegatedAttribute, SignedAssertion> delegationAssertions = 
-		new LRUCache<DelegatedAttribute, SignedAssertion>(DELEGATION_CACHE_SIZE);
-	
 	
 	/**
 	 * Intended to manipulate the calling context as necessary before 
@@ -83,20 +76,9 @@ public class GamlMessageSendHandler {
 									signedAssertion, 
 									resourceCertChain);
 							
-							// check the cache to see if this assertion exists already
-							synchronized(delegationAssertions) {
-								signedAssertion = delegationAssertions.get(delegatedAttribute);
-								if (signedAssertion == null) {
-									// not in cache: create a new delegated assertion
-									signedAssertion = new DelegatedAssertion(
-										delegatedAttribute, 
-										clientKeyMaterial._clientPrivateKey);
-
-									delegationAssertions.put(
-										delegatedAttribute, 
-										signedAssertion);
-								}
-							}
+							signedAssertion = SignedCredentialCache.getCachedDelegateAssertion(
+									delegatedAttribute, 
+									clientKeyMaterial._clientPrivateKey);
 						}
 						
 						toSerialize.add(signedAssertion);
