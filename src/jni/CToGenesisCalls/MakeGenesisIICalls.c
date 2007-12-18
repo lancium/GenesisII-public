@@ -98,14 +98,10 @@ DllExport int genesisII_login(PGII_JNI_INFO info, char * keystore_path,
 		char * password, char * cert_pattern){
 	jmethodID mid;
 
-	if(keystore_path == NULL || password == NULL){
-		return JNI_ERR;
-	}
-
 	if(get_static_method(info,&(info->jni_launcher), "login", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z", &mid) != JNI_ERR)
 	{
-		/* Build arguments */
-		jstring j_arg1 = NewPlatformString(info->env, keystore_path, -1);
+		/* Build arguments */		
+		jstring j_arg1 = (keystore_path == NULL) ? NULL: NewPlatformString(info->env, keystore_path, -1);
 		jstring j_arg2 = NewPlatformString(info->env, password, -1);		
 		jstring j_arg3 = NewPlatformString(info->env, cert_pattern, -1);		
 

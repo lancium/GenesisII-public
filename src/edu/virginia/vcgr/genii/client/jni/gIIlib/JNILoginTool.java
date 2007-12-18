@@ -33,10 +33,25 @@ public class JNILoginTool extends JNILibraryBase
 		
 		
 		try{
-			if(keystorePath == null){			
-				GamlLoginTool loginTool = new GamlLoginTool();				
+			if(keystorePath == null || keystorePath.length() == 0){	
+				System.out.println("Running GamlLoginTool");
+				GamlLoginTool loginTool = new GamlLoginTool();	
+				loginTool.setStoretype("WIN");
 				loginTool.run(System.out, System.err, 
 					new BufferedReader(new InputStreamReader(System.in)));
+				
+				/* Checks to make sure login worked */
+				ICallingContext callContext = ContextManager.getCurrentContext(false);
+				TransientCredentials transientCredentials = TransientCredentials
+				.getTransientCredentials(callContext);
+				
+				if(transientCredentials != null && transientCredentials._credentials != null &&
+						transientCredentials._credentials.size() > 0){
+					return true;
+				}
+				else{
+					return false;
+				}
 			}
 			else{								
 				AbstractGamlLoginHandler handler = null;

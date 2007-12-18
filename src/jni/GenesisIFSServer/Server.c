@@ -600,7 +600,7 @@ int main(int argc, char* argv[])
 
 	GII_JNI_INFO rootInfo;		
 
-	int StatusCode, bytes, fileid;
+	int StatusCode, bytes, fileid;	
 	char ** directoryListing;
 	char buffer[8192];	
 
@@ -609,19 +609,19 @@ int main(int argc, char* argv[])
 		printf("Initialization Failed!\n ");
 		return 0;
 	}
-	
-	/*if(!loggedin){
-		printf("Logging In to Genesis\n");
-		genesisII_login(&rootInfo, "sosa.pfx", "sosa", "cbs");
-		printf("Login successful\n");
-		loggedin = 1;
-	}*/
 
 	if(!loggedin){
+		int isSuccessful;
 		printf("Logging In to Genesis\n");
-		genesisII_login(&rootInfo, "deployments/default/security/keys.pfx", "keys", "sky");
-		printf("Login successful\n");
-		loggedin = 1;
+		isSuccessful = genesisII_login(&rootInfo, NULL, "keys", "sky");
+		if(isSuccessful == JNI_ERR){
+			printf("Login unsuccessful\n");
+			return 0;
+		}
+		else{
+			printf("Login successful\n");
+			loggedin = 1;
+		}
 	}
 	
 	status = runMultiThreaded();		
