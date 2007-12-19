@@ -16,13 +16,22 @@
 
 package edu.virginia.vcgr.genii.container.security.authz.handlers;
 
+import java.security.cert.PKIXBuilderParameters;
+import java.security.cert.X509CertSelector;
 import java.security.cert.X509Certificate;
 import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+import java.security.cert.CertificateException;
 
 import java.util.*;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.util.HashSet;
+
+import javax.net.ssl.CertPathTrustManagerParameters;
+import javax.net.ssl.ManagerFactoryParameters;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -104,11 +113,13 @@ public class GamlAuthZHandler extends AuthZHandler {
 			}
 		}
 
+/* dgm4d: this is a security issue		
 		// Add the resoure's static creating service
 		if (serviceCertChain != null) {
 			defaultOwners.add(new X509Identity(serviceCertChain));
 		}
-
+*/
+		
 		// Add the resource itself
 		defaultOwners.add(new X509Identity((X509Certificate[]) 
 				resource.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME)));
@@ -157,9 +168,6 @@ public class GamlAuthZHandler extends AuthZHandler {
 				
 			} else if (identity instanceof X509Identity) {
 
-/*	DGM4D: We no longer use CA's and intermediate CA's as grouping mechanisms			
- * 
- * 
 				X509Certificate[] identityCertChain = 
 					((X509Identity) identity).getAssertingIdentityCertChain();
 
@@ -204,7 +212,6 @@ public class GamlAuthZHandler extends AuthZHandler {
 		        } catch (java.security.GeneralSecurityException e) {
 		    		throw new AuthZSecurityException(e.getMessage(), e);
 				}			
-*/			
 			}
 		}
 		
@@ -212,7 +219,6 @@ public class GamlAuthZHandler extends AuthZHandler {
 	}
 
 	
-	@SuppressWarnings("unchecked")
 	public boolean checkAccess(
 			ICallingContext callingContext,
 			X509Certificate callerCert, 

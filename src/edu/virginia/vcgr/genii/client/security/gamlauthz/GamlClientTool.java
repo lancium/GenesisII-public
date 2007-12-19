@@ -34,6 +34,7 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
 import edu.virginia.vcgr.genii.common.security.*;
 import edu.virginia.vcgr.genii.client.cmd.tools.GamlLoginTool;
+import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 
 public class GamlClientTool {
 
@@ -163,6 +164,7 @@ public class GamlClientTool {
 				RNSPathQueryFlags.MUST_EXIST);
 		
 		if (path.isFile()) {
+			// read the file as an encoded X.509 .cer file
 			InputStream in = new ByteIOInputStream(path);
 			try {
 				CertificateFactory cf = CertificateFactory.getInstance("X.509");
@@ -173,6 +175,7 @@ public class GamlClientTool {
 				StreamUtils.close(in);
 			}
 		} else if (path.isIDP()) {
+			// get the identity represented by the idp
 			try {
 				ArrayList<SignedAssertion> identities = 
 					GamlLoginTool.doIdpLogin(path.getEndpoint(), null, 0);
@@ -184,6 +187,10 @@ public class GamlClientTool {
 			} catch (Throwable t) {
 				throw new GeneralSecurityException(t.getMessage(), t);
 			}
+		} else {
+			// get the identity of the resource
+			X509Certificate[] chain = EPRUtils.extractCertChain(path.getEndpoint());
+			return new X509Identity(chain);
 		}
 		
 		throw new RNSException(sourcePath + " is not of a valid identity type.");
