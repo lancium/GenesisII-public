@@ -291,7 +291,7 @@
 		<gsh:param>/containers</gsh:param>
 		<gsh:param>+r+w+x</gsh:param>
 		<gsh:param>--local-src</gsh:param>
-		<gsh:param>${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/containergrp.cer</gsh:param>
+		<gsh:param>${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/installer.cer</gsh:param>
 	</geniix:chmod>
 
 	<gsh:echo
@@ -300,7 +300,7 @@
 		<gsh:param>/bes-containers</gsh:param>
 		<gsh:param>+r+w+x</gsh:param>
 		<gsh:param>--local-src</gsh:param>
-		<gsh:param>${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/containergrp.cer</gsh:param>
+		<gsh:param>${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/installer.cer</gsh:param>
 	</geniix:chmod>
 
 	<gsh:echo
@@ -309,7 +309,7 @@
 		<gsh:param>/schedulers/BootstrapScheduler</gsh:param>
 		<gsh:param>+r+w+x</gsh:param>
 		<gsh:param>--local-src</gsh:param>
-		<gsh:param>${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/containergrp.cer</gsh:param>
+		<gsh:param>${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/installer.cer</gsh:param>
 	</geniix:chmod>
 
 	<gsh:echo message="Logging out"/>
