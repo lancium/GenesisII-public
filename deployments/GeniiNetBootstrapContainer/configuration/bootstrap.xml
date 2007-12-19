@@ -25,9 +25,9 @@
 		message="Logging in as ${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/admin.pfx."/>
 	<geniix:login>
 		<gsh:param>--no-gui</gsh:param>
-		<gsh:param>${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/admin.pfx</gsh:param>
 		<gsh:param>--password=admin</gsh:param>
-		<gsh:param>Admin</gsh:param>
+		<gsh:param>--pattern=Admin</gsh:param>
+		<gsh:param>${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/admin.pfx</gsh:param>
 	</geniix:login>
 	
 	<gsh:echo
@@ -313,5 +313,7 @@
 	</geniix:chmod>
 
 	<gsh:echo message="Logging out"/>
-	<geniix:logout/>
+	<geniix:logout>
+		<gsh:param>--all</gsh:param>
+	</geniix:logout>
 </gsh:script>

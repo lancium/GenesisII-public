@@ -24,8 +24,8 @@
 		<gsh:param>--no-gui</gsh:param>
 		<gsh:param>${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/container.pfx</gsh:param>
 		<gsh:param>--password=container</gsh:param>
+		<gsh:param>--pattern=container</gsh:param>
 		<gsh:param>--alias</gsh:param>
-		<gsh:param>Container</gsh:param>
 	</geniix:login>
 
 	<gsh:echo message="Attaching host as ${CONTAINER_NAME}"/>
@@ -98,5 +98,7 @@
 	</gsh:foreach>
 
 	<gsh:echo message="Logging out"/>
-	<geniix:logout/>
+	<geniix:logout>
+		<gsh:param>--all</gsh:param>
+	</geniix:logout>
 </gsh:script>

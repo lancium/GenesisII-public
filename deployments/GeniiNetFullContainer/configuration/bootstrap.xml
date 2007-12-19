@@ -313,7 +313,5 @@
 	</geniix:chmod>
 
 	<gsh:echo message="Logging out"/>
-	<geniix:logout>
-		<gsh:param>--all</gsh:param>
-	</geniix:logout>
+	<geniix:logout/>
 </gsh:script>

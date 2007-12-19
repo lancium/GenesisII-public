@@ -17,7 +17,7 @@
       <parameter name="wsdlServiceElement" value="QueueService"/>
       <parameter name="schemaQualified" value="http://docs.oasis-open.org/wsrf/bf-2,http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple,http://schemas.ggf.org/rns/2006/05/rns,http://vcgr.cs.virginia.edu/genii/queue,http://vcgr.cs.virginia.edu/genii/2006/12/resource-lifetime,http://vcgr.cs.virginia.edu/genii/2006/12/context,http://schemas.ggf.org/jsdl/2005/11/jsdl,http://vcgr.cs.virginia.edu/genii/2006/12/notification,http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs,http://vcgr.cs.virginia.edu/genii/2006/12/resource-authz,http://vcgr.cs.virginia.edu/genii/2006/12/resource,http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory,http://vcgr.cs.virginia.edu/genii/2006/12/security,http://www.w3.org/2005/08/addressing"/>
       <parameter name="wsdlServicePort" value="QueuePortType"/>
-      <parameter name="className" value="edu.virginia.vcgr.genii.container.queue.QueueServiceImpl"/>
+      <parameter name="className" value="edu.virginia.vcgr.genii.container.q2.QueueServiceImpl"/>
       <parameter name="wsdlPortType" value="QueuePortType"/>
       <parameter name="typeMappingVersion" value="1.2"/>
       <operation name="list" qname="list" returnQName="retNS:listResponse" xmlns:retNS="http://schemas.ggf.org/rns/2006/05/rns" returnType="rtns:>listResponse" xmlns:rtns="http://schemas.ggf.org/rns/2006/05/rns" >
