@@ -26,6 +26,7 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.UsernameTokenIdentity;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.X509Identity;
 import edu.virginia.vcgr.genii.client.security.SecurityConstants;
+import edu.virginia.vcgr.genii.client.utils.PathUtils;
 import edu.virginia.vcgr.genii.client.cmd.tools.gamllogin.*;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
@@ -336,7 +337,7 @@ public class GamlLoginTool extends BaseGridTool {
 	protected int runCommand() throws Throwable {
 
 		_authnUri = getArgument(0);
-		URI authnSource = (_authnUri == null) ? null : new URI(_authnUri);
+		URI authnSource = PathUtils.pathToURI(_authnUri);
 
 		// get the local identity's key material (or create one if necessary)
 		ICallingContext callContext = ContextManager.getCurrentContext(false);

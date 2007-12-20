@@ -14,17 +14,7 @@ public class CommandLineFormer
 		for (int begin= 0; begin < line.length(); begin++)
 		{
 			char c = line.charAt(begin);
-			if (c == '\\')
-			{
-				begin++;
-				if (begin >= line.length())
-					throw new ToolException("Couldn't parse command line.");
-				
-				if (builder == null)
-					builder = new StringBuilder();
-				
-				builder.append(line.charAt(begin));
-			} else if (c == '"')
+			if (c == '"')
 			{
 				if (!insideQuotes && (builder == null))
 					builder = new StringBuilder();
