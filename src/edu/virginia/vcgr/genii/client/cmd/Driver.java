@@ -44,7 +44,15 @@ public class Driver extends ApplicationBase
 				} catch (ReloadShellException e) {}
 			}
 		else
-			doNonShell(in, args);
+		{
+			try
+			{
+				doNonShell(in, args);
+			}
+			catch (ReloadShellException re) 
+			{
+			}
+		}
 	}
 	
 	static private void doShell(BufferedReader in) throws ReloadShellException
@@ -135,6 +143,7 @@ public class Driver extends ApplicationBase
 	}
 	
 	static private void doNonShell(BufferedReader in, String []args)
+		throws ReloadShellException
 	{
 		CommandLineRunner runner = new CommandLineRunner();
 		IExceptionHandler exceptionHandler =
@@ -144,6 +153,10 @@ public class Driver extends ApplicationBase
 		{	
 			System.exit(
 				runner.runCommand(args, System.out, System.err, in));
+		}
+		catch (ReloadShellException re)
+		{
+			throw re;
 		}
 		catch (Throwable cause)
 		{
