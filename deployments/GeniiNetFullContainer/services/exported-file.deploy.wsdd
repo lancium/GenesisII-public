@@ -15,253 +15,90 @@
   <service name="ExportedFilePortType" provider="java:RPC" style="document" use="literal">
       <parameter name="wsdlTargetNamespace" value="http://vcgr.cs.virginia.edu/byteio/2006/08/exported-file"/>
       <parameter name="wsdlServiceElement" value="ExportedFileService"/>
-      <parameter name="schemaQualified" value="http://docs.oasis-open.org/wsrf/bf-2,http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple,http://vcgr.cs.virginia.edu/genii/2006/12/resource-lifetime,http://vcgr.cs.virginia.edu/genii/2006/12/context,http://vcgr.cs.virginia.edu/genii/2006/12/notification,http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs,http://schemas.ggf.org/byteio/2005/10/byte-io,http://vcgr.cs.virginia.edu/genii/2006/12/resource-authz,http://vcgr.cs.virginia.edu/genii/2006/12/resource,http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory,http://vcgr.cs.virginia.edu/genii/2006/12/security,http://www.w3.org/2005/08/addressing,http://schemas.ggf.org/byteio/2005/10/random-access"/>
+      <parameter name="schemaQualified" value="http://vcgr.cs.virginia.edu/genii/2006/12/notification,http://docs.oasis-open.org/wsrf/rp-2,http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple,http://docs.oasis-open.org/wsrf/bf-2,http://vcgr.cs.virginia.edu/genii/2006/12/resource-lifetime,http://www.w3.org/2005/08/addressing,http://vcgr.cs.virginia.edu/genii/2006/12/security,http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory,http://vcgr.cs.virginia.edu/genii/2006/12/context,http://vcgr.cs.virginia.edu/genii/2006/12/resource-authz,http://vcgr.cs.virginia.edu/genii/2006/12/resource,http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs,http://schemas.ggf.org/byteio/2005/10/byte-io,http://schemas.ggf.org/byteio/2005/10/random-access,http://docs.oasis-open.org/wsrf/r-2,http://docs.oasis-open.org/wsrf/rw-2"/>
       <parameter name="wsdlServicePort" value="ExportedFilePortType"/>
       <parameter name="className" value="edu.virginia.vcgr.genii.container.exportdir.ExportedFileServiceImpl"/>
       <parameter name="wsdlPortType" value="ExportedFilePortType"/>
       <parameter name="typeMappingVersion" value="1.2"/>
-      <operation name="append" qname="append" returnQName="retNS:appendResponse" xmlns:retNS="http://schemas.ggf.org/byteio/2005/10/random-access" returnType="rtns:>appendResponse" xmlns:rtns="http://schemas.ggf.org/byteio/2005/10/random-access" soapAction="http://schemas.ggf.org/byteio/2005/10/random-access/append" >
-        <parameter qname="pns:append" xmlns:pns="http://schemas.ggf.org/byteio/2005/10/random-access" type="tns:>append" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/random-access"/>
-        <fault name="WriteNotPermittedFault" qname="fns:WriteNotPermittedFault" xmlns:fns="http://schemas.ggf.org/byteio/2005/10/byte-io" class="org.ggf.byteio.WriteNotPermittedFaultType" type="tns:WriteNotPermittedFaultType" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/byte-io"/>
-        <fault name="CustomFault" qname="fns:CustomFault" xmlns:fns="http://schemas.ggf.org/byteio/2005/10/byte-io" class="org.ggf.byteio.CustomFaultType" type="tns:CustomFaultType" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/byte-io"/>
-        <fault name="UnsupportedTransferFault" qname="fns:UnsupportedTransferFault" xmlns:fns="http://schemas.ggf.org/byteio/2005/10/byte-io" class="org.ggf.byteio.UnsupportedTransferFaultType" type="tns:UnsupportedTransferFaultType" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/byte-io"/>
-        <fault name="ResourceUnknownFault" qname="fns:ResourceUnknownFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource" class="edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType" type="tns:ResourceUnknownFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource"/>
-      </operation>
-      <operation name="write" qname="write" returnQName="retNS:writeResponse" xmlns:retNS="http://schemas.ggf.org/byteio/2005/10/random-access" returnType="rtns:>writeResponse" xmlns:rtns="http://schemas.ggf.org/byteio/2005/10/random-access" soapAction="http://schemas.ggf.org/byteio/2005/10/random-access/write" >
-        <parameter qname="pns:write" xmlns:pns="http://schemas.ggf.org/byteio/2005/10/random-access" type="tns:>write" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/random-access"/>
-        <fault name="WriteNotPermittedFault" qname="fns:WriteNotPermittedFault" xmlns:fns="http://schemas.ggf.org/byteio/2005/10/byte-io" class="org.ggf.byteio.WriteNotPermittedFaultType" type="tns:WriteNotPermittedFaultType" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/byte-io"/>
-        <fault name="CustomFault" qname="fns:CustomFault" xmlns:fns="http://schemas.ggf.org/byteio/2005/10/byte-io" class="org.ggf.byteio.CustomFaultType" type="tns:CustomFaultType" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/byte-io"/>
-        <fault name="UnsupportedTransferFault" qname="fns:UnsupportedTransferFault" xmlns:fns="http://schemas.ggf.org/byteio/2005/10/byte-io" class="org.ggf.byteio.UnsupportedTransferFaultType" type="tns:UnsupportedTransferFaultType" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/byte-io"/>
-        <fault name="ResourceUnknownFault" qname="fns:ResourceUnknownFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource" class="edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType" type="tns:ResourceUnknownFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource"/>
-      </operation>
-      <operation name="subscribe" qname="subscribe" returnQName="retNS:subscribeResponse" xmlns:retNS="http://vcgr.cs.virginia.edu/genii/2006/12/notification" returnType="rtns:>subscribeResponse" xmlns:rtns="http://vcgr.cs.virginia.edu/genii/2006/12/notification" >
-        <parameter qname="pns:subscribe" xmlns:pns="http://vcgr.cs.virginia.edu/genii/2006/12/notification" type="tns:>subscribe" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/notification"/>
-        <fault name="ResourceUnknownFault" qname="fns:ResourceUnknownFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource" class="edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType" type="tns:ResourceUnknownFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource"/>
+      <operation name="getMultipleResourceProperties" qname="GetMultipleResourceProperties" returnQName="retNS:GetMultipleResourcePropertiesResponse" xmlns:retNS="http://docs.oasis-open.org/wsrf/rp-2" returnType="rtns:>GetMultipleResourcePropertiesResponse" xmlns:rtns="http://docs.oasis-open.org/wsrf/rp-2" soapAction="http://docs.oasis-open.org/wsrf/rpw-2/GetMultipleResourceProperties/GetMultipleResourcePropertiesRequest" >
+        <parameter qname="pns:GetMultipleResourceProperties" xmlns:pns="http://docs.oasis-open.org/wsrf/rp-2" type="tns:>GetMultipleResourceProperties" xmlns:tns="http://docs.oasis-open.org/wsrf/rp-2" itemQName="itns:ResourceProperty" xmlns:itns="http://docs.oasis-open.org/wsrf/rp-2"/>
+        <fault name="InvalidResourcePropertyQNameFault" qname="fns:InvalidResourcePropertyQNameFault" xmlns:fns="http://docs.oasis-open.org/wsrf/rp-2" class="org.oasis_open.docs.wsrf.rp_2.InvalidResourcePropertyQNameFaultType" type="tns:InvalidResourcePropertyQNameFaultType" xmlns:tns="http://docs.oasis-open.org/wsrf/rp-2"/>
+        <fault name="ResourceUnknownFault" qname="fns:ResourceUnknownFault" xmlns:fns="http://docs.oasis-open.org/wsrf/r-2" class="org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType" type="tns:ResourceUnknownFaultType" xmlns:tns="http://docs.oasis-open.org/wsrf/r-2"/>
+        <fault name="ResourceUnavailableFault" qname="fns:ResourceUnavailableFault" xmlns:fns="http://docs.oasis-open.org/wsrf/r-2" class="org.oasis_open.docs.wsrf.r_2.ResourceUnavailableFaultType" type="tns:ResourceUnavailableFaultType" xmlns:tns="http://docs.oasis-open.org/wsrf/r-2"/>
       </operation>
       <operation name="getAttributesDocument" qname="getAttributesDocument" returnQName="retNS:getAttributesDocumentResponse" xmlns:retNS="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs" returnType="rtns:>getAttributesDocumentResponse" xmlns:rtns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs" >
         <parameter qname="pns:getAttributesDocument" xmlns:pns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs" type="tns:anyType" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
         <fault name="ResourceUnknownFault" qname="fns:ResourceUnknownFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource" class="edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType" type="tns:ResourceUnknownFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource"/>
       </operation>
-      <operation name="truncAppend" qname="truncAppend" returnQName="retNS:truncAppendResponse" xmlns:retNS="http://schemas.ggf.org/byteio/2005/10/random-access" returnType="rtns:>truncAppendResponse" xmlns:rtns="http://schemas.ggf.org/byteio/2005/10/random-access" soapAction="http://schemas.ggf.org/byteio/2005/10/random-access/truncAppend" >
-        <parameter qname="pns:truncAppend" xmlns:pns="http://schemas.ggf.org/byteio/2005/10/random-access" type="tns:>truncAppend" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/random-access"/>
-        <fault name="TruncateNotPermittedFault" qname="fns:TruncateNotPermittedFault" xmlns:fns="http://schemas.ggf.org/byteio/2005/10/random-access" class="org.ggf.rbyteio.TruncateNotPermittedFaultType" type="tns:TruncateNotPermittedFaultType" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/random-access"/>
+      <operation name="append" qname="append" returnQName="retNS:appendResponse" xmlns:retNS="http://schemas.ggf.org/byteio/2005/10/random-access" returnType="rtns:>appendResponse" xmlns:rtns="http://schemas.ggf.org/byteio/2005/10/random-access" soapAction="http://schemas.ggf.org/byteio/2005/10/random-access/append" >
+        <parameter qname="pns:append" xmlns:pns="http://schemas.ggf.org/byteio/2005/10/random-access" type="tns:>append" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/random-access"/>
+        <fault name="ResourceUnknownFault" qname="fns:ResourceUnknownFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource" class="edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType" type="tns:ResourceUnknownFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource"/>
         <fault name="WriteNotPermittedFault" qname="fns:WriteNotPermittedFault" xmlns:fns="http://schemas.ggf.org/byteio/2005/10/byte-io" class="org.ggf.byteio.WriteNotPermittedFaultType" type="tns:WriteNotPermittedFaultType" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/byte-io"/>
-        <fault name="CustomFault" qname="fns:CustomFault" xmlns:fns="http://schemas.ggf.org/byteio/2005/10/byte-io" class="org.ggf.byteio.CustomFaultType" type="tns:CustomFaultType" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/byte-io"/>
         <fault name="UnsupportedTransferFault" qname="fns:UnsupportedTransferFault" xmlns:fns="http://schemas.ggf.org/byteio/2005/10/byte-io" class="org.ggf.byteio.UnsupportedTransferFaultType" type="tns:UnsupportedTransferFaultType" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/byte-io"/>
-        <fault name="ResourceUnknownFault" qname="fns:ResourceUnknownFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource" class="edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType" type="tns:ResourceUnknownFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource"/>
-      </operation>
-      <operation name="getAttributes" qname="getAttributes" returnQName="retNS:getAttributesResponse" xmlns:retNS="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs" returnType="rtns:>getAttributesResponse" xmlns:rtns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs" >
-        <parameter qname="pns:getAttributes" xmlns:pns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs" type="tns:>getAttributes" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs" itemQName="itns:attribute-qname" xmlns:itns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"/>
-        <fault name="ResourceUnknownFault" qname="fns:ResourceUnknownFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource" class="edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType" type="tns:ResourceUnknownFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource"/>
-        <fault name="AttributeUnknownFault" qname="fns:AttributeUnknownFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs" class="edu.virginia.vcgr.genii.common.rattrs.AttributeUnknownFaultType" type="tns:AttributeUnknownFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"/>
-      </operation>
-      <operation name="vcgrCreate" qname="vcgrCreate" returnQName="retNS:vcgrCreateResponse" xmlns:retNS="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory" returnType="rtns:>vcgrCreateResponse" xmlns:rtns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory" >
-        <parameter qname="pns:vcgrCreate" xmlns:pns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory" type="tns:>vcgrCreate" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"/>
-        <fault name="ResourceCreationFault" qname="fns:ResourceCreationFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory" class="edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType" type="tns:ResourceCreationFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"/>
-        <fault name="ResourceUnknownFault" qname="fns:ResourceUnknownFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource" class="edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType" type="tns:ResourceUnknownFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource"/>
+        <fault name="CustomFault" qname="fns:CustomFault" xmlns:fns="http://schemas.ggf.org/byteio/2005/10/byte-io" class="org.ggf.byteio.CustomFaultType" type="tns:CustomFaultType" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/byte-io"/>
       </operation>
       <operation name="immediateTerminate" qname="immediateTerminate" returnQName="retNS:immediateTerminateResponse" xmlns:retNS="http://vcgr.cs.virginia.edu/genii/2006/12/resource-lifetime" returnType="rtns:anyType" xmlns:rtns="http://www.w3.org/2001/XMLSchema" >
         <parameter qname="pns:immediateTerminate" xmlns:pns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-lifetime" type="tns:anyType" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
         <fault name="ResourceUnknownFault" qname="fns:ResourceUnknownFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource" class="edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType" type="tns:ResourceUnknownFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource"/>
       </operation>
+      <operation name="getResourceProperty" qname="GetResourceProperty" returnQName="retNS:GetResourcePropertyResponse" xmlns:retNS="http://docs.oasis-open.org/wsrf/rp-2" returnType="rtns:>GetResourcePropertyResponse" xmlns:rtns="http://docs.oasis-open.org/wsrf/rp-2" soapAction="http://docs.oasis-open.org/wsrf/rpw-2/GetResourceProperty/GetResourcePropertyRequest" >
+        <parameter qname="pns:GetResourceProperty" xmlns:pns="http://docs.oasis-open.org/wsrf/rp-2" type="tns:QName" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <fault name="InvalidResourcePropertyQNameFault" qname="fns:InvalidResourcePropertyQNameFault" xmlns:fns="http://docs.oasis-open.org/wsrf/rp-2" class="org.oasis_open.docs.wsrf.rp_2.InvalidResourcePropertyQNameFaultType" type="tns:InvalidResourcePropertyQNameFaultType" xmlns:tns="http://docs.oasis-open.org/wsrf/rp-2"/>
+        <fault name="ResourceUnknownFault" qname="fns:ResourceUnknownFault" xmlns:fns="http://docs.oasis-open.org/wsrf/r-2" class="org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType" type="tns:ResourceUnknownFaultType" xmlns:tns="http://docs.oasis-open.org/wsrf/r-2"/>
+        <fault name="ResourceUnavailableFault" qname="fns:ResourceUnavailableFault" xmlns:fns="http://docs.oasis-open.org/wsrf/r-2" class="org.oasis_open.docs.wsrf.r_2.ResourceUnavailableFaultType" type="tns:ResourceUnavailableFaultType" xmlns:tns="http://docs.oasis-open.org/wsrf/r-2"/>
+      </operation>
       <operation name="setAttributes" qname="setAttributes" returnQName="retNS:setAttributesResponse" xmlns:retNS="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs" returnType="rtns:>setAttributesResponse" xmlns:rtns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs" >
         <parameter qname="pns:setAttributes" xmlns:pns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs" type="tns:>setAttributes" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"/>
-        <fault name="AttributeNotSettableFault" qname="fns:AttributeNotSettableFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs" class="edu.virginia.vcgr.genii.common.rattrs.AttributeNotSettableFaultType" type="tns:AttributeNotSettableFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"/>
-        <fault name="IncorrectAttributeCardinalityFault" qname="fns:IncorrectAttributeCardinalityFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs" class="edu.virginia.vcgr.genii.common.rattrs.IncorrectAttributeCardinalityFaultType" type="tns:IncorrectAttributeCardinalityFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"/>
-        <fault name="ResourceUnknownFault" qname="fns:ResourceUnknownFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource" class="edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType" type="tns:ResourceUnknownFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource"/>
         <fault name="AttributeUnknownFault" qname="fns:AttributeUnknownFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs" class="edu.virginia.vcgr.genii.common.rattrs.AttributeUnknownFaultType" type="tns:AttributeUnknownFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"/>
+        <fault name="ResourceUnknownFault" qname="fns:ResourceUnknownFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource" class="edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType" type="tns:ResourceUnknownFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource"/>
+        <fault name="IncorrectAttributeCardinalityFault" qname="fns:IncorrectAttributeCardinalityFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs" class="edu.virginia.vcgr.genii.common.rattrs.IncorrectAttributeCardinalityFaultType" type="tns:IncorrectAttributeCardinalityFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"/>
+        <fault name="AttributeNotSettableFault" qname="fns:AttributeNotSettableFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs" class="edu.virginia.vcgr.genii.common.rattrs.AttributeNotSettableFaultType" type="tns:AttributeNotSettableFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"/>
+      </operation>
+      <operation name="subscribe" qname="subscribe" returnQName="retNS:subscribeResponse" xmlns:retNS="http://vcgr.cs.virginia.edu/genii/2006/12/notification" returnType="rtns:>subscribeResponse" xmlns:rtns="http://vcgr.cs.virginia.edu/genii/2006/12/notification" >
+        <parameter qname="pns:subscribe" xmlns:pns="http://vcgr.cs.virginia.edu/genii/2006/12/notification" type="tns:>subscribe" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/notification"/>
+        <fault name="ResourceUnknownFault" qname="fns:ResourceUnknownFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource" class="edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType" type="tns:ResourceUnknownFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource"/>
+      </operation>
+      <operation name="write" qname="write" returnQName="retNS:writeResponse" xmlns:retNS="http://schemas.ggf.org/byteio/2005/10/random-access" returnType="rtns:>writeResponse" xmlns:rtns="http://schemas.ggf.org/byteio/2005/10/random-access" soapAction="http://schemas.ggf.org/byteio/2005/10/random-access/write" >
+        <parameter qname="pns:write" xmlns:pns="http://schemas.ggf.org/byteio/2005/10/random-access" type="tns:>write" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/random-access"/>
+        <fault name="ResourceUnknownFault" qname="fns:ResourceUnknownFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource" class="edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType" type="tns:ResourceUnknownFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource"/>
+        <fault name="WriteNotPermittedFault" qname="fns:WriteNotPermittedFault" xmlns:fns="http://schemas.ggf.org/byteio/2005/10/byte-io" class="org.ggf.byteio.WriteNotPermittedFaultType" type="tns:WriteNotPermittedFaultType" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/byte-io"/>
+        <fault name="UnsupportedTransferFault" qname="fns:UnsupportedTransferFault" xmlns:fns="http://schemas.ggf.org/byteio/2005/10/byte-io" class="org.ggf.byteio.UnsupportedTransferFaultType" type="tns:UnsupportedTransferFaultType" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/byte-io"/>
+        <fault name="CustomFault" qname="fns:CustomFault" xmlns:fns="http://schemas.ggf.org/byteio/2005/10/byte-io" class="org.ggf.byteio.CustomFaultType" type="tns:CustomFaultType" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/byte-io"/>
+      </operation>
+      <operation name="truncAppend" qname="truncAppend" returnQName="retNS:truncAppendResponse" xmlns:retNS="http://schemas.ggf.org/byteio/2005/10/random-access" returnType="rtns:>truncAppendResponse" xmlns:rtns="http://schemas.ggf.org/byteio/2005/10/random-access" soapAction="http://schemas.ggf.org/byteio/2005/10/random-access/truncAppend" >
+        <parameter qname="pns:truncAppend" xmlns:pns="http://schemas.ggf.org/byteio/2005/10/random-access" type="tns:>truncAppend" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/random-access"/>
+        <fault name="ResourceUnknownFault" qname="fns:ResourceUnknownFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource" class="edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType" type="tns:ResourceUnknownFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource"/>
+        <fault name="WriteNotPermittedFault" qname="fns:WriteNotPermittedFault" xmlns:fns="http://schemas.ggf.org/byteio/2005/10/byte-io" class="org.ggf.byteio.WriteNotPermittedFaultType" type="tns:WriteNotPermittedFaultType" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/byte-io"/>
+        <fault name="UnsupportedTransferFault" qname="fns:UnsupportedTransferFault" xmlns:fns="http://schemas.ggf.org/byteio/2005/10/byte-io" class="org.ggf.byteio.UnsupportedTransferFaultType" type="tns:UnsupportedTransferFaultType" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/byte-io"/>
+        <fault name="TruncateNotPermittedFault" qname="fns:TruncateNotPermittedFault" xmlns:fns="http://schemas.ggf.org/byteio/2005/10/random-access" class="org.ggf.rbyteio.TruncateNotPermittedFaultType" type="tns:TruncateNotPermittedFaultType" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/random-access"/>
+        <fault name="CustomFault" qname="fns:CustomFault" xmlns:fns="http://schemas.ggf.org/byteio/2005/10/byte-io" class="org.ggf.byteio.CustomFaultType" type="tns:CustomFaultType" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/byte-io"/>
       </operation>
       <operation name="read" qname="read" returnQName="retNS:readResponse" xmlns:retNS="http://schemas.ggf.org/byteio/2005/10/random-access" returnType="rtns:>readResponse" xmlns:rtns="http://schemas.ggf.org/byteio/2005/10/random-access" soapAction="http://schemas.ggf.org/byteio/2005/10/random-access/read" >
         <parameter qname="pns:read" xmlns:pns="http://schemas.ggf.org/byteio/2005/10/random-access" type="tns:>read" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/random-access"/>
-        <fault name="CustomFault" qname="fns:CustomFault" xmlns:fns="http://schemas.ggf.org/byteio/2005/10/byte-io" class="org.ggf.byteio.CustomFaultType" type="tns:CustomFaultType" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/byte-io"/>
         <fault name="ReadNotPermittedFault" qname="fns:ReadNotPermittedFault" xmlns:fns="http://schemas.ggf.org/byteio/2005/10/byte-io" class="org.ggf.byteio.ReadNotPermittedFaultType" type="tns:ReadNotPermittedFaultType" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/byte-io"/>
-        <fault name="UnsupportedTransferFault" qname="fns:UnsupportedTransferFault" xmlns:fns="http://schemas.ggf.org/byteio/2005/10/byte-io" class="org.ggf.byteio.UnsupportedTransferFaultType" type="tns:UnsupportedTransferFaultType" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/byte-io"/>
         <fault name="ResourceUnknownFault" qname="fns:ResourceUnknownFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource" class="edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType" type="tns:ResourceUnknownFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource"/>
+        <fault name="UnsupportedTransferFault" qname="fns:UnsupportedTransferFault" xmlns:fns="http://schemas.ggf.org/byteio/2005/10/byte-io" class="org.ggf.byteio.UnsupportedTransferFaultType" type="tns:UnsupportedTransferFaultType" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/byte-io"/>
+        <fault name="CustomFault" qname="fns:CustomFault" xmlns:fns="http://schemas.ggf.org/byteio/2005/10/byte-io" class="org.ggf.byteio.CustomFaultType" type="tns:CustomFaultType" xmlns:tns="http://schemas.ggf.org/byteio/2005/10/byte-io"/>
+      </operation>
+      <operation name="vcgrCreate" qname="vcgrCreate" returnQName="retNS:vcgrCreateResponse" xmlns:retNS="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory" returnType="rtns:>vcgrCreateResponse" xmlns:rtns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory" >
+        <parameter qname="pns:vcgrCreate" xmlns:pns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory" type="tns:>vcgrCreate" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"/>
+        <fault name="ResourceUnknownFault" qname="fns:ResourceUnknownFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource" class="edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType" type="tns:ResourceUnknownFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource"/>
+        <fault name="ResourceCreationFault" qname="fns:ResourceCreationFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory" class="edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType" type="tns:ResourceCreationFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"/>
       </operation>
       <operation name="ping" qname="ping" returnQName="retNS:pingResponse" xmlns:retNS="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" >
         <parameter qname="pns:ping" xmlns:pns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
       </operation>
-      <parameter name="allowedMethods" value="append write subscribe getAttributesDocument truncAppend vcgrCreate getAttributes immediateTerminate setAttributes ping read"/>
+      <operation name="getAttributes" qname="getAttributes" returnQName="retNS:getAttributesResponse" xmlns:retNS="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs" returnType="rtns:>getAttributesResponse" xmlns:rtns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs" >
+        <parameter qname="pns:getAttributes" xmlns:pns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs" type="tns:>getAttributes" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs" itemQName="itns:attribute-qname" xmlns:itns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"/>
+        <fault name="AttributeUnknownFault" qname="fns:AttributeUnknownFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs" class="edu.virginia.vcgr.genii.common.rattrs.AttributeUnknownFaultType" type="tns:AttributeUnknownFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"/>
+        <fault name="ResourceUnknownFault" qname="fns:ResourceUnknownFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource" class="edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType" type="tns:ResourceUnknownFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource"/>
+      </operation>
+      <parameter name="allowedMethods" value="getAttributesDocument append immediateTerminate getMultipleResourceProperties setAttributes getResourceProperty subscribe write truncAppend read vcgrCreate ping getAttributes"/>
 
       <typeMapping
-        xmlns:ns="http://schemas.ggf.org/byteio/2005/10/random-access"
-        qname="ns:>truncAppend"
-        type="java:org.ggf.rbyteio.TruncAppend"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://schemas.ggf.org/byteio/2005/10/random-access"
-        qname="ns:>writeResponse"
-        type="java:org.ggf.rbyteio.WriteResponse"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/security"
-        qname="ns:GamlIdentityListType"
-        type="java:edu.virginia.vcgr.genii.common.security.GamlIdentityListType"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/security"
-        qname="ns:>RequiredMessageSecurityType>min"
-        type="java:edu.virginia.vcgr.genii.common.security.RequiredMessageSecurityTypeMin"
-        serializer="org.apache.axis.encoding.ser.EnumSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/context"
-        qname="ns:RNSPathElementType"
-        type="java:edu.virginia.vcgr.genii.context.RNSPathElementType"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
-        qname="ns:>setAttributes"
-        type="java:edu.virginia.vcgr.genii.common.rattrs.SetAttributes"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
         xmlns:ns="http://www.w3.org/2005/08/addressing"
-        qname="ns:FaultCodesType"
-        type="java:org.ws.addressing.FaultCodesType"
-        serializer="org.apache.axis.encoding.ser.EnumSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://schemas.ggf.org/byteio/2005/10/random-access"
-        qname="ns:>read"
-        type="java:org.ggf.rbyteio.Read"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/security"
-        qname="ns:RequiredMessageSecurityType"
-        type="java:edu.virginia.vcgr.genii.common.security.RequiredMessageSecurityType"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://schemas.ggf.org/byteio/2005/10/random-access"
-        qname="ns:>write"
-        type="java:org.ggf.rbyteio.Write"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <arrayMapping
-        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
-        qname="ns:>getAttributes"
-        type="java:javax.xml.namespace.QName[]"
-        innerType="cmp-ns:QName" xmlns:cmp-ns="http://www.w3.org/2001/XMLSchema"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/security"
-        qname="ns:X509IdentityType"
-        type="java:edu.virginia.vcgr.genii.common.security.X509IdentityType"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://schemas.ggf.org/byteio/2005/10/random-access"
-        qname="ns:TruncateNotPermittedFaultType"
-        type="java:org.ggf.rbyteio.TruncateNotPermittedFaultType"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://www.w3.org/2005/08/addressing"
-        qname="ns:ReferenceParametersType"
-        type="java:org.ws.addressing.ReferenceParametersType"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://docs.oasis-open.org/wsrf/bf-2"
-        qname="ns:>BaseFaultType>ErrorCode"
-        type="java:org.oasis_open.wsrf.basefaults.BaseFaultTypeErrorCode"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/security"
-        qname="ns:IdentityType"
-        type="java:edu.virginia.vcgr.genii.common.security.IdentityType"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/security"
-        qname="ns:PublicKeyType"
-        type="java:edu.virginia.vcgr.genii.common.security.PublicKeyType"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/context"
-        qname="ns:ContextType"
-        type="java:edu.virginia.vcgr.genii.context.ContextType"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
-        qname="ns:ResourceCreationFaultType"
-        type="java:edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
-        qname="ns:user-data-type"
-        type="java:edu.virginia.vcgr.genii.common.notification.UserDataType"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://schemas.ggf.org/byteio/2005/10/byte-io"
-        qname="ns:ReadNotPermittedFaultType"
-        type="java:org.ggf.byteio.ReadNotPermittedFaultType"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://schemas.ggf.org/byteio/2005/10/random-access"
-        qname="ns:>truncAppendResponse"
-        type="java:org.ggf.rbyteio.TruncAppendResponse"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://schemas.ggf.org/byteio/2005/10/random-access"
-        qname="ns:>append"
-        type="java:org.ggf.rbyteio.Append"
+        qname="ns:MetadataType"
+        type="java:org.ws.addressing.MetadataType"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
@@ -275,9 +112,9 @@
         encodingStyle=""
       />
       <typeMapping
-        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/security"
-        qname="ns:AuthZConfig"
-        type="java:edu.virginia.vcgr.genii.common.security.AuthZConfig"
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/context"
+        qname="ns:ContextType"
+        type="java:edu.virginia.vcgr.genii.context.ContextType"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
@@ -291,24 +128,73 @@
         encodingStyle=""
       />
       <typeMapping
-        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/context"
-        qname="ns:ContextNameValuePairType"
-        type="java:edu.virginia.vcgr.genii.context.ContextNameValuePairType"
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:>SetResourceProperties"
+        type="java:org.oasis_open.docs.wsrf.rp_2.SetResourceProperties"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
-      <arrayMapping
-        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/context"
-        qname="ns:RNSPathDataType"
-        type="java:edu.virginia.vcgr.genii.context.RNSPathElementType[]"
-        innerType="cmp-ns:RNSPathElementType" xmlns:cmp-ns="http://vcgr.cs.virginia.edu/genii/2006/12/context"
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:>DeleteResourceProperties"
+        type="java:org.oasis_open.docs.wsrf.rp_2.DeleteResourceProperties"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
       <typeMapping
-        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
-        qname="ns:IncorrectAttributeCardinalityFaultType"
-        type="java:edu.virginia.vcgr.genii.common.rattrs.IncorrectAttributeCardinalityFaultType"
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:>InsertResourceProperties"
+        type="java:org.oasis_open.docs.wsrf.rp_2.InsertResourceProperties"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/security"
+        qname="ns:AuthZConfig"
+        type="java:edu.virginia.vcgr.genii.common.security.AuthZConfig"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:QueryExpressionType"
+        type="java:org.oasis_open.docs.wsrf.rp_2.QueryExpressionType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:>GetMultipleResourcePropertiesResponse"
+        type="java:org.oasis_open.docs.wsrf.rp_2.GetMultipleResourcePropertiesResponse"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://schemas.ggf.org/byteio/2005/10/random-access"
+        qname="ns:>append"
+        type="java:org.ggf.rbyteio.Append"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://schemas.ggf.org/byteio/2005/10/random-access"
+        qname="ns:>truncAppend"
+        type="java:org.ggf.rbyteio.TruncAppend"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
+        qname="ns:user-data-type"
+        type="java:edu.virginia.vcgr.genii.common.notification.UserDataType"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
@@ -322,43 +208,75 @@
         encodingStyle=""
       />
       <typeMapping
-        xmlns:ns="http://www.w3.org/2005/08/addressing"
-        qname="ns:EndpointReferenceType"
-        type="java:org.ws.addressing.EndpointReferenceType"
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:>InsertResourcePropertiesResponse"
+        type="java:org.oasis_open.docs.wsrf.rp_2.InsertResourcePropertiesResponse"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
       <typeMapping
         xmlns:ns="http://schemas.ggf.org/byteio/2005/10/random-access"
-        qname="ns:>appendResponse"
-        type="java:org.ggf.rbyteio.AppendResponse"
+        qname="ns:>writeResponse"
+        type="java:org.ggf.rbyteio.WriteResponse"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:>ResourcePropertyChangeFailureType>CurrentValue"
+        type="java:org.oasis_open.docs.wsrf.rp_2.ResourcePropertyChangeFailureTypeCurrentValue"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:InvalidModificationFaultType"
+        type="java:org.oasis_open.docs.wsrf.rp_2.InvalidModificationFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:>GetResourcePropertyResponse"
+        type="java:org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyResponse"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:QueryEvaluationErrorFaultType"
+        type="java:org.oasis_open.docs.wsrf.rp_2.QueryEvaluationErrorFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/r-2"
+        qname="ns:ResourceUnavailableFaultType"
+        type="java:org.oasis_open.docs.wsrf.r_2.ResourceUnavailableFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:>GetResourcePropertyDocumentResponse"
+        type="java:org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyDocumentResponse"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
       <typeMapping
         xmlns:ns="http://www.w3.org/2005/08/addressing"
-        qname="ns:ProblemActionType"
-        type="java:org.ws.addressing.ProblemActionType"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://docs.oasis-open.org/wsrf/bf-2"
-        qname="ns:>BaseFaultType>FaultCause"
-        type="java:org.oasis_open.wsrf.basefaults.BaseFaultTypeFaultCause"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
-        qname="ns:AttributeNotSettableFaultType"
-        type="java:edu.virginia.vcgr.genii.common.rattrs.AttributeNotSettableFaultType"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        qname="ns:AttributedURIType"
+        type="java:org.ws.addressing.AttributedURIType"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
         encodingStyle=""
       />
       <typeMapping
@@ -370,9 +288,152 @@
         encodingStyle=""
       />
       <typeMapping
+        xmlns:ns="http://schemas.ggf.org/byteio/2005/10/random-access"
+        qname="ns:>read"
+        type="java:org.ggf.rbyteio.Read"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:>GetResourcePropertyDocument"
+        type="java:org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyDocument"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
+        qname="ns:>notify"
+        type="java:edu.virginia.vcgr.genii.common.notification.Notify"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:ReferenceParametersType"
+        type="java:org.ws.addressing.ReferenceParametersType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:UnknownQueryExpressionDialectFaultType"
+        type="java:org.oasis_open.docs.wsrf.rp_2.UnknownQueryExpressionDialectFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:>QueryExpressionRPDocument"
+        type="java:org.apache.axis.types.URI[]"
+        innerType="cmp-ns:QueryExpressionDialect" xmlns:cmp-ns="http://docs.oasis-open.org/wsrf/rp-2"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/security"
+        qname="ns:PublicKeyType"
+        type="java:edu.virginia.vcgr.genii.common.security.PublicKeyType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://schemas.ggf.org/byteio/2005/10/byte-io"
+        qname="ns:ReadNotPermittedFaultType"
+        type="java:org.ggf.byteio.ReadNotPermittedFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/security"
+        qname="ns:UTIdentityType"
+        type="java:edu.virginia.vcgr.genii.common.security.UTIdentityType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:FaultCodesType"
+        type="java:org.ws.addressing.FaultCodesType"
+        serializer="org.apache.axis.encoding.ser.EnumSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/security"
+        qname="ns:IDPIdentityType"
+        type="java:edu.virginia.vcgr.genii.common.security.IDPIdentityType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
         xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
-        qname="ns:>setAttributesResponse"
-        type="java:edu.virginia.vcgr.genii.common.rattrs.SetAttributesResponse"
+        qname="ns:>getAttributesDocumentResponse"
+        type="java:edu.virginia.vcgr.genii.common.rattrs.GetAttributesDocumentResponse"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:InvalidResourcePropertyQNameFaultType"
+        type="java:org.oasis_open.docs.wsrf.rp_2.InvalidResourcePropertyQNameFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:DeleteResourcePropertiesRequestFailedFaultType"
+        type="java:org.oasis_open.docs.wsrf.rp_2.DeleteResourcePropertiesRequestFailedFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/security"
+        qname="ns:X509IdentityType"
+        type="java:edu.virginia.vcgr.genii.common.security.X509IdentityType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
+        qname="ns:>setAttributes"
+        type="java:edu.virginia.vcgr.genii.common.rattrs.SetAttributes"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:>QueryResourceProperties"
+        type="java:org.oasis_open.docs.wsrf.rp_2.QueryResourceProperties"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
+        qname="ns:>vcgrCreate"
+        type="java:edu.virginia.vcgr.genii.common.rfactory.VcgrCreate"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
+        qname="ns:>vcgrCreateResponse"
+        type="java:edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
@@ -387,8 +448,8 @@
       />
       <typeMapping
         xmlns:ns="http://schemas.ggf.org/byteio/2005/10/random-access"
-        qname="ns:>readResponse"
-        type="java:org.ggf.rbyteio.ReadResponse"
+        qname="ns:>write"
+        type="java:org.ggf.rbyteio.Write"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
@@ -402,97 +463,17 @@
         encodingStyle=""
       />
       <typeMapping
-        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
-        qname="ns:>getAttributesResponse"
-        type="java:edu.virginia.vcgr.genii.common.rattrs.GetAttributesResponse"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://www.w3.org/2005/08/addressing"
-        qname="ns:RelationshipType"
-        type="java:org.ws.addressing.RelationshipType"
-        serializer="org.apache.axis.encoding.ser.EnumSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
-        qname="ns:>notify"
-        type="java:edu.virginia.vcgr.genii.common.notification.Notify"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://www.w3.org/2005/08/addressing"
-        qname="ns:AttributedAnyType"
-        type="java:org.ws.addressing.AttributedAnyType"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
-        qname="ns:>subscribeResponse"
-        type="java:edu.virginia.vcgr.genii.common.notification.SubscribeResponse"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/security"
-        qname="ns:CertificateChainType"
-        type="java:edu.virginia.vcgr.genii.common.security.CertificateChainType"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://schemas.ggf.org/byteio/2005/10/byte-io"
-        qname="ns:CustomFaultType"
-        type="java:org.ggf.byteio.CustomFaultType"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://www.w3.org/2005/08/addressing"
-        qname="ns:AttributedQNameType"
-        type="java:org.ws.addressing.AttributedQNameType"
-        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://schemas.ggf.org/byteio/2005/10/byte-io"
-        qname="ns:UnsupportedTransferFaultType"
-        type="java:org.ggf.byteio.UnsupportedTransferFaultType"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://www.w3.org/2005/08/addressing"
-        qname="ns:FaultCodesOpenEnumType"
-        type="java:org.ws.addressing.FaultCodesOpenEnumType"
-        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
-        qname="ns:>vcgrCreateResponse"
-        type="java:edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse"
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:>ResourcePropertyChangeFailureType>RequestedValue"
+        type="java:org.oasis_open.docs.wsrf.rp_2.ResourcePropertyChangeFailureTypeRequestedValue"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
       <typeMapping
         xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
-        qname="ns:>getAttributesDocumentResponse"
-        type="java:edu.virginia.vcgr.genii.common.rattrs.GetAttributesDocumentResponse"
+        qname="ns:>setAttributesResponse"
+        type="java:edu.virginia.vcgr.genii.common.rattrs.SetAttributesResponse"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
@@ -506,57 +487,41 @@
         encodingStyle=""
       />
       <typeMapping
-        xmlns:ns="http://www.w3.org/2005/08/addressing"
-        qname="ns:MetadataType"
-        type="java:org.ws.addressing.MetadataType"
+        xmlns:ns="http://schemas.ggf.org/byteio/2005/10/random-access"
+        qname="ns:>appendResponse"
+        type="java:org.ggf.rbyteio.AppendResponse"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
       <typeMapping
-        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/security"
-        qname="ns:UTIdentityType"
-        type="java:edu.virginia.vcgr.genii.common.security.UTIdentityType"
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:>DeleteResourcePropertiesResponse"
+        type="java:org.oasis_open.docs.wsrf.rp_2.DeleteResourcePropertiesResponse"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
       <typeMapping
-        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
-        qname="ns:>vcgrCreate"
-        type="java:edu.virginia.vcgr.genii.common.rfactory.VcgrCreate"
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
+        qname="ns:AttributeUnknownFaultType"
+        type="java:edu.virginia.vcgr.genii.common.rattrs.AttributeUnknownFaultType"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
       <typeMapping
-        xmlns:ns="http://www.w3.org/2005/08/addressing"
-        qname="ns:RelatesToType"
-        type="java:org.ws.addressing.RelatesToType"
-        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://www.w3.org/2005/08/addressing"
-        qname="ns:RelationshipTypeOpenEnum"
-        type="java:org.ws.addressing.RelationshipTypeOpenEnum"
-        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://schemas.ggf.org/byteio/2005/10/byte-io"
-        qname="ns:transfer-information-type"
-        type="java:org.ggf.byteio.TransferInformationType"
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
+        qname="ns:>subscribeResponse"
+        type="java:edu.virginia.vcgr.genii.common.notification.SubscribeResponse"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
       <typeMapping
-        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/security"
-        qname="ns:IDPIdentityType"
-        type="java:edu.virginia.vcgr.genii.common.security.IDPIdentityType"
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:>ResourcePropertyValueChangeNotificationType>OldValues"
+        type="java:org.oasis_open.docs.wsrf.rp_2.ResourcePropertyValueChangeNotificationTypeOldValues"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
@@ -570,6 +535,117 @@
         encodingStyle=""
       />
       <typeMapping
+        xmlns:ns="http://schemas.ggf.org/byteio/2005/10/byte-io"
+        qname="ns:CustomFaultType"
+        type="java:org.ggf.byteio.CustomFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:>PutResourcePropertyDocument"
+        type="java:org.oasis_open.docs.wsrf.rp_2.PutResourcePropertyDocument"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/r-2"
+        qname="ns:ResourceUnknownFaultType"
+        type="java:org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://schemas.ggf.org/byteio/2005/10/byte-io"
+        qname="ns:UnsupportedTransferFaultType"
+        type="java:org.ggf.byteio.UnsupportedTransferFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/context"
+        qname="ns:RNSPathElementType"
+        type="java:edu.virginia.vcgr.genii.context.RNSPathElementType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/context"
+        qname="ns:ContextNameValuePairType"
+        type="java:edu.virginia.vcgr.genii.context.ContextNameValuePairType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:SetResourcePropertyRequestFailedFaultType"
+        type="java:org.oasis_open.docs.wsrf.rp_2.SetResourcePropertyRequestFailedFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/security"
+        qname="ns:CertificateChainType"
+        type="java:edu.virginia.vcgr.genii.common.security.CertificateChainType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/security"
+        qname="ns:>RequiredMessageSecurityType>min"
+        type="java:edu.virginia.vcgr.genii.common.security.RequiredMessageSecurityTypeMin"
+        serializer="org.apache.axis.encoding.ser.EnumSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:EndpointReferenceType"
+        type="java:org.ws.addressing.EndpointReferenceType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/bf-2"
+        qname="ns:>BaseFaultType>ErrorCode"
+        type="java:org.oasis_open.wsrf.basefaults.BaseFaultTypeErrorCode"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
+        qname="ns:AttributeNotSettableFaultType"
+        type="java:edu.virginia.vcgr.genii.common.rattrs.AttributeNotSettableFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/context"
+        qname="ns:RNSPathDataType"
+        type="java:edu.virginia.vcgr.genii.context.RNSPathElementType[]"
+        innerType="cmp-ns:RNSPathElementType" xmlns:cmp-ns="http://vcgr.cs.virginia.edu/genii/2006/12/context"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://schemas.ggf.org/byteio/2005/10/random-access"
+        qname="ns:>readResponse"
+        type="java:org.ggf.rbyteio.ReadResponse"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
         xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
         qname="ns:topic-type"
         type="java:org.apache.axis.types.Token"
@@ -577,18 +653,280 @@
         deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
         encodingStyle=""
       />
+      <arrayMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:>GetMultipleResourceProperties"
+        type="java:javax.xml.namespace.QName[]"
+        innerType="cmp-ns:QName" xmlns:cmp-ns="http://www.w3.org/2001/XMLSchema"
+        encodingStyle=""
+      />
       <typeMapping
         xmlns:ns="http://www.w3.org/2005/08/addressing"
-        qname="ns:AttributedURIType"
-        type="java:org.ws.addressing.AttributedURIType"
+        qname="ns:FaultCodesOpenEnumType"
+        type="java:org.ws.addressing.FaultCodesOpenEnumType"
         serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
         encodingStyle=""
       />
       <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:>QueryResourcePropertiesResponse"
+        type="java:org.oasis_open.docs.wsrf.rp_2.QueryResourcePropertiesResponse"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:ProblemActionType"
+        type="java:org.ws.addressing.ProblemActionType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:UnableToPutResourcePropertyDocumentFaultType"
+        type="java:org.oasis_open.docs.wsrf.rp_2.UnableToPutResourcePropertyDocumentFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:RelationshipType"
+        type="java:org.ws.addressing.RelationshipType"
+        serializer="org.apache.axis.encoding.ser.EnumSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:ResourcePropertyValueChangeNotificationType"
+        type="java:org.oasis_open.docs.wsrf.rp_2.ResourcePropertyValueChangeNotificationType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
         xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
-        qname="ns:AttributeUnknownFaultType"
-        type="java:edu.virginia.vcgr.genii.common.rattrs.AttributeUnknownFaultType"
+        qname="ns:IncorrectAttributeCardinalityFaultType"
+        type="java:edu.virginia.vcgr.genii.common.rattrs.IncorrectAttributeCardinalityFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:RelationshipTypeOpenEnum"
+        type="java:org.ws.addressing.RelationshipTypeOpenEnum"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:AttributedQNameType"
+        type="java:org.ws.addressing.AttributedQNameType"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:>ResourcePropertyValueChangeNotificationType>NewValues"
+        type="java:org.oasis_open.docs.wsrf.rp_2.ResourcePropertyValueChangeNotificationTypeNewValues"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:ResourcePropertyChangeFailureType"
+        type="java:org.oasis_open.docs.wsrf.rp_2.ResourcePropertyChangeFailureType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:RelatesToType"
+        type="java:org.ws.addressing.RelatesToType"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:UpdateResourcePropertiesRequestFailedFaultType"
+        type="java:org.oasis_open.docs.wsrf.rp_2.UpdateResourcePropertiesRequestFailedFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/security"
+        qname="ns:GamlIdentityListType"
+        type="java:edu.virginia.vcgr.genii.common.security.GamlIdentityListType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
+        qname="ns:>getAttributes"
+        type="java:javax.xml.namespace.QName[]"
+        innerType="cmp-ns:QName" xmlns:cmp-ns="http://www.w3.org/2001/XMLSchema"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:>PutResourcePropertyDocumentResponse"
+        type="java:org.oasis_open.docs.wsrf.rp_2.PutResourcePropertyDocumentResponse"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:DeleteType"
+        type="java:org.oasis_open.docs.wsrf.rp_2.DeleteType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://schemas.ggf.org/byteio/2005/10/byte-io"
+        qname="ns:transfer-information-type"
+        type="java:org.ggf.byteio.TransferInformationType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:UpdateType"
+        type="java:org.oasis_open.docs.wsrf.rp_2.UpdateType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://schemas.ggf.org/byteio/2005/10/random-access"
+        qname="ns:>truncAppendResponse"
+        type="java:org.ggf.rbyteio.TruncAppendResponse"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://www.w3.org/2005/08/addressing"
+        qname="ns:AttributedAnyType"
+        type="java:org.ws.addressing.AttributedAnyType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:InsertResourcePropertiesRequestFailedFaultType"
+        type="java:org.oasis_open.docs.wsrf.rp_2.InsertResourcePropertiesRequestFailedFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:UnableToModifyResourcePropertyFaultType"
+        type="java:org.oasis_open.docs.wsrf.rp_2.UnableToModifyResourcePropertyFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/security"
+        qname="ns:IdentityType"
+        type="java:edu.virginia.vcgr.genii.common.security.IdentityType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:>SetResourcePropertiesResponse"
+        type="java:org.oasis_open.docs.wsrf.rp_2.SetResourcePropertiesResponse"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:>UpdateResourceProperties"
+        type="java:org.oasis_open.docs.wsrf.rp_2.UpdateResourceProperties"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:InvalidQueryExpressionFaultType"
+        type="java:org.oasis_open.docs.wsrf.rp_2.InvalidQueryExpressionFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://schemas.ggf.org/byteio/2005/10/random-access"
+        qname="ns:TruncateNotPermittedFaultType"
+        type="java:org.ggf.rbyteio.TruncateNotPermittedFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/security"
+        qname="ns:RequiredMessageSecurityType"
+        type="java:edu.virginia.vcgr.genii.common.security.RequiredMessageSecurityType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/bf-2"
+        qname="ns:>BaseFaultType>FaultCause"
+        type="java:org.oasis_open.wsrf.basefaults.BaseFaultTypeFaultCause"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
+        qname="ns:>getAttributesResponse"
+        type="java:edu.virginia.vcgr.genii.common.rattrs.GetAttributesResponse"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:>UpdateResourcePropertiesResponse"
+        type="java:org.oasis_open.docs.wsrf.rp_2.UpdateResourcePropertiesResponse"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
+        qname="ns:ResourceCreationFaultType"
+        type="java:edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
+        qname="ns:InsertType"
+        type="java:org.oasis_open.docs.wsrf.rp_2.InsertType"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
