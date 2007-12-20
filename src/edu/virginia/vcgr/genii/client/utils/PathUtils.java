@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 public class PathUtils
 {
-	static private Pattern windowsRootPathPattern = Pattern.compile("^[a-zA-Z]:\\.*");
+	static private Pattern windowsRootPathPattern = Pattern.compile("^[a-zA-Z]:\\\\.*");
 	
 	static public URI pathToURI(String path) throws URISyntaxException
 	{
