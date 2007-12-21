@@ -19,10 +19,8 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
+import java.text.*;
+import java.util.*;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
@@ -447,8 +445,17 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 					null);
 		}
 
-		Date created = new Date(lifetime.getCreated().get_value());
-		Date expiry = new Date(lifetime.getExpires().get_value());
+	    SimpleDateFormat zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		Date created = zulu.parse(lifetime.getCreated().get_value(), new ParsePosition(0));
+		Date expiry = zulu.parse(lifetime.getExpires().get_value(), new ParsePosition(0));
+
+		if ((created == null) || (expiry == null)) {
+			throw new AxisFault(
+					new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "InvalidRequest"), 
+					"Could not parse lifetime dates", 
+					null, 
+					null);
+		}
 		
 		//------ Assemble response ------------------------------------------		
 		

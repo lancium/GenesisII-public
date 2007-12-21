@@ -340,10 +340,10 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			}
 		} catch (IOException ioe) {
 			throw new ResourceException(
-				"Error creating secure client stub.", ioe);
+				"Error creating secure client stub: " + ioe.getMessage(), ioe);
  		} catch (GeneralSecurityException gse) {
 			throw new ResourceException(
-				"Error creating secure client stub.", gse);
+				"Error creating secure client stub: " + gse.getMessage(), gse);
 		}
 
 	}	
@@ -402,7 +402,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		}
 		catch (Exception e)
 		{
-			throw new ResourceException("Unable to create locator instance.",
+			throw new ResourceException("Unable to create locator instance: " + e.getMessage(),
 				e);
 		}
 	}

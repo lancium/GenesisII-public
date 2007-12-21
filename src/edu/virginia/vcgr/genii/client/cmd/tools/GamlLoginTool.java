@@ -5,6 +5,7 @@ import java.io.*;
 
 import javax.xml.namespace.QName;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import org.w3c.dom.Node;
@@ -185,12 +186,17 @@ public class GamlLoginTool extends BaseGridTool {
 		elements.add(element);
 
 		// Add Lifetime element
+	    SimpleDateFormat zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+//        zulu.setTimeZone(TimeZone.getTimeZone("GMT"));
 		element = new MessageElement(
-				new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
-						"Lifetime"), new LifetimeType(new AttributedDateTime( // start time
-						new Date().toString()), new AttributedDateTime( // expiry time
-						new Date(System.currentTimeMillis() + validMillis)
-								.toString())));
+				new QName(
+					"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
+					"Lifetime"), 
+				new LifetimeType(
+					new AttributedDateTime(
+						zulu.format(new Date())), 
+					new AttributedDateTime(
+						zulu.format(new Date(System.currentTimeMillis() + validMillis)))));
 		element.setType(LifetimeType.getTypeDesc().getXmlType());
 		elements.add(element);
 
@@ -376,22 +382,25 @@ public class GamlLoginTool extends BaseGridTool {
 		RenewableClientAttribute delegateeAttribute = 
 			new RenewableClientAttribute(null, callContext);
 		
-		// log in
-		ArrayList<SignedAssertion> signedAssertions = 
-			delegateToIdentity(authnSource, delegateeAttribute);
-
-		if (signedAssertions == null) {
-			return 0;
-		}
-		
-		// insert the assertion into the calling context's transient creds
 		TransientCredentials transientCredentials = TransientCredentials
 				.getTransientCredentials(callContext);
-		transientCredentials._credentials.addAll(signedAssertions);
-
-		if (utCredential != null) {
-			// the UT credential was used only to log into the IDP, remove it
-			transientCredentials._credentials.remove(utCredential);
+		try {
+			// log in
+			ArrayList<SignedAssertion> signedAssertions = 
+				delegateToIdentity(authnSource, delegateeAttribute);
+	
+			if (signedAssertions == null) {
+				return 0;
+			}
+			
+			// insert the assertion into the calling context's transient creds
+			transientCredentials._credentials.addAll(signedAssertions);
+		} finally {
+	
+			if (utCredential != null) {
+				// the UT credential was used only to log into the IDP, remove it
+				transientCredentials._credentials.remove(utCredential);
+			}
 		}
 		
 		ContextManager.storeCurrentContext(callContext);

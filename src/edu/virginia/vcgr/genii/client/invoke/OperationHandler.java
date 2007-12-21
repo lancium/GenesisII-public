@@ -1,6 +1,6 @@
 package edu.virginia.vcgr.genii.client.invoke;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 
 class OperationHandler
 {
@@ -27,7 +27,11 @@ class OperationHandler
 			Object []p = new Object[params.length + 1];
 			p[0] = context;
 			System.arraycopy(params, 0, p, 1, params.length);
-			return _handlerMethod.invoke(_handler, p);
+			try {
+				return _handlerMethod.invoke(_handler, p);
+			} catch (InvocationTargetException e) {
+				throw e.getCause();
+			}
 		}
 	}
 }
