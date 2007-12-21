@@ -12,14 +12,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.GUID;
 
-import edu.virginia.vcgr.genii.client.GenesisIIConstants;
-import edu.virginia.vcgr.genii.client.cmd.tools.gamllogin.*;
-import edu.virginia.vcgr.genii.client.context.ContextManager;
+import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.cmd.tools.GamlLoginTool;
 import edu.virginia.vcgr.genii.client.context.ContextStreamUtils;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.TransientCredentials;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.X509Identity;
 import edu.virginia.vcgr.ogrsh.server.comm.CommUtils;
 import edu.virginia.vcgr.ogrsh.server.comm.InvocationMatcher;
 import edu.virginia.vcgr.ogrsh.server.comm.OGRSHOperation;
@@ -267,58 +263,37 @@ public class OGRSHConnection implements Runnable
 	}
 	
 	@OGRSHOperation
-	public int loginSession(String file, String password, String credentialPattern)
+	public int loginSession(String file, String password, String patternOrUsername)
 		throws OGRSHException
 	{
+		GamlLoginTool tool = new GamlLoginTool();
+		
 		try
 		{
-			AbstractGamlLoginHandler handler = null;
-			handler = new GuiGamlLoginHandler(null, null, null);
-			
-			CertEntry certEntry = handler.selectCert(new FileInputStream(file), null, password, false, credentialPattern);
-			if (certEntry == null)
+			if (file.startsWith("rns:"))
 			{
-				throw new OGRSHException("Unable to log in as \"" +
-					credentialPattern + "\".", OGRSHException.PERMISSION_DENIED);
+				tool.addArgument("--username=" + patternOrUsername);
+				tool.addArgument("--password=" + password);
+				tool.addArgument(file);
+			} else
+			{
+				tool.addArgument("--password=" + password);
+				tool.addArgument("--pattern=" + patternOrUsername);
+				tool.addArgument(file);
 			}
 			
-			// Create identitiy assertion
-			RenewableIdentityAttribute identityAttr = new RenewableIdentityAttribute(
-				new BasicConstraints(
-						System.currentTimeMillis() - (1000L * 60 * 15), // 15 minutes ago
-						GenesisIIConstants.CredentialExpirationMillis,	// valid 24 hours
-						10),
-				new X509Identity(certEntry._certChain));
-			RenewableAttributeAssertion identityAssertion =
-				new RenewableAttributeAssertion(identityAttr, certEntry._privateKey);
-			
-			// get the calling context (or create one if necessary)
-			ICallingContext callContext = ContextManager.getCurrentContext();
-			if (callContext == null)
-				throw new OGRSHException(OGRSHException.UNKNOWN_SESSION_EXCEPTION,
-					"Cannot log in without a session to log in to.");
-			
-			// Delegate the identity assertion to the temporary client
-			// identity
-			RenewableClientAttribute delegatedAttr = new RenewableClientAttribute(
-				null, identityAssertion, callContext);
-			RenewableClientAssertion delegatedAssertion = new RenewableClientAssertion(
-				delegatedAttr, certEntry._privateKey);
-			
-			// insert the assertion into the calling context's transient creds
-			TransientCredentials transientCredentials =
-				TransientCredentials.getTransientCredentials(callContext);
-			transientCredentials._credentials.add(delegatedAssertion);
-			
-			ContextManager.storeCurrentContext(callContext);
-			_mySession.setCallingContext(callContext);
-		
-			_logger.debug("Logged in as " + certEntry + "[" + file + "].");
+			return tool.run(System.out, System.err, new BufferedReader(new InputStreamReader(System.in)));
 		}
-		catch (Exception e)
+		catch (ToolException te)
 		{
-			throw new OGRSHException(e);
+			// This shouldn't happen
+			_logger.error("Unexpected login exception.", te);
+			throw new OGRSHException("Unexpected login exception.", te);
 		}
-		return 0;
+		catch (Throwable t)
+		{
+			_logger.warn("Unable to log in to grid from OGRSH.", t);
+			throw new OGRSHException("Unable to log in to grid.", t);
+		}
 	}
 }

@@ -30,12 +30,13 @@ public class ConnectTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
+		File testUserDir = null;
 		String connectURL = getArgument(0);
 		String deploymentDir = null;
 		if (numArguments() > 1)
 		{
 			deploymentDir = getArgument(1);
-			File testUserDir = new File(deploymentDir);
+			testUserDir = new File(deploymentDir);
 			if (!testUserDir.exists())
 				throw new ConfigurationException("Deployment directory " + deploymentDir + " does not exist.");
 			if (!testUserDir.isDirectory())
@@ -46,7 +47,7 @@ public class ConnectTool extends BaseGridTool
 //		else
 //			userConfigDir = ConfigurationManager.getUserConfigDir();
 
-		connect(connectURL, deploymentDir);
+		connect(connectURL, (testUserDir == null) ? null : testUserDir.getAbsolutePath());
 		
 		throw new ReloadShellException();
 	}

@@ -791,6 +791,9 @@ public class JobManager implements Closeable
 		 */
 		for (JobData job : _runningJobs.values())
 		{
+			if (job == null || job.getBESID() == null)
+				continue;
+			
 			/* For convenience, we bundle together the id's of the
 			 * job to check, and the bes container on which it is
 			 * running.
