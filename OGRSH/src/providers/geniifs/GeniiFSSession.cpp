@@ -26,6 +26,7 @@ namespace ogrsh
 
 		static std::string getCredentialFile(const std::string &sessionName)
 			throw (jcomm::OGRSHException);
+		static std::string getUsername();
 		static std::string getPassword();
 		static std::string getPattern();
 
@@ -89,7 +90,7 @@ namespace ogrsh
 
 				std::string credentialFile;
 				std::string password;
-				std::string pattern;
+				std::string patternOrUsername;
 
 				while (1)
 				{
@@ -97,8 +98,18 @@ namespace ogrsh
 					{
 						credentialFile = getCredentialFile(
 							getSessionName());
-						password = getPassword();
-						pattern = getPattern();
+						std::string::size_type index =
+							credentialFile.find("rns:");
+						if (index == 0)
+						{
+							// It's an RNS path.
+							patternOrUsername = getUsername();
+							password = getPassword();
+						} else
+						{
+							password = getPassword();
+							patternOrUsername = getPattern();
+						}
 					}
 					catch (jcomm::OGRSHException oe)
 					{
@@ -114,7 +125,8 @@ namespace ogrsh
 					try
 					{
 						sessionClient.loginSession(
-							credentialFile.c_str(), password, pattern);
+							credentialFile.c_str(), password,
+							patternOrUsername);
 						password = "";
 						break;
 					}
@@ -199,9 +211,12 @@ namespace ogrsh
 		{
 			ogrsh::shims::uber_real_fprintf(stdout, "Session \"%s\"\n",
 				sessionName.c_str());
-			return prompt(
-				"Please enter the path to your PKCS12 keystore:  ",
-				NULL);
+			ogrsh::shims::uber_real_fprintf(stdout,
+				"Please enter the URI for your credential information."
+				"This can either be\na local file system path, or an rns "
+				"path with rns: pre-pended to it.\n");
+
+			return prompt("Grid Credential URI:  ", NULL);
 		}
 
 		std::string getPassword()
@@ -213,6 +228,19 @@ namespace ogrsh
 			catch (jcomm::OGRSHException oe)
 			{
 				// can't happen
+				return "";
+			}
+		}
+
+		std::string getUsername()
+		{
+			try
+			{
+				return prompt("Username?  ", "");
+			}
+			catch (jcomm::OGRSHException oe)
+			{
+				// Can't happen.
 				return "";
 			}
 		}
