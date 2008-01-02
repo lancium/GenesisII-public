@@ -457,8 +457,10 @@ public class GamlLoginTool extends BaseGridTool {
 				"store certificate?", UIYesNoCancelType.YES);
 			UIYesNoCancelType answer = useWindowsWidget.ask();
 			if (answer == UIYesNoCancelType.YES)
+			{
+				_storeType = "WIN";
 				return false;
-			else if (answer == UIYesNoCancelType.CANCEL)
+			} else if (answer == UIYesNoCancelType.CANCEL)
 				return true;
 		}
 		
