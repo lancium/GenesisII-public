@@ -28,6 +28,12 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.UsernameTokenI
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.X509Identity;
 import edu.virginia.vcgr.genii.client.security.SecurityConstants;
 import edu.virginia.vcgr.genii.client.utils.PathUtils;
+import edu.virginia.vcgr.genii.client.utils.ui.UIException;
+import edu.virginia.vcgr.genii.client.utils.ui.UIFactory;
+import edu.virginia.vcgr.genii.client.utils.ui.UIGeneralQuestion;
+import edu.virginia.vcgr.genii.client.utils.ui.UIYesNoCancelType;
+import edu.virginia.vcgr.genii.client.utils.ui.UIYesNoQuestion;
+import edu.virginia.vcgr.genii.client.utils.ui.text.TextUIProvider;
 import edu.virginia.vcgr.genii.client.cmd.tools.gamllogin.*;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
@@ -340,8 +346,18 @@ public class GamlLoginTool extends BaseGridTool {
 	}
 
 	@Override
-	protected int runCommand() throws Throwable {
-
+	protected int runCommand() throws Throwable
+	{
+		if (numArguments() == 0 
+			&& _username == null 
+			&& _storeType == null
+			&& _password == null
+			&& _pattern == null)
+		{
+			if (queryUserForDefaultOptions())
+				return 0;
+		}
+		
 		_authnUri = getArgument(0);
 		URI authnSource = PathUtils.pathToURI(_authnUri);
 
@@ -409,15 +425,70 @@ public class GamlLoginTool extends BaseGridTool {
 	}
 
 	@Override
-	protected void verify() throws ToolException {
+	protected void verify() throws ToolException 
+	{
 		int numArgs = numArguments();
-		if (numArgs > 1) {
+		if (numArgs > 1) 
 			throw new InvalidToolUsageException();
-		} else if ((numArgs == 0) && 
-				(_username == null) && 
-				((_storeType == null) || (!_storeType.equals(WINDOWS)))) {
-			throw new InvalidToolUsageException();
+	}
+	
+	/**
+	 * This method is called by login when no parameters whatsover are given.
+	 * It will ask the user for a list of "default" options to select from and
+	 * then log the user in using those by filling in the correct tool
+	 * parameter values.  The intent is that this function essentially fills
+	 * in parameters that would normally have been given on the command line
+	 * had the user typed them in.
+	 * 
+	 * @return A boolean value indicating whether the login was cancelled 
+	 * (true), or not.
+	 */
+	private boolean queryUserForDefaultOptions() throws UIException
+	{
+		boolean isWindows = System.getProperty("os.name").contains("Windows");
+		UIFactory factory = new UIFactory(new TextUIProvider(stdout, stderr, stdin));
+		
+		if (isWindows)
+		{
+			UIYesNoQuestion useWindowsWidget = factory.createYesNoQuestion(
+				"Genesis II can use certificates stored in your windows " +
+				"certificate store for authentication purposes.",
+				"Would you like to log in using a windows certificate " +
+				"store certificate?", UIYesNoCancelType.YES);
+			UIYesNoCancelType answer = useWindowsWidget.ask();
+			if (answer == UIYesNoCancelType.YES)
+				return false;
+			else if (answer == UIYesNoCancelType.CANCEL)
+				return true;
+		}
+		
+		UIGeneralQuestion certificatePathWidget = factory.createGeneralQuestion(
+			"Certificate paths can be given either as relative or absolute " +
+			"local file system paths (in which case it is expected that the " +
+			"path will lead to a PKCS12 formatted keystore), or they can be " +
+			"given as URIs.  If a URI is given, the URI may be any common URI " +
+			"which leads to a PKCS12 keystore, or it may be a URI whose " +
+			"protocol is rns: which then indicates an absolute or relative RNS " +
+			"path leading to a Genesis II IDP service instance.", 
+			"Please enter the URI for your certitificate store?", null);
+		String path = certificatePathWidget.ask();
+		
+		getArguments().clear();
+		getArguments().add(path);
+		
+		if (path.startsWith("rns:"))
+		{
+			// It's an RNS path, assume its an IDP we are looking for.
+			UIGeneralQuestion usernameWidget = factory.createGeneralQuestion(
+				"Please enter the IDP service instance username:");
+			String username = usernameWidget.ask();
+			
+			_username = username;
+			return false;
+		} else
+		{
+			// It wasn't an RNS path, so we'll assume it's a PKCS12 store.
+			return false;
 		}
 	}
-
 }

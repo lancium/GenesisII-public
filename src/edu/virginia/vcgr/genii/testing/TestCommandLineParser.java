@@ -12,14 +12,13 @@ public class TestCommandLineParser
 	public void testCommandLineParser() throws ToolException
 	{
 		String []cLine = CommandLineFormer.formCommandLine(
-			"a bb ccc \"a b c\"   a\\ b\tfoo");
+			"a bb ccc abc   abfoo");
 		
-		Assert.assertEquals(6, cLine.length);
+		Assert.assertEquals(5, cLine.length);
 		Assert.assertEquals("a", cLine[0]);
 		Assert.assertEquals("bb", cLine[1]);
 		Assert.assertEquals("ccc", cLine[2]);
-		Assert.assertEquals("a b c", cLine[3]);
-		Assert.assertEquals("a b", cLine[4]);
-		Assert.assertEquals("foo", cLine[5]);
+		Assert.assertEquals("abc", cLine[3]);
+		Assert.assertEquals("abfoo", cLine[4]);
 	}
 }
