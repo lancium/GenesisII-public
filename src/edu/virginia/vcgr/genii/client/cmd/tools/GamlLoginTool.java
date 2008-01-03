@@ -5,6 +5,7 @@ import java.io.*;
 
 import javax.xml.namespace.QName;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -34,6 +35,7 @@ import edu.virginia.vcgr.genii.client.utils.dialog.GenericQuestionWidget;
 import edu.virginia.vcgr.genii.client.utils.dialog.YesNoCancelType;
 import edu.virginia.vcgr.genii.client.utils.dialog.YesNoWidget;
 import edu.virginia.vcgr.genii.client.utils.dialog.text.TextWidgetProvider;
+import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.cmd.tools.gamllogin.*;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
@@ -53,26 +55,11 @@ public class GamlLoginTool extends BaseGridTool {
 	static public final String WINDOWS = "WIN";
 ;
 	static private final String _DESCRIPTION = "Inserts authentication information into the user's context.";
-	static private final String _USAGE = ""
-			+ "login "
-			+ "[--storetype=<PKCS12|JKS|WIN>] "
-			+ "[--password=<keystore-password>] " 
-			+ "[--alias] "
-			+ "[--pattern=<certificate/token pattern>] "
-			+ "[--validMillis=<valid milliseconds>] " 
-			+ "[<keystore URL>]\n"
-			
-			+ "login "
-			+ "[--validMillis=<valid milliseconds>] " 
-			+ "[--username=<username> [--password=<password>] ] "			
-			+ "rns:<identity provider path>\n"
-
-			+"login "
-			+ "--username=<username>  "
-			+ "[--password=<password>]";			
-
+	static private final String _USAGE_RESOURCE = 
+		"edu/virginia/vcgr/genii/client/cmd/tools/resources/login-usage.txt";
 	protected String _password = null;
 	protected String _storeType = null;
+	protected String _durationString = null;
 	protected long _validMillis = GenesisIIConstants.CredentialExpirationMillis;
 	protected boolean _aliasPatternFlag = false;
 	protected String _username = null;
@@ -84,7 +71,7 @@ public class GamlLoginTool extends BaseGridTool {
 	}
 	
 	public GamlLoginTool() {
-		super(_DESCRIPTION, _USAGE, false);
+		super(_DESCRIPTION, new FileResource(_USAGE_RESOURCE), false);
 	}
 
 	public void setStoretype(String storeType) {
@@ -107,8 +94,10 @@ public class GamlLoginTool extends BaseGridTool {
 		_pattern = pattern;
 	}
 
-	public void setValidMillis(String millis) {
-		_validMillis = Long.parseLong(millis);
+	public void setValidDuration(String durationString) 
+		throws ParseException
+	{
+		_durationString = durationString;
 	}
 	
 	public static SignedAssertion extractAssertion(RequestSecurityTokenResponseType reponseMessage) 
@@ -430,6 +419,18 @@ public class GamlLoginTool extends BaseGridTool {
 		int numArgs = numArguments();
 		if (numArgs > 1) 
 			throw new InvalidToolUsageException();
+		
+		if (_durationString != null)
+		{
+			try
+			{
+				_validMillis = Duration.parse(_durationString).getMilliseconds();
+			}
+			catch (ParseException pe)
+			{
+				throw new ToolException("Invalid duration string given.", pe);
+			}
+		}
 	}
 	
 	/**

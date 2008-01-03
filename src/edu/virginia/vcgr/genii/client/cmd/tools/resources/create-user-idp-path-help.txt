@@ -1,0 +1,4 @@
+You can enter either the path to the IDP service to use, or the name of the
+IDP service to use on the BootstrapContainer, or the path or name of the
+container on which to find the IDP service, or you can simply leave this
+question blank to use the default container and IDP service.

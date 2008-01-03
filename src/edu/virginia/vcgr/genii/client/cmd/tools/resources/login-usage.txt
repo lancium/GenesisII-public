@@ -1,0 +1,11 @@
+login
+
+login [--storetype=<PKCS12|JKS|WIN>] [--password=<keystore-password>] 
+	[--alias] [--pattern=<certificate/token pattern>] 
+	[--validDuration=<duration-string>] [<keystore URL>]
+			
+login [--validDuration=<duration-string>]
+	[--username=<username> [--password=<password>]] 
+	rns:<identity provider path>
+
+login --username=<username> [--password=<password>]

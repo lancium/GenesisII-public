@@ -72,7 +72,7 @@ public class TextMenuWidget extends AbstractTextWidget implements MenuWidget
 			_choices.add(choice);
 		}
 		
-		_formatString = "\t[%-" + longestKey + "s]\t%s";
+		_formatString = "\t[%-" + longestKey + "s]\t%s\n";
 	}
 
 	@Override
@@ -117,6 +117,7 @@ public class TextMenuWidget extends AbstractTextWidget implements MenuWidget
 				twp.stdout.format(_formatString, choice.getKey(), choice.getValue());
 			}
 			
+			twp.stdout.println();
 			twp.stdout.print(_prompt + "  ");
 			twp.stdout.flush();
 			
