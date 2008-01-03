@@ -72,6 +72,7 @@ public class Duration
 		value = new Long(1L);
 		_milliSecondMap.put("millisecond", value);
 		_milliSecondMap.put("milliseconds", value);
+		_milliSecondMap.put("milli", value);
 		_milliSecondMap.put("millis", value);
 		_milliSecondMap.put("ms", value);
 	}
