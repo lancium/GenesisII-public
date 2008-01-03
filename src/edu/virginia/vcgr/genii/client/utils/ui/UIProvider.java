@@ -120,4 +120,16 @@ public interface UIProvider
 	 */
 	public UIOKCancelQuestion createOKCancelQuestion(String header, 
 		String question, UIOKCancelType defaultValue) throws UIException;
+	
+	/**
+	 * Create a new password widget from this provider.
+	 * 
+	 * @param header An optional header to display before the password prompt.
+	 * @param question The password prompt to display.
+	 * @return The password (possibly empty, but not null).
+	 * 
+	 * @throws UIException
+	 */
+	public UIPassword createPassword(String header, String question) 
+		throws UIException;
 }

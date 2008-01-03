@@ -8,6 +8,7 @@ import edu.virginia.vcgr.genii.client.utils.ui.AbstractUIProvider;
 import edu.virginia.vcgr.genii.client.utils.ui.UIException;
 import edu.virginia.vcgr.genii.client.utils.ui.UIGeneralQuestion;
 import edu.virginia.vcgr.genii.client.utils.ui.UIMenu;
+import edu.virginia.vcgr.genii.client.utils.ui.UIPassword;
 import edu.virginia.vcgr.genii.client.utils.ui.UIProvider;
 
 /**
@@ -114,5 +115,12 @@ public class TextUIProvider extends AbstractUIProvider implements UIProvider
 			boolean includeCancel, MenuElement[] elements) throws UIException
 	{
 		return new TextUIMenu(this, header, footer, includeCancel, elements);
+	}
+	
+	@Override
+	public UIPassword createPassword(String header, String prompt) 
+		throws UIException
+	{
+		return new TextUIPassword(this, header, prompt);
 	}
 }

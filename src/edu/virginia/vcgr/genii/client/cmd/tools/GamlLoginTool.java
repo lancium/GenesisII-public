@@ -20,6 +20,7 @@ import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.TransientCredentials;
@@ -28,12 +29,11 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.UsernameTokenI
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.X509Identity;
 import edu.virginia.vcgr.genii.client.security.SecurityConstants;
 import edu.virginia.vcgr.genii.client.utils.PathUtils;
-import edu.virginia.vcgr.genii.client.utils.ui.UIException;
-import edu.virginia.vcgr.genii.client.utils.ui.UIFactory;
-import edu.virginia.vcgr.genii.client.utils.ui.UIGeneralQuestion;
-import edu.virginia.vcgr.genii.client.utils.ui.UIYesNoCancelType;
-import edu.virginia.vcgr.genii.client.utils.ui.UIYesNoQuestion;
-import edu.virginia.vcgr.genii.client.utils.ui.text.TextUIProvider;
+import edu.virginia.vcgr.genii.client.utils.dialog.DialogException;
+import edu.virginia.vcgr.genii.client.utils.dialog.GenericQuestionWidget;
+import edu.virginia.vcgr.genii.client.utils.dialog.YesNoCancelType;
+import edu.virginia.vcgr.genii.client.utils.dialog.YesNoWidget;
+import edu.virginia.vcgr.genii.client.utils.dialog.text.TextWidgetProvider;
 import edu.virginia.vcgr.genii.client.cmd.tools.gamllogin.*;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
@@ -443,37 +443,38 @@ public class GamlLoginTool extends BaseGridTool {
 	 * @return A boolean value indicating whether the login was cancelled 
 	 * (true), or not.
 	 */
-	private boolean queryUserForDefaultOptions() throws UIException
+	private boolean queryUserForDefaultOptions() throws DialogException, IOException
 	{
 		boolean isWindows = System.getProperty("os.name").contains("Windows");
-		UIFactory factory = new UIFactory(new TextUIProvider(stdout, stderr, stdin));
+		TextWidgetProvider twp = new TextWidgetProvider(stdout, stderr, stdin);
 		
 		if (isWindows)
 		{
-			UIYesNoQuestion useWindowsWidget = factory.createYesNoQuestion(
-				"Genesis II can use certificates stored in your windows " +
-				"certificate store for authentication purposes.",
-				"Would you like to log in using a windows certificate " +
-				"store certificate?", UIYesNoCancelType.YES);
-			UIYesNoCancelType answer = useWindowsWidget.ask();
-			if (answer == UIYesNoCancelType.YES)
+			YesNoWidget widget = twp.createYesNoDialog("Use Windows Certificate Store");
+			widget.includeCancel(true);
+			widget.setDefault(YesNoCancelType.Yes);
+			widget.setDetailedHelp(new FileResource(
+				"edu/virginia/vcgr/genii/client/cmd/tools/resources/use-windows-cert-help.txt"));
+			widget.setPrompt(
+				"Would you like to log in using a windows certificate?");
+			widget.showWidget();
+			YesNoCancelType answer = widget.getAnswer();
+			
+			if (answer == YesNoCancelType.Yes)
 			{
 				_storeType = "WIN";
 				return false;
-			} else if (answer == UIYesNoCancelType.CANCEL)
+			} else if (answer == YesNoCancelType.Cancel)
 				return true;
 		}
 		
-		UIGeneralQuestion certificatePathWidget = factory.createGeneralQuestion(
-			"Certificate paths can be given either as relative or absolute " +
-			"local file system paths (in which case it is expected that the " +
-			"path will lead to a PKCS12 formatted keystore), or they can be " +
-			"given as URIs.  If a URI is given, the URI may be any common URI " +
-			"which leads to a PKCS12 keystore, or it may be a URI whose " +
-			"protocol is rns: which then indicates an absolute or relative RNS " +
-			"path leading to a Genesis II IDP service instance.", 
-			"Please enter the URI for your certitificate store?", null);
-		String path = certificatePathWidget.ask();
+		GenericQuestionWidget certPathWidget = twp.createGenericQuestionDialog(
+			"Certificate URI");
+		certPathWidget.setDetailedHelp(new FileResource(
+			"edu/virginia/vcgr/genii/client/cmd/tools/resources/cert-uri-help.txt"));
+		certPathWidget.setPrompt("Please enter the URI for your certificate store?");
+		certPathWidget.showWidget();
+		String path = certPathWidget.getAnswer();
 		
 		getArguments().clear();
 		getArguments().add(path);
@@ -481,9 +482,10 @@ public class GamlLoginTool extends BaseGridTool {
 		if (path.startsWith("rns:"))
 		{
 			// It's an RNS path, assume its an IDP we are looking for.
-			UIGeneralQuestion usernameWidget = factory.createGeneralQuestion(
-				"Please enter the IDP service instance username:");
-			String username = usernameWidget.ask();
+			GenericQuestionWidget usernameWidget = twp.createGenericQuestionDialog("IDP Username");
+			usernameWidget.setPrompt("Please enter the IDP service instance username:");
+			usernameWidget.showWidget();
+			String username = usernameWidget.getAnswer();
 			
 			_username = username;
 			return false;

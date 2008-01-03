@@ -1,0 +1,2 @@
+Genesis II can use certificates stored in your windows
+certificate store for authentication purposes.

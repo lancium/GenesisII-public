@@ -108,4 +108,16 @@ public class UIFactory
 	{
 		return _provider.createOKCancelQuestion(null, question, null);
 	}
+	
+	public UIPassword createPassword(String header, String prompt)
+		throws UIException
+	{
+		return _provider.createPassword(header, prompt);
+	}
+	
+	public UIPassword createPassword(String prompt)
+		throws UIException
+	{
+		return createPassword(null, prompt);
+	}
 }
