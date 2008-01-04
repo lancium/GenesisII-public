@@ -14,13 +14,14 @@ import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ContextStreamUtils;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.utils.urls.URLUtilities;
 
 public class ConnectTool extends BaseGridTool
 {
 	static private final String _DESCRIPTION =
 		"Connects to an existing net.";
 	static private final String _USAGE =
-		"connect <connect-url> [<deployment dir>]";
+		"connect <connect-url|connect-path> [<deployment dir>]";
 	
 	public ConnectTool()
 	{
@@ -70,7 +71,9 @@ public class ConnectTool extends BaseGridTool
 		throws ResourceException, MalformedURLException, IOException,
 			ConfigurationException
 	{
-		URL url = new URL(connectURL);
+		boolean isWindows = System.getProperty("os.name").contains("Windows");
+		
+		URL url = URLUtilities.formURL(connectURL, isWindows);
 		connect(ContextStreamUtils.load(url), null);
 	}
 
@@ -104,8 +107,9 @@ public class ConnectTool extends BaseGridTool
 		throws ResourceException, MalformedURLException, IOException,
 			ConfigurationException
 	{
-		URL url = new URL(connectURL);
+		boolean isWindows = System.getProperty("os.name").contains("Windows");
+		
+		URL url = URLUtilities.formURL(connectURL, isWindows);
 		connect(ContextStreamUtils.load(url), deploymentDir);
 	}
-
 }
