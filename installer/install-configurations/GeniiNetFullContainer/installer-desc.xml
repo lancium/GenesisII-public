@@ -72,6 +72,8 @@
 				targetdir="$INSTALL_PATH" os="unix"/>
 			<file src="../../../scripts/install-new-container"
 				targetdir="$INSTALL_PATH" os="unix"/>
+			<file src="../../../scripts/connect-new-client"
+				targetdir="$INSTALL_PATH" os="unix"/>
 			<file src="../../../scripts/uninstall-container"
 				targetdir="$INSTALL_PATH" os="unix"/>
 			<file src="../../../ext/JavaServiceWrapper/bin/InstallContainerWrapper"
@@ -93,6 +95,8 @@
 			<file src="../../../scripts/cert-tool.bat"
 				targetdir="$INSTALL_PATH" os="windows"/>
 			<file src="../../../scripts/install-new-container.bat"
+				targetdir="$INSTALL_PATH" os="windows"/>
+			<file src="../../../scripts/connect-new-client.bat"
 				targetdir="$INSTALL_PATH" os="windows"/>
 			<file src="../../../scripts/uninstall-container.bat"
 				targetdir="$INSTALL_PATH" os="windows"/>
@@ -159,6 +163,8 @@
 			</executable>
 			<executable targetfile="$INSTALL_PATH/install-new-container"
 				stage="never" os="unix"/>
+			<executable targetfile="$INSTALL_PATH/connect-new-client"
+				stage="never" os="unix"/>
 			<parsable type="plain"
 				targetfile="$INSTALL_PATH/RELEASE"/>
 			<parsable type="xml"
@@ -173,6 +179,8 @@
 				targetfile="$INSTALL_PATH/cert-tool" os="unix"/>
 			<parsable type="shell"
 				targetfile="$INSTALL_PATH/install-new-container" os="unix"/>
+			<parsable type="shell"
+				targetfile="$INSTALL_PATH/connect-new-client" os="unix"/>
 			<parsable type="shell"
 				targetfile="$INSTALL_PATH/uninstall-container" os="unix"/>
 			<parsable type="shell"
@@ -195,6 +203,8 @@
 				targetfile="$INSTALL_PATH/cert-tool.bat" os="windows"/>
 			<parsable type="plain"
 				targetfile="$INSTALL_PATH/install-new-container.bat" os="windows"/>
+			<parsable type="plain"
+				targetfile="$INSTALL_PATH/connect-new-client.bat" os="windows"/>
 			<parsable type="plain"
 				targetfile="$INSTALL_PATH/uninstall-container.bat" os="windows"/>
 			<parsable type="plain"
@@ -244,6 +254,29 @@
 					<arg value="$INSTALL_PATH/install-new-container"/>
 					<arg value="GeniiNetFullContainer"/>
 					<arg value="GeniiNetContainer"/>
+					<arg value="http:\/\/www.cs.virginia.edu\/~vcgr\/GeniiNet\/root.xml"/>
+				</args>
+			</executable>
+		</pack>
+
+		<pack name="Connect Client" required="no" preselected="no">
+		    <depends packname="Core"/>
+			<description>Connect new client to existing GeniiNet</description>
+			<executable targetfile="$INSTALL_PATH/windows-start-wrapper.bat"
+				os="windows" stage="postinstall" keep="true">
+				<args>
+					<arg value="Configure and Install New Client"/>
+					<arg value="$INSTALL_PATH/connect-new-client"/>
+					<arg value="GeniiNetFullContainer"/>
+					<arg value="http:\/\/www.cs.virginia.edu\/~vcgr\/GeniiNet\/root.xml"/>
+				</args>
+			</executable>
+			<executable targetfile="$INSTALL_PATH/linux-cmd-wrapper"
+				os="unix" stage="postinstall" keep="true">
+				<args>
+					<arg value="Configure and Install New Client"/>
+					<arg value="$INSTALL_PATH/connect-new-client"/>
+					<arg value="GeniiNetFullContainer"/>
 					<arg value="http:\/\/www.cs.virginia.edu\/~vcgr\/GeniiNet\/root.xml"/>
 				</args>
 			</executable>

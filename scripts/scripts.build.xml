@@ -38,6 +38,7 @@
 				<include name="cert-tool*"/>
 				<include name="initialize-new-net-security*"/>
 				<include name="install-new-container*"/>
+				<include name="connect-new-client*"/>
 				<include name="uninstall-container*"/>
 				<include name="InstallContainerWrapper*"/>
 				<include name="UninstallContainerWrapper*"/>
@@ -102,6 +103,10 @@
 		<antcall target="build-script">
 			<param name="script-src-dir" value="${scripts.dir}"/>
 			<param name="script-base-name" value="install-new-container"/>
+		</antcall>
+		<antcall target="build-script">
+			<param name="script-src-dir" value="${scripts.dir}"/>
+			<param name="script-base-name" value="connect-new-client"/>
 		</antcall>
 		<antcall target="build-script">
 			<param name="script-src-dir" value="${scripts.dir}"/>

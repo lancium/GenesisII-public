@@ -27,6 +27,7 @@
 	</target>
 
 	<target name="build-installer" depends="compile-code, init">
+		<buildnumber/>
 		<izpack input="${basedir}/install-configurations/${install-config-dir}/installer-desc.xml"
 			output="${basedir}/installers/GenesisII-${install-config-dir}-installer-${genesisII.version}.jar"
 			installerType="standard" basedir="${basedir}/install-configurations/${install-config-dir}"
