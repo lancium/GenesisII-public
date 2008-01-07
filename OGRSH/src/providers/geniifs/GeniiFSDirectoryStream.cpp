@@ -52,7 +52,7 @@ namespace ogrsh
 			if (entry == NULL)
 				return NULL;
 
-			_dent.d_ino = 0;
+			_dent.d_ino = entry->_inode;
 			_dent.d_off = 0;
 			_dent.d_reclen = entry->_entryName.length();
 			_dent.d_type = entry->_entryType;
@@ -73,7 +73,7 @@ namespace ogrsh
 			if (entry == NULL)
 				return NULL;
 
-			_dent64.d_ino = 0;
+			_dent64.d_ino = entry->_inode;
 			_dent64.d_off = 0;
 			_dent64.d_reclen = entry->_entryName.length();
 			_dent64.d_type = entry->_entryType;

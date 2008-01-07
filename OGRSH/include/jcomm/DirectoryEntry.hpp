@@ -12,6 +12,7 @@ namespace jcomm
 		public:
 			DirectoryEntry();
 
+			long long _inode;
 			std::string _entryName;
 			int _entryType;
 

@@ -51,6 +51,7 @@ namespace ogrsh
 		SHIM_DECL(int, vfprintf, (FILE*, const char *format, va_list ap));
 		SHIM_DECL(int, fflush, (FILE*));
 		SHIM_DECL(int, fflush_unlocked, (FILE*));
+		SHIM_DECL(void, rewind, (FILE*));
 		SHIM_DECL(int, fseek, (FILE*, long offset, int whence));
 		SHIM_DECL(int, fseeko, (FILE*, off_t offset, int whence));
 		SHIM_DECL(long, ftell, (FILE*));

@@ -367,9 +367,11 @@ namespace ogrsh
 
 				if (fStream->_magicNumber == FILE_STREAM_MAGIC_NUMBER)
 				{
+/*
 					OGRSH_FATAL( "clearerr on intercepted stream not "
 						<< "supported in OGRSH.");
 					ogrsh::shims::real_exit(1);
+*/
 				} else
 				{
 					real_clearerr(stream);
@@ -505,6 +507,14 @@ namespace ogrsh
 				errno = EBADF;
 				return -1;
 			}
+		}
+
+		SHIM_DEF(void, rewind, (FILE *fptr), (fptr))
+		{
+			OGRSH_TRACE("rewind(...) called.");
+
+			fseek(fptr, 0, SEEK_SET);
+			clearerr(fptr);
 		}
 
 		SHIM_DEF(int, fseek, (FILE *fptr, long offset, int whence),
@@ -975,6 +985,7 @@ extern "C" {
 			START_SHIM(vfprintf);
 			START_SHIM(fflush);
 			START_SHIM(ftell);
+			START_SHIM(rewind);
 			START_SHIM(fseek);
 			START_SHIM(fseeko);
 			START_SHIM(fread);
@@ -1023,6 +1034,7 @@ extern "C" {
 			STOP_SHIM(fread);
 			STOP_SHIM(fseeko);
 			STOP_SHIM(fseek);
+			STOP_SHIM(rewind);
 			STOP_SHIM(ftell);
 			STOP_SHIM(fflush);
 			STOP_SHIM(vfprintf);
