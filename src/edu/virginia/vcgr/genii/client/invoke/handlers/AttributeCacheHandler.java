@@ -188,6 +188,9 @@ public class AttributeCacheHandler
 		QName xferMechs = new QName(ByteIOConstants.RANDOM_BYTEIO_NS,
 			ByteIOConstants.XFER_MECHS_ATTR_NAME);
 		QName size = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.SIZE_ATTR_NAME);
+		QName accessTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.ACCESSTIME_ATTR_NAME);
+		QName modTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME);
+		QName creatTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME);
 		
 		for (EntryType entry : resp.getEntryList())
 		{
@@ -201,7 +204,9 @@ public class AttributeCacheHandler
 					for (MessageElement elem : any)
 					{
 						QName elemName = elem.getQName();
-						if (elemName.equals(xferMechs) || elemName.equals(size))
+						if (elemName.equals(xferMechs) || elemName.equals(size) ||
+							elemName.equals(accessTime) || elemName.equals(modTime) ||
+							elemName.equals(creatTime))
 						{
 							cachedAttrs.add(elem);
 						}
