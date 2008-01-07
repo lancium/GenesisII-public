@@ -224,7 +224,14 @@ public class CallingContextImpl implements ICallingContext, Serializable
 
 	public synchronized void setCurrentPath(RNSPath newPath) 
 	{
-		removeProperty(CURRENT_PATH_KEY);
+		/* Actually, this isn't correct.  If you remove the property from the
+		 * entire hierarchy, then you are essentially saying that whatever you
+		 * are setting the path to now is true for all stacks of this
+		 * invocation.  That isn't the purpose of the tree-like property
+		 * hierarchy.  This was put in to fix a connect issue with pwd, but
+		 * it shouldn't be fixed here.
+		 */
+		// removeProperty(CURRENT_PATH_KEY);
 		ArrayList<Serializable> multiValue = new ArrayList<Serializable>();
 		multiValue.add(newPath);
 		_properties.put(CURRENT_PATH_KEY, multiValue);
