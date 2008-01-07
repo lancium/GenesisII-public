@@ -35,6 +35,7 @@ import edu.virginia.vcgr.ogrsh.server.exceptions.OGRSHException;
 import edu.virginia.vcgr.ogrsh.server.packing.IOGRSHReadBuffer;
 import edu.virginia.vcgr.ogrsh.server.packing.IOGRSHWriteBuffer;
 import edu.virginia.vcgr.ogrsh.server.packing.IPackable;
+import edu.virginia.vcgr.ogrsh.server.util.StatUtils;
 
 public class DirectoryHandler
 {
@@ -79,11 +80,13 @@ public class DirectoryHandler
 	
 	static private class DirectoryEntry implements IPackable
 	{
+		private long _inode;
 		private DirectoryEntryType _entryType;
 		private String _entryName;
 		
-		public DirectoryEntry(String entryName, DirectoryEntryType entryType)
+		public DirectoryEntry(long inode, String entryName, DirectoryEntryType entryType)
 		{
+			_inode = inode;
 			_entryName = entryName;
 			_entryType = entryType;
 		}
@@ -95,12 +98,14 @@ public class DirectoryHandler
 
 		public void pack(IOGRSHWriteBuffer buffer) throws IOException
 		{
+			buffer.writeObject(_inode);
 			buffer.writeObject(_entryName);
 			buffer.writeObject(_entryType.getValue());
 		}
 
 		public void unpack(IOGRSHReadBuffer buffer) throws IOException
 		{
+			_inode = (Long)buffer.readObject();
 			_entryName = String.class.cast(buffer.readObject());
 			_entryType = DirectoryEntryType.fromInt((Integer)buffer.readObject());
 		}
@@ -131,19 +136,20 @@ public class DirectoryHandler
 			{
 				String entryName = et.getEntry_name();
 				TypeInformation ti = new TypeInformation(et.getEntry_reference());
+				long st_ino = StatUtils.generateInodeNumber(ti.getEndpoint());
 				if (ti.isRNS())
 				{
-					entries.add(new DirectoryEntry(entryName, 
+					entries.add(new DirectoryEntry(st_ino, entryName, 
 						DirectoryEntryType.DIRECTORY));
 				}
 				else if (ti.isByteIO())
 				{
-					entries.add(new DirectoryEntry(entryName,
+					entries.add(new DirectoryEntry(st_ino, entryName,
 						DirectoryEntryType.REGULAR_FILE));
 				}
 				else
 				{
-					entries.add(new DirectoryEntry(entryName,
+					entries.add(new DirectoryEntry(st_ino, entryName,
 						DirectoryEntryType.UNKNOWN));
 				}
 			}
