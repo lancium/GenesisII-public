@@ -74,6 +74,8 @@ public class AttributeCacheHandler
 			return (GetAttributesResponse)ctxt.proceed();
 		}
 		
+		_logger.debug("Looking for cached attribute data.");
+		
 		CachedAttributeData data;
 		synchronized(_attrCache)
 		{
@@ -114,6 +116,8 @@ public class AttributeCacheHandler
 			return (GetAttributesDocumentResponse)ctxt.proceed();
 		}
 		
+		_logger.debug("Looking for cached attribute data.");
+		
 		CachedAttributeData data;
 		synchronized(_attrCache)
 		{
@@ -146,6 +150,8 @@ public class AttributeCacheHandler
 			return (SetAttributesResponse)ctxt.proceed();
 		}
 		
+		_logger.debug("Clearing cached attribute data.");
+		
 		synchronized(_attrCache)
 		{
 			_attrCache.remove(name);
@@ -174,6 +180,8 @@ public class AttributeCacheHandler
 	public ListResponse list(InvocationContext ctxt,
 		List listRequest) throws Throwable
 	{
+		_logger.debug("Doing an RNS listing so we can cache attribute data.");
+		
 		// We're going to let the list proceed, and then see if any meta data came back with it.
 		ListResponse resp = (ListResponse)ctxt.proceed();
 		

@@ -97,7 +97,7 @@ public class ByteIOInteropTool extends BaseGridTool
 	private String _SeprURL = null;
 	
 	public ByteIOInteropTool() {
-		super(_DESCRIPTION, _USAGE, false);
+		super(_DESCRIPTION, _USAGE, true);
 	}
 	
 	public void setAll(){
