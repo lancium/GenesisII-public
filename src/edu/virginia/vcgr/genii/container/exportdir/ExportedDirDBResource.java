@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.RNSEntryExistsFaultType;
 import org.morgan.util.GUID;
 import org.morgan.util.configuration.ConfigurationException;
+import org.mortbay.http.InclusiveByteRange;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
@@ -36,7 +37,9 @@ import edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
 import edu.virginia.vcgr.genii.container.Container;
+import edu.virginia.vcgr.genii.container.byteio.IRByteIOResource;
 import edu.virginia.vcgr.genii.container.byteio.RandomByteIOAttributeHandlers;
+import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -886,6 +889,25 @@ public class ExportedDirDBResource extends BasicDBResource implements
 			ByteIOConstants.TRANSFER_TYPE_DIME_URI));
 		attrs.add(new MessageElement(transMechName,
 			ByteIOConstants.TRANSFER_TYPE_MTOM_URI));
+		
+		try
+		{
+			IRByteIOResource resource = (IRByteIOResource)(ResourceManager.getTargetResource(
+				entry.getEntryReference()).dereference());
+			attrs.add(new MessageElement(new QName(
+				ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.ACCESSTIME_ATTR_NAME),
+				resource.getAccessTime()));
+			attrs.add(new MessageElement(new QName(
+				ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME),
+				resource.getModTime()));
+			attrs.add(new MessageElement(new QName(
+				ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME),
+				resource.getCreateTime()));
+		}
+		catch (ResourceUnknownFaultType ruft)
+		{
+			// We couldn't find the resource, so we just skip it for now.
+		}
 		
 		entry.setAttributes(attrs.toArray(new MessageElement[0]));
 		
