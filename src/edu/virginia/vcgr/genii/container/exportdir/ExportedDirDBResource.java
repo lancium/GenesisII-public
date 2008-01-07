@@ -22,7 +22,6 @@ import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.RNSEntryExistsFaultType;
 import org.morgan.util.GUID;
 import org.morgan.util.configuration.ConfigurationException;
-import org.mortbay.http.InclusiveByteRange;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
@@ -39,7 +38,6 @@ import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.byteio.IRByteIOResource;
 import edu.virginia.vcgr.genii.container.byteio.RandomByteIOAttributeHandlers;
-import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;

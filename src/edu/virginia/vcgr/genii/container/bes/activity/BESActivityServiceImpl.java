@@ -82,6 +82,7 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 		new BESActivityAttributeHandler(getAttributePackage());
 	}
 	
+	@SuppressWarnings("unchecked")
 	protected void postCreate(ResourceKey rKey,
 		EndpointReferenceType activityEPR, HashMap<QName, Object> creationParameters)
 		throws ResourceException, BaseFaultType, RemoteException

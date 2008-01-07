@@ -52,8 +52,8 @@ public class InputStreamBuilder extends Builder {
 			throw new KeyStoreException(
 					"Previous KeyStore instantiation failed", oldException);
 		}
-		PrivilegedExceptionAction action = new PrivilegedExceptionAction() {
-			public Object run() throws Exception {
+		PrivilegedExceptionAction<KeyStore> action = new PrivilegedExceptionAction<KeyStore>() {
+			public KeyStore run() throws Exception {
 				if (protection instanceof CallbackHandlerProtection == false) {
 					return run0();
 				}
@@ -74,7 +74,7 @@ public class InputStreamBuilder extends Builder {
 				}
 			}
 
-			public Object run0() throws Exception {
+			public KeyStore run0() throws Exception {
 				KeyStore ks;
 				if (provider == null) {
 					ks = KeyStore.getInstance(type);

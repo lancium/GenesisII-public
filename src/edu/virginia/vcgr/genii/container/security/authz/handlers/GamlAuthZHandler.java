@@ -219,6 +219,7 @@ public class GamlAuthZHandler extends AuthZHandler {
 	}
 
 	
+	@SuppressWarnings("unchecked")
 	public boolean checkAccess(
 			ICallingContext callingContext,
 			X509Certificate callerCert, 
