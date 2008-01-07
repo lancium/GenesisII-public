@@ -222,7 +222,8 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		return null;
 	}
 
-	public synchronized void setCurrentPath(RNSPath newPath) {
+	public synchronized void setCurrentPath(RNSPath newPath) 
+	{
 		removeProperty(CURRENT_PATH_KEY);
 		ArrayList<Serializable> multiValue = new ArrayList<Serializable>();
 		multiValue.add(newPath);
