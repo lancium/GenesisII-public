@@ -254,19 +254,27 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		return new CallingContextImpl(this);
 	}
 
-	public ICallingContext deriveNewContext(ContextType serializedInformation) throws IOException  {
+	public ICallingContext deriveNewContext(ContextType serializedInformation)
+		throws IOException 
+	{
 		CallingContextImpl retval = new CallingContextImpl(this);
 
 		// load the properties from the ContextType
-		if (serializedInformation != null) {
-			ContextNameValuePairType[] pairs = serializedInformation.getProperty();
-			if (pairs != null) {
-				for (ContextNameValuePairType pair : serializedInformation.getProperty()) {
+		if (serializedInformation != null)
+		{
+			ContextNameValuePairType[] pairs =
+				serializedInformation.getProperty();
+			if (pairs != null)
+			{
+				for (ContextNameValuePairType pair : pairs)
+				{
 					String name = pair.getName();
-					ArrayList<Serializable> multiValue = _properties.get(name);
-					if (multiValue == null) {
+					ArrayList<Serializable> multiValue =
+						retval._properties.get(name);
+					if (multiValue == null)
+					{
 						multiValue = new ArrayList<Serializable>();
-						_properties.put(name, multiValue);
+						retval._properties.put(name, multiValue);
 					}
 					
 					multiValue.add(retrieveBase64Decoded(pair.getValue()));
