@@ -240,7 +240,7 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	public ContextType getSerialized() throws IOException {
 		ContextType ct = new ContextType();
 
-		ArrayList<ContextNameValuePairType> pairs = new ArrayList<ContextNameValuePairType>();
+		LinkedList<ContextNameValuePairType> pairs = new LinkedList<ContextNameValuePairType>();
 		accumulateProperties(pairs);
 		ContextNameValuePairType[] pairsArray = 
 			new ContextNameValuePairType[pairs.size()];
@@ -285,7 +285,7 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		return retval;
 	}
 
-	private synchronized void accumulateProperties(ArrayList<ContextNameValuePairType> pairs) throws IOException {
+	private synchronized void accumulateProperties(List<ContextNameValuePairType> pairs) throws IOException {
 		if (_parent != null) {
 			_parent.accumulateProperties(pairs);
 		}
@@ -294,7 +294,7 @@ public class CallingContextImpl implements ICallingContext, Serializable
 			ArrayList<Serializable> values = _properties.get(name);
 			for (Serializable val : values) {
 				String strVal = retrieveBase64Encoded(val);
-				pairs.add(new ContextNameValuePairType(name, strVal));
+				pairs.add(0, new ContextNameValuePairType(name, strVal));
 			}
 		}
 	}
