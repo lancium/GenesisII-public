@@ -13,6 +13,8 @@
 	<info>
 		<appname>OGRSH</appname>
 		<appversion>@{ogrsh.version} Build @{build.number}</appversion>
+		<appsubpath>Genesis II</appsubpath>
+		<uninstaller write="no"/>
 		<authors>
 			<author name="Andrew Grimshaw" email="grimshaw@cs.virginia.edu"/>
 			<author name="Mark Morgan" email="mmm2a@cs.virginia.edu"/>
@@ -62,7 +64,6 @@
 			<file src="src/scripts/patch-file.sh"
 				targetdir="$INSTALL_PATH/OGRSH"/>
 			<file src="RELEASE" targetdir="$INSTALL_PATH/OGRSH"/>
-			<fileset dir="config" targetdir="$INSTALL_PATH/OGRSH/config"/>
 
 			<executable targetfile="$INSTALL_PATH/jserver.sh"
 				stage="never"/>
@@ -87,6 +88,9 @@
 			<parsable type="shell"
 				targetfile="$INSTALL_PATH/OGRSH/shim-x86.sh" os="unix"/>
 
+			<executable targetfile="$INSTALL_PATH/OGRSH/shim-x86.sh"
+				os="unix" stage="never" keep="true"/>
+
 			<executable targetfile="$INSTALL_PATH/OGRSH/patch-file.sh"
 				stage="postinstall" keep="true">
 				<args>
@@ -107,6 +111,9 @@
 
 			<parsable type="shell"
 				targetfile="$INSTALL_PATH/OGRSH/shim-x86-64.sh" os="unix"/>
+
+			<executable targetfile="$INSTALL_PATH/OGRSH/shim-x86-64.sh"
+				os="unix" stage="never" keep="true"/>
 
 			<executable targetfile="$INSTALL_PATH/OGRSH/patch-file.sh"
 				stage="postinstall" keep="true">
