@@ -1,3 +1,5 @@
+include $(OGRSH_HOME)/macros/makefile.$(OGRSH_ARCH).in
+
 CC			=			gcc
 CPP			=			g++
 
@@ -14,6 +16,8 @@ OGRSH_LEVEL_ERROR=4
 OGRSH_LEVEL_FATAL=5
 
 DFLAGS		=			-DOGRSH_DEBUG_LEVEL=$(OGRSH_LEVEL_WARN)
-CFLAGS		=			-Wall -g -fPIC -rdynamic -I$(INC_DIR) $(DFLAGS)
-CPPFLAGS	=			-Wall -g -fPIC -rdynamic -I$(INC_DIR) $(DFLAGS)
+CFLAGS		=			-Wall -g -fPIC -rdynamic $(CROSS_COMP_FLAG)	\
+						-I$(INC_DIR) $(DFLAGS)
+CPPFLAGS	=			-Wall -g -fPIC -rdynamic $(CROSS_COMP_FLAG) \
+						-I$(INC_DIR) $(DFLAGS)
 LFLAGS		=			-lc -ldl -lxerces-c -L$(LIB_DIR)

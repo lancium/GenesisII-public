@@ -1,0 +1,1 @@
+CROSS_COMP_FLAG	=	-m32

@@ -23,12 +23,12 @@
 	<ogrsh:fs-provider name="genesisII-fs-provider"
 		provider-library="libGenesisIIOGRSHProvider.so"
 		provider-creator="createGenesisIIOGRSHProvider">
-		<ogrsh:session name="uva-geniinet-session"
-			root-rns-url="file:///home/mmm2a/Work/Workspace/GenesisII/context.xml"/>
 <!--
 		<ogrsh:session name="uva-geniinet-session"
-			root-rns-url="http://www.cs.virginia.edu/~vcgr/GeniiNet/root.xml"/>
+			root-rns-url="file:///home/mmm2a/Work/Workspace/GenesisII/context.xml"/>
 -->
+		<ogrsh:session name="uva-geniinet-session"
+			root-rns-url="http://www.cs.virginia.edu/~vcgr/GeniiNet/root.xml"/>
 	</ogrsh:fs-provider>
 
 <!--
