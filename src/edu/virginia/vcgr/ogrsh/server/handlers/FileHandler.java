@@ -10,6 +10,7 @@ import org.morgan.util.GUID;
 import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.byteio.streamable.factory.StreamableByteIOFactory;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
@@ -17,7 +18,6 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
-import edu.virginia.vcgr.genii.container.common.SByteIOFactory;
 import edu.virginia.vcgr.ogrsh.server.comm.OGRSHOperation;
 import edu.virginia.vcgr.ogrsh.server.dir.StatBuffer;
 import edu.virginia.vcgr.ogrsh.server.exceptions.OGRSHException;
@@ -49,12 +49,11 @@ public class FileHandler
 	static private EndpointReferenceType openSByteIOFromFactory(
 		EndpointReferenceType factory)
 		throws GenesisIISecurityException, ConfigurationException,
-			ResourceException, ResourceCreationFaultType, RemoteException,
-			IOException
+			ResourceException, ResourceCreationFaultType, RemoteException
 	{
-		SByteIOFactory f = ClientUtils.createProxy(
-			SByteIOFactory.class, factory);
-		return f.create();
+		StreamableByteIOFactory f = ClientUtils.createProxy(
+			StreamableByteIOFactory.class, factory);
+		return f.openStream(null).getEndpoint();
 	}
 	
 	private HashMap<String, IFileDescriptor> _openFiles =
