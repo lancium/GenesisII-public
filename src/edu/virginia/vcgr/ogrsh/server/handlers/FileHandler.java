@@ -1,15 +1,23 @@
 package edu.virginia.vcgr.ogrsh.server.handlers;
 
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.HashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.GUID;
+import org.morgan.util.configuration.ConfigurationException;
+import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
+import edu.virginia.vcgr.genii.container.common.SByteIOFactory;
 import edu.virginia.vcgr.ogrsh.server.comm.OGRSHOperation;
 import edu.virginia.vcgr.ogrsh.server.dir.StatBuffer;
 import edu.virginia.vcgr.ogrsh.server.exceptions.OGRSHException;
@@ -37,6 +45,17 @@ public class FileHandler
 	static public final int DIRECTORY = 0200000;
 	static public final int NOFOLLOW = 0400000;
 	static public final int NOATIME = 01000000;
+	
+	static private EndpointReferenceType openSByteIOFromFactory(
+		EndpointReferenceType factory)
+		throws GenesisIISecurityException, ConfigurationException,
+			ResourceException, ResourceCreationFaultType, RemoteException,
+			IOException
+	{
+		SByteIOFactory f = ClientUtils.createProxy(
+			SByteIOFactory.class, factory);
+		return f.create();
+	}
 	
 	private HashMap<String, IFileDescriptor> _openFiles =
 		new HashMap<String, IFileDescriptor>();
@@ -106,8 +125,22 @@ public class FileHandler
 				return key;
 			} else if (typeInfo.isSByteIOFactory())
 			{
-				throw new OGRSHException(OGRSHException.EXCEPTION_UNKNOWN,
-					"SByteIO is unimplemented for OGRSH.");
+				String key;
+				do
+				{
+					key = "F" + (new GUID()).toString();
+				} while (_openFiles.containsKey(key));
+				
+				EndpointReferenceType endpoint = openSByteIOFromFactory(
+					typeInfo.getEndpoint());
+				
+				_openFiles.put(key, new StreamableByteIOFileDescriptor(
+					endpoint,
+					((twobits == 0) || (twobits == 2)),
+					((twobits == 1) || (twobits == 2)),
+					((flags & APPEND) > 0)));
+				
+				return key;
 			} else if (typeInfo.isRNS())
 			{
 				return "D";
