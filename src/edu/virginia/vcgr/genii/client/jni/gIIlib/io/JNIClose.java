@@ -8,7 +8,7 @@ public class JNIClose {
 		WindowsIFSFile file = DataTracker.getInstance().getFile(fileHandle);
 		
 		if(file == null){
-			System.out.println("Invalid file handle or a directory being closed");			
+			System.out.println("Directory being closed or invalid FH");			
 			return false;
 		}
 		else{

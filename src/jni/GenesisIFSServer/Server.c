@@ -605,7 +605,7 @@ int main(int argc, char* argv[])
 	char buffer[8192];	
 
 	//Initialize in root thread
-	if(initializeJavaVM("C:/GenesisIIDevelopment/GenesisII", &rootInfo) == -1){
+	if(initializeJavaVM(NULL, &rootInfo) == -1){
 		printf("Initialization Failed!\n ");
 		return 0;
 	}

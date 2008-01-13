@@ -334,7 +334,7 @@ DllExport int initializeJavaVM(char * genesis_directory, PGII_JNI_INFO newInfo){
 
 	/* default directory */
 	if(genesis_directory == NULL){
-		genesis_directory = "'C:/Program Files/Genesis II'";
+		genesis_directory = "C:/Program\ Files/Genesis\ II";
 	}
 
 	sprintf_s(op0, 512, "-Djava.class.path=%s/ext/bouncycastle/bcprov-jdk15-133.jar;%s/lib/GenesisII-security.jar;%s/lib/morgan-utilities.jar;%s/lib;%s/security;", genesis_directory, genesis_directory, genesis_directory, genesis_directory, genesis_directory);	
@@ -347,7 +347,7 @@ DllExport int initializeJavaVM(char * genesis_directory, PGII_JNI_INFO newInfo){
 	options[2].optionString = op2;
 	options[3].optionString = op3;
 	options[4].optionString = "-Xms256M";
-	options[5].optionString = "-Xmx512M";
+	options[5].optionString = "-Xmx512M";	
 
 	memset(&vm_args, 0, sizeof(vm_args));
 	vm_args.version = JNI_VERSION_1_2;
