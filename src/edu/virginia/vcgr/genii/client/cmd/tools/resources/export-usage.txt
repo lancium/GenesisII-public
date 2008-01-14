@@ -2,7 +2,7 @@ export
 
 	OR
 	
-export --create { --url <export-service-url> | <export-service-rns-path> } 
+export --create { --url <export-service-url> | <export-service-hint> } 
 	<local-path> [new-rns-path]
 	
 	OR

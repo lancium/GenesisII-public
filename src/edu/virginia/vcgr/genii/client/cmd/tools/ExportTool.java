@@ -10,6 +10,7 @@ import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
@@ -23,6 +24,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.exportdir.ExportedRootPortType;
@@ -73,10 +75,11 @@ public class ExportTool extends BaseGridTool
 				exportServiceEPR = EPRUtils.makeEPR(serviceLocation);
 			else
 			{
-				RNSPath path = RNSPath.getCurrent();
-				path = path.lookup(serviceLocation, 
-					RNSPathQueryFlags.MUST_EXIST);
-				exportServiceEPR = path.getEndpoint();
+				exportServiceEPR = RNSUtilities.findService(
+					"/containers/BootstrapContainer", "ExportedRootPortType", 
+					new QName[] {
+							WellKnownPortTypes.EXPORTED_ROOT_SERVICE_PORT_TYPE
+					}, serviceLocation).getEndpoint();
 			}
 
 			/* get local directory path to be exported */
