@@ -19,6 +19,7 @@ import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.rattrs.SetAttributes;
 
@@ -57,36 +58,13 @@ public class TerminationScheduleTool extends BaseGridTool
 		return 0;
 	}
 	
-	static private Pattern _DELTA_PAT = Pattern.compile(
-		"([0-9]+)((?:ms)|(?:[smhd]))");
-	
 	static private Date parseTargetTime(String targetTime)
 		throws ParseException
 	{
 		if (targetTime.startsWith("+"))
 		{
-			Matcher m = _DELTA_PAT.matcher(targetTime.substring(1));
-			if (!m.matches())
-				throw new ParseException("Delta timestamp \""
-						+ targetTime + "\" unrecognized.", -1);
-			long value = Long.parseLong(m.group(1));
-			String type = m.group(2);
-			
-			if (type.equals("s"))
-			{
-				value *= 1000;
-			} else if (type.equals("m"))
-			{
-				value *= (60 * 1000);
-			} else if (type.equals("h"))
-			{
-				value *= (60 * 60 * 1000);
-			} else if (type.equals("d"))
-			{
-				value *= (24 * 60 * 60 * 1000);
-			}
-			
-			return new Date(new Date().getTime() + value);
+			Duration d = Duration.parse(targetTime.substring(1));
+			return new Date(new Date().getTime() + d.getMilliseconds());
 		} else
 		{
 			DateFormat format = DateFormat.getDateTimeInstance();
