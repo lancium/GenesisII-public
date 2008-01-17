@@ -5,8 +5,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.axis.message.MessageElement;
 import org.morgan.util.configuration.ConfigurationException;
