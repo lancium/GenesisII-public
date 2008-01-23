@@ -3,9 +3,12 @@ package edu.virginia.vcgr.genii.client.security.gamlauthz.assertions;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.security.GeneralSecurityException;
 import java.util.Date;
 
-public class BasicConstraints implements AttributeConstraints {
+public class BasicConstraints implements AttributeConstraints, Renewable {
+
+	static public final long serialVersionUID = 5685430283725684151L;
 
 	protected long _notValidBeforeMillis;
 	protected long _durationValidMillis;
@@ -19,6 +22,14 @@ public class BasicConstraints implements AttributeConstraints {
 		_notValidBeforeMillis = notValidBeforeMillis;
 		_maxDelegationDepth = maxDelegationDepth;
 	}	
+	
+	/**
+	 * Renew this object 
+	 */
+	public void renew() throws GeneralSecurityException {
+		// renew the start-valid date (minus 10 seconds for consistency)
+		_notValidBeforeMillis = System.currentTimeMillis() - (1000 * 10);
+	}
 	
 	/**
 	 * Checks that the attribute is time-valid with respect to the supplied 
@@ -55,13 +66,22 @@ public class BasicConstraints implements AttributeConstraints {
 	
 	
 	public String toString() {
+		long days = _durationValidMillis / (1000 * 60 * 60 * 24);
+		long remainder = _durationValidMillis % (1000 * 60 * 60 * 24);
+		long hours = remainder / (1000 * 60 * 60);
+		remainder = remainder % (1000 * 60 * 60);
+		long minutes = remainder / (1000 * 60);
+		remainder = remainder % (1000 * 60);
+		long seconds = remainder / (1000);
+		remainder = remainder % (1000);
+		
 		return "Constraints (" + 
 			" before: \"" + (new Date(_notValidBeforeMillis)) + 
 			"\" duration: \"" + 
-			(_durationValidMillis / (1000 * 60 * 60 * 24)) + " days, " +  
-			((_durationValidMillis % (1000 * 60 * 60 * 24)) / 24) + " hours, " +  
-			(((_durationValidMillis % (1000 * 60 * 60 * 24)) % 24) / 60) + " minutes, " +  
-			((((_durationValidMillis % (1000 * 60 * 60 * 24)) % 24) % 60) / 60) + " seconds" +  
+			days + " days, " +  
+			hours + " hours, " +  
+			minutes + " minutes, " +  
+			seconds + " seconds" +  
 			"\" maxDelegationDepth: " + this._maxDelegationDepth + ")"; 
 	}
 	
