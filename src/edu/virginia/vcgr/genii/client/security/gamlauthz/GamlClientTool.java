@@ -100,45 +100,62 @@ public class GamlClientTool {
 		} catch (NumberFormatException e) {
 		}
 
-		if ((modeString.length() % 2 != 0) || (modeString.length() / 2 < 1)) {
+		if ( modeString.length() / 2 < 1) {
 			throw new IllegalArgumentException();
 		}
 
 		int retval = 0;
 
-		while (true) {
-			switch (modeString.charAt(1)) {
-			case 'r':
-				if (modeString.charAt(0) == '+') {
-					retval |= READ;
-				} else {
-					retval |= NOT_READ;
+		while (true) 
+		{
+			int borderIndex;
+			int plusIndex = modeString.indexOf('+', 1);
+			int minusIndex = modeString.indexOf('-', 1);
+			if (plusIndex==-1 && minusIndex==-1)
+				borderIndex=modeString.length();
+			else if (plusIndex>minusIndex)
+				borderIndex=plusIndex;
+			else
+				borderIndex=minusIndex;
+			
+			switch (modeString.charAt(0))
+			{
+			case '+':
+				for (int i=1; i<borderIndex; i++)
+				{
+					if (modeString.charAt(i) == 'r')
+						retval |=READ;
+					else if (modeString.charAt(i) == 'w')
+						retval |=WRITE;
+					else if (modeString.charAt(i) == 'x')
+						retval |= EXECUTE;
 				}
 				break;
-			case 'w':
-				if (modeString.charAt(0) == '+') {
-					retval |= WRITE;
-				} else {
-					retval |= NOT_WRITE;
+			
+			case '-':
+				for (int i=1; i<borderIndex; i++)
+				{
+					if (modeString.charAt(i) == 'r')
+						retval |= NOT_READ;
+					else if (modeString.charAt(i) == 'w')
+						retval |= NOT_WRITE;
+					else if (modeString.charAt(i) == 'x')
+						retval |= NOT_EXECUTE;
 				}
 				break;
-			case 'x':
-				if (modeString.charAt(0) == '+') {
-					retval |= EXECUTE;
-				} else {
-					retval |= NOT_EXECUTE;
-				}
-				break;
+			
 			default:
 				throw new IllegalArgumentException();
-			}
-			if (modeString.length() / 2 == 1) {
+			}	
+			if (borderIndex == (modeString.length())) 
+			{
 				break;
-			} else {
-				modeString = modeString.substring(2);
+			} 
+			else 
+			{
+				modeString = modeString.substring(borderIndex);
 			}
 		}
-
 		return retval;
 	}
 
