@@ -390,17 +390,29 @@ public class BESServiceImpl extends GenesisIIBase
 			
 		for (EndpointReferenceType activity : activities)
 		{
+			/* We have to remember that an activity can dissapear from
+			 * underneath us while this is going on.
+			 */
 			String name = null;
-			ResourceKey activityKey = ResourceManager.getTargetResource(activity);
-			IBESActivityResource activityResource =
-				(IBESActivityResource)activityKey.dereference();
-			name = (String)activityResource.getProperty(
-				IBESActivityResource.ACTIVITY_NAME_PROPERTY);
-			if (name == null)
-				name = new WSName(activity).toString();
-				
-			if (p.matcher(name).matches())
-				aEntryList.add(new EntryType(name, null, activity));
+			try
+			{
+				ResourceKey activityKey = ResourceManager.getTargetResource(activity);
+				IBESActivityResource activityResource =
+					(IBESActivityResource)activityKey.dereference();
+				name = (String)activityResource.getProperty(
+					IBESActivityResource.ACTIVITY_NAME_PROPERTY);
+				if (name == null)
+					name = new WSName(activity).toString();
+					
+				if (p.matcher(name).matches())
+					aEntryList.add(new EntryType(name, null, activity));
+			}
+			catch (ResourceUnknownFaultType unknown)
+			{
+				_logger.debug(
+					"An activity dissapeared while we were listing it.", 
+					unknown);
+			}
 		}
 			
 		EntryType []entryList = new EntryType[aEntryList.size()];

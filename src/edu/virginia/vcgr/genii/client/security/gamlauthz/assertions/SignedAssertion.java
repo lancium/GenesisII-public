@@ -32,7 +32,7 @@ public abstract class SignedAssertion implements Externalizable, GamlCredential 
 	
 	/** Cache of verified assertions, keyed by _encodedValues */
 	static protected int VERIFIED_CACHE_SIZE = 16;
-	static protected LRUCache<String, SignedAssertion> verifiedAssertionsCache = 
+	static protected LRUCache<String, SignedAssertion> _verifiedAssertionsCache = 
 		new LRUCache<String, SignedAssertion>(VERIFIED_CACHE_SIZE);
 
 	/** Cached serialized value for comparison checking **/
@@ -54,19 +54,23 @@ public abstract class SignedAssertion implements Externalizable, GamlCredential 
 	 * Verify the assertion.  It is verified if all signatures successfully
 	 * authenticate the signed-in authorizing identities
 	 */	
-	static public void verifyAssertion(SignedAssertion assertion) throws GeneralSecurityException {
-		// check cache first
-		if ((assertion._encodedValue != null) && 
-				(verifiedAssertionsCache.get(assertion._encodedValue) != null)) {
-			return;
-		}
-		
-		// verify assertion
-		assertion.verifyAssertion();
-		
-		// insert into verified cache since no exception was thrown
-		if (assertion._encodedValue != null) {
-			verifiedAssertionsCache.put(assertion._encodedValue, assertion);
+	static public void verifyAssertion(SignedAssertion assertion) throws GeneralSecurityException
+	{
+		synchronized(_verifiedAssertionsCache)
+		{
+			// check cache first
+			if ((assertion._encodedValue != null) && 
+					(_verifiedAssertionsCache.get(assertion._encodedValue) != null)) {
+				return;
+			}
+			
+			// verify assertion
+			assertion.verifyAssertion();
+			
+			// insert into verified cache since no exception was thrown
+			if (assertion._encodedValue != null) {
+				_verifiedAssertionsCache.put(assertion._encodedValue, assertion);
+			}
 		}
 	}
 	

@@ -141,10 +141,14 @@ public class BasicDBResource implements IResource
 			stmt.setString(1, _resourceKey);
 			rs = stmt.executeQuery();
 			if (!rs.next())
+			{
+				_logger.error("Unable to load resource \"" + key + "\".  Throwing resource unknown fault.");
+				
 				throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(
 					null, null, null, null, new BaseFaultTypeDescription[] {
 						new BaseFaultTypeDescription("Resource \"" + _resourceKey + "\" is unknown.")
 					}, null));
+			}
 		}
 		catch (SQLException sqe)
 		{
