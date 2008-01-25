@@ -19,7 +19,7 @@ public class BrowserTool extends BaseGridTool
 	
 	public BrowserTool()
 	{
-		super(_DESCRIPTION, _USAGE, true);
+		super(_DESCRIPTION, _USAGE, false);
 	}
 	
 	@Override

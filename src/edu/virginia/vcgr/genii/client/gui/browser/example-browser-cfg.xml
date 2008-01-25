@@ -1,0 +1,24 @@
+<browser-config>
+
+	<plugin-factories>
+		<plugin-factory
+			name="Foo Factory"
+			implementing-class="edu.virginia.vcgr.genii.client.gui.browser.Foo">
+			<main-menu-class>main-menu</main-menu-class>
+			<context-menu-class>context-menu</context-menu-class>
+			<tab-class>tab-menu</tab-class>
+		<plugin-factory>
+	</plugin-factories>
+	
+	<plugin name="Some Name" factory="Foo Factory">
+		<main-menu 
+			menu-name="Foo" menu-label="Run Foo" group-name="Security"/>
+			
+		<context-menu
+			menu-label="Run Foo" group-name="Security"/>
+		
+		<tab
+			tab-label="Foo" priority="0"/>
+	</plugin>
+
+</browser-config>
