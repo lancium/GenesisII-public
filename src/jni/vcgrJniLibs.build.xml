@@ -30,6 +30,11 @@
 			<class name="edu.virginia.vcgr.genii.container.sysinfo.WindowsProvider"/>
 		</javah>
 
+		<javah outputFile="${src-dir}/jni/VcgrContainerLib/WindowsProviderProcessManager.jh"
+			classpath="${basedir}/obj">
+			<class name="edu.virginia.vcgr.genii.container.processmanager.WindowsProvider"/>
+		</javah>
+		
 	</target>
 
 	<target name="jni-native-build" depends="jni-generate-headers">

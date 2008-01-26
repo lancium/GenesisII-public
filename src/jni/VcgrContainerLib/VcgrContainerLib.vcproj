@@ -181,6 +181,10 @@
 				RelativePath=".\WindowsProvider.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\WindowsProviderProcessManager.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -189,6 +193,10 @@
 			>
 			<File
 				RelativePath=".\WindowsProvider.jh"
+				>
+			</File>
+			<File
+				RelativePath=".\WindowsProviderProcessManager.jh"
 				>
 			</File>
 		</Filter>
