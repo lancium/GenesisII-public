@@ -98,4 +98,7 @@ public class ProcFilesystemProvider implements ISystemInfoProvider
 			StreamUtils.close(reader);
 		}
 	}
+	
+	// This method is currently un-implemented for Linux.
+	public boolean getUserLoggedIn() { return false;};
 }

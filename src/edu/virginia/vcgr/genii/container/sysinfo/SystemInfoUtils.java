@@ -61,4 +61,9 @@ public class SystemInfoUtils
 	{
 		return getProvider().getVirtualMemoryAvailable();
 	}
+
+	static public boolean getUserLoggedIn()
+	{
+		return getProvider().getUserLoggedIn();
+	}
 }

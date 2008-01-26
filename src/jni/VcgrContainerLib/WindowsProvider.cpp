@@ -1,4 +1,8 @@
 #include <windows.h>
+#include <Ntsecapi.h>
+
+// This define may be in Ntstatus.h, not relying on that
+#define STATUS_SUCCESS ((NTSTATUS)0x00000000L)
 
 #include "WindowsProvider.jh"
 
@@ -182,11 +186,61 @@ JNIEXPORT jboolean JNICALL Java_edu_virginia_vcgr_genii_container_sysinfo_Window
 
 
 //-----------------------------------------------------------------------------
-// IsUserLoggedIn
+// This is a helper function for the getUserLoggedIn function.  This function
+// will determine information about a passed in session variable.  It can 
+// determine whether or not an interactive session is currently running.
+//  This is a robust method for checking if a user is logged in at a computer.
+//-----------------------------------------------------------------------------
+bool GetSessionData(PLUID session)
+{
+  PSECURITY_LOGON_SESSION_DATA sessionData = NULL;
+  NTSTATUS retval;
+
+  // Check for a valid session.
+  if (!session ) {
+    wprintf(L"Error - Invalid logon session identifier.\n");
+    return false;
+  }
+
+  // Get the session information.
+  retval = LsaGetLogonSessionData(session, &sessionData);
+
+  // This will check to ensure that we were able to get the session data.
+  if (retval != STATUS_SUCCESS) {
+    // An error occurred.
+    wprintf (L"LsaGetLogonSessionData failed %lu \n",
+      LsaNtStatusToWinError(retval));
+    // If session information was returned, free it.
+    if (sessionData) {
+      LsaFreeReturnBuffer(sessionData);
+    }
+    return false;
+  } 
+
+  // Determine whether there is session data to parse. 
+  if (!sessionData) { // no data for session
+    wprintf(L"Invalid logon session data. \n");
+    return false;
+  }
+
+  // Check to see if an interactive user is currently logged on
+  if ((SECURITY_LOGON_TYPE) sessionData->LogonType == Interactive) {
+    return true;
+  }
+
+  // Free the memory returned by the LSA.
+  LsaFreeReturnBuffer(sessionData);
+  return false;
+}
+
+
+//-----------------------------------------------------------------------------
+// getUserLoggedIn
 //
-// Determines if an interactive user is logged into the machine.  (This is done
-// by determining if GUI shell is active.  Services wishing to check this much 
-// be "allowed to interact with the desktop".
+// Determines if an interactive user is logged into the machine.  This is done
+// by enumerating all sessions on the computer and determining if any currently
+// active sessions are 'interactive' sessions.  This conforms to MS documents
+// located: http://msdn2.microsoft.com/en-us/library/aa375400.aspx
 //-----------------------------------------------------------------------------
 
 /*
@@ -196,13 +250,31 @@ JNIEXPORT jboolean JNICALL Java_edu_virginia_vcgr_genii_container_sysinfo_Window
  */
 JNIEXPORT jboolean JNICALL Java_edu_virginia_vcgr_genii_container_sysinfo_WindowsProvider_getUserLoggedIn
 (JNIEnv *env, jobject obj) {
+  PLUID sessions;
+  ULONG count;
+  NTSTATUS retval;
+  int i;
 
-    HWND hwndShell = NULL;
+  // Get all of the logon sessions
+  retval = LsaEnumerateLogonSessions(&count, &sessions);
 
-	//Get Desktop Window HWND 
-    hwndShell = GetShellWindow();
-    if (!hwndShell) 
-		return false;
+  // Check to ensure there was no error enumerating the sessions
+  if (retval != STATUS_SUCCESS) {
+     wprintf (L"LsaEnumerate failed %lu\n",
+       LsaNtStatusToWinError(retval));
+    return false;
+  }
 
-	return true;
+  // Process the array of session LUIDs...
+  bool userLoggedIn = false;
+  for (i = 0; i < (int) count; i++) {
+	  userLoggedIn = GetSessionData(&sessions[i]);
+	  if (userLoggedIn) {
+		  // Free the array of session LUIDs allocated by the LSA.
+		  LsaFreeReturnBuffer(sessions);
+		  return userLoggedIn;
+	  }
+  }
+
+  return false;
 }
