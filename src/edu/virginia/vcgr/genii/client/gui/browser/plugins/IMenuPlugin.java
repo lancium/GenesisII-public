@@ -1,15 +1,11 @@
-package edu.virginia.vcgr.genii.client.gui.browser;
+package edu.virginia.vcgr.genii.client.gui.browser.plugins;
 
 import javax.swing.JDialog;
 
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 
-public interface IContextMenuPlugin extends IPlugin
+public interface IMenuPlugin extends IPlugin
 {
-	public String getMenuLabel();
-	
-	public String getGroupName();
-	
 	public void performAction(
 		RNSPath []selectedResources,
 		JDialog ownerDialog) throws PluginException;
