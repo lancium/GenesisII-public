@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.container.db;
 
 import java.io.File;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
@@ -185,7 +186,20 @@ public class DatabaseConnectionPool
 					"Someone tried to close a pooled connection.");
 			}
 			
-			return method.invoke(_instance, args);
+			try
+			{
+				return method.invoke(_instance, args);
+			}
+			catch (Throwable cause)
+			{
+				_logger.error("Error calling method on connection.", cause);
+				if (cause instanceof InvocationTargetException)
+				{
+					throw cause.getCause();
+				}
+				
+				throw cause;
+			}
 		}
 	}
 }

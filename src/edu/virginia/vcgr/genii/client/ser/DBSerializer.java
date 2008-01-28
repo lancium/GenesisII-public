@@ -22,6 +22,9 @@ public class DBSerializer
 	static public Blob toBlob(Object obj)
 		throws IOException
 	{
+		if (obj == null)
+			return null;
+		
 		try
 		{
 			return new SerialBlob(serialize(obj));
@@ -37,6 +40,9 @@ public class DBSerializer
 	{
 		InputStream in = null;
 		ObjectInputStream oin = null;
+		
+		if (b == null)
+			return null;
 		
 		try
 		{
@@ -59,6 +65,9 @@ public class DBSerializer
 		ObjectOutputStream oos = null;
 		ByteArrayOutputStream baos = null; 
 		
+		if (obj == null)
+			return null;
+		
 		try
 		{
 			baos = new ByteArrayOutputStream();
@@ -77,6 +86,9 @@ public class DBSerializer
 		throws IOException, ClassNotFoundException
 	{
 		ObjectInputStream ois = null;
+		
+		if (data == null)
+			return null;
 		
 		try
 		{
@@ -98,6 +110,9 @@ public class DBSerializer
 		ByteArrayOutputStream baos = null;
 		OutputStreamWriter writer = null;
 		
+		if (obj == null)
+			return null;
+		
 		try
 		{
 			baos = new ByteArrayOutputStream();
@@ -118,6 +133,9 @@ public class DBSerializer
 	{
 		ByteArrayInputStream bais = null;
 		
+		if (data == null)
+			return null;
+		
 		try
 		{
 			bais = new ByteArrayInputStream(data);
@@ -132,6 +150,9 @@ public class DBSerializer
 	static public Blob xmlToBlob(Object obj)
 		throws IOException
 	{
+		if (obj == null)
+			return null;
+		
 		try
 		{
 			byte []data = xmlSerialize(obj);
@@ -148,6 +169,9 @@ public class DBSerializer
 		throws IOException, ClassNotFoundException
 	{
 		InputStream in = null;
+		
+		if (blob == null)
+			return null;
 		
 		try
 		{
