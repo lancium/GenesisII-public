@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.client.gui.browser.plugins.rns;
 
 import javax.swing.JFrame;
 
+import edu.virginia.vcgr.genii.client.gui.browser.grid.IActionContext;
 import edu.virginia.vcgr.genii.client.gui.browser.plugins.IMenuPlugin;
 import edu.virginia.vcgr.genii.client.gui.browser.plugins.PluginException;
 import edu.virginia.vcgr.genii.client.gui.browser.plugins.PluginStatus;
@@ -12,11 +13,14 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 public class MkdirPlugin implements IMenuPlugin
 {
 	@Override
-	public void performAction(RNSPath[] selectedResources, JFrame ownerDialog)
+	public void performAction(RNSPath[] selectedResources, JFrame ownerDialog,
+		IActionContext actionContext)
 			throws PluginException
 	{
-		// TODO Auto-generated method stub
-
+		String name = NewDirectoryDialog.getDirectoryName(ownerDialog);
+		
+		// TODO
+		System.err.println("New Directory is \"" + name + "\".");
 	}
 
 	@Override

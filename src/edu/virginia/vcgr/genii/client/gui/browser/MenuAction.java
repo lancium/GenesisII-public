@@ -51,7 +51,8 @@ public class MenuAction extends AbstractAction
 		try
 		{
 			if (plugin.getStatus(selectedResources) == PluginStatus.ACTIVTE)
-				plugin.performAction(selectedResources, _ownerDialog);
+				plugin.performAction(selectedResources, _ownerDialog,
+					_ownerDialog.getActionContext());
 		}
 		catch (PluginException pe)
 		{

@@ -26,6 +26,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.configuration.ConfigurationException;
 
+import edu.virginia.vcgr.genii.client.gui.browser.grid.IActionContext;
+import edu.virginia.vcgr.genii.client.gui.browser.grid.ILongRunningAction;
 import edu.virginia.vcgr.genii.client.gui.browser.plugins.ContextMenuDescriptor;
 import edu.virginia.vcgr.genii.client.gui.browser.plugins.MainMenuDescriptor;
 import edu.virginia.vcgr.genii.client.gui.browser.plugins.PluginException;
@@ -220,6 +222,43 @@ public class BrowserDialog extends JFrame
 		}
 		
 		return ret;
+	}
+	
+	public IActionContext getActionContext()
+	{
+		return new ActionContext();
+	}
+	
+	private class ActionContext implements IActionContext
+	{
+		@Override
+		public void performLongRunningAction(ILongRunningAction action)
+		{
+			Thread th = new Thread(new LongActionRunner(action, this));
+			th.setDaemon(false);
+			th.setName("Long Running Action");
+			th.start();
+		}
+
+		@Override
+		public void refreshSubTree(RNSPath subtreePath)
+		{
+			// TODO
+		}
+		
+		@Override
+		public void reportError(String msg)
+		{
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void reportError(String msg, Throwable cause)
+		{
+			// TODO Auto-generated method stub
+			
+		}
 	}
 	
 	private class SelectionCallback implements ISelectionCallback,
