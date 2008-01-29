@@ -17,6 +17,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -229,6 +230,21 @@ public class BrowserDialog extends JFrame
 		return new ActionContext();
 	}
 	
+	private class TreeRefresher implements Runnable
+	{
+		private RNSPath _subtreePath;
+		
+		public TreeRefresher(RNSPath subtreePath)
+		{
+			_subtreePath = subtreePath;
+		}
+		
+		public void run()
+		{
+			_rnsTree.reloadSubtree(_subtreePath);
+		}
+	}
+	
 	private class ActionContext implements IActionContext
 	{
 		@Override
@@ -243,21 +259,24 @@ public class BrowserDialog extends JFrame
 		@Override
 		public void refreshSubTree(RNSPath subtreePath)
 		{
-			// TODO
+			if (SwingUtilities.isEventDispatchThread())
+				_rnsTree.reloadSubtree(subtreePath);
+			else
+				SwingUtilities.invokeLater(new TreeRefresher(subtreePath));
 		}
 		
 		@Override
 		public void reportError(String msg)
 		{
 			// TODO Auto-generated method stub
-			
+			_logger.error(msg);
 		}
 
 		@Override
 		public void reportError(String msg, Throwable cause)
 		{
 			// TODO Auto-generated method stub
-			
+			_logger.error(msg, cause);
 		}
 	}
 	

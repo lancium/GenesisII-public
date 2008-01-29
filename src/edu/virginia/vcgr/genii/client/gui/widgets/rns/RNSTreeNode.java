@@ -54,6 +54,12 @@ public class RNSTreeNode extends DefaultMutableTreeNode
 		return _target;
 	}
 	
+	public void refresh(RNSTreeModel model)
+	{
+		_nodeState = NodeState.NEEDS_EXPANSION;
+		prepareExpansion(model);
+	}
+	
 	synchronized public void prepareExpansion(RNSTreeModel model)
 	{
 		if (_nodeState == NodeState.NEEDS_EXPANSION)
