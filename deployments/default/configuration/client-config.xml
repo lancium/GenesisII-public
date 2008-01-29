@@ -163,7 +163,7 @@
 			base="edu.virginia.vcgr.genii.client.comm.IProxyFactory"/>
 		<mconf:instance name="context-resolver" 
 			type="edu.virginia.vcgr.genii.client.context.ClientContextResolver"
-			base="edu.virginia.vcgr.genii.client.context.IContextResolver"/>
+			base="edu.virginia.vcgr.genii.client.context.IContextResolver"/>		
 <!--
 		<mconf:instance name="exception-handler"
 			type="edu.virginia.vcgr.genii.client.cmd.DebugExceptionHandler"

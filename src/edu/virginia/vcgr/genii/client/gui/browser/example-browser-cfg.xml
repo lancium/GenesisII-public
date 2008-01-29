@@ -15,7 +15,7 @@
 			
 		<tab
 			tab-name="Foo"
-			priority="0"/>
+			tab-priority="0"/>
 		
 	</plugin>
 	

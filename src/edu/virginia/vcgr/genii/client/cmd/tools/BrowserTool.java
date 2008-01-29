@@ -1,14 +1,11 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
-import java.awt.Container;
-import java.awt.Dimension;
-
-import javax.swing.JDialog;
-import javax.swing.JScrollPane;
-
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
-import edu.virginia.vcgr.genii.client.gui.widgets.rns.RNSTree;
+import edu.virginia.vcgr.genii.client.gui.GuiUtils;
+import edu.virginia.vcgr.genii.client.gui.browser.BrowserDialog;
+import edu.virginia.vcgr.genii.client.gui.browser.plugins.PluginManager;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class BrowserTool extends BaseGridTool
 {
@@ -25,17 +22,11 @@ public class BrowserTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		JDialog dialog = new JDialog();
-		dialog.setTitle("RNS Browser");
-		Container pane = dialog.getContentPane();
-		JScrollPane jp = new JScrollPane(new RNSTree());
+		PluginManager pluginManager = PluginManager.loadPlugins(new FileResource(
+			"edu/virginia/vcgr/genii/client/gui/browser/browser-config.xml"));
+		BrowserDialog dialog = new BrowserDialog(pluginManager);
 		
-
-		Dimension size = new Dimension(250, 250);
-		jp.setPreferredSize(size);
-		
-		pane.add(jp);
-		dialog.pack();
+		GuiUtils.centerComponent(dialog);
 		dialog.setVisible(true);
 		return 0;
 	}

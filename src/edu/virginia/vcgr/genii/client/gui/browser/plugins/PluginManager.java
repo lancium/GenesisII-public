@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.TreeSet;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -112,7 +113,7 @@ public class PluginManager
 						= mainMenuPlugins.get(descriptor.getMenuName());
 					if (menu == null)
 					{
-						menu = new HashMap<String, Collection<MainMenuDescriptor>>();
+						menu = new LinkedHashMap<String, Collection<MainMenuDescriptor>>();
 						mainMenuPlugins.put(descriptor.getMenuName(), menu);
 					}
 					
@@ -164,9 +165,9 @@ public class PluginManager
 		throws PluginException
 	{
 		HashMap<String, HashMap<String, Collection<MainMenuDescriptor>>> mainMenuPlugins
-			= new HashMap<String, HashMap<String,Collection<MainMenuDescriptor>>>();
+			= new LinkedHashMap<String, HashMap<String,Collection<MainMenuDescriptor>>>();
 		HashMap<String, Collection<ContextMenuDescriptor>> contextMenuPlugins
-			= new HashMap<String, Collection<ContextMenuDescriptor>>();
+			= new LinkedHashMap<String, Collection<ContextMenuDescriptor>>();
 		TreeSet<TabPluginDescriptor> tabs = new TreeSet<TabPluginDescriptor>(
 			TabPluginDescriptor.getPriorityComparator());
 		

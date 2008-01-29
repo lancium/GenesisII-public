@@ -1,0 +1,37 @@
+<browser-config>
+
+	<plugin name="Mkdir Plugin"
+		implementing-class="edu.virginia.vcgr.genii.client.gui.browser.plugins.rns.MkdirPlugin">
+		
+		<main-menu menu-name="File"
+			menu-label="Create Subdirectory"
+			menu-group="Directory Management"/>
+			
+		<context-menu
+			menu-label="Create Subdirectory"
+			menu-group="Directory Management"/>
+		
+	</plugin>
+	
+	<plugin name="Default Selection Display Plugin"
+		implementing-class="edu.virginia.vcgr.genii.client.gui.browser.plugins.sys.DefaultSelectionDisplayPlugin">
+		
+		<tab
+			tab-name="Path/EPR"
+			tab-priority="100"/>
+		
+	</plugin>
+
+	<!-- This should ALWAYS be the last plugin listed, or at least the last one for the File menu.
+			If not, then the exit command in the menu could appear somewhere other than last in the file menu.
+	-->
+	<plugin name="Exit Plugin"
+		implementing-class="edu.virginia.vcgr.genii.client.gui.browser.plugins.sys.ExitPlugin">
+		
+		<main-menu menu-name="File"
+			menu-label="Exit"
+			menu-group="Exit"/>
+			
+	</plugin>
+	
+</browser-config>
