@@ -8,6 +8,12 @@ import edu.virginia.vcgr.genii.client.gui.browser.plugins.PluginException;
 import edu.virginia.vcgr.genii.client.gui.browser.plugins.PluginStatus;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 
+/**
+ * This is the default exit plugin that is displayed in the menus so that the
+ * user of the browser can exit the browser.
+ * 
+ * @author mmm2a
+ */
 public class ExitPlugin implements IMenuPlugin
 {
 	@Override

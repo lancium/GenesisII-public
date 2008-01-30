@@ -15,7 +15,13 @@ import edu.virginia.vcgr.genii.client.gui.browser.plugins.PluginException;
 import edu.virginia.vcgr.genii.client.gui.browser.plugins.PluginStatus;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 
-public class MenuAction extends AbstractAction
+/**
+ * Menu actions are GUI action items that correspond to plugin entries in
+ * a menu.
+ * 
+ * @author mmm2a
+ */
+class MenuAction extends AbstractAction
 	implements TreeSelectionListener
 {
 	static final long serialVersionUID = 0L;
@@ -26,6 +32,15 @@ public class MenuAction extends AbstractAction
 	private BrowserDialog _ownerDialog;
 	private ContextMenuDescriptor _descriptor;
 	
+	/**
+	 * Create a new menu action.
+	 * 
+	 * @param ownerDialog The Browser that owns this menu action.
+	 * @param selectionCallback The selectioncallback that can be
+	 * used to determine which RNS paths are currently selected.
+	 * @param descriptor The plugin descriptor for this menu (can
+	 * be a context menu, or the main menu.
+	 */
 	public MenuAction(BrowserDialog ownerDialog,
 		ISelectionCallback selectionCallback,
 		ContextMenuDescriptor descriptor)

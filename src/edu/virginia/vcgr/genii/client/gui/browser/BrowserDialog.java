@@ -39,6 +39,11 @@ import edu.virginia.vcgr.genii.client.gui.widgets.rns.RNSTreeNode;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 
+/**
+ * The BrowserDialog class is the main frame for the browser dialog.
+ * 
+ * @author mmm2a
+ */
 public class BrowserDialog extends JFrame
 {
 	static final long serialVersionUID = 0L;
@@ -53,6 +58,15 @@ public class BrowserDialog extends JFrame
 	
 	static
 	{
+		/* Create a list of top menu names that can easily be
+		 * referenced by a hash table, but can be accessed in
+		 * the order in which they were added.  This list is
+		 * used to priority the order that menus appear in along
+		 * the top.  If a plugin shows up in one of these menus, then
+		 * that menu will be placed, relative to others, according to
+		 * this list.  If a plugin is in a menu NOT included on this
+		 * list, then it simply goes at the end.
+		 */
 		PREFERRED_MENU_ORDER = new LinkedHashSet<String>();
 		
 		PREFERRED_MENU_ORDER.add("File");
@@ -66,6 +80,16 @@ public class BrowserDialog extends JFrame
 	private SelectionCallback _selectionCallback;
 	private RNSTree _rnsTree;
 	
+	/**
+	 * Given a plugin manager (with configured plugins), create a new
+	 * browser dialog that we can display.
+	 * 
+	 * @param pluginManager The plugin manager that contains the plugins
+	 * to use for this browser.
+	 * 
+	 * @throws RNSException
+	 * @throws ConfigurationException
+	 */
 	public BrowserDialog(PluginManager pluginManager)
 		throws RNSException, ConfigurationException
 	{
@@ -74,7 +98,8 @@ public class BrowserDialog extends JFrame
 		setResizable(true);
 		
 		_pluginManager = pluginManager;
-		_rnsTree = new RNSTree();		
+		_rnsTree = new RNSTree();
+		
 		_selectionCallback = new SelectionCallback();
 		_rnsTree.addTreeSelectionListener(_selectionCallback);
 		_rnsTree.addMouseListener(new RightClickHandler());
@@ -102,6 +127,11 @@ public class BrowserDialog extends JFrame
 		pack();
 	}
 	
+	/**
+	 * Create the top menu bar for the browser.
+	 * 
+	 * @return The top menu bar.
+	 */
 	private JMenuBar createMenuBar()
 	{
 		JMenuBar menuBar = new JMenuBar();
@@ -109,6 +139,9 @@ public class BrowserDialog extends JFrame
 		HashMap<String, HashMap<String, Collection<MainMenuDescriptor>>> mainMenu =
 			_pluginManager.getMainMenuPlugins();
 		
+		/* First, go through the preferred order and see if there are any 
+		 * plugins in the list that should be added in a specific order.
+		 */
 		for (String menuName : PREFERRED_MENU_ORDER)
 		{
 			HashMap<String, Collection<MainMenuDescriptor>> menu = 
@@ -117,6 +150,9 @@ public class BrowserDialog extends JFrame
 				menuBar.add(createTopMenu(menuName, menu));
 		}
 		
+		/* Now, go through all the plugins and add all the ones which weren't
+		 * already taken care of during the preferred menu order code above.
+		 */
 		for (String menuName : mainMenu.keySet())
 		{
 			if (!PREFERRED_MENU_ORDER.contains(menuName))
@@ -134,6 +170,15 @@ public class BrowserDialog extends JFrame
 		return menuBar;
 	}
 	
+	/**
+	 * This internal function creates a top menu pull-down.
+	 * 
+	 * @param menuName The name of the menu to create.
+	 * @param menuDesc The collection of menu descriptions for this
+	 * pulldown menu.
+	 * 
+	 * @return The newly created menu.
+	 */
 	private JMenu createTopMenu(String menuName, 
 		HashMap<String, Collection<MainMenuDescriptor>> menuDesc)
 	{
@@ -141,19 +186,29 @@ public class BrowserDialog extends JFrame
 		JMenu menu = new JMenu(menuName);
 		JMenu targetMenu;
 		
+		/* Iterate through all the groups */
 		for (String group : menuDesc.keySet())
 		{
+			/* If it's a new group and we have already added at least one
+			 * group before, then add a seperator
+			 */
 			if (!first)
 				menu.addSeparator();
-			targetMenu = menu;
 			
+			targetMenu = menu; 
 			Collection<MainMenuDescriptor> descList = menuDesc.get(group);
+			
+			/* If this group has more then the group limit number of items,
+			 * then go ahead and make it a seperate pop-up menu off of the
+			 * main menu.
+			 */
 			if (descList.size() > GROUP_SIZE_LIMIT)
 			{
 				targetMenu = new JMenu(group);
 				menu.add(targetMenu);
 			}
 			
+			/* Now, go through the menu items creating the menus indicated. */
 			for (MainMenuDescriptor desc : descList)
 			{
 				first = false;
@@ -166,6 +221,11 @@ public class BrowserDialog extends JFrame
 		return menu;
 	}
 	
+	/**
+	 * Create a popup menu for the items currently selected in the RNStree.
+	 * 
+	 * @return The newly created popup-menu.
+	 */
 	private JPopupMenu createPopupMenu()
 	{
 		HashMap<String, Collection<ContextMenuDescriptor>> menuDesc
@@ -174,23 +234,25 @@ public class BrowserDialog extends JFrame
 		JPopupMenu ret = new JPopupMenu("Available Actions");
 		boolean first = true;
 		
+		/* Iterate through the groups */
 		for (String group : menuDesc.keySet())
 		{
+			/* If we've already added groups before, then put a seperator */
 			if (!first)
 				ret.addSeparator();
 			
+			/* We're now going to figure out which of the plugins are NOT
+			 * hidden according to their status.
+			 */
 			Collection<ContextMenuDescriptor> nonHiddenItems = 
 				new ArrayList<ContextMenuDescriptor>();
-			
 			for (ContextMenuDescriptor desc : menuDesc.get(group))
 			{
 				RNSPath []selectedPaths = _selectionCallback.getSelectedPaths();
 				try
 				{
 					if (desc.getPlugin().getStatus(selectedPaths) != PluginStatus.HIDDEN)
-					{
 						nonHiddenItems.add(desc);
-					}
 				}
 				catch (PluginException pe)
 				{
@@ -198,6 +260,11 @@ public class BrowserDialog extends JFrame
 				}
 			}
 			
+			/* Now that we know how many plugins in this group are NOT hidden,
+			 * we check to see if the number is larger then our group limit.
+			 * If it is, we instead create a side popup-menu to handle the large
+			 * group.
+			 */
 			if (nonHiddenItems.size() > GROUP_SIZE_LIMIT)
 			{
 				JMenu menu = new JMenu(group);
@@ -213,6 +280,9 @@ public class BrowserDialog extends JFrame
 				ret.add(menu);
 			} else
 			{
+				/* If the group wasn't too large, just go ahead and add the
+				 * items to the popup menu.
+				 */
 				for (ContextMenuDescriptor desc : nonHiddenItems)
 				{
 					first = false;
@@ -225,30 +295,61 @@ public class BrowserDialog extends JFrame
 		return ret;
 	}
 	
+	/**
+	 * Create a new action context that we can give to plugins to allow them
+	 * to request "favors" from us.
+	 * 
+	 * @return The newly created action context.
+	 */
 	public IActionContext getActionContext()
 	{
 		return new ActionContext(this);
 	}
 	
+	/**
+	 * The tree refresher is a simple internal class that gets
+	 * queued up by the event dispatch mechanism so that we can
+	 * guarantee that it modifies the RNS tree on the event
+	 * dispatch thread.
+	 * 
+	 * @author mmm2a
+	 */
 	private class TreeRefresher implements Runnable
 	{
 		private RNSPath _subtreePath;
 		
+		/**
+		 * Create a new TreeRefresher.
+		 * 
+		 * @param subtreePath The RNSPath in the tree to refresh.
+		 */
 		public TreeRefresher(RNSPath subtreePath)
 		{
 			_subtreePath = subtreePath;
 		}
 		
+		@Override
 		public void run()
 		{
 			_rnsTree.reloadSubtree(_subtreePath);
 		}
 	}
 	
+	/**
+	 * This private class is the implementation of the ActionContext that
+	 * plugins can use to ask the browser to do things for them.
+	 * 
+	 * @author mmm2a
+	 */
 	private class ActionContext implements IActionContext
 	{
 		private BrowserDialog _browser;
 		
+		/**
+		 * Create a new ActionContext.
+		 * 
+		 * @param browser The browser that will handle the favors.
+		 */
 		public ActionContext(BrowserDialog browser)
 		{
 			_browser = browser;
@@ -287,6 +388,13 @@ public class BrowserDialog extends JFrame
 		}
 	}
 	
+	/**
+	 * The selection callback class is used to allow other pieces of
+	 * code to ask for the currently selected items.  This is given
+	 * to actions so that they know how to find the items.
+	 * 
+	 * @author mmm2a
+	 */
 	private class SelectionCallback implements ISelectionCallback,
 		TreeSelectionListener
 	{
@@ -327,18 +435,33 @@ public class BrowserDialog extends JFrame
 		}	
 	}
 	
+	/**
+	 * This is a class which is registered with the RNSTree to receive mouse
+	 * clicks that might trigger the popup-context menu.
+	 * 
+	 * @author mmm2a
+	 */
 	private class RightClickHandler extends MouseAdapter
 	{
+		@Override
 		public void mousePressed(MouseEvent e)
 		{
 			maybeShowPopup(e);
 		}
 
+		@Override
 		public void mouseReleased(MouseEvent e) 
 		{
 			maybeShowPopup(e);
 		}
 
+		/**
+		 * Determines whether or not a popup-event has
+		 * happend, and if so, handles the popup menu.
+		 * 
+		 * @param e The mouse event that triggered the check for a
+		 * popup action.
+		 */
 		private void maybeShowPopup(MouseEvent e) 
 		{
 			if (e.isPopupTrigger()) 

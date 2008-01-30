@@ -17,11 +17,20 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 
+/**
+ * This class implements the default tab plugin display which shows the
+ * RNS path and EPR of the selected instance.
+ * 
+ * @author mmm2a
+ */
 public class DefaultSelectionDisplayPlugin implements ITabPlugin
 {
 	private JScrollPane _scrollPane;
 	private JTextArea _textArea;
 	
+	/**
+	 * Create a new default selection display plugin instance.
+	 */
 	public DefaultSelectionDisplayPlugin()
 	{
 		_textArea = new JTextArea();
@@ -37,6 +46,10 @@ public class DefaultSelectionDisplayPlugin implements ITabPlugin
 		boolean first = true;
 		StringBuilder builder = new StringBuilder();
 		
+		/* For each path that we were given, we will create a string
+		 * document which has the appropriate text embedded to be
+		 * displayed.
+		 */
 		for (RNSPath path : selectedPaths)
 		{
 			if (!first)
@@ -68,6 +81,10 @@ public class DefaultSelectionDisplayPlugin implements ITabPlugin
 		
 		try
 		{
+			/* Now that we have the text that we want to display,
+			 * we have to update the tab's component display to
+			 * show that text.
+			 */
 			Document doc = _textArea.getDocument();
 			doc.remove(0, doc.getLength());
 			_textArea.insert(builder.toString(), 0);
