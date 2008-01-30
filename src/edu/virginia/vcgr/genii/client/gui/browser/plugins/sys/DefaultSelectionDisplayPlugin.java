@@ -25,6 +25,8 @@ public class DefaultSelectionDisplayPlugin implements ITabPlugin
 	public DefaultSelectionDisplayPlugin()
 	{
 		_textArea = new JTextArea();
+		_textArea.setEditable(false);
+		
 		_scrollPane = new JScrollPane(_textArea);
 	}
 	

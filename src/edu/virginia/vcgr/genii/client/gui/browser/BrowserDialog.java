@@ -227,7 +227,7 @@ public class BrowserDialog extends JFrame
 	
 	public IActionContext getActionContext()
 	{
-		return new ActionContext();
+		return new ActionContext(this);
 	}
 	
 	private class TreeRefresher implements Runnable
@@ -247,6 +247,13 @@ public class BrowserDialog extends JFrame
 	
 	private class ActionContext implements IActionContext
 	{
+		private BrowserDialog _browser;
+		
+		public ActionContext(BrowserDialog browser)
+		{
+			_browser = browser;
+		}
+		
 		@Override
 		public void performLongRunningAction(ILongRunningAction action)
 		{
@@ -268,15 +275,15 @@ public class BrowserDialog extends JFrame
 		@Override
 		public void reportError(String msg)
 		{
-			// TODO Auto-generated method stub
 			_logger.error(msg);
+			ErrorDialog.showErrorDialog(_browser, msg);
 		}
 
 		@Override
 		public void reportError(String msg, Throwable cause)
 		{
-			// TODO Auto-generated method stub
 			_logger.error(msg, cause);
+			ErrorDialog.showErrorDialog(_browser, msg, cause);
 		}
 	}
 	

@@ -13,6 +13,14 @@
 		
 	</plugin>
 	
+	<plugin name="Attributes Plugin"
+		implementing-class="edu.virginia.vcgr.genii.client.gui.browser.plugins.attrs.ShowAttributesPlugin">
+		
+		<tab
+			tab-name="Attributes"
+			tab-priority="0"/>
+	</plugin>
+	
 	<plugin name="Default Selection Display Plugin"
 		implementing-class="edu.virginia.vcgr.genii.client.gui.browser.plugins.sys.DefaultSelectionDisplayPlugin">
 		
