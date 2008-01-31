@@ -267,7 +267,8 @@ public class BasicDBResource implements IResource
 		}
 		catch (SQLException sqe)
 		{
-			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
+			throw new ResourceException(
+				"Error while trying to destroy resource.", sqe);
 		}
 		finally
 		{

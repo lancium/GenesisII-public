@@ -260,13 +260,14 @@ public class QueueManager implements Closeable
 	{
 		if (_closed)
 			return;
-		
 		_closed = true;
+		
+		/* Stop the running threads */
 		StreamUtils.close(_scheduler);
 		StreamUtils.close(_besManager);
 		StreamUtils.close(_jobManager);
 	}
-	
+		
 	/************************************************************************/
 	/* The remainder of the methods in this class correspond exactly to     */
 	/* methods in the various managers (BESManager and JobManager) with the */

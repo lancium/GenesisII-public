@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.container.q2;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import org.ggf.rns.Remove;
 import org.morgan.util.configuration.ConfigurationException;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
+import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
 import edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType;
@@ -322,5 +324,27 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		}
 		
 		return serviceCreated;
+	}
+	
+	@Override
+	protected void preDestroy() throws RemoteException, ResourceException
+	{
+		super.preDestroy();
+		
+		ResourceKey rKey = ResourceManager.getCurrentResource();
+		
+		try
+		{
+			QueueManager mgr = QueueManager.getManager((String)rKey.getKey());
+			mgr.close();
+		}
+		catch (SQLException sqe)
+		{
+			throw new ResourceException("Unable to pre-destroy queue.", sqe);
+		}
+		catch (IOException ioe)
+		{
+			throw new ResourceException("Unable to pre-destroy queue.", ioe);
+		}
 	}
 }
