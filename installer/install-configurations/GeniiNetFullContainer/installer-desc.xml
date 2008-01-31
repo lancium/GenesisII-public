@@ -4,6 +4,10 @@
 		<property file="build.number"/>
 	</properties>
 
+	<variables>
+		<variable name="LOG4JCONFIG" value="production.log4j.properties"/>
+	</variables>
+
 	<info>
 		<appname>Genesis II</appname>
 		<appversion>@{genesisII.version} Build @{build.number}</appversion>

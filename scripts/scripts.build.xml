@@ -6,6 +6,9 @@
 			tofile="${basedir}/${win-script-base-name}.bat"/>
 		<replace file="${basedir}/${win-script-base-name}.bat"
 			token="$INSTALL_PATH" value="${basedir}" summary="yes"/>
+		<replace file="${basedir}/${win-script-base-name}.bat"
+			token="$LOG4JCONFIG" value="genesisII.log4j.properties"
+			summary="yes"/>
 	</target>
 
 	<target name="build-script-unix" if="unix.scripts">
@@ -13,6 +16,9 @@
 			tofile="${basedir}/${unix-script-base-name}"/>
 		<replace file="${basedir}/${unix-script-base-name}"
 			token="%{INSTALL_PATH}" value="${basedir}" summary="yes"/>
+		<replace file="${basedir}/${unix-script-base-name}"
+			token="%{LOG4JCONFIG}" value="genesisII.log4j.properties"
+			summary="yes"/>
 		<chmod file="${basedir}/${unix-script-base-name}" perm="755"/>
 	</target>
 
@@ -67,6 +73,9 @@
 			tofile="${basedir}/jserver-jar-desc.xml"/>
 		<replace file="${basedir}/jserver-jar-desc.xml"
 			token="$INSTALL_PATH" value="${basedir}" summary="yes"/>
+		<replace file="${basedir}/jserver-jar-desc.xml"
+			token="$LOG4JCONFIG" value="genesisII.log4j.properties"
+			summary="yes"/>
 
 		<antcall target="build-script-win">
 			<param name="win-script-src-dir" value="${scripts.dir}"/>

@@ -3,4 +3,4 @@
 _CT_GENII_INSTALL_DIR="%{INSTALL_PATH}"
 _CT_LOCAL_JAVA_DIR="$_CT_GENII_INSTALL_DIR/Java/linux-i586/jre"
 
-"$_CT_LOCAL_JAVA_DIR/bin/java" -classpath "%{INSTALL_PATH}/ext/bouncycastle/bcprov-jdk15-133.jar:%{INSTALL_PATH}/lib/GenesisII-security.jar:%{INSTALL_PATH}/lib/morgan-utilities.jar:%{INSTALL_PATH}/lib:%{INSTALL_PATH}/security" -Dlog4j.configuration=genesisII.log4j.properties "-Djava.library.path=%{INSTALL_PATH}/jni-lib" org.morgan.util.launcher.Launcher "%{INSTALL_PATH}/jar-desc.xml" edu.virginia.vcgr.genii.client.security.x509.CertTool "$@"
+"$_CT_LOCAL_JAVA_DIR/bin/java" -classpath "%{INSTALL_PATH}/ext/bouncycastle/bcprov-jdk15-133.jar:%{INSTALL_PATH}/lib/GenesisII-security.jar:%{INSTALL_PATH}/lib/morgan-utilities.jar:%{INSTALL_PATH}/lib:%{INSTALL_PATH}/security" "-Dlog4j.configuration=%{LOG4JCONFIG}" "-Djava.library.path=%{INSTALL_PATH}/jni-lib" org.morgan.util.launcher.Launcher "%{INSTALL_PATH}/jar-desc.xml" edu.virginia.vcgr.genii.client.security.x509.CertTool "$@"
