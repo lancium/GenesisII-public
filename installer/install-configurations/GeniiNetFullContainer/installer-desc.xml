@@ -169,6 +169,8 @@
 				stage="never" os="unix"/>
 			<executable targetfile="$INSTALL_PATH/connect-new-client"
 				stage="never" os="unix"/>
+			<parsable type="javaprop"
+				targetfile="$INSTALL_PATH/lib/production.log4j.properties"/>
 			<parsable type="plain"
 				targetfile="$INSTALL_PATH/RELEASE"/>
 			<parsable type="xml"

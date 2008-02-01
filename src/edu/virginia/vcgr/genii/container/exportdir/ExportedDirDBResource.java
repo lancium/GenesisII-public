@@ -867,6 +867,8 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		File entryFile = new File(getLocalPath(), entry.getName());
 		if (!entryFile.exists())
 			return;
+		if (!entryFile.isFile())
+			return;
 		
 		ArrayList<MessageElement> attrs = new ArrayList<MessageElement>();
 		MessageElement []attrsA = entry.getAttributes();
