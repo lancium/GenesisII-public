@@ -302,8 +302,10 @@
 		
 		<pack name="IFS" required="no" preselected="no" os="windows">
 		  <description>Installable File System for Windows XP</description>
-		  <file src="../../../jni-lib/IFS/nulmrx.sys" targetdir="C:/Windows/system32/drivers"/>
-		  <file src="../../../jni-lib/IFS/nulmrxnp.dll" targetdir="C:/Windows/system32"/>
+		  <file src="../../../jni-lib/IFS/nulmrx.sys" targetdir="C:/Windows/system32/drivers" 
+		  	override="true"/>
+		  <file src="../../../jni-lib/IFS/nulmrxnp.dll" targetdir="C:/Windows/system32"
+		  	override="true"/>
 		  <file src="../../../jni-lib/IFS/GenesisIFSServer.exe" targetdir="$INSTALL_PATH"/>		  		  
 		  <executable targetfile="$INSTALL_PATH/jni-lib/IFS/editRegistry.bat" stage="postinstall">
 		    <args>
