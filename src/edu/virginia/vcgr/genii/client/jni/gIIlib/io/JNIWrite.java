@@ -14,7 +14,7 @@ public class JNIWrite{
 		else{		
 			try{
 				file.lseek64(offset);
-				toReturn = file.write(data);	
+				toReturn = file.write(data);					
 			}catch(Exception e){
 				e.printStackTrace();
 			}

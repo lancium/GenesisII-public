@@ -26,7 +26,7 @@ typedef struct _WORKER{
 typedef struct _CommRequest {
 
     GENII_CONTROL_REQUEST    ControlRequest;
-    char                     ControlRequestBuffer[65536 + (3 * sizeof(long))];
+    char                     ControlRequestBuffer[USER_KERNEL_MAX_TRANSFER_SIZE + (3 * sizeof(long))];
 
 } COMMREQUEST, *PCOMMREQUEST;
 
@@ -35,7 +35,7 @@ typedef struct _CommResponse {
     GENII_CONTROL_RESPONSE  ControlResponse;
 	
 	//Max 128 entries (65536 / 512) in QD
-    char                    ControlResponseBuffer[65536 + (3 * sizeof(long))];
+    char                    ControlResponseBuffer[USER_KERNEL_MAX_TRANSFER_SIZE + (3 * sizeof(long))];
 
 } COMMRESPONSE, *PCOMMRESPONSE;
 
@@ -594,8 +594,8 @@ int main(int argc, char* argv[])
 {
 	int status = 0;
 	
-	int desiredAccess = GENESIS_FILE_READ_DATA | GENESIS_FILE_WRITE_DATA;						
-	char requestedDeposition = GENESIS_FILE_CREATE;
+	int desiredAccess = GENESIS_FILE_READ_DATA | GENESIS_FILE_WRITE_DATA;
+	char requestedDeposition = GENESIS_FILE_OPEN;
 	int isDirectory = FALSE;
 
 	GII_JNI_INFO rootInfo;		
@@ -630,21 +630,20 @@ int main(int argc, char* argv[])
 
 	//printf("Creating directory SOME_DIRECTORY\n");
 
-	//genesisII_remove(&rootInfo, "/taco.txt", 0, 0);
+	//genesisII_remove(&rootInfo, "/taco.txt", 0, 0);	
 
-	//StatusCode = genesisII_open(&rootInfo, "/taco.txt", requestedDeposition, desiredAccess, isDirectory, &directoryListing);
-	//printf("Got Create Info for taco.txt\n");
-	//bytes = copyListing(buffer, directoryListing, StatusCode);
-	//printListing(buffer, StatusCode);
+	/*StatusCode = genesisII_open(&rootInfo, "/home/sosa/crime.txt", requestedDeposition, desiredAccess, isDirectory, &directoryListing);	
+	bytes = copyListing(buffer, directoryListing, StatusCode);
+	printListing(buffer, StatusCode);
 
-	//StatusCode = genesisII_write(&rootInfo,fileid, "IlikeTacos", 0, 10);
-	//printf("Wrote data %d\n", StatusCode);
-	//
-	//StatusCode = genesisII_read(&rootInfo,fileid, buffer, 0, 10);
-	//printf("Got Data\n");
-	//printListing2(buffer, StatusCode);
+	StatusCode = genesisII_write(&rootInfo,fileid, "IlikeTacos", 0, 10);
+	printf("Wrote data %d\n", StatusCode);
+	
+	StatusCode = genesisII_read(&rootInfo,fileid, buffer, 0, 10);
+	printf("Got Data\n");
+	printListing2(buffer, StatusCode);
 
-	//StatusCode = genesisII_close(&rootInfo,fileid);
+	StatusCode = genesisII_close(&rootInfo,fileid);*/
 
 	//memcpy(&fileid, buffer, sizeof(ULONG));
 

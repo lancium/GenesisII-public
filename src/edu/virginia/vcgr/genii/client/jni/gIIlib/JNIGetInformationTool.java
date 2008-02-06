@@ -11,9 +11,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 /* Gets the information related to a resource i.e. a Cache Entry */
 public class JNIGetInformationTool extends JNILibraryBase {
 	public static ArrayList<String> getInformation(String path){		
-		tryToInitialize();
-		
-		System.out.println("Genesis is getting information for file: " + path);
+		tryToInitialize();				
 		
 		//Make sure path is valid
 		if(!checkIfValidPath(path))
@@ -102,8 +100,6 @@ public class JNIGetInformationTool extends JNILibraryBase {
 	
 	public static ArrayList<String> getInformationFromRNS(RNSPath path){		
 		tryToInitialize();		
-		
-		System.out.println("Genesis is getting information for file that has been opened: " + path.pwd());
 				
 		RNSPath parent = null;
 		JNICacheManager cacheManager = JNICacheManager.getInstance();		

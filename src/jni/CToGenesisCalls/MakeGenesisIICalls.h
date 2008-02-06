@@ -24,6 +24,7 @@ extern "C" {
 typedef struct _GII_JNI_INFO{
 	JNIEnv *env;
 	jclass jni_launcher;
+	jbyteArray myArrayBuffer;
 }*PGII_JNI_INFO, GII_JNI_INFO;
 
 

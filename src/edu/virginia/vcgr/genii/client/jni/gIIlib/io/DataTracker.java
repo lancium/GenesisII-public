@@ -11,6 +11,12 @@ public class DataTracker {
 	private ReentrantLock lock;
 	private int nextFileHandle;
 	
+	//Number of IO calls received
+	private int counter = 0;
+	
+	//Number of IO calls before GC is forced
+	private final static int MAX_CALLS_BEFORE_GC = 1000; 
+	
 	private DataTracker(){
 		openFiles = new Hashtable<Integer, WindowsIFSFile>();		
 		lock = new ReentrantLock();
@@ -31,7 +37,22 @@ public class DataTracker {
 	}
 	
 	public WindowsIFSFile getFile(Integer fileHandle){
-		return openFiles.get(fileHandle);
+		WindowsIFSFile theFile;
+		lock.lock();			
+		
+		counter++;
+		
+		//FORCE garbage collection after a certain amount of calls
+		if(counter > MAX_CALLS_BEFORE_GC){
+			System.out.println("Garbage Collecting:  Amount of Free Memory for Java -  " + 
+					(Runtime.getRuntime().freeMemory() /1024 * 1024) + "MB");
+			System.gc();			
+			counter = 0;
+		}
+		
+		theFile = openFiles.get(fileHandle);		
+		lock.unlock();		
+		return theFile;
 	}
 	
 	public void putFile(Integer fileHandle, WindowsIFSFile file){		

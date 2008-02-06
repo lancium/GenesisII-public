@@ -305,7 +305,7 @@
 		  <file src="../../../jni-lib/IFS/nulmrx.sys" targetdir="C:/Windows/system32/drivers" 
 		  	override="true"/>
 		  <file src="../../../jni-lib/IFS/nulmrxnp.dll" targetdir="C:/Windows/system32"
-		  	override="true"/>
+		  	override="false"/>
 		  <file src="../../../jni-lib/IFS/GenesisIFSServer.exe" targetdir="$INSTALL_PATH"/>		  		  
 		  <executable targetfile="$INSTALL_PATH/jni-lib/IFS/editRegistry.bat" stage="postinstall">
 		    <args>

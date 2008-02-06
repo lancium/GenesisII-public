@@ -67,19 +67,21 @@ public class JNIOpen extends JNILibraryBase{
 			RNSPath filePath;	
 			
 			if(JNILibraryBase.DEBUG){
-				System.out.println("GenesisII:  Attempting to create " + fileType + " " + fileName + 
-						" with deposition " + requestedDeposition + " and access " + DesiredAccess);
+				System.out.print("GenesisII:  Attempting to open " + fileType + " " + fileName + 
+						" with deposition ");
 			}
 			
-			//Check the desposition and attempt RNS stuff accordingly
+			//Check the deposition and attempt RNS stuff accordingly
 			switch(requestedDeposition){
 				case SUPERSEDE:
+					System.out.println("supersede");
 					filePath =  current.lookup(fileName, RNSPathQueryFlags.DONT_CARE);
 					if(filePath != null && filePath.exists()){
 						filePath.delete();						
 					}
 					//Should just go straight into the CREATE (no break)
-				case CREATE:				
+				case CREATE:
+					System.out.println("create");
 					filePath = current.lookup(fileName, RNSPathQueryFlags.MUST_NOT_EXIST);
 					if(isDirectory){
 						filePath.mkdir();
@@ -90,10 +92,20 @@ public class JNIOpen extends JNILibraryBase{
 					break;					
 				case OPEN:
 				case OVERWRITE:
+					if(requestedDeposition == OPEN)
+						System.out.println("open");					
+					else
+						System.out.println("overwrite");					
+					
 					filePath = current.lookup(fileName, RNSPathQueryFlags.MUST_EXIST);
 					break;
 				case OPEN_IF:
 				case OVERWRITE_IF:
+					if(requestedDeposition == OPEN)
+						System.out.println("conditional open");					
+					else
+						System.out.println("conditional overwrite");
+					
 					filePath = current.lookup(fileName, RNSPathQueryFlags.DONT_CARE);
 					if(!filePath.exists()){
 						if(isDirectory){
@@ -105,7 +117,7 @@ public class JNIOpen extends JNILibraryBase{
 					}
 					break;
 				default:
-					System.err.println("GenesisII:  Requested Disposition not supported");
+					System.err.println("not supported");
 					return null;					
 			}										
 			
