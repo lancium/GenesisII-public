@@ -28,10 +28,6 @@ public class RandomByteIOFileDescriptor extends WindowsIFSFile
 		throws IOException
 	{
 		super(path, isReadable, isWriteable, isAppend);
-		
-		if(JNILibraryBase.DEBUG){
-			System.out.println("Using Random ByteIO FD");
-		}
 	
 		try
 		{

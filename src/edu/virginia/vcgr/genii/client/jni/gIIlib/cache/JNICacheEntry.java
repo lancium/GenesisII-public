@@ -23,15 +23,13 @@ public class JNICacheEntry {
 		this.fileSize = fileSize;
 		this.directoryEntries = entries;
 		this.timeOfEntry = System.currentTimeMillis();
-		this.name = name;
-		System.out.println("Creating " + this.toString());
+		this.name = name;		
 		previous = next = null;
 	}
 	
 	public static JNICacheEntry createNonExistingEntry(String path){
 		JNICacheEntry dummy = new JNICacheEntry(path, false, 0, null, null);
-		dummy.exists = false;
-		System.out.println("Creating non-existent for " + path);
+		dummy.exists = false;		
 		return dummy;
 	}
 	

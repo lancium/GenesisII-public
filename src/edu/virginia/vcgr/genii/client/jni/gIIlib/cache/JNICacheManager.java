@@ -75,10 +75,6 @@ public class JNICacheManager {
 		}
 		else if(myCache.size() > MAX_SIZE){
 			myCache.remove(eldest.getPath());
-			if(JNILibraryBase.DEBUG){
-				System.out.println("GIILibCache:  Removing " + eldest.getPath() + ". " +
-					"Cache too large!");
-			}
 			eldest = eldest.next;
 		}
 		else{

@@ -17,6 +17,7 @@ package org.morgan.util.launcher;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class JNILibraryLauncher
 {
@@ -172,12 +173,24 @@ public class JNILibraryLauncher
 		return (byte[])invoke(myClass, myMethod, argTypes, args);				
 	}
 	
-	public static int write(int fileHandle, byte[] data, int offset){
+	public static int write(int fileHandle, byte[] data, int offset, int validLength){
 		String myClass = JNI_IO_PACKAGE + ".JNIWrite";
 		String myMethod = "write";
-		Class<?>[] argTypes = new Class[] {Integer.class, byte[].class, Integer.class};
-		Object[] args = new Object[] {new Integer(fileHandle),data, new Integer(offset)};
+		Class<?>[] argTypes = new Class[] {Integer.class, byte[].class, Integer.class};				
+
+		/*	
+			Only not use default if not the same size (i.e. pool buffers may be larger than
+			valid length 
+		*/
 		
+		//Bytes to actually use
+		byte[] toUse = data;		
+		
+		if(data.length != validLength){
+			toUse = Arrays.copyOf(data, validLength);  //truncates to valid length
+		}
+		
+		Object[] args = new Object[] {new Integer(fileHandle),toUse, new Integer(offset)};		
 		return (Integer)invoke(myClass, myMethod, argTypes, args);				
 	}
 	

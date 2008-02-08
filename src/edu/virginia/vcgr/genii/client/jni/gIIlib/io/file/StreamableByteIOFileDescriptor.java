@@ -34,10 +34,6 @@ public class StreamableByteIOFileDescriptor extends WindowsIFSFile
 		boolean isReadable, boolean isWriteable, boolean isAppend) throws IOException
 	{
 		super(path, isReadable, isWriteable, isAppend);
-	
-		if(JNILibraryBase.DEBUG){
-			System.out.println("Using Streamable ByteIO FD");
-		}
 		
 		_epr = epr;
 		try
