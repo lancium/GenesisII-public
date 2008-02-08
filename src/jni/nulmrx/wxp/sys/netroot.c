@@ -179,7 +179,6 @@ Notes:
 		pNetRoot->MRxNetRootState = MRX_NET_ROOT_STATE_GOOD;
 
 		// validate the fixed netroot name
-
 		RootNameLength = pNetRoot->pNetRootName->Length - pSrvCall->pSrvCallName->Length;
 
 		if ( RootNameLength >= 12 )

@@ -742,18 +742,6 @@ Return Value:
     RxDbgTrace( 0, Dbg, ("NulMRxCleanupFobx\n"));
 	DbgPrint("NulMRxCleanupFobx for %d\n", geniiCCB->GenesisFileID);	
 
-	////Only makes sense for files that were opened correctly
-	//if(giiFCB->State == GENII_STATE_HAVE_INFO && !giiFCB->isDirectory){
-
-	//	//Close this file handle on the Genesis Side
-	//	Status = GenesisSendInvertedCall(RxContext, GENII_CLOSE, FALSE);
-
-	//	//Waits for caller
-	//	KeWaitForSingleObject(&(giiFCB->FcbPhore), Executive, KernelMode, FALSE, NULL);
-
-	//	KeReleaseSemaphore(&(giiFCB->FcbPhore), IO_NO_INCREMENT, 1, FALSE);
-	//}
-
     if (FlagOn(capFcb->FcbState,FCB_STATE_ORPHANED)) {
        RxDbgTrace( 0, Dbg, ("File orphaned\n"));
        return (STATUS_SUCCESS);
@@ -837,11 +825,13 @@ Return Value:
 
 --*/
 {
-    NTSTATUS Status = STATUS_SUCCESS;
-	PGENESIS_FCB giiFCB;
+    NTSTATUS Status = STATUS_SUCCESS;	
     
     RxCaptureFcb;
     RxCaptureFobx;
+
+	GenesisGetFcbExtension(capFcb, giiFCB);
+	GenesisGetCcbExtension(capFobx, giiCCB);
 
     PMRX_SRV_OPEN   pSrvOpen = capFobx->pSrvOpen;
     PUNICODE_STRING RemainingName = pSrvOpen->pAlreadyPrefixedName;
@@ -853,13 +843,17 @@ Return Value:
 	giiFCB = (PGENESIS_FCB)capFcb->Context2;
 
     RxDbgTrace( 0, Dbg, ("NulMRxCloseSrvOpen \n"));
-	DbgPrint("NulMrxCloseSrvOpen for %wZ\n", pSrvOpen->pAlreadyPrefixedName);
+	DbgPrint("NulMrxCloseSrvOpen for %wZ\n", pSrvOpen->pAlreadyPrefixedName);		
 
-	if(giiFCB != NULL){    
-		//Make sure no one else is trying to edit this
-		KeWaitForSingleObject(&(giiFCB->FcbPhore), Executive, KernelMode, FALSE, NULL);
-		KeReleaseSemaphore(&(giiFCB->FcbPhore), 0, 1, FALSE);
-	}
+	//Only makes sense for files that were opened correctly
+	if(giiFCB->State == GENII_STATE_HAVE_INFO && !giiFCB->isDirectory){
+
+		//Close this file handle on the Genesis Side
+		Status = GenesisSendInvertedCall(RxContext, GENII_CLOSE, FALSE);
+
+		//Waits for caller
+		KeWaitForSingleObject(&(giiFCB->FcbPhore), Executive, KernelMode, FALSE, NULL);		
+	}	
 
     return(Status);
 }

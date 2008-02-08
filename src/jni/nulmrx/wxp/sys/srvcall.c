@@ -61,18 +61,24 @@ Return Value:
 	// validate the server name with the test name of 'nulsvr'
 	DbgPrint("NulMRx - SrvCall: Connection Name Length: %d\n",  pSrvCall->pSrvCallName->Length );
 
-	if ( pSrvCall->pSrvCallName->Length >= 14 )
+	if ( pSrvCall->pSrvCallName->Length >= 26 )
 	{
 		pSrvName = pSrvCall->pSrvCallName->Buffer;
 	
 		Verifyer  = ( pSrvName[0] == L'\\' );
-		Verifyer &= ( pSrvName[1] == L'N' ) || ( pSrvName[1] == L'n' );
-		Verifyer &= ( pSrvName[2] == L'U' ) || ( pSrvName[2] == L'u' );
-		Verifyer &= ( pSrvName[3] == L'L' ) || ( pSrvName[3] == L'l' );
-		Verifyer &= ( pSrvName[4] == L'S' ) || ( pSrvName[4] == L's' );
-		Verifyer &= ( pSrvName[5] == L'V' ) || ( pSrvName[5] == L'v' );
-		Verifyer &= ( pSrvName[6] == L'R' ) || ( pSrvName[6] == L'r' );
-		Verifyer &= ( pSrvName[7] == L'\\' ) || ( pSrvName[7] == L'\0' );
+		Verifyer &= ( pSrvName[1] == L'G' ) || ( pSrvName[1] == L'g' );
+		Verifyer &= ( pSrvName[2] == L'E' ) || ( pSrvName[2] == L'e' );
+		Verifyer &= ( pSrvName[3] == L'N' ) || ( pSrvName[3] == L'n' );
+		Verifyer &= ( pSrvName[4] == L'E' ) || ( pSrvName[4] == L'e' );
+		Verifyer &= ( pSrvName[5] == L'S' ) || ( pSrvName[5] == L's' );
+		Verifyer &= ( pSrvName[6] == L'I' ) || ( pSrvName[6] == L'i' );
+		Verifyer &= ( pSrvName[7] == L'S' ) || ( pSrvName[7] == L's' );
+		Verifyer &= ( pSrvName[8] == L'D' ) || ( pSrvName[8] == L'd' );
+		Verifyer &= ( pSrvName[9] == L'R' ) || ( pSrvName[9] == L'r' );
+		Verifyer &= ( pSrvName[10] == L'I' ) || ( pSrvName[10] == L'i' );
+		Verifyer &= ( pSrvName[11] == L'V' ) || ( pSrvName[11] == L'v' );
+		Verifyer &= ( pSrvName[12] == L'E' ) || ( pSrvName[12] == L'e' );		
+		Verifyer &= ( pSrvName[13] == L'\\' ) || ( pSrvName[13] == L'\0' );
 	}
 	else
 	{

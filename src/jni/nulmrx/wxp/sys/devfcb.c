@@ -22,7 +22,7 @@ Abstract:
 
 #define Dbg                              (DEBUG_TRACE_DEVFCB)
 
-#define FIXED_CONNECT_NAME L"\\;0:\\nulsvr\\share"
+#define FIXED_CONNECT_NAME L"\\;0:\\genesisdrive\\share"
 
 
 #ifdef ALLOC_PRAGMA

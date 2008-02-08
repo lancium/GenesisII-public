@@ -183,7 +183,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\MakeGenesisIICalls.c"
+				RelativePath=".\makegenesisIIcalls.c"
 				>
 			</File>
 			<File
@@ -191,7 +191,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Utility.c"
+				RelativePath=".\utility.c"
 				>
 			</File>
 		</Filter>
@@ -201,7 +201,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\MakeGenesisIICalls.h"
+				RelativePath=".\makegenesisIIcalls.h"
 				>
 			</File>
 			<File
@@ -209,11 +209,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\StringManipulation.h"
+				RelativePath=".\stringmanipulation.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Utility.h"
+				RelativePath=".\utility.h"
 				>
 			</File>
 		</Filter>
