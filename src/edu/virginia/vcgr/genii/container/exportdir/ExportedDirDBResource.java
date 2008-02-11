@@ -222,6 +222,15 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		return ret;
 	}
 
+	public void destroy() throws ResourceException
+	{
+		try {
+			destroy(_connection, true);
+		} catch (ResourceUnknownFaultType e) {
+			throw new ResourceException(e.getMessage(), e);
+		}
+	}
+	
 	public void destroy(boolean hardDestroy) throws ResourceException, ResourceUnknownFaultType
 	{
 		destroy(_connection, hardDestroy);
