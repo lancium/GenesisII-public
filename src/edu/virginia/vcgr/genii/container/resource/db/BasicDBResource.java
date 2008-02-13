@@ -214,39 +214,55 @@ public class BasicDBResource implements IResource
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		
-		try
+		for (int lcv = 0; lcv < 5; lcv++)
 		{
-			stmt = _connection.prepareStatement(_GET_PROPERTY_STMT);
-			stmt.setString(1, _resourceKey);
-			stmt.setString(2, propertyName);
-			rs = stmt.executeQuery();
-			if (!rs.next()) {
-				return null;
+			try
+			{
+				stmt = _connection.prepareStatement(_GET_PROPERTY_STMT);
+				stmt.setString(1, _resourceKey);
+				stmt.setString(2, propertyName);
+				rs = stmt.executeQuery();
+				if (!rs.next()) {
+					return null;
+				}
+				
+				Blob blob = rs.getBlob(1);
+				if (blob == null)
+					return null;
+				
+				return DBSerializer.fromBlob(rs.getBlob(1));
 			}
-			
-			Blob blob = rs.getBlob(1);
-			if (blob == null)
-				return null;
-			
-			return DBSerializer.fromBlob(rs.getBlob(1));
+			catch (IOException ioe)
+			{
+				throw new ResourceException("Unable to deserialize property.", ioe);
+			}
+			catch (ClassNotFoundException cnfe)
+			{
+				throw new ResourceException("Unable to deserialize property.", cnfe);
+			}
+			catch (SQLException sqe)
+			{
+				throw new ResourceException(sqe.getLocalizedMessage(), sqe);
+			}
+			catch (NullPointerException npe)
+			{
+				if (lcv < 4)
+				{
+					// Make another attempt
+					System.err.println("Making another attempt to read property.");
+				} else
+				{
+					throw npe;
+				}
+			}
+			finally
+			{
+				close(rs);
+				close(stmt);
+			}
 		}
-		catch (IOException ioe)
-		{
-			throw new ResourceException("Unable to deserialize property.", ioe);
-		}
-		catch (ClassNotFoundException cnfe)
-		{
-			throw new ResourceException("Unable to deserialize property.", cnfe);
-		}
-		catch (SQLException sqe)
-		{
-			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
-		}
-		finally
-		{
-			close(rs);
-			close(stmt);
-		}
+		
+		throw new ResourceException("Unexpected code hit.");
 	}
 
 	public void destroy() throws ResourceException

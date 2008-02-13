@@ -63,7 +63,7 @@ public class RNSURIHandler implements IURIHandler
 		}
 		catch (ConfigurationException ce)
 		{
-			throw new IOException(ce.getMessage());
+			throw new IOException("Unable to open input stream.", ce);
 		}
 	}
 

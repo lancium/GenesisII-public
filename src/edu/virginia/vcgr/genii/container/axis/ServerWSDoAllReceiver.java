@@ -119,7 +119,9 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		        }
 			}
 		        
-		} catch (Exception e) {
+		} catch (Exception e)
+		{
+			throw new AxisFault("Exception thrown while retrieving security headers.", e);
 		}
 
 		// process all incoming security headers
