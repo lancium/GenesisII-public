@@ -97,6 +97,10 @@
       <operation name="listJobs" qname="listJobs" returnQName="retNS:ListResponseType" xmlns:retNS="http://vcgr.cs.virginia.edu/genii/queue" returnType="rtns:ListResponseType" xmlns:rtns="http://vcgr.cs.virginia.edu/genii/queue" returnItemQName="tns:reduced-job-information" xmlns:tns="http://vcgr.cs.virginia.edu/genii/queue" >
         <parameter qname="pns:ListRequest" xmlns:pns="http://vcgr.cs.virginia.edu/genii/queue" type="tns:anyType" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
       </operation>
+      <operation name="notify" qname="notify" mep="oneway" >
+        <parameter qname="pns:notify" xmlns:pns="http://vcgr.cs.virginia.edu/genii/2006/12/notification" type="tns:>notify" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/notification"/>
+        <fault name="ResourceUnknownFault" qname="fns:ResourceUnknownFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource" class="edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType" type="tns:ResourceUnknownFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource"/>
+      </operation>
       <operation name="vcgrCreate" qname="vcgrCreate" returnQName="retNS:vcgrCreateResponse" xmlns:retNS="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory" returnType="rtns:>vcgrCreateResponse" xmlns:rtns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory" >
         <parameter qname="pns:vcgrCreate" xmlns:pns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory" type="tns:>vcgrCreate" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"/>
         <fault name="ResourceUnknownFault" qname="fns:ResourceUnknownFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource" class="edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType" type="tns:ResourceUnknownFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource"/>
@@ -118,7 +122,7 @@
         <fault name="AttributeUnknownFault" qname="fns:AttributeUnknownFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs" class="edu.virginia.vcgr.genii.common.rattrs.AttributeUnknownFaultType" type="tns:AttributeUnknownFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"/>
         <fault name="ResourceUnknownFault" qname="fns:ResourceUnknownFaultType" xmlns:fns="http://vcgr.cs.virginia.edu/genii/2006/12/resource" class="edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType" type="tns:ResourceUnknownFaultType" xmlns:tns="http://vcgr.cs.virginia.edu/genii/2006/12/resource"/>
       </operation>
-      <parameter name="allowedMethods" value="getStatus getAttributesDocument immediateTerminate getMultipleResourceProperties setAttributes remove killJobs query list add createFile completeJobs submitJob getResourceProperty subscribe listJobs vcgrCreate configureResource getAttributes ping move"/>
+      <parameter name="allowedMethods" value="getStatus getAttributesDocument immediateTerminate getMultipleResourceProperties setAttributes remove killJobs query list add createFile completeJobs submitJob getResourceProperty subscribe listJobs notify vcgrCreate configureResource getAttributes ping move"/>
 
       <typeMapping
         xmlns:ns="http://www.w3.org/2005/08/addressing"

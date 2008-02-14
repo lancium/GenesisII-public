@@ -277,6 +277,16 @@
 				<include name="**/*.wsdd"/>
 			</fileset>
 		</copy>
+		<copy todir="${basedir}/deployments/GeniiNetBootstrapContainer/services">
+			<fileset dir="${basedir}/services">
+				<include name="**/*.wsdd"/>
+			</fileset>
+		</copy>
+		<copy todir="${basedir}/deployments/GeniiNetFullContainer/services">
+			<fileset dir="${basedir}/services">
+				<include name="**/*.wsdd"/>
+			</fileset>
+		</copy>
 	</target>
 
 	<target name="wipestate">
