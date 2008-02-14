@@ -14,12 +14,12 @@ public class InfoSQueryTool extends BaseGridTool {
 	
 	static private final String _DESCRIPTION =
 		"allows you to query the XML database";
-	static private final String _USAGE1 =
+	static private final String _USAGE =
 		"xmldb-query <Berkeley DB query> <informationService-service-path>";
 
-	public InfoSQueryTool() {
-		super(_DESCRIPTION, _USAGE1, false);
-		// TODO Auto-generated constructor stub
+	public InfoSQueryTool() 
+	{
+		super(_DESCRIPTION, _USAGE, false);
 	}
 
 	
@@ -38,6 +38,9 @@ public class InfoSQueryTool extends BaseGridTool {
 
 	private void query(String query, String servicePath) throws Throwable
 	{
+		/*
+		 * create a proxy to the target
+		 */
 		RNSPath path = RNSPath.getCurrent().lookup(servicePath, RNSPathQueryFlags.MUST_EXIST);
 		InformationServicePortType informationService = ClientUtils.createProxy(
 				InformationServicePortType.class, path.getEndpoint());

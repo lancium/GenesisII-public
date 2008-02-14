@@ -9,6 +9,8 @@ import java.util.Collection;
 import java.util.regex.Pattern;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.EntryType;
 import org.ggf.rns.RNSEntryExistsFaultType;
 import org.morgan.util.io.StreamUtils;
@@ -27,8 +29,10 @@ import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
 public class DBISResource extends RNSDBResource implements IISResource{
 	
+	static private Log _logger = LogFactory.getLog(DBISResource.class);
+	
 	static private final String _ADD_BES_ENTRY_STATEMENT =
-		"INSERT INTO isbescontainers(resourcename, endpoint, callingcontext) VALUES(?, ?, ?)";
+		"INSERT INTO isbescontainers(servicekey, resourcename, endpoint, serviceEPR, callingcontext) VALUES(?, ?, ?, ?, ?)";
 	static private final String _REMOVE_ENTRIES_STMT =
 		"DELETE FROM isbescontainers WHERE resourcename = ?";
 	
@@ -40,7 +44,11 @@ public class DBISResource extends RNSDBResource implements IISResource{
 	}
 
 	
-	
+	/*
+	 * (non-Javadoc)
+	 * @see edu.virginia.vcgr.genii.container.rns.RNSDBResource#addEntry(edu.virginia.vcgr.genii.container.rns.InternalEntry)
+	 * this function is not used
+	 */
 	public void addEntry(InternalEntry entry) throws ResourceException,
 	RNSEntryExistsFaultType
 	{
@@ -66,10 +74,9 @@ public class DBISResource extends RNSDBResource implements IISResource{
 				throw FaultManipulator.fillInFault(fault);
 			} else
 				throw new ResourceException(sqe.getLocalizedMessage(), sqe);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
+		catch (IOException ioe) {
+		_logger.warn(ioe.getLocalizedMessage(), ioe);}
 		
 		finally
 		{
@@ -79,17 +86,19 @@ public class DBISResource extends RNSDBResource implements IISResource{
 
 
 
-	public void addResource(String resourceName, 
-			EndpointReferenceType resourceEndpoint, ICallingContext callingContext) 
+	public void addResource( String resourceName, 
+			EndpointReferenceType resourceEndpoint, EndpointReferenceType serviceEndpoint, ICallingContext callingContext) 
 		throws ResourceException {
 		PreparedStatement stmt = null;
 		
 		try
 		{
 			stmt = _connection.prepareStatement(_ADD_BES_ENTRY_STATEMENT);
-			stmt.setString(1, resourceName);
-			stmt.setBlob(2, EPRUtils.toBlob(resourceEndpoint));
-			stmt.setBlob(3, DBSerializer.toBlob(callingContext));
+			stmt.setString(1, this._resourceKey);
+			stmt.setString(2, resourceName);
+			stmt.setBlob(3, EPRUtils.toBlob(resourceEndpoint));
+			stmt.setBlob(4, EPRUtils.toBlob(serviceEndpoint));
+			stmt.setBlob(5, DBSerializer.toBlob(callingContext));
 			if (stmt.executeUpdate() != 1)
 				throw new ResourceException("Unable to update database.");
 			stmt.close();
@@ -106,34 +115,34 @@ public class DBISResource extends RNSDBResource implements IISResource{
 				fault.setPath(resourceName);
 				try {
 					throw FaultManipulator.fillInFault(fault);
-				} catch (RNSEntryExistsFaultType e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				} 
+				catch (RNSEntryExistsFaultType e) {
+					_logger.warn(e.getLocalizedMessage(), e);}
 			} 
 			else
+				_logger.warn(sqe.getLocalizedMessage(), sqe);
 		
 			throw new ResourceException("Unable to update database.", sqe);
 		} 
-		catch (IOException e) 
-		{
+		catch (IOException e) {
+			_logger.warn(e.getLocalizedMessage(), e);
 			throw new ResourceException ("Couldn't update database." , e);
 		}
 		finally
 		{
 			StreamUtils.close(stmt);
-		
 		}			
 	}
 
 
 	static private final String _LIST_RESOURCES_STMT =
-		"SELECT resourcename, endpoint FROM isbescontainers";
+		"SELECT resourcename, endpoint FROM isbescontainers WHERE servicekey = ?";
 	
 	public Collection<EntryType> listResources(Pattern pattern) throws ResourceException {
 		
 		ResultSet rs = null;
 		PreparedStatement stmt = null;
+		
 		
 		Collection<EntryType> ret = new ArrayList<EntryType>();
 		
@@ -141,6 +150,7 @@ public class DBISResource extends RNSDBResource implements IISResource{
 		{
 				
 			stmt = _connection.prepareStatement(_LIST_RESOURCES_STMT);
+			stmt.setString(1, _resourceKey);
 			rs = stmt.executeQuery();
 			
 			while (rs.next())
@@ -156,7 +166,7 @@ public class DBISResource extends RNSDBResource implements IISResource{
 		}
 		catch (SQLException sqe)
 		{
-			throw new ResourceException("Unable to query database.", sqe);
+			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
 		}
 		finally
 		{
@@ -167,7 +177,7 @@ public class DBISResource extends RNSDBResource implements IISResource{
 	
 
 	public void configureResource(String resourceName, int numSlots) throws ResourceException {
-		// TODO Auto-generated method stub
+		_logger.warn("Method configureResource() is not implemented");
 		
 	}
 
@@ -175,10 +185,8 @@ public class DBISResource extends RNSDBResource implements IISResource{
 	public Collection<String> removeEntries(String name)
 	throws ResourceException
 	{
-		//Pattern p = Pattern.compile(name);
 		ArrayList<String> ret = new ArrayList<String>();
 		PreparedStatement stmt = null;
-		//Collection<String> entries = listEntries();
 		
 		try
 		{
@@ -186,13 +194,12 @@ public class DBISResource extends RNSDBResource implements IISResource{
 			stmt.setString(1, name);
 			stmt.executeUpdate();
 			ret.add(name);
-				
-			
-			
+	
 			return ret;
 		}
 		catch (SQLException sqe)
 		{
+			_logger.warn(sqe.getLocalizedMessage(), sqe);
 			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
 		}
 		finally
@@ -202,7 +209,7 @@ public class DBISResource extends RNSDBResource implements IISResource{
 	}
 
 	public Collection<String> remove(Pattern pattern) throws ResourceException {
-		// TODO Auto-generated method stub
+		_logger.warn("Method remove(Pattern pattern) in not implemented");
 		return null;
 	}
 	
@@ -226,6 +233,7 @@ public class DBISResource extends RNSDBResource implements IISResource{
 		}
 		catch (SQLException sqe)
 		{
+			_logger.warn(sqe.getLocalizedMessage(), sqe);
 			throw new ResourceException("Unable to query database.", sqe);
 		}
 		finally

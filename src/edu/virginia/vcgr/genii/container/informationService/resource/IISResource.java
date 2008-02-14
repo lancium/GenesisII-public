@@ -13,7 +13,7 @@ import edu.virginia.vcgr.genii.container.rns.IRNSResource;
 
 public interface IISResource extends IRNSResource{
 	public void addResource(String resourceName, 
-		EndpointReferenceType resourceEndpoint, ICallingContext callingContext) throws ResourceException;
+		EndpointReferenceType resourceEndpoint, EndpointReferenceType serviceEndpoint, ICallingContext callingContext) throws ResourceException;
 	public Collection<EntryType> listResources(Pattern pattern) 
 		throws ResourceException;
 	public Collection<String> remove(Pattern pattern)

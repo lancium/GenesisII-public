@@ -2,6 +2,11 @@ package edu.virginia.vcgr.genii.container.informationService;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.morgan.util.io.GuaranteedDirectory;
 
 import com.sleepycat.db.DatabaseException;
 import com.sleepycat.db.Environment;
@@ -18,19 +23,23 @@ import com.sleepycat.dbxml.XmlResults;
 import com.sleepycat.dbxml.XmlTransaction;
 import com.sleepycat.dbxml.XmlUpdateContext;
 
+import edu.virginia.vcgr.genii.container.Container;
+
 public class XMLDatabaseOperations {
+	
+	static private Log _logger = LogFactory.getLog(XMLDatabaseOperations.class);
 	
 	private void setup(EnvironmentConfig config)
 	{
 	    config.setAllowCreate(true);			// if the environment does not exist, create it
-	    config.setInitializeCache(true);		// required for multithreaded applications; 
-												// this is turning on shared memory
+	    config.setInitializeCache(true);		 
+												
 	    config.setCacheSize(4 * 1024 * 1024);	// 4 MB
 	    config.setInitializeLogging(true);
 	    config.setInitializeLocking(true);
 		config.setTransactional(true);
 		config.setVerboseRecovery(true);
-		config.setThreaded(true);
+		config.setThreaded(true);				// required for multithreaded applications;
 		
 		// for setting up the container properties
 		// XmlContainerConfig containerConfig = new XmlContainerConfig();
@@ -43,15 +52,17 @@ public class XMLDatabaseOperations {
 		setup(config);
 		
 		/*
-		 *for creating the collection in the same place as the container
-		 *
-		 *String environmentPath = ENVIRONMENT_PATH_SYSTEM_PROPERTY;
-		 *File collectionDir = new 
-		 *GuaranteedDirectory(Container.getConfigurationManager().getUserDirectory(), "collection");
-		 *String environmentPath = collectionDir.getPath();
+		 * for creating the collection in the user directory (.genesisII)
 		 */
-		
-		String environmentPath = "C:/dbxml-2.3.10/MyStuff";
+		 	
+		File collectionDir = null;
+		try {
+			collectionDir = new 
+			 GuaranteedDirectory(Container.getConfigurationManager().getUserDirectory(), "collection");
+		} 
+		catch (IOException ioe) {
+			_logger.warn(ioe.getLocalizedMessage(), ioe);}
+		String environmentPath = collectionDir.getPath();
 		
 		Environment env =  null;
 		XmlManager myManager = null;
@@ -59,7 +70,8 @@ public class XMLDatabaseOperations {
 		XmlTransaction trn = null;
 		XmlDocument myDoc = null;
 		String success = "the document is not added";
-		 if (document.toString()!=null)
+
+		 if (document!=null)
 		 {
 			try
 			{    
@@ -77,9 +89,14 @@ public class XMLDatabaseOperations {
 				cconfig.setIndexNodes(true);
 				cconfig.setTransactional(true);
 				
+				//fix this
 				String containerName = serviceName.toString() + ".bdbxml";
-				if (myManager.existsContainer(containerName)==0)
-				{
+				
+				/*
+				 * check if a container already exists for this service. If there is one, open it.
+				 * If not - create a new container.
+				 */
+				if (myManager.existsContainer(containerName)==0){
 					container = myManager.createContainer(containerName, cconfig);	
 				}
 				else container = myManager.openContainer(containerName, cconfig);
@@ -88,6 +105,9 @@ public class XMLDatabaseOperations {
 				myDoc.setName(name);
 				myDoc.setContent(document.toString());
 				
+				/*
+				 * start a transaction for adding the document to the XML database
+				 */
 				trn = myManager.createTransaction();
 				XmlUpdateContext theContext = myManager.createUpdateContext();
 				container.putDocument(myDoc, theContext);
@@ -95,12 +115,12 @@ public class XMLDatabaseOperations {
 				success = "the document is added";
 				trn.delete();
 			}
-			catch (XmlException e) { System.err.println("The error in addBESContainer() is: " +e.getMessage());}
-			catch (DatabaseException de){System.err.println("A database exception has occured in addBESContainer()") ;} 
-			catch (FileNotFoundException e) 
-			{
-				System.err.println("The error is: " +e.getMessage());
-				e.printStackTrace();
+			catch (XmlException xmle) { 
+				_logger.warn(xmle.getLocalizedMessage(), xmle);}
+			catch (DatabaseException dbe){
+				_logger.warn(dbe.getLocalizedMessage(), dbe);} 
+			catch (FileNotFoundException fnotfe) {
+				_logger.warn(fnotfe.getLocalizedMessage(), fnotfe);
 			}
 			
 			finally { 
@@ -110,7 +130,8 @@ public class XMLDatabaseOperations {
 					if (container !=null){container.close();}
 					if (myManager !=null){myManager.close();}	
 				}
-				catch (DatabaseException de){System.err.println("A database exception has occured in addBESContainer()") ;}
+				catch (DatabaseException dbe){
+					_logger.warn(dbe.getLocalizedMessage(), dbe);}
 				}
 		 }
 		return success;			
@@ -119,25 +140,21 @@ public class XMLDatabaseOperations {
 	public String queryForProperties(String query, String serviceName)
 	{		
 		/*
-		 *for creating the collection in the same place as the container
-		 *
-		 *File collectionDir = new 
-		 *GuaranteedDirectory(Container.getConfigurationManager().getUserDirectory(), "collection");
-		 *String environmentPath = collectionDir.getPath();
+		 * for creating the collection in the user directory (.genesisII)
 		 */
+		
+		File collectionDir = null;
+		try {
+			collectionDir = new 
+			 GuaranteedDirectory(Container.getConfigurationManager().getUserDirectory(), "collection");
+		} 
+		catch (IOException ioe) {
+			_logger.warn(ioe.getLocalizedMessage(), ioe);}
+		
+		String environmentPath = collectionDir.getPath();
+		 
 		EnvironmentConfig config = new EnvironmentConfig();
 		setup(config);
-		
-		/*
-		 *for creating the collection in the same place as the container
-		 *
-		 *String environmentPath = ENVIRONMENT_PATH_SYSTEM_PROPERTY;
-		 *File collectionDir = new 
-		 *GuaranteedDirectory(Container.getConfigurationManager().getUserDirectory(), "collection");
-		 *String environmentPath = collectionDir.getPath();
-		 */
-	
-		String environmentPath = "C:/dbxml-2.3.10/MyStuff";
 		
 		Environment env =  null;
 		XmlManager myManager = null;
@@ -147,8 +164,7 @@ public class XMLDatabaseOperations {
 	    XmlQueryExpression qe=  null;
 	    String result = "";
 	    
-	    String internalQuery = "" ;
-		
+	    String internalQuery = "";
 		
 		try
 		{    
@@ -162,7 +178,7 @@ public class XMLDatabaseOperations {
 			myManager = new XmlManager(env, managerConfig);
 		    myManager.setDefaultContainerType(XmlContainer.NodeContainer);
 
-		    /**
+		    /*
 		     * setting up the container configuration
 		     */
 		    XmlContainerConfig cconfig = new XmlContainerConfig();
@@ -170,10 +186,12 @@ public class XMLDatabaseOperations {
 		    cconfig.setIndexNodes(true);
 		    cconfig.setTransactional(true);
 
+		    //fix up the query
+		    
 			String theContainer = (serviceName.toString() + ".bdbxml");
 //			String myQuery = "collection('newContainer.dbxml')/string()";
-			internalQuery = internalQuery.concat("collection('"+ theContainer+"')/string()");
-			internalQuery = internalQuery.concat(query);
+			internalQuery = internalQuery.concat("collection('"+ theContainer+"')");
+			internalQuery = internalQuery.concat(query+"/string()");
 			
 			if (internalQuery.toString()!= null)
 			{
@@ -204,12 +222,12 @@ public class XMLDatabaseOperations {
 				}
 			}
 		}
-		catch (XmlException e) { System.err.println("The error in addBESContainer() is: " +e.getMessage());}
-		catch (DatabaseException de){System.err.println("A database exception has occured in addBESContainer()") ;} 
-		catch (FileNotFoundException e) 
-		{
-			System.err.println("The error is: " +e.getMessage());
-			e.printStackTrace();
+		catch (XmlException xmle) { 
+			_logger.warn(xmle.getLocalizedMessage(), xmle);}
+		catch (DatabaseException dbe){
+			_logger.warn(dbe.getLocalizedMessage(), dbe) ;} 
+		catch (FileNotFoundException fnotfe) {
+			_logger.warn(fnotfe.getLocalizedMessage(), fnotfe);
 		}
 		
 		finally { 
@@ -220,33 +238,36 @@ public class XMLDatabaseOperations {
 				if (container !=null){container.close();}
 				if (myManager !=null){myManager.close();}	
 			}
-			catch (DatabaseException de){System.err.println("A database exception has occured in addBESContainer()") ;}
+			catch (DatabaseException dbe){_logger.warn(dbe.getLocalizedMessage(), dbe) ;}
 			}
 		
 		return result;	
 	}
 	
-	/*
+	/**
 	 * deletes an XML document if it already exists in the database
 	 */
 	
-	public void preexist(String elementToAdd, String serviceName) {
-		/*
-		 * database setup
+	public void deleteIfExisting(String elementToAdd, String serviceName) {
+		/* database setup
 		 */ 
 		 
 		EnvironmentConfig config = new EnvironmentConfig();
 		setup(config);
 		
 		/*
-		 *for creating the collection in the same place as the container
-		 *
-		 *String environmentPath = ENVIRONMENT_PATH_SYSTEM_PROPERTY;
-		 *File collectionDir = new 
-		 *GuaranteedDirectory(Container.getConfigurationManager().getUserDirectory(), "collection");
-		 *String environmentPath = collectionDir.getPath();
+		 * for creating the collection in the user directory (.genesisII)
 		 */
-		String environmentPath = "C:/dbxml-2.3.10/MyStuff";
+		
+		File collectionDir = null;
+		try {
+			collectionDir = new 
+			 GuaranteedDirectory(Container.getConfigurationManager().getUserDirectory(), "collection");
+		} 
+		catch (IOException ioe) {
+			_logger.warn(ioe.getLocalizedMessage(), ioe);}
+		
+		 String environmentPath = collectionDir.getPath();
 		
 		Environment env =  null;
 		XmlManager myManager = null;
@@ -261,6 +282,7 @@ public class XMLDatabaseOperations {
 			XmlManagerConfig managerConfig = new XmlManagerConfig();
 			managerConfig.setAdoptEnvironment(true);
 			managerConfig.setAllowExternalAccess(true);
+			managerConfig.setAllowAutoOpen(true);
 			
 			myManager = new XmlManager(env, managerConfig);
 			myManager.setDefaultContainerType(XmlContainer.NodeContainer);
@@ -271,11 +293,11 @@ public class XMLDatabaseOperations {
 			cconfig.setTransactional(true);
 			
 			String containerName = serviceName.toString() + ".bdbxml";
-			if (myManager.existsContainer(containerName)==0)
-			{
+			if (myManager.existsContainer(containerName)==0){
 				container = myManager.createContainer(containerName, cconfig);
-				
 			}
+		
+			//freaking out here
 			else container = myManager.openContainer(containerName, cconfig);
 			
 			if (elementToAdd !=null)
@@ -285,10 +307,9 @@ public class XMLDatabaseOperations {
 				try {
 				myDoc = container.getDocument(elementToAdd);
 				}
-				catch (XmlException e)
-				{
-					//ignore
-				}
+				catch (XmlException xmle){
+					//ignore as otherwise it will cause an exception if the document is not in the database
+					}
 				if (myDoc!= null)
 					container.deleteDocument(elementToAdd, theContext);
 				trn.commit();
@@ -296,12 +317,12 @@ public class XMLDatabaseOperations {
 			}
 
 		}
-		catch (XmlException e) { System.err.println("The error in addBESContainer() is: " +e.getMessage());}
-		catch (DatabaseException de){System.err.println("A database exception has occured in addBESContainer()") ;} 
-		catch (FileNotFoundException e) 
-		{
-			System.err.println("The error is: " +e.getMessage());
-			e.printStackTrace();
+		catch (XmlException xmle) {
+			_logger.warn(xmle.getLocalizedMessage(), xmle);}
+		catch (DatabaseException dbe){
+			_logger.warn(dbe.getLocalizedMessage(), dbe);} 
+		catch (FileNotFoundException fnotfe){
+			_logger.warn(fnotfe.getLocalizedMessage(), fnotfe);
 		}
 		
 		finally { 
@@ -311,7 +332,8 @@ public class XMLDatabaseOperations {
 				if (container !=null){container.close();}
 				if (myManager !=null){myManager.close();}	
 			}
-			catch (DatabaseException de){System.err.println("A database exception has occured in addBESContainer()") ;}
+			catch (DatabaseException dbe){
+				_logger.warn(dbe.getLocalizedMessage(), dbe) ;}
 			}		
 	}
 
