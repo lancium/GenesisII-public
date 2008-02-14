@@ -197,8 +197,9 @@ public class InformationServiceImpl extends RNSServiceImpl implements
 				}
 				/*
 				 * for testing
+				 * System.out.println("*    " + resource.getKey().toString());
 				 */ 
-				System.out.println("*    " + resource.getKey().toString());
+				
 				 
 				
 				/*

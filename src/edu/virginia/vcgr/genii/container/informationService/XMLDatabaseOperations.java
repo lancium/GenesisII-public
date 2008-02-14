@@ -206,9 +206,11 @@ public class XMLDatabaseOperations {
 					
 					qe = myManager.prepare(internalQuery, qContext);
 					results = qe.execute(qContext);
-					String docNumber = "Number of documents found: " +String.valueOf(results.size());
-					System.out.println(docNumber);
 					
+					/* for test
+					* String docNumber = "Number of documents found: " +String.valueOf(results.size());
+					* System.out.println(docNumber);
+					*/
 					 if (results.next()!= null) 
 					 {
 						result += results.peek().asString().toString() + "\n";
