@@ -99,6 +99,8 @@
 				targetdir="$INSTALL_PATH" os="windows"/>
 			<file src="../../../scripts/grid.bat"
 				targetdir="$INSTALL_PATH" os="windows"/>
+			<file src="../../../scripts/ifs.bat"
+				targetdir="$INSTALL_PATH" os="windows"/>
 			<file src="../../../scripts/simple-command.bat"
 				targetdir="$INSTALL_PATH" os="windows"/>
 			<file src="../../../scripts/cert-tool.bat"
@@ -208,6 +210,8 @@
 				targetfile="$INSTALL_PATH/runContainer.bat" os="windows"/>
 			<parsable type="plain"
 				targetfile="$INSTALL_PATH/grid.bat" os="windows"/>
+			<parsable type="plain"
+				targetfile="$INSTALL_PATH/ifs.bat" os="windows"/>
 			<parsable type="plain"
 				targetfile="$INSTALL_PATH/simple-command.bat" os="windows"/>
 			<parsable type="plain"

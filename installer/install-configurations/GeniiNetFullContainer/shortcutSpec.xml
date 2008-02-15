@@ -74,7 +74,7 @@
 		startMenu="no"
 		startup="no"
 		name="Genesis II IFS"
-		target="$INSTALL_PATH/GenesisIFSServer.exe"
+		target="$INSTALL_PATH/ifs.bat"
 		workingDirectory="$INSTALL_PATH"
 		description="Run the Genesis II Installable File System."
 		initialState="normal"
