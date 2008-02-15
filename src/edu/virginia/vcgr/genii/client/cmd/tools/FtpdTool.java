@@ -16,7 +16,8 @@ public class FtpdTool extends BaseGridTool
 		"Runs an FTP daemon on the given port.";
 	static private final String _USAGE_RESOURCE =
 		"edu/virginia/vcgr/genii/client/cmd/tools/resources/ftpd-usage.txt";
-	
+
+	private boolean _block = false;	
 	private int _idleTimeout = -1;
 	private int _dataConnectionTimeout = -1;
 	private int _maxAuthAttempts = -1;
@@ -27,6 +28,11 @@ public class FtpdTool extends BaseGridTool
 	public FtpdTool()
 	{
 		super(_DESCRIPTION, new FileResource(_USAGE_RESOURCE), false);
+	}
+
+	public void setBlock(boolean block)
+	{
+		_block = block;
 	}
 	
 	public void setIdle_timeout(String seconds)
@@ -108,7 +114,18 @@ public class FtpdTool extends BaseGridTool
 			_daemon = new FTPDaemon(new GeniiBackendFactory(backConf), conf);
 			_daemon.start();
 		}
-		
+	
+		while (_block)
+		{
+			try
+			{
+				Thread.sleep(1000 * 60 * 60 * 24 * 7);
+			}
+			catch (Throwable cause)
+			{
+			}
+		}
+	
 		return 0;
 	}
 

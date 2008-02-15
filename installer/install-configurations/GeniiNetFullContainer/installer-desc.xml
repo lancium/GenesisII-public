@@ -1,4 +1,7 @@
 <installation version="1.0">
+
+	<native type="izpack" name="ShellLink.dll" os="windows"/>
+
 	<properties>
 		<property file="release.properties"/>
 		<property file="build.number"/>
@@ -40,6 +43,7 @@
 		<res src="../../common/resources/install-readme.html"
 			id="HTMLInfoPanel.info"/>
 		<res src="../../common/resources/License.txt" id="LicencePanel.licence"/>
+		<res src="shortcutSpec.xml" id="shortcutSpec.xml"/>
 	</resources>
 
 	<panels>
@@ -49,6 +53,7 @@
 		<panel classname="PacksPanel"/>
 		<panel classname="TargetPanel"/>
 		<panel classname="InstallPanel"/>
+		<panel classname="ShortcutPanel"/>
 		<panel classname="FinishPanel"/>
 	</panels>
 
