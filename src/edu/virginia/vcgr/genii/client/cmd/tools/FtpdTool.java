@@ -30,9 +30,9 @@ public class FtpdTool extends BaseGridTool
 		super(_DESCRIPTION, new FileResource(_USAGE_RESOURCE), false);
 	}
 
-	public void setBlock(boolean block)
+	public void setBlock()
 	{
-		_block = block;
+		_block = true;
 	}
 	
 	public void setIdle_timeout(String seconds)
