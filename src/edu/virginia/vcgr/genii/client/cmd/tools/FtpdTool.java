@@ -79,6 +79,9 @@ public class FtpdTool extends BaseGridTool
 			return 0;
 		}
 		
+		FTPConfiguration conf = new FTPConfiguration(
+			Integer.parseInt(arg));
+
 		synchronized(FtpdTool.class)
 		{
 			if (_daemon != null)
@@ -87,8 +90,6 @@ public class FtpdTool extends BaseGridTool
 				return 1;
 			}
 			
-			FTPConfiguration conf = new FTPConfiguration(
-				Integer.parseInt(arg));
 			if (_idleTimeout >= 0)
 				conf.setIdleTimeoutSeconds(_idleTimeout);
 			if (_dataConnectionTimeout >= 0)
@@ -115,6 +116,9 @@ public class FtpdTool extends BaseGridTool
 			_daemon.start();
 		}
 	
+		stdout.format("FTP Daemon started on port %d\n",
+			conf.getListenPort());
+			
 		while (_block)
 		{
 			try
