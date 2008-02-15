@@ -99,6 +99,8 @@ public class FtpdTool extends BaseGridTool
 			
 			if (_sandbox != null)
 				backConf.setSandboxPath(_sandbox);
+			else
+				backConf.setSandboxPath("/");
 			
 			if (numArguments() > 1)
 			{
