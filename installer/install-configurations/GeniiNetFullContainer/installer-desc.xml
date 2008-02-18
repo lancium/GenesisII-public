@@ -44,6 +44,7 @@
 			id="HTMLInfoPanel.info"/>
 		<res src="../../common/resources/License.txt" id="LicencePanel.licence"/>
 		<res src="shortcutSpec.xml" id="shortcutSpec.xml"/>
+		<res src="Unix_shortcutSpec.xml" id="Unix_shortcutSpec.xml"/>
 	</resources>
 
 	<panels>

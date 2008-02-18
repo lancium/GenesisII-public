@@ -8,6 +8,7 @@
 		<variable name="OGRSH_HOME" value="$INSTALL_PATH/OGRSH"/>
 		<variable name="GENII_ROOT_SESSION_URL"
 			value="http://www.cs.virginia.edu/~vcgr/GeniiNet/root.xml"/>
+		<variable name="LOG4JCONFIG" value="production.log4j.properties"/>
 	</variables>
 
 	<info>
