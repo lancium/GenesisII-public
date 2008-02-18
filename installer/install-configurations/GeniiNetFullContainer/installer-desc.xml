@@ -25,6 +25,7 @@
 			<author name="Chris Sosa" email="cbs6n@cs.virginia.edu"/>
 			<author name="Dan Wasserman" email="daw9f@cs.virginia.edu"/>
 		</authors>
+		<appsubpath>GenesisII</appsubpath>
 		<url>http://vcgr.cs.virginia.edu</url>
 		<javaversion>1.5</javaversion>
 	</info>

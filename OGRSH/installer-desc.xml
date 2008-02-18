@@ -15,7 +15,7 @@
 	<info>
 		<appname>OGRSH</appname>
 		<appversion>@{ogrsh.version} Build @{build.number}</appversion>
-		<appsubpath>Genesis II</appsubpath>
+		<appsubpath>GenesisII</appsubpath>
 		<uninstaller write="no"/>
 		<authors>
 			<author name="Andrew Grimshaw" email="grimshaw@cs.virginia.edu"/>
