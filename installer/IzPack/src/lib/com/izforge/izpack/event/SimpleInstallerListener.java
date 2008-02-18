@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2004 Klaus Bartz
  * 
@@ -197,6 +197,11 @@ public class SimpleInstallerListener implements InstallerListener
     public void beforeDir(File dir, PackFile pf) throws Exception
     {
         // Do nothing
+    }
+    
+    public void afterInstallerInitialization(AutomatedInstallData data)
+    {
+       this.installdata = data;
     }
 
     /**

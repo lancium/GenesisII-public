@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,13 @@ public class Pack implements Serializable
 
     /** Flag for store files of this pack outside the installation jar file */
     public boolean loose;
-
+   
+    /** If true, all files of the pack will be deleted during uninstallation, if 
+     * false they are only removed if uninstaller force delete option is
+     * activated.
+     */
+    public boolean uninstall;
+        
     /** The pack name. */
     public String name;
 
@@ -58,7 +64,7 @@ public class Pack implements Serializable
      * is a string and serves are key identifying each group of mutually
      * exclusive packs.
      */
-    public String excludeGroup = new String();
+    public String excludeGroup = "";
 
     /** The group the pack is associated with. The pack group identifies
      * packs with common functionality to allow for grouping of packs in a
@@ -71,6 +77,9 @@ public class Pack implements Serializable
 
     /** The target operation system of this pack */
     public List osConstraints = null;
+    
+    /** Condition for this pack **/
+    private String condition;
 
     /** The list of packs this pack depends on */
     public List dependencies = null;
@@ -86,9 +95,15 @@ public class Pack implements Serializable
 
     /** Whether this pack is suggested (preselected for installation). */
     public boolean preselected;
+    
+    /** Parent pack name to display it in the TreePacksPanel (optional)*/
+    public String parent;
 
     /** The color of the node. This is used for the dependency graph algorithms */
     public int color;
+
+    /** The id to use if we want to obtain this pack's image resource */
+    public String packImgId;
 
     /** white colour */
     public final static int WHITE = 0;
@@ -110,10 +125,11 @@ public class Pack implements Serializable
      * @param required Indicates wether the pack is required or not.
      * @param preselected This pack will be selected automatically.
      * @param loose Flag for store files of this pack outside the installation jar file
-     * @param excludegroup associated exclude group 
+     * @param excludegroup associated exclude group
+     * @param uninstall If true, pack must be uninstalled.
      */
     public Pack(String name, String id, String description, List osConstraints, List dependencies,
-            boolean required, boolean preselected, boolean loose, String excludegroup)
+            boolean required, boolean preselected, boolean loose, String excludegroup, boolean uninstall)
     {
         this.name = name;
         this.id = id;
@@ -124,6 +140,9 @@ public class Pack implements Serializable
         this.preselected = preselected;
         this.loose = loose;
         this.excludeGroup = excludegroup;
+        this.uninstall = uninstall;
+        this.packImgId = null;
+        this.condition = null;
         nbytes = 0;
         color = PackInfo.WHITE;
     }
@@ -216,5 +235,27 @@ public class Pack implements Serializable
             double value = bytes / GIGABYTES;
             return formatter.format(value) + " GB";
         }
+    }
+
+    
+    /**
+     * @return the condition
+     */
+    public String getCondition()
+    {
+        return this.condition;
+    }
+
+    
+    /**
+     * @param condition the condition to set
+     */
+    public void setCondition(String condition)
+    {
+        this.condition = condition;
+    }
+    
+    public boolean hasCondition() {
+        return this.condition != null;
     }
 }

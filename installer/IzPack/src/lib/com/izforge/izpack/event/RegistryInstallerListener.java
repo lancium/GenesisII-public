@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2004 Klaus Bartz
  * 
@@ -117,6 +117,7 @@ public class RegistryInstallerListener extends NativeInstallerListener
             // No interrupt desired after writing registry entries.
             Unpacker.setDiscardInterrupt(true);
             rh.activateLogging();
+
             if (getSpecHelper().getSpec() != null)
             {
                 VariableSubstitutor substitutor = new VariableSubstitutor(idata.getVariables());

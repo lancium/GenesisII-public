@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  *
  * Copyright 2005 Marc Eppelmann
  *
@@ -24,10 +24,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import java.net.URL;
 
 
 /**
@@ -158,6 +161,62 @@ public class FileUtil
     }
 
     return result;
+  }
+  
+  /**
+   * Gets file date and time.
+   *
+   * @param   url     The URL of the file for which date and time will be returned.
+   * @return  Returns long value which is the date and time of the file. If any error
+   *          occures returns -1 (=no file date and time available).
+   */
+  public static long getFileDateTime(URL url)
+  {
+      if (url==null)
+          return -1;
+
+      String fileName = url.getFile();
+      if (fileName.charAt(0) == '/' || fileName.charAt(0) == '\\')
+          fileName = fileName.substring(1, fileName.length());
+
+      try
+      {
+          File file = new File(fileName);
+          // File name must be a file or a directory.
+          if (!file.isDirectory() && !file.isFile())
+          {
+              return -1;
+          }
+
+          return file.lastModified();
+      }
+      catch (java.lang.Exception e)
+      {   // Trap all Exception based exceptions and return -1.
+          return -1;
+      }
+  }
+  
+  public static String[] getFileNames(String dirPath) throws Exception
+  {
+      return getFileNames(dirPath, null);
+  }
+  
+  public static String[] getFileNames(String dirPath, FilenameFilter fileNameFilter) throws Exception
+  {
+      String fileNames[] = null;
+      File dir = new File(dirPath);
+      if (dir.isDirectory())
+      {
+          if (fileNameFilter != null)
+          {
+              fileNames = dir.list(fileNameFilter);
+          }
+          else
+          {
+              fileNames = dir.list();
+          }
+      }
+      return fileNames;
   }
 
   /** 

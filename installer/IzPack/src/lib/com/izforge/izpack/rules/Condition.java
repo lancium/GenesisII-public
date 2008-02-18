@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  *
  * Copyright 2007 Dennis Reil
  *
@@ -21,6 +21,8 @@
 
 package com.izforge.izpack.rules;
 
+import java.io.Serializable;
+
 import com.izforge.izpack.installer.AutomatedInstallData;
 import net.n3.nanoxml.XMLElement;
 
@@ -29,7 +31,7 @@ import net.n3.nanoxml.XMLElement;
  *
  * @author Dennis Reil, <Dennis.Reil@reddot.de>
  */
-public abstract class Condition
+public abstract class Condition implements Serializable
 {
 
     protected String id;
@@ -71,5 +73,9 @@ public abstract class Condition
     public void setInstalldata(AutomatedInstallData installdata)
     {
         this.installdata = installdata;
+    }
+    
+    public String getDependenciesDetails() {
+        return "No dependencies for this condition.";
     }
 }

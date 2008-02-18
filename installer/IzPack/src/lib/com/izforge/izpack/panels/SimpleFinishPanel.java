@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import com.izforge.izpack.gui.LabelFactory;
 import com.izforge.izpack.installer.InstallData;
 import com.izforge.izpack.installer.InstallerFrame;
 import com.izforge.izpack.installer.IzPanel;
+import com.izforge.izpack.util.Log;
 import com.izforge.izpack.util.VariableSubstitutor;
 
 /**
@@ -98,7 +99,7 @@ public class SimpleFinishPanel extends IzPanel
             add(LabelFactory.create(parent.langpack.getString("FinishPanel.fail"),
                     parent.icons.getImageIcon("information"),  LEADING));
         getLayoutHelper().completeLayout(); // Call, or call not?
-
+        Log.getInstance().informUser();
     }
 
     /**

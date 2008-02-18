@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2001,2002 Olexij Tkatchenko
  *
@@ -84,6 +84,9 @@ public class ExecutableFile implements Serializable
      * compatibility.
      */
     public boolean keepFile;
+    
+    /** condition for this executable */
+    private String condition = null;
 
     /** Constructs a new uninitialized instance. */
     public ExecutableFile()
@@ -166,5 +169,27 @@ public class ExecutableFile implements Serializable
         retval.append("keepFile = ").append(keepFile);
         retval.append("\n");
         return retval.toString();
+    }
+
+    
+    /**
+     * @return the condition
+     */
+    public String getCondition()
+    {
+        return this.condition;
+    }
+
+    
+    /**
+     * @param condition the condition to set
+     */
+    public void setCondition(String condition)
+    {
+        this.condition = condition;
+    }
+    
+    public boolean hasCondition() {
+        return this.condition != null;
     }
 }

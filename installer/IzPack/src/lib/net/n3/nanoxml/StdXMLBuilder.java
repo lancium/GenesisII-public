@@ -1,7 +1,7 @@
 /* StdXMLBuilder.java                                              NanoXML/Java
  *
- * $Revision: 1421 $
- * $Date: 2006-03-12 17:32:32 +0100 (Sun, 12 Mar 2006) $
+ * $Revision: 1961 $
+ * $Date: 2007-12-17 12:20:05 +0000 (Mon, 17 Dec 2007) $
  * $Name$
  *
  * This file is part of NanoXML 2 for Java.
@@ -38,7 +38,7 @@ import java.util.Stack;
  * @see net.n3.nanoxml.XMLElement
  * 
  * @author Marc De Scheemaecker
- * @version $Name$, $Revision: 1421 $
+ * @version $Name$, $Revision: 1961 $
  */
 public class StdXMLBuilder implements IXMLBuilder
 {
@@ -60,6 +60,36 @@ public class StdXMLBuilder implements IXMLBuilder
     {
         this.stack = null;
         this.root = null;
+    }
+
+    /**
+     * Return the element that is currently being processed
+     *
+     * @return  the element that is currently being processed
+     */
+    protected XMLElement getCurrentElement() {
+        return (XMLElement) stack.peek();
+    }
+
+    /**
+     * Return the stack used for processing the elements.
+     *
+     * @return  the stack used for processing the elements.
+     */
+    protected Stack getStack() {
+        return stack;
+    }
+
+    /**
+     * Set the root element to a new element. This causes the internal stack
+     * to be flushed and the supplied element to be pushed onto it
+     *
+     * @param element the new root element.
+     */
+    protected void setRootElement(XMLElement element) {
+        stack.clear();
+        stack.push(element);
+        this.root = element;
     }
 
     /**

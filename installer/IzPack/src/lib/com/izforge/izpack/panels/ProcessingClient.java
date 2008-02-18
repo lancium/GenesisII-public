@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2003 Elmar Grom
  * 
@@ -20,6 +20,8 @@
  */
 
 package com.izforge.izpack.panels;
+
+import java.util.Map;
 
 /*---------------------------------------------------------------------------*/
 /**
@@ -56,5 +58,35 @@ public interface ProcessingClient
      */
     /*--------------------------------------------------------------------------*/
     public String getFieldContents(int index);
+    
+// These newly added fields are similar to the functionality provided 
+// by the multiple validator support using the validator container.
+    
+    /*---------------------------------------------------------------------------*/
+    /**
+     * Returns the field contents.
+     * 
+     * @return the field contents
+     */
+    /*--------------------------------------------------------------------------*/
+    public String getText();
+
+    /*--------------------------------------------------------------------------*/
+    /**
+     * @return true if this instance has any parameters to pass to the Validator instance.
+     */
+    /*--------------------------------------------------------------------------*/
+    public boolean hasParams();
+
+    /*--------------------------------------------------------------------------*/
+    /**
+     * Returns the validator parameters, if any. The caller should check for the existence of
+     * validator parameters via the <code>hasParams()</code> method prior to invoking this method.
+     * 
+     * @return a java.util.Map containing the validator parameters.
+     */
+    /*--------------------------------------------------------------------------*/
+    public Map getValidatorParams();
+
 }
 /*---------------------------------------------------------------------------*/

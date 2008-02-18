@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  *
  * Copyright 2002 Jan Blok
  *
@@ -96,14 +96,11 @@ public class DataCheckPanel extends IzPanel
 	 * When the panel is made active, call the printDebugInfo method.
      * 
 	 * @see com.izforge.izpack.installer.IzPanel#panelActivate()
-     * @param none
-     * @return void
 	 */
 	public void panelActivate()
 	{
         printDebugInfo();
-		return;
-	}	
+    }
 	
     /**
      * Get and return the list of pack names.
@@ -133,8 +130,6 @@ public class DataCheckPanel extends IzPanel
      * Print list of variables names and value, as well as the list
      * of packages and their status (selected or not).
      * 
-     * @param none
-     * @return void
      */
     private void printDebugInfo()
     {

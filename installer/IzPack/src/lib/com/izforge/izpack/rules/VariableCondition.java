@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  *
  * Copyright 2007 Dennis Reil
  *
@@ -21,9 +21,9 @@
 package com.izforge.izpack.rules;
 
 import java.util.HashMap;
-import java.util.Properties;
 
 import net.n3.nanoxml.XMLElement;
+
 import com.izforge.izpack.util.Debug;
 
 /**
@@ -31,6 +31,11 @@ import com.izforge.izpack.util.Debug;
  */
 public class VariableCondition extends Condition
 {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2881336115632480575L;
 
     protected String variablename;
 
@@ -96,14 +101,37 @@ public class VariableCondition extends Condition
 
     public boolean isTrue()
     {
-        String val = this.installdata.getVariable(variablename);
-        if (val == null)
-        {
+        if (this.installdata != null) {
+            String val = this.installdata.getVariable(variablename);
+            if (val == null)
+            {
+                return false;
+            }
+            else
+            {
+                return val.equals(value);
+            }
+        }
+        else {
             return false;
         }
-        else
-        {
-            return val.equals(value);
-        }
+    }
+
+    /* (non-Javadoc)
+     * @see com.izforge.izpack.rules.Condition#getDependenciesDetails()
+     */
+    public String getDependenciesDetails()
+    {
+        StringBuffer details = new StringBuffer();
+        details.append(this.id);
+        details.append(" depends on a value of <b>");        
+        details.append(this.value);
+        details.append("</b> on variable <b>");
+        details.append(this.variablename);
+        details.append(" (current value: ");
+        details.append(this.installdata.getVariable(variablename));
+        details.append(")");
+        details.append("</b><br/>");
+        return details.toString();
     }
 }

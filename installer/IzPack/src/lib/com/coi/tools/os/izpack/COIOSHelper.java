@@ -1,8 +1,9 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * $Id: COIOSHelper.java 2036 2008-02-09 11:14:05Z jponge $
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2005 Klaus Bartz
  *
@@ -40,6 +41,8 @@ public class COIOSHelper
     private static int used = 0;
 
     private static boolean destroyed = false;
+    
+    private boolean failed = false;
 
     /**
      * This method is used to free the library at the end of progam execution. After this call, any
@@ -110,15 +113,23 @@ public class COIOSHelper
     public void addDependant(NativeLibraryClient dependant) throws Exception
     {
         used++;
+        if( failed )
+            throw (new Exception("load native library failed"));
         try
         {
             Librarian.getInstance().loadLibrary("COIOSHelper", dependant);
         }
         catch (UnsatisfiedLinkError exception)
         {
+            failed = true;
             throw (new Exception("could not locate native library"));
         }
-
+        catch( Throwable t)
+        {
+            failed = true;
+            throw (new Exception(t));
+        }
+        
     }
 
 }

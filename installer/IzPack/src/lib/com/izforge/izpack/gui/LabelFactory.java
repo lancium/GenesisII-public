@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2004 Klaus Bartz
  * 
@@ -197,6 +197,11 @@ public class LabelFactory implements SwingConstants
      */
     public static class FullLineLabel extends JLabel
     {
+
+        /**
+         * Required (serializable)
+         */
+        private static final long serialVersionUID = 2918265795390777147L;
 
         /**
          * Creates a <code>JLabel</code> instance with the specified image.

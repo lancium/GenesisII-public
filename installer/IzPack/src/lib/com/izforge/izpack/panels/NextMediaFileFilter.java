@@ -1,7 +1,7 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
- * http://izpack.org/ http://developer.berlios.de/projects/izpack/
+ * http://izpack.org/ http://izpack.codehaus.org/
  * 
  * Copyright 2007 Dennis Reil
  * 
@@ -44,12 +44,7 @@ public class NextMediaFileFilter extends FileFilter {
       return true;
     }
     String filepath = f.getAbsolutePath();
-    if (filepath.endsWith(this.volumename)) {
-      return true;
-    }
-    else {
-      return false;
-    }
+      return filepath.endsWith(this.volumename);
   }
 
   /* (non-Javadoc)

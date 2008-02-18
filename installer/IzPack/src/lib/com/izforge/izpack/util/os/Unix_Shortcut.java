@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  *
- * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://www.izforge.com/izpack/
+ * http://izpack.codehaus.org/
  *
  * Copyright 2003 Marc Eppelmann
  *
@@ -83,11 +83,11 @@ public class Unix_Shortcut extends Shortcut implements Unix_ShortcutConstants
 
     // ~ Static fields/initializers
     // *******************************************************************************************************************************
-    /** version = "$Id: Unix_Shortcut.java 1816 2007-04-23 19:57:27Z jponge $" */
-    private static String version = "$Id: Unix_Shortcut.java 1816 2007-04-23 19:57:27Z jponge $";
+    /** version = "$Id: Unix_Shortcut.java 2036 2008-02-09 11:14:05Z jponge $" */
+    private static String version = "$Id: Unix_Shortcut.java 2036 2008-02-09 11:14:05Z jponge $";
 
-    /** rev = "$Revision: 1816 $" */
-    private static String rev = "$Revision: 1816 $";
+    /** rev = "$Revision: 2036 $" */
+    private static String rev = "$Revision: 2036 $";
 
     /** DESKTOP_EXT = ".desktop" */
     private static String DESKTOP_EXT = ".desktop";
@@ -320,27 +320,26 @@ public class Unix_Shortcut extends Shortcut implements Unix_ShortcutConstants
     }
 
     /**
-     * Gets the kde/share/applink - Folder for the given user and for the currently known and
-     * supported distribution.
+     * Gets the XDG path to place the menu shortcuts
      * 
      * @param userType to get for.
      * 
-     * @return the users or the systems kde share/applink(-redhat/-mdk)
+     * @return handle to the directory
      */
     private File getKdeShareApplnkFolder(int userType)
     {
-       /*
-        //newer XDG system
-        File xdgPath = new File("usr" + File.separator + "share" + File.separator
-               + "applications");
-        if(xdgPath.exists()) return xdgPath;*/
-       
-        File kdeBase = getKdeBase(userType);
 
-        File result = new File(kdeBase + File.separator + "share" + File.separator
-                + getKdeApplinkFolderName());
+        if(userType == Shortcut.ALL_USERS)
+        {
+           return new File(File.separator + "usr" + File.separator + "share" + File.separator
+                 + "applications");
+        }
+        else
+        {
+           return new File(System.getProperty("user.home") + File.separator + ".local"
+                 + File.separator + "share" + File.separator + "applications");
+        }
 
-        return result;
     }
 
     /**
@@ -435,15 +434,13 @@ public class Unix_Shortcut extends Shortcut implements Unix_ShortcutConstants
         // Create The Desktop Shortcuts
         if ("".equals(this.itsGroupName) && (this.getLinkType() == Shortcut.DESKTOP))
         {
-            //System.out.println("this.itsGroupName: "+this.itsGroupName);
-            //System.out.println("this.getLinkType(): "+this.getLinkType());
-            target = myHome + FS + "Desktop" + FS + this.itsName
-                    + DESKTOP_EXT;
+
             this.itsFileName = target;
 
             // write my own ShortCut
-            File writtenDesktopFile = writeShortCut(target, shortCutDef);
-
+            File writtenDesktopFile = writeSafeShortcut(myHome + FS + "Desktop" + FS, this.itsName, shortCutDef);
+            uninstaller.addFile(writtenDesktopFile.toString(), true);
+            
             // If I'm root and this Desktop.ShortCut should be for all other users
             if (rootUser4All && create4All)
             {
@@ -560,6 +557,9 @@ public class Unix_Shortcut extends Shortcut implements Unix_ShortcutConstants
             // the following is for backwards compatibility to older versions of KDE!
             // on newer versions of KDE the icons will appear duplicated unless you set
             // the category=""
+           
+           //removed because of compatibility issues
+           /*
             Object categoryobject = props.getProperty($Categories);
             if(categoryobject != null && ((String)categoryobject).length()>0)
             {
@@ -568,10 +568,11 @@ public class Unix_Shortcut extends Shortcut implements Unix_ShortcutConstants
                     + DESKTOP_EXT;
                this.itsFileName = target;
                File kdemenufile = writeShortCut(target, shortCutDef);
-          
-               uninstaller.addFile(kdemenufile.toString());
+
+               uninstaller.addFile(kdemenufile.toString(), true);
             }
-            
+            */
+           
             if (rootUser4All && create4All)
             {
                 {
@@ -583,7 +584,7 @@ public class Unix_Shortcut extends Shortcut implements Unix_ShortcutConstants
                     try
                     {
                         copyTo(theIcon, commonIcon);
-                        uninstaller.addFile(commonIcon.toString());
+                        uninstaller.addFile(commonIcon.toString(), true);
                     }
                     catch (Exception cnc)
                     {
@@ -591,13 +592,12 @@ public class Unix_Shortcut extends Shortcut implements Unix_ShortcutConstants
                                 + cnc.getMessage() + " )");
                     }
 
-                    // write *.desktop.file into /usr/share/applications
+                    // write *.desktop
 
-                    String commonTarget = "/usr/share/applications/" + this.itsName + DESKTOP_EXT;
                     this.itsFileName = target;
-                    File writtenFile = writeShortCut(commonTarget, shortCutDef);
-
-                    uninstaller.addFile(writtenFile.toString());
+                    File writtenFile = writeSafeShortcut("/usr/share/applications/", this.itsName, shortCutDef);
+                    setWrittenFileName(writtenFile.getName());
+                    uninstaller.addFile(writtenFile.toString(), true);
 
                 }
             }
@@ -629,7 +629,7 @@ public class Unix_Shortcut extends Shortcut implements Unix_ShortcutConstants
                try
                {
                    copyTo(theIcon, commonIcon);
-                   uninstaller.addFile(commonIcon.toString());
+                   uninstaller.addFile(commonIcon.toString(), true);
                }
                catch (Exception cnc)
                {
@@ -637,13 +637,12 @@ public class Unix_Shortcut extends Shortcut implements Unix_ShortcutConstants
                            + cnc.getMessage() + " )");
                }
 
-               // write *.desktop.file into ~/share/applications
+               // write *.desktop in the local folder
 
-               String commonTarget = localApps + this.itsName + DESKTOP_EXT;
                this.itsFileName = target;
-               File writtenFile = writeShortCut(commonTarget, shortCutDef);
-
-               uninstaller.addFile(writtenFile.toString());
+               File writtenFile = writeSafeShortcut(localApps, this.itsName, shortCutDef);
+               setWrittenFileName(writtenFile.getName());
+               uninstaller.addFile(writtenFile.toString(), true);
             }
 
         }
@@ -711,6 +710,66 @@ public class Unix_Shortcut extends Shortcut implements Unix_ShortcutConstants
         writer.close();
     }
 
+    private String writtenFileName;
+    
+    public String getWrittenFileName()
+    {
+       return writtenFileName;
+    }
+    
+    protected void setWrittenFileName(String s)
+    {
+       writtenFileName = s;
+    }
+    
+    private File writeSafeShortcut(String targetPath, String shortcutName, String shortcutDef)
+    {
+        if( !(targetPath.endsWith("/") || targetPath.endsWith("\\")) )
+        {
+            targetPath += File.separatorChar;
+        }
+        
+        File shortcutFile;
+        
+        do
+        {
+           shortcutFile = new File(targetPath + shortcutName + "-" + System.currentTimeMillis() + DESKTOP_EXT);
+        }
+        while (shortcutFile.exists());
+
+
+        FileWriter fileWriter = null;
+
+        try
+        {
+            fileWriter = new FileWriter(shortcutFile);
+        }
+        catch (IOException e1)
+        {
+            System.out.println(e1.getMessage());
+        }
+
+        try
+        {
+            fileWriter.write(shortcutDef);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            fileWriter.close();
+        }
+        catch (IOException e2)
+        {
+            e2.printStackTrace();
+        }
+        return shortcutFile;        
+        
+    }
+    
     /**
      * Writes the given Shortcutdefinition to the given Target. Returns the written File.
      * 

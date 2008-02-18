@@ -1,9 +1,9 @@
 /*
- * $Id: GUIInstaller.java 1816 2007-04-23 19:57:27Z jponge $
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * $Id: GUIInstaller.java 2036 2008-02-09 11:14:05Z jponge $
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,12 +64,14 @@ import javax.swing.plaf.metal.MetalTheme;
 
 import com.izforge.izpack.GUIPrefs;
 import com.izforge.izpack.LocaleDatabase;
+import com.izforge.izpack.ExecutableFile;
 import com.izforge.izpack.gui.ButtonFactory;
 import com.izforge.izpack.gui.IzPackMetalTheme;
 import com.izforge.izpack.gui.LabelFactory;
 import com.izforge.izpack.util.Debug;
 import com.izforge.izpack.util.OsVersion;
 import com.izforge.izpack.util.VariableSubstitutor;
+import com.izforge.izpack.util.FileExecutor;
 
 /**
  * The IzPack graphical installer class.
@@ -117,9 +119,11 @@ public class GUIInstaller extends InstallerBase
 
         // Checks the Java version
         checkJavaVersion();
+        checkJDKAvailable();
 
         // Loads the suitable langpack
         SwingUtilities.invokeAndWait(new Runnable() {
+
             public void run()
             {
                 try
@@ -141,6 +145,7 @@ public class GUIInstaller extends InstallerBase
 
         // We launch the installer GUI
         SwingUtilities.invokeLater(new Runnable() {
+
             public void run()
             {
                 try
@@ -195,6 +200,35 @@ public class GUIInstaller extends InstallerBase
     }
 
     /**
+     * Checks if a JDK is available.
+     */
+    private void checkJDKAvailable()
+    {
+        if (!this.installdata.info.isJdkRequired())
+        {
+            return;
+        }
+
+        FileExecutor exec = new FileExecutor();
+        String[] output = new String[2];
+        String[] params = { "javac", "-help" };
+        if (exec.executeCommand(params, output) != 0)
+        {
+            String[] message = {
+                "It looks like your system does not have a Java Development Kit (JDK) available.",
+                "The software that you plan to install requires a JDK for both its installation and execution.",
+                "\n",
+                "Do you still want to proceed with the installation process?"
+            };
+            int status = JOptionPane.showConfirmDialog(null, message, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (status == JOptionPane.NO_OPTION)
+            {
+                System.exit(1);
+            }
+        }
+    }
+
+    /**
      * Loads the suitable langpack.
      * 
      * @exception Exception Description of the Exception
@@ -221,10 +255,10 @@ public class GUIInstaller extends InstallerBase
         if (npacks != 1)
         {
             LanguageDialog picker = new LanguageDialog(frame, availableLangPacks.toArray());
-            picker.setSelection(Locale.getDefault().getISO3Country().toLowerCase());
+            picker.setSelection(Locale.getDefault().getISO3Language().toLowerCase());
             picker.setModal(true);
             picker.toFront();
-            //frame.setVisible(true);
+            // frame.setVisible(true);
             frame.setVisible(false);
             picker.setVisible(true);
 
@@ -242,6 +276,7 @@ public class GUIInstaller extends InstallerBase
         installdata.setVariable(ScriptParser.ISO3_LANG, installdata.localeISO3);
         InputStream in = getClass().getResourceAsStream("/langpacks/" + selectedPack + ".xml");
         this.installdata.langpack = new LocaleDatabase(in);
+
     }
 
     /**
@@ -288,11 +323,13 @@ public class GUIInstaller extends InstallerBase
         // Resolve whether button icons should be used or not.
         boolean useButtonIcons = true;
         if (installdata.guiPrefs.modifier.containsKey("useButtonIcons")
-                && "no".equalsIgnoreCase((String) installdata.guiPrefs.modifier.get("useButtonIcons"))) useButtonIcons = false;
+                && "no".equalsIgnoreCase((String) installdata.guiPrefs.modifier
+                        .get("useButtonIcons"))) useButtonIcons = false;
         ButtonFactory.useButtonIcons(useButtonIcons);
         boolean useLabelIcons = true;
         if (installdata.guiPrefs.modifier.containsKey("useLabelIcons")
-                && "no".equalsIgnoreCase((String) installdata.guiPrefs.modifier.get("useLabelIcons"))) useLabelIcons = false;
+                && "no".equalsIgnoreCase((String) installdata.guiPrefs.modifier
+                        .get("useLabelIcons"))) useLabelIcons = false;
         LabelFactory.setUseLabelIcons(useLabelIcons);
         if (laf == null)
         {
@@ -381,15 +418,50 @@ public class GUIInstaller extends InstallerBase
             return;
         }
 
+				// Nimbus (http://nimbus.dev.java.net/)
+				if ("nimbus".equals(laf))
+				{
+						UIManager.setLookAndFeel("org.jdesktop.swingx.plaf.nimbus.NimbusLookAndFeel");
+						return;
+				}
+
         // JGoodies Looks (http://looks.dev.java.net/)
         if ("looks".equals(laf))
         {
             Map variants = new TreeMap();
-            variants.put("extwin", "com.jgoodies.plaf.windows.ExtWindowsLookAndFeel");
-            variants.put("plastic", "com.jgoodies.plaf.plastic.PlasticLookAndFeel");
-            variants.put("plastic3D", "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel");
-            variants.put("plasticXP", "com.jgoodies.plaf.plastic.PlasticXPLookAndFeel");
+            variants.put("windows", "com.jgoodies.looks.windows.WindowsLookAndFeel");
+            variants.put("plastic", "com.jgoodies.looks.plastic.PlasticLookAndFeel");
+            variants.put("plastic3D", "com.jgoodies.looks.plastic.Plastic3DLookAndFeel");
+            variants.put("plasticXP", "com.jgoodies.looks.plastic.Plastic3DLookAndFeel");
             String variant = (String) variants.get("plasticXP");
+
+            Map params = (Map) installdata.guiPrefs.lookAndFeelParams.get(laf);
+            if (params.containsKey("variant"))
+            {
+                String param = (String) params.get("variant");
+                if (variants.containsKey(param))
+                {
+                    variant = (String) variants.get(param);
+                }
+            }
+
+            UIManager.setLookAndFeel(variant);
+						return;
+        }
+
+        // Substance (http://substance.dev.java.net/)
+        if ("substance".equals(laf))
+        {
+            Map variants = new TreeMap();
+            variants.put("default", "org.jvnet.substance.SubstanceLookAndFeel"); // Ugly!!!
+            variants.put("business", "org.jvnet.substance.skin.SubstanceBusinessLookAndFeel");
+            variants.put("business-blue", "org.jvnet.substance.skin.SubstanceBusinessBlueSteelLookAndFeel");
+            variants.put("business-black", "org.jvnet.substance.skin.SubstanceBusinessBlackSteelLookAndFeel");
+            variants.put("creme", "org.jvnet.substance.skin.SubstanceCremeLookAndFeel");
+            variants.put("sahara", "org.jvnet.substance.skin.SubstanceSaharaLookAndFeel");
+            variants.put("moderate", "org.jvnet.substance.skin.SubstanceModerateLookAndFeel");
+            variants.put("officesilver", "org.jvnet.substance.skin.SubstanceOfficeSilver2007LookAndFeel");
+            String variant = (String) variants.get("default");
 
             Map params = (Map) installdata.guiPrefs.lookAndFeelParams.get(laf);
             if (params.containsKey("variant"))
@@ -425,7 +497,7 @@ public class GUIInstaller extends InstallerBase
             title = installdata.langpack.getString("installer.title")
                     + installdata.info.getAppName();
         else
-        {   // Attention! The alternate message has to contain the hole message including
+        { // Attention! The alternate message has to contain the hole message including
             // $APP_NAME and may be $APP_VER.
             VariableSubstitutor vs = new VariableSubstitutor(installdata.getVariables());
             title = vs.substitute(message, null);
@@ -516,44 +588,40 @@ public class GUIInstaller extends InstallerBase
             GridBagConstraints gbConstraints = new GridBagConstraints();
             gbConstraints.anchor = GridBagConstraints.CENTER;
             gbConstraints.insets = new Insets(5, 5, 5, 5);
-            gbConstraints.fill = GridBagConstraints.NONE;
+            gbConstraints.fill = GridBagConstraints.HORIZONTAL;
             gbConstraints.gridx = 0;
             gbConstraints.weightx = 1.0;
             gbConstraints.weighty = 1.0;
+			gbConstraints.ipadx = 0;
+			gbConstraints.ipady = 6;
 
             ImageIcon img = getImage();
             JLabel imgLabel = new JLabel(img);
             gbConstraints.gridy = 0;
             contentPane.add(imgLabel);
 
-            gbConstraints.fill = GridBagConstraints.HORIZONTAL;
             String firstMessage = "Please select your language";
             if (getLangType().equals(LANGUAGE_DISPLAY_TYPES[0]))
             // iso3
-                firstMessage = "Please select your language (ISO3 code)";
+                firstMessage = "Please select your language below";
 
-            JLabel label1 = new JLabel(firstMessage, SwingConstants.CENTER);
+            JLabel label1 = new JLabel(firstMessage, SwingConstants.LEADING);
             gbConstraints.gridy = 1;
-            gbConstraints.insets = new Insets(5, 5, 0, 5);
+            gbConstraints.insets = new Insets(15, 5, 5, 5);
             layout.addLayoutComponent(label1, gbConstraints);
             contentPane.add(label1);
-            JLabel label2 = new JLabel("for install instructions:", SwingConstants.CENTER);
-            gbConstraints.gridy = 2;
-            gbConstraints.insets = new Insets(0, 5, 5, 5);
-            layout.addLayoutComponent(label2, gbConstraints);
-            contentPane.add(label2);
-            gbConstraints.insets = new Insets(5, 5, 5, 5);
 
+            gbConstraints.insets = new Insets(5, 5, 5, 5);
             items = reviseItems(items);
 
             comboBox = new JComboBox(items);
             if (useFlags()) comboBox.setRenderer(new FlagRenderer());
-            gbConstraints.fill = GridBagConstraints.HORIZONTAL;
             gbConstraints.gridy = 3;
             layout.addLayoutComponent(comboBox, gbConstraints);
             contentPane.add(comboBox);
 
-            JButton okButton = new JButton("OK");
+            gbConstraints.insets = new Insets(15, 5, 15, 5);
+            JButton okButton = new JButton("Ok");
             okButton.addActionListener(this);
             gbConstraints.fill = GridBagConstraints.NONE;
             gbConstraints.gridy = 4;
@@ -565,14 +633,14 @@ public class GUIInstaller extends InstallerBase
             // Packs and centers
             // Fix for bug "Installer won't show anything on OSX"
             if (System.getProperty("mrj.version") == null)
+			{
                 pack();
-            else
-                setSize(getPreferredSize());
+			}
+            setSize(getPreferredSize());
 
             Dimension frameSize = getSize();
             Point center = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
-            setLocation(center.x - frameSize.width / 2,
-                    center.y - frameSize.height / 2 - 10);
+            setLocation(center.x - frameSize.width / 2, center.y - frameSize.height / 2 - 10);
             setResizable(true);
         }
 

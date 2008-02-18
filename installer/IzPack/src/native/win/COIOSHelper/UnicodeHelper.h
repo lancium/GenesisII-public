@@ -1,9 +1,9 @@
 /*
- * $Id: UnicodeHelper.h 1816 2007-04-23 19:57:27Z jponge $
+ * $Id: UnicodeHelper.h 2036 2008-02-09 11:14:05Z jponge $
  * IzPack - Copyright 2001-2005 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2005 Klaus Bartz
  * 

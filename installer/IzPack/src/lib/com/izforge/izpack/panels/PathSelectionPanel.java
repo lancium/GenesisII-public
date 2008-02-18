@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2004 Klaus Bartz
  * 
@@ -22,9 +22,6 @@
 package com.izforge.izpack.panels;
 
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -94,9 +91,9 @@ public class PathSelectionPanel extends JPanel implements ActionListener, Layout
      */
     protected void createLayout()
     {
-        // We woulduse the IzPanelLayout also in this "sub"panel.
-        // In an IzPanel there are support of this layout manager at
-        // more than one places. In this panel not, therefore we have
+        // We would use the IzPanelLayout also in this "sub" panel.
+        // In an IzPanel there is support for this layout manager in
+        // more than one place, but not in this panel so we have
         // to make all things needed.
         // First create a layout helper.
         LayoutHelper layoutHelper = new LayoutHelper(this);

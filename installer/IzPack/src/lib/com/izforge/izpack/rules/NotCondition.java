@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  *
  * Copyright 2007 Dennis Reil
  *
@@ -30,6 +30,10 @@ import com.izforge.izpack.util.Debug;
 public class NotCondition extends Condition
 {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3194843222487006309L;
     protected Condition operand;
 
     /**
@@ -92,5 +96,18 @@ public class NotCondition extends Condition
     public boolean isTrue()
     {        
         return !operand.isTrue();
+    }
+
+    /* (non-Javadoc)
+     * @see com.izforge.izpack.rules.Condition#getDependenciesDetails()
+     */
+    public String getDependenciesDetails()
+    {
+        StringBuffer details = new StringBuffer();
+        details.append(this.id);
+        details.append(" depends on:<ul><li>NOT ");        
+        details.append(operand.getDependenciesDetails());
+        details.append("</li></ul>");
+        return details.toString();
     }
 }

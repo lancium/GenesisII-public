@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2001 Johannes Lehtinen
  * 
@@ -78,6 +78,9 @@ public class ScriptParser
 
     /** The language IS03 code. */
     public final static String ISO3_LANG = "ISO3_LANG";
+    
+    /** The language code as _ll_CC like used with ResourceBoundle. */
+    public final static String LOCALE = "LOCALE_IDENTIFIER";
     
 
     /** The files to parse. */

@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2003 Tino Schwarze
  * 
@@ -54,6 +54,15 @@ public interface AbstractUIProgressHandler extends AbstractUIHandler
      */
     public void nextStep(String step_name, int step_no, int no_of_substeps);
 
+    /**
+     * Set the number of substeps.
+     * 
+     * This may be used if the number of substeps changes during an action.
+     * 
+     * @param no_of_substeps The number of substeps.
+     */
+    public void setSubStepNo (int no_of_substeps);
+    
     /**
      * Notify of progress.
      * 

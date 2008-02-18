@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2003 Elmar Grom
  * 
@@ -18,9 +18,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.izforge.izpack.panels;
 
+import com.izforge.izpack.installer.InstallData;
+import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.JPasswordField;
@@ -45,35 +47,44 @@ public class PasswordGroup implements ProcessingClient
     // ------------------------------------------------------------------------
     private Vector fields = new Vector();
 
-    private Validator validator = null;
-
+    private List validatorContainers = null;
+//  private Validator validator = null;
+//  private boolean hasParams = false;
+//  private Map validatorParams = null;
     private Processor processor = null;
+
+    private int currentValidator = 0;
+
+    private InstallData idata;
 
     /*--------------------------------------------------------------------------*/
     /**
-     * Creates a passowrd group to manage one or more password fields.
+     * Creates a password group to manage one or more password fields.
      * 
-     * @param validator A string that specifies a class that provides a password validation service.
-     * The class must implement the <code>Validator</code> interface. If an attempt to instantiate
-     * this class fails, no validation will be performed.
-     * @param processor A string that specifies a class that provides a password processing service,
-     * such as password encryption. The class must implement the <code>Processor</code> interface.
-     * If an attempt to instantiate this class fails, no processing will be performed. Insted the
-     * contents of the first field will be returned.
+     * @param idata the installation data
+     * @param validatorContainers the validator containers
+     * @param processor the processor
      */
     /*--------------------------------------------------------------------------*/
-    public PasswordGroup(String validator, String processor)
+    public PasswordGroup(InstallData idata, List validatorContainers, String processor)
     {
         // ----------------------------------------------------
         // attempt to create an instance of the Validator
         // ----------------------------------------------------
         try
         {
-            this.validator = (Validator) Class.forName(validator).newInstance();
-        }
-        catch (Throwable exception)
+            this.idata = idata;
+//      this.validator = (Validator) Class.forName(validator).newInstance();
+            this.validatorContainers = validatorContainers;
+//      this.validatorParams = validatorParams;
+//      if (validatorParams != null) {
+//        if (validatorParams.size() > 0) {
+//          hasParams = true;
+//        }
+//      }
+        } catch (Throwable exception)
         {
-            this.validator = null;
+            this.validatorContainers = null;
         }
 
         // ----------------------------------------------------
@@ -82,11 +93,15 @@ public class PasswordGroup implements ProcessingClient
         try
         {
             this.processor = (Processor) Class.forName(processor).newInstance();
-        }
-        catch (Throwable exception)
+        } catch (Throwable exception)
         {
             this.processor = null;
         }
+    }
+
+    public InstallData getIdata()
+    {
+        return idata;
     }
 
     /*--------------------------------------------------------------------------*/
@@ -114,7 +129,10 @@ public class PasswordGroup implements ProcessingClient
     /*--------------------------------------------------------------------------*/
     public String getFieldContents(int index) throws IndexOutOfBoundsException
     {
-        if ((index < 0) || (index >= fields.size())) { throw (new IndexOutOfBoundsException()); }
+        if ((index < 0) || (index >= fields.size()))
+        {
+            throw (new IndexOutOfBoundsException());
+        }
 
         String contents = new String(((JPasswordField) fields.elementAt(index)).getPassword());
         return (contents);
@@ -144,16 +162,123 @@ public class PasswordGroup implements ProcessingClient
      * rule exists. Otherwise <code>false</code> is returned.
      */
     /*--------------------------------------------------------------------------*/
-    public boolean validateContents()
+    public boolean validateContents(int i)
     {
-        if (validator != null)
+        boolean returnValue = true;
+        try
         {
-            return (validator.validate(this));
-        }
-        else
+            currentValidator = i;
+            ValidatorContainer container = getValidatorContainer(i);
+            Validator validator = container.getValidator();
+            if (validator != null)
+            {
+                returnValue = validator.validate(this);
+            }
+        } catch (Exception e)
         {
-            return (true);
+            System.out.println("validateContents(" + i + ") failed: " + e);
+        // just return true
         }
+        return returnValue;
+    }
+
+    public String getValidatorMessage(int i)
+    {
+        String returnValue = null;
+        try
+        {
+            ValidatorContainer container = getValidatorContainer(i);
+            if (container != null)
+            {
+                returnValue = container.getMessage();
+            }
+        } catch (Exception e)
+        {
+            System.out.println("getValidatorMessage(" + i + ") failed: " + e);
+        // just return true
+        }
+        return returnValue;
+    }
+
+    public int validatorSize()
+    {
+        int size = 0;
+        if (validatorContainers != null)
+        {
+            size = validatorContainers.size();
+        }
+        return size;
+    }
+
+    public ValidatorContainer getValidatorContainer()
+    {
+        return getValidatorContainer(currentValidator);
+    }
+
+    public ValidatorContainer getValidatorContainer(int i)
+    {
+        ValidatorContainer container = null;
+        try
+        {
+            container = (ValidatorContainer) validatorContainers.get(i);
+        } catch (Exception e)
+        {
+            container = null;
+        }
+        return container;
+    }
+
+    public boolean hasParams()
+    {
+        return hasParams(currentValidator);
+    }
+
+    public boolean hasParams(int i)
+    {
+        boolean returnValue = false;
+        try
+        {
+            ValidatorContainer container = getValidatorContainer(i);
+            if (container != null)
+            {
+                returnValue = container.hasParams();
+            }
+        } catch (Exception e)
+        {
+            System.out.println("hasParams(" + i + ") failed: " + e);
+        // just return true
+        }
+        return returnValue;
+    }
+
+    public Map getValidatorParams()
+    {
+        return getValidatorParams(currentValidator);
+    }
+
+    public Map getValidatorParams(int i)
+    {
+        Map returnValue = null;
+        try
+        {
+            ValidatorContainer container = getValidatorContainer(i);
+            if (container != null)
+            {
+                returnValue = container.getValidatorParams();
+            }
+        } catch (Exception e)
+        {
+            System.out.println("getValidatorParams(" + i + ") failed: " + e);
+        // just return true
+        }
+        return returnValue;
+    }
+
+    // This method was added to support changes to ProcessingClient interface
+    // it's use is non-deterministic in the newly implemented text validators.
+    public String getText()
+    {
+        return getValidatorMessage(currentValidator);
     }
 
     /*--------------------------------------------------------------------------*/
@@ -170,8 +295,7 @@ public class PasswordGroup implements ProcessingClient
         if (processor != null)
         {
             return (processor.process(this));
-        }
-        else
+        } else
         {
             String contents = "";
 
@@ -183,5 +307,6 @@ public class PasswordGroup implements ProcessingClient
             return (contents);
         }
     }
+
 }
 /*---------------------------------------------------------------------------*/

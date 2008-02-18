@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2001 Johannes Lehtinen
  * 
@@ -19,30 +19,6 @@
  * limitations under the License.
  */
 
-/*
- *  $Id: PackFile.java 1816 2007-04-23 19:57:27Z jponge $
- *  IzPack
- *  Copyright (C) 2001 Johannes Lehtinen
- *
- *  File :               Pack.java
- *  Description :        Contains informations about a pack file.
- *  Author's email :     johannes.lehtinen@iki.fi
- *  Author's Website :   http://www.iki.fi/jle/
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 package com.izforge.izpack;
 
 import java.io.File;
@@ -99,9 +75,12 @@ public class PackFile implements Serializable
     /** Additional attributes or any else for customisation */
     private Map additionals = null;
 
-    public int previousPackNumber = -1;
+    public String previousPackId = null;
 
     public long offsetInPreviousPack = -1;
+    
+    /** condition for this packfile */
+    private String condition = null;
 
     /**
      * Constructs and initializes from a source file.
@@ -193,10 +172,10 @@ public class PackFile implements Serializable
         return null;
     }
 
-    public void setPreviousPackFileRef(int previousPackNumber, long offsetInPreviousPack)
+    public void setPreviousPackFileRef(String previousPackId, Long offsetInPreviousPack)
     {
-        this.previousPackNumber = previousPackNumber;
-        this.offsetInPreviousPack = offsetInPreviousPack;
+        this.previousPackId = previousPackId;
+        this.offsetInPreviousPack = offsetInPreviousPack.longValue();
     }
 
     /** The target operating system constraints of this file */
@@ -230,7 +209,7 @@ public class PackFile implements Serializable
 
     public final boolean isBackReference()
     {
-        return (previousPackNumber >= 0);
+        return (previousPackId != null);
     }
 
     /** The full path name of the target file, using '/' as fileseparator. */
@@ -256,4 +235,25 @@ public class PackFile implements Serializable
         return additionals;
     }
 
+    
+    /**
+     * @return the condition
+     */
+    public String getCondition()
+    {
+        return this.condition;
+    }
+
+    
+    /**
+     * @param condition the condition to set
+     */
+    public void setCondition(String condition)
+    {
+        this.condition = condition;
+    }
+
+    public boolean hasCondition() {
+        return this.condition != null;
+    }
 }

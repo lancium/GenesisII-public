@@ -1,7 +1,7 @@
 /* XMLParserFactory.java                                           NanoXML/Java
  *
- * $Revision: 1421 $
- * $Date: 2006-03-12 17:32:32 +0100 (Sun, 12 Mar 2006) $
+ * $Revision: 1961 $
+ * $Date: 2007-12-17 12:20:05 +0000 (Mon, 17 Dec 2007) $
  * $Name$
  *
  * This file is part of NanoXML 2 for Java.
@@ -32,7 +32,7 @@ package net.n3.nanoxml;
  * Creates an XML parser.
  * 
  * @author Marc De Scheemaecker
- * @version $Name$, $Revision: 1421 $
+ * @version $Name$, $Revision: 1961 $
  */
 public class XMLParserFactory
 {
@@ -65,7 +65,7 @@ public class XMLParserFactory
     {
         String className = System.getProperty(XMLParserFactory.CLASS_KEY,
                 XMLParserFactory.DEFAULT_CLASS);
-        return XMLParserFactory.createXMLParser(className, new StdXMLBuilder());
+        return XMLParserFactory.createXMLParser(className, XMLBuilderFactory.createXMLBuilder());
     }
 
     /**

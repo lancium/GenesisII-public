@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2004 Gaganis Giorgos
  * 
@@ -22,6 +22,7 @@
 package com.izforge.izpack.panels;
 
 import com.izforge.izpack.LocaleDatabase;
+import com.izforge.izpack.installer.Debugger;
 
 /**
  * This interface is used to be able to access the common information in the PackPanel and the
@@ -41,11 +42,13 @@ public interface PacksPanelInterface
 
     public LocaleDatabase getLangpack();
 
-    public int getBytes();
+    public long getBytes();
 
-    public void setBytes(int bytes);
+    public void setBytes(long bytes);
 
     public void showSpaceRequired();
 
     public void showFreeSpace();
+    
+    public Debugger getDebugger();
 }

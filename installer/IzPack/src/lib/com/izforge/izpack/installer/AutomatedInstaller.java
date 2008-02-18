@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2003 Jonathan Halliday
  * 
@@ -22,29 +22,28 @@
 package com.izforge.izpack.installer;
 
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
-import java.io.ByteArrayOutputStream;
-
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
 
 import net.n3.nanoxml.NonValidator;
-import net.n3.nanoxml.StdXMLBuilder;
 import net.n3.nanoxml.StdXMLParser;
 import net.n3.nanoxml.StdXMLReader;
 import net.n3.nanoxml.XMLElement;
+import net.n3.nanoxml.XMLBuilderFactory;
 
 import com.izforge.izpack.CustomData;
 import com.izforge.izpack.ExecutableFile;
@@ -123,7 +122,7 @@ public class AutomatedInstaller extends InstallerBase
         {
             // We get the data
             UninstallData udata = UninstallData.getInstance();
-            List files = udata.getFilesList();
+            List files = udata.getUninstalableFilesList();
             ZipOutputStream outJar = this.idata.uninstallOutJar;
 
             if (outJar == null) 
@@ -166,7 +165,7 @@ public class AutomatedInstaller extends InstallerBase
             }
             execStream.flush();
             outJar.closeEntry();
-	    
+
             // ***  ADDED code bellow 
 	    // Write out additional uninstall data
             // Do not "kill" the installation if there is a problem
@@ -412,7 +411,6 @@ public class AutomatedInstaller extends InstallerBase
                                 + panelClassName );
                         e.printStackTrace();
                         this.result = false;
-                        continue;
                     }
     
                 }
@@ -456,7 +454,7 @@ public class AutomatedInstaller extends InstallerBase
 
         // Initialises the parser
         StdXMLParser parser = new StdXMLParser();
-        parser.setBuilder(new StdXMLBuilder());
+        parser.setBuilder(XMLBuilderFactory.createXMLBuilder());
         parser.setReader(new StdXMLReader(in));
         parser.setValidator(new NonValidator());
 

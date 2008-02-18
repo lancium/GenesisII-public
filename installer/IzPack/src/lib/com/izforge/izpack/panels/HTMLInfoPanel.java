@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,7 @@ public class HTMLInfoPanel extends IzPanel implements HyperlinkListener
         try
         {
             textArea = new JEditorPane();
+            textArea.setContentType("text/html; charset=utf-8");
             textArea.setEditable(false);
             textArea.addHyperlinkListener(this);
             JScrollPane scroller = new JScrollPane(textArea);
@@ -113,8 +114,43 @@ public class HTMLInfoPanel extends IzPanel implements HyperlinkListener
     {
         try
         {
-            if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED)
-                textArea.setPage(e.getURL());
+             if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED)
+             {
+                String urls = e.getURL().toExternalForm();
+                // if the link points to a chapter in the same page
+                // don't open a browser
+                if(urls.contains("HTMLInfoPanel.info#"))
+                   textArea.setPage(e.getURL());
+                else
+                {
+                   if(com.izforge.izpack.util.OsVersion.IS_OSX)
+                   {
+                       Runtime.getRuntime().exec("open " + urls);
+                   } else if(com.izforge.izpack.util.OsVersion.IS_UNIX)
+                   {
+                      String[] launchers = {"htmlview QqzURL", "xdg-open QqzURL", "gnome-open QqzURL", "kfmclient openURL QqzURL", "call-browser QqzURL", "firefox QqzURL", "opera QqzURL", "konqueror QqzURL", "epiphany QqzURL", "mozilla QqzURL", "netscape QqzURL"};
+                      //String launchers = "/bin/sh -c \"htmlview QqzURL || xdg-open QqzURL || gnome-open QqzURL || kfmclient openURL QqzURL || call-browser QqzURL || firefox QqzURL || opera QqzURL || konqueror QqzURL || epiphany QqzURL || mozilla QqzURL || netscape QqzURL\"";
+                      for(int q=0; q<launchers.length; q++)
+                      {
+                         
+                         try
+                         {
+                            Runtime.getRuntime().exec(launchers[q].replaceAll("QqzURL", urls));
+                            System.out.println("OK");
+                            break;
+                         }
+                         catch(Exception ignore)
+                         {
+                            System.out.println(launchers[q]+" NOT OK");
+                         }
+                      }
+                   }
+                   else // windows
+                   {
+                      Runtime.getRuntime().exec("cmd /C start " + urls);
+                   }
+                }
+            }
         }
         catch (Exception err)
         {

@@ -1,7 +1,7 @@
 /* StdXMLParser.java                                               NanoXML/Java
  *
- * $Revision: 1422 $
- * $Date: 2006-03-21 19:14:56 +0100 (Tue, 21 Mar 2006) $
+ * $Revision: 1729 $
+ * $Date: 2007-02-13 13:49:18 +0000 (Tue, 13 Feb 2007) $
  * $Name$
  *
  * This file is part of NanoXML 2 for Java.
@@ -36,7 +36,7 @@ import java.util.Properties;
  * StdXMLParser is the core parser of NanoXML.
  * 
  * @author Marc De Scheemaecker
- * @version $Name$, $Revision: 1422 $
+ * @version $Name$, $Revision: 1729 $
  */
 public class StdXMLParser implements IXMLParser
 {
@@ -352,6 +352,10 @@ public class StdXMLParser implements IXMLParser
         }
 
         XMLUtil.skipWhitespace(this.reader, '&', null, null);
+        
+        // read the root element name
+        XMLUtil.scanIdentifier(this.reader, '&', this.entityResolver);
+        
         String systemID = null;
         StringBuffer publicID = new StringBuffer();
         XMLUtil.skipWhitespace(this.reader, '&', null, null);

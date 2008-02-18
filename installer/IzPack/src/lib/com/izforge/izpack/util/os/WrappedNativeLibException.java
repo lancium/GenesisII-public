@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2005 Klaus Bartz
  * 
@@ -110,7 +110,7 @@ public class WrappedNativeLibException extends Exception
                     }
                     if (nle.getOsErr() != 0)
                     {
-                        String val = (String) langpack
+                        String val = langpack
                                 .get("NativeLibException.libInternal.OsErrNumPraefix")
                                 + Integer.toString(nle.getOsErr());
                         if (val == null) break;
@@ -120,7 +120,7 @@ public class WrappedNativeLibException extends Exception
                     }
                     if (nle.getOsMessage() != null)
                     {
-                        String val = (String) langpack
+                        String val = langpack
                                 .get("NativeLibException.libInternal.OsErrStringPraefix")
                                 + nle.getOsMessage();
                         if (val == null) break;

@@ -1,9 +1,9 @@
 /*
  * $Id: copyright-notice-template 1421 2006-03-12 16:32:32Z jponge $
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  *
  * Copyright 2006 Marc Eppelmann (marc.eppelmann&#064;gmx.de)
  *
@@ -208,7 +208,7 @@ public class ShortcutPanelAutomationHelper implements PanelAutomation
 
             data.TryExec = dataElement.getAttribute(ShortcutPanel.SPEC_TRYEXEC, "");
 
-            data.createForAll = new Boolean(dataElement.getAttribute(ShortcutPanel.CREATE_FOR_ALL,
+            data.createForAll = Boolean.valueOf(dataElement.getAttribute(ShortcutPanel.CREATE_FOR_ALL,
                     "false"));
             data.userType = Integer.valueOf(
                     dataElement.getAttribute(ShortcutPanel.USER_TYPE, Integer
@@ -316,7 +316,6 @@ public class ShortcutPanelAutomationHelper implements PanelAutomation
             }
             catch (Throwable exception)
             {
-                continue;
             }
         }
 
@@ -354,7 +353,7 @@ public class ShortcutPanelAutomationHelper implements PanelAutomation
 
         for (int i = 0; i < files.size(); i++)
         {
-            uninstallData.addFile((String) files.elementAt(i));
+            uninstallData.addFile((String) files.elementAt(i), true);
             System.out.print(".");
             System.out.flush();
         }

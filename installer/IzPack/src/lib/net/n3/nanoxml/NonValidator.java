@@ -1,7 +1,7 @@
 /* NonValidator.java                                               NanoXML/Java
  *
  * $Revision: 1422 $
- * $Date: 2006-03-21 19:14:56 +0100 (Tue, 21 Mar 2006) $
+ * $Date: 2006-03-21 18:14:56 +0000 (Tue, 21 Mar 2006) $
  * $Name$
  *
  * This file is part of NanoXML 2 for Java.

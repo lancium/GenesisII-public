@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  *
  * Copyright 2007 Dennis Reil
  *
@@ -20,10 +20,8 @@
  */
 package com.izforge.izpack.rules;
 
-import java.util.List;
-import java.util.Properties;
-
 import net.n3.nanoxml.XMLElement;
+
 import com.izforge.izpack.util.Debug;
 
 /**
@@ -32,10 +30,11 @@ import com.izforge.izpack.util.Debug;
  */
 public class OrCondition extends Condition
 {
-
-    public static final String RDE_VCS_REVISION = "$Revision: 1.1 $";
-
-    public static final String RDE_VCS_NAME = "$Name:  $";
+   
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 8341350377205144199L;
 
     protected Condition leftoperand;
 
@@ -99,5 +98,20 @@ public class OrCondition extends Condition
     public boolean isTrue()
     {
         return this.leftoperand.isTrue() || this.rightoperand.isTrue();
+    }
+
+    /* (non-Javadoc)
+     * @see com.izforge.izpack.rules.Condition#getDependenciesDetails()
+     */
+    public String getDependenciesDetails()
+    {
+        StringBuffer details = new StringBuffer();
+        details.append(this.id);
+        details.append(" depends on:<ul><li>");        
+        details.append(leftoperand.getDependenciesDetails());
+        details.append("</li> OR <li>");
+        details.append(rightoperand.getDependenciesDetails());
+        details.append("</li></ul>");
+        return details.toString();
     }
 }

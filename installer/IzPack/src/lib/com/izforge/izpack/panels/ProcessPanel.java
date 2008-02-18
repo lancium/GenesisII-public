@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2004 Tino Schwarze
  * 
@@ -74,9 +74,9 @@ public class ProcessPanel extends IzPanel implements AbstractUIProcessHandler
     private ProcessPanelWorker worker;
 
     /** Number of jobs to process. Used for progress indication. */
-    private int noOfJobs;
+    private int noOfJobs = 0;
 
-    private int currentJob;
+    private int currentJob = 0;
 
     /** Where the output is displayed */
     private JTextArea outputPane;
@@ -100,7 +100,10 @@ public class ProcessPanel extends IzPanel implements AbstractUIProcessHandler
         heading.setHorizontalAlignment(SwingConstants.CENTER);
         heading.setText(parent.langpack.getString("ProcessPanel.heading"));
         heading.setVerticalAlignment(SwingConstants.TOP);
-        setLayout(new BorderLayout());
+        BorderLayout layout = new BorderLayout();
+        layout.setHgap(2);
+        layout.setVgap(2);
+        setLayout(layout);
         add(heading, BorderLayout.NORTH);
 
         // put everything but the heading into it's own panel
@@ -142,23 +145,23 @@ public class ProcessPanel extends IzPanel implements AbstractUIProcessHandler
     public void startProcessing(int no_of_jobs)
     {
         this.noOfJobs = no_of_jobs;
-        overallProgressBar.setMaximum(noOfJobs);
+        overallProgressBar.setMaximum(no_of_jobs);
+        overallProgressBar.setIndeterminate(true);
         parent.lockPrevButton();
     }
 
     /** The compiler stops. */
     public void finishProcessing()
     {
-        overallProgressBar.setValue(this.noOfJobs);
+        overallProgressBar.setIndeterminate(false);
         String no_of_jobs = Integer.toString(this.noOfJobs);
         overallProgressBar.setString(no_of_jobs + " / " + no_of_jobs);
-        overallProgressBar.setEnabled(false);
 
         processLabel.setText(" ");
         processLabel.setEnabled(false);
 
         validated = true;
-        idata.installSuccess = true;
+        idata.installSuccess = worker.getResult();
         if (idata.panels.indexOf(this) != (idata.panels.size() - 1)) parent.unlockNextButton();
     }
 
@@ -190,7 +193,7 @@ public class ProcessPanel extends IzPanel implements AbstractUIProcessHandler
     public void startProcess(String jobName)
     {
         processLabel.setText(jobName);
-
+        
         this.currentJob++;
         overallProgressBar.setValue(this.currentJob);
         overallProgressBar.setString(Integer.toString(this.currentJob) + " / "
@@ -199,6 +202,7 @@ public class ProcessPanel extends IzPanel implements AbstractUIProcessHandler
 
     public void finishProcess()
     {
+
     }
 
     /** Called when the panel becomes active. */

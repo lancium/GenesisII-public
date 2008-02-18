@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  *
  * Copyright 2006 Vladimir Ralev
  *
@@ -88,7 +88,7 @@ public class UninstallerConsole
        private boolean askOKCancel(String question, int defaultchoice)
        {
           if(defaultchoice == AUTO_ANSWER_MODE) return true;
-          boolean defaultanswer = defaultchoice == 1 ? true : false;
+          boolean defaultanswer = defaultchoice == 1;
           try
           {
              System.out.print(question + " (Ok/Cancel) [" + (defaultanswer?"O":"C") + "]:");
@@ -104,7 +104,7 @@ public class UninstallerConsole
        private int askYesNoCancel(String question, int defaultchoice)
        {
           if(defaultchoice == AUTO_ANSWER_MODE) return AbstractUIHandler.ANSWER_YES;
-          boolean defaultanswer = defaultchoice == 1 ? true : false;
+          boolean defaultanswer = defaultchoice == 1;
           try
           {
              System.out.print(question + " (Yes/No/Cancel) [" + (defaultanswer?"Y":"N") + "]:");
@@ -121,7 +121,7 @@ public class UninstallerConsole
        private int askYesNo(String question, int defaultchoice)
        {
           if(defaultchoice == AUTO_ANSWER_MODE) return AbstractUIHandler.ANSWER_YES;
-          boolean defaultanswer = defaultchoice == 1 ? true : false;
+          boolean defaultanswer = defaultchoice == 1;
           try
           {
              System.out.print(question + " (Yes/No) [" + (defaultanswer?"Y":"N") + "]:");
@@ -182,8 +182,14 @@ public class UninstallerConsole
 
        public void nextStep(String step_name, int step_no, int no_of_substeps)
        {
+           // not used
        }
 
+       public void setSubStepNo(int no_of_substeps)
+       {
+           // not used
+       }
+       
        /**
         * Output a notification.
         *

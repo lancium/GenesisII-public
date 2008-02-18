@@ -1,7 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
- * http://izpack.org/ http://developer.berlios.de/projects/izpack/
+ * http://izpack.org/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2002 Elmar Grom
  * 
@@ -34,6 +35,7 @@ import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -47,18 +49,21 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
 import net.n3.nanoxml.NonValidator;
-import net.n3.nanoxml.StdXMLBuilder;
 import net.n3.nanoxml.StdXMLParser;
 import net.n3.nanoxml.StdXMLReader;
 import net.n3.nanoxml.XMLElement;
+import net.n3.nanoxml.XMLBuilderFactory;
 
 import com.izforge.izpack.LocaleDatabase;
 import com.izforge.izpack.Pack;
+import com.izforge.izpack.Panel;
 import com.izforge.izpack.gui.ButtonFactory;
+import com.izforge.izpack.gui.LabelFactory;
 import com.izforge.izpack.gui.TwoColumnConstraints;
 import com.izforge.izpack.gui.TwoColumnLayout;
 import com.izforge.izpack.installer.InstallData;
@@ -66,10 +71,13 @@ import com.izforge.izpack.installer.InstallerFrame;
 import com.izforge.izpack.installer.IzPanel;
 import com.izforge.izpack.installer.ResourceManager;
 import com.izforge.izpack.rules.RulesEngine;
+import com.izforge.izpack.util.Debug;
 import com.izforge.izpack.util.MultiLineLabel;
 import com.izforge.izpack.util.OsConstraint;
 import com.izforge.izpack.util.OsVersion;
 import com.izforge.izpack.util.VariableSubstitutor;
+import java.util.ArrayList;
+import java.util.List;
 
 /*---------------------------------------------------------------------------*/
 /**
@@ -113,7 +121,7 @@ import com.izforge.izpack.util.VariableSubstitutor;
  * To Do: ------ * make sure all header documentation is complete and correct
  * --------------------------------------------------------------------------
  */
-public class UserInputPanel extends IzPanel
+public class UserInputPanel extends IzPanel implements ActionListener
 {
 
     // ------------------------------------------------------------------------
@@ -160,6 +168,8 @@ public class UserInputPanel extends IzPanel
 
     private static final int POS_GROUP = 10;
 
+    protected static final String ICON_KEY = "icon";
+    
     /** The name of the XML file that specifies the panel layout */
     private static final String SPEC_FILE_NAME = "userInputSpec.xml";
 
@@ -171,6 +181,7 @@ public class UserInputPanel extends IzPanel
     private static final String FIELD_NODE_ID = "field";
 
     private static final String INSTANCE_IDENTIFIER = "order";
+    protected static final String PANEL_IDENTIFIER = "id";
 
     private static final String TYPE = "type";
 
@@ -185,6 +196,10 @@ public class UserInputPanel extends IzPanel
     private static final String SPEC = "spec";
 
     private static final String SET = "set";
+    
+    private static final String REVALIDATE = "revalidate";
+    
+    private static final String TOPBUFFER = "topBuffer";
 
     private static final String TRUE = "true";
 
@@ -269,6 +284,10 @@ public class UserInputPanel extends IzPanel
     private static final String PWD_SIZE = "size";
 
     private static final String SEARCH_FIELD = "search";
+    
+    private static final String FILE_FIELD = "file";
+    
+    private static final String DIR_FIELD = "dir";
 
     // internal value for the button used to trigger autodetection
     private static final String SEARCH_BUTTON_FIELD = "autodetect";
@@ -296,7 +315,7 @@ public class UserInputPanel extends IzPanel
     private static final String UNSELECTEDPACKS = "createForUnselectedPack"; // new
 
     protected static final String ATTRIBUTE_CONDITIONID_NAME = "conditionid";
-    
+
     protected static final String VARIABLE_NODE = "variable";
 
     protected static final String ATTRIBUTE_VARIABLE_NAME = "name";
@@ -310,6 +329,8 @@ public class UserInputPanel extends IzPanel
     private static final String OS = "os";
 
     private static final String FAMILY = "family";
+
+    private static final String FIELD_BUTTON = "button";
 
     // ------------------------------------------------------------------------
     // Variable Declarations
@@ -355,6 +376,10 @@ public class UserInputPanel extends IzPanel
     private Vector entries = new Vector();
 
     private LocaleDatabase langpack = null;
+    
+    // Used for dynamic controls to skip content validation unless the user
+    // really clicks "Next"
+    private boolean validating = true;
 
     /*--------------------------------------------------------------------------*/
     // This method can be used to search for layout problems. If this class is
@@ -384,13 +409,10 @@ public class UserInputPanel extends IzPanel
 
     protected void init()
     {
+        
+        TwoColumnLayout layout;
         super.removeAll();
         uiElements.clear();
-
-        // ----------------------------------------------------
-        // ----------------------------------------------------
-        TwoColumnLayout layout = new TwoColumnLayout(10, 5, 30, 25, TwoColumnLayout.LEFT);
-        setLayout(layout);
 
         // ----------------------------------------------------
         // get a locale database
@@ -419,6 +441,24 @@ public class UserInputPanel extends IzPanel
             exception.printStackTrace();
         }
 
+        // ----------------------------------------------------
+        // Set the topBuffer from the attribute. topBuffer=0 is useful
+        // if you don't want your panel to be moved up and down during
+        // dynamic validation (showing and hiding components within the
+        // same panel)
+        // ----------------------------------------------------
+        int topbuff = 25;
+        try
+        {
+           topbuff = Integer.parseInt(spec.getAttribute(TOPBUFFER));
+        }
+        catch(Exception ex){}
+        finally
+        {
+            layout = new TwoColumnLayout(10, 5, 30, topbuff, TwoColumnLayout.LEFT);
+        }
+        setLayout(layout);
+        
         if (!haveSpec)
         {
             // return if we could not read the spec. further
@@ -429,7 +469,7 @@ public class UserInputPanel extends IzPanel
 
         // refresh variables specified in spec
         updateVariables();
-        
+
         // ----------------------------------------------------
         // process all field nodes. Each field node is analyzed
         // for its type, then an appropriate memeber function
@@ -495,9 +535,216 @@ public class UserInputPanel extends IzPanel
                 else if (attribute.equals(SEARCH_FIELD))
                 {
                     addSearch(field);
+                }                
+                else if (attribute.equals(FILE_FIELD))
+                {
+                    addFileField(field);
+                }
+                else if (attribute.equals(DIR_FIELD))
+                {
+                    addDirectoryField(field);
                 }
             }
         }
+    }
+
+    private void addDirectoryField(XMLElement field)
+    {
+        Vector forPacks = field.getChildrenNamed(SELECTEDPACKS);
+        Vector forOs = field.getChildrenNamed(OS);
+        
+        JLabel label;
+        String set;
+        int size;
+
+        String filter = null;
+        String filterdesc = null;
+        
+        String variable = field.getAttribute(VARIABLE);
+        if ((variable == null) || (variable.length() == 0)) { return; }                      
+                
+        XMLElement element = field.getFirstChildNamed(SPEC);
+        if (element == null){            
+            Debug.trace("Error: no spec element defined in file field");
+            return;
+        }
+        else {
+            label = new JLabel(getText(element));
+            // ----------------------------------------------------
+            // extract the specification details
+            // ----------------------------------------------------
+            set = element.getAttribute(SET);
+            if (set == null)
+            {
+                set = idata.getVariable(variable);
+                if (set == null)
+                {
+                    set = "";
+                }
+            }
+            else
+            {
+                if (set != null && !"".equals(set))
+                {
+                    VariableSubstitutor vs = new VariableSubstitutor(idata.getVariables());
+                    set = vs.substitute(set, null);
+                }
+            }
+    
+            try
+            {
+                size = Integer.parseInt(element.getAttribute(TEXT_SIZE));
+            }
+            catch (Throwable exception)
+            {
+                size = 1;
+            }
+            
+            filter = element.getAttribute("fileext");
+            if (filter == null){
+                filter = "";
+            }
+            filterdesc = element.getAttribute("fileextdesc");
+            if (filterdesc == null){
+                filterdesc = "";
+            }
+            // internationalize it
+            filterdesc = idata.langpack.getString(filterdesc);             
+        }             
+       
+        final JTextField filetxt = new JTextField(set,size);
+        filetxt.setCaretPosition(0);
+        
+        TwoColumnConstraints constraints = new TwoColumnConstraints();
+        constraints.position = TwoColumnConstraints.WEST;
+
+        uiElements.add(new Object[] { null, FIELD_LABEL, null, constraints, label, forPacks, forOs});
+
+        TwoColumnConstraints constraints2 = new TwoColumnConstraints();
+        constraints2.position = TwoColumnConstraints.EAST;
+                
+        // TODO: use separate key for button text
+        JButton button = ButtonFactory.createButton(idata.langpack.getString("UserInputPanel.search.browse"),idata.buttonsHColor);
+        button.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {               
+               System.out.println("Show dirchooser"); 
+               JFileChooser filechooser = new JFileChooser();
+               filechooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                              
+               if (filechooser.showOpenDialog(parentFrame) == JFileChooser.APPROVE_OPTION){
+                   filetxt.setText(filechooser.getSelectedFile().getAbsolutePath());
+               }
+            }
+        });
+        JPanel panel = new JPanel();
+        panel.add(filetxt);
+        panel.add(button);        
+        uiElements.add(new Object[] { null, DIR_FIELD, variable, constraints2, panel, forPacks,
+                forOs});
+        
+    }
+
+    private void addFileField(XMLElement field)
+    {
+        Vector forPacks = field.getChildrenNamed(SELECTEDPACKS);
+        Vector forOs = field.getChildrenNamed(OS);
+        
+        JLabel label;
+        String set;
+        int size;
+
+        String filter = null;
+        String filterdesc = null;
+        
+        String variable = field.getAttribute(VARIABLE);
+        if ((variable == null) || (variable.length() == 0)) { return; }                      
+                
+        XMLElement element = field.getFirstChildNamed(SPEC);
+        if (element == null){            
+            Debug.trace("Error: no spec element defined in file field");
+            return;
+        }
+        else {
+            label = new JLabel(getText(element));
+            // ----------------------------------------------------
+            // extract the specification details
+            // ----------------------------------------------------
+            set = element.getAttribute(SET);
+            if (set == null)
+            {
+                set = idata.getVariable(variable);
+                if (set == null)
+                {
+                    set = "";
+                }
+            }
+            else
+            {
+                if (set != null && !"".equals(set))
+                {
+                    VariableSubstitutor vs = new VariableSubstitutor(idata.getVariables());
+                    set = vs.substitute(set, null);
+                }
+            }
+    
+            try
+            {
+                size = Integer.parseInt(element.getAttribute(TEXT_SIZE));
+            }
+            catch (Throwable exception)
+            {
+                size = 1;
+            }
+            
+            filter = element.getAttribute("fileext");
+            if (filter == null){
+                filter = "";
+            }
+            filterdesc = element.getAttribute("fileextdesc");
+            if (filterdesc == null){
+                filterdesc = "";
+            }
+            // internationalize it
+            filterdesc = idata.langpack.getString(filterdesc);             
+        }             
+       
+        final JTextField filetxt = new JTextField(set,size);
+        filetxt.setCaretPosition(0);
+        
+        TwoColumnConstraints constraints = new TwoColumnConstraints();
+        constraints.position = TwoColumnConstraints.WEST;
+
+        uiElements.add(new Object[] { null, FIELD_LABEL, null, constraints, label, forPacks, forOs});
+
+        TwoColumnConstraints constraints2 = new TwoColumnConstraints();
+        constraints2.position = TwoColumnConstraints.EAST;
+        
+        
+        final UserInputFileFilter uiff = new UserInputFileFilter();
+        uiff.setFileExt(filter);
+        uiff.setFileExtDesc(filterdesc);
+        
+        // TODO: use separate key for button text
+        JButton button = ButtonFactory.createButton(idata.langpack.getString("UserInputPanel.search.browse"),idata.buttonsHColor);
+        button.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e)
+            {               
+               System.out.println("Show filechooser"); 
+               JFileChooser filechooser = new JFileChooser();
+               filechooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+               filechooser.setFileFilter(uiff);
+                              
+               if (filechooser.showOpenDialog(parentFrame) == JFileChooser.APPROVE_OPTION){
+                   filetxt.setText(filechooser.getSelectedFile().getAbsolutePath());
+               }
+            }
+        });
+        JPanel panel = new JPanel();
+        panel.add(filetxt);
+        panel.add(button);        
+        uiElements.add(new Object[] { null, FILE_FIELD, variable, constraints2, panel, forPacks,
+                forOs});
     }
 
     protected void updateUIElements()
@@ -513,7 +760,7 @@ public class UserInputPanel extends IzPanel
                 continue;
             }
             String value = idata.getVariable((String) element[POS_VARIABLE]);
-            
+
             if (RADIO_FIELD.equals(element[POS_TYPE]))
             {
                 // we have a radio field, which should be updated
@@ -535,9 +782,8 @@ public class UserInputPanel extends IzPanel
             else if (TEXT_FIELD.equals(element[POS_TYPE]))
             {
                 // update TextField
-                JTextField textf = (JTextField) element[POS_FIELD];
+                TextInputField textf = (TextInputField) element[POS_FIELD];
 
-                // System.out.println("Textfield: " + value);
                 if (value == null)
                 {
                     value = textf.getText();
@@ -561,7 +807,10 @@ public class UserInputPanel extends IzPanel
                 if (value == null)
                 {
                     value = rulef.getText();
-                }               
+                }
+            }
+            else if (FIELD_BUTTON.equals(element[POS_TYPE])){
+                // nothing to do
             }
             // overwrite entry;
             uiElements.set(i, element);
@@ -585,8 +834,8 @@ public class UserInputPanel extends IzPanel
      */
     /*--------------------------------------------------------------------------*/
     public boolean isValidated()
-    {
-        return (readInput());
+    {                               
+        return readInput();
     }
 
     /*--------------------------------------------------------------------------*/
@@ -596,8 +845,8 @@ public class UserInputPanel extends IzPanel
     /*--------------------------------------------------------------------------*/
     public void panelActivate()
     {
-        this.init();        
-                
+        this.init();
+
         if (spec == null)
         {
             // TODO: translate
@@ -605,7 +854,7 @@ public class UserInputPanel extends IzPanel
                     "The specification for the user input panel could not be found. Please contact the packager.");
             parentFrame.skipPanel();
         }
-        //  update UI with current values of associated variables
+        // update UI with current values of associated variables
         updateUIElements();
         Vector forPacks = spec.getChildrenNamed(SELECTEDPACKS);
         Vector forUnselectedPacks = spec.getChildrenNamed(UNSELECTEDPACKS);
@@ -629,11 +878,13 @@ public class UserInputPanel extends IzPanel
 
         buildUI();
         //need a validation, else ui is scrambled
+
+        this.setSize(this.getMaximumSize().width, this.getMaximumSize().height);
         validate();
         if (packsDefined)
         {
             parentFrame.lockPrevButton();
-        }        
+        }
     }
 
     /*--------------------------------------------------------------------------*/
@@ -785,10 +1036,89 @@ public class UserInputPanel extends IzPanel
                     success = readSearch(field);
                     if (!success) { return (false); }
                 }
+                else if (fieldType.equals(FILE_FIELD))
+                {
+                    success = readFileField(field);
+                    if (!success) { return (false); }
+                }
+                else if (fieldType.equals(DIR_FIELD))
+                {
+                    success = readDirectoryField(field);
+                    if (!success) { return (false); }
+                }
             }
         }
 
         return (true);
+    }
+
+    private boolean readDirectoryField(Object[] field)
+    {        
+        try {
+            JPanel panel = (JPanel) field[POS_FIELD];
+            JTextField textf = (JTextField) panel.getComponent(0);
+            String file = textf.getText();
+            if  (file != null){                
+                File ffile = new File(file);
+                if (ffile.isDirectory()){
+                    idata.setVariable((String) field[POS_VARIABLE],file);
+                    entries.add(new TextValuePair((String) field[POS_VARIABLE],file));
+                    return true;
+                }
+                else {
+                    showMessage("dir.notdirectory");
+                    return false;
+                }                
+            }
+            else {
+                showMessage("dir.nodirectory");
+                return false;
+            }               
+        }
+        catch (Exception e){
+            if (Debug.stackTracing()){
+                Debug.trace(e);
+            }
+            return false;
+        }
+    }
+
+    private void showMessage(String messageType)
+    {
+        JOptionPane.showMessageDialog(parent, parent.langpack.getString("UserInputPanel." + messageType + ".message"),
+                parent.langpack.getString("UserInputPanel." + messageType + ".caption"),
+                JOptionPane.WARNING_MESSAGE);
+    }
+
+    private boolean readFileField(Object[] field)
+    {
+        try {
+            JPanel panel = (JPanel) field[POS_FIELD];
+            JTextField textf = (JTextField) panel.getComponent(0);
+            String file = textf.getText();
+            if  (file != null){                
+                File ffile = new File(file);
+                if (ffile.isFile()){
+                    idata.setVariable((String) field[POS_VARIABLE],file);
+                    entries.add(new TextValuePair((String) field[POS_VARIABLE],file));
+                    return true;
+                }
+                else {
+                    showMessage("file.notfile");
+                    return false;
+                }                
+            }
+            else {
+                showMessage("file.nofile");
+                return false;
+            }               
+        }
+        catch (Exception e){
+            if (Debug.stackTracing()){
+                Debug.trace(e);
+            }
+            return false;
+        }
     }
 
     /*--------------------------------------------------------------------------*/
@@ -804,8 +1134,14 @@ public class UserInputPanel extends IzPanel
         XMLElement data;
         Vector specElements;
         String attribute;
+        String panelattribute;
         String instance = Integer.toString(instanceNumber);
-
+        
+        String panelid=null;
+        Panel p = this.getMetadata();
+        if (p != null){
+         panelid = p.getPanelid();
+        }
         try
         {
             input = parentFrame.getResource(SPEC_FILE_NAME);
@@ -823,7 +1159,7 @@ public class UserInputPanel extends IzPanel
 
         // initialize the parser
         StdXMLParser parser = new StdXMLParser();
-        parser.setBuilder(new StdXMLBuilder());
+        parser.setBuilder(XMLBuilderFactory.createXMLBuilder());
         parser.setValidator(new NonValidator());
         parser.setReader(new StdXMLReader(input));
 
@@ -838,8 +1174,11 @@ public class UserInputPanel extends IzPanel
             {
                 data = (XMLElement) specElements.elementAt(i);
                 attribute = data.getAttribute(INSTANCE_IDENTIFIER);
-
-                if (instance.equals(attribute))
+                panelattribute = data.getAttribute(PANEL_IDENTIFIER);
+                
+                if (((attribute != null) && instance.equals(attribute))
+                     ||
+                     ((panelattribute != null) && (panelid!=null) && (panelid.equals(panelattribute))))
                 {
                     // use the current element as spec
                     spec = data;
@@ -873,34 +1212,61 @@ public class UserInputPanel extends IzPanel
         boolean bold = getBoolean(spec, BOLD, false);
         float multiplier = getFloat(spec, SIZE, 2.0f);
         int justify = getAlignment(spec);
+        
+        String icon = getIconName(spec);
 
         if (title != null)
         {
-            JLabel label = new JLabel(title);
-            Font font = label.getFont();
-            float size = font.getSize();
-            int style = 0;
+          JLabel label = null;
+          ImageIcon imgicon = null;
+          try {
+            imgicon = parent.icons.getImageIcon(icon);
+            label = LabelFactory.create(title, imgicon , JLabel.TRAILING , true);
+          }
+          catch (Exception e){
+            Debug.trace("Icon " + icon + " not found in icon list. " + e.getMessage());
+            label = LabelFactory.create(title);
+          }       
+          Font font = label.getFont();
+          float size = font.getSize();
+          int style = 0;      
+          
+          if (bold) {
+            style += Font.BOLD;
+          }
+          if (italic) {
+            style += Font.ITALIC;
+          }
 
-            if (bold)
-            {
-                style += Font.BOLD;
-            }
-            if (italic)
-            {
-                style += Font.ITALIC;
-            }
+          font = font.deriveFont(style, (size * multiplier));
+          label.setFont(font);
+          label.setAlignmentX(0);
 
-            font = font.deriveFont(style, (size * multiplier));
-            label.setFont(font);
-            label.setAlignmentX(0);
+          TwoColumnConstraints constraints = new TwoColumnConstraints();
+          constraints.align = justify;
+          constraints.position = TwoColumnConstraints.NORTH;
 
-            TwoColumnConstraints constraints = new TwoColumnConstraints();
-            constraints.align = justify;
-            constraints.position = TwoColumnConstraints.NORTH;
-
-            add(label, constraints);
+          add(label, constraints);          
         }
     }
+
+    protected String getIconName(XMLElement element) {
+      if (element == null) {
+        return (null);
+      }
+
+      String key = element.getAttribute(ICON_KEY);
+      String text = null;
+      if ((key != null) && (langpack != null)) {
+        try {
+          text = langpack.getString(key);
+        } catch (Throwable exception) {
+          text = null;
+        }
+      }
+
+      return (text);
+    }        
 
     /*--------------------------------------------------------------------------*/
     /**
@@ -1067,11 +1433,13 @@ public class UserInputPanel extends IzPanel
     {
         RuleInputField ruleField = null;
         String variable = null;
+	String message = null;
 
         try
         {
             ruleField = (RuleInputField) field[POS_FIELD];
             variable = (String) field[POS_VARIABLE];
+            message = (String) field[POS_MESSAGE]; 
         }
         catch (Throwable exception)
         {
@@ -1079,24 +1447,11 @@ public class UserInputPanel extends IzPanel
         }
         if ((variable == null) || (ruleField == null)) { return (true); }
 
-        boolean success = ruleField.validateContents();
+
+        boolean success = !validating || ruleField.validateContents();
         if (!success)
         {
-            String message = "";
-            try
-            {
-                message = langpack.getString((String) field[POS_MESSAGE]);
-                if ("".equals(message))
-                {
-                    message = (String) field[POS_MESSAGE];
-                }
-            }
-            catch (Throwable t)
-            {
-                message = (String) field[POS_MESSAGE];
-            }
-            JOptionPane.showMessageDialog(parentFrame, message, parentFrame.langpack
-                    .getString("UserInputPanel.error.caption"), JOptionPane.WARNING_MESSAGE);
+            showWarningMessageDialog(parentFrame, message);
             return (false);
         }
 
@@ -1120,6 +1475,13 @@ public class UserInputPanel extends IzPanel
         JLabel label;
         String set;
         int size;
+        HashMap validateParamMap = null;
+        Vector validateParams = null;
+        String validator = null;
+        String message = null;
+        boolean hasParams = false;
+        TextInputField inputField;
+
 
         String variable = spec.getAttribute(VARIABLE);
         if ((variable == null) || (variable.length() == 0)) { return; }
@@ -1167,6 +1529,37 @@ public class UserInputPanel extends IzPanel
         }
 
         // ----------------------------------------------------
+        // get the validator if was defined
+        // ----------------------------------------------------
+        element = spec.getFirstChildNamed(VALIDATOR);
+        if (element != null)
+        {
+            validator = element.getAttribute(CLASS);
+            message = getText(element);
+            // ----------------------------------------------------------
+            // check and see if we have any parameters for this validator.
+            // If so, then add them to validateParamMap.
+            // ----------------------------------------------------------
+            validateParams = element.getChildrenNamed(RULE_PARAM);
+            if (validateParams != null && validateParams.size() > 0)
+            {
+                hasParams = true;
+
+                if (validateParamMap == null) validateParamMap = new HashMap();
+
+                for (Iterator it = validateParams.iterator(); it.hasNext();)
+                {
+                    element = (XMLElement) it.next();
+                    String paramName = element.getAttribute(RULE_PARAM_NAME);
+                    String paramValue = element.getAttribute(RULE_PARAM_VALUE);
+                    validateParamMap.put(paramName, paramValue);
+                }
+
+            }
+
+        }
+
+        // ----------------------------------------------------
         // get the description and add it to the list UI
         // elements if it exists.
         // ----------------------------------------------------
@@ -1176,8 +1569,14 @@ public class UserInputPanel extends IzPanel
         // ----------------------------------------------------
         // construct the UI element and add it to the list
         // ----------------------------------------------------
-        JTextField field = new JTextField(set, size);
-        field.setCaretPosition(0);
+        if (hasParams)
+        {
+            inputField = new TextInputField(set, size, validator, validateParamMap);
+        } else 
+        {
+            inputField = new TextInputField(set, size, validator);
+        }
+
 
         TwoColumnConstraints constraints = new TwoColumnConstraints();
         constraints.position = TwoColumnConstraints.WEST;
@@ -1188,8 +1587,8 @@ public class UserInputPanel extends IzPanel
         TwoColumnConstraints constraints2 = new TwoColumnConstraints();
         constraints2.position = TwoColumnConstraints.EAST;
 
-        uiElements.add(new Object[] { null, TEXT_FIELD, variable, constraints2, field, forPacks,
-                forOs});
+        uiElements.add(new Object[] { null, TEXT_FIELD, variable, constraints2, inputField, forPacks,
+                forOs, null, null, message});
     }
 
     /*--------------------------------------------------------------------------*/
@@ -1205,14 +1604,16 @@ public class UserInputPanel extends IzPanel
     /*--------------------------------------------------------------------------*/
     private boolean readTextField(Object[] field)
     {
-        JTextField textField = null;
+        TextInputField textField = null;
         String variable = null;
         String value = null;
+	String message = null;
 
         try
         {
-            textField = (JTextField) field[POS_FIELD];
+            textField = (TextInputField) field[POS_FIELD];
             variable = (String) field[POS_VARIABLE];
+            message = (String) field[POS_MESSAGE]; 
             value = textField.getText();
         }
         catch (Throwable exception)
@@ -1220,6 +1621,14 @@ public class UserInputPanel extends IzPanel
             return (true);
         }
         if ((variable == null) || (value == null)) { return (true); }
+
+        // validate the input
+        boolean success = textField.validateContents();
+        if (!success)
+        {
+            showWarningMessageDialog(parentFrame, message);
+            return (false);
+        }
 
         idata.setVariable(variable, value);
         entries.add(new TextValuePair(variable, value));
@@ -1232,21 +1641,21 @@ public class UserInputPanel extends IzPanel
      * This is a complete example of a valid XML specification
      * 
      * <pre>
-     *  
      *   
      *    
-     *     &lt;field type=&quot;combo&quot; variable=&quot;testVariable&quot;&gt;
-     *       &lt;description text=&quot;Description for the combo box&quot; id=&quot;a key for translated text&quot;/&gt;
-     *       &lt;spec text=&quot;label&quot; id=&quot;key for the label&quot;/&gt;
-     *         &lt;choice text=&quot;choice 1&quot; id=&quot;&quot; value=&quot;combo box 1&quot;/&gt;
-     *         &lt;choice text=&quot;choice 2&quot; id=&quot;&quot; value=&quot;combo box 2&quot; set=&quot;true&quot;/&gt;
-     *         &lt;choice text=&quot;choice 3&quot; id=&quot;&quot; value=&quot;combo box 3&quot;/&gt;
-     *         &lt;choice text=&quot;choice 4&quot; id=&quot;&quot; value=&quot;combo box 4&quot;/&gt;
-     *       &lt;/spec&gt;
-     *     &lt;/field&gt;
+     *     
+     *      &lt;field type=&quot;combo&quot; variable=&quot;testVariable&quot;&gt;
+     *        &lt;description text=&quot;Description for the combo box&quot; id=&quot;a key for translated text&quot;/&gt;
+     *        &lt;spec text=&quot;label&quot; id=&quot;key for the label&quot;/&gt;
+     *          &lt;choice text=&quot;choice 1&quot; id=&quot;&quot; value=&quot;combo box 1&quot;/&gt;
+     *          &lt;choice text=&quot;choice 2&quot; id=&quot;&quot; value=&quot;combo box 2&quot; set=&quot;true&quot;/&gt;
+     *          &lt;choice text=&quot;choice 3&quot; id=&quot;&quot; value=&quot;combo box 3&quot;/&gt;
+     *          &lt;choice text=&quot;choice 4&quot; id=&quot;&quot; value=&quot;combo box 4&quot;/&gt;
+     *        &lt;/spec&gt;
+     *      &lt;/field&gt;
+     *      
      *     
      *    
-     *   
      * </pre>
      * 
      * @param spec a <code>XMLElement</code> containing the specification for the combo box.
@@ -1262,6 +1671,7 @@ public class UserInputPanel extends IzPanel
         JComboBox field = new JComboBox();
         JLabel label;
 
+        boolean userinput = false; // is there already user input?
         // ----------------------------------------------------
         // extract the specification details
         // ----------------------------------------------------
@@ -1272,7 +1682,13 @@ public class UserInputPanel extends IzPanel
             Vector choices = element.getChildrenNamed(COMBO_CHOICE);
 
             if (choices == null) { return; }
-
+            // get current value of associated variable
+            String currentvariablevalue = idata.getVariable(variable);
+            if (currentvariablevalue != null)
+            {
+                // there seems to be user input
+                userinput = true;
+            }
             for (int i = 0; i < choices.size(); i++)
             {
                 String processorClass = ((XMLElement) choices.elementAt(i))
@@ -1317,20 +1733,36 @@ public class UserInputPanel extends IzPanel
                 }
                 else
                 {
-                    listItem = new TextValuePair(getText((XMLElement) choices.elementAt(i)),
-                            ((XMLElement) choices.elementAt(i)).getAttribute(COMBO_VALUE));
+                    String value = ((XMLElement) choices.elementAt(i)).getAttribute(COMBO_VALUE);
+                    listItem = new TextValuePair(getText((XMLElement) choices.elementAt(i)), value);
                     field.addItem(listItem);
-                    String set = ((XMLElement) choices.elementAt(i)).getAttribute(SET);
-                    if (set != null)
-                    {
-                        if (set != null && !"".equals(set))
+                    if (userinput)
+                    {         
+                        // is the current value identical to the value associated with this element
+                        if ((value != null) && (value.length() > 0)
+                                && (currentvariablevalue.equals(value)))
                         {
-                            VariableSubstitutor vs = new VariableSubstitutor(idata.getVariables());
-                            set = vs.substitute(set, null);
-                        }
-                        if (set.equals(TRUE))
-                        {
+                            // select it
                             field.setSelectedIndex(i);
+                        }               
+                        // else do nothing
+                    }
+                    else
+                    {
+                        // there is no user input
+                        String set = ((XMLElement) choices.elementAt(i)).getAttribute(SET);
+                        if (set != null)
+                        {
+                            if (set != null && !"".equals(set))
+                            {
+                                VariableSubstitutor vs = new VariableSubstitutor(idata
+                                        .getVariables());
+                                set = vs.substitute(set, null);
+                            }
+                            if (set.equals(TRUE))
+                            {
+                                field.setSelectedIndex(i);
+                            }
                         }
                     }
                 }
@@ -1406,22 +1838,22 @@ public class UserInputPanel extends IzPanel
      * This is a complete example of a valid XML specification
      * 
      * <pre>
-     *  
      *   
      *    
-     *     &lt;field type=&quot;radio&quot; variable=&quot;testVariable&quot;&gt;
-     *       &lt;description text=&quot;Description for the radio buttons&quot; id=&quot;a key for translated text&quot;/&gt;
-     *       &lt;spec text=&quot;label&quot; id=&quot;key for the label&quot;/&gt;
-     *         &lt;choice text=&quot;radio 1&quot; id=&quot;&quot; value=&quot;&quot;/&gt;
-     *         &lt;choice text=&quot;radio 2&quot; id=&quot;&quot; value=&quot;&quot; set=&quot;true&quot;/&gt;
-     *         &lt;choice text=&quot;radio 3&quot; id=&quot;&quot; value=&quot;&quot;/&gt;
-     *         &lt;choice text=&quot;radio 4&quot; id=&quot;&quot; value=&quot;&quot;/&gt;
-     *         &lt;choice text=&quot;radio 5&quot; id=&quot;&quot; value=&quot;&quot;/&gt;
-     *       &lt;/spec&gt;
-     *     &lt;/field&gt;
+     *     
+     *      &lt;field type=&quot;radio&quot; variable=&quot;testVariable&quot;&gt;
+     *        &lt;description text=&quot;Description for the radio buttons&quot; id=&quot;a key for translated text&quot;/&gt;
+     *        &lt;spec text=&quot;label&quot; id=&quot;key for the label&quot;/&gt;
+     *          &lt;choice text=&quot;radio 1&quot; id=&quot;&quot; value=&quot;&quot;/&gt;
+     *          &lt;choice text=&quot;radio 2&quot; id=&quot;&quot; value=&quot;&quot; set=&quot;true&quot;/&gt;
+     *          &lt;choice text=&quot;radio 3&quot; id=&quot;&quot; value=&quot;&quot;/&gt;
+     *          &lt;choice text=&quot;radio 4&quot; id=&quot;&quot; value=&quot;&quot;/&gt;
+     *          &lt;choice text=&quot;radio 5&quot; id=&quot;&quot; value=&quot;&quot;/&gt;
+     *        &lt;/spec&gt;
+     *      &lt;/field&gt;
+     *      
      *     
      *    
-     *   
      * </pre>
      * 
      * @param spec a <code>XMLElement</code> containing the specification for the radio button
@@ -1468,11 +1900,19 @@ public class UserInputPanel extends IzPanel
             {
                 JRadioButton choice = new JRadioButton();
                 choice.setText(getText((XMLElement) choices.elementAt(i)));
+                String causesValidataion = ((XMLElement) choices.elementAt(i)).getAttribute(REVALIDATE);
+                if(causesValidataion != null && causesValidataion.equals("yes"))
+                    choice.addActionListener(this);
                 value = (((XMLElement) choices.elementAt(i)).getAttribute(RADIO_VALUE));
 
                 group.add(choice);
 
                 String set = ((XMLElement) choices.elementAt(i)).getAttribute(SET);
+                // in order to properly initialize dependent controls
+                // we must set this variable now
+                if(idata.getVariable(variable) == null)
+                   if(set != null)
+                      idata.setVariable(variable, value);
                 if (set != null)
                 {
                     if (set != null && !"".equals(set))
@@ -1535,21 +1975,37 @@ public class UserInputPanel extends IzPanel
      * This is a complete example of a valid XML specification
      * 
      * <pre>
-     *  
      *   
      *    
-     *     &lt;field type=&quot;password&quot; variable=&quot;testVariable&quot;&gt;
-     *       &lt;description align=&quot;left&quot; txt=&quot;Please enter your password&quot; id=&quot;a key for translated text&quot;/&gt;
-     *       &lt;spec&gt;
-     *         &lt;pwd txt=&quot;Password&quot; id=&quot;key for the label&quot; size=&quot;10&quot; set=&quot;&quot;/&gt;
-     *         &lt;pwd txt=&quot;Retype password&quot; id=&quot;another key for the label&quot; size=&quot;10&quot; set=&quot;&quot;/&gt;
-     *       &lt;/spec&gt;
-     *       &lt;validator class=&quot;com.izforge.sample.PWDValidator&quot; txt=&quot;Both versions of the password must match&quot; id=&quot;key for the error text&quot;/&gt;
-     *       &lt;processor class=&quot;com.izforge.sample.PWDEncryptor&quot;/&gt;
-     *     &lt;/field&gt;
      *     
-     *    
-     *   
+     *      &lt;field type=&quot;password&quot; variable=&quot;testVariable&quot;&gt;
+     *        &lt;description align=&quot;left&quot; txt=&quot;Please enter your password&quot; id=&quot;a key for translated text&quot;/&gt;
+     *        &lt;spec&gt;
+     *          &lt;pwd txt=&quot;Password&quot; id=&quot;key for the label&quot; size=&quot;10&quot; set=&quot;&quot;/&gt;
+     *          &lt;pwd txt=&quot;Retype password&quot; id=&quot;another key for the label&quot; size=&quot;10&quot; set=&quot;&quot;/&gt;
+     *        &lt;/spec&gt;
+     *        &lt;validator class=&quot;com.izforge.sample.PWDValidator&quot; txt=&quot;Both versions of the password must match&quot; id=&quot;key for the error text&quot;/&gt;
+     *        &lt;processor class=&quot;com.izforge.sample.PWDEncryptor&quot;/&gt;
+     *      &lt;/field&gt;
+     *      
+     * </pre>
+     * Additionally, parameters and multiple validators can be used to provide
+     * separate validation and error messages for each case.
+     * <pre>
+     *     
+     *    &lt;field type=&quot;password&quot; align=&quot;left&quot; variable=&quot;keystore.password&quot;&gt;
+     *      &lt;spec&gt;
+     *        &lt;pwd txt=&quot;Keystore Password:&quot; size=&quot;25&quot; set=&quot;&quot;/&gt;
+     *        &lt;pwd txt=&quot;Retype Password:&quot; size=&quot;25&quot; set=&quot;&quot;/&gt;
+     *      &lt;/spec&gt;
+     *      &lt;validator class=&quot;com.izforge.izpack.util.PasswordEqualityValidator&quot; txt=&quot;Both keystore passwords must match.&quot; id=&quot;key for the error text&quot;/&gt;
+     *      &lt;validator class=&quot;com.izforge.izpack.util.PasswordKeystoreValidator&quot; txt=&quot;Could not validate keystore with password and alias provided.&quot; id=&quot;key for the error text&quot;&gt;
+     *        &lt;param name=&quot;keystoreFile&quot; value=&quot;${existing.ssl.keystore}&quot;/&gt;
+     *        &lt;param name=&quot;keystoreType&quot; value=&quot;JKS&quot;/&gt;
+     *        &lt;param name=&quot;keystoreAlias&quot; value=&quot;${keystore.key.alias}&quot;/&gt;
+     *      &lt;/validator&gt;
+     *    &lt;/field&gt;
+     *      
      * </pre>
      * 
      * @param spec a <code>XMLElement</code> containing the specification for the set of password
@@ -1561,12 +2017,15 @@ public class UserInputPanel extends IzPanel
         Vector forPacks = spec.getChildrenNamed(SELECTEDPACKS);
         Vector forOs = spec.getChildrenNamed(OS);
         String variable = spec.getAttribute(VARIABLE);
-        String validator = null;
         String message = null;
         String processor = null;
         XMLElement element = null;
         PasswordGroup group = null;
         int size = 0;
+        // For multiple validator support
+        Vector validatorsElem = null;
+        List validatorsList = new ArrayList();
+        int vsize = 0;
 
         // ----------------------------------------------------
         // get the description and add it to the list of UI
@@ -1578,11 +2037,36 @@ public class UserInputPanel extends IzPanel
         // ----------------------------------------------------
         // get the validator and processor if they are defined
         // ----------------------------------------------------
-        element = spec.getFirstChildNamed(VALIDATOR);
-        if (element != null)
+
+        validatorsElem = spec.getChildrenNamed(VALIDATOR);
+        if (validatorsElem != null && validatorsElem.size() > 0)
         {
-            validator = element.getAttribute(CLASS);
-            message = getText(element);
+            vsize = validatorsElem.size();
+            for (int i = 0; i < vsize; i++)
+            {
+                element = (XMLElement) validatorsElem.get(i);
+                String validator = element.getAttribute(CLASS);
+                message = getText(element);
+                HashMap validateParamMap = new HashMap();
+                // ----------------------------------------------------------
+                // check and see if we have any parameters for this validator.
+                // If so, then add them to validateParamMap.
+                // ----------------------------------------------------------
+                Vector validateParams = element.getChildrenNamed(RULE_PARAM);
+                if (validateParams != null && validateParams.size() > 0)
+                {
+                    Iterator iter = validateParams.iterator();
+                    while (iter.hasNext())
+                    {
+                        element = (XMLElement) iter.next();
+                        String paramName = element.getAttribute(RULE_PARAM_NAME);
+                        String paramValue = element.getAttribute(RULE_PARAM_VALUE);
+                        // System.out.println("Adding parameter: "+paramName+"="+paramValue);
+                        validateParamMap.put(paramName, paramValue);
+                    }
+                }
+                validatorsList.add(new ValidatorContainer(validator, message, validateParamMap));
+            }
         }
 
         element = spec.getFirstChildNamed(PROCESSOR);
@@ -1591,7 +2075,7 @@ public class UserInputPanel extends IzPanel
             processor = element.getAttribute(CLASS);
         }
 
-        group = new PasswordGroup(validator, processor);
+        group = new PasswordGroup(idata, validatorsList, processor);
 
         // ----------------------------------------------------
         // extract the specification details
@@ -1642,8 +2126,14 @@ public class UserInputPanel extends IzPanel
                 TwoColumnConstraints constraints2 = new TwoColumnConstraints();
                 constraints2.position = TwoColumnConstraints.EAST;
 
-                uiElements.add(new Object[] { null, PWD_FIELD, variable, constraints2, field,
-                        forPacks, forOs, null, null, message, group});
+                // Removed message to support pulling from multiple validators
+                uiElements.add(new Object[]{null, PWD_FIELD, variable, constraints2, field,
+                    forPacks, forOs, null, null, null, group
+                });
+                // Original
+//        uiElements.add(new Object[]{null, PWD_FIELD, variable, constraints2, field,
+//          forPacks, forOs, null, null, message, group
+//        });
                 group.addField(field);
             }
         }
@@ -1672,7 +2162,8 @@ public class UserInputPanel extends IzPanel
         {
             group = (PasswordGroup) field[POS_GROUP];
             variable = (String) field[POS_VARIABLE];
-            message = (String) field[POS_MESSAGE];
+        // Removed to support grabbing the message from multiple validators
+        // message = (String) field[POS_MESSAGE];
         }
         catch (Throwable exception)
         {
@@ -1681,18 +2172,40 @@ public class UserInputPanel extends IzPanel
         if ((variable == null) || (passwordGroupsRead.contains(group))) { return (true); }
         passwordGroups.add(group);
 
-        boolean success = group.validateContents();
 
+        //boolean success = !validating || group.validateContents();
+        boolean success = !validating;
+
+        // Use each validator to validate contents
         if (!success)
         {
-            JOptionPane.showMessageDialog(parentFrame, message, parentFrame.langpack
-                    .getString("UserInputPanel.error.caption"), JOptionPane.WARNING_MESSAGE);
-            return (false);
+            int size = group.validatorSize();
+            // System.out.println("Found "+(size)+" validators");
+            for (int i = 0; i < size; i++)
+            {
+                success = group.validateContents(i);
+                if (!success)
+                {
+                    JOptionPane.showMessageDialog(parentFrame, group.getValidatorMessage(i),
+                            parentFrame.langpack.getString("UserInputPanel.error.caption"),
+                            JOptionPane.WARNING_MESSAGE);
+                    break;
+                }
+            }
         }
 
-        idata.setVariable(variable, group.getPassword());
-        entries.add(new TextValuePair(variable, group.getPassword()));
-        return (true);
+//    // Changed to show messages for each validator
+//    if (!success) {
+//      JOptionPane.showMessageDialog(parentFrame, message, parentFrame.langpack.getString("UserInputPanel.error.caption"), JOptionPane.WARNING_MESSAGE);
+//      return (false);
+//    }
+
+        if (success)
+        {
+            idata.setVariable(variable, group.getPassword());
+            entries.add(new TextValuePair(variable, group.getPassword()));
+        }
+        return success;
     }
 
     /*--------------------------------------------------------------------------*/
@@ -1711,6 +2224,7 @@ public class UserInputPanel extends IzPanel
         String trueValue = null;
         String falseValue = null;
         String variable = spec.getAttribute(VARIABLE);
+        String causesValidataion = null;
         XMLElement detail = spec.getFirstChildNamed(SPEC);
 
         if (variable == null) { return; }
@@ -1721,10 +2235,20 @@ public class UserInputPanel extends IzPanel
             set = detail.getAttribute(SET);
             trueValue = detail.getAttribute(TRUE);
             falseValue = detail.getAttribute(FALSE);
+            causesValidataion = detail.getAttribute(REVALIDATE);
+            String value = idata.getVariable(variable);
+            if(value != null)
+            {
+                set = value;
+            }
         }
 
         JCheckBox checkbox = new JCheckBox(label);
-
+        
+        if(causesValidataion != null && causesValidataion.equals("yes"))
+           checkbox.addActionListener(this);
+        idata.setVariable(variable, set);
+        
         if (set != null)
         {
             if (set != null && !"".equals(set))
@@ -1818,19 +2342,19 @@ public class UserInputPanel extends IzPanel
      * This is a complete example of a valid XML specification
      * 
      * <pre>
-     *  
      *   
      *    
-     *     &lt;field type=&quot;search&quot; variable=&quot;testVariable&quot;&gt;
-     *       &lt;description text=&quot;Description for the search field&quot; id=&quot;a key for translated text&quot;/&gt;
-     *       &lt;spec text=&quot;label&quot; id=&quot;key for the label&quot; filename=&quot;the_file_to_search&quot; result=&quot;directory&quot; /&gt; &lt;!-- values for result: directory, file --&gt;
-     *         &lt;choice dir=&quot;directory1&quot; set=&quot;true&quot; /&gt; &lt;!-- default value --&gt;
-     *         &lt;choice dir=&quot;dir2&quot; /&gt;
-     *       &lt;/spec&gt;
-     *     &lt;/field&gt;
+     *     
+     *      &lt;field type=&quot;search&quot; variable=&quot;testVariable&quot;&gt;
+     *        &lt;description text=&quot;Description for the search field&quot; id=&quot;a key for translated text&quot;/&gt;
+     *        &lt;spec text=&quot;label&quot; id=&quot;key for the label&quot; filename=&quot;the_file_to_search&quot; result=&quot;directory&quot; /&gt; &lt;!-- values for result: directory, file --&gt;
+     *          &lt;choice dir=&quot;directory1&quot; set=&quot;true&quot; /&gt; &lt;!-- default value --&gt;
+     *          &lt;choice dir=&quot;dir2&quot; /&gt;
+     *        &lt;/spec&gt;
+     *      &lt;/field&gt;
+     *      
      *     
      *    
-     *   
      * </pre>
      * 
      * @param spec a <code>XMLElement</code> containing the specification for the search field
@@ -2149,6 +2673,7 @@ public class UserInputPanel extends IzPanel
             if (description != null)
             {
                 String alignment = spec.getAttribute(ALIGNMENT);
+                // FIX needed: where do we use this variable at all? i dont think so... 
                 int justify = MultiLineLabel.LEFT;
 
                 if (alignment != null)
@@ -2168,20 +2693,23 @@ public class UserInputPanel extends IzPanel
                 }
 
                 javax.swing.JTextPane label = new javax.swing.JTextPane();
-                
+
                 // Not editable, but still selectable.
                 label.setEditable(false);
-                
+
                 // If html tags are present enable html rendering, otherwise the JTextPane
                 // looks exactly like MultiLineLabel.
-                if(description.startsWith("<html>") && description.endsWith("</html>"))
-                    label.setContentType("text/html");               
+                if (description.startsWith("<html>") && description.endsWith("</html>"))
+                    label.setContentType("text/html");
                 label.setText(description);
-                
+
                 // Background color and font to match the label's.
                 label.setBackground(javax.swing.UIManager.getColor("label.backgroud"));
                 label.setMargin(new java.awt.Insets(3, 0, 3, 0));
-                    
+                // workaround to cut out layout problems
+                label.getPreferredSize();
+                // end of workaround.
+
                 uiElements.add(new Object[] { null, DESCRIPTION, null, constraints, label,
                         forPacks, forOs});
             }
@@ -2328,8 +2856,11 @@ public class UserInputPanel extends IzPanel
         {
             text = element.getAttribute(TEXT);
         }
+        
+        // try to parse the text, and substitute any variable it finds
+        VariableSubstitutor vs = new VariableSubstitutor(idata.getVariables());
 
-        return (text);
+        return (vs.substitute(text, null));
     }
 
     /*--------------------------------------------------------------------------*/
@@ -2461,7 +2992,7 @@ public class UserInputPanel extends IzPanel
 
             for (int k = 0; k < packs.size(); k++)
             {
-                required = (String) ((XMLElement) packs.elementAt(k)).getAttribute(NAME, "");
+                required = ((XMLElement) packs.elementAt(k)).getAttribute(NAME, "");
                 if (selected.equals(required)) { return (true); }
             }
         }
@@ -2510,7 +3041,7 @@ public class UserInputPanel extends IzPanel
 
             for (int k = 0; k < packs.size(); k++)
             {
-                required = (String) ((XMLElement) packs.elementAt(k)).getAttribute(NAME, "");
+                required = ((XMLElement) packs.elementAt(k)).getAttribute(NAME, "");
                 if (selected.equals(required)) { return (false); }
             }
         }
@@ -2789,7 +3320,7 @@ public class UserInputPanel extends IzPanel
             boolean found = false;
             for (int x = 0; x < this.pathComboBox.getItemCount(); x++)
             {
-                if (((String) this.pathComboBox.getItemAt(x)).equals(selected))
+                if (this.pathComboBox.getItemAt(x).equals(selected))
                 {
                     found = true;
                 }
@@ -2871,7 +3402,7 @@ public class UserInputPanel extends IzPanel
 
         /*--------------------------------------------------------------------------*/
         /**
-         * This is called if one of the buttons has bee pressed.
+         * This is called if one of the buttons has been pressed.
          * 
          * It checks, which button caused the action and acts accordingly.
          */
@@ -2883,10 +3414,8 @@ public class UserInputPanel extends IzPanel
             if (event.getSource() == this.autodetectButton)
             {
                 if (!autodetect())
-                    JOptionPane.showMessageDialog(parent, parent.langpack
-                            .getString("UserInputPanel.search.autodetect.failed.message"),
-                            parent.langpack
-                                    .getString("UserInputPanel.search.autodetect.failed.caption"),
+                    showMessageDialog(parent, "UserInputPanel.search.autodetect.failed.message", 
+                            "UserInputPanel.search.autodetect.failed.caption", 
                             JOptionPane.WARNING_MESSAGE);
             }
             else if (event.getSource() == this.browseButton)
@@ -2907,11 +3436,10 @@ public class UserInputPanel extends IzPanel
                     // use any given directory directly
                     if (this.resultType != TYPE_FILE && !this.pathMatches(f.getAbsolutePath()))
                     {
-                        JOptionPane.showMessageDialog(parent, parent.langpack
-                                .getString("UserInputPanel.search.wrongselection.message"),
-                                parent.langpack
-                                        .getString("UserInputPanel.search.wrongselection.caption"),
+                        showMessageDialog(parent, "UserInputPanel.search.wrongselection.message", 
+                                "UserInputPanel.search.wrongselection.caption", 
                                 JOptionPane.WARNING_MESSAGE);
+
                     }
                 }
 
@@ -2969,7 +3497,7 @@ public class UserInputPanel extends IzPanel
         }
 
     } // private class SearchFile
-    
+
     protected void updateVariables()
     {
         /**
@@ -2984,6 +3512,17 @@ public class UserInputPanel extends IzPanel
             XMLElement variable = (XMLElement) variables.elementAt(i);
             String vname = variable.getAttribute(ATTRIBUTE_VARIABLE_NAME);
             String vvalue = variable.getAttribute(ATTRIBUTE_VARIABLE_VALUE);
+            
+            if (vvalue == null)
+            {
+                // try to read value element
+                if (variable.hasChildren())
+                {
+                    XMLElement value = variable.getFirstChildNamed("value");
+                    vvalue = value.getContent();
+                }
+            }
+            
             String conditionid = variable.getAttribute(ATTRIBUTE_CONDITIONID_NAME);
             if (conditionid != null)
             {
@@ -2998,7 +3537,6 @@ public class UserInputPanel extends IzPanel
             {
                 if (vname == null)
                 {
-                    continue;
                 }
                 else
                 {
@@ -3014,12 +3552,81 @@ public class UserInputPanel extends IzPanel
                     // try to set variable
                     idata.setVariable(vname, vvalue);
 
-                    //                        
+                    // for save this variable to be used later by Automation Helper
+                    entries.add(new TextValuePair(vname, vvalue));                       
                 }
             }
         }
     }
+    
+    // Repaint all controls and validate them agains the current variables
+    public void actionPerformed(ActionEvent e) {
+       validating = false;
+       readInput();
+       panelActivate();
+       validating = true;
+   }
+
+    /*--------------------------------------------------------------------------*/
+    /**
+     * Show localized message dialog basing on given parameters.
+     * 
+     * @param parentFrame The parent frame.
+     * @param message The message to print out in dialog box.
+     * @param caption The caption of dialog box.
+     * @param messageType The message type (JOptionPane.*_MESSAGE)
+     */
+    /*--------------------------------------------------------------------------*/
+    private void showMessageDialog(InstallerFrame parentFrame, String message, String caption, int messageType) {
+        String localizedMessage = langpack.getString(message);
+        if ("".equals(localizedMessage))
+        {
+            localizedMessage = message;
+        }
+        JOptionPane.showMessageDialog(parentFrame, localizedMessage, caption, messageType);
+    }
+
+    /*--------------------------------------------------------------------------*/
+    /**
+     * Show localized warning message dialog basing on given parameters.
+     * 
+     * @param parentFrame parent frame.
+     * @param message the message to print out in dialog box.
+     */
+    /*--------------------------------------------------------------------------*/
+    private void showWarningMessageDialog(InstallerFrame parentFrame, String message) {
+        showMessageDialog(parentFrame, message, 
+                parentFrame.langpack.getString("UserInputPanel.error.caption"), 
+                JOptionPane.WARNING_MESSAGE);    
+    }
 
 } // public class UserInputPanel
-/*---------------------------------------------------------------------------*/
 
+/*---------------------------------------------------------------------------*/
+class UserInputFileFilter extends FileFilter{
+    String fileext = "";
+    String description = "";
+    
+    public void setFileExt(String fileext){                    
+        this.fileext = fileext;                    
+    }
+    
+    public void setFileExtDesc(String desc){
+        this.description = desc;
+    }
+   
+    public boolean accept(File pathname)
+    {
+        if (pathname.isDirectory()){
+            return true;
+        }
+        else {
+            return pathname.getAbsolutePath().endsWith(this.fileext);
+        }                    
+    }
+
+    public String getDescription()
+    {
+        return this.description;
+    }                  
+}

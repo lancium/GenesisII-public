@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ package com.izforge.izpack.installer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.zip.ZipOutputStream;
@@ -41,7 +42,9 @@ public class AutomatedInstallData
 {
 
     // --- Static members -------------------------------------------------
-
+    public static final String MODIFY_INSTALLATION = "modify.izpack.install";
+    public static final String INSTALLATION_INFORMATION = ".installationinformation";
+    
     /**
      * Names of the custom actions types with which they are stored in the installer jar file. These
      * names are also used to identify the type of custom action in the customData map. Slashes as
@@ -65,6 +68,9 @@ public class AutomatedInstallData
 
     /** The language code. */
     public String localeISO3;
+
+    /** The used locale. */
+    public Locale locale;
 
     /** The language pack. */
     public LocaleDatabase langpack;

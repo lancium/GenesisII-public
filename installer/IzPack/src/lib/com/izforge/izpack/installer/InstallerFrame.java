@@ -1,9 +1,9 @@
 /*
- * $Id: InstallerFrame.java 1816 2007-04-23 19:57:27Z jponge $
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * $Id: InstallerFrame.java 2036 2008-02-09 11:14:05Z jponge $
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2002 Jan Blok
  * 
@@ -48,6 +48,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -75,6 +76,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JSeparator;
+import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
@@ -82,24 +84,27 @@ import javax.swing.border.TitledBorder;
 import javax.swing.text.JTextComponent;
 
 import net.n3.nanoxml.NonValidator;
-import net.n3.nanoxml.StdXMLBuilder;
 import net.n3.nanoxml.StdXMLParser;
 import net.n3.nanoxml.StdXMLReader;
 import net.n3.nanoxml.XMLElement;
 import net.n3.nanoxml.XMLWriter;
+import net.n3.nanoxml.XMLBuilderFactory;
 
 import com.izforge.izpack.CustomData;
 import com.izforge.izpack.ExecutableFile;
 import com.izforge.izpack.LocaleDatabase;
 import com.izforge.izpack.Panel;
+import com.izforge.izpack.compiler.DynamicVariable;
 import com.izforge.izpack.gui.ButtonFactory;
 import com.izforge.izpack.gui.EtchedLineBorder;
 import com.izforge.izpack.gui.IconsDatabase;
 import com.izforge.izpack.rules.RulesEngine;
 import com.izforge.izpack.util.AbstractUIProgressHandler;
 import com.izforge.izpack.util.Debug;
+import com.izforge.izpack.util.DebugConstants;
 import com.izforge.izpack.util.Housekeeper;
 import com.izforge.izpack.util.IoHelper;
+import com.izforge.izpack.util.Log;
 import com.izforge.izpack.util.OsConstraint;
 import com.izforge.izpack.util.VariableSubstitutor;
 
@@ -227,6 +232,13 @@ public class InstallerFrame extends JFrame
      * Resource name for custom icons
      */
     private static final String CUSTOM_ICONS_RESOURCEFILE = "customicons.xml";
+    
+    private Map dynamicvariables;
+    private VariableSubstitutor substitutor;
+    
+    
+    private JTextPane debugtxt;
+    private Debugger debugger;
 
     /**
      * The constructor (normal mode).
@@ -238,6 +250,7 @@ public class InstallerFrame extends JFrame
     public InstallerFrame(String title, InstallData installdata) throws Exception
     {
         super(title);
+        substitutor = new VariableSubstitutor(installdata.variables);
         guiListener = new ArrayList();
         visiblePanelMapping = new ArrayList();
         this.installdata = installdata;
@@ -250,6 +263,8 @@ public class InstallerFrame extends JFrame
         // initialize rules by loading the conditions
         loadConditions();
 
+        // load dynamic variables
+        loadDynamicVariables();
         // Builds the GUI
         loadIcons();
         loadCustomIcons();
@@ -260,24 +275,83 @@ public class InstallerFrame extends JFrame
         showFrame();
         switchPanel(0);
     }
+    
+    public Debugger getDebugger() {
+        return this.debugger;
+    }
+    
+    private void refreshDynamicVariables() {        
+        if (dynamicvariables != null) {
+            Iterator iter = dynamicvariables.keySet().iterator();
+            while (iter.hasNext()) {
+                String dynvarname = (String) iter.next();
+                DynamicVariable dynvar = (DynamicVariable) dynamicvariables.get(dynvarname);
+                boolean refresh = false;
+                if (dynvar.getConditionid() != null) {
+                    if ((rules != null) &&  rules.isConditionTrue(dynvar.getConditionid())) {
+                        // condition for this rule is true
+                        refresh = true;
+                    }                    
+                }
+                else {
+                    refresh = true;
+                }
+                if (refresh) {
+                    String newvalue = substitutor.substitute(dynvar.getValue(), null);
+                    installdata.variables.setProperty(dynvar.getName(), newvalue);
+                }
+            }
+        }
+    }
+
+    private void loadDynamicVariables()
+    {
+        try {
+            InputStream in = InstallerFrame.class.getResourceAsStream("/dynvariables");
+            ObjectInputStream objIn = new ObjectInputStream(in); 
+            dynamicvariables = (Map) objIn.readObject();
+            objIn.close();
+        }
+        catch (Exception e) {
+            Debug.trace("Can not find optional dynamic variables");   
+            System.out.println(e);
+        }        
+    }
 
     /**
      * Reads the conditions specification file and initializes the rules engine.
      */
     protected void loadConditions()
     {
+        // try to load already parsed conditions
+        try {
+            InputStream in = InstallerFrame.class.getResourceAsStream("/rules");
+            ObjectInputStream objIn = new ObjectInputStream(in);
+            Map rules = (Map) objIn.readObject();
+            if ((rules != null) && (rules.size() != 0)) {
+                this.rules = new RulesEngine(rules,installdata);
+            }
+            objIn.close();
+        }
+        catch (Exception e) {
+            Debug.trace("Can not find optional rules");            
+        }
+        if (rules != null) {
+            // rules already read
+            return;
+        }
         try
         {
             InputStream input = null;
             input = this.getResource(CONDITIONS_SPECRESOURCENAME);
             if (input == null)
             {
-                this.rules = new RulesEngine(null, installdata);
+                this.rules = new RulesEngine((XMLElement) null, installdata);
                 return;
             }
 
             StdXMLParser parser = new StdXMLParser();
-            parser.setBuilder(new StdXMLBuilder());
+            parser.setBuilder(XMLBuilderFactory.createXMLBuilder());
             parser.setValidator(new NonValidator());
             parser.setReader(new StdXMLReader(input));
 
@@ -289,7 +363,7 @@ public class InstallerFrame extends JFrame
         {
             Debug.trace("Can not find optional resource " + CONDITIONS_SPECRESOURCENAME);
             // there seem to be no conditions
-            this.rules = new RulesEngine(null, installdata);
+            this.rules = new RulesEngine((XMLElement) null, installdata);
         }
     }
 
@@ -369,7 +443,7 @@ public class InstallerFrame extends JFrame
 
         // Initialises the parser
         StdXMLParser parser = new StdXMLParser();
-        parser.setBuilder(new StdXMLBuilder());
+        parser.setBuilder(XMLBuilderFactory.createXMLBuilder());
         parser.setReader(new StdXMLReader(inXML));
         parser.setValidator(new NonValidator());
 
@@ -421,7 +495,7 @@ public class InstallerFrame extends JFrame
 
       // Initialises the parser
       StdXMLParser parser = new StdXMLParser();
-      parser.setBuilder(new StdXMLBuilder());
+      parser.setBuilder(XMLBuilderFactory.createXMLBuilder());
       parser.setReader(new StdXMLReader(inXML));
       parser.setValidator(new NonValidator());
 
@@ -519,6 +593,24 @@ public class InstallerFrame extends JFrame
         quitButton.addActionListener(navHandler);
         contentPane.add(navPanel, BorderLayout.SOUTH);
 
+        // create a debug panel if TRACE is enabled
+        if (Debug.isTRACE()) {            
+            debugger = new Debugger(installdata,icons,rules);
+            JPanel debugpanel = debugger.getDebugPanel();
+            if (installdata.guiPrefs.modifier.containsKey("showDebugWindow")) {
+                if (Boolean.valueOf((String) installdata.guiPrefs.modifier.get("showDebugWindow")).booleanValue()) {
+                    JFrame debugframe = new JFrame("Debug information");                    
+                    debugframe.setContentPane(debugpanel);
+                    debugframe.setSize(new Dimension(400,400));
+                    debugframe.setVisible(true);
+                }
+                else {
+                    debugpanel.setPreferredSize(new Dimension(200,400));                        
+                    contentPane.add(debugpanel,BorderLayout.EAST);
+                }                            
+            }
+        }
+        
         try
         {
             ImageIcon icon = loadIcon(ICON_RESOURCE, 0, true);
@@ -720,6 +812,8 @@ public class InstallerFrame extends JFrame
      */
     protected void switchPanel(int last)
     {
+        // refresh dynamic variables every time, a panel switch is done
+        refreshDynamicVariables();          
         try
         {
             if (installdata.curPanelNumber < last)
@@ -729,6 +823,15 @@ public class InstallerFrame extends JFrame
             panelsContainer.setVisible(false);
             IzPanel panel = (IzPanel) installdata.panels.get(installdata.curPanelNumber);
             IzPanel l_panel = (IzPanel) installdata.panels.get(last);
+            if (Debug.isTRACE()) {
+                debugger.switchPanel(panel.getMetadata(),l_panel.getMetadata());
+            }
+            Log.getInstance().addDebugMessage(
+                    "InstallerFrame.switchPanel: try switching panel from {0} to {1} ({2} to {3})",
+                    new String[] { l_panel.getClass().getName(), panel.getClass().getName(),
+                            Integer.toString(last), Integer.toString(installdata.curPanelNumber)},
+                    DebugConstants.PANEL_TRACE, null);
+
             // instead of writing data here which leads to duplicated entries in
             // auto-installation script (bug # 4551), let's make data only immediately before
             // writing out that script.
@@ -764,6 +867,7 @@ public class InstallerFrame extends JFrame
                 public void run()
                 {
                    JButton cdb = null;
+                   String buttonName = "next";
                    if (nextButton.isEnabled()) {
                      cdb = nextButton;
                      quitButton.setDefaultCapable(false);
@@ -771,11 +875,16 @@ public class InstallerFrame extends JFrame
                      nextButton.setDefaultCapable(true);
                    } else if (quitButton.isEnabled()) {
                      cdb = quitButton;
+                     buttonName = "quit";
                      quitButton.setDefaultCapable(true);
                      prevButton.setDefaultCapable(false);
                      nextButton.setDefaultCapable(false);
                    }
                    getRootPane().setDefaultButton(cdb);
+                   Log.getInstance().addDebugMessage("InstallerFrame.switchPanel: setting {0} as default button", 
+                           new String[] { buttonName }, 
+                           DebugConstants.PANEL_TRACE,
+                             null);
                  }
             });
 
@@ -835,6 +944,8 @@ public class InstallerFrame extends JFrame
             }
             isBack = false;
             callGUIListener(GUIListener.PANEL_SWITCHED);
+            Log.getInstance().addDebugMessage("InstallerFrame.switchPanel: switched", null,
+                    DebugConstants.PANEL_TRACE, null);
         }
         catch (Exception err)
         {
@@ -874,7 +985,7 @@ public class InstallerFrame extends JFrame
         {
             // We get the data
             UninstallData udata = UninstallData.getInstance();
-            List files = udata.getFilesList();
+            List files = udata.getUninstalableFilesList();
             ZipOutputStream outJar = installdata.uninstallOutJar;
 
             if (outJar == null) return;
@@ -1201,7 +1312,7 @@ public class InstallerFrame extends JFrame
 
         // Wipes them all in 2 stages
         UninstallData u = UninstallData.getInstance();
-        it = u.getFilesList().iterator();
+        it = u.getInstalledFilesList().iterator();
         if (!it.hasNext()) return;
         while (it.hasNext())
         {
@@ -1239,12 +1350,9 @@ public class InstallerFrame extends JFrame
     public void install(AbstractUIProgressHandler listener)
     {       
         IUnpacker unpacker = UnpackerFactory.getUnpacker(this.installdata.info.getUnpackerClassName(), installdata, listener);
+        unpacker.setRules(this.rules);
         Thread unpackerthread = new Thread(unpacker, "IzPack - Unpacker thread");
-        unpackerthread.start();
-        /*
-        Unpacker unpacker = new Unpacker(installdata, listener);
-        unpacker.start();
-        */
+        unpackerthread.start();        
     }
 
     /**
@@ -1401,19 +1509,26 @@ public class InstallerFrame extends JFrame
     public boolean canShow(int panelnumber)
     {
         IzPanel panel = (IzPanel) installdata.panels.get(panelnumber);
-        String panelid = panel.getMetadata().getPanelid();
-        Debug.trace("Current Panel: " + panelid);
-
-        if (!this.getRules().canShowPanel(panelid, this.installdata.variables))
-        {
-            // skip panel, if conditions for panel aren't met
-            Debug.log("Skip panel with panelid=" + panelid);
-            // panel should be skipped, so we have to decrement panelnumber for skipping
-            return false;
+        Panel panelmetadata = panel.getMetadata(); 
+        String panelid = panelmetadata.getPanelid();
+        Debug.trace("Current Panel: " + panelid);                
+        
+        if (panelmetadata.hasCondition()) {
+            Debug.log("Checking panelcondition");
+            return rules.isConditionTrue(panelmetadata.getCondition());
         }
-        else
-        {
-            return true;
+        else {        
+            if (!rules.canShowPanel(panelid, this.installdata.variables))
+            {
+                // skip panel, if conditions for panel aren't met
+                Debug.log("Skip panel with panelid=" + panelid);
+                // panel should be skipped, so we have to decrement panelnumber for skipping
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
     }
 
@@ -1445,7 +1560,6 @@ public class InstallerFrame extends JFrame
             if (!canShow(installdata.curPanelNumber))
             {
                 this.navigateNext(last);
-                return;
             }
             else
             {
@@ -1479,7 +1593,6 @@ public class InstallerFrame extends JFrame
             if (!canShow(installdata.curPanelNumber))
             {
                 this.navigatePrevious(last);
-                return;
             }
             else
             {
@@ -1598,6 +1711,17 @@ public class InstallerFrame extends JFrame
         headingLabels[0] = new JLabel("");
         // First line ist the "main heading" which should be bold.
         headingLabels[0].setFont(headingLabels[0].getFont().deriveFont(Font.BOLD));
+        
+        // Updated by Daniel Azarov, Exadel Inc.
+        // start
+        Color foreground = null;
+        if (installdata.guiPrefs.modifier.containsKey("headingForegroundColor")){
+            foreground = Color.decode((String) installdata.guiPrefs.modifier
+                    .get("headingForegroundColor"));
+            headingLabels[0].setForeground(foreground);
+        }
+        // end
+        
         if (installdata.guiPrefs.modifier.containsKey("headingFontSize"))
         {
             float fontSize = Float.parseFloat((String) installdata.guiPrefs.modifier
@@ -1644,6 +1768,16 @@ public class InstallerFrame extends JFrame
                 JLabel headingCountPanels = new JLabel(" ");
                 headingCounterComponent = headingCountPanels;
                 headingCounterComponent.setBorder(BorderFactory.createEmptyBorder(0, 30, 0, 0));
+                
+                // Updated by Daniel Azarov, Exadel Inc.
+                // start
+                Color foreground = null;
+                if (installdata.guiPrefs.modifier.containsKey("headingForegroundColor")){
+                    foreground = Color.decode((String) installdata.guiPrefs.modifier
+                            .get("headingForegroundColor"));
+                    headingCountPanels.setForeground(foreground);
+                }
+                // end
             }
             if ("inHeading".equals(counterPos))
             {
@@ -1680,7 +1814,18 @@ public class InstallerFrame extends JFrame
         }
         JPanel imgPanel = new JPanel();
         imgPanel.setLayout(new BoxLayout(imgPanel, BoxLayout.Y_AXIS));
-        imgPanel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+        
+        // Updated by Daniel Azarov, Exadel Inc.
+        // start
+        int borderSize = 8;
+        if (installdata.guiPrefs.modifier.containsKey("headingImageBorderSize"))
+        {
+            borderSize = Integer.parseInt((String) installdata.guiPrefs.modifier
+                    .get("headingImageBorderSize"));
+        }
+        imgPanel.setBorder(BorderFactory.createEmptyBorder(borderSize, borderSize, borderSize, borderSize));
+        // end
+        
         if (back != null) imgPanel.setBackground(back);
         JLabel iconLab = new JLabel(icon);
         imgPanel.add(iconLab, BorderLayout.EAST);

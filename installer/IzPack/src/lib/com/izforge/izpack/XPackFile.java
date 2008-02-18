@@ -1,7 +1,7 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
- * http://izpack.org/ http://developer.berlios.de/projects/izpack/
+ * http://izpack.org/ http://izpack.codehaus.org/
  * 
  * Copyright 2007 Dennis Reil
  * 
@@ -32,12 +32,8 @@ import com.izforge.izpack.PackFile;
  */
 public class XPackFile extends PackFile
 {
-
     private static final long serialVersionUID = 5875050264763504283L;
-
-    protected long archivefileposition;
-
-    protected PackFile packfile;
+    protected long archivefileposition;    
 
     /**
      * @param src
@@ -72,8 +68,7 @@ public class XPackFile extends PackFile
     {
         super(new File(packf.sourcePath), packf.relativePath, packf.getTargetPath(), packf.osConstraints(), packf
                 .override(), packf.getAdditionals());
-        this.archivefileposition = 0;
-        this.packfile = packf;
+        this.archivefileposition = 0;        
     }
 
     public long getArchivefileposition()
@@ -88,12 +83,6 @@ public class XPackFile extends PackFile
 
     public PackFile getPackfile()
     {
-        return packfile;
+        return this;
     }
-
-    public void setPackfile(PackFile packfile)
-    {
-        this.packfile = packfile;
-    }
-
 }

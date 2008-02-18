@@ -1,9 +1,9 @@
 /*
- * $Id: Librarian.java 1816 2007-04-23 19:57:27Z jponge $ 
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * $Id: Librarian.java 2036 2008-02-09 11:14:05Z jponge $ 
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2002 Elmar Grom
  * 
@@ -159,6 +159,17 @@ public class Librarian implements CleanupClient
         return (me);
     }
 
+    public synchronized void loadLibrary(String name, NativeLibraryClient client) throws Exception
+    {
+       try
+       {
+          loadArchSpecificLibrary(name, client);
+       }
+       catch(Exception ex)
+       {
+          loadArchSpecificLibrary(name+"_x64", client);
+       }
+    }
     /*--------------------------------------------------------------------------*/
     /**
      * Loads the requested library. If the library is already loaded, this method returns
@@ -200,7 +211,7 @@ public class Librarian implements CleanupClient
      * @exception Exception if all attempts to load the library fail.
      */
     /*--------------------------------------------------------------------------*/
-    public synchronized void loadLibrary(String name, NativeLibraryClient client) throws Exception
+    public synchronized void loadArchSpecificLibrary(String name, NativeLibraryClient client) throws Exception
     {
         String libraryName = strip(name);
         String tempFileName = "";

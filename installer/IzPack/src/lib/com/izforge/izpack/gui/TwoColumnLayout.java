@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2002 Elmar Grom
  * 
@@ -760,7 +760,7 @@ public class TwoColumnLayout implements LayoutManager2
     private int topBuffer(int usedHeight, Container parent)
     {
         int amount = ((int) parent.getSize().getHeight()) - usedHeight;
-        amount = (int) (amount * topBuffer) / 100;
+        amount = amount * topBuffer / 100;
 
         return (amount);
     }

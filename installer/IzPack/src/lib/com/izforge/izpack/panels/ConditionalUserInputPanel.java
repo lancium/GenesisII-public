@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ import com.izforge.izpack.installer.InstallerFrame;
  * @see UserInputPanel
  * 
  * @author $author$
- * @version $Revision: 1816 $
+ * @version $Revision: 2036 $
  */
 public class ConditionalUserInputPanel extends UserInputPanel
 {

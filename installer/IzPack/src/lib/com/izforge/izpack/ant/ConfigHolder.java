@@ -1,9 +1,9 @@
 /*
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2002 Marcus Wolschon
  * Copyright 2002 Jan Blok
@@ -34,7 +34,7 @@ import org.apache.tools.ant.Project;
  * The installation document must be passed in using a CDATA element.
  * 
  * @author Scott Stark
- * @version $Revision: 1816 $
+ * @version $Revision: 2036 $
  */
 public class ConfigHolder
 {

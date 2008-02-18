@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  *
  * Copyright 2007 Dennis Reil
  *
@@ -21,10 +21,8 @@
 
 package com.izforge.izpack.rules;
 
-import java.util.List;
-import java.util.Properties;
-
 import net.n3.nanoxml.XMLElement;
+
 import com.izforge.izpack.util.Debug;
 
 /**
@@ -34,6 +32,11 @@ import com.izforge.izpack.util.Debug;
  */
 public class AndCondition extends Condition
 {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -5854944262991488370L;
 
     protected Condition leftoperand;
 
@@ -55,18 +58,7 @@ public class AndCondition extends Condition
         this.leftoperand = operand1;
         this.rightoperand = operand2;
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.reddot.installer.util.Condition#isTrue()
-     */
-    /*
-    public boolean isTrue(Properties variables)
-    {
-        return leftoperand.isTrue(variables) && rightoperand.isTrue(variables);
-    }
-    */
+  
 
     /*
      * (non-Javadoc)
@@ -91,15 +83,24 @@ public class AndCondition extends Condition
         }
     }
 
-    /*
-    public boolean isTrue(Properties variables, List selectedpacks)
-    {
-        return leftoperand.isTrue(variables, selectedpacks)
-                && rightoperand.isTrue(variables, selectedpacks);
-    }
-    */
+  
     public boolean isTrue()
     {        
         return leftoperand.isTrue() && rightoperand.isTrue();
+    }
+
+    /* (non-Javadoc)
+     * @see com.izforge.izpack.rules.Condition#getDependenciesDetails()
+     */
+    public String getDependenciesDetails()
+    {
+        StringBuffer details = new StringBuffer();
+        details.append(this.id);
+        details.append(" depends on:<ul><li>");        
+        details.append(leftoperand.getDependenciesDetails());
+        details.append("</li> AND <li>");
+        details.append(rightoperand.getDependenciesDetails());
+        details.append("</li></ul>");
+        return details.toString();
     }
 }

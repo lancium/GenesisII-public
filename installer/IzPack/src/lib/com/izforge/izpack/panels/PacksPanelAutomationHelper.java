@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2003 Jonathan Halliday
  * 
@@ -98,7 +98,10 @@ public class PacksPanelAutomationHelper implements PanelAutomation
                         int index = Integer.parseInt(index_str);
                         if ((index >= 0) && (index < idata.availablePacks.size()))
                         {
+                          if (el.getAttribute("selected").equalsIgnoreCase("true") ||
+                              el.getAttribute("selected").equalsIgnoreCase("on")) {
                             idata.selectedPacks.add(idata.availablePacks.get(index));
+                          }
                         }
                         else
                         {

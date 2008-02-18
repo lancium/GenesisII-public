@@ -1,7 +1,7 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  *
- * http://izpack.org/ http://developer.berlios.de/projects/izpack/
+ * http://izpack.org/ http://izpack.codehaus.org/
  *
  * Copyright 2006 Marc Eppelmann
  *
@@ -92,7 +92,7 @@ public class ShellScript
      */
     public ShellScript(String aShell)
     {
-        content.append("#!/usr/bin/env " + aShell);
+        content.append("#!/usr/bin/env ").append(aShell);
         content.append(header);
     }
 

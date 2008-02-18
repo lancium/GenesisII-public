@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -162,6 +162,17 @@ public void testEll() throws Exception{
  */
 public void testEng() throws Exception{
         this.checkLangpack("eng.xml");
+    }
+/**
+ * Checks the Farsi language pack for missing / superfluous translations
+ * @throws Exception Forwarded Exception for the LocaleDatabase contructor, FileInputStream constructor or TreeMap containsKey method
+ * 
+ * @see com.izforge.izpack.LocaleDatabase#LocaleDatabase(java.io.InputStream)
+ * @see java.io.FileInputStream#FileInputStream(java.lang.String)
+ * @see java.util.TreeMap#containsKey(java.lang.Object)
+ */
+    public void testFa() throws Exception{
+        this.checkLangpack("fa.xml");
     }
 /**
  * Checks the Finnish language pack for missing / superfluous translations

@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2003 Jonathan Halliday
  * 
@@ -264,7 +264,7 @@ public class InstallerBase
     /** 
      * just plain wrong in case the programfiles are not stored where the developer expects them.
      * E.g. in custom installations of large companies or if used internationalized version of windows with a language pack.
-     * @return
+     * @return the program files path
      */
     private String buildWindowsDefaultPathFromProps()
     {

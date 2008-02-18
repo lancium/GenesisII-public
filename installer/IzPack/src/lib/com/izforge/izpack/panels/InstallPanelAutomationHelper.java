@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2003 Jonathan Halliday
  * 
@@ -101,7 +101,7 @@ public class InstallPanelAutomationHelper extends PanelAutomationHelper implemen
      */
     public void stopAction()
     {
-        System.out.println("[ Unpacking finished. ]");
+        System.out.println("[ Unpacking finished ]");
         boolean done = true;
     }
 
@@ -135,4 +135,11 @@ public class InstallPanelAutomationHelper extends PanelAutomationHelper implemen
         System.out.println(") ]");
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void setSubStepNo(int no_of_substeps)
+    {
+        // not used here
+    }
 }

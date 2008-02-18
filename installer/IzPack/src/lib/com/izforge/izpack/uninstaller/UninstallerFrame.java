@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,9 +96,12 @@ public class UninstallerFrame extends JFrame
     /**
      * The constructor.
      * 
+     * @param displayForceOption If true, display to the user the option permitting to force
+     * all files deletion.
+     * @param forceOptionState If true, force deletion is activated.
      * @exception Exception Description of the Exception
      */
-    public UninstallerFrame() throws Exception
+    public UninstallerFrame(boolean displayForceOption, boolean forceOptionState) throws Exception
     {
         super("IzPack - Uninstaller");
 
@@ -115,7 +118,7 @@ public class UninstallerFrame extends JFrame
         setIconImage(icons.getImageIcon("JFrameIcon").getImage());
 
         // We build the GUI & show it
-        buildGUI();
+        buildGUI(displayForceOption, forceOptionState);
         addWindowListener(new WindowHandler());
         pack();
         centerFrame(this);
@@ -123,8 +126,14 @@ public class UninstallerFrame extends JFrame
         setVisible(true);
     }
 
-    /** Builds the GUI. */
-    private void buildGUI()
+    /**
+     * Builds the GUI.
+     * 
+     * @param displayForceOption If true, display to the user the option permitting to force
+     * all files deletion.
+     * @param forceOptionState If true, force deletion is activated.
+     */
+    private void buildGUI(boolean displayForceOption, boolean forceOptionState)
     {
         // We initialize our layout
         JPanel contentPane = (JPanel) getContentPane();
@@ -157,10 +166,10 @@ public class UninstallerFrame extends JFrame
         contentPane.add(warningLabel);
 
         targetDestroyCheckbox = new JCheckBox(langpack.getString("uninstaller.destroytarget")
-                + installPath, false);
+                + installPath, forceOptionState);
         buildConstraints(gbConstraints, 0, 1, 2, 1, 1.0, 0.0);
         layout.addLayoutComponent(targetDestroyCheckbox, gbConstraints);
-        contentPane.add(targetDestroyCheckbox);
+        if (displayForceOption) contentPane.add(targetDestroyCheckbox);
         gbConstraints.fill = GridBagConstraints.HORIZONTAL;
 
         progressBar = new JProgressBar();
@@ -365,10 +374,22 @@ public class UninstallerFrame extends JFrame
             });
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void nextStep(String step_name, int step_no, int no_of_substeps)
         {
+            // not used
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        public void setSubStepNo(int no_of_substeps)
+        {
+            // not used
+        }
+        
         /**
          * Output a notification.
          * 
@@ -438,7 +459,7 @@ public class UninstallerFrame extends JFrame
             else if (choices == AbstractUIHandler.CHOICES_YES_NO_CANCEL)
                 jo_choices = JOptionPane.YES_NO_CANCEL_OPTION;
 
-            int user_choice = JOptionPane.showConfirmDialog(null, (Object) question, title,
+            int user_choice = JOptionPane.showConfirmDialog(null, question, title,
                     jo_choices, JOptionPane.QUESTION_MESSAGE);
 
             if (user_choice == JOptionPane.CANCEL_OPTION) return AbstractUIHandler.ANSWER_CANCEL;

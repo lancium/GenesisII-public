@@ -1,9 +1,9 @@
 /*
- * $Id: IzPanel.java 1816 2007-04-23 19:57:27Z jponge $
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * $Id: IzPanel.java 2036 2008-02-09 11:14:05Z jponge $
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -398,7 +398,7 @@ public class IzPanel extends JPanel implements AbstractUIHandler, LayoutConstant
         else if (choices == AbstractUIHandler.CHOICES_YES_NO_CANCEL)
             jo_choices = JOptionPane.YES_NO_CANCEL_OPTION;
 
-        int user_choice = JOptionPane.showConfirmDialog(this, (Object) question, title, jo_choices,
+        int user_choice = JOptionPane.showConfirmDialog(this, question, title, jo_choices,
                 JOptionPane.QUESTION_MESSAGE);
 
         if (user_choice == JOptionPane.CANCEL_OPTION) return AbstractUIHandler.ANSWER_CANCEL;

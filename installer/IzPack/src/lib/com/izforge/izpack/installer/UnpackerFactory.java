@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2007 Dennis Reil
  * 
@@ -38,7 +38,7 @@ public abstract class UnpackerFactory
      * @param unpackerclassname
      * @param installdata
      * @param listener
-     * @return
+     * @return the unpacker
      */
     public static IUnpacker getUnpacker(String unpackerclassname, AutomatedInstallData installdata, AbstractUIProgressHandler listener){
         IUnpacker unpackerobj = null;

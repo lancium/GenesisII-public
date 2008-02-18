@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2006 Klaus Bartz
  *
@@ -34,6 +34,10 @@ import java.util.ArrayList;
 public class AccessControlList extends java.util.ArrayList
 {
 
+    /**
+     * Required (serializable)
+     */
+    private static final long serialVersionUID = -5350586385078554562L;
     private ArrayList permissions = new ArrayList();
 
     /**

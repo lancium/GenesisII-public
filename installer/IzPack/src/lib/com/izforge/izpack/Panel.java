@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2004 Jan Blok
  * 
@@ -40,6 +40,9 @@ public class Panel implements Serializable
 
     /** the unique id of this panel */
     protected String panelid;
+    
+    /** condition for this panel */
+    private String condition = null;
 
     public String getClassName() {
       return this.className;
@@ -60,12 +63,34 @@ public class Panel implements Serializable
     public String getPanelid() {
       if (this.panelid == null)
       {
-        this.panelid = "UNKNOWN";
+        this.panelid = "UNKNOWN (" + className + ")";
       }
       return this.panelid;
     }
 
     public void setPanelid(String panelid) {      
       this.panelid = panelid;
+    }
+
+    
+    /**
+     * @return the condition
+     */
+    public String getCondition()
+    {
+        return this.condition;
+    }
+
+    
+    /**
+     * @param condition the condition to set
+     */
+    public void setCondition(String condition)
+    {
+        this.condition = condition;
+    }
+    
+    public boolean hasCondition() {
+        return this.condition != null;
     }
 }

@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ package com.izforge.izpack.compiler;
 import java.io.File;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import net.n3.nanoxml.XMLElement;
@@ -182,4 +183,26 @@ public interface IPackager
      * @param data - the xml-element packaging from the install.xml
      */
     public abstract void addConfigurationInformation(XMLElement data);
+    
+    /**
+     * @return the rules
+     */
+    public abstract Map getRules();    
+    
+    /**
+     * @param rules the rules to set
+     */
+    public abstract void setRules(Map rules);
+    
+    /**
+     * Returns a map of dynamically refreshed variables
+     * @return the map
+     */
+    public abstract Map getDynamicVariables();
+    
+    /**
+     * 
+     * @param dynamicvariables
+     */
+    public abstract void setDynamicVariables(Map dynamicvariables);
 }

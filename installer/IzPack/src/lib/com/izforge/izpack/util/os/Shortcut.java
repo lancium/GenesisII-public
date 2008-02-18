@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2002 Elmar Grom
  * 
@@ -25,7 +25,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.Vector;
 
 import com.izforge.izpack.installer.UninstallData;
-import com.izforge.izpack.util.Debug;
 
 /*---------------------------------------------------------------------------*/
 /**

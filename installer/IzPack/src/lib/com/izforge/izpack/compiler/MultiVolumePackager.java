@@ -1,7 +1,7 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
- * http://izpack.org/ http://developer.berlios.de/projects/izpack/
+ * http://izpack.org/ http://izpack.codehaus.org/
  * 
  * Copyright 2007 Dennis Reil
  * 
@@ -33,29 +33,20 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import net.n3.nanoxml.XMLElement;
 
-import com.izforge.izpack.CustomData;
-import com.izforge.izpack.GUIPrefs;
-import com.izforge.izpack.Info;
 import com.izforge.izpack.Pack;
 import com.izforge.izpack.PackFile;
-import com.izforge.izpack.Panel;
 import com.izforge.izpack.XPackFile;
-import com.izforge.izpack.compressor.PackCompressor;
-import com.izforge.izpack.compressor.PackCompressorFactory;
-import com.izforge.izpack.io.FileSpanningInputStream;
 import com.izforge.izpack.io.FileSpanningOutputStream;
 import com.izforge.izpack.util.Debug;
+import com.izforge.izpack.util.FileUtil;
 
 /**
  * The packager class. The packager is used by the compiler to put files into an installer, and
@@ -65,59 +56,15 @@ import com.izforge.izpack.util.Debug;
  * 
  * @author Dennis Reil, <Dennis.Reil@reddot.de>
  */
-public class MultiVolumePackager implements IPackager
+public class MultiVolumePackager extends PackagerBase
 {
 
     public static final String INSTALLER_PAK_NAME = "installer";
 
-    /** Path to the skeleton installer. */
-    public static final String SKELETON_SUBPATH = "lib/installer.jar";
-
-    /** Base file name of all jar files. This has no ".jar" suffix. */
-    private File baseFile = null;
-
     /** Executable zipped output stream. First to open, last to close. */
     private ZipOutputStream primaryJarStream;
 
-    /** Basic installer info. */
-    private Info info = null;
 
-    /** Gui preferences of instatller. */
-    private GUIPrefs guiPrefs = null;
-
-    /** The variables used in the project */
-    private Properties variables = new Properties();
-
-    /** The ordered panels informations. */
-    private List panelList = new ArrayList();
-
-    /** The ordered packs informations (as PackInfo objects). */
-    private List packsList = new ArrayList();
-
-    /** The ordered langpack ISO3 names. */
-    private List langpackNameList = new ArrayList();
-
-    /** The ordered custom actions informations. */
-    private List customDataList = new ArrayList();
-
-    /** The langpack URLs keyed by ISO3 name. */
-    private Map installerResourceURLMap = new HashMap();
-
-    /** Jar file URLs who's contents will be copied into the installer. */
-    private Set includedJarURLs = new HashSet();
-
-    /** Each pack is created in a separte jar if webDirURL is non-null. */
-    private boolean packJarsSeparate = false;
-
-    /** The listeners. */
-    private PackagerListener listener;
-
-    /** The compression format to be used for pack compression */
-    private PackCompressor compressor;
-
-    /** Files which are always written into the container file */
-    private HashMap alreadyWrittenFiles = new HashMap();
-    
     private XMLElement configdata = null;
 
     /**
@@ -151,7 +98,7 @@ public class MultiVolumePackager implements IPackager
      */
     public MultiVolumePackager(String compr_format, int compr_level) throws CompilerException
     {
-        setCompressorOptions(compr_format, compr_level);
+        initPackCompressor(compr_format, compr_level);
     }
 
     /**
@@ -184,19 +131,7 @@ public class MultiVolumePackager implements IPackager
 
         sendStart();
 
-        // write the primary jar. MUST be first so manifest is not overwritten
-        // by
-        // an included jar
-        System.out.println("Writing skeleton installer.");
-        writeSkeletonInstaller();
-        writeInstallerObject("info", info);
-        writeInstallerObject("vars", variables);
-        writeInstallerObject("GUIPrefs", guiPrefs);
-        writeInstallerObject("panelsOrder", panelList);
-        writeInstallerObject("customData", customDataList);
-        writeInstallerObject("langpacks.info", langpackNameList);
-        writeInstallerResources();
-        writeIncludedJars();
+        writeInstaller();
 
         // Pack File Data may be written to separate jars
         String packfile = baseFile.getParent() + File.separator + INSTALLER_PAK_NAME;
@@ -221,7 +156,8 @@ public class MultiVolumePackager implements IPackager
     {
         String classname = this.getClass().getName();
         String sizeprop = classname + ".volumesize";
-        String freespaceprop = classname + ".firstvolumefreespace";        
+        String freespaceprop = classname + ".firstvolumefreespace"; 
+        
         if (this.configdata == null){
             // no configdata given, set default values
             this.variables.setProperty(sizeprop, Long.toString(FileSpanningOutputStream.DEFAULT_VOLUME_SIZE));
@@ -236,226 +172,6 @@ public class MultiVolumePackager implements IPackager
         }         
     }
 
-    /**
-     * Get the PackagerListener.
-     * 
-     * @return the current PackagerListener
-     */
-    public PackagerListener getPackagerListener()
-    {
-        return listener;
-    }
-
-    /**
-     * Adds a listener.
-     * 
-     * @param listener The listener.
-     */
-    public void setPackagerListener(PackagerListener listener)
-    {
-        this.listener = listener;
-    }
-
-    /**
-     * Dispatches a message to the listeners.
-     * 
-     * @param job The job description.
-     */
-    private void sendMsg(String job)
-    {
-        sendMsg(job, PackagerListener.MSG_INFO);
-    }
-
-    /**
-     * Dispatches a message to the listeners at specified priority.
-     * 
-     * @param job The job description.
-     * @param priority The message priority.
-     */
-    private void sendMsg(String job, int priority)
-    {
-        Debug.trace(job);
-        if (listener != null) listener.packagerMsg(job, priority);
-    }
-
-    /** Dispatches a start event to the listeners. */
-    private void sendStart()
-    {
-        if (listener != null) listener.packagerStart();
-    }
-
-    /** Dispatches a stop event to the listeners. */
-    private void sendStop()
-    {
-        if (listener != null) listener.packagerStop();
-    }
-
-    /***********************************************************************************************
-     * Public methods to add data to the Installer being packed
-     **********************************************************************************************/
-
-    /**
-     * Sets the informations related to this installation.
-     * 
-     * @param info The info section.
-     * @exception Exception Description of the Exception
-     */
-    public void setInfo(Info info) throws Exception
-    {
-        sendMsg("Setting the installer information", PackagerListener.MSG_VERBOSE);
-        this.info = info;
-        if (!getCompressor().useStandardCompression()
-                && getCompressor().getDecoderMapperName() != null)
-        {
-            this.info.setPackDecoderClassName(getCompressor().getDecoderMapperName());
-        }
-    }
-
-    /**
-     * Sets the GUI preferences.
-     * 
-     * @param prefs The new gUIPrefs value
-     */
-    public void setGUIPrefs(GUIPrefs prefs)
-    {
-        sendMsg("Setting the GUI preferences", PackagerListener.MSG_VERBOSE);
-        guiPrefs = prefs;
-    }
-
-    /**
-     * Allows access to add, remove and update the variables for the project, which are maintained
-     * in the packager.
-     * 
-     * @return map of variable names to values
-     */
-    public Properties getVariables()
-    {
-        return variables;
-    }
-
-    /**
-     * Add a panel, where order is important. Only one copy of the class files neeed are inserted in
-     * the installer.
-     */
-    public void addPanelJar(Panel panel, URL jarURL)
-    {
-        panelList.add(panel); // serialized to keep order/variables correct
-        addJarContent(jarURL); // each included once, no matter how many times
-        // added
-    }
-
-    /**
-     * Add a custom data like custom actions, where order is important. Only one copy of the class
-     * files neeed are inserted in the installer.
-     * 
-     * @param ca custom action object
-     * @param url the URL to include once
-     */
-    public void addCustomJar(CustomData ca, URL url)
-    {
-        customDataList.add(ca); // serialized to keep order/variables correct
-        addJarContent(url); // each included once, no matter how many times
-        // added
-    }
-
-    /**
-     * Adds a pack, order is mostly irrelevant.
-     * 
-     * @param pack contains all the files and items that go with a pack
-     */
-    public void addPack(PackInfo pack)
-    {
-        packsList.add(pack);
-    }
-
-    /**
-     * Gets the packages list
-     */
-    public List getPacksList()
-    {
-        return packsList;
-    }
-
-    /**
-     * Adds a language pack.
-     * 
-     * @param iso3 The ISO3 code.
-     * @param xmlURL The location of the xml local info
-     * @param flagURL The location of the flag image resource
-     */
-    public void addLangPack(String iso3, URL xmlURL, URL flagURL)
-    {
-        sendMsg("Adding langpack: " + iso3, PackagerListener.MSG_VERBOSE);
-        // put data & flag as entries in installer, and keep array of iso3's
-        // names
-        langpackNameList.add(iso3);
-        addResource("flag." + iso3, flagURL);
-        installerResourceURLMap.put("langpacks/" + iso3 + ".xml", xmlURL);
-    }
-
-    /**
-     * Adds a resource.
-     * 
-     * @param resId The resource Id.
-     * @param url The location of the data
-     */
-    public void addResource(String resId, URL url)
-    {
-        sendMsg("Adding resource: " + resId, PackagerListener.MSG_VERBOSE);
-        installerResourceURLMap.put("res/" + resId, url);
-    }
-
-    /**
-     * Adds a native library.
-     * 
-     * @param name The native library name.
-     * @param url The url to get the data from.
-     * @exception Exception Description of the Exception
-     */
-    public void addNativeLibrary(String name, URL url) throws Exception
-    {
-        sendMsg("Adding native library: " + name, PackagerListener.MSG_VERBOSE);
-        installerResourceURLMap.put("native/" + name, url);
-    }
-
-    /**
-     * Adds a jar file content to the installer. Package structure is maintained. Need mechanism to
-     * copy over signed entry information.
-     * 
-     * @param jarURL The url of the jar to add to the installer. We use a URL so the jar may be
-     * nested within another.
-     */
-    public void addJarContent(URL jarURL)
-    {
-        addJarContent(jarURL, null);
-    }
-
-    /**
-     * Adds a jar file content to the installer. Package structure is maintained. Need mechanism to
-     * copy over signed entry information.
-     * 
-     * @param jarURL The url of the jar to add to the installer. We use a URL so the jar may be
-     * nested within another.
-     */
-    public void addJarContent(URL jarURL, List files)
-    {
-        Object[] cont = { jarURL, files};
-        sendMsg("Adding content of jar: " + jarURL.getFile(), PackagerListener.MSG_VERBOSE);
-        includedJarURLs.add(cont);
-    }
-
-    /**
-     * Marks a native library to be added to the uninstaller.
-     * 
-     * @param data the describing custom action data object
-     */
-    public void addNativeUninstallerLibrary(CustomData data)
-    {
-        customDataList.add(data); // serialized to keep order/variables
-        // correct
-
-    }
-
     /***********************************************************************************************
      * Private methods used when writing out the installer to jar files.
      **********************************************************************************************/
@@ -464,7 +180,7 @@ public class MultiVolumePackager implements IPackager
      * Write skeleton installer to primary jar. It is just an included jar, except that we copy the
      * META-INF as well.
      */
-    private void writeSkeletonInstaller() throws IOException
+    protected void writeSkeletonInstaller() throws IOException
     {
         sendMsg("Copying the skeleton installer", PackagerListener.MSG_VERBOSE);
         
@@ -539,7 +255,7 @@ public class MultiVolumePackager implements IPackager
     /**
      * Write an arbitrary object to primary jar.
      */
-    private void writeInstallerObject(String entryName, Object object) throws IOException
+    protected void writeInstallerObject(String entryName, Object object) throws IOException
     {
         primaryJarStream.putNextEntry(new ZipEntry(entryName));
         ObjectOutputStream out = new ObjectOutputStream(primaryJarStream);
@@ -549,7 +265,7 @@ public class MultiVolumePackager implements IPackager
     }
 
     /** Write the data referenced by URL to primary jar. */
-    private void writeInstallerResources() throws IOException
+    protected void writeInstallerResources() throws IOException
     {
         sendMsg("Copying " + installerResourceURLMap.size() + " files into installer");
 
@@ -558,7 +274,13 @@ public class MultiVolumePackager implements IPackager
         {
             String name = (String) i.next();
             InputStream in = ((URL) installerResourceURLMap.get(name)).openStream();
-            primaryJarStream.putNextEntry(new ZipEntry(name));
+
+            org.apache.tools.zip.ZipEntry newEntry = new org.apache.tools.zip.ZipEntry(name);
+            long dateTime = FileUtil.getFileDateTime((URL) installerResourceURLMap.get(name));
+            if (dateTime != -1)
+                newEntry.setTime(dateTime);
+            primaryJarStream.putNextEntry(newEntry);
+
             copyStream(in, primaryJarStream);
             primaryJarStream.closeEntry();
             in.close();
@@ -566,7 +288,7 @@ public class MultiVolumePackager implements IPackager
     }
 
     /** Copy included jars to primary jar. */
-    private void writeIncludedJars() throws IOException
+    protected void writeIncludedJars() throws IOException
     {
         sendMsg("Merging " + includedJarURLs.size() + " jars into installer");
 
@@ -628,10 +350,6 @@ public class MultiVolumePackager implements IPackager
             Debug.trace("Writing Pack " + packNumber + ": " + pack.name);
             ZipEntry entry = new ZipEntry("packs/pack" + packNumber);
             // write the metadata as uncompressed object stream to primaryJarStream
-            // ByteCountingOutputStream dos = new
-            // ByteCountingOutputStream(comprStream);
-            // ByteCountingOutputStream dos = new
-            // ByteCountingOutputStream(primaryJarStream);
             // first write a packs entry
 
             primaryJarStream.putNextEntry(entry);
@@ -649,11 +367,11 @@ public class MultiVolumePackager implements IPackager
                 Debug.trace("Next file: " + file.getAbsolutePath());
                 // use a back reference if file was in previous pack, and in
                 // same jar
-                long[] info = (long[]) storedFiles.get(file);
+                Object[] info = (Object[]) storedFiles.get(file);
                 if (info != null && !packJarsSeparate)
                 {
                     Debug.trace("File already included in other pack");
-                    pf.setPreviousPackFileRef((int) info[0], info[1]);
+                    pf.setPreviousPackFileRef((String) info[0], (Long)info[1]);
                     addFile = false;
                 }
 
@@ -687,7 +405,7 @@ public class MultiVolumePackager implements IPackager
                     if (bytesWritten != pf.length()) { throw new IOException(
                             "File size mismatch when reading " + file); }
                     inStream.close();
-                    // keine backreferences möglich
+                    // keine backreferences mglich
                     // storedFiles.put(file, new long[] { packNumber, pos});
                 }
 
@@ -767,21 +485,7 @@ public class MultiVolumePackager implements IPackager
 
         return jar;
     }
-
-    /**
-     * Copies contents of one jar to another.
-     * 
-     * <p>
-     * TODO: it would be useful to be able to keep signature information from signed jar files, can
-     * we combine manifests and still have their content signed?
-     * 
-     * @see #copyStream(InputStream, OutputStream)
-     */
-    private void copyZip(ZipInputStream zin, ZipOutputStream out) throws IOException
-    {
-        copyZip(zin, out, null);
-    }
-
+    
     /**
      * Copies specified contents of one jar to another.
      * 
@@ -819,7 +523,15 @@ public class MultiVolumePackager implements IPackager
             if (currentSet.contains(currentName)) continue;
             try
             {
-                out.putNextEntry(new ZipEntry(currentName));
+                // Create new entry for zip file.
+                ZipEntry newEntry = new ZipEntry(currentName);
+                // Get input file date and time.
+                long fileTime = zentry.getTime();
+                // Make sure there is date and time set.
+                if (fileTime != -1)
+                    newEntry.setTime(fileTime); // If found set it into output file.
+                out.putNextEntry(newEntry);
+
                 copyStream(zin, out);
                 out.closeEntry();
                 zin.closeEntry();
@@ -874,7 +586,15 @@ public class MultiVolumePackager implements IPackager
             if (currentSet.contains(currentName)) continue;
             try
             {
-                out.putNextEntry(new ZipEntry(currentName));
+                // Create new entry for zip file.
+                ZipEntry newEntry = new ZipEntry(currentName);
+                // Get input file date and time.
+                long fileTime = zentry.getTime();
+                // Make sure there is date and time set.
+                if (fileTime != -1)
+                    newEntry.setTime(fileTime); // If found set it into output file.
+                out.putNextEntry(newEntry);
+
                 copyStream(zin, out);
                 out.closeEntry();
                 zin.closeEntry();
@@ -910,29 +630,21 @@ public class MultiVolumePackager implements IPackager
         return bytesCopied;
     }
 
-    /**
-     * Returns the current pack compressor
-     * 
-     * @return Returns the current pack compressor.
+    /* (non-Javadoc)
+     * @see com.izforge.izpack.compiler.IPackager#addConfigurationInformation(net.n3.nanoxml.XMLElement)
      */
-    public PackCompressor getCompressor()
-    {
-        return compressor;
-    }
-
-    public void setCompressorOptions(String compr_format, int compr_level) throws CompilerException
-    {
-        compressor = PackCompressorFactory.get(compr_format);
-        compressor.setCompressionLevel(compr_level);
-    }
-
     public void addConfigurationInformation(XMLElement data)
     {
        this.configdata = data;        
     }
 
-    public void initPackCompressor(String compr_format, int compr_level) throws CompilerException
-    {       
-        this.setCompressorOptions(compr_format, compr_level);        
+    /* (non-Javadoc)
+     * @see com.izforge.izpack.compiler.PackagerBase#writePacks()
+     */
+    protected void writePacks() throws Exception
+    {
+        // TODO Auto-generated method stub
+        
     }
+
 }

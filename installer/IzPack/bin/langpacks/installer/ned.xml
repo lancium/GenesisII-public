@@ -114,6 +114,7 @@
     <str id="JDKPathPanel.badVersion2" txt=" vereist: " />
     <str id="JDKPathPanel.badVersion3"
         txt=") wilt u toch deze JDK gebruiken?" />
+    <str id="JDKPathPanel.nonValidPathInReg" txt="Het Windows register bevat een ongeldig pad voor deze JDK. Wilt u deze JDK toch gebruiken?"/>
 
 
     <str id="PacksPanel.info"
@@ -281,7 +282,41 @@
 
     <!-- Strings for the loggin/reporting system (Messenger) -->
 
+    <!-- This string defines the time stamp format in the installation report.
+         The format details are documented in java.text.SimpleDateFormat -->
+    <str id="log.timeStamp"               txt="dd-MM-yyyy [HH:mm:ss]  zzzz"/>
 
+    <!-- Strings for various purposes in the logging/reporting system  -->
+    <str id="log.reportHeading"           txt="                           IzPack INSTALLATIE RAPPORT"/>
+    <str id="log.installFailed"           txt="WAARSCHUWING!!! De installatie is niet gelukt!"/>
+    <str id="log.partialInstall"          txt="WAARSCHUWING!!! De installatie is mogelijk niet volledig gelukt!"/>
+    <str id="log.messageCount"            txt="Dit rapport bevat {0} bericht(en), {1} waarschuwing(en) and {2} fout(en)"/>
+    <str id="log.application"             txt="Installatie rapport voor : {0} Versie {1}"/>
+    <str id="log.timePrefix"              txt="Installatie tijd         : {0}"/>
+    <str id="log.pathPrefix"              txt="Installatie map          : {0}"/>
+    <str id="log.messageHeading"          txt="                         --- Installatie berichten ---"/>
+    <str id="log.warningHeading"          txt="                             --- Waarschuwingen ---"/>
+    <str id="log.errorHeading"            txt="                                --- Fouten ---"/>
+    <str id="log.exceptionPrefix"         txt="                 >> Exception: {0}"/>
+    <str id="log.messagePrefix"           txt="Bericht  [{0}] - "/>
+    <str id="log.warningPrefix"           txt="Waarschuwing [{0}] - "/>
+    <str id="log.errorPrefix"             txt="Fout [{0}] - "/>
+    <str id="log.reportWriteErrorTitle"   txt="Fout bij het schrijven van het rapport"/>
+    <str id="log.reportWriteError"        txt="Kan het installatie rapport niet schrijven naar ''{0}''"/>
+    <str id="log.informUserTitle"         txt="Installatie problemen"/>
+    <str id="log.saveLogTitle"            txt="Log bestand opslaan"/>
+    <str id="log.LogFileName"             txt="installatieLog.txt"/>
+    <str id="log.informUserFail"          txt="&lt;html&gt;De installatie is niet gelukt!&lt;br&gt;Wilt u een log-bestand opslaan?&lt;/html&gt;"/>
+    <str id="log.informUserPartial"       txt="&lt;html&gt;De installatie is mogelijk niet volledig gelukt!&lt;br&gt;Wilt u een log-bestand opslaan?&lt;/html&gt;"/>
+
+    <!-- Strings for individual messages in the logging/reporting system.
+         Numbers for each category (message/warning/error) start at 0  -->
+    <str id="log.message_"                txt=""/>
+
+    <str id="log.warning_"                txt=""/>
+
+    <str id="log.error_0"                 txt="Kan ''{0}'' niet wegschrijven"/>
+    
     <str id="InstallationGroupPanel.colNameSelected" txt="Geselecteerd" />
     <str id="InstallationGroupPanel.colNameInstallType" txt="Installatie Type" />
     <str id="InstallationGroupPanel.colNameSize" txt="Grootte" />

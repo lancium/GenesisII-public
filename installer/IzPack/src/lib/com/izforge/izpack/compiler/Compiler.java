@@ -1,9 +1,9 @@
 /*
- * $Id: Compiler.java 1831 2007-05-11 19:38:20Z jponge $
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * $Id: Compiler.java 2036 2008-02-09 11:14:05Z jponge $
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  *
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  *
  * Copyright 2001 Johannes Lehtinen
  * Copyright 2002 Paul Wilkinson
@@ -26,7 +26,6 @@
 package com.izforge.izpack.compiler;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ import com.izforge.izpack.util.VariableSubstitutor;
 public class Compiler extends Thread
 {
     /** The IzPack version. */
-    public final static String IZPACK_VERSION = "3.10.2";
+    public final static String IZPACK_VERSION = "3.11.0";
 
     /** The IzPack home directory. */
     public static String IZPACK_HOME = ".";
@@ -93,7 +92,7 @@ public class Compiler extends Thread
     private String compr_format;
     private int compr_level;
     private PackagerListener packagerlistener;
-
+      
     /**
      * Set the IzPack home directory
      * @param izHome - the izpack home directory
@@ -151,7 +150,7 @@ public class Compiler extends Thread
         // initialize backed by system properties
         properties = new Properties(System.getProperties());
         propertySubstitutor = new VariableSubstitutor(properties);
-
+       
         // add izpack built in property
         setProperty("izpack.version", IZPACK_VERSION);
         setProperty("basedir", basedir);
@@ -418,14 +417,15 @@ public class Compiler extends Thread
     }
     /**
      * Add a lang pack to the installation.
-     * @param iso3
-     * @param iso3xmlURL
-     * @param iso3FlagURL
+     * 
+     * @param locale
+     * @param localeURL
+     * @param flagURL
      */
-    public void addLangPack(String iso3, URL iso3xmlURL, URL iso3FlagURL)
-    {
-        packager.addLangPack(iso3, iso3xmlURL, iso3FlagURL);
-    }
+    public void addLangPack(String locale, URL localeURL, URL flagURL)
+   {
+       packager.addLangPack(locale, localeURL, flagURL);
+   }
     /**
      * Add a native library to the installation.
      * @param name
@@ -730,6 +730,11 @@ public class Compiler extends Thread
         URL url = findIzPackResource(jarPath, "CustomAction jar file");
         List filePaths = getContainedFilePaths(url);
         String fullClassName = getFullClassName(url, className);
+        if (fullClassName == null)
+        {
+            throw new CompilerException("CustomListener class '" + className + "' not found in '"
+                    + url + "'. The class and listener name must match");
+        }
         CustomData ca = new CustomData(fullClassName, filePaths, constraints, type);
         packager.addCustomJar(ca, url);
     }
@@ -783,12 +788,12 @@ public class Compiler extends Thread
             if (className != null)
             {
                 pos = name.indexOf(className);
-            }
-            if (name.length() == pos + className.length() + 6) // "Main" class
-            // found
-            {
-                jis.close();
-                return (name.substring(0, lastPos));
+                if (name.length() == pos + className.length() + 6) // "Main" class
+                // found
+                {
+                    jis.close();
+                    return (name.substring(0, lastPos));
+                }
             }
         }
         jis.close();
@@ -858,6 +863,35 @@ public class Compiler extends Thread
             System.out.println();
             System.out.println("[ End ]");
         }
+    }
+
+    
+    /**
+     * @return the conditions
+     */
+    public Map getConditions()
+    {
+        return this.packager.getRules();
+    }
+
+    
+    /**
+     * @param conditions the conditions to set
+     */
+    public void setConditions(Map conditions)
+    {
+        this.packager.setRules(conditions);        
+    }
+    
+    public Map getDynamicVariables()
+    {
+        return this.packager.getDynamicVariables();
+    }
+    
+    
+    public void setDynamicVariables(Map dynamicvariables)
+    {
+        this.packager.setDynamicVariables(dynamicvariables);
     }
 
 }

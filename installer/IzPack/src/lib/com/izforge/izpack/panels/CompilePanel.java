@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2003 Tino Schwarze
  * 
@@ -467,6 +467,14 @@ public class CompilePanel extends IzPanel implements ActionListener, CompileHand
                 + Integer.toString(this.noOfJobs));
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void setSubStepNo(int max)
+    {
+        packProgressBar.setMaximum(max);        
+    }
+    
     /** Called when the panel becomes active. */
     public void panelActivate()
     {

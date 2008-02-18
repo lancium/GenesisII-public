@@ -1,7 +1,7 @@
 /* StdXMLReader.java                                               NanoXML/Java
  *
- * $Revision: 1422 $
- * $Date: 2006-03-21 19:14:56 +0100 (Tue, 21 Mar 2006) $
+ * $Revision: 1961 $
+ * $Date: 2007-12-17 12:20:05 +0000 (Mon, 17 Dec 2007) $
  * $Name$
  *
  * This file is part of NanoXML 2 for Java.
@@ -47,7 +47,7 @@ import java.util.Stack;
  * StdXMLReader reads the data to be parsed.
  * 
  * @author Marc De Scheemaecker
- * @version $Name$, $Revision: 1422 $
+ * @version $Name$, $Revision: 1961 $
  */
 public class StdXMLReader implements IXMLReader
 {
@@ -138,7 +138,7 @@ public class StdXMLReader implements IXMLReader
         }
         catch (MalformedURLException e)
         {
-            systemID = "file:" + systemID;
+            systemID = "file://" + systemID;
 
             try
             {

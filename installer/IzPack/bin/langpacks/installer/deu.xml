@@ -25,6 +25,7 @@
     <str id="SummaryPanel.headline" txt="Zusammenfassung Konfigurationsdaten"/>
     <str id="TargetPanel.headline" txt="Installationspfad"/>
     <str id="UserInputPanel.headline" txt="Benutzerdaten"/>
+    <str id="InstallationTypePanel.headline" txt="Installationsart" />
     
     <!-- General installer strings -->
     <str id="installer.title" txt="IzPack - Installation von "/>
@@ -42,6 +43,7 @@
     <str id="installer.help" txt="Hilfe"/>
     <str id="installer.step" txt="Schritt"/>
     <str id="installer.of" txt="von"/>
+    <str id="installer.Message" txt="Meldung"/> 
 
     <!-- Uninstaller specific strings -->
     <str id="uninstaller.warning" txt="Jetzt werden die installierten Anwendungen entfernt!"/>
@@ -67,7 +69,12 @@
     <str id="LicencePanel.no" txt="Nein"/>
     <str id="InfoPanel.info" txt="Bitte lesen Sie die folgenden Informationen:"/>
     
+    <str id="InstallationTypePanel.info" txt="Bitte wählen Sie die Installationsart:" />
+    <str id="InstallationTypePanel.normal" txt="Neue Installation" />
+    <str id="InstallationTypePanel.modify" txt="Installation anpassen" />
+    
     <str id="PathInputPanel.required" txt="Das gewählte Verzeichnis muss existieren."/>
+    <str id="PathInputPanel.required.forModificationInstallation" txt="Das gewählte Verzeichnis muss existieren."/>
     <str id="PathInputPanel.notValid" txt="Das gewählte Verzeichnis enthält nicht das benötigte Produkt."/>
 
     <str id="TargetPanel.info" txt="Wählen Sie den Installationspfad:"/>
@@ -89,6 +96,7 @@
     <str id="JDKPathPanel.badVersion1" txt="Der gewählte JDK hat die falsche Version (vorhanden: "/>
     <str id="JDKPathPanel.badVersion2" txt=" benötigt: "/>
     <str id="JDKPathPanel.badVersion3" txt=") Soll der JDK trotzdem benutzt werden?"/>
+    <str id="JDKPathPanel.nonValidPathInReg" txt="Die Windows-Registry enthält für diesen JDK einen fehlerhaften Pfad-Eintrag. Soll der JDK trotzdem benutzt werden?"/>
 
     <str id="PacksPanel.info" txt="Bitte wählen Sie hier die Installationspakete aus:"/>
     <str id="PacksPanel.tip" txt="Hinweis: die grau markierten Pakete können nicht optional ausgewählt werden."/>
@@ -103,6 +111,8 @@
     <str id="PacksPanel.notEnoughSpace" 
     	txt="Der erforderliche Festplattenplatz für die Installation ist größer als der zur Verfügung stehende Speicherplatz."/>
     <str id="PacksPanel.notAscertainable" txt="nicht bestimmbar"/>
+    <str id="PacksPanel.installedpacks.summarycaption" txt="Bereits installierte Pakete"/>
+    
     
     <str id="InstallPanel.info" txt="Starten Sie hier die Installation:"/>
     <str id="InstallPanel.install" txt="Installieren!"/>
@@ -192,13 +202,13 @@
 
     <str id="ProcessPanel.heading" txt="Prozesse" />
 
-    <!-- Strings for the summary of panels --- START -->
+    <!-- Strings for the summary of panels - START -->
     <str id="SummaryPanel.info" txt="Alle für die Installation notwendigen Daten liegen nun vor. Die wichtigsten sind nachfolgend aufgeführt. Klicken Sie auf &quot;Weiter&quot; um mit der Installation zu beginnen. "/>
     <str id="TargetPanel.summaryCaption" txt="Installationspfad"/>
     <str id="JDKPathPanel.summaryCaption" txt="Pfad des JDK-Verzeichnisses"/>
     <str id="PacksPanel.summaryCaption" txt="Gewählte Installationspakete"/>
     <str id="ImgPacksPanel.summaryCaption" txt="Gewählte Installationspakete"/>
-    <!-- Strings for the summary of panels --- END -->
+    <!-- Strings for the summary of panels - END -->
 
     <!-- Strings for the Registry -->
     <str id="functionFailed.RegOpenKeyEx" txt="Der Registry-Schlüssel {0}\\{1} konnte nicht geöffnet werden."/>
@@ -214,10 +224,48 @@
 	  <str id="nextmedia.cancelbtn" txt="Installation abbrechen" />	
     <str id="nextmedia.choosertitle" txt="Installationsmedium auswählen" />
     <str id="nextmedia.filedesc" txt="Installationspakete (.pak*)" />
+
+    <!-- Strings for the loggin/reporting system (Messenger) -->
+
+    <!-- This string defines the time stamp format in the installation report.
+         The format details are documented in java.text.SimpleDateFormat -->
+    <str id="log.timeStamp"               txt="dd-MM-yyyy [HH:mm:ss]  zzzz"/>
+
+    <!-- Strings for various purposes in the logging/reporting system  -->
+    <str id="log.reportHeading"           txt="                          IzPack INSTALLATIONSREPORT"/>
+    <str id="log.installFailed"           txt="Achtung!!! Die Installation ist fehlgeschalgen!"/>
+    <str id="log.partialInstall"          txt="Achtung!!! Die Installation konnte nicht vollständig ausgeführt werden!"/>
+    <str id="log.messageCount"            txt="Dieser Report enthält {0} Meldung(en), {1} Warnung(en) und {2} Fehlermeldung(en)"/>
+    <str id="log.application"             txt="Installationsreport für : {0} Version {1}"/>
+    <str id="log.timePrefix"              txt="Install time            : {0}"/>
+    <str id="log.pathPrefix"              txt="Install directory       : {0}"/>
+    <str id="log.messageHeading"          txt="                              --- Meldungen ---"/>
+    <str id="log.warningHeading"          txt="                              --- Warnungen ---"/>
+    <str id="log.errorHeading"            txt="                          --- Installationsfehler ---"/>
+    <str id="log.exceptionPrefix"         txt="                 >> Exception: {0}"/>
+    <str id="log.messagePrefix"           txt="Meldung  [{0}] - "/>
+    <str id="log.warningPrefix"           txt="Warnung [{0}] - "/>
+    <str id="log.errorPrefix"             txt="Fehler [{0}] - "/>
+    <str id="log.reportWriteErrorTitle"   txt="Schreibfehler"/>
+    <str id="log.reportWriteError"        txt="Konnte den Report nicht in die Datei ''{0}'' schreiben"/>
+    <str id="log.informUserTitle"         txt="Installationsprobleme"/>
+    <str id="log.saveLogTitle"            txt="Protokoll speichern"/>
+    <str id="log.LogFileName"             txt="installLog.txt"/>
+    <str id="log.informUserFail"          txt="&lt;html&gt;Die Installation ist fehlgeschalgen!&lt;br&gt;Möchten Sie ein Protokoll abspeichern?&lt;/html&gt;"/>
+    <str id="log.informUserPartial"       txt="&lt;html&gt;Die Installation konnte nicht vollständig ausgeführt werden!&lt;br&gt;Möchten Sie ein Protokoll abspeichern?&lt;/html&gt;"/>
+
+    <!-- Strings for individual messages in the logging/reporting system.
+         Numbers for each category (message/warning/error) start at 0  -->
+    <str id="log.message_"                txt=""/>
+    <str id="log.warning_"                txt=""/>
+
+    <str id="log.error_0"                 txt="konnte die Datei ''{0}'' nicht schreiben"/>
+
     
     <str id="InstallationGroupPanel.colNameSelected" txt="Selektiert" />
     <str id="InstallationGroupPanel.colNameInstallType" txt="Installationstyp" />
     <str id="InstallationGroupPanel.colNameSize" txt="Grösse" />
     
+    <str id="debug.changevariable" txt="Wert ändern"/>
 </langpack>
 

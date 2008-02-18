@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2004 Klaus Bartz
  * 
@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import com.izforge.izpack.gui.IzPanelLayout;
+import com.izforge.izpack.installer.AutomatedInstallData;
 import com.izforge.izpack.installer.InstallData;
 import com.izforge.izpack.installer.InstallerFrame;
 import com.izforge.izpack.installer.IzPanel;
@@ -95,6 +96,9 @@ public class PathInputPanel extends IzPanel implements ActionListener
         // Intro
         // row 0 column 0
         add(createMultiLineLabel(introText));
+
+        add(IzPanelLayout.createParagraphGap());
+
         // Label for input
         // row 1 column 0.
         add(createLabel("info", "TargetPanel", "open",
@@ -138,7 +142,20 @@ public class PathInputPanel extends IzPanel implements ActionListener
     {
         String chosenPath = pathSelectionPanel.getPath();
         boolean ok = true;
-
+        
+        boolean modifyinstallation = Boolean.valueOf(idata.getVariable(InstallData.MODIFY_INSTALLATION)).booleanValue();
+        if (modifyinstallation) {
+            // installation directory has to exist in a modification installation
+            mustExist = true;
+            
+            File installationinformation = new File(pathSelectionPanel.getPath() + File.separator + AutomatedInstallData.INSTALLATION_INFORMATION);
+            if (!installationinformation.exists()) {
+                emitError(parent.langpack.getString("installer.error"), parent.langpack.getString("PathInputPanel.required.forModificationInstallation"));
+                
+                return false;
+            }
+        }
+        
         // We put a warning if the specified target is nameless
         if (chosenPath.length() == 0)
         {
@@ -194,7 +211,7 @@ public class PathInputPanel extends IzPanel implements ActionListener
 			            + chosenPath);
 			
 			}
-        }
+        }        
         return ok;
     }
 

@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,11 @@
 
 package com.izforge.izpack.util;
 
+import com.izforge.izpack.panels.PasswordGroup;
 import java.util.Map;
-
-import org.apache.regexp.RE;
+import java.util.regex.Pattern;
 
 import com.izforge.izpack.panels.ProcessingClient;
-import com.izforge.izpack.panels.RuleInputField;
 import com.izforge.izpack.panels.Validator;
 
 /**
@@ -47,20 +46,34 @@ public class RegularExpressionValidator implements Validator
 
         String patternString;
 
-        RuleInputField field = (RuleInputField) client;
-        if (field.hasParams())
+        if (client.hasParams())
         {
-            Map paramMap = field.getValidatorParams();
+            Map paramMap = client.getValidatorParams();
             patternString = (String) paramMap.get(PATTERN_PARAM);
-
         }
         else
         {
             patternString = STR_PATTERN_DEFAULT;
         }
-
-        RE pattern = new RE(patternString);
-        return pattern.match(((RuleInputField) client).getText());
+        Pattern pattern = Pattern.compile(patternString);
+        return pattern.matcher(getString(client)).matches();
+    }
+    
+    private String getString(ProcessingClient client) {
+      String returnValue = "";
+      if (client instanceof PasswordGroup) {
+        int numFields = client.getNumFields();
+        if (numFields > 0) {
+          returnValue = client.getFieldContents(0);
+        } else {
+          // Should never get here, but might as well try and grab some text
+          returnValue = client.getText();
+        }
+      } else {
+        // Original way to retrieve text for validation
+        returnValue = client.getText();
+      }
+      return returnValue;
     }
 
 }

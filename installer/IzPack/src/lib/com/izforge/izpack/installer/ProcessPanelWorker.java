@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2004 Tino Schwarze
  * 
@@ -38,12 +38,14 @@ import java.util.List;
 import java.util.Vector;
 
 import net.n3.nanoxml.NonValidator;
-import net.n3.nanoxml.StdXMLBuilder;
 import net.n3.nanoxml.StdXMLParser;
 import net.n3.nanoxml.StdXMLReader;
 import net.n3.nanoxml.XMLElement;
+import net.n3.nanoxml.XMLBuilderFactory;
 
 import com.izforge.izpack.Pack;
+import com.izforge.izpack.rules.Condition;
+import com.izforge.izpack.rules.RulesEngine;
 import com.izforge.izpack.util.AbstractUIHandler;
 import com.izforge.izpack.util.AbstractUIProcessHandler;
 import com.izforge.izpack.util.Debug;
@@ -115,7 +117,7 @@ public class ProcessPanelWorker implements Runnable
         }
 
         StdXMLParser parser = new StdXMLParser();
-        parser.setBuilder(new StdXMLBuilder());
+        parser.setBuilder(XMLBuilderFactory.createXMLBuilder());
         parser.setValidator(new NonValidator());
 
         XMLElement spec;
@@ -144,7 +146,17 @@ public class ProcessPanelWorker implements Runnable
         for (Iterator job_it = spec.getChildrenNamed("job").iterator(); job_it.hasNext();)
         {
             XMLElement job_el = (XMLElement) job_it.next();
-
+            String conditionid = job_el.getAttribute("conditionid");
+            if (conditionid != null){
+              Debug.trace("Condition for job.");
+              Condition cond = RulesEngine.getCondition(conditionid);
+              if ((cond != null) && !cond.isTrue()){
+                Debug.trace("condition is not fulfilled.");
+                // skip, if there is a condition and this condition isn't true
+                continue;
+              }
+            }
+            Debug.trace("Condition is fulfilled or not existent.");
             // ExecuteForPack Patch
             // Check if processing required for pack
             Vector forPacks = job_el.getChildrenNamed("executeForPack");
@@ -400,9 +412,15 @@ public class ProcessPanelWorker implements Runnable
 
                     if (exitStatus != 0)
                     {
-                        if (this.handler.askQuestion("process execution failed",
+                        // New bahavior: make it fail
+                        this.handler.emitError("Process execution failure", "The process has returned an error.");
+                        return false;
+                        /*if (this.handler.askQuestion("process execution failed",
                                 "Continue anyway?", AbstractUIHandler.CHOICES_YES_NO,
-                                AbstractUIHandler.ANSWER_YES) == AbstractUIHandler.ANSWER_NO) { return false; }
+                                AbstractUIHandler.ANSWER_YES) == AbstractUIHandler.ANSWER_NO)
+                        {
+                            return false;
+                        }*/
                     }
                 }
                 catch (InterruptedException ie)
@@ -637,7 +655,7 @@ public class ProcessPanelWorker implements Runnable
 
             for (int k = 0; k < packs.size(); k++)
             {
-                required = (String) ((XMLElement) packs.elementAt(k)).getAttribute("name", "");
+                required = ((XMLElement) packs.elementAt(k)).getAttribute("name", "");
                 // System.out.println ("Attribute name is " + required);
                 if (selected.equals(required))
                 {

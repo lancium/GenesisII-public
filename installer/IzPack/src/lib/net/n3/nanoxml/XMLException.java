@@ -1,7 +1,7 @@
 /* XMLException.java                                               NanoXML/Java
  *
  * $Revision: 1421 $
- * $Date: 2006-03-12 17:32:32 +0100 (Sun, 12 Mar 2006) $
+ * $Date: 2006-03-12 16:32:32 +0000 (Sun, 12 Mar 2006) $
  * $Name$
  *
  * This file is part of NanoXML 2 for Java.

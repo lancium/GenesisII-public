@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2002 Elmar Grom
  * 
@@ -152,9 +152,8 @@ public class RuleInputField extends JComponent implements KeyListener, FocusList
      */
     private Processor encryptionService;
 
-    /**
-     * @return true if this instance has any parameters to pass to the Validator instance.
-     */
+    /*--------------------------------------------------------------------------*/
+    // javadoc inherited
     public boolean hasParams()
     {
         return hasParams;
@@ -319,12 +318,7 @@ public class RuleInputField extends JComponent implements KeyListener, FocusList
     }
 
     /*--------------------------------------------------------------------------*/
-    /**
-     * Returns the validator parameters, if any. The caller should check for the existence of
-     * validator parameters via the <code>hasParams()</code> method prior to invoking this method.
-     * 
-     * @return a java.util.Map containing the validator parameters.
-     */
+    // javadoc inherited
     public Map getValidatorParams()
     {
         return validatorParams;

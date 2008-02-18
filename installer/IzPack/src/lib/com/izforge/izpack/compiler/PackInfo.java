@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2004 Chadwick McHenry
  * 
@@ -70,7 +70,7 @@ public class PackInfo
 
     /** Update check specifications in this Pack. */
     private List updateChecks = new ArrayList();
-
+        
     /** Constructor with required info. 
      * @param name name of the pack
      * @param id id of the pack e.g. to resolve I18N
@@ -78,11 +78,12 @@ public class PackInfo
      * @param required pack is required or not
      * @param loose files of pack should be stored separatly or not
      * @param excludegroup name of the exclude group 
+     * @param uninstall pack must be uninstalled 
      */
-    protected PackInfo(String name, String id, String description, boolean required, boolean loose, String excludegroup)
+    public PackInfo(String name, String id, String description, boolean required, boolean loose, String excludegroup, boolean uninstall)
     {
-        boolean ispreselected = (excludegroup == null) ? true : false;
-        pack = new Pack(name, id, description, null, null, required, ispreselected, loose, excludegroup);
+        boolean ispreselected = (excludegroup == null);
+        pack = new Pack(name, id, description, null, null, required, ispreselected, loose, excludegroup, uninstall);
         colour = PackInfo.WHITE;
     }
 
@@ -183,6 +184,7 @@ public class PackInfo
      * @param targetfile path file will be installed to.
      * @param osList the target operation system(s) of this pack.
      * @param override what to do if the file already exists when installing
+     * @param condition 
      * 
      * @throws FileNotFoundException if the file specified does not exist. The file is not read
      * until the {@link Packager#createInstaller} is invoked, thus a FileNotFoundEception will occur
@@ -204,12 +206,13 @@ public class PackInfo
      * until the {@link Packager#createInstaller} is invoked, thus a FileNotFoundEception will occur
      * then, if the file is deleted in between.
      */
-    public void addFile(File baseDir, File file, String targetfile, List osList, int override, Map additionals)
+    public void addFile(File baseDir, File file, String targetfile, List osList, int override, Map additionals, String condition)
             throws FileNotFoundException
     {
         if (!file.exists()) throw new FileNotFoundException(file.toString());
 
         PackFile packFile = new PackFile(baseDir, file, targetfile, osList, override, additionals);
+        packFile.setCondition(condition);
         files.put(packFile, file);
     }
 
@@ -289,8 +292,42 @@ public class PackInfo
         return pack.dependencies;
     }
     
+	public String getParent()
+    {
+       return pack.parent;
+    }
+    
+    public void setParent(String p)
+    {
+       pack.parent = p;
+    }
+    
     public String toString()
     {
         return pack.name;
     }
+
+    public void setPackImgId(String packImgId)
+    {
+        pack.packImgId = packImgId;
+    }
+
+    
+    /**
+     * @return the condition
+     */
+    public String getCondition()
+    {
+        return this.pack.getCondition();
+    }
+
+    
+    /**
+     * @param condition the condition to set
+     */
+    public void setCondition(String condition)
+    {
+        this.pack.setCondition(condition);
+    }
+    
 }

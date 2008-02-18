@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Copyright 2002 Marcus Wolschon
  * Copyright 2002 Jan Blok
@@ -30,8 +30,6 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -39,7 +37,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -53,12 +50,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
-import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
 import net.n3.nanoxml.XMLElement;
@@ -66,6 +61,7 @@ import net.n3.nanoxml.XMLElement;
 import com.izforge.izpack.LocaleDatabase;
 import com.izforge.izpack.Pack;
 import com.izforge.izpack.gui.LabelFactory;
+import com.izforge.izpack.installer.Debugger;
 import com.izforge.izpack.installer.InstallData;
 import com.izforge.izpack.installer.InstallerFrame;
 import com.izforge.izpack.installer.IzPanel;
@@ -86,8 +82,8 @@ import com.izforge.izpack.util.VariableSubstitutor;
  */
 public abstract class PacksPanelBase extends IzPanel implements PacksPanelInterface,
         ListSelectionListener
-{
-
+{    
+    
     // Common used Swing fields
     /**
      * The free space label.
@@ -133,7 +129,7 @@ public abstract class PacksPanelBase extends IzPanel implements PacksPanelInterf
     /**
      * The bytes of the current pack.
      */
-    protected int bytes = 0;
+    protected long bytes = 0;
 
     /**
      * The free bytes of the current selected disk.
@@ -154,6 +150,8 @@ public abstract class PacksPanelBase extends IzPanel implements PacksPanelInterf
      * The name of the XML file that specifies the panel langpack
      */
     private static final String LANG_FILE_NAME = "packsLang.xml";
+    
+    private Debugger debugger;
 
     /**
      * The constructor.
@@ -170,6 +168,7 @@ public abstract class PacksPanelBase extends IzPanel implements PacksPanelInterf
             this.langpack = parent.langpack;
             InputStream inputStream = ResourceManager.getInstance().getInputStream(LANG_FILE_NAME);
             this.langpack.add(inputStream);
+            this.debugger = parent.getDebugger();
         }
         catch (Throwable exception)
         {
@@ -201,9 +200,9 @@ public abstract class PacksPanelBase extends IzPanel implements PacksPanelInterf
      * 
      * @see com.izforge.izpack.panels.PacksPanelInterface#getBytes()
      */
-    public int getBytes()
+    public long getBytes()
     {
-        return (bytes);
+        return bytes;
     }
 
     /*
@@ -211,7 +210,7 @@ public abstract class PacksPanelBase extends IzPanel implements PacksPanelInterf
      * 
      * @see com.izforge.izpack.panels.PacksPanelInterface#setBytes(int)
      */
-    public void setBytes(int bytes)
+    public void setBytes(long bytes)
     {
         this.bytes = bytes;
     }
@@ -281,16 +280,15 @@ public abstract class PacksPanelBase extends IzPanel implements PacksPanelInterf
     public void valueChanged(ListSelectionEvent e)
     {
         VariableSubstitutor vs = new VariableSubstitutor(idata.getVariables());
-
         int i = packsTable.getSelectedRow();
         if (i < 0) return;
         
         // toggle the value stored in the packsModel
-        Integer checked = (Integer)packsModel.getValueAt(i, 0);
-        if (checked.intValue() == 0) {
-          packsModel.setValueAt(new Integer(1), i, 0);
-        } else if (checked.intValue() == 1) {
-          packsModel.setValueAt(new Integer(0), i, 0);
+        if (e.getValueIsAdjusting())
+        {
+            Integer checked = (Integer) packsModel.getValueAt(i, 0);
+            checked = (checked.intValue() == 0) ? Integer.valueOf(1) : Integer.valueOf(0);
+            packsModel.setValueAt(checked, i, 0);
         }
         
         // Operations for the description
@@ -534,12 +532,18 @@ public abstract class PacksPanelBase extends IzPanel implements PacksPanelInterf
     public void panelActivate()
     {
         try
-        {
+        {            
+            
             // TODO the PacksModel could be patched such that isCellEditable
             // allows returns false. In that case the PacksModel must not be
             // adapted here.
             packsModel = new PacksModel(this, idata, this.parent.getRules()) {
-              public boolean isCellEditable(int rowIndex, int columnIndex) { return false; }
+              /**
+               * Required (serializable)
+               */
+              private static final long serialVersionUID = 5061108355293832820L;
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) { return false; }
             };
             packsTable.setModel(packsModel);
             CheckBoxRenderer packSelectedRenderer = new CheckBoxRenderer();
@@ -577,8 +581,10 @@ public abstract class PacksPanelBase extends IzPanel implements PacksPanelInterf
         {
             e.printStackTrace();
         }
+
         showSpaceRequired();
         showFreeSpace();
+        packsTable.setRowSelectionInterval(0, 0);
     }
 
     /*
@@ -606,6 +612,25 @@ public abstract class PacksPanelBase extends IzPanel implements PacksPanelInterf
             else
                 retval.append(pack.name);
         }
+        if (packsModel.isModifyinstallation()) {
+            Map installedpacks = packsModel.getInstalledpacks();
+            iter = installedpacks.keySet().iterator();
+            retval.append("<br><b>");           
+            retval.append(langpack.getString("PacksPanel.installedpacks.summarycaption"));
+            retval.append("</b>");
+            retval.append("<br>");
+            while (iter.hasNext()) {
+                Pack pack = (Pack) installedpacks.get(iter.next());
+                if (langpack != null && pack.id != null && !"".equals(pack.id))
+                {
+                    retval.append(langpack.getString(pack.id));
+                }
+                else {
+                    retval.append(pack.name);
+                }
+                retval.append("<br>");
+            }
+        }
         return (retval.toString());
     }
 
@@ -615,7 +640,7 @@ public abstract class PacksPanelBase extends IzPanel implements PacksPanelInterf
                 boolean isSelected, boolean hasFocus, int row, int column)
         {
             JCheckBox display = new JCheckBox();
-            if(com.izforge.izpack.util.OsVersion.IS_UNIX)
+            if(com.izforge.izpack.util.OsVersion.IS_UNIX && !com.izforge.izpack.util.OsVersion.IS_OSX)
             {
                 display.setIcon(new LFIndependentIcon());
                 display.setDisabledIcon(new LFIndependentIcon());
@@ -641,6 +666,12 @@ public abstract class PacksPanelBase extends IzPanel implements PacksPanelInterf
                 display.setForeground(Color.GRAY);                
             }
             display.setSelected((value != null && Math.abs(state) == 1));
+            
+            if (state == -3) {
+                display.setForeground(Color.RED);
+                display.setSelected(true);
+            }
+            
             display.setEnabled(state >= 0);
             return display;
         }
@@ -731,6 +762,11 @@ public abstract class PacksPanelBase extends IzPanel implements PacksPanelInterf
     {
 
         
+        /**
+         * Required (serializable)
+         */
+        private static final long serialVersionUID = -9089892183236584242L;
+
         public Component getTableCellRendererComponent(JTable table, Object value,
                 boolean isSelected, boolean hasFocus, int row, int column)
         {
@@ -763,5 +799,8 @@ public abstract class PacksPanelBase extends IzPanel implements PacksPanelInterf
         }
 
     }
-
+    
+    public Debugger getDebugger() {
+        return this.debugger;
+    }
 }

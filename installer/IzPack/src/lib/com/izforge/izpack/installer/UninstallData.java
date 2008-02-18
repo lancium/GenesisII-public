@@ -1,8 +1,8 @@
 /*
- * IzPack - Copyright 2001-2007 Julien Ponge, All Rights Reserved.
+ * IzPack - Copyright 2001-2008 Julien Ponge, All Rights Reserved.
  * 
  * http://izpack.org/
- * http://developer.berlios.de/projects/izpack/
+ * http://izpack.codehaus.org/
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,13 +21,10 @@ package com.izforge.izpack.installer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-
 import com.izforge.izpack.ExecutableFile;
-import com.izforge.izpack.util.os.unix.UnixUser;
 
 /**
  * Holds uninstallation data. Implemented as a singleton.
@@ -39,8 +36,11 @@ public class UninstallData
     /** The uninstall data object. */
     private static UninstallData instance = null;
 
-    /** The files list. */
-    private List filesList;
+    /** The installed files list. */
+    private List installedFilesList;
+    
+    /** The uninstallable files list. */
+    private List uninstallableFilesList;
 
     /** The executables list. */
     private List executablesList;
@@ -60,10 +60,11 @@ public class UninstallData
     /** The constructor. */
     private UninstallData()
     {
-        filesList = new ArrayList();
+        installedFilesList = new ArrayList();
+        uninstallableFilesList = new ArrayList();
         executablesList = new ArrayList();
         additionalData = new HashMap();
-        rootScript = new String();
+        rootScript = "";
     }
     
     /** Constant RootFiles = "rootfiles" */
@@ -84,22 +85,35 @@ public class UninstallData
      * Adds a file to the data.
      * 
      * @param path The file to add.
+     * @param uninstall If true, file must be uninstalled.
      */
-    public synchronized void addFile(String path)
+    public synchronized void addFile(String path, boolean uninstall)
     {
-        if(path != null)
-           filesList.add(path);
+        if(path != null) {
+            installedFilesList.add(path);
+            if (uninstall) uninstallableFilesList.add(path);
+		}
     }
 
     /**
-     * Returns the files list.
+     * Returns the installed files list.
      * 
-     * @return The files list.
+     * @return The installed files list.
      */
-    public List getFilesList()
+    public List getInstalledFilesList()
     {
-        return filesList;
+        return installedFilesList;
     }
+    
+    /**
+     * Returns the uninstallable files list.
+     * 
+     * @return The uninstallable files list.
+     */
+    public List getUninstalableFilesList()
+    {
+        return uninstallableFilesList;
+    }    
 
     /**
      * Adds an executable to the data.
@@ -189,7 +203,7 @@ public class UninstallData
      */
     public void addRootUninstallScript( String aRootUninstallScript )
     {    
-        rootScript = new String( aRootUninstallScript==null?"":aRootUninstallScript );
+        rootScript = aRootUninstallScript == null ? "" : aRootUninstallScript;
     }
     
     /**

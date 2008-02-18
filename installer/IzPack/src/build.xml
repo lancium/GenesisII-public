@@ -1,6 +1,6 @@
 <project name="IzPack" default="all" basedir="..">
     <!--
-  $Id: build.xml 1831 2007-05-11 19:38:20Z jponge $
+  $Id: build.xml 2041 2008-02-09 18:33:52Z jponge $
 
   build.xml first written by Pierre Dittgen (pierre.dittgen@criltelecom.com)
   This file is intended to be used with ant (http://jakarta.apache.org/ant),
@@ -160,6 +160,15 @@
   10.10.2006: (Fabrice Mirabile)
 	  Fixed target src.tar.gz and clean.src.tar.gz
 
+  11.02.2007: (Ari Voutilainen)
+     Added 'preservelastmodified="true"' to all 'copy todir' commands to keep original file date
+     and time. This will effect in directory _dist. This won't effect to compiled files and
+     other files which are manipulated during the process.
+
+  08.11.2007: (Julien Ponge)
+     Call the new docutils-based documentation build system.
+
+
   Mini-HowTo:
 
   To compile and package the compiler.jar jar file, type:
@@ -197,8 +206,8 @@
     <property name="cwd" value="${basedir}" />
 
     <property file="src/ant.properties" />
-    <property name="ver" value="3.10" />
-    <property name="rel" value="2" />
+    <property name="ver" value="3.11" />
+    <property name="rel" value="0" />
     <property name="build.number" value="${ver}.${rel}" />
 
     <property name="src.dir" value="${basedir}/src/lib" />
@@ -281,6 +290,7 @@
             <include name="com/izforge/izpack/util/Debug.java" />
             <include name="com/izforge/izpack/util/OsConstraint.java" />
             <include name="com/izforge/izpack/util/JarOutputStream.java" />
+        	<include name="com/izforge/izpack/rules/*.java" />
             <include name="net/n3/nanoxml/*.java" />
         </javac>
         <copy todir="${build.dir}/com/izforge/izpack/ant/langpacks">
@@ -307,10 +317,13 @@
                 <include name="com/izforge/izpack/util/*Processor.class" />
                 <include name="com/izforge/izpack/util/VariableSubstitutor.class" />
                 <include name="com/izforge/izpack/util/JarOutputStream.class" />
+                <include name="com/izforge/izpack/util/FileUtil.class" />
                 <include name="com/izforge/izpack/ant/*.class" />
                 <include name="com/izforge/izpack/ant/langpacks/*.properties" />
                 <include name="com/izforge/izpack/event/CompilerListener.class" />
                 <include name="com/izforge/izpack/event/SimpleCompilerListener.class" />
+            	<include name="com/izforge/izpack/rules/*.class" />
+            	<include name="com/izforge/izpack/installer/*.class" />
                 <include name="net/n3/nanoxml/*.class" />
             </fileset>
         </jar>
@@ -348,7 +361,11 @@
                 <include name="lib/liquidlnf.jar" />
                 <include name="lib/metouia.jar" />
                 <include name="lib/looks.jar" />
+                <include name="lib/nimbus.jar" />
+                <include name="lib/substance.jar" />
                 <include name="lib/ant.jar" />
+                <include name="lib/nimbus.jar" />
+                <include name="lib/substance.jar" />
                 <exclude name="**/CVS" />
             </fileset>
         </jar>
@@ -375,6 +392,8 @@
             <include name="com/izforge/izpack/util/os/*.java" />
             <include name="com/izforge/izpack/rules/*.java" />
             <include name="com/izforge/izpack/uninstaller/SelfModifier*.java"/>
+        	<include name="com/izforge/izpack/rules/*.java" />
+        	<include name="com/izforge/izpack/compiler/DynamicVariable.java" />
             <include name="net/n3/nanoxml/*.java" />
         </javac>
     </target>
@@ -398,6 +417,8 @@
                 <include name="com/izforge/izpack/panels/NextMedia*.class"/>
                 <include name="com/izforge/izpack/rules/*.class" />
                 <include name="com/izforge/izpack/uninstaller/SelfModifier*.class"/>
+            	<include name="com/izforge/izpack/rules/*.class" />
+            	<include name="com/izforge/izpack/compiler/DynamicVariable.class" />
                 <include name="net/n3/nanoxml/*.class" />
             </fileset>
             <zipfileset src="${basedir}/lib/jakarta-regexp-1.3.jar">
@@ -603,6 +624,13 @@
             <include name="com/izforge/izpack/panels/JDKPathPanel.java" />
             <include name="com/izforge/izpack/panels/PathInputPanel.java" />
             <include name="com/izforge/izpack/panels/PathSelectionPanel.java" />
+            <include name="com/izforge/izpack/util/os/*RegistryHandler.java" />
+            <include name="com/izforge/izpack/util/OSClassHelper.java" />
+            <include name="com/izforge/izpack/util/os/WrappedNativeLibException.java" />
+            <include name="com/coi/tools/os/win/*.java" />
+            <include name="com/coi/tools/os/win/resources/NativeLibErr*.java" />
+            <include name="com/coi/tools/os/izpack/Registry.java" />
+            <include name="com/coi/tools/os/izpack/COIOSHelper.java" />
         </build-panel>
         <build-panel name="XInfoPanel">
             <include name="com/izforge/izpack/panels/XInfoPanel.java" />
@@ -618,9 +646,17 @@
             <include name="com/izforge/izpack/panels/Processor.java" />
             <include name="com/izforge/izpack/panels/RuleInputField.java" />
             <include name="com/izforge/izpack/panels/RuleTextField.java" />
+            <include name="com/izforge/izpack/panels/TextInputField.java" />
             <include name="com/izforge/izpack/panels/UserInputPanel.java" />
             <include name="com/izforge/izpack/panels/UserInputPanelAutomationHelper.java" />
             <include name="com/izforge/izpack/panels/Validator.java" />
+            <include name="com/izforge/izpack/panels/ValidatorContainer.java" />
+        </build-panel>
+        <build-panel name="UserPathPanel">
+            <include name="com/izforge/izpack/panels/UserPathInputPanel.java" />
+            <include name="com/izforge/izpack/panels/UserPathSelectionPanel.java" />
+            <include name="com/izforge/izpack/panels/UserPathPanel.java" />
+            <include name="com/izforge/izpack/panels/UserPathPanelAutomationHelper.java" />
         </build-panel>
         <build-panel name="ConditionalUserInputPanel">
             <include name="com/izforge/izpack/panels/ConditionalUserInputPanel.java" />
@@ -629,9 +665,11 @@
             <include name="com/izforge/izpack/panels/Processor.java" />
             <include name="com/izforge/izpack/panels/RuleInputField.java" />
             <include name="com/izforge/izpack/panels/RuleTextField.java" />
+            <include name="com/izforge/izpack/panels/TextInputField.java" />
             <include name="com/izforge/izpack/panels/UserInputPanel.java" />
             <include name="com/izforge/izpack/panels/UserInputPanelAutomationHelper.java" />
             <include name="com/izforge/izpack/panels/Validator.java" />
+            <include name="com/izforge/izpack/panels/ValidatorContainer.java" />
         </build-panel>
         <build-panel name="CompilePanel">
             <include name="com/izforge/izpack/panels/CompilePanel.java" />
@@ -654,6 +692,18 @@
          <include name="com/izforge/izpack/panels/InstallationGroupPanel.java"/>
          <include name="com/izforge/izpack/panels/InstallationGroupPanelAutomationHelper.java"/>
         </build-panel>
+        <build-panel name="TreePacksPanel">
+         <include name="com/izforge/izpack/panels/TreePacksPanel.java"/>
+         <include name="com/izforge/izpack/panels/ImgPacksPanelAutomationHelper.java" />
+         <include name="com/izforge/izpack/panels/ImgPacksPanelBase.java" />
+         <include name="com/izforge/izpack/panels/PacksModel.java" />
+         <include name="com/izforge/izpack/panels/PacksPanelAutomationHelper.java" />
+         <include name="com/izforge/izpack/panels/PacksPanelBase.java" />
+         <include name="com/izforge/izpack/panels/PacksPanelInterface.java" />
+        </build-panel>
+    	<build-panel name="InstallationTypePanel">
+    		<include name="com/izforge/izpack/panels/InstallationTypePanel.java"/>
+    	</build-panel>    	
     </target>
 
     <!--
@@ -863,6 +913,8 @@
         </delete>
     	    <delete file="bin/native/3rdparty/COIOSHelper.dll" />
         <delete dir="${basedir}/bin/native/izpack" />
+        <delete dir="${basedir}/src/doc-reST/html" />
+        <delete dir="${basedir}/src/doc-reST/pdf" />
         <delete includeEmptyDirs="true" dir="${basedir}/doc/izpack" />
         <delete dir="${basedir}/_src${dist.subdir}"/>
     </target>
@@ -879,7 +931,7 @@
                 <exclude name="**/CVS" />
             </packageset>
         </javadoc>
-        <copy todir="${doc.dir}/izpack/javadoc">
+        <copy todir="${doc.dir}/izpack/javadoc" preservelastmodified="true">
             <fileset dir="${build.dir}/javadoc">
                 <include name="**/*" />
             </fileset>
@@ -887,12 +939,26 @@
     </target>
 
     <target name="build.docu" description="Builds the customer documentation">
-        <mkdir dir="${doc.dir}/izpack/xhtml" />
-        <copy todir="${doc.dir}/izpack/xhtml">
-            <fileset dir="${basedir}/src/doc-ng/XHTML">
+        <exec executable="python" dir="${basedir}/src/doc-reST">
+            <arg value="build.py"/>
+        </exec>
+         
+        <mkdir dir="${doc.dir}/izpack/html" />
+        <copy todir="${doc.dir}/izpack/html" preservelastmodified="true">
+            <fileset dir="${basedir}/src/doc-reST/html">
                 <include name="**/*" />
             </fileset>
         </copy>
+        <mkdir dir="${doc.dir}/izpack/pdf" />
+        <copy todir="${doc.dir}/izpack/pdf" preservelastmodified="true">
+            <fileset dir="${basedir}/src/doc-reST/pdf">
+                <include name="manual.pdf" />
+            </fileset>
+        </copy>
+
+	<delete file="${basedir}/src/texput.log" />
+	<delete dir="${basedir}/src/doc-reST/html" />
+	<delete dir="${basedir}/src/doc-reST/pdf" />
     </target>
 
     <target name="create.docu"
@@ -922,17 +988,19 @@
         <mkdir dir="${basedir}/bin/native/izpack" />
         <!-- If unicode support of ShellLink.dll will be not used, change between  both copy blocks -->
         <!--
-		<copy todir="${basedir}/bin/native/izpack" file="${basedir}/src/native/ShellLink/Release/ShellLink.dll" verbose="true" overwrite="yes"/>
-		<copy todir="${basedir}/bin/native/3rdparty" file="${basedir}/src/native/win/COIOSHelper/Release/COIOSHelper.dll" verbose="true" overwrite="yes"/>
+		<copy todir="${basedir}/bin/native/izpack" file="${basedir}/src/native/ShellLink/Release/ShellLink.dll" verbose="true" overwrite="yes" preservelastmodified="true"/>
+		<copy todir="${basedir}/bin/native/3rdparty" file="${basedir}/src/native/win/COIOSHelper/Release/COIOSHelper.dll" verbose="true" overwrite="yes" preservelastmodified="true"/>
 		-->
         <copy todir="${basedir}/bin/native/izpack"
               file="${basedir}/src/native/ShellLink/Release_Unicode/ShellLink.dll"
               verbose="true"
-              overwrite="yes" />
+              overwrite="yes"
+              preservelastmodified="true" />
         <copy todir="${basedir}/bin/native/3rdparty"
               file="${basedir}/src/native/win/COIOSHelper/Release_Unicode/COIOSHelper.dll"
               verbose="true"
-              overwrite="yes" />
+              overwrite="yes"
+              preservelastmodified="true" />
     </target>
 
 
@@ -941,9 +1009,10 @@
          - - - - - - - - - - - - - - - - - -->
     <target name="copy.dist.files">
         <echo message="Copies the general files to the dist directory" />
-        <copy todir="${dist.dir}" includeEmptyDirs="yes">
+        <copy todir="${dist.dir}" includeEmptyDirs="yes" preservelastmodified="true">
             <fileset dir="${basedir}">
                 <include name="bin/**" />
+                <include name="utils/**" />
                 <include name="lib/*.jar" />
                 <include name="doc/**" />
                 <include name="legal/**" />
@@ -953,13 +1022,13 @@
             </fileset>
         </copy>
         <echo message="Copies the langpacks to the dist directory" />
-        <copy todir="${dist.dir}/bin" includeEmptyDirs="yes">
+        <copy todir="${dist.dir}/bin" includeEmptyDirs="yes" preservelastmodified="true">
             <fileset dir="${basedir}">
                 <include name="langpacks/**" />
             </fileset>
         </copy>
         <echo message="Copies the license images and specs to the dist directory" />
-        <copy todir="${dist.dir}" includeEmptyDirs="yes">
+        <copy todir="${dist.dir}" includeEmptyDirs="yes" preservelastmodified="true">
             <fileset dir="${dist-files.dir}">
                 <include name="useNativeLAF" />
                 <include name="*.jpg" />
@@ -974,7 +1043,7 @@
             </fileset>
         </copy>
         <echo message="Copies the bin files to the dist directory" />
-        <copy todir="${dist.dir}/bin" includeEmptyDirs="yes" overwrite="yes">
+        <copy todir="${dist.dir}/bin" includeEmptyDirs="yes" overwrite="yes" preservelastmodified="true">
             <fileset dir="${dist-files.dir}">
                 <include name="compile*" />
                 <include name="lcp.bat" />
@@ -1066,6 +1135,12 @@ Fixing linefeeds for several files in:
     	  <include name="**/*.sh"/>
     	  <include name="compile"/>
     	</fixcrlf>
+    	<fixcrlf srcdir="${dist.dir}" eol="dos" eof="add">
+            <include name="**/*.bat"/>
+        </fixcrlf>
+    	<fixcrlf srcdir="${dist.bin.dir}" eol="dos" eof="add">
+    	  <include name="**/*.bat"/>
+    	</fixcrlf>
     </target>
 
     <!-- Runs a testing installer. -->
@@ -1100,7 +1175,7 @@ Fixing linefeeds for several files in:
          ================================= -->
     <target name="src.tar.gz"  description="--> creates a src.tar.gz ">
       <mkdir dir="${basedir}/_src${dist.subdir}"/>
-      <property name="src.tar.gz" value="${basedir}/_src${dist.subdir}/${product}.src.${ver}.${rel}.tar.gz"/>
+      <property name="src.tar.gz" value="${basedir}/_src${dist.subdir}/${product}-src-${ver}.${rel}.tar.gz"/>
       <tar compression="gzip" destfile="${src.tar.gz}" basedir="${basedir}" excludes="_src${dist.subdir}/**, _dist/**, _build/**, bin/panels/**, bin/customActions/**, doc/izpack/**, eclipse-bin/**, lib/standalone-compiler.jar, lib/izevent.jar, lib/uninstaller*, lib/installer.jar, lib/compiler.jar"/>
     </target>
 
@@ -1124,22 +1199,16 @@ Fixing linefeeds for several files in:
             description="shows the used environment and project settings">
 
         <property name="console_line" value="**************************************************" />
-        <!-- Task splash/ ?? -->
         <echo message="${console_line}" />
         <echo message="* ${ant.version}" />
-        <!-- N2H: Test if this is the right ANT-Version (implementation of an own JAVA-Class which compares BuildNumbers) -->
         <echo message="*   Java JRE version ${ant.java.version} ${java.vm.vendor}" />
-        <!-- 1.3 -->
         <exec executable="${java.home}/bin/java">
             <arg line="-version" />
         </exec>
         <echo message="${console_line}" />
         <echo message="*  processing file ....... '${ant.file}'" />
-        <!-- D:\ToDo\_2002-11\AntTest\build.xml -->
         <echo message="*  in base-directory ..... '${basedir}'" />
-        <!-- D:\ToDo\_2002-11\AntTest -->
         <echo message="*  building project ...... '${ant.project.name}'" />
-        <!-- CIS -->
         <echo message="*  working in directory .. '${cwd}'" />
         <echo message="${console_line}" />
     </target>
