@@ -30,4 +30,9 @@ public class OGRSHContextResolver implements IContextResolver
 	{
 		_localCallingContext.set(ctxt);
 	}
+	
+	public Object clone()
+	{
+		return new OGRSHContextResolver();
+	}
 }

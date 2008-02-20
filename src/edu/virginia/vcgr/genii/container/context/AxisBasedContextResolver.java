@@ -54,7 +54,6 @@ import edu.virginia.vcgr.genii.container.Container;
 
 public class AxisBasedContextResolver implements IContextResolver
 {
-	
 	@SuppressWarnings("unchecked")
 	public ICallingContext load() throws ResourceException, IOException,
 			FileNotFoundException
@@ -154,5 +153,10 @@ public class AxisBasedContextResolver implements IContextResolver
 	{
 		ResourceManager.getCurrentResource().dereference().setProperty(
 			IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME, ctxt);
+	}
+	
+	public Object clone()
+	{
+		return new AxisBasedContextResolver();
 	}
 }

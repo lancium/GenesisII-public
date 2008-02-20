@@ -26,8 +26,23 @@ import edu.virginia.vcgr.genii.context.ContextType;
 
 public class ContextManager
 {
-	static private IContextResolver _resolver = null;
 	static private final String _CONTEXT_RESOLVER_NAME = "context-resolver";
+	
+	static private class ResolverThreadLocal 
+		extends InheritableThreadLocal<IContextResolver>
+	{
+		@Override
+		protected IContextResolver childValue(IContextResolver parentValue)
+		{
+			if (parentValue == null)
+				return null;
+			
+			return (IContextResolver)parentValue.clone();
+		}	
+	}
+	
+	static private ResolverThreadLocal _resolver =
+		new ResolverThreadLocal();
 	
 	static public ICallingContext getCurrentContext()
 		throws ConfigurationException, FileNotFoundException, IOException
@@ -68,30 +83,28 @@ public class ContextManager
 	}
 	
 	@SuppressWarnings("unchecked")
-	static private IContextResolver getResolver() throws ConfigurationException
+	static public IContextResolver getResolver() throws ConfigurationException
 	{
-		synchronized(ContextManager.class)
+		IContextResolver resolver = _resolver.get();
+		if (resolver == null)
 		{
-			if (_resolver != null)
-				return _resolver;
-		
-			_resolver = 
+			resolver = 
 				(IContextResolver)NamedInstances.getRoleBasedInstances().lookup(
 					_CONTEXT_RESOLVER_NAME);
-			if (_resolver != null)
-				return _resolver;
+			
+			if (_resolver == null)
+				throw new ConfigurationException(
+					"Unable to locate a \"" + _CONTEXT_RESOLVER_NAME + 
+					"\" resolver in the config file.");
+			
+			_resolver.set(resolver);
 		}
 		
-		throw new ConfigurationException(
-			"Unable to locate a \"" + _CONTEXT_RESOLVER_NAME + 
-			"\" resolver in the config file.");
+		return resolver;
 	}
 	
 	static public void setResolver(IContextResolver resolver)
 	{
-		synchronized(ContextManager.class)
-		{
-			_resolver = resolver;
-		}
+		_resolver.set(resolver);
 	}
 }

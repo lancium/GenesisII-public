@@ -18,9 +18,11 @@ package edu.virginia.vcgr.genii.client.context;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public interface IContextResolver
+public interface IContextResolver extends Cloneable
 {
 	public ICallingContext load() 
 		throws IOException, FileNotFoundException;
 	public void store(ICallingContext ctxt) throws FileNotFoundException, IOException;
+	
+	public Object clone();
 }

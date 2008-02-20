@@ -58,8 +58,6 @@ public class FtpdTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		GeniiBackendConfiguration backConf = new GeniiBackendConfiguration();
-		
 		String arg = getArgument(0);
 		
 		if (arg.equals("stop"))
@@ -78,6 +76,9 @@ public class FtpdTool extends BaseGridTool
 			
 			return 0;
 		}
+		
+		GeniiBackendConfiguration backConf = new GeniiBackendConfiguration(
+				stdin, stdout, stderr);
 		
 		FTPConfiguration conf = new FTPConfiguration(
 			Integer.parseInt(arg));

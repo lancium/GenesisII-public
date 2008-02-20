@@ -289,6 +289,7 @@ public class GamlLoginTool extends BaseGridTool {
 	}
 
 	protected ArrayList<SignedAssertion> delegateToIdentity(
+			ICallingContext callingContext,
 			URI authnUri, 
 			RenewableClientAttribute delegateAttribute)
 			throws Throwable {
@@ -311,7 +312,7 @@ public class GamlLoginTool extends BaseGridTool {
 		}
 
 		if (protocol.equals("rns")) {
-			RNSPath authnPath = RNSPath.getCurrent().lookup(authnUri.getSchemeSpecificPart(),
+			RNSPath authnPath = callingContext.getCurrentPath().lookup(authnUri.getSchemeSpecificPart(),
 					RNSPathQueryFlags.MUST_EXIST);
 			EndpointReferenceType epr = authnPath.getEndpoint();
 			TypeInformation type = new TypeInformation(epr);
@@ -392,7 +393,7 @@ public class GamlLoginTool extends BaseGridTool {
 		try {
 			// log in
 			ArrayList<SignedAssertion> signedAssertions = 
-				delegateToIdentity(authnSource, delegateeAttribute);
+				delegateToIdentity(callContext, authnSource, delegateeAttribute);
 	
 			if (signedAssertions == null) {
 				return 0;

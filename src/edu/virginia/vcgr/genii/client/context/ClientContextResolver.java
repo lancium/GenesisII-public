@@ -54,4 +54,9 @@ public class ClientContextResolver implements IContextResolver
 	{
 		ContextFileSystem.store(getContextFile(), getContextTransientFile(), ctxt);
 	}
+	
+	public Object clone()
+	{
+		return new ClientContextResolver();
+	}
 }

@@ -8,6 +8,7 @@ import org.apache.axis.message.MessageElement;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
 import edu.virginia.vcgr.genii.client.security.*;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
@@ -86,7 +87,8 @@ public class IdpTool extends GamlLoginTool {
 			// log in
 			URI authnSource = (_authnUri == null) ? null : new URI(_authnUri);
 			ArrayList<SignedAssertion> assertions = 
-				delegateToIdentity(authnSource, delegateeAttribute);
+				delegateToIdentity(ContextManager.getCurrentContext(),
+					authnSource, delegateeAttribute);
 	
 			if ((assertions == null) || (assertions.size() == 0)) {
 				return 0;

@@ -1,11 +1,17 @@
 package edu.virginia.vcgr.genii.ftp;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.PrintStream;
 
 import org.morgan.util.configuration.ConfigurationException;
 
+import edu.virginia.vcgr.genii.client.cmd.tools.GamlLoginTool;
+import edu.virginia.vcgr.genii.client.cmd.tools.LogoutTool;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.context.IContextResolver;
+import edu.virginia.vcgr.genii.client.context.InMemoryContextResolver;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
@@ -16,21 +22,51 @@ public class GeniiBackendConfiguration implements Cloneable
 	private RNSPath _root;
 	
 	private GeniiBackendConfiguration(ICallingContext callingContext, RNSPath root)
+		throws ConfigurationException, IOException
 	{
 		_callingContext = callingContext;
 		_root = root;
+		
+		// This always gets called in a new thread, so...
+		ContextManager.setResolver(new InMemoryContextResolver());
+		ContextManager.storeCurrentContext(_callingContext);
 	}
 	
-	public GeniiBackendConfiguration(ICallingContext callingContext)
+	public GeniiBackendConfiguration(BufferedReader stdin,
+		PrintStream stdout, PrintStream stderr, ICallingContext callingContext)
+		throws Throwable
 	{
-		_callingContext = callingContext.deriveNewContext();
-		_root = _callingContext.getCurrentPath().getRoot();
+		IContextResolver oldResolver = ContextManager.getResolver();
+		try
+		{
+			IContextResolver newResolver = new InMemoryContextResolver();
+			ContextManager.setResolver(newResolver);
+	
+			newResolver.store(callingContext);
+			_callingContext = newResolver.load();
+			
+			_root = _callingContext.getCurrentPath().getRoot();
+			_callingContext.setCurrentPath(_root);
+			
+			LogoutTool logout = new LogoutTool();
+			logout.setAll();
+			logout.run(stdout, stderr, stdin);
+			
+			GamlLoginTool login = new GamlLoginTool();
+			login.run(stdout, stderr, stdin);
+			_callingContext = newResolver.load();
+		}
+		finally
+		{
+			ContextManager.setResolver(oldResolver);
+		}
 	}
 	
-	public GeniiBackendConfiguration()
-		throws IOException, ConfigurationException
+	public GeniiBackendConfiguration(BufferedReader stdin,
+		PrintStream stdout, PrintStream stderr)
+		throws Throwable
 	{
-		this(ContextManager.getCurrentContext());
+		this(stdin, stdout, stderr, ContextManager.getCurrentContext());
 	}
 	
 	public void setSandboxPath(String sandboxPath)
@@ -52,6 +88,17 @@ public class GeniiBackendConfiguration implements Cloneable
 	
 	public Object clone()
 	{
-		return new GeniiBackendConfiguration(_callingContext.deriveNewContext(), _root);
+		try
+		{
+			return new GeniiBackendConfiguration(_callingContext.deriveNewContext(), _root);
+		}
+		catch (ConfigurationException ce)
+		{
+			throw new RuntimeException("Unexpected internal exception.", ce);
+		}
+		catch (IOException ioe)
+		{
+			throw new RuntimeException("Unexpected internal exception.", ioe);
+		}
 	}
 }
