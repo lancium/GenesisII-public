@@ -5,6 +5,11 @@
 	<property environment="env"/>
 	<property file="${basedir}/build.properties"/>
 
+	<condition property="wsdl.source.prefix" value=""
+		else="file:///">
+		<matches string="${java.specification.version}" pattern="^1\.5$"/>
+	</condition>
+
 	<!-- Static Class paths -->
 	<path id="log4j.classpath">
 		<fileset dir="${axis-home}" includes="**/log4j*.jar"/>

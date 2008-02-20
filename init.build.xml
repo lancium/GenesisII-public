@@ -7,7 +7,7 @@
 		<axis-wsdl2java
 			nowrapped="true"
 			output="${stub.gen.target-dir}"
-			url="${stub.gen.source-wsdl}"
+			url="${wsdl.source.prefix}${stub.gen.source-wsdl}"
 			serverside="true"
 			quiet="true"
 			namespacemappingfile="${basedir}/mappings.properties"/>
