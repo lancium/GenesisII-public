@@ -32,7 +32,7 @@
 		<antcall target="gen.stub-generation">
 			<param name="stub.gen.target-dir" value="${codegen-dir}/notification-consumer"/>
 			<param name="stub.gen.source-wsdl"
-				value="file:///${codegen-dir}/wsdl/notification-consumer-service.wsdl"/>
+				value="${codegen-dir}/wsdl/notification-consumer-service.wsdl"/>
 			<param name="stub.gen.target-flag-file"
 				value="${codegen-dir}/wsdl/notification-consumer.flag"/>
 		</antcall>

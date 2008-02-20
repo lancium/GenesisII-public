@@ -42,7 +42,7 @@
 		<antcall target="gen.stub-generation">
 			<param name="stub.gen.target-dir" value="${codegen-dir}/bes-activity"/>
 			<param name="stub.gen.source-wsdl"
-				value="file:///${codegen-dir}/wsdl/bes-activity-service.wsdl"/>
+				value="${codegen-dir}/wsdl/bes-activity-service.wsdl"/>
 			<param name="stub.gen.target-flag-file"
 				value="${codegen-dir}/wsdl/bes-activity.flag"/>
 		</antcall>

@@ -48,7 +48,7 @@
 		<antcall target="gen.stub-generation">
 			<param name="stub.gen.target-dir" value="${codegen-dir}/rbyteiointerop"/>
 			<param name="stub.gen.source-wsdl"
-				value="file:///${codegen-dir}/wsdl/rbyteiointerop-service.wsdl"/>
+				value="${codegen-dir}/wsdl/rbyteiointerop-service.wsdl"/>
 			<param name="stub.gen.target-flag-file"
 				value="${codegen-dir}/wsdl/rbyteiointerop.flag"/>
 		</antcall>
