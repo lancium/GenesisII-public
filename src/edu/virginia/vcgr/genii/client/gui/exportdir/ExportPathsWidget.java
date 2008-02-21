@@ -26,6 +26,22 @@ public class ExportPathsWidget extends JComponent
 	private JTextField _rnsPath;
 	private Collection<IInformationListener> _listeners = new ArrayList<IInformationListener>();
 	
+	private JButton createLocalBrowseButton()
+	{
+		String osName = System.getProperty("os.name").toUpperCase();
+		if (osName.startsWith("WINDOWS"))
+		{
+			// A persistent bug in Microsoft Windows JFileChooser
+			// implementation can cause this widget to hang
+			// indefinitely and so we can't safely use it.
+			return null;
+		}
+		
+		JButton browseLocal = new JButton(
+			new BrowseLocalPathAction(this, _BUTTON_LABEL, _localPath));
+		return browseLocal;
+	}
+	
 	public ExportPathsWidget()
 	{
 		super();
@@ -37,9 +53,13 @@ public class ExportPathsWidget extends JComponent
 		add(_localPath = new JTextField(),
 			new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 				new Insets(5, 5, 5, 5), 5, 5));
-		add(new JButton(new BrowseLocalPathAction(this, _BUTTON_LABEL, _localPath)),
-			new GridBagConstraints(2, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
-				new Insets(5, 5, 5, 5), 5, 5));
+		
+		JButton browseLocal = createLocalBrowseButton();
+		
+		if (browseLocal != null)
+			add(browseLocal,
+				new GridBagConstraints(2, 0, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
+					new Insets(5, 5, 5, 5), 5, 5));
 		add(new JLabel(_RNS_LABEL),
 			new GridBagConstraints(0, 1, 1, 1, 0.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
 				new Insets(5, 5, 5, 5), 5, 5));
