@@ -5,7 +5,10 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+
+import org.morgan.util.gui.FileChooserHelper;
 
 public class BrowseLocalPathAction extends AbstractAction
 {
@@ -25,7 +28,17 @@ public class BrowseLocalPathAction extends AbstractAction
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
-		JFileChooser chooser = new JFileChooser();
+		JFileChooser chooser;
+		
+		chooser = FileChooserHelper.createFileChooser();
+		if (chooser == null)
+		{
+			JOptionPane.showMessageDialog(_parent,
+				"The Java File Chooser widget has failed to respond in a timely manner.\n" +
+				"Unfortunately, this is a known bug that has yet to be fixed in the Java\n" +
+				"Platform.  In the mean time, please simply type in the name of the local\n" +
+				"path that you wish to export.");
+		}
 		
 		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		chooser.setMultiSelectionEnabled(false);
