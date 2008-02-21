@@ -102,8 +102,7 @@ public class InstallationState implements Serializable
 	static public HashMap<String, ContainerInformation> getRunningContainers()
 		throws FileLockException
 	{
-		File installFile = new File(
-			ConfigurationManager.getCurrentConfiguration().getUserDirectory(), "installation-state");
+		File installFile = getInstallationStateFile();
 		FileLock flock = null;
 		
 		try
@@ -120,8 +119,7 @@ public class InstallationState implements Serializable
 	static public void addRunningContainer(String deploymentName, URL containerURL)
 		throws IOException, FileLockException
 	{
-		File installFile = new File(
-			ConfigurationManager.getCurrentConfiguration().getUserDirectory(), "installation-state");
+		File installFile = getInstallationStateFile();
 		FileLock flock = null;
 		
 		try
@@ -140,8 +138,7 @@ public class InstallationState implements Serializable
 	static public void removeRunningContainer(String deploymentName)
 		throws IOException, FileLockException
 	{
-		File installFile = new File(
-			ConfigurationManager.getCurrentConfiguration().getUserDirectory(), "installation-state");
+		File installFile = getInstallationStateFile();
 		FileLock flock = null;
 		
 		try
@@ -155,5 +152,17 @@ public class InstallationState implements Serializable
 		{
 			StreamUtils.close(flock);
 		}
+	}
+	
+	static private File getInstallationStateFile()
+	{
+		/* This isn't a perfect solution to bug #65, but until we have 
+		 * something better, it will have to do.  The problem is that 
+		 * the user's home directory may not be a local partition 
+		 * which could cause troubles. 
+		 */
+		File installFile = new File(System.getProperty("user.home"),
+			"installation-state");
+		return installFile;
 	}
 }
