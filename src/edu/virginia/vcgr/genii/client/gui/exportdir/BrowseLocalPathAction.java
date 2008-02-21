@@ -31,8 +31,6 @@ public class BrowseLocalPathAction extends AbstractAction
 		chooser.setMultiSelectionEnabled(false);
 		
 		if (chooser.showOpenDialog(_parent) == JFileChooser.APPROVE_OPTION)
-		{
 			_target.setText(chooser.getSelectedFile().getAbsolutePath());
-		}
 	}
 }
