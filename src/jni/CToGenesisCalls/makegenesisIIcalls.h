@@ -131,6 +131,16 @@ DllExport int initializeJavaVM(char * genesis_directory, PGII_JNI_INFO newInfo);
 */
 DllExport int initializeJavaVMForThread(PGII_JNI_INFO newInfo);
 
+/*
+	Kills the JVM (make sure to unattach all threads before calling)
+*/
+DllExport void cleanupJVM();
+
+/*	
+	Unattaches a thread from the JVM
+*/
+DllExport void detatchThreadFromJVM();
+
 #ifdef __cplusplus
 }
 #endif	/* C PLUS PLUS */
