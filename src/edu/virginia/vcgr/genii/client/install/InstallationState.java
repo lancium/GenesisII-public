@@ -161,7 +161,7 @@ public class InstallationState implements Serializable
 		 * which could cause troubles. 
 		 */
 		File installFile = new File(System.getProperty("user.home"),
-			"installation-state");
+			".installation-state");
 		return installFile;
 	}
 }
