@@ -18,7 +18,6 @@ import edu.virginia.vcgr.genii.client.byteio.xfer.dime.DimeSByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.xfer.mtom.MTomSByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.xfer.simple.SimpleSByteIOTransferer;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
-import edu.virginia.vcgr.genii.client.jni.gIIlib.JNILibraryBase;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 
 public class StreamableByteIOFileDescriptor extends WindowsIFSFile		

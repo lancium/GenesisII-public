@@ -260,13 +260,13 @@ Return Value:
 
 	PAGED_CODE();		
 
-	KeWaitForSingleObject(&(giiFCB->FcbPhore), Executive, KernelMode, FALSE, NULL);	
+	ExAcquireFastMutex(&(giiFCB->ExclusiveLock));	
  
 	DbgPrint("NulMRxQueryFileInformation: Started for file %wZ\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName);
 
 	//Something went wrong
 	if(giiFCB == NULL){		
-		KeReleaseSemaphore(&(giiFCB->FcbPhore), 0, 1, FALSE);
+		ExReleaseFastMutex(&(giiFCB->ExclusiveLock));
 		DbgPrint("NulMRxQueryFileInformation: Failed!  GIIFCB == NULL\n");
 		RxContext->Info.LengthRemaining = 0;
 		Status = STATUS_FILE_CLOSED;
@@ -276,12 +276,15 @@ Return Value:
 		if(giiFCB->State == GENII_STATE_NOT_INITIALIZED){
 			//Will release semaphore later (on return)
 			Status = GenesisSendInvertedCall(RxContext, GENII_QUERYFILEINFO, FALSE);
-			KeWaitForSingleObject(&(giiFCB->FcbPhore), Executive, KernelMode, FALSE, NULL);		
+			
+			//Something could go wrong (only wait if something will actually come back to free you)
+			if(NT_SUCCESS(Status)){
+				KeWaitForSingleObject(&(giiFCB->InvertedCallSemaphore), Executive, KernelMode, FALSE, NULL);		
+			}
 		}	
 		
-		Status = GenesisCompleteQueryFileInformation(RxContext);		
-		//Operation is always synchronous		
-		KeReleaseSemaphore(&(giiFCB->FcbPhore), 0, 1, FALSE);
+		Status = GenesisCompleteQueryFileInformation(RxContext);	
+		ExReleaseFastMutex(&(giiFCB->ExclusiveLock));
 	}
     
     RxTraceLeave(Status);

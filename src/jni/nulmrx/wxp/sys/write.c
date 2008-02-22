@@ -19,12 +19,15 @@ Abstract:
 
 NTSTATUS GenesisWriteCompletionRoutine(PRX_CONTEXT RxContext){
 	RxCaptureFcb;
+	GenesisGetFcbExtension(capFcb, giiFCB);
 	PGENESIS_COMPLETION_CONTEXT pIoCompContext = GenesisGetMinirdrContext(RxContext);
 	PGENESIS_SRV_OPEN giiSrvOpen = (PGENESIS_SRV_OPEN)RxContext->pRelevantSrvOpen->Context2;
 
 	if(NT_SUCCESS(pIoCompContext->Status)){
 		giiSrvOpen->ServerFileSize = capFcb->Header.FileSize;
 	}
+
+	ExReleaseFastMutex(&giiFCB->ExclusiveLock);
 
 	RxContext->IoStatusBlock.Information = pIoCompContext->Information;
 	RxContext->IoStatusBlock.Status = pIoCompContext->Status;
@@ -127,23 +130,25 @@ Return Value:
 
 	RxContext->LowIoContext.CompletionRoutine = GenesisWriteCompletionRoutine;	
 
-	KeWaitForSingleObject(&(giiFcb->FcbPhore), Executive, KernelMode, FALSE, NULL);
+	ExAcquireFastMutex(&giiFcb->ExclusiveLock);
 
 	//Sends Genii read request
 	Status = GenesisSendInvertedCall(RxContext, GENII_WRITE, !SynchronousIo);
 
-	if(SynchronousIo){
-		PVOID requestBuffer = NULL;
+	//Something could go wrong (only wait if something will actually come back to free you)
+	if(NT_SUCCESS(Status)){
+		if(SynchronousIo){
+			PVOID requestBuffer = NULL;
 
-		KeWaitForSingleObject(&(giiFcb->FcbPhore), Executive, KernelMode, FALSE, NULL);
-		KeReleaseSemaphore(&(giiFcb->FcbPhore), 0, 1, FALSE);		
+			KeWaitForSingleObject(&(giiFcb->InvertedCallSemaphore), Executive, KernelMode, FALSE, NULL);			
 
-		if(!PagingIo){
-			FileObject->CurrentByteOffset = 
-				RtlConvertLongToLargeInteger(ByteOffset + pIoCompContext->Information);
-		}
-		else{
-			DbgPrint("NulMrxWrite:  Paging IO Recv'd\n");
+			if(!PagingIo){
+				FileObject->CurrentByteOffset = 
+					RtlConvertLongToLargeInteger(ByteOffset + pIoCompContext->Information);
+			}
+			else{
+				DbgPrint("NulMrxWrite:  Paging IO Recv'd\n");
+			}
 		}
 	}
 

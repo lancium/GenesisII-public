@@ -56,7 +56,7 @@ Return Value:
 
 	PAGED_CODE();			      
 
-	KeWaitForSingleObject(&(fcb->FcbPhore), Executive, KernelMode, FALSE, NULL);
+	ExAcquireFastMutex(&(fcb->ExclusiveLock));
 
 	if(IoIsOperationSynchronous(RxContext->CurrentIrp)){
 		DbgPrint("QueryDirectory: Io Is Synchronous\n");
@@ -68,13 +68,13 @@ Return Value:
 
 	//For some weird error this is null sometimes
 	if(FileIndex == NULL){		
-		KeReleaseSemaphore(&(fcb->FcbPhore), 0, 1, FALSE);
+		ExReleaseFastMutex(&(fcb->ExclusiveLock));
 		RxContext->Info.LengthRemaining = 0;
 		Status = STATUS_FILE_CLOSED;
 		try_return(Status);
 	}	
 	if(!(fcb->isDirectory)){
-		KeReleaseSemaphore(&(fcb->FcbPhore), 0, 1, FALSE);
+		ExReleaseFastMutex(&(fcb->ExclusiveLock));
 		DbgPrint("QueryDirectory:  File is not a directory %wZ\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName);
 		RxContext->Info.LengthRemaining = 0;
 		RxContext->IoStatusBlock.Information = FILE_NON_DIRECTORY_FILE;
@@ -119,30 +119,41 @@ Return Value:
 			
 	//Check if we have the listing yet
 	if(fcb->State != GENII_STATE_HAVE_LISTING){
-		//Keep semaphore (releases after async call)
+		//Keep Exclusive Mutex for FCB (released on response)
 
 		//Calls Genesis to get Directory Listing
 		Status = GenesisSendInvertedCall(RxContext, GENII_QUERYDIRECTORY, 
 			(!IoIsOperationSynchronous(RxContext->CurrentIrp)));
 
-		//If this operation is synchronous we don't block
-		if(IoIsOperationSynchronous(RxContext->CurrentIrp)){
-			KeWaitForSingleObject(&(fcb->FcbPhore), Executive, KernelMode, FALSE, NULL);			
-			
-			//Actually get listing
-			Status = GenesisCompleteQueryDirectory(RxContext);	
-			KeReleaseSemaphore(&(fcb->FcbPhore), 0, 1, FALSE);
+		//Something could go wrong (only wait if something will actually come back to free you)
+		if(NT_SUCCESS(Status)){
+			//If this operation is synchronous we don't block
+			if(IoIsOperationSynchronous(RxContext->CurrentIrp)){
+				//Wait on semaphore (released on response)
+				KeWaitForSingleObject(&(fcb->InvertedCallSemaphore), Executive, KernelMode, FALSE, NULL);			
+				
+				//Actually get listing
+				Status = GenesisCompleteQueryDirectory(RxContext);
+
+				ExReleaseFastMutex(&(fcb->ExclusiveLock));
+			}
+		}
+		else{
+			DbgPrint("NulMRxQueryDirectory: Failed due to failure status %d\n", Status);
+
+			//If failed to send inverted call, release mutex
+			ExReleaseFastMutex(&(fcb->ExclusiveLock));
 		}
 
 		try_return(Status);
 	}						
 	else{				
 		//Actually get listing
-		Status = GenesisCompleteQueryDirectory(RxContext);					
-		
-		//Release Semaphore
-		KeReleaseSemaphore(&(fcb->FcbPhore), 0, 1, FALSE);
+		Status = GenesisCompleteQueryDirectory(RxContext);
 
+		//If failed to send inverted call, release mutex
+		ExReleaseFastMutex(&(fcb->ExclusiveLock));
+				
 		try_return(Status);
 	}				
 

@@ -22,8 +22,9 @@ Abstract:
 
 #define Dbg                              (DEBUG_TRACE_READ)
 
-NTSTATUS FunnyCompletionRoutine(PRX_CONTEXT RxContext){
-	
+NTSTATUS GenesisReadCompletionRoutine(PRX_CONTEXT RxContext){
+	RxCaptureFcb;
+	GenesisGetFcbExtension(capFcb, giiFCB);
 	NTSTATUS Status = STATUS_SUCCESS;
 	PGENESIS_COMPLETION_CONTEXT pIoCompContext = GenesisGetMinirdrContext(RxContext);
 	PVOID buffer;
@@ -33,7 +34,7 @@ NTSTATUS FunnyCompletionRoutine(PRX_CONTEXT RxContext){
 	buffer = RxLowIoGetBufferAddress(RxContext);
 	Status = pIoCompContext->Status;
 
-	if(buffer != NULL && NT_SUCCESS(Status)){
+	if(NT_SUCCESS(Status) && buffer != NULL){
 		__try { 
 			RtlCopyMemory(buffer, pIoCompContext->Context, pIoCompContext->Information);							
 			DbgPrint("NulMRxRead:  Copied successful: %d bytes\n", pIoCompContext->Information);
@@ -42,12 +43,15 @@ NTSTATUS FunnyCompletionRoutine(PRX_CONTEXT RxContext){
 			Status = GetExceptionCode();							
 		}	
 	}	
-	else if(buffer == NULL){		
+	else if(NT_SUCCESS(Status)){		
+		//Staus is ok, buffer should not be null but is
 		Status = STATUS_INSUFFICIENT_RESOURCES;
 	}
 
 	RxFreePool(pIoCompContext->Context);
 	pIoCompContext->Context = NULL;
+
+	ExReleaseFastMutex(&giiFCB->ExclusiveLock);
 	
 	RxSetIoStatusStatus(RxContext, Status);
 	RxSetIoStatusInfo(RxContext, (NT_SUCCESS(Status) ? pIoCompContext->Information : 0));
@@ -161,9 +165,9 @@ Return Value:
 	//	try_return(Status = STATUS_PENDING);
 	}
 
-	RxContext->LowIoContext.CompletionRoutine = FunnyCompletionRoutine;	
+	RxContext->LowIoContext.CompletionRoutine = GenesisReadCompletionRoutine;	
 
-	KeWaitForSingleObject(&(giiFcb->FcbPhore), Executive, KernelMode, FALSE, NULL);
+	ExAcquireFastMutex(&giiFcb->ExclusiveLock);
 
 	//Store read data here
 	pIoCompContext->Context = RxAllocatePoolWithTag(PagedPool, ByteCount, 'abcd');
@@ -171,19 +175,22 @@ Return Value:
 	//Sends Genii read request
 	Status = GenesisSendInvertedCall(RxContext, GENII_READ, !SynchronousIo);
 
-	if(SynchronousIo){
-		PVOID requestBuffer = NULL;
+	//Something could go wrong (only wait if something will actually come back to free you)
+	if(NT_SUCCESS(Status)){
 
-		KeWaitForSingleObject(&(giiFcb->FcbPhore), Executive, KernelMode, FALSE, NULL);
-		KeReleaseSemaphore(&(giiFcb->FcbPhore), 0, 1, FALSE);
-		Status = STATUS_SUCCESS;
+		if(SynchronousIo){
+			PVOID requestBuffer = NULL;
 
-		if(!PagingIo){
-			FileObject->CurrentByteOffset = 
-				RtlConvertLongToLargeInteger(ByteOffset + pIoCompContext->Information);
-		}
-		else{
-			DbgPrint("NulMrxRead:  Paging IO Recv'd\n");
+			KeWaitForSingleObject(&(giiFcb->InvertedCallSemaphore), Executive, KernelMode, FALSE, NULL);			
+			Status = STATUS_SUCCESS;
+
+			if(!PagingIo){
+				FileObject->CurrentByteOffset = 
+					RtlConvertLongToLargeInteger(ByteOffset + pIoCompContext->Information);
+			}
+			else{
+				DbgPrint("NulMrxRead:  Paging IO Recv'd\n");
+			}
 		}
 	}
 

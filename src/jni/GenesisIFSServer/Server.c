@@ -1,27 +1,34 @@
 #include <tchar.h>
 #include <stdio.h>
 #include <windows.h>
+#include <signal.h>
 
 #include <MakeGenesisIICalls.h>
 #include "nulmrx.h"
 #include <winioctl.h>
+#include "server.h"
 
 //-----------------------------------------------------------------------------
 // Local structures
 
-#define DEBUG			 0x00000000
+#define DEBUG						 0
 #define NUMBER_OF_THREADS			 5
+#define THREAD_DELAY				200
                                                 
-HANDLE sem_handle;
+//Global variables
+HANDLE sem_handle;					//Semaphore to control access to device (necessary?)
+HANDLE close_handle;				//Semaphore to control when to close
 HANDLE GenesisControlHandle;		//Device handle	
+BOOL isRunning = TRUE;				//Communication between threads (for closing)
+int loggedin = 0;					//Whether logged in or not
 
-int loggedin = 0;
+//Defined in Test.c
+void TestThread(GII_JNI_INFO rootInfo);
 
 typedef struct _WORKER{
 	HANDLE thread;
-	struct _WORKER *nextWorker;
+	struct _WORKER * nextWorker;
 }*PWORKER, WORKER;
-
 
 typedef struct _CommRequest {
 
@@ -38,7 +45,6 @@ typedef struct _CommResponse {
     char                    ControlResponseBuffer[USER_KERNEL_MAX_TRANSFER_SIZE + (3 * sizeof(long))];
 
 } COMMRESPONSE, *PCOMMRESPONSE;
-
 
 void printListing(char * listing, int size){
 	int i;	
@@ -133,7 +139,6 @@ int copyListing(char * buffer, char ** listing, int size){
 	}
 	return bytesCopied;
 }
-
 BOOL GetRequest(PGENII_CONTROL_REQUEST PRequest,LPOVERLAPPED POverlapped)
 {
     BOOL    status;
@@ -181,6 +186,75 @@ BOOL SendResponse(PGENII_CONTROL_RESPONSE PResponse,LPOVERLAPPED POverlapped)
     }        
 
     return TRUE;                             
+}
+
+BOOL SendUFSClose(LPOVERLAPPED POverlapped)
+{
+    BOOL    status;
+    DWORD   bytesReturned;    
+
+	WaitForSingleObject(sem_handle, INFINITE);	
+	status = DeviceIoControl(GenesisControlHandle,GENII_CONTROL_UFS_STOP,
+                             NULL,0,
+                             NULL,0,
+                             &bytesReturned,
+                             POverlapped);
+	ReleaseSemaphore(sem_handle, 1, NULL);
+
+    if(!status) {
+        DWORD error = GetLastError();
+        if(error != ERROR_IO_PENDING) {
+            printf("Something went wrong:  SendUFSClose - Status %x",GetLastError());
+            return FALSE;
+        }
+    }        
+
+    return TRUE;                             
+}
+
+void RepeatControlCSignalHandler(int signalNumber){
+	signal(SIGINT, RepeatControlCSignalHandler);
+
+	printf("G-ICING:  CTRL+C received, UFS is already shutting down\n");
+}
+
+void ControlCSignalHandler(int signalNumber){
+	OVERLAPPED      OverlappedForCloser;
+	BOOLEAN ret;
+
+	//Setup other signal handler if many calls are made
+	signal(SIGINT, RepeatControlCSignalHandler);
+
+	printf("G-ICING:  CTRL+C received, UFS is shutting down\n");
+
+	//This will step all threads from waiting again
+	isRunning = FALSE;
+    
+	//Acquire an event handler
+	do{
+		//Tell device you are ready to process 
+	    memset(&OverlappedForCloser,0,sizeof(OverlappedForCloser));
+		OverlappedForCloser.hEvent = CreateEvent(NULL,TRUE,FALSE,NULL);
+	}while(OverlappedForCloser.hEvent == INVALID_HANDLE_VALUE);
+
+    ret = SendUFSClose(&OverlappedForCloser);
+    if(!ret) {
+		printf("UFSClose not able to be sent!!!  Unable to abort, please restart\n");
+        CloseHandle(OverlappedForCloser.hEvent);
+        return;
+    } 			
+
+	//Wait to be alerted by the device that IO is waiting
+    while(!HasOverlappedIoCompleted(&OverlappedForCloser)) {        
+        Sleep(100);
+    }
+
+	printf("Signal handler has returned. Kernel is now consistent with a close\n");
+
+	//Signal main thread to finish clean up
+	ReleaseSemaphore(close_handle, 1, NULL);
+
+	CloseHandle(OverlappedForCloser.hEvent);
 }
 
 //Prepares a response 
@@ -410,41 +484,10 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 	}
 }
 
-DWORD WINAPI TestThread(LPVOID parameter){	
-	char ** directoryListing;
-	char buffer[8192];
-	int StatusCode;
-	GII_JNI_INFO myInfo;
-
-	if(initializeJavaVMForThread(&myInfo) == -1){
-		printf("Thread initialization failed\n");
-		return -1;
-	}
-
-	//Log in!
-	WaitForSingleObject(sem_handle, INFINITE);
-	if(!loggedin){
-		printf("Logging In to Genesis\n");
-		genesisII_login(&myInfo, "deployments/default/security/keys.pfx", "keys", "skynet1");
-		printf("Login successful\n");
-		loggedin = 1;
-	}
-	ReleaseSemaphore(sem_handle, 1, NULL);
-
-	StatusCode = genesisII_directory_listing(&myInfo, &directoryListing, "", "");
-	copyListing(buffer, directoryListing, StatusCode);
-	printListing(buffer, StatusCode);
-
-	Sleep(300000);
-	return 0 ;
-}
-
 /*	
 	Server thread with inverted calls
 */
-DWORD WINAPI ServerThread(LPVOID parameter){
-	BOOL			connected = TRUE;
-	BOOL			isRunning = TRUE;    
+DWORD WINAPI ServerThread(LPVOID parameter){	
     OVERLAPPED      GeniiRequestOverlapped;
     COMMREQUEST     GeniiRequest;
     COMMRESPONSE    GeniiResponse;
@@ -457,12 +500,12 @@ DWORD WINAPI ServerThread(LPVOID parameter){
 	}
 	
 	//For this, we'll assume driver stays connected
-	while(isRunning && connected){		        
+	while(isRunning){		        
 		DWORD bytesTransferred;
 
         //Tell device you are ready to process 
         memset(&GeniiRequestOverlapped,0,sizeof(GeniiRequestOverlapped));
-        GeniiRequestOverlapped.hEvent = CreateEvent(NULL,TRUE,FALSE,NULL);
+        GeniiRequestOverlapped.hEvent = CreateEvent(NULL,TRUE,FALSE,L"ChangeMyName");
         
 		if(GeniiRequestOverlapped.hEvent == INVALID_HANDLE_VALUE) {
 			//try to acquire one next time around
@@ -472,9 +515,7 @@ DWORD WINAPI ServerThread(LPVOID parameter){
         memset(&GeniiRequest,0,sizeof(GeniiRequest));
 
         GeniiRequest.ControlRequest.RequestBuffer = &(GeniiRequest.ControlRequestBuffer[0]);
-        GeniiRequest.ControlRequest.RequestBufferLength = sizeof(GeniiRequest.ControlRequestBuffer);
-
-		printf("Notication sent to Kernel Driver\n");
+        GeniiRequest.ControlRequest.RequestBufferLength = sizeof(GeniiRequest.ControlRequestBuffer);		
 
         ret = GetRequest(&(GeniiRequest.ControlRequest),&GeniiRequestOverlapped);
         if(!ret) {
@@ -483,126 +524,128 @@ DWORD WINAPI ServerThread(LPVOID parameter){
         } 			
 
 		//Wait to be alerted by the device that IO is waiting
-        while(!HasOverlappedIoCompleted(&GeniiRequestOverlapped)) {
-            if(!isRunning) {
-                goto exitStageLeft;                    
-            } 
-            Sleep(100);
+        while(!HasOverlappedIoCompleted(&GeniiRequestOverlapped)) {            
+            Sleep(THREAD_DELAY);
         }
 
 		//Get the request				                                 
-		ret = GetOverlappedResult(GenesisControlHandle,&GeniiRequestOverlapped,&bytesTransferred,FALSE);                        
-        
-        printf("Request from Kernel Driver Received : Id= %x, Type = %x, Length %x\n", 
-                 GeniiRequest.ControlRequest.RequestID,
-                 GeniiRequest.ControlRequest.RequestType,                 
-                 GeniiRequest.ControlRequest.RequestBufferLength);
+		ret = GetOverlappedResult(GenesisControlHandle,&GeniiRequestOverlapped,&bytesTransferred,FALSE);		        
+
+		if(!isRunning){
+			if(DEBUG){
+				printf("Closing event signal after return from Kernel\n");
+			}
+			CloseHandle(GeniiRequestOverlapped.hEvent);
+			continue;
+		}
+		else{
+			ResetEvent(GeniiRequestOverlapped.hEvent);
+		}
 
 		//This must be done before preparing the Response
 		GeniiResponse.ControlResponse.ResponseBuffer = &(GeniiResponse.ControlResponseBuffer[0]);
 		      
-		//PREPARE GENESIS RESPONSE depending on RequestID
-		prepareResponse(&myInfo, &(GeniiRequest.ControlRequest), &(GeniiResponse.ControlResponse));
+		//Call Genesis for appropriate response
+		prepareResponse(&myInfo, &(GeniiRequest.ControlRequest), &(GeniiResponse.ControlResponse));		
 
-		//Send response (Closes are asynchronous)
-		
-		ResetEvent(GeniiRequestOverlapped.hEvent);
-
-		printf("Sending Response to Kernel Driver: Id= %x, Type = %x, Length %x\n", 
+		printf("Sending Response to Kernel Driver: Id= %d, Type = %x, Length %d\n\n", 
 				 GeniiResponse.ControlResponse.RequestID,
 				 GeniiResponse.ControlResponse.ResponseType,                 
 				 GeniiResponse.ControlResponse.ResponseBufferLength);
 		ret = SendResponse(&(GeniiResponse.ControlResponse),&GeniiRequestOverlapped);
-		if(!ret) {              
+		if(!ret) {             
 			CloseHandle(GeniiRequestOverlapped.hEvent);
 			continue;
 		} 
-		while(!HasOverlappedIoCompleted(&GeniiRequestOverlapped)) {
-			if(!isRunning) {
-				goto exitStageLeft;                    
-			} 
-			Sleep(100);
+
+		while(!HasOverlappedIoCompleted(&GeniiRequestOverlapped)) {		
+			Sleep(THREAD_DELAY);
 		}     		
         CloseHandle(GeniiRequestOverlapped.hEvent);
 	}
 
-exitStageLeft:
+	//Must detatch this thread from Genesis
+	detatchThreadFromJVM();
 	return 0;
 }
 
-int runMultiThreaded(){
+int runMultiThreaded(PGII_JNI_INFO rootInfo){
 	
-	PWORKER head, last=NULL, current;
+	PWORKER head=NULL, last=NULL, current=NULL, next;
     DWORD dwThreadId;	
 	int i;	
 
-	sem_handle = CreateSemaphore(NULL, 1, 1, NULL); 	
+	sem_handle = CreateSemaphore(NULL, 1, 1, NULL);
+	close_handle = CreateSemaphore(NULL, 0, 1, NULL);
+
+	signal(SIGINT, ControlCSignalHandler);
 
 	//Open device that deals with inverted calls
 	GenesisControlHandle = CreateFile(DD_GENII_CONTROL_DEVICE_USER_NAME,
 									GENERIC_READ|GENERIC_WRITE,
                                     FILE_SHARE_READ | FILE_SHARE_WRITE,NULL,OPEN_EXISTING,
-                                    FILE_ATTRIBUTE_NORMAL|FILE_FLAG_OVERLAPPED,NULL);
+                                    FILE_ATTRIBUTE_NORMAL|FILE_FLAG_OVERLAPPED|FILE_FLAG_NO_BUFFERING,NULL);
+
 
 	// We cannot continue if we cannot find the device
 	if(GenesisControlHandle == INVALID_HANDLE_VALUE) {
-		DWORD error = GetLastError();
-		printf("\n%x\n", error);
-		_tprintf(_T("\nGenesis Control device not located.  Please reinstall the Genesis Driver\n"));
+		DWORD error = GetLastError();		
+		printf("Kernel Driver not opened correctly.  Error code %d\n", error);
 		return 0; 
-	}
-
-	head = (PWORKER) malloc(sizeof(WORKER));
-
-	// Run both threads testing small LPC messages   
-	head->thread = CreateThread(NULL, 0, ServerThread, NULL, 0, &dwThreadId);
-	head->nextWorker = NULL;
-	current = head;
-
-	for(i=1; i < NUMBER_OF_THREADS; i++){
-		last = current;
-		current = (PWORKER) malloc(sizeof(WORKER));
-		current->thread = CreateThread(NULL, 0, ServerThread, NULL, 0, &dwThreadId);
-		current->nextWorker = NULL;
-		last->nextWorker = current;
-	}
-
-	//Wait for last node
-	WaitForSingleObject(current->thread, INFINITE);
-
-	//Clean up
-	current = head;
-	while(current != NULL){
-		last = current;
-		current = current->nextWorker;		
-		CloseHandle(last->thread);
-		free(last);
 	}	
 
-	if(GenesisControlHandle != INVALID_HANDLE_VALUE) {
+	for(i=0; i < NUMBER_OF_THREADS; i++){
+		last = current;
+		current = (PWORKER) malloc(sizeof(WORKER));			
+		current->thread = CreateThread(NULL, 0, ServerThread, NULL, 0, &dwThreadId);
+		current->nextWorker = NULL;
+		if(last != NULL){
+			last->nextWorker = current;
+		}
+		else{
+			head = current;
+		}	
+	}
 
-        CloseHandle(GenesisControlHandle);
+	//Wait for close semaphore to be released
+	WaitForSingleObject(close_handle, INFINITE);
+
+	printf("Waiting for User Level Threads to Quit\n");
+
+	//Wait five seconds for other threads to catch up
+	Sleep(5000);
+
+	//Let's close these handles
+	next = head;
+	for(i=0; i < NUMBER_OF_THREADS; i++){
+		__try {
+			current = next;
+			next = next->nextWorker;		
+			CloseHandle(current->thread);
+		}__except(EXCEPTION_EXECUTE_HANDLER){
+			printf("Error on thread close\n");
+		}
+	}		
+
+	genesisII_logout(rootInfo);	
+	//DetatchCurrentThreadFromJVM();
+
+	if(GenesisControlHandle != INVALID_HANDLE_VALUE) {				 
+		CloseHandle(GenesisControlHandle);		
         GenesisControlHandle = INVALID_HANDLE_VALUE;
     }
 
 	//Delete semaphore
 	CloseHandle(sem_handle);
+	CloseHandle(close_handle);
 	return 0;
 }
 
 int main(int argc, char* argv[])
 {
 	int status = 0;
-	
-	int desiredAccess = GENESIS_FILE_READ_DATA | GENESIS_FILE_WRITE_DATA;
-	char requestedDeposition = GENESIS_FILE_OPEN;
-	int isDirectory = FALSE;
 
 	GII_JNI_INFO rootInfo;		
-
-	int StatusCode, bytes, fileid;	
-	char ** directoryListing;
-	char buffer[8192];	
 
 	//Initialize in root thread
 	if(initializeJavaVM(NULL, &rootInfo) == -1){
@@ -624,43 +667,12 @@ int main(int argc, char* argv[])
 		}
 	}
 	
-	status = runMultiThreaded();		
+	status = runMultiThreaded(&rootInfo);		
 
-	//fileid=0;
+	//TestThread(rootInfo);	
 
-	//printf("Creating directory SOME_DIRECTORY\n");
-
-	//genesisII_remove(&rootInfo, "/taco.txt", 0, 0);	
-
-	/*StatusCode = genesisII_open(&rootInfo, "/home/sosa/crime.txt", requestedDeposition, desiredAccess, isDirectory, &directoryListing);	
-	bytes = copyListing(buffer, directoryListing, StatusCode);
-	printListing(buffer, StatusCode);
-
-	StatusCode = genesisII_write(&rootInfo,fileid, "IlikeTacos", 0, 10);
-	printf("Wrote data %d\n", StatusCode);
-	
-	StatusCode = genesisII_read(&rootInfo,fileid, buffer, 0, 10);
-	printf("Got Data\n");
-	printListing2(buffer, StatusCode);
-
-	StatusCode = genesisII_close(&rootInfo,fileid);*/
-
-	//memcpy(&fileid, buffer, sizeof(ULONG));
-
-	//printf("Reading 3468 from offset 4000 bytes from %d \n", fileid);
-
-	//StatusCode = genesisII_read(&rootInfo,fileid, buffer, 0, 4096);
-	//printf("Got Data\n");
-	//printListing2(buffer, StatusCode);
-
-	//StatusCode = genesisII_truncate_append(&rootInfo,fileid, "IlikeTacos", 100, 10);
-	//printf("Wrote data %d\n", StatusCode);
-
-	//*StatusCode = genesisII_write(&rootInfo,fileid, "IlikeTacos", 8000, 10);
-	//printf("Wrote data %d\n", StatusCode);
-
-	genesisII_logout(&rootInfo);
+	printf("Shutdown Complete\n");
+	exit(0);
 	
 	return status;
 }
-

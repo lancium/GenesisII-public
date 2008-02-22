@@ -237,110 +237,101 @@ NTSTATUS GenesisSendInvertedCall(PRX_CONTEXT RxContext, ULONG callType, BOOLEAN 
 	PLIST_ENTRY listEntry;
 	PIRP controlIrp;
 	PGENII_CONTROL_REQUEST controlRequest;	
-	PFAST_MUTEX queueLock;
-	PLIST_ENTRY queue;	
+	PFAST_MUTEX dataQueueLock;
+	PLIST_ENTRY dataQueue;	
 	
 	PMDL mdl;
 	PVOID controlBuffer;
     
-	queue = &dataExt->GeniiRequestQueue;
-    queueLock = &dataExt->GeniiRequestQueueLock;
+	dataQueue = &dataExt->GeniiRequestQueue;
+    dataQueueLock = &dataExt->GeniiRequestQueueLock;
 
-	switch (controlExt->DeviceState) {
-		case GENII_CONTROL_ACTIVE:			
-			// Data device read must be satisfied by queuing request
-			// off to the service.
-			dataRequest = (PGENII_REQUEST) ExAllocatePoolWithTag(PagedPool, sizeof(GENII_REQUEST), 'rdCO');
-			if (!dataRequest) {
-				// Complete the request, indicating that the operation failed						
-				status = STATUS_INSUFFICIENT_RESOURCES;
-				break;
-			}
-			RtlZeroMemory(dataRequest, sizeof(GENII_REQUEST));
-			dataRequest->RequestID = (ULONG) InterlockedIncrement(&GeniiRequestID);
-			dataRequest->Irp = Irp;						
+	// Insert the request into the appropriate queue here
+	ExAcquireFastMutex(dataQueueLock);
 
-			//Also want originating RxContext!
-			dataRequest->RxContext = RxContext;
+	if(controlExt->DeviceState == GENII_CONTROL_ACTIVE){
+		// Data device read must be satisfied by queuing request off to the service.
+		dataRequest = (PGENII_REQUEST) ExAllocatePoolWithTag(PagedPool, sizeof(GENII_REQUEST), 'rdCO');
+		if (!dataRequest) {
+			// Complete the request, indicating that the operation failed						
+			status = STATUS_INSUFFICIENT_RESOURCES;
 
-			// Since we are enqueuing the IRP, mark it pending
+			//Cleanup (not good coding practice but easiest way without a HUGE if statement
+			ExReleaseFastMutex(dataQueueLock);	
+			return status;
+		}
+		RtlZeroMemory(dataRequest, sizeof(GENII_REQUEST));
+		dataRequest->RequestID = (ULONG) InterlockedIncrement(&GeniiRequestID);
+		dataRequest->RequestType = callType;
+		dataRequest->Irp = Irp;				
+
+		//Also want originating RxContext!
+		dataRequest->RxContext = RxContext;
+			
+		//Check if the UFS has a thread ready to handle this request
+		ExAcquireFastMutex(&controlExt->ServiceQueueLock);
+
+		//If no waiting threads.  We need to insert this into the request queue
+		if (IsListEmpty(&controlExt->ServiceQueue)) {
+
+			//First put it into Data Queue
+
+			//We are enqueuing the IRP, mark it as pending if allowed
 			if(MarkAsPending){
 				RxMarkContextPending(RxContext);					
 				status = STATUS_PENDING;
 			}
+
+			//Insert into Data Q (ready to be responded to)
+			InsertTailList(dataQueue, &dataRequest->ListEntry);	
+
+			//Second put it into Request Queue
+			ExAcquireFastMutex(&controlExt->RequestQueueLock);
+			InsertTailList(&controlExt->RequestQueue, &dataRequest->ServiceListEntry);
+			ExReleaseFastMutex(&controlExt->RequestQueueLock);			
+		}
+		else{
+			//UFS has a thread ready to handle the request		
+			listEntry = RemoveHeadList(&controlExt->ServiceQueue);			
+
+			controlIrp = CONTAINING_RECORD(listEntry, IRP, Tail.Overlay.ListEntry);
+
+			//This stuff locks control buffer (to write input commands into)
+			controlRequest = (PGENII_CONTROL_REQUEST) controlIrp->AssociatedIrp.SystemBuffer;							
+			controlRequest->RequestID = dataRequest->RequestID;			
+			controlRequest->RequestType = callType;				
+
+			// Our problem here is that the control buffer is in a different address space.
+			mdl = IoAllocateMdl(controlRequest->RequestBuffer,
+							  controlRequest->RequestBufferLength,
+							  FALSE, // should not be any other MDLs associated with control IRP
+							  FALSE, // no quota charged
+							  controlIrp); // track the MDL in the control IRP...
 			
-			// Insert the request into the appropriate queue here
-			ExAcquireFastMutex(queueLock);
-			InsertTailList(queue, &dataRequest->ListEntry);
-			ExReleaseFastMutex(queueLock);
-			
-			// Now, let's try to dispatch this to a service thread (really an IRP)
-			// and if we cannot do so, we need to enqueue it for later processing
-			// when a thread becomes available.
-			ExAcquireFastMutex(&controlExt->ServiceQueueLock);
-			if (IsListEmpty(&controlExt->ServiceQueue)) {
-
-				// No waiting threads.  We need to insert this into the service request queue
-				ExAcquireFastMutex(&controlExt->RequestQueueLock);
-				InsertTailList(&controlExt->RequestQueue, &dataRequest->ServiceListEntry);
-				ExReleaseFastMutex(&controlExt->RequestQueueLock);
-				
-				// Release the service queue lock
-				ExReleaseFastMutex(&controlExt->ServiceQueueLock);
-			}else {
-				// A service thread is available right now.  Remove the service thread
-				// from the queue.						
-				listEntry = RemoveHeadList(&controlExt->ServiceQueue);
-				controlIrp = CONTAINING_RECORD(listEntry, IRP, Tail.Overlay.ListEntry);
-
-				//This stuff locks control buffer (to write input commands into)
-				controlRequest = (PGENII_CONTROL_REQUEST) controlIrp->AssociatedIrp.SystemBuffer;
-								
-				controlRequest->RequestID = dataRequest->RequestID;			
-				controlRequest->RequestType = callType;				
-
-				// Our problem here is that the control buffer is in a different
-				// address space.  So, we need to reach over into that address space and
-				// grab it.
-				mdl = IoAllocateMdl(controlRequest->RequestBuffer,
-								  controlRequest->RequestBufferLength,
-								  FALSE, // should not be any other MDLs associated with control IRP
-								  FALSE, // no quota charged
-								  controlIrp); // track the MDL in the control IRP...
-				if (NULL == mdl) {                
-					// We failed to get an MDL.  What a pain.                
-					InsertTailList(&controlExt->ServiceQueue, listEntry);
-                
-					// Complete the data request - this falls through and completes below.
-					status = STATUS_INSUFFICIENT_RESOURCES;
-                
-					// Release the service queue lock
-					ExReleaseFastMutex(&controlExt->ServiceQueueLock);					                    
-					status = STATUS_PENDING;
-					break;
-				}
-
+			if (NULL == mdl) {               
+				// Complete the data request - this falls through and completes below.
+				status = STATUS_INSUFFICIENT_RESOURCES;				                    									
+			}				
+			else{
 				__try {
 					// Probe and lock the pages
 					MmProbeAndLockProcessPages(mdl, IoGetRequestorProcess(controlIrp),UserMode,IoModifyAccess);
-
 				} __except(EXCEPTION_EXECUTE_HANDLER) {
-					// Access probe failed
-	                
+					// Access probe failed	                
 					status = GetExceptionCode();
 
 					// Cleanup what we were doing....
-					IoFreeMdl(mdl);
-					InsertTailList(&controlExt->ServiceQueue, listEntry);
-
-					// Release the service queue lock
-					ExReleaseFastMutex(&controlExt->ServiceQueueLock);					
-					status = STATUS_PENDING;
-					break;
-				}				
+					IoFreeMdl(mdl);					
+				
+					//I'm not sure about the right status to return here
+					status = STATUS_INSUFFICIENT_RESOURCES;					
+				}			
+			}
+			//We are still succesful
+			if(NT_SUCCESS(status)){
 				
 				//Actually get pointer (same as ControlRequest->RequestBuffer)
-				controlBuffer = MmGetSystemAddressForMdlSafe(mdl, NormalPagePriority);
+				controlBuffer = MmGetSystemAddressForMdlSafe(mdl, NormalPagePriority);				
 
 				switch(callType){
 					case GENII_QUERYFILEINFO:
@@ -388,27 +379,47 @@ NTSTATUS GenesisSendInvertedCall(PRX_CONTEXT RxContext, ULONG callType, BOOLEAN 
 						break;
 					}
 					default:
-						DbgPrint("Unsupported function placed in async queue");
-						status = STATUS_NOT_SUPPORTED;
-						return status;
+						DbgPrint("G-ICING:  Unsupported function trying to be sent to UFS");
+						status = STATUS_NOT_SUPPORTED;						
+				}
+			}
+			//Were we successful with getting the control request and moving the data request into it
+			if(NT_SUCCESS(status)){
+
+				//First place in Data Queue
+
+				//We are enqueuing the IRP, mark it as pending if allowed
+				if(MarkAsPending){
+					RxMarkContextPending(RxContext);					
+					status = STATUS_PENDING;
 				}
 
-				// And complete the control request
+				//Insert into Data Q (ready to be responded to)
+				InsertTailList(dataQueue, &dataRequest->ListEntry);					
+
+				//Second, sends back inverted call
 				controlIrp->IoStatus.Status = STATUS_SUCCESS;
 				controlIrp->IoStatus.Information = sizeof(GENII_CONTROL_REQUEST);          
-				IoCompleteRequest(controlIrp, IO_NO_INCREMENT);						
-		
-				// Release the service queue lock
-                ExReleaseFastMutex(&controlExt->ServiceQueueLock);
+				IoCompleteRequest(controlIrp, IO_NO_INCREMENT);
 			}
-			break;
-			//end switch case
-		default:
-			//Device is inactive			
-			status = STATUS_INVALID_DEVICE_REQUEST;
-			break;				
-	}		  
-	// Done.
+			else{
+				DbgPrint("G-ICING returned bad status %d\n", status);
+
+				//Free memory
+				ExFreePoolWithTag(dataRequest,'rdCO');
+
+				//Return entry to ServiceQueue (so we don't lose threads :-))
+				InsertTailList(&controlExt->ServiceQueue, listEntry);
+			}
+			//Release the service queue lock
+			ExReleaseFastMutex(&controlExt->ServiceQueueLock);					
+		}
+	}else{		
+		//Device is inactive	
+		status = STATUS_DEVICE_NOT_CONNECTED;		
+	}	  	
+	ExReleaseFastMutex(dataQueueLock);	
+
 	return status;	
 }
 

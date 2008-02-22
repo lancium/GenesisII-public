@@ -14,7 +14,6 @@ import edu.virginia.vcgr.genii.client.byteio.xfer.dime.DimeRByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.xfer.mtom.MtomRByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.xfer.simple.SimpleRByteIOTransferer;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
-import edu.virginia.vcgr.genii.client.jni.gIIlib.JNILibraryBase;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 
 public class RandomByteIOFileDescriptor extends WindowsIFSFile

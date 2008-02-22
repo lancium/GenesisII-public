@@ -57,7 +57,8 @@ void GenesisInitializeFCB(PGENESIS_FCB fcb){
 	fcb->State = GENII_STATE_NOT_INITIALIZED;	
 	fcb->GenesisTempFileID = GENII_FILE_INVALID;
 
-	KeInitializeSemaphore(&(fcb->FcbPhore), 1, 1);
+	ExInitializeFastMutex(&(fcb->ExclusiveLock));
+	KeInitializeSemaphore(&(fcb->InvertedCallSemaphore), 0, 1);	
 }
 
 void GenesisInitializeCCB(PGENESIS_CCB ccb, ULONG tempFileID){
@@ -293,7 +294,7 @@ Return Value:
 			DbgPrint("NulMrxCreate: Failed!  Open By file id not supported\n");
 			Status = STATUS_NOT_SUPPORTED;
 			try_return(Status);
-		}
+		}		
 
 		//We don't check the names at all cause of how we use names in Redirector
 
@@ -343,17 +344,25 @@ Return Value:
 		giiSrvOpen = (PGENESIS_SRV_OPEN)SrvOpen->Context2;
 
 		//On behalf of Sender
-		KeWaitForSingleObject(&(giiFCB->FcbPhore), Executive, KernelMode, FALSE, NULL);
+		ExAcquireFastMutex(&giiFCB->ExclusiveLock);
 
 		/* You would enter code here to do path traversal (but we just open up directly :-D) */
 		DbgPrint("NulMrxCreate:  Checking in with Genesis\n");		
 		Status = GenesisSendInvertedCall(RxContext, GENII_CREATE, FALSE);
+
+		//Something could go wrong (only wait if something will actually come back to free you)
+		if(!NT_SUCCESS(Status)){
+			DbgPrint("GenesisSendInvertedCall failed with Status %d\n", Status);
+			ExReleaseFastMutex(&giiFCB->ExclusiveLock);
+			RxReleaseFcbResourceInMRx(capFcb);
+			try_return(Status);
+		}
+
 		//Completes on return		
 
 		//Waits for caller
-		KeWaitForSingleObject(&(giiFCB->FcbPhore), Executive, KernelMode, FALSE, NULL);
-
-		KeReleaseSemaphore(&(giiFCB->FcbPhore), IO_NO_INCREMENT, 1, FALSE);
+		KeWaitForSingleObject(&(giiFCB->InvertedCallSemaphore), Executive, KernelMode, FALSE, NULL);
+		ExReleaseFastMutex(&giiFCB->ExclusiveLock);
 
 		tempFileID = giiFCB->GenesisTempFileID;
 
@@ -791,8 +800,8 @@ Notes:
 	if(giiFCB != NULL){
 
 		//Make sure no one else is trying to edit this
-		KeWaitForSingleObject(&(giiFCB->FcbPhore), Executive, KernelMode, FALSE, NULL);
-		KeReleaseSemaphore(&(giiFCB->FcbPhore), 0, 1, FALSE);
+		ExAcquireFastMutex(&giiFCB->ExclusiveLock);
+		ExReleaseFastMutex(&giiFCB->ExclusiveLock);
 	}
 
     return STATUS_SUCCESS;
@@ -851,8 +860,11 @@ Return Value:
 		//Close this file handle on the Genesis Side
 		Status = GenesisSendInvertedCall(RxContext, GENII_CLOSE, FALSE);
 
-		//Waits for caller
-		KeWaitForSingleObject(&(giiFCB->FcbPhore), Executive, KernelMode, FALSE, NULL);		
+		//Something could go wrong (only wait if something will actually come back to free you)
+		if(NT_SUCCESS(Status)){
+			//Waits for caller
+			KeWaitForSingleObject(&(giiFCB->InvertedCallSemaphore), Executive, KernelMode, FALSE, NULL);		
+		}
 	}	
 
     return(Status);

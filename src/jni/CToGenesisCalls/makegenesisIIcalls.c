@@ -434,3 +434,12 @@ int get_static_method(PGII_JNI_INFO info, jclass *my_class, char* method, char* 
 
 	return JNI_ERR;
 }
+
+DllExport void cleanupJVM(){
+	(*jvm)->DestroyJavaVM(jvm);
+}
+
+
+DllExport void detatchThreadFromJVM(){	
+	(*jvm)->DetachCurrentThread(jvm);		
+}
