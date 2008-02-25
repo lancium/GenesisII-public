@@ -90,6 +90,7 @@
 	<import file="${wsdl-dir}/queue/queue.build.xml"/>
 	<import file="${wsdl-dir}/informationService/informationService.build.xml"/>
 	<import file="${wsdl-dir}/certGenerator/certGenerator.build.xml"/>
+	<import file="${wsdl-dir}/ticker/ticker.build.xml"/>
 
 	<!-- Build Targets -->
 	<target name="morganu.jar" depends="init">
@@ -185,6 +186,9 @@
 		<antcall target="gen.queue"/>
 		<antcall target="gen.informationService"/>
 		<antcall target="gen.certGenerator"/>
+<!--
+		<antcall target="gen.ticker"/>
+-->
 		<antcall target="deployments"/>
 	</target>
 

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="gen.ticker" name="ticker.build">
+
+	<condition property="gen.ticker.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${codegen-dir}/wsdl/ticker.flag"/>
+			<uptodate targetfile="${codegen-dir}/wsdl/ticker.flag">
+				<srcfiles dir="${wsdl-dir}/ticker">
+					<include name="ticker-factory.gwsdl"/>
+					<include name="ticker-factory.wsdl"/>
+					<include name="ticker-factory.xsd"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.ticker" unless="gen.ticker.uptodate">
+		<copy todir="${codegen-dir}/wsdl">
+			<fileset refid="common.source.files"/>
+			<fileset dir="${wsdl-dir}/ticker">
+				<include name="ticker-factory.gwsdl"/>
+				<include name="ticker-factory.wsdl"/>
+				<include name="ticker-factory.xsd"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${codegen-dir}/wsdl/ticker-factory.gwsdl"
+			target="${codegen-dir}/wsdl/ticker-factory-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${codegen-dir}/wsdl/ticker-factory-generated.wsdl"
+			target="${codegen-dir}/wsdl/ticker-factory-service.wsdl"
+    		portType="{http://schemas.ogf.org/ogsa/2007/12/wsrf-bp-interop/ticker-factory}TickerFactory"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${codegen-dir}/ticker"/>
+			<param name="stub.gen.source-wsdl"
+				value="${codegen-dir}/wsdl/ticker-factory-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${codegen-dir}/wsdl/ticker.flag"/>
+		</antcall>
+		<move file="${codegen-dir}/ticker/org/ogf/ogsa/ticker/deploy.wsdd"
+			tofile="${wsdd-dir}/ticker.deploy.wsdd"/>
+		<replace file="${wsdd-dir}/ticker.deploy.wsdd"
+			token="org.ogf.ogsa.ticker.TickerFactorySOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.ticker.TickerServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd-dir}/ticker.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>
