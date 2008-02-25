@@ -9,11 +9,11 @@ import java.util.Date;
 import org.apache.axis.message.MessageElement;
 import org.morgan.util.configuration.ConfigurationException;
 
-import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.io.FileResource;
+import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
@@ -83,7 +83,7 @@ public class TerminationScheduleTool extends BaseGridTool
 		SetAttributes set = new SetAttributes(
 			new MessageElement [] {
 				new MessageElement(
-						GenesisIIConstants.SCHED_TERM_TIME_QNAME, c) });
+					OGSAWSRFBPConstants.TERMINATION_TIME_ATTR_QNAME, c) });
 				
 		common.setAttributes(set);
 	}

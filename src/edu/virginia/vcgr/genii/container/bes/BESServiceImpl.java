@@ -120,6 +120,11 @@ public class BESServiceImpl extends GenesisIIBase
 		addImplementedPortType(WellKnownPortTypes.GENII_NOTIFICATION_CONSUMER_PORT_TYPE);
 	}
 	
+	public QName getFinalWSResourceInterface()
+	{
+		return WellKnownPortTypes.BES_SERVICE_PORT_TYPE;
+	}
+	
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType myEPR,
 		HashMap<QName, Object> constructionParameters)
 		throws ResourceException, BaseFaultType, RemoteException

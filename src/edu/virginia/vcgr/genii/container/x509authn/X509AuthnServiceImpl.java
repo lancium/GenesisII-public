@@ -107,6 +107,11 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 		addImplementedPortType(WellKnownPortTypes.RNS_SERVICE_PORT_TYPE);
 	}
 
+	public QName getFinalWSResourceInterface()
+	{
+		return WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE;
+	}
+	
 	protected Object translateConstructionParameter(MessageElement property)
 			throws Exception {
 

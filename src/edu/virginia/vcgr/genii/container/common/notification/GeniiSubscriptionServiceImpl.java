@@ -22,6 +22,11 @@ public class GeniiSubscriptionServiceImpl extends GenesisIIBase implements
 		addImplementedPortType(WellKnownPortTypes.GENII_SUBSCRIPTION_PORT_TYPE);
 	}
 	
+	public QName getFinalWSResourceInterface()
+	{
+		return WellKnownPortTypes.GENII_SUBSCRIPTION_PORT_TYPE;
+	}
+	
 	protected Object translateConstructionParameter(MessageElement parameter)
 		throws Exception
 	{

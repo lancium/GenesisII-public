@@ -186,9 +186,7 @@
 		<antcall target="gen.queue"/>
 		<antcall target="gen.informationService"/>
 		<antcall target="gen.certGenerator"/>
-<!--
 		<antcall target="gen.ticker"/>
--->
 		<antcall target="deployments"/>
 	</target>
 

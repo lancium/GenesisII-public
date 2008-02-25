@@ -7,11 +7,11 @@ import javax.xml.namespace.QName;
 
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cmd.CommandLineRunner;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
+import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
@@ -48,7 +48,7 @@ public class TimeReplicatedFile extends BaseGridTool
 		for (int lcv = 0; lcv < 100; lcv++)
 		{
 			proxy.getAttributes(new QName[] {
-				GenesisIIConstants.IMPLEMENTED_PORT_TYPES_ATTR_QNAME
+				OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME
 			});
 		}
 		long stopTime = System.currentTimeMillis();
@@ -69,7 +69,7 @@ public class TimeReplicatedFile extends BaseGridTool
 		for (int lcv = 0; lcv < 100; lcv++)
 		{
 			proxy.getAttributes(new QName[] {
-				GenesisIIConstants.IMPLEMENTED_PORT_TYPES_ATTR_QNAME
+				OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME
 			});
 		}
 		stopTime = System.currentTimeMillis();
@@ -82,7 +82,7 @@ public class TimeReplicatedFile extends BaseGridTool
 			try
 			{
 				replica1Replica.getAttributes(new QName[] {
-						GenesisIIConstants.IMPLEMENTED_PORT_TYPES_ATTR_QNAME
+					OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME
 				});
 			}
 			catch(Throwable t)

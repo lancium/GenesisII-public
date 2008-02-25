@@ -75,6 +75,11 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 			WellKnownPortTypes.SBYTEIO_FACTORY_PORT_TYPE);
 	}
 	
+	public QName getFinalWSResourceInterface()
+	{
+		return WellKnownPortTypes.VCGR_BES_ACTIVITY_SERVICE_PORT_TYPE;
+	}
+	
 	protected void setAttributeHandlers() throws NoSuchMethodException
 	{
 		super.setAttributeHandlers();

@@ -90,6 +90,11 @@ public class SimpleResolverServiceImpl extends GenesisIIBase implements SimpleRe
 		addImplementedPortType(WellKnownPortTypes.GENII_NOTIFICATION_CONSUMER_PORT_TYPE);
 	}
 	
+	public QName getFinalWSResourceInterface()
+	{
+		return WellKnownPortTypes.GENII_SIMPLE_RESOLVER_PORT_TYPE;
+	}
+	
 		
 	/* EndpointIdentifierResolver port type. */
 	@RWXMapping(RWXCategory.OPEN)

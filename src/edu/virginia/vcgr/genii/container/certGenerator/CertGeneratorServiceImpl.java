@@ -69,6 +69,11 @@ public class CertGeneratorServiceImpl extends GenesisIIBase implements CertGener
 		addImplementedPortType(WellKnownPortTypes.CERT_GENERATOR_SERVICE_PORT_TYPE);
 	}
 	
+	public QName getFinalWSResourceInterface()
+	{
+		return WellKnownPortTypes.CERT_GENERATOR_SERVICE_PORT_TYPE;
+	}
+	
 	@RWXMapping(RWXCategory.EXECUTE)
     public GenerateX509V3CertificateChainResponseType generateX509V3CertificateChain(GenerateX509V3CertificateChainRequestType request) 
 		throws java.rmi.RemoteException, 

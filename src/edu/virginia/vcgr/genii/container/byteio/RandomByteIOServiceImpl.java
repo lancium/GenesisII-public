@@ -85,6 +85,11 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 				WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE);
 	}
 	
+	public QName getFinalWSResourceInterface()
+	{
+		return WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE;
+	}
+	
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
 		HashMap<QName, Object> creationParameters)
 			throws ResourceException, BaseFaultType, RemoteException

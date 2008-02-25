@@ -37,6 +37,7 @@ import org.xml.sax.InputSource;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
 import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
@@ -89,7 +90,9 @@ public class EPRUtils
 
 			// attempt to get the full EPR from the object itself
 			GetAttributesResponse resp = common.getAttributes(
-					new QName[] {GenesisIIConstants.RESOURCE_ENDPOINT_ATTR_QNAME});
+					new QName[] {
+						OGSAWSRFBPConstants.RESOURCE_ENDPOINT_REFERENCE_ATTR_QNAME
+					});
 			MessageElement []elements = resp.get_any();
 			if (elements == null || elements.length < 1)
 				throw new Exception("Couldn't get EPR for target container.");
@@ -357,7 +360,7 @@ public class EPRUtils
 		for (MessageElement element : any)
 		{
 			if (element.getQName().equals(
-				GenesisIIConstants.IMPLEMENTED_PORT_TYPES_ATTR_QNAME))
+				OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME))
 			{
 				String s = element.getValue().toString();
 				int firstIndex = s.indexOf('{');

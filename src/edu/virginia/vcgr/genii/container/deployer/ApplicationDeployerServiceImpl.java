@@ -73,6 +73,11 @@ public class ApplicationDeployerServiceImpl extends GenesisIIBase implements
 		addImplementedPortType(WellKnownPortTypes.DEPLOYER_PORT_TYPE);
 	}
 
+	public QName getFinalWSResourceInterface()
+	{
+		return WellKnownPortTypes.DEPLOYER_PORT_TYPE;
+	}
+	
 	@RWXMapping(RWXCategory.EXECUTE)
 	public CreateDeploymentResponseType createDeployment(
 		CreateDeploymentRequestType createDeploymentRequest) 

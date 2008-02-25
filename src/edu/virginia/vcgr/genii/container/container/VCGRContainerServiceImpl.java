@@ -76,6 +76,11 @@ public class VCGRContainerServiceImpl extends GenesisIIBase
 		addImplementedPortType(WellKnownPortTypes.VCGR_CONTAINER_SERVICE_PORT_TYPE);
 	}
 	
+	public QName getFinalWSResourceInterface()
+	{
+		return WellKnownPortTypes.VCGR_CONTAINER_SERVICE_PORT_TYPE;
+	}
+	
 	public Object shutdown(Object shutdownRequest) throws RemoteException
 	{
 		try

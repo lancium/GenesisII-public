@@ -27,6 +27,11 @@ public class CounterServiceImpl extends GenesisIIBase implements
 			GenesisIIConstants.GENESISII_NS, "CounterPortType"));
 	}
 	
+	public QName getFinalWSResourceInterface()
+	{
+		return new QName(GenesisIIConstants.GENESISII_NS, "CounterPortType");
+	}
+	
 	@RWXMapping(RWXCategory.EXECUTE)
 	public AddResponse add(Add addRequest) throws RemoteException,
 			ResourceUnknownFaultType

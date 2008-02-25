@@ -15,6 +15,10 @@
     xmlns:rw-2="http://docs.oasis-open.org/wsrf/rw-2"
     targetNamespace="http://vcgr.cs.virginia.edu/genii/2006/12/common">
 
+	<xsd:import
+		namespace="http://schemas.ggf.org/ogsa/2006/05/wsrf-bp"
+		schemaLocation="./ogsa-wsrf-bp.xsd"/>
+
 	<wsdl:import
 		namespace="http://docs.oasis-open.org/wsrf/rw-2"
 		location="./wsrf/wsResourceFaults.wsdl"/>

@@ -89,6 +89,11 @@ public class RNSServiceImpl extends GenesisIIBase implements RNSPortType
 		addImplementedPortType(WellKnownPortTypes.RNS_SERVICE_PORT_TYPE);
 	}
 	
+	public QName getFinalWSResourceInterface()
+	{
+		return WellKnownPortTypes.RNS_SERVICE_PORT_TYPE;
+	}
+	
 	protected void registerTopics(TopicSpace topicSpace)
 		throws InvalidTopicException
 	{

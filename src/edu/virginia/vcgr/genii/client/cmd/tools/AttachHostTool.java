@@ -5,12 +5,12 @@ import javax.xml.namespace.QName;
 import org.apache.axis.message.MessageElement;
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
@@ -42,7 +42,7 @@ public class AttachHostTool extends BaseGridTool
 			GeniiCommon.class, EPRUtils.makeEPR(containerURL));
 		GetAttributesResponse resp = common.getAttributes(
 			new QName[] {
-				GenesisIIConstants.RESOURCE_ENDPOINT_ATTR_QNAME
+				OGSAWSRFBPConstants.RESOURCE_ENDPOINT_REFERENCE_ATTR_QNAME
 			});
 		MessageElement []elements = resp.get_any();
 		if (elements == null || elements.length < 1)

@@ -26,11 +26,6 @@ public class GenesisIIConstants
 	static public QName REGISTERED_TOPICS_ATTR_QNAME =
 		new QName(GENESISII_NS, REGISTERED_TOPICS_ATTR);
 	
-	static public final String IMPLEMENTED_PORT_TYPES_ATTR =
-		"implemented-port-types";
-	static public QName IMPLEMENTED_PORT_TYPES_ATTR_QNAME =
-		new QName(GENESISII_NS, IMPLEMENTED_PORT_TYPES_ATTR);
-
 	static public QName AUTHZ_CONFIG_ATTR_QNAME =
 		new QName("http://vcgr.cs.virginia.edu/genii/2006/12/security", "AuthZConfig");
 	static public final String AUTHZ_CONFIG_ATTR =
@@ -39,11 +34,6 @@ public class GenesisIIConstants
 	static public final String SCHED_TERM_TIME_PROPERTY_NAME =
 		"scheduled-termintation-time";
 	
-	static public QName SCHED_TERM_TIME_QNAME =
-		new QName(GENESISII_NS, SCHED_TERM_TIME_PROPERTY_NAME);
-	
-	static public QName RESOURCE_ENDPOINT_ATTR_QNAME =
-		new QName(OGSA_BP_NS, "ResourceEndpointReference");
 	static public QName RESOURCE_PROPERTY_NAMES_QNAME =
 		new QName(OGSA_BP_NS, "ResourcePropertyNames");
 	

@@ -64,6 +64,11 @@ public class SimpleResolverFactoryServiceImpl extends GenesisIIBase implements S
 		addImplementedPortType(WellKnownPortTypes.GENII_NOTIFICATION_CONSUMER_PORT_TYPE);
 	}
 	
+	public QName getFinalWSResourceInterface()
+	{
+		return WellKnownPortTypes.GENII_SIMPLE_RESOLVER_FACTORY_PORT_TYPE;
+	}
+	
 	private synchronized String getResolverServiceURL()
 	{
 		if (_simpleResolverServiceURL == null)

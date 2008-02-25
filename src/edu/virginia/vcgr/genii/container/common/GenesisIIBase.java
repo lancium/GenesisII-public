@@ -6,7 +6,6 @@ import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Properties;
@@ -28,7 +27,6 @@ import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.common.security.*;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.comm.ClientConstructionParameters;
@@ -63,10 +61,8 @@ import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.IContainerManaged;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
-import edu.virginia.vcgr.genii.container.attrs.DefaultAttributeManipulator;
 import edu.virginia.vcgr.genii.container.attrs.IAttributeManipulator;
 import edu.virginia.vcgr.genii.container.common.notification.SubscriptionConstructionParameters;
-import edu.virginia.vcgr.genii.container.common.notification.Topic;
 import edu.virginia.vcgr.genii.container.common.notification.TopicSpace;
 import edu.virginia.vcgr.genii.container.configuration.ServiceDescription;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
@@ -79,14 +75,12 @@ import edu.virginia.vcgr.genii.container.resolver.Resolution;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
-import edu.virginia.vcgr.genii.container.security.authz.handlers.*;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.AuthZSecurityException;
 
 @GAroundInvoke({WSAddressingHandler.class, DatabaseHandler.class, DebugInvoker.class})
-public class GenesisIIBase implements GeniiCommon, IContainerManaged
+public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 {
 	static private Log _logger = LogFactory.getLog(GenesisIIBase.class);
 
@@ -97,13 +91,15 @@ public class GenesisIIBase implements GeniiCommon, IContainerManaged
 		new HashMap<Class<? extends GenesisIIBase>, TopicSpace>();
 	
 	protected String _serviceName;
-	private ArrayList<QName> _implementedPortTypes =
+	public ArrayList<QName> _implementedPortTypes =
 		new ArrayList<QName>();
 	private AttributePackage _attributePackage = new AttributePackage();
 	
 	private Properties _defaultResolverFactoryProperties = null;
 	private Class<? extends IResolverFactoryProxy> _defaultResolverFactoryProxyClass = null;
-
+	
+	public abstract QName getFinalWSResourceInterface();
+	
 	protected AttributePackage getAttributePackage()
 	{
 		return _attributePackage;
@@ -119,30 +115,7 @@ public class GenesisIIBase implements GeniiCommon, IContainerManaged
 	
 	protected void setAttributeHandlers() throws NoSuchMethodException
 	{
-		AttributeHandlers handlers = new AttributeHandlers();
-		
-		_attributePackage.addManipulator(
-			DefaultAttributeManipulator.createManipulator(
-				handlers, GenesisIIConstants.SCHED_TERM_TIME_QNAME,
-				"getScheduledTerminationTimeAttr",
-				"setScheduledTerminationTimeAttr"));
-		_attributePackage.addManipulator(
-			DefaultAttributeManipulator.createManipulator(
-				handlers, GenesisIIConstants.IMPLEMENTED_PORT_TYPES_ATTR_QNAME,
-				"getImplementedPortTypes"));
-		_attributePackage.addManipulator(
-			DefaultAttributeManipulator.createManipulator(
-				handlers, GenesisIIConstants.RESOURCE_ENDPOINT_ATTR_QNAME,
-				"getResourceEndpoint"));
-		_attributePackage.addManipulator(
-			DefaultAttributeManipulator.createManipulator(
-				handlers, GenesisIIConstants.REGISTERED_TOPICS_ATTR_QNAME,
-				"getRegisteredTopics"));
-		_attributePackage.addManipulator(
-			DefaultAttributeManipulator.createManipulator(
-				handlers, GenesisIIConstants.AUTHZ_CONFIG_ATTR_QNAME,
-				"getAuthZConfig",
-				"setAuthZConfig"));
+		new GenesisIIBaseAttributesHandler(this, getAttributePackage());
 	}
 	
 	protected GenesisIIBase(String serviceName)
@@ -162,7 +135,7 @@ public class GenesisIIBase implements GeniiCommon, IContainerManaged
 		}
 		catch (NoSuchMethodException nsme)
 		{
-			_logger.error(nsme);
+			_logger.error("Couldn't set attribute handlers.", nsme);
 			throw new RemoteException(nsme.getLocalizedMessage(), nsme);
 		}
 	}
@@ -210,6 +183,8 @@ public class GenesisIIBase implements GeniiCommon, IContainerManaged
 		HashMap<QName, Object> constructionParameters) 
 		throws ResourceException, BaseFaultType, RemoteException
 	{
+		IResource resource = rKey.dereference();
+		
 		Long timeToLive = (Long)constructionParameters.get(
 			ClientConstructionParameters.TIME_TO_LIVE_PROPERTY_ELEMENT);
 		if (timeToLive != null)
@@ -217,18 +192,9 @@ public class GenesisIIBase implements GeniiCommon, IContainerManaged
 			Calendar termTime = Calendar.getInstance();
 			termTime.setTime(
 				new Date(new Date().getTime() + timeToLive.longValue()));
-			rKey.dereference().setProperty(
+			resource.setProperty(
 					IResource.SCHEDULED_TERMINATION_TIME_PROPERTY_NAME, termTime);
-/* MOOCH				
-			Container.getLifetimeVulture().setLifetimeWatch(
-				(URI)(rKey.dereference().getProperty(
-					IResource.ENDPOINT_IDENTIFIER_PROPERTY_NAME)),
-				(EndpointReferenceType)(WorkingContext.getCurrentWorkingContext().getProperty(
-					WorkingContext.EPR_PROPERTY_NAME)),
-				termTime.getTime());
-*/
 		}
-		
 	}
 	
 	static protected Calendar getScheduledTerminationTime()
@@ -726,138 +692,6 @@ public class GenesisIIBase implements GeniiCommon, IContainerManaged
 		return new SByteIOFactory(Container.getServiceURL("StreamableByteIOPortType"));
 	}	
 	
-	public class AttributeHandlers
-	{
-		public Collection<MessageElement> getRegisteredTopics() 
-			throws InvalidTopicException
-		{
-			Collection<Topic> topics = getTopicSpace().getRegisteredTopics();
-			ArrayList<MessageElement> document = new ArrayList<MessageElement>(
-				topics.size());
-			
-			for (Topic topic : topics)
-			{
-				document.add(new MessageElement(
-					GenesisIIConstants.REGISTERED_TOPICS_ATTR_QNAME,
-					topic.getTopicName()));
-			}
-			
-			return document;
-		}
-		
-		public Collection<MessageElement> getImplementedPortTypes()
-		{
-			synchronized(_implementedPortTypes)
-			{
-				ArrayList<MessageElement> document = new ArrayList<MessageElement>(
-					_implementedPortTypes.size());
-				
-				for (QName portType : _implementedPortTypes)
-				{
-					document.add(new MessageElement(
-						GenesisIIConstants.IMPLEMENTED_PORT_TYPES_ATTR_QNAME,
-						portType));
-				}
-				
-				return document;
-			}
-		}
-		
-		public MessageElement getScheduledTerminationTimeAttr()
-			throws ResourceUnknownFaultType, ResourceException
-		{
-			Calendar termTime = getScheduledTerminationTime();
-			
-			if (termTime != null)
-				return new MessageElement(
-					GenesisIIConstants.SCHED_TERM_TIME_QNAME,
-					termTime);
-			else
-				return new MessageElement(
-					GenesisIIConstants.SCHED_TERM_TIME_QNAME);
-		}
-		
-		public void setScheduledTerminationTimeAttr(MessageElement newTermTime)
-			throws ResourceException, ResourceUnknownFaultType
-		{
-			if (newTermTime == null)
-				setScheduledTerminationTime(null);
-			
-			try
-			{
-				setScheduledTerminationTime(
-					(Calendar)(newTermTime.getObjectValue(
-						Calendar.class)));
-			}
-			catch (Exception e)
-			{
-				throw new ResourceException(e.getMessage(), e);
-			}
-		}
-		
-		public MessageElement getResourceEndpoint()
-			throws ResourceUnknownFaultType, ResourceException
-		{
-			EndpointReferenceType myEPR = (EndpointReferenceType)WorkingContext.getCurrentWorkingContext(
-				).getProperty(WorkingContext.EPR_PROPERTY_NAME);
-			ResourceKey rKey = ResourceManager.getCurrentResource();
-			QName []implementedPortTypes = new QName[_implementedPortTypes.size()];
-			_implementedPortTypes.toArray(implementedPortTypes);
-			EndpointReferenceType epr = ResourceManager.createEPR(
-				rKey, myEPR.getAddress().get_value().toString(), implementedPortTypes);
-			
-			return new MessageElement(
-				GenesisIIConstants.RESOURCE_ENDPOINT_ATTR_QNAME, epr);
-		}
-		
-		public MessageElement getAuthZConfig()
-				throws ResourceUnknownFaultType, ResourceException, AuthZSecurityException
-		{
-    		IResource resource = ResourceManager.getCurrentResource().dereference();
-    		AuthZHandler authZHandler = AuthZHandler.getAuthZHandler(resource);
-    		AuthZConfig config = null;
-    		if (authZHandler != null) {
-        		config = authZHandler.getAuthZConfig(resource);
-    		}
-    		
-    		return new MessageElement(
-				AuthZConfig.getTypeDesc().getXmlType(), 
-				config);
-		}
-		
-		public void setAuthZConfig(MessageElement mel)
-				throws ResourceException, ResourceUnknownFaultType, AuthZSecurityException {
-
-			IResource resource = ResourceManager.getCurrentResource().dereference();
-
-			// get the authZ configuration
-			if (!mel.getQName().equals(AuthZConfig.getTypeDesc().getXmlType())) {
-				throw new AuthZSecurityException("Invalid AuthZ config");
-			}
-			AuthZConfig config = null;
-			try {
-				config = (AuthZConfig) 
-					mel.getObjectValue(AuthZConfig.class);
-			} catch (Exception e) { 
-				throw new AuthZSecurityException("Invalid AuthZ config: " + e.getMessage(), e);
-			}
-			if (config == null) {
-				throw new AuthZSecurityException("Invalid AuthZ config");
-			}
-			
-			// get the authZ handler 			
-    		AuthZHandler authZHandler = AuthZHandler.getAuthZHandler(resource);
-    		if (authZHandler == null) {
-    			throw new ResourceException("Resource does not have an AuthZ module");
-    		}
-    		
-    		// config the authZ handler
-    		authZHandler.setAuthZConfig(config, resource);
-		}
-		
-		
-	}
-
 	@RWXMapping(RWXCategory.WRITE)
 	public SubscribeResponse subscribe(Subscribe subscribeRequest) 
 		throws RemoteException, ResourceUnknownFaultType

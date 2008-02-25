@@ -68,6 +68,11 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		addImplementedPortType(WellKnownPortTypes.RNS_SERVICE_PORT_TYPE);
 	}
 	
+	public QName getFinalWSResourceInterface()
+	{
+		return WellKnownPortTypes.QUEUE_PORT_TYPE;
+	}
+	
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
 		HashMap<QName, Object> constructionParameters) 
 		throws ResourceException, BaseFaultType, RemoteException

@@ -69,6 +69,11 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 		addImplementedPortType(WellKnownPortTypes.RNS_SERVICE_PORT_TYPE);
 	}
 	
+	public QName getFinalWSResourceInterface()
+	{
+		return WellKnownPortTypes.EXPORTED_DIR_SERVICE_PORT_TYPE;
+	}
+	
 	protected ResourceKey createResource(HashMap<QName, Object> constructionParameters)
 		throws ResourceException, BaseFaultType
 	{

@@ -71,6 +71,11 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements
 		new StreamableByteIOAttributeHandlers(getAttributePackage());
 	}
 	
+	public QName getFinalWSResourceInterface()
+	{
+		return WellKnownPortTypes.SBYTEIO_SERVICE_PORT_TYPE;
+	}
+	
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
 		HashMap<QName, Object> creationParameters)	
 			throws ResourceException, BaseFaultType, RemoteException
