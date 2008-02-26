@@ -35,7 +35,7 @@ public class OGSAWSRFBPInteropTool extends BaseGridTool
 			
 		EndpointReferenceType epr = factory.createTicker(new CreateTicker()).getTickerReference();
 		OGSARP rp = (OGSARP)ResourcePropertyManager.createRPInterface(epr, OGSARP.class); 
-		for (QName rpname : rp.getResourcePropertyNames().getQNames())
+		for (QName rpname : rp.getResourcePropertyNames())
 		{
 			System.err.println("ResourceProperty:  " + rpname);
 		}

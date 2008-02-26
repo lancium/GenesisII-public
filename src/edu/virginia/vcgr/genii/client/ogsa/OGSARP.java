@@ -2,25 +2,18 @@ package edu.virginia.vcgr.genii.client.ogsa;
 
 import java.util.Calendar;
 
-import javax.xml.namespace.QName;
-
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.rp.ResourceProperty;
 
+/**
+ * This is the RP interface for getting OGSA BP resource
+ * properties.
+ * 
+ * @author mmm2a
+ */
 public interface OGSARP extends OGSAWSRFBPConstants
 {
-	static public final QName CURRENT_TIME_ATTR_QNAME = new QName(
-		WSRF_RL_NS, CURRENT_TIME_ATTR);
-	static public final QName RESOURCE_ENDPOINT_REFERENCE_ATTR_QNAME =
-		new QName(OGSA_WSRF_BP_NS, RESOURCE_ENDPOINT_REFERENCE_ATTR);
-	static public final QName TERMINATION_TIME_ATTR_QNAME = new QName(
-		WSRF_RL_NS, TERMINATION_TIME_ATTR);
-	static public final QName WS_RESOURCE_INTERFACES_ATTR_QNAME = new QName(
-		OGSA_WSRF_BP_NS, WS_RESOURCE_INTERFACES_ATTR);
-	static public final QName RESOURCE_PROPERTY_NAMES_ATTR_QNAME = new QName(
-		OGSA_WSRF_BP_NS, RESOURCE_PROPERTY_NAMES_ATTR);
-	
 	@ResourceProperty(namespace = WSRF_RL_NS, localname = CURRENT_TIME_ATTR)
 	public Calendar getCurrentTime();
 	
