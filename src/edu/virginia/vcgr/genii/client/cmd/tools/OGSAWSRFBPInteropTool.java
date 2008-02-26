@@ -22,8 +22,12 @@ public class OGSAWSRFBPInteropTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
+		/*
 		TickerFactory factory = ClientUtils.createProxy(TickerFactory.class,
 			EPRUtils.makeEPR("http://193.122.18.162:8080/ogsabp-interop/ticker-factory", false));
+		*/
+		TickerFactory factory = ClientUtils.createProxy(TickerFactory.class,
+			EPRUtils.makeEPR("http://zam461.zam.kfa-juelich.de:9126/services/TickerFactoryService", false));
 		EndpointReferenceType epr = factory.createTicker(new CreateTicker()).getTickerReference();
 		TickerFactory ticker = ClientUtils.createProxy(TickerFactory.class, epr);
 		ticker.getResourceProperty(OGSAWSRFBPConstants.RESOURCE_PROPERTY_NAMES_ATTR_QNAME);
