@@ -41,7 +41,7 @@ public class CachedAttributeData
 	{
 		this(resp.get_any(), true);
 	}
-	
+		
 	@SuppressWarnings("unchecked")
 	public CachedAttributeData(MessageElement uberDoc)
 	{
@@ -52,6 +52,11 @@ public class CachedAttributeData
 	public CachedAttributeData(Collection<MessageElement> attrs)
 	{
 		this(attrs.toArray(new MessageElement[0]), false);
+	}
+	
+	public CachedAttributeData(MessageElement []any)
+	{
+		this(any, false);
 	}
 	
 	public boolean isFull()

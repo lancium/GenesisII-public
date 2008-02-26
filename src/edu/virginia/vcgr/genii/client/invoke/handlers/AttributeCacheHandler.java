@@ -164,16 +164,86 @@ public class AttributeCacheHandler
 	public GetMultipleResourcePropertiesResponse getMultipleResourceProperties(InvocationContext ctxt,
 			QName[] getMultipleResourcePropertiesRequest) throws Throwable
 	{
-		_logger.warn("Caching or WSRF-RP is not supported yet.");
-		return (GetMultipleResourcePropertiesResponse)ctxt.proceed();
+		EndpointReferenceType target = ctxt.getTarget();
+		WSName name = new WSName(target);
+		
+		if (!name.isValidWSName())
+		{
+			// we can't cache if it doesn't have a valid EPI
+			return (GetMultipleResourcePropertiesResponse)ctxt.proceed();
+		}
+		
+		_logger.debug("Looking for cached attribute data.");
+		
+		CachedAttributeData data;
+		synchronized(_attrCache)
+		{
+			data = _attrCache.get(name);
+		}
+		
+		Collection<MessageElement> ret = null;
+		if (data != null)
+			ret = findAttributes(getMultipleResourcePropertiesRequest, data);
+		if (ret == null)
+		{
+			GetMultipleResourcePropertiesResponse resp = 
+				(GetMultipleResourcePropertiesResponse)ctxt.proceed();
+			data = new CachedAttributeData(resp.get_any());
+			synchronized(_attrCache)
+			{
+				_attrCache.put(name, data);
+			}
+			
+			ret = findAttributes(getMultipleResourcePropertiesRequest, data);
+		}
+		
+		if (ret == null)
+			return new GetMultipleResourcePropertiesResponse(new MessageElement[0]);;
+		
+		return new GetMultipleResourcePropertiesResponse(ret.toArray(new MessageElement[0]));
 	}
 
 	@PipelineProcessor(portType = GeniiCommon.class)
 	public GetResourcePropertyResponse getResourceProperty(InvocationContext ctxt,
 			QName getResourcePropertyRequest) throws Throwable
 	{
-		_logger.warn("Caching or WSRF-RP is not supported yet.");
-		return (GetResourcePropertyResponse)ctxt.proceed();
+		EndpointReferenceType target = ctxt.getTarget();
+		WSName name = new WSName(target);
+		
+		if (!name.isValidWSName())
+		{
+			// we can't cache if it doesn't have a valid EPI
+			return (GetResourcePropertyResponse)ctxt.proceed();
+		}
+		
+		_logger.debug("Looking for cached attribute data.");
+		
+		CachedAttributeData data;
+		synchronized(_attrCache)
+		{
+			data = _attrCache.get(name);
+		}
+		
+		Collection<MessageElement> ret = null;
+		if (data != null)
+			ret = findAttributes(new QName[] { getResourcePropertyRequest }, data);
+		if (ret == null)
+		{
+			GetResourcePropertyResponse resp = 
+				(GetResourcePropertyResponse)ctxt.proceed();
+			data = new CachedAttributeData(resp.get_any());
+			synchronized(_attrCache)
+			{
+				_attrCache.put(name, data);
+			}
+			
+			ret = findAttributes(new QName[] { getResourcePropertyRequest }, data);
+		}
+		
+		if (ret == null)
+			return new GetResourcePropertyResponse(new MessageElement[0]);;
+		
+		return new GetResourcePropertyResponse(ret.toArray(new MessageElement[0]));
 	}
 
 	@PipelineProcessor(portType = RNSPortType.class)

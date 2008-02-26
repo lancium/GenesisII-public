@@ -1,0 +1,43 @@
+package edu.virginia.vcgr.genii.client.rp;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
+import javax.xml.namespace.QName;
+
+import org.apache.axis.message.MessageElement;
+
+public class DefaultMultiResourcePropertyTranslator implements
+		MultiResourcePropertyTranslator
+{
+	static private DefaultSingleResourcePropertyTranslator _single =
+		new DefaultSingleResourcePropertyTranslator();
+	
+	@Override
+	public <Type> Collection<Type> deserialize(Class<Type> clazz,
+			Collection<MessageElement> elements)
+			throws ResourcePropertyException
+	{
+		Collection<Type> ret = new ArrayList<Type>(elements.size());
+		for (MessageElement element : elements)
+		{
+			ret.add(_single.deserialize(clazz, element));
+		}
+		
+		return ret;
+	}
+
+	@Override
+	public Collection<MessageElement> serialize(QName name,
+			Collection<Object> obj) throws ResourcePropertyException
+	{
+		Collection<MessageElement> ret = new ArrayList<MessageElement>(
+			obj.size());
+		for (Object o : obj)
+		{
+			ret.add(_single.serialize(name, o));
+		}
+		
+		return ret;
+	}
+}

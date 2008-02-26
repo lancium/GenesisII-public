@@ -22,15 +22,18 @@ import java.util.Date;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
-import org.ggf.rbyteio.RandomByteIOPortType;
 import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.byteio.streamable.factory.StreamableByteIOFactory;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
+import edu.virginia.vcgr.genii.client.byteio.RandomByteIORP;
+import edu.virginia.vcgr.genii.client.byteio.StreamableByteIORP;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.ogsa.OGSARP;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.rattrs.GetAttributesResponse;
@@ -192,22 +195,27 @@ public class TypeInformation
 				epr = factory.openStream(null).getEndpoint();
 			}
 			
-			RandomByteIOPortType rpt =
-				ClientUtils.createProxy(RandomByteIOPortType.class, epr);
+			Long value = null;
 			
-			QName sizeAttr;
 			if (isRByteIO())
-				sizeAttr = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, 
-					ByteIOConstants.SIZE_ATTR_NAME);
-			else
-				sizeAttr = new QName(ByteIOConstants.STREAMABLE_BYTEIO_NS,
-					ByteIOConstants.SIZE_ATTR_NAME);
+			{
+				RandomByteIORP rp = (RandomByteIORP)ResourcePropertyManager.createRPInterface(
+					epr, OGSARP.class, RandomByteIORP.class);
+				value = rp.getSize();
+			} else
+			{
+				StreamableByteIORP rp = (StreamableByteIORP)ResourcePropertyManager.createRPInterface(
+					epr, OGSARP.class, StreamableByteIORP.class);
+				value = rp.getSize();
+			}
 			
-			return Long.parseLong(rpt.getAttributes(
-				new QName[] { sizeAttr}).get_any()[0].getValue());
+			if (value == null)
+				return -1L;
+			return value.longValue();
 		}
 		catch (Throwable t)
 		{
+			t.printStackTrace(System.err);
 			return -1L;
 		}
 		finally

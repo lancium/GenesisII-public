@@ -2,7 +2,7 @@ package edu.virginia.vcgr.genii.client.ogsa;
 
 import javax.xml.namespace.QName;
 
-public class OGSAWSRFBPConstants
+public interface OGSAWSRFBPConstants
 {
 	static public final String WSRF_RL_NS =
 		"http://docs.oasis-open.org/wsrf/rl-2";

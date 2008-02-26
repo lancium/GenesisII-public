@@ -6,12 +6,14 @@ import java.util.Collection;
 import java.util.Date;
 
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
 
 import org.apache.axis.message.MessageElement;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
+import edu.virginia.vcgr.genii.client.ogsa.OGSAQNameList;
 import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.AuthZSecurityException;
@@ -57,21 +59,13 @@ public class GenesisIIBaseAttributesHandler
 		return document;
 	}
 	
-	public Collection<MessageElement> getImplementedPortTypes()
+	public MessageElement getImplementedPortTypes() throws SOAPException
 	{
 		synchronized(_baseService._implementedPortTypes)
 		{
-			ArrayList<MessageElement> document = new ArrayList<MessageElement>(
-				_baseService._implementedPortTypes.size());
-			
-			for (QName portType : _baseService._implementedPortTypes)
-			{
-				document.add(new MessageElement(
-					OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME,
-					portType));
-			}
-			
-			return document;
+			OGSAQNameList list = new OGSAQNameList(_baseService._implementedPortTypes);
+			return list.toMessageElement(
+				OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME);
 		}
 	}
 	
@@ -175,6 +169,7 @@ public class GenesisIIBaseAttributesHandler
 	}
 	
 	public MessageElement getResourcePropertyNames()
+		throws SOAPException
 	{
 		Collection<QName> propertyNames = new ArrayList<QName>();
 		for (IAttributeManipulator manipulator : 
@@ -183,9 +178,9 @@ public class GenesisIIBaseAttributesHandler
 			propertyNames.add(manipulator.getAttributeQName());
 		}
 		
-		return new MessageElement(
-			OGSAWSRFBPConstants.RESOURCE_PROPERTY_NAMES_ATTR_QNAME,
-			propertyNames.toArray(new QName[0]));
+		OGSAQNameList list = new OGSAQNameList(propertyNames);
+		return list.toMessageElement(
+			OGSAWSRFBPConstants.RESOURCE_PROPERTY_NAMES_ATTR_QNAME);
 	}
 	
 	@Override
