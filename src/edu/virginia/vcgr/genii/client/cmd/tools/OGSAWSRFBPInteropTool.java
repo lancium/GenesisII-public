@@ -22,6 +22,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.rp.DefaultSingleResourcePropertyTranslator;
+import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
 import edu.virginia.vcgr.genii.container.ticker.TickerConstants;
 
 public class OGSAWSRFBPInteropTool extends BaseGridTool
@@ -163,7 +164,23 @@ public class OGSAWSRFBPInteropTool extends BaseGridTool
 		TickerFactory ticker = createTicker(factory);
 		stdout.println("Done");
 		
-		// TODO
+		MessageElement []any = ticker.getResourceProperty(
+			OGSAWSRFBPConstants.WS_FINAL_RESOURCE_INTERFACE_ATTR_QNAME).get_any();
+		if (any == null)
+			stderr.println("\t\tGetResourceProperty(" + 
+				OGSAWSRFBPConstants.WS_FINAL_RESOURCE_INTERFACE_ATTR_QNAME + 
+				") returned no properties.");
+		else if (any.length != 1)
+			stderr.println("\t\tGetResourceProperty(" + 
+				OGSAWSRFBPConstants.WS_FINAL_RESOURCE_INTERFACE_ATTR_QNAME + 
+				") did not return 1 property.");
+		else
+		{
+			QName finalWS = new DefaultSingleResourcePropertyTranslator().deserialize(QName.class, any[0]);
+			stdout.println("\t\tGetResourceProperty(" + 
+				OGSAWSRFBPConstants.WS_FINAL_RESOURCE_INTERFACE_ATTR_QNAME + 
+				") worked and returned + " + finalWS);
+		}
 		
 		stdout.print("\tTerminating ticker...");
 		terminateTicker(ticker);
@@ -176,7 +193,43 @@ public class OGSAWSRFBPInteropTool extends BaseGridTool
 		TickerFactory ticker = createTicker(factory);
 		stdout.println("Done");
 		
-		// TODO
+		MessageElement []any = ticker.getResourceProperty(
+			OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME).get_any();
+		if (any == null)
+			stderr.println("\t\tGetResourceProperty(" + 
+				OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME + 
+				") returned no properties.");
+		else if (any.length != 1)
+			stderr.println("\t\tGetResourceProperty(" + 
+				OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME + 
+				") did not return 1 property.");
+		else
+		{
+			OGSAQNameList list = new OGSAQNameList(any[0]);
+			
+			HashSet<QName> expected = new HashSet<QName>();
+			expected.add(WSRFConstants.WSRF_RLW_IMMEDIATE_TERMINATE_PORT_QNAME);
+			expected.add(WSRFConstants.WSRF_RLW_SCHEDULED_TERMINATE_PORT_QNAME);
+			expected.add(WSRFConstants.WSRF_RPW_GET_MULTIPLE_RP_PORT_QNAME);
+			expected.add(WSRFConstants.WSRF_RPW_GET_RP_PORT_QNAME);
+			expected.add(new QName(TickerConstants.TICKER_NS, TickerConstants.TICKER_PORT_NAME));
+			
+			for (QName item : list)
+			{
+				expected.remove(item);
+			}
+			
+			if (expected.size() == 0)
+				stdout.println("\t\tGetResourceProperty("+ 
+				OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME + 
+				") worked!");
+			else
+			{
+				stdout.println("\t\tThe following resource interface names were not retrieved:");
+				for (QName item : expected)
+					stdout.println("\t\t\t" + item);
+			}
+		}
 		
 		stdout.print("\tTerminating ticker...");
 		terminateTicker(ticker);

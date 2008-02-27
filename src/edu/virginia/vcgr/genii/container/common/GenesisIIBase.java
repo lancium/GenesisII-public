@@ -138,7 +138,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		addImplementedPortType(WellKnownPortTypes.GENII_NOTIFICATION_PRODUCER_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.VCGR_COMMON_PORT_TYPE);
 		addImplementedPortType(WSRFConstants.WSRF_RLW_IMMEDIATE_TERMINATE_PORT_QNAME);
-		addImplementedPortType(WSRFConstants.wSRF_RLW_SCHEDULED_TERMINATE_PORT_QNAME);
+		addImplementedPortType(WSRFConstants.WSRF_RLW_SCHEDULED_TERMINATE_PORT_QNAME);
 		addImplementedPortType(WSRFConstants.WSRF_RPW_GET_RP_PORT_QNAME);
 		addImplementedPortType(WSRFConstants.WSRF_RPW_GET_MULTIPLE_RP_PORT_QNAME);
 		
