@@ -20,8 +20,8 @@
         location="./rns-generated.wsdl"/>
 
 	<wsdl:import
-		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
-		location="./resource.wsdl"/>
+		namespace="http://docs.oasis-open.org/wsrf/rw-2"
+		location="wsrf/wsResourceFaults.wsdl"/>
 
 	<wsdl:import
 		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple"
@@ -40,8 +40,8 @@
 		location="./resource-factory.wsdl"/>
 
 	<wsdl:import
-		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-lifetime"
-		location="./resource-lifetime.wsdl"/>
+		namespace="http://docs.oasis-open.org/wsrf/rlw-2"
+		location="wsrf/wsResourceLifetime.wsdl"/>
 
 	<wsdl:import
 		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"

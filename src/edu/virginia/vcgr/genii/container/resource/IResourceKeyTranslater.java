@@ -3,7 +3,8 @@ package edu.virginia.vcgr.genii.container.resource;
 import org.ws.addressing.ReferenceParametersType;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType;
+
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
 /**
  * Resource Key Translaters handle the job of translating from internal key

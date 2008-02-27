@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.client.rcreate;
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
@@ -72,7 +73,7 @@ public class ResourceCreator
 		{
 			GeniiCommon common = ClientUtils.createProxy(
 				GeniiCommon.class, target);
-			common.immediateTerminate(null);
+			common.destroy(new Destroy());
 		}
 		catch (Throwable t)
 		{

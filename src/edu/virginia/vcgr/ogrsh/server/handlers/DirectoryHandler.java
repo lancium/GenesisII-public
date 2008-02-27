@@ -16,6 +16,7 @@ import org.ggf.rns.List;
 import org.ggf.rns.ListResponse;
 import org.ggf.rns.RNSPortType;
 import org.morgan.util.GUID;
+import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.byteio.streamable.factory.StreamableByteIOFactory;
@@ -265,7 +266,7 @@ public class DirectoryHandler
 				{
 					GeniiCommon common = ClientUtils.createProxy(
 						GeniiCommon.class, epr);
-					common.immediateTerminate(null);
+					common.destroy(new Destroy());
 				}
 				catch (Throwable t)
 				{

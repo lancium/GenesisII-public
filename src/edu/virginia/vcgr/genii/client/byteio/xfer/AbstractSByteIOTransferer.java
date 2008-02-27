@@ -7,6 +7,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 import org.ggf.sbyteio.StreamableByteIOPortType;
+import org.oasis_open.docs.wsrf.rl_2.Destroy;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.common.rattrs.GetAttributesResponse;
@@ -59,6 +60,6 @@ public abstract class AbstractSByteIOTransferer
 
 	public void close() throws IOException
 	{
-		_target.immediateTerminate(null);
+		_target.destroy(new Destroy());
 	}
 }

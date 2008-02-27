@@ -26,7 +26,8 @@ import org.morgan.util.configuration.XMLConfiguration;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType;
+
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
 public class ExecutionEngine
 {

@@ -6,6 +6,7 @@ import java.util.Collection;
 import org.apache.axis.message.MessageElement;
 import org.ggf.jsdl.CPUArchitecture_Type;
 import org.ggf.jsdl.OperatingSystem_Type;
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
 import edu.virginia.vcgr.genii.appdesc.PlatformDescriptionType;
 import edu.virginia.vcgr.genii.appdesc.SupportDocumentType;
@@ -13,7 +14,6 @@ import edu.virginia.vcgr.genii.client.appdesc.ApplicationDescriptionUtils;
 import edu.virginia.vcgr.genii.client.deployer.AppDeployerConstants;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
 

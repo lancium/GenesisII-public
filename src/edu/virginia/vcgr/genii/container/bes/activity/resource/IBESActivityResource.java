@@ -22,7 +22,8 @@ import org.ggf.jsdl.JobDefinition_Type;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType;
+
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 

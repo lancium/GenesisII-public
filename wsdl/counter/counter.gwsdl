@@ -7,15 +7,16 @@
 	xmlns:counter="http://vcgr.cs.virginia.edu/counter/2006/06/counter"
 	xmlns:wsa="http://www.w3.org/2005/08/addressing"
 	xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common"
-	xmlns:genii-resource="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+	xmlns:wsrf-r="http://docs.oasis-open.org/wsrf/r-2"
+	xmlns:wsrf-rw="http://docs.oasis-open.org/wsrf/rw-2" 
     xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
 	xmlns:rpw-2="http://docs.oasis-open.org/wsrf/rpw-2"
     xmlns:rw-2="http://docs.oasis-open.org/wsrf/rw-2"
     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
 
 	<wsdl:import
-		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
-		location="./resource.wsdl"/>
+		namespace="http://docs.oasis-open.org/wsrf/rw-2"
+		location="wsrf/wsResourceFaults.wsdl"/>
 
 	<wsdl:import
 		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple"
@@ -34,8 +35,8 @@
 		location="./resource-factory.wsdl"/>
 
 	<wsdl:import
-		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-lifetime"
-		location="./resource-lifetime.wsdl"/>
+		namespace="http://docs.oasis-open.org/wsrf/rlw-2"
+		location="wsrf/wsResourceLifetime.wsdl"/>
 
 	<wsdl:import
 		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
@@ -101,7 +102,7 @@
 			<wsdl:input message="counter:addRequest"/>
 			<wsdl:output message="counter:addResponse"/>
 			<wsdl:fault name="ResourceUnknownFault"
-				message="genii-resource:ResourceUnknownFault"/>
+				message="wsrf-rw:ResourceUnknownFault"/>
 		</wsdl:operation>
 	</wsdl:portType>
 </wsdl:definitions>

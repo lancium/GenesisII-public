@@ -11,6 +11,9 @@
 
 	<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"
 		schemaLocation="./wsrf/basefaults.xsd"/>
+		
+	<xsd:import namespace="http://docs.oasis-open.org/wsrf/r-2"
+		schemaLocation="./wsrf/wsResourceFaults.xsd"/>
 
 	<xsd:import
 		namespace="http://www.w3.org/2005/08/addressing"

@@ -39,7 +39,9 @@ import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
-import edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType;
+
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+import org.oasis_open.docs.wsrf.rl_2.Destroy;
 
 /**
  * The RNSPath class is the main client side interface between developers and
@@ -658,7 +660,7 @@ public class RNSPath implements Externalizable  {
 			if (EPRUtils.isCommunicable(epr))
 			{
 				GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, epr);
-				common.immediateTerminate(null);
+				common.destroy(new Destroy());
 			}
 			unlink();
 		} catch (BaseFaultType bft) {

@@ -18,7 +18,8 @@ import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.rattrs.AttributeUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rattrs.GetAttributesResponse;
-import edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType;
+
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
 public class TransferUtils
 {

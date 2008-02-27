@@ -28,6 +28,7 @@ import javax.xml.namespace.QName;
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -78,7 +79,7 @@ public class CertGeneratorServiceImpl extends GenesisIIBase implements CertGener
     public GenerateX509V3CertificateChainResponseType generateX509V3CertificateChain(GenerateX509V3CertificateChainRequestType request) 
 		throws java.rmi.RemoteException, 
 			edu.virginia.vcgr.genii.certGenerator.InvalidCertificateRequestFaultType, 
-			edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType
+			ResourceUnknownFaultType
 	{
 		ICertGeneratorResource resource = null;
 		GenerateX509V3CertificateChainResponseType response = null;

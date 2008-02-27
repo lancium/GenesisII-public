@@ -72,7 +72,10 @@ import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.common.notification.Notify;
 import edu.virginia.vcgr.genii.common.notification.Subscribe;
 import edu.virginia.vcgr.genii.common.notification.UserDataType;
-import edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType;
+
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+import org.oasis_open.docs.wsrf.rl_2.Destroy;
+
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
 import edu.virginia.vcgr.genii.container.Container;
@@ -282,7 +285,7 @@ public class BESServiceImpl extends GenesisIIBase
                         GeniiCommon.class,
                         terminateActivitiesRequest[lcv]);
 
-                common.immediateTerminate(null);
+                common.destroy(new Destroy());
 			}
 			catch (BaseFaultType buft)
 			{

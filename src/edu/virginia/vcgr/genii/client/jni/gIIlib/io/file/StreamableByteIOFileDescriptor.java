@@ -8,6 +8,7 @@ import javax.xml.namespace.QName;
 import org.apache.axis.types.URI;
 import org.ggf.sbyteio.StreamableByteIOPortType;
 import org.morgan.util.configuration.ConfigurationException;
+import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
@@ -121,7 +122,7 @@ public class StreamableByteIOFileDescriptor extends WindowsIFSFile
 			StreamableByteIOPortType stub =
 				ClientUtils.createProxy(StreamableByteIOPortType.class, _epr);
 			
-			stub.immediateTerminate(null);
+			stub.destroy(new Destroy());
 		}
 		catch (ConfigurationException ce)
 		{

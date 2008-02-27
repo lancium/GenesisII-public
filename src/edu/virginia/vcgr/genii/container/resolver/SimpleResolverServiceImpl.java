@@ -56,7 +56,10 @@ import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
 import edu.virginia.vcgr.genii.common.notification.Notify;
 import edu.virginia.vcgr.genii.common.notification.UserDataType;
-import edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType;
+
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+import org.oasis_open.docs.wsrf.rl_2.Destroy;
+
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -312,7 +315,7 @@ public class SimpleResolverServiceImpl extends GenesisIIBase implements SimpleRe
 						entry.getSubscriptionGUID().equals(notifyData.getSubscriptionGUID()))
 				{
 					/* kill myself */
-					immediateTerminate(null);
+					destroy(new Destroy());
 				}
 			}
 		}

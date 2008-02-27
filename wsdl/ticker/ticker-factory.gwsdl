@@ -7,7 +7,8 @@
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
 	xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common"
-	xmlns:genii-resource="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+	xmlns:wsrf-r="http://docs.oasis-open.org/wsrf/r-2"
+	xmlns:wsrf-rw="http://docs.oasis-open.org/wsrf/rw-2" 
 	xmlns:genii-rfact="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
     xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
 	xmlns:sfact="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory"
@@ -27,8 +28,8 @@
         location="./sbyteio-factory.wsdl"/>
 
 	<wsdl:import
-		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
-		location="./resource.wsdl"/>
+		namespace="http://docs.oasis-open.org/wsrf/rw-2"
+		location="wsrf/wsResourceFaults.wsdl"/>
 
 	<wsdl:import
 		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple"
@@ -39,8 +40,8 @@
 		location="./resource-factory.wsdl"/>
 
 	<wsdl:import
-		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-lifetime"
-		location="./resource-lifetime.wsdl"/>
+		namespace="http://docs.oasis-open.org/wsrf/rlw-2"
+		location="wsrf/wsResourceLifetime.wsdl"/>
 
 	<wsdl:import
 		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"

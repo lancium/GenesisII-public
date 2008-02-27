@@ -6,6 +6,7 @@ import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.Token;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
@@ -101,7 +102,7 @@ public class SimpleResolverUtils
 		{
 			/* call terminate operation on subscription. */
 			GeniiCommon subscription = ClientUtils.createProxy(GeniiCommon.class, subscriptionEPR);
-			subscription.immediateTerminate(null);
+			subscription.destroy(new Destroy());
 		}
 		catch (Exception e)
 		{ 

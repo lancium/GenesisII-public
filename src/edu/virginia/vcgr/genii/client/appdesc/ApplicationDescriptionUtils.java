@@ -10,6 +10,7 @@ import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
+import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.appdesc.DeploymentDocumentType;
@@ -252,7 +253,7 @@ public class ApplicationDescriptionUtils
 				{
 					GeniiCommon common = ClientUtils.createProxy(
 					GeniiCommon.class, newFile);
-					common.immediateTerminate(null);
+					common.destroy(new Destroy());
 				}
 				catch (Throwable t)
 				{

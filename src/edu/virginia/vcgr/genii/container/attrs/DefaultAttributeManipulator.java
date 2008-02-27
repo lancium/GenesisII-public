@@ -27,7 +27,8 @@ import org.apache.axis.message.MessageElement;
 
 import edu.virginia.vcgr.genii.common.rattrs.AttributeNotSettableFaultType;
 import edu.virginia.vcgr.genii.common.rattrs.IncorrectAttributeCardinalityFaultType;
-import edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType;
+
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
 public class DefaultAttributeManipulator implements IAttributeManipulator

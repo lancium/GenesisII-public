@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 import java.rmi.RemoteException;
 
 import org.morgan.util.configuration.ConfigurationException;
+import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.ogf.ogsa.ticker.CreateTicker;
 import org.ogf.ogsa.ticker.TickerFactory;
 import org.ws.addressing.EndpointReferenceType;
@@ -41,8 +42,9 @@ public class OGSAWSRFBPInteropTool extends BaseGridTool
 	}
 	
 	static private void terminateTicker(TickerFactory ticker)
+		throws RemoteException
 	{
-		// TODO
+		ticker.destroy(new Destroy());
 	}
 	
 	private void runTest1(TickerFactory factory) throws Throwable

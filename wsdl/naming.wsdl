@@ -6,16 +6,15 @@
     xmlns:wsa="http://www.w3.org/2005/08/addressing"
     xmlns:naming-w="http://schemas.ogf.org/naming/2006/08/naming/wsdl"
     xmlns:naming="http://schemas.ogf.org/naming/2006/08/naming"
-    xmlns:genii-resource="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+	xmlns:wsrf-r="http://docs.oasis-open.org/wsrf/r-2"
+	xmlns:wsrf-rw="http://docs.oasis-open.org/wsrf/rw-2" 
     targetNamespace="http://schemas.ogf.org/naming/2006/08/naming/wsdl">
 
 <!-- imports -->
-		namespace="http://www.w3.org/2005/08/addressing"
-		location="./ws-addr.xsd"/>
 
 	<wsdl:import
-		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
-		location="./resource.wsdl"/>
+		namespace="http://docs.oasis-open.org/wsrf/rw-2"
+		location="wsrf/wsResourceFaults.wsdl"/>
 
 
 <!-- ===== Types Definitions ==== -->
@@ -61,13 +60,6 @@
 		<wsdl:part name="ResolveFailedWithReferralFault"
 			element="naming:ResolveFailedWithReferralFault"/>
 	</wsdl:message>
-
-	
-    <wsdl:message name="ResourceUnknownFault">
-        <wsdl:part name="ResourceUnknownFault"
-            element="genii-resource:ResourceUnknownFaultType"/>
-    </wsdl:message>
-
 
 	<!-- Port Type Definitions -->
 	<wsdl:portType name="EndpointIdentifierResolver">

@@ -44,7 +44,10 @@ import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
-import edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType;
+
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+import org.oasis_open.docs.wsrf.rl_2.Destroy;
+
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -164,7 +167,7 @@ public class ApplicationDescriptionServiceImpl
 				{
 					GeniiCommon common = ClientUtils.createProxy(
 						GeniiCommon.class, newFile);
-					common.immediateTerminate(null);
+					common.destroy(new Destroy());
 				}
 				catch (Throwable t)
 				{

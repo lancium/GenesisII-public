@@ -4,13 +4,14 @@
     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:wsa="http://www.w3.org/2005/08/addressing"
-    xmlns:genii-resource="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+	xmlns:wsrf-r="http://docs.oasis-open.org/wsrf/r-2"
+	xmlns:wsrf-rw="http://docs.oasis-open.org/wsrf/rw-2" 
     xmlns:genii-rfact="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
     targetNamespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory">
 
 	<wsdl:import
-		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
-		location="./resource.wsdl"/>
+		namespace="http://docs.oasis-open.org/wsrf/rw-2"
+		location="wsrf/wsResourceFaults.wsdl"/>
 
 <!-- ===== Types Definitions ==== -->
     <wsdl:types>
@@ -29,8 +30,8 @@
 				schemaLocation="./resource-factory.xsd"/>
 
 			<xsd:import
-				namespace="http://vcgr.cs.virginia.edu/genii/2006/06/resource"
-				schemaLocation="./resource.xsd"/>
+				namespace="http://docs.oasis-open.org/wsrf/r-2"
+				schemaLocation="wsrf/wsResourceFaults.xsd"/>
 
 			<xsd:import
 				namespace="http://vcgr.cs.virginia.edu/genii/2006/12/context"
@@ -85,7 +86,7 @@
 			<wsdl:fault name="ResourceCreationFault"
 				message="genii-rfact:ResourceCreationFault"/>
 			<wsdl:fault name="ResourceUnknownFault"
-				message="genii-resource:ResourceUnknownFault"/>
+				message="wsrf-rw:ResourceUnknownFault"/>
 		</wsdl:operation>
 
 	</wsdl:portType>

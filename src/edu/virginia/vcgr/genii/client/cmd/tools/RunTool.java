@@ -59,7 +59,10 @@ import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.rattrs.AttributeUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rattrs.GetAttributesResponse;
-import edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType;
+
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+import org.oasis_open.docs.wsrf.rl_2.Destroy;
+
 import edu.virginia.vcgr.genii.deployer.ApplicationDeployerPortType;
 import edu.virginia.vcgr.genii.deployer.CreateDeploymentRequestType;
 import edu.virginia.vcgr.genii.deployer.ReifyJSDLRequestType;
@@ -224,7 +227,7 @@ public class RunTool extends BaseGridTool
 				if (state.isInState(ActivityState.FAILED))
 					error = getError(activity);
 				GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, activity);
-				common.immediateTerminate(null);
+				common.destroy(new Destroy());
 
 				if (error != null)
 					throw error;

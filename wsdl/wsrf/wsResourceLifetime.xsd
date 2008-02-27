@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+	xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:wsrf-rl="http://docs.oasis-open.org/wsrf/rl-2"
+	xmlns:wsrf-bf="http://docs.oasis-open.org/wsrf/bf-2"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified"
+	targetNamespace="http://docs.oasis-open.org/wsrf/rl-2">
+	
+	<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"
+		schemaLocation="./basefaults.xsd"/>
+		
+	<xsd:element name="Destroy">
+		<xsd:complexType/>
+	</xsd:element>
+	
+	<xsd:element name="DestroyResponse">
+		<xsd:complexType/>
+	</xsd:element>
+	
+	<xsd:complexType name="ResourceNotDestroyedFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="wsrf-bf:BaseFaultType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="ResourceNotDestroyedFault" type="wsrf-rl:ResourceNotDestroyedFaultType"/>
+	
+	<xsd:element name="SetTerminationTime">
+		<xsd:complexType>
+			<xsd:choice>
+				<xsd:element name="RequestedTerminationTime" nillable="true" type="xsd:dateTime"/>
+				<xsd:element name="RequestedLifetimeDuration" type="xsd:duration"/>
+			</xsd:choice>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="SetTerminationTimeResponse">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="NewTerminationTime" nillable="true" type="xsd:dateTime"/>
+				<xsd:element name="CurrentTime" type="xsd:dateTime"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:complexType name="UnableToSetTerminationTimeFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="wsrf-bf:BaseFaultType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="UnableToSetTerminationTimeFault"
+		type="wsrf-rl:UnableToSetTerminationTimeFaultType"/>
+		
+	<xsd:complexType name="TerminationTimeChangeRejectedFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="wsrf-bf:BaseFaultType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="TerminationTimeChangeRejectedFault"
+		type="wsrf-rl:TerminationTimeChangeRejectedFaultType"/>
+		
+	<!-- Notification Message Related -->
+	<xsd:element name="TerminationNotification">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="TerminationTime" type="xsd:dateTime"
+					minOccurs="1" maxOccurs="1" nillable="true"/>
+				<xsd:element name="TerminationReason" type="xsd:anyType"
+					minOccurs="0" maxOccurs="1"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	
+</xsd:schema>

@@ -16,7 +16,8 @@
 package edu.virginia.vcgr.genii.container.bes.execution;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType;
+
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
 public interface IExecutionProvider
 {

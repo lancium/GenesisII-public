@@ -13,6 +13,7 @@ import java.util.Properties;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.axis.types.Duration;
 import org.apache.axis.types.Token;
 import org.apache.axis.types.UnsignedLong;
 import org.apache.commons.logging.LogFactory;
@@ -20,6 +21,13 @@ import org.apache.commons.logging.Log;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnavailableFaultType;
+import org.oasis_open.docs.wsrf.rl_2.Destroy;
+import org.oasis_open.docs.wsrf.rl_2.DestroyResponse;
+import org.oasis_open.docs.wsrf.rl_2.ResourceNotDestroyedFaultType;
+import org.oasis_open.docs.wsrf.rl_2.SetTerminationTime;
+import org.oasis_open.docs.wsrf.rl_2.SetTerminationTimeResponse;
+import org.oasis_open.docs.wsrf.rl_2.TerminationTimeChangeRejectedFaultType;
+import org.oasis_open.docs.wsrf.rl_2.UnableToSetTerminationTimeFaultType;
 import org.oasis_open.docs.wsrf.rp_2.GetMultipleResourcePropertiesResponse;
 import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyResponse;
 import org.oasis_open.docs.wsrf.rp_2.InvalidResourcePropertyQNameFaultType;
@@ -54,7 +62,8 @@ import edu.virginia.vcgr.genii.common.rattrs.GetAttributesResponse;
 import edu.virginia.vcgr.genii.common.rattrs.IncorrectAttributeCardinalityFaultType;
 import edu.virginia.vcgr.genii.common.rattrs.SetAttributes;
 import edu.virginia.vcgr.genii.common.rattrs.SetAttributesResponse;
-import edu.virginia.vcgr.genii.common.resource.ResourceUnknownFaultType;
+
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
@@ -350,49 +359,6 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	{
 	}
 	
-	@RWXMapping(RWXCategory.EXECUTE)
-	public final Object immediateTerminate(Object immedateTerminateRequest)
-			throws RemoteException, ResourceUnknownFaultType
-	{
-		preDestroy();
-		
-		try
-    	{
-	    	MessageElement []payload = new MessageElement[1];
-	    	
-	    	payload[0] = new MessageElement(
-	    		new QName(GenesisIIConstants.GENESISII_NS, "entry-reference"),
-	    		ResourceManager.createEPR(
-	    			ResourceManager.getCurrentResource(), 
-	    			Container.getServiceURL(_serviceName),
-	    			getImplementedPortTypes()));
-	    	
-	    	getTopicSpace().getTopic(WellknownTopics.TERMINATED).notifyAll(
-	    		payload);
-    	}
-    	catch (InvalidTopicException ite)
-    	{
-    		_logger.warn(ite.getLocalizedMessage(), ite);
-    	}
-    	catch (UnknownTopicException ute)
-    	{
-    		_logger.warn(ute.getLocalizedMessage(), ute);
-    	}
-		
-    	ResourceKey resource = ResourceManager.getCurrentResource();
-    	try
-    	{
-    		resource.destroy();
-        	resource.dereference().commit();
-    	}
-    	catch(ResourceException re)
-    	{
-    		_logger.error(re);
-    		throw re;
-    	}
-		return null;
-	}
-
 	@RWXMapping(RWXCategory.WRITE)
 	public final SetAttributesResponse setAttributes(
 			SetAttributes setAttributesRequest) throws RemoteException,
@@ -767,5 +733,68 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	{
 		setDefaultResolverFactoryDescription();
 		return _defaultResolverFactoryProxyClass;
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public DestroyResponse destroy(Destroy destroyRequest)
+			throws RemoteException, ResourceUnknownFaultType,
+			ResourceNotDestroyedFaultType, ResourceUnavailableFaultType
+	{
+		preDestroy();
+		
+		try
+    	{
+	    	MessageElement []payload = new MessageElement[1];
+	    	
+	    	payload[0] = new MessageElement(
+	    		new QName(GenesisIIConstants.GENESISII_NS, "entry-reference"),
+	    		ResourceManager.createEPR(
+	    			ResourceManager.getCurrentResource(), 
+	    			Container.getServiceURL(_serviceName),
+	    			getImplementedPortTypes()));
+	    	
+	    	getTopicSpace().getTopic(WellknownTopics.TERMINATED).notifyAll(
+	    		payload);
+    	}
+    	catch (InvalidTopicException ite)
+    	{
+    		_logger.warn(ite.getLocalizedMessage(), ite);
+    	}
+    	catch (UnknownTopicException ute)
+    	{
+    		_logger.warn(ute.getLocalizedMessage(), ute);
+    	}
+		
+    	ResourceKey resource = ResourceManager.getCurrentResource();
+    	try
+    	{
+    		resource.destroy();
+        	resource.dereference().commit();
+    	}
+    	catch(ResourceException re)
+    	{
+    		_logger.error(re);
+    		throw re;
+    	}
+		return null;
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public SetTerminationTimeResponse setTerminationTime(
+			SetTerminationTime setTerminationTimeRequest)
+			throws RemoteException, ResourceUnknownFaultType,
+			UnableToSetTerminationTimeFaultType, ResourceUnavailableFaultType,
+			TerminationTimeChangeRejectedFaultType
+	{
+		Duration duration = setTerminationTimeRequest.getRequestedLifetimeDuration();
+		Calendar c = setTerminationTimeRequest.getRequestedTerminationTime();
+		
+		if (c == null)
+			c = duration.getAsCalendar();
+		
+		setScheduledTerminationTime(c);
+		return new SetTerminationTimeResponse(c, Calendar.getInstance());
 	}
 }

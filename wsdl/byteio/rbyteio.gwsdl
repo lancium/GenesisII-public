@@ -9,15 +9,16 @@
     xmlns:byteio="http://schemas.ggf.org/byteio/2005/10/byte-io"
     xmlns:rbyteio="http://schemas.ggf.org/byteio/2005/10/random-access"
 	xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common"
-	xmlns:genii-resource="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
+	xmlns:wsrf-r="http://docs.oasis-open.org/wsrf/r-2"
+	xmlns:wsrf-rw="http://docs.oasis-open.org/wsrf/rw-2" 
     xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
     xmlns:rpw-2="http://docs.oasis-open.org/wsrf/rpw-2"
     xmlns:rw-2="http://docs.oasis-open.org/wsrf/rw-2"
     targetNamespace="http://schemas.ggf.org/byteio/2005/10/random-access">
 
 	<wsdl:import
-		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource"
-		location="./resource.wsdl"/>
+		namespace="http://docs.oasis-open.org/wsrf/rw-2"
+		location="wsrf/wsResourceFaults.wsdl"/>
 
 	<wsdl:import
 		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple"
@@ -36,8 +37,8 @@
 		location="./wsrf/wsResourceProperties.wsdl"/>
 	
 	<wsdl:import
-		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-lifetime"
-		location="./resource-lifetime.wsdl"/>
+		namespace="http://docs.oasis-open.org/wsrf/rlw-2"
+		location="wsrf/wsResourceLifetime.wsdl"/>
 
 	<wsdl:import
 		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
@@ -262,7 +263,7 @@
         	<wsdl:output message="rbyteio:readResponse"
         	wsa:Action="http://schemas.ggf.org/byteio/2005/10/random-access/readResponse"/>
         	<wsdl:fault name="ResourceUnknownFault"
-            	message="genii-resource:ResourceUnknownFault"
+            	message="wsrf-rw:ResourceUnknownFault"
             	wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
         	<wsdl:fault name="UnsupportedTransferFault"
             	message="rbyteio:UnsupportedTransferFault"
@@ -281,7 +282,7 @@
         	<wsdl:output message="rbyteio:writeResponse"
         	wsa:Action="http://schemas.ggf.org/byteio/2005/10/random-access/writeResponse"/>
         	<wsdl:fault name="ResourceUnknownFault"
-            	message="genii-resource:ResourceUnknownFault"
+            	message="wsrf-rw:ResourceUnknownFault"
             	wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
         	<wsdl:fault name="UnsupportedTransferFault"
             	message="rbyteio:UnsupportedTransferFault"
@@ -300,7 +301,7 @@
         	<wsdl:output message="rbyteio:appendResponse"
         	wsa:Action="http://schemas.ggf.org/byteio/2005/10/random-access/appendResponse"/>
         	<wsdl:fault name="ResourceUnknownFault"
-            	message="genii-resource:ResourceUnknownFault"
+            	message="wsrf-rw:ResourceUnknownFault"
             	wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
         	<wsdl:fault name="UnsupportedTransferFault"
             	message="rbyteio:UnsupportedTransferFault"
@@ -319,7 +320,7 @@
         	<wsdl:output message="rbyteio:truncAppendResponse"
         	wsa:Action="http://schemas.ggf.org/byteio/2005/10/random-access/truncAppendResponse"/>
         	<wsdl:fault name="ResourceUnknownFault"
-            	message="genii-resource:ResourceUnknownFault"
+            	message="wsrf-rw:ResourceUnknownFault"
             	wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"/>
         	<wsdl:fault name="UnsupportedTransferFault"
             	message="rbyteio:UnsupportedTransferFault"

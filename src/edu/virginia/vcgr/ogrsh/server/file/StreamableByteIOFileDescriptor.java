@@ -10,6 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.sbyteio.StreamableByteIOPortType;
 import org.morgan.util.configuration.ConfigurationException;
+import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
@@ -156,7 +157,7 @@ public class StreamableByteIOFileDescriptor extends AbstractFileDescriptor
 			StreamableByteIOPortType stub =
 				ClientUtils.createProxy(StreamableByteIOPortType.class, _epr);
 			
-			stub.immediateTerminate(null);
+			stub.destroy(new Destroy());
 		}
 		catch (ConfigurationException ce)
 		{
