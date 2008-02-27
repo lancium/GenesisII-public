@@ -62,8 +62,13 @@ public class OGSAQNameList extends ArrayList<QName>
 			 */
 			int index = token.indexOf(':');
 			if (index < 0)
-				names.add(new QName("", token));
-			else
+			{
+				// It didn't have a prefix, so let's put it in the default namespace
+				String ns = qnameElement.getNamespaceURI("");
+				if (ns == null)
+					ns = "";
+				names.add(new QName(ns, token));
+			} else
 			{
 				String prefix = token.substring(0, index);
 				String local = token.substring(index + 1);
