@@ -8,6 +8,7 @@ import org.apache.axis.MessageContext;
 import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.morgan.util.GUID;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.ws.addressing.EndpointReferenceType;
@@ -117,6 +118,13 @@ public class WSAddressingHandler implements IAroundInvoker
 			relatesTo.setMustUnderstand(false);
 			header.addChildElement(relatesTo);
 		}
+		
+		// Add the message id
+		SOAPHeaderElement messageid = new SOAPHeaderElement(
+			_WS_ADDR_MSG_ID_QNAME, "urn:uuid:" + new GUID());
+		messageid.setActor(null);
+		messageid.setMustUnderstand(false);
+		header.addChildElement(messageid);
 		
 		// Add the To element
 		SOAPHeaderElement to = new SOAPHeaderElement(
