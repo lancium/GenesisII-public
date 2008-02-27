@@ -30,9 +30,6 @@ public class WellKnownPortTypes
 	static public QName GENII_NOTIFICATION_CONSUMER_PORT_TYPE =
 		new QName("http://vcgr.cs.virginia.edu/genii/2006/12/notification",
 			"GeniiNotificationConsumerPortType");
-	static public QName GENII_RESOURCE_LIFETIME_PORT_TYPE =
-		new QName("http://vcgr.cs.virginia.edu/genii/2006/12/resource-lifetime",
-			"GeniiResourceLifetime");
 	static public QName GENII_RESOURCE_FACTORY_PORT_TYPE =
 		new QName("http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory",
 			"GeniiResourceFactory");

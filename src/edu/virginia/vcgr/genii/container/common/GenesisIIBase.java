@@ -87,6 +87,7 @@ import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
+import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
 
 @GAroundInvoke({WSAddressingHandler.class, DatabaseHandler.class, DebugInvoker.class})
 public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
@@ -133,10 +134,13 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		_serviceName = serviceName;
 		
 		addImplementedPortType(WellKnownPortTypes.GENII_RESOURCE_ATTRS_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.GENII_RESOURCE_LIFETIME_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.GENII_RESOURCE_FACTORY_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.GENII_NOTIFICATION_PRODUCER_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.VCGR_COMMON_PORT_TYPE);
+		addImplementedPortType(WSRFConstants.WSRF_RLW_IMMEDIATE_TERMINATE_PORT_QNAME);
+		addImplementedPortType(WSRFConstants.wSRF_RLW_SCHEDULED_TERMINATE_PORT_QNAME);
+		addImplementedPortType(WSRFConstants.WSRF_RPW_GET_RP_PORT_QNAME);
+		addImplementedPortType(WSRFConstants.WSRF_RPW_GET_MULTIPLE_RP_PORT_QNAME);
 		
 		try
 		{
