@@ -324,23 +324,55 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	public GetMultipleResourcePropertiesResponse getMultipleResourceProperties(
 			QName[] getMultipleResourcePropertiesRequest)
 			throws RemoteException, InvalidResourcePropertyQNameFaultType,
-			ResourceUnavailableFaultType, ResourceUnknownFaultType {
-
-		return new GetMultipleResourcePropertiesResponse(
-				getAttributes(getMultipleResourcePropertiesRequest).get_any());
+			ResourceUnavailableFaultType, ResourceUnknownFaultType
+	{
+		ArrayList<MessageElement> document = new ArrayList<MessageElement>();
+		
+		for (QName name : getMultipleResourcePropertiesRequest)
+		{
+			IAttributeManipulator manipulator =
+				_attributePackage.getManipulator(name);
+				
+			if (manipulator == null)
+				throw FaultManipulator.fillInFault(
+					new InvalidResourcePropertyQNameFaultType(
+						null, null, null, null, new BaseFaultTypeDescription[] {
+							new BaseFaultTypeDescription("The resource property " +
+								name + " is unknown.") },
+						null));
+				
+			document.addAll(manipulator.getAttributeValues());
+		}
+		
+		MessageElement []ret = new MessageElement[document.size()];
+		document.toArray(ret);
+		return new GetMultipleResourcePropertiesResponse(ret);
 	}
 
 	@RWXMapping(RWXCategory.READ)
 	public GetResourcePropertyResponse getResourceProperty(
 			QName getResourcePropertyRequest) throws RemoteException,
 			InvalidResourcePropertyQNameFaultType,
-			ResourceUnavailableFaultType, ResourceUnknownFaultType {
-
-		QName []request = new QName[1];
-		request[0] = getResourcePropertyRequest;
-				
-		return new GetResourcePropertyResponse(
-				getAttributes(request).get_any());	
+			ResourceUnavailableFaultType, ResourceUnknownFaultType
+	{
+		ArrayList<MessageElement> document = new ArrayList<MessageElement>();
+		
+		IAttributeManipulator manipulator =
+			_attributePackage.getManipulator(getResourcePropertyRequest);
+			
+		if (manipulator == null)
+			throw FaultManipulator.fillInFault(
+				new InvalidResourcePropertyQNameFaultType(
+					null, null, null, null, new BaseFaultTypeDescription[] {
+						new BaseFaultTypeDescription("The resource property " +
+							getResourcePropertyRequest + " is unknown.") },
+					null));
+			
+		document.addAll(manipulator.getAttributeValues());
+		
+		MessageElement []ret = new MessageElement[document.size()];
+		document.toArray(ret);
+		return new GetResourcePropertyResponse(ret);	
 	}
 	
 	@RWXMapping(RWXCategory.READ)
