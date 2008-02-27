@@ -8,6 +8,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 import org.morgan.util.configuration.ConfigurationException;
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.ogf.ogsa.ticker.CreateTicker;
 import org.ogf.ogsa.ticker.TickerFactory;
@@ -272,11 +273,20 @@ public class OGSAWSRFBPInteropTool extends BaseGridTool
 		TickerFactory ticker = createTicker(factory);
 		stdout.println("Done");
 		
-		// TODO
-		
 		stdout.print("\tTerminating ticker...");
 		terminateTicker(ticker);
 		stdout.println("Done");
+		
+		stdout.println("\tTerminating ticker a second time to test base faults.");
+		try
+		{
+			ticker.destroy(new Destroy());
+			stderr.println("Didn't receive a fault like we were supposed to.");
+		}
+		catch (ResourceUnknownFaultType ruft)
+		{
+			stdout.println("\tCorrectly received ResourceUnknownFaultTYpe.");
+		}
 	}
 	
 	private void runTest6(TickerFactory factory) throws Throwable
