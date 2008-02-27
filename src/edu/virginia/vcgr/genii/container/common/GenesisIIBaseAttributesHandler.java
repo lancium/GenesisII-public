@@ -70,6 +70,12 @@ public class GenesisIIBaseAttributesHandler
 		}
 	}
 	
+	public MessageElement getFinalResourceInterface() throws SOAPException
+	{
+		return new MessageElement(OGSAWSRFBPConstants.WS_FINAL_RESOURCE_INTERFACE_ATTR_QNAME,
+			_baseService.getFinalWSResourceInterface());
+	}
+	
 	public MessageElement getScheduledTerminationTimeAttr()
 		throws ResourceUnknownFaultType, ResourceException
 	{
@@ -203,6 +209,10 @@ public class GenesisIIBaseAttributesHandler
 		addHandler(
 			OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME,
 			"getImplementedPortTypes");
+		
+		addHandler(
+			OGSAWSRFBPConstants.WS_FINAL_RESOURCE_INTERFACE_ATTR_QNAME,
+			"getFinalResourceInterface");
 		
 		addHandler(
 			GenesisIIConstants.REGISTERED_TOPICS_ATTR_QNAME,

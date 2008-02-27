@@ -13,6 +13,8 @@ public interface OGSAWSRFBPConstants
 	static public final String CURRENT_TIME_ATTR = "CurrentTime";
 	static public final String RESOURCE_ENDPOINT_REFERENCE_ATTR =
 		"ResourceEndpointReference";
+	static public final String WS_FINAL_RESOURCE_INTERFACE_ATTR =
+		"FinalWSResourceInterface";
 	static public final String TERMINATION_TIME_ATTR = "TerminationTime";
 	static public final String WS_RESOURCE_INTERFACES_ATTR = "WSResourceInterfaces";
 	static public final String RESOURCE_PROPERTY_NAMES_ATTR = "ResourcePropertyNames";
@@ -25,6 +27,8 @@ public interface OGSAWSRFBPConstants
 		WSRF_RL_NS, TERMINATION_TIME_ATTR);
 	static public final QName WS_RESOURCE_INTERFACES_ATTR_QNAME = new QName(
 		OGSA_WSRF_BP_NS, WS_RESOURCE_INTERFACES_ATTR);
+	static public final QName WS_FINAL_RESOURCE_INTERFACE_ATTR_QNAME =
+		new QName(OGSA_WSRF_BP_NS, WS_FINAL_RESOURCE_INTERFACE_ATTR);
 	static public final QName RESOURCE_PROPERTY_NAMES_ATTR_QNAME = new QName(
 		OGSA_WSRF_BP_NS, RESOURCE_PROPERTY_NAMES_ATTR);
 }
