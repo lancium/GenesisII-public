@@ -7,12 +7,15 @@ import java.util.HashSet;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.axis.types.URI;
 import org.morgan.util.configuration.ConfigurationException;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.oasis_open.docs.wsrf.rl_2.SetTerminationTime;
 import org.oasis_open.docs.wsrf.rl_2.SetTerminationTimeResponse;
 import org.oasis_open.docs.wsrf.rp_2.InvalidResourcePropertyQNameFaultType;
+import org.oasis_open.docs.wsrf.rp_2.QueryExpressionType;
+import org.oasis_open.docs.wsrf.rp_2.QueryResourceProperties;
 import org.ogf.ogsa.ticker.CreateTicker;
 import org.ogf.ogsa.ticker.TickerFactory;
 import org.ws.addressing.EndpointReferenceType;
@@ -156,6 +159,9 @@ public class OGSAWSRFBPInteropTool extends BaseGridTool
 			stdout.println("\t\tGetMultipleResourceProperties(" +
 				OGSAWSRFBPConstants.CURRENT_TIME_ATTR + ") worked! (" + c + ").");
 		}
+		
+		ticker.queryResourceProperties(new QueryResourceProperties(
+			new QueryExpressionType(null, new URI(WSRFConstants.XPATH_QUERY_EXPRESSION_DIALECT_STRING))));
 		
 		stdout.print("\tTerminating ticker...");
 		terminateTicker(ticker);

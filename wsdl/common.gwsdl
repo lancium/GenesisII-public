@@ -67,6 +67,12 @@
 		<genii-ext:extend portType="genii-authz:GeniiResourceAuthz"/>
 		<genii-ext:extend portType="rpw-2:GetResourceProperty"/>
 		<genii-ext:extend portType="rpw-2:GetMultipleResourceProperties"/>
+		<genii-ext:extend portType="rpw-2:GetResourcePropertyDocument"/>
+		<genii-ext:extend portType="rpw-2:SetResourceProperties"/>
+		<genii-ext:extend portType="rpw-2:InsertResourceProperties"/>
+		<genii-ext:extend portType="rpw-2:DeleteResourceProperties"/>
+		<genii-ext:extend portType="rpw-2:UpdateResourceProperties"/>
+		<genii-ext:extend portType="rpw-2:QueryResourceProperties"/>
 		<genii-ext:extend portType="genii-not:GeniiNotificationProducerPortType"/>
 	</wsdl:portType>
 

@@ -20,4 +20,7 @@ public interface WSRFConstants
 		WSRF_RLW_NS, WSRF_IMMEDIATE_TERMINATE_PORT);
 	static public final QName WSRF_RLW_SCHEDULED_TERMINATE_PORT_QNAME = new QName(
 		WSRF_RLW_NS, WSRF_SCHEDULED_TERMINATE_PORT);
+	
+	static public final String XPATH_QUERY_EXPRESSION_DIALECT_STRING =
+		"http://www.w3.org/TR/1999/REC-xpath-19991116";
 }

@@ -159,7 +159,8 @@ public class StreamableByteIOInteropServiceImpl
 	}
     	
 	@RWXMapping(RWXCategory.READ)
-    public Object queryResourceProperties(QueryResourceProperties queryResourcePropertiesRequest) 
+    public QueryResourcePropertiesResponse queryResourceProperties(
+    		QueryResourceProperties queryResourcePropertiesRequest) 
     		throws RemoteException, InvalidResourcePropertyQNameFaultType, 
     		InvalidQueryExpressionFaultType, QueryEvaluationErrorFaultType, 
     		ResourceUnavailableFaultType, ResourceUnknownFaultType, 

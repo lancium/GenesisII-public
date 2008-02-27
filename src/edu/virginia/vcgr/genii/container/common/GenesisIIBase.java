@@ -1,20 +1,29 @@
 package edu.virginia.vcgr.genii.container.common;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Properties;
 
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.Duration;
 import org.apache.axis.types.Token;
+import org.apache.axis.types.URI;
 import org.apache.axis.types.UnsignedLong;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
@@ -28,12 +37,40 @@ import org.oasis_open.docs.wsrf.rl_2.SetTerminationTime;
 import org.oasis_open.docs.wsrf.rl_2.SetTerminationTimeResponse;
 import org.oasis_open.docs.wsrf.rl_2.TerminationTimeChangeRejectedFaultType;
 import org.oasis_open.docs.wsrf.rl_2.UnableToSetTerminationTimeFaultType;
+import org.oasis_open.docs.wsrf.rp_2.DeleteResourceProperties;
+import org.oasis_open.docs.wsrf.rp_2.DeleteResourcePropertiesRequestFailedFaultType;
+import org.oasis_open.docs.wsrf.rp_2.DeleteResourcePropertiesResponse;
+import org.oasis_open.docs.wsrf.rp_2.DeleteType;
 import org.oasis_open.docs.wsrf.rp_2.GetMultipleResourcePropertiesResponse;
+import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyDocument;
+import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyDocumentResponse;
 import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyResponse;
+import org.oasis_open.docs.wsrf.rp_2.InsertResourceProperties;
+import org.oasis_open.docs.wsrf.rp_2.InsertResourcePropertiesRequestFailedFaultType;
+import org.oasis_open.docs.wsrf.rp_2.InsertResourcePropertiesResponse;
+import org.oasis_open.docs.wsrf.rp_2.InsertType;
+import org.oasis_open.docs.wsrf.rp_2.InvalidModificationFaultType;
+import org.oasis_open.docs.wsrf.rp_2.InvalidQueryExpressionFaultType;
 import org.oasis_open.docs.wsrf.rp_2.InvalidResourcePropertyQNameFaultType;
+import org.oasis_open.docs.wsrf.rp_2.QueryEvaluationErrorFaultType;
+import org.oasis_open.docs.wsrf.rp_2.QueryExpressionType;
+import org.oasis_open.docs.wsrf.rp_2.QueryResourceProperties;
+import org.oasis_open.docs.wsrf.rp_2.QueryResourcePropertiesResponse;
+import org.oasis_open.docs.wsrf.rp_2.SetResourceProperties;
+import org.oasis_open.docs.wsrf.rp_2.SetResourcePropertiesResponse;
+import org.oasis_open.docs.wsrf.rp_2.SetResourcePropertyRequestFailedFaultType;
+import org.oasis_open.docs.wsrf.rp_2.UnableToModifyResourcePropertyFaultType;
+import org.oasis_open.docs.wsrf.rp_2.UnknownQueryExpressionDialectFaultType;
+import org.oasis_open.docs.wsrf.rp_2.UpdateResourceProperties;
+import org.oasis_open.docs.wsrf.rp_2.UpdateResourcePropertiesRequestFailedFaultType;
+import org.oasis_open.docs.wsrf.rp_2.UpdateResourcePropertiesResponse;
+import org.oasis_open.docs.wsrf.rp_2.UpdateType;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.ws.addressing.EndpointReferenceType;
+import org.xml.sax.InputSource;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
@@ -88,6 +125,7 @@ import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
+import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
 
 @GAroundInvoke({WSAddressingHandler.class, DatabaseHandler.class, 
@@ -834,5 +872,233 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		
 		setScheduledTerminationTime(c);
 		return new SetTerminationTimeResponse(c, Calendar.getInstance());
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public DeleteResourcePropertiesResponse deleteResourceProperties(
+			DeleteResourceProperties deleteResourcePropertiesRequest)
+			throws RemoteException, InvalidResourcePropertyQNameFaultType,
+			InvalidModificationFaultType,
+			DeleteResourcePropertiesRequestFailedFaultType,
+			ResourceUnknownFaultType, UnableToModifyResourcePropertyFaultType,
+			ResourceUnavailableFaultType
+	{
+		setResourceProperties(deleteResourcePropertiesRequest.getDelete());
+		return new DeleteResourcePropertiesResponse();
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.READ)
+	public GetResourcePropertyDocumentResponse getResourcePropertyDocument(
+			GetResourcePropertyDocument getResourcePropertyDocumentRequest)
+			throws RemoteException, ResourceUnknownFaultType,
+			ResourceUnavailableFaultType
+	{
+		ArrayList<IAttributeManipulator> manipulators =
+			_attributePackage.getManipulators();
+		ArrayList<MessageElement> elements = new ArrayList<MessageElement>();
+		for (IAttributeManipulator manipulator : manipulators)
+		{
+			elements.addAll(manipulator.getAttributeValues());
+		}
+		
+		MessageElement []elementsArray = new MessageElement[elements.size()];
+		elements.toArray(elementsArray);
+		
+		return new GetResourcePropertyDocumentResponse(elementsArray);
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public InsertResourcePropertiesResponse insertResourceProperties(
+			InsertResourceProperties insertResourcePropertiesRequest)
+			throws RemoteException,
+			InsertResourcePropertiesRequestFailedFaultType,
+			InvalidResourcePropertyQNameFaultType,
+			InvalidModificationFaultType, ResourceUnknownFaultType,
+			UnableToModifyResourcePropertyFaultType,
+			ResourceUnavailableFaultType
+	{
+		setResourceProperties(insertResourcePropertiesRequest.getInsert());
+		return new InsertResourcePropertiesResponse();
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.READ)
+	public QueryResourcePropertiesResponse queryResourceProperties(
+			QueryResourceProperties queryResourcePropertiesRequest)
+			throws RemoteException, UnknownQueryExpressionDialectFaultType,
+			QueryEvaluationErrorFaultType, InvalidQueryExpressionFaultType,
+			InvalidResourcePropertyQNameFaultType, ResourceUnknownFaultType,
+			ResourceUnavailableFaultType
+	{
+		QueryExpressionType qet = queryResourcePropertiesRequest.getQueryExpression();
+		
+		// First, make sure we understand the query expresion dialect
+		URI dialect = qet.getDialect();
+		if (!dialect.toString().equals(WSRFConstants.XPATH_QUERY_EXPRESSION_DIALECT_STRING))
+			throw FaultManipulator.fillInFault(new UnknownQueryExpressionDialectFaultType(
+				null, null, null, null, null, null));
+		
+		// Form document
+		try
+		{
+			MessageElement doc = new MessageElement(
+				new QName("http://tempuri.org", "ResourcePropertiesDocument"));
+			for (MessageElement elem : getResourcePropertyDocument(new GetResourcePropertyDocument()).get_any())
+			{
+				doc.addChild(elem);
+			}
+			
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			OutputStreamWriter writer = new OutputStreamWriter(baos);
+			ObjectSerializer.serialize(writer, doc, doc.getQName());
+			writer.flush();
+			InputSource inputSource = new InputSource(new ByteArrayInputStream(baos.toByteArray()));
+			
+			String str = (String)XPathFactory.newInstance().newXPath().evaluate(
+				"/*/Ticker", inputSource, XPathConstants.STRING);
+			System.err.println("The String is \"" + str + "\".");
+			
+			return null;
+		}
+		catch (SOAPException se)
+		{
+			_logger.error("Unable to query resource properties.", se);
+			throw FaultManipulator.fillInFault(
+				new QueryEvaluationErrorFaultType(null, null, null, null, null, null));
+		}
+		catch (IOException ioe)
+		{
+			_logger.error("Unable to query resource properties.", ioe);
+			throw FaultManipulator.fillInFault(
+				new QueryEvaluationErrorFaultType(null, null, null, null, null, null));
+		}
+		catch (XPathExpressionException xpee)
+		{
+			_logger.error("Unable to query resource properties.", xpee);
+			throw FaultManipulator.fillInFault(
+				new InvalidQueryExpressionFaultType(null, null, null, null, null, null));
+		}
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public SetResourcePropertiesResponse setResourceProperties(
+			SetResourceProperties setResourcePropertiesRequest)
+			throws RemoteException, InvalidResourcePropertyQNameFaultType,
+			InvalidModificationFaultType,
+			SetResourcePropertyRequestFailedFaultType,
+			ResourceUnknownFaultType, UnableToModifyResourcePropertyFaultType,
+			ResourceUnavailableFaultType
+	{
+		setResourceProperties(setResourcePropertiesRequest.getInsert());
+		setResourceProperties(setResourcePropertiesRequest.getUpdate());
+		setResourceProperties(setResourcePropertiesRequest.getDelete());
+		
+		return new SetResourcePropertiesResponse();
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public UpdateResourcePropertiesResponse updateResourceProperties(
+			UpdateResourceProperties updateResourcePropertiesRequest)
+			throws RemoteException, InvalidResourcePropertyQNameFaultType,
+			InvalidModificationFaultType, ResourceUnknownFaultType,
+			UnableToModifyResourcePropertyFaultType,
+			UpdateResourcePropertiesRequestFailedFaultType,
+			ResourceUnavailableFaultType
+	{
+		setResourceProperties(updateResourcePropertiesRequest.getUpdate());
+		return new UpdateResourcePropertiesResponse();
+	}
+	
+	private void setResourceProperties(DeleteType del)
+		throws RemoteException
+	{
+		QName rp = del.getResourceProperty();
+		
+		IAttributeManipulator manipulator =
+			_attributePackage.getManipulator(rp);
+			
+		if (manipulator == null)
+			FaultManipulator.fillInFault(
+				new InvalidResourcePropertyQNameFaultType(
+					null, null, null, null, new BaseFaultTypeDescription[] {
+						new BaseFaultTypeDescription("The resource property " + rp + " is unknown.")
+					}, null));
+			
+		manipulator.setAttributeValues(new ArrayList<MessageElement>());
+	}
+	
+	private void setResourceProperties(InsertType ins) throws RemoteException
+	{
+		HashMap<QName, Collection<MessageElement>> map =
+			new HashMap<QName, Collection<MessageElement>>();
+		
+		MessageElement []any = ins.get_any();
+		for (MessageElement elem : any)
+		{
+			QName name = elem.getQName();
+			Collection<MessageElement> list = map.get(name);
+			if (list == null)
+				map.put(name, list = new ArrayList<MessageElement>());
+			list.add(elem);
+		}
+		
+		for (QName attrName : map.keySet())
+		{
+			Collection<MessageElement> newAttrs = map.get(attrName);
+			
+			IAttributeManipulator manip = getAttributePackage().getManipulator(attrName);
+			if (manip == null)
+			{
+				FaultManipulator.fillInFault(
+					new InvalidResourcePropertyQNameFaultType(
+						null, null, null, null, new BaseFaultTypeDescription[] {
+							new BaseFaultTypeDescription("The resource property " + attrName + " is unknown.")
+						}, null));
+			}
+			
+			Collection<MessageElement> oldValues = new ArrayList<MessageElement>(
+				manip.getAttributeValues());
+			oldValues.addAll(newAttrs);
+			manip.setAttributeValues(oldValues);
+		}
+	}
+	
+	private void setResourceProperties(UpdateType update)
+		throws RemoteException
+	{
+		HashMap<QName, Collection<MessageElement>> map =
+			new HashMap<QName, Collection<MessageElement>>();
+		
+		MessageElement []any = update.get_any();
+		for (MessageElement elem : any)
+		{
+			QName name = elem.getQName();
+			Collection<MessageElement> list = map.get(name);
+			if (list == null)
+				map.put(name, list = new ArrayList<MessageElement>());
+			list.add(elem);
+		}
+		
+		for (QName attrName : map.keySet())
+		{
+			Collection<MessageElement> newAttrs = map.get(attrName);
+			
+			IAttributeManipulator manip = getAttributePackage().getManipulator(attrName);
+			if (manip == null)
+			{
+				FaultManipulator.fillInFault(
+					new InvalidResourcePropertyQNameFaultType(
+						null, null, null, null, new BaseFaultTypeDescription[] {
+							new BaseFaultTypeDescription("The resource property " + attrName + " is unknown.")
+						}, null));
+			}
+			
+			manip.setAttributeValues(newAttrs);
+		}
 	}
 }

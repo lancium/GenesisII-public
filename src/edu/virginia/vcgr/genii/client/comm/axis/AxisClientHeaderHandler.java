@@ -29,6 +29,7 @@ import org.apache.axis.MessageContext;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPHeaderElement;
+import org.morgan.util.GUID;
 import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.ReferenceParametersType;
 import org.apache.ws.security.WSEncryptionPart;
@@ -47,6 +48,24 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 public class AxisClientHeaderHandler extends BasicHandler
 {
 	static final long serialVersionUID = 0L;
+	
+	private void setMessageID(MessageContext msgContext) throws AxisFault
+	{
+		SOAPHeaderElement messageid = new SOAPHeaderElement(
+			new QName(
+				EndpointReferenceType.getTypeDesc().getXmlType().getNamespaceURI(),
+				"MessageID"), "urn:uuid:" + new GUID());
+		messageid.setActor(null);
+		messageid.setMustUnderstand(false);
+		try
+		{
+			msgContext.getMessage().getSOAPHeader().addChildElement(messageid);
+		}
+		catch (SOAPException se)
+		{
+			throw new AxisFault(se.getLocalizedMessage());
+		}
+	}
 	
 	private void setSOAPAction(MessageContext msgContext) throws AxisFault
 	{
@@ -210,6 +229,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 	
 	public void invoke(MessageContext msgContext) throws AxisFault
 	{
+		setMessageID(msgContext);
 		setSOAPAction(msgContext);
 		setWSAddressingHeaders(msgContext);
 		setCallingContextHeaders(msgContext);
