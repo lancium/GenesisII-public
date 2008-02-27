@@ -2,6 +2,7 @@
 <wsdl:definitions
 	name="TickerFactory"
 	targetNamespace="http://schemas.ogf.org/ogsa/2007/12/wsrf-bp-interop/ticker-factory"
+    xmlns:wsa="http://www.w3.org/2005/08/addressing"
 	xmlns:factory="http://schemas.ogf.org/ogsa/2007/12/wsrf-bp-interop/ticker-factory"
 	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
@@ -88,8 +89,10 @@
 		
 		<wsdl:operation name="CreateTicker">
 			<wsdl:input name="CreateTickerRequest"
+				wsa:Action="http://schemas.ogf.org/ogsa/2007/12/wsrf-bp-interop/ticker-factory/CreateTickerRequest"
 				message="factory:CreateTickerRequest"/>
 			<wsdl:output name="CreateTickerResponse"
+				wsa:Action="http://schemas.ogf.org/ogsa/2007/12/wsrf-bp-interop/ticker-factory/CreateTickerResponse"
 				message="factory:CreateTickerResponse"/>
 		</wsdl:operation>
 	</wsdl:portType>

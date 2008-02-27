@@ -2,6 +2,7 @@
 <wsdl:definitions name="WS-ResourceLifetime"
 	targetNamespace="http://docs.oasis-open.org/wsrf/rlw-2"
 	xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
 	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
 	xmlns:wsrf-bf="http://docs.oasis-open.org/wsrf/bf-2"
 	xmlns:wsrf-rl="http://docs.oasis-open.org/wsrf/rl-2"
@@ -61,22 +62,44 @@
 	
 	<wsdl:portType name="ImmediateResourceTermination">
 		<wsdl:operation name="Destroy">
-			<wsdl:input name="DestroyRequest" message="wsrf-rlw:DestroyRequest"/>
-			<wsdl:output name="DestroyResponse" message="wsrf-rlw:DestroyResponse"/>
-			<wsdl:fault message="wsrf-rlw:ResourceNotDestroyedFault" name="ResourceNotDestroyedFault"/>
-			<wsdl:fault message="wsrf-rw:ResourceUnknownFault" name="ResourceUnknownFault"/>
-			<wsdl:fault message="wsrf-rw:ResourceUnavailableFault" name="ResourceUnavailableFault"/>
+			<wsdl:input name="DestroyRequest"
+				wsa:Action="http://docs.oasis-open.org/wsrf/rlw-2/ImmediateResourceTermination/DestroyRequest"
+				message="wsrf-rlw:DestroyRequest"/>
+			<wsdl:output name="DestroyResponse"
+				wsa:Action="http://docs.oasis-open.org/wsrf/rlw-2/ImmediateResourceTermination/DestroyResponse"
+				message="wsrf-rlw:DestroyResponse"/>
+			<wsdl:fault message="wsrf-rlw:ResourceNotDestroyedFault"
+				wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"
+				name="ResourceNotDestroyedFault"/>
+			<wsdl:fault message="wsrf-rw:ResourceUnknownFault"
+				wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"
+				name="ResourceUnknownFault"/>
+			<wsdl:fault message="wsrf-rw:ResourceUnavailableFault"
+				wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"
+				name="ResourceUnavailableFault"/>
 		</wsdl:operation>
 	</wsdl:portType>
 	
 	<wsdl:portType name="ScheduledResourceTermination">
 		<wsdl:operation name="SetTerminationTime">
-			<wsdl:input name="SetTerminationTimeRequest" message="wsrf-rlw:SetTerminationTimeRequest"/>
-			<wsdl:output name="SetTerminationTimeResponse" message="wsrf-rlw:SetTerminationTimeResponse"/>
-			<wsdl:fault message="wsrf-rlw:UnableToSetTerminationTimeFault" name="UnableToSetTerminationTimeFault"/>
-			<wsdl:fault message="wsrf-rlw:TerminationTimeChangeRejectedFault" name="TerminationTimeChangeRejectedFault"/>
-			<wsdl:fault message="wsrf-rw:ResourceUnknownFault" name="ResourceUnknownFault"/>
-			<wsdl:fault message="wsrf-rw:ResourceUnavailableFault" name="ResourceUnavailableFault"/>
+			<wsdl:input name="SetTerminationTimeRequest"
+				wsa:Action="http://docs.oasis-open.org/wsrf/rlw-2/ScheduledResourceTermination/SetTerminationTimeRequest"
+				message="wsrf-rlw:SetTerminationTimeRequest"/>
+			<wsdl:output name="SetTerminationTimeResponse"
+				wsa:Action="http://docs.oasis-open.org/wsrf/rlw-2/ScheduledResourceTermination/SetTerminationTimeResponse"
+				message="wsrf-rlw:SetTerminationTimeResponse"/>
+			<wsdl:fault message="wsrf-rlw:UnableToSetTerminationTimeFault"
+				wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"
+				name="UnableToSetTerminationTimeFault"/>
+			<wsdl:fault message="wsrf-rlw:TerminationTimeChangeRejectedFault"
+				wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"
+				name="TerminationTimeChangeRejectedFault"/>
+			<wsdl:fault message="wsrf-rw:ResourceUnknownFault"
+				wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"
+				name="ResourceUnknownFault"/>
+			<wsdl:fault message="wsrf-rw:ResourceUnavailableFault"
+				wsa:Action="http://www.w3.org/2005/08/addressing/soap/fault"
+				name="ResourceUnavailableFault"/>
 		</wsdl:operation>
 	</wsdl:portType>
 </wsdl:definitions>
