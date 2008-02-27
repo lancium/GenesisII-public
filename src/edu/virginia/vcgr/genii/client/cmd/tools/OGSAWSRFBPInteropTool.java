@@ -60,7 +60,7 @@ public class OGSAWSRFBPInteropTool extends BaseGridTool
 		TickerFactory ticker = createTicker(factory);
 		stdout.println("Done");
 		
-		MessageElement []any = factory.getResourceProperty(
+		MessageElement []any = ticker.getResourceProperty(
 			OGSAWSRFBPConstants.RESOURCE_PROPERTY_NAMES_ATTR_QNAME).get_any();
 		if (any == null)
 			stderr.println("\t\tGetResourceProperty(" + 
