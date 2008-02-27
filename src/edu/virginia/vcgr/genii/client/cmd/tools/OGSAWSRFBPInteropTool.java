@@ -7,9 +7,12 @@ import java.util.HashSet;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.axis.types.Duration;
 import org.morgan.util.configuration.ConfigurationException;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
+import org.oasis_open.docs.wsrf.rl_2.SetTerminationTime;
+import org.oasis_open.docs.wsrf.rl_2.SetTerminationTimeResponse;
 import org.ogf.ogsa.ticker.CreateTicker;
 import org.ogf.ogsa.ticker.TickerFactory;
 import org.ws.addressing.EndpointReferenceType;
@@ -295,11 +298,31 @@ public class OGSAWSRFBPInteropTool extends BaseGridTool
 		TickerFactory ticker = createTicker(factory);
 		stdout.println("Done");
 		
-		// TODO
+		MessageElement []any = ticker.getResourceProperty(OGSAWSRFBPConstants.CURRENT_TIME_ATTR_QNAME).get_any();
+		Calendar c = new DefaultSingleResourcePropertyTranslator().deserialize(Calendar.class, any[0]);
+		c.add(Calendar.SECOND, 30);
 		
-		stdout.print("\tTerminating ticker...");
-		terminateTicker(ticker);
-		stdout.println("Done");
+		SetTerminationTimeResponse resp = ticker.setTerminationTime(new SetTerminationTime(c, null));
+		if (resp == null)
+			stderr.println("\tSetTerminationTime returned null.");
+		else if (!resp.getNewTerminationTime().equals(c))
+			stderr.println("\tSetTerminationTime returned, but with wrong timestamp.");
+		else
+			stdout.println("\tSet termination time worked.");
+		
+		stdout.println("\tWaiting 45 seconds to test.");
+		try { Thread.sleep(1000 * 45); } catch (Throwable cause) {}
+		
+		stdout.println("\tTesting that it's actually dead now.");
+		try
+		{
+			ticker.destroy(new Destroy());
+			stderr.println("Didn't receive a fault like we were supposed to.");
+		}
+		catch (ResourceUnknownFaultType ruft)
+		{
+			stdout.println("\tCorrectly received ResourceUnknownFaultTYpe.");
+		}
 	}
 	
 	private void runTest7(TickerFactory factory) throws Throwable
