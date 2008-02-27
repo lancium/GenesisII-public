@@ -242,7 +242,24 @@ public class OGSAWSRFBPInteropTool extends BaseGridTool
 		TickerFactory ticker = createTicker(factory);
 		stdout.println("Done");
 		
-		// TODO
+		MessageElement []any = ticker.getResourceProperty(
+			OGSAWSRFBPConstants.RESOURCE_ENDPOINT_REFERENCE_ATTR_QNAME).get_any();
+		if (any == null)
+			stderr.println("\t\tGetResourceProperty(" + 
+				OGSAWSRFBPConstants.RESOURCE_ENDPOINT_REFERENCE_ATTR_QNAME + 
+				") returned no properties.");
+		else if (any.length != 1)
+			stderr.println("\t\tGetResourceProperty(" + 
+				OGSAWSRFBPConstants.RESOURCE_ENDPOINT_REFERENCE_ATTR_QNAME + 
+				") did not return 1 property.");
+		else
+		{
+			new DefaultSingleResourcePropertyTranslator().deserialize(
+				EndpointReferenceType.class, any[0]);
+			stdout.println("\t\tGetResourceProperty(" +
+				OGSAWSRFBPConstants.RESOURCE_ENDPOINT_REFERENCE_ATTR_QNAME +
+				") worked and returned an EPR.");
+		}
 		
 		stdout.print("\tTerminating ticker...");
 		terminateTicker(ticker);
