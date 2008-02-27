@@ -78,6 +78,7 @@ import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.invoker.DatabaseHandler;
 import edu.virginia.vcgr.genii.container.invoker.DebugInvoker;
 import edu.virginia.vcgr.genii.container.invoker.GAroundInvoke;
+import edu.virginia.vcgr.genii.container.invoker.ScheduledTerminationInvoker;
 import edu.virginia.vcgr.genii.container.invoker.WSAddressingHandler;
 import edu.virginia.vcgr.genii.container.resolver.IResolverFactoryProxy;
 import edu.virginia.vcgr.genii.container.resolver.Resolution;
@@ -89,7 +90,8 @@ import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
 import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
 
-@GAroundInvoke({WSAddressingHandler.class, DatabaseHandler.class, DebugInvoker.class})
+@GAroundInvoke({WSAddressingHandler.class, DatabaseHandler.class, 
+	DebugInvoker.class, ScheduledTerminationInvoker.class})
 public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 {
 	static private Log _logger = LogFactory.getLog(GenesisIIBase.class);

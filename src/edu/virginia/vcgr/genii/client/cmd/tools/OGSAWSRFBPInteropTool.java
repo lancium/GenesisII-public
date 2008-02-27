@@ -305,8 +305,6 @@ public class OGSAWSRFBPInteropTool extends BaseGridTool
 		SetTerminationTimeResponse resp = ticker.setTerminationTime(new SetTerminationTime(c, null));
 		if (resp == null)
 			stderr.println("\tSetTerminationTime returned null.");
-		else if (!resp.getNewTerminationTime().equals(c))
-			stderr.println("\tSetTerminationTime returned, but with wrong timestamp.");
 		else
 			stdout.println("\tSet termination time worked.");
 		
