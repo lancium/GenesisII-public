@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.rmi.RemoteException;
+import java.util.Calendar;
 import java.util.HashSet;
 
 import javax.xml.namespace.QName;
@@ -20,6 +21,7 @@ import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.rp.DefaultSingleResourcePropertyTranslator;
 import edu.virginia.vcgr.genii.container.ticker.TickerConstants;
 
 public class OGSAWSRFBPInteropTool extends BaseGridTool
@@ -97,6 +99,57 @@ public class OGSAWSRFBPInteropTool extends BaseGridTool
 				for (QName item : expected)
 					stdout.println("\t\t\t" + item);
 			}
+		}
+		
+		any = ticker.getMultipleResourceProperties(new QName[] {
+			OGSAWSRFBPConstants.RESOURCE_PROPERTY_NAMES_ATTR_QNAME,
+			OGSAWSRFBPConstants.CURRENT_TIME_ATTR_QNAME
+		}).get_any();
+		if (any == null)
+			stderr.println("\t\tGetMultipleResourceProperties(" + 
+				OGSAWSRFBPConstants.RESOURCE_PROPERTY_NAMES_ATTR_QNAME + 
+				", " + OGSAWSRFBPConstants.CURRENT_TIME_ATTR_QNAME +
+				") returned no properties.");
+		else if (any.length != 2)
+			stderr.println("\t\tGetMultipleResourceProperties(" + 
+				OGSAWSRFBPConstants.RESOURCE_PROPERTY_NAMES_ATTR_QNAME + 
+				", " + OGSAWSRFBPConstants.CURRENT_TIME_ATTR +
+				") did not return 2 properties.");
+		else
+		{
+			int curTime = 0;
+			
+			if (!any[0].getQName().equals(OGSAWSRFBPConstants.CURRENT_TIME_ATTR_QNAME))
+				curTime = 1;
+			OGSAQNameList list = new OGSAQNameList(any[1 - curTime]);
+			
+			HashSet<QName> expected = new HashSet<QName>();
+			expected.add(OGSAWSRFBPConstants.CURRENT_TIME_ATTR_QNAME);
+			expected.add(OGSAWSRFBPConstants.RESOURCE_ENDPOINT_REFERENCE_ATTR_QNAME);
+			expected.add(new QName(TickerConstants.TICKER_NS, "Ticker"));
+			expected.add(OGSAWSRFBPConstants.WS_FINAL_RESOURCE_INTERFACE_ATTR_QNAME);
+			expected.add(OGSAWSRFBPConstants.TERMINATION_TIME_ATTR_QNAME);
+			expected.add(OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME);
+			
+			for (QName item : list)
+			{
+				expected.remove(item);
+			}
+			
+			if (expected.size() == 0)
+				stdout.println("\t\tGetMultipleResourceProperties("+ 
+				OGSAWSRFBPConstants.RESOURCE_PROPERTY_NAMES_ATTR_QNAME + 
+				") worked for ResourcePropertyNames!");
+			else
+			{
+				stdout.println("\t\tThe following resource property names were not retrieved:");
+				for (QName item : expected)
+					stdout.println("\t\t\t" + item);
+			}
+			
+			Calendar c = new DefaultSingleResourcePropertyTranslator().deserialize(Calendar.class, any[curTime]);
+			stdout.println("\t\tGetMultipleResourceProperties(" +
+				OGSAWSRFBPConstants.CURRENT_TIME_ATTR + ") worked! (" + c + ").");
 		}
 		
 		stdout.print("\tTerminating ticker...");
