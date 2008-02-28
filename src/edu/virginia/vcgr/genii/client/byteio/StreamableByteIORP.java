@@ -32,8 +32,14 @@ public interface StreamableByteIORP
 	@ResourceProperty(namespace = STREAMABLE_BYTEIO_NS, localname = "ModificationTime")
 	public Calendar getModificationTime();
 	
+	@ResourceProperty(namespace = STREAMABLE_BYTEIO_NS, localname = "ModificationTime")
+	public void setModificationTime(Calendar modTime);
+	
 	@ResourceProperty(namespace = STREAMABLE_BYTEIO_NS, localname = "AccessTime")
 	public Calendar getAccessTime();
+	
+	@ResourceProperty(namespace = STREAMABLE_BYTEIO_NS, localname = "AccessTime")
+	public void setAccessTime(Calendar accessTime);
 	
 	@ResourceProperty(namespace = STREAMABLE_BYTEIO_NS, localname = "Position")
 	public Long getPosition();

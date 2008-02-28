@@ -186,6 +186,8 @@
 	</genii:configured-instances>
 
 	<genii:tools>
+		<mconf:class name="touch"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.TouchTool</mconf:class>
 		<mconf:class name="ogsa-bp-interop"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.OGSAWSRFBPInteropTool</mconf:class>
 		<mconf:class name="idp"

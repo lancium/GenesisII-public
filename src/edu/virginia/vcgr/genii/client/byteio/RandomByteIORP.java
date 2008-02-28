@@ -30,6 +30,12 @@ public interface RandomByteIORP
 	@ResourceProperty(namespace = RANDOM_BYTEIO_NS, localname = "ModificationTime")
 	public Calendar getModificationTime();
 	
+	@ResourceProperty(namespace = RANDOM_BYTEIO_NS, localname = "ModificationTime")
+	public void setModificationTime(Calendar modTime);
+	
 	@ResourceProperty(namespace = RANDOM_BYTEIO_NS, localname = "AccessTime")
 	public Calendar getAccessTime();
+	
+	@ResourceProperty(namespace = RANDOM_BYTEIO_NS, localname = "AccessTime")
+	public void setAccessTime(Calendar accessTime);
 }
