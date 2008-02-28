@@ -22,10 +22,10 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 
-import edu.virginia.vcgr.genii.common.rattrs.AttributeNotSettableFaultType;
-import edu.virginia.vcgr.genii.common.rattrs.IncorrectAttributeCardinalityFaultType;
-
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+import org.oasis_open.docs.wsrf.rp_2.InvalidResourcePropertyQNameFaultType;
+import org.oasis_open.docs.wsrf.rp_2.UnableToModifyResourcePropertyFaultType;
+import org.oasis_open.docs.wsrf.rp_2.UpdateResourcePropertiesRequestFailedFaultType;
 
 public interface IAttributeManipulator
 {
@@ -37,5 +37,7 @@ public interface IAttributeManipulator
 		throws ResourceUnknownFaultType, RemoteException;
 	public void setAttributeValues(Collection<MessageElement> values)
 		throws ResourceUnknownFaultType, RemoteException,
-			AttributeNotSettableFaultType, IncorrectAttributeCardinalityFaultType;
+			InvalidResourcePropertyQNameFaultType,
+			UnableToModifyResourcePropertyFaultType,
+			UpdateResourcePropertiesRequestFailedFaultType;
 }

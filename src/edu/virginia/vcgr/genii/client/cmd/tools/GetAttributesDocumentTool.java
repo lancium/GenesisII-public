@@ -3,6 +3,8 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
+import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyDocument;
+import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyDocumentResponse;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
@@ -11,7 +13,6 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
-import edu.virginia.vcgr.genii.common.rattrs.GetAttributesDocumentResponse;
 
 public class GetAttributesDocumentTool extends BaseGridTool
 {
@@ -33,7 +34,8 @@ public class GetAttributesDocumentTool extends BaseGridTool
 		
 		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class,
 			path.getEndpoint());
-		GetAttributesDocumentResponse resp = common.getAttributesDocument(null);
+		GetResourcePropertyDocumentResponse resp = common.getResourcePropertyDocument(
+			new GetResourcePropertyDocument());
 		MessageElement document = new MessageElement(
 			new QName(GenesisIIConstants.GENESISII_NS, "attributes"));
 		for (MessageElement child : resp.get_any())

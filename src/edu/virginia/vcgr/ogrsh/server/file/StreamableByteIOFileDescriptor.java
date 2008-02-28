@@ -3,8 +3,6 @@ package edu.virginia.vcgr.ogrsh.server.file;
 import java.io.IOException;
 import java.rmi.RemoteException;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -15,6 +13,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.byteio.SeekOrigin;
+import edu.virginia.vcgr.genii.client.byteio.StreamableByteIORP;
 import edu.virginia.vcgr.genii.client.byteio.xfer.ISByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.xfer.TransferUtils;
 import edu.virginia.vcgr.genii.client.byteio.xfer.dime.DimeSByteIOTransferer;
@@ -22,6 +21,8 @@ import edu.virginia.vcgr.genii.client.byteio.xfer.mtom.MTomSByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.xfer.simple.SimpleSByteIOTransferer;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.ogrsh.server.dir.StatBuffer;
 import edu.virginia.vcgr.ogrsh.server.exceptions.OGRSHException;
 
@@ -29,10 +30,6 @@ public class StreamableByteIOFileDescriptor extends AbstractFileDescriptor
 		implements IFileDescriptor 
 {
 	static private Log _logger = LogFactory.getLog(RandomByteIOFileDescriptor.class);
-	
-	static private QName _POSITION_ATTR_NAME = new QName(
-		"http://schemas.ggf.org/byteio/2005/10/streamable-access",
-		"Position");
 	
 	private EndpointReferenceType _epr;
 	private ISByteIOTransferer _transferer;
@@ -138,15 +135,14 @@ public class StreamableByteIOFileDescriptor extends AbstractFileDescriptor
 	{
 		try
 		{
-			StreamableByteIOPortType stub =
-				ClientUtils.createProxy(StreamableByteIOPortType.class, _epr);
-			
-			return Long.parseLong(stub.getAttributes(
-				new QName[] {_POSITION_ATTR_NAME}).get_any()[0].getValue());
+			StreamableByteIORP rp = 
+				(StreamableByteIORP)ResourcePropertyManager.createRPInterface(
+					_epr, StreamableByteIORP.class);
+			return rp.getPosition();
 		}
-		catch (ConfigurationException ce)
+		catch (ResourcePropertyException re)
 		{
-			throw new OGRSHException(ce);
+			throw new OGRSHException(re);
 		}
 	}
 

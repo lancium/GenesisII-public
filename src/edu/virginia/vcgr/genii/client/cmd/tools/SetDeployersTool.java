@@ -3,6 +3,8 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 import java.util.ArrayList;
 
 import org.apache.axis.message.MessageElement;
+import org.oasis_open.docs.wsrf.rp_2.UpdateResourceProperties;
+import org.oasis_open.docs.wsrf.rp_2.UpdateType;
 
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
@@ -11,7 +13,6 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
-import edu.virginia.vcgr.genii.common.rattrs.SetAttributes;
 
 public class SetDeployersTool extends BaseGridTool
 {
@@ -45,8 +46,8 @@ public class SetDeployersTool extends BaseGridTool
 				BESConstants.DEPLOYER_EPR_ATTR, target.getEndpoint()));
 		}
 		
-		bes.setAttributes(
-			new SetAttributes(deployers.toArray(new MessageElement[0])));
+		bes.updateResourceProperties(new UpdateResourceProperties(
+			new UpdateType(deployers.toArray(new MessageElement[0]))));
 		
 		return 0;
 	}

@@ -22,10 +22,10 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
-import edu.virginia.vcgr.genii.common.rattrs.AttributeNotSettableFaultType;
-import edu.virginia.vcgr.genii.common.rattrs.SetAttributes;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+import org.oasis_open.docs.wsrf.rp_2.UpdateResourceProperties;
+import org.oasis_open.docs.wsrf.rp_2.UpdateType;
 
 public class RPInvoker implements InvocationHandler
 {
@@ -148,18 +148,13 @@ public class RPInvoker implements InvocationHandler
 	{
 		try
 		{
-			_stub.setAttributes(new SetAttributes(
-				values.toArray(new MessageElement[0])));
+			_stub.updateResourceProperties(new UpdateResourceProperties(new UpdateType(
+				values.toArray(new MessageElement[0]))));
 			_propertiesCache.put(properties, values);
 		}
 		catch (ResourceUnknownFaultType ruft)
 		{
 			throw new ResourcePropertyException("Resource is unknown.", ruft);
-		}
-		catch (AttributeNotSettableFaultType notSettable)
-		{
-			throw new ResourcePropertyException("Property " 
-				+ properties + " is not settable.", notSettable);
 		}
 		catch (RemoteException re)
 		{
@@ -247,8 +242,8 @@ public class RPInvoker implements InvocationHandler
 	{
 		try
 		{
-			_stub.setAttributes(new SetAttributes(
-				new MessageElement[] { me }));
+			_stub.updateResourceProperties(new UpdateResourceProperties(
+				new UpdateType(new MessageElement[] { me })));
 			ArrayList<MessageElement> values = new ArrayList<MessageElement>();
 			values.add(me);
 			_propertiesCache.put(propertyName, values);
@@ -256,11 +251,6 @@ public class RPInvoker implements InvocationHandler
 		catch (ResourceUnknownFaultType ruft)
 		{
 			throw new ResourcePropertyException("Resource is unknown.", ruft);
-		}
-		catch (AttributeNotSettableFaultType notSettable)
-		{
-			throw new ResourcePropertyException("Property " 
-				+ propertyName + " is not settable.", notSettable);
 		}
 		catch (RemoteException re)
 		{

@@ -44,10 +44,6 @@
 		location="wsrf/wsResourceLifetime.wsdl"/>
 
 	<wsdl:import
-		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
-		location="./resource-attributes.wsdl"/>
-
-	<wsdl:import
 		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-authz"
 		location="./resource-authz.wsdl"/>
 

@@ -16,10 +16,9 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
-import edu.virginia.vcgr.genii.common.rattrs.AttributeUnknownFaultType;
-import edu.virginia.vcgr.genii.common.rattrs.GetAttributesResponse;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyResponse;
 
 public class TransferUtils
 {
@@ -87,7 +86,7 @@ public class TransferUtils
 	
 	private void fillInPreferences()
 		throws ConfigurationException, GenesisIISecurityException, 
-			ResourceException, AttributeUnknownFaultType,
+			ResourceException,
 			ResourceUnknownFaultType, RemoteException
 	{
 		synchronized(this)
@@ -107,8 +106,7 @@ public class TransferUtils
 				attrName = new QName(ByteIOConstants.STREAMABLE_BYTEIO_NS,
 					ByteIOConstants.XFER_MECHS_ATTR_NAME);
 			
-			GetAttributesResponse resp = stub.getAttributes(new QName[] {
-				attrName } );
+			GetResourcePropertyResponse resp = stub.getResourceProperty(attrName);
 			MessageElement []elem = resp.get_any();
 			parseAttributes(elem);
 		}

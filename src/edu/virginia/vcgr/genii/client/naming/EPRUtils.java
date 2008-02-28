@@ -36,14 +36,13 @@ import org.ws.addressing.MetadataType;
 import org.xml.sax.InputSource;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
-import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.ogsa.OGSARP;
 import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
 import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
-import edu.virginia.vcgr.genii.common.GeniiCommon;
-import edu.virginia.vcgr.genii.common.rattrs.GetAttributesResponse;
 import edu.virginia.vcgr.genii.common.security.*;
 import edu.virginia.vcgr.genii.client.security.*;
 
@@ -86,18 +85,9 @@ public class EPRUtils
 		
 		try
 		{
-			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, epr);
-
-			// attempt to get the full EPR from the object itself
-			GetAttributesResponse resp = common.getAttributes(
-					new QName[] {
-						OGSAWSRFBPConstants.RESOURCE_ENDPOINT_REFERENCE_ATTR_QNAME
-					});
-			MessageElement []elements = resp.get_any();
-			if (elements == null || elements.length < 1)
-				throw new Exception("Couldn't get EPR for target container.");
-			return (EndpointReferenceType)elements[0].getObjectValue(
-					EndpointReferenceType.class);
+			OGSARP rp = (OGSARP)ResourcePropertyManager.createRPInterface(
+				epr, OGSARP.class);
+			return rp.getResourceEndpoint();
 		}
 		catch (Throwable t)
 		{

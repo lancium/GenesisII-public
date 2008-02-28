@@ -25,10 +25,10 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 
-import edu.virginia.vcgr.genii.common.rattrs.AttributeNotSettableFaultType;
-import edu.virginia.vcgr.genii.common.rattrs.IncorrectAttributeCardinalityFaultType;
-
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+import org.oasis_open.docs.wsrf.rp_2.UnableToModifyResourcePropertyFaultType;
+import org.oasis_open.docs.wsrf.rp_2.UpdateResourcePropertiesRequestFailedFaultType;
+
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
 public class DefaultAttributeManipulator implements IAttributeManipulator
@@ -100,13 +100,13 @@ public class DefaultAttributeManipulator implements IAttributeManipulator
 
 	public void setAttributeValues(Collection<MessageElement> values) 
 		throws ResourceUnknownFaultType, RemoteException,
-			AttributeNotSettableFaultType, IncorrectAttributeCardinalityFaultType
+			UnableToModifyResourcePropertyFaultType
 	{
 		Object []params = null;
 		
 		if (_setMethod == null)
 			throw FaultManipulator.fillInFault(
-				new AttributeNotSettableFaultType());
+				new UnableToModifyResourcePropertyFaultType());
 		
 		if (_isSingleSet)
 		{
@@ -116,7 +116,7 @@ public class DefaultAttributeManipulator implements IAttributeManipulator
 				params = new Object[] { values.iterator().next() };
 			else
 				throw FaultManipulator.fillInFault(
-					new IncorrectAttributeCardinalityFaultType());
+					new UpdateResourcePropertiesRequestFailedFaultType());
 		} else
 		{
 			params = new Object[] { values };

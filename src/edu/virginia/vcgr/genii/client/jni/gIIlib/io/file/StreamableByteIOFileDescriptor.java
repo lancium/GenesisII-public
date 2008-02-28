@@ -3,8 +3,6 @@ package edu.virginia.vcgr.genii.client.jni.gIIlib.io.file;
 import java.io.IOException;
 import java.rmi.RemoteException;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axis.types.URI;
 import org.ggf.sbyteio.StreamableByteIOPortType;
 import org.morgan.util.configuration.ConfigurationException;
@@ -13,6 +11,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.byteio.SeekOrigin;
+import edu.virginia.vcgr.genii.client.byteio.StreamableByteIORP;
 import edu.virginia.vcgr.genii.client.byteio.xfer.ISByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.xfer.TransferUtils;
 import edu.virginia.vcgr.genii.client.byteio.xfer.dime.DimeSByteIOTransferer;
@@ -20,13 +19,11 @@ import edu.virginia.vcgr.genii.client.byteio.xfer.mtom.MTomSByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.xfer.simple.SimpleSByteIOTransferer;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 
 public class StreamableByteIOFileDescriptor extends WindowsIFSFile		
 {		
-	static private QName _POSITION_ATTR_NAME = new QName(
-		"http://schemas.ggf.org/byteio/2005/10/streamable-access",
-		"Position");
-	
 	private EndpointReferenceType _epr;
 	private ISByteIOTransferer _transferer;
 	
@@ -92,26 +89,23 @@ public class StreamableByteIOFileDescriptor extends WindowsIFSFile
 			_transferer.seekRead(origin, offset, 0);
 			return getPosition();
 		}
+		catch (ResourcePropertyException rpe)
+		{
+			throw new IOException("Unable to seek.", rpe);
+		}
 		catch (RemoteException re)
 		{
-			throw new IOException(re.getMessage());
+			throw new IOException("Unable to seek.", re);
 		}
 	}
 	
-	private long getPosition() throws RemoteException, IOException
+	private long getPosition() 
+		throws RemoteException, IOException, ResourcePropertyException
 	{
-		try
-		{
-			StreamableByteIOPortType stub =
-				ClientUtils.createProxy(StreamableByteIOPortType.class, _epr);
-			
-			return Long.parseLong(stub.getAttributes(
-				new QName[] {_POSITION_ATTR_NAME}).get_any()[0].getValue());
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new IOException(ce.getMessage());
-		}
+		StreamableByteIORP rp = 
+			(StreamableByteIORP)ResourcePropertyManager.createRPInterface(
+				_epr, StreamableByteIORP.class);
+		return rp.getPosition();
 	}
 
 	@Override

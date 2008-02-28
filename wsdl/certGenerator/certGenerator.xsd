@@ -2,7 +2,6 @@
 <xsd:schema
 	xmlns="http://vcgr.cs.virginia.edu/genii/2007/08/certGenerator"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	xmlns:genii-rattrs="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
 	xmlns:security="http://vcgr.cs.virginia.edu/genii/2006/12/security"
 	xmlns:genii-cert-generator="http://vcgr.cs.virginia.edu/genii/2007/08/certGenerator"
 	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"

@@ -24,6 +24,7 @@ import javax.xml.namespace.QName;
 import org.apache.axis.message.MessageElement;
 import org.morgan.util.configuration.ConfigurationException;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
+import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyResponse;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.byteio.streamable.factory.StreamableByteIOFactory;
@@ -37,7 +38,6 @@ import edu.virginia.vcgr.genii.client.ogsa.OGSARP;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
-import edu.virginia.vcgr.genii.common.rattrs.GetAttributesResponse;
 
 public class TypeInformation
 {
@@ -243,7 +243,7 @@ public class TypeInformation
 			(isRByteIO() ? ByteIOConstants.RANDOM_BYTEIO_NS : ByteIOConstants.STREAMABLE_BYTEIO_NS),
 			attrName);
 		GeniiCommon proxy = ClientUtils.createProxy(GeniiCommon.class, _epr);
-		GetAttributesResponse resp = proxy.getAttributes(new QName[] { attrQName } );
+		GetResourcePropertyResponse resp = proxy.getResourceProperty(attrQName);
 		
 		MessageElement []any = resp.get_any();
 		if (any == null || any.length != 1)

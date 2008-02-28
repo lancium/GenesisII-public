@@ -67,8 +67,6 @@ import org.oasis_open.docs.wsrf.rp_2.UpdateResourcePropertiesResponse;
 import org.oasis_open.docs.wsrf.rp_2.UpdateType;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.ws.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
 
@@ -92,13 +90,6 @@ import edu.virginia.vcgr.genii.common.notification.GeniiSubscriptionPortType;
 import edu.virginia.vcgr.genii.common.notification.Subscribe;
 import edu.virginia.vcgr.genii.common.notification.SubscribeResponse;
 import edu.virginia.vcgr.genii.common.notification.UserDataType;
-import edu.virginia.vcgr.genii.common.rattrs.AttributeNotSettableFaultType;
-import edu.virginia.vcgr.genii.common.rattrs.AttributeUnknownFaultType;
-import edu.virginia.vcgr.genii.common.rattrs.GetAttributesDocumentResponse;
-import edu.virginia.vcgr.genii.common.rattrs.GetAttributesResponse;
-import edu.virginia.vcgr.genii.common.rattrs.IncorrectAttributeCardinalityFaultType;
-import edu.virginia.vcgr.genii.common.rattrs.SetAttributes;
-import edu.virginia.vcgr.genii.common.rattrs.SetAttributesResponse;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
@@ -336,29 +327,6 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	}
 
 	@RWXMapping(RWXCategory.READ)
-	public final GetAttributesResponse getAttributes(QName[] attributeQname)
-			throws RemoteException, ResourceUnknownFaultType,
-			AttributeUnknownFaultType
-	{
-		ArrayList<MessageElement> document = new ArrayList<MessageElement>();
-		for (QName name : attributeQname)
-		{
-			IAttributeManipulator manipulator =
-				_attributePackage.getManipulator(name);
-			
-			if (manipulator == null)
-				throw FaultManipulator.fillInFault(
-					new AttributeUnknownFaultType());
-			
-			document.addAll(manipulator.getAttributeValues());
-		}
-		
-		MessageElement []ret = new MessageElement[document.size()];
-		document.toArray(ret);
-		return new GetAttributesResponse(ret);
-	}
-	
-	@RWXMapping(RWXCategory.READ)
 	public GetMultipleResourcePropertiesResponse getMultipleResourceProperties(
 			QName[] getMultipleResourcePropertiesRequest)
 			throws RemoteException, InvalidResourcePropertyQNameFaultType,
@@ -413,63 +381,10 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		return new GetResourcePropertyResponse(ret);	
 	}
 	
-	@RWXMapping(RWXCategory.READ)
-	public final GetAttributesDocumentResponse getAttributesDocument(
-			Object getAttributesDocumentRequest) throws RemoteException,
-			ResourceUnknownFaultType
-	{
-		ArrayList<IAttributeManipulator> manipulators =
-			_attributePackage.getManipulators();
-		ArrayList<MessageElement> elements = new ArrayList<MessageElement>();
-		for (IAttributeManipulator manipulator : manipulators)
-		{
-			elements.addAll(manipulator.getAttributeValues());
-		}
-		
-		MessageElement []elementsArray = new MessageElement[elements.size()];
-		elements.toArray(elementsArray);
-		return new GetAttributesDocumentResponse(elementsArray);
-	}
-
 	protected void preDestroy() throws RemoteException, ResourceException
 	{
 	}
 	
-	@RWXMapping(RWXCategory.WRITE)
-	public final SetAttributesResponse setAttributes(
-			SetAttributes setAttributesRequest) throws RemoteException,
-			AttributeNotSettableFaultType,
-			IncorrectAttributeCardinalityFaultType, ResourceUnknownFaultType,
-			AttributeUnknownFaultType
-	{
-		HashMap<QName, ArrayList<MessageElement> > map =
-			new HashMap<QName, ArrayList<MessageElement> >();
-		
-		MessageElement []elements = setAttributesRequest.get_any();
-		for (MessageElement element : elements)
-		{
-			QName name = element.getQName();
-			ArrayList<MessageElement> list = map.get(name);
-			if (list == null)
-				map.put(name, (list = new ArrayList<MessageElement>()));
-			list.add(element);
-		}
-		
-		for (QName name : map.keySet())
-		{
-			IAttributeManipulator manipulator =
-				_attributePackage.getManipulator(name);
-			
-			if (manipulator == null)
-				FaultManipulator.fillInFault(
-					new AttributeUnknownFaultType());
-			
-			manipulator.setAttributeValues(map.get(name));
-		}
-		
-		return new SetAttributesResponse(true);
-	}
-
 	@RWXMapping(RWXCategory.EXECUTE)
 	public final VcgrCreateResponse vcgrCreate(VcgrCreate createRequest)
 		throws RemoteException, ResourceCreationFaultType

@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.rmi.RemoteException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 
@@ -19,18 +18,17 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.appdesc.SourceElementType;
 import edu.virginia.vcgr.genii.client.appdesc.ApplicationDescriptionUtils;
 import edu.virginia.vcgr.genii.client.appdesc.DeploymentException;
-import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOInputStream;
-import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.byteio.RandomByteIORP;
 import edu.virginia.vcgr.genii.client.io.FileSystemUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
-import edu.virginia.vcgr.genii.common.GeniiCommon;
-import edu.virginia.vcgr.genii.common.rattrs.GetAttributesResponse;
 
 public abstract class AbstractDeploymentProvider implements IDeployerProvider
 {
@@ -171,27 +169,17 @@ public abstract class AbstractDeploymentProvider implements IDeployerProvider
 	{
 		try
 		{
-			GeniiCommon common = ClientUtils.createProxy(
-				GeniiCommon.class, target);
-			GetAttributesResponse resp = common.getAttributes(
-				new QName[] { new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME) } );
+			RandomByteIORP rp = 
+				(RandomByteIORP)ResourcePropertyManager.createRPInterface(
+					target, RandomByteIORP.class);
 			
-			MessageElement []any = resp.get_any();
-			if (any == null || any.length != 1)
-				throw new DeploymentException(
-					"Invalid modification time received.");
-			Calendar modTime = ObjectDeserializer.toObject(
-				any[0], Calendar.class);
+			Calendar modTime = rp.getModificationTime();
 			
 			return new Timestamp(modTime.getTime().getTime());
 		}
-		catch (RemoteException re)
+		catch (ResourcePropertyException re)
 		{
-			throw new DeploymentException("Can't get source attrs.", re);
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new DeploymentException("Can't get source attributes.", ce);
+			throw new DeploymentException("Can't get source attributes.", re);
 		}
 	}
 	

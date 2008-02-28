@@ -12,8 +12,6 @@
 		<include name="context.xsd"/>
 		<include name="resource-authz.wsdl"/>
 		<include name="security.xsd"/>
-		<include name="resource-attributes.wsdl"/>
-		<include name="resource-attributes.xsd"/>
 		<include name="resource-factory.wsdl"/>
 		<include name="resource-factory.xsd"/>
 		<include name="wsrf/wsResourceLifetime.wsdl"/>
@@ -40,8 +38,6 @@
 				<include name="context.xsd"/>
 				<include name="resource-authz.xsd"/>
 				<include name="security.xsd"/>
-				<include name="resource-attributes.wsdl"/>
-				<include name="resource-attributes.xsd"/>
 				<include name="resource-factory.wsdl"/>
 				<include name="resource-factory.xsd"/>
 				<include name="resource-lifetime.wsdl"/>

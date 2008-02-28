@@ -7,9 +7,9 @@ import java.util.HashMap;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
-
-import edu.virginia.vcgr.genii.common.rattrs.GetAttributesDocumentResponse;
-import edu.virginia.vcgr.genii.common.rattrs.GetAttributesResponse;
+import org.oasis_open.docs.wsrf.rp_2.GetMultipleResourcePropertiesResponse;
+import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyDocumentResponse;
+import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyResponse;
 
 public class CachedAttributeData
 {
@@ -32,12 +32,17 @@ public class CachedAttributeData
 		}
 	}
 	
-	public CachedAttributeData(GetAttributesResponse resp)
+	public CachedAttributeData(GetResourcePropertyResponse resp)
 	{
 		this(resp.get_any(), false);
 	}
 	
-	public CachedAttributeData(GetAttributesDocumentResponse resp)
+	public CachedAttributeData(GetMultipleResourcePropertiesResponse resp)
+	{
+		this(resp.get_any(), false);
+	}
+	
+	public CachedAttributeData(GetResourcePropertyDocumentResponse resp)
 	{
 		this(resp.get_any(), true);
 	}

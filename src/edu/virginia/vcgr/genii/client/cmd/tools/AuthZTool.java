@@ -1,8 +1,9 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axis.message.MessageElement;
+import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyResponse;
+import org.oasis_open.docs.wsrf.rp_2.UpdateResourceProperties;
+import org.oasis_open.docs.wsrf.rp_2.UpdateType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
@@ -12,8 +13,6 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.GamlClientTool;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
-import edu.virginia.vcgr.genii.common.rattrs.GetAttributesResponse;
-import edu.virginia.vcgr.genii.common.rattrs.SetAttributes;
 import edu.virginia.vcgr.genii.common.security.AuthZConfig;
 
 public class AuthZTool extends BaseGridTool
@@ -39,8 +38,8 @@ public class AuthZTool extends BaseGridTool
 
 		// get the authz config from the target's attributes
 		AuthZConfig config = null;
-		GetAttributesResponse resp = common.getAttributes(
-				new QName[] {GenesisIIConstants.AUTHZ_CONFIG_ATTR_QNAME});
+		GetResourcePropertyResponse resp = common.getResourceProperty(
+			GenesisIIConstants.AUTHZ_CONFIG_ATTR_QNAME);
 		MessageElement []elements = resp.get_any();
 		if (elements != null && elements.length >= 1) {
 			config = (AuthZConfig) elements[0].getObjectValue(
@@ -92,8 +91,9 @@ public class AuthZTool extends BaseGridTool
 					// upload new authz config to resource
 					elements = new MessageElement[1];
 					elements[0] = new MessageElement(AuthZConfig.getTypeDesc().getXmlType(), config);
-					SetAttributes request = new SetAttributes(elements);
-					common.setAttributes(request);
+					
+					common.updateResourceProperties(
+						new UpdateResourceProperties(new UpdateType(elements)));
 					
 					chosen = true;
 					done = true;

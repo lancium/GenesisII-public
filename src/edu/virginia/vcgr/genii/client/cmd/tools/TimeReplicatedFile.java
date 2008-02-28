@@ -3,8 +3,6 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-import javax.xml.namespace.QName;
-
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cmd.CommandLineRunner;
@@ -47,9 +45,9 @@ public class TimeReplicatedFile extends BaseGridTool
 		long startTime = System.currentTimeMillis();
 		for (int lcv = 0; lcv < 100; lcv++)
 		{
-			proxy.getAttributes(new QName[] {
+			proxy.getResourceProperty(
 				OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME
-			});
+			);
 		}
 		long stopTime = System.currentTimeMillis();
 		stdout.println("Elapsed millis for originalFile:  " + 
@@ -68,9 +66,9 @@ public class TimeReplicatedFile extends BaseGridTool
 		startTime = System.currentTimeMillis();
 		for (int lcv = 0; lcv < 100; lcv++)
 		{
-			proxy.getAttributes(new QName[] {
+			proxy.getResourceProperty(
 				OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME
-			});
+			);
 		}
 		stopTime = System.currentTimeMillis();
 		stdout.println("Elapsed millis for rep. File:  " + 
@@ -81,9 +79,9 @@ public class TimeReplicatedFile extends BaseGridTool
 		{
 			try
 			{
-				replica1Replica.getAttributes(new QName[] {
-					OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME
-				});
+				replica1Replica.getResourceProperty(
+						OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME
+				);
 			}
 			catch(Throwable t)
 			{}

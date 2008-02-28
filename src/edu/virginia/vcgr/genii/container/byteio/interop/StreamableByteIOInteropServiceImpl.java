@@ -10,7 +10,6 @@ import java.util.HashMap;
 import javax.xml.namespace.QName;
 
 import edu.virginia.vcgr.genii.common.GeniiCommon;
-import edu.virginia.vcgr.genii.common.rattrs.AttributeUnknownFaultType;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
@@ -225,7 +224,7 @@ public class StreamableByteIOInteropServiceImpl
 			
 			if (manipulator == null)
 				throw FaultManipulator.fillInFault(
-					new AttributeUnknownFaultType());
+					new InvalidResourcePropertyQNameFaultType());
 			
 			document.addAll(manipulator.getAttributeValues());
 		}

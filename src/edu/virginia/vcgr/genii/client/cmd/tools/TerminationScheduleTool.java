@@ -6,20 +6,18 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.apache.axis.message.MessageElement;
 import org.morgan.util.configuration.ConfigurationException;
+import org.oasis_open.docs.wsrf.rl_2.SetTerminationTime;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.io.FileResource;
-import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
-import edu.virginia.vcgr.genii.common.rattrs.SetAttributes;
 
 public class TerminationScheduleTool extends BaseGridTool
 {
@@ -80,12 +78,7 @@ public class TerminationScheduleTool extends BaseGridTool
 		Calendar c = Calendar.getInstance();
 		c.setTime(targetTime);
 		
-		SetAttributes set = new SetAttributes(
-			new MessageElement [] {
-				new MessageElement(
-					OGSAWSRFBPConstants.TERMINATION_TIME_ATTR_QNAME, c) });
-				
-		common.setAttributes(set);
+		common.setTerminationTime(new SetTerminationTime(c, null));
 	}
 
 	@Override

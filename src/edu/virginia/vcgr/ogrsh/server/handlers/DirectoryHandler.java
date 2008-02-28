@@ -17,6 +17,8 @@ import org.ggf.rns.ListResponse;
 import org.ggf.rns.RNSPortType;
 import org.morgan.util.GUID;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
+import org.oasis_open.docs.wsrf.rp_2.UpdateResourceProperties;
+import org.oasis_open.docs.wsrf.rp_2.UpdateType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.byteio.streamable.factory.StreamableByteIOFactory;
@@ -28,7 +30,6 @@ import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
-import edu.virginia.vcgr.genii.common.rattrs.SetAttributes;
 import edu.virginia.vcgr.ogrsh.server.comm.OGRSHOperation;
 import edu.virginia.vcgr.ogrsh.server.dir.StatBuffer;
 import edu.virginia.vcgr.ogrsh.server.dir.TimeValStructure;
@@ -243,10 +244,11 @@ public class DirectoryHandler
 			aTime.setTimeInMillis(accessTime.getSeconcds() * 1000L + accessTime.getMicroSeconds() / 1000L);
 			mTime.setTimeInMillis(modTime.getSeconcds() * 1000L + modTime.getMicroSeconds() / 1000L);
 			
-			proxy.setAttributes(new SetAttributes(new MessageElement[] {
+			proxy.updateResourceProperties(new UpdateResourceProperties(
+					new UpdateType(new MessageElement[] {
 				new MessageElement(new QName(ns, ByteIOConstants.ACCESSTIME_ATTR_NAME), aTime),
 				new MessageElement(new QName(ns, ByteIOConstants.MODTIME_ATTR_NAME), mTime)
-			}));
+			})));
 			
 			return 0;
 		}

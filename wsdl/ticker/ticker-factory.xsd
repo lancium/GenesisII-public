@@ -2,7 +2,6 @@
 <xsd:schema
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	xmlns:wsa="http://www.w3.org/2005/08/addressing"
-	xmlns:rattrs="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
 	targetNamespace="http://schemas.ogf.org/ogsa/2007/12/wsrf-bp-interop/ticker-factory"
 	elementFormDefault="qualified"
 	attributeFormDefault="unqualified">
@@ -10,9 +9,6 @@
 	<xsd:import namespace="http://www.w3.org/2005/08/addressing"
 		schemaLocation="./ws-addr.xsd"/>
 		
-	<xsd:import namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-attrs"
-		schemaLocation="./resource-attributes.xsd"/>
-
 	<!-- message used to create a Ticker WS-Resource -->
 	
 	<xsd:element name="CreateTicker">

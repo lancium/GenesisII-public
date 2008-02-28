@@ -12,8 +12,18 @@ import org.ggf.rns.EntryType;
 import org.ggf.rns.List;
 import org.ggf.rns.ListResponse;
 import org.ggf.rns.RNSPortType;
+import org.oasis_open.docs.wsrf.rp_2.DeleteResourceProperties;
+import org.oasis_open.docs.wsrf.rp_2.DeleteResourcePropertiesResponse;
 import org.oasis_open.docs.wsrf.rp_2.GetMultipleResourcePropertiesResponse;
+import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyDocument;
+import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyDocumentResponse;
 import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyResponse;
+import org.oasis_open.docs.wsrf.rp_2.InsertResourceProperties;
+import org.oasis_open.docs.wsrf.rp_2.InsertResourcePropertiesResponse;
+import org.oasis_open.docs.wsrf.rp_2.SetResourceProperties;
+import org.oasis_open.docs.wsrf.rp_2.SetResourcePropertiesResponse;
+import org.oasis_open.docs.wsrf.rp_2.UpdateResourceProperties;
+import org.oasis_open.docs.wsrf.rp_2.UpdateResourcePropertiesResponse;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
@@ -22,10 +32,6 @@ import edu.virginia.vcgr.genii.client.invoke.InvocationContext;
 import edu.virginia.vcgr.genii.client.invoke.PipelineProcessor;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
-import edu.virginia.vcgr.genii.common.rattrs.GetAttributesDocumentResponse;
-import edu.virginia.vcgr.genii.common.rattrs.GetAttributesResponse;
-import edu.virginia.vcgr.genii.common.rattrs.SetAttributes;
-import edu.virginia.vcgr.genii.common.rattrs.SetAttributesResponse;
 
 public class AttributeCacheHandler
 {
@@ -62,8 +68,9 @@ public class AttributeCacheHandler
 	}
 	
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public GetAttributesResponse getAttributes(InvocationContext ctxt,
-		QName[] getAttributesRequest) throws Throwable
+	public GetResourcePropertyDocumentResponse getResourcePropertyDocument(
+		InvocationContext ctxt,
+		GetResourcePropertyDocument request) throws Throwable
 	{
 		EndpointReferenceType target = ctxt.getTarget();
 		WSName name = new WSName(target);
@@ -71,49 +78,7 @@ public class AttributeCacheHandler
 		if (!name.isValidWSName())
 		{
 			// we can't cache if it doesn't have a valid EPI
-			return (GetAttributesResponse)ctxt.proceed();
-		}
-		
-		_logger.debug("Looking for cached attribute data.");
-		
-		CachedAttributeData data;
-		synchronized(_attrCache)
-		{
-			data = _attrCache.get(name);
-		}
-		
-		Collection<MessageElement> ret = null;
-		if (data != null)
-			ret = findAttributes(getAttributesRequest, data);
-		if (ret == null)
-		{
-			GetAttributesResponse resp = (GetAttributesResponse)ctxt.proceed();
-			data = new CachedAttributeData(resp);
-			synchronized(_attrCache)
-			{
-				_attrCache.put(name, data);
-			}
-			
-			ret = findAttributes(getAttributesRequest, data);
-		}
-		
-		if (ret == null)
-			return new GetAttributesResponse(new MessageElement[0]);;
-		
-		return new GetAttributesResponse(ret.toArray(new MessageElement[0]));
-	}
-
-	@PipelineProcessor(portType = GeniiCommon.class)
-	public GetAttributesDocumentResponse getAttributesDocument(InvocationContext ctxt,
-			Object getAttributesDocumentRequest) throws Throwable
-	{
-		EndpointReferenceType target = ctxt.getTarget();
-		WSName name = new WSName(target);
-		
-		if (!name.isValidWSName())
-		{
-			// we can't cache if it doesn't have a valid EPI
-			return (GetAttributesDocumentResponse)ctxt.proceed();
+			return (GetResourcePropertyDocumentResponse)ctxt.proceed();
 		}
 		
 		_logger.debug("Looking for cached attribute data.");
@@ -126,7 +91,8 @@ public class AttributeCacheHandler
 		
 		if (data == null || !data.isFull())
 		{
-			GetAttributesDocumentResponse resp = (GetAttributesDocumentResponse)ctxt.proceed();
+			GetResourcePropertyDocumentResponse resp =
+				(GetResourcePropertyDocumentResponse)ctxt.proceed();
 			data = new CachedAttributeData(resp);
 			synchronized(_attrCache)
 			{
@@ -134,12 +100,13 @@ public class AttributeCacheHandler
 			}
 		}
 		
-		return new GetAttributesDocumentResponse(data.getAll());
+		return new GetResourcePropertyDocumentResponse(data.getAll());
 	}
 	
 	@PipelineProcessor(portType = GeniiCommon.class)
-	public SetAttributesResponse setAttributes(InvocationContext ctxt,
-			SetAttributes setAttributesRequest) throws Throwable
+	public UpdateResourcePropertiesResponse updateResourceProperties(
+		InvocationContext ctxt, UpdateResourceProperties updateRequest) 
+			throws Throwable
 	{
 		EndpointReferenceType target = ctxt.getTarget();
 		WSName name = new WSName(target);
@@ -147,7 +114,7 @@ public class AttributeCacheHandler
 		if (!name.isValidWSName())
 		{
 			// we can't cache if it doesn't have a valid EPI
-			return (SetAttributesResponse)ctxt.proceed();
+			return (UpdateResourcePropertiesResponse)ctxt.proceed();
 		}
 		
 		_logger.debug("Clearing cached attribute data.");
@@ -157,7 +124,79 @@ public class AttributeCacheHandler
 			_attrCache.remove(name);
 		}
 		
-		return (SetAttributesResponse)ctxt.proceed();
+		return (UpdateResourcePropertiesResponse)ctxt.proceed();
+	}
+	
+	@PipelineProcessor(portType = GeniiCommon.class)
+	public DeleteResourcePropertiesResponse deleteResourceProperties(
+		InvocationContext ctxt, DeleteResourceProperties deleteRequest) 
+			throws Throwable
+	{
+		EndpointReferenceType target = ctxt.getTarget();
+		WSName name = new WSName(target);
+		
+		if (!name.isValidWSName())
+		{
+			// we can't cache if it doesn't have a valid EPI
+			return (DeleteResourcePropertiesResponse)ctxt.proceed();
+		}
+		
+		_logger.debug("Clearing cached attribute data.");
+		
+		synchronized(_attrCache)
+		{
+			_attrCache.remove(name);
+		}
+		
+		return (DeleteResourcePropertiesResponse)ctxt.proceed();
+	}
+	
+	@PipelineProcessor(portType = GeniiCommon.class)
+	public InsertResourcePropertiesResponse insertResourceProperties(
+		InvocationContext ctxt, InsertResourceProperties insertRequest) 
+			throws Throwable
+	{
+		EndpointReferenceType target = ctxt.getTarget();
+		WSName name = new WSName(target);
+		
+		if (!name.isValidWSName())
+		{
+			// we can't cache if it doesn't have a valid EPI
+			return (InsertResourcePropertiesResponse)ctxt.proceed();
+		}
+		
+		_logger.debug("Clearing cached attribute data.");
+		
+		synchronized(_attrCache)
+		{
+			_attrCache.remove(name);
+		}
+		
+		return (InsertResourcePropertiesResponse)ctxt.proceed();
+	}
+	
+	@PipelineProcessor(portType = GeniiCommon.class)
+	public SetResourcePropertiesResponse setResourceProperties(
+		InvocationContext ctxt, SetResourceProperties setRequest) 
+			throws Throwable
+	{
+		EndpointReferenceType target = ctxt.getTarget();
+		WSName name = new WSName(target);
+		
+		if (!name.isValidWSName())
+		{
+			// we can't cache if it doesn't have a valid EPI
+			return (SetResourcePropertiesResponse)ctxt.proceed();
+		}
+		
+		_logger.debug("Clearing cached attribute data.");
+		
+		synchronized(_attrCache)
+		{
+			_attrCache.remove(name);
+		}
+		
+		return (SetResourcePropertiesResponse)ctxt.proceed();
 	}
 
 	@PipelineProcessor(portType = GeniiCommon.class)

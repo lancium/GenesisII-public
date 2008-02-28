@@ -3,14 +3,12 @@ package edu.virginia.vcgr.genii.client.byteio.xfer;
 import java.io.IOException;
 import java.rmi.RemoteException;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axis.message.MessageElement;
 import org.ggf.sbyteio.StreamableByteIOPortType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
+import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyResponse;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
-import edu.virginia.vcgr.genii.common.rattrs.GetAttributesResponse;
 
 public abstract class AbstractSByteIOTransferer 
 	extends AbstractByteIOTransferer implements ISByteIOTransferer
@@ -24,8 +22,8 @@ public abstract class AbstractSByteIOTransferer
 	
 	public boolean endOfStream() throws RemoteException, IOException
 	{
-		GetAttributesResponse resp = _target.getAttributes(new QName[] {
-			ByteIOConstants.END_OF_STREAM_ATTR_NAME });
+		GetResourcePropertyResponse resp = _target.getResourceProperty(
+			ByteIOConstants.END_OF_STREAM_ATTR_NAME);
 		MessageElement []any = resp.get_any();
 		if (any == null || any.length != 1)
 			throw new IOException("Couldn't figure out whether or not we " +
@@ -42,8 +40,8 @@ public abstract class AbstractSByteIOTransferer
 
 	public long position() throws RemoteException, IOException
 	{
-		GetAttributesResponse resp = _target.getAttributes(new QName[] {
-			ByteIOConstants.POSITION_ATTR_NAME });
+		GetResourcePropertyResponse resp = _target.getResourceProperty(
+			ByteIOConstants.POSITION_ATTR_NAME);
 		MessageElement []any = resp.get_any();
 		if (any == null || any.length != 1)
 			throw new IOException(

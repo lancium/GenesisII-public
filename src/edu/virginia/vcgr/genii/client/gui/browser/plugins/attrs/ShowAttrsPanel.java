@@ -7,6 +7,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.xml.namespace.QName;
 
+import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyDocument;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
@@ -62,7 +63,8 @@ class ShowAttrsPanel extends ExpensiveInitializationPanel
 		 * Go ahead and ask the target endpoint for it's attributes document.
 		 */
 		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, _target);
-		ObjectSerializer.serialize(writer, common.getAttributesDocument(null),
+		ObjectSerializer.serialize(writer, common.getResourcePropertyDocument(
+			new GetResourcePropertyDocument()),
 			new QName("http://tempuri.org", "object-attributes"));
 		writer.flush();
 		

@@ -57,11 +57,10 @@ import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
-import edu.virginia.vcgr.genii.common.rattrs.AttributeUnknownFaultType;
-import edu.virginia.vcgr.genii.common.rattrs.GetAttributesResponse;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
+import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyResponse;
 
 import edu.virginia.vcgr.genii.deployer.ApplicationDeployerPortType;
 import edu.virginia.vcgr.genii.deployer.CreateDeploymentRequestType;
@@ -321,8 +320,8 @@ public class RunTool extends BaseGridTool
 	{
 		GeniiCommon common = ClientUtils.createProxy(
 				GeniiCommon.class, activity);
-		GetAttributesResponse resp = common.getAttributes(
-			new QName[] { BESActivityConstants.STATUS_ATTR } );
+		GetResourcePropertyResponse resp = common.getResourceProperty(
+			BESActivityConstants.STATUS_ATTR);
 		return ActivityState.fromMessage((MessageElement)(resp.get_any()[0].getChildElements().next()));
 	}
 	
@@ -504,8 +503,8 @@ public class RunTool extends BaseGridTool
 		ArrayList<EndpointReferenceType> ret =
 			new ArrayList<EndpointReferenceType>();
 		
-		GetAttributesResponse response =
-			bes.getAttributes(new QName[] { BESConstants.DEPLOYER_EPR_ATTR });
+		GetResourcePropertyResponse response =
+			bes.getResourceProperty(BESConstants.DEPLOYER_EPR_ATTR);
 		MessageElement []any = response.get_any();
 		if (any == null)
 			return ret;
@@ -574,13 +573,10 @@ public class RunTool extends BaseGridTool
 	
 	static private SupportDocumentType[] determineSupport(
 		ApplicationDeployerPortType deployer)
-		throws ResourceUnknownFaultType, AttributeUnknownFaultType,
-			RemoteException
+		throws ResourceUnknownFaultType, RemoteException
 	{
-		GetAttributesResponse resp = deployer.getAttributes(
-			new QName[] { 
-				AppDeployerConstants.DEPLOYER_SUPPORT_DOCUMENT_ATTR_QNAME 
-			});
+		GetResourcePropertyResponse resp = deployer.getResourceProperty(
+				AppDeployerConstants.DEPLOYER_SUPPORT_DOCUMENT_ATTR_QNAME);
 		
 		MessageElement []any = resp.get_any();
 		SupportDocumentType []ret = new SupportDocumentType[any.length];
