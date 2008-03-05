@@ -20,6 +20,8 @@ import org.apache.ws.axis.security.WSDoAllReceiver;
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.SOAPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
@@ -64,13 +66,15 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 {
 	static final long serialVersionUID = 0L;
 	
-	public static final String CRYPTO_ALIAS = "CRYPTO_ALIAS";
+	static private Log _logger = LogFactory.getLog(ServerWSDoAllReceiver.class);
 	
-	private static final String CRYTO_PASS = "pwd";
+	static public final String CRYPTO_ALIAS = "CRYPTO_ALIAS";
+	static private final String CRYTO_PASS = "pwd";
 
 	private static PrivateKey _serverPrivateKey;
 	
-	public ServerWSDoAllReceiver() {
+	public ServerWSDoAllReceiver() 
+	{
 	}
 
 	public void configure(PrivateKey serverPrivateKey) {
@@ -94,33 +98,37 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		_serverPrivateKey = serverPrivateKey;
 	}
 	
-	public void invoke(MessageContext msgContext) throws AxisFault {
-
-		try {
+	public void invoke(MessageContext msgContext) throws AxisFault
+	{
+		try 
+		{
 			IResource resource = ResourceManager.getCurrentResource().dereference();
 			AuthZHandler authZHandler = AuthZHandler.getAuthZHandler(resource);
 			
-			if ((authZHandler == null) || (authZHandler.getMinIncomingMsgLevelSecurity(resource).isNone())) {
-
+			if ((authZHandler == null) || 
+				(authZHandler.getMinIncomingMsgLevelSecurity(resource).isNone())) 
+			{
 				// We have no requirements for incoming message security.  If there 
 				// are no incoming headers, don't do any crypto processing
 				
 				Message sm = msgContext.getCurrentMessage();
-		        if (sm == null) {
+		        if (sm == null) 
+		        {
 					// We did not receive anything...Usually happens when we get a 
 					// HTTP 202 message (with no content)
 		        	return;
 		        }
-		       	Document doc = sm.getSOAPEnvelope().getAsDocument();
+		       	
+		        Document doc = sm.getSOAPEnvelope().getAsDocument();
 		        String actor = (String) getOption(WSHandlerConstants.ACTOR);
 		        SOAPConstants sc = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-		        if (WSSecurityUtil.getSecurityHeader(doc, actor, sc) == null) {
+		        if (WSSecurityUtil.getSecurityHeader(doc, actor, sc) == null)
 		        	return;
-		        }
 			}
 		        
 		} catch (Exception e)
 		{
+			_logger.error("An error occurred while trying to handler server-side, receiver security.", e);
 			throw new AxisFault("Exception thrown while retrieving security headers.", e);
 		}
 
