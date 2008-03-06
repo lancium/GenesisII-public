@@ -1,3 +1,6 @@
+/**
+ * @author Krasi
+ */
 package edu.virginia.vcgr.genii.container.informationService;
 
 import java.io.File;
@@ -32,7 +35,7 @@ public class XMLDatabaseOperations {
 	private void setup(EnvironmentConfig config)
 	{
 	    config.setAllowCreate(true);			// if the environment does not exist, create it
-	    config.setInitializeCache(true);		 
+	    config.setInitializeCache(true);
 												
 	    config.setCacheSize(4 * 1024 * 1024);	// 4 MB
 	    config.setInitializeLogging(true);
@@ -93,9 +96,15 @@ public class XMLDatabaseOperations {
 				String containerName = serviceName.toString() + ".bdbxml";
 				
 				/*
+				 * start a transaction for adding the document to the XML database
+				 */
+				trn = myManager.createTransaction();
+				
+				/*
 				 * check if a container already exists for this service. If there is one, open it.
 				 * If not - create a new container.
 				 */
+				
 				if (myManager.existsContainer(containerName)==0){
 					container = myManager.createContainer(containerName, cconfig);	
 				}
@@ -104,13 +113,9 @@ public class XMLDatabaseOperations {
 				myDoc = myManager.createDocument();
 				myDoc.setName(name);
 				myDoc.setContent(document.toString());
-				
-				/*
-				 * start a transaction for adding the document to the XML database
-				 */
-				trn = myManager.createTransaction();
 				XmlUpdateContext theContext = myManager.createUpdateContext();
 				container.putDocument(myDoc, theContext);
+				container.close();
 				trn.commit();
 				success = "the document is added";
 				trn.delete();
@@ -190,19 +195,34 @@ public class XMLDatabaseOperations {
 		    
 			String theContainer = (serviceName.toString() + ".bdbxml");
 //			String myQuery = "collection('newContainer.dbxml')/string()";
-			internalQuery = internalQuery.concat("collection('"+ theContainer+"')");
-			internalQuery = internalQuery.concat(query+"/string()");
-			
+			//internalQuery = internalQuery.concat("collection('"+ theContainer+"')");
+			//internalQuery = internalQuery.concat(query+ "/ns1:bes-factory-attributes/ns2:FactoryResourceAttributesDocument/ns2:OperatingSystem/string()");
+			if (query.equals(""))
+				internalQuery = "for $i in collection('"+theContainer+"') return $i/string()";
+			else
+				internalQuery = "for $i in collection('"+theContainer+"') " +
+					"where "+query+" return $i/string()";
 			if (internalQuery.toString()!= null)
 			{
 				if (myManager.existsContainer(theContainer) == 0)
 				{ System.err.println("This container does not exist");}
 				else
 				{ 
-					container = myManager.openContainer(theContainer, cconfig); 
+									
 				
 					trn = myManager.createTransaction();
+					container = myManager.openContainer(theContainer, cconfig);	
 					XmlQueryContext qContext = myManager.createQueryContext();
+					
+					qContext.setNamespace("ns1", "http://tempuri.org");
+					qContext.setNamespace("ns2", "http://schemas.ggf.org/bes/2006/08/bes-factory");
+					qContext.setNamespace("ns3", "http://schemas.ggf.org/jsdl/2005/11/jsdl");
+					qContext.setNamespace("ns4", "http://schemas.ggf.org/jsdl/2005/11/jsdl");
+					qContext.setNamespace("ns5", "http://vcgr.cs.virginia.edu/Genesis-II");
+					qContext.setNamespace("ns6", "http://schemas.ggf.org/bes/2006/08/bes/naming");
+					qContext.setNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+					qContext.setNamespace("xsd", "http://www.w3.org/2001/XMLSchema");
+					
 					
 					qe = myManager.prepare(internalQuery, qContext);
 					results = qe.execute(qContext);
@@ -211,13 +231,12 @@ public class XMLDatabaseOperations {
 					* String docNumber = "Number of documents found: " +String.valueOf(results.size());
 					* System.out.println(docNumber);
 					*/
-					 if (results.next()!= null) 
+					 while (results.next()!= null) 
 					 {
-						result += results.peek().asString().toString() + "\n";
-						
-						results.next();
+						String intermediate =results.peek().asString();
+						result = result.concat(intermediate).concat("\n");
 					 }
-				
+					container.close();
 					trn.commit();
 					trn.delete();
 					qContext.delete();
@@ -243,7 +262,7 @@ public class XMLDatabaseOperations {
 			catch (DatabaseException dbe){_logger.warn(dbe.getLocalizedMessage(), dbe) ;}
 			}
 		
-		return result;	
+		return result.toString();	
 	}
 	
 	/**
@@ -295,15 +314,16 @@ public class XMLDatabaseOperations {
 			cconfig.setTransactional(true);
 			
 			String containerName = serviceName.toString() + ".bdbxml";
-			if (myManager.existsContainer(containerName)==0){
-				container = myManager.createContainer(containerName, cconfig);
-			}
-		
-			//freaking out here
-			else container = myManager.openContainer(containerName, cconfig);
+
 			
 			if (elementToAdd !=null)
 			{
+				if (myManager.existsContainer(containerName)==0){
+					container = myManager.createContainer(containerName, cconfig);
+				}
+			
+				//freaking out here
+				else container = myManager.openContainer(containerName, cconfig);
 				trn = myManager.createTransaction();
 				XmlUpdateContext theContext = myManager.createUpdateContext();
 				try {
@@ -314,6 +334,7 @@ public class XMLDatabaseOperations {
 					}
 				if (myDoc!= null)
 					container.deleteDocument(elementToAdd, theContext);
+				container.close();
 				trn.commit();
 				trn.delete();
 			}

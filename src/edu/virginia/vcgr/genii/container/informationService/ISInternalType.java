@@ -1,3 +1,7 @@
+/**
+ * @author Krasi
+ */
+
 package edu.virginia.vcgr.genii.container.informationService;
 
 import org.ws.addressing.EndpointReferenceType;

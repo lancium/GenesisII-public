@@ -1,3 +1,6 @@
+/**
+ * @author Krasi
+ */
 package edu.virginia.vcgr.genii.container.informationService.resource;
 
 import java.io.IOException;
