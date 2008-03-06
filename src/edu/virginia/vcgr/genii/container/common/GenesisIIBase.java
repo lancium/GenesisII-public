@@ -103,6 +103,7 @@ import edu.virginia.vcgr.genii.container.common.notification.SubscriptionConstru
 import edu.virginia.vcgr.genii.container.common.notification.TopicSpace;
 import edu.virginia.vcgr.genii.container.configuration.ServiceDescription;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
+import edu.virginia.vcgr.genii.container.invoker.BaseFaultFixer;
 import edu.virginia.vcgr.genii.container.invoker.DatabaseHandler;
 import edu.virginia.vcgr.genii.container.invoker.DebugInvoker;
 import edu.virginia.vcgr.genii.container.invoker.GAroundInvoke;
@@ -119,7 +120,7 @@ import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
 
-@GAroundInvoke({WSAddressingHandler.class, DatabaseHandler.class, 
+@GAroundInvoke({BaseFaultFixer.class, WSAddressingHandler.class, DatabaseHandler.class, 
 	DebugInvoker.class, ScheduledTerminationInvoker.class})
 public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 {

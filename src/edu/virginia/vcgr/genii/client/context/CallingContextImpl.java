@@ -343,16 +343,29 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		}
 	}	
 	
-	public Object writeReplace() throws ObjectStreamException {
+	public Object writeReplace() throws ObjectStreamException 
+	{
 		ByteArrayOutputStream baos = null;
 		OutputStreamWriter writer = null;
 		
-		try {
-			writer = new OutputStreamWriter(
-				(baos = new ByteArrayOutputStream()) );
+		try 
+		{
+			/*
+			DeflaterOutputStream dos = new DeflaterOutputStream(
+				baos = new ByteArrayOutputStream());
+			*/
+			baos = new ByteArrayOutputStream();
+			/*
+			writer = new OutputStreamWriter(dos);
+			*/
+			writer = new OutputStreamWriter(baos);
 			ContextStreamUtils.store(writer, this);
 			
 			writer.flush();
+			
+			/*
+			dos.finish();
+			*/
 			
 			HashMap<String, Serializable> transientCollapse = 
 				new HashMap<String, Serializable>();

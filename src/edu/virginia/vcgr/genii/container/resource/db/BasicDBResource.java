@@ -184,10 +184,12 @@ public class BasicDBResource implements IResource
 			if (b.length() <= 0)
 			{
 				_logger.error(
-					"Attempt to serialize 0 bytes into the property database.");
+					"Attempt to serialize property \"" + propertyName + 
+					"\" with 0 bytes into the property database.");
 			} else if (b.length() >= 128 * 1024)
 			{
-				_logger.error("Attempt to serialize " + b.length() + " bytes into a "
+				_logger.error("Attempt to serialize property \"" + propertyName +
+					"\" of length " + b.length() + " bytes into a "
 					+ "128K space.");
 			}
 			

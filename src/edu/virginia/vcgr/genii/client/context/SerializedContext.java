@@ -7,10 +7,16 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
+
+import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 
 public class SerializedContext implements Serializable
 {
+	static private Log _logger = LogFactory.getLog(SerializedContext.class);
+	
 	static final long serialVersionUID = 0L;
 	
 	private byte[] _data;
@@ -20,6 +26,24 @@ public class SerializedContext implements Serializable
 	{
 		_data = data;
 		_transientProperties = transientProperties;
+		
+		StringBuilder builder = new StringBuilder();
+		builder.append("SerializedContext created with raw data of size " + 
+			data.length + " bytes and the following transients.\n");
+		for (String key : transientProperties.keySet())
+		{
+			try
+			{
+				byte []sData = DBSerializer.serialize(transientProperties.get(key));
+				builder.append("\t" + key + ": " + sData.length + "\n");
+			}
+			catch (Throwable cause)
+			{
+				_logger.error("Error...", cause);
+			}
+		}
+		
+		_logger.debug(builder);
 	}
 	
 	public SerializedContext()
@@ -34,6 +58,10 @@ public class SerializedContext implements Serializable
 		try
 		{
 			bais = new ByteArrayInputStream(_data);
+			/*
+			CallingContextImpl context = (CallingContextImpl)ContextStreamUtils.load(
+				new InflaterInputStream(bais));
+			*/
 			CallingContextImpl context = (CallingContextImpl)ContextStreamUtils.load(bais);
 			context.setTransientProperties(_transientProperties);
 			return context;

@@ -27,6 +27,8 @@ import java.security.*;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.GUID;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.GuaranteedDirectory;
@@ -66,6 +68,8 @@ import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 public class BESActivityServiceImpl extends GenesisIIBase implements
 		BESActivityPortType
 {
+	static private Log _logger = LogFactory.getLog(BESActivityServiceImpl.class);
+	
 	public BESActivityServiceImpl() throws RemoteException
 	{
 		super("BESActivityPortType");
@@ -142,9 +146,11 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 
 				// have the activity context inherit the current path from 
 				// the calling context
+				_logger.debug("About to Serialize in the BESActivityService.");
 				resource.setProperty(
 						IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME,
 						ctxt);
+				_logger.debug("Done serializing in the BESActivityService.\n\n");
 			}
 				
 			

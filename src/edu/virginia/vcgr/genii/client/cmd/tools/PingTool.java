@@ -1,5 +1,7 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import org.ws.addressing.EndpointReferenceType;
+
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
@@ -31,8 +33,12 @@ public class PingTool extends BaseGridTool
 		
 		path = path.lookup(getArgument(0), RNSPathQueryFlags.MUST_EXIST);
 		
+		EndpointReferenceType target = path.getEndpoint();
+		/*
+		target.getAddress().get_value().setFragment("resource-fork");
+		*/
 		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class,
-			path.getEndpoint());
+			target);
 
 		for (int i = 0; i < _attempts; i++) {
 			String response = common.ping(getArgument(1));
