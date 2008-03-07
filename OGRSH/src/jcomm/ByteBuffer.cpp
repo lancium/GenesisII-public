@@ -48,9 +48,11 @@ namespace jcomm
 		if (isUnderflow)
 		{
 			OGRSH_FATAL("ByteBuffer Underflow Exception occurred.");
+			abort();
 		} else
 		{
 			OGRSH_FATAL("ByteBuffer Overflow Exception occurred.");
+			abort();
 		}
 
 		ogrsh::shims::real_exit(1);

@@ -1,10 +1,63 @@
 #!/bin/sh
 
+# Some Constants
+GENII_CRED_URI_PARM="--genii-credential-uri="
+GENII_CRED_USER_PARM="--genii-credential-user="
+GENII_CRED_PASS_PARM="--genii-credential-pass="
+GENII_CRED_PATTERN_PARM="--genii-credential-pattern="
+
 if [ $# -lt 1 ]
 then
-	echo "USAGE:  shim-%{OGRSH_ARCH}.sh <program-to-shim> [args]"
+	echo "USAGE:  shim-%{OGRSH_ARCH}.sh [options] <program-to-shim> [args]"
+	echo "	WHERE options are:"
+	echo "		$GENII_CRED_URI_PARM<credential-uri>"
+	echo "		$GENII_CRED_USER_PARM<credential-user>"
+	echo "		$GENII_CRED_PASS_PARM<credential-password>"
+	echo "		$GENII_CRED_PATTERN_PARM<credential-pattern>"
 	exit 1
 fi
+
+GENII_CREDENTIAL_URI=
+GENII_CREDENTIAL_USER=
+GENII_CREDENTIAL_PASS=
+GENII_CREDENTIAL_PATTERN=
+
+DONE=false
+while [ $DONE != true ]
+do
+	if [ X"$1" = X ]
+	then
+		echo "USAGE:  shim-%{OGRSH_ARCH}.sh [options] <program-to-shim> [args]"
+		echo "	WHERE options are:"
+		echo "		$GENII_CRED_URI_PARM<credential-uri>"
+		echo "		$GENII_CRED_USER_PARM<crednetial-user>"
+		echo "		$GENII_CRED_PASS_PARM<credential-password>"
+		echo "		$GENII_CRED_PATTERN_PARM<credential-pattern>"
+		exit 1
+	fi
+
+	case "$1" in
+		$GENII_CRED_URI_PARM*)
+			export GENII_CREDENTIAL_URI="${1:${#GENII_CRED_URI_PARM}}"
+			shift
+			;;
+		$GENII_CRED_USER_PARM*)
+			export GENII_CREDENTIAL_USER="${1:${#GENII_CRED_USER_PARM}}"
+			shift
+			;;
+		$GENII_CRED_PASS_PARM*)
+			export GENII_CREDENTIAL_PASS="${1:${#GENII_CRED_PASS_PARM}}"
+			shift
+			;;
+		$GENII_CRED_PATTERN_PARM*)
+			export GENII_CREDENTIAL_PATTERN="${1:${#GENII_CRED_PATTERN_PARM}}"
+			shift
+			;;
+		*)
+			DONE=true
+			;;
+	esac
+done
 
 JSERVER_LOCATION="%{INSTALL_PATH}"
 

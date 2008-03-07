@@ -24,16 +24,21 @@ namespace ogrsh
 		static std::string prompt(const std::string &prmpt,
 			const char *defaultValue) throw (jcomm::OGRSHException);
 
-		static std::string getCredentialFile(const std::string &sessionName)
-			throw (jcomm::OGRSHException);
-		static std::string getUsername();
-		static std::string getPassword();
-		static std::string getPattern();
+		static std::string getCredentialFile(bool tryEnvironment,
+			const std::string &sessionName) throw (jcomm::OGRSHException);
+		static std::string getUsername(bool tryEnvironment);
+		static std::string getPassword(bool tryEnvironment);
+		static std::string getPattern(bool tryEnvironment);
 
 		static const char *_OGRSH_JSERVER_ADDRESS_VAR = "OGRSH_JSERVER_ADDRESS";
 		static const char *_OGRSH_JSERVER_PORT_VAR = "OGRSH_JSERVER_PORT";
 		static const char *_OGRSH_JSERVER_SECRET_VAR = "OGRSH_JSERVER_SECRET";
 		static const char *_OGRSH_JSERVER_SESSION_VAR = "OGRSH_JSERVER_SESSION";
+
+		static const char *_GENII_CRED_URI_VAR = "GENII_CREDENTIAL_URI";
+		static const char *_GENII_CRED_USER_VAR = "GENII_CREDENTIAL_USER";
+		static const char *_GENII_CRED_PASS_VAR = "GENII_CREDENTIAL_PASS";
+		static const char *_GENII_CRED_PATTERN_VAR = "GENII_CREDENTIAL_PATTERN";
 
 		static const char *_LOCAL_FS_MOUNT_ROOT_NS
 			= "http://vcgr.cs.virginia.edu/ogrsh";
@@ -92,23 +97,24 @@ namespace ogrsh
 				std::string password;
 				std::string patternOrUsername;
 
+				bool tryEnvironment = true;
 				while (1)
 				{
 					try
 					{
-						credentialFile = getCredentialFile(
+						credentialFile = getCredentialFile(tryEnvironment,
 							getSessionName());
 						std::string::size_type index =
 							credentialFile.find("rns:");
 						if (index == 0)
 						{
 							// It's an RNS path.
-							patternOrUsername = getUsername();
-							password = getPassword();
+							patternOrUsername = getUsername(tryEnvironment);
+							password = getPassword(tryEnvironment);
 						} else
 						{
-							password = getPassword();
-							patternOrUsername = getPattern();
+							password = getPassword(tryEnvironment);
+							patternOrUsername = getPattern(tryEnvironment);
 						}
 					}
 					catch (jcomm::OGRSHException oe)
@@ -118,6 +124,7 @@ namespace ogrsh
 							"Log in cancelled.  Exiting.\n");
 						ogrsh::shims::real_exit(0);
 					}
+					tryEnvironment = false;
 
 					// We also need to log in to it.
 					OGRSH_DEBUG("Attempting to log in to the Genesis II net.");
@@ -206,9 +213,17 @@ namespace ogrsh
 				delete _socket;
 		}
 
-		std::string getCredentialFile(const std::string &sessionName)
+		std::string getCredentialFile(bool tryEnvironment,
+			const std::string &sessionName)
 			throw (jcomm::OGRSHException)
 		{
+			if (tryEnvironment)
+			{
+				const char *fromEnv = getenv(_GENII_CRED_URI_VAR);
+				if (fromEnv != NULL)
+					return fromEnv;
+			}
+
 			ogrsh::shims::uber_real_fprintf(stdout, "Session \"%s\"\n",
 				sessionName.c_str());
 			ogrsh::shims::uber_real_fprintf(stdout,
@@ -219,8 +234,15 @@ namespace ogrsh
 			return prompt("Grid Credential URI:  ", NULL);
 		}
 
-		std::string getPassword()
+		std::string getPassword(bool tryEnvironment)
 		{
+			if (tryEnvironment)
+			{
+				const char *fromEnv = getenv(_GENII_CRED_PASS_VAR);
+				if (fromEnv != NULL)
+					return fromEnv;
+			}
+
 			try
 			{
 				return getpass("Keystore password?  ");
@@ -232,8 +254,15 @@ namespace ogrsh
 			}
 		}
 
-		std::string getUsername()
+		std::string getUsername(bool tryEnvironment)
 		{
+			if (tryEnvironment)
+			{
+				const char *fromEnv = getenv(_GENII_CRED_USER_VAR);
+				if (fromEnv != NULL)
+					return fromEnv;
+			}
+
 			try
 			{
 				return prompt("Username?  ", "");
@@ -245,8 +274,15 @@ namespace ogrsh
 			}
 		}
 
-		std::string getPattern()
+		std::string getPattern(bool tryEnvironment)
 		{
+			if (tryEnvironment)
+			{
+				const char *fromEnv = getenv(_GENII_CRED_PATTERN_VAR);
+				if (fromEnv != NULL)
+					return fromEnv;
+			}
+
 			try
 			{
 				return prompt("Certificate Pattern?  ", "");
