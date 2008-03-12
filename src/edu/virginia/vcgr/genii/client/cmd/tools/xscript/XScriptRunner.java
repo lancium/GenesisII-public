@@ -431,7 +431,7 @@ public class XScriptRunner
 			return 1;
 		}
 		
-		long limit = (inclusiveLimitString != null) ? inclusiveLimit : exclusiveLimit + 1;
+		long limit = (inclusiveLimitString != null) ? inclusiveLimit + 1 : exclusiveLimit;
 		variables = variables.deriveSubScope();	
 		for (long value = initialValue; value < limit; value += incrementValue)
 		{
