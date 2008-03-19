@@ -22,7 +22,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 
-public class StreamableByteIOFileDescriptor extends WindowsIFSFile		
+public class StreamableByteIOFileDescriptor extends IFSFile		
 {		
 	private EndpointReferenceType _epr;
 	private ISByteIOTransferer _transferer;
@@ -31,6 +31,7 @@ public class StreamableByteIOFileDescriptor extends WindowsIFSFile
 		boolean isReadable, boolean isWriteable, boolean isAppend) throws IOException
 	{
 		super(path, isReadable, isWriteable, isAppend);
+		isAStream = true;
 		
 		_epr = epr;
 		try
@@ -109,7 +110,7 @@ public class StreamableByteIOFileDescriptor extends WindowsIFSFile
 	}
 
 	@Override
-	public void close() throws IOException
+	public void doClose() throws IOException
 	{
 		try
 		{

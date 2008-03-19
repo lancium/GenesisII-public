@@ -204,11 +204,11 @@ public class JNILibraryLauncher
 		return (Integer)invoke(myClass, myMethod, argTypes, args);				
 	}
 	
-	public static boolean close(int fileHandle){
+	public static boolean close(int fileHandle, boolean deleteOnClose){
 		String myClass = JNI_IO_PACKAGE + ".JNIClose";
 		String myMethod = "close";
-		Class<?>[] argTypes = new Class[] {Integer.class};
-		Object[] args = new Object[] {new Integer(fileHandle)};
+		Class<?>[] argTypes = new Class[] {Integer.class, Boolean.class};
+		Object[] args = new Object[] {new Integer(fileHandle), new Boolean(deleteOnClose)};
 		
 		return (Boolean)invoke(myClass, myMethod, argTypes, args);				
 	}

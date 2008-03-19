@@ -16,7 +16,7 @@ import edu.virginia.vcgr.genii.client.byteio.xfer.simple.SimpleRByteIOTransferer
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 
-public class RandomByteIOFileDescriptor extends WindowsIFSFile
+public class RandomByteIOFileDescriptor extends IFSFile
 {		
 	private IRByteIOTransferer _transferer;
 	private long _offset = 0;
@@ -110,5 +110,9 @@ public class RandomByteIOFileDescriptor extends WindowsIFSFile
 			System.out.println("IOException: Remote Connection lost");
 			return -1;
 		}
+	}
+	
+	public void doClose() throws IOException{
+		//Do nothing		
 	}
 }

@@ -3,11 +3,11 @@ package edu.virginia.vcgr.genii.client.jni.gIIlib.io;
 import java.util.Hashtable;
 import java.util.concurrent.locks.ReentrantLock;
 
-import edu.virginia.vcgr.genii.client.jni.gIIlib.io.file.WindowsIFSFile;
+import edu.virginia.vcgr.genii.client.jni.gIIlib.io.file.IFSResource;
 
 public class DataTracker {
 	private static DataTracker myInstance = null;
-	private Hashtable<Integer, WindowsIFSFile> openFiles;	
+	private Hashtable<Integer, IFSResource> openResources;	
 	private ReentrantLock lock;
 	private int nextFileHandle;
 	
@@ -18,7 +18,7 @@ public class DataTracker {
 	private final static int MAX_CALLS_BEFORE_GC = 1000; 
 	
 	private DataTracker(){
-		openFiles = new Hashtable<Integer, WindowsIFSFile>();		
+		openResources = new Hashtable<Integer, IFSResource>();		
 		lock = new ReentrantLock();
 		nextFileHandle = 0;
 	}
@@ -36,8 +36,8 @@ public class DataTracker {
 		return lastFileHandle;
 	}
 	
-	public WindowsIFSFile getFile(Integer fileHandle){
-		WindowsIFSFile theFile;
+	public IFSResource getResource(Integer handle){
+		IFSResource theResource;
 		lock.lock();			
 		
 		counter++;
@@ -50,20 +50,20 @@ public class DataTracker {
 			counter = 0;
 		}
 		
-		theFile = openFiles.get(fileHandle);		
+		theResource = openResources.get(handle);		
 		lock.unlock();		
-		return theFile;
+		return theResource;
 	}
 	
-	public void putFile(Integer fileHandle, WindowsIFSFile file){		
+	public void putResource(Integer handle, IFSResource resource){		
 		lock.lock();
-		openFiles.put(fileHandle, file);
+		openResources.put(handle, resource);
 		lock.unlock();
 	}
 	
-	public void removeFile(Integer fileHandle){	
+	public void removeResource(Integer handle){	
 		lock.lock();
-		openFiles.remove(fileHandle); 
+		openResources.remove(handle); 
 		lock.unlock(); 
 	}
 }

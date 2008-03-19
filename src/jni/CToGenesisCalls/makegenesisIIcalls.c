@@ -287,13 +287,14 @@ DllExport int genesisII_truncate_append(PGII_JNI_INFO info, GII_FILE_HANDLE targ
 	return JNI_ERR;
 }
 
-DllExport int genesisII_close(PGII_JNI_INFO info, GII_FILE_HANDLE handle){
+DllExport int genesisII_close(PGII_JNI_INFO info, GII_FILE_HANDLE handle, BOOLEAN deleteOnClose){
 	jmethodID mid;
 	int return_val;
 
-	if(get_static_method(info,&(info->jni_launcher), "close", "(I)Z", &mid) != JNI_ERR)
+	if(get_static_method(info,&(info->jni_launcher), "close", "(IZ)Z", &mid) != JNI_ERR)
 	{				
-		return_val = (*info->env)->CallStaticBooleanMethod(info->env, info->jni_launcher, mid, handle);
+		return_val = (*info->env)->CallStaticBooleanMethod(info->env, info->jni_launcher, mid, handle, 
+			(jboolean)deleteOnClose) ;
 		return (return_val - 1);
 	}
 	else{

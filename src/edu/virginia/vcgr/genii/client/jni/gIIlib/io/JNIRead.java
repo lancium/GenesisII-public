@@ -1,17 +1,20 @@
 package edu.virginia.vcgr.genii.client.jni.gIIlib.io;
 
-import edu.virginia.vcgr.genii.client.jni.gIIlib.io.file.WindowsIFSFile;
+import edu.virginia.vcgr.genii.client.jni.gIIlib.io.file.IFSFile;
+import edu.virginia.vcgr.genii.client.jni.gIIlib.io.file.IFSResource;
 
 public class JNIRead {
 	synchronized public static byte[] read(Integer fileHandle, Integer offset, Integer length){
-		WindowsIFSFile file = DataTracker.getInstance().getFile(fileHandle);
+		IFSResource resource = DataTracker.getInstance().getResource(fileHandle);
 		byte[] toReturn = null;
 		
-		if(file == null){
+		//Make sure the handle points to a valid file (not a directory)
+		if(resource == null || resource.isDirectory()){
 			System.out.println("Invalid file handle");						
 		}
-		else{		
+		else{					
 			try{
+				IFSFile file = (IFSFile)resource;
 				file.lseek64(offset);
 				toReturn = file.read(length);			
 			}catch(Exception e){

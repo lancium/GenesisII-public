@@ -1,19 +1,25 @@
 package edu.virginia.vcgr.genii.client.jni.gIIlib.io;
 
-import edu.virginia.vcgr.genii.client.jni.gIIlib.io.file.WindowsIFSFile;
+import edu.virginia.vcgr.genii.client.jni.gIIlib.io.file.IFSFile;
+import edu.virginia.vcgr.genii.client.jni.gIIlib.io.file.IFSResource;
 
 
 public class JNIWrite{
 	public static Integer write(Integer fileHandle, byte[] data, Integer offset){
-		WindowsIFSFile file = DataTracker.getInstance().getFile(fileHandle);
+		IFSResource resource = DataTracker.getInstance().getResource(fileHandle);
 		int toReturn = -1;
 		
-		if(file == null){
+		//Make sure the handle points to a valid file (not a directory)
+		if(resource == null || resource.isDirectory()){
 			System.out.println("Invalid file handle");						
 		}
 		else{		
 			try{
-				file.lseek64(offset);
+				IFSFile file = (IFSFile)resource;
+				if(file.isStream() || offset != 0)
+				{
+					file.lseek64(offset);
+				}
 				toReturn = file.write(data);					
 			}catch(Exception e){
 				e.printStackTrace();
@@ -23,14 +29,15 @@ public class JNIWrite{
 	}
 	
 	public static Integer truncateAppend(Integer fileHandle, String data, Integer offset){
-		WindowsIFSFile file = DataTracker.getInstance().getFile(fileHandle);
+		IFSResource resource = DataTracker.getInstance().getResource(fileHandle);
 		int toReturn = -1;
 
-		if(file == null){
+		if(resource == null || resource.isDirectory()){
 			System.out.println("Invalid file handle");						
 		}
 		else{
 			try{
+				IFSFile file = (IFSFile)resource;
 				toReturn = file.truncateAppend(offset.longValue(), data.getBytes());							
 			}catch(Exception e){
 				e.printStackTrace();

@@ -14,34 +14,38 @@ void TestThread(GII_JNI_INFO rootInfo){
 
 	fileid=0;
 
-	printf("Creating directory SOME_DIRECTORY\n");
+	genesisII_open(&rootInfo, "/home/sosa/somefile.txt", requestedDeposition, desiredAccess, FALSE, &directoryListing);
 
-	genesisII_remove(&rootInfo, "/taco.txt", 0, 0);	
+	genesisII_close(&rootInfo, fileid, TRUE);
 
-	StatusCode = genesisII_open(&rootInfo, "/home/sosa/crime.txt", requestedDeposition, desiredAccess, isDirectory, &directoryListing);	
-	bytes = copyListing(buffer, directoryListing, StatusCode);
-	printListing(buffer, StatusCode);
+	//printf("Creating directory SOME_DIRECTORY\n");
 
-	StatusCode = genesisII_write(&rootInfo,fileid, "IlikeTacos", 0, 10);
-	printf("Wrote data %d\n", StatusCode);
-	
-	StatusCode = genesisII_read(&rootInfo,fileid, buffer, 0, 10);
-	printf("Got Data\n");
-	printListing2(buffer, StatusCode);
+	//genesisII_remove(&rootInfo, "/taco.txt", 0, 0);	
 
-	StatusCode = genesisII_close(&rootInfo,fileid);
+	//StatusCode = genesisII_open(&rootInfo, "/home/sosa/crime.txt", requestedDeposition, desiredAccess, isDirectory, &directoryListing);	
+	//bytes = copyListing(buffer, directoryListing, StatusCode);
+	//printListing(buffer, StatusCode);
 
-	memcpy(&fileid, buffer, sizeof(ULONG));
+	//StatusCode = genesisII_write(&rootInfo,fileid, "IlikeTacos", 0, 10);
+	//printf("Wrote data %d\n", StatusCode);
+	//
+	//StatusCode = genesisII_read(&rootInfo,fileid, buffer, 0, 10);
+	//printf("Got Data\n");
+	//printListing2(buffer, StatusCode);
 
-	printf("Reading 3468 from offset 4000 bytes from %d \n", fileid);
+	//StatusCode = genesisII_close(&rootInfo,fileid, FALSE);
 
-	StatusCode = genesisII_read(&rootInfo,fileid, buffer, 0, 4096);
-	printf("Got Data\n");
-	printListing2(buffer, StatusCode);
+	//memcpy(&fileid, buffer, sizeof(ULONG));
 
-	StatusCode = genesisII_truncate_append(&rootInfo,fileid, "IlikeTacos", 100, 10);
-	printf("Wrote data %d\n", StatusCode);
+	//printf("Reading 3468 from offset 4000 bytes from %d \n", fileid);
 
-	StatusCode = genesisII_write(&rootInfo,fileid, "IlikeTacos", 8000, 10);
-	printf("Wrote data %d\n", StatusCode);
+	//StatusCode = genesisII_read(&rootInfo,fileid, buffer, 0, 4096);
+	//printf("Got Data\n");
+	//printListing2(buffer, StatusCode);
+
+	//StatusCode = genesisII_truncate_append(&rootInfo,fileid, "IlikeTacos", 100, 10);
+	//printf("Wrote data %d\n", StatusCode);
+
+	//StatusCode = genesisII_write(&rootInfo,fileid, "IlikeTacos", 8000, 10);
+	//printf("Wrote data %d\n", StatusCode);
 }

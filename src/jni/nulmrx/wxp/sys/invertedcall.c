@@ -120,13 +120,18 @@ ULONG GenesisPrepareCreate(PRX_CONTEXT RxContext, PVOID buffer){
 }
 
 ULONG GenesisPrepareClose(PRX_CONTEXT RxContext, PVOID buffer){	
+	char* bufptr = (char*)buffer;
+	RxCaptureFcb;
 	RxCaptureFobx;
+	GenesisGetFcbExtension(capFcb, fcb);
 	GenesisGetCcbExtension(capFobx, ccb);
 	
 	PAGED_CODE();
 
-	RtlCopyMemory(buffer, &ccb->GenesisFileID, sizeof(long));
-	return sizeof(long);
+	RtlCopyMemory(bufptr, &ccb->GenesisFileID, sizeof(long));	
+	bufptr += sizeof(long);
+	RtlCopyMemory(bufptr, &fcb->DeleteOnCloseSpecified, sizeof(char));
+	return sizeof(long) + sizeof(char);
 }
 
 void GenesisSaveDirectoryListing(PGENESIS_FCB fcb, PVOID directoryListing, int size){

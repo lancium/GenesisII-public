@@ -4,8 +4,10 @@ import java.io.IOException;
 
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 
-public abstract class WindowsIFSFile extends WindowsIFSResource
+public abstract class IFSFile extends IFSResource
 {
+	protected boolean isAStream = false; 
+	
 	private boolean _readable;
 	private boolean _writeable;
 	private boolean _isAppend;
@@ -18,22 +20,23 @@ public abstract class WindowsIFSFile extends WindowsIFSResource
 	protected abstract byte[] doRead(int length) throws IOException;
 	protected abstract int doWrite(byte []data) throws IOException;
 	protected abstract int doTruncateAppend(long offset,byte []data) throws IOException;	
+	protected abstract void doClose() throws IOException;
 	
-	public WindowsIFSFile(RNSPath path, boolean isReadable,
+	public IFSFile(RNSPath path, boolean isReadable,
 		boolean isWriteable, boolean isAppend)
 	{
 		super(path);
+		isDirectory = false;
 		_readable = isReadable;
 		_writeable = isWriteable;
 		_isAppend = isAppend;
 	}
 	
-	public abstract long lseek64(long offset) throws IOException;
-	
-	public void close() throws IOException
-	{
-		// By default, I don't need to do anything.
+	public void close() throws IOException{
+		doClose();		
 	}
+	
+	public abstract long lseek64(long offset) throws IOException;	
 	
 	public byte[] read(int length) throws IOException
 	{
@@ -54,5 +57,9 @@ public abstract class WindowsIFSFile extends WindowsIFSResource
 		if(_writeable)
 			return doTruncateAppend(offset, data);
 		throw new IOException("File is not open for writing.");
+	}
+	
+	public boolean isStream(){
+		return isAStream;
 	}
 }

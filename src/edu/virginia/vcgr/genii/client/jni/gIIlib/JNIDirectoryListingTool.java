@@ -65,7 +65,7 @@ public class JNIDirectoryListingTool extends JNILibraryBase
 					{
 						if(entry.isDirectory()){														
 							toAdd = new JNICacheEntry(entry.pwd(), 
-									true, -1, entry.getName(), null);
+									true, -1, entry.getName(), null);													
 							
 							//Add to cache and then to return listing
 							manager.putCacheEntry(entry.pwd(), toAdd);

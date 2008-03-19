@@ -9,9 +9,8 @@ import edu.virginia.vcgr.genii.client.jni.gIIlib.JNIGetInformationTool;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.JNILibraryBase;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.io.file.RandomByteIOFileDescriptor;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.io.file.StreamableByteIOFileDescriptor;
-import edu.virginia.vcgr.genii.client.jni.gIIlib.io.file.WindowsIFSDirectory;
-import edu.virginia.vcgr.genii.client.jni.gIIlib.io.file.WindowsIFSFile;
-import edu.virginia.vcgr.genii.client.jni.gIIlib.io.file.WindowsIFSResource;
+import edu.virginia.vcgr.genii.client.jni.gIIlib.io.file.IFSDirectory;
+import edu.virginia.vcgr.genii.client.jni.gIIlib.io.file.IFSResource;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
@@ -36,7 +35,7 @@ public class JNIOpen extends JNILibraryBase{
 	public static ArrayList<String> open(String fileName, Integer requestedDeposition,
 			Integer DesiredAccess, Boolean isDirectory){
 		DataTracker tracker = DataTracker.getInstance();
-		WindowsIFSResource resource;		
+		IFSResource resource;		
 		ArrayList<String> toReturn = new ArrayList<String>();		
 		int fileHandle = -1;
 		
@@ -125,7 +124,7 @@ public class JNIOpen extends JNILibraryBase{
 			
 			//If Directory, all we need is local copy, otherwise open file
 			if(filePath.isDirectory()){		
-				resource = new WindowsIFSDirectory(filePath);
+				resource = new IFSDirectory(filePath);
 			}
 			else{
 				//Check the type of ByteIO and create it according to the options specified
@@ -146,9 +145,10 @@ public class JNIOpen extends JNILibraryBase{
 				{
 					throw new IOException("The path \"" + fileName + 
 						"\" refers to an object that isn't a file.");
-				}			
-				tracker.putFile(fileHandle, (WindowsIFSFile)resource);
-			}							
+				}							
+			}				
+			
+			tracker.putResource(fileHandle, (IFSResource)resource);
 			
 			//Add information to return
 			toReturn.add(String.valueOf(fileHandle));
@@ -157,7 +157,7 @@ public class JNIOpen extends JNILibraryBase{
 		}
 		catch(Exception e){
 			e.printStackTrace();
-			tracker.removeFile(fileHandle);
+			tracker.removeResource(fileHandle);
 			return null;						
 		}				
 	}

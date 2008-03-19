@@ -343,7 +343,8 @@ Return Value:
 			PFILE_DISPOSITION_INFORMATION pDispo = (PFILE_DISPOSITION_INFORMATION) RxContext->Info.Buffer;
             DbgPrint("FileDispositionInformation\n");
 			RxSetIoStatusInfo(RxContext, sizeof(FILE_DISPOSITION_INFORMATION));
-			if(pDispo->DeleteFile)
+			fcb->DeleteOnCloseSpecified = pDispo->DeleteFile;
+			if(pDispo->DeleteFile == TRUE)
 			{
 				DbgPrint("Delete file requested ... \n");
 			}
@@ -385,10 +386,13 @@ Return Value:
 		}
         break;
     
-        case FileRenameInformation:
+		case FileRenameInformation:{
+			PFILE_RENAME_INFORMATION pRenameInfo = (PFILE_RENAME_INFORMATION) RxContext->Info.Buffer;
             DbgPrint("FileRenameInformation\n");
+
+			pRenameInfo->
             break;
-    
+		}
         default:
 			DbgPrint("Unknown set information requested\n");
             break;									  

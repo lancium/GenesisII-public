@@ -51,6 +51,7 @@ void GenesisInitializeFCB(PGENESIS_FCB fcb){
 	KeQuerySystemTime(&(fcb->OpenTime));
 	fcb->CreateTime = fcb->AccessedTime = fcb->ModifiedTime = fcb->OpenTime;
 
+	fcb->DeleteOnCloseSpecified = FALSE;
 	fcb->DirectorySize = 0;
 	fcb->DirectoryListing = NULL;
 	fcb->isDirectory = FALSE;			
@@ -391,6 +392,9 @@ Return Value:
 				giiSrvOpen->ServerFileSize = capFcb->Header.FileSize;
 			}
 		}
+
+		//Set Deletion Flag (if either is true, we're deleting (can't cancel a delete))
+		giiFCB->DeleteOnCloseSpecified |= DeleteOnCloseSpecified;
 
 		/*	Let's do some checks now */
 
@@ -855,7 +859,7 @@ Return Value:
 	DbgPrint("NulMrxCloseSrvOpen for %wZ\n", pSrvOpen->pAlreadyPrefixedName);		
 
 	//Only makes sense for files that were opened correctly
-	if(giiFCB->State == GENII_STATE_HAVE_INFO && !giiFCB->isDirectory){
+	if(giiFCB->State == GENII_STATE_HAVE_INFO){
 
 		//Close this file handle on the Genesis Side
 		Status = GenesisSendInvertedCall(RxContext, GENII_CLOSE, FALSE);

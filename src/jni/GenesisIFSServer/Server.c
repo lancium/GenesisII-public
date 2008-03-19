@@ -381,13 +381,22 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 		}
 		case GENII_CLOSE:{
 			char *bufPtr = (char*) request->RequestBuffer;				
-			long fileID;			
+			long fileID;						
 			int returnCode;
+			BOOLEAN deleteOnCloseSpecified;
 
+			//Get fileid
 			memcpy(&fileID, bufPtr, sizeof(long));			
+			bufPtr += sizeof(long);
+		
+			//Get Delete on Close
+			memcpy(&deleteOnCloseSpecified, bufPtr, sizeof(char));
 			response->ResponseBufferLength = sizeof(int);
+
 			printf("Closing file with fileID: %d\n", fileID);
-			returnCode = genesisII_close(pMyInfo, fileID);
+			printf("Delete Specified == %s\n", (deleteOnCloseSpecified ? "TRUE" : "FALSE"));
+			returnCode = genesisII_close(pMyInfo, fileID, deleteOnCloseSpecified);
+
 			memcpy(response->ResponseBuffer, &returnCode, sizeof(int));	
 			printf("File %d closed\n", fileID);
 
@@ -628,7 +637,6 @@ int runMultiThreaded(PGII_JNI_INFO rootInfo){
 	}		
 
 	genesisII_logout(rootInfo);	
-	//DetatchCurrentThreadFromJVM();
 
 	if(GenesisControlHandle != INVALID_HANDLE_VALUE) {				 
 		CloseHandle(GenesisControlHandle);		
@@ -669,7 +677,7 @@ int main(int argc, char* argv[])
 	
 	status = runMultiThreaded(&rootInfo);		
 
-	//TestThread(rootInfo);	
+	//TestThread(rootInfo);		
 
 	printf("Shutdown Complete\n");
 	exit(0);

@@ -119,7 +119,7 @@ DllExport int genesisII_truncate_append(PGII_JNI_INFO info, GII_FILE_HANDLE file
 	This method closes a file.  Data is only committed when a file is properly closed.  
 	Once closed, the file handle has no value.  
 */
-DllExport int genesisII_close(PGII_JNI_INFO info, GII_FILE_HANDLE file);
+DllExport int genesisII_close(PGII_JNI_INFO info, GII_FILE_HANDLE file, BOOLEAN OPTIONAL deleteOnClose);
 
 /*
 	Initializes the JavaVM (must be run first with master thread)

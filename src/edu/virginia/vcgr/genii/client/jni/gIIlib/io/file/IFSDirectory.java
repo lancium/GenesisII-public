@@ -5,10 +5,11 @@ import java.util.ArrayList;
 
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 
-public class WindowsIFSDirectory extends WindowsIFSResource
+public class IFSDirectory extends IFSResource
 {			
-	public WindowsIFSDirectory(RNSPath fullPath) 		
+	public IFSDirectory(RNSPath fullPath) 		
 	{		
+		isDirectory = true;
 		myPath = fullPath;
 	}
 
