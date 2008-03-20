@@ -15,34 +15,12 @@
  */
 package edu.virginia.vcgr.genii.container.bes.activity.resource;
 
-import java.io.File;
-
-import org.ggf.bes.factory.ActivityStatusType;
-import org.ggf.jsdl.JobDefinition_Type;
-import org.ws.addressing.EndpointReferenceType;
-
-import edu.virginia.vcgr.genii.client.resource.ResourceException;
-
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
-import edu.virginia.vcgr.genii.container.jsdl.JSDLException;
+
+import edu.virginia.vcgr.genii.container.bes.execution.Activity;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public interface IBESActivityResource extends IResource
 {
-	static public final String ACTIVITY_NAME_PROPERTY = "activity-name";
-	static public final String ERROR_PROPERTY = "bes-activity:error";
-	
-	public void createProcess(EndpointReferenceType activityEPR,
-		File basedir, JobDefinition_Type jobDef)
-			throws ResourceException, JSDLException;
-	public void restartProcessing() throws ResourceException, JSDLException;
-	
-	public JobDefinition_Type getJobDefinition() throws ResourceException;
-	
-	public void associateWithContainer(EndpointReferenceType activityEPR,
-		String containerID) throws ResourceException;
-	
-	public ActivityStatusType getOverallStatus() throws ResourceException;
-	public boolean terminateActivity() 
-		throws ResourceException, ResourceUnknownFaultType;
+	public Activity findActivity() throws ResourceUnknownFaultType;
 }

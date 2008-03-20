@@ -15,61 +15,47 @@
  */
 package edu.virginia.vcgr.genii.container.bes.resource;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.rmi.RemoteException;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.naming.EPRUtils;
-import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.container.bes.execution.Activity;
+import edu.virginia.vcgr.genii.container.bes.execution.ActivityManager;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
 public class DBBESResource extends BasicDBResource implements IBESResource
 {
-	static private final String _FIND_ACTIVITIES =
-		"SELECT activityepr FROM besactivities WHERE containerkey = ?";
-	
 	public DBBESResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool)
 		throws SQLException
 	{
 		super(parentKey, connectionPool);
 	}
-
+	
 	public EndpointReferenceType[] getContainedActivities()
-		throws ResourceException
+		throws RemoteException
 	{
-		EndpointReferenceType []ret;
-		ArrayList<EndpointReferenceType> tmpRet = new ArrayList<EndpointReferenceType>();
+		Collection<Activity> activities = ActivityManager.getManager().getAllActivities(
+			_resourceKey);
 		
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
+		Collection<EndpointReferenceType> ret = new LinkedList<EndpointReferenceType>();
 		
 		try
 		{
-			stmt = _connection.prepareStatement(_FIND_ACTIVITIES);
-			stmt.setString(1, _resourceKey);
-			rs = stmt.executeQuery();
-			while (rs.next())
+			for (Activity activity : activities)
 			{
-				tmpRet.add(EPRUtils.fromBlob(rs.getBlob(1)));
+				ret.add(activity.getActivityEPR());
 			}
 			
-			ret = new EndpointReferenceType[tmpRet.size()];
-			tmpRet.toArray(ret);
-			return ret;
+			return ret.toArray(new EndpointReferenceType[0]);
 		}
 		catch (SQLException sqe)
 		{
-			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
-		}
-		finally
-		{
-			close(rs);
-			close(stmt);
+			throw new RemoteException("Internal state error with BES activity.", sqe);
 		}
 	}
 }

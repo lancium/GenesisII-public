@@ -14,6 +14,7 @@ import edu.virginia.vcgr.genii.client.utils.dialog.MenuWidget;
 import edu.virginia.vcgr.genii.client.utils.dialog.WidgetProvider;
 import edu.virginia.vcgr.genii.client.utils.dialog.text.TextWidgetProvider;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
+import edu.virginia.vcgr.genii.container.sysinfo.SupportedOperatingSystems;
 
 /**
  * This is almost the same tool as the create-user tool, except that it creates
@@ -164,7 +165,9 @@ public class CreateUserDelegateTool extends CreateUserTool
 			+ "which to retrieve the certificate that will be delegate to\n"
 			+ "the new IDP instance.");
 		
-		boolean isWindows = System.getProperty("os.name").contains("Windows");
+		boolean isWindows = SupportedOperatingSystems.current().equals(
+			SupportedOperatingSystems.WINDOWS);
+		
 		if (isWindows)
 			menu.setChoices(
 				new MenuChoice("P", "PKCS12"), 

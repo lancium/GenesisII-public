@@ -14,9 +14,10 @@ import org.ggf.jsdl.hpcp.HPCProfileApplication_Type;
 import org.ggf.jsdl.posix.POSIXApplication_Type;
 
 import edu.virginia.vcgr.genii.client.appdesc.DeploymentException;
+import edu.virginia.vcgr.genii.client.jsdl.hpc.HPCConstants;
+import edu.virginia.vcgr.genii.client.jsdl.posix.JSDLPosixConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
-import edu.virginia.vcgr.genii.container.bes.jsdl.SimpleApplicationRedux;
 
 public abstract class AbstractReifier implements IJSDLReifier
 {
@@ -58,10 +59,10 @@ public abstract class AbstractReifier implements IJSDLReifier
 			for (MessageElement element : any)
 			{
 				QName name = element.getQName();
-				if (name.equals(SimpleApplicationRedux.JSDL_POSIX_APP_QNAME))
+				if (name.equals(JSDLPosixConstants.JSDL_POSIX_APPLICATION_QNAME))
 					elements.add(reifyPOSIXApplication(
 						deployDirectory, element));
-				else if (name.equals(SimpleApplicationRedux.HPC_APP_QNAME))
+				else if (name.equals(HPCConstants.HPC_APPLICATION_QNAME))
 					elements.add(reifyHPCApplication(
 						deployDirectory, element));
 				else
@@ -98,7 +99,7 @@ public abstract class AbstractReifier implements IJSDLReifier
 		posixApplication = POSIXApplicationReifier.reifyApplication(
 			deployDirectory, this, posixApplication);
 		return new MessageElement(
-			SimpleApplicationRedux.JSDL_POSIX_APP_QNAME,
+			JSDLPosixConstants.JSDL_POSIX_APPLICATION_QNAME,
 			posixApplication);
 	}
 	
@@ -112,7 +113,7 @@ public abstract class AbstractReifier implements IJSDLReifier
 		hpcApplication = HPCApplicationReifier.reifyApplication(
 			deployDirectory, this, hpcApplication);
 		return new MessageElement(
-			SimpleApplicationRedux.HPC_APP_QNAME,
+			HPCConstants.HPC_APPLICATION_QNAME,
 			hpcApplication);
 	}
 	

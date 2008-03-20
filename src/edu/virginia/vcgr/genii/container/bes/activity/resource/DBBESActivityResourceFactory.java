@@ -21,12 +21,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.container.bes.SharedBESTableBase;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
+import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
-public class DBBESActivityResourceFactory extends SharedBESTableBase
+public class DBBESActivityResourceFactory extends BasicDBResourceFactory
 	implements IBESActivityResourceFactory
 {
 	@SuppressWarnings("unused")

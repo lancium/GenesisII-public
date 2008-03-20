@@ -13,16 +13,17 @@ import java.util.TreeMap;
 import org.apache.axis.types.UnsignedShort;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.ggf.bes.BESPortType;
 import org.ggf.bes.factory.ActivityDocumentType;
 import org.ggf.bes.factory.CreateActivityResponseType;
 import org.ggf.bes.factory.CreateActivityType;
+import org.ggf.bes.factory.TerminateActivitiesType;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.rns.EntryType;
 import org.morgan.util.GUID;
 import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
@@ -947,7 +948,7 @@ public class JobManager implements Closeable
 	 */
 	private class Resolver implements IBESPortTypeResolver, IJobEndpointResolver
 	{
-		private BESPortType _portType = null;
+		private GeniiBESPortType _portType = null;
 		private EndpointReferenceType _endpoint = null;
 		
 		/**
@@ -966,12 +967,12 @@ public class JobManager implements Closeable
 			
 			_endpoint = info.getJobEndpoint();
 			_portType = ClientUtils.createProxy(
-				BESPortType.class, info.getBESEndpoint(), 
+				GeniiBESPortType.class, info.getBESEndpoint(), 
 				info.getCallingContext());
 		}
 		
 		@Override
-		public BESPortType createClientStub(Connection connection, long besID)
+		public GeniiBESPortType createClientStub(Connection connection, long besID)
 				throws Throwable
 		{
 			if (_portType == null)
@@ -1133,12 +1134,12 @@ public class JobManager implements Closeable
 				/* We need to start the job, so go ahead and create a proxy to
 				 * call the container and then call it.
 				 */
-				BESPortType bes = ClientUtils.createProxy(BESPortType.class, 
+				GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, 
 					entryType.getEntry_reference(), 
 					startInfo.getCallingContext());
 				CreateActivityResponseType resp = bes.createActivity(
 					new CreateActivityType(
-						new ActivityDocumentType(startInfo.getJSDL(), null)));
+						new ActivityDocumentType(startInfo.getJSDL(), null), null));
 				
 				synchronized(_manager)
 				{
@@ -1221,13 +1222,13 @@ public class JobManager implements Closeable
 			try
 			{
 				/* Create the proxy and terminate the activity */
-				BESPortType bes = ClientUtils.createProxy(BESPortType.class, 
+				GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, 
 					killInfo.getBESEndpoint(), 
 					killInfo.getCallingContext());
-				bes.terminateActivities(
+				bes.terminateActivities(new TerminateActivitiesType(
 					new EndpointReferenceType[] {
 						killInfo.getJobEndpoint()
-					} );
+					}, null ));
 			}
 			catch (Throwable cause)
 			{

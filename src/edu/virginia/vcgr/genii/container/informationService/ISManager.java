@@ -4,7 +4,6 @@
 
 package edu.virginia.vcgr.genii.container.informationService;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -97,8 +96,6 @@ public class ISManager{
 		} 
 		catch (SQLException e) { _logger.warn(e.getLocalizedMessage(), e);} 
 		catch (ResourceException e) { _logger.warn(e.getLocalizedMessage(), e);} 
-		catch (IOException e) {_logger.warn(e.getLocalizedMessage(), e);} 
-		catch (ClassNotFoundException e) {_logger.warn(e.getLocalizedMessage(), e);}
 			
 		finally
 		{

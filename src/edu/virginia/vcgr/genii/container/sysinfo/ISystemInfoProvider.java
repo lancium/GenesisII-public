@@ -22,5 +22,7 @@ public interface ISystemInfoProvider
 	public long getPhysicalMemoryAvailable();
 	public long getVirtualMemory();
 	public long getVirtualMemoryAvailable();
+	
 	public boolean getUserLoggedIn();
+	public boolean getScreenSaverActive();
 }

@@ -20,7 +20,7 @@ import org.xml.sax.InputSource;
 public class DBSerializer
 {
 	static public Blob toBlob(Object obj)
-		throws IOException
+		throws SQLException
 	{
 		if (obj == null)
 			return null;
@@ -29,14 +29,14 @@ public class DBSerializer
 		{
 			return new SerialBlob(serialize(obj));
 		}
-		catch (SQLException sqe)
+		catch (IOException ioe)
 		{
-			throw new IOException(sqe.getLocalizedMessage());
+			throw new SQLException("Unable to serialize to blob.", ioe);
 		}
 	}
 	
 	static public Object fromBlob(Blob b)
-		throws IOException, ClassNotFoundException
+		throws SQLException
 	{
 		InputStream in = null;
 		ObjectInputStream oin = null;
@@ -49,9 +49,13 @@ public class DBSerializer
 			oin = new ObjectInputStream(in = b.getBinaryStream());
 			return oin.readObject();
 		}
-		catch (SQLException sqe)
+		catch (IOException ioe)
 		{
-			throw new IOException(sqe.getLocalizedMessage());
+			throw new SQLException("Unable to deserialize from blob.", ioe);
+		}
+		catch (ClassNotFoundException cnfe)
+		{
+			throw new SQLException("Unable to deserialize from blob.", cnfe);
 		}
 		finally
 		{
@@ -148,7 +152,7 @@ public class DBSerializer
 	}
 	
 	static public Blob xmlToBlob(Object obj)
-		throws IOException
+		throws SQLException
 	{
 		if (obj == null)
 			return null;
@@ -158,9 +162,9 @@ public class DBSerializer
 			byte []data = xmlSerialize(obj);
 			return new SerialBlob(data);
 		}
-		catch (SQLException sqe)
+		catch (IOException ioe)
 		{
-			throw new IOException(sqe.getLocalizedMessage());
+			throw new SQLException("Unable to xml serialize object.", ioe);
 		}
 	}
 	

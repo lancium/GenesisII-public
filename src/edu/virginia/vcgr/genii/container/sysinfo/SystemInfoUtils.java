@@ -20,16 +20,16 @@ public class SystemInfoUtils
 	static private ISystemInfoProvider _provider;
 	static
 	{
-		String osName = System.getProperty("os.name");
-		
-		if (osName.equals("Linux"))
+		SupportedOperatingSystems os = SupportedOperatingSystems.current();
+
+		if (os.equals(SupportedOperatingSystems.LINUX))
 			_provider = new ProcFilesystemProvider();
-		else if ((osName.equals("Windows XP")|| osName.equals("Windows 2003")))
+		else if (os.equals(SupportedOperatingSystems.WINDOWS))
 			_provider = new WindowsProvider();
 		else
 			throw new RuntimeException(
 				"Don't know an ISystemInfoProvider for OS type \"" +
-				osName + "\".");
+				os + "\".");
 	}
 	
 	static private ISystemInfoProvider getProvider()
@@ -65,5 +65,10 @@ public class SystemInfoUtils
 	static public boolean getUserLoggedIn()
 	{
 		return getProvider().getUserLoggedIn();
+	}
+	
+	static public boolean getScreenSaverActive()
+	{
+		return getProvider().getScreenSaverActive();
 	}
 }

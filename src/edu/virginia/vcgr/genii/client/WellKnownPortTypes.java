@@ -17,8 +17,6 @@ package edu.virginia.vcgr.genii.client;
 
 import javax.xml.namespace.QName;
 
-import edu.virginia.vcgr.genii.client.bes.BESConstants;
-
 public class WellKnownPortTypes
 {
 	static public QName GENII_NOTIFICATION_PRODUCER_PORT_TYPE =
@@ -64,14 +62,6 @@ public class WellKnownPortTypes
 	static public QName BASIC_SCHEDULER_PORT_TYPE =
 		new QName("http://vcgr.cs.virginia.edu/genii/2007/01/scheduler/basic",
 			"BasicSchedulerPortType");
-	
-	static public QName BES_SERVICE_PORT_TYPE =
-		new QName(BESConstants.BES_NS, "BESPortType");
-	static public QName BES_FACTORY_PORT_TYPE =
-		new QName("http://schemas.ggf.org/bes/2006/08/bes-factory",
-			"BESFactoryPortType");
-	static public QName VCGR_BES_ACTIVITY_SERVICE_PORT_TYPE =
-		new QName("http://vcgr.cs.virginia.edu/bes/2006/07/bes-activity");
 	
 	static public QName RBYTEIO_SERVICE_PORT_TYPE =
 		new QName("http://schemas.ggf.org/byteio/2005/10/random-access",

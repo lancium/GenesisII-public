@@ -100,5 +100,16 @@ public class ProcFilesystemProvider implements ISystemInfoProvider
 	}
 	
 	// This method is currently un-implemented for Linux.
-	public boolean getUserLoggedIn() { return false;};
+	public boolean getUserLoggedIn()
+	{
+		throw new RuntimeException(
+			"User Logged-in method not implemented for Linux.");
+	}
+	
+	// This method is currently un-implemented for Linux.
+	public boolean getScreenSaverActive()
+	{
+		throw new RuntimeException(
+			"ScreenSaver Active method not implemented for Linux.");
+	}
 }

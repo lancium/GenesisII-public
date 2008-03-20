@@ -16,226 +16,139 @@
 package edu.virginia.vcgr.genii.client.bes;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collection;
+import java.util.Vector;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPException;
 
 import org.apache.axis.message.MessageElement;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.ggf.bes.factory.ActivityStateEnumeration;
 import org.ggf.bes.factory.ActivityStatusType;
 
-import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 
-public class ActivityState implements Serializable
+public class ActivityState implements Serializable, Cloneable
 {
 	static final long serialVersionUID = 0L;
+
+	static final private String _GENII_NS = 
+		"http://vcgr.cs.virginia.edu/genesisII/bes/activity-states";
 	
-	static private Log _logger = LogFactory.getLog(ActivityState.class);
+	static final private String _GENII_SUS_NS =
+		"http://vcgr.cs.virginia.edu/genesisII/bes/activity-states/suspend";
+	static final private String _SUSPEND_STATE_ELEMENT_NAME = "suspended";
+	static final private QName _SUSPEND_STATE_ELEMENT_QNAME = new QName(
+		_GENII_SUS_NS, _SUSPEND_STATE_ELEMENT_NAME);
 	
-	static public ActivityState PENDING;
-	static public ActivityState SUSPENDED;
-	static public ActivityState STAGING_IN;
-	static public ActivityState PREPARING_APPLICATION;
-	static public ActivityState EXECUTING;
-	static public ActivityState STAGING_OUT;
-	static public ActivityState FAILED;
-	static public ActivityState ERROR;
-	static public ActivityState KILLED;
-	static public ActivityState CANCELLED;
-	static public ActivityState FINISHED;
+	private String _besState;
+	private String _geniiState;
+	private boolean _isSuspended;
 	
-	static private QName _PENDING = 
-		new QName(GenesisIIConstants.BES_FACTORY_NS, "Pending");
-	static private QName _RUNNING =
-		new QName(GenesisIIConstants.BES_FACTORY_NS, "Running");
-	static private QName _SUSPENDED = 
-		new QName(GenesisIIConstants.GENESISII_NS, "Suspended");
-	static private QName _STAGING_IN =
-		new QName(GenesisIIConstants.GENESISII_NS, "Staging-in");
-	static private QName _PREPARING_APP =
-		new QName(GenesisIIConstants.GENESISII_NS, "Preparing-application");
-	static private QName _EXECUTING =
-		new QName(GenesisIIConstants.GENESISII_NS, "Executing");
-	static private QName _STAGING_OUT =
-		new QName(GenesisIIConstants.GENESISII_NS, "Staging-out");
-	static private QName _FAILED =
-		new QName(GenesisIIConstants.BES_FACTORY_NS, "Failed");
-	static private QName _ERROR =
-		new QName(GenesisIIConstants.GENESISII_NS, "Error");
-	static private QName _KILLED =
-		new QName(GenesisIIConstants.GENESISII_NS, "Killed");
-	static private QName _CANCELLED =
-		new QName(GenesisIIConstants.BES_FACTORY_NS, "Cancelled");
-	static private QName _FINISHED =
-		new QName(GenesisIIConstants.BES_FACTORY_NS, "Finished");
-	
-	static
+	public ActivityState(ActivityStateEnumeration besState, 
+		String geniiState, boolean isSuspended)
 	{
-		PENDING = new ActivityState(_PENDING);
-		SUSPENDED = new ActivityState(_RUNNING, _SUSPENDED);
-		STAGING_IN = new ActivityState(_RUNNING, _STAGING_IN);
-		PREPARING_APPLICATION = new ActivityState(_RUNNING, _PREPARING_APP);
-		EXECUTING = new ActivityState(_RUNNING, _EXECUTING);
-		STAGING_OUT = new ActivityState(_RUNNING, _STAGING_OUT);
-		FAILED = new ActivityState(_FAILED);
-		ERROR = new ActivityState(_FAILED, _ERROR);
-		KILLED = new ActivityState(_FAILED, _KILLED);
-		CANCELLED = new ActivityState(_CANCELLED);
-		FINISHED = new ActivityState(_FINISHED);
+		if (besState == null)
+			throw new IllegalArgumentException("BESState cannot be null.");
+		
+		_besState = besState.getValue();
+		_geniiState = geniiState;
+		_isSuspended = isSuspended;
+	}
+	
+	public ActivityState(ActivityStatusType wireState)
+	{
+		_geniiState = null;
+		_isSuspended = false;
+		
+		_besState = wireState.getState().getValue();
+		
+		MessageElement []any = wireState.get_any();
+		if (any != null)
+		{
+			for (MessageElement me : any)
+			{
+				QName eName = me.getQName();
+				if (eName.getNamespaceURI().equals(_GENII_NS))
+					_geniiState = eName.getLocalPart();
+				else if (eName.equals(_SUSPEND_STATE_ELEMENT_QNAME))
+					_isSuspended = true;
+			}
+		}
+	}
+	
+	public ActivityState(MessageElement element)
+		throws ResourceException
+	{
+		this(ObjectDeserializer.toObject(element, ActivityStatusType.class));
+	}
+	
+	public boolean isSuspended()
+	{
+		return _isSuspended;
+	}
+	
+	public void suspend(boolean setSuspended)
+	{
+		_isSuspended = setSuspended;
+	}
+	
+	public boolean isFinalState()
+	{
+		if (_besState.equals(ActivityStateEnumeration._Cancelled))
+			return true;
+		else if (_besState.equals(ActivityStateEnumeration._Failed))
+			return true;
+		else if (_besState.equals(ActivityStateEnumeration._Finished))
+			return true;
+		
+		return false;
+	}
+	
+	public boolean isFailedState()
+	{
+		return _besState.equals(ActivityStateEnumeration._Failed);	
+	}
+	
+	public boolean isCancelledState()
+	{
+		return _besState.equals(ActivityStateEnumeration._Cancelled);	
+	}
+	
+	public boolean isFinishedState()
+	{
+		return _besState.equals(ActivityStateEnumeration._Finished);	
+	}
+	
+	public ActivityStatusType toActivityStatusType()
+	{
+		Collection<MessageElement> anyC = new Vector<MessageElement>(2);
+		if (_geniiState != null)
+			anyC.add(new MessageElement(new QName(_GENII_NS, _geniiState)));
+		if (_isSuspended)
+			anyC.add(new MessageElement(_SUSPEND_STATE_ELEMENT_QNAME));
+		
+		return new ActivityStatusType(
+			(anyC.size() > 0) ? anyC.toArray(new MessageElement[0]) : null,
+			ActivityStateEnumeration.fromValue(_besState));
 	}
 
-	private ArrayList<QName> _state = new ArrayList<QName>();
-	
-	private ActivityState(QName... stateList)
-	{
-		for (QName state : stateList)
-		{
-			_state.add(state);
-		}
-	}
-	
-	private ActivityState(MessageElement message)
-	{
-		while (message != null)
-		{
-			_state.add(message.getQName());
-			Iterator<?> iter = message.getChildElements();
-			message = null;
-			if (iter != null)
-			{
-				while (iter.hasNext())
-				{
-					Object obj = iter.next();
-					if (obj instanceof MessageElement)
-					{
-						message = (MessageElement)obj;
-						break;
-					}
-				}
-			}
-		}
-	}
-	
-	public boolean isInState(ActivityState targetState)
-	{
-		int targetSize = targetState._state.size();
-		
-		if (_state.size() < targetSize)
-			return false;
-		
-		for (int lcv = 0; lcv < targetSize; lcv++)
-		{
-			QName myState = _state.get(lcv);
-			QName target = targetState._state.get(lcv);
-			if (!myState.equals(target))
-				return false;
-		}
-		
-		return true;
-	}
-	
-	public boolean equals(ActivityState other)
-	{
-		int size = other._state.size();
-		if (size != _state.size())
-			return false;
-		
-		for (int lcv = 0; lcv < size; lcv++)
-		{
-			if (!_state.get(lcv).equals(other._state.get(lcv)))
-				return false;
-		}
-		
-		return true;
-	}
-	
-	public boolean equals(Object other)
-	{
-		return equals((ActivityState)other);
-	}
-	
-	public int hashCode()
-	{
-		int ret = 0;
-		
-		for (QName state : _state)
-		{
-			ret <<= 3;
-			ret ^= state.hashCode();
-		}
-		
-		return ret;
-	}
-	
 	public String toString()
 	{
-		StringBuffer buffer = new StringBuffer();
-		int tab = 0;
+		StringBuilder builder = new StringBuilder();
+		builder.append(_besState);
+		if (_geniiState != null)
+			builder.append(":" + _geniiState);
+		if (_isSuspended)
+			builder.append("[suspended]");
 		
-		for (QName state : _state)
-		{
-			for (int lcv = 0; lcv < tab; lcv++)
-				buffer.append("      ");
-			if (tab > 0)
-				buffer.append("|-> ");
-			buffer.append(state.toString() + "\n");
-			tab++;
-		}
-		
-		return buffer.toString();
+		return builder.toString();
 	}
 	
-	public boolean isTerminalState()
+	public Object clone()
 	{
-		return isInState(FAILED) ||
-			isInState(FINISHED) || isInState(CANCELLED);
-	}
-	
-	static public ActivityState fromMessage(MessageElement state)
-	{
-		return new ActivityState(state);
-	}
-	
-	static public ActivityState fromActivityStatus(ActivityStatusType ast)
-	{
-		return new ActivityState(ast.get_any()[0]);
-	}
-	
-	static public MessageElement toMessage(ActivityState state)
-	{
-		MessageElement ret = null;
-		MessageElement last = null;
-		
-		try
-		{
-			for (QName stateName : state._state)
-			{
-				MessageElement next = new MessageElement(stateName);
-				if (ret == null)
-					ret = next;
-				else
-					last.addChild(next);
-				
-				last = next;
-			}
-			
-			return ret;
-		}
-		catch (SOAPException se)
-		{
-			// Shouldn't happen
-			_logger.fatal(
-				"Unexpected exception:  " + se.getLocalizedMessage(),
-				se);
-			throw new RuntimeException(se);
-		}
-	}
-	
-	static public ActivityStatusType toActivityStatus(ActivityState state)
-	{
-		return new ActivityStatusType(new MessageElement[] { toMessage(state) });
+		return new ActivityState(
+			ActivityStateEnumeration.fromValue(_besState),
+			_geniiState, _isSuspended);
 	}
 }

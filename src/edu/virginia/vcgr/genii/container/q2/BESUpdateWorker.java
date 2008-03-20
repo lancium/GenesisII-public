@@ -4,10 +4,10 @@ import java.sql.Connection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.ggf.bes.BESPortType;
 import org.ggf.bes.factory.GetFactoryAttributesDocumentResponseType;
 import org.ggf.bes.factory.GetFactoryAttributesDocumentType;
 
+import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 
 /**
@@ -52,7 +52,7 @@ public class BESUpdateWorker implements Runnable
 			 * allocated to this worker task.  This way we limit the number of
 			 * EPRs in memory at any one time.
 			 */
-			BESPortType clientStub = _portTypeResolver.createClientStub(
+			GeniiBESPortType clientStub = _portTypeResolver.createClientStub(
 				connection, _besID);
 			
 			/* Make the out call to the BES object to get it's factory 

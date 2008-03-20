@@ -2,7 +2,7 @@ package edu.virginia.vcgr.genii.container.q2;
 
 import java.sql.Connection;
 
-import org.ggf.bes.BESPortType;
+import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 
 /**
  * This interface is used to indicate an object which is cable of
@@ -26,7 +26,7 @@ public interface IBESPortTypeResolver
 	 * 
 	 * @throws Throwable
 	 */
-	public BESPortType createClientStub(
+	public GeniiBESPortType createClientStub(
 		Connection connection, long besID)
 			throws Throwable;
 }

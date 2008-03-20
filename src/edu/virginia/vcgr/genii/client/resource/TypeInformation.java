@@ -29,6 +29,8 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.byteio.streamable.factory.StreamableByteIOFactory;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
+import edu.virginia.vcgr.genii.client.bes.BESActivityConstants;
+import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.byteio.RandomByteIORP;
 import edu.virginia.vcgr.genii.client.byteio.StreamableByteIORP;
@@ -93,19 +95,17 @@ public class TypeInformation
 	
 	public boolean isBESContainer()
 	{
-		return hasPortType(
-			WellKnownPortTypes.BES_SERVICE_PORT_TYPE);
+		return hasPortType(BESConstants.GENII_BES_PORT_TYPE_QNAME);
 	}
 	
 	public boolean isBESActivity()
 	{
-		return hasPortType(
-			WellKnownPortTypes.VCGR_BES_ACTIVITY_SERVICE_PORT_TYPE);
+		return hasPortType(BESActivityConstants.GENII_BES_ACTIVITY_PORT_TYPE_QNAME);
 	}
 
 	public boolean isBES()
 	{
-		return hasPortType(WellKnownPortTypes.BES_SERVICE_PORT_TYPE);
+		return hasPortType(BESConstants.GENII_BES_PORT_TYPE_QNAME);
 	}
 	
 	public boolean isContainer()

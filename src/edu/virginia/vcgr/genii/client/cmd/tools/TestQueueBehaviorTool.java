@@ -3,19 +3,22 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.ggf.bes.BESPortType;
 import org.ggf.bes.factory.ActivityDocumentType;
 import org.ggf.bes.factory.CreateActivityType;
-import org.ggf.bes.factory.GetActivityStatusResponseType;
+import org.ggf.bes.factory.GetActivityStatusesResponseType;
+import org.ggf.bes.factory.GetActivityStatusesType;
+import org.ggf.bes.factory.TerminateActivitiesType;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
 
+import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
@@ -62,28 +65,29 @@ public class TestQueueBehaviorTool extends BaseGridTool {
 		for (int lcv = 0; lcv < iters; lcv++)
 		{
 			stdout.format("[%d] Creating activity on container.\n", lcv);
-			BESPortType bes = ClientUtils.createProxy(BESPortType.class, besEPR,
+			GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, besEPR,
 				loadInformation());
 			EndpointReferenceType job = bes.createActivity(
 				new CreateActivityType(
-					new ActivityDocumentType(jsdl, null))).getActivityIdentifier();
+					new ActivityDocumentType(jsdl, null), null)).getActivityIdentifier();
 			while (true)
 			{
-				bes = ClientUtils.createProxy(BESPortType.class, besEPR,
+				bes = ClientUtils.createProxy(GeniiBESPortType.class, besEPR,
 					loadInformation());
-				GetActivityStatusResponseType []resp =
-					bes.getActivityStatuses(new EndpointReferenceType[] { job } );
-				ActivityState state = ActivityState.fromActivityStatus(
-					resp[0].getActivityStatus());
+				GetActivityStatusesResponseType resp =
+					bes.getActivityStatuses(new GetActivityStatusesType(
+						new EndpointReferenceType[] { job }, null));;
+				ActivityState state = new ActivityState(
+					resp.getResponse(0).getActivityStatus());
 				stdout.format("[%d] %s\n", lcv, state);
-				if (state.isTerminalState())
+				if (state.isFinalState())
 					break;
 			}
 			
 			stdout.format("[%d] Garbage collecting the job.\n", lcv);
-			bes = ClientUtils.createProxy(BESPortType.class, besEPR,
+			bes = ClientUtils.createProxy(GeniiBESPortType.class, besEPR,
 				loadInformation());
-			bes.terminateActivities(new EndpointReferenceType[] { job } );
+			bes.terminateActivities(new TerminateActivitiesType(new EndpointReferenceType[] { job }, null) );
 		}
 		
 		return 0;
@@ -116,7 +120,7 @@ public class TestQueueBehaviorTool extends BaseGridTool {
 	}
 	
 	private void storeInformation()
-		throws IOException, ConfigurationException
+		throws SQLException, IOException, ConfigurationException
 	{
 		ICallingContext callingContext = ContextManager.getCurrentContext();
 		Collection<Identity> identities = getCallerIdentities();
@@ -126,7 +130,7 @@ public class TestQueueBehaviorTool extends BaseGridTool {
 	}
 	
 	private ICallingContext loadInformation()
-		throws IOException, ClassNotFoundException
+		throws SQLException, IOException, ClassNotFoundException
 	{
 		DBSerializer.fromBlob(_storedIdentities);
 		return (ICallingContext)DBSerializer.fromBlob(_storedCallingContext);

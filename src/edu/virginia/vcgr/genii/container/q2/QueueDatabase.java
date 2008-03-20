@@ -278,16 +278,6 @@ public class QueueDatabase
 			
 			return new CallingContextImpl((CallingContextImpl)null);
 		}
-		catch (ClassNotFoundException cnfe)
-		{
-			throw new ResourceException(
-				"Unable to read calling context from database.", cnfe);
-		}
-		catch (IOException ioe)
-		{
-			throw new ResourceException(
-				"Unable to read calling context from database.", ioe);
-		}
 		finally
 		{
 			StreamUtils.close(rs);
@@ -507,11 +497,6 @@ public class QueueDatabase
 			throw new ResourceException(
 				"Unable to deserialize owners for job.", ioe);
 		}
-		catch (ClassNotFoundException cnfe)
-		{
-			throw new ResourceException(
-				"Unable to deserialize owners for job.", cnfe);
-		}
 		finally
 		{
 			StreamUtils.close(rs);
@@ -553,12 +538,6 @@ public class QueueDatabase
 				EPRUtils.fromBlob(rs.getBlob(2)),
 				EPRUtils.fromBlob(rs.getBlob(3)),
 				(ICallingContext)DBSerializer.fromBlob(rs.getBlob(1)));
-		}
-		catch (ClassNotFoundException cnfe)
-		{
-			throw new ResourceException(
-				"Unable to deserialize calling context form database.",
-				cnfe);
 		}
 		catch (IOException ioe)
 		{
@@ -797,11 +776,6 @@ public class QueueDatabase
 			{
 				throw new ResourceException(
 					"Couldn't deserialize blob from database.", ioe);
-			}
-			catch (ClassNotFoundException cnfe)
-			{
-				throw new ResourceException(
-					"Couldn't deserialize blob from database.", cnfe);
 			}
 		}
 		finally

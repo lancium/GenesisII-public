@@ -20,15 +20,15 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.rmi.RemoteException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.security.*;
+import java.sql.SQLException;
 
 import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.ggf.jsdl.JobDefinition_Type;
 import org.morgan.util.GUID;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.GuaranteedDirectory;
@@ -42,54 +42,54 @@ import edu.virginia.vcgr.genii.bes.activity.BESActivityPortType;
 import edu.virginia.vcgr.genii.byteio.streamable.factory.OpenStreamResponse;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
+import edu.virginia.vcgr.genii.client.bes.BESActivityConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.context.*;
+import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
+import edu.virginia.vcgr.genii.client.jsdl.JSDLInterpreter;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.Identity;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
-import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivityUtils.BESActivityInitInfo;
 import edu.virginia.vcgr.genii.container.bes.activity.resource.IBESActivityResource;
+import edu.virginia.vcgr.genii.container.bes.execution.ActivityManager;
+import edu.virginia.vcgr.genii.container.bes.jsdl.personality.simpleexec.SimpleExecutionPersonalityProvider;
+import edu.virginia.vcgr.genii.container.bes.jsdl.personality.simpleexec.SimpleExecutionUnderstanding;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.common.SByteIOFactory;
-import edu.virginia.vcgr.genii.container.jsdl.JSDLException;
-import edu.virginia.vcgr.genii.container.resource.IResource;
+import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
 public class BESActivityServiceImpl extends GenesisIIBase implements
-		BESActivityPortType
+		BESActivityPortType, BESActivityConstants
 {
+	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(BESActivityServiceImpl.class);
 	
 	public BESActivityServiceImpl() throws RemoteException
 	{
 		super("BESActivityPortType");
 		
-		addImplementedPortType(
-			WellKnownPortTypes.VCGR_BES_ACTIVITY_SERVICE_PORT_TYPE);
+		addImplementedPortType(GENII_BES_ACTIVITY_PORT_TYPE_QNAME);
 		addImplementedPortType(
 			WellKnownPortTypes.SBYTEIO_FACTORY_PORT_TYPE);
 	}
 	
 	public QName getFinalWSResourceInterface()
 	{
-		return WellKnownPortTypes.VCGR_BES_ACTIVITY_SERVICE_PORT_TYPE;
+		return GENII_BES_ACTIVITY_PORT_TYPE_QNAME;
 	}
 	
 	protected void setAttributeHandlers() throws NoSuchMethodException
 	{
 		super.setAttributeHandlers();
-		
-		new BESActivityAttributeHandler(getAttributePackage());
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -102,96 +102,41 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 		IBESActivityResource resource = (IBESActivityResource)rKey.dereference();
 		BESActivityInitInfo initInfo = BESActivityUtils.extractCreationProperties(
 			creationParameters);
-	
+		
+		String activityServiceName = "BESActivityPortType";
+		Collection<Identity> owners = QueueSecurity.getCallerIdentities();
+		
 		try
 		{
-			resource.associateWithContainer(activityEPR, initInfo.getContainerID());
-				
-			ICallingContext ctxt = ContextManager.getCurrentContext(false);
-			if (ctxt != null) {
-				
-				// delegate credentials inbound for me to the child resource so
-				// when he comes alive he can use them because they're his
-
-				X509Certificate[] activityCertChain = 
-					(X509Certificate[])resource.getProperty(
-							IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
-				
-				ArrayList<GamlCredential> credsToDelegate = 
-					TransientCredentials.getTransientCredentials(ctxt)._credentials;
-				ArrayList<GamlCredential> callerCredentials = (ArrayList<GamlCredential>)
-					ctxt.getTransientProperty(GamlCredential.CALLER_CREDENTIALS_PROPERTY);
-				for (GamlCredential cred : callerCredentials) {
-					
-					if (cred instanceof UsernameTokenIdentity) {
-						// Do nothing: do not serialize UT tokens: we will be sending
-						// it in its own header the old fashioned way.
-						credsToDelegate.add(cred);
-						
-					} else if (cred instanceof SignedAssertion) {
-						
-						// Because we know an identity for the remote resource, delegate the 
-						// current credential assertion to it
-						DelegatedAttribute delegatedAttribute = new DelegatedAttribute(
-								null,
-								(SignedAssertion) cred, 
-								activityCertChain);
-						
-						credsToDelegate.add(SignedCredentialCache.getCachedDelegateAssertion(
-								delegatedAttribute, 
-								Container.getContainerPrivateKey()));
-					}
-
-				}
-
-				// have the activity context inherit the current path from 
-				// the calling context
-				_logger.debug("About to Serialize in the BESActivityService.");
-				resource.setProperty(
-						IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME,
-						ctxt);
-				_logger.debug("Done serializing in the BESActivityService.\n\n");
-			}
-				
+			JobDefinition_Type jsdl = initInfo.getJobDefinition();
 			
-			resource.createProcess(activityEPR, chooseDirectory(10), 
-					initInfo.getJobDefinition());
+			Object understanding = JSDLInterpreter.interpretJSDL(
+				new SimpleExecutionPersonalityProvider(), jsdl);
+			SimpleExecutionUnderstanding seUnderstanding =
+				(SimpleExecutionUnderstanding)understanding;
+				
+			ActivityManager.getManager().createActivity(
+				seUnderstanding.getJobName(),
+				initInfo.getContainerID(), resource.getKey().toString(), activityEPR,
+				activityServiceName, initInfo.getJobDefinition(), owners,
+				ContextManager.getCurrentContext(), chooseDirectory(5), 
+				seUnderstanding.createExecutionPlan());
 		}
-		catch (JSDLException je)
+		catch (IOException fnfe)
 		{
-			throw FaultManipulator.fillInFault(
-				new BaseFaultType(null, null, null, null,
-					new BaseFaultTypeDescription[]
-                     {
-						new BaseFaultTypeDescription(je.getLocalizedMessage())
-                     }, null));
-		}
-		catch (IOException ioe)
-		{
-			throw FaultManipulator.fillInFault(
-				new BaseFaultType(null, null, null, null,
-					new BaseFaultTypeDescription[]
-                     {
-						new BaseFaultTypeDescription(ioe.getLocalizedMessage())
-                     }, null));
+			throw new RemoteException("Unable to create new activity.", fnfe);
 		}
 		catch (ConfigurationException ce)
 		{
-			throw FaultManipulator.fillInFault(
-				new BaseFaultType(null, null, null, null,
-					new BaseFaultTypeDescription[]
-                     {
-						new BaseFaultTypeDescription(ce.getLocalizedMessage())
-                     }, null));
+			throw new RemoteException("Unable to create new activity.", ce);
 		}
-		catch (GeneralSecurityException ce)
+		catch (SQLException sqe)
 		{
-			throw FaultManipulator.fillInFault(
-				new BaseFaultType(null, null, null, null,
-					new BaseFaultTypeDescription[]
-                     {
-						new BaseFaultTypeDescription(ce.getLocalizedMessage())
-                     }, null));
+			throw new RemoteException("Unable to create new activity.", sqe);
+		}
+		catch (JSDLException je)
+		{
+			throw new RemoteException("Unable to create new activity.", je);
 		}
 	}
 	
@@ -233,8 +178,7 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 		{
 			factory = createStreamableByteIOResource();
 			OutputStream out = factory.getCreationStream();
-			ActivityState state = ActivityState.fromActivityStatus(
-				resource.getOverallStatus());
+			ActivityState state = resource.findActivity().getState();
 			PrintStream ps = new PrintStream(out);
 			ps.println("Status:");
 			ps.println(state);
@@ -274,11 +218,23 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 			byte []serializedFault = null;
 			IBESActivityResource resource = 
 				(IBESActivityResource)ResourceManager.getCurrentResource().dereference();
-			Throwable cause = (Throwable)resource.getProperty(IBESActivityResource.ERROR_PROPERTY);
-			if (cause != null)
-				serializedFault = DBSerializer.serialize(cause);
+			Collection<Throwable> faults = resource.findActivity().getFaults();
+			if (faults != null && faults.size() > 0)
+			{
+				Throwable cause = faults.iterator().next();
+				if (cause != null)
+					serializedFault = DBSerializer.serialize(cause);
+			}
 			
 			return new BESActivityGetErrorResponseType(serializedFault);
+		}
+		catch (SQLException sqe)
+		{
+			throw FaultManipulator.fillInFault(
+				new ResourceCreationFaultType(null, null, null, null,
+						new BaseFaultTypeDescription[] {
+							new BaseFaultTypeDescription(sqe.getLocalizedMessage()) },
+						null));
 		}
 		catch (IOException ioe)
 		{

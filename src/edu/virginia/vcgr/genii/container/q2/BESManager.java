@@ -14,11 +14,11 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.ggf.bes.BESPortType;
 import org.ggf.rns.EntryType;
 import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -573,7 +573,7 @@ public class BESManager implements Closeable
 
 		/* See interface declaration */
 		@Override
-		public BESPortType createClientStub(Connection connection, long besID)
+		public GeniiBESPortType createClientStub(Connection connection, long besID)
 			throws Throwable
 		{
 			/* We need to get the EPR of this BES container.  The database
@@ -589,7 +589,7 @@ public class BESManager implements Closeable
 			/* Go ahead and create the client stub with the calling context and
 			 * the EPR.
 			 */
-			return ClientUtils.createProxy(BESPortType.class, 
+			return ClientUtils.createProxy(GeniiBESPortType.class, 
 				entry.getEntry_reference(), _callingContext);
 		}
 	}

@@ -1007,7 +1007,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 			IAttributeManipulator manip = getAttributePackage().getManipulator(attrName);
 			if (manip == null)
 			{
-				FaultManipulator.fillInFault(
+				throw FaultManipulator.fillInFault(
 					new InvalidResourcePropertyQNameFaultType(
 						null, null, null, null, new BaseFaultTypeDescription[] {
 							new BaseFaultTypeDescription("The resource property " + attrName + " is unknown.")

@@ -16,6 +16,7 @@
 package edu.virginia.vcgr.genii.container.bes;
 
 import java.lang.management.ManagementFactory;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -28,7 +29,6 @@ import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
-import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
@@ -45,28 +45,25 @@ import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.sysinfo.SystemInfoUtils;
 
 public class BESAttributesHandler extends AbstractAttributeHandler
+	implements BESConstants
 {
 	static private final String _DESCRIPTION_PROPERTY = "attribute:description";
 	static private final String _DEPLOYER_PROPERTY = "attribute:deployer";
 	
 	static public QName NAME_ATTR = new QName(
-		WellKnownPortTypes.BES_SERVICE_PORT_TYPE.getNamespaceURI(), "Name");
+		GENII_BES_NS, "Name");
 	static public QName TOTAL_NUMBER_OF_ACTIVITIES_ATTR = new QName(
-		WellKnownPortTypes.BES_SERVICE_PORT_TYPE.getNamespaceURI(), 
-		"TotalNumberOfActivities");
+		GENII_BES_NS, "TotalNumberOfActivities");
 	static public QName ACTIVITY_REFERENCE_ATTR = new QName(
-		WellKnownPortTypes.BES_SERVICE_PORT_TYPE.getNamespaceURI(),
-		"ActivityReference");
+		GENII_BES_NS, "ActivityReference");
 	static public QName DESCRIPTION_ATTR = new QName(
-		WellKnownPortTypes.BES_SERVICE_PORT_TYPE.getNamespaceURI(), "Description");
+		GENII_BES_NS, "Description");
 	static public QName OPERATING_SYSTEM_ATTR = new QName(
-		WellKnownPortTypes.BES_SERVICE_PORT_TYPE.getNamespaceURI(), 
-		"OperatingSystem");
+		GENII_BES_NS, "OperatingSystem");
 	static public QName CPU_ARCHITECTURE_ATTR = new QName(
-		WellKnownPortTypes.BES_SERVICE_PORT_TYPE.getNamespaceURI(), 
-		"CPUArchitecture");
+		GENII_BES_NS, "CPUArchitecture");
 	static public QName CPU_COUNT_ATTR = new QName(
-		WellKnownPortTypes.BES_SERVICE_PORT_TYPE.getNamespaceURI(), "CPUCount");
+		GENII_BES_NS, "CPUCount");
 	
 	static public QName CPU_SPEED_ATTR = new QName(
 		GenesisIIConstants.JSDL_NS, "IndividualCPUSpeed");
@@ -74,6 +71,9 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		GenesisIIConstants.JSDL_NS, "PhysicalMemory");
 	static public QName VIRTUAL_MEMORY_ATTR = new QName(
 		GenesisIIConstants.JSDL_NS, "VirtualMemory");
+	
+	static public QName IS_ACCEPTING_NEW_ACTIVITIES_ATTR = new QName(
+		GENII_BES_NS, "IsAcceptingNewActivities");
 	
 	public BESAttributesHandler(AttributePackage pkg) throws NoSuchMethodException
 	{
@@ -91,6 +91,7 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		addHandler(OPERATING_SYSTEM_ATTR, "getOperatingSystemAttr");
 		addHandler(CPU_ARCHITECTURE_ATTR, "getCPUArchitectureAttr");
 		addHandler(CPU_COUNT_ATTR, "getCPUCountAttr");
+		addHandler(IS_ACCEPTING_NEW_ACTIVITIES_ATTR, "getIsAcceptingNewActivitiesAttr");
 		
 		addHandler(CPU_SPEED_ATTR, "getCPUSpeedAttr");
 		addHandler(PHYSICAL_MEMORY_ATTR, "getPhysicalMemoryAttr");
@@ -105,13 +106,13 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 	}
 	
 	static public int getTotalNumberOfActivities() 
-		throws ResourceUnknownFaultType, ResourceException
+		throws ResourceUnknownFaultType, ResourceException, RemoteException
 	{
 		return getActivityReferences().length;
 	}
 	
 	static public EndpointReferenceType[] getActivityReferences()
-		throws ResourceUnknownFaultType, ResourceException
+		throws ResourceUnknownFaultType, ResourceException, RemoteException
 	{
 		IBESResource resource = null;
 		
@@ -142,6 +143,20 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 	{
 		return ManagementFactory.getOperatingSystemMXBean(
 			).getAvailableProcessors();
+	}
+	
+	static public Boolean getIsAcceptingNewActivities()
+		throws ResourceException, ResourceUnknownFaultType
+	{
+		IBESResource resource = null;
+		
+		resource = (IBESResource)ResourceManager.getCurrentResource().dereference();
+		Boolean isAccepting = (Boolean)resource.getProperty(
+			IBESResource.STORED_ACCEPTING_NEW_ACTIVITIES);
+		if (isAccepting == null)
+			isAccepting = Boolean.TRUE;
+		
+		return isAccepting;
 	}
 	
 	public void setDescription(String description)
@@ -191,20 +206,27 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		resource.commit();
 	}
 	
+	public MessageElement getIsAcceptingNewActivitiesAttr()
+		throws ResourceUnknownFaultType, ResourceException
+	{
+		return new MessageElement(IS_ACCEPTING_NEW_ACTIVITIES_ATTR, 
+			getIsAcceptingNewActivities());
+	}
+	
 	public MessageElement getNameAttr()
 	{
 		return new MessageElement(NAME_ATTR, getName());
 	}
 	
 	public MessageElement getTotalNumberOfActivitiesAttr()
-		throws ResourceException, ResourceUnknownFaultType
+		throws ResourceException, ResourceUnknownFaultType, RemoteException
 	{
 		return new MessageElement(TOTAL_NUMBER_OF_ACTIVITIES_ATTR,
 			getTotalNumberOfActivities());
 	}
 	
 	public ArrayList<MessageElement> getActivityReferencesAttr()
-		throws ResourceException, ResourceUnknownFaultType
+		throws ResourceException, ResourceUnknownFaultType, RemoteException
 	{
 		EndpointReferenceType []eprs = getActivityReferences();
 		ArrayList<MessageElement> ret = new ArrayList<MessageElement>(eprs.length);

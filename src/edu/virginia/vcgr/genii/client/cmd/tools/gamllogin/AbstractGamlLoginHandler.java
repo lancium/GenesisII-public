@@ -21,6 +21,7 @@ import javax.security.auth.callback.PasswordCallback;
 
 import edu.virginia.vcgr.genii.client.security.wincrypto.WinX509KeyManager;
 import edu.virginia.vcgr.genii.client.security.x509.InputStreamBuilder;
+import edu.virginia.vcgr.genii.container.sysinfo.SupportedOperatingSystems;
 
 public abstract class AbstractGamlLoginHandler implements CallbackHandler {
 	static private final int _PASSWORD_TRIES = 5;
@@ -76,9 +77,11 @@ public abstract class AbstractGamlLoginHandler implements CallbackHandler {
 		}
 	}
 
-	private void addEntriesFromWindows(
-			Collection<CertEntry> entries) {
-		if (System.getProperty("os.name").contains("Windows")) {
+	private void addEntriesFromWindows(Collection<CertEntry> entries) 
+	{
+		if (SupportedOperatingSystems.current().equals(
+			SupportedOperatingSystems.WINDOWS)) 
+		{
 			WinX509KeyManager km = new WinX509KeyManager();
 			String[] aliases = km.getClientAliases(null, null);
 			for (String alias : aliases) {

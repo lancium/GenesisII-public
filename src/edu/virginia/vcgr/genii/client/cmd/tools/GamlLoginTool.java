@@ -37,6 +37,7 @@ import edu.virginia.vcgr.genii.client.utils.dialog.YesNoWidget;
 import edu.virginia.vcgr.genii.client.utils.dialog.text.TextWidgetProvider;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.cmd.tools.gamllogin.*;
+import edu.virginia.vcgr.genii.container.sysinfo.SupportedOperatingSystems;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.resource.*;
@@ -447,7 +448,9 @@ public class GamlLoginTool extends BaseGridTool {
 	 */
 	private boolean queryUserForDefaultOptions() throws DialogException, IOException
 	{
-		boolean isWindows = System.getProperty("os.name").contains("Windows");
+		boolean isWindows = SupportedOperatingSystems.current().equals(
+			SupportedOperatingSystems.WINDOWS);
+		
 		TextWidgetProvider twp = new TextWidgetProvider(stdout, stderr, stdin);
 		
 		if (isWindows)

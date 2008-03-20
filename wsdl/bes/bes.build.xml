@@ -14,6 +14,8 @@
 					<include name="bes.gwsdl"/>
 					<include name="bes-factory.wsdl"/>
 					<include name="bes-factory.xsd"/>
+					<include name="bes-management.wsdl"/>
+					<include name="bes-management.xsd"/>
 				</srcfiles>
 				<srcfiles dir="${wsdl-dir}/jsdl">
 					<include name="jsdl.xsd"/>
@@ -31,6 +33,8 @@
 				<include name="bes.gwsdl"/>
 				<include name="bes-factory.wsdl"/>
 				<include name="bes-factory.xsd"/>
+				<include name="bes-management.wsdl"/>
+				<include name="bes-management.xsd"/>
 			</fileset>
 			<fileset dir="${wsdl-dir}/jsdl">
 				<include name="jsdl.xsd"/>
@@ -50,7 +54,7 @@
 		<genii-service-generator
 			source="${codegen-dir}/wsdl/bes-generated.wsdl"
 			target="${codegen-dir}/wsdl/bes-service.wsdl"
-    		portType="{http://schemas.ggf.org/bes/2006/08/bes}BESPortType"/>
+    		portType="{http://vcgr.cs.virginia.edu/genii/2008/3/bes}GeniiBESPortType"/>
 
 		<antcall target="gen.stub-generation">
 			<param name="stub.gen.target-dir" value="${codegen-dir}/bes"/>
@@ -59,11 +63,11 @@
 			<param name="stub.gen.target-flag-file"
 				value="${codegen-dir}/wsdl/bes.flag"/>
 		</antcall>
-		<move file="${codegen-dir}/bes/org/ggf/bes/deploy.wsdd"
+		<move file="${codegen-dir}/bes/edu/virginia/vcgr/genii/bes/deploy.wsdd"
 			tofile="${wsdd-dir}/bes.deploy.wsdd"/>
 		<replace file="${wsdd-dir}/bes.deploy.wsdd"
-			token="org.ggf.bes.BESSOAPBindingImpl"
-			value="edu.virginia.vcgr.genii.container.bes.BESServiceImpl"
+			token="edu.virginia.vcgr.genii.bes.GeniiBESSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.bes.GeniiBESServiceImpl"
 			summary="yes"/>
 		<copy file="${wsdd-dir}/bes.deploy.wsdd"
 			todir="${services.dir}"/>

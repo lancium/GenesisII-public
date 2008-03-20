@@ -4,10 +4,10 @@ import java.io.OutputStreamWriter;
 
 import javax.xml.namespace.QName;
 
-import org.ggf.bes.BESPortType;
 import org.ggf.bes.factory.GetFactoryAttributesDocumentResponseType;
 import org.ggf.bes.factory.GetFactoryAttributesDocumentType;
 
+import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
@@ -33,7 +33,7 @@ public class GetBESFactoryAttributesTool extends BaseGridTool
 		RNSPath path = RNSPath.getCurrent();
 		path = path.lookup(getArgument(0), RNSPathQueryFlags.MUST_EXIST);
 		
-		BESPortType bes = ClientUtils.createProxy(BESPortType.class,
+		GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class,
 			path.getEndpoint());
 
 		GetFactoryAttributesDocumentResponseType resp =

@@ -31,7 +31,6 @@ import org.apache.axis.AxisFault;
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.ggf.bes.BESPortType;
 import org.ggf.bes.factory.GetFactoryAttributesDocumentResponseType;
 import org.ggf.bes.factory.GetFactoryAttributesDocumentType;
 import org.ggf.rns.Add;
@@ -56,6 +55,7 @@ import org.xml.sax.SAXException;
 
 
 
+import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
@@ -390,16 +390,16 @@ public class InformationServiceImpl extends RNSServiceImpl implements
 		
 		try 
 		{
-			BESPortType bes = null;
+			GeniiBESPortType bes = null;
 			/*
 			 * it's done in this way so that the update thread can also perform those functions
 			 * while using the calling context of the parent thread.
 			 */
 			if (_serviceCallingContext != null) {
-				bes = ClientUtils.createProxy(BESPortType.class, myEPR, _serviceCallingContext);
+				bes = ClientUtils.createProxy(GeniiBESPortType.class, myEPR, _serviceCallingContext);
 			}
 			else {
-				bes = ClientUtils.createProxy(BESPortType.class, myEPR, callingContext);
+				bes = ClientUtils.createProxy(GeniiBESPortType.class, myEPR, callingContext);
 			}
 			GetFactoryAttributesDocumentResponseType resp =
 				bes.getFactoryAttributesDocument(new GetFactoryAttributesDocumentType());

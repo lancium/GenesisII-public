@@ -2,11 +2,37 @@ package edu.virginia.vcgr.genii.client.bes;
 
 import javax.xml.namespace.QName;
 
-public class BESConstants
+public interface BESConstants
 {
-	static public final String BES_NS = 
-		"http://schemas.ggf.org/bes/2006/08/bes";
+	static public final String BES_FACTORY_NS =
+		"http://schemas.ggf.org/bes/2006/08/bes-factory";
+	static public final String BES_MANAGEMENT_NS =
+		"http://schemas.ggf.org/bes/2006/08/bes-management";
+	static public final String GENII_BES_NS =
+		"http://vcgr.cs.virginia.edu/genii/2008/3/bes";
 	
-	static public QName DEPLOYER_EPR_ATTR =
-		new QName(BES_NS, "deployer");
+	static public final String BES_FACTORY_PORT_TYPE_NAME =
+		"BESFactoryPortType";
+	static public final String BES_MANAGEMENT_PORT_TYPE_NAME =
+		"BESManagementPortType";
+	static public final String GENII_BES_PORT_TYPE_NAME =
+		"GeniiBESPortType";
+	
+	static public final QName BES_FACTORY_PORT_TYPE_QNAME =
+		new QName(BES_FACTORY_NS, BES_FACTORY_PORT_TYPE_NAME);
+	static public final QName BES_MANAGEMENT_PORT_TYPE_QNAME =
+		new QName(BES_MANAGEMENT_NS, BES_MANAGEMENT_PORT_TYPE_NAME);
+	static public final QName GENII_BES_PORT_TYPE_QNAME =
+		new QName(GENII_BES_NS, GENII_BES_PORT_TYPE_NAME);
+	
+	static public final QName DEPLOYER_EPR_ATTR =
+		new QName(GENII_BES_NS, "deployer");
+	
+	static public final String NAMING_PROFILE_WS_ADDRESSING = 
+		"http://schemas.ggf.org/bes/2006/08/bes/naming/BasicWSAddressing";
+	static public final String NAMING_PROFILE_WS_NAMING =
+		"http://www.ogf.org/naming/2006/08/naming-uwsep-pf";
+	
+	static public final String LOCAL_RESOURCE_MANAGER_TYPE_SIMPLE =
+		"http://vcgr.cs.virginia.edu/2008/03/resource-manager-type/simple";
 }

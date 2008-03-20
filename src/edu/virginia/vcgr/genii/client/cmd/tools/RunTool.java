@@ -16,11 +16,11 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
-import org.ggf.bes.BESPortType;
 import org.ggf.bes.factory.ActivityDocumentType;
 import org.ggf.bes.factory.CreateActivityResponseType;
 import org.ggf.bes.factory.CreateActivityType;
-import org.ggf.bes.factory.GetActivityStatusResponseType;
+import org.ggf.bes.factory.GetActivityStatusesResponseType;
+import org.ggf.bes.factory.GetActivityStatusesType;
 import org.ggf.jsdl.Application_Type;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.jsdl.JobIdentification_Type;
@@ -34,6 +34,7 @@ import org.xml.sax.InputSource;
 
 import edu.virginia.vcgr.genii.appdesc.ApplicationDescriptionPortType;
 import edu.virginia.vcgr.genii.appdesc.SupportDocumentType;
+import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.bes.activity.BESActivityPortType;
 import edu.virginia.vcgr.genii.client.appdesc.Matching;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
@@ -175,7 +176,7 @@ public class RunTool extends BaseGridTool
 			
 			ActivityState state = checkStatus(path.getEndpoint());
 			stdout.println("Status:  " + state);
-			if (state.isInState(ActivityState.FAILED))
+			if (state.isFailedState())
 				throw getError(path.getEndpoint());
 			return 0;
 		} else if (_jsdl != null)
@@ -220,10 +221,10 @@ public class RunTool extends BaseGridTool
 		{
 			ActivityState state = checkStatus(besContainer, activity);
 			stdout.println("Status:  " + state);
-			if (state.isTerminalState())
+			if (state.isFinalState())
 			{
 				Throwable error = null;
-				if (state.isInState(ActivityState.FAILED))
+				if (state.isFailedState())
 					error = getError(activity);
 				GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, activity);
 				common.destroy(new Destroy());
@@ -322,7 +323,9 @@ public class RunTool extends BaseGridTool
 				GeniiCommon.class, activity);
 		GetResourcePropertyResponse resp = common.getResourceProperty(
 			BESActivityConstants.STATUS_ATTR);
-		return ActivityState.fromMessage((MessageElement)(resp.get_any()[0].getChildElements().next()));
+		
+		MessageElement elem = (MessageElement)(resp.get_any()[0].getChildElements().next());
+		return new ActivityState(elem);
 	}
 	
 	static public ActivityState checkStatus(
@@ -330,11 +333,11 @@ public class RunTool extends BaseGridTool
 		throws ResourceException, RemoteException, ConfigurationException,
 			RNSPathDoesNotExistException
 	{
-		BESPortType bes = ClientUtils.createProxy(
-			BESPortType.class, besContainer);
-		GetActivityStatusResponseType []resp = bes.getActivityStatuses(
-			new EndpointReferenceType[] { activity });
-		return ActivityState.fromActivityStatus(resp[0].getActivityStatus());
+		GeniiBESPortType bes = ClientUtils.createProxy(
+			GeniiBESPortType.class, besContainer);
+		GetActivityStatusesResponseType resp = bes.getActivityStatuses(
+			new GetActivityStatusesType(new EndpointReferenceType[] { activity }, null));
+		return new ActivityState(resp.getResponse(0).getActivityStatus());
 	}
 	
 	static public EndpointReferenceType submitJob(String jsdlFileName,
@@ -378,8 +381,8 @@ public class RunTool extends BaseGridTool
 		throws ResourceException, ConfigurationException,
 			RNSException, RemoteException
 	{
-		BESPortType bes = ClientUtils.createProxy(
-			BESPortType.class, besContainer);
+		GeniiBESPortType bes = ClientUtils.createProxy(
+			GeniiBESPortType.class, besContainer);
 		
 		jobDef = deployAndReify(bes, jobDef);
 		if (jobDef == null)
@@ -387,7 +390,7 @@ public class RunTool extends BaseGridTool
 					"Unable to find a suitable deployment.");
 		
 		CreateActivityType createActivityRequest =
-			new CreateActivityType(new ActivityDocumentType(jobDef, null));
+			new CreateActivityType(new ActivityDocumentType(jobDef, null), null);
 		CreateActivityResponseType response = 
 			bes.createActivity(createActivityRequest);
 		return response.getActivityIdentifier();
@@ -424,7 +427,7 @@ public class RunTool extends BaseGridTool
 		new QName(GENII_APP_NS, "ApplicationEndpoint");
 	
 	static private JobDefinition_Type deployAndReify(
-		BESPortType bes, JobDefinition_Type jobDef)
+		GeniiBESPortType bes, JobDefinition_Type jobDef)
 		throws RNSException, ConfigurationException, ResourceException,
 			RemoteException
 	{
@@ -498,7 +501,7 @@ public class RunTool extends BaseGridTool
 	}
 	
 	static private Collection<EndpointReferenceType> getPossibleBESDeployers(
-		BESPortType bes) throws ResourceUnknownFaultType, RemoteException
+		GeniiBESPortType bes) throws ResourceUnknownFaultType, RemoteException
 	{
 		ArrayList<EndpointReferenceType> ret =
 			new ArrayList<EndpointReferenceType>();

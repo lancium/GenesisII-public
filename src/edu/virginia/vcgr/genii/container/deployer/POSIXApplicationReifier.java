@@ -10,6 +10,8 @@ import org.ggf.jsdl.posix.Environment_Type;
 import org.ggf.jsdl.posix.FileName_Type;
 import org.ggf.jsdl.posix.POSIXApplication_Type;
 
+import edu.virginia.vcgr.genii.container.sysinfo.SupportedOperatingSystems;
+
 public class POSIXApplicationReifier
 {
 	static public POSIXApplication_Type 
@@ -109,7 +111,8 @@ public class POSIXApplicationReifier
 	
 	static private boolean isWindows()
 	{
-		return (System.getProperty("os.name").startsWith("Windows"));
+		return SupportedOperatingSystems.current().equals(
+			SupportedOperatingSystems.WINDOWS);
 	}
 	
 	static private String modifyPath(String original,

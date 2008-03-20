@@ -121,8 +121,8 @@
 			locator-type="org.ggf.rns.RNSServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.scheduler.basic.BasicSchedulerPortType"
 			locator-type="edu.virginia.vcgr.genii.scheduler.basic.BasicSchedulerServiceLocator"/>
-		<locator interface="org.ggf.bes.BESPortType"
-			locator-type="org.ggf.bes.BESServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.bes.GeniiBESPortType"
+			locator-type="edu.virginia.vcgr.genii.bes.GeniiBESServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.bes.activity.BESActivityPortType"
 			locator-type="edu.virginia.vcgr.genii.bes.activity.BESActivityServiceLocator"/>
 		<locator interface="org.ggf.rbyteio.RandomByteIOPortType"

@@ -15,12 +15,17 @@
  */
 package edu.virginia.vcgr.genii.container.bes.resource;
 
+import java.rmi.RemoteException;
+
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public interface IBESResource extends IResource
 {
-	public EndpointReferenceType[] getContainedActivities() throws ResourceException;
+	static public final String STORED_ACCEPTING_NEW_ACTIVITIES = 
+		"edu.virginia.bes.resource.stored-accepting-new-activities";
+	
+	public EndpointReferenceType[] getContainedActivities() 
+		throws RemoteException;
 }

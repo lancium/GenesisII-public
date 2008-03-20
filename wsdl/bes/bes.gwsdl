@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<wsdl:definitions name="BES"
-    targetNamespace="http://schemas.ggf.org/bes/2006/08/bes"
+<wsdl:definitions name="GeniiBES"
+    targetNamespace="http://vcgr.cs.virginia.edu/genii/2008/3/bes"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:bes="http://schemas.ggf.org/bes/2006/08/bes"
+    xmlns:genii-bes="http://vcgr.cs.virginia.edu/genii/2008/3/bes"
+    xmlns:bes-mgmt="http://schemas.ggf.org/bes/2006/08/bes-management"
     xmlns:bes-factory="http://schemas.ggf.org/bes/2006/08/bes-factory"
     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
 	xmlns:rns="http://schemas.ggf.org/rns/2006/05/rns"
@@ -28,6 +29,9 @@
 	
 	<wsdl:import namespace="http://schemas.ggf.org/bes/2006/08/bes-factory"
 		location="./bes-factory.wsdl"/>
+
+	<wsdl:import namespace="http://schemas.ggf.org/bes/2006/08/bes-management"
+		location="./bes-management.wsdl"/>
 
     <wsdl:import
         namespace="http://schemas.ggf.org/rns/2006/05/rns"
@@ -65,7 +69,7 @@
 		<xsd:schema
 			attributeFormDefault="unqualified"
 			elementFormDefault="qualified"
-			targetNamespace="http://schemas.ggf.org/bes/2006/08/bes">
+			targetNamespace="http://vcgr.cs.virginia.edu/genii/2008/3/bes">
 
 			<xsd:import
 				namespace="http://schemas.ggf.org/jsdl/2005/11/jsdl"
@@ -81,10 +85,11 @@
 		</xsd:schema>
 	</wsdl:types>
 
-	<wsdl:portType name="BESPortType">
+	<wsdl:portType name="GeniiBESPortType">
 		<genii-ext:extend portType="genii-common:GeniiCommon"/>
 		<genii-ext:extend portType="rns:RNSPortType"/>
 		<genii-ext:extend portType="bes-factory:BESFactoryPortType"/>
+		<genii-ext:extend portType="bes-mgmt:BESManagementPortType"/>
 		<genii-ext:extend portType="rpw-2:GetResourceProperty"/>
 		<genii-ext:extend portType="rpw-2:GetMultipleResourceProperties"/>
 		<genii-ext:extend portType="genii-not:GeniiNotificationConsumerPortType"/>

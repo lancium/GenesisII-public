@@ -1,20 +1,28 @@
 package edu.virginia.vcgr.genii.container.processmanager;
 
-public class ProcessManagerUtils {
+import edu.virginia.vcgr.genii.container.sysinfo.SupportedOperatingSystems;
+
+public class ProcessManagerUtils 
+{
 	static private IProcessManagerProvider _provider;
+
 	static
 	{
-		String osName = System.getProperty("os.name");
+		SupportedOperatingSystems os = SupportedOperatingSystems.current();
 		
-		if (osName.equals("Linux"))
+		if (os.equals(SupportedOperatingSystems.LINUX))
+		{
 			// Currently undefined Linux behavior for process management
-			_provider = null;
-		else if ((osName.equals("Windows XP")|| osName.equals("Windows 2003")))
+			_provider = new LinuxProvider();
+		} else if (os.equals(SupportedOperatingSystems.WINDOWS))
+		{
 			_provider = new WindowsProvider();
-		else
+		} else
+		{
 			throw new RuntimeException(
-				"Don't know an ISystemInfoProvider for OS type \"" +
-				osName + "\".");
+				"Don't know an IProcessManagerProvider for OS type \"" +
+				os + "\".");
+		}
 	}
 
 	static private IProcessManagerProvider getProvider()

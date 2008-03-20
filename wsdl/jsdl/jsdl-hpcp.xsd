@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.ggf.org/jsdl/2006/07/jsdl-hpcp" xmlns:jsdl-hpcp="http://schemas.ggf.org/jsdl/2006/07/jsdl-hpcp" targetNamespace="http://schemas.ggf.org/jsdl/2006/07/jsdl-hpcp" elementFormDefault="qualified">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://schemas.ggf.org/jsdl/2006/07/jsdl-hpcp"
+	xmlns:jsdl-hpcp="http://schemas.ggf.org/jsdl/2006/07/jsdl-hpcpa"
+	targetNamespace="http://schemas.ggf.org/jsdl/2006/07/jsdl-hpcpa"
+	elementFormDefault="qualified">
+	
 	<!--========================================================================-->
 	<xsd:complexType name="Environment_Type">
 		<xsd:simpleContent>

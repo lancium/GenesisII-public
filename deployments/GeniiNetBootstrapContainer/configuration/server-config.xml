@@ -333,7 +333,7 @@
 			<genii:resource-provider name="sbyteio-db-resource-provider"/>
 		</genii:service>
 
-		<genii:service name="BESPortType">
+		<genii:service name="GeniiBESPortType">
 			<genii:resource-provider name="bes-db-resource-provider"/>
 		</genii:service>
 		

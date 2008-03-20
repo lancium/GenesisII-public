@@ -15,6 +15,7 @@ import edu.virginia.vcgr.genii.client.context.ContextStreamUtils;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.utils.urls.URLUtilities;
+import edu.virginia.vcgr.genii.container.sysinfo.SupportedOperatingSystems;
 
 public class ConnectTool extends BaseGridTool
 {
@@ -71,7 +72,8 @@ public class ConnectTool extends BaseGridTool
 		throws ResourceException, MalformedURLException, IOException,
 			ConfigurationException
 	{
-		boolean isWindows = System.getProperty("os.name").contains("Windows");
+		boolean isWindows = SupportedOperatingSystems.current().equals(
+			SupportedOperatingSystems.WINDOWS);
 		
 		URL url = URLUtilities.formURL(connectURL, isWindows);
 		connect(ContextStreamUtils.load(url), null);
@@ -107,7 +109,8 @@ public class ConnectTool extends BaseGridTool
 		throws ResourceException, MalformedURLException, IOException,
 			ConfigurationException
 	{
-		boolean isWindows = System.getProperty("os.name").contains("Windows");
+		boolean isWindows = SupportedOperatingSystems.current().equals(
+			SupportedOperatingSystems.WINDOWS);
 		
 		URL url = URLUtilities.formURL(connectURL, isWindows);
 		connect(ContextStreamUtils.load(url), deploymentDir);

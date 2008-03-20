@@ -235,14 +235,6 @@ public class BasicDBResource implements IResource
 				
 				return DBSerializer.fromBlob(rs.getBlob(1));
 			}
-			catch (IOException ioe)
-			{
-				throw new ResourceException("Unable to deserialize property.", ioe);
-			}
-			catch (ClassNotFoundException cnfe)
-			{
-				throw new ResourceException("Unable to deserialize property.", cnfe);
-			}
 			catch (SQLException sqe)
 			{
 				throw new ResourceException(sqe.getLocalizedMessage(), sqe);
