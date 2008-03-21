@@ -58,7 +58,7 @@ public class BESPolicy
 			ssiaAction = _screenSaverInactiveAction;
 		
 		int comp = uliAction.compareTo(ssiaAction);
-		if (comp < 0)
+		if (comp > 0)
 			return uliAction;
 		
 		return ssiaAction;

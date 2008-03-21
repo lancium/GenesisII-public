@@ -151,6 +151,8 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 			stmt.setString(3, _resourceKey);
 			if (stmt.executeUpdate() != 1)
 				throw new ResourceException("Unable to update bes policy.");
+			
+			getBES().getPolicyEnactor().setPolicy(policy);
 		}
 		catch (SQLException sqe)
 		{

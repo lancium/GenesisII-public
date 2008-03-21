@@ -242,6 +242,7 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		IBESResource resource;
 		resource = (IBESResource)ResourceManager.getCurrentResource().dereference();
 		resource.setPolicy(p);
+		resource.commit();
 	}
 	
 	public MessageElement getNameAttr()

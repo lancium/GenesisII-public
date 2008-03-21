@@ -76,9 +76,9 @@ public class BESActivity implements Closeable
 		_suspendRequested = suspendRequested;
 		_terminateRequested = terminateRequested;
 		
+		_runner = new ActivityRunner(_suspendRequested, _terminateRequested);
 		_policyListener = new PolicyListener();
 		_bes.getPolicyEnactor().addBESPolicyListener(_policyListener);
-		_runner = new ActivityRunner(_suspendRequested, _terminateRequested);
 		
 		Thread thread = new Thread(_runner, "BES Activity Runner Thread");
 		thread.setDaemon(true);

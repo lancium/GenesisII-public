@@ -71,6 +71,8 @@ public class BESPolicyEnactor implements Closeable
 		{
 			_listeners.add(listener);
 		}
+		
+		fireNewAction(listener, _lastAction);
 	}
 	
 	public void removeBESPolicyListener(BESPolicyListener listener)
@@ -78,6 +80,26 @@ public class BESPolicyEnactor implements Closeable
 		synchronized(_listeners)
 		{
 			_listeners.remove(listener);
+		}
+	}
+	
+	private void fireNewAction(BESPolicyListener listener, 
+		BESPolicyActions action)
+	{
+		try
+		{
+			if (action.equals(BESPolicyActions.NOACTION))
+				listener.resume();
+			else if (action.equals(BESPolicyActions.SUSPEND))
+				listener.suspend();
+			else if (action.equals(BESPolicyActions.SUSPENDORKILL))
+				listener.suspendOrKill();
+			else if (action.equals(BESPolicyActions.KILL))
+				listener.kill();
+		}
+		catch (Throwable cause)
+		{
+			_logger.error("Exception thrown while enacting BES policy.", cause);
 		}
 	}
 	
@@ -92,21 +114,7 @@ public class BESPolicyEnactor implements Closeable
 		
 		for (BESPolicyListener listener : listeners)
 		{
-			try
-			{
-				if (action.equals(BESPolicyActions.NOACTION))
-					listener.resume();
-				else if (action.equals(BESPolicyActions.SUSPEND))
-					listener.suspend();
-				else if (action.equals(BESPolicyActions.SUSPENDORKILL))
-					listener.suspendOrKill();
-				else if (action.equals(BESPolicyActions.KILL))
-					listener.kill();
-			}
-			catch (Throwable cause)
-			{
-				_logger.error("Exception thrown while enacting BES policy.", cause);
-			}
+			fireNewAction(listener, action);
 		}
 	}
 	
@@ -132,12 +140,14 @@ public class BESPolicyEnactor implements Closeable
 		public void screenSaverActivated(boolean activated)
 		{
 			_lastScreenSaverActiveStatus = new Boolean(activated);
+			updateAction();
 		}
 
 		@Override
 		public void userLoggedIn(boolean loggedIn)
 		{
 			_lastUserLoggedInStatus = new Boolean(loggedIn);
+			updateAction();
 		}
 	}
 }
