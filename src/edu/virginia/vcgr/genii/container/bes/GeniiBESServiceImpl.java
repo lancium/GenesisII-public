@@ -93,9 +93,8 @@ import edu.virginia.vcgr.genii.common.notification.UserDataType;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
 import edu.virginia.vcgr.genii.container.Container;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivityUtils;
-import edu.virginia.vcgr.genii.container.bes.execution.Activity;
-import edu.virginia.vcgr.genii.container.bes.execution.ActivityManager;
 import edu.virginia.vcgr.genii.container.bes.resource.DBBESResourceFactory;
 import edu.virginia.vcgr.genii.container.bes.resource.IBESResource;
 import edu.virginia.vcgr.genii.container.byteio.RByteIOResource;
@@ -104,7 +103,6 @@ import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
-import edu.virginia.vcgr.genii.container.resource.StringResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.sysinfo.SystemInfoUtils;
 
 public class GeniiBESServiceImpl extends GenesisIIBase implements
@@ -136,7 +134,7 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 				(DBBESResourceFactory)ResourceManager.getServiceResource(_serviceName
 					).getProvider().getFactory()).getConnectionPool();
 			
-			ActivityManager.startManager(connectionPool);
+			BES.loadAllInstances(connectionPool);
 		}
 		catch (Exception e)
 		{
@@ -194,31 +192,36 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 		ActivityDocumentType adt = parameters.getActivityDocument();
 		JobDefinition_Type jdt = adt.getJobDefinition();
 
-		  if (_localActivityServiceEPR == null) {
-              // only need to make this epr from scratch once (which involves
-              // a get-attr rpc to the service to get its full epr)
-			  _localActivityServiceEPR =
-                  EPRUtils.makeEPR(Container.getServiceURL("BESActivityPortType"));
-          }
-
-		  IResource resource = ResourceManager.getCurrentResource().dereference();
+		IBESResource resource = 
+			(IBESResource)ResourceManager.getCurrentResource().dereference();
 		 
-		  try
-		  {
-	          BESActivityPortType activity = ClientUtils.createProxy(
-	              BESActivityPortType.class,
-	              _localActivityServiceEPR);
-	
-	          VcgrCreateResponse resp = activity.vcgrCreate(
-	              new VcgrCreate(
-	                  BESActivityUtils.createCreationProperties(
-	                      jdt, (String)resource.getKey())));
-	          return new CreateActivityResponseType(resp.getEndpoint(), adt, null);
-		  }
-		  catch (ConfigurationException ce)
-		  {
-			  throw new RemoteException("Unable to create client proxy.", ce);
-		  }
+		if (!resource.isAcceptingNewActivities())
+			throw new NotAcceptingNewActivitiesFaultType(null);
+		
+		if (_localActivityServiceEPR == null) 
+		{
+			// only need to make this epr from scratch once (which involves
+			// a get-attr rpc to the service to get its full epr)
+			_localActivityServiceEPR =
+				EPRUtils.makeEPR(Container.getServiceURL("BESActivityPortType"));
+		}
+		
+		try
+		{
+			BESActivityPortType activity = ClientUtils.createProxy(
+			BESActivityPortType.class,
+			_localActivityServiceEPR);
+			
+			VcgrCreateResponse resp = activity.vcgrCreate(
+				new VcgrCreate(
+					BESActivityUtils.createCreationProperties(
+						jdt, (String)resource.getKey())));
+			return new CreateActivityResponseType(resp.getEndpoint(), adt, null);
+		}
+		catch (ConfigurationException ce)
+		{
+			throw new RemoteException("Unable to create client proxy.", ce);
+		}
 	}
 	
 	static private UserDataType createUserData(String filename, String filepath)
@@ -294,36 +297,31 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 	public GetActivityDocumentsResponseType getActivityDocuments(
 			GetActivityDocumentsType parameters) throws RemoteException
 	{
-		Collection<GetActivityDocumentResponseType> responses =
+		Collection<GetActivityDocumentResponseType> response =
 			new LinkedList<GetActivityDocumentResponseType>();
 		
-		String besid = ResourceManager.getCurrentResource(
-			).dereference().getKey().toString();
-		String activity;
+		IBESResource resource = 
+			(IBESResource)ResourceManager.getCurrentResource().dereference();
 		
-		for (EndpointReferenceType aepr : parameters.getActivityIdentifier())
+		for (EndpointReferenceType target : parameters.getActivityIdentifier())
 		{
 			try
 			{
-				activity = new StringResourceKeyTranslater().unwrap(
-					aepr.getReferenceParameters()).toString();
-					
-				Activity a = ActivityManager.getManager().findActivity(
-					besid, activity, true);
-			
-				responses.add(new GetActivityDocumentResponseType(
-					aepr, a.getJSDL(), null, null));
+				BESActivity activity = resource.getActivity(target);
+				response.add(new GetActivityDocumentResponseType(
+					target, activity.getJobDefinition(),
+					null, null));
 			}
 			catch (Throwable cause)
 			{
-				responses.add(new GetActivityDocumentResponseType(
-					aepr, null, 
-					FaultConstructor.constructFault(cause), null));
+				response.add(new GetActivityDocumentResponseType(
+					target, null, FaultConstructor.constructFault(cause), 
+					null));
 			}
 		}
 		
 		return new GetActivityDocumentsResponseType(
-			responses.toArray(new GetActivityDocumentResponseType[0]), null);
+			response.toArray(new GetActivityDocumentResponseType[0]), null);
 	}
 
 	@Override
@@ -332,36 +330,32 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 			GetActivityStatusesType parameters) throws RemoteException,
 			UnknownActivityIdentifierFaultType
 	{
-		Collection<GetActivityStatusResponseType> responses =
+		Collection<GetActivityStatusResponseType> response =
 			new LinkedList<GetActivityStatusResponseType>();
 		
-		String besid = ResourceManager.getCurrentResource(
-			).dereference().getKey().toString();
-		String activity;
+		IBESResource resource = 
+			(IBESResource)ResourceManager.getCurrentResource().dereference();
 		
-		for (EndpointReferenceType aepr : parameters.getActivityIdentifier())
+		for (EndpointReferenceType target : parameters.getActivityIdentifier())
 		{
 			try
 			{
-				activity = new StringResourceKeyTranslater().unwrap(
-					aepr.getReferenceParameters()).toString();
-					
-				Activity a = ActivityManager.getManager().findActivity(
-					besid, activity, true);
-			
-				responses.add(new GetActivityStatusResponseType(
-					aepr, a.getState().toActivityStatusType(), null, null));
+				BESActivity activity = resource.getActivity(target);
+				activity.verifyOwner();
+				response.add(new GetActivityStatusResponseType(
+					target, activity.getState().toActivityStatusType(),
+					null, null));
 			}
 			catch (Throwable cause)
 			{
-				responses.add(new GetActivityStatusResponseType(
-					aepr, null, 
-					FaultConstructor.constructFault(cause), null));
+				response.add(new GetActivityStatusResponseType(
+					target, null, FaultConstructor.constructFault(cause), 
+					null));
 			}
 		}
 		
 		return new GetActivityStatusesResponseType(
-			responses.toArray(new GetActivityStatusResponseType[0]), null);
+			response.toArray(new GetActivityStatusResponseType[0]), null);
 	}
 
 	@Override
@@ -391,25 +385,32 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 			_logger.fatal("Unexpected exception in BES.", cause);
 		}
 		
-		return new GetFactoryAttributesDocumentResponseType(
-			new FactoryResourceAttributesDocumentType(
-				new BasicResourceAttributesDocumentType(
-					resourceName,
-					BESAttributesHandler.getOperatingSystem(),
-					BESAttributesHandler.getCPUArchitecture(),
-					new Double((double)BESAttributesHandler.getCPUCount()),
-					new Double(
-						(double)SystemInfoUtils.getIndividualCPUSpeed()),
-					new Double((double)SystemInfoUtils.getPhysicalMemory()),
-					new Double((double)SystemInfoUtils.getVirtualMemory()),
-					null),
-				BESAttributesHandler.getIsAcceptingNewActivities(),
-				BESAttributesHandler.getName(),
-				BESAttributesHandler.getDescription(),
-				BESAttributesHandler.getTotalNumberOfActivities(),
-				BESAttributesHandler.getActivityReferences(),
-				0, null, namingProfiles, besExtensions, 
-				localResourceManagerType, null), null);	
+		try
+		{
+			return new GetFactoryAttributesDocumentResponseType(
+				new FactoryResourceAttributesDocumentType(
+					new BasicResourceAttributesDocumentType(
+						resourceName,
+						BESAttributesHandler.getOperatingSystem(),
+						BESAttributesHandler.getCPUArchitecture(),
+						new Double((double)BESAttributesHandler.getCPUCount()),
+						new Double(
+							(double)SystemInfoUtils.getIndividualCPUSpeed()),
+						new Double((double)SystemInfoUtils.getPhysicalMemory()),
+						new Double((double)SystemInfoUtils.getVirtualMemory()),
+						null),
+					BESAttributesHandler.getIsAcceptingNewActivities(),
+					BESAttributesHandler.getName(),
+					BESAttributesHandler.getDescription(),
+					BESAttributesHandler.getTotalNumberOfActivities(),
+					BESAttributesHandler.getActivityReferences(),
+					0, null, namingProfiles, besExtensions, 
+					localResourceManagerType, null), null);
+		}
+		catch (SQLException sqe)
+		{
+			throw new RemoteException("Unexpected BES exception.", sqe);
+		}
 	}
 
 	@Override
@@ -418,33 +419,31 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 			RNSFaultType, ResourceUnknownFaultType,
 			RNSEntryNotDirectoryFaultType
 	{
-		Collection<EntryType> entries = new LinkedList<EntryType>();
+		Collection<EntryType> response =
+			new LinkedList<EntryType>();
 		
-		String besid = ResourceManager.getCurrentResource(
-			).dereference().getKey().toString();
-		
-		Pattern pattern = Pattern.compile(listRequest.getEntry_name_regexp());
+		IBESResource resource = 
+			(IBESResource)ResourceManager.getCurrentResource().dereference();
+		Pattern regex = Pattern.compile(listRequest.getEntry_name_regexp());
 		
 		try
 		{
-			for (Activity activity : ActivityManager.getManager(
-				).getAllActivities(besid))
+			for (BESActivity activity : resource.getContainedActivities())
 			{
-				String name = activity.getName();
-				Matcher matcher = pattern.matcher(name);
-				if (!matcher.matches())
-					continue;
-				
-				EndpointReferenceType epr = activity.getActivityEPR();
-				
-				entries.add(new EntryType(name, null, epr));
+				String name = activity.getJobName();
+				Matcher matcher = regex.matcher(name);
+				if (matcher.matches())
+				{
+					response.add(new EntryType(
+						name, null, activity.getActivityEPR()));
+				}
 			}
 			
-			return new ListResponse(entries.toArray(new EntryType[0]));
+			return new ListResponse(response.toArray(new EntryType[0]));
 		}
 		catch (SQLException sqe)
 		{
-			throw new RemoteException("Unable to list entries.", sqe);
+			throw new RemoteException("Unexpected BES exception.", sqe);
 		}
 	}
 
@@ -565,46 +564,38 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 			RNSFaultType, ResourceUnknownFaultType,
 			RNSDirectoryNotEmptyFaultType
 	{
-		String besid = ResourceManager.getCurrentResource(
-			).dereference().getKey().toString();
+		Collection<String> response =
+			new LinkedList<String>();
 		
-		Pattern pattern = Pattern.compile(removeRequest.getEntry_name());
-		Collection<Activity> activities = new LinkedList<Activity>();
+		IBESResource resource = 
+			(IBESResource)ResourceManager.getCurrentResource().dereference();
+		Pattern regex = Pattern.compile(removeRequest.getEntry_name());
 		
 		try
 		{
-			for (Activity activity : ActivityManager.getManager(
-				).getAllActivities(besid))
+			for (BESActivity activity : resource.getContainedActivities())
 			{
-				String name = activity.getName();
-				Matcher matcher = pattern.matcher(name);
-				if (!matcher.matches())
-					continue;
-				
-				activities.add(activity);
+				String name = activity.getJobName();
+				Matcher matcher = regex.matcher(name);
+				if (matcher.matches())
+				{
+					TerminateActivitiesResponseType tat;
+					tat = terminateActivities(new TerminateActivitiesType(
+						new EndpointReferenceType[] { 
+							activity.getActivityEPR() }, null));
+					if (tat.getResponse(0).getFault() == null)
+						response.add(name);
+					else
+						_logger.error("Unable to remove activity \"" + 
+							name + "\":  " + tat.getResponse(0).getFault());
+				}
 			}
 			
-			EndpointReferenceType []endpoints = new EndpointReferenceType[activities.size()];
-			String []ret = new String[activities.size()];
-			
-			int lcv = 0;
-			for (Activity activity : activities)
-			{
-				endpoints[lcv] = activity.getActivityEPR();
-				ret[lcv] = activity.getName();
-				
-				lcv++;
-			}
-			
-			TerminateActivitiesType tat = new TerminateActivitiesType(
-				endpoints, null);
-			terminateActivities(tat);
-			
-			return ret;
+			return response.toArray(new String[0]);
 		}
 		catch (SQLException sqe)
 		{
-			throw new RemoteException("Unable to list entries.", sqe);
+			throw new RemoteException("Unexpected BES exception.", sqe);
 		}
 	}
 

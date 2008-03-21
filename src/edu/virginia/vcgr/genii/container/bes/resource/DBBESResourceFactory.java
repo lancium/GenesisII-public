@@ -34,32 +34,10 @@ public class DBBESResourceFactory extends BasicDBResourceFactory
 	static private Log _logger = LogFactory.getLog(QueueDBResourceFactory.class);
 	
 	static private final String []_CREATE_STMTS = new String[] {
-		"CREATE TABLE besactivityfaultstable (" +
-			"faultid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY," +
-			"besactivityid VARCHAR(256) NOT NULL," +
-			"fault BLOB(32K))",
-		"CREATE TABLE besactivitiestable (" +
-			"activityid VARCHAR(256) NOT NULL PRIMARY KEY," +
-			"besid VARCHAR(256) NOT NULL," +
-			"jsdl BLOB(256K) NOT NULL," +
-			"owners BLOB(128K) NOT NULL," +
-			"callingcontext BLOB(128K) NOT NULL," +
-			"state BLOB(256K) NOT NULL," +
-			"submittime TIMESTAMP NOT NULL," +
-			"suspendrequested SMALLINT NOT NULL," +
-			"terminaterequested SMALLINT NOT NULL," +
-			"activitycwd VARCHAR(256) NOT NULL," +
-			"executionplan BLOB(256K) NOT NULL," +
-			"nextphase INTEGER NOT NULL," +
-			"activityepr BLOB(128K) NOT NULL," +
-			"activityservicename VARCHAR(128) NOT NULL," +
-			"jobname VARCHAR(256) NOT NULL)",
 		"CREATE TABLE bespolicytable (" +
 			"besid VARCHAR(256) NOT NULL PRIMARY KEY," +
 			"userloggedinaction VARCHAR(64) NOT NULL," +
-			"screensaverinactiveaction VARCHAR(64) NOT NULL)",
-		"CREATE INDEX besactivityfaultsindex ON besactivityfaultstable(besactivityid)",
-		"CREATE INDEX besactivitiestableindex ON besactivitiestable(besid)"
+			"screensaverinactiveaction VARCHAR(64) NOT NULL)"
 	};
 	
 	public DBBESResourceFactory(DatabaseConnectionPool connectionPool)
@@ -109,10 +87,5 @@ public class DBBESResourceFactory extends BasicDBResourceFactory
 			if (conn != null)
 				_pool.release(conn);
 		}
-	}
-	
-	public DatabaseConnectionPool getConnectionPool()
-	{
-		return _pool;
 	}
 }

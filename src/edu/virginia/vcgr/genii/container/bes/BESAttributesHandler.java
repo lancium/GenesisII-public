@@ -17,8 +17,10 @@ package edu.virginia.vcgr.genii.container.bes;
 
 import java.lang.management.ManagementFactory;
 import java.rmi.RemoteException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 
 import javax.xml.namespace.QName;
 
@@ -39,6 +41,7 @@ import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.bes.resource.IBESResource;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
@@ -108,18 +111,28 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 	}
 	
 	static public int getTotalNumberOfActivities() 
-		throws ResourceUnknownFaultType, ResourceException, RemoteException
+		throws ResourceUnknownFaultType, ResourceException, 
+			RemoteException, SQLException
 	{
 		return getActivityReferences().length;
 	}
 	
 	static public EndpointReferenceType[] getActivityReferences()
-		throws ResourceUnknownFaultType, ResourceException, RemoteException
+		throws ResourceUnknownFaultType, ResourceException, 
+			RemoteException, SQLException
 	{
 		IBESResource resource = null;
+	
+		resource = (IBESResource)ResourceManager.getCurrentResource().dereference();
+	
+		Collection<EndpointReferenceType> eprs = 
+			new LinkedList<EndpointReferenceType>();
+		for (BESActivity activity : resource.getContainedActivities())
+		{
+			eprs.add(activity.getActivityEPR());
+		}
 		
-		resource = (IBESResource)(ResourceManager.getCurrentResource().dereference());
-		return resource.getContainedActivities();
+		return eprs.toArray(new EndpointReferenceType[0]);
 	}
 	
 	static public String getDescription()
@@ -148,15 +161,12 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 	}
 	
 	static public Boolean getIsAcceptingNewActivities()
-		throws ResourceException, ResourceUnknownFaultType
+		throws ResourceException, ResourceUnknownFaultType, RemoteException
 	{
 		IBESResource resource = null;
 		
 		resource = (IBESResource)ResourceManager.getCurrentResource().dereference();
-		Boolean isAccepting = (Boolean)resource.getProperty(
-			IBESResource.STORED_ACCEPTING_NEW_ACTIVITIES);
-		if (isAccepting == null)
-			isAccepting = Boolean.TRUE;
+		Boolean isAccepting = new Boolean(resource.isAcceptingNewActivities());
 		
 		return isAccepting;
 	}
@@ -209,7 +219,7 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 	}
 	
 	public MessageElement getIsAcceptingNewActivitiesAttr()
-		throws ResourceUnknownFaultType, ResourceException
+		throws ResourceUnknownFaultType, ResourceException, RemoteException
 	{
 		return new MessageElement(IS_ACCEPTING_NEW_ACTIVITIES_ATTR, 
 			getIsAcceptingNewActivities());
@@ -240,14 +250,16 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 	}
 	
 	public MessageElement getTotalNumberOfActivitiesAttr()
-		throws ResourceException, ResourceUnknownFaultType, RemoteException
+		throws ResourceException, ResourceUnknownFaultType, 
+			RemoteException, SQLException
 	{
 		return new MessageElement(TOTAL_NUMBER_OF_ACTIVITIES_ATTR,
 			getTotalNumberOfActivities());
 	}
 	
 	public ArrayList<MessageElement> getActivityReferencesAttr()
-		throws ResourceException, ResourceUnknownFaultType, RemoteException
+		throws ResourceException, ResourceUnknownFaultType, 
+			RemoteException, SQLException
 	{
 		EndpointReferenceType []eprs = getActivityReferences();
 		ArrayList<MessageElement> ret = new ArrayList<MessageElement>(eprs.length);

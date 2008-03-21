@@ -21,27 +21,48 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 
 import javax.xml.namespace.QName;
 
+import org.ggf.bes.factory.UnknownActivityIdentifierFaultType;
 import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.container.bes.BES;
 import edu.virginia.vcgr.genii.container.bes.BESPolicy;
 import edu.virginia.vcgr.genii.container.bes.BESPolicyActions;
-import edu.virginia.vcgr.genii.container.bes.execution.Activity;
-import edu.virginia.vcgr.genii.container.bes.execution.ActivityManager;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
+import edu.virginia.vcgr.genii.container.resource.StringResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
 public class DBBESResource extends BasicDBResource implements IBESResource
 {
+	@Override
+	public void initialize(HashMap<QName, Object> constructionParams)
+			throws ResourceException
+	{
+		super.initialize(constructionParams);
+		
+		try
+		{
+			if (!isServiceResource())
+				BES.createBES(_resourceKey,
+					new BESPolicy(BESPolicyActions.NOACTION, 
+						BESPolicyActions.NOACTION));
+		}
+		catch (SQLException sqe)
+		{
+			throw new ResourceException(
+				"Unable to create resource -- database error.", sqe);
+		}
+	}
+
 	@Override
 	public void destroy() throws ResourceException
 	{
@@ -49,12 +70,7 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 		
 		try
 		{
-			stmt = _connection.prepareStatement(
-				"DELETE FROM bespolicytable WHERE besid = ?");
-			stmt.setString(1, _resourceKey);
-			stmt.executeUpdate();
-			
-			ActivityManager.getManager().removeBESPolicy(_resourceKey);
+			BES.deleteBES(_resourceKey);
 		}
 		catch (SQLException sqe)
 		{
@@ -68,72 +84,10 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 		super.destroy();
 	}
 
-	@Override
-	public void initialize(HashMap<QName, Object> constructionParams)
-			throws ResourceException
-	{
-		PreparedStatement stmt = null;
-		
-		super.initialize(constructionParams);
-		
-		try
-		{
-			stmt = _connection.prepareStatement(
-				"INSERT INTO bespolicytable " +
-					"(besid, userloggedinaction, screensaverinactiveaction) " +
-				"VALUES (?, ?, ?)");
-			stmt.setString(1, _resourceKey);
-			stmt.setString(2, BESPolicyActions.NOACTION.name());
-			stmt.setString(3, BESPolicyActions.NOACTION.name());
-			
-			if (stmt.executeUpdate() != 1)
-				throw new ResourceException(
-					"Unable to create bes policy in database.");
-			
-			if (!isServiceResource())
-				ActivityManager.getManager().setBESPolicy(_resourceKey, 
-					new BESPolicy(BESPolicyActions.NOACTION,
-							BESPolicyActions.NOACTION));
-					
-		}
-		catch (SQLException sqe)
-		{
-			throw new ResourceException("Unable to delete resource.", sqe);
-		}
-		finally
-		{
-			StreamUtils.close(stmt);
-		}
-	}
-
 	public DBBESResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool)
 		throws SQLException
 	{
 		super(parentKey, connectionPool);
-	}
-	
-	@Override
-	public EndpointReferenceType[] getContainedActivities()
-		throws RemoteException
-	{
-		Collection<Activity> activities = ActivityManager.getManager().getAllActivities(
-			_resourceKey);
-		
-		Collection<EndpointReferenceType> ret = new LinkedList<EndpointReferenceType>();
-		
-		try
-		{
-			for (Activity activity : activities)
-			{
-				ret.add(activity.getActivityEPR());
-			}
-			
-			return ret.toArray(new EndpointReferenceType[0]);
-		}
-		catch (SQLException sqe)
-		{
-			throw new RemoteException("Internal state error with BES activity.", sqe);
-		}
 	}
 
 	@Override
@@ -172,6 +126,14 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 		}
 	}
 
+	public BES getBES() throws RemoteException
+	{
+		BES bes = BES.getBES(_resourceKey);
+		if (bes == null)
+			throw new RemoteException("Couldn't find active BES entity.");
+		return bes;
+	}
+	
 	@Override
 	public void setPolicy(BESPolicy policy) throws RemoteException
 	{
@@ -189,8 +151,6 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 			stmt.setString(3, _resourceKey);
 			if (stmt.executeUpdate() != 1)
 				throw new ResourceException("Unable to update bes policy.");
-			
-			ActivityManager.getManager().setBESPolicy(_resourceKey, policy);
 		}
 		catch (SQLException sqe)
 		{
@@ -201,5 +161,45 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 		{
 			StreamUtils.close(stmt);
 		}
+	}
+	
+	@Override
+	public Collection<BESActivity> getContainedActivities() 
+		throws RemoteException
+	{
+		BES bes = BES.getBES(_resourceKey);
+		return bes.getContainedActivities();
+	}
+	
+	@Override
+	public BESActivity getActivity(String activityid)
+		throws RemoteException, UnknownActivityIdentifierFaultType
+	{
+		BES bes = BES.getBES(_resourceKey);
+		BESActivity activity = bes.findActivity(activityid);
+		if (activity == null)
+			throw new UnknownActivityIdentifierFaultType("Unknown activity \"" 
+				+ activityid + "\".", null);
+		return activity;
+	}
+	
+	@Override
+	public BESActivity getActivity(EndpointReferenceType activity)
+		throws RemoteException, UnknownActivityIdentifierFaultType
+	{
+		StringResourceKeyTranslater trans = new StringResourceKeyTranslater();
+		String id = (String)trans.unwrap(activity.getReferenceParameters());
+		return getActivity(id);
+	}
+	
+	public boolean isAcceptingNewActivities()
+		throws RemoteException
+	{
+		Boolean storedAccepting = (Boolean)getProperty(
+			IBESResource.STORED_ACCEPTING_NEW_ACTIVITIES);
+		if (storedAccepting != null && !storedAccepting.booleanValue())
+			return false;
+		
+		return getBES().isAcceptingActivites();
 	}
 }

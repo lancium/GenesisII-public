@@ -17,12 +17,13 @@ package edu.virginia.vcgr.genii.container.bes.activity.resource;
 
 import java.sql.SQLException;
 
+import org.ggf.bes.factory.UnknownActivityIdentifierFaultType;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.container.bes.execution.Activity;
-import edu.virginia.vcgr.genii.container.bes.execution.ActivityManager;
+import edu.virginia.vcgr.genii.container.bes.BES;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
@@ -36,16 +37,18 @@ public class DBBESActivityResource extends BasicDBResource implements
 	{
 		super.destroy();
 		
-		ActivityManager mgr = ActivityManager.getManager();
+		BES bes = BES.findBESForActivity(_resourceKey);
+		if (bes == null)
+			throw new ResourceException(
+				"Unable to find bes for activity " + _resourceKey);
 		
 		try
 		{
-			Activity activity = mgr.findActivity(_resourceKey);
-			if (activity == null)
-				throw new ResourceException("Unable to find activity \"" + 
-					_resourceKey + "\".");
-			
-			ActivityManager.getManager().deleteActivity(activity);
+			bes.deleteActivity(_resourceKey);
+		}
+		catch (UnknownActivityIdentifierFaultType uaift)
+		{
+			throw new ResourceException("Unable to delete activity.", uaift);
 		}
 		catch (SQLException sqe)
 		{
@@ -61,15 +64,26 @@ public class DBBESActivityResource extends BasicDBResource implements
 		super(parentKey, connectionPool);
 	}
 	
-	public Activity findActivity() throws ResourceUnknownFaultType
+	public BESActivity findActivity()
+		throws ResourceUnknownFaultType
 	{
-		Activity a = ActivityManager.getManager().findActivity(
-			getKey().toString());
-		if (a == null)
-			throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(
-				null, null, null, null, new BaseFaultTypeDescription[] {
-					new BaseFaultTypeDescription("Unable to find activity.")
+		BES bes = BES.findBESForActivity(_resourceKey);
+		if (bes == null)
+			throw FaultManipulator.fillInFault(
+				new ResourceUnknownFaultType(null, null, null, null,
+					new BaseFaultTypeDescription[] {
+						new BaseFaultTypeDescription("Unknown BES \"" +
+							_resourceKey + "\".")
 				}, null));
-		return a;
+		BESActivity activity = bes.findActivity(_resourceKey);
+		if (activity == null)
+			throw FaultManipulator.fillInFault(
+				new ResourceUnknownFaultType(null, null, null, null,
+					new BaseFaultTypeDescription[] {
+						new BaseFaultTypeDescription("Unknown BES \"" +
+							_resourceKey + "\".")
+				}, null));
+		
+		return activity;
 	}
 }

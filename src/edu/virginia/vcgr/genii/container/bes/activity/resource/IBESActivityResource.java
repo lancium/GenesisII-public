@@ -17,10 +17,11 @@ package edu.virginia.vcgr.genii.container.bes.activity.resource;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
-import edu.virginia.vcgr.genii.container.bes.execution.Activity;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public interface IBESActivityResource extends IResource
 {
-	public Activity findActivity() throws ResourceUnknownFaultType;
+	public BESActivity findActivity()
+		throws ResourceUnknownFaultType;
 }

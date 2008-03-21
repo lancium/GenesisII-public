@@ -38,8 +38,6 @@ public class GeniiBackend implements IBackend
 	public boolean authenticate(String username, String password)
 			throws FTPException
 	{
-		// TODO
-		
 		_username = username;
 		return true;
 	}

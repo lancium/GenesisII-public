@@ -357,8 +357,6 @@ public class OGSAWSRFBPInteropTool extends BaseGridTool
 		TickerFactory ticker = createTicker(factory);
 		stdout.println("Done");
 		
-		// TODO
-		
 		stdout.print("\tTerminating ticker...");
 		terminateTicker(ticker);
 		stdout.println("Done");

@@ -55,9 +55,9 @@ import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
+import edu.virginia.vcgr.genii.container.bes.BES;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivityUtils.BESActivityInitInfo;
 import edu.virginia.vcgr.genii.container.bes.activity.resource.IBESActivityResource;
-import edu.virginia.vcgr.genii.container.bes.execution.ActivityManager;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.simpleexec.SimpleExecutionPersonalityProvider;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.simpleexec.SimpleExecutionUnderstanding;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
@@ -115,12 +115,20 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 			SimpleExecutionUnderstanding seUnderstanding =
 				(SimpleExecutionUnderstanding)understanding;
 				
-			ActivityManager.getManager().createActivity(
-				seUnderstanding.getJobName(),
-				initInfo.getContainerID(), resource.getKey().toString(), activityEPR,
-				activityServiceName, initInfo.getJobDefinition(), owners,
-				ContextManager.getCurrentContext(), chooseDirectory(5), 
-				seUnderstanding.createExecutionPlan());
+			BES bes = BES.getBES(initInfo.getContainerID());
+			if (bes == null)
+				throw FaultManipulator.fillInFault(
+					new ResourceUnknownFaultType(null, null, null, null,
+						new BaseFaultTypeDescription[] {
+							new BaseFaultTypeDescription("Unknown BES \"" +
+								initInfo.getContainerID() + "\".")
+					}, null));
+			
+			bes.createActivity(
+				resource.getKey().toString(), jsdl,	owners, 
+				ContextManager.getCurrentContext(), 
+				chooseDirectory(5), seUnderstanding.createExecutionPlan(),
+				activityEPR, activityServiceName, seUnderstanding.getJobName());
 		}
 		catch (IOException fnfe)
 		{
@@ -178,7 +186,8 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 		{
 			factory = createStreamableByteIOResource();
 			OutputStream out = factory.getCreationStream();
-			ActivityState state = resource.findActivity().getState();
+			BESActivity activity = resource.findActivity(); 	
+			ActivityState state = activity.getState();
 			PrintStream ps = new PrintStream(out);
 			ps.println("Status:");
 			ps.println(state);

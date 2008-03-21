@@ -16,10 +16,14 @@
 package edu.virginia.vcgr.genii.container.bes.resource;
 
 import java.rmi.RemoteException;
+import java.util.Collection;
 
+import org.ggf.bes.factory.UnknownActivityIdentifierFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.container.bes.BES;
 import edu.virginia.vcgr.genii.container.bes.BESPolicy;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public interface IBESResource extends IResource
@@ -27,9 +31,19 @@ public interface IBESResource extends IResource
 	static public final String STORED_ACCEPTING_NEW_ACTIVITIES = 
 		"edu.virginia.bes.resource.stored-accepting-new-activities";
 	
-	public EndpointReferenceType[] getContainedActivities() 
-		throws RemoteException;
-	
 	public BESPolicy getPolicy() throws RemoteException;
 	public void setPolicy(BESPolicy policy) throws RemoteException;
+	
+	public BES getBES() throws RemoteException;
+	
+	public Collection<BESActivity> getContainedActivities() 
+		throws RemoteException;
+	
+	public BESActivity getActivity(String activityid)
+		throws RemoteException, UnknownActivityIdentifierFaultType;
+	public BESActivity getActivity(EndpointReferenceType activity)
+		throws RemoteException, UnknownActivityIdentifierFaultType;
+	
+	public boolean isAcceptingNewActivities()
+		throws RemoteException;
 }

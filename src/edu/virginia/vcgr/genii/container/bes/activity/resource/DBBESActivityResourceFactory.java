@@ -15,7 +15,9 @@
  */
 package edu.virginia.vcgr.genii.container.bes.activity.resource;
 
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,10 +35,67 @@ public class DBBESActivityResourceFactory extends BasicDBResourceFactory
 	static private Log _logger = LogFactory.getLog(
 		DBBESActivityResourceFactory.class);
 	
+	static private final String []_CREATE_STMTS = new String[] {
+		"CREATE TABLE besactivityfaultstable (" +
+			"faultid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY," +
+			"besactivityid VARCHAR(256) NOT NULL," +
+			"fault BLOB(32K))",
+		"CREATE TABLE besactivitiestable (" +
+			"activityid VARCHAR(256) NOT NULL PRIMARY KEY," +
+			"besid VARCHAR(256) NOT NULL," +
+			"jsdl BLOB(256K) NOT NULL," +
+			"owners BLOB(128K) NOT NULL," +
+			"callingcontext BLOB(128K) NOT NULL," +
+			"state BLOB(256K) NOT NULL," +
+			"submittime TIMESTAMP NOT NULL," +
+			"suspendrequested SMALLINT NOT NULL," +
+			"terminaterequested SMALLINT NOT NULL," +
+			"activitycwd VARCHAR(256) NOT NULL," +
+			"executionplan BLOB(256K) NOT NULL," +
+			"nextphase INTEGER NOT NULL," +
+			"activityepr BLOB(128K) NOT NULL," +
+			"activityservicename VARCHAR(128) NOT NULL," +
+			"jobname VARCHAR(256) NOT NULL)",
+		"CREATE INDEX besactivityfaultsindex ON besactivityfaultstable(besactivityid)",
+		"CREATE INDEX besactivitiestableindex ON besactivitiestable(besid)"
+	};
+	
+	
 	public DBBESActivityResourceFactory(DatabaseConnectionPool pool)
 		throws SQLException
 	{
 		super(pool);
+	}
+	
+	protected void createTables() throws SQLException
+	{
+		Connection conn = null;
+		Statement stmt = null;
+		
+		super.createTables();
+		
+		try
+		{
+			conn = _pool.acquire();
+			stmt = conn.createStatement();
+			
+			for (String createStmt : _CREATE_STMTS)
+			{
+				stmt.executeUpdate(createStmt);
+			}
+			conn.commit();
+		}
+		catch (SQLException sqe)
+		{
+			 _logger.debug("Got an exception while creating tables (could be because they exist).", sqe);
+		}
+		finally
+		{
+			if (stmt != null)
+				try { stmt.close(); } catch (SQLException sqe) {}
+			if (conn != null)
+				_pool.release(conn);
+		}
 	}
 	
 	public IResource instantiate(ResourceKey rKey) throws ResourceException

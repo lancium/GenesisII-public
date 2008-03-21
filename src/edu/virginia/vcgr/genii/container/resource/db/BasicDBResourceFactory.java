@@ -67,4 +67,9 @@ public class BasicDBResourceFactory implements IResourceFactory
 				_pool.release(conn);
 		}
 	}
+	
+	public DatabaseConnectionPool getConnectionPool()
+	{
+		return _pool;
+	}
 }
