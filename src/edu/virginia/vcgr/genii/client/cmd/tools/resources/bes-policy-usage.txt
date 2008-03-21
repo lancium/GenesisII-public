@@ -1,0 +1,10 @@
+bes-policy
+
+	OR
+
+bes-policy --query
+	OR
+
+bes-policy <target-bes>
+	--set-user-logged-in=<NOACTION|SUSPEND|SUSPENDORKILL|KILL> 
+	--set-screensaver-inactive=<NOACTION|SUSPEND|SUSPENDORKILL|KILL>]

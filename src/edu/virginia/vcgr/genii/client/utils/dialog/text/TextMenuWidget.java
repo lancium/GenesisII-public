@@ -85,7 +85,7 @@ public class TextMenuWidget extends AbstractTextWidget implements MenuWidget
 		
 		for (int lcv = 0; lcv < choices.length; lcv++)
 		{
-			mChoices[lcv] = new MenuChoice(Integer.toString(lcv), choices);
+			mChoices[lcv] = new MenuChoice(Integer.toString(lcv), choices[lcv]);
 		}
 		
 		setChoices(mChoices);

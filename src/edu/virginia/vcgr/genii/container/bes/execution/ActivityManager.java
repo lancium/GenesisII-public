@@ -27,11 +27,15 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.machine.MachineFacetUpdater;
+import edu.virginia.vcgr.genii.client.machine.MachineListener;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.Identity;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
+import edu.virginia.vcgr.genii.container.bes.BESPolicy;
+import edu.virginia.vcgr.genii.container.bes.BESPolicyActions;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
 
@@ -61,9 +65,39 @@ public class ActivityManager
 		return _manager;
 	}
 	
+	private BESPolicyEnactor _enactor;
 	private DatabaseConnectionPool _connectionPool;
 	private HashMap<String, Activity> _activities =
 		new HashMap<String, Activity>();
+	private HashMap<String, BESPolicy> _besPolicies =
+		new HashMap<String, BESPolicy>();
+	
+	private void loadBESPolicies(Connection connection)
+		throws SQLException
+	{
+		Statement stmt = null;
+		ResultSet rs = null;
+		
+		try
+		{
+			stmt = connection.createStatement();
+			rs = stmt.executeQuery(
+				"SELECT besid, userloggedinaction, screensaverinactiveaction " +
+				"FROM bespolicytable");
+			while (rs.next())
+			{
+				_besPolicies.put(rs.getString(1), 
+					new BESPolicy(
+						BESPolicyActions.valueOf(rs.getString(2)),
+						BESPolicyActions.valueOf(rs.getString(3))));
+			}
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+	}
 	
 	@SuppressWarnings("unchecked")
 	private ActivityManager(DatabaseConnectionPool connectionPool)
@@ -80,6 +114,10 @@ public class ActivityManager
 		try
 		{
 			connection = _connectionPool.acquire();
+			loadBESPolicies(connection);
+			
+			_enactor = new BESPolicyEnactor();
+			
 			updateStmt = connection.prepareStatement(
 				"UPDATE besactivitiestable " +
 					"SET suspendrequested = 0, " +
@@ -121,7 +159,7 @@ public class ActivityManager
 				
 				Activity activity = new Activity(
 					_connectionPool, jobname, besid, activityid, activityCWD,
-					state, phases, nextPhase);
+					state, phases, nextPhase, false);
 				_activities.put(activityid, activity);
 			}
 			
@@ -138,6 +176,22 @@ public class ActivityManager
 			StreamUtils.close(stmt);
 			StreamUtils.close(updateStmt);
 			_connectionPool.release(connection);
+		}
+	}
+	
+	public void removeBESPolicy(String besid)
+	{
+		synchronized(_besPolicies)
+		{
+			_besPolicies.remove(besid);
+		}
+	}
+	
+	public void setBESPolicy(String besid, BESPolicy policy)
+	{
+		synchronized(_besPolicies)
+		{
+			_besPolicies.put(besid, policy);
 		}
 	}
 	
@@ -285,7 +339,7 @@ public class ActivityManager
 			
 			Activity activity = new Activity(
 				_connectionPool, jobName, besid, activityid, activityCWD, 
-				state, phases, 0);
+				state, phases, 0, false);
 			synchronized(_activities)
 			{
 				_activities.put(activityid, activity);
@@ -363,6 +417,103 @@ public class ActivityManager
 				_logger.error("Error trying to destroy activity on bes.", 
 					cause);
 			}
+		}
+	}
+	
+	synchronized private void enactPolicy(Activity activity, 
+		BESPolicyActions action) throws SQLException, ExecutionException
+	{
+		if (action.equals(BESPolicyActions.NOACTION))
+		{
+			activity.containerResume();
+		} else if (action.equals(BESPolicyActions.SUSPEND))
+		{
+			activity.containerSuspend();
+		} else if (action.equals(BESPolicyActions.SUSPENDORKILL))
+		{
+			activity.containerSuspend();
+			if (activity.getState().isSuspended())
+				return;
+			action = BESPolicyActions.KILL;
+		}
+		
+		if (action.equals(BESPolicyActions.KILL))
+			activity.terminateActivity();
+	}
+	
+	synchronized private void enactPolicyChange()
+	{
+		HashMap<String, BESPolicyActions> actions = 
+			new HashMap<String, BESPolicyActions>();
+		
+		if (_enactor == null)
+		{
+			// During startup still
+			return;
+		}
+		
+		synchronized(_besPolicies)
+		{
+			for (String besid : _besPolicies.keySet())
+			{
+				actions.put(besid, _enactor.getCurrentAction(besid));
+			}
+		}
+		
+		synchronized(_activities)
+		{
+			for (Activity activity : _activities.values())
+			{
+				try
+				{
+					BESPolicyActions action = actions.get(activity.getBESID());
+					enactPolicy(activity, action);
+				}
+				catch (Throwable t)
+				{
+					_logger.error(
+						"Exception thrown while enacting BES policy.", t);
+				}
+			}
+		}
+	}
+	
+	private class BESPolicyEnactor implements MachineListener
+	{
+		private MachineFacetUpdater _updater;
+		private Boolean _userLoggedIn = null;
+		private Boolean _screenSaverActive = null;
+		
+		public BESPolicyEnactor()
+		{
+			_updater = new MachineFacetUpdater(1000 * 30, 1000 * 30);
+			_updater.addMachineListener(this);
+		}
+		
+		public BESPolicyActions getCurrentAction(String besid)
+		{
+			BESPolicy policy;
+			
+			synchronized(_besPolicies)
+			{
+				policy = _besPolicies.get(besid);
+			}
+			
+			return policy.getCurrentAction(_userLoggedIn, _screenSaverActive);
+		}
+		
+		@Override
+		public void screenSaverActivated(boolean activated)
+		{
+			_screenSaverActive = new Boolean(activated);
+			enactPolicyChange();
+		}
+
+		@Override
+		public void userLoggedIn(boolean loggedIn)
+		{
+			_userLoggedIn = new Boolean(loggedIn);
+			enactPolicyChange();
 		}
 	}
 }

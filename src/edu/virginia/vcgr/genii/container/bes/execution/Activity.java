@@ -40,6 +40,7 @@ public class Activity implements Closeable
 	private String _activityid;
 	private String _besid;
 	private File _cwd;
+	private boolean _containerSuspendRequested;
 	private boolean _containerSuspended;
 	
 	private boolean _activitySuspendRequested;
@@ -52,9 +53,9 @@ public class Activity implements Closeable
 	private Thread _myThread = null;
 	
 	public Activity(DatabaseConnectionPool connectionPool,
-		String name,
-		String besid, String activityid, File cwd, ActivityState state, 
-		Vector<ExecutionPhase> phases, int nextPhase)
+		String name, String besid, String activityid, 
+		File cwd, ActivityState state, Vector<ExecutionPhase> phases, 
+		int nextPhase, boolean startContainerSuspended)
 	{
 		_connectionPool = connectionPool;
 	
@@ -65,6 +66,8 @@ public class Activity implements Closeable
 		_state = state;
 		_phases = phases;
 		_nextPhase = nextPhase;
+		
+		_containerSuspendRequested = startContainerSuspended;
 	}
 	
 	public String getName()
@@ -124,10 +127,14 @@ public class Activity implements Closeable
 	{
 		synchronized(_lockObject)
 		{
-			_containerSuspended = true;
+			_containerSuspendRequested = true;
 			if (_currentPhase != null &&
 				(_currentPhase instanceof SuspendableExecutionPhase))
+			{
 				((SuspendableExecutionPhase)_currentPhase).suspend();
+				_containerSuspendRequested = false;
+				_containerSuspended = true;
+			}
 		}
 	}
 	
@@ -135,7 +142,7 @@ public class Activity implements Closeable
 	{
 		synchronized(_lockObject)
 		{
-			_containerSuspended = false;
+			_containerSuspendRequested = false;
 			_lockObject.notify();
 		}
 	}
@@ -556,8 +563,16 @@ public class Activity implements Closeable
 							return;
 						}
 						
+						if (_containerSuspendRequested)
+						{
+							_containerSuspendRequested = false;
+							_containerSuspended = true;
+						}
 						while (_state.isSuspended() || _containerSuspended)
 							_lockObject.wait();
+						
+						_containerSuspended = false;
+						_containerSuspendRequested = false;
 						
 						if (_state.isFinalState())
 						{

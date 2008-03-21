@@ -54,6 +54,10 @@ public class DBBESResourceFactory extends BasicDBResourceFactory
 			"activityepr BLOB(128K) NOT NULL," +
 			"activityservicename VARCHAR(128) NOT NULL," +
 			"jobname VARCHAR(256) NOT NULL)",
+		"CREATE TABLE bespolicytable (" +
+			"besid VARCHAR(256) NOT NULL PRIMARY KEY," +
+			"userloggedinaction VARCHAR(64) NOT NULL," +
+			"screensaverinactiveaction VARCHAR(64) NOT NULL)",
 		"CREATE INDEX besactivityfaultsindex ON besactivityfaultstable(besactivityid)",
 		"CREATE INDEX besactivitiestableindex ON besactivitiestable(besid)"
 	};

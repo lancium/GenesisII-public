@@ -64,6 +64,8 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		GENII_BES_NS, "CPUArchitecture");
 	static public QName CPU_COUNT_ATTR = new QName(
 		GENII_BES_NS, "CPUCount");
+	static public QName BES_POLICY_ATTR = new QName(
+		GENII_BES_NS, "Policy");
 	
 	static public QName CPU_SPEED_ATTR = new QName(
 		GenesisIIConstants.JSDL_NS, "IndividualCPUSpeed");
@@ -92,7 +94,7 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		addHandler(CPU_ARCHITECTURE_ATTR, "getCPUArchitectureAttr");
 		addHandler(CPU_COUNT_ATTR, "getCPUCountAttr");
 		addHandler(IS_ACCEPTING_NEW_ACTIVITIES_ATTR, "getIsAcceptingNewActivitiesAttr");
-		
+		addHandler(BES_POLICY_ATTR, "getBESPolicyAttr", "setBESPolicyAttr");
 		addHandler(CPU_SPEED_ATTR, "getCPUSpeedAttr");
 		addHandler(PHYSICAL_MEMORY_ATTR, "getPhysicalMemoryAttr");
 		addHandler(VIRTUAL_MEMORY_ATTR, "getVirtualMemoryAttr");
@@ -211,6 +213,25 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 	{
 		return new MessageElement(IS_ACCEPTING_NEW_ACTIVITIES_ATTR, 
 			getIsAcceptingNewActivities());
+	}
+	
+	public MessageElement getBESPolicyAttr()
+		throws ResourceUnknownFaultType, ResourceException, 
+			RemoteException
+	{
+		IBESResource resource;
+		resource = (IBESResource)ResourceManager.getCurrentResource().dereference();
+		return resource.getPolicy().toMessageElement(BES_POLICY_ATTR);
+	}
+	
+	public void setBESPolicyAttr(MessageElement policy)
+		throws ResourceUnknownFaultType, ResourceException, 
+			RemoteException
+	{
+		BESPolicy p = BESPolicy.fromMessageElement(policy);
+		IBESResource resource;
+		resource = (IBESResource)ResourceManager.getCurrentResource().dereference();
+		resource.setPolicy(p);
 	}
 	
 	public MessageElement getNameAttr()

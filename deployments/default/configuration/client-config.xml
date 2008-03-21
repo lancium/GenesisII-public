@@ -290,6 +290,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CreateUserTool</mconf:class>
 		<mconf:class name="create-user-delegate"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CreateUserDelegateTool</mconf:class>
+		<mconf:class name="bes-policy"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.BesPolicyTool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

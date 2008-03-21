@@ -19,6 +19,7 @@ import java.rmi.RemoteException;
 
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.container.bes.BESPolicy;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public interface IBESResource extends IResource
@@ -28,4 +29,7 @@ public interface IBESResource extends IResource
 	
 	public EndpointReferenceType[] getContainedActivities() 
 		throws RemoteException;
+	
+	public BESPolicy getPolicy() throws RemoteException;
+	public void setPolicy(BESPolicy policy) throws RemoteException;
 }

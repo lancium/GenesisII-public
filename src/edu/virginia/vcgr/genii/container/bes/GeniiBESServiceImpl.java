@@ -146,7 +146,7 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 		{
 			WorkingContext.setCurrentWorkingContext(null);
 		}
-		
+
 		return ret;
 	}
 	
