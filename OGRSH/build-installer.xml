@@ -25,6 +25,15 @@
 			izPackDir="${basedir}/../installer/IzPack"/>
 	</target>
 
+	<target name="build-test-install-bundle"
+		depends="compile-code.x86, compile-code.x86-64, init">
+		<buildnumber/>
+		<izpack input="${basedir}/test-installer-desc.xml"
+			output="${basedir}/installers/OGRSH-test-installer-${ogrsh.version}.jar"
+			installerType="standard" basedir="${basedir}"
+			izPackDir="${basedir}/../installer/IzPack"/>
+	</target>
+
 	<target name="init">
 		<mkdir dir="${basedir}/installers"/>
 	</target>

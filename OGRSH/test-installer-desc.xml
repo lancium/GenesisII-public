@@ -1,0 +1,131 @@
+<installation version="1.0">
+	<properties>
+		<property file="release.properties"/>
+		<property file="build.number"/>
+	</properties>
+
+	<variables>
+		<variable name="LOG4JCONFIG" value="production.log4j.properties"/>
+		<variable name="OGRSH_HOME" value="$INSTALL_PATH/OGRSH"/>
+		<variable name="GENII_ROOT_SESSION_URL"
+			value="http://www.cs.virginia.edu/~vcgr/TestNet/root.xml"/>
+		<variable name="LOG4JCONFIG" value="production.log4j.properties"/>
+	</variables>
+
+	<info>
+		<appname>OGRSH</appname>
+		<appversion>@{ogrsh.version} Build @{build.number}</appversion>
+		<appsubpath>GenesisII</appsubpath>
+		<uninstaller write="no"/>
+		<authors>
+			<author name="Andrew Grimshaw" email="grimshaw@cs.virginia.edu"/>
+			<author name="Mark Morgan" email="mmm2a@cs.virginia.edu"/>
+		</authors>
+		<url>http://vcgr.cs.virginia.edu</url>
+		<javaversion>1.5</javaversion>
+	</info>
+
+	<guiprefs height="600" resizable="yes" width="900">
+		<laf name="metouia">
+			<os family="unix"/>
+		</laf>
+	</guiprefs>
+
+	<locale>
+		<langpack iso3="eng"/>
+	</locale>
+
+	<resources>
+		<res src="install-resources/install-readme.html"
+			id="HTMLInfoPanel.info"/>
+		<res src="install-resources/License.txt" id="LicencePanel.licence"/>
+	</resources>
+
+	<panels>
+		<panel classname="HelloPanel"/>
+		<panel classname="HTMLInfoPanel"/>
+		<panel classname="LicencePanel"/>
+		<panel classname="PacksPanel"/>
+		<panel classname="TargetPanel"/>
+		<panel classname="InstallPanel"/>
+		<panel classname="FinishPanel"/>
+	</panels>
+
+	<packs>
+		<pack name="Core" required="yes">
+			<description>OGRSH Core System</description>
+
+			<singlefile src="config/config.template"
+				target="$INSTALL_PATH/OGRSH/config/ogrsh-conf.xml"/>
+			<file src="install-resources/License.txt"
+				targetdir="$INSTALL_PATH/OGRSH"/>
+			<file src="../scripts/jserver-jar-desc.xml"
+				targetdir="$INSTALL_PATH"/>
+			<file src="../scripts/jserver.sh"
+				targetdir="$INSTALL_PATH"/>
+			<file src="src/scripts/patch-file.sh"
+				targetdir="$INSTALL_PATH/OGRSH"/>
+			<file src="RELEASE" targetdir="$INSTALL_PATH/OGRSH"/>
+
+			<executable targetfile="$INSTALL_PATH/jserver.sh"
+				stage="never"/>
+
+			<parsable type="plain"
+				targetfile="$INSTALL_PATH/OGRSH/RELEASE"/>
+			<parsable type="xml"
+				targetfile="$INSTALL_PATH/OGRSH/config/ogrsh-conf.xml"/>
+			<parsable type="xml"
+				targetfile="$INSTALL_PATH/jserver-jar-desc.xml"/>
+			<parsable type="shell"
+				targetfile="$INSTALL_PATH/jserver.sh" os="unix"/>
+		</pack>
+
+		<pack name="OGRSH for Linux x86" required="no" preselected="no">
+			<description>OGRSH for x86 Linux</description>
+
+			<fileset dir="lib/x86" targetdir="$INSTALL_PATH/OGRSH/lib/x86"/>
+			<singlefile src="src/scripts/shim.sh"
+				target="$INSTALL_PATH/OGRSH/shim-x86.sh"/>
+
+			<parsable type="shell"
+				targetfile="$INSTALL_PATH/OGRSH/shim-x86.sh" os="unix"/>
+
+			<executable targetfile="$INSTALL_PATH/OGRSH/shim-x86.sh"
+				os="unix" stage="never" keep="true"/>
+
+			<executable targetfile="$INSTALL_PATH/OGRSH/patch-file.sh"
+				stage="postinstall" keep="true">
+				<args>
+					<arg value="$INSTALL_PATH/OGRSH/shim-x86.sh"/>
+					<arg value="%{OGRSH_ARCH}"/>
+					<arg value="x86"/>
+				</args>
+			</executable>
+		</pack>
+
+		<pack name="OGRSH for Linux x86-64" required="no" preselected="no">
+			<description>OGRSH for x86-64 Linux</description>
+
+			<fileset dir="lib/x86-64"
+				targetdir="$INSTALL_PATH/OGRSH/lib/x86-64"/>
+			<singlefile src="src/scripts/shim.sh"
+				target="$INSTALL_PATH/OGRSH/shim-x86-64.sh"/>
+
+			<parsable type="shell"
+				targetfile="$INSTALL_PATH/OGRSH/shim-x86-64.sh" os="unix"/>
+
+			<executable targetfile="$INSTALL_PATH/OGRSH/shim-x86-64.sh"
+				os="unix" stage="never" keep="true"/>
+
+			<executable targetfile="$INSTALL_PATH/OGRSH/patch-file.sh"
+				stage="postinstall" keep="true">
+				<args>
+					<arg value="$INSTALL_PATH/OGRSH/shim-x86-64.sh"/>
+					<arg value="%{OGRSH_ARCH}"/>
+					<arg value="x86-64"/>
+				</args>
+			</executable>
+		</pack>
+
+	</packs>
+</installation>

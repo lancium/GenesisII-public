@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project basedir="." default="all-installers" name="genii-release">
+<project basedir="." default="geniinet-installers" name="genii-release">
 
 	<!-- import all environment variables -->
 	<property environment="env"/>
@@ -10,15 +10,24 @@
 	<taskdef name="izpack" classpath="${basedir}/IzPack/lib/compiler.jar"
 		classname="com.izforge.izpack.ant.IzPackTask"/>
 
-	<target name="all-installers" depends="all-cleanup">
+	<target name="geniinet-installers" depends="all-cleanup">
 		<antcall target="build-installer">
 			<param name="install-config-dir" value="GeniiNetFullContainer"/>
+		</antcall>
+	</target>
+
+	<target name="testnet-installers" depends="all-cleanup">
+		<antcall target="build-installer">
+			<param name="install-config-dir" value="TestNetFullContainer"/>
 		</antcall>
 	</target>
 		
 	<target name="all-cleanup">
 		<antcall target="cleanup-install">
 			<param name="install-config-dir" value="GeniiNetFullContainer"/>
+		</antcall>
+		<antcall target="cleanup-install">
+			<param name="install-config-dir" value="TestNetFullContainer"/>
 		</antcall>
 	</target>
 
