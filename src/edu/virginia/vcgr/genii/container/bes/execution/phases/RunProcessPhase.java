@@ -54,6 +54,15 @@ public class RunProcessPhase extends AbstractExecutionPhase
 		
 		_redirects = redirects;
 	}
+
+	protected void finalize() throws Throwable
+	{
+		synchronized(_processLock)
+		{
+			if (_process != null)
+				_process.destroy();
+		}
+	}
 	
 	@Override
 	public void execute(ExecutionContext context) throws Throwable
@@ -91,8 +100,18 @@ public class RunProcessPhase extends AbstractExecutionPhase
 		}
 		catch (InterruptedException ie)
 		{
-			_process.destroy();
-			throw ie;
+			synchronized(_processLock)
+			{
+				_process.destroy();
+				_process = null;
+			}
+		}
+		finally
+		{
+			synchronized(_processLock)
+			{
+				_process = null;
+			}
 		}
 	}
 	

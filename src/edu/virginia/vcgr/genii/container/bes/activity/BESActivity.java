@@ -499,20 +499,25 @@ public class BESActivity implements Closeable
 			}
 		}
 		
-		public void requestSuspend() throws ExecutionException
+		public boolean requestSuspend() throws ExecutionException
 		{
 			synchronized(_phaseLock)
 			{
 				if (_suspendRequested || _terminateRequested)
-					return;
+					return true;
 				
 				_suspendRequested = true;
 				if (_currentPhase != null)
 				{
 					if (_currentPhase instanceof SuspendableExecutionPhase)
 						((SuspendableExecutionPhase)_currentPhase).suspend();
-				}
+					else
+						return false;
+				} else
+					return true;
 			}
+
+			return true;
 		}
 		
 		public void requestTerminate() throws ExecutionException
@@ -693,8 +698,7 @@ public class BESActivity implements Closeable
 		@Override
 		public void suspendOrKill() throws ExecutionException
 		{
-			_runner.requestSuspend();
-			if (!_runner.isSuspended())
+			if (!_runner.requestSuspend())
 				kill();
 		}
 	}
