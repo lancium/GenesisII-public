@@ -45,6 +45,7 @@ import org.ggf.bes.management.StopAcceptingNewActivitiesResponseType;
 import org.ggf.bes.management.StopAcceptingNewActivitiesType;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.jsdl.JobIdentification_Type;
+import org.ggf.jsdl.JobMultiDefinition_Type;
 import org.ggf.rns.Add;
 import org.ggf.rns.AddResponse;
 import org.ggf.rns.CreateFile;
@@ -514,41 +515,116 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 	
 	private void submitJob(String jobName, String filepath)
 		throws IOException
-	 {
-	     File file = new File(filepath);
-	     FileInputStream fin = null;
+	{
+		File file = new File(filepath);
+		
+		try
+		{
+			if (!submitJobTrySingle(jobName, file))
+				submitJobTryMulti(jobName, file);
+		}
+		finally
+		{
+			file.delete();
+		}
+	}
 	
-	     try
-	     {
-	         fin = new FileInputStream(file);
-	         JobDefinition_Type jobDef =
-	             (JobDefinition_Type)ObjectDeserializer.deserialize(
-	                 new InputSource(fin), JobDefinition_Type.class);
-	         
-	         if (jobName != null)
-	         {
-	             JobIdentification_Type ident =
-	                 jobDef.getJobDescription().getJobIdentification();
-	             if (ident != null)
-	             {
-	                 ident.setJobName(jobName);
-	             } else
-	             {
-	                 jobDef.getJobDescription().setJobIdentification(
-	                     new JobIdentification_Type(jobName, null, null,
-	                         null, null));
-	             }
-	         }
+	private boolean submitJobTrySingle(String jobName, File file)
+		throws IOException
+	{
+		JobDefinition_Type jobDef = null;
+		
+		FileInputStream fin = null;
+		
+		try
+		{
+			fin = new FileInputStream(file);
+			jobDef =
+				(JobDefinition_Type)ObjectDeserializer.deserialize(
+					new InputSource(fin), JobDefinition_Type.class);
+			
+			if (jobDef == null)
+				return false;
+
+			if (jobDef.getJobDescription() == null)
+				return false;
+			
+			if (jobName != null)
+			{
+				JobIdentification_Type ident =
+					jobDef.getJobDescription().getJobIdentification();
+				if (ident != null)
+				{
+					ident.setJobName(jobName);
+				} else
+				{
+					jobDef.getJobDescription().setJobIdentification(
+						new JobIdentification_Type(jobName, null, null,
+						null, null));
+				}
+			}
+			
+			createActivity(new CreateActivityType(new ActivityDocumentType(
+				jobDef, null), null));
+			return true;
+		}
+		finally
+		{
+			StreamUtils.close(fin);
+		}
+	}
 	
-	         createActivity(new CreateActivityType(new ActivityDocumentType(
-	        		jobDef, null), null));
-	     }
-	     finally
-	     {
-	         StreamUtils.close(fin);
-	         file.delete();
-	     }
-	 }
+	private boolean submitJobTryMulti(String jobName, File file)
+		throws IOException
+	{
+		JobDefinition_Type []jobDefs = null;
+		
+		FileInputStream fin = null;
+		
+		try
+		{
+			fin = new FileInputStream(file);
+			jobDefs =
+				((JobMultiDefinition_Type)ObjectDeserializer.deserialize(
+					new InputSource(fin), JobMultiDefinition_Type.class)).getJobDefinition();
+			
+			if (jobDefs == null)
+				return false;
+			
+			if (jobDefs.length == 0)
+				return true;
+			 
+			if (jobName != null)
+			{
+				for (JobDefinition_Type jobDef : jobDefs)
+				{
+					JobIdentification_Type ident =
+						jobDef.getJobDescription().getJobIdentification();
+					if (ident != null)
+					{
+						ident.setJobName(jobName);
+					} else
+					{
+						jobDef.getJobDescription().setJobIdentification(
+							new JobIdentification_Type(jobName, null, null,
+							null, null));
+					}
+				}
+			}
+			
+			for (JobDefinition_Type jobDef : jobDefs)
+			{
+				createActivity(new CreateActivityType(new ActivityDocumentType(
+					jobDef, null), null));
+			}
+			
+			return true;
+		}
+		finally
+		{
+			StreamUtils.close(fin);
+		}
+	}
 
 	@Override
 	@RWXMapping(RWXCategory.READ)

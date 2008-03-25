@@ -333,4 +333,15 @@ This document and the information contained herein is provided on an "AS IS" bas
 	<xsd:element name="Source" type="jsdl:SourceTarget_Type"/>
 	<xsd:element name="Target" type="jsdl:SourceTarget_Type"/>
 	<xsd:element name="URI" type="xsd:anyURI"/>
+	
+	<!-- Morgan Added -->
+	<xsd:complexType name="JobMultiDefinition_Type">
+		<xsd:sequence>
+			<xsd:element name="JobDefinition" type="jsdl:JobDefinition_Type"
+				minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:anyAttribute namespace="##other" processContents="lax"/>
+	</xsd:complexType>
+	<xsd:element name="JobMultiDefinition" type="JobMultiDefinition_Type"/>
 </xsd:schema>

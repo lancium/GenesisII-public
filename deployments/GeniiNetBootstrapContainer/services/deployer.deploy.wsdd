@@ -1033,6 +1033,14 @@
         encodingStyle=""
       />
       <typeMapping
+        xmlns:ns="http://schemas.ggf.org/jsdl/2005/11/jsdl"
+        qname="ns:JobMultiDefinition_Type"
+        type="java:org.ggf.jsdl.JobMultiDefinition_Type"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
         xmlns:ns="http://docs.oasis-open.org/wsrf/rp-2"
         qname="ns:InsertResourcePropertiesRequestFailedFaultType"
         type="java:org.oasis_open.docs.wsrf.rp_2.InsertResourcePropertiesRequestFailedFaultType"

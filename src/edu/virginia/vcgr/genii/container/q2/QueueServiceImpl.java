@@ -17,6 +17,7 @@ import org.apache.axis.types.UnsignedLong;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.JobDefinition_Type;
+import org.ggf.jsdl.JobMultiDefinition_Type;
 import org.ggf.rns.Add;
 import org.ggf.rns.AddResponse;
 import org.ggf.rns.CreateFile;
@@ -506,6 +507,46 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		throws IOException
 	{
 		File file = new File(filepath);
+		
+		try
+		{
+			if (!submitJobTrySingle(file))
+				submitJobTryMulti(file);
+		}
+		finally
+		{
+			file.delete();
+		}
+	}
+	
+	private boolean submitJobTryMulti(File file)
+		throws IOException
+	{
+		FileInputStream fin = null;
+		
+		try
+		{
+			fin = new FileInputStream(file);
+			JobDefinition_Type []jobDefs = 
+				((JobMultiDefinition_Type)ObjectDeserializer.deserialize(
+					new InputSource(fin), JobMultiDefinition_Type.class)).getJobDefinition();
+			if (jobDefs == null)
+				return false;
+			
+			for (JobDefinition_Type jobDef : jobDefs)
+				submitJob(new SubmitJobRequestType(jobDef, (byte)0x0));
+			
+			return true;
+		}
+		finally
+		{
+			StreamUtils.close(fin);
+		}
+	}
+	
+	private boolean submitJobTrySingle(File file)
+		throws IOException
+	{
 		FileInputStream fin = null;
 		
 		try
@@ -514,13 +555,15 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 			JobDefinition_Type jobDef = 
 				(JobDefinition_Type)ObjectDeserializer.deserialize(
 					new InputSource(fin), JobDefinition_Type.class);
+			if (jobDef == null || jobDef.getJobDescription() == null)
+				return false;
 			
 			submitJob(new SubmitJobRequestType(jobDef, (byte)0x0));
+			return true;
 		}
 		finally
 		{
 			StreamUtils.close(fin);
-			file.delete();
 		}
 	}
 }

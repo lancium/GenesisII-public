@@ -191,8 +191,30 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 			PrintStream ps = new PrintStream(out);
 			ps.println("Status:");
 			ps.println(state);
+			
+			if (state.isFailedState())
+			{
+				ps.print("\nFaults:");
+				int lcv = 0;
+				for (Throwable cause : activity.getFaults())
+				{
+					ps.println("\nFault #" + lcv);
+					cause.printStackTrace(ps);
+					ps.println();
+					lcv++;
+				}
+			}
+			
 			ps.flush();
 			return new OpenStreamResponse(factory.create());
+		}
+		catch (SQLException sqe)
+		{
+			throw FaultManipulator.fillInFault(
+				new ResourceCreationFaultType(null, null, null, null,
+					new BaseFaultTypeDescription[] {
+						new BaseFaultTypeDescription(sqe.getLocalizedMessage()) },
+					null));
 		}
 		catch (ConfigurationException ce)
 		{
