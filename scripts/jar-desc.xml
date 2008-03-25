@@ -5,6 +5,7 @@
 		<vcgr:jar-file>lib/morgan-utilities.jar</vcgr:jar-file>
 		<vcgr:jar-file>lib/GenesisII-client.jar</vcgr:jar-file>
 		<vcgr:jar-file>lib/GenesisII-container.jar</vcgr:jar-file>
+		<vcgr:jar-file>lib/GenesisII-ws.jar</vcgr:jar-file>
 	</vcgr:jar-files>
 	
 	<vcgr:jar-dir recursive="true">$INSTALL_PATH/ext</vcgr:jar-dir>
