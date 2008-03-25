@@ -7,8 +7,10 @@ import java.util.Vector;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.CleanupPhase;
+import edu.virginia.vcgr.genii.container.bes.execution.phases.SetupOGRSHPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.StageInPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.StageOutPhase;
+import edu.virginia.vcgr.genii.container.bes.execution.phases.StoreContextPhase;
 
 public class SimpleExecutionUnderstanding
 {
@@ -21,6 +23,7 @@ public class SimpleExecutionUnderstanding
 	private Collection<DataStagingUnderstanding> _pureCleans =
 		new LinkedList<DataStagingUnderstanding>();
 	
+	private String _requiredOGRSHVersion = null;
 	private Application _application = null;
 	
 	public void setJobName(String jobName)
@@ -50,6 +53,11 @@ public class SimpleExecutionUnderstanding
 		_application = application;
 	}
 	
+	public void setRequiredOGRSHVersion(String version)
+	{
+		_requiredOGRSHVersion = version;
+	}
+	
 	public Vector<ExecutionPhase> createExecutionPlan() throws JSDLException
 	{
 		Vector<ExecutionPhase> ret = new Vector<ExecutionPhase>();
@@ -65,8 +73,19 @@ public class SimpleExecutionUnderstanding
 				cleanups.add(new CleanupPhase(stage.getFilename()));
 		}
 		
+		if (_requiredOGRSHVersion != null)
+		{
+			String storedOGRSHContextFilename = "stored-ogrsh-context.dat";
+			String OGRSHConfigFilename = "ogrsh-config.xml";
+			ret.add(new SetupOGRSHPhase(storedOGRSHContextFilename, OGRSHConfigFilename));
+			ret.add(new StoreContextPhase(storedOGRSHContextFilename));
+			cleanups.add(new CleanupPhase(storedOGRSHContextFilename));
+			cleanups.add(new CleanupPhase(OGRSHConfigFilename));
+		}
+		
 		if (_application != null)
-			_application.addExecutionPhases(ret, cleanups);
+			_application.addExecutionPhases(ret, cleanups, 
+				_requiredOGRSHVersion);
 		
 		for (DataStagingUnderstanding stage : _stageOuts)
 		{

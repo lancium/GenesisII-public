@@ -69,6 +69,8 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		GENII_BES_NS, "CPUCount");
 	static public QName BES_POLICY_ATTR = new QName(
 		GENII_BES_NS, "Policy");
+	static public QName OGRSH_VERSIONS_ATTR = new QName(
+		GENII_BES_NS, "OGRSHVersion");
 	
 	static public QName CPU_SPEED_ATTR = new QName(
 		GenesisIIConstants.JSDL_NS, "IndividualCPUSpeed");
@@ -103,6 +105,7 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		addHandler(VIRTUAL_MEMORY_ATTR, "getVirtualMemoryAttr");
 		addHandler(BESConstants.DEPLOYER_EPR_ATTR, 
 			"getDeployersAttr", "setDeployersAttr");
+		addHandler(OGRSH_VERSIONS_ATTR, "getOGRSHVersionsAttr");
 	}
 	
 	static public String getName()
@@ -267,6 +270,17 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		for (int lcv = 0; lcv < eprs.length; lcv++)
 		{
 			ret.add(new MessageElement(ACTIVITY_REFERENCE_ATTR, eprs[lcv]));
+		}
+		
+		return ret;
+	}
+	
+	public ArrayList<MessageElement> getOGRSHVersionsAttr()
+	{
+		ArrayList<MessageElement> ret = new ArrayList<MessageElement>();
+		for (String version : OGRSHUtils.ogrshVersionsSupported())
+		{
+			ret.add(new MessageElement(OGRSH_VERSIONS_ATTR, version));
 		}
 		
 		return ret;

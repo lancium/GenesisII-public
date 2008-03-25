@@ -5,6 +5,7 @@ import edu.virginia.vcgr.genii.client.jsdl.personality.DataStagingFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.HPCApplicationFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.JobIdentificationFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.POSIXApplicationFacet;
+import edu.virginia.vcgr.genii.client.jsdl.personality.ResourcesFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.SourceURIFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.TargetURIFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.def.DefaultPersonalityProvider;
@@ -12,6 +13,13 @@ import edu.virginia.vcgr.genii.client.jsdl.personality.def.DefaultPersonalityPro
 public class SimpleExecutionPersonalityProvider extends
 		DefaultPersonalityProvider
 {
+	@Override
+	public ResourcesFacet getResourcesFacet(Object currentUnderstanding)
+			throws JSDLException
+	{
+		return new SEResourcesFacet();
+	}
+
 	@Override
 	public HPCApplicationFacet getHPCApplicationFacet(
 			Object currentUnderstanding) throws JSDLException

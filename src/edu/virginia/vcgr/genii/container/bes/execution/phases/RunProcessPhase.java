@@ -77,7 +77,15 @@ public class RunProcessPhase extends AbstractExecutionPhase
 			ProcessBuilder builder = new ProcessBuilder(command);
 			builder.directory(context.getCurrentWorkingDirectory());
 			if (_environment != null)
+			{
+				String ogrshConfig = _environment.get("OGRSH_CONFIG");
+				if (ogrshConfig != null)
+				{
+					File f = new File(context.getCurrentWorkingDirectory(), ogrshConfig);
+					_environment.put("OGRSH_CONFIG", f.getAbsolutePath());
+				}
 				overloadEnvironment(builder.environment(), _environment);
+			}
 			resetCommand(builder);
 			
 			_process = builder.start();

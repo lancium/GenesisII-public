@@ -91,7 +91,10 @@ namespace ogrsh
 
 				OGRSH_DEBUG("Trying to connect to RNS configuration url \""
 					<< _rootRNSUrl << "\".");
-				sessionClient.connectNet(_rootRNSUrl);
+				sessionClient.connectNet(_rootRNSUrl, _isStoredContext);
+
+				if (_isStoredContext > 0)
+					return;
 
 				std::string credentialFile;
 				std::string password;
@@ -201,9 +204,10 @@ namespace ogrsh
 		}
 
 		GeniiFSSession::GeniiFSSession(const std::string  &sessionName,
-			const std::string &rootRNSUrl)
+			const std::string &rootRNSUrl, int isStoredContext)
 			: ogrsh::Session(sessionName), _rootRNSUrl(rootRNSUrl)
 		{
+			_isStoredContext = isStoredContext;
 			_socket = NULL;
 		}
 

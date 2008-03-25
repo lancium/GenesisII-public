@@ -85,6 +85,11 @@ public class BESActivity implements Closeable
 		thread.start();
 	}
 	
+	public File getActivityCWD()
+	{
+		return _activityCWD;
+	}
+	
 	@SuppressWarnings("unchecked")
 	synchronized public void verifyOwner() 
 		throws GenesisIISecurityException, SQLException

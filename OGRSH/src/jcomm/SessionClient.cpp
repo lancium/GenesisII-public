@@ -28,11 +28,12 @@ namespace jcomm
 		return result;
 	}
 
-	int SessionClient::connectNet(const std::string &url)
+	int SessionClient::connectNet(const std::string &url, int isStoredContext)
 		throw (OGRSHException, IOException)
 	{
 		Invocation inv(_socket, "connectNet");
 		inv.addString(url);
+		inv.addInt(isStoredContext);
 
 		int result;
 		IOGRSHReadBuffer *buffer = inv.invoke();

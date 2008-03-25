@@ -17,6 +17,7 @@ namespace ogrsh
 	namespace geniifs
 	{
 		static const char* _ROOT_RNS_URL_ATTR_NAME = "root-rns-url";
+		static const char* _STORED_CONTEXT_URL_ATTR_NAME = "stored-context-url";
 
 		ogrsh::Session* GeniiFSProvider::createSession(
 			const std::string &sessionName,
@@ -26,19 +27,37 @@ namespace ogrsh
 				(xercesc_2_8::DOMElement*)(&configElement),
 				_ROOT_RNS_URL_ATTR_NAME);
 
-			if (rootRNSUrl.length() == 0)
+			if (rootRNSUrl.length() != 0)
 			{
-				OGRSH_FATAL("Configuration for session \""
+				OGRSH_TRACE("Creating a GeniiFSSession with sessionName = "
 					<< sessionName
-					<< "\" is invalid.  Missing required attribute \""
-					<< _ROOT_RNS_URL_ATTR_NAME << "\".");
-				ogrsh::shims::real_exit(1);
+					<< ", and root RNS URL = " << rootRNSUrl << ".");
+				return new GeniiFSSession(sessionName, rootRNSUrl);
 			}
 
-			OGRSH_TRACE("Creating a GeniiFSSession with sessionName = "
+			std::string storedContextURL = ogrsh::getAttribute(
+				(xercesc_2_8::DOMElement*)(&configElement),
+				_STORED_CONTEXT_URL_ATTR_NAME);
+
+			if (storedContextURL.length() != 0)
+			{
+				OGRSH_TRACE("Creating a GeniiFSSession with sessionName = "
+					<< sessionName
+					<< ", and stored context URL = " << storedContextURL
+					<< ".");
+				return new GeniiFSSession(sessionName, storedContextURL,
+					1);
+			}
+
+			OGRSH_FATAL("Configuration for session \""
 				<< sessionName
-				<< ", and root RNS URL = " << rootRNSUrl << ".");
-			return new GeniiFSSession(sessionName, rootRNSUrl);
+				<< "\" is invalid.  Missing required attribute \""
+				<< _ROOT_RNS_URL_ATTR_NAME << "\" or \""
+				<< _STORED_CONTEXT_URL_ATTR_NAME << "\".");
+			ogrsh::shims::real_exit(1);
+
+			/* Can't reach this code */
+			return NULL;
 		}
 
 		GeniiFSProvider::GeniiFSProvider(const std::string &providerName)

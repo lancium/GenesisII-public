@@ -14,6 +14,7 @@ namespace ogrsh
 		class GeniiFSSession : public ogrsh::Session
 		{
 			private:
+				int _isStoredContext;
 				std::string _rootRNSUrl;
 				jcomm::Socket *_socket;
 
@@ -27,7 +28,8 @@ namespace ogrsh
 
 			public:
 				GeniiFSSession(const std::string &sessionName,
-					const std::string &rootRNSUrl);
+					const std::string &rootRNSUrl,
+					const int isStoredContext = 0);
 				virtual ~GeniiFSSession();
 
 				jcomm::Socket *getSocket();

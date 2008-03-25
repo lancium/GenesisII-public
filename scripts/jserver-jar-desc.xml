@@ -5,6 +5,7 @@
 		<vcgr:jar-file>lib/morgan-utilities.jar</vcgr:jar-file>
 		<vcgr:jar-file>lib/GenesisII-client.jar</vcgr:jar-file>
 		<vcgr:jar-file>lib/GenesisII-container.jar</vcgr:jar-file>
+		<vcgr:jar-file>lib/GenesisII-ws.jar</vcgr:jar-file>
 		<vcgr:jar-file>lib/OGRSH.jar</vcgr:jar-file>
 	</vcgr:jar-files>
 	

@@ -9,6 +9,7 @@ public interface Application
 {
 	public void addExecutionPhases(
 		Vector<ExecutionPhase> executionPlan, 
-		Vector<ExecutionPhase> cleanupPhases)
+		Vector<ExecutionPhase> cleanupPhases,
+		String ogrshVersion)
 			throws JSDLException;
 }

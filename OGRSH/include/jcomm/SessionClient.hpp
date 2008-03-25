@@ -17,7 +17,7 @@ namespace jcomm
 
 			std::string connectSession(const char *sessionID = NULL)
 				throw (OGRSHException, IOException);
-			int connectNet(const std::string &url)
+			int connectNet(const std::string &url, int isStoredContext)
 				throw (OGRSHException, IOException);
 			int loginSession(const char *credentialFile,
 				const std::string &password,

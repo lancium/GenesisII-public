@@ -88,8 +88,19 @@ export OGRSH_JSERVER_ADDRESS="127.0.0.1"
 export OGRSH_JSERVER_SECRET=`echo $LINE | sed -e 's/^Server.//' | sed -e 's/].*//'`
 export OGRSH_JSERVER_PORT=`echo $LINE | sed -e 's/^.*port //'`
 export LINE=
-export HOME="/home/%{USER_NAME}"
-export OGRSH_CONFIG="%{INSTALL_PATH}/OGRSH/config/ogrsh-conf.xml"
+
+if [ -n "$BES_HOME" ]
+then
+	export HOME="$BES_HOME"
+else
+	export HOME="/home/%{USER_NAME}"
+fi
+
+if [ -z "$OGRSH_CONFIG" ]
+then
+	export OGRSH_CONFIG="%{INSTALL_PATH}/OGRSH/config/ogrsh-conf.xml"
+fi
+
 export LD_LIBRARY_PATH="%{INSTALL_PATH}/OGRSH/lib/%{OGRSH_ARCH}:$LD_LIBRARY_PATH"
 export LD_PRELOAD=libOGRSH.so
 

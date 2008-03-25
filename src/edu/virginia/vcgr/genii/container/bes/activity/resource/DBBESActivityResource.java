@@ -41,7 +41,8 @@ public class DBBESActivityResource extends BasicDBResource implements
 		if (bes == null)
 			throw new ResourceException(
 				"Unable to find bes for activity " + _resourceKey);
-		
+		BESActivity activity = bes.findActivity(_resourceKey);
+		activity.getActivityCWD().delete();
 		try
 		{
 			bes.deleteActivity(_resourceKey);

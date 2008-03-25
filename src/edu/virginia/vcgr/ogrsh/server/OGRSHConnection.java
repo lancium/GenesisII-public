@@ -11,6 +11,7 @@ import java.security.GeneralSecurityException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.GUID;
+import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.GamlLoginTool;
@@ -234,10 +235,54 @@ public class OGRSHConnection implements Runnable
 		return _mySession.getSessionID().toString();
 	}
 	
-	@OGRSHOperation
-	public int connectNet(String rootRNSUrl)
+	private int connectNetFromStoredContext(String storedContextURL)
 		throws OGRSHException
 	{
+		InputStream in = null;
+		
+		try
+		{
+			URL url = new URL(storedContextURL);
+			in = url.openConnection().getInputStream();
+			ObjectInputStream ois = new ObjectInputStream(in);
+			ICallingContext ctxt = (ICallingContext)ois.readObject();
+			_mySession.setCallingContext(ctxt);
+			ctxt.getActiveKeyAndCertMaterial();
+			return 0;
+		}
+		catch (ClassNotFoundException cnfe)
+		{
+			throw new OGRSHException(OGRSHException.EXCEPTION_CORRUPTED_REQUEST,
+				"The stored calling context appears to be corrupt.");
+		}
+		catch (GeneralSecurityException gse)
+		{
+			throw new OGRSHException(OGRSHException.PERMISSION_DENIED,
+				"Unable to initialize key and cert material.");
+		}
+		catch (MalformedURLException mue)
+		{
+			throw new OGRSHException(OGRSHException.MALFORMED_URL,
+				"The URL \"" + storedContextURL + "\" is malformed.");
+		}
+		catch (IOException ioe)
+		{
+			ioe.printStackTrace(System.err);
+			throw new OGRSHException(OGRSHException.IO_EXCEPTION,
+				"An IO Exception occured while trying to acquire root RNS EPR.");
+		}
+		finally
+		{
+			StreamUtils.close(in);
+		}
+	}
+	
+	@OGRSHOperation
+	public int connectNet(String rootRNSUrl, int isStoredContext)
+		throws OGRSHException
+	{
+		if (isStoredContext != 0)
+			return connectNetFromStoredContext(rootRNSUrl);
 		try
 		{
 			ICallingContext ctxt = ContextStreamUtils.load(new URL(rootRNSUrl));
@@ -257,6 +302,7 @@ public class OGRSHConnection implements Runnable
 		}
 		catch (IOException ioe)
 		{
+			ioe.printStackTrace(System.err);
 			throw new OGRSHException(OGRSHException.IO_EXCEPTION,
 				"An IO Exception occured while trying to acquire root RNS EPR.");
 		}
