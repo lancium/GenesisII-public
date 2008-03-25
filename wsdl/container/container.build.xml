@@ -4,12 +4,12 @@
 	<condition property="gen.container.uptodate">
 		<and>
 			<common.source.files.uptodate
-				targetfile="${codegen-dir}/wsdl/container.flag"/>
-			<uptodate targetfile="${codegen-dir}/wsdl/container.flag">
-				<srcfiles dir="${wsdl-dir}/container">
+				targetfile="${temporary.codegen.dir}/wsdl/container.flag"/>
+			<uptodate targetfile="${temporary.codegen.dir}/wsdl/container.flag">
+				<srcfiles dir="${wsdl.dir}/container">
 					<include name="container.wsdl"/>
 				</srcfiles>
-				<srcfiles dir="${wsdl-dir}/rns">
+				<srcfiles dir="${wsdl.dir}/rns">
 					<include name="rns.gwsdl"/>
 				</srcfiles>
 			</uptodate>
@@ -17,38 +17,38 @@
 	</condition>
 
 	<target name="gen.container" unless="gen.container.uptodate">
-		<copy todir="${codegen-dir}/wsdl">
+		<copy todir="${temporary.codegen.dir}/wsdl">
 			<fileset refid="common.source.files"/>
-			<fileset dir="${wsdl-dir}/container">
+			<fileset dir="${wsdl.dir}/container">
 				<include name="container.gwsdl"/>
 				<include name="container.xsd"/>
 			</fileset>
 		</copy>
 
 		<echo message="Normalizing gwsdl."/>
-		<genii-gwsdl-normalizer source="${codegen-dir}/wsdl/container.gwsdl"
-			target="${codegen-dir}/wsdl/container-generated.wsdl"/>
+		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/container.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/container-generated.wsdl"/>
 
 		<echo message="Generating Service gwsdl."/>
 		<genii-service-generator
-			source="${codegen-dir}/wsdl/container-generated.wsdl"
-			target="${codegen-dir}/wsdl/container-service.wsdl"
+			source="${temporary.codegen.dir}/wsdl/container-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/container-service.wsdl"
 			portType="{http://vcgr.cs.virginia.edu/container/2006/07/container}VCGRContainerPortType"/>
 
 		<antcall target="gen.stub-generation">
-			<param name="stub.gen.target-dir" value="${codegen-dir}/container"/>
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/container"/>
 			<param name="stub.gen.source-wsdl"
-				value="${codegen-dir}/wsdl/container-service.wsdl"/>
+				value="${temporary.codegen.dir}/wsdl/container-service.wsdl"/>
 			<param name="stub.gen.target-flag-file"
-				value="${codegen-dir}/wsdl/container.flag"/>
+				value="${temporary.codegen.dir}/wsdl/container.flag"/>
 		</antcall>
-		<move file="${codegen-dir}/container/edu/virginia/vcgr/genii/container/deploy.wsdd"
-			tofile="${wsdd-dir}/container.deploy.wsdd"/>
-		<replace file="${wsdd-dir}/container.deploy.wsdd"
+		<move file="${temporary.codegen.dir}/container/edu/virginia/vcgr/genii/container/deploy.wsdd"
+			tofile="${wsdd.dir}/container.deploy.wsdd"/>
+		<replace file="${wsdd.dir}/container.deploy.wsdd"
 			token="edu.virginia.vcgr.genii.container.VCGRContainerSOAPBindingImpl"
 			value="edu.virginia.vcgr.genii.container.container.VCGRContainerServiceImpl"
 			summary="yes"/>
-		<copy file="${wsdd-dir}/container.deploy.wsdd"
+		<copy file="${wsdd.dir}/container.deploy.wsdd"
 			todir="${services.dir}"/>
 	</target>
 

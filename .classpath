@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry excluding="edu/virginia/vcgr/genii/container/factory/GeniiFactoryServiceImpl.java" kind="src" path="src"/>
-	<classpathentry excluding="edu/virginia/vcgr/genii/x509-authn/|edu/virginia/vcgr/genii/x509-authn/" kind="src" path="genned-src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="ext/axis/ext/activation.jar"/>
 	<classpathentry kind="lib" path="ext/axis/ext/mail.jar"/>
@@ -42,5 +41,6 @@
 	<classpathentry kind="lib" path="ext/derby/derby.jar"/>
 	<classpathentry kind="lib" path="ext/xmldb/db.jar"/>
 	<classpathentry kind="lib" path="ext/xmldb/dbxml.jar"/>
+	<classpathentry kind="lib" path="lib/GenesisII-ws.jar" sourcepath="genned-src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

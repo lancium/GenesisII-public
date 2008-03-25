@@ -4,9 +4,9 @@
 	<condition property="gen.sbyteio-factory.uptodate">
 		<and>
 			<common.source.files.uptodate
-				targetfile="${codegen-dir}/wsdl/sbyteio-factory.flag"/>
-			<uptodate targetfile="${codegen-dir}/wsdl/sbyteio-factory.flag">
-				<srcfiles dir="${wsdl-dir}/byteio">
+				targetfile="${temporary.codegen.dir}/wsdl/sbyteio-factory.flag"/>
+			<uptodate targetfile="${temporary.codegen.dir}/wsdl/sbyteio-factory.flag">
+				<srcfiles dir="${wsdl.dir}/byteio">
 					<include name="sbyteio-factory.wsdl"/>
 				</srcfiles>
 			</uptodate>
@@ -14,25 +14,25 @@
 	</condition>
 
 	<target name="gen.sbyteio-factory" unless="gen.sbyteio-factory.uptodate">
-		<copy todir="${codegen-dir}/wsdl">
+		<copy todir="${temporary.codegen.dir}/wsdl">
 			<fileset refid="common.source.files"/>
-			<fileset dir="${wsdl-dir}/byteio">
+			<fileset dir="${wsdl.dir}/byteio">
 				<include name="sbyteio-factory.wsdl"/>
 			</fileset>
 		</copy>
 
 		<echo message="Generating Service gwsdl."/>
 		<genii-service-generator
-			source="${codegen-dir}/wsdl/sbyteio-factory.wsdl"
-			target="${codegen-dir}/wsdl/sbyteio-factory-service.wsdl"
+			source="${temporary.codegen.dir}/wsdl/sbyteio-factory.wsdl"
+			target="${temporary.codegen.dir}/wsdl/sbyteio-factory-service.wsdl"
 			portType="{http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory}StreamableByteIOFactory"/>
 
 		<antcall target="gen.stub-generation">
-			<param name="stub.gen.target-dir" value="${codegen-dir}/sbyteio-factory"/>
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/sbyteio-factory"/>
 			<param name="stub.gen.source-wsdl"
-				value="${codegen-dir}/wsdl/sbyteio-factory-service.wsdl"/>
+				value="${temporary.codegen.dir}/wsdl/sbyteio-factory-service.wsdl"/>
 			<param name="stub.gen.target-flag-file"
-				value="${codegen-dir}/wsdl/sbyteio-factory.flag"/>
+				value="${temporary.codegen.dir}/wsdl/sbyteio-factory.flag"/>
 		</antcall>
 	</target>
 

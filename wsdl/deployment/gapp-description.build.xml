@@ -4,9 +4,9 @@
 	<condition property="gen.gapp-description.uptodate">
 		<and>
 			<common.source.files.uptodate
-				targetfile="${codegen-dir}/wsdl/gapp-description.flag"/>
-			<uptodate targetfile="${codegen-dir}/wsdl/gapp-description.flag">
-				<srcfiles dir="${wsdl-dir}/deployment">
+				targetfile="${temporary.codegen.dir}/wsdl/gapp-description.flag"/>
+			<uptodate targetfile="${temporary.codegen.dir}/wsdl/gapp-description.flag">
+				<srcfiles dir="${wsdl.dir}/deployment">
 					<include name="gapp-description.xsd"/>
 					<include name="gapp-description.gwsdl"/>
 				</srcfiles>
@@ -15,47 +15,47 @@
 	</condition>
 
 	<target name="gen.gapp-description" unless="gen.gapp-description.uptodate">
-		<copy todir="${codegen-dir}/wsdl">
+		<copy todir="${temporary.codegen.dir}/wsdl">
 			<fileset refid="common.source.files"/>
-			<fileset dir="${wsdl-dir}/deployment">
+			<fileset dir="${wsdl.dir}/deployment">
 				<include name="gapp-description.gwsdl"/>
 				<include name="gapp-description.xsd"/>
 				<include name="gdescription.xsd"/>
 				<include name="gdescription-zipjar.xsd"/>
 				<include name="gdescription-bin.xsd"/>
 			</fileset>
-			<fileset dir="${wsdl-dir}/jsdl">
+			<fileset dir="${wsdl.dir}/jsdl">
 				<include name="jsdl.xsd"/>
 			</fileset>
-			<fileset dir="${wsdl-dir}/byteio">
+			<fileset dir="${wsdl.dir}/byteio">
 				<include name="sbyteio-factory.wsdl"/>
 			</fileset>
 		</copy>
 
 		<echo message="Normalizing gwsdl."/>
-		<genii-gwsdl-normalizer source="${codegen-dir}/wsdl/gapp-description.gwsdl"
-			target="${codegen-dir}/wsdl/gapp-description-generated.wsdl"/>
+		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/gapp-description.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/gapp-description-generated.wsdl"/>
 
 		<echo message="Generating Service gwsdl."/>
 		<genii-service-generator
-			source="${codegen-dir}/wsdl/gapp-description-generated.wsdl"
-			target="${codegen-dir}/wsdl/gapp-description-service.wsdl"
+			source="${temporary.codegen.dir}/wsdl/gapp-description-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/gapp-description-service.wsdl"
 			portType="{http://vcgr.cs.virginia.edu/genii/application-description}ApplicationDescriptionPortType"/>
 
 		<antcall target="gen.stub-generation">
-			<param name="stub.gen.target-dir" value="${codegen-dir}/gapp-description"/>
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/gapp-description"/>
 			<param name="stub.gen.source-wsdl"
-				value="${codegen-dir}/wsdl/gapp-description-service.wsdl"/>
+				value="${temporary.codegen.dir}/wsdl/gapp-description-service.wsdl"/>
 			<param name="stub.gen.target-flag-file"
-				value="${codegen-dir}/wsdl/gapp-description.flag"/>
+				value="${temporary.codegen.dir}/wsdl/gapp-description.flag"/>
 		</antcall>
-		<move file="${codegen-dir}/gapp-description/edu/virginia/vcgr/genii/appdesc/deploy.wsdd"
-			tofile="${wsdd-dir}/gapp-description.deploy.wsdd"/>
-		<replace file="${wsdd-dir}/gapp-description.deploy.wsdd"
+		<move file="${temporary.codegen.dir}/gapp-description/edu/virginia/vcgr/genii/appdesc/deploy.wsdd"
+			tofile="${wsdd.dir}/gapp-description.deploy.wsdd"/>
+		<replace file="${wsdd.dir}/gapp-description.deploy.wsdd"
 			token="edu.virginia.vcgr.genii.appdesc.ApplicationDescriptionSOAPBindingImpl"
 			value="edu.virginia.vcgr.genii.container.appdesc.ApplicationDescriptionServiceImpl"
 			summary="yes"/>
-		<copy file="${wsdd-dir}/gapp-description.deploy.wsdd"
+		<copy file="${wsdd.dir}/gapp-description.deploy.wsdd"
 			todir="${services.dir}"/>
 	</target>
 

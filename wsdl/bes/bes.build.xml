@@ -4,20 +4,20 @@
 	<condition property="gen.bes.uptodate">
 		<and>
 			<common.source.files.uptodate
-				targetfile="${codegen-dir}/wsdl/bes.flag"/>
-			<uptodate targetfile="${codegen-dir}/wsdl/bes.flag">
-				<srcfiles dir="${wsdl-dir}/rns">
+				targetfile="${temporary.codegen.dir}/wsdl/bes.flag"/>
+			<uptodate targetfile="${temporary.codegen.dir}/wsdl/bes.flag">
+				<srcfiles dir="${wsdl.dir}/rns">
 					<include name="rns.xsd"/>
 					<include name="rns.gwsdl"/>
 				</srcfiles>
-				<srcfiles dir="${wsdl-dir}/bes">
+				<srcfiles dir="${wsdl.dir}/bes">
 					<include name="bes.gwsdl"/>
 					<include name="bes-factory.wsdl"/>
 					<include name="bes-factory.xsd"/>
 					<include name="bes-management.wsdl"/>
 					<include name="bes-management.xsd"/>
 				</srcfiles>
-				<srcfiles dir="${wsdl-dir}/jsdl">
+				<srcfiles dir="${wsdl.dir}/jsdl">
 					<include name="jsdl.xsd"/>
 					<include name="jsdl-hpcp.xsd"/>
 					<include name="jsdl-posix.xsd"/>
@@ -27,49 +27,49 @@
 	</condition>
 
 	<target name="gen.bes" unless="gen.bes.uptodate">
-		<copy todir="${codegen-dir}/wsdl">
+		<copy todir="${temporary.codegen.dir}/wsdl">
 			<fileset refid="common.source.files"/>
-			<fileset dir="${wsdl-dir}/bes">
+			<fileset dir="${wsdl.dir}/bes">
 				<include name="bes.gwsdl"/>
 				<include name="bes-factory.wsdl"/>
 				<include name="bes-factory.xsd"/>
 				<include name="bes-management.wsdl"/>
 				<include name="bes-management.xsd"/>
 			</fileset>
-			<fileset dir="${wsdl-dir}/jsdl">
+			<fileset dir="${wsdl.dir}/jsdl">
 				<include name="jsdl.xsd"/>
 				<include name="jsdl-hpcp.xsd"/>
 				<include name="jsdl-posix.xsd"/>
 			</fileset>
-			<fileset dir="${wsdl-dir}/rns">
+			<fileset dir="${wsdl.dir}/rns">
 				<include name="rns.xsd"/>
 			</fileset>
 		</copy>
 
 		<echo message="Normalizing gwsdl."/>
-		<genii-gwsdl-normalizer source="${codegen-dir}/wsdl/bes.gwsdl"
-			target="${codegen-dir}/wsdl/bes-generated.wsdl"/>
+		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/bes.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/bes-generated.wsdl"/>
 
 		<echo message="Generating Service gwsdl."/>
 		<genii-service-generator
-			source="${codegen-dir}/wsdl/bes-generated.wsdl"
-			target="${codegen-dir}/wsdl/bes-service.wsdl"
+			source="${temporary.codegen.dir}/wsdl/bes-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/bes-service.wsdl"
     		portType="{http://vcgr.cs.virginia.edu/genii/2008/3/bes}GeniiBESPortType"/>
 
 		<antcall target="gen.stub-generation">
-			<param name="stub.gen.target-dir" value="${codegen-dir}/bes"/>
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/bes"/>
 			<param name="stub.gen.source-wsdl"
-				value="${codegen-dir}/wsdl/bes-service.wsdl"/>
+				value="${temporary.codegen.dir}/wsdl/bes-service.wsdl"/>
 			<param name="stub.gen.target-flag-file"
-				value="${codegen-dir}/wsdl/bes.flag"/>
+				value="${temporary.codegen.dir}/wsdl/bes.flag"/>
 		</antcall>
-		<move file="${codegen-dir}/bes/edu/virginia/vcgr/genii/bes/deploy.wsdd"
-			tofile="${wsdd-dir}/bes.deploy.wsdd"/>
-		<replace file="${wsdd-dir}/bes.deploy.wsdd"
+		<move file="${temporary.codegen.dir}/bes/edu/virginia/vcgr/genii/bes/deploy.wsdd"
+			tofile="${wsdd.dir}/bes.deploy.wsdd"/>
+		<replace file="${wsdd.dir}/bes.deploy.wsdd"
 			token="edu.virginia.vcgr.genii.bes.GeniiBESSOAPBindingImpl"
 			value="edu.virginia.vcgr.genii.container.bes.GeniiBESServiceImpl"
 			summary="yes"/>
-		<copy file="${wsdd-dir}/bes.deploy.wsdd"
+		<copy file="${wsdd.dir}/bes.deploy.wsdd"
 			todir="${services.dir}"/>
 	</target>
 

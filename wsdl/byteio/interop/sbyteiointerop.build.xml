@@ -4,14 +4,14 @@
 	<condition property="gen.sbyteiointerop.uptodate">
 		<and>
 			<common.source.files.uptodate
-				targetfile="${codegen-dir}/wsdl/sbyteiointerop.flag"/>
-			<uptodate targetfile="${codegen-dir}/wsdl/sbyteiointerop.flag">
-				<srcfiles dir="${wsdl-dir}/byteio">
+				targetfile="${temporary.codegen.dir}/wsdl/sbyteiointerop.flag"/>
+			<uptodate targetfile="${temporary.codegen.dir}/wsdl/sbyteiointerop.flag">
+				<srcfiles dir="${wsdl.dir}/byteio">
 					<include name="sbyteio.gwsdl"/>
 					<include name="sbyteio.xsd"/>
 					<include name="byteio.xsd"/>
 				</srcfiles>
-				<srcfiles dir="${wsdl-dir}/byteio/interop">
+				<srcfiles dir="${wsdl.dir}/byteio/interop">
 					<include name="sbyteiointerop.xsd"/>
 					<include name="sbyteiointerop.gwsdl"/>
 					<include name="byteiointeropfactory.wsdl"/>
@@ -21,14 +21,14 @@
 	</condition>
 
 	<target name="gen.sbyteiointerop" unless="gen.sbyteiointerop.uptodate">
-		<copy todir="${codegen-dir}/wsdl">
+		<copy todir="${temporary.codegen.dir}/wsdl">
 			<fileset refid="common.source.files"/>
-			<fileset dir="${wsdl-dir}/byteio">
+			<fileset dir="${wsdl.dir}/byteio">
 				<include name="sbyteio.gwsdl"/>
 				<include name="sbyteio.xsd"/>
 				<include name="byteio.xsd"/>
 			</fileset>
-			<fileset dir="${wsdl-dir}/byteio/interop">
+			<fileset dir="${wsdl.dir}/byteio/interop">
 				<include name="sbyteiointerop.xsd"/>
 				<include name="sbyteiointerop.gwsdl"/>
 				<include name="byteiointeropfactory.wsdl"/>
@@ -36,29 +36,29 @@
 		</copy>
 
 		<echo message="Normalizing gwsdl."/>
-		<genii-gwsdl-normalizer source="${codegen-dir}/wsdl/sbyteiointerop.gwsdl"
-			target="${codegen-dir}/wsdl/sbyteiointerop-generated.wsdl"/>
+		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/sbyteiointerop.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/sbyteiointerop-generated.wsdl"/>
 
 		<echo message="Generating Service gwsdl."/>
 		<genii-service-generator
-			source="${codegen-dir}/wsdl/sbyteiointerop-generated.wsdl"
-			target="${codegen-dir}/wsdl/sbyteiointerop-service.wsdl"
+			source="${temporary.codegen.dir}/wsdl/sbyteiointerop-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/sbyteiointerop-service.wsdl"
 			portType="{http://schemas.ggf.org/byteio/2005/10/streamable-access}StreamableByteIOInteropPortType"/>
 
 		<antcall target="gen.stub-generation">
-			<param name="stub.gen.target-dir" value="${codegen-dir}/sbyteiointerop"/>
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/sbyteiointerop"/>
 			<param name="stub.gen.source-wsdl"
-				value="${codegen-dir}/wsdl/sbyteiointerop-service.wsdl"/>
+				value="${temporary.codegen.dir}/wsdl/sbyteiointerop-service.wsdl"/>
 			<param name="stub.gen.target-flag-file"
-				value="${codegen-dir}/wsdl/sbyteiointerop.flag"/>
+				value="${temporary.codegen.dir}/wsdl/sbyteiointerop.flag"/>
 		</antcall>
-		<move file="${codegen-dir}/sbyteiointerop/org/ggf/sbyteio/deploy.wsdd"
-			tofile="${wsdd-dir}/sbyteiointerop.deploy.wsdd"/>
-		<replace file="${wsdd-dir}/sbyteiointerop.deploy.wsdd"
+		<move file="${temporary.codegen.dir}/sbyteiointerop/org/ggf/sbyteio/deploy.wsdd"
+			tofile="${wsdd.dir}/sbyteiointerop.deploy.wsdd"/>
+		<replace file="${wsdd.dir}/sbyteiointerop.deploy.wsdd"
 			token="org.ggf.sbyteio.StreamableByteIOInteropSOAPBindingImpl"
 			value="edu.virginia.vcgr.genii.container.byteio.interop.StreamableByteIOInteropServiceImpl"
 			summary="yes"/>
-		<copy file="${wsdd-dir}/sbyteiointerop.deploy.wsdd"
+		<copy file="${wsdd.dir}/sbyteiointerop.deploy.wsdd"
 			todir="${services.dir}"/>
 	</target>
 

@@ -4,9 +4,9 @@
 	<condition property="gen.rns.uptodate">
 		<and>
 			<common.source.files.uptodate
-				targetfile="${codegen-dir}/wsdl/rns.flag"/>
-			<uptodate targetfile="${codegen-dir}/wsdl/rns.flag">
-				<srcfiles dir="${wsdl-dir}/rns">
+				targetfile="${temporary.codegen.dir}/wsdl/rns.flag"/>
+			<uptodate targetfile="${temporary.codegen.dir}/wsdl/rns.flag">
+				<srcfiles dir="${wsdl.dir}/rns">
 					<include name="rns.xsd"/>
 					<include name="rns.gwsdl"/>
 				</srcfiles>
@@ -15,38 +15,38 @@
 	</condition>
 
 	<target name="gen.rns" unless="gen.rns.uptodate">
-		<copy todir="${codegen-dir}/wsdl">
+		<copy todir="${temporary.codegen.dir}/wsdl">
 			<fileset refid="common.source.files"/>
-			<fileset dir="${wsdl-dir}/rns">
+			<fileset dir="${wsdl.dir}/rns">
 				<include name="rns.gwsdl"/>
 				<include name="rns.xsd"/>
 			</fileset>
 		</copy>
 
 		<echo message="Normalizing gwsdl."/>
-		<genii-gwsdl-normalizer source="${codegen-dir}/wsdl/rns.gwsdl"
-			target="${codegen-dir}/wsdl/rns-generated.wsdl"/>
+		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/rns.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/rns-generated.wsdl"/>
 
 		<echo message="Generating Service gwsdl."/>
 		<genii-service-generator
-			source="${codegen-dir}/wsdl/rns-generated.wsdl"
-			target="${codegen-dir}/wsdl/rns-service.wsdl"
+			source="${temporary.codegen.dir}/wsdl/rns-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/rns-service.wsdl"
 			portType="{http://schemas.ggf.org/rns/2006/05/rns}RNSPortType"/>
 
 		<antcall target="gen.stub-generation">
-			<param name="stub.gen.target-dir" value="${codegen-dir}/rns"/>
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/rns"/>
 			<param name="stub.gen.source-wsdl"
-				value="${codegen-dir}/wsdl/rns-service.wsdl"/>
+				value="${temporary.codegen.dir}/wsdl/rns-service.wsdl"/>
 			<param name="stub.gen.target-flag-file"
-				value="${codegen-dir}/wsdl/rns.flag"/>
+				value="${temporary.codegen.dir}/wsdl/rns.flag"/>
 		</antcall>
-		<move file="${codegen-dir}/rns/org/ggf/rns/deploy.wsdd"
-			tofile="${wsdd-dir}/rns.deploy.wsdd"/>
-		<replace file="${wsdd-dir}/rns.deploy.wsdd"
+		<move file="${temporary.codegen.dir}/rns/org/ggf/rns/deploy.wsdd"
+			tofile="${wsdd.dir}/rns.deploy.wsdd"/>
+		<replace file="${wsdd.dir}/rns.deploy.wsdd"
 			token="org.ggf.rns.RNSSOAPBindingImpl"
 			value="edu.virginia.vcgr.genii.container.rns.RNSServiceImpl"
 			summary="yes"/>
-		<copy file="${wsdd-dir}/rns.deploy.wsdd"
+		<copy file="${wsdd.dir}/rns.deploy.wsdd"
 			todir="${services.dir}"/>
 	</target>
 

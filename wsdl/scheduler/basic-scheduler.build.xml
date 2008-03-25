@@ -4,13 +4,13 @@
 	<condition property="gen.bsched.uptodate">
 		<and>
 			<common.source.files.uptodate
-				targetfile="${codegen-dir}/wsdl/bsched.flag"/>
-			<uptodate targetfile="${codegen-dir}/wsdl/bsched.flag">
-				<srcfiles dir="${wsdl-dir}/rns">
+				targetfile="${temporary.codegen.dir}/wsdl/bsched.flag"/>
+			<uptodate targetfile="${temporary.codegen.dir}/wsdl/bsched.flag">
+				<srcfiles dir="${wsdl.dir}/rns">
 					<include name="rns.xsd"/>
 					<include name="rns.gwsdl"/>
 				</srcfiles>
-				<srcfiles dir="${wsdl-dir}/scheduler">
+				<srcfiles dir="${wsdl.dir}/scheduler">
 					<include name="basic-scheduler.gwsdl"/>
 					<include name="scheduler.wsdl"/>
 					<include name="scheduler.xsd"/>
@@ -20,42 +20,42 @@
 	</condition>
 
 	<target name="gen.bsched" unless="gen.bsched.uptodate">
-		<copy todir="${codegen-dir}/wsdl">
+		<copy todir="${temporary.codegen.dir}/wsdl">
 			<fileset refid="common.source.files"/>
-			<fileset dir="${wsdl-dir}/scheduler">
+			<fileset dir="${wsdl.dir}/scheduler">
 				<include name="basic-scheduler.gwsdl"/>
 				<include name="scheduler.wsdl"/>
 				<include name="scheduler.xsd"/>
 			</fileset>
-			<fileset dir="${wsdl-dir}/rns">
+			<fileset dir="${wsdl.dir}/rns">
 				<include name="rns.xsd"/>
 			</fileset>
 		</copy>
 
 		<echo message="Normalizing gwsdl."/>
-		<genii-gwsdl-normalizer source="${codegen-dir}/wsdl/basic-scheduler.gwsdl"
-			target="${codegen-dir}/wsdl/basic-scheduler-generated.wsdl"/>
+		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/basic-scheduler.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/basic-scheduler-generated.wsdl"/>
 
 		<echo message="Generating Service gwsdl."/>
 		<genii-service-generator
-			source="${codegen-dir}/wsdl/basic-scheduler-generated.wsdl"
-			target="${codegen-dir}/wsdl/basic-scheduler-service.wsdl"
+			source="${temporary.codegen.dir}/wsdl/basic-scheduler-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/basic-scheduler-service.wsdl"
     		portType="{http://vcgr.cs.virginia.edu/genii/2007/01/scheduler/basic}BasicSchedulerPortType"/>
 
 		<antcall target="gen.stub-generation">
-			<param name="stub.gen.target-dir" value="${codegen-dir}/bsched"/>
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/bsched"/>
 			<param name="stub.gen.source-wsdl"
-				value="${codegen-dir}/wsdl/basic-scheduler-service.wsdl"/>
+				value="${temporary.codegen.dir}/wsdl/basic-scheduler-service.wsdl"/>
 			<param name="stub.gen.target-flag-file"
-				value="${codegen-dir}/wsdl/basic-scheduler.flag"/>
+				value="${temporary.codegen.dir}/wsdl/basic-scheduler.flag"/>
 		</antcall>
-		<move file="${codegen-dir}/bsched/edu/virginia/vcgr/genii/scheduler/basic/deploy.wsdd"
-			tofile="${wsdd-dir}/bsched.deploy.wsdd"/>
-		<replace file="${wsdd-dir}/bsched.deploy.wsdd"
+		<move file="${temporary.codegen.dir}/bsched/edu/virginia/vcgr/genii/scheduler/basic/deploy.wsdd"
+			tofile="${wsdd.dir}/bsched.deploy.wsdd"/>
+		<replace file="${wsdd.dir}/bsched.deploy.wsdd"
 			token="edu.virginia.vcgr.genii.scheduler.basic.BasicSchedulerSOAPBindingImpl"
 			value="edu.virginia.vcgr.genii.container.scheduler.basic.BasicSchedulerServiceImpl"
 			summary="yes"/>
-		<copy file="${wsdd-dir}/bsched.deploy.wsdd"
+		<copy file="${wsdd.dir}/bsched.deploy.wsdd"
 			todir="${services.dir}"/>
 	</target>
 

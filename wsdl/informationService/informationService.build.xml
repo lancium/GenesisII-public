@@ -4,9 +4,9 @@
 	<condition property="gen.informationService.uptodate">
 		<and>
 			<common.source.files.uptodate
-				targetfile="${codegen-dir}/wsdl/informationService.flag"/>
-			<uptodate targetfile="${codegen-dir}/wsdl/informationService.flag">
-				<srcfiles dir="${wsdl-dir}/informationService">
+				targetfile="${temporary.codegen.dir}/wsdl/informationService.flag"/>
+			<uptodate targetfile="${temporary.codegen.dir}/wsdl/informationService.flag">
+				<srcfiles dir="${wsdl.dir}/informationService">
 					<include name="informationService.xsd"/>
 					<include name="informationService.gwsdl"/>
 				</srcfiles>
@@ -15,9 +15,9 @@
 	</condition>
 
 	<target name="gen.informationService" unless="gen.informationService.uptodate">
-		<copy todir="${codegen-dir}/wsdl">
+		<copy todir="${temporary.codegen.dir}/wsdl">
 			<fileset refid="common.source.files"/>
-			<fileset dir="${wsdl-dir}/informationService">
+			<fileset dir="${wsdl.dir}/informationService">
 				<include name="informationService.gwsdl"/>
 				<include name="informationService.xsd"/>
 				<include name="jsdl.xsd"/>
@@ -25,29 +25,29 @@
 		</copy>
 
 		<echo message="Normalizing gwsdl."/>
-		<genii-gwsdl-normalizer source="${codegen-dir}/wsdl/informationService.gwsdl"
-			target="${codegen-dir}/wsdl/informationService-generated.wsdl"/>
+		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/informationService.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/informationService-generated.wsdl"/>
 
 		<echo message="Generating Service gwsdl."/>
 		<genii-service-generator
-			source="${codegen-dir}/wsdl/informationService-generated.wsdl"
-			target="${codegen-dir}/wsdl/informationService-service.wsdl"
+			source="${temporary.codegen.dir}/wsdl/informationService-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/informationService-service.wsdl"
 			portType="{http://vcgr.cs.virginia.edu/genii/informationService}InformationServicePortType"/>
 
 		<antcall target="gen.stub-generation">
-			<param name="stub.gen.target-dir" value="${codegen-dir}/informationService"/>
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/informationService"/>
 			<param name="stub.gen.source-wsdl"
-				value="${codegen-dir}/wsdl/informationService-service.wsdl"/>
+				value="${temporary.codegen.dir}/wsdl/informationService-service.wsdl"/>
 			<param name="stub.gen.target-flag-file"
-				value="${codegen-dir}/wsdl/informationService.flag"/>
+				value="${temporary.codegen.dir}/wsdl/informationService.flag"/>
 		</antcall>
-		<move file="${codegen-dir}/informationService/edu/virginia/vcgr/genii/informationService/deploy.wsdd"
-			tofile="${wsdd-dir}/informationService.deploy.wsdd"/>
-		<replace file="${wsdd-dir}/informationService.deploy.wsdd"
+		<move file="${temporary.codegen.dir}/informationService/edu/virginia/vcgr/genii/informationService/deploy.wsdd"
+			tofile="${wsdd.dir}/informationService.deploy.wsdd"/>
+		<replace file="${wsdd.dir}/informationService.deploy.wsdd"
 			token="edu.virginia.vcgr.genii.informationService.InformationServiceSOAPBindingImpl"
 			value="edu.virginia.vcgr.genii.container.informationService.InformationServiceImpl"
 			summary="yes"/>
-		<copy file="${wsdd-dir}/informationService.deploy.wsdd"
+		<copy file="${wsdd.dir}/informationService.deploy.wsdd"
 			todir="${services.dir}"/>
 	</target>
 

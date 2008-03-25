@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="gen.common" name="common.build">
 
-	<fileset id="common.source.files" dir="${wsdl-dir}">
+	<fileset id="common.source.files" dir="${wsdl.dir}">
 		<include name="common.gwsdl"/>
 
 		<include name="wsrf/basefaults.xsd"/>
@@ -27,7 +27,7 @@
 
 	<presetdef name="common.source.files.uptodate">
 		<uptodate targetfile="${flag.name}">
-			<srcfiles dir="${wsdl-dir}">
+			<srcfiles dir="${wsdl.dir}">
 				<include name="common.gwsdl"/>
 
 				<include name="wsrf/basefaults.xsd"/>
@@ -54,30 +54,30 @@
 
 	<condition property="gen.common.uptodate">
 		<common.source.files.uptodate
-			targetfile="${codegen-dir}/wsdl/common.flag"/>
+			targetfile="${temporary.codegen.dir}/wsdl/common.flag"/>
 	</condition>
 
 	<target name="gen.common" unless="gen.common.uptodate">
-		<copy todir="${codegen-dir}/wsdl">
+		<copy todir="${temporary.codegen.dir}/wsdl">
 			<fileset refid="common.source.files"/>
 		</copy>
 
 		<echo message="Normalizing gwsdl."/>
-		<genii-gwsdl-normalizer source="${wsdl-dir}/common.gwsdl"
-			target="${codegen-dir}/wsdl/common-generated.wsdl"/>
+		<genii-gwsdl-normalizer source="${wsdl.dir}/common.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/common-generated.wsdl"/>
 
 		<echo message="Generating Service gwsdl."/>
 		<genii-service-generator
-			source="${codegen-dir}/wsdl/common-generated.wsdl"
-			target="${codegen-dir}/wsdl/common-service.wsdl"
+			source="${temporary.codegen.dir}/wsdl/common-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/common-service.wsdl"
 			portType="{http://vcgr.cs.virginia.edu/genii/2006/12/common}GeniiCommon"/>
 
 		<antcall target="gen.stub-generation">
-			<param name="stub.gen.target-dir" value="${codegen-dir}/common"/>
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/common"/>
 			<param name="stub.gen.source-wsdl"
-				value="${codegen-dir}/wsdl/common-service.wsdl"/>
+				value="${temporary.codegen.dir}/wsdl/common-service.wsdl"/>
 			<param name="stub.gen.target-flag-file"
-				value="${codegen-dir}/wsdl/common.flag"/>
+				value="${temporary.codegen.dir}/wsdl/common.flag"/>
 		</antcall>
 	</target>
 

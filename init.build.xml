@@ -11,7 +11,7 @@
 			serverside="true"
 			quiet="true"
 			namespacemappingfile="${basedir}/mappings.properties"/>
-		<copy todir="${gennedsrc-dir}">
+		<copy todir="${generated.source.dir}">
 			<fileset dir="${stub.gen.target-dir}">
 				<include name="**/*.java"/>
 				<exclude name="**/*SOAPBindingImpl.java"/>
@@ -22,14 +22,14 @@
 	</target>
 
 	<target name="init">
-		<mkdir dir="${wsdd-dir}"/>
-		<mkdir dir="${codegen-dir}"/>
-		<mkdir dir="${codegen-dir}/wsdl"/>
-		<mkdir dir="${gennedsrc-dir}"/>
-		<mkdir dir="${gennedobj-dir}"/>
-		<mkdir dir="${obj-dir}"/>
-		<mkdir dir="${deployments.default.dir}"/>
-		<mkdir dir="${deployments.default-secure.dir}/services"/>
+		<mkdir dir="${wsdd.dir}"/>
+		<mkdir dir="${temporary.codegen.dir}"/>
+		<mkdir dir="${temporary.codegen.dir}/wsdl"/>
+		<mkdir dir="${generated.source.dir}"/>
+		<mkdir dir="${generated.obj.dir}"/>
+		<mkdir dir="${obj.dir}"/>
+		<mkdir dir="${deployments.dir}/default"/>
+		<mkdir dir="${deployments.dir}/default-secure/services"/>
 	</target>
 	
 </project>
