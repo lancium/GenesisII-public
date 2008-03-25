@@ -561,6 +561,14 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 			submitJob(new SubmitJobRequestType(jobDef, (byte)0x0));
 			return true;
 		}
+		catch (IOException ioe)
+		{
+			throw ioe;
+		}
+		catch (Throwable cause)
+		{
+			return false;
+		}
 		finally
 		{
 			StreamUtils.close(fin);

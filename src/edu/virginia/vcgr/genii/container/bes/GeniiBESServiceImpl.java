@@ -568,6 +568,14 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 				jobDef, null), null));
 			return true;
 		}
+		catch (IOException ioe)
+		{
+			throw ioe;
+		}
+		catch (Throwable cause)
+		{
+			return false;
+		}
 		finally
 		{
 			StreamUtils.close(fin);
