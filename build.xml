@@ -138,6 +138,8 @@
 		</jar>
 	</target>
 
+	<target name="genii.ws" depends="genii.ws.jar,deployments"/>
+
 	<target name="genii.ws.jar" depends="genii.ws.compile">
 		<jar destfile="${lib.dir}/GenesisII-ws.jar">
 			<fileset dir="${generated.obj.dir}"/>
@@ -218,7 +220,7 @@
 			classpathref="wsdl-tools.classpath"/>
 	</target>
 
-	<target name="genii.compile" depends="init,genii.ws.jar">
+	<target name="genii.compile" depends="init,genii.ws">
 		<javac debug="${debug.on}" destdir="${obj.dir}">
 			<src path="${src.dir}"/>
 			<classpath refid="project.classpath"/>
