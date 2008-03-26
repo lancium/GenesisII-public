@@ -54,6 +54,7 @@ import javax.xml.soap.SOAPException;
 import org.apache.axis.SimpleChain;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.cache.LRUCache;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.CommConstants;
 import edu.virginia.vcgr.genii.client.comm.MethodDescription;
@@ -64,6 +65,8 @@ import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.MessageLevelSecurity;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.DelegatedAssertion;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.DelegatedAttribute;
 import edu.virginia.vcgr.genii.client.security.x509.*;
 import edu.virginia.vcgr.genii.client.utils.deployment.DeploymentRelativeFile;
 import edu.virginia.vcgr.genii.client.invoke.IFinalInvoker;
@@ -251,6 +254,11 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	private Class<?> [] _locators = null;
 	private AxisClientInvocationHandler _parentHandler = null;
 	
+	// cache of signed, serialized delegation assertions
+	static private int VALIDATED_CERT_CACHE_SIZE = 32;
+	static private LRUCache<X509Certificate, Boolean> validatedCerts = 
+		new LRUCache<X509Certificate, Boolean>(VALIDATED_CERT_CACHE_SIZE);
+	
 	public AxisClientInvocationHandler(
 			Class<?> locator, 
 			EndpointReferenceType epr,
@@ -293,24 +301,32 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 				}
 				_resourceCert = chain[0];
 				
-				// make sure the epi's match
-				String certEpi = CertTool.getUID(chain[0]);
-				if (!certEpi.equals(epi.toString())) {
-					throw new GenesisIISecurityException("EPI for " + epr.getAddress().toString() + " (" + epi.toString() + ") does not match that in the certificate (" + certEpi + ")");
+				synchronized(validatedCerts) {
+					if (!validatedCerts.containsKey(_resourceCert)) {
+
+						// make sure the epi's match
+						String certEpi = CertTool.getUID(chain[0]);
+						if (!certEpi.equals(epi.toString())) {
+							throw new GenesisIISecurityException("EPI for " + epr.getAddress().toString() + " (" + epi.toString() + ") does not match that in the certificate (" + certEpi + ")");
+						}
+						
+						// run it through the trust manager
+						ArrayList<X509Certificate> certList = new ArrayList<X509Certificate>();
+						for (int i = 0; i < chain.length - 1; i++) {
+							certList.add(chain[i]);
+						}
+						CertPath cp = CertificateFactory.getInstance("X.509", "BC").
+				        	generateCertPath(certList);
+				        CertPathValidator cpv = CertPathValidator.getInstance(
+				        		"PKIX", "BC");
+				        PKIXParameters param = new PKIXParameters(getTrustStore());
+				        param.setRevocationEnabled(false);
+				        cpv.validate(cp, param); // throws exception if not valid
+				        
+				        // insert into valid certs cache
+				        validatedCerts.put(_resourceCert, Boolean.TRUE);
+					}
 				}
-				
-				// run it through the trust manager
-				ArrayList<X509Certificate> certList = new ArrayList<X509Certificate>();
-				for (int i = 0; i < chain.length - 1; i++) {
-					certList.add(chain[i]);
-				}
-				CertPath cp = CertificateFactory.getInstance("X.509", "BC").
-		        	generateCertPath(certList);
-		        CertPathValidator cpv = CertPathValidator.getInstance(
-		        		"PKIX", "BC");
-		        PKIXParameters param = new PKIXParameters(getTrustStore());
-		        param.setRevocationEnabled(false);
-		        cpv.validate(cp, param);
 			} catch (Exception e) {
 				if (minClientMessageSec.isWarn()) {
 					Exception ex = new GenesisIISecurityException(

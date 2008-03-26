@@ -36,7 +36,7 @@ public abstract class SignedAssertion implements Externalizable, GamlCredential 
 		new LRUCache<String, SignedAssertion>(VERIFIED_CACHE_SIZE);
 
 	/** Cached serialized value for comparison checking **/
-	public transient String _encodedValue = null;
+	protected transient String _encodedValue = null;
 	
 	
 	/**
@@ -54,24 +54,44 @@ public abstract class SignedAssertion implements Externalizable, GamlCredential 
 	 * Verify the assertion.  It is verified if all signatures successfully
 	 * authenticate the signed-in authorizing identities
 	 */	
-	static public void verifyAssertion(SignedAssertion assertion) throws GeneralSecurityException
-	{
-		synchronized(_verifiedAssertionsCache)
-		{
-			// check cache first
-			if ((assertion._encodedValue != null) && 
-					(_verifiedAssertionsCache.get(assertion._encodedValue) != null)) {
-				return;
-			}
-			
-			// verify assertion
-			assertion.verifyAssertion();
-			
-			// insert into verified cache since no exception was thrown
-			if (assertion._encodedValue != null) {
-				_verifiedAssertionsCache.put(assertion._encodedValue, assertion);
+	static public void verifyAssertion(SignedAssertion assertion) throws GeneralSecurityException {
+		// check cached encoding
+		synchronized(_verifiedAssertionsCache) {
+			try {
+				String encoded = base64encodeAssertion(assertion);
+				if (_verifiedAssertionsCache.get(encoded) != null) {
+					// signatures previously found to match
+					return ;
+				}
+				// verify assertion
+				assertion.verifyAssertion();
+				_verifiedAssertionsCache.put(encoded, assertion);
+			} catch (IOException e) {
 			}
 		}
+	}
+	
+	public int hashCode() {
+		try {
+			return base64encodeAssertion(this).hashCode();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+	
+	public boolean equals(Object o) {
+		SignedAssertion other = (SignedAssertion) o;
+		// force encoded values to represent signed assertion
+		try {
+			if (base64encodeAssertion(this).equals(base64encodeAssertion(other))) {
+				return true;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return false;
 	}
 	
 	/**
@@ -87,16 +107,18 @@ public abstract class SignedAssertion implements Externalizable, GamlCredential 
 		return "GAML: " + getAttribute().getAssertingIdentityCertChain()[0].getSubjectDN().getName();
 	}	
 	
-	
-	
-	
 	public static String base64encodeAssertion(SignedAssertion signedAssertion) throws IOException {
- 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
- 		ObjectOutputStream oos = new ObjectOutputStream(baos);
- 		oos.writeObject(signedAssertion);
- 		oos.close();
-
-		return Base64.byteArrayToBase64(baos.toByteArray());
+ 		synchronized(signedAssertion) {
+ 			if (signedAssertion._encodedValue == null) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		 		ObjectOutputStream oos = new ObjectOutputStream(baos);
+		 		oos.writeObject(signedAssertion);
+		 		oos.close();
+	
+		 		signedAssertion._encodedValue = Base64.byteArrayToBase64(baos.toByteArray());
+ 			}
+		 	return signedAssertion._encodedValue;
+ 		}
 	}
 	
 	public static String base64encodeAssertions(ArrayList<SignedAssertion> signedAssertions) throws IOException {

@@ -61,11 +61,6 @@ public class CallingContextImpl implements ICallingContext, Serializable
 
 				try {
 					retval = (Serializable) ois.readObject();
-					
-					// optimize for later comparison checking
-					if (retval instanceof SignedAssertion) {
-						((SignedAssertion) retval)._encodedValue = encoded;
-					}
 				} catch (ClassNotFoundException e) { 
 					throw new IOException(e.getMessage());
 				}

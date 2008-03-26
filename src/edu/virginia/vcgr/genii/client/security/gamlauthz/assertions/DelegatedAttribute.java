@@ -164,35 +164,15 @@ public class DelegatedAttribute implements Attribute {
 	}	
 	
 	public int hashCode() {
-		try {
-			if (_encodedValue == null) {
-				if (_assertion != null) {
-					_encodedValue = SignedAssertion.base64encodeAssertion(_assertion);
-					return _encodedValue.hashCode();
-				}
-			} else {
-				return _encodedValue.hashCode();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return 0;
+		return _assertion.hashCode();
 	}
 	
 	public boolean equals(Object o) {
 		DelegatedAttribute other = (DelegatedAttribute) o;
 
+
 		// force encoded values to represent signed assertion
-		other.hashCode();
-		hashCode();
-		
-		// check for signed assertion equiv
-		if (_encodedValue == null) {
-			if (other._encodedValue != null) {
-				return false;
-			}
-		} else if (!_encodedValue.equals(other._encodedValue)) {
+		if (!_assertion.equals(other._assertion)) {
 			return false;
 		}
 		
