@@ -15,7 +15,7 @@
 		</and>
 	</condition>
 
-	<target name="gen.x509-authn" unless="gen.authn.uptodate">
+	<target name="gen.x509-authn" unless="gen.x509-authn.uptodate">
 		<copy todir="${temporary.codegen.dir}/wsdl">
 			<fileset refid="common.source.files"/>
 			<fileset dir="${wsdl.dir}/authn">

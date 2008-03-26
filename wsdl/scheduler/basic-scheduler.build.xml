@@ -47,7 +47,7 @@
 			<param name="stub.gen.source-wsdl"
 				value="${temporary.codegen.dir}/wsdl/basic-scheduler-service.wsdl"/>
 			<param name="stub.gen.target-flag-file"
-				value="${temporary.codegen.dir}/wsdl/basic-scheduler.flag"/>
+				value="${temporary.codegen.dir}/wsdl/bsched.flag"/>
 		</antcall>
 		<move file="${temporary.codegen.dir}/bsched/edu/virginia/vcgr/genii/scheduler/basic/deploy.wsdd"
 			tofile="${wsdd.dir}/bsched.deploy.wsdd"/>

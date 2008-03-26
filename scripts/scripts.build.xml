@@ -5,20 +5,20 @@
 		<copy file="${win-script-src-dir}/${win-script-base-name}.bat"
 			tofile="${basedir}/${win-script-base-name}.bat"/>
 		<replace file="${basedir}/${win-script-base-name}.bat"
-			token="$INSTALL_PATH" value="${basedir}" summary="yes"/>
+			token="$INSTALL_PATH" value="${basedir}" summary="no"/>
 		<replace file="${basedir}/${win-script-base-name}.bat"
 			token="$LOG4JCONFIG" value="genesisII.log4j.properties"
-			summary="yes"/>
+			summary="no"/>
 	</target>
 
 	<target name="build-script-unix" if="unix.scripts">
 		<copy file="${unix-script-src-dir}/${unix-script-base-name}"
 			tofile="${basedir}/${unix-script-base-name}"/>
 		<replace file="${basedir}/${unix-script-base-name}"
-			token="%{INSTALL_PATH}" value="${basedir}" summary="yes"/>
+			token="%{INSTALL_PATH}" value="${basedir}" summary="no"/>
 		<replace file="${basedir}/${unix-script-base-name}"
 			token="%{LOG4JCONFIG}" value="genesisII.log4j.properties"
-			summary="yes"/>
+			summary="no"/>
 		<chmod file="${basedir}/${unix-script-base-name}" perm="755"/>
 	</target>
 
@@ -67,15 +67,15 @@
 		<copy file="${scripts.dir}/jar-desc.xml"
 			tofile="${basedir}/jar-desc.xml"/>
 		<replace file="${basedir}/jar-desc.xml"
-			token="$INSTALL_PATH" value="${basedir}" summary="yes"/>
+			token="$INSTALL_PATH" value="${basedir}" summary="no"/>
 
 		<copy file="${scripts.dir}/jserver-jar-desc.xml"
 			tofile="${basedir}/jserver-jar-desc.xml"/>
 		<replace file="${basedir}/jserver-jar-desc.xml"
-			token="$INSTALL_PATH" value="${basedir}" summary="yes"/>
+			token="$INSTALL_PATH" value="${basedir}" summary="no"/>
 		<replace file="${basedir}/jserver-jar-desc.xml"
 			token="$LOG4JCONFIG" value="genesisII.log4j.properties"
-			summary="yes"/>
+			summary="no"/>
 
 		<antcall target="build-script-win">
 			<param name="win-script-src-dir" value="${scripts.dir}"/>
