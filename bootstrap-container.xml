@@ -77,7 +77,7 @@
 
 	<gsh:echo message="Creating BES resource for ${CONTAINER_NAME}."/>
 	<geniix:create-resource>
-		<gsh:param>/containers/${CONTAINER_NAME}/Services/BESPortType</gsh:param>
+		<gsh:param>/containers/${CONTAINER_NAME}/Services/GeniiBESPortType</gsh:param>
 		<gsh:param>/bes-containers/${CONTAINER_NAME}</gsh:param>
 	</geniix:create-resource>
 

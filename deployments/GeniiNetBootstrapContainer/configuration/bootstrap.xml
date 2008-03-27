@@ -35,7 +35,7 @@
 	<geniix:create-rns-root>
 		<gsh:param>--protocol=https</gsh:param>
 		<gsh:param>--host=localhost</gsh:param>
-		<gsh:param>--port=19090</gsh:param>
+		<gsh:param>--port=18080</gsh:param>
 		<gsh:param>context.xml</gsh:param>
 	</geniix:create-rns-root>
 
@@ -44,7 +44,7 @@
 	</geniix:mkdir>
 	
 	<geniix:ln>
-		<gsh:param>--service-url=https://localhost:19090/axis/services/VCGRContainerPortType</gsh:param>
+		<gsh:param>--service-url=https://localhost:18080/axis/services/VCGRContainerPortType</gsh:param>
 		<gsh:param>/containers/BootstrapContainer</gsh:param>
 	</geniix:ln>
 

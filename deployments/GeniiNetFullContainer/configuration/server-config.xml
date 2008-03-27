@@ -24,7 +24,7 @@
 	
 	<genii:global-properties>
 		<mconf:property name="edu.virginia.vcgr.genii.container.listen-port"
-			value="19092"/>
+			value="18082"/>
 		<mconf:property 
 			name="edu.virginia.vcgr.genii.container.production.bes.thread-pool-size"
 			value="20"/>
