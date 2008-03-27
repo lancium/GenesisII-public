@@ -24,7 +24,7 @@
 	
 	<genii:global-properties>
 		<mconf:property name="edu.virginia.vcgr.genii.container.listen-port"
-			value="18080"/>
+			value="19090"/>
 		<mconf:property 
 			name="edu.virginia.vcgr.genii.container.production.bes.thread-pool-size"
 			value="20"/>
@@ -391,6 +391,10 @@
 		
 		<genii:service name="InformationServicePortType">
 			<genii:resource-provider name="is-db-resource-provider"/>
+		</genii:service>
+
+		<genii:service name="TickerFactory">
+			<genii:resource-provider name="basic-db-resource-provider"/>
 		</genii:service>
 
 		<genii:service name="TTYPortType">
