@@ -389,6 +389,10 @@
 		<genii:service name="InformationServicePortType">
 			<genii:resource-provider name="is-db-resource-provider"/>
 		</genii:service>
+
+		<genii:service name="TTYPortType">
+			<genii:resource-provider name="basic-db-resource-provider"/>
+		</genii:service>
 	</genii:services>
 	
 	<genii:deployment-configuration>

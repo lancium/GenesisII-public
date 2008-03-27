@@ -1,12 +1,13 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
-import edu.virginia.vcgr.genii.client.byteio.ByteIOInputStream;
+import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
@@ -63,11 +64,11 @@ public class CatTool extends BaseGridTool
 			throw new RNSException("Path \"" + file.pwd() +
 				"\" is not a file.");
 		
-		ByteIOInputStream in = null;
+		InputStream in = null;
 		
 		try
 		{
-			in = new ByteIOInputStream(file);
+			in = ByteIOStreamFactory.createInputStream(file);
 			while ( (read = in.read(data)) >= 0)
 				stdout.write(data, 0, read);
 		}

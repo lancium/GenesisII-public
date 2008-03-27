@@ -6,6 +6,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 
+import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
@@ -51,6 +52,19 @@ public class StreamableByteIOAttributeHandlers extends ByteIOAttributeHandlers
 		return (offset >= path.length());
 	}
 	
+	private boolean getDestroyOnClose() throws ResourceException, ResourceUnknownFaultType
+	{
+		ISByteIOResource resource = null;
+		
+		ResourceKey rKey = ResourceManager.getCurrentResource();
+		resource = (ISByteIOResource)rKey.dereference();
+		Boolean b = (Boolean)resource.getProperty(ISByteIOResource.DESTROY_ON_CLOSE_PROPERTY);
+		if (b == null || !b.booleanValue())
+			return false;
+		
+		return true;
+	}
+	
 	public MessageElement getPositionAttr() 
 		throws ResourceException, ResourceUnknownFaultType
 	{
@@ -70,20 +84,28 @@ public class StreamableByteIOAttributeHandlers extends ByteIOAttributeHandlers
 				GetEndOfStreamNamespace(), getEndOfStream());
 	}
 	
+	public MessageElement getDestroyOnCloseAttr()
+		throws ResourceException, ResourceUnknownFaultType
+	{
+		return new MessageElement(
+			GetDestroyOnCloseNamespace(), getDestroyOnClose());
+	}
+	
 	@Override
 	protected void registerHandlers() throws NoSuchMethodException
 	{
 		super.registerHandlers();
-		/*
-		addHandler(ByteIOConstants.POSITION_ATTR_NAME, "getPositionAttr");
-		addHandler(ByteIOConstants.SEEKABLE_ATTR_NAME, "getSeekableAttr");
-		addHandler(ByteIOConstants.END_OF_STREAM_ATTR_NAME, "getEndOfStreamAttr");
-		*/
+		
 		addHandler(GetPositionNamespace(), "getPositionAttr");
 		addHandler(GetSeekableNamespace(), "getSeekableAttr");
 		addHandler(GetEndOfStreamNamespace(), "getEndOfStreamAttr");
+		addHandler(GetDestroyOnCloseNamespace(), "getDestroyOnCloseAttr");
 		
-		
+	}
+	
+	protected QName GetDestroyOnCloseNamespace()
+	{
+		return ByteIOConstants.SBYTEIO_DESTROY_ON_CLOSE_FLAG;
 	}
 	
 	protected QName GetSizeNamespace()

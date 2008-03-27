@@ -102,7 +102,7 @@ public class StreamRedirectionDescription
 		{
 			try
 			{
-				StreamUtils.copyStream(_in, _out);
+				StreamUtils.copyStream(_in, _out, true);
 			}
 			catch (IOException ioe)
 			{

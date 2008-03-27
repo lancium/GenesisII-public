@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.client.appdesc;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import javax.xml.namespace.QName;
 
@@ -19,7 +20,7 @@ import edu.virginia.vcgr.genii.appdesc.bin.NamedSourceType;
 import edu.virginia.vcgr.genii.appdesc.bin.RelativeNamedSourceType;
 import edu.virginia.vcgr.genii.appdesc.zipjar.ZipJarDeploymentType;
 import edu.virginia.vcgr.genii.appdesc.zipjar.ZipJarSourceType;
-import edu.virginia.vcgr.genii.client.byteio.ByteIOOutputStream;
+import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.rcreate.CreationException;
 import edu.virginia.vcgr.genii.client.rcreate.ResourceCreator;
@@ -207,7 +208,7 @@ public class ApplicationDescriptionUtils
 		IUploadProgressListener listener)
 		throws IOException
 	{
-		ByteIOOutputStream bos = null;
+		OutputStream bos = null;
 		EndpointReferenceType newFile = null;
 		FileInputStream fin = null;
 		EndpointReferenceType ret;
@@ -224,7 +225,7 @@ public class ApplicationDescriptionUtils
 			fin = new FileInputStream(deployFile);
 			newFile = ResourceCreator.createNewResource(
 				"RandomByteIOPortType", null, null);
-			bos = new ByteIOOutputStream(newFile);
+			bos = ByteIOStreamFactory.createOutputStream(newFile);
 			
 			StreamUtils.copyStream(fin, bos);
 			ret = newFile;

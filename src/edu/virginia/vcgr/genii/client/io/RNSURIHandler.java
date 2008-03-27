@@ -22,8 +22,7 @@ import java.net.URI;
 
 import org.morgan.util.configuration.ConfigurationException;
 
-import edu.virginia.vcgr.genii.client.byteio.ByteIOInputStream;
-import edu.virginia.vcgr.genii.client.byteio.ByteIOOutputStream;
+import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
@@ -55,7 +54,7 @@ public class RNSURIHandler implements IURIHandler
 			RNSPath path = RNSPath.getCurrent();
 			path = path.lookup(uri.getSchemeSpecificPart(), 
 				RNSPathQueryFlags.MUST_EXIST);
-			return new ByteIOInputStream(path);
+			return ByteIOStreamFactory.createInputStream(path);
 		}
 		catch (RNSException re)
 		{
@@ -74,7 +73,7 @@ public class RNSURIHandler implements IURIHandler
 			RNSPath path = RNSPath.getCurrent();
 			path = path.lookup(uri.getSchemeSpecificPart(), 
 				RNSPathQueryFlags.DONT_CARE);
-			return new ByteIOOutputStream(path);
+			return ByteIOStreamFactory.createOutputStream(path);
 		}
 		catch (RNSException re)
 		{

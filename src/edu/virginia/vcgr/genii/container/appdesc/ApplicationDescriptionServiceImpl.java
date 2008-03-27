@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.container.appdesc;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.rmi.RemoteException;
 import java.util.HashMap;
@@ -37,7 +38,7 @@ import edu.virginia.vcgr.genii.client.appdesc.ApplicationDescriptionConstants;
 import edu.virginia.vcgr.genii.client.appdesc.ApplicationDescriptionCreator;
 import edu.virginia.vcgr.genii.client.appdesc.ApplicationDescriptionUtils;
 import edu.virginia.vcgr.genii.client.appdesc.ApplicationVersion;
-import edu.virginia.vcgr.genii.client.byteio.ByteIOOutputStream;
+import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
@@ -126,7 +127,7 @@ public class ApplicationDescriptionServiceImpl
 		
 		CreateFile createFile = new CreateFile(name);
 		EndpointReferenceType newFile = null;
-		ByteIOOutputStream bos = null;
+		OutputStream bos = null;
 		OutputStreamWriter writer = null;
 		
 		try
@@ -137,7 +138,7 @@ public class ApplicationDescriptionServiceImpl
 					ApplicationDescriptionConstants.SUPPORT_DOCUMENT_ATTR_QNAME,
 					supportDoc) });
 			newFile = response.getEntry_reference();
-			bos = new ByteIOOutputStream(newFile);
+			bos = ByteIOStreamFactory.createOutputStream(newFile);
 			writer = new OutputStreamWriter(bos);
 			ObjectSerializer.serialize(writer, deployDoc, new QName(
 				"http://vcgr.cs.virginia.edu/genii/application-description",

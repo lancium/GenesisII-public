@@ -39,6 +39,7 @@ import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.ogsa.OGSARP;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
+import edu.virginia.vcgr.genii.client.tty.TTYConstants;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 
 public class TypeInformation
@@ -147,6 +148,11 @@ public class TypeInformation
 		return hasPortType(WellKnownPortTypes.COUNTER_PORT_TYPE);
 	}
 	
+	public boolean isTTY()
+	{
+		return hasPortType(TTYConstants.TTY_PORT_TYPE_QNAME);
+	}
+	
 	public boolean isUnknown()
 	{
 		return (_implementedPortTypes == null)	||
@@ -169,6 +175,8 @@ public class TypeInformation
 			return "BES Activity";
 		else if (isBES())
 			return "BES";
+		else if (isTTY())
+			return "TTY";
 		else if (isContainer())
 			return "Container";
 		else if (isCounter())

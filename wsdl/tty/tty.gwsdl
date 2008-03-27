@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+	name="GeniiTTY"
+	targetNamespace="http://vcgr.cs.virginia.edu/tty/2008/03/tty"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:tty="http://vcgr.cs.virginia.edu/tty/2008/03/tty"
+	xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+	xmlns:wsrf-r="http://docs.oasis-open.org/wsrf/r-2"
+	xmlns:wsrf-rw="http://docs.oasis-open.org/wsrf/rw-2" 
+	xmlns:genii-rfact="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
+    xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
+    xmlns:sbyteio="http://schemas.ggf.org/byteio/2005/10/streamable-access"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:rpw-2="http://docs.oasis-open.org/wsrf/rpw-2"
+    xmlns:rw-2="http://docs.oasis-open.org/wsrf/rw-2">
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rw-2"
+		location="./wsrf/wsResourceFaults.wsdl"/>
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rpw-2"
+		location="./wsrf/wsResourceProperties.wsdl"/>
+	
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory"
+        location="./sbyteio-factory.wsdl"/>
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rw-2"
+		location="wsrf/wsResourceFaults.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple"
+		location="./resource-simple.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
+		location="./resource-factory.wsdl"/>
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rlw-2"
+		location="wsrf/wsResourceLifetime.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-authz"
+		location="./resource-authz.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+        location="./common-generated.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
+        location="./notification.wsdl"/>
+
+	<wsdl:import
+		namespace="http://schemas.ggf.org/byteio/2005/10/streamable-access"
+		location="./sbyteio-generated.wsdl"/>
+
+	<wsdl:portType name="TTYPortType">
+		<genii-ext:extend portType="genii-common:GeniiCommon"/>
+		<genii-ext:extend portType="sbyteio:StreamableByteIOPortType"/>
+		<genii-ext:extend portType="rpw-2:GetResourceProperty"/>
+		<genii-ext:extend portType="rpw-2:GetMultipleResourceProperties"/>
+	</wsdl:portType>
+</wsdl:definitions>

@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.container.deployer;
 
+import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 
@@ -22,7 +23,7 @@ import edu.virginia.vcgr.genii.appdesc.zipjar.ZipJarDeploymentType;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.appdesc.ApplicationDescriptionUtils;
 import edu.virginia.vcgr.genii.client.appdesc.DeploymentException;
-import edu.virginia.vcgr.genii.client.byteio.ByteIOInputStream;
+import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
@@ -108,10 +109,10 @@ public class ApplicationDeployerServiceImpl extends GenesisIIBase implements
 			ObjectDeserializer.toObject(eprElem, EndpointReferenceType.class);
 		DeploymentDocumentType deployDoc;
 		
-		ByteIOInputStream bin = null;
+		InputStream bin = null;
 		try
 		{
-			bin = new ByteIOInputStream(depDescEPR);
+			bin = ByteIOStreamFactory.createInputStream(depDescEPR);
 			deployDoc = (DeploymentDocumentType)ObjectDeserializer.deserialize(
 				new InputSource(bin), DeploymentDocumentType.class);
 

@@ -18,7 +18,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.appdesc.SourceElementType;
 import edu.virginia.vcgr.genii.client.appdesc.ApplicationDescriptionUtils;
 import edu.virginia.vcgr.genii.client.appdesc.DeploymentException;
-import edu.virginia.vcgr.genii.client.byteio.ByteIOInputStream;
+import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.byteio.RandomByteIORP;
 import edu.virginia.vcgr.genii.client.io.FileSystemUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
@@ -112,7 +112,7 @@ public abstract class AbstractDeploymentProvider implements IDeployerProvider
 		throws DeploymentException, IOException, ConfigurationException
 	{
 		EndpointReferenceType epr = getSourceEndpoint(source);
-		return new ByteIOInputStream(epr);
+		return ByteIOStreamFactory.createInputStream(epr);
 	}
 	
 	static protected void downloadFile(SourceElementType source, File target,

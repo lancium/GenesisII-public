@@ -52,4 +52,7 @@ public interface StreamableByteIORP
 	
 	@ResourceProperty(namespace = STREAMABLE_BYTEIO_NS, localname = "DataResource")
 	public EndpointReferenceType getDataResource();
+	
+	@ResourceProperty(namespace = STREAMABLE_BYTEIO_NS, localname = "DestroyOnClose")
+	public Boolean getDestroyOnClose();
 }

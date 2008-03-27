@@ -307,16 +307,6 @@ public abstract class ByteIOAttributeHandlers
 	@Override
 	protected void registerHandlers() throws NoSuchMethodException
 	{
-		//addHandler(ByteIOConstants.FILE_CHECKSUM_ATTR_NAME, "getChecksumAttr");
-        /*	
-		addHandler(ByteIOConstants.SIZE_ATTR_NAME, "getSizeAttr");
-		addHandler(ByteIOConstants.READABLE_ATTR_NAME, "getReadableAttr");
-		addHandler(ByteIOConstants.WRITEABLE_ATTR_NAME, "getWriteableAttr");
-		addHandler(ByteIOConstants.XFER_MECHS_ATTR_NAME, "getTransferMechsAttr");
-		addHandler(ByteIOConstants.CREATTIME_ATTR_NAME, "getCreateTimeAttr");
-		addHandler(ByteIOConstants.MODTIME_ATTR_NAME, "getModificationTimeAttr");
-		addHandler(ByteIOConstants.ACCESSTIME_ATTR_NAME, "getAccessTimeAttr");
-		*/
 		addHandler(GetSizeNamespace(), "getSizeAttr");
 		addHandler(GetReadableNamespace(), "getReadableAttr");
 		addHandler(GetWriteableNamespace(), "getWriteableAttr");
@@ -332,6 +322,5 @@ public abstract class ByteIOAttributeHandlers
 	protected abstract QName GetTransferMechanismNamespace();
 	protected abstract QName GetCreateTimeNamespace();
 	protected abstract QName GetModificationTimeNamespace();
-	protected abstract QName GetAccessTimeNamespace();
-	
+	protected abstract QName GetAccessTimeNamespace();	
 }

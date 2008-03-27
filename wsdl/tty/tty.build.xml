@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="gen.tty" name="tty.build">
+
+	<condition property="gen.tty.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${temporary.codegen.dir}/wsdl/tty.flag"/>
+			<uptodate targetfile="${temporary.codegen.dir}/wsdl/tty.flag">
+				<srcfiles dir="${wsdl.dir}/byteio">
+					<include name="sbyteio.gwsdl"/>
+				</srcfiles>
+				<srcfiles dir="${wsdl.dir}/tty">
+					<include name="tty.gwsdl"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.tty" unless="gen.tty.uptodate">
+		<copy todir="${temporary.codegen.dir}/wsdl">
+			<fileset refid="common.source.files"/>
+			<fileset dir="${wsdl.dir}/tty">
+				<include name="tty.gwsdl"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/tty.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/tty-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${temporary.codegen.dir}/wsdl/tty-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/tty-service.wsdl"
+			portType="{http://vcgr.cs.virginia.edu/tty/2008/03/tty}TTYPortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/tty"/>
+			<param name="stub.gen.source-wsdl"
+				value="${temporary.codegen.dir}/wsdl/tty-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${temporary.codegen.dir}/wsdl/tty.flag"/>
+		</antcall>
+		<move file="${temporary.codegen.dir}/tty/edu/virginia/vcgr/genii/tty/deploy.wsdd"
+			tofile="${wsdd.dir}/tty.deploy.wsdd"/>
+		<replace file="${wsdd.dir}/tty.deploy.wsdd"
+			token="edu.virginia.vcgr.genii.tty.TTYSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.tty.TTYServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd.dir}/tty.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>

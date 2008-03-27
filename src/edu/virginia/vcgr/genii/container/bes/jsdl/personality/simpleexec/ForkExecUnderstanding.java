@@ -7,10 +7,17 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Vector;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
+import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.jsdl.InvalidJSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
+import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.tty.TTYConstants;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
+import edu.virginia.vcgr.genii.container.bes.execution.phases.ByteIORedirectionSink;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.FileRedirectionSink;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.FileRedirectionSource;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.PrepareApplicationPhase;
@@ -18,9 +25,12 @@ import edu.virginia.vcgr.genii.container.bes.execution.phases.RunProcessPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.StreamRedirectionDescription;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.StreamRedirectionSink;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.StreamRedirectionSource;
+import edu.virginia.vcgr.genii.container.bes.execution.phases.TeeRedirectionSink;
 
 public class ForkExecUnderstanding implements Application
 {
+	static private Log _logger = LogFactory.getLog(ForkExecUnderstanding.class);
+	
 	private String _executable = null;
 	private Collection<String> _arguments =
 		new LinkedList<String>();
@@ -82,6 +92,30 @@ public class ForkExecUnderstanding implements Application
 			stdout = new FileRedirectionSink(_stdoutRedirect);
 		if (_stderrRedirect != null)
 			stderr = new FileRedirectionSink(_stderrRedirect);
+		
+		try
+		{
+			byte[] data = (byte[])ContextManager.getCurrentContext().getSingleValueProperty(
+				TTYConstants.TTY_CALLING_CONTEXT_PROPERTY);
+			if (data != null)
+			{
+				ByteIORedirectionSink sink = new ByteIORedirectionSink(
+					EPRUtils.fromBytes(data));
+				if (stdout != null)
+					stdout = new TeeRedirectionSink(stdout, sink);
+				else
+					stdout = sink;
+				
+				if (stderr != null)
+					stderr = new TeeRedirectionSink(stderr, sink);
+				else
+					stderr = sink;
+			}
+		}
+		catch (Exception e)
+		{
+			_logger.warn("Error trying to get the TTY property.", e);
+		}
 		
 		executionPlan.add(new PrepareApplicationPhase(_executable));
 		

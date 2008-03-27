@@ -2,18 +2,13 @@ package edu.virginia.vcgr.ogrsh.server.file;
 
 import java.rmi.RemoteException;
 
-import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.rbyteio.RandomByteIOPortType;
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
-import edu.virginia.vcgr.genii.client.byteio.xfer.IRByteIOTransferer;
-import edu.virginia.vcgr.genii.client.byteio.xfer.TransferUtils;
-import edu.virginia.vcgr.genii.client.byteio.xfer.dime.DimeRByteIOTransferer;
-import edu.virginia.vcgr.genii.client.byteio.xfer.mtom.MtomRByteIOTransferer;
-import edu.virginia.vcgr.genii.client.byteio.xfer.simple.SimpleRByteIOTransferer;
+import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransferer;
+import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransfererFactory;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.ogrsh.server.dir.StatBuffer;
@@ -24,7 +19,7 @@ public class RandomByteIOFileDescriptor extends AbstractFileDescriptor
 	static private Log _logger = LogFactory.getLog(RandomByteIOFileDescriptor.class);
 	
 	private EndpointReferenceType _epr;
-	private IRByteIOTransferer _transferer;
+	private RandomByteIOTransferer _transferer;
 	private long _offset = 0;
 	
 	public RandomByteIOFileDescriptor(EndpointReferenceType epr,
@@ -36,17 +31,11 @@ public class RandomByteIOFileDescriptor extends AbstractFileDescriptor
 		_epr = epr;
 		try
 		{
-			TransferUtils tu = new TransferUtils(epr);
-			URI xferType = tu.getPreferredTransferType();
 			RandomByteIOPortType stub =
 				ClientUtils.createProxy(RandomByteIOPortType.class, epr);
-			
-			if (xferType.equals(ByteIOConstants.TRANSFER_TYPE_DIME_URI))
-				_transferer = new DimeRByteIOTransferer(stub);
-			else if (xferType.equals(ByteIOConstants.TRANSFER_TYPE_MTOM_URI))
-				_transferer = new MtomRByteIOTransferer(stub);
-			else
-				_transferer = new SimpleRByteIOTransferer(stub);
+			_transferer = 
+				RandomByteIOTransfererFactory.createRandomByteIOTransferer(
+					stub);
 			
 			if (isTruncate)
 				_transferer.truncAppend(0, new byte[0]);

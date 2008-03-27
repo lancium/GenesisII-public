@@ -103,4 +103,7 @@ public class ByteIOConstants
 		new QName(GenesisIIConstants.GENESISII_NS, "must-destroy");
 	
 	static public int PREFERRED_SIMPLE_XFER_BLOCK_SIZE = 1024 * 512;
+	
+	static public QName SBYTEIO_DESTROY_ON_CLOSE_FLAG =
+		new QName(STREAMABLE_BYTEIO_NS, "DestroyOnClose");
 }

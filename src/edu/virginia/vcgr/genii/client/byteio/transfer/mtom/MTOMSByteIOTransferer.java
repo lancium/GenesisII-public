@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.genii.client.byteio.xfer.mtom;
+package edu.virginia.vcgr.genii.client.byteio.transfer.mtom;
 
 import java.rmi.RemoteException;
 
@@ -12,18 +12,21 @@ import org.ggf.sbyteio.StreamableByteIOPortType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.byteio.SeekOrigin;
-import edu.virginia.vcgr.genii.client.byteio.xfer.AbstractSByteIOTransferer;
-import edu.virginia.vcgr.genii.client.byteio.xfer.ISByteIOTransferer;
+import edu.virginia.vcgr.genii.client.byteio.transfer.AbstractByteIOTransferer;
+import edu.virginia.vcgr.genii.client.byteio.transfer.StreamableByteIOTransferer;
 import edu.virginia.vcgr.genii.client.comm.attachments.AttachmentType;
 
-public class MTomSByteIOTransferer
-	extends AbstractSByteIOTransferer implements ISByteIOTransferer
+public class MTOMSByteIOTransferer 
+	extends AbstractByteIOTransferer<StreamableByteIOPortType> 
+	implements StreamableByteIOTransferer, MTOMByteIOTransferer
 {
-	public MTomSByteIOTransferer(StreamableByteIOPortType target)
+	public MTOMSByteIOTransferer(StreamableByteIOPortType clientStub)
 	{
-		super(target);
+		super(clientStub,
+			TRANSFER_PROTOCOL, PREFERRED_READ_SIZE, PREFERRED_WRITE_SIZE);
 	}
 	
+	@Override
 	public byte[] seekRead(SeekOrigin origin, long offset, long numBytes)
 			throws RemoteException
 	{
@@ -40,16 +43,17 @@ public class MTomSByteIOTransferer
 			offset, seekOrigin, new UnsignedInt(numBytes), 
 			new TransferInformationType(
 				null, ByteIOConstants.TRANSFER_TYPE_MTOM_URI));
-		_target.seekRead(seekReadRequest);
+		_clientStub.seekRead(seekReadRequest);
 		
-		return receiveResponseAttachmentData(_target);
+		return receiveResponseAttachmentData(_clientStub);
 	}
 
+	@Override
 	public void seekWrite(SeekOrigin origin, long offset, byte[] data)
 			throws RemoteException
 	{
 		URI seekOrigin;
-		
+	
 		if (origin.equals(SeekOrigin.SEEK_BEGINNING))
 			seekOrigin = ByteIOConstants.SEEK_ORIGIN_BEGINNING_URI;
 		else if (origin.equals(SeekOrigin.SEEK_CURRENT))
@@ -57,7 +61,7 @@ public class MTomSByteIOTransferer
 		else
 			seekOrigin = ByteIOConstants.SEEK_ORIGIN_END_URI;
 		
-		sendRequestAttachmentData(_target, data, AttachmentType.MTOM);
+		sendRequestAttachmentData(_clientStub, data, AttachmentType.MTOM);
 		
 		TransferInformationType transType = new TransferInformationType(
 			new MessageElement[0],
@@ -65,6 +69,6 @@ public class MTomSByteIOTransferer
 		SeekWrite seekWriteRequest = new SeekWrite(
 			offset, seekOrigin, transType);
 		
-		_target.seekWrite(seekWriteRequest);
+		_clientStub.seekWrite(seekWriteRequest);
 	}
 }

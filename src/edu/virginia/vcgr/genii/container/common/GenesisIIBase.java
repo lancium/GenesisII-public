@@ -341,12 +341,15 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 				_attributePackage.getManipulator(name);
 				
 			if (manipulator == null)
+			{
+				_logger.error("The resource property \"" + name + "\" is unknown.");
 				throw FaultManipulator.fillInFault(
 					new InvalidResourcePropertyQNameFaultType(
 						null, null, null, null, new BaseFaultTypeDescription[] {
 							new BaseFaultTypeDescription("The resource property " +
 								name + " is unknown.") },
 						null));
+			}
 				
 			document.addAll(manipulator.getAttributeValues());
 		}

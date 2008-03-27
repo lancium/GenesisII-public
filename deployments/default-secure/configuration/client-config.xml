@@ -157,6 +157,8 @@
 			locator-type="edu.virginia.vcgr.genii.informationService.InformationServiceServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.x509authn.X509AuthnPortType"
 			locator-type="edu.virginia.vcgr.genii.x509authn.X509AuthnServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.tty.TTYPortType"
+			locator-type="edu.virginia.vcgr.genii.tty.TTYServiceLocator"/>
 	</genii:locator-registry>
 	
 	<genii:configured-instances>
@@ -247,8 +249,6 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ExportTool</mconf:class>
 		<mconf:class name="script"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ScriptTool</mconf:class>
-		<mconf:class name="perf"
-			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ByteIOPerformanceTool</mconf:class>
 		<mconf:class name="app-description-tool"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ApplicationDescriptionTool</mconf:class>
 		<mconf:class name="browser"
@@ -287,6 +287,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CreateUserDelegateTool</mconf:class>
 		<mconf:class name="bes-policy"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.BesPolicyTool</mconf:class>
+		<mconf:class name="tty"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.TTYTool</mconf:class>
 	</genii:tools>
 
 	<genii:client-pipeline>

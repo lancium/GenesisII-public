@@ -31,8 +31,7 @@ import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
-import edu.virginia.vcgr.genii.client.byteio.ByteIOInputStream;
-import edu.virginia.vcgr.genii.client.byteio.ByteIOOutputStream;
+import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientConstructionParameters;
@@ -236,7 +235,7 @@ public class ReplicatedFileTool extends BaseGridTool
 			} else
 			{
 				RNSPath path = currentPath.lookup(sourcePath, RNSPathQueryFlags.MUST_EXIST);
-				in = new ByteIOInputStream(path);
+				in = ByteIOStreamFactory.createInputStream(path);
 			}
 
 			// make path name for this replica...
@@ -247,7 +246,7 @@ public class ReplicatedFileTool extends BaseGridTool
 
 			// copy data to new file
 			RNSPath path = currentPath.lookup(replicaRNSPath, RNSPathQueryFlags.DONT_CARE);
-			out = new ByteIOOutputStream(path);
+			out = ByteIOStreamFactory.createOutputStream(path);
 			copy(in, out);
 			return epr;
 		}

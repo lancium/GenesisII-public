@@ -26,13 +26,13 @@ import org.morgan.util.cmdline.*;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 
-import edu.virginia.vcgr.genii.client.byteio.ByteIOInputStream;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
 import edu.virginia.vcgr.genii.common.security.*;
+import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.cmd.tools.GamlLoginTool;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 
@@ -182,7 +182,7 @@ public class GamlClientTool {
 		
 		if (path.isFile()) {
 			// read the file as an encoded X.509 .cer file
-			InputStream in = new ByteIOInputStream(path);
+			InputStream in = ByteIOStreamFactory.createInputStream(path);
 			try {
 				CertificateFactory cf = CertificateFactory.getInstance("X.509");
 				X509Certificate cert = (X509Certificate) cf.generateCertificate(in);

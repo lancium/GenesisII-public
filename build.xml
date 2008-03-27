@@ -91,6 +91,7 @@
 	<import file="${wsdl.dir}/informationService/informationService.build.xml"/>
 	<import file="${wsdl.dir}/certGenerator/certGenerator.build.xml"/>
 	<import file="${wsdl.dir}/ticker/ticker.build.xml"/>
+	<import file="${wsdl.dir}/tty/tty.build.xml"/>
 
 	<!-- Build Targets -->
 	<target name="build" depends="jars,scripts,deployments"/>
@@ -207,6 +208,7 @@
 		<antcall target="gen.informationService"/>
 		<antcall target="gen.certGenerator"/>
 		<antcall target="gen.ticker"/>
+		<antcall target="gen.tty"/>
 	</target>
 
 	<target name="genii.wsdl.tools"

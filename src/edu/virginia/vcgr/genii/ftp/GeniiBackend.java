@@ -13,8 +13,7 @@ import org.morgan.ftp.ListEntry;
 import org.morgan.ftp.PathAlreadyExistsException;
 import org.morgan.ftp.PathDoesNotExistException;
 
-import edu.virginia.vcgr.genii.client.byteio.ByteIOInputStream;
-import edu.virginia.vcgr.genii.client.byteio.ByteIOOutputStream;
+import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
@@ -231,7 +230,7 @@ public class GeniiBackend implements IBackend
 			}
 			
 			if (path.isFile())
-				return new ByteIOInputStream(path);
+				return ByteIOStreamFactory.createInputStream(path);
 			else
 				return (new RedirectFile(path.getEndpoint())).getStream();
 		}
@@ -300,7 +299,7 @@ public class GeniiBackend implements IBackend
 				path.createFile();
 			}
 			
-			return new ByteIOOutputStream(path.getEndpoint());
+			return ByteIOStreamFactory.createOutputStream(path);
 		}
 		catch (Throwable cause)
 		{

@@ -12,6 +12,8 @@ public interface ISByteIOResource extends IRByteIOResource
 {
 	static public final String POSITION_PROPERTY =
 		"edu.virginia.vcgr.genii.byteio.streamable.position";
+	static public final String DESTROY_ON_CLOSE_PROPERTY =
+		"edu.virginia.vcgr.genii.byteio.sbyteio.destroy-on-close";
 	
 	public File chooseFile(HashMap<QName, Object> creationProperties)
 		throws ResourceException;

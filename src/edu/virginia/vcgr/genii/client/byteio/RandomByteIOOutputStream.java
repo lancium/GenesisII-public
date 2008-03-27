@@ -15,6 +15,7 @@
  */
 package edu.virginia.vcgr.genii.client.byteio;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.rmi.RemoteException;
@@ -24,90 +25,57 @@ import org.ggf.rbyteio.RandomByteIOPortType;
 import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.byteio.xfer.IRByteIOTransferer;
-import edu.virginia.vcgr.genii.client.byteio.xfer.dime.DimeRByteIOTransferer;
-import edu.virginia.vcgr.genii.client.byteio.xfer.mtom.MtomRByteIOTransferer;
-import edu.virginia.vcgr.genii.client.byteio.xfer.simple.SimpleRByteIOTransferer;
+import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransferer;
+import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransfererFactory;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
-import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.rns.RNSException;
-import edu.virginia.vcgr.genii.client.rns.RNSPath;
 
-class RandomByteIOOutputStream extends OutputStream
+public class RandomByteIOOutputStream extends OutputStream
 {
-	private RandomByteIOPortType _stub;
-	private IRByteIOTransferer _transferer;
-	private long _offset = 0;
+	private RandomByteIOTransferer _transferer;
+	private long _offset = 0L;
 	
-	RandomByteIOOutputStream(EndpointReferenceType epr, URI xferType)
-		throws ResourceException, ConfigurationException, RemoteException
+	public RandomByteIOOutputStream(EndpointReferenceType target, 
+		URI desiredTransferType)
+			throws ConfigurationException, RemoteException
 	{
-		_stub = ClientUtils.createProxy(RandomByteIOPortType.class, epr);
+		RandomByteIOPortType clientStub = ClientUtils.createProxy(
+			RandomByteIOPortType.class, target);
+		RandomByteIOTransfererFactory factory = 
+			new RandomByteIOTransfererFactory(clientStub);
+		_transferer = factory.createRandomByteIOTransferer(desiredTransferType);
+	}
+	
+	public RandomByteIOOutputStream(EndpointReferenceType target)
+		throws ConfigurationException, RemoteException
+	{
+		this(target, null);
+	}
+	
+	@Override
+	public void write(byte []data) throws IOException
+	{
+		_transferer.write(_offset, data.length, 0, data);
+		_offset += data.length;
+	}
+	
+	@Override
+	public void write(byte []data, int offset, int length)
+		throws IOException
+	{
+		byte []newData = new byte[length];
+		System.arraycopy(data, offset, newData, 0, length);
+		write(newData);
+	}
+	
+	@Override
+	public void write(int b) throws IOException
+	{
+		write(new byte[] { (byte)b });
+	}
 
-		if (xferType.equals(ByteIOConstants.TRANSFER_TYPE_DIME_URI))
-			_transferer = new DimeRByteIOTransferer(_stub);
-		else if (xferType.equals(ByteIOConstants.TRANSFER_TYPE_MTOM_URI))
-			_transferer = new MtomRByteIOTransferer(_stub);
-		else
-			_transferer = new SimpleRByteIOTransferer(_stub);
-		
-		_transferer.truncAppend(0, new byte[0]);
-	}
-	
-	RandomByteIOOutputStream(RNSPath path)
-		throws ResourceException, ConfigurationException, RNSException,
-			RemoteException
+	public BufferedOutputStream createPreferredBufferedStream()
 	{
-		if (path.exists())
-		{
-			if (!path.isFile())
-				throw new RNSException("Path \"" + path.pwd() + 
-					"\" does not represent a file.");
-		} else
-		{
-			path.createFile();
-		}
-		
-		_transferer = new SimpleRByteIOTransferer(
-			ClientUtils.createProxy(RandomByteIOPortType.class, path.getEndpoint()));
-		_transferer.truncAppend(0, new byte[0]);
-	}
-	
-	public void close() throws IOException
-	{
-		_transferer.close();
-		_transferer = null;
-	}
-	
-    public void write(byte[] b) throws IOException
-    {
-    	_transferer.write(_offset, b.length, 0, b);
-    	_offset += b.length;
-    }
-    
-	public void write(byte[] b, int off, int len) throws IOException
-	{
-		byte []data = new byte[len];
-		System.arraycopy(b, off, data, 0, len);
-		_transferer.write(_offset, len, 0, data);
-		_offset += len;
-	}
-	
-    public void write(int b) throws IOException
-    {
-    	_transferer.write(_offset, 1, 0, new byte[] {(byte)b});
-    	_offset += 1;
-    }
-    
-	public void setTransferMechanism(URI transferMechanism)
-	{
-		if (transferMechanism.equals(
-			ByteIOConstants.TRANSFER_TYPE_DIME_URI))
-			_transferer = new DimeRByteIOTransferer(_stub);
-		else if (transferMechanism.equals(
-			ByteIOConstants.TRANSFER_TYPE_MTOM_URI))
-			_transferer = new MtomRByteIOTransferer(_stub);
-		else
-			_transferer = new SimpleRByteIOTransferer(_stub);
+		return new BufferedOutputStream(
+			this, _transferer.getPreferredWriteSize());
 	}
 }

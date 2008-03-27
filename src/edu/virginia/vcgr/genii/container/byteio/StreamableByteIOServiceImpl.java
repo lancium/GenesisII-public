@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ import org.morgan.util.io.StreamUtils;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
+import org.ws.addressing.MetadataType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
@@ -61,6 +63,9 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements
 		if (name.equals(ByteIOConstants.SBYTEIO_SUBSCRIBE_CONSTRUCTION_PARAMETER))
 		{
 			return property.getObjectValue(Subscribe.class);
+		} else if (name.equals(ByteIOConstants.SBYTEIO_DESTROY_ON_CLOSE_FLAG))
+		{
+			return Boolean.parseBoolean(property.getValue());
 		} else
 			return super.translateConstructionParameter(property);
 	}
@@ -91,6 +96,25 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements
 		resource.chooseFile(creationParameters);
 		
 		resource.setProperty(ISByteIOResource.POSITION_PROPERTY, new Long(0));
+		
+		Boolean destroyOnClose = (Boolean)creationParameters.get(
+			ByteIOConstants.SBYTEIO_DESTROY_ON_CLOSE_FLAG);
+		if (destroyOnClose == null)
+			destroyOnClose = Boolean.FALSE;
+		resource.setProperty(ISByteIOResource.DESTROY_ON_CLOSE_PROPERTY, destroyOnClose);
+		MetadataType mdt = newEPR.getMetadata();
+		if (mdt == null)
+			newEPR.setMetadata(mdt = new MetadataType(new MessageElement[] {
+				new MessageElement(ByteIOConstants.SBYTEIO_DESTROY_ON_CLOSE_FLAG, destroyOnClose)
+			}));
+		else
+		{
+			ArrayList<MessageElement> tmp = new ArrayList<MessageElement>();
+			for (MessageElement e : mdt.get_any())
+				tmp.add(e);
+			tmp.add(new MessageElement(ByteIOConstants.SBYTEIO_DESTROY_ON_CLOSE_FLAG, destroyOnClose));
+			mdt.set_any(tmp.toArray(new MessageElement[0]));
+		}
 		
 		Date d = new Date();
 		Calendar c = Calendar.getInstance();

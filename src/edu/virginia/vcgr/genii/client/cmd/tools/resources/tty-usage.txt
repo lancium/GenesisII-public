@@ -1,0 +1,1 @@
+tty { watch <tty-object-path> | unwatch }

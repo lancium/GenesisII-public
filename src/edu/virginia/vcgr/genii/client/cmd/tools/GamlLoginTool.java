@@ -13,7 +13,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.byteio.ByteIOInputStream;
+import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
@@ -324,11 +324,11 @@ public class GamlLoginTool extends BaseGridTool {
 			} else if (type.isByteIO()) {
 	
 				// log into keystore from rns path to keystore file
-				BufferedInputStream fis = new BufferedInputStream(new ByteIOInputStream(epr));
+				InputStream in = ByteIOStreamFactory.createInputStream(epr);
 				try {
-					return doKeystoreLogin(fis, delegateAttribute);
+					return doKeystoreLogin(in, delegateAttribute);
 				} finally {
-					fis.close();
+					in.close();
 				}
 			}
 		}

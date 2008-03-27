@@ -274,6 +274,9 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
             new MessageElement(
                 ByteIOConstants.MUST_DESTROY_PROPERTY,
                 Boolean.FALSE),
+            new MessageElement(
+            	ByteIOConstants.SBYTEIO_DESTROY_ON_CLOSE_FLAG,
+            	Boolean.TRUE),
             ClientConstructionParameters.createTimeToLiveProperty(
                 _DEFAULT_TIME_TO_LIVE)
         };

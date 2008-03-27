@@ -45,8 +45,7 @@ import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
-import edu.virginia.vcgr.genii.client.byteio.ByteIOInputStream;
-import edu.virginia.vcgr.genii.client.byteio.ByteIOOutputStream;
+import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSMultiLookupResultException;
@@ -405,8 +404,8 @@ public class RNSTree extends JTree implements Autoscroll
 				
 				try
 				{
-					in = new ByteIOInputStream(rPath);
-					out = new ByteIOOutputStream(newPath);
+					in = ByteIOStreamFactory.createInputStream(rPath);
+					out = ByteIOStreamFactory.createOutputStream(newPath);
 					copy(in, out);
 				}
 				catch (Exception e)
@@ -480,7 +479,7 @@ public class RNSTree extends JTree implements Autoscroll
 				try
 				{
 					in = new FileInputStream(file);
-					out = new ByteIOOutputStream(newPath);
+					out = ByteIOStreamFactory.createOutputStream(newPath);
 					copy(in, out);
 				}
 				catch (Exception e)

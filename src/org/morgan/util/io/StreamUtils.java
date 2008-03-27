@@ -31,7 +31,7 @@ public class StreamUtils
 {
 	static private final int _DEFAULT_BUFFER_SIZE = 1024 * 8;
 	
-	static public void copyStream(InputStream in, OutputStream out)
+	static public void copyStream(InputStream in, OutputStream out, boolean autoflush)
 		throws IOException
 	{
 		byte []data = new byte[_DEFAULT_BUFFER_SIZE];
@@ -40,8 +40,16 @@ public class StreamUtils
 		while ( (read = in.read(data)) >= 0)
 		{
 			out.write(data, 0, read);
+			if (autoflush)
+				out.flush();
 		}
 		out.flush();
+	}
+	
+	static public void copyStream(InputStream in, OutputStream out)
+		throws IOException
+	{
+		copyStream(in, out, false);
 	}
 	
 	static public void close(Closeable item)

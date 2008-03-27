@@ -1,117 +1,219 @@
 package edu.virginia.vcgr.genii.client.byteio;
 
-import java.io.FileNotFoundException;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.rmi.RemoteException;
 
+import javax.xml.namespace.QName;
+
+import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
 import org.ggf.sbyteio.StreamableByteIOPortType;
 import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
+import org.ws.addressing.MetadataType;
 
-import edu.virginia.vcgr.genii.client.byteio.xfer.ISByteIOTransferer;
-import edu.virginia.vcgr.genii.client.byteio.xfer.dime.DimeSByteIOTransferer;
-import edu.virginia.vcgr.genii.client.byteio.xfer.mtom.MTomSByteIOTransferer;
-import edu.virginia.vcgr.genii.client.byteio.xfer.simple.SimpleSByteIOTransferer;
+import edu.virginia.vcgr.genii.byteio.streamable.factory.StreamableByteIOFactory;
+import edu.virginia.vcgr.genii.client.byteio.transfer.StreamableByteIOTransferer;
+import edu.virginia.vcgr.genii.client.byteio.transfer.StreamableByteIOTransfererFactory;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
-import edu.virginia.vcgr.genii.client.rns.RNSException;
-import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.resource.TypeInformation;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
+import edu.virginia.vcgr.genii.common.GeniiCommon;
 
-class StreamableByteIOInputStream extends InputStream
+public class StreamableByteIOInputStream extends InputStream
 {
-	private StreamableByteIOPortType _stub;
-	private ISByteIOTransferer _transferer;
-	private long _nextSeek = 0;
-
-	StreamableByteIOInputStream(EndpointReferenceType epr, URI xferType)
-		throws ConfigurationException, RemoteException
+	static final private long MAX_SLEEP = 1000 * 8;
+	
+	private StreamableByteIOTransferer _transferer;
+	private StreamableByteIORP _rp;
+	private EndpointReferenceType _targetByteIO = null;
+	private EndpointReferenceType _createdSByteIO = null;
+	private long _nextSeek = 0L;
+	private boolean _endOfStream = false;
+	private Boolean _destroyOnClose = null;
+	
+	public StreamableByteIOInputStream(EndpointReferenceType epr,
+		URI desiredTransferProtocol)
+			throws ConfigurationException, RemoteException
 	{
-		_stub = ClientUtils.createProxy(StreamableByteIOPortType.class, epr);
-
-		if (xferType.equals(ByteIOConstants.TRANSFER_TYPE_DIME_URI))
-			_transferer = new DimeSByteIOTransferer(_stub);
-		else if (xferType.equals(ByteIOConstants.TRANSFER_TYPE_MTOM_URI))
-			_transferer = new MTomSByteIOTransferer(_stub);
-		else
-			_transferer = new SimpleSByteIOTransferer(_stub);
+		TypeInformation tInfo = new TypeInformation(epr);
+		
+		if (tInfo.isSByteIOFactory())
+		{
+			StreamableByteIOFactory sFactory = ClientUtils.createProxy(
+				StreamableByteIOFactory.class, epr);
+			_createdSByteIO = sFactory.openStream(null).getEndpoint();
+			epr = _createdSByteIO;
+		} else
+		{
+			discoverDestroyOnCloseFromEPR(epr.getMetadata());
+		}
+		
+		try
+		{
+			_rp = (StreamableByteIORP)ResourcePropertyManager.createRPInterface(
+				epr, StreamableByteIORP.class);
+		}
+		catch (ResourcePropertyException rpe)
+		{
+			throw new ConfigurationException("Unable to create RP interface.", rpe);
+		}
+		
+		_targetByteIO = epr;
+		StreamableByteIOPortType clientStub = ClientUtils.createProxy(
+			StreamableByteIOPortType.class, epr);
+		StreamableByteIOTransfererFactory factory = 
+			new StreamableByteIOTransfererFactory(clientStub);
+		_transferer = factory.createStreamableByteIOTransferer(
+			desiredTransferProtocol);
 	}
 	
-	StreamableByteIOInputStream(RNSPath path)
-		throws IOException, RemoteException, ConfigurationException, RNSException
+	public StreamableByteIOInputStream(EndpointReferenceType epr)
+		throws ConfigurationException, RemoteException
 	{
-		if (!path.exists())
-			throw new FileNotFoundException("Couldn't find file \"" +
-				path.pwd() + "\".");
+		this(epr, null);
+	}
+	
+	private boolean determineEndOfStream()
+	{
+		Boolean eof = _rp.getEOF();
+		if (eof == null)
+			return false;
 		
-		if (!path.isFile())
-			throw new RNSException("Path \"" + path.pwd() +
-				"\" does not represent a file.");
+		return eof.booleanValue();
+	}
+	
+	private byte[] read(int length) throws IOException
+	{
+		long sleep = 1000L;
 		
-		_transferer = new SimpleSByteIOTransferer(
-			ClientUtils.createProxy(StreamableByteIOPortType.class, path.getEndpoint()));
+		try
+		{
+			while (!_endOfStream)
+			{
+				byte []data = _transferer.seekRead(SeekOrigin.SEEK_CURRENT, 
+					_nextSeek, length);
+				_nextSeek = 0L;
+				
+				if (data.length > 0)
+					return data;
+				
+				if (data.length == 0)
+					_endOfStream = determineEndOfStream();
+				
+				if (!_endOfStream)
+				{
+					Thread.sleep(sleep);
+					sleep = Math.min(sleep << 2, MAX_SLEEP);
+				}
+			}
+			
+			return new byte[0];
+		}
+		catch (InterruptedException ie)
+		{
+			throw new IOException("I/O Operation interrupted.", ie);
+		}
 	}
 	
 	@Override
 	public int read() throws IOException
 	{
-		byte []data = _transferer.seekRead(SeekOrigin.SEEK_CURRENT, _nextSeek, 1);
-		_nextSeek = 0;
-		if (data.length == 1)
-			return data[0];
+		byte []data = read(1);
 		if (data.length == 0)
-			return (_transferer.endOfStream() ? -1 : 0);
-		return -1;
+			return -1;
+		return data[0];
 	}
 	
+	@Override
 	public int read(byte []b) throws IOException
 	{
-		byte []data = _transferer.seekRead(SeekOrigin.SEEK_CURRENT, _nextSeek, b.length);
-		_nextSeek = 0;
-		System.arraycopy(data, 0, b, 0, data.length);
+		byte []data = read(b.length);
 		if (data.length == 0)
-			return (_transferer.endOfStream() ? -1 : 0);
+			return -1;
+		System.arraycopy(data, 0, b, 0, data.length);
 		return data.length;
 	}
 	
+	@Override
 	public int read(byte []b, int off, int len) throws IOException
 	{
-		byte []data = _transferer.seekRead(SeekOrigin.SEEK_CURRENT, _nextSeek, len);
-		_nextSeek = 0;
-		System.arraycopy(data, 0, b, off, data.length);
+		byte []data = read(len);
 		if (data.length == 0)
-			return (_transferer.endOfStream() ? -1 : 0);
+			return -1;
+		System.arraycopy(data, 0, b, off, data.length);
 		return data.length;
 	}
 	
 	public long skip(long n) throws IOException
 	{
+		Long position = _rp.getPosition();
+		_nextSeek += n;
+		if (position == null)
+			return -1L;
+		
+		return position.longValue() + _nextSeek;
+	}
+	
+	@Override
+	synchronized public void close() throws IOException
+	{
 		try
 		{
-			_nextSeek = n;
-			return _transferer.position() + _nextSeek;
+			if (_createdSByteIO != null || destroyOnClose())
+			{
+				GeniiCommon common = ClientUtils.createProxy(
+					GeniiCommon.class, _targetByteIO);
+				common.destroy(null);
+				
+				_createdSByteIO = null;
+				_targetByteIO = null;
+			}
 		}
-		catch (RemoteException re)
+		catch (ConfigurationException ce)
 		{
-			throw new IOException(re.getLocalizedMessage());
+			throw new IOException("Unable to close streamble byteio.", ce);
 		}
 	}
 	
-	public void close() throws IOException
+	public BufferedInputStream createPreferredBufferedStream()
 	{
-		_transferer.close();
-		_transferer = null;
+		return new BufferedInputStream(this, 
+			_transferer.getPreferredReadSize());
 	}
-    
-	public void setTransferMechanism(URI transferMechanism)
+
+	synchronized private boolean destroyOnClose()
 	{
-		if (transferMechanism.equals(
-			ByteIOConstants.TRANSFER_TYPE_DIME_URI))
-			_transferer = new DimeSByteIOTransferer(_stub);
-		else if (transferMechanism.equals(
-			ByteIOConstants.TRANSFER_TYPE_MTOM_URI))
-			_transferer = new MTomSByteIOTransferer(_stub);
-		else
-			_transferer = new SimpleSByteIOTransferer(_stub);
+		if (_destroyOnClose != null)
+			return _destroyOnClose.booleanValue();
+		
+		_destroyOnClose = _rp.getDestroyOnClose();
+		if (_destroyOnClose == null)
+			_destroyOnClose = Boolean.FALSE;
+		
+		return _destroyOnClose.booleanValue();
+	}
+	
+	private void discoverDestroyOnCloseFromEPR(MetadataType mdt)
+	{
+		if (mdt == null)
+			return;
+		
+		MessageElement []any = mdt.get_any();
+		if (any == null)
+			return;
+		
+		for (MessageElement me : any)
+		{
+			QName name = me.getQName();
+			if (name.equals(ByteIOConstants.SBYTEIO_DESTROY_ON_CLOSE_FLAG))
+			{
+				_destroyOnClose = Boolean.valueOf(me.getValue());
+				return;
+			}
+		}
 	}
 }
