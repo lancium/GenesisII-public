@@ -43,6 +43,7 @@ public class RandomByteIOOutputStream extends OutputStream
 		RandomByteIOTransfererFactory factory = 
 			new RandomByteIOTransfererFactory(clientStub);
 		_transferer = factory.createRandomByteIOTransferer(desiredTransferType);
+		_transferer.truncAppend(0, new byte[0]);
 	}
 	
 	public RandomByteIOOutputStream(EndpointReferenceType target)
