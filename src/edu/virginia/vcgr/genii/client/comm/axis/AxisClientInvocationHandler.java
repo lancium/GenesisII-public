@@ -65,8 +65,6 @@ import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.MessageLevelSecurity;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.DelegatedAssertion;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.DelegatedAttribute;
 import edu.virginia.vcgr.genii.client.security.x509.*;
 import edu.virginia.vcgr.genii.client.utils.deployment.DeploymentRelativeFile;
 import edu.virginia.vcgr.genii.client.invoke.IFinalInvoker;

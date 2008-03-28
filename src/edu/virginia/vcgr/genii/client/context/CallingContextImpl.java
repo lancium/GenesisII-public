@@ -33,7 +33,6 @@ import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.cache.LRUCache;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.SignedAssertion;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.client.ser.Base64;
 import edu.virginia.vcgr.genii.context.ContextNameValuePairType;
