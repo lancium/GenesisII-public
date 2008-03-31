@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.text.ParseException;
+import java.util.LinkedList;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
@@ -80,31 +81,40 @@ public class CreateUserDelegateTool extends CreateUserTool
 	{
 		TextWidgetProvider twp = new TextWidgetProvider(stdout, stderr, stdin);
 		
+		LinkedList<String> args = new LinkedList<String>(getArguments());
+		
 		String sourceURI = null;
-		int start = 0;
 		
 		if (_storeType == null)
-			_storeType = getStoreTypeFromUser(twp);
-		
-		if (_storeType == null)
-			return 0;
-		
-		if (_storeType.equalsIgnoreCase("WIN"))
-			start = 0;
-		else
 		{
-			sourceURI = getArgument(0);
-			if (sourceURI == null)
+			_storeType = getStoreTypeFromUser(twp);
+			if (_storeType == null)
+				return 0;
+			if (!_storeType.equalsIgnoreCase("WIN"))
 			{
 				sourceURI = getSourceURIFromUser(twp);
 				if (sourceURI == null)
 					return 0;
 			}
-			
-			start = 1;
+		} else
+		{
+			if (!_storeType.equalsIgnoreCase("WIN"))
+			{
+				if (args.isEmpty())
+					throw new InvalidToolUsageException();
+				sourceURI = args.pop();
+			}
 		}
-		String idpServicePath = getArgument(start);
-		String idpName = getArgument(start + 1);
+		
+		String idpServicePath = null;
+		String idpName = null;
+		
+		if (!args.isEmpty())
+		{
+			idpServicePath = args.pop();
+			if (!args.isEmpty())
+				idpName = args.pop();
+		}
 		
 		RNSPath idpServiceRNS;
 		
