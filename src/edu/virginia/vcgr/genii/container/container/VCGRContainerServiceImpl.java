@@ -138,6 +138,9 @@ public class VCGRContainerServiceImpl extends GenesisIIBase
 			results = getServiceListing(p);
 		}
 
+		if (results == null)
+			return new ListResponse(new EntryType[0]);
+		
 		EntryType []ret = new EntryType[results.size()];
 		results.toArray(ret);
 		return new ListResponse(ret);

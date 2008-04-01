@@ -120,6 +120,7 @@ public class ThreadPool
 						}
 						catch (InterruptedException ie)
 						{
+							Thread.interrupted();
 							_logger.warn("Thread in thread pool interrupted.");
 						}
 						catch (Throwable t)

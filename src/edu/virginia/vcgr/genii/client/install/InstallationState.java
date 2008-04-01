@@ -40,6 +40,7 @@ public class InstallationState implements Serializable
 		}
 		catch (InterruptedException ie)
 		{
+			Thread.interrupted();
 			_logger.fatal("Unexpected interruption exception while trying to read installation state.", ie);
 			throw new FileLockException("Unable to lock file.", ie);
 		}

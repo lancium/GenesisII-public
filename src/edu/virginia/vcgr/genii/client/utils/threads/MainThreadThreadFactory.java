@@ -59,6 +59,7 @@ public class MainThreadThreadFactory implements ThreadFactory
 			}
 			catch (InterruptedException ie)
 			{
+				Thread.interrupted();
 				throw new RuntimeException("Thread interrupted.", ie);
 			}
 		}

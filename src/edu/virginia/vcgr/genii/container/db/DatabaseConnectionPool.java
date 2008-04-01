@@ -186,6 +186,7 @@ public class DatabaseConnectionPool
 					"Someone tried to close a pooled connection.");
 			}
 			
+			boolean interrupted = Thread.interrupted();
 			try
 			{
 				return method.invoke(_instance, args);
@@ -199,6 +200,11 @@ public class DatabaseConnectionPool
 				}
 				
 				throw cause;
+			}
+			finally
+			{
+				if (interrupted)
+					Thread.currentThread().interrupt();
 			}
 		}
 	}

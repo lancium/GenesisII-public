@@ -3,6 +3,8 @@ package edu.virginia.vcgr.genii.container.bes.activity;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.io.NotSerializableException;
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -442,20 +444,42 @@ public class BESActivity implements Closeable
 		};
 	}
 	
-	private void addFault(Throwable cause)
+	private void addFault(Throwable cause, int attemptsLeft)
 	{
+		if (attemptsLeft <= 0)
+			return;
+		
 		Connection connection = null;
 		PreparedStatement stmt = null;
+		Blob blob = null;
 		
 		try
 		{
+			try
+			{
+				blob = DBSerializer.toBlob(cause);
+			}
+			catch (SQLException sqe)
+			{
+				Throwable cause2 = sqe.getCause();
+				if (cause2 instanceof NotSerializableException)
+				{
+					_logger.error("Attempt to serialize an unserializable exception into the database.", sqe);
+					addFault(new Exception(
+						"Unserializable fault occurred in BES activity (" + 
+						cause.getLocalizedMessage() + 
+						") -- no further information available."), attemptsLeft - 1);
+					return;
+				}
+			}
+			
 			connection = _connectionPool.acquire();
 			stmt = connection.prepareStatement(
 				"INSERT INTO besactivityfaultstable " +
 					"(besactivityid, fault) " +
 				"VALUES(?, ?)");
 			stmt.setString(1, _activityid);
-			stmt.setBlob(2, DBSerializer.toBlob(cause));
+			stmt.setBlob(2, blob);
 			stmt.executeUpdate();
 			connection.commit();
 		}
@@ -637,7 +661,7 @@ public class BESActivity implements Closeable
 					}
 					catch (ContinuableExecutionException cee)
 					{
-						addFault(cee);
+						addFault(cee, 3);
 					}
 					catch (InterruptedException ie)
 					{
@@ -656,7 +680,7 @@ public class BESActivity implements Closeable
 				catch (Throwable cause)
 				{
 					_logger.error("BES Activity Unrecoverably Faulted.", cause);
-					addFault(cause);
+					addFault(cause, 3);
 					try
 					{
 						updateState(_executionPlan.size(),
