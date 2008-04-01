@@ -25,6 +25,8 @@ import java.util.LinkedList;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.CPUArchitecture_Type;
 import org.ggf.jsdl.OperatingSystem_Type;
 import org.morgan.util.io.StreamUtils;
@@ -50,6 +52,8 @@ import edu.virginia.vcgr.genii.container.sysinfo.SystemInfoUtils;
 public class BESAttributesHandler extends AbstractAttributeHandler
 	implements BESConstants
 {
+	static private Log _logger = LogFactory.getLog(BESAttributesHandler.class);
+	
 	static private final String _DESCRIPTION_PROPERTY = "attribute:description";
 	static private final String _DEPLOYER_PROPERTY = "attribute:deployer";
 	
@@ -132,7 +136,16 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 			new LinkedList<EndpointReferenceType>();
 		for (BESActivity activity : resource.getContainedActivities())
 		{
-			eprs.add(activity.getActivityEPR());
+			try
+			{
+				eprs.add(activity.getActivityEPR());
+			}
+			catch (SQLException sqe)
+			{
+				// We lost the activity while we were waiting...just ignore it
+				_logger.debug("Lost an activity between the time we got it's " +
+					"key and asked for it's EPR.", sqe);
+			}
 		}
 		
 		return eprs.toArray(new EndpointReferenceType[0]);
