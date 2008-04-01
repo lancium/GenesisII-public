@@ -31,7 +31,6 @@ public class Scheduler implements Closeable
 	
 	private JobManager _jobManager;
 	private BESManager _besManager;
-	private Thread _schedulerThread;
 	
 	public Scheduler(
 		SchedulingEvent schedulingEvent, 
@@ -44,10 +43,10 @@ public class Scheduler implements Closeable
 		_jobManager = jobManager;
 		_besManager = besManager;
 		
-		_schedulerThread = new Thread(new SchedulerWorker());
-		_schedulerThread.setDaemon(true);
-		_schedulerThread.setName("Queue Scheduler Worker");
-		_schedulerThread.start();
+		Thread schedulerThread = new Thread(new SchedulerWorker());
+		schedulerThread.setDaemon(true);
+		schedulerThread.setName("Queue Scheduler Worker");
+		schedulerThread.start();
 	}
 	
 	protected void finalize() throws Throwable
@@ -61,7 +60,6 @@ public class Scheduler implements Closeable
 			return;
 		
 		_closed = true;
-		_schedulerThread.interrupt();
 	}
 	
 	/**

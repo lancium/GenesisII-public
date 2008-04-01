@@ -22,7 +22,6 @@ public class JobStatusChecker
 	private DatabaseConnectionPool _connectionPool;
 	private JobManager _manager;
 	private long _updateFrequency;
-	private Thread _thread;
 	
 	public JobStatusChecker(DatabaseConnectionPool connectionPool,
 		JobManager manager, long updateFrequency)
@@ -32,11 +31,11 @@ public class JobStatusChecker
 		_updateFrequency = updateFrequency;
 	
 		/* Start the thread */
-		_thread = new Thread(new UpdaterWorker());
-		_thread.setDaemon(true);
-		_thread.setName("Job Status Checker");
+		Thread thread = new Thread(new UpdaterWorker());
+		thread.setDaemon(true);
+		thread.setName("Job Status Checker");
 		
-		_thread.start();
+		thread.start();
 	}
 	
 	protected void finalize() throws Throwable
@@ -52,7 +51,6 @@ public class JobStatusChecker
 			return;
 		
 		_closed = true;
-		_thread.interrupt();
 	}
 	
 	/**

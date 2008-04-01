@@ -65,9 +65,9 @@ public class ThreadPool implements Closeable
 			return;
 		
 		_closing = true;
-		for (Thread th : _threads)
+		synchronized(_queue)
 		{
-			th.interrupt();
+			_queue.notifyAll();
 		}
 	}
 	
@@ -107,8 +107,11 @@ public class ThreadPool implements Closeable
 					synchronized(_queue)
 					{
 						/* While the queue is empty, we simply wait. */
-						while (_queue.isEmpty())
+						while (_queue.isEmpty() && !_closing)
 							_queue.wait();
+						
+						if (_closing)
+							break;
 						
 						/* Pull the first task off of the queue */
 						job = _queue.removeFirst();

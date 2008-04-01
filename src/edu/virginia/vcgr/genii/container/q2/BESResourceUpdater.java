@@ -23,7 +23,6 @@ public class BESResourceUpdater implements Closeable
 	private DatabaseConnectionPool _connectionPool;
 	private BESManager _manager;
 	private long _updateFrequency;
-	private Thread _thread;
 	
 	public BESResourceUpdater(DatabaseConnectionPool connectionPool,
 		BESManager manager, long updateFrequency)
@@ -33,11 +32,11 @@ public class BESResourceUpdater implements Closeable
 		_updateFrequency = updateFrequency;
 		
 		/* Start a new thread to regularly update (and sleep in between) */
-		_thread = new Thread(new UpdaterWorker());
-		_thread.setDaemon(true);
-		_thread.setName("BES Updater Worker");
+		Thread thread = new Thread(new UpdaterWorker());
+		thread.setDaemon(true);
+		thread.setName("BES Updater Worker");
 		
-		_thread.start();
+		thread.start();
 	}
 	
 	protected void finalize() throws Throwable
@@ -53,7 +52,6 @@ public class BESResourceUpdater implements Closeable
 			return;
 		
 		_closed = true;
-		_thread.interrupt();
 	}
 	
 	/* The update worker that the thread is using */
@@ -72,6 +70,8 @@ public class BESResourceUpdater implements Closeable
 					
 					/* Have the BES manager update the resources */
 					_manager.updateResources(connection);
+					_connectionPool.release(connection);
+					connection = null;
 					
 					/* Wait for the next update cycle */
 					Thread.sleep(_updateFrequency);

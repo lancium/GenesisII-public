@@ -497,7 +497,6 @@ public class BESActivity implements Closeable
 	
 	private class ActivityRunner implements Runnable
 	{
-		private Thread _myThread = null;
 		private boolean _terminateRequested = false;
 		private boolean _suspendRequested = false;
 		
@@ -568,12 +567,6 @@ public class BESActivity implements Closeable
 					_phaseLock.notify();
 				}
 			}
-			
-			synchronized(this)
-			{
-				if (_myThread != null)
-					_myThread.interrupt();
-			}
 		}
 		
 		public void requestResume() throws ExecutionException
@@ -597,11 +590,6 @@ public class BESActivity implements Closeable
 		
 		public void run()
 		{
-			synchronized(this)
-			{
-				_myThread = Thread.currentThread();
-			}
-			
 			while (true)
 			{
 				try
@@ -695,11 +683,6 @@ public class BESActivity implements Closeable
 						return;
 					}
 				}
-			}
-			
-			synchronized(this)
-			{
-				_myThread = null;
 			}
 		}
 	}
