@@ -14,14 +14,12 @@
 			<jsdl:ApplicationName>tree</jsdl:ApplicationName>
 			<jsdl-posix:POSIXApplication>
 				<jsdl-posix:Executable>
-					/usr/bin/tree
+					/bin/ls
 				</jsdl-posix:Executable>
 				<jsdl-posix:Output>stdout</jsdl-posix:Output>
 				<jsdl-posix:Error>stderr</jsdl-posix:Error>
-				<jsdl-posix:Argument>-L</jsdl-posix:Argument>
-				<jsdl-posix:Argument>4</jsdl-posix:Argument>
+				<jsdl-posix:Argument>-la</jsdl-posix:Argument>
 				<jsdl-posix:Argument>/uva-genii</jsdl-posix:Argument>
-				<jsdl-posix:Argument>/home</jsdl-posix:Argument>
 			</jsdl-posix:POSIXApplication>
 		</jsdl:Application>
 
