@@ -450,7 +450,7 @@ public class CertTool {
 			if (base64CertFile != null) {
 				// read in the cert from the binary cert file
 
-				System.out.print("Retrieving import cert...");
+				System.out.println("Retrieving import cert...");
 				System.out.flush();
 
 				java.io.FileInputStream fin = new java.io.FileInputStream(base64CertFile);
@@ -462,14 +462,33 @@ public class CertTool {
 			} else {
 			
 				// open the keystore
-				System.out.print("Retrieving import cert...");
+				System.out.print("Retrieving import cert...\n");
 				System.out.flush();
 				KeyStore ks = KeyStore.getInstance(inputStoreType, "BC");
 			    FileInputStream fis = new FileInputStream(inputKeyStore);
 			    ks.load(fis, inputKeyStorePass);
 		    	fis.close();
 		    	
-		    	cert = ks.getCertificate(inputAlias);
+		    	if (inputAlias == null) {
+		    		
+		    		// no input alias: enumerate all aliases
+		    		Enumeration<String> aliases = ks.aliases();
+		    		while (aliases.hasMoreElements()) {
+		    			System.out.println("---------------------------------------------------");
+		    			String alias = aliases.nextElement();
+		    			System.out.println("Alias \"" + alias + "\":");
+		    			System.out.println("---------------------------------------------------");
+			    		cert = ks.getCertificate(alias);
+						System.out.println(cert.toString() + "\n");
+		    		}
+		    		
+					System.out.println("Done.");
+		    		return;
+
+		    	} else {
+
+		    		cert = ks.getCertificate(inputAlias);
+		    	}
 	
 			    if (cert == null) {
 			    	System.err.println("No such issuing certificate alias");

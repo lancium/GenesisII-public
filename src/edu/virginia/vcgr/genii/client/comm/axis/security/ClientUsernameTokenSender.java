@@ -38,7 +38,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import java.security.GeneralSecurityException;
 
 
-public class ClientUsernameTokenSender extends WSDoAllSender implements ISecurityHandler
+public class ClientUsernameTokenSender extends WSDoAllSender implements ISecuritySendHandler
 {
 	static final long serialVersionUID = 0L;
 	
@@ -46,16 +46,25 @@ public class ClientUsernameTokenSender extends WSDoAllSender implements ISecurit
 	private static final String CRYTO_PASS = "pwd";
 	
 	private UsernameTokenIdentity _utIdentity;
+	private boolean _serialize = false;
+	private String _securityActions = "";
 	
 	public ClientUsernameTokenSender() {
 	}
 
-	public void configure(ICallingContext callContext) throws GeneralSecurityException { 
-		configure(callContext, true);
+	/**
+	 * Indicates that this handler is the final handler and should 
+	 * serialize the message context
+	 */
+	public void setToSerialize() {
+		_serialize = true;
 	}
 	
-	public void configure(ICallingContext callContext, boolean serialize) throws GeneralSecurityException {
-		_utIdentity = null;
+	/**
+	 * Configures the Send handler. Returns whether or not this handler is to 
+	 * perform any actions
+	 */
+	public boolean configure(ICallingContext callContext, MessageSecurityData msgSecData) throws GeneralSecurityException {		_utIdentity = null;
 		
 		// get credentials from calling context
 		ArrayList <GamlCredential> credentials = 
@@ -70,33 +79,30 @@ public class ClientUsernameTokenSender extends WSDoAllSender implements ISecurit
 			}
 		}
 
-		String securityActions = "";
-		if (_utIdentity != null) {
-			securityActions = securityActions + " " + WSHandlerConstants.USERNAME_TOKEN;
-//			securityActions = securityActions + " " + WSHandlerConstants.TIMESTAMP;
-
-	    	setOption(WSHandlerConstants.USER, _utIdentity.getUserName());
-	    	setOption(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
-			
-		} else {
-			securityActions = securityActions + " " + WSHandlerConstants.NO_SECURITY;
+		if (_utIdentity == null) {
+			_securityActions = _securityActions + " " + WSHandlerConstants.NO_SECURITY;
+			return false;
 		}
 		
-		if (!serialize) {
-			// don't let this handler serialize just yet: there may be more
-			securityActions = securityActions + " " + WSHandlerConstants.NO_SERIALIZATION;
-		}
-		
-		securityActions = securityActions.trim();
-    	setOption(WSHandlerConstants.ACTION, securityActions);        	
-    	setOption(WSHandlerConstants.PW_CALLBACK_CLASS, ClientUsernameTokenSender.ClientPWCallback.class.getName());
+		_securityActions = _securityActions + " " + WSHandlerConstants.USERNAME_TOKEN;
+//			_securityActions = _securityActions + " " + WSHandlerConstants.TIMESTAMP;
 
+    	setOption(WSHandlerConstants.USER, _utIdentity.getUserName());
+    	setOption(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+		return true;
 	}
 
     public void invoke(MessageContext msgContext) throws AxisFault {
-    	if (_utIdentity == null) {
-    		return;
-    	}
+
+    	if (!_serialize) {
+			// don't let this handler serialize just yet: there may be more
+    		_securityActions = _securityActions + " " + WSHandlerConstants.NO_SERIALIZATION;
+		}
+		
+    	_securityActions = _securityActions.trim();
+    	setOption(WSHandlerConstants.ACTION, _securityActions);        	
+    	setOption(WSHandlerConstants.PW_CALLBACK_CLASS, ClientUsernameTokenSender.ClientPWCallback.class.getName());
+
     	super.invoke(msgContext);
     }
     

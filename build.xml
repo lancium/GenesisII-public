@@ -316,4 +316,8 @@
 		<delete file="${basedir}/jar-desc.xml"/>
 		<delete file="${basedir}/jserver-jar-desc.xml"/>
 	</target>
+	
+	<target name="wipestate">
+		<delete dir="${user.home}/.genesisII"/>
+	</target>	
 </project>

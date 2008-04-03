@@ -30,6 +30,7 @@ import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.client.comm.*;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 
 import java.io.IOException;
@@ -41,7 +42,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 
-public class ClientMessageSecuritySender extends WSDoAllSender implements ISecurityHandler
+public class ClientMessageSecuritySender extends WSDoAllSender implements ISecuritySendHandler
 {
 	static final long serialVersionUID = 0L;
 	
@@ -50,56 +51,60 @@ public class ClientMessageSecuritySender extends WSDoAllSender implements ISecur
 	
 	private MessageSecurityData _messageSec = null;
 	private ICallingContext _callContext = null;
-	private boolean _serialize = true;
+	private boolean _serialize = false;
+	private String _securityActions = "";
 	
 	public ClientMessageSecuritySender() {
 	}
 
-	public void configure(ICallingContext callContext) { 
-		configure(callContext, true);
+	/**
+	 * Indicates that this handler is the final handler and should 
+	 * serialize the message context
+	 */
+	public void setToSerialize() {
+		_serialize = true;
 	}
 	
-	public void configure(ICallingContext callContext, boolean serialize) {
-		_serialize = serialize;
+	/**
+	 * Configures the Send handler. Returns whether or not this handler is to 
+	 * perform any actions
+	 */
+	public boolean configure(ICallingContext callContext, MessageSecurityData msgSecData) throws GeneralSecurityException {	
+
+		_messageSec = msgSecData;
+
+    	if ((_messageSec == null) || (_messageSec._neededMsgSec.isNone())) {
+			_securityActions = _securityActions + " " + WSHandlerConstants.NO_SECURITY;
+			return false;
+		} 
+
+		if (_messageSec._neededMsgSec.isNone()) {
+			_securityActions = _securityActions + " " + WSHandlerConstants.NO_SECURITY;
+		}
+		if (_messageSec._neededMsgSec.isSign()) {
+			_securityActions = _securityActions + " " + WSHandlerConstants.SIGNATURE;
+		}
+		if (_messageSec._neededMsgSec.isEncrypt()) {
+			_securityActions = _securityActions + " " + WSHandlerConstants.ENCRYPT;
+		}
+		setOption(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
+    	setOption(WSHandlerConstants.USER, CRYPTO_ALIAS);
+    	return true;
 	}
 
     public void invoke(MessageContext msgContext) throws AxisFault {
 		
-		_messageSec = (MessageSecurityData) msgContext.getProperty(
-				CommConstants.MESSAGE_SEC_CALL_DATA);
-		_callContext = (ICallingContext) msgContext.getProperty(
+    	_callContext = (ICallingContext) msgContext.getProperty(
 				CommConstants.CALLING_CONTEXT_PROPERTY_NAME);
 		
-		String securityActions = "";
-		if (_messageSec != null) {
-			if (_messageSec._neededMsgSec.isNone()) {
-				securityActions = securityActions + " " + WSHandlerConstants.NO_SECURITY;
-			}
-			if (_messageSec._neededMsgSec.isSign()) {
-				securityActions = securityActions + " " + WSHandlerConstants.SIGNATURE;
-			}
-			if (_messageSec._neededMsgSec.isEncrypt()) {
-				securityActions = securityActions + " " + WSHandlerConstants.ENCRYPT;
-			}
-			setOption(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
-	    	setOption(WSHandlerConstants.USER, CRYPTO_ALIAS);
-		} else {
-			securityActions = securityActions + " " + WSHandlerConstants.NO_SECURITY;
-		}
-
 		if (!_serialize) {
 			// don't let this handler serialize just yet: there may be more
-			securityActions = securityActions + " " + WSHandlerConstants.NO_SERIALIZATION;
+			_securityActions = _securityActions + " " + WSHandlerConstants.NO_SERIALIZATION;
 		}
 
-		securityActions = securityActions.trim();
-
-		setOption(WSHandlerConstants.ACTION, securityActions);        	
+		_securityActions = _securityActions.trim();
+		setOption(WSHandlerConstants.ACTION, _securityActions);        	
     	setOption(WSHandlerConstants.PW_CALLBACK_CLASS, ClientMessageSecuritySender.ClientPWCallback.class.getName());
-
-    	if ((_messageSec == null) || (_messageSec._neededMsgSec.isNone())) {
-    		return;
-    	}
     	
     	super.invoke(msgContext);
     }

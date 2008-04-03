@@ -295,7 +295,7 @@
 			<wsdl:input
 				name="CreateActivity"
 				message="bes-factory:CreateActivityRequest"
-				wsa:Action="http://schemas.ggf.orgt/bes/2006/08/bes-factory/BESFactoryPortType/CreateActivity"/>
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/CreateActivity"/>
 			<wsdl:output
 				name="CreateActivityResponse"
 				message="bes-factory:CreateActivityResponse"
@@ -322,7 +322,7 @@
 			<wsdl:input
 				name="GetActivityStatuses"
 				message="bes-factory:GetActivityStatusesRequest"
-				wsa:Action="http://schemas.ggf.orgt/bes/2006/08/bes-factory/BESFactoryPortType/GetActivityStatuses"/>
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/GetActivityStatuses"/>
 			<wsdl:output
 				name="GetActivityStatusesResponse"
 				message="bes-factory:GetActivityStatusesResponse"
@@ -337,7 +337,7 @@
 			<wsdl:input
 				name="TerminateActivities"
 				message="bes-factory:TerminateActivitiesRequest"
-				wsa:Action="http://schemas.ggf.orgt/bes/2006/08/bes-factory/BESFactoryPortType/TerminateActivities"/>
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/TerminateActivities"/>
 			<wsdl:output
 				name="TerminateActivitiesResponse"
 				message="bes-factory:TerminateActivitiesResponse"
@@ -352,7 +352,7 @@
 			<wsdl:input
 				name="GetActivityDocuments"
 				message="bes-factory:GetActivityDocumentsRequest"
-				wsa:Action="http://schemas.ggf.orgt/bes/2006/08/bes-factory/BESFactoryPortType/GetActivityDocuments"/>
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/GetActivityDocuments"/>
 			<wsdl:output
 				name="GetActivityDocumentsResponse"
 				message="bes-factory:GetActivityDocumentsResponse"
@@ -367,7 +367,7 @@
 			<wsdl:input
 				name="GetFactoryAttributesDocument"
 				message="bes-factory:GetFactoryAttributesDocumentRequest"
-				wsa:Action="http://schemas.ggf.orgt/bes/2006/08/bes-factory/BESFactoryPortType/GetFactoryAttributesDocument"/>
+				wsa:Action="http://schemas.ggf.org/bes/2006/08/bes-factory/BESFactoryPortType/GetFactoryAttributesDocument"/>
 			<wsdl:output
 				name="GetFactoryAttributesDocumentResponse"
 				message="bes-factory:GetFactoryAttributesDocumentResponse"

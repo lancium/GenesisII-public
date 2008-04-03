@@ -76,9 +76,7 @@ import edu.virginia.vcgr.genii.client.naming.ResolverDescription;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.comm.attachments.AttachmentType;
 import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
-import edu.virginia.vcgr.genii.client.comm.axis.security.MessageSecurityData;
-import edu.virginia.vcgr.genii.client.comm.axis.security.ISecurityHandler;
-import edu.virginia.vcgr.genii.client.comm.axis.security.VcgrSslSocketFactory;
+import edu.virginia.vcgr.genii.client.comm.axis.security.*;
 
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.naming.ReferenceResolver;
@@ -349,7 +347,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			for (Class<?> locator : locators) {
 				Object locatorInstance = createLocatorInstance(
 						locator,
-						_callContext);
+						_callContext, 
+						msgSecData);
 				addMethods(locatorInstance, epr, msgSecData);
 			}
 		} catch (IOException ioe) {
@@ -376,7 +375,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	
 	static private Object createLocatorInstance(
 			Class<?> loc,
-			ICallingContext callingContext)
+			ICallingContext callingContext, 
+			MessageSecurityData msgSecData)
 		throws ResourceException
 	{
 		try
@@ -385,25 +385,25 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			FileProvider config = new FileProvider("client-config.wsdd");
 			Object retval = cons.newInstance(config);
 
-			// configure the send handler(s)
-			ArrayList<ISecurityHandler> sendHandlers = getHandler(
+			// configure the send handler(s), working backwards so as to set the 
+			// last one that actually does work to serialize the message
+			ArrayList<ISecuritySendHandler> sendHandlers = getHandler(
 					(SimpleChain) config.getGlobalRequest(), 
-					ISecurityHandler.class);
-			for (int i = 0; i < sendHandlers.size(); i++) {
-				ISecurityHandler h = sendHandlers.get(i);
-				// instruct the last handler to serialize the message
-				if (i < sendHandlers.size() - 1) {
-					h.configure(callingContext, false);
-				} else {
-					h.configure(callingContext, true);
+					ISecuritySendHandler.class);
+			boolean serializerFound = false;
+			for (int i = sendHandlers.size() - 1; i >= 0; i--) {
+				ISecuritySendHandler h = sendHandlers.get(i);
+				if (h.configure(callingContext, msgSecData) && !serializerFound) {
+					serializerFound = true;
+					h.setToSerialize();
 				}
 			}
         	
 			// configure the recv handler(s)
-			ArrayList<ISecurityHandler> recvHandlers = getHandler(
+			ArrayList<ISecurityRecvHandler> recvHandlers = getHandler(
 					(SimpleChain) config.getGlobalResponse(), 
-					ISecurityHandler.class);
-			for (ISecurityHandler h : recvHandlers) {
+					ISecurityRecvHandler.class);
+			for (ISecurityRecvHandler h : recvHandlers) {
 				h.configure(callingContext);
 			}
         	
