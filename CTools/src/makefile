@@ -2,9 +2,10 @@ CC			=			gcc
 CFLAGS		=			-Wall -g
 LFLAGS		=
 
-OBJECTS		=			StringUtils.o StringPair.o Test.o PairList.o		\
-						JobDescription.o
-BINARIES	=			Test
+OBJECTS		=			StringUtils.o StringPair.o JSDLFormer.o PairList.o	\
+						JobDescription.o JSDLWriter.o POSIXAppWriter.o		\
+						HPCAppWriter.o
+BINARIES	=			JSDLFormer
 
 #################
 
@@ -28,8 +29,21 @@ StringPair.o:			StringPair.h StringPair.c StringUtils.h
 PairList.o:			StringPair.h StringUtils.h PairList.h PairList.c
 	$(CC) $(CFLAGS) PairList.c -c -o PairList.o
 
-Test.o:		StringPair.h StringUtils.h Test.c
-	$(CC) $(CFLAGS) Test.c -c -o Test.o
+JSDLFormer.o:		StringPair.h StringUtils.h JSDLFormer.c PairList.h		\
+		JobDescription.h JSDLWriter.h POSIXAppWriter.h HPCAppWriter.h
+	$(CC) $(CFLAGS) JSDLFormer.c -c -o JSDLFormer.o
 
-Test:			$(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -o Test $(LFLAGS)
+POSIXAppWriter.o:		StringPair.h StringUtils.h POSIXAppWriter.c			\
+		PairList.h JobDescription.h
+	$(CC) $(CFLAGS) POSIXAppWriter.c -c -o POSIXAppWriter.o
+
+HPCAppWriter.o:		StringPair.h StringUtils.h HPCAppWriter.c				\
+		PairList.h JobDescription.h
+	$(CC) $(CFLAGS) HPCAppWriter.c -c -o HPCAppWriter.o
+
+JSDLWriter.o:		StringPair.h StringUtils.h JSDLWriter.c					\
+		PairList.h JobDescription.h HPCAppWriter.h POSIXAppWriter.h
+	$(CC) $(CFLAGS) JSDLWriter.c -c -o JSDLWriter.o
+
+JSDLFormer:			$(OBJECTS)
+	$(CC) $(CFLAGS) $(OBJECTS) -o JSDLFormer $(LFLAGS)
