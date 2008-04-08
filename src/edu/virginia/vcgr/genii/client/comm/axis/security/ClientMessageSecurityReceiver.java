@@ -273,7 +273,8 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
      * @param msgContext message context.
      * @throws AxisFault
      */
-    public void superinvoke(MessageContext msgContext) throws AxisFault {
+    @SuppressWarnings("unchecked")
+	public void superinvoke(MessageContext msgContext) throws AxisFault {
 
     	boolean doDebug = log.isDebugEnabled();
 
@@ -355,7 +356,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
             */
             doReceiverAction(doAction, reqData);
             
-            Vector wsResult = null;
+            Vector<?> wsResult = null;
 
             try {
                 wsResult = secEngine.processSecurityHeader(doc, actor,
@@ -383,7 +384,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
             */
             ArrayList<QName> processedHeaders = 
             	new ArrayList<QName>();
-            Iterator iterator = sm.getSOAPEnvelope().getHeaders().iterator();
+            Iterator<?> iterator = sm.getSOAPEnvelope().getHeaders().iterator();
             while (iterator.hasNext()) {
                 org.apache.axis.message.SOAPHeaderElement tempHeader = (org.apache.axis.message.SOAPHeaderElement) iterator
                         .next();
@@ -414,7 +415,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
             iterator = processedHeaders.iterator();
             while (iterator.hasNext()) {
                 QName qname = (QName) iterator.next();
-                Enumeration headersByName = sm.getSOAPEnvelope().getHeadersByName(
+                Enumeration<?> headersByName = sm.getSOAPEnvelope().getHeadersByName(
                         qname.getNamespaceURI(), qname.getLocalPart());
                 while (headersByName.hasMoreElements()) {
                     org.apache.axis.message.SOAPHeaderElement tempHeader =
@@ -444,7 +445,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
                         ex);
             }
 
-            Iterator headers = sHeader.examineHeaderElements(actor);
+            Iterator<?> headers = sHeader.examineHeaderElements(actor);
 
             SOAPHeaderElement headerElement = null;
             while (headers.hasNext()) {
@@ -520,10 +521,10 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
             * All ok up to this point. Now construct and setup the security
             * result structure. The service may fetch this and check it.
             */
-            Vector results = null;
-            if ((results = (Vector) msgContext
+            Vector<Object> results = null;
+            if ((results = (Vector<Object>) msgContext
                     .getProperty(WSHandlerConstants.RECV_RESULTS)) == null) {
-                results = new Vector();
+                results = new Vector<Object>();
                 msgContext
                         .setProperty(WSHandlerConstants.RECV_RESULTS, results);
             }
