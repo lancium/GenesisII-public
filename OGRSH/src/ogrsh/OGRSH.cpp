@@ -9,10 +9,31 @@
 #include "ogrsh/shims/System.hpp"
 #include "ogrsh/shims/File.hpp"
 #include "ogrsh/shims/Execute.hpp"
+#include "ogrsh/shims/Threads.hpp"
 
 namespace ogrsh
 {
 	static void fix_environment();
+
+	void startAllShims()
+	{
+		ogrsh::shims::startSystemShims();
+		ogrsh::shims::startDirectoryShims();
+		ogrsh::shims::startACLShims();
+		ogrsh::shims::startFileShims();
+		ogrsh::shims::startExecuteShims();
+		ogrsh::shims::startThreadShims();
+	}
+
+	void stopAllShims()
+	{
+		ogrsh::shims::stopThreadShims();
+		ogrsh::shims::stopExecuteShims();
+		ogrsh::shims::stopFileShims();
+		ogrsh::shims::stopACLShims();
+		ogrsh::shims::stopDirectoryShims();
+		ogrsh::shims::stopSystemShims();
+	}
 
 	void __attribute__((constructor)) initializeLibrary()
 	{
@@ -23,12 +44,7 @@ namespace ogrsh
 		fix_environment();
 
 		Configuration::createConfiguration();
-
-		ogrsh::shims::startSystemShims();
-		ogrsh::shims::startDirectoryShims();
-		ogrsh::shims::startACLShims();
-		ogrsh::shims::startFileShims();
-		ogrsh::shims::startExecuteShims();
+		startAllShims();
 	}
 
 	void __attribute__((destructor)) finalizeLibrary()
@@ -36,12 +52,7 @@ namespace ogrsh
 		OGRSH_TRACE("Finalizing OGRSH");
 
 		Configuration::destroyConfiguration();
-
-		ogrsh::shims::stopExecuteShims();
-		ogrsh::shims::stopFileShims();
-		ogrsh::shims::stopACLShims();
-		ogrsh::shims::stopDirectoryShims();
-		ogrsh::shims::stopSystemShims();
+		stopAllShims();
 	}
 
 	void fix_environment()

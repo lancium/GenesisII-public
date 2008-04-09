@@ -61,6 +61,7 @@ namespace ogrsh
 		if (descriptor < 0 || descriptor >= NOFILE)
 		{
 			OGRSH_FATAL("Invalid file descriptor used for table.");
+			pthread_mutex_unlock(&descMutex);
 			ogrsh::shims::real_exit(1);
 		}
 

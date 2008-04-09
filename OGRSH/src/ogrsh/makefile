@@ -18,6 +18,7 @@ OBJECTS			=		$(OOBJ_DIR)/XMLUtilities.o							\
 						$(OOBJ_DIR)/Directory.o								\
 						$(OOBJ_DIR)/File.o									\
 						$(OOBJ_DIR)/Execute.o								\
+						$(OOBJ_DIR)/Threads.o								\
 						$(OOBJ_DIR)/ExecuteState.o							\
 						$(OOBJ_DIR)/ACL.o									\
 						$(OOBJ_DIR)/System.o								\
@@ -108,6 +109,9 @@ $(OOBJ_DIR)/File.o:		File.cpp
 
 $(OOBJ_DIR)/Execute.o:		Execute.cpp
 		$(CPP) $(CPPFLAGS) -c Execute.cpp -o $@
+
+$(OOBJ_DIR)/Threads.o:		Threads.cpp
+		$(CPP) $(CPPFLAGS) -c Threads.cpp -o $@
 
 $(OOBJ_DIR)/ExecuteState.o:		ExecuteState.cpp
 		$(CPP) $(CPPFLAGS) -c ExecuteState.cpp -o $@

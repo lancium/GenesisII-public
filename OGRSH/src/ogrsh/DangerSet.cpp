@@ -104,16 +104,6 @@ extern "C" {
 		return 0;
 	}
 
-	int ftruncate(int fd, off_t length)
-	{
-		OGRSH_FATAL(
-			"Attempt to use un-intercepted method ftruncate("
-			<< fd << ", " << length << ")");
-		ogrsh::shims::real_exit(1);
-
-		return 0;
-	}
-
 	int fstatat(int dirfd, const char *pathname, struct stat *buf,
 		int flags)
 	{
@@ -234,5 +224,14 @@ extern "C" {
 	{
 		OGRSH_FATAL("Attempting to use un-intercepted method __flushlbf(...).");
 		ogrsh::shims::real_exit(1);
+	}
+
+	int __libc_write(int, const void*, size_t)
+	{
+		OGRSH_FATAL(
+			"Attempting to use un-intercepted method __libc_write(...).");
+		ogrsh::shims::real_exit(1);
+
+		return -1;
 	}
 }
