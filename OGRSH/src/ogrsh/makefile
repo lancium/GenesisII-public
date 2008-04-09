@@ -34,14 +34,11 @@ OBJECTS			=		$(OOBJ_DIR)/XMLUtilities.o							\
 						$(OOBJ_DIR)/VirtualDirectoryStream.o				\
 						$(OOBJ_DIR)/VirtualProviderUtilities.o				\
 						$(OOBJ_DIR)/FileDescriptor.o						\
-						$(OOBJ_DIR)/FileStream.o							\
 						$(OOBJ_DIR)/FileDescriptorTable.o					\
 						$(OOBJ_DIR)/ProtectedTable.o						\
 						$(OOBJ_DIR)/FileFunctions.o							\
 						$(OOBJ_DIR)/ExecuteFunctions.o						\
-						$(OOBJ_DIR)/Random.o								\
-						$(OOBJ_DIR)/Stream.o								\
-						$(OOBJ_DIR)/FDStreamBackend.o
+						$(OOBJ_DIR)/Random.o
 
 LIBRARY			=		$(LIB_DIR)/libOGRSH.so
 
@@ -106,7 +103,7 @@ $(OOBJ_DIR)/Path.o:		Path.cpp
 $(OOBJ_DIR)/Directory.o:		Directory.cpp
 		$(CPP) $(CPPFLAGS) -c Directory.cpp -o $@
 
-$(OOBJ_DIR)/File.o:		File.cpp File.fprintf.inc
+$(OOBJ_DIR)/File.o:		File.cpp
 		$(CPP) $(CPPFLAGS) -c File.cpp -o $@
 
 $(OOBJ_DIR)/Execute.o:		Execute.cpp
@@ -160,9 +157,6 @@ $(OOBJ_DIR)/VirtualProviderUtilities.o:		VirtualProviderUtilities.cpp
 $(OOBJ_DIR)/FileDescriptor.o:		FileDescriptor.cpp
 		$(CPP) $(CPPFLAGS) -c FileDescriptor.cpp -o $@
 
-$(OOBJ_DIR)/FileStream.o:		FileStream.cpp
-		$(CPP) $(CPPFLAGS) -c FileStream.cpp -o $@
-
 $(OOBJ_DIR)/FileDescriptorTable.o:		FileDescriptorTable.cpp
 		$(CPP) $(CPPFLAGS) -c FileDescriptorTable.cpp -o $@
 
@@ -177,9 +171,3 @@ $(OOBJ_DIR)/ExecuteFunctions.o:		ExecuteFunctions.cpp
 
 $(OOBJ_DIR)/Random.o:		Random.cpp
 		$(CPP) $(CPPFLAGS) -c Random.cpp -o $@
-
-$(OOBJ_DIR)/Stream.o:		Stream.cpp
-		$(CPP) $(CPPFLAGS) -c Stream.cpp -o $@
-
-$(OOBJ_DIR)/FDStreamBackend.o:		FDStreamBackend.cpp
-		$(CPP) $(CPPFLAGS) -c FDStreamBackend.cpp -o $@

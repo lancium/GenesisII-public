@@ -38,48 +38,9 @@ namespace ogrsh
 		SHIM_DECL(FILE*, fopen, (const char *path, const char *modes));
 		SHIM_DECL(FILE*, fopen64, (const char *path, const char *modes));
 		SHIM_DECL(FILE*, fdopen, (int fd, const char *modes));
-		SHIM_DECL(int, fclose, (FILE *stream));
-		SHIM_DECL(char*, fgets, (char *s, int n, FILE *stream));
-		SHIM_DECL(int, fputs, (const char *s, FILE *stream));
-		SHIM_DECL(char*, fgets_unlocked, (char *s, int n, FILE *stream));
 
-		extern "C" {
-			int fprintf(FILE*, const char *, ...);
-			int __fprintf_chk(FILE*, int, const char *, ...);
-		}		
-
-		SHIM_DECL(int, vfprintf, (FILE*, const char *format, va_list ap));
-		SHIM_DECL(int, fflush, (FILE*));
-		SHIM_DECL(int, fflush_unlocked, (FILE*));
-		SHIM_DECL(void, rewind, (FILE*));
-		SHIM_DECL(int, fseek, (FILE*, long offset, int whence));
-		SHIM_DECL(int, fseeko, (FILE*, off_t offset, int whence));
-		SHIM_DECL(long, ftell, (FILE*));
-		SHIM_DECL(off_t, ftello, (FILE*));
-		SHIM_DECL(size_t, fread,
-			(void *ptr, size_t size, size_t nmemb, FILE *stream));
-		SHIM_DECL(size_t, fwrite,
-			(const void *ptr, size_t size, size_t nmemb, FILE *stream));
-		SHIM_DECL(int, fputc, (int c, FILE *stream));
-		SHIM_DECL(int, putc, (int c, FILE *stream));
-		SHIM_DECL(int, getc, (FILE *stream));
-		SHIM_DECL(int, fgetc, (FILE *stream));
-		SHIM_DECL(int, feof, (FILE *stream));
-		SHIM_DECL(int, ferror, (FILE *stream));
-		SHIM_DECL(int, fileno, (FILE *stream));
 		SHIM_DECL(int, fcntl, (int fd, int cmd, long arg));
-		SHIM_DECL(int, setvbuf,
-			(FILE *stream, char *buf, int mode, size_t size));
-		SHIM_DECL(void, clearerr, (FILE *stream));
-		SHIM_DECL(int, _IO_getc, (FILE *stream));
-		SHIM_DECL(int, _IO_putc, (int c, FILE *stream));
-		SHIM_DECL(int, _IO_feof, (FILE *stream));
-		SHIM_DECL(int, _IO_ferror, (FILE *stream));
 		SHIM_DECL(int, fchmod, (int fd, mode_t mode));
-		SHIM_DECL(int, __fsetlocking, (FILE *stream, int type));
-		SHIM_DECL(int, __fpending, (FILE *stream));
-
-		int uber_real_fprintf(FILE*, const char *format, ...);
 
 		void startFileShims();
 		void stopFileShims();

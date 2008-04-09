@@ -7,7 +7,6 @@
 
 #include "ogrsh/Configuration.hpp"
 #include "ogrsh/FileDescriptorTable.hpp"
-#include "ogrsh/FileStream.hpp"
 #include "ogrsh/Logging.hpp"
 #include "ogrsh/ProtectedTable.hpp"
 
@@ -17,6 +16,12 @@ using namespace ogrsh;
 
 namespace ogrsh
 {
+	static int translateMode(const char *mode);
+	static ssize_t IOCookieReadImpl(void*, char *buffer, size_t bytes);
+	static ssize_t IOCookieWriteImpl(void*, const char *buffer, size_t bytes);
+	static int IOCookieSeekImpl(void*, off64_t *pos, int whence);
+	static int IOCookieCloseImpl(void*);
+
 	namespace shims
 	{
 		SHIM_DEF(int, creat, (const char *pathname, mode_t mode),
@@ -330,72 +335,13 @@ namespace ogrsh
 			return desc->fchmod(mode);
 		}
 
-		SHIM_DEF(int, setvbuf, (FILE *stream, char *buf, int mode, size_t size),
-			(stream, buf, mode, size))
-		{
-			OGRSH_TRACE("setvbuf(..., mode=" << mode << ", size = "
-				<< size << ") called.");
-
-			if (stream != NULL)
-			{
-				FileStream *fStream = (FileStream*)stream;
-
-				if (fStream->_magicNumber == FILE_STREAM_MAGIC_NUMBER)
-				{
-					OGRSH_FATAL( "setvbuf on intercepted stream not "
-						<< "supported in OGRSH.");
-					ogrsh::shims::real_exit(1);
-				} else
-				{
-					return real_setvbuf(stream, buf, mode, size);
-				}
-			} else
-			{
-				errno = EBADF;
-			}
-
-			return -1;
-		}
-
-		SHIM_DEF(void, clearerr, (FILE *stream), (stream))
-		{
-			OGRSH_TRACE("clearerr(...) called.");
-
-			if (stream != NULL)
-			{
-				FileStream *fStream = (FileStream*)stream;
-
-				if (fStream->_magicNumber == FILE_STREAM_MAGIC_NUMBER)
-				{
-/*
-					OGRSH_FATAL( "clearerr on intercepted stream not "
-						<< "supported in OGRSH.");
-					ogrsh::shims::real_exit(1);
-*/
-				} else
-				{
-					real_clearerr(stream);
-				}
-			} else
-			{
-				errno = EBADF;
-			}
-		}
-
 		SHIM_DEF(FILE*, fopen, (const char *path, const char *mode),
 			(path, mode))
 		{
 			OGRSH_TRACE("fopen(\"" << path << "\", \"" << mode
 				<< "\") called.");
 
-			FileStream *ret = new FileStream(path, mode);
-			if (ret != NULL && (ret->fileno() < 0))
-			{
-				delete ret;
-				ret = NULL;
-			}
-
-			return (FILE*)ret;
+			return fopen64(path, mode);
 		}
 
 		SHIM_DEF(FILE*, fopen64, (const char *path, const char *mode),
@@ -404,14 +350,18 @@ namespace ogrsh
 			OGRSH_TRACE("fopen64(\"" << path << "\", \"" << mode
 				<< "\") called.");
 
-			FileStream *ret = new FileStream(path, mode);
-			if (ret != NULL && (ret->fileno() < 0))
-			{
-				delete ret;
-				ret = NULL;
-			}
+			int fd;
+			FILE *ret;
 
-			return (FILE*)ret;
+			fd = open64(path, translateMode(mode), 0666);
+			if (fd < 0)
+				return NULL;
+
+			ret = fdopen(fd, mode);
+			if (ret == NULL)
+				close(fd);
+
+			return ret;
 		}
 
 		SHIM_DEF(FILE*, fdopen, (int fd, const char *mode),
@@ -420,541 +370,27 @@ namespace ogrsh
 			OGRSH_TRACE("fdopen(" << fd << ", \"" << mode
 				<< "\") called.");
 
-			if (fd < 0)
-				return NULL;
+			int *fdPtr;
+			FILE *ret;
+			_IO_cookie_io_functions_t ioFunctions;
 
-			FileStream *ret = new FileStream(fd);
-			return (FILE*)ret;
-		}
+			fdPtr = (int*)malloc(sizeof(int));
+			*fdPtr = fd;
 
-		SHIM_DEF(int, fflush, (FILE *fptr), (fptr))
-		{
-			if (fptr != NULL)
+			ioFunctions.read = IOCookieReadImpl;
+			ioFunctions.write = IOCookieWriteImpl;
+			ioFunctions.seek = IOCookieSeekImpl;
+			ioFunctions.close = IOCookieCloseImpl;
+
+			ret = fopencookie(fdPtr, mode, ioFunctions);
+			if (ret == NULL)
 			{
-				FileStream *fStream = (FileStream*)fptr;
-
-				if (fStream->_magicNumber == FILE_STREAM_MAGIC_NUMBER)
-				{
-					return fStream->fflush();
-					return 0;
-				} else
-				{
-					return real_fflush(fptr);
-				}
-			} else
-			{
-				errno = EBADF;
-				return EOF;
-			}
-		}
-
-		SHIM_DEF(int, fflush_unlocked, (FILE *fptr), (fptr))
-		{
-			if (fptr != NULL)
-			{
-				FileStream *fStream = (FileStream*)fptr;
-
-				if (fStream->_magicNumber == FILE_STREAM_MAGIC_NUMBER)
-				{
-					return fStream->fflush();
-					return 0;
-				} else
-				{
-					return real_fflush_unlocked(fptr);
-				}
-			} else
-			{
-				errno = EBADF;
-				return EOF;
-			}
-		}
-
-		SHIM_DEF(long, ftell, (FILE *fptr), (fptr))
-		{
-			if (fptr != NULL)
-			{
-				FileStream *fStream = (FileStream*)fptr;
-
-				if (fStream->_magicNumber == FILE_STREAM_MAGIC_NUMBER)
-				{
-					return fStream->ftell();
-				} else
-				{
-					return real_ftell(fptr);
-				}
-			} else
-			{
-				errno = EBADF;
-				return -1;
-			}
-		}
-
-		SHIM_DEF(off_t, ftello, (FILE *fptr), (fptr))
-		{
-			if (fptr != NULL)
-			{
-				FileStream *fStream = (FileStream*)fptr;
-
-				if (fStream->_magicNumber == FILE_STREAM_MAGIC_NUMBER)
-				{
-					return fStream->ftell();
-				} else
-				{
-					return real_ftell(fptr);
-				}
-			} else
-			{
-				errno = EBADF;
-				return -1;
-			}
-		}
-
-		SHIM_DEF(void, rewind, (FILE *fptr), (fptr))
-		{
-			OGRSH_TRACE("rewind(...) called.");
-
-			fseek(fptr, 0, SEEK_SET);
-			clearerr(fptr);
-		}
-
-		SHIM_DEF(int, fseek, (FILE *fptr, long offset, int whence),
-			(fptr, offset, whence))
-		{
-			OGRSH_TRACE("fseek(..., " << offset << ", " << whence
-				<< ") called.");
-
-			if (fptr != NULL)
-			{
-				FileStream *fStream = (FileStream*)fptr;
-
-				if (fStream->_magicNumber == FILE_STREAM_MAGIC_NUMBER)
-				{
-					return fStream->fseek(offset, whence);
-					return 0;
-				} else
-				{
-					return real_fseek(fptr, offset, whence);
-				}
-			} else
-			{
-				errno = EBADF;
-				return EOF;
-			}
-		}
-
-		SHIM_DEF(int, fseeko, (FILE *fptr, off_t offset, int whence),
-			(fptr, offset, whence))
-		{
-			if (fptr != NULL)
-			{
-				FileStream *fStream = (FileStream*)fptr;
-
-				if (fStream->_magicNumber == FILE_STREAM_MAGIC_NUMBER)
-				{
-					return fStream->fseek(offset, whence);
-					return 0;
-				} else
-				{
-					return real_fseek(fptr, offset, whence);
-				}
-			} else
-			{
-				errno = EBADF;
-				return EOF;
-			}
-		}
-
-		SHIM_DEF(int, fclose, (FILE *stream), (stream))
-		{
-			OGRSH_TRACE("fclose(...) called.");
-
-			if (stream != NULL)
-			{
-				FileStream *fStream = (FileStream*)stream;
-
-				if (fStream->_magicNumber == FILE_STREAM_MAGIC_NUMBER)
-				{
-					delete fStream;
-					return 0;
-				} else
-				{
-					return real_fclose(stream);
-				}
-			} else
-			{
-				errno = EBADF;
-				return EOF;
-			}
-		}
-
-		SHIM_DEF(char*, fgets, (char *s, int n, FILE *stream),
-			(s, n, stream))
-		{
-			OGRSH_TRACE("fgets(..., " << n << ", ...) called.");
-
-			if (stream != NULL)
-			{
-				FileStream *fStream = (FileStream*)stream;
-
-				if (fStream->_magicNumber == FILE_STREAM_MAGIC_NUMBER)
-				{
-					return fStream->fgets(s, n);
-				} else
-				{
-					return real_fgets(s, n, stream);
-				}
-			} else
-			{
-				errno = EBADF;
+				free(fdPtr);
 				return NULL;
 			}
-		}
 
-		SHIM_DEF(int, fputs, (const char *s, FILE *stream), (s, stream))
-		{
-			OGRSH_TRACE("fputs(...) called.");
-
-			if (stream != NULL)
-			{
-				FileStream *fStream = (FileStream*)stream;
-
-				if (fStream->_magicNumber == FILE_STREAM_MAGIC_NUMBER)
-				{
-					return fStream->fwrite(s, 1, strlen(s));
-				} else
-				{
-					return real_fputs(s, stream);
-				}
-			} else
-			{
-				errno = EBADF;
-				return -1;
-			}
-		}
-
-		SHIM_DEF(char*, fgets_unlocked, (char *s, int n, FILE *stream),
-			(s, n, stream))
-		{
-			OGRSH_TRACE("fgets_unlocked(..., " << n << ", ...) called.");
-
-			if (stream != NULL)
-			{
-				FileStream *fStream = (FileStream*)stream;
-
-				if (fStream->_magicNumber == FILE_STREAM_MAGIC_NUMBER)
-				{
-					return fStream->fgets(s, n);
-				} else
-				{
-					return real_fgets_unlocked(s, n, stream);
-				}
-			} else
-			{
-				errno = EBADF;
-				return NULL;
-			}
-		}
-
-		SHIM_DEF(size_t, fread, (void *ptr, size_t size, size_t nmemb,
-			FILE *stream), (ptr, size, nmemb, stream))
-		{
-			OGRSH_TRACE("fread(..., " << size << ", " << nmemb
-				<< ", ...) called.");
-
-			if (stream != NULL)
-			{
-				FileStream *fStream = (FileStream*)stream;
-
-				if (fStream->_magicNumber == FILE_STREAM_MAGIC_NUMBER)
-				{
-					return fStream->fread(ptr, size, nmemb);
-				} else
-				{
-					return real_fread(ptr, size, nmemb, stream);
-				}
-			} else
-			{
-				errno = EBADF;
-				return 0;
-			}
-		}
-
-		SHIM_DEF(int, __fsetlocking, (FILE *stream, int type), (stream, type))
-		{
-			const char *typeStr;
-
-			switch (type)
-			{
-				case FSETLOCKING_INTERNAL :
-					typeStr = "FSETLOCKING_INTERNAL";
-					break;
-				case FSETLOCKING_BYCALLER :
-                    typeStr = "FSETLOCKING_BYCALLER";
-                    break;
-				case FSETLOCKING_QUERY :
-                    typeStr = "FSETLOCKING_QUERY";
-					OGRSH_FATAL("__fsetlocking(..., \""
-						<< typeStr << "\") is not implemented.");
-					ogrsh::shims::real_exit(1);
-                    break;
-				default :
-					typeStr = "<Unknown>";
-					break;
-			}
-
-			OGRSH_TRACE("__fsetlocking(..., \""
-				<< typeStr << "\") called.");
-
-			if (stream != NULL)
-			{
-				FileStream *fStream = (FileStream*)stream;
-
-				if (fStream->_magicNumber == FILE_STREAM_MAGIC_NUMBER)
-				{
-					OGRSH_DEBUG("For now, we don't really handle the __fsetlocking function call.");
-					return 0;
-				} else
-				{
-					return real___fsetlocking(stream, type);
-				}
-			} else
-			{
-				errno = EBADF;
-				return 0;
-			}
-		}
-
-		SHIM_DEF(int, __fpending, (FILE *stream), (stream))
-		{
-			OGRSH_TRACE("__fpending(...) called.");
-
-			if (stream != NULL)
-			{
-				FileStream *fStream = (FileStream*)stream;
-
-				if (fStream->_magicNumber == FILE_STREAM_MAGIC_NUMBER)
-				{
-					return fStream->pending();
-				} else
-				{
-					return real___fpending(stream);
-				}
-			} else
-			{
-				errno = EBADF;
-				return 0;
-			}
-		}
-
-		SHIM_DEF(size_t, fwrite, (const void *ptr, size_t size, size_t nmemb,
-			FILE *stream), (ptr, size, nmemb, stream))
-		{
-			if (stream != NULL)
-			{
-				FileStream *fStream = (FileStream*)stream;
-
-				if (fStream->_magicNumber == FILE_STREAM_MAGIC_NUMBER)
-				{
-					return fStream->fwrite(ptr, size, nmemb);
-				} else
-				{
-					return real_fwrite(ptr, size, nmemb, stream);
-				}
-			} else
-			{
-				errno = EBADF;
-				return 0;
-			}
-		}
-
-		SHIM_DEF(int, fputc, (int c, FILE *stream), (c, stream))
-		{
-			char cc = (char)c;
-			return (int)fwrite(&cc, 1, 1, stream);
-		}
-
-		SHIM_DEF(int, putc, (int c, FILE *stream), (c, stream))
-		{
-			return fputc(c, stream);
-		}
-
-		SHIM_DEF(int, _IO_putc, (int c, FILE *stream), (c, stream))
-		{
-			return fputc(c, stream);
-		}
-
-		SHIM_DEF(int, fgetc, (FILE *stream), (stream))
-		{
-			OGRSH_TRACE("fgetc(...) called.");
-
-			if (stream != NULL)
-			{
-				FileStream *fStream = (FileStream*)stream;
-
-				if (fStream->_magicNumber == FILE_STREAM_MAGIC_NUMBER)
-				{
-					return fStream->fgetc();
-				} else
-				{
-					return real_fgetc(stream);
-				}
-			} else
-			{
-				errno = EBADF;
-				return -1;
-			}
-		}
-
-		SHIM_DEF(int, getc, (FILE *stream), (stream))
-		{
-			OGRSH_TRACE("getc(...) called.");
-			return fgetc(stream);
-		}
-
-		SHIM_DEF(int, _IO_getc, (FILE *stream), (stream))
-		{
-			OGRSH_TRACE("_IO_getc(...) called.");
-			return fgetc(stream);
-		}
-
-		SHIM_DEF(int, feof, (FILE *stream), (stream))
-		{
-			OGRSH_TRACE("feof(...) called.");
-
-			if (stream != NULL)
-			{
-				FileStream *fStream = (FileStream*)stream;
-
-				if (fStream->_magicNumber == FILE_STREAM_MAGIC_NUMBER)
-				{
-					return fStream->feof();
-				} else
-				{
-					return real_feof(stream);
-				}
-			} else
-			{
-				errno = EBADF;
-				return -1;
-			}
-		}
-
-		SHIM_DEF(int, _IO_feof, (FILE *stream), (stream))
-		{
-			OGRSH_TRACE("_IO_feof(...) called.");
-			return feof(stream);
-		}
-
-		SHIM_DEF(int, ferror, (FILE *stream), (stream))
-		{
-			OGRSH_TRACE("ferror(...) called.");
-
-			if (stream != NULL)
-			{
-				FileStream *fStream = (FileStream*)stream;
-
-				if (fStream->_magicNumber == FILE_STREAM_MAGIC_NUMBER)
-				{
-					return fStream->ferror();
-				} else
-				{
-					return real_ferror(stream);
-				}
-			} else
-			{
-				errno = EBADF;
-				return -1;
-			}
-		}
-
-		SHIM_DEF(int, _IO_ferror, (FILE *stream), (stream))
-		{
-			OGRSH_TRACE("_IO_ferror(...) called.");
-			return ferror(stream);
-		}
-
-		SHIM_DEF(int, fileno, (FILE *stream), (stream))
-		{
-			OGRSH_TRACE("fileno(...) called.");
-
-			if (stream != NULL)
-			{
-				FileStream *fStream = (FileStream*)stream;
-
-				if (fStream->_magicNumber == FILE_STREAM_MAGIC_NUMBER)
-				{
-					return fStream->fileno();
-				} else
-				{
-					return real_fileno(stream);
-				}
-			} else
-			{
-				errno = EBADF;
-				return -1;
-			}
-		}
-
-		SHIM_DEF(int, vfprintf, (FILE *stream, const char *format, va_list ap),
-			(stream, format, ap))
-		{
-			if (stream != NULL)
-			{
-				FileStream *fStream = (FileStream*)stream;
-
-				if (fStream->_magicNumber == FILE_STREAM_MAGIC_NUMBER)
-				{
-					return fStream->fprintf(format, ap);
-				} else
-				{
-					return real_vfprintf(stream, format, ap);
-				}
-			} else
-			{
-				errno = EBADF;
-				return -1;
-			}
-		}
-/* MOOCH
-#include "File.fprintf.inc"
-*/
-
-extern "C" {
-	int fprintf(FILE *stream, const char *format, ...)
-	{
-		int result;
-		va_list ap;
-
-		va_start(ap, format);
-		result = vfprintf(stream, format, ap);
-		va_end(ap);
-
-		return result;
-	}
-
-	int __fprintf_chk(FILE *stream, int flag, const char *format, ...)
-	{
-		int result;
-		va_list ap;
-
-		va_start(ap, format);
-		result = vfprintf(stream, format, ap);
-		va_end(ap);
-
-		return result;
-	}
-}
-
-		int uber_real_fprintf(FILE *file, const char *format, ...)
-		{
-			int result;
-
-			va_list ap;
-			va_start(ap, format);
-			result = real_vfprintf(file, format, ap);
-			va_end(ap);
-
-			return result;
+			ret->_fileno = fd;
+			return ret;
 		}
 
 		void startFileShims()
@@ -974,78 +410,22 @@ extern "C" {
 			START_SHIM(lseek64);
 			START_SHIM(lseek);
 
-			START_SHIM(clearerr);
-			START_SHIM(setvbuf);
 			START_SHIM(fopen);
-//			START_SHIM(fopen64);
+			START_SHIM(fopen64);
 			START_SHIM(fdopen);
-			START_SHIM(fclose);
-			START_SHIM(fgets);
-			START_SHIM(fputs);
-			START_SHIM(vfprintf);
-			START_SHIM(fflush);
-			START_SHIM(ftell);
-			START_SHIM(rewind);
-			START_SHIM(fseek);
-			START_SHIM(fseeko);
-			START_SHIM(fread);
-			START_SHIM(fwrite);
-			START_SHIM(fputc);
-			START_SHIM(putc);
-			START_SHIM(_IO_getc);
-			START_SHIM(_IO_putc);
-			START_SHIM(_IO_feof);
-			START_SHIM(_IO_ferror);
-			START_SHIM(fgetc);
-			START_SHIM(getc);
-			START_SHIM(feof);
-			START_SHIM(ferror);
-			START_SHIM(fileno);
-			START_SHIM(fflush_unlocked);
-			START_SHIM(fgets_unlocked);
 			START_SHIM(fcntl);
 			START_SHIM(fsync);
 			START_SHIM(fchmod);
-			START_SHIM(__fsetlocking);
-			START_SHIM(__fpending);
 		}
 
 		void stopFileShims()
 		{
-			STOP_SHIM(__fpending);
-			STOP_SHIM(__fsetlocking);
 			STOP_SHIM(fchmod);
 			STOP_SHIM(fsync);
 			STOP_SHIM(fcntl);
-			STOP_SHIM(fgets_unlocked);
-			STOP_SHIM(fflush_unlocked);
-			STOP_SHIM(fileno);
-			STOP_SHIM(ferror);
-			STOP_SHIM(feof);
-			STOP_SHIM(getc);
-			STOP_SHIM(fgetc);
-			STOP_SHIM(putc);
-			STOP_SHIM(fputc);
-			STOP_SHIM(_IO_getc);
-			STOP_SHIM(_IO_putc);
-			STOP_SHIM(_IO_feof);
-			STOP_SHIM(_IO_ferror);
-			STOP_SHIM(fwrite);
-			STOP_SHIM(fread);
-			STOP_SHIM(fseeko);
-			STOP_SHIM(fseek);
-			STOP_SHIM(rewind);
-			STOP_SHIM(ftell);
-			STOP_SHIM(fflush);
-			STOP_SHIM(vfprintf);
-			STOP_SHIM(fputs);
-			STOP_SHIM(fgets);
-			STOP_SHIM(fclose);
 			STOP_SHIM(fdopen);
-//			STOP_SHIM(fopen64);
+			STOP_SHIM(fopen64);
 			STOP_SHIM(fopen);
-			STOP_SHIM(setvbuf);
-			STOP_SHIM(clearerr);
 
 			STOP_SHIM(lseek);
 			STOP_SHIM(lseek64);
@@ -1062,5 +442,75 @@ extern "C" {
 			STOP_SHIM(unlink);
 			STOP_SHIM(close);
 		}
+	}
+
+	int translateMode(const char *mode)
+	{
+		int lcv;
+		char rwa;
+		int hasPlus = 0;
+		int ret = 0x0;
+
+		for (lcv = 0; mode[lcv] != (char)0; lcv++)
+		{
+			switch (mode[lcv])
+			{
+				case 'r' :
+				case 'w' :
+				case 'a' :
+					rwa = mode[lcv];
+					break;
+				case '+' :
+					hasPlus = 1;
+					break;
+			}
+		}
+
+		if (rwa == 'r')
+			ret = (hasPlus ? O_RDWR : O_RDONLY);
+		else
+		{
+			ret = O_CREAT;
+			if (hasPlus)
+				ret |= O_RDWR;
+			else
+				ret |= O_WRONLY;
+
+			ret |= ( (rwa == 'w') ? O_TRUNC : O_APPEND);
+		}
+
+		return ret;
+	}
+
+	ssize_t IOCookieReadImpl(void *cookie, char *buffer, size_t bytes)
+	{
+		int fd = *((int*)cookie);
+		return read(fd, buffer, bytes);
+	}
+
+	ssize_t IOCookieWriteImpl(void *cookie, const char *buffer, size_t bytes)
+	{
+		int fd = *((int*)cookie);
+		return write(fd, buffer, bytes);
+	}
+
+	int IOCookieSeekImpl(void *cookie, off64_t *pos, int whence)
+	{
+		off64_t ret;
+		int fd = *((int*)cookie);
+
+		ret = lseek64(fd, *pos, whence);
+		if (ret < 0)
+			return -1;
+
+		*pos = ret;
+		return 0;
+	}
+
+	int IOCookieCloseImpl(void *cookie)
+	{
+		int fd = *((int*)cookie);
+		free(cookie);
+		return close(fd);
 	}
 }

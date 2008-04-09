@@ -123,7 +123,7 @@ namespace ogrsh
 					catch (jcomm::OGRSHException oe)
 					{
 						// The log in was cancelled.
-						ogrsh::shims::uber_real_fprintf(stderr,
+						fprintf(stderr,
 							"Log in cancelled.  Exiting.\n");
 						ogrsh::shims::real_exit(0);
 					}
@@ -142,7 +142,7 @@ namespace ogrsh
 					}
 					catch (jcomm::OGRSHException oe)
 					{
-						ogrsh::shims::uber_real_fprintf(stderr,
+						fprintf(stderr,
 							"%s\n\n", oe.what());
 					}
 				}
@@ -228,9 +228,9 @@ namespace ogrsh
 					return fromEnv;
 			}
 
-			ogrsh::shims::uber_real_fprintf(stdout, "Session \"%s\"\n",
+			fprintf(stdout, "Session \"%s\"\n",
 				sessionName.c_str());
-			ogrsh::shims::uber_real_fprintf(stdout,
+			fprintf(stdout,
 				"Please enter the URI for your credential information."
 				"This can either be\na local file system path, or an rns "
 				"path with rns: pre-pended to it.\n");
@@ -302,8 +302,8 @@ namespace ogrsh
 			throw (jcomm::OGRSHException)
 		{
 			char *buffer = new char[512];
-			ogrsh::shims::uber_real_fprintf(stdout, "%s", prmpt.c_str());
-			ogrsh::shims::real_fgets(buffer, 512, stdin);
+			fprintf(stdout, "%s", prmpt.c_str());
+			fgets(buffer, 512, stdin);
 
 			int len = strlen(buffer);
 			while (1)
