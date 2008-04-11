@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project basedir="." default="gen.counter" name="counter.build">
+<project default="gen.counter">
+
+	<fail message="wsdl.dir variable not set.">
+		<condition>
+			<not>
+				<isset property="wsdl.dir"/>
+			</not>
+		</condition>
+	</fail>
+
+	<import file="${wsdl.dir}/wsdl-build.xml"/>
+	<import file="${wsdl.dir}/common.build.xml"/>
 
 	<condition property="gen.counter.uptodate">
 		<and>
@@ -12,7 +23,7 @@
 
 	<target name="gen.counter" unless="gen.counter.uptodate">
 		<copy todir="${temporary.codegen.dir}/wsdl">
-			<fileset refid="common.source.files"/>
+			<filelist refid="common.source.files"/>
 			<fileset dir="${wsdl.dir}/counter">
 				<include name="counter.gwsdl"/>
 			</fileset>

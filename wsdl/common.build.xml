@@ -1,54 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project basedir="." default="gen.common" name="common.build">
+<project default="gen.common">
 
-	<fileset id="common.source.files" dir="${wsdl.dir}">
-		<include name="common.gwsdl"/>
+	<fail message="wsdl.dir variable not set.">
+		<condition>
+			<not>
+				<isset property="wsdl.dir"/>
+			</not>
+		</condition>
+	</fail>
 
-		<include name="wsrf/basefaults.xsd"/>
-		<include name="wsrf/wsResourceFaults.xsd"/>
-		<include name="wsrf/wsResourceFaults.wsdl"/>
-		<include name="wsrf/wsResourceProperties.xsd"/>
-		<include name="wsrf/wsResourceProperties.wsdl"/>
-		<include name="context.xsd"/>
-		<include name="resource-authz.wsdl"/>
-		<include name="security.xsd"/>
-		<include name="resource-factory.wsdl"/>
-		<include name="resource-factory.xsd"/>
-		<include name="wsrf/wsResourceLifetime.wsdl"/>
-		<include name="wsrf/wsResourceLifetime.xsd"/>
-		<include name="notification.wsdl"/>
-		<include name="notification.xsd"/>
-		<include name="resource-simple.wsdl"/>
-		<include name="ws-addr.xsd"/>
-		<include name="xml.xsd"/>
-		<include name="soapenv.xsd"/>
-		<include name="ogsa-wsrf-bp.xsd"/>
-	</fileset>
+	<import file="${wsdl.dir}/wsdl-build.xml"/>
+
+	<filelist id="common.source.files" dir="${wsdl.dir}">
+		<file name="common.gwsdl"/>
+		<file name="context.xsd"/>
+		<file name="resource-authz.wsdl"/>
+		<file name="security.xsd"/>
+		<file name="resource-factory.wsdl"/>
+		<file name="resource-factory.xsd"/>
+		<file name="wsrf/basefaults.xsd"/>
+		<file name="wsrf/wsResourceFaults.xsd"/>
+		<file name="wsrf/wsResourceFaults.wsdl"/>
+		<file name="wsrf/wsResourceProperties.xsd"/>
+		<file name="wsrf/wsResourceProperties.wsdl"/>
+		<file name="wsrf/wsResourceLifetime.wsdl"/>
+		<file name="wsrf/wsResourceLifetime.xsd"/>
+		<file name="notification.wsdl"/>
+		<file name="notification.xsd"/>
+		<file name="resource-simple.wsdl"/>
+		<file name="ws-addr.xsd"/>
+		<file name="xml.xsd"/>
+		<file name="soapenv.xsd"/>
+		<file name="ogsa-wsrf-bp.xsd"/>
+	</filelist>
 
 	<presetdef name="common.source.files.uptodate">
 		<uptodate targetfile="${flag.name}">
-			<srcfiles dir="${wsdl.dir}">
-				<include name="common.gwsdl"/>
-
-				<include name="wsrf/basefaults.xsd"/>
-				<include name="wsrf/wsResourceFaults.xsd"/>
-				<include name="wsrf/wsResourceFaults.wsdl"/>
-				<include name="wsrf/wsResourceProperties.xsd"/>
-				<include name="wsrf/wsResourceProperties.wsdl"/>
-				<include name="context.xsd"/>
-				<include name="resource-authz.xsd"/>
-				<include name="security.xsd"/>
-				<include name="resource-factory.wsdl"/>
-				<include name="resource-factory.xsd"/>
-				<include name="resource-lifetime.wsdl"/>
-				<include name="notification.wsdl"/>
-				<include name="notification.xsd"/>
-				<include name="resource-simple.wsdl"/>
-				<include name="ws-addr.xsd"/>
-				<include name="xml.xsd"/>
-				<include name="soapenv.xsd"/>
-				<include name="ogsa-wsrf-bp.xsd"/>
-			</srcfiles>
+			<srcresources>
+ 				<filelist refid="common.source.files"/>
+			</srcresources>
 		</uptodate>
 	</presetdef>
 
@@ -59,7 +49,7 @@
 
 	<target name="gen.common" unless="gen.common.uptodate">
 		<copy todir="${temporary.codegen.dir}/wsdl">
-			<fileset refid="common.source.files"/>
+			<filelist refid="common.source.files"/>
 		</copy>
 
 		<echo message="Normalizing gwsdl."/>
@@ -73,7 +63,8 @@
 			portType="{http://vcgr.cs.virginia.edu/genii/2006/12/common}GeniiCommon"/>
 
 		<antcall target="gen.stub-generation">
-			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/common"/>
+			<param name="stub.gen.target-dir"
+				value="${temporary.codegen.dir}/common"/>
 			<param name="stub.gen.source-wsdl"
 				value="${temporary.codegen.dir}/wsdl/common-service.wsdl"/>
 			<param name="stub.gen.target-flag-file"

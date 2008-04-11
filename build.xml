@@ -4,11 +4,13 @@
 	<!-- Properties -->
 	<property environment="env"/>
 	<property file="${basedir}/build.properties"/>
+	<property name="project.dir" value="${basedir}"/>
 
 	<condition property="wsdl.source.prefix" value=""
 		else="file:///">
 		<matches string="${java.specification.version}" pattern="^1\.5$"/>
 	</condition>
+
 
 	<!-- Static Class paths -->
 	<path id="log4j.classpath">
@@ -55,43 +57,10 @@
 		<path refid="xmldb.classpath"/>
 	</path>
 			
-	<!-- Static Task Defs -->
-	<taskdef resource="axis-tasks.properties"
-		classpathref="axis.classpath"/>
-
 	<!-- Imports -->	
 	<import file="${basedir}/init.build.xml"/>
 	<import file="${scripts.dir}/scripts.build.xml"/>
-
-	<import file="${wsdl.dir}/common.build.xml"/>
 	<import file="${src.dir}/jni/vcgrJniLibs.build.xml"/>
-	<import file="${wsdl.dir}/notification-consumer.build.xml"/>
-	<import file="${wsdl.dir}/subscription.build.xml"/>
-	<import file="${wsdl.dir}/counter/counter.build.xml"/>
-	<import file="${wsdl.dir}/rns/rns.build.xml"/>
-	<import file="${wsdl.dir}/authn/x509-authn.build.xml"/>
-	<import file="${wsdl.dir}/deployment/gapp-description.build.xml"/>
-	<import file="${wsdl.dir}/deployment/deployer.build.xml"/>
-	<import file="${wsdl.dir}/byteio/rbyteio.build.xml"/>
-	<import file="${wsdl.dir}/byteio/interop/rbyteiointerop.build.xml"/>
-	<import file="${wsdl.dir}/byteio/sbyteio.build.xml"/>
-	<import file="${wsdl.dir}/byteio/interop/sbyteiointerop.build.xml"/>
-	<import file="${wsdl.dir}/byteio/sbyteio-factory.build.xml"/>
-	<import file="${wsdl.dir}/container/container.build.xml"/>
-	<import file="${wsdl.dir}/bes/bes-activity.build.xml"/>
-	<import file="${wsdl.dir}/bes/bes.build.xml"/>
-	<import file="${wsdl.dir}/scheduler/basic-scheduler.build.xml"/>
-	<import file="${wsdl.dir}/exported/exported-file.build.xml"/>
-	<import file="${wsdl.dir}/exported/exported-dir.build.xml"/>
-	<import file="${wsdl.dir}/exported/exported-root.build.xml"/>
-	<import file="${wsdl.dir}/naming.build.xml"/>
-	<import file="${wsdl.dir}/resolver/simple-resolver.build.xml"/>
-	<import file="${wsdl.dir}/resolver/simple-resolver-factory.build.xml"/>
-	<import file="${wsdl.dir}/queue/queue.build.xml"/>
-	<import file="${wsdl.dir}/informationService/informationService.build.xml"/>
-	<import file="${wsdl.dir}/certGenerator/certGenerator.build.xml"/>
-	<import file="${wsdl.dir}/ticker/ticker.build.xml"/>
-	<import file="${wsdl.dir}/tty/tty.build.xml"/>
 
 	<!-- Build Targets -->
 	<target name="build" depends="jars,scripts,deployments"/>
@@ -181,34 +150,34 @@
 	</target>
 
 	<target name="generate.ws.source" depends="genii.wsdl.tools">
-		<antcall target="gen.common"/>
-		<antcall target="gen.notification-consumer"/>
-		<antcall target="gen.subscription"/>
-		<antcall target="gen.counter"/>
-		<antcall target="gen.rns"/>
-		<antcall target="gen.gapp-description"/>
-		<antcall target="gen.deployer"/>
-		<antcall target="gen.rbyteio"/>
-		<antcall target="gen.rbyteiointerop"/>
-		<antcall target="gen.sbyteio"/>
-		<antcall target="gen.sbyteiointerop"/>
-		<antcall target="gen.sbyteio-factory"/>
-		<antcall target="gen.x509-authn"/>
-		<antcall target="gen.container"/>
-		<antcall target="gen.bes-activity"/>
-		<antcall target="gen.bes"/>
-		<antcall target="gen.bsched"/>
-		<antcall target="gen.exported-file"/>
-		<antcall target="gen.exported-dir"/>
-		<antcall target="gen.exported-root"/>
-		<antcall target="gen.naming"/>
-		<antcall target="gen.simple-resolver"/>
-		<antcall target="gen.simple-resolver-factory"/>
-		<antcall target="gen.queue"/>
-		<antcall target="gen.informationService"/>
-		<antcall target="gen.certGenerator"/>
-		<antcall target="gen.ticker"/>
-		<antcall target="gen.tty"/>
+		<ant antfile="${wsdl.dir}/common.build.xml"/>
+		<ant antfile="${wsdl.dir}/notification-consumer.build.xml"/>
+		<ant antfile="${wsdl.dir}/subscription.build.xml"/>
+		<ant antfile="${wsdl.dir}/rns/rns.build.xml"/>
+		<ant antfile="${wsdl.dir}/deployment/gapp-description.build.xml"/>
+		<ant antfile="${wsdl.dir}/deployment/deployer.build.xml"/>
+		<ant antfile="${wsdl.dir}/byteio/rbyteio.build.xml"/>
+		<ant antfile="${wsdl.dir}/byteio/interop/rbyteiointerop.build.xml"/>
+		<ant antfile="${wsdl.dir}/byteio/sbyteio.build.xml"/>
+		<ant antfile="${wsdl.dir}/byteio/interop/sbyteiointerop.build.xml"/>
+		<ant antfile="${wsdl.dir}/byteio/sbyteio-factory.build.xml"/>
+		<ant antfile="${wsdl.dir}/authn/x509-authn.build.xml"/>
+		<ant antfile="${wsdl.dir}/container/container.build.xml"/>
+		<ant antfile="${wsdl.dir}/bes/bes-activity.build.xml"/>
+		<ant antfile="${wsdl.dir}/bes/bes.build.xml"/>
+		<ant antfile="${wsdl.dir}/scheduler/basic-scheduler.build.xml"/>
+		<ant antfile="${wsdl.dir}/exported/exported-file.build.xml"/>
+		<ant antfile="${wsdl.dir}/exported/exported-dir.build.xml"/>
+		<ant antfile="${wsdl.dir}/exported/exported-root.build.xml"/>
+		<ant antfile="${wsdl.dir}/naming.build.xml"/>
+		<ant antfile="${wsdl.dir}/resolver/simple-resolver.build.xml"/>
+		<ant antfile="${wsdl.dir}/resolver/simple-resolver-factory.build.xml"/>
+		<ant antfile="${wsdl.dir}/queue/queue.build.xml"/>
+		<ant antfile="${wsdl.dir}/informationService/informationService.build.xml"/>
+		<ant antfile="${wsdl.dir}/certGenerator/certGenerator.build.xml"/>
+		<ant antfile="${wsdl.dir}/ticker/ticker.build.xml"/>
+		<ant antfile="${wsdl.dir}/tty/tty.build.xml"/>
+		<ant antfile="${wsdl.dir}/counter/counter.build.xml"/>
 	</target>
 
 	<target name="genii.wsdl.tools"

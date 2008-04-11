@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project basedir="." default="gen.naming" name="naming.build">
+<project default="gen.naming">
 
-	<fileset id="naming.source.files" dir="${wsdl.dir}">
-		<include name="naming.xsd"/>
-		<include name="naming.wsdl"/>
-	</fileset>
+	<fail message="wsdl.dir variable not set.">
+		<condition>
+			<not>
+				<isset property="wsdl.dir"/>
+			</not>
+		</condition>
+	</fail>
+
+	<import file="${wsdl.dir}/wsdl-build.xml"/>
+	<import file="${wsdl.dir}/common.build.xml"/>
+
+	<filelist id="naming.source.files" dir="${wsdl.dir}">
+		<file name="naming.xsd"/>
+		<file name="naming.wsdl"/>
+	</filelist>
 
 	<presetdef name="naming.source.files.uptodate">
 		<uptodate targetfile="${flag.name}">
-			<srcfiles dir="${wsdl.dir}">
-				<include name="naming.xsd"/>
-				<include name="naming.wsdl"/>
-			</srcfiles>
+			<srcresources>
+				<filelist refid="naming.source.files"/>
+			</srcresources>
 		</uptodate>
 	</presetdef>
 
@@ -26,7 +36,7 @@
 
 	<target name="gen.naming" unless="gen.naming.uptodate">
 		<copy todir="${temporary.codegen.dir}/wsdl">
-			<fileset refid="naming.source.files"/>
+			<filelist refid="naming.source.files"/>
 		</copy>
 
 		<genii-service-generator

@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project basedir="." default="gen.sbyteio-factory" name="sbyteio-factory.build">
+<project default="gen.sbyteio-factory">
+
+	<fail message="wsdl.dir variable not set.">
+		<condition>
+			<not>
+				<isset property="wsdl.dir"/>
+			</not>
+		</condition>
+	</fail>
+
+	<import file="${wsdl.dir}/wsdl-build.xml"/>
+	<import file="${wsdl.dir}/common.build.xml"/>
 
 	<condition property="gen.sbyteio-factory.uptodate">
 		<and>
@@ -15,7 +26,7 @@
 
 	<target name="gen.sbyteio-factory" unless="gen.sbyteio-factory.uptodate">
 		<copy todir="${temporary.codegen.dir}/wsdl">
-			<fileset refid="common.source.files"/>
+			<filelist refid="common.source.files"/>
 			<fileset dir="${wsdl.dir}/byteio">
 				<include name="sbyteio-factory.wsdl"/>
 			</fileset>

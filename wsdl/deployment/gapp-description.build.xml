@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project basedir="." default="gen.gapp-description" name="gapp-description.build">
+<project default="gen.gapp-description">
+
+	<fail message="wsdl.dir variable not set.">
+		<condition>
+			<not>
+				<isset property="wsdl.dir"/>
+			</not>
+		</condition>
+	</fail>
+
+	<import file="${wsdl.dir}/wsdl-build.xml"/>
+	<import file="${wsdl.dir}/common.build.xml"/>
 
 	<condition property="gen.gapp-description.uptodate">
 		<and>
@@ -16,7 +27,7 @@
 
 	<target name="gen.gapp-description" unless="gen.gapp-description.uptodate">
 		<copy todir="${temporary.codegen.dir}/wsdl">
-			<fileset refid="common.source.files"/>
+			<filelist refid="common.source.files"/>
 			<fileset dir="${wsdl.dir}/deployment">
 				<include name="gapp-description.gwsdl"/>
 				<include name="gapp-description.xsd"/>

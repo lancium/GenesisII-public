@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project basedir="." default="gen.simple-resolver" name="simple-resolver.build">
+<project default="gen.simple-resolver">
+
+	<fail message="wsdl.dir variable not set.">
+		<condition>
+			<not>
+				<isset property="wsdl.dir"/>
+			</not>
+		</condition>
+	</fail>
+
+	<import file="${wsdl.dir}/wsdl-build.xml"/>
+	<import file="${wsdl.dir}/common.build.xml"/>
+	<import file="${wsdl.dir}/naming.build.xml"/>
 
 	<presetdef name="simple-resolver.source.files.uptodate">
 		<uptodate targetfile="${flag.name}">
@@ -23,7 +35,7 @@
 
 	<target name="gen.simple-resolver" unless="gen.simple-resolver.uptodate">
 		<copy todir="${temporary.codegen.dir}/wsdl">
-			<fileset refid="common.source.files"/>
+			<filelist refid="common.source.files"/>
 			<fileset dir="${wsdl.dir}/resolver">
 				<include name="simple-resolver.gwsdl"/>
 				<include name="simple-resolver.xsd"/>
