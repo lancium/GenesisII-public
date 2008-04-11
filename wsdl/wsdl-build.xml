@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="wsdl-build.echo">
+
+	<fail message="project.dir variable not set.">
+		<condition>
+			<not>
+				<isset property="project.dir"/>
+			</not>
+		</condition>
+	</fail>
+
+	<fail message="wsdl.source.prefix variable not set.">
+		<condition>
+			<not>
+				<isset property="wsdl.source.prefix"/>
+			</not>
+		</condition>
+	</fail>
+
+	<fail message="generated.source.dir variable not set.">
+		<condition>
+			<not>
+				<isset property="generated.source.dir"/>
+			</not>
+		</condition>
+	</fail>
+
+	<fail message="axis.home variable not set.">
+		<condition>
+			<not>
+				<isset property="axis.home"/>
+			</not>
+		</condition>
+	</fail>
+
+	<path id="axis.classpath">
+		<fileset dir="${axis.home}" includes="**/*.jar"/>
+	</path>
+
+	<taskdef resource="axis-tasks.properties"
+		classpathref="axis.classpath"/>
+
+	<target name="wsdl-build.echo">
+		<echo message="This is the build file common to all service builds."/>
+	</target>
+
+	<target name="gen.stub-generation">
+		<echo message="Generating source stubs for ${stub.gen.source-wsdl}."/>
+		<mkdir dir="${stub.gen.target-dir}"/>
+		<axis-wsdl2java
+			nowrapped="true"
+			output="${stub.gen.target-dir}"
+			url="${wsdl.source.prefix}${stub.gen.source-wsdl}"
+			serverside="true"
+			quiet="true"
+			namespacemappingfile="${project.dir}/mappings.properties"/>
+		<copy todir="${generated.source.dir}">
+			<fileset dir="${stub.gen.target-dir}">
+				<include name="**/*.java"/>
+				<exclude name="**/*SOAPBindingImpl.java"/>
+			</fileset>
+		</copy>
+
+		<touch file="${stub.gen.target-flag-file}"/>
+	</target>
+</project>
