@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.client.jni.gIIlib.io.file;
 
 import java.io.IOException;
 
+import edu.virginia.vcgr.genii.client.jni.gIIlib.deprecated.IFSResource;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 
 public abstract class IFSFile extends IFSResource

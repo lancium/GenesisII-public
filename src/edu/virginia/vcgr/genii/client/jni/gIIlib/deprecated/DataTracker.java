@@ -1,9 +1,8 @@
-package edu.virginia.vcgr.genii.client.jni.gIIlib.io;
+package edu.virginia.vcgr.genii.client.jni.gIIlib.deprecated;
 
 import java.util.Hashtable;
 import java.util.concurrent.locks.ReentrantLock;
 
-import edu.virginia.vcgr.genii.client.jni.gIIlib.io.file.IFSResource;
 
 public class DataTracker {
 	private static DataTracker myInstance = null;

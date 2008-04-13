@@ -26,39 +26,28 @@ Abstract:
 ULONG GenesisPrepareDirectoryAndTarget(PRX_CONTEXT RxContext, PVOID buffer, BOOLEAN hasTarget){
 /*
 	Adds the target directory and regexp to the buffer to send the user mode
-*/
+*/		
+	RxCaptureFobx;
+	GenesisGetCcbExtension(capFobx, giiCCB);	
 	char * myBuffer = (char *) buffer;	
-	int i;
-	ANSI_STRING temp;
-	PGENESIS_CCB giiCCB;	
 
-	RtlUnicodeStringToAnsiString(&temp, RxContext->pRelevantSrvOpen->pAlreadyPrefixedName,TRUE);
-	RtlCopyMemory(myBuffer, temp.Buffer, temp.Length);			
-	for(i=0; i<temp.Length; i++){
-		if(myBuffer[i] =='\\'){
-			myBuffer[i] = '/';
-		}
-	}
-	myBuffer[temp.Length] = '\0';
-	myBuffer += temp.Length + 1;	
-	
-	RtlFreeAnsiString(&temp);
+	RtlCopyMemory(myBuffer, &giiCCB->GenesisFileID, sizeof(long));	
+	myBuffer += sizeof(long);
 
 	if(hasTarget){
 
-		//If it has a target		
-		giiCCB = (PGENESIS_CCB)RxContext->pFobx->Context2;
+		//If it has a target				
 		RtlCopyMemory(myBuffer,giiCCB->Target.Buffer, giiCCB->Target.Length);
 		myBuffer[giiCCB->Target.Length] = '\0';
 		
 		DbgPrint("GenesisIFS:  Sending to Genesis for Directory %s and Target %s\n", (char*)buffer, myBuffer);
 
 		//Return lengths + 2 null characters
-		return temp.Length + giiCCB->Target.Length + 2;	
+		return sizeof(long) + giiCCB->Target.Length + 2;	
 	}else{
 		DbgPrint("GenesisIFS:  Sending get info to Genesis for File %s\n", (char*)buffer);
 		myBuffer[0] = '\0';
-		return temp.Length + 2;	
+		return sizeof(long) + 1;
 	}
 }
 
@@ -132,6 +121,40 @@ ULONG GenesisPrepareClose(PRX_CONTEXT RxContext, PVOID buffer){
 	bufptr += sizeof(long);
 	RtlCopyMemory(bufptr, &fcb->DeleteOnCloseSpecified, sizeof(char));
 	return sizeof(long) + sizeof(char);
+}
+
+ULONG GenesisPrepareRename(PRX_CONTEXT RxContext, PVOID buffer){	
+	char* bufptr = (char*)buffer;
+	int i;
+	UNICODE_STRING uni;
+	ANSI_STRING temp;
+	RxCaptureFcb;
+	RxCaptureFobx;
+	GenesisGetFcbExtension(capFcb, fcb);
+	GenesisGetCcbExtension(capFobx, ccb);
+	
+	PFILE_RENAME_INFORMATION pRenameInfo = (PFILE_RENAME_INFORMATION) RxContext->Info.Buffer;
+	
+	PAGED_CODE();	
+
+	RtlCopyMemory(bufptr, &ccb->GenesisFileID, sizeof(long));	
+	bufptr += sizeof(long);
+
+	uni.Buffer = pRenameInfo->FileName;
+	uni.Length = (USHORT)pRenameInfo->FileNameLength;
+	uni.MaximumLength = (USHORT)pRenameInfo->FileNameLength;
+
+	RtlUnicodeStringToAnsiString(&temp, (PUNICODE_STRING)&uni,TRUE);
+	RtlCopyMemory(bufptr, temp.Buffer, temp.Length);
+
+	for(i=0; i<temp.Length; i++){
+		if(bufptr[i] =='\\'){
+			bufptr[i] = '/';
+		}
+	}
+	bufptr[temp.Length] = '\0';
+
+	return sizeof(long) + temp.Length + 1;
 }
 
 void GenesisSaveDirectoryListing(PGENESIS_FCB fcb, PVOID directoryListing, int size){
@@ -339,11 +362,6 @@ NTSTATUS GenesisSendInvertedCall(PRX_CONTEXT RxContext, ULONG callType, BOOLEAN 
 				controlBuffer = MmGetSystemAddressForMdlSafe(mdl, NormalPagePriority);				
 
 				switch(callType){
-					case GENII_QUERYFILEINFO:
-						//Copies Target info into buffer
-						controlRequest->RequestBufferLength = 
-							GenesisPrepareDirectoryAndTarget(RxContext, controlBuffer, FALSE);			
-						break;
 					case GENII_QUERYDIRECTORY:
 						//Copies Directory and Target info into buffer with length
 						controlRequest->RequestBufferLength = 
@@ -382,6 +400,13 @@ NTSTATUS GenesisSendInvertedCall(PRX_CONTEXT RxContext, ULONG callType, BOOLEAN 
 							controlRequest->RequestType = GENII_TRUNCATEAPPEND;
 						}
 						break;
+					}
+					case GENII_RENAME:
+					{
+						//Copies Target info into buffer
+						controlRequest->RequestBufferLength = 
+							GenesisPrepareRename(RxContext, controlBuffer);
+						break;		
 					}
 					default:
 						DbgPrint("G-ICING:  Unsupported function trying to be sent to UFS");

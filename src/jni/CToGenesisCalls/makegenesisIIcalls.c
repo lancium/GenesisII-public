@@ -17,42 +17,20 @@ JavaVM *jvm=NULL;
 int get_static_method(PGII_JNI_INFO info, jclass *my_class, char* method, char* method_type, jmethodID *mid);
 
 DllExport int genesisII_directory_listing(PGII_JNI_INFO info, char *** listing, 
-		char * directory, char * target){		
+		GII_FILE_HANDLE directory, char * target){		
 	jmethodID mid;
 	
-	if(get_static_method(info,&(info->jni_launcher), "getDirectoryListing", "(Ljava/lang/String;Ljava/lang/String;)[Ljava/lang/Object;", &mid) != JNI_ERR)
+	if(get_static_method(info,&(info->jni_launcher), "getDirectoryListing", "(ILjava/lang/String;)[Ljava/lang/Object;", &mid) != JNI_ERR)
 	{
-		/* Build arguments */
-		jstring j_arg1 = directory == NULL ? NULL : NewPlatformString(info->env, directory, -1);
+		/* Build arguments */		
 		jstring j_arg2 = target == NULL ? NULL : NewPlatformString(info->env, target, -1);		
 
 		/* Invoke Method */
 		jarray jlisting = (*info->env)->CallStaticObjectMethod(info->env, info->jni_launcher, mid, 
-			j_arg1, j_arg2);						
+			directory, j_arg2);						
 
 		/* Convert to char** and return */
 		return convert_listing(info->env, listing, jlisting);
-	}
-	else{
-		printf("GenesisII Error:  Could not find the method specified for this call\n");
-	}	
-	return JNI_ERR;
-}
-
-DllExport int genesisII_get_information(PGII_JNI_INFO info, char *** gInfo, char * path){		
-	jmethodID mid;
-
-	if(get_static_method(info,&(info->jni_launcher), "getInformation", "(Ljava/lang/String;)[Ljava/lang/Object;", &mid) != JNI_ERR)
-	{
-		/* Build arguments */
-		jstring j_arg1 = path == NULL ? NULL : NewPlatformString(info->env, path, -1);		
-
-		/* Invoke Method */
-		jarray jlisting = (*info->env)->CallStaticObjectMethod(info->env, info->jni_launcher, mid, 
-			j_arg1);						
-
-		/* Convert to char** and return */
-		return convert_listing(info->env, gInfo, jlisting);
 	}
 	else{
 		printf("GenesisII Error:  Could not find the method specified for this call\n");
@@ -132,50 +110,6 @@ DllExport int genesisII_logout(PGII_JNI_INFO info){
 		printf("GenesisII Error:  Could not find the method specified for this call\n");
 	}	
 	return JNI_ERR;	
-}
-
-DllExport int genesisII_make_directory(PGII_JNI_INFO info, char * new_directory){
-	jmethodID mid;
-
-	if(new_directory == NULL){
-		return JNI_ERR;
-	}
-
-	if(get_static_method(info,&(info->jni_launcher), "makeDirectory", "(Ljava/lang/String;)Z", &mid) != JNI_ERR)
-	{		
-		/* Build argument */
-		jstring j_argument = NewPlatformString(info->env, new_directory, -1);		
-
-		jboolean if_success = (*info->env)->CallStaticBooleanMethod(info->env, info->jni_launcher, mid, j_argument);
-		return (if_success - 1);		
-	}
-	else{
-		printf("GenesisII Error:  Could not find the method specified for this call\n");
-	}	
-	return JNI_ERR;
-}
-
-DllExport int genesisII_remove(PGII_JNI_INFO info, char * path, int recursive, int force){
-	jmethodID mid;
-
-	if((recursive != JNI_TRUE && recursive != JNI_FALSE) || 
-		force != JNI_TRUE && force != JNI_FALSE){
-			return JNI_ERR;
-	}
-
-	if(get_static_method(info,&(info->jni_launcher), "remove", "(Ljava/lang/String;ZZ)Z", &mid) != JNI_ERR)
-	{		
-		/* Build argument */
-		jstring j_argument = NewPlatformString(info->env, path, -1);		
-
-		jboolean if_success = (*info->env)->CallStaticBooleanMethod(info->env, info->jni_launcher, mid, j_argument,
-			recursive, force);
-		return (if_success -1 );		
-	}
-	else{
-		printf("GenesisII Error:  Could not find the method specified for this call\n");
-	}	
-	return JNI_ERR;
 }
 
 DllExport int genesisII_open(PGII_JNI_INFO info, char * target,	int requestedDeposition, 
@@ -268,17 +202,20 @@ DllExport int genesisII_truncate_append(PGII_JNI_INFO info, GII_FILE_HANDLE targ
 	jmethodID mid;
 	int bytes_written;
 
-	if(get_static_method(info,&(info->jni_launcher), "truncateAppend", "(ILjava/lang/String;I)I", &mid) != JNI_ERR)
-	{	
-		jstring j_data;
-		if(length > 0 && data != NULL){
-			j_data = NewPlatformString(info->env, data, length);		
+	if(get_static_method(info,&(info->jni_launcher), "truncateAppend", "(I[BII)I", &mid) != JNI_ERR)
+	{
+		if(length == 0){
+			bytes_written = 0;
+		}
+		else if(info->myArrayBuffer == NULL){
+			bytes_written = JNI_ERR;
 		}
 		else{
-			j_data = NULL;
+			/* Create Java Array and sets bytes accordingly */
+			(*info->env)->SetByteArrayRegion(info->env, info->myArrayBuffer, 0, length, data);			
+			bytes_written = (*info->env)->CallStaticIntMethod(info->env, 
+				info->jni_launcher, mid, target, info->myArrayBuffer, offset, length);				
 		}
-
-		bytes_written = (*info->env)->CallStaticIntMethod(info->env, info->jni_launcher, mid, target, j_data, offset);
 		return bytes_written;
 	}
 	else{
@@ -303,42 +240,30 @@ DllExport int genesisII_close(PGII_JNI_INFO info, GII_FILE_HANDLE handle, BOOLEA
 	return JNI_ERR;
 }
 
-DllExport int genesisII_copy(PGII_JNI_INFO info, char * src, char * dst, 
-		int src_local, int dst_local){
+DllExport int genesisII_rename(PGII_JNI_INFO info, GII_FILE_HANDLE handle, char * dst){
 	jmethodID mid;
-	if((src_local != JNI_TRUE && src_local != JNI_FALSE) || 
-		dst_local != JNI_TRUE && dst_local != JNI_FALSE){
-			return JNI_ERR;
-	}
-	if(src == NULL || dst == NULL){
+	int return_val;
+
+	if(dst == NULL){
 		return JNI_ERR;
 	}
 
-	if(get_static_method(info,&(info->jni_launcher), "copy", "(Ljava/lang/String;Ljava/lang/String;ZZ)Z", &mid) != JNI_ERR)
-	{		
-		/* Build arguments */
-		jstring j_arg1 = NewPlatformString(info->env, src, -1);		
-		jstring j_arg2 = NewPlatformString(info->env, dst, -1);		
+	if(get_static_method(info,&(info->jni_launcher), "rename", "(ILjava/lang/String;)Z", &mid) != JNI_ERR)
+	{			
+		/* Build argument */
+		jstring j_argument = NewPlatformString(info->env, dst, -1);		
 
-		return ((*info->env)->CallStaticBooleanMethod(info->env, info->jni_launcher, mid, j_arg1, j_arg2, src_local, dst_local) - 1);
+		/* Invoke Method */
+		return_val = (*info->env)->CallStaticBooleanMethod(info->env, info->jni_launcher, mid, handle, j_argument);
+
+		/* Convert to char** and return */
+		return (return_val - 1);
 	}
 	else{
 		printf("GenesisII Error:  Could not find the method specified for this call\n");
 	}	
 	return JNI_ERR;
-
-}
-
-DllExport int genesisII_move(PGII_JNI_INFO info, char * src, char * dst){
-	if(src == NULL || dst == NULL){
-		return JNI_ERR;
-	}
-	if(genesisII_copy(info, src, dst, JNI_FALSE, JNI_FALSE) != JNI_ERR){
-		return genesisII_remove(info, src, JNI_FALSE, JNI_TRUE);
-	}
-	else{
-		return JNI_ERR;
-	}
+	
 }
 
 /* Extra initialization and helper functions */
@@ -443,4 +368,109 @@ DllExport void cleanupJVM(){
 
 DllExport void detatchThreadFromJVM(){	
 	(*jvm)->DetachCurrentThread(jvm);		
+}
+
+/*  UNSUPPORTED FUNCTIONS */
+
+int genesisII_copy(PGII_JNI_INFO info, char * src, char * dst, 
+		int src_local, int dst_local){
+	jmethodID mid;
+	if((src_local != JNI_TRUE && src_local != JNI_FALSE) || 
+		dst_local != JNI_TRUE && dst_local != JNI_FALSE){
+			return JNI_ERR;
+	}
+	if(src == NULL || dst == NULL){
+		return JNI_ERR;
+	}
+
+	if(get_static_method(info,&(info->jni_launcher), "copy", "(Ljava/lang/String;Ljava/lang/String;ZZ)Z", &mid) != JNI_ERR)
+	{		
+		/* Build arguments */
+		jstring j_arg1 = NewPlatformString(info->env, src, -1);		
+		jstring j_arg2 = NewPlatformString(info->env, dst, -1);		
+
+		return ((*info->env)->CallStaticBooleanMethod(info->env, info->jni_launcher, mid, j_arg1, j_arg2, src_local, dst_local) - 1);
+	}
+	else{
+		printf("GenesisII Error:  Could not find the method specified for this call\n");
+	}	
+	return JNI_ERR;
+
+}
+
+int genesisII_move(PGII_JNI_INFO info, char * src, char * dst){
+	if(src == NULL || dst == NULL){
+		return JNI_ERR;
+	}
+	if(genesisII_copy(info, src, dst, JNI_FALSE, JNI_FALSE) != JNI_ERR){
+		return genesisII_remove(info, src, JNI_FALSE, JNI_TRUE);
+	}
+	else{
+		return JNI_ERR;
+	}
+}
+
+int genesisII_get_information(PGII_JNI_INFO info, char *** gInfo, char * path){		
+	jmethodID mid;
+
+	if(get_static_method(info,&(info->jni_launcher), "getInformation", "(Ljava/lang/String;)[Ljava/lang/Object;", &mid) != JNI_ERR)
+	{
+		/* Build arguments */
+		jstring j_arg1 = path == NULL ? NULL : NewPlatformString(info->env, path, -1);		
+
+		/* Invoke Method */
+		jarray jlisting = (*info->env)->CallStaticObjectMethod(info->env, info->jni_launcher, mid, 
+			j_arg1);						
+
+		/* Convert to char** and return */
+		return convert_listing(info->env, gInfo, jlisting);
+	}
+	else{
+		printf("GenesisII Error:  Could not find the method specified for this call\n");
+	}	
+	return JNI_ERR;
+}
+
+int genesisII_remove(PGII_JNI_INFO info, char * path, int recursive, int force){
+	jmethodID mid;
+
+	if((recursive != JNI_TRUE && recursive != JNI_FALSE) || 
+		force != JNI_TRUE && force != JNI_FALSE){
+			return JNI_ERR;
+	}
+
+	if(get_static_method(info,&(info->jni_launcher), "remove", "(Ljava/lang/String;ZZ)Z", &mid) != JNI_ERR)
+	{		
+		/* Build argument */
+		jstring j_argument = NewPlatformString(info->env, path, -1);		
+
+		jboolean if_success = (*info->env)->CallStaticBooleanMethod(info->env, info->jni_launcher, mid, j_argument,
+			recursive, force);
+		return (if_success -1 );		
+	}
+	else{
+		printf("GenesisII Error:  Could not find the method specified for this call\n");
+	}	
+	return JNI_ERR;
+}
+
+int genesisII_make_directory(PGII_JNI_INFO info, char * new_directory){
+	jmethodID mid;
+
+	if(new_directory == NULL){
+		return JNI_ERR;
+	}
+
+	if(get_static_method(info,&(info->jni_launcher), "makeDirectory", "(Ljava/lang/String;)Z", &mid) != JNI_ERR)
+	{		
+		/* Build argument */
+		jstring j_argument = NewPlatformString(info->env, new_directory, -1);		
+
+		jboolean if_success = (*info->env)->CallStaticBooleanMethod(info->env, info->jni_launcher, mid, j_argument);
+		return (if_success - 1);		
+	}
+	else{
+		printf("GenesisII Error:  Could not find the method specified for this call\n");
+	}	
+	return JNI_ERR;
 }

@@ -28,23 +28,6 @@ typedef struct _GII_JNI_INFO{
 }*PGII_JNI_INFO, GII_JNI_INFO;
 
 
-/* 
-	Gets the directory listing of the directory specified and the target specified
-	from the directory.
-	Listing - a pointer to the array of strings to be used
-	Directory - target Directory (relative path to get directory listing
-	Target - Optional path (can be * or something.* etc))
-	Method Does it's own memory allocation. Returns number of items in listing
-	Note:  The number of items in the listing = 2*size.  Every other is the type
-	of file {F,text.txt,D, containers}
-*/
-DllExport int genesisII_directory_listing(PGII_JNI_INFO info, char *** listing, char * directory, char * target);
-
-/*
-	Return information about an object in the same style as directory listing
-*/
-DllExport int genesisII_get_information(PGII_JNI_INFO info, char *** gInfo, char * path);
-
 /*	
 	Changes the current directory to the new_directory given
 */
@@ -64,28 +47,6 @@ DllExport int genesisII_login(PGII_JNI_INFO info, char * keystore_path, char * p
 	Logs out of genesisII
 */
 DllExport int genesisII_logout(PGII_JNI_INFO info);
-
-/*
-	Creates the directory specfied
-*/
-DllExport int genesisII_make_directory(PGII_JNI_INFO info, char * new_directory);
-
-/*
-	Removes a the target path.  Force does it regardless of exceptions and 
-	recursive does a recursive removal of a directory
-*/
-DllExport int genesisII_remove(PGII_JNI_INFO info, char * path, int recursive, int force);
-
-/*
-	Copies a file from src to dst and allows copying from/to local given the two booleans
-*/
-DllExport int genesisII_copy(PGII_JNI_INFO info, char *src, char* dst, int src_local, int dst_local);
-
-/*
-	Moves a file from src to dst.  Both paths must be in GenesisII
-	If a failure occurs somewhere along the way, either nothing  was performed or a copy was made
-*/
-DllExport int genesisII_move(PGII_JNI_INFO info, char *src, char * dst);
 
 /*
 	This method returns the Genesis II file handle for the target specified.  It opens the file 
@@ -121,6 +82,25 @@ DllExport int genesisII_truncate_append(PGII_JNI_INFO info, GII_FILE_HANDLE file
 */
 DllExport int genesisII_close(PGII_JNI_INFO info, GII_FILE_HANDLE file, BOOLEAN OPTIONAL deleteOnClose);
 
+/* 
+	Gets the directory listing of the directory specified and the target specified
+	from the directory.
+	Listing - a pointer to the array of strings to be used
+	Directory - target Directory (relative path to get directory listing
+	Target - Optional path (can be * or something.* etc))
+	Method Does it's own memory allocation. Returns number of items in listing
+	Note:  The number of items in the listing = 2*size.  Every other is the type
+	of file {F,text.txt,D, containers}
+*/
+DllExport int genesisII_directory_listing(PGII_JNI_INFO info, char *** listing, GII_FILE_HANDLE directory, char * target);
+
+
+/*
+	Does a rename on a file.  At the genesis side, this file (corresponding to the handle) will now have been moved
+	to the new location (dst)
+*/
+DllExport int genesisII_rename(PGII_JNI_INFO info, GII_FILE_HANDLE handle, char * dst);
+
 /*
 	Initializes the JavaVM (must be run first with master thread)
 */
@@ -140,6 +120,35 @@ DllExport void cleanupJVM();
 	Unattaches a thread from the JVM
 */
 DllExport void detatchThreadFromJVM();
+
+/*					NO LONGER SUPPORTED FUNCTIONS				*/
+
+/*
+	Creates the directory specfied
+*/
+//DllExport int genesisII_make_directory(PGII_JNI_INFO info, char * new_directory);
+
+/*
+	Removes a the target path.  Force does it regardless of exceptions and 
+	recursive does a recursive removal of a directory
+*/
+//DllExport int genesisII_remove(PGII_JNI_INFO info, char * path, int recursive, int force);
+
+/*
+	Copies a file from src to dst and allows copying from/to local given the two booleans
+*/
+//DllExport int genesisII_copy(PGII_JNI_INFO info, char *src, char* dst, int src_local, int dst_local);
+
+/*
+	Moves a file from src to dst.  Both paths must be in GenesisII
+	If a failure occurs somewhere along the way, either nothing  was performed or a copy was made
+*/
+//DllExport int genesisII_move(PGII_JNI_INFO info, char *src, char * dst);
+
+/*
+	Return information about an object in the same style as directory listing
+*/
+//DllExport int genesisII_get_information(PGII_JNI_INFO info, char *** gInfo, char * path);
 
 #ifdef __cplusplus
 }

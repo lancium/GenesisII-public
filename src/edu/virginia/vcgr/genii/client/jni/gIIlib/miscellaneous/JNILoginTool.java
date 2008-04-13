@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.genii.client.jni.gIIlib;
+package edu.virginia.vcgr.genii.client.jni.gIIlib.miscellaneous;
 
 
 import java.io.BufferedReader;
@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import edu.virginia.vcgr.genii.client.cmd.CommandLineRunner;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.jni.gIIlib.JNILibraryBase;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.TransientCredentials;
 
 

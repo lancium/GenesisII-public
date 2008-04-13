@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.genii.client.jni.gIIlib;
+package edu.virginia.vcgr.genii.client.jni.gIIlib.deprecated;
 
 import org.ggf.rns.RNSPortType;
 import org.ws.addressing.EndpointReferenceType;
@@ -6,6 +6,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.jni.gIIlib.JNILibraryBase;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 

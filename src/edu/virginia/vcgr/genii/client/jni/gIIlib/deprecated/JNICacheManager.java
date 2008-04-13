@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.genii.client.jni.gIIlib.cache;
+package edu.virginia.vcgr.genii.client.jni.gIIlib.deprecated;
 
 import java.util.Hashtable;
 import java.util.concurrent.locks.ReentrantLock;

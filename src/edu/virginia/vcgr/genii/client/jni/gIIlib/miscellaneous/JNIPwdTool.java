@@ -1,7 +1,8 @@
-package edu.virginia.vcgr.genii.client.jni.gIIlib;
+package edu.virginia.vcgr.genii.client.jni.gIIlib.miscellaneous;
 
 import org.morgan.util.configuration.ConfigurationException;
 
+import edu.virginia.vcgr.genii.client.jni.gIIlib.JNILibraryBase;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 
 

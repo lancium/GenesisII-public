@@ -909,8 +909,7 @@ static NTSTATUS ProcessUFSClose()
 					break;
 				}
 
-				//Always synchronous
-				case GENII_QUERYFILEINFO:
+				//Always synchronous				
 				case GENII_CREATE:
 				case GENII_CLOSE:
 				{										
@@ -1052,6 +1051,7 @@ static NTSTATUS ProcessResponse(PIRP Irp)
 				try{				
 					PMRX_FCB commonFcb = dataRequest->RxContext->pFcb;
 					GenesisGetFcbExtension(commonFcb, giiFcb);
+					GenesisGetCcbExtension(commonFcb, giiCcb);
 
 					switch(response->ResponseType){
 						case GENII_QUERYDIRECTORY:	
@@ -1079,12 +1079,22 @@ static NTSTATUS ProcessResponse(PIRP Irp)
 								break;
 							}
 
-							//Always synchronous
-						case GENII_QUERYFILEINFO:
+						//Always synchronous
 						case GENII_CREATE:
 						{				
 							//SAVE INTO FCB here
 							GenesisSaveInfoIntoFCB(commonFcb, response->ResponseBuffer, response->StatusCode);										
+
+							//Release semaphore.  This should make the create finish
+							KeReleaseSemaphore(&(giiFcb->InvertedCallSemaphore),0, 1, FALSE);
+
+							//If it got here it is successful regardless
+							status = STATUS_SUCCESS;					
+							break;
+						}
+						case GENII_RENAME:
+						{
+							memcpy(&giiCcb->lastStatus, response->ResponseBuffer, sizeof(int));
 
 							//Release semaphore.  This should make the create finish
 							KeReleaseSemaphore(&(giiFcb->InvertedCallSemaphore),0, 1, FALSE);
@@ -1318,20 +1328,6 @@ static NTSTATUS ProcessControlRequest(PIRP Irp)
 				status = STATUS_SUCCESS;
 				break;
 			}
-			case GENII_QUERYFILEINFO:
-			{
-				DbgPrint("QueryInformation being serviced\n");				
-
-				//Copies Directory and Target info into buffer with length
-				controlRequest->RequestBufferLength = 
-					GenesisPrepareDirectoryAndTarget(dataRequest->RxContext, 
-					controlRequest->RequestBuffer, FALSE);						
-
-				// We've finished processing the request to this point.  Dispatch to the control application
-				// for further processing.
-				status = STATUS_SUCCESS;					
-				break;
-			}		
 			case GENII_CREATE:
 			{				
 				DbgPrint("Create being serviced\n");	
@@ -1375,6 +1371,19 @@ static NTSTATUS ProcessControlRequest(PIRP Irp)
 
 				status = STATUS_SUCCESS;
 				break;
+			}
+			case GENII_RENAME:
+			{
+				DbgPrint("Rename being serviced\n");
+
+				//Copies Target info with other info
+				controlRequest->RequestBufferLength = 
+					GenesisPrepareRename(dataRequest->RxContext, 
+					controlRequest->RequestBuffer);										
+
+				status = STATUS_SUCCESS;
+				break;
+
 			}
 			default:
 				DbgPrint("Unsupported function placed in async queue %x\n",irpSp->MajorFunction);

@@ -56,7 +56,7 @@ void printListing(char * listing, int size){
 	}
 
 	for(i =0; i< size; i++){		
-		memcpy(&fileid, listing, sizeof(ULONG));
+		memcpy(&fileid, listing, sizeof(ULONG));		
 		printf("File ID: %d ", fileid);
 		listing += sizeof(ULONG);
 
@@ -97,20 +97,25 @@ int copyListing(char * buffer, char ** listing, int size){
 
 	__try{
 
-		//Copy as F\0taco.txt\0
+		//{FileID}{D|F}{FileSize}{FileName}
 		for(i =0; i < 4*size; i+=4){
 			//Copy file id
 			memcpy(lengthBuffer, listing[i], strlen(listing[i]));
 			lengthBuffer[strlen(listing[i])] = '\0';
-			length = atol(lengthBuffer);
+			length = atol(lengthBuffer);			
 			memcpy(pointer, &length, sizeof(long));
+			
+			if(length != -1)
+				printf("FileID: %d ",length);
 			
 			bytesCopied += sizeof(long);
 			pointer += sizeof(long);
 
 			//Copy type of File F | D
 			memcpy(pointer, listing[i+1], strlen(listing[i+1]));
-			pointer[strlen(listing[i+1])] = '\0';		
+			pointer[strlen(listing[i+1])] = '\0';
+
+			printf("FileType: %s ", pointer);
 
 			bytesCopied += (int)strlen(listing[i+1]) + 1;
 			pointer += strlen(listing[i+1]) + 1;		
@@ -121,12 +126,16 @@ int copyListing(char * buffer, char ** listing, int size){
 			length = atol(lengthBuffer);
 			memcpy(pointer, &length, sizeof(long));
 
+			printf("FileSize: %d ", length); 
+
 			bytesCopied += sizeof(long);
 			pointer += sizeof(long);
 			
 			//Copy file name
 			memcpy(pointer, listing[i+3], strlen(listing[i+3]));
-			pointer[strlen(listing[i+3])] = '\0';		
+			pointer[strlen(listing[i+3])] = '\0';
+
+			printf("FileName: %s\n", pointer);
 			
 			bytesCopied += (int)strlen(listing[i+3]) + 1;
 			pointer += strlen(listing[i+3]) + 1;
@@ -268,23 +277,16 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 		case GENII_QUERYDIRECTORY:
 		{			
 			//Status code in Query Directory = # of entries
-			char *directory;
+			long directoryId;
 			char *target;
 			char *bufPtr = (char*) request->RequestBuffer;
 			char ** directoryListing;
 
-			//Get Directory
-			if(request->RequestBufferLength && strlen(bufPtr) > 0){
-				directory = (char*) malloc(strlen(bufPtr) + 1);
-				memcpy(directory, bufPtr, strlen(bufPtr));
-				directory[strlen(bufPtr)] = '\0';				
-			}else{
-				directory = "";
-			}			
-
-			bufPtr += (request->RequestBufferLength > 0) ? strlen(bufPtr) + 1 : 0;
-
-			if(request->RequestBufferLength && strlen(bufPtr) > 0){
+			//Get Directory id
+			memcpy(&directoryId, bufPtr, sizeof(long));			
+			bufPtr += sizeof(long);			
+			
+			if(request->RequestBufferLength > 0 && strlen(bufPtr) > 0){
 				target = (char*) malloc(strlen(bufPtr) + 1);
 				memcpy(target, bufPtr, strlen(bufPtr));
 				target[strlen(bufPtr)] = '\0';
@@ -292,41 +294,15 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 				target = "";
 			}
 
-			printf("Directory: %s Target: %s for Query Directory\n", directory, target);			
-			response->StatusCode = genesisII_directory_listing(pMyInfo, &directoryListing, directory, target);
-			printf("Got actual listing\n");
+			printf("Directory: %d Target: %s for Query Directory\n", directoryId, target);			
+			response->StatusCode = genesisII_directory_listing(pMyInfo, &directoryListing, directoryId, target);
+
 			//If an error, no copy is done
 			response->ResponseBufferLength = response->StatusCode == -1 ? 0 : 
 				copyListing(response->ResponseBuffer, directoryListing, response->StatusCode);
-
-			printf("Listing Copied successful\n");					
+							
 			break;
-		}	
-		case GENII_QUERYFILEINFO:{
-			//Status code in Query Directory = # of entries
-			char * path;			
-			char *bufPtr = (char*) request->RequestBuffer;
-			char ** listing;
-
-			//Get Directory
-			if(request->RequestBufferLength && strlen(bufPtr) > 0){
-				path = (char*) malloc(strlen(bufPtr) + 1);
-				memcpy(path, bufPtr, strlen(bufPtr));
-				path[strlen(bufPtr)] = '\0';				
-			}else{
-				path = "";
-			}					
-
-			printf("Path: %s for Query Info\n", path);			
-			response->StatusCode = genesisII_get_information(pMyInfo, &listing, path);
-			printf("Got Info!\n");
-			//If an error, no copy is done
-			response->ResponseBufferLength = response->StatusCode == -1 ? 0 : 
-				copyListing(response->ResponseBuffer, listing, response->StatusCode);
-
-			printf("Information Copied successful\n");								 
-			break;						 
-		}
+		}			
 		case GENII_CREATE:{
 			//Status code in Query Directory = # of entries
 			char * path;			
@@ -339,7 +315,7 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 			int desiredAccess;
 			int isDirectory;
 
-			//Get Directory
+			//Get path
 			if(request->RequestBufferLength && strlen(bufPtr) > 0){
 				path = (char*) malloc(strlen(bufPtr) + 1);
 				memcpy(path, bufPtr, strlen(bufPtr));
@@ -360,18 +336,16 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 
 				isMalformed = FALSE;
 						
-				printf("Path: %s for Create\n", path);
+				printf("Path: %s for Create, ", path);
 				printf("Options: %d, %d, %d\n", requestedDeposition, desiredAccess, isDirectory);
 
 				response->StatusCode = genesisII_open(pMyInfo, path, requestedDeposition, desiredAccess, 
-					isDirectory, &listing);
-				printf("Create finished on Genesis side!\n");
+					isDirectory, &listing);				
 				
 				//If an error, no copy is done
 				response->ResponseBufferLength = (response->StatusCode == -1) ? 0 : 
 					copyListing(response->ResponseBuffer, listing, response->StatusCode);
 
-				printListing(response->ResponseBuffer, response->StatusCode);
 			}__finally{
 				if(isMalformed){
 					response->StatusCode = -1;
@@ -393,13 +367,38 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 			memcpy(&deleteOnCloseSpecified, bufPtr, sizeof(char));
 			response->ResponseBufferLength = sizeof(int);
 
-			printf("Closing file with fileID: %d\n", fileID);
+			printf("Closing file with fileID: %d. ", fileID);
 			printf("Delete Specified == %s\n", (deleteOnCloseSpecified ? "TRUE" : "FALSE"));
 			returnCode = genesisII_close(pMyInfo, fileID, deleteOnCloseSpecified);
 
-			memcpy(response->ResponseBuffer, &returnCode, sizeof(int));	
-			printf("File %d closed\n", fileID);
+			memcpy(response->ResponseBuffer, &returnCode, sizeof(int));				
 
+			break;
+		}
+		case GENII_RENAME:{
+			char *bufPtr = (char*) request->RequestBuffer;
+			long fileID;						
+			char * target;
+
+			int returnCode;			
+
+			//Get fileid
+			memcpy(&fileID, bufPtr, sizeof(long));			
+			bufPtr += sizeof(long);
+
+			//Get path
+			if(strlen(bufPtr) > 0){
+				target = (char*) malloc(strlen(bufPtr) + 1);
+				memcpy(target, bufPtr, strlen(bufPtr));
+				target[strlen(bufPtr)] = '\0';				
+			}else{
+				target = "";
+			}						
+
+			printf("Renaming file with fileID: %d to %s. ", fileID, target);		
+			returnCode = genesisII_rename(pMyInfo, fileID, target);
+
+			memcpy(response->ResponseBuffer, &returnCode, sizeof(int));				
 			break;
 		}
 		case GENII_READ:
@@ -416,11 +415,7 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 				memcpy(&length, bufPtr, sizeof(long));
 			}
 			printf("Read started for file with fileID: %d, offset: %d, length %d\n", fileID, offset, length);
-
-			response->ResponseBufferLength = genesisII_read(pMyInfo, fileID, response->ResponseBuffer, offset, length);
-			//printListing2(response->ResponseBuffer, response->ResponseBufferLength);
-			printf("Read finished on Genesis side!\n");	
-
+			response->ResponseBufferLength = genesisII_read(pMyInfo, fileID, response->ResponseBuffer, offset, length);			
 			break;
 		}
 		case GENII_WRITE:
@@ -440,13 +435,7 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 				bufPtr += sizeof(long);
 				
 				printf("Write started for file with fileID: %d, offset: %d, length %d\n", fileID, offset, length);
-
-				if(DEBUG){
-					printf("Data: %s\n", bufPtr);
-				}
-
-				response->ResponseBufferLength = genesisII_write(pMyInfo, fileID, bufPtr, offset, length);
-				printf("Write finished on Genesis side!\n");	
+				response->ResponseBufferLength = genesisII_write(pMyInfo, fileID, bufPtr, offset, length);				
 			}			
 			__finally{			
 			}
@@ -469,13 +458,7 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 				bufPtr += sizeof(long);
 				
 				printf("TruncateAppend started for file with fileID: %d, offset: %d, length %d\n", fileID, offset, length);
-
-				if(DEBUG){
-					printf("Data: %s\n", bufPtr);
-				}
-
-				response->ResponseBufferLength = genesisII_truncate_append(pMyInfo, fileID, bufPtr, offset, length);
-				printf("TruncateAppend finished on Genesis side!\n");	
+				response->ResponseBufferLength = genesisII_truncate_append(pMyInfo, fileID, bufPtr, offset, length);				
 			}			
 			__finally{			
 			}
@@ -678,9 +661,7 @@ int main(int argc, char* argv[])
 	status = runMultiThreaded(&rootInfo);		
 
 	//TestThread(rootInfo);		
-
-	printf("Shutdown Complete\n");
-	exit(0);
+	printf("Shutdown Complete\n");	
 	
 	return status;
 }

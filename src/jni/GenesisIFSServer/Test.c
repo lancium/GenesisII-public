@@ -14,7 +14,11 @@ void TestThread(GII_JNI_INFO rootInfo){
 
 	fileid=0;
 
-	genesisII_open(&rootInfo, "/home/sosa/somefile.txt", requestedDeposition, desiredAccess, FALSE, &directoryListing);
+	genesisII_open(&rootInfo, "/home/sosa/createMe.txt", requestedDeposition, desiredAccess, FALSE, &directoryListing);
+
+	genesisII_read(&rootInfo, 0, buffer, fileid, 200);
+
+	printf_s("%s\n", buffer);
 
 	genesisII_close(&rootInfo, fileid, TRUE);
 

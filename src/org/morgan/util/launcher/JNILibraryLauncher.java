@@ -23,10 +23,16 @@ public class JNILibraryLauncher
 {
 	private static boolean isLoaded = false;
 	private static ClassLoader loader;
+	/*
 	private final static String JNI_PACKAGE = 
 		"edu.virginia.vcgr.genii.client.jni.gIIlib";
+	private final static String JNI_DEPRECATED_PACKAGE = 
+		"edu.virginia.vcgr.genii.client.jni.gIIlib.deprecated";
+	*/
 	private final static String JNI_IO_PACKAGE = 
 		"edu.virginia.vcgr.genii.client.jni.gIIlib.io";
+	private final static String JNI_MISCELLANEOUS_PACKAGE = 
+		"edu.virginia.vcgr.genii.client.jni.gIIlib.miscellaneous";
 	private static final String BASE_DIR_SYSTEM_PROPERTY = 
 		"edu.virginia.vcgr.genii.install-base-dir";
 	
@@ -45,32 +51,8 @@ public class JNILibraryLauncher
 		}
 	}	
 	
-	@SuppressWarnings("unchecked")
-	public static Object[] getInformation(String path){
-		String myClass = JNI_PACKAGE + ".JNIGetInformationTool";										 
-		String myMethod = "getInformation";
-		Class[] argTypes = new Class[] {String.class};
-		Object[] args = new Object[] {path};
-				
-		ArrayList<String> toReturn = (ArrayList<String>)
-			invoke(myClass, myMethod, argTypes, args);
-		return ((toReturn != null) ? toReturn.toArray() : null);
-	}
-	
-	@SuppressWarnings("unchecked")
-	public static Object[] getDirectoryListing(String directory, String target){		
-		String myClass = JNI_PACKAGE + ".JNIDirectoryListingTool";
-		String myMethod = "getDirectoryListing";
-		Class[] argTypes = new Class[] {String.class, String.class};
-		Object[] args = new Object[] { directory, target };
-						
-		ArrayList<String> toReturn = (ArrayList<String>)
-			invoke(myClass, myMethod, argTypes, args);
-		return ((toReturn != null) ? toReturn.toArray() : null);
-	}
-	
 	public static boolean changeDirectory(String targetDirectory){				
-		String myClass = JNI_PACKAGE + ".JNICdTool";
+		String myClass = JNI_MISCELLANEOUS_PACKAGE + ".JNICdTool";
 		String myMethod = "changeDirectory";
 		Class<?>[] argTypes = new Class[] {String.class };
 		Object[] args = new Object[] { targetDirectory};
@@ -79,7 +61,7 @@ public class JNILibraryLauncher
 	}
 	
 	public static String getCurrentDirectory(){
-		String myClass = JNI_PACKAGE + ".JNIPwdTool";
+		String myClass = JNI_MISCELLANEOUS_PACKAGE + ".JNIPwdTool";
 		String myMethod = "getCurrentDirectory";
 		Class<?>[] argTypes = null;
 		Object[] args = null;
@@ -87,17 +69,8 @@ public class JNILibraryLauncher
 		return (String)invoke(myClass, myMethod, argTypes, args);				
 	}
 	
-	public static boolean makeDirectory(String newDirectory){
-		String myClass = JNI_PACKAGE + ".JNIMkDirTool";
-		String myMethod = "makeDirectory";
-		Class<?>[] argTypes = new Class[] {String.class };
-		Object[] args = new Object[] { newDirectory};
-		
-		return (Boolean)invoke(myClass, myMethod, argTypes, args);					
-	}
-	
 	public static boolean login(String keystorePath, String password, String certPath){
-		String myClass = JNI_PACKAGE + ".JNILoginTool";
+		String myClass = JNI_MISCELLANEOUS_PACKAGE + ".JNILoginTool";
 		String myMethod = "login";
 		Class<?>[] argTypes = new Class[] {String.class, String.class , String.class };
 		Object[] args = new Object[] { keystorePath , password , certPath };
@@ -106,43 +79,12 @@ public class JNILibraryLauncher
 	}
 	
 	public static void logout(){
-		String myClass = JNI_PACKAGE + ".JNILogoutTool";
+		String myClass = JNI_MISCELLANEOUS_PACKAGE + ".JNILogoutTool";
 		String myMethod = "logout";
 		Class<?>[] argTypes = null;
 		Object[] args = null;
 		
 		invoke(myClass, myMethod, argTypes, args);				
-	}
-	
-	public static boolean remove(String target, boolean recursive, boolean force){
-		String myClass = JNI_PACKAGE + ".JNIRmTool";
-		String myMethod = "remove";
-		Class<?>[] argTypes = new Class[] {String.class, 
-				Boolean.class, Boolean.class};
-		Object[] args = new Object[] {target, 
-				new Boolean(recursive), new Boolean(force)};
-		
-		return (Boolean)invoke(myClass, myMethod, argTypes, args);				
-	}
-	
-	public static boolean copy(String source, String destination,boolean srcLocal, boolean dstLocal){
-		String myClass = JNI_PACKAGE + ".JNICpTool";
-		String myMethod = "copy";
-		Class<?>[] argTypes = new Class[] {String.class, String.class, 
-					Boolean.class, Boolean.class};
-		Object[] args = new Object[] {source, destination, 
-				new Boolean(srcLocal), new Boolean(dstLocal)};
-		
-		return (Boolean)invoke(myClass, myMethod, argTypes, args);				
-	}
-	
-	public static boolean move(String source, String destination){
-		String myClass = JNI_PACKAGE + ".JNIMvTool";
-		String myMethod = "move";
-		Class<?>[] argTypes = new Class[] {String.class, String.class};
-		Object[] args = new Object[] {source, destination};
-		
-		return (Boolean)invoke(myClass, myMethod, argTypes, args);				
 	}
 	
 	/* ************************* IO Functions**************************** */
@@ -194,12 +136,25 @@ public class JNILibraryLauncher
 		return (Integer)invoke(myClass, myMethod, argTypes, args);				
 	}
 	
-	public static int truncateAppend(int fileHandle, String data, int offset){
+	public static int truncateAppend(int fileHandle, byte[] data, int offset, int validLength){
 		String myClass = JNI_IO_PACKAGE + ".JNIWrite";
 		String myMethod = "truncateAppend";
-		Class<?>[] argTypes = new Class[] {Integer.class, String.class, Integer.class};
+		Class<?>[] argTypes = new Class[] {Integer.class, byte[].class, Integer.class};
+		
+		/*	
+			Only not use default if not the same size (i.e. pool buffers may be larger than
+			valid length 
+		 */
+	
+		//Bytes to actually use
+		byte[] toUse = data;		
+	
+		if(data.length != validLength){
+			toUse = Arrays.copyOf(data, validLength);  //truncates to valid length
+		}
+		
 		Object[] args = new Object[] {new Integer(fileHandle), 
-				new String(data), new Integer(offset)};
+				toUse, new Integer(offset)};
 		
 		return (Integer)invoke(myClass, myMethod, argTypes, args);				
 	}
@@ -212,6 +167,29 @@ public class JNILibraryLauncher
 		
 		return (Boolean)invoke(myClass, myMethod, argTypes, args);				
 	}
+	
+	@SuppressWarnings("unchecked")
+	public static Object[] getDirectoryListing(int handle, String target){		
+		String myClass = JNI_IO_PACKAGE + ".JNIDirectoryListing";
+		String myMethod = "getDirectoryListing";
+		Class[] argTypes = new Class[] {Integer.class, String.class};
+		Object[] args = new Object[] {new Integer(handle), target};
+						
+		ArrayList<String> toReturn = (ArrayList<String>)
+			invoke(myClass, myMethod, argTypes, args);
+		return ((toReturn != null) ? toReturn.toArray() : null);
+	}
+	
+	public static boolean rename(int handle, String destination){
+		String myClass = JNI_IO_PACKAGE + ".JNIRename";
+		String myMethod = "rename";
+		Class<?>[] argTypes = new Class[] {Integer.class, String.class};
+		Object[] args = new Object[] {handle, destination};
+		
+		return (Boolean)invoke(myClass, myMethod, argTypes, args);				
+	}
+	
+	/* ************************* END IO Functions**************************** */
 	
 	private static Object invoke(String cls, String mtd, Class<?>[] argTypes, Object[] args){
 		if(!isLoaded){
@@ -233,4 +211,82 @@ public class JNILibraryLauncher
 			return null;
 		}			
 	}
+	
+	/*  NO LONGER SUPPORTED */
+	
+	/*
+	@SuppressWarnings("unchecked")
+	public static Object[] getInformation(String path){
+		String myClass = JNI_PACKAGE + ".JNIGetInformationTool";										 
+		String myMethod = "getInformation";
+		Class[] argTypes = new Class[] {String.class};
+		Object[] args = new Object[] {path};
+				
+		ArrayList<String> toReturn = (ArrayList<String>)
+			invoke(myClass, myMethod, argTypes, args);
+		return ((toReturn != null) ? toReturn.toArray() : null);
+	}
+	*/
+	
+	/*
+	@SuppressWarnings("unchecked")
+	public static Object[] getDirectoryListing(String directory, String target){		
+		String myClass = JNI_IO_PACKAGE + ".JNIDirectoryListing";
+		String myMethod = "getDirectoryListingOld";
+		Class[] argTypes = new Class[] {String.class, String.class};
+		Object[] args = new Object[] { directory, target };
+						
+		ArrayList<String> toReturn = (ArrayList<String>)
+			invoke(myClass, myMethod, argTypes, args);
+		return ((toReturn != null) ? toReturn.toArray() : null);
+	}
+	*/
+	
+	/*
+	public static boolean makeDirectory(String newDirectory){
+		String myClass = JNI_PACKAGE + ".JNIMkDirTool";
+		String myMethod = "makeDirectory";
+		Class<?>[] argTypes = new Class[] {String.class };
+		Object[] args = new Object[] { newDirectory};
+		
+		return (Boolean)invoke(myClass, myMethod, argTypes, args);					
+	}
+	*/
+	
+	/*
+	public static boolean remove(String target, boolean recursive, boolean force){
+		String myClass = JNI_PACKAGE + ".JNIRmTool";
+		String myMethod = "remove";
+		Class<?>[] argTypes = new Class[] {String.class, 
+				Boolean.class, Boolean.class};
+		Object[] args = new Object[] {target, 
+				new Boolean(recursive), new Boolean(force)};
+		
+		return (Boolean)invoke(myClass, myMethod, argTypes, args);				
+	}
+	*/
+	
+	/*
+	public static boolean copy(String source, String destination,boolean srcLocal, boolean dstLocal){
+		String myClass = JNI_PACKAGE + ".JNICpTool";
+		String myMethod = "copy";
+		Class<?>[] argTypes = new Class[] {String.class, String.class, 
+					Boolean.class, Boolean.class};
+		Object[] args = new Object[] {source, destination, 
+				new Boolean(srcLocal), new Boolean(dstLocal)};
+		
+		return (Boolean)invoke(myClass, myMethod, argTypes, args);				
+	}
+	*/
+	
+	/*
+	public static boolean move(String source, String destination){
+		String myClass = JNI_PACKAGE + ".JNIMvTool";
+		String myMethod = "move";
+		Class<?>[] argTypes = new Class[] {String.class, String.class};
+		Object[] args = new Object[] {source, destination};
+		
+		return (Boolean)invoke(myClass, myMethod, argTypes, args);				
+	}
+	*/
 }

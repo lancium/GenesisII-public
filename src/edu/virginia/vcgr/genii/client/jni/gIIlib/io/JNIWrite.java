@@ -1,48 +1,35 @@
 package edu.virginia.vcgr.genii.client.jni.gIIlib.io;
 
-import edu.virginia.vcgr.genii.client.jni.gIIlib.io.file.IFSFile;
-import edu.virginia.vcgr.genii.client.jni.gIIlib.io.file.IFSResource;
+import edu.virginia.vcgr.genii.client.jni.gIIlib.cache.CacheManager;
+import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.WindowsDirHandle;
+import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.WindowsFileHandle;
+import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.WindowsResourceHandle;
 
 
 public class JNIWrite{
 	public static Integer write(Integer fileHandle, byte[] data, Integer offset){
-		IFSResource resource = DataTracker.getInstance().getResource(fileHandle);
-		int toReturn = -1;
+		CacheManager manager = CacheManager.getInstance();		
+		WindowsResourceHandle resourceHandle = manager.getHandle(fileHandle);							
 		
-		//Make sure the handle points to a valid file (not a directory)
-		if(resource == null || resource.isDirectory()){
-			System.out.println("Invalid file handle");						
-		}
-		else{		
-			try{
-				IFSFile file = (IFSFile)resource;
-				if(file.isStream() || offset != 0)
-				{
-					file.lseek64(offset);
-				}
-				toReturn = file.write(data);					
-			}catch(Exception e){
-				e.printStackTrace();
-			}
-		}
-		return toReturn;
+		if(resourceHandle == null || resourceHandle instanceof WindowsDirHandle){
+			System.out.println("G-ICING:  Invalid handle received for file write");			
+			return null;
+		}		
+		
+		WindowsFileHandle fh = (WindowsFileHandle) resourceHandle;		
+		return fh.write(data, offset);						
 	}
 	
-	public static Integer truncateAppend(Integer fileHandle, String data, Integer offset){
-		IFSResource resource = DataTracker.getInstance().getResource(fileHandle);
-		int toReturn = -1;
-
-		if(resource == null || resource.isDirectory()){
-			System.out.println("Invalid file handle");						
-		}
-		else{
-			try{
-				IFSFile file = (IFSFile)resource;
-				toReturn = file.truncateAppend(offset.longValue(), data.getBytes());							
-			}catch(Exception e){
-				e.printStackTrace();
-			}
-		}
-		return toReturn;
+	public static Integer truncateAppend(Integer fileHandle, byte[] data, Integer offset){
+		CacheManager manager = CacheManager.getInstance();		
+		WindowsResourceHandle resourceHandle = manager.getHandle(fileHandle);							
+		
+		if(resourceHandle == null || resourceHandle instanceof WindowsDirHandle){
+			System.out.println("G-ICING:  Invalid handle received for file truncateAppend");			
+			return null;
+		}		
+		
+		WindowsFileHandle fh = (WindowsFileHandle) resourceHandle;
+		return fh.truncateAppend(data, offset);			
 	}
 }

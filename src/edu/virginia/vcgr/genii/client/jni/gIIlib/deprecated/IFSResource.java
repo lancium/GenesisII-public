@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.genii.client.jni.gIIlib.io.file;
+package edu.virginia.vcgr.genii.client.jni.gIIlib.deprecated;
 
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import java.io.Closeable;

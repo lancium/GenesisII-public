@@ -136,7 +136,7 @@ Return Value:
 			PFILE_FS_ATTRIBUTE_INFORMATION pAttribInfo = (PFILE_FS_ATTRIBUTE_INFORMATION) OriginalBuffer;
 			RtlZeroMemory(pAttribInfo, sizeof(FILE_FS_ATTRIBUTE_INFORMATION));
 
-			pAttribInfo->FileSystemAttributes = 0;			
+			pAttribInfo->FileSystemAttributes = FILE_CASE_PRESERVED_NAMES | FILE_CASE_SENSITIVE_SEARCH;			
 			pAttribInfo->MaximumComponentNameLength = MAX_PATH_LENGTH;			
 
             RxContext->Info.LengthRemaining -= FIELD_OFFSET(FILE_FS_ATTRIBUTE_INFORMATION, FileSystemName[0]);
@@ -271,18 +271,7 @@ Return Value:
 		RxContext->Info.LengthRemaining = 0;
 		Status = STATUS_FILE_CLOSED;
 	}
-	else{
-
-		if(giiFCB->State == GENII_STATE_NOT_INITIALIZED){
-			//Will release semaphore later (on return)
-			Status = GenesisSendInvertedCall(RxContext, GENII_QUERYFILEINFO, FALSE);
-			
-			//Something could go wrong (only wait if something will actually come back to free you)
-			if(NT_SUCCESS(Status)){
-				KeWaitForSingleObject(&(giiFCB->InvertedCallSemaphore), Executive, KernelMode, FALSE, NULL);		
-			}
-		}	
-		
+	else{				
 		Status = GenesisCompleteQueryFileInformation(RxContext);	
 		ExReleaseFastMutex(&(giiFCB->ExclusiveLock));
 	}
@@ -389,11 +378,24 @@ Return Value:
 		case FileRenameInformation:{
 			PFILE_RENAME_INFORMATION pRenameInfo = (PFILE_RENAME_INFORMATION) RxContext->Info.Buffer;
             DbgPrint("FileRenameInformation\n");
+			
+			//Close this file handle on the Genesis Side
+			Status = GenesisSendInvertedCall(RxContext, GENII_RENAME, FALSE);
 
-			pRenameInfo->
+			//Something could go wrong (only wait if something will actually come back to free you)
+			if(NT_SUCCESS(Status)){
+				//Waits for caller
+				KeWaitForSingleObject(&(fcb->InvertedCallSemaphore), Executive, KernelMode, FALSE, NULL);
+			}
+
+			if(ccb->lastStatus == -1){
+				Status =  STATUS_ACCESS_DENIED;
+			}
+
             break;
 		}
         default:
+
 			DbgPrint("Unknown set information requested\n");
             break;									  
     }

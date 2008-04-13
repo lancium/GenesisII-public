@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.genii.client.jni.gIIlib.io.file;
+package edu.virginia.vcgr.genii.client.jni.gIIlib.deprecated;
 
 import java.io.IOException;
 import java.util.ArrayList;
