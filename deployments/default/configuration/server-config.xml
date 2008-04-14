@@ -160,6 +160,12 @@
 			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
 				value="connection-pool"/>
 		</mconf:instance>
+
+		<mconf:instance name="iterator-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.iterator.IteratorDBResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
 		
 		<mconf:instance name="basic-scheduler-db-resource-provider"
 			type="edu.virginia.vcgr.genii.container.scheduler.basic.BasicSchedulerDBResourceProvider">
@@ -384,6 +390,10 @@
 		
 		<genii:service name="QueuePortType">
 			<genii:resource-provider name="queue-db-resource-provider"/>
+		</genii:service>
+
+		<genii:service name="IteratorPortType">
+			<genii:resource-provider name="iterator-db-resource-provider"/>
 		</genii:service>
 
 		<genii:service name="X509AuthnPortType">

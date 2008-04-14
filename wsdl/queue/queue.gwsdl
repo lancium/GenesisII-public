@@ -84,24 +84,24 @@
 			element="queue:SubmitJobResponseType"/>
 	</wsdl:message>
 	
-	<wsdl:message name="GetStatusRequest">
-		<wsdl:part name="GetStatusRequest"
-			element="queue:GetStatusRequestType"/>
+	<wsdl:message name="IterateStatusRequest">
+		<wsdl:part name="IterateStatusRequest"
+			element="queue:IterateStatusRequestType"/>
 	</wsdl:message>
 
-	<wsdl:message name="GetStatusResponse">
-		<wsdl:part name="GetStatusResponse"
-			element="queue:GetStatusResponseType"/>
+	<wsdl:message name="IterateStatusResponse">
+		<wsdl:part name="IterateStatusResponse"
+			element="queue:IterateStatusResponseType"/>
 	</wsdl:message>
 	
-	<wsdl:message name="ListRequest">
-		<wsdl:part name="ListRequest"
-			element="queue:ListRequest"/>
+	<wsdl:message name="IterateListRequest">
+		<wsdl:part name="IterateListRequest"
+			element="queue:IterateListRequest"/>
 	</wsdl:message>
 
-	<wsdl:message name="ListResponse">
-		<wsdl:part name="ListResponse"
-			element="queue:ListResponseType"/>
+	<wsdl:message name="IterateListResponse">
+		<wsdl:part name="IterateListResponse"
+			element="queue:IterateListResponseType"/>
 	</wsdl:message>
 	
 	<wsdl:message name="KillRequest">
@@ -146,14 +146,14 @@
 			<wsdl:output message="queue:SubmitJobResponse"/>
 		</wsdl:operation>
 		
-		<wsdl:operation name="getStatus">
-			<wsdl:input message="queue:GetStatusRequest"/>
-			<wsdl:output message="queue:GetStatusResponse"/>
+		<wsdl:operation name="iterateStatus">
+			<wsdl:input message="queue:IterateStatusRequest"/>
+			<wsdl:output message="queue:IterateStatusResponse"/>
 		</wsdl:operation>
 		
-		<wsdl:operation name="listJobs">
-			<wsdl:input message="queue:ListRequest"/>
-			<wsdl:output message="queue:ListResponse"/>
+		<wsdl:operation name="iterateListJobs">
+			<wsdl:input message="queue:IterateListRequest"/>
+			<wsdl:output message="queue:IterateListResponse"/>
 		</wsdl:operation>
 		
 		<wsdl:operation name="killJobs">

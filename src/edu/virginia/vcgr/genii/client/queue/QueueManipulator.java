@@ -6,8 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Iterator;
 
 import org.apache.axis.types.UnsignedInt;
 import org.ggf.jsdl.JobDefinition_Type;
@@ -17,6 +16,7 @@ import org.ws.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.iterator.WSIterable;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
@@ -78,10 +78,9 @@ public class QueueManipulator
 			jobDef, (byte)priority)).getJobTicket());
 	}
 	
-	public Map<JobTicket, JobInformation> status(Collection<JobTicket> jobs)
+	public Iterator<JobInformation> status(Collection<JobTicket> jobs)
 		throws RemoteException, ConfigurationException
 	{
-		Map<JobTicket, JobInformation> ret = new HashMap<JobTicket, JobInformation>();
 		QueuePortType queue = ClientUtils.createProxy(QueuePortType.class, _queue);
 		String []jobTickets = null;
 		
@@ -93,62 +92,39 @@ public class QueueManipulator
 				jobTickets[lcv++] = ticket.toString();
 		}
 		
-		for (JobInformationType jobInfo : queue.getStatus(jobTickets))
+		EndpointReferenceType iter = null;
+		iter = queue.iterateStatus(jobTickets).getIterator();
+		WSIterable<JobInformationType> iterable = null;
+		try
 		{
-			JobTicket ticket = new JobTicket(jobInfo.getJobTicket());
-			byte [][]owners = jobInfo.getOwner();
-			Collection<Identity> identities;
-			try
-			{
-				identities = QueueUtils.deserializeIdentities(owners);
-			}
-			catch (Exception e)
-			{
-				throw new RemoteException("Unable to deserialize owner identities.", e);
-			}
-			
-			ret.put(ticket,
-				new JobInformation(ticket, identities,
-					QueueStates.fromQueueStateType(jobInfo.getJobStatus()),
-					(int)jobInfo.getPriority(), jobInfo.getSubmitTime(),
-					jobInfo.getStartTime(), jobInfo.getFinishTime(),
-					jobInfo.getAttempts().intValue()));
-					
+			iterable = new WSIterable<JobInformationType>(
+				JobInformationType.class, iter, 200, true);
+			return new JobInformationIterator(iterable.iterator());
 		}
-		
-		return ret;
+		finally
+		{
+			StreamUtils.close(iterable);
+		}
 	}
 	
-	public Map<JobTicket, ReducedJobInformation> list()
+	public Iterator<ReducedJobInformation> list()
 		throws RemoteException, ConfigurationException
 	{
-		HashMap<JobTicket, ReducedJobInformation> ret =
-			new HashMap<JobTicket, ReducedJobInformation>();
 		QueuePortType queue = ClientUtils.createProxy(QueuePortType.class, _queue);
 		
-		ReducedJobInformationType []result = queue.listJobs(null);
-		for (ReducedJobInformationType jobInfo : result)
+		EndpointReferenceType iter = null;
+		iter = queue.iterateListJobs(null).getIterator();
+		WSIterable<ReducedJobInformationType> iterable = null;
+		try
 		{
-			JobTicket ticket = new JobTicket(jobInfo.getJobTicket());
-			JobStateEnumerationType state = jobInfo.getJobStatus();
-			byte [][]ownerBytes = jobInfo.getOwner();
-			Collection<Identity> identities;
-			try
-			{
-				identities = QueueUtils.deserializeIdentities(ownerBytes);
-			}
-			catch (Exception e)
-			{
-				throw new RemoteException("Unable to deserialize owner identities.", e);
-			}
-			
-			ret.put(ticket,
-				new ReducedJobInformation(ticket, 
-					identities, 
-					QueueStates.fromQueueStateType(state)));				
+			iterable = new WSIterable<ReducedJobInformationType>(
+				ReducedJobInformationType.class, iter, 200, true);
+			return new ReducedJobInformationIterator(iterable.iterator());
 		}
-		
-		return ret;
+		finally
+		{
+			StreamUtils.close(iterable);
+		}
 	}
 	
 	public void kill(Collection<JobTicket> jobs)
@@ -192,5 +168,96 @@ public class QueueManipulator
 		QueuePortType queue = ClientUtils.createProxy(QueuePortType.class, _queue);
 		queue.configureResource(new ConfigureRequestType(resourceName,
 			new UnsignedInt((long)numSlots)));
+	}
+	
+	static private class ReducedJobInformationIterator
+		implements Iterator<ReducedJobInformation>
+	{
+		private Iterator<ReducedJobInformationType> _jit;
+		
+		public ReducedJobInformationIterator(Iterator<ReducedJobInformationType> jit)
+		{
+			_jit = jit;
+		}
+		
+		@Override
+		public boolean hasNext()
+		{
+			return _jit.hasNext();
+		}
+
+		@Override
+		public ReducedJobInformation next()
+		{
+			ReducedJobInformationType jobInfo = _jit.next();
+			JobTicket ticket = new JobTicket(jobInfo.getJobTicket());
+			JobStateEnumerationType state = jobInfo.getJobStatus();
+			byte [][]ownerBytes = jobInfo.getOwner();
+			Collection<Identity> identities;
+			try
+			{
+				identities = QueueUtils.deserializeIdentities(ownerBytes);
+			}
+			catch (Exception e)
+			{
+				throw new RuntimeException("Unable to deserialize owner identities.", e);
+			}
+			
+			return new ReducedJobInformation(ticket, 
+					identities, 
+					QueueStates.fromQueueStateType(state));		
+		}
+
+		@Override
+		public void remove()
+		{
+			_jit.remove();
+		}
+	}
+	
+	static private class JobInformationIterator 
+		implements Iterator<JobInformation>
+	{
+		private Iterator<JobInformationType> _jit;
+		
+		public JobInformationIterator(Iterator<JobInformationType> jit)
+		{
+			_jit = jit;
+		}
+		
+		@Override
+		public boolean hasNext()
+		{
+			return _jit.hasNext();
+		}
+
+		@Override
+		public JobInformation next()
+		{
+			JobInformationType jobInfo = _jit.next();
+			JobTicket ticket = new JobTicket(jobInfo.getJobTicket());
+			byte [][]owners = jobInfo.getOwner();
+			Collection<Identity> identities;
+			try
+			{
+				identities = QueueUtils.deserializeIdentities(owners);
+			}
+			catch (Exception e)
+			{
+				throw new RuntimeException("Unable to deserialize owner identities.", e);
+			}
+			
+			return new JobInformation(ticket, identities,
+					QueueStates.fromQueueStateType(jobInfo.getJobStatus()),
+					(int)jobInfo.getPriority(), jobInfo.getSubmitTime(),
+					jobInfo.getStartTime(), jobInfo.getFinishTime(),
+					jobInfo.getAttempts().intValue());	
+		}
+
+		@Override
+		public void remove()
+		{
+			_jit.remove();
+		}
 	}
 }

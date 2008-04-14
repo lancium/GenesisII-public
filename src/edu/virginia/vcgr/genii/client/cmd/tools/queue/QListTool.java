@@ -1,12 +1,11 @@
 package edu.virginia.vcgr.genii.client.cmd.tools.queue;
 
 import java.util.Collection;
-import java.util.Map;
+import java.util.Iterator;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
-import edu.virginia.vcgr.genii.client.queue.JobTicket;
 import edu.virginia.vcgr.genii.client.queue.QueueManipulator;
 import edu.virginia.vcgr.genii.client.queue.ReducedJobInformation;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.Identity;
@@ -27,12 +26,12 @@ public class QListTool extends BaseGridTool
 	protected int runCommand() throws Throwable
 	{
 		QueueManipulator manipulator = new QueueManipulator(getArgument(0));
-		Map<JobTicket, ReducedJobInformation> jobs = manipulator.list();
+		Iterator<ReducedJobInformation> jobs = manipulator.list();
 		
 		printHeader();
-		for (JobTicket ticket : jobs.keySet())
+		while (jobs.hasNext())
 		{
-			printJobInformation(jobs.get(ticket));
+			printJobInformation(jobs.next());
 		}
 		
 		return 0;

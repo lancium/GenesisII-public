@@ -7,6 +7,7 @@ import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
@@ -52,6 +53,7 @@ import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
+import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.common.notification.Notify;
 import edu.virginia.vcgr.genii.common.notification.Subscribe;
@@ -69,6 +71,8 @@ import edu.virginia.vcgr.genii.container.q2.resource.QueueDBResourceFactory;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.queue.ConfigureRequestType;
+import edu.virginia.vcgr.genii.queue.IterateListResponseType;
+import edu.virginia.vcgr.genii.queue.IterateStatusResponseType;
 import edu.virginia.vcgr.genii.queue.JobInformationType;
 import edu.virginia.vcgr.genii.queue.QueuePortType;
 import edu.virginia.vcgr.genii.queue.ReducedJobInformationType;
@@ -245,9 +249,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		}
 	}
 
-	@Override
-	@RWXMapping(RWXCategory.OPEN)
-	public JobInformationType[] getStatus(String[] getStatusRequest)
+	private JobInformationType[] getStatus(String[] getStatusRequest)
 			throws RemoteException
 	{
 		ResourceKey rKey = ResourceManager.getCurrentResource();
@@ -262,6 +264,32 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		catch (SQLException sqe)
 		{
 			throw new RemoteException("Unable to list jobs in queue.", sqe);
+		}
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.OPEN)
+	public IterateStatusResponseType iterateStatus(String[] iterateStatusRequest)
+			throws RemoteException
+	{
+		Collection<MessageElement> col = new LinkedList<MessageElement>();
+		
+		for (JobInformationType jit : getStatus(iterateStatusRequest))
+		{
+			col.add(AnyHelper.toAny(jit));
+		}
+		
+		try
+		{
+			return new IterateStatusResponseType(super.createWSIterator(col.iterator()));
+		}
+		catch (ConfigurationException ce)
+		{
+			throw new RemoteException("Unable to create iterator.", ce);
+		}
+		catch (SQLException sqe)
+		{
+			throw new RemoteException("Unable to create iterator.", sqe);
 		}
 	}
 
@@ -305,9 +333,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		}
 	}
 
-	@Override
-	@RWXMapping(RWXCategory.READ)
-	public ReducedJobInformationType[] listJobs(Object listRequest)
+	private ReducedJobInformationType[] listJobs(Object listRequest)
 			throws RemoteException
 	{
 		ResourceKey rKey = ResourceManager.getCurrentResource();
@@ -322,6 +348,32 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		catch (SQLException sqe)
 		{
 			throw new RemoteException("Unable to list jobs in queue.", sqe);
+		}
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.READ)
+	public IterateListResponseType iterateListJobs(Object iterateListRequest)
+			throws RemoteException
+	{
+		Collection<MessageElement> col = new LinkedList<MessageElement>();
+		
+		for (ReducedJobInformationType rjit : listJobs(iterateListRequest))
+		{
+			col.add(AnyHelper.toAny(rjit));
+		}
+		
+		try
+		{
+			return new IterateListResponseType(super.createWSIterator(col.iterator()));
+		}
+		catch (ConfigurationException ce)
+		{
+			throw new RemoteException("Unable to create iterator.", ce);
+		}
+		catch (SQLException sqe)
+		{
+			throw new RemoteException("Unable to create iterator.", sqe);
 		}
 	}
 

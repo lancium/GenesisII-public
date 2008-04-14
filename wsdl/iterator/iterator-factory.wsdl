@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<wsdl:definitions
+	name="IteratorFactory"
+	xmlns="http://vcgr.cs.virginia.edu/genii/iterator-factory"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:ifactory="http://vcgr.cs.virginia.edu/genii/iterator-factory"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	targetNamespace="http://vcgr.cs.virginia.edu/genii/iterator-factory">
+
+	<wsdl:types>
+		<xsd:schema
+			xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			attributeFormDefault="unqualified"
+			elementFormDefault="qualified"
+			targetNamespace="http://vcgr.cs.virginia.edu/genii/iterator-factory">
+
+			<xsd:import
+				namespace="http://vcgr.cs.virginia.edu/genii/iterator-factory"
+				schemaLocation="./iterator-factory.xsd"/>
+
+		</xsd:schema>
+	</wsdl:types>
+
+	<wsdl:message name="CreateIteratorRequest">
+		<wsdl:part name="CreateIteratorRequest"
+			element="ifactory:CreateIteratorRequestType"/>
+	</wsdl:message>
+
+	<wsdl:message name="CreateIteratorResponse">
+		<wsdl:part name="CreateIteratorResponse"
+			element="ifactory:CreateIteratorResponseType"/>
+	</wsdl:message>
+	
+	<wsdl:portType name="IteratorFactoryPortType">
+		<wsdl:operation name="createIterator">
+			<wsdl:input message="ifactory:CreateIteratorRequest"/>
+			<wsdl:output message="ifactory:CreateIteratorResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+
+</wsdl:definitions>

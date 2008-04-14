@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+	xmlns="http://vcgr.cs.virginia.edu/genii/iterator-factory"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:ifactory="http://vcgr.cs.virginia.edu/genii/iterator-factory"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	targetNamespace="http://vcgr.cs.virginia.edu/genii/iterator-factory"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"
+		schemaLocation="./wsrf/basefaults.xsd"/>
+
+	<xsd:import
+		namespace="http://www.w3.org/2005/08/addressing"
+		schemaLocation="./ws-addr.xsd"/>
+	
+<!-- Message Types -->
+	<xsd:complexType name="CreateIteratorRequestType">
+		<xsd:sequence>
+			<xsd:any namespace="##other" processContents="lax"
+				minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="CreateIteratorRequestType"
+		type="ifactory:CreateIteratorRequestType"/>
+
+	<xsd:complexType name="CreateIteratorResponseType">
+		<xsd:sequence>
+			<xsd:element name="iterator" type="wsa:EndpointReferenceType"
+				minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="CreateIteratorResponseType"
+		type="ifactory:CreateIteratorResponseType"/>
+</xsd:schema>

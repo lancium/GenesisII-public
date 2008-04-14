@@ -265,7 +265,6 @@
 		<genii-ext:extend portType="genii-common:GeniiCommon"/>
 		<genii-ext:extend portType="rpw-2:GetResourceProperty"/>
 		<genii-ext:extend portType="rpw-2:GetMultipleResourceProperties"/>
-		
 
 		<wsdl:operation name="createFile">
 			<wsdl:input message="rns:createFileRequest"/>

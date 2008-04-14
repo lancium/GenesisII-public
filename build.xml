@@ -178,6 +178,7 @@
 		<ant antfile="${wsdl.dir}/ticker/ticker.build.xml"/>
 		<ant antfile="${wsdl.dir}/tty/tty.build.xml"/>
 		<ant antfile="${wsdl.dir}/counter/counter.build.xml"/>
+		<ant antfile="${wsdl.dir}/iterator/iterator.build.xml"/>
 	</target>
 
 	<target name="genii.wsdl.tools"

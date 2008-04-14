@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="gen.iterator">
+
+	<fail message="wsdl.dir variable not set.">
+		<condition>
+			<not>
+				<isset property="wsdl.dir"/>
+			</not>
+		</condition>
+	</fail>
+
+	<import file="${wsdl.dir}/wsdl-build.xml"/>
+	<import file="${wsdl.dir}/common.build.xml"/>
+
+	<condition property="gen.iterator.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${temporary.codegen.dir}/wsdl/iterator.flag"/>
+			<uptodate targetfile="${temporary.codegen.dir}/wsdl/iterator.flag">
+				<srcfiles dir="${wsdl.dir}/iterator">
+					<include name="iterator.xsd"/>
+					<include name="iterator.gwsdl"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.iterator" unless="gen.iterator.uptodate">
+		<copy todir="${temporary.codegen.dir}/wsdl">
+			<filelist refid="common.source.files"/>
+			<fileset dir="${wsdl.dir}/iterator">
+				<include name="iterator.gwsdl"/>
+				<include name="iterator.xsd"/>
+				<include name="jsdl.xsd"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/iterator.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/iterator-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${temporary.codegen.dir}/wsdl/iterator-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/iterator-service.wsdl"
+			portType="{http://vcgr.cs.virginia.edu/genii/iterator}IteratorPortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/iterator"/>
+			<param name="stub.gen.source-wsdl"
+				value="${temporary.codegen.dir}/wsdl/iterator-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${temporary.codegen.dir}/wsdl/iterator.flag"/>
+		</antcall>
+		<move file="${temporary.codegen.dir}/iterator/edu/virginia/vcgr/genii/iterator/deploy.wsdd"
+			tofile="${wsdd.dir}/iterator.deploy.wsdd"/>
+		<replace file="${wsdd.dir}/iterator.deploy.wsdd"
+			token="edu.virginia.vcgr.genii.iterator.IteratorSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.iterator.IteratorServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd.dir}/iterator.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>

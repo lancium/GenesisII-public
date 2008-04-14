@@ -83,33 +83,33 @@
 	<xsd:element name="SubmitJobResponseType"
 		type="queue:SubmitJobResponseType"/>
 	
-	<xsd:complexType name="GetStatusRequestType">
+	<xsd:complexType name="IterateStatusRequestType">
 		<xsd:sequence>
 			<xsd:element name="job-ticket" type="xsd:string"
-				minOccurs="1" maxOccurs="unbounded" nillable="false"/>
+				minOccurs="0" maxOccurs="unbounded" nillable="false"/>
 		</xsd:sequence>
 	</xsd:complexType>
-	<xsd:element name="GetStatusRequestType"
-		type="queue:GetStatusRequestType"/>
+	<xsd:element name="IterateStatusRequestType"
+		type="queue:IterateStatusRequestType"/>
 	
-	<xsd:complexType name="GetStatusResponseType">
+	<xsd:complexType name="IterateStatusResponseType">
 		<xsd:sequence>
-			<xsd:element name="job-information" type="queue:JobInformationType"
-				minOccurs="1" maxOccurs="unbounded" nillable="false"/>
+			<xsd:element name="iterator" type="wsa:EndpointReferenceType"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
 		</xsd:sequence>
 	</xsd:complexType>
-	<xsd:element name="GetStatusResponseType"
-		type="queue:GetStatusResponseType"/>
+	<xsd:element name="IterateStatusResponseType"
+		type="queue:IterateStatusResponseType"/>
 	
-	<xsd:element name="ListRequest"/>
-	<xsd:complexType name="ListResponseType">
+	<xsd:element name="IterateListRequest"/>
+	<xsd:complexType name="IterateListResponseType">
 		<xsd:sequence>
-			<xsd:element name="reduced-job-information" type="queue:ReducedJobInformationType"
-				minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+			<xsd:element name="iterator" type="wsa:EndpointReferenceType"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
 		</xsd:sequence>
 	</xsd:complexType>
-	<xsd:element name="ListResponseType"
-		type="queue:ListResponseType"/>
+	<xsd:element name="IterateListResponseType"
+		type="queue:IterateListResponseType"/>
 	
 	<xsd:complexType name="KillRequestType">
 		<xsd:sequence>

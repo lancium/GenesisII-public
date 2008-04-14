@@ -1,7 +1,7 @@
 package edu.virginia.vcgr.genii.client.cmd.tools.queue;
 
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.Iterator;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
@@ -38,11 +38,11 @@ public class QStatTool extends BaseGridTool
 		} else
 			tickets = null;
 		
-		Map<JobTicket, JobInformation> info = manipulator.status(tickets);
+		Iterator<JobInformation> info = manipulator.status(tickets);
 		printHeader();
-		for (JobTicket ticket : info.keySet())
+		while (info.hasNext())
 		{
-			printJobInformation(info.get(ticket));
+			printJobInformation(info.next());
 		}
 		
 		return 0;

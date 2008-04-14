@@ -7,11 +7,15 @@ import java.io.OutputStreamWriter;
 import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Properties;
 
 import javax.xml.namespace.QName;
@@ -24,11 +28,14 @@ import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.Duration;
 import org.apache.axis.types.Token;
 import org.apache.axis.types.URI;
+import org.apache.axis.types.UnsignedInt;
 import org.apache.axis.types.UnsignedLong;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.morgan.util.GUID;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
+import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnavailableFaultType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.oasis_open.docs.wsrf.rl_2.DestroyResponse;
@@ -83,6 +90,7 @@ import edu.virginia.vcgr.genii.client.notification.UnknownTopicException;
 import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.x509.CertCreationSpec;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
@@ -103,22 +111,28 @@ import edu.virginia.vcgr.genii.container.common.notification.SubscriptionConstru
 import edu.virginia.vcgr.genii.container.common.notification.TopicSpace;
 import edu.virginia.vcgr.genii.container.configuration.ServiceDescription;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
+import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.invoker.BaseFaultFixer;
 import edu.virginia.vcgr.genii.container.invoker.DatabaseHandler;
 import edu.virginia.vcgr.genii.container.invoker.DebugInvoker;
 import edu.virginia.vcgr.genii.container.invoker.GAroundInvoke;
 import edu.virginia.vcgr.genii.container.invoker.ScheduledTerminationInvoker;
 import edu.virginia.vcgr.genii.container.invoker.WSAddressingHandler;
+import edu.virginia.vcgr.genii.container.iterator.IteratorResource;
 import edu.virginia.vcgr.genii.container.resolver.IResolverFactoryProxy;
 import edu.virginia.vcgr.genii.container.resolver.Resolution;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
+import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
+import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
+import edu.virginia.vcgr.genii.iterator.IteratorMemberType;
+import edu.virginia.vcgr.genii.iterator.IteratorPortType;
 
 @GAroundInvoke({BaseFaultFixer.class, WSAddressingHandler.class, DatabaseHandler.class, 
 	DebugInvoker.class, ScheduledTerminationInvoker.class})
@@ -651,7 +665,76 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		throws IOException
 	{
 		return new SByteIOFactory(Container.getServiceURL("StreamableByteIOPortType"));
-	}	
+	}
+	
+	protected EndpointReferenceType createWSIterator(
+		Iterator<MessageElement> contents) 
+			throws ResourceException, ResourceUnknownFaultType,
+				SQLException, ConfigurationException,
+				GenesisIISecurityException, RemoteException
+	{
+		String id = (new GUID()).toString();
+		DatabaseConnectionPool pool =
+			((BasicDBResourceFactory)ResourceManager.getCurrentResource(
+				).getProvider().getFactory()).getConnectionPool();
+		Connection connection = null;
+		PreparedStatement stmt = null;
+		long count = 0L;
+		boolean needsExecute = false;
+		
+		try
+		{
+			connection = pool.acquire();
+			stmt = connection.prepareStatement(
+				"INSERT INTO iterators (iteratorid, elementindex, contents) " +
+				"VALUES(?, ?, ?)");
+			while (contents.hasNext())
+			{
+				MessageElement any = contents.next();
+				IteratorMemberType member = new IteratorMemberType(
+					new MessageElement[] { any }, new UnsignedInt(count));
+				stmt.setString(1, id);
+				stmt.setLong(2, count);
+				stmt.setBlob(3, DBSerializer.xmlToBlob(member));
+				
+				stmt.addBatch();
+				needsExecute = true;
+				count++;
+				
+				if (count % 16 == 0)
+				{
+					stmt.executeBatch();
+					needsExecute = false;
+				}
+			}
+			
+			if (needsExecute)
+				stmt.executeBatch();
+			
+			IteratorPortType iter = ClientUtils.createProxy(
+				IteratorPortType.class, 
+				EPRUtils.makeEPR(Container.getServiceURL("IteratorPortType")));
+			
+			MessageElement []createRequest =
+				new MessageElement[2];
+			createRequest[0] = new MessageElement(
+				IteratorResource.ITERATOR_CONSTRUCTION_PARAM_ID, id);
+			createRequest[1] = 
+				ClientConstructionParameters.createTimeToLiveProperty(
+					1000L * 60 * 60);
+			
+			EndpointReferenceType epr = iter.vcgrCreate(
+				new VcgrCreate(createRequest)).getEndpoint();
+			
+			connection.commit();
+			return epr;
+		}
+		finally
+		{
+			StreamUtils.close(stmt);
+			pool.release(connection);
+		}
+	}
 	
 	@RWXMapping(RWXCategory.WRITE)
 	public SubscribeResponse subscribe(Subscribe subscribeRequest) 

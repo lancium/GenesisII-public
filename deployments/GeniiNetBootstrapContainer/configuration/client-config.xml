@@ -159,6 +159,8 @@
 			locator-type="edu.virginia.vcgr.genii.deployer.ApplicationDeployerServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.queue.QueuePortType"
 			locator-type="edu.virginia.vcgr.genii.queue.QueueServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.iterator.IteratorPortType"
+			locator-type="edu.virginia.vcgr.genii.iterator.IteratorServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.certGenerator.CertGeneratorPortType"
 			locator-type="edu.virginia.vcgr.genii.certGenerator.CertGeneratorServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.informationService.InformationServicePortType"
