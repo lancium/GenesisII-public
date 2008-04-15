@@ -191,7 +191,7 @@ void usage(const char *progName, int doExit)
 		"USAGE:  %s --merge <merge-target> <input-jsdl1>...<input-jsdln>\n"
 		"\t\tOR\n"
 		"\t%s <jsdl-file> [--jsdl--application={posix | hpc}]\n"
-		"\t\t[--job-name=<job-name>] [run-options] <executable> [program args]\n\n"
+		"\t\t[--job-name=<name>] [run-options] <executable> [program args]\n\n"
 		"\tWHERE run-options are:\n"
 		"\t\t--ogrsh-version={x86 | x86-64}\n"
 		"\t\t--stdin=<in-filename>\n"

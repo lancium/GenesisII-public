@@ -1,6 +1,6 @@
 CC			=			gcc
-CFLAGS		=			-Wall -g
-LFLAGS		=
+CFLAGS		=			-Wall -g -static
+LFLAGS		=			-static
 
 OBJECTS		=			StringUtils.o StringPair.o JSDLFormer.o PairList.o	\
 						JobDescription.o JSDLWriter.o POSIXAppWriter.o		\
