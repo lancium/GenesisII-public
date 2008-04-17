@@ -1,4 +1,7 @@
-#include <unistd.h>
+#ifndef WIN32
+	#include <unistd.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
