@@ -1,10 +1,12 @@
 package edu.virginia.vcgr.genii.container.tty;
 
 import java.rmi.RemoteException;
+import java.util.Collection;
 import java.util.HashMap;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
 import org.ggf.byteio.CustomFaultType;
 import org.ggf.byteio.ReadNotPermittedFaultType;
@@ -139,10 +141,11 @@ public class TTYServiceImpl extends GenesisIIBase implements TTYPortType
 	
 	@Override
 	protected void postCreate(ResourceKey key, EndpointReferenceType newEPR,
-			HashMap<QName, Object> constructionParameters)
+			HashMap<QName, Object> constructionParameters,
+			Collection<MessageElement> resolverCreationParams)
 			throws ResourceException, BaseFaultType, RemoteException
 	{
-		super.postCreate(key, newEPR, constructionParameters);
+		super.postCreate(key, newEPR, constructionParameters, resolverCreationParams);
 	}
 
 	@Override
