@@ -19,6 +19,7 @@ package edu.virginia.vcgr.genii.container.resolver;
 import java.rmi.RemoteException;
 import java.util.Properties;
 
+import org.apache.axis.message.MessageElement;
 import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -33,7 +34,8 @@ import edu.virginia.vcgr.genii.resolver.simple.SimpleResolverFactoryPortType;
 
 public class SimpleResolverFactoryProxy implements IResolverFactoryProxy
 {	
-	public Resolution createResolver(EndpointReferenceType targetEPR, Properties params)
+	public Resolution createResolver(EndpointReferenceType targetEPR, Properties params,
+			MessageElement []resolverProperties)
 		throws RemoteException,	ResourceException, InvalidWSNameFaultType
 	{
 		EndpointReferenceType resolverReference = null;
@@ -44,8 +46,10 @@ public class SimpleResolverFactoryProxy implements IResolverFactoryProxy
 		{
 			SimpleResolverFactoryPortType resolverFactoryService = ClientUtils.createProxy(
 					SimpleResolverFactoryPortType.class,
-					EPRUtils.makeEPR(Container.getServiceURL("SimpleResolverFactoryPortType")));
-			CreateResolverResponseType resp = resolverFactoryService.createResolver(new CreateResolverRequestType(targetEPR));
+					EPRUtils.makeEPR(Container.getServiceURL(
+							"SimpleResolverFactoryPortType")));
+			CreateResolverResponseType resp = resolverFactoryService.createResolver(
+					new CreateResolverRequestType(targetEPR, resolverProperties));
 			resolverReference = resp.getResolver_EPR();
 			resolutionEPR = resp.getResolution_EPR();
 		}
