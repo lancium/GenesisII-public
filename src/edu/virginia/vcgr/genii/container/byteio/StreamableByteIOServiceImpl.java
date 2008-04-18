@@ -6,6 +6,7 @@ import java.io.RandomAccessFile;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -83,12 +84,13 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements
 	}
 	
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
-		HashMap<QName, Object> creationParameters)	
+		HashMap<QName, Object> creationParameters,
+		Collection<MessageElement> resolverCreationParams)	
 			throws ResourceException, BaseFaultType, RemoteException
 	{
 		_logger.debug("Creating new StreamableByteIO Resource.");
 		
-		super.postCreate(rKey, newEPR, creationParameters);
+		super.postCreate(rKey, newEPR, creationParameters, resolverCreationParams);
 		
 		ISByteIOResource resource = null;
 		
