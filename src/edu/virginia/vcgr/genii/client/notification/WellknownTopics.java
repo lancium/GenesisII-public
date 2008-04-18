@@ -22,4 +22,8 @@ public class WellknownTopics
 	 */
 	static public final String SBYTEIO_INSTANCE_DYING =
 		"edu.virginia.vcgr.genii.byteio.sbyteio.instance-dying";
+	
+	/** This topic is raised when rbyteio operation occurs */
+	static public final String RANDOM_BYTEIO_OP = 
+		"edu.virginia.vcgr.genii.byteio.rbyteio.op";
 }
