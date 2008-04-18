@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.rmi.RemoteException;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -51,12 +52,18 @@ import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
+import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
+import edu.virginia.vcgr.genii.client.notification.UnknownTopicException;
+
+import org.apache.axis.message.MessageElement;
 
 public class RandomByteIOServiceImpl extends GenesisIIBase
 	implements RandomByteIOPortType
@@ -92,12 +99,13 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 	}
 	
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
-		HashMap<QName, Object> creationParameters)
+		HashMap<QName, Object> creationParameters,
+		Collection<MessageElement> resolverCreationParams)
 			throws ResourceException, BaseFaultType, RemoteException
 	{
 		_logger.debug("Creating new RandomByteIO Resource.");
 		
-		super.postCreate(rKey, newEPR, creationParameters);
+		super.postCreate(rKey, newEPR, creationParameters, resolverCreationParams);
 		
 		IRByteIOResource resource = null;
 		
@@ -241,6 +249,26 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 					startOffset += stride;
 					off += toWrite;
 				}
+				
+				//notify of rbyteio write event
+				try{
+					MessageElement []payload = new MessageElement[1];
+			    	
+					payload[0] = new MessageElement(
+			    		new QName(GenesisIIConstants.GENESISII_NS, "operation"),
+			    		"write");
+			    	
+			    	getTopicSpace().getTopic(WellknownTopics.RANDOM_BYTEIO_OP).notifyAll(
+			    		payload);
+			    	
+			    	_logger.info("RandomByteIO write notification sent");
+				}
+				catch (InvalidTopicException ite){
+					_logger.warn(ite.getLocalizedMessage(), ite);
+				}
+				catch (UnknownTopicException ute){
+					_logger.warn(ute.getLocalizedMessage(), ute);
+				}
 			}
 			catch (IOException ioe)
 			{
@@ -281,6 +309,27 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 				raf = new RandomAccessFile(myFile, "rw");
 				raf.seek(myFile.length());
 				raf.write(data);
+				
+				//notify of append
+				try{
+					MessageElement []payload = new MessageElement[1];
+			    	
+					payload[0] = new MessageElement(
+			    		new QName(GenesisIIConstants.GENESISII_NS, "operation"),
+			    		"append");
+			    	
+			    	getTopicSpace().getTopic(WellknownTopics.RANDOM_BYTEIO_OP).notifyAll(
+			    		payload);
+			    	
+			    	_logger.info("RandomByteIO append notification sent");
+				}
+				catch (InvalidTopicException ite){
+					_logger.warn(ite.getLocalizedMessage(), ite);
+				}
+				catch (UnknownTopicException ute){
+					_logger.warn(ute.getLocalizedMessage(), ute);
+				}
+				
 				return new AppendResponse(new TransferInformationType(null,
 					append.getTransferInformation().getTransferMechanism()));
 			}
@@ -322,6 +371,27 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 				raf.setLength(truncAppend.getOffset());
 				raf.seek(truncAppend.getOffset());
 				raf.write(data);
+				
+				//notify rbyteio truncappend event
+				try{
+					MessageElement []payload = new MessageElement[1];
+			    	
+					payload[0] = new MessageElement(
+			    		new QName(GenesisIIConstants.GENESISII_NS, "operation"),
+			    		"truncappend");
+			    	
+			    	getTopicSpace().getTopic(WellknownTopics.RANDOM_BYTEIO_OP).notifyAll(
+			    		payload);
+			    	
+			    	_logger.info("RandomByteIO truncAppend notification sent");
+				}
+				catch (InvalidTopicException ite){
+					_logger.warn(ite.getLocalizedMessage(), ite);
+				}
+				catch (UnknownTopicException ute){
+					_logger.warn(ute.getLocalizedMessage(), ute);
+				}
+				
 			}
 			catch (IOException ioe)
 			{
