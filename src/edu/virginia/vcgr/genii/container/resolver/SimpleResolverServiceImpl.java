@@ -18,6 +18,7 @@ package edu.virginia.vcgr.genii.container.resolver;
 import java.net.URI;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.regex.Pattern;
@@ -168,7 +169,7 @@ public class SimpleResolverServiceImpl extends GenesisIIBase implements SimpleRe
 		entryReference = updateRequest.getNew_EPR();
 		WSName inputName = new WSName(entryReference);
 		
-		if (inputName.isValidWSName())
+		if (!inputName.isValidWSName())
 			throw new InvalidWSNameFaultType();
 		
 		ResourceKey rKey = ResourceManager.getCurrentResource();
@@ -327,10 +328,11 @@ public class SimpleResolverServiceImpl extends GenesisIIBase implements SimpleRe
 
 	/* create/initialization helper methods */
 	public void postCreate(ResourceKey rKey, EndpointReferenceType myEPR,
-			HashMap<QName, Object> constructionParameters)
+			HashMap<QName, Object> constructionParameters,
+			Collection<MessageElement> resolverCreationParams)
 		throws ResourceException, BaseFaultType, RemoteException
 	{
-		super.postCreate(rKey, myEPR, constructionParameters);
+		super.postCreate(rKey, myEPR, constructionParameters, resolverCreationParams);
 		
 		/* grab targetEPR construction parameter and initialize resource with its information */
 		EndpointReferenceType targetEPR = (EndpointReferenceType) constructionParameters.get(SIMPLE_RESOLVER_TARGET_CONSTRUCTION_PARAMETER);
