@@ -10,6 +10,7 @@
     xmlns:byteio="http://schemas.ggf.org/byteio/2005/10/byte-io"
     xmlns:rbyteio="http://schemas.ggf.org/byteio/2005/10/random-access"
     xmlns:exportedfile="http://vcgr.cs.virginia.edu/byteio/2006/08/exported-file"
+    xmlns:sfact="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory"
     targetNamespace="http://vcgr.cs.virginia.edu/byteio/2006/08/exported-file">
 
 	<wsdl:import
@@ -31,6 +32,10 @@
 	<wsdl:import
 		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
 		location="./resource-factory.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory"
+        location="./sbyteio-factory.wsdl"/>
 
 	<wsdl:import
 		namespace="http://docs.oasis-open.org/wsrf/rlw-2"
@@ -57,5 +62,6 @@
 		<genii-ext:extend portType="rpw-2:GetResourceProperty"/>
 		<genii-ext:extend portType="rpw-2:GetMultipleResourceProperties"/>
 		<genii-ext:extend portType="rbyteio:RandomByteIOPortType"/>
+		<genii-ext:extend portType="sfact:StreamableByteIOFactory"/>
 	</wsdl:portType>
 </wsdl:definitions>
