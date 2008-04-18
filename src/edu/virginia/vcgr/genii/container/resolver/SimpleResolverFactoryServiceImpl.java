@@ -83,7 +83,7 @@ public class SimpleResolverFactoryServiceImpl extends GenesisIIBase implements S
 			ResourceException,
 			InvalidWSNameFaultType
 	{
-		_logger.debug("createResolver called");
+		_logger.debug("create simpleResolver called");
 
 		EndpointReferenceType resolverReference = null;
 		EndpointReferenceType resolutionEPR = null;
