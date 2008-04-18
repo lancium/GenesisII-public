@@ -26,6 +26,7 @@ import java.sql.SQLException;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.JobDefinition_Type;
@@ -94,10 +95,11 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 	
 	@SuppressWarnings("unchecked")
 	protected void postCreate(ResourceKey rKey,
-		EndpointReferenceType activityEPR, HashMap<QName, Object> creationParameters)
+		EndpointReferenceType activityEPR, HashMap<QName, Object> creationParameters,
+		Collection<MessageElement> resolverCreationParams)
 		throws ResourceException, BaseFaultType, RemoteException
 	{
-		super.postCreate(rKey, activityEPR, creationParameters);
+		super.postCreate(rKey, activityEPR, creationParameters, resolverCreationParams);
 		
 		IBESActivityResource resource = (IBESActivityResource)rKey.dereference();
 		BESActivityInitInfo initInfo = BESActivityUtils.extractCreationProperties(
