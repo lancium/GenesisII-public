@@ -130,7 +130,8 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 	}
 
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
-			HashMap<QName, Object> constructionParameters)
+			HashMap<QName, Object> constructionParameters,
+			Collection<MessageElement> resolverCreationParams)
 			throws ResourceException, BaseFaultType, RemoteException {
 
 		// make sure the specific IDP doesn't yet exist
@@ -219,7 +220,7 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 		resource.setProperty(SecurityConstants.IDP_DELEGATED_IDENITY_QNAME
 			.getLocalPart(), identityAssertion);
 		
-		super.postCreate(rKey, newEPR, constructionParameters);
+		super.postCreate(rKey, newEPR, constructionParameters, resolverCreationParams);
 	}
 
 	protected void setAttributeHandlers() throws NoSuchMethodException {
