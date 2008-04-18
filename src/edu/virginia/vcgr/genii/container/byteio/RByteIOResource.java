@@ -47,6 +47,8 @@ public class RByteIOResource extends BasicDBResource implements IRByteIOResource
 		"edu.virginia.vcgr.genii.byteio.rbyteio.mod-time";
 	static private final String _INTERNAL_ACCESS_TIME_PROP_NAME=
 		"edu.virginia.vcgr.genii.byteio.rbyteio.access-time";
+	static public QName OPERATION = new QName(
+			GenesisIIConstants.GENESISII_NS, "operation");
 	
 	static private Log _logger = LogFactory.getLog(RByteIOResource.class);
 	
