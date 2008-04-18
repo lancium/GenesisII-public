@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.container.iterator;
 
 import java.rmi.RemoteException;
+import java.util.Collection;
 import java.util.HashMap;
 
 import javax.xml.namespace.QName;
@@ -43,10 +44,11 @@ public class IteratorServiceImpl extends GenesisIIBase implements
 {
 	@Override
 	protected void postCreate(ResourceKey key, EndpointReferenceType newEPR,
-			HashMap<QName, Object> constructionParameters)
+			HashMap<QName, Object> constructionParameters, 
+			Collection<MessageElement> resolverCreationParameters)
 			throws ResourceException, BaseFaultType, RemoteException
 	{
-		super.postCreate(key, newEPR, constructionParameters);
+		super.postCreate(key, newEPR, constructionParameters, resolverCreationParameters);
 		
 		MessageElement elem = (MessageElement)constructionParameters.get(
 			IteratorResource.ITERATOR_CONSTRUCTION_PARAM_ID);
