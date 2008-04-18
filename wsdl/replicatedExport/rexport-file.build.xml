@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="gen.rexport-file">
+
+	<fail message="wsdl.dir variable not set.">
+		<condition>
+			<not>
+				<isset property="wsdl.dir"/>
+			</not>
+		</condition>
+	</fail>
+
+	<import file="${wsdl.dir}/wsdl-build.xml"/>
+	<import file="${wsdl.dir}/common.build.xml"/>
+	
+	<condition property="gen.rexport-file.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${temporary.codegen.dir}/wsdl/rexport-file.flag"/>
+			<uptodate targetfile="${temporary.codegen.dir}/wsdl/rexport-file.flag">
+				<srcfiles dir="${wsdl.dir}/replicatedExport">
+					<include name="rexport-file.xsd"/>
+					<include name="rexport-file.gwsdl"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.rexport-file" unless="gen.rexport-file.uptodate">
+		<copy todir="${temporary.codegen.dir}/wsdl">
+			<filelist refid="common.source.files"/>
+			<fileset dir="${wsdl.dir}/replicatedExport">
+				<include name="rexport-file.xsd"/>
+				<include name="rexport-file.gwsdl"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/rexport-file.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/rexport-file-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${temporary.codegen.dir}/wsdl/rexport-file-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/rexport-file-service.wsdl"
+    		portType="{http://vcgr.cs.virginia.edu/rns/2007/08/rexport-file}RExportFilePortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/rexport-file"/>
+			<param name="stub.gen.source-wsdl"
+				value="${temporary.codegen.dir}/wsdl/rexport-file-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${temporary.codegen.dir}/wsdl/rexport-file.flag"/>
+		</antcall>
+		<move file="${temporary.codegen.dir}/rexport-file/edu/virginia/vcgr/genii/replicatedExport/deploy.wsdd"
+			tofile="${wsdd.dir}/rexport-file.deploy.wsdd"/>
+		<replace file="${wsdd.dir}/rexport-file.deploy.wsdd"
+			token="edu.virginia.vcgr.genii.replicatedExport.RExportFileSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.replicatedExport.RExportFileServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd.dir}/rexport-file.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<wsdl:definitions
+	name="RExportResolver"
+	targetNamespace="http://vcgr.cs.virginia.edu/rns/2007/08/replicatedExport/resolver"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+	xmlns:rpw-2="http://docs.oasis-open.org/wsrf/rpw-2"
+    xmlns:rw-2="http://docs.oasis-open.org/wsrf/rw-2"
+    xmlns:wsrf-r="http://docs.oasis-open.org/wsrf/r-2"
+	xmlns:wsrf-rw="http://docs.oasis-open.org/wsrf/rw-2" 
+    xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
+	xmlns:genii-not="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
+    xmlns:rns="http://schemas.ggf.org/rns/2006/05/rns"
+    xmlns:naming-w="http://schemas.ogf.org/naming/2006/08/naming/wsdl"
+    xmlns:naming="http://schemas.ogf.org/naming/2006/08/naming"
+	xmlns:rexport-resolver="http://vcgr.cs.virginia.edu/rns/2007/08/replicatedExport/resolver"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rw-2"
+		location="./wsrf/wsResourceFaults.wsdl"/>
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rpw-2"
+		location="./wsrf/wsResourceProperties.wsdl"/>
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rw-2"
+		location="wsrf/wsResourceFaults.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple"
+		location="./resource-simple.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
+		location="./resource-factory.wsdl"/>
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rlw-2"
+		location="wsrf/wsResourceLifetime.wsdl"/>
+
+	<wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+        location="./common-generated.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
+        location="./notification.wsdl"/>
+
+    <wsdl:import
+        namespace="http://schemas.ogf.org/naming/2006/08/naming/wsdl"
+        location="./naming.wsdl"/>
+
+    <wsdl:import
+        namespace="http://schemas.ggf.org/rns/2006/05/rns"
+        location="./rns-generated.wsdl"/>
+
+	<wsdl:types>
+		<xsd:schema
+			xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			attributeFormDefault="unqualified"
+			elementFormDefault="qualified"
+			targetNamespace="http://vcgr.cs.virginia.edu/rns/2007/08/replicatedExport/resolver">
+ 
+ 			<xsd:import
+        		namespace="http://schemas.ogf.org/naming/2006/08/naming"
+            	schemaLocation="./naming.xsd"/>
+
+            <xsd:import
+        		namespace="http://vcgr.cs.virginia.edu/rns/2007/08/replicatedExport/resolver"
+            	schemaLocation="./rexport-resolver.xsd"/>
+
+		</xsd:schema>
+	</wsdl:types>
+
+	<wsdl:message name="updateRequest">
+		<wsdl:part name="updateRequest" 
+				element="rexport-resolver:UpdateRequest"/>
+	</wsdl:message>
+
+	<wsdl:message name="updateResponse">
+		<wsdl:part name="updateResponse" 
+				element="rexport-resolver:UpdateResponse"/>
+	</wsdl:message>
+	
+	<wsdl:message name="createReplicaRequest">
+		<wsdl:part name="createReplicaRequest" 
+				element="rexport-resolver:CreateReplicaRequest"/>
+	</wsdl:message>
+
+	<wsdl:message name="createReplicaResponse">
+		<wsdl:part name="createReplicaResponse" 
+				element="rexport-resolver:CreateReplicaResponse"/>
+	</wsdl:message>
+	
+	<wsdl:message name="resolverQueryRequest">
+		<wsdl:part name="resolverQueryRequest" 
+				element="rexport-resolver:ResolverQueryRequest"/>
+	</wsdl:message>
+
+	<wsdl:message name="resolverQueryResponse">
+		<wsdl:part name="resolverQueryResponse" 
+				element="rexport-resolver:ResolverQueryResponse"/>
+	</wsdl:message>
+	
+	<wsdl:message name="createRootReplicaRequest">
+		<wsdl:part name="createRootReplicaRequest" 
+				element="rexport-resolver:CreateRootReplicaRequest"/>
+	</wsdl:message>
+
+	<wsdl:message name="createRootReplicaResponse">
+		<wsdl:part name="createRootReplicaResponse" 
+			element="rexport-resolver:CreateRootReplicaResponse"/>
+	</wsdl:message>
+	
+	<wsdl:message name="ServiceEPRRequest">
+		<wsdl:part name="ServiceEPRRequest" 
+			element="rexport-resolver:ServiceEPRRequest"/>
+	</wsdl:message>
+	
+	<wsdl:message name="EPRRequestResponse">
+		<wsdl:part name="EPRRequestResponse" 
+			element="rexport-resolver:EPRRequestResponse"/>
+	</wsdl:message>
+	
+    <wsdl:message name="InvalidWSNameFault">
+        <wsdl:part name="InvalidWSNameFault" 
+        		element="rexport-resolver:InvalidWSNameFault"/>
+    </wsdl:message>
+
+	<wsdl:portType name="RExportResolverPortType">
+		<genii-ext:extend portType="genii-common:GeniiCommon"/>
+		<genii-ext:extend portType="rpw-2:GetResourceProperty"/>
+		<genii-ext:extend portType="rpw-2:GetMultipleResourceProperties"/>
+		<genii-ext:extend portType="naming-w:ReferenceResolver"/>
+		<genii-ext:extend portType="naming-w:EndpointIdentifierResolver"/>
+		<genii-ext:extend portType="rns:RNSPortType"/>
+		<genii-ext:extend portType="genii-not:GeniiNotificationConsumerPortType"/>
+
+		<wsdl:operation name="update">
+			<wsdl:input message="rexport-resolver:updateRequest"/>
+			<wsdl:output message="rexport-resolver:updateResponse"/>
+			<wsdl:fault name="ResourceUnknownFault"
+				message="wsrf-rw:ResourceUnknownFault"/>
+			<wsdl:fault name="InvalidWSNameFault"
+				message="rexport-resolver:InvalidWSNameFault"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="createReplica">
+			<wsdl:input message="rexport-resolver:createReplicaRequest"/>
+			<wsdl:output message="rexport-resolver:createReplicaResponse"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="resolverQuery">
+			<wsdl:input message="rexport-resolver:resolverQueryRequest"/>
+			<wsdl:output message="rexport-resolver:resolverQueryResponse"/>
+		</wsdl:operation>	
+		
+		<wsdl:operation name="createRootReplica">
+			<wsdl:input message="rexport-resolver:createRootReplicaRequest"/>
+			<wsdl:output message="rexport-resolver:createRootReplicaResponse"/>
+		</wsdl:operation>	
+		
+		<wsdl:operation name="getResolverServiceEPR">
+			<wsdl:input message="rexport-resolver:ServiceEPRRequest"/>
+			<wsdl:output message="rexport-resolver:EPRRequestResponse"/>
+		</wsdl:operation>	
+	</wsdl:portType>
+
+</wsdl:definitions>

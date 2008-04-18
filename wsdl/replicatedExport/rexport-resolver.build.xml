@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="gen.rexport-resolver">
+	
+	<fail message="wsdl.dir variable not set.">
+		<condition>
+			<not>
+				<isset property="wsdl.dir"/>
+			</not>
+		</condition>
+	</fail>
+
+	<import file="${wsdl.dir}/wsdl-build.xml"/>
+	<import file="${wsdl.dir}/common.build.xml"/>
+	<import file="${wsdl.dir}/naming.build.xml"/>
+
+	<presetdef name="rexport-resolver.source.files.uptodate">
+		<uptodate targetfile="${flag.name}">
+			<srcfiles dir="${wsdl.dir}/replicatedExport">
+				<include name="rexport-resolver.xsd"/>
+				<include name="rexport-resolver.gwsdl"/>
+			</srcfiles>
+		</uptodate>
+	</presetdef>
+
+	<condition property="gen.rexport-resolver.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${temporary.codegen.dir}/wsdl/rexport-resolver.flag"/>
+			<naming.source.files.uptodate
+				targetfile="${temporary.codegen.dir}/wsdl/rexport-resolver.flag"/>
+			<rexport-resolver.source.files.uptodate
+				targetfile="${temporary.codegen.dir}/wsdl/rexport-resolver.flag"/>
+		</and>
+	</condition>
+
+	<target name="gen.rexport-resolver" unless="gen.rexport-resolver.uptodate">
+		<copy todir="${temporary.codegen.dir}/wsdl">
+			<filelist refid="common.source.files"/>
+			<fileset dir="${wsdl.dir}/replicatedExport">
+				<include name="rexport-resolver.gwsdl"/>
+				<include name="rexport-resolver.xsd"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/rexport-resolver.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/rexport-resolver-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${temporary.codegen.dir}/wsdl/rexport-resolver-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/rexport-resolver-service.wsdl"
+			portType="{http://vcgr.cs.virginia.edu/rns/2007/08/replicatedExport/resolver}RExportResolverPortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/rexport-resolver"/>
+			<param name="stub.gen.source-wsdl"
+				value="${temporary.codegen.dir}/wsdl/rexport-resolver-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${temporary.codegen.dir}/wsdl/rexport-resolver.flag"/>
+		</antcall>
+		<move file="${temporary.codegen.dir}/rexport-resolver/edu/virginia/vcgr/genii/replicatedExport/resolver/deploy.wsdd"
+			tofile="${wsdd.dir}/rexport-resolver.deploy.wsdd"/>
+		<replace file="${wsdd.dir}/rexport-resolver.deploy.wsdd"
+			token="edu.virginia.vcgr.genii.replicatedExport.resolver.RExportResolverSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd.dir}/rexport-resolver.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>
