@@ -85,7 +85,11 @@ public class SimpleResolverUtils
 			/* create subscription to terminate event */
 			UserDataType userData = createTerminateSubscriptionUserData(entry);
 			GeniiCommon producer = ClientUtils.createProxy(GeniiCommon.class, entry.getTargetEPR());
-			SubscribeResponse subscription = producer.subscribe(new Subscribe(new Token(WellknownTopics.TERMINATED), null, resolverEPR, userData));
+			SubscribeResponse subscription = producer.subscribe(new Subscribe(
+					new Token(WellknownTopics.TERMINATED), 
+					null, 
+					resolverEPR,
+					userData));
 			newSubscriptionEPR = subscription.getSubscription();
 		}
 		catch (Exception e)
