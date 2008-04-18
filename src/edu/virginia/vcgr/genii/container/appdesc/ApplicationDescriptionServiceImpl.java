@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.rmi.RemoteException;
+import java.util.Collection;
 import java.util.HashMap;
 
 import javax.xml.namespace.QName;
@@ -74,10 +75,11 @@ public class ApplicationDescriptionServiceImpl
 	}
 	
 	protected void postCreate(ResourceKey rKey,
-		EndpointReferenceType myEPR, HashMap<QName, Object> creationParameters)
+		EndpointReferenceType myEPR, HashMap<QName, Object> creationParameters,
+		Collection<MessageElement> resolverCreationParams)
 		throws ResourceException, BaseFaultType, RemoteException
 	{
-		super.postCreate(rKey, myEPR, creationParameters);
+		super.postCreate(rKey, myEPR, creationParameters, resolverCreationParams);
 		
 		IResource resource = rKey.dereference();
 		
