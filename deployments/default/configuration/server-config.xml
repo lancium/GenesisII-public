@@ -215,6 +215,12 @@
 				value="connection-pool"/>
 		</mconf:instance>
 		
+		<mconf:instance name="rexport-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.replicatedExport.RExportDBResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
+		
 		<mconf:instance name="subscription-db-resource-provider"
 			type="edu.virginia.vcgr.genii.container.common.notification.DBSubscriptionResourceProvider">
 			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
@@ -229,6 +235,18 @@
 
 		<mconf:instance name="simple-resolver-factory-db-resource-provider"
 			type="edu.virginia.vcgr.genii.container.resolver.SimpleResolverFactoryDBResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
+		
+		<mconf:instance name="rexport-resolver-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverDBResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
+
+		<mconf:instance name="rexport-resolver-factory-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverFactoryDBResourceProvider">
 			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
 				value="connection-pool"/>
 		</mconf:instance>
@@ -358,14 +376,68 @@
 		
 		<genii:service name="ExportedFilePortType">
 			<genii:resource-provider name="exported-file-db-resource-provider"/>
+<!--  turns on making rexport resolver for new instances of this type
+			<genii:default-resolver-factory-settings>
+				<mconf:property 
+					name="edu.virginia.vcgr.genii.container.resolver.default-resolver-factory-proxy-class"
+					value="edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverFactoryProxy"/>
+			</genii:default-resolver-factory-settings>
+-->
 		</genii:service>
 		
 		<genii:service name="ExportedDirPortType">
 			<genii:resource-provider name="exported-dir-db-resource-provider"/>
+<!--  turns on making rexport resolver for new instances of this type 
+			<genii:default-resolver-factory-settings>
+				<mconf:property 
+					name="edu.virginia.vcgr.genii.container.resolver.default-resolver-factory-proxy-class"
+					value="edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverFactoryProxy"/>
+			</genii:default-resolver-factory-settings>
+-->
 		</genii:service>
 		
 		<genii:service name="ExportedRootPortType">
 			<genii:resource-provider name="exported-root-db-resource-provider"/>
+
+<!--  turns on making rexport resolver for new instances of this type -->
+			<genii:default-resolver-factory-settings>
+				<mconf:property 
+					name="edu.virginia.vcgr.genii.container.resolver.default-resolver-factory-proxy-class"
+					value="edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverFactoryProxy"/>
+			</genii:default-resolver-factory-settings>
+
+		</genii:service>
+		
+		<genii:service name="RExportFilePortType">
+			<genii:resource-provider name="rbyteio-db-resource-provider"/>
+			
+<!--  turns on making resolver for new instances of this type
+			<genii:default-resolver-factory-settings>
+				<mconf:property 
+					name="edu.virginia.vcgr.genii.container.resolver.default-resolver-factory-proxy-class"
+					value="edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverFactoryProxy"/>
+			</genii:default-resolver-factory-settings>
+-->	
+		</genii:service>
+		
+		<genii:service name="RExportDirPortType">
+			 <genii:resource-provider name="rexport-db-resource-provider"/>
+			
+<!--  turns on making resolver for new instances of this type
+			<genii:default-resolver-factory-settings>
+				<mconf:property 
+					name="edu.virginia.vcgr.genii.container.resolver.default-resolver-factory-proxy-class"
+					value="edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverFactoryProxy"/>
+			</genii:default-resolver-factory-settings>
+-->	
+		</genii:service>
+		
+		<genii:service name="RExportResolverPortType">
+			<genii:resource-provider name="rexport-resolver-db-resource-provider"/>
+		</genii:service>
+
+		<genii:service name="RExportResolverFactoryPortType">
+			<genii:resource-provider name="rexport-resolver-factory-db-resource-provider"/>
 		</genii:service>
 		
 		<genii:service name="GeniiSubscriptionPortType">

@@ -135,6 +135,10 @@
 			locator-type="edu.virginia.vcgr.genii.exportdir.ExportedDirServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.exportdir.ExportedFilePortType"
 			locator-type="edu.virginia.vcgr.genii.exportdir.ExportedFileServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.replicatedExport.RExportFilePortType"
+			locator-type="edu.virginia.vcgr.genii.replicatedExport.RExportFileServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.replicatedExport.RExportDirPortType"
+			locator-type="edu.virginia.vcgr.genii.replicatedExport.RExportDirServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.common.notification.GeniiNotificationConsumerPortType"
 			locator-type="edu.virginia.vcgr.genii.common.notification.GeniiNotificationConsumerServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.common.notification.GeniiSubscriptionPortType"
@@ -145,6 +149,10 @@
 			locator-type="edu.virginia.vcgr.genii.resolver.simple.SimpleResolverServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.resolver.simple.SimpleResolverFactoryPortType"
 			locator-type="edu.virginia.vcgr.genii.resolver.simple.SimpleResolverFactoryServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.replicatedExport.resolver.RExportResolverPortType"
+			locator-type="edu.virginia.vcgr.genii.replicatedExport.resolver.RExportResolverServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.replicatedExport.resolver.RExportResolverFactoryPortType"
+			locator-type="edu.virginia.vcgr.genii.replicatedExport.resolver.RExportResolverFactoryServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.appdesc.ApplicationDescriptionPortType"
 			locator-type="edu.virginia.vcgr.genii.appdesc.ApplicationDescriptionServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.deployer.ApplicationDeployerPortType"
@@ -252,6 +260,10 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CreateResourceTool</mconf:class>
 		<mconf:class name="export"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ExportTool</mconf:class>
+		<mconf:class name="rexport"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ReplicatedExportTool</mconf:class>
+		<mconf:class name="rexport-test"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ExportPerformanceTest</mconf:class>
 		<mconf:class name="script"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ScriptTool</mconf:class>
 		<mconf:class name="app-description-tool"
