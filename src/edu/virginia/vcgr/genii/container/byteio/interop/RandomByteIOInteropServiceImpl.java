@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.container.byteio.interop;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.io.*;
 
@@ -61,10 +62,11 @@ public class RandomByteIOInteropServiceImpl extends RandomByteIOServiceImpl
 	 * Overloaded to create resources with particular interop contents
 	 */
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
-			HashMap<QName, Object> creationParameters)
+			HashMap<QName, Object> creationParameters,
+			Collection<MessageElement> resolverCreationParams)
 			throws ResourceException, BaseFaultType, RemoteException {
 
-		super.postCreate(rKey, newEPR, creationParameters);
+		super.postCreate(rKey, newEPR, creationParameters, resolverCreationParams);
 
 		IRByteIOResource resource = (IRByteIOResource)rKey.dereference();
 

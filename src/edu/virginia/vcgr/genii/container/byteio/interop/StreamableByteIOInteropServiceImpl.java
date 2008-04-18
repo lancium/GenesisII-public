@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 import javax.xml.namespace.QName;
@@ -68,7 +69,8 @@ public class StreamableByteIOInteropServiceImpl
 	 * contents
 	 */
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
-			HashMap<QName, Object> creationParameters)
+			HashMap<QName, Object> creationParameters,
+			Collection<MessageElement> resolverCreationParams)
 			throws ResourceException, BaseFaultType, RemoteException {
 
 		//choose file if not chosen
@@ -106,7 +108,7 @@ public class StreamableByteIOInteropServiceImpl
 					mustDelete);
 		}
 		
-		super.postCreate(rKey, newEPR, creationParameters);
+		super.postCreate(rKey, newEPR, creationParameters, resolverCreationParams);
 		
 		ISByteIOResource resource = (ISByteIOResource)rKey.dereference();
 
