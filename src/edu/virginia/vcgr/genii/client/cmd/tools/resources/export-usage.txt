@@ -7,4 +7,10 @@ export --create { --url <export-service-url> | <export-service-hint> }
 	
 	OR
 	
+export --replicate { --url <primary-machine-url> <resolver-machine-url> |
+       <primary-container-name> <resolver-container-name> }
+       <primary-local-path> [new-rns-path]
+
+   OR 
+	
 export --quit { --url <export-root-url> | <export-root-rns-path> }
