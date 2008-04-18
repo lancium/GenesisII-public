@@ -418,7 +418,7 @@ public class RNSPath implements Externalizable  {
 
 	/**
 	 * Looks up a single element which matches the pathExpression given
-	 * (relative to the curren path indicated in this instance.
+	 * (relative to the current path indicated in this instance.
 	 * 
 	 * @param pathExpression
 	 *            The string path expression (regular expression) which is being
