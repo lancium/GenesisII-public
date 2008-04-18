@@ -22,7 +22,10 @@
 			<xsd:element
 				name="target_EPR" type="wsa:EndpointReferenceType"
 				minOccurs="1" maxOccurs="1"/>
+			<xsd:any namespace="##other" processContents="lax" 
+				minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
+		<xsd:anyAttribute namespace="##other" processContents="lax"/>
 	</xsd:complexType>
 	<xsd:element name="CreateResolverRequest"
 		type="simple-resolver-factory:CreateResolverRequestType"/>
