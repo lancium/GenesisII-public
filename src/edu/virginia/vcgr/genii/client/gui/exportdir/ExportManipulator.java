@@ -23,7 +23,7 @@ public class ExportManipulator
 		URL containerURL, File localPath, String rnsPath)
 			throws FileNotFoundException, ExportException,
 				RNSException, ConfigurationException, CreationException,
-				ResourceCreationFaultType, RemoteException
+				ResourceCreationFaultType, RemoteException, IOException
 	{
 		validate(localPath);
 			
@@ -32,7 +32,7 @@ public class ExportManipulator
 		
 		ExportTool.createExportedRoot(EPRUtils.makeEPR(containerURL.toString() 
 			+ "/axis/services/ExportedRootPortType"),
-			localPath.getAbsolutePath(), rnsPath);
+			localPath.getAbsolutePath(), rnsPath, false);
 		return RNSPath.getCurrent().lookup(rnsPath, RNSPathQueryFlags.MUST_EXIST);
 	}
 	
