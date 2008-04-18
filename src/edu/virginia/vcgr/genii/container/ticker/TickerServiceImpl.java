@@ -1,10 +1,12 @@
 package edu.virginia.vcgr.genii.container.ticker;
 
 import java.rmi.RemoteException;
+import java.util.Collection;
 import java.util.HashMap;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axis.message.MessageElement;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.ogf.ogsa.ticker.CreateTicker;
 import org.ogf.ogsa.ticker.CreateTickerResponse;
@@ -52,10 +54,11 @@ public class TickerServiceImpl
 	
 	@Override
 	protected void postCreate(ResourceKey key, EndpointReferenceType newEPR,
-			HashMap<QName, Object> constructionParameters)
+			HashMap<QName, Object> constructionParameters,
+			Collection<MessageElement> resolverCreationParams)
 			throws ResourceException, BaseFaultType, RemoteException
 	{
-		super.postCreate(key, newEPR, constructionParameters);
+		super.postCreate(key, newEPR, constructionParameters, resolverCreationParams);
 		
 		IResource resource = key.dereference();
 		resource.setProperty(TICKER_CREATION_PROPERTY,
