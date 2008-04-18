@@ -30,6 +30,7 @@ public class ExportedFileUtils
 {
 	static final protected String _PATH_ELEM_NAME = "path";
 	static final protected String _PARENT_IDS_ELEM_NAME = "parent-ids";
+	static final protected String _REPLICATION_INDICATOR_ = "replicate";
 	static final public String _PARENT_ID_BEGIN_DELIMITER = ":";
 	static final public String _PARENT_ID_END_DELIMITER = ":";
 	
@@ -37,11 +38,13 @@ public class ExportedFileUtils
 	{
 		private String _path = null;
 		private String _parentIds = null;
+		private String _isReplicated = null;
 	
-		public ExportedFileInitInfo(String path, String parentIds)
+		public ExportedFileInitInfo(String path, String parentIds, String isReplicated)
 		{
 			_path = path;
 			_parentIds = parentIds;
+			_isReplicated = isReplicated;
 		}
 		
 		public String getPath()
@@ -53,18 +56,25 @@ public class ExportedFileUtils
 		{
 			return _parentIds;
 		}
+		
+		public String getReplicationState()
+		{
+			return _isReplicated;
+		}
 	}
 	
 	static public MessageElement[] createCreationProperties(
-		String path, String parentIds)
+		String path, String parentIds, String isReplicated)
 	{
-		MessageElement[]ret = new MessageElement[2];
+		MessageElement[]ret = new MessageElement[3];
 		
 		ret[0] = new MessageElement(new QName(
 			GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME), path);
 		ret[1] = new MessageElement(new QName(
 			GenesisIIConstants.GENESISII_NS, _PARENT_IDS_ELEM_NAME), parentIds);
-		
+		ret[2] = new MessageElement(new QName(
+				GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR_), 
+				isReplicated);
 		return ret;
 	}
 	
@@ -73,6 +83,7 @@ public class ExportedFileUtils
 	{
 		String path = null;
 		String parentIds = null;
+		String isReplicated = null;
 		
 		if (properties == null)
 			throw new IllegalArgumentException(
@@ -93,14 +104,25 @@ public class ExportedFileUtils
 				"Couldn't find parentIds in creation properties.");
 		parentIds = parentIDSElement.getValue();
 		
+		//get replication state
+		MessageElement replicationElement = (MessageElement)properties.get(new QName(
+				GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR_));
+		if (replicationElement == null)
+			throw new IllegalArgumentException(
+				"Couldn't find replication indicator in export creation properties.");
+		isReplicated = replicationElement.getValue();
+		
 		if (path == null)
 			throw new IllegalArgumentException(
 				"Couldn't find path in creation properties.");
 		if (parentIds == null)
 			throw new IllegalArgumentException(
 				"Couldn't find parent IDs in creation properties.");
+		if (isReplicated == null)
+			throw new IllegalArgumentException(
+				"Couldn't find replication indicator in export creation properties.");
 		
-		return new ExportedFileInitInfo(path, parentIds);
+		return new ExportedFileInitInfo(path, parentIds, isReplicated);
 	}
 	
 	static public String createFullPath(String dirName, String fileName) 
