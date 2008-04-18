@@ -7,6 +7,43 @@
 #include "ogrsh/Logging.hpp"
 
 extern "C" {
+
+	int __open64(const char *name, int openMode, int filePerm)
+	{
+		OGRSH_FATAL("Attempt to use un-intercepted method __open64(\""
+			<< name << "\", " << openMode << ", " << filePerm << ")");
+		ogrsh::shims::real_exit(1);
+
+		return -1;
+	}
+
+	int __open(const char *name, int openMode, int filePerm)
+	{
+		OGRSH_FATAL("Attempt to use un-intercepted method __open(\""
+			<< name << "\", " << openMode << ", " << filePerm << ")");
+		ogrsh::shims::real_exit(1);
+
+		return -1;
+	}
+
+	int _open64(const char *name, int openMode, int filePerm)
+	{
+		OGRSH_FATAL("Attempt to use un-intercepted method _open64(\""
+			<< name << "\", " << openMode << ", " << filePerm << ")");
+		ogrsh::shims::real_exit(1);
+
+		return -1;
+	}
+
+	int _open(const char *name, int openMode, int filePerm)
+	{
+		OGRSH_FATAL("Attempt to use un-intercepted method _open(\""
+			<< name << "\", " << openMode << ", " << filePerm << ")");
+		ogrsh::shims::real_exit(1);
+
+		return -1;
+	}
+
 	// ACCESS CONTROL
 	int acl_entries(acl_t)
 	{
