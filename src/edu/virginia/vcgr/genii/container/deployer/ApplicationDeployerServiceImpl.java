@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.container.deployer;
 
 import java.io.InputStream;
 import java.rmi.RemoteException;
+import java.util.Collection;
 import java.util.HashMap;
 
 import javax.xml.namespace.QName;
@@ -94,7 +95,8 @@ public class ApplicationDeployerServiceImpl extends GenesisIIBase implements
 	}
 	
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
-		HashMap<QName, Object> constructionParameters) 
+		HashMap<QName, Object> constructionParameters,
+		Collection<MessageElement> resolverCreationParams) 
 		throws ResourceException, BaseFaultType
 	{
 		IDeployment deployment = null;
