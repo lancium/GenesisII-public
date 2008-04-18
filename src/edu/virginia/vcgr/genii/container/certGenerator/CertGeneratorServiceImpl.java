@@ -20,6 +20,7 @@ import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -165,12 +166,13 @@ public class CertGeneratorServiceImpl extends GenesisIIBase implements CertGener
 	}
 	
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
-		HashMap<QName, Object> creationParameters)
+		HashMap<QName, Object> creationParameters,
+		Collection<MessageElement> resolverCreationParams)
 			throws ResourceException, BaseFaultType, RemoteException
 	{
 		_logger.debug("Creating new certGenerator Resource.");
 		
-		super.postCreate(rKey, newEPR, creationParameters);
+		super.postCreate(rKey, newEPR, creationParameters, resolverCreationParams);
 		
 		
 		ICertGeneratorResource resource = null;
