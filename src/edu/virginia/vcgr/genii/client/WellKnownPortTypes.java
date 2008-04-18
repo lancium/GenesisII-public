@@ -106,6 +106,17 @@ public class WellKnownPortTypes
 		new QName("http://vcgr.cs.virginia.edu/container/2006/12/simple-resolver-factory",
 			"SimpleResolverFactoryPortType");
 	
+	static public QName REXPORT_RESOLVER_FACTORY_PORT_TYPE =
+		new QName("http://vcgr.cs.virginia.edu/rns/2007/08/replicatedExport/resolver-factory",
+			"RExportResolverFactoryPortType");
+	static public QName REXPORT_RESOLVER_PORT_TYPE =
+		new QName("http://vcgr.cs.virginia.edu/rns/2007/08/replicatedExport/resolver",
+			"RExportResolverPortType");
+	static public QName REXPORT_DIR_PORT_TYPE =
+		new QName("http://vcgr.cs.virginia.edu/rns/2007/08/rexport-dir",
+			"RExportDirPortType");
+	
+	
 	static public QName GENII_FACTORY_PORT_TYPE =
 		new QName("http://vcgr.cs.virginia.edu/genii/2006/12/factory-pattern",
 			"GeniiFactoryPortType");
