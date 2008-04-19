@@ -45,6 +45,8 @@ import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
+import edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverUtils;
+import edu.virginia.vcgr.genii.container.context.WorkingContext;
 
 public class ExportedDirDBResource extends BasicDBResource implements
 		IExportedDirResource
@@ -52,9 +54,9 @@ public class ExportedDirDBResource extends BasicDBResource implements
 	static private Log _logger = LogFactory.getLog(ExportedDirDBResource.class);
 	
 	static private final String _RETRIEVE_DIR_INFO =
-		"SELECT path, parentIds FROM exporteddir WHERE dirid = ?";
+		"SELECT path, parentIds, isReplicated FROM exporteddir WHERE dirid = ?";
 	static private final String _CREATE_DIR_INFO =
-		"INSERT INTO exporteddir VALUES(?, ?, ?)";
+		"INSERT INTO exporteddir VALUES(?, ?, ?, ?)";
 	static private final String _ADD_ENTRY_STMT =
 		"INSERT INTO exporteddirentry VALUES(?, ?, ?, ?, ?)";
 	static private final String _ADD_DIR_ATTR_STMT =
@@ -90,12 +92,19 @@ public class ExportedDirDBResource extends BasicDBResource implements
 	static private final String _RETRIEVE_ALL_DIR_IDS_FOR_PARENT_STMT = 
 		"SELECT dirid FROM exporteddir WHERE parentIds LIKE ?";
 	
+	static private final String _RETRIEVE_ALL_EPRS_FOR_PARENT_STMT =
+		"SELECT endpoint " +
+		"FROM exporteddirentry " +
+		"WHERE dirid in " +
+		"(SELECT dirid FROM exporteddir WHERE parentIds LIKE ?)";
+	
 	static final private String _CREATE_TIME_PROP_NAME = "create-time";
 	static final private String _MOD_TIME_PROP_NAME = "mod-time";
 	static final private String _ACCESS_TIME_PROP_NAME = "access-time";
 	
 	private String _myLocalPath = null;
 	private String _myParentIds = null;
+	private String _isReplicated = null;
 	
 	protected static EndpointReferenceType _fileServiceEPR;
 	protected static EndpointReferenceType _dirServiceEPR;
@@ -114,6 +123,8 @@ public class ExportedDirDBResource extends BasicDBResource implements
 			IExportedFileResource.PARENT_IDS_CONSTRUCTION_PARAM);
 		_myLocalPath = (String)constructionParams.get(
 			IExportedFileResource.PATH_CONSTRUCTION_PARAM);
+		_isReplicated = (String)constructionParams.get(
+			IExportedFileResource.REPLICATION_INDICATOR); 
 		
 		super.initialize(constructionParams);
 		
@@ -240,10 +251,11 @@ public class ExportedDirDBResource extends BasicDBResource implements
 	public void destroy(Connection connection, boolean hardDestroy) throws ResourceException,
 			ResourceUnknownFaultType
 	{
-		dirDestroyAllForParentDir(connection, getId(), false);
-		ExportedFileDBResource.fileDestroyAllForParentDir(_connection, getId(), false);
+		dirDestroyAllForParentDir(connection, getId(), false, getReplicationState());
+		ExportedFileDBResource.fileDestroyAllForParentDir(connection, getId(), 
+				false, getReplicationState());
 		
-		/* Delete information related directly to parent exported dri */
+		/* Delete information related directly to parent exported dir */
 		PreparedStatement stmt = null;
 		try
 		{
@@ -279,6 +291,19 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		{
 			close(stmt);
 		}
+		
+		//if replicated, delete resolver mapping and notify resolver of termination
+		if (getReplicationState().equals("true")){
+			try{
+				_logger.info("Notifying resolver of exportedDir termination.");
+				RExportResolverUtils.destroyResolverByEPI(
+						getResourceEPIasString(), null);
+			}
+			catch (Exception e){
+				_logger.error("No resolver for exportedDir could be found to destory.");
+			}
+		}
+		
 	}
 
 	public String getId() throws ResourceException
@@ -294,6 +319,11 @@ public class ExportedDirDBResource extends BasicDBResource implements
 	public String getParentIds() throws ResourceException
 	{
 		return _myParentIds;
+	}
+	
+	public String getReplicationState() throws ResourceException
+	{
+		return _isReplicated;
 	}
 
 	public void setAccessTime(Calendar c) throws ResourceException
@@ -340,10 +370,12 @@ public class ExportedDirDBResource extends BasicDBResource implements
 			{
 				_myLocalPath = rs.getString(1);
 				_myParentIds = rs.getString(2);
+				_isReplicated = rs.getString(3);
 			} else
 			{
 				_myLocalPath = null;
 				_myParentIds = null;
+				_isReplicated = null;
 			}
 		}
 		catch (SQLException sqe)
@@ -371,6 +403,7 @@ public class ExportedDirDBResource extends BasicDBResource implements
 			stmt.setString(1, _resourceKey);
 			stmt.setString(2, _myLocalPath);
 			stmt.setString(3, _myParentIds);
+			stmt.setString(4, _isReplicated);
 			if (stmt.executeUpdate() != 1)
 				throw new ResourceException(
 					"Unable to insert ExportedDir resource information.");
@@ -600,7 +633,7 @@ public class ExportedDirDBResource extends BasicDBResource implements
 					serviceEPR = _fileServiceEPR; 
 					entryType = ExportedDirEntry._FILE_TYPE;
 					creationProperties = ExportedFileUtils.createCreationProperties(
-						newPath, childrenParentIds);
+						newPath, childrenParentIds, getReplicationState());
 				} else if (nextReal.isDirectory())
 				{
 					synchronized(this.getClass()) {
@@ -612,12 +645,12 @@ public class ExportedDirDBResource extends BasicDBResource implements
 					serviceEPR = _dirServiceEPR;
 					entryType = ExportedDirEntry._DIR_TYPE;
 					creationProperties = ExportedDirUtils.createCreationProperties(
-						newPath, childrenParentIds);
+						newPath, childrenParentIds, getReplicationState());
 				} else
 				{
 					throw new ResourceException("Local directory " + getLocalPath()
 						+ " has an entry (" + nextReal.getName() + 
-						") that is neither a directory now a file.");
+						") that is neither a directory nor a file.");
 				}
 				
 				try
@@ -644,19 +677,41 @@ public class ExportedDirDBResource extends BasicDBResource implements
 	{
 		try
 		{
-			/* create new ExportedFile resource */
+			_logger.info("Creating new export entries");
+			
+			/* create new Export resource */
 			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, serviceEPR);
 			VcgrCreateResponse resp = common.vcgrCreate(
 				new VcgrCreate(creationProperties));
 			
 			EndpointReferenceType entryReference = resp.getEndpoint();
 			
+			//replicate if flag is set
+			if (getReplicationState().equals("true")){
+			
+				//creates resolver and replica for new export entry
+				//returns augmented EPR with resolver to replica
+				try{
+					entryReference = RExportResolverUtils.setupRExport(
+						entryReference,  //primary epr
+						entryType,       //file or dir primary type
+						creationProperties[0].getValue(),  //primary localpath of export
+						getResourceEPIasString(),	 //EPI of dir resource containing new entry
+						nextRealName);   //name of file/dir
+				}
+				catch (Exception e){
+					_logger.error("Unable to create/replicate/fill exportdir's rexport resolver: " + e.getLocalizedMessage());
+					throw new ResourceException("Unable to create/replicate/fill exportdir's  rexport resolver: " + e.getLocalizedMessage());
+				}
+			}
+		
+			//create entry for new export resource in export DB
 			String newId = (new GUID()).toString();
 			ExportedDirEntry newEntry = new ExportedDirEntry(
 				getId(), nextRealName, entryReference, newId, 
 				entryType, null);
 			addEntry(newEntry, false);
-
+			
 			return newEntry;
 		}
 		catch (ConfigurationException ce)
@@ -665,6 +720,20 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		}
 	}
 	
+	/*
+	 * returns current resource's EPI as String from working context
+	 */
+	protected String getResourceEPIasString()
+		throws RuntimeException, ResourceException, ResourceUnknownFaultType
+	{
+		String resourceEPI = null;
+		
+		resourceEPI = (String)WorkingContext.getCurrentWorkingContext().getProperty(
+				WorkingContext.EPI_KEY);
+		
+		return resourceEPI;
+	}
+
 	protected Collection<ExportedDirEntry> retrieveKnownEntries() 
 		throws ResourceException
 	{
@@ -758,6 +827,7 @@ public class ExportedDirDBResource extends BasicDBResource implements
 			ResourceKey rKey = ResourceManager.getTargetResource(entry.getEntryReference());
 			IExportedEntryResource resource = (IExportedEntryResource)rKey.dereference();
 			
+			//destory everything underneath/relating to that export resource
 			resource.destroy(_connection, hardDestroy);
 		}
 		catch (ResourceException ruft)
@@ -818,7 +888,8 @@ public class ExportedDirDBResource extends BasicDBResource implements
 	}
 
 	static void dirDestroyAllForParentDir(Connection connection, 
-		String parentId, boolean hardDestroy) throws ResourceException
+		String parentId, boolean hardDestroy, String isReplicated) 
+		throws ResourceException
 	{
 		String parentIdSearch = "%" + ExportedDirUtils._PARENT_ID_BEGIN_DELIMITER +
 			parentId + ExportedDirUtils._PARENT_ID_END_DELIMITER + "%";
@@ -839,6 +910,37 @@ public class ExportedDirDBResource extends BasicDBResource implements
 			rs = null;
 			stmt.close();
 			stmt = null;
+			
+			//if replicated, perform required actions
+			if (isReplicated.equals("true")){
+				
+				//retrieve all EPRs associated with dirs
+				stmt = connection.prepareStatement(_RETRIEVE_ALL_EPRS_FOR_PARENT_STMT);
+				stmt.setString(1, parentIdSearch);
+				rs = stmt.executeQuery();
+				Collection<EndpointReferenceType> dirEPRs = new ArrayList<EndpointReferenceType>();
+				while (rs.next())
+					dirEPRs.add(EPRUtils.fromBlob(rs.getBlob(1)));
+				rs.close();
+				rs = null;
+				stmt.close();
+				stmt = null;
+				
+				for (EndpointReferenceType exportEPR : dirEPRs){
+					
+					//notify exportDirs resolver of termination
+					try {
+						_logger.info("Notifying resolver of (contained) exportedDir termination");
+						
+						RExportResolverUtils.destroyResolverByEPR(exportEPR);
+					}
+					catch (Exception ce){
+						_logger.error(
+								"Unable to notify resolver of export termination.", ce);
+					}
+					
+				}
+			}
 			
 			stmt = connection.prepareStatement(_DESTROY_ALL_ATTRS_FOR_PARENT_STMT);
 			stmt.setString(1, parentIdSearch);
