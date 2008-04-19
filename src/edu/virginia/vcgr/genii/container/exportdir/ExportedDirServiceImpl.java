@@ -78,7 +78,7 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 	protected ResourceKey createResource(HashMap<QName, Object> constructionParameters)
 		throws ResourceException, BaseFaultType
 	{
-		_logger.debug("Creating new ExportedDir Resource.");
+		_logger.info("Creating new ExportedDir Resource.");
 		
 		if (constructionParameters == null)
 		{
@@ -98,15 +98,18 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 			IExportedDirResource.PATH_CONSTRUCTION_PARAM, initInfo.getPath());
 		constructionParameters.put(
 			IExportedDirResource.PARENT_IDS_CONSTRUCTION_PARAM, initInfo.getParentIds());
+		constructionParameters.put(
+			IExportedDirResource.REPLICATION_INDICATOR, initInfo.getReplicationState());
 		
 		return super.createResource(constructionParameters);
 	}
 	
 	protected void fillIn(ResourceKey rKey, EndpointReferenceType newEPR,
-			HashMap<QName, Object> creationParameters) 
+			HashMap<QName, Object> creationParameters,
+			Collection<MessageElement> resolverCreationParams) 
 		throws ResourceException, BaseFaultType, RemoteException
 	{
-		super.postCreate(rKey, newEPR, creationParameters);
+		super.postCreate(rKey, newEPR, creationParameters, resolverCreationParams);
 		
 		Date d = new Date();
 		Calendar c = Calendar.getInstance();
@@ -156,7 +159,8 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 			WorkingContext.temporarilyAssumeNewIdentity(
 				EPRUtils.makeEPR(Container.getServiceURL("ExportedFilePortType")));
 			entryReference = new ExportedFileServiceImpl().vcgrCreate(new VcgrCreate(
-				ExportedFileUtils.createCreationProperties(fullPath, parentIds))).getEndpoint();
+				ExportedFileUtils.createCreationProperties(
+						fullPath, parentIds, resource.getReplicationState()))).getEndpoint();
 		}
 		finally
 		{
@@ -184,6 +188,7 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 		RNSEntryExistsFaultType, ResourceUnknownFaultType,
 		RNSEntryNotDirectoryFaultType, RNSFaultType
 	{
+		//add request missing
 		if (addRequest == null)
 		{
 			// Pure factory operation
@@ -194,6 +199,8 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 				}, null, null));
 		}
 		
+		//decipher add request
+		//get name of file
 		String name = addRequest.getEntry_name();
 		EndpointReferenceType entryReference = addRequest.getEntry_reference();
 		MessageElement []attrs = addRequest.get_any();
@@ -218,9 +225,10 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 			resource.getLocalPath(), name);
 		String parentIds = ExportedDirUtils.createParentIdsString(
 			resource.getParentIds(), resource.getId());
+		String isReplicated = resource.getReplicationState();
 		EndpointReferenceType newRef =
 			vcgrCreate(new VcgrCreate(ExportedDirUtils.createCreationProperties(
-				fullPath, parentIds))).getEndpoint();
+				fullPath, parentIds, isReplicated))).getEndpoint();
 		
 		String newEntryId = (new GUID()).toString();
 		ExportedDirEntry newEntry = new ExportedDirEntry(
@@ -238,7 +246,7 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 	{
 		String entry_name_regexp = listRequest.getEntry_name_regexp();
 		
-		_logger.debug("ExportDir asked to lookup \"" + entry_name_regexp + "\".");
+		_logger.info("ExportDir asked to lookup \"" + entry_name_regexp + "\".");
 		
 		IExportedDirResource resource = 
 			(IExportedDirResource)ResourceManager.getCurrentResource().dereference();
