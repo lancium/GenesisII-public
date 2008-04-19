@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Vector;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -239,7 +240,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	}
 	
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
-		HashMap<QName, Object> constructionParameters) 
+		HashMap<QName, Object> constructionParameters, 
+		Collection<MessageElement> resolverCreationParameters) 
 		throws ResourceException, BaseFaultType, RemoteException
 	{
 		IResource resource = rKey.dereference();
@@ -305,6 +307,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	protected void registerTopics(TopicSpace topicSpace) throws InvalidTopicException
 	{
 		topicSpace.registerTopic(WellknownTopics.TERMINATED);
+		topicSpace.registerTopic(WellknownTopics.RANDOM_BYTEIO_OP);
 	}
 	
 	protected Object translateConstructionParameter(MessageElement property)
@@ -466,23 +469,39 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 					new BaseFaultTypeDescription("Security error while initializing new resource's calling context."),
 					new BaseFaultTypeDescription(gse.getLocalizedMessage()) }, null));
 		}
+		//collection to hold creation parameters for default resolvers
+		Collection<MessageElement> resolverCreationParams = new Vector<MessageElement>();
 		
 		// allow subclasses to do creation work
-		postCreate(rKey, epr, constructionParameters);
-		
+		postCreate(rKey, epr, constructionParameters, resolverCreationParams);
+	
 		rKey.dereference().commit();
 		_logger.debug("Created resource \"" + rKey.getKey() + "\" for service \"" +
 			rKey.getServiceName() + "\".");
-		EndpointReferenceType resolveEPR = addResolvers(rKey, epr, constructionParameters);
+		EndpointReferenceType resolveEPR = addResolvers(rKey, epr, resolverCreationParams);
 		
 		return new VcgrCreateResponse(resolveEPR);
 	}
 	
-	protected EndpointReferenceType addResolvers(ResourceKey rKey, EndpointReferenceType newEPR,
-			HashMap<QName, Object> constructionParameters) 
+	protected EndpointReferenceType addResolvers(ResourceKey rKey, 
+			EndpointReferenceType newEPR,
+			Collection<MessageElement> resolverCreationParams) 
 			throws ResourceException, BaseFaultType
 	{
 		EndpointReferenceType resolveEPR = newEPR;
+		
+		//convert collection to array of message elements
+		MessageElement[] resolverCreationParamsArray = null;
+		if (!resolverCreationParams.isEmpty()){
+			int paramCnt = resolverCreationParams.size();
+			int paramIter = 0;
+			resolverCreationParamsArray = new MessageElement[paramCnt];
+			Iterator<MessageElement>collectionIter = resolverCreationParams.iterator();
+			for(;paramIter < paramCnt; paramIter++){
+				resolverCreationParamsArray[paramIter]=
+					collectionIter.next();
+			}
+		}		
 		
 		/* parse config info for service to see if there is a default resolver service */
 		try
@@ -492,21 +511,29 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 			if (resolverFactoryProxyClass != null)
 			{
 				Properties resolverFactoryProps = getDefaultResolverFactoryProperties();
-				IResolverFactoryProxy resolverFactoryProxy = (IResolverFactoryProxy) resolverFactoryProxyClass.newInstance();
+				
+				IResolverFactoryProxy resolverFactoryProxy = 
+					(IResolverFactoryProxy) resolverFactoryProxyClass.newInstance();
 				if (resolverFactoryProxy != null)
 				{
-					Resolution newResolution = resolverFactoryProxy.createResolver(newEPR, resolverFactoryProps);
-					if (newResolution != null)
-					{
+					Resolution newResolution = resolverFactoryProxy.createResolver(
+							newEPR,
+							resolverFactoryProps,
+							resolverCreationParamsArray);
+					if (newResolution != null){
 						_logger.debug("Setup new resolver for instance of service \"" + _serviceName);
 						resolveEPR = newResolution.getResolvedTargetEPR();
+					}
+					else{
+						_logger.debug("No resolver setup for instance of service \"" + _serviceName);
+						resolveEPR = newEPR;
 					}
 				}
 			}
 		}
 		catch(Throwable t)
 		{
-			_logger.warn("Could not create resolver for new instance of service \"" + _serviceName, t);
+			_logger.error("Could not create resolver for new instance of service \"" + _serviceName, t);
 //			throw new ResourceException("Could not create resolver for new instance of service \"" + _serviceName, t);
 		}
 		
