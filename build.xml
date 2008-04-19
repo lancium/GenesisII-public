@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="build" name="GenesisII">
+
+	<!-- Properties -->
+	<property environment="env"/>
+	<property file="${basedir}/build.properties"/>
+	<property name="project.dir" value="${basedir}"/>
+
+	<condition property="wsdl.source.prefix" value=""
+		else="file:///">
+		<matches string="${java.specification.version}" pattern="^1\.5$"/>
+	</condition>
+
+
+	<!-- Static Class paths -->
+	<path id="log4j.classpath">
+		<fileset dir="${axis.home}" includes="**/log4j*.jar"/>
+	</path>
+
+	<path id="axis.classpath">
+		<fileset dir="${axis.home}" includes="**/*.jar"/>
+	</path>
+
+	<path id="jetty.classpath">
+		<fileset dir="${jetty.home}" includes="**/*.jar"/>
+	</path>
+
+	<path id="junit.classpath">
+		<fileset dir="${junit.home}" includes="**/*.jar"/>
+	</path>
+
+	<path id="hypersonic.classpath">
+		<fileset dir="${hypersonic.home}" includes="**/*.jar"/>
+	</path>
+
+	<path id="bouncycastle.classpath">
+		<fileset dir="${bouncycastle.home}" includes="**/*.jar"/>
+	</path>
+
+	<path id="wss4j.classpath">
+		<fileset dir="${wss4j.home}" includes="**/*.jar"/>
+	</path>
+	
+	<path id="xmldb.classpath">
+			<fileset dir="${xmldb.home}" includes="**/*.jar"/>
+		</path>
+
+	<path id="project.classpath">
+		<pathelement location="${obj-dir}"/>
+		<pathelement location="${gennedobj-dir}"/>
+		<path refid="axis.classpath"/>
+		<path refid="jetty.classpath"/>
+		<path refid="junit.classpath"/>
+		<path refid="hypersonic.classpath"/>
+		<path refid="bouncycastle.classpath"/>
+		<path refid="wss4j.classpath"/>
+		<path refid="xmldb.classpath"/>
+	</path>
+			
+	<!-- Imports -->	
+	<import file="${basedir}/init.build.xml"/>
+	<import file="${scripts.dir}/scripts.build.xml"/>
+	<import file="${src.dir}/jni/vcgrJniLibs.build.xml"/>
+
+	<!-- Build Targets -->
+	<target name="build" depends="jars,scripts,deployments"/>
+
+	<target name="jars" depends="genii.container.jar,genii.client.jar,ogrsh.jar,genii.ws.jar,genii.wsdl.jar,morgan.utilities.jar,genii.security.jar"/>
+
+	<target name="deployments" depends="generate.ws.source">
+		<copy todir="${deployments.dir}/default/services">
+			<fileset dir="${basedir}/services" includes="**/*.wsdd"/>
+		</copy>
+		<copy todir="${deployments.dir}/default-secure/services">
+			<fileset dir="${basedir}/services" includes="**/*.wsdd"/>
+		</copy>
+		<copy todir="${deployments.dir}/GeniiNetBootstrapContainer/services">
+			<fileset dir="${basedir}/services" includes="**/*.wsdd"/>
+		</copy>
+		<copy todir="${deployments.dir}/GeniiNetFullContainer/services">
+			<fileset dir="${basedir}/services" includes="**/*.wsdd"/>
+		</copy>
+	</target>
+
+	<target name="genii.container.jar" depends="genii.compile">
+		<jar destfile="${lib.dir}/GenesisII-container.jar">
+			<fileset dir="${obj.dir}">
+				<include name="edu/virginia/vcgr/genii/container/**/*"/>
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="genii.client.jar" depends="genii.compile">
+		<jar destfile="${lib.dir}/GenesisII-client.jar">
+			<fileset dir="${obj.dir}">
+				<include name="edu/virginia/vcgr/genii/client/**/*"/>
+				<include name="edu/virginia/vcgr/genii/ftp/**/*"/>
+				<include name="edu/virginia/vcgr/genii/testing/**/*"/>
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="ogrsh.jar" depends="ogrsh.compile.java">
+		<jar destfile="${lib.dir}/OGRSH.jar">
+			<fileset dir="${obj.dir}">
+				<include name="edu/virginia/vcgr/ogrsh/**/*"/>
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="genii.ws" depends="genii.ws.jar,deployments"/>
+
+	<target name="genii.ws.jar" depends="genii.ws.compile">
+		<jar destfile="${lib.dir}/GenesisII-ws.jar">
+			<fileset dir="${generated.obj.dir}"/>
+		</jar>
+		<path id="genii.ws.classpath" path="${lib.dir}/GenesisII-ws.jar"/>
+	</target>
+
+	<target name="genii.wsdl.jar" depends="genii.wsdl.tools.compile">
+		<jar destfile="${lib.dir}/genii-wsdl.jar">
+			<fileset dir="${obj.dir}">
+				<include name="edu/virginia/vcgr/genii/wsdl/**/*"/>
+			</fileset>
+		</jar>
+		<path id="genii-wsdl.classpath" path="${lib.dir}/genii-wsdl.jar"/>
+	</target>
+
+	<target name="morgan.utilities.jar" depends="morgan.compile">
+		<jar destfile="${lib.dir}/morgan-utilities.jar">
+			<fileset dir="${obj.dir}">
+				<include name="org/morgan/**/*"/>
+			</fileset>
+		</jar>
+		<path id="morganu.classpath" path="${lib.dir}/morgan-utilities.jar"/>
+	</target>
+
+	<target name="genii.security.jar" depends="genii.security.compile">
+		<jar destfile="${lib.dir}/GenesisII-security.jar">
+			<fileset dir="${obj.dir}">
+				<include name="edu/virginia/vcgr/genii/client/GenesisIIConstants.class"/>
+				<include name="edu/virginia/vcgr/genii/client/io/PreferredFiles.class"/>
+				<include name="edu/virginia/vcgr/genii/client/configuration/ConfigurationManager.class"/>
+				<include name="edu/virginia/vcgr/genii/client/utils/deployment/DeploymentRelativeFile.class"/>
+				<include name="edu/virginia/vcgr/genii/client/comm/axis/security/VcgrSslSocketFactory.class"/>
+				<include name="edu/virginia/vcgr/genii/client/security/x509/*.class"/>
+				<include name="edu/virginia/vcgr/genii/client/configuration/UserConfig.class"/>
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="generate.ws.source" depends="genii.wsdl.tools">
+		<ant antfile="${wsdl.dir}/common.build.xml"/>
+		<ant antfile="${wsdl.dir}/notification-consumer.build.xml"/>
+		<ant antfile="${wsdl.dir}/subscription.build.xml"/>
+		<ant antfile="${wsdl.dir}/rns/rns.build.xml"/>
+		<ant antfile="${wsdl.dir}/deployment/gapp-description.build.xml"/>
+		<ant antfile="${wsdl.dir}/deployment/deployer.build.xml"/>
+		<ant antfile="${wsdl.dir}/byteio/rbyteio.build.xml"/>
+		<ant antfile="${wsdl.dir}/byteio/interop/rbyteiointerop.build.xml"/>
+		<ant antfile="${wsdl.dir}/byteio/sbyteio.build.xml"/>
+		<ant antfile="${wsdl.dir}/byteio/interop/sbyteiointerop.build.xml"/>
+		<ant antfile="${wsdl.dir}/byteio/sbyteio-factory.build.xml"/>
+		<ant antfile="${wsdl.dir}/authn/x509-authn.build.xml"/>
+		<ant antfile="${wsdl.dir}/container/container.build.xml"/>
+		<ant antfile="${wsdl.dir}/bes/bes-activity.build.xml"/>
+		<ant antfile="${wsdl.dir}/bes/bes.build.xml"/>
+		<ant antfile="${wsdl.dir}/scheduler/basic-scheduler.build.xml"/>
+		<ant antfile="${wsdl.dir}/exported/exported-file.build.xml"/>
+		<ant antfile="${wsdl.dir}/exported/exported-dir.build.xml"/>
+		<ant antfile="${wsdl.dir}/exported/exported-root.build.xml"/>
+		<ant antfile="${wsdl.dir}/naming.build.xml"/>
+		<ant antfile="${wsdl.dir}/resolver/simple-resolver.build.xml"/>
+		<ant antfile="${wsdl.dir}/resolver/simple-resolver-factory.build.xml"/>
+		<ant antfile="${wsdl.dir}/queue/queue.build.xml"/>
+		<ant antfile="${wsdl.dir}/informationService/informationService.build.xml"/>
+		<ant antfile="${wsdl.dir}/certGenerator/certGenerator.build.xml"/>
+		<ant antfile="${wsdl.dir}/ticker/ticker.build.xml"/>
+		<ant antfile="${wsdl.dir}/tty/tty.build.xml"/>
+		<ant antfile="${wsdl.dir}/counter/counter.build.xml"/>
+		<ant antfile="${wsdl.dir}/iterator/iterator.build.xml"/>
+		<ant antfile="${wsdl.dir}/replicatedExport/rexport-file.build.xml"/>
+		<ant antfile="${wsdl.dir}/replicatedExport/rexport-dir.build.xml"/>
+		<ant antfile="${wsdl.dir}/replicatedExport/rexport-resolver.build.xml"/>
+		<ant antfile="${wsdl.dir}/replicatedExport/rexport-resolver-factory.build.xml"/>
+	</target>
+
+	<target name="genii.wsdl.tools"
+		depends="genii.wsdl.jar,morgan.utilities.jar">
+		<path id="wsdl-tools.classpath">
+			<path refid="morganu.classpath"/>
+			<path refid="genii-wsdl.classpath"/>
+		</path>
+		<taskdef
+			resource="edu/virginia/vcgr/genii/wsdl/ant/ant-tasks.properties"
+			classpathref="wsdl-tools.classpath"/>
+	</target>
+
+	<target name="genii.compile" depends="init,genii.ws">
+		<javac debug="${debug.on}" destdir="${obj.dir}">
+			<src path="${src.dir}"/>
+			<classpath refid="project.classpath"/>
+			<classpath refid="genii.ws.classpath"/>
+			<include name="**/*.java"/>
+			<exclude name="**/edu/virginia/vcgr/genii/container/factory/**/*.java"/>
+		</javac>
+		<copy todir="${obj.dir}">
+			<fileset dir="${src.dir}"
+				includes="${default.compile.copy.includes}"/>
+		</copy>
+	</target>
+
+	<target name="genii.ws.compile" depends="generate.ws.source">
+		<javac debug="${debug.on}" destdir="${generated.obj.dir}">
+			<src path="${generated.source.dir}"/>
+			<classpath refid="project.classpath"/>
+		</javac>
+	</target>
+
+	<target name="genii.security.compile" depends="init">
+		<javac debug="${debug.on}" destdir="${obj.dir}">
+			<src path="${src.dir}"/>
+			<include name="edu/virginia/vcgr/genii/client/GenesisIIConstants.class"/>
+			<include name="edu/virginia/vcgr/genii/client/io/PreferredFiles.class"/>
+			<include name="edu/virginia/vcgr/genii/client/configuration/ConfigurationManager.class"/>
+			<include name="edu/virginia/vcgr/genii/client/utils/deployment/DeploymentRelativeFile.class"/>
+			<include name="edu/virginia/vcgr/genii/client/comm/axis/security/VcgrSslSocketFactory.class"/>
+			<include name="edu/virginia/vcgr/genii/client/security/x509/*.class"/>
+			<include name="edu/virginia/vcgr/genii/client/configuration/UserConfig.class"/>
+		</javac>
+	</target>
+
+	<target name="genii.wsdl.tools.compile" depends="init">
+		<javac debug="${debug.on}" destdir="${obj.dir}">
+			<src path="${src.dir}"/>
+			<classpath refid="junit.classpath"/>
+			<include name="edu/virginia/vcgr/genii/wsdl/**/*.java"/>
+		</javac>
+		<copy todir="${obj.dir}">
+			<fileset dir="${src.dir}"
+				includes="${default.compile.copy.includes}"/>
+		</copy>
+	</target>
+
+	<target name="morgan.compile" depends="init">
+		<javac debug="${debug.on}" destdir="${obj.dir}">
+			<src path="${src.dir}"/>
+			<classpath refid="junit.classpath"/>
+			<classpath refid="log4j.classpath"/>
+			<include name="org/morgan/**/*.java"/>
+		</javac>
+		<copy todir="${obj.dir}">
+			<fileset dir="${src.dir}"
+				includes="${default.compile.copy.includes}"/>
+		</copy>
+	</target>
+
+	<target name="ogrsh.compile.java" depends="init">
+		<javac debug="${debug.on}" destdir="${obj.dir}">
+			<src path="${src.dir}"/>
+			<classpath refid="junit.classpath"/>
+			<classpath refid="log4j.classpath"/>
+			<include name="edu/virginia/vcgr/ogrsh/**/*.java"/>
+		</javac>
+		<copy todir="${obj.dir}">
+			<fileset dir="${src.dir}"
+				includes="${default.compile.copy.includes}"/>
+		</copy>
+	</target>
+
+	<target name="clean">
+		<delete dir="${temporary.codegen.dir}"/>
+		<delete dir="${wsdd.dir}"/>
+		<delete dir="${generated.source.dir}"/>
+		<delete dir="${generated.obj.dir}"/>
+		<delete dir="${obj.dir}"/>
+		<delete dir="${deployments.dir}/default/services" quiet="true"/>
+		<delete dir="${deployments.dir}/default-secure/services" quiet="true"/>
+		<delete quiet="true">
+			<fileset dir="${lib.dir}" includes="**/*.jar"/>
+		</delete>
+		<delete dir="${services.dir}"/>
+		<delete file="${basedir}/jserver.sh"/>
+		<delete file="${basedir}/runContainer.sh"/>
+		<delete file="${basedir}/runContainer.bat"/>
+		<delete file="${basedir}/grid"/>
+		<delete file="${basedir}/grid.bat"/>
+		<delete file="${basedir}/cert-tool"/>
+		<delete file="${basedir}/cert-tool.bat"/>
+		<delete file="${basedir}/jar-desc.xml"/>
+		<delete file="${basedir}/jserver-jar-desc.xml"/>
+	</target>
+	
+	<target name="wipestate">
+		<delete dir="${user.home}/.genesisII"/>
+	</target>	
+</project>
