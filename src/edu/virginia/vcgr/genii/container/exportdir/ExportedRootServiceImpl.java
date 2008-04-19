@@ -2,10 +2,12 @@ package edu.virginia.vcgr.genii.container.exportdir;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.Collection;
 import java.util.HashMap;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.Add;
@@ -59,9 +61,13 @@ public class ExportedRootServiceImpl extends ExportedDirServiceImpl implements
 	protected ResourceKey createResource(HashMap<QName, Object> creationParameters)
 		throws ResourceException, BaseFaultType
 	{
+		_logger.info("Creating new ExportedRoot Resource.");
+		
 		ExportedDirUtils.ExportedDirInitInfo initInfo = 
 			ExportedDirUtils.extractCreationProperties(creationParameters);
 		
+		//ensure that local dir to be exported is readable
+		//if so, proceed with export creation
 		try
 		{
 			// check if directory exists
@@ -79,7 +85,8 @@ public class ExportedRootServiceImpl extends ExportedDirServiceImpl implements
 		}
 		catch (IOException ioe)
 		{
-			throw new ResourceException(ioe.getLocalizedMessage(), ioe);
+			throw new ResourceException(
+					"Could not determine if export localpath is readable.", ioe);
 		}
 		
 		return super.createResource(creationParameters);
@@ -90,6 +97,7 @@ public class ExportedRootServiceImpl extends ExportedDirServiceImpl implements
 		RNSEntryExistsFaultType, ResourceUnknownFaultType,
 		RNSEntryNotDirectoryFaultType, RNSFaultType
 	{
+		_logger.info("ADDING Exported Root");
 		try
 		{
 			EndpointReferenceType myEPR = 
@@ -120,4 +128,38 @@ public class ExportedRootServiceImpl extends ExportedDirServiceImpl implements
 		
 		return new QuitExportResponse(true);
 	}
+	
+	public void postCreate(ResourceKey rKey, EndpointReferenceType myEPR,
+			HashMap<QName, Object> constructionParameters, 
+			Collection<MessageElement> resolverCreationParams)
+		throws ResourceException, BaseFaultType, RemoteException
+	{
+		//get construction params
+		ExportedDirUtils.ExportedDirInitInfo initInfo = 
+			ExportedDirUtils.extractCreationProperties(constructionParameters);
+		
+		//if replicated, package construction params for resolver
+		if (initInfo.getReplicationState().equals("true"))
+			ExportedDirUtils.createResolverCreationProperties(resolverCreationParams,
+				initInfo);
+		 
+		super.postCreate(rKey, myEPR, constructionParameters, resolverCreationParams);
+	}
 }
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
