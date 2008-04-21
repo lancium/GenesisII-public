@@ -16,16 +16,30 @@ import edu.virginia.vcgr.genii.client.byteio.transfer.AbstractByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.transfer.StreamableByteIOTransferer;
 import edu.virginia.vcgr.genii.client.comm.attachments.AttachmentType;
 
+/**
+ * This class implements the DIME transfer protocol for the Streamable ByteIO
+ * case.
+ * 
+ * @author mmm2a
+ */
 public class DimeSByteIOTransferer 
 	extends AbstractByteIOTransferer<StreamableByteIOPortType> 
 	implements StreamableByteIOTransferer, DimeByteIOTransferer
 {
+	/**
+	 * Create a new DIMESByteIO transferer.
+	 * 
+	 * @param clientStub The client stub to use for all out calls.
+	 */
 	public DimeSByteIOTransferer(StreamableByteIOPortType clientStub)
 	{
 		super(clientStub,
 			TRANSFER_PROTOCOL, PREFERRED_READ_SIZE, PREFERRED_WRITE_SIZE);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public byte[] seekRead(SeekOrigin origin, long offset, long numBytes)
 			throws RemoteException
@@ -48,6 +62,9 @@ public class DimeSByteIOTransferer
 		return receiveResponseAttachmentData(_clientStub);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void seekWrite(SeekOrigin origin, long offset, byte[] data)
 			throws RemoteException

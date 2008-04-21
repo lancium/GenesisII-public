@@ -4,6 +4,13 @@ import org.apache.axis.types.URI;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 
+/**
+ * An interface for all DIME transferers.  This interface is basically a
+ * convenient place to put some constants relevant to the DIME transfer
+ * protocol.
+ * 
+ * @author mmm2a
+ */
 public interface DimeByteIOTransferer
 {
 	static final public URI TRANSFER_PROTOCOL = 

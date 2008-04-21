@@ -7,6 +7,16 @@ import javax.xml.namespace.QName;
 
 import edu.virginia.vcgr.genii.client.rp.ResourceProperty;
 
+/**
+ * An interface that represents the resource properties (or attributes) of a
+ * random byteio resource.  As per the resource property translators in 
+ * Genesis II, this interface does not need to be realized as a class 
+ * implementation -- rather, a dynamically generated proxy is created at
+ * runtime which has the ability to retrieve and translate the correct
+ * attributes.
+ * 
+ * @author mmm2a
+ */
 public interface RandomByteIORP
 {
 	static public final String RANDOM_BYTEIO_NS =

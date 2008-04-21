@@ -29,11 +29,31 @@ import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransfererFactory;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 
+/**
+ * An implementation of the standard Java Output stream that writes
+ * to remote Random ByteIO resources.
+ * 
+ * @author mmm2a
+ */
 public class RandomByteIOOutputStream extends OutputStream
 {
+	/* The transferer being used by this stream. */
 	private RandomByteIOTransferer _transferer;
+	
+	/* The current offset within the remote random byteio resource */
 	private long _offset = 0L;
 	
+	/**
+	 * Create a new RandomByteIO output stream for a given endpoint and
+	 * transfer protocol.
+	 * 
+	 * @param target The target ByteIO to write bytes to.
+	 * @param desiredTransferProtocol The desired transfer protocol to use when
+	 * writing bytes.
+	 * 
+	 * @throws ConfigurationException
+	 * @throws RemoteException
+	 */
 	public RandomByteIOOutputStream(EndpointReferenceType target, 
 		URI desiredTransferType)
 			throws ConfigurationException, RemoteException
@@ -46,12 +66,23 @@ public class RandomByteIOOutputStream extends OutputStream
 		_transferer.truncAppend(0, new byte[0]);
 	}
 	
+	/**
+	 * Create a new RandomByteIO output stream for a given endpoint
+	 * 
+	 * @param target The target ByteIO to write bytes to.
+	 * 
+	 * @throws ConfigurationException
+	 * @throws RemoteException
+	 */
 	public RandomByteIOOutputStream(EndpointReferenceType target)
 		throws ConfigurationException, RemoteException
 	{
 		this(target, null);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void write(byte []data) throws IOException
 	{
@@ -59,6 +90,9 @@ public class RandomByteIOOutputStream extends OutputStream
 		_offset += data.length;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void write(byte []data, int offset, int length)
 		throws IOException
@@ -68,12 +102,21 @@ public class RandomByteIOOutputStream extends OutputStream
 		write(newData);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void write(int b) throws IOException
 	{
 		write(new byte[] { (byte)b });
 	}
 
+	/**
+	 * A convenience method for creating a buffered stream (using the
+	 * current transferer's preferred buffering size) from this output stream.
+	 * 
+	 * @return The newly created buffered output stream.
+	 */
 	public BufferedOutputStream createPreferredBufferedStream()
 	{
 		return new BufferedOutputStream(

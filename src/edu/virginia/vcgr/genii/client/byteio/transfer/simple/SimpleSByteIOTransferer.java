@@ -18,16 +18,30 @@ import edu.virginia.vcgr.genii.client.byteio.SeekOrigin;
 import edu.virginia.vcgr.genii.client.byteio.transfer.AbstractByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.transfer.StreamableByteIOTransferer;
 
+/**
+ * This class implements the Simple transfer protocol for the Streamable ByteIO
+ * case.
+ * 
+ * @author mmm2a
+ */
 public class SimpleSByteIOTransferer 
 	extends AbstractByteIOTransferer<StreamableByteIOPortType> 
 	implements StreamableByteIOTransferer, SimpleByteIOTransferer
 {
+	/**
+	 * Create a new SimpleSByteIO transferer.
+	 * 
+	 * @param clientStub The client stub to use for all out calls.
+	 */
 	public SimpleSByteIOTransferer(StreamableByteIOPortType clientStub)
 	{
 		super(clientStub,
 			TRANSFER_PROTOCOL, PREFERRED_READ_SIZE, PREFERRED_WRITE_SIZE);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public byte[] seekRead(SeekOrigin origin, long offset, long numBytes)
 			throws RemoteException
@@ -68,6 +82,9 @@ public class SimpleSByteIOTransferer
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void seekWrite(SeekOrigin origin, long offset, byte[] data)
 			throws RemoteException

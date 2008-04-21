@@ -21,6 +21,11 @@ import org.apache.axis.types.URI;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 
+/**
+ * This is a list of constants common to the ByteIO specification.
+ * 
+ * @author mmm2a
+ */
 public class ByteIOConstants
 {
 	static public final String TRANSFER_TYPE_SIMPLE =
