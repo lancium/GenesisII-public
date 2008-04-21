@@ -27,21 +27,67 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.rp_2.UpdateResourceProperties;
 import org.oasis_open.docs.wsrf.rp_2.UpdateType;
 
+/**
+ * This is the invoker handler that handles ALL resource property
+ * interactions.  It is used as part of the 
+ * {@link java.lang.reflect.Proxy} proxying mechanism.
+ * 
+ * @author mmm2a
+ */
 public class RPInvoker implements InvocationHandler
 {
 	static private Log _logger = LogFactory.getLog(RPInvoker.class);
 
+	/**
+	 * The RP invoker is essentially a collection of "handlers" that
+	 * handle RP interactions for both single and multi-value properties.
+	 * Further, these handlers can be getters or setters.  THis interface
+	 * represents that common ability.
+	 * 
+	 * @author mmm2a
+	 */
 	static private interface Handler
 	{
+		/**
+		 * Handle a resource property request (get/set, single/multi).
+		 * 
+		 * @param method The method that as called on an RP interface
+		 * @param args The arguments passed to that method (should be empty
+		 * for a getter, and a single argument (which could be a collection for
+		 * a multi-valued RP, or not for a single-value RP) for a setter).
+		 * 
+		 * @return The results of the RP get/set.
+		 * 
+		 * @throws Throwable
+		 */
 		public Object handle(Method method, Object []args)
 			throws Throwable;
 	}
 
+	/**
+	 * This is the implementation of handlers that can get single-valued
+	 * RPs.
+	 * 
+	 * @author mmm2a
+	 */
 	private class SingleGetterHandler implements Handler
 	{
+		/**
+		 * The translator to use for RP translation.
+		 */
 		private SingleResourcePropertyTranslator _translator;
+		
+		/**
+		 * The QName of the source XML element.
+		 */
 		private QName _propName;
 		
+		/**
+		 * Create a new RP SingleGetterHandler.
+		 * 
+		 * @param propName The resource property name.
+		 * @param translator The translator to use for translation.
+		 */
 		public SingleGetterHandler(QName propName,
 			SingleResourcePropertyTranslator translator)
 		{
@@ -49,6 +95,10 @@ public class RPInvoker implements InvocationHandler
 			_translator = translator;
 		}
 		
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public Object handle(Method method, Object []args)
 			throws Throwable
 		{
@@ -57,11 +107,30 @@ public class RPInvoker implements InvocationHandler
 		}
 	}
 	
+	/**
+	 * This is the implementation of handlers that can get multi-valued
+	 * RPs.
+	 * 
+	 * @author mmm2a
+	 */
 	private class MultiGetterHandler implements Handler
 	{
+		/**
+		 * The translator to use for RP translation.
+		 */
 		private MultiResourcePropertyTranslator _translator;
+		
+		/**
+		 * The QName of the source XML element.
+		 */
 		private QName _propName;
 	
+		/**
+		 * Create a new RP MultiGetterHandler.
+		 * 
+		 * @param propName The resource property name.
+		 * @param translator The translator to use for translation.
+		 */
 		public MultiGetterHandler(QName propName,
 			MultiResourcePropertyTranslator translator)
 		{
@@ -69,6 +138,10 @@ public class RPInvoker implements InvocationHandler
 			_translator = translator;
 		}
 		
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public Object handle(Method method, Object []args)
 			throws Throwable
 		{
@@ -77,17 +150,42 @@ public class RPInvoker implements InvocationHandler
 		}
 	}
 	
+	/**
+	 * This is the implementation of handlers that can set single-valued
+	 * RPs.
+	 * 
+	 * @author mmm2a
+	 */
 	private class SingleSetterHandler implements Handler
 	{
+		/**
+		 * The translator to use for RP translation.
+		 */
 		private SingleResourcePropertyTranslator _translator;
+		
+		/**
+		 * The QName of the target XML element.
+		 */
 		private QName _propName;
 		
-		public SingleSetterHandler(QName propName, SingleResourcePropertyTranslator translator)
+		/**
+		 * Creates a new SingleSetterHandler
+		 * 
+		 * @param propName The Resource Property name for this setter.
+		 * @param translator The translator to use for resource property 
+		 * translations.
+		 */
+		public SingleSetterHandler(QName propName, 
+			SingleResourcePropertyTranslator translator)
 		{
 			_propName = propName;
 			_translator = translator;
 		}
 		
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public Object handle(Method m, Object []args) throws Throwable
 		{
 			MessageElement me = _translator.serialize(_propName, args[0]);
@@ -96,17 +194,42 @@ public class RPInvoker implements InvocationHandler
 		}
 	}
 	
+	/**
+	 * This is the implementation of handlers that can set multi-valued
+	 * RPs.
+	 * 
+	 * @author mmm2a
+	 */
 	private class MultiSetterHandler implements Handler
 	{
+		/**
+		 * The translator to use for RP translation.
+		 */
 		private MultiResourcePropertyTranslator _translator;
+		
+		/**
+		 * The QName of the target XML element.
+		 */
 		private QName _propName;
 		
-		public MultiSetterHandler(QName propName, MultiResourcePropertyTranslator translator)
+		/**
+		 * Creates a new MultiSetterHandler
+		 * 
+		 * @param propName The Resource Property name for this setter.
+		 * @param translator The translator to use for resource property 
+		 * translations.
+		 */
+		public MultiSetterHandler(QName propName,
+			MultiResourcePropertyTranslator translator)
 		{
 			_propName = propName;
 			_translator = translator;
 		}
 		
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		@SuppressWarnings("unchecked")
 		public Object handle(Method m, Object []args) throws Throwable
 		{
@@ -117,6 +240,10 @@ public class RPInvoker implements InvocationHandler
 		}
 	}
 	
+	/**
+	 * This is the method that represents the request to refresh the cache.
+	 * We store it as a performance optimization.
+	 */
 	static private Method _refreshMethod;
 	
 	static
@@ -142,14 +269,23 @@ public class RPInvoker implements InvocationHandler
 	private HashMap<QName, Collection<MessageElement>> _propertiesCache =
 		new HashMap<QName, Collection<MessageElement>>();
 	
+	/**
+	 * Update a list of resource properties (by making the appropriate 
+	 * outcalls and updating the cache.
+	 * 
+	 * @param properties The resource properties to set.
+	 * @param values The values of those resource properties.
+	 * 
+	 * @throws ResourcePropertyException
+	 */
 	synchronized private void setProperties(QName properties, 
 		Collection<MessageElement> values)
 			throws ResourcePropertyException
 	{
 		try
 		{
-			_stub.updateResourceProperties(new UpdateResourceProperties(new UpdateType(
-				values.toArray(new MessageElement[0]))));
+			_stub.updateResourceProperties(new UpdateResourceProperties(
+				new UpdateType(values.toArray(new MessageElement[0]))));
 			_propertiesCache.put(properties, values);
 		}
 		catch (ResourceUnknownFaultType ruft)
@@ -163,6 +299,15 @@ public class RPInvoker implements InvocationHandler
 		}
 	}
 	
+	/**
+	 * Fill in the cache with a bunch of resource properties from a remote 
+	 * resource.
+	 * 
+	 * @param properties The resource properties to get from the remote 
+	 * resource.
+	 * 
+	 * @throws ResourcePropertyException
+	 */
 	synchronized private void fillInCache(Collection<QName> properties)
 		throws ResourcePropertyException
 	{
@@ -211,11 +356,13 @@ public class RPInvoker implements InvocationHandler
 		}
 		catch (org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType ruft)
 		{
-			throw new ResourcePropertyException("Resource is unknown.", ruft);
+			throw new ResourcePropertyException("Resource is unknown.", 
+				ruft);
 		}
 		catch (ResourceUnavailableFaultType ruft)
 		{
-			throw new ResourcePropertyException("Resource is unavailable.", ruft);
+			throw new ResourcePropertyException("Resource is unavailable.", 
+				ruft);
 		}
 		catch (RemoteException re)
 		{
@@ -224,6 +371,16 @@ public class RPInvoker implements InvocationHandler
 		}
 	}
 	
+	/**
+	 * A singleton version of getting a resource property (singleton in the 
+	 * sense of the number of RPs retrieve, not their value cardinalities).
+	 * 
+	 * @param properties The resource property to get.
+	 * 
+	 * @return The retrieved RP values.
+	 * 
+	 * @throws ResourcePropertyException
+	 */
 	synchronized private Collection<MessageElement> getProperties(
 		QName properties) throws ResourcePropertyException
 	{
@@ -237,6 +394,14 @@ public class RPInvoker implements InvocationHandler
 		return _propertiesCache.get(properties);
 	}
 	
+	/**
+	 * Set a resource property.
+	 * 
+	 * @param propertyName The name of the property to set.
+	 * @param me The XML representation of the resource property.
+	 * 
+	 * @throws ResourcePropertyException
+	 */
 	private void setProperty(QName propertyName, MessageElement me)
 		throws ResourcePropertyException
 	{
@@ -259,6 +424,15 @@ public class RPInvoker implements InvocationHandler
 		}
 	}
 	
+	/**
+	 * Get a single value resource property.
+	 * 
+	 * @param propertyName The name of the resource property to retrieve.
+	 * 
+	 * @return The value of the resource property.
+	 * 
+	 * @throws ResourcePropertyException
+	 */
 	private MessageElement getProperty(QName propertyName)
 		throws ResourcePropertyException
 	{
@@ -276,9 +450,19 @@ public class RPInvoker implements InvocationHandler
 			return ret.iterator().next();
 		
 		throw new ResourcePropertyException(
-			"Attempt to retrieve multi-valued resource property as a singleton.");
+			"Attempt to retrieve multi-valued resource " +
+			"property as a singleton.");
 	}
 	
+	/**
+	 * A convenience method to create a translator from it's class.
+	 * 
+	 * @param transClass The class of the translator to create.
+	 * 
+	 * @return The newly created resource property translator.
+	 * 
+	 * @throws ResourcePropertyException
+	 */
 	static private ResourcePropertyTranslator createTanslator(
 		Class<? extends ResourcePropertyTranslator> transClass)
 			throws ResourcePropertyException
@@ -316,6 +500,17 @@ public class RPInvoker implements InvocationHandler
 		}
 	}
 	
+	/**
+	 * Determine from return type whether or not the given method is a setter
+	 * or a getter method.
+	 * 
+	 * @param method The method to analyze.
+	 * 
+	 * @return true if the method given represents a set operation, 
+	 * false otherwise.
+	 * 
+	 * @throws ResourcePropertyException
+	 */
 	static private boolean isSetter(Method method)
 		throws ResourcePropertyException
 	{
@@ -339,6 +534,19 @@ public class RPInvoker implements InvocationHandler
 			"\" does not match either the RP getter or RP setter pattern.");
 	}
 	
+	/**
+	 * Create a new handler appropriate for handling singleton values.
+	 * 
+	 * @param propertyName The name of the resource property this handler
+	 * will handle.
+	 * @param translator The translator to use for translating the resource
+	 * properties.
+	 * @param method The method that this handler is being used for.
+	 * 
+	 * @return A newly created handler appropriate for the given method.
+	 * 
+	 * @throws ResourcePropertyException
+	 */
 	private Handler createSingleHandler(QName propertyName, 
 		SingleResourcePropertyTranslator translator, Method method)
 		throws ResourcePropertyException
@@ -349,6 +557,19 @@ public class RPInvoker implements InvocationHandler
 			return new SingleGetterHandler(propertyName, translator);
 	}
 	
+	/**
+	 * Create a new handler appropriate for handling multi-values.
+	 * 
+	 * @param propertyName The name of the resource property this handler
+	 * will handle.
+	 * @param translator The translator to use for translating the resource
+	 * properties.
+	 * @param method The method that this handler is being used for.
+	 * 
+	 * @return A newly created handler appropriate for the given method.
+	 * 
+	 * @throws ResourcePropertyException
+	 */
 	private Handler createMultiHandler(QName propertyName, 
 			MultiResourcePropertyTranslator translator, Method method)
 			throws ResourcePropertyException
@@ -370,6 +591,18 @@ public class RPInvoker implements InvocationHandler
 			method.toGenericString() + ") does not take/return a collection.");
 	}
 		
+	/**
+	 * Create a new handler for the given method.  This method is responsible
+	 * for reflecting on the method and it's annotations and determining which
+	 * kind of handler is appropriate, what the name of the RP is, what 
+	 * translators to use, etc.
+	 * 
+	 * @param method The method to create a handler for.
+	 * 
+	 * @return The newly created handler.
+	 * 
+	 * @throws ResourcePropertyException
+	 */
 	private Handler createHandler(Method method) throws ResourcePropertyException
 	{
 		ResourceProperty rp = method.getAnnotation(ResourceProperty.class);
@@ -422,6 +655,16 @@ public class RPInvoker implements InvocationHandler
 		}
 	}
 	
+	/**
+	 * Get the handler registered for a given method.  THis is called at
+	 * run time to handle an RP request.
+	 * 
+	 * @param method The method that we are getting the handler for.
+	 * 
+	 * @return The registered handler.
+	 * 
+	 * @throws ResourcePropertyException
+	 */
 	private Handler getHandler(Method method) throws ResourcePropertyException
 	{
 		synchronized(_handlers)
@@ -437,6 +680,17 @@ public class RPInvoker implements InvocationHandler
 		}
 	}
 	
+	/**
+	 * Create a new RPInvoker.
+	 * 
+	 * @param likelyRPs The list of resource properties that we are "likely" 
+	 * going to have to handle.
+	 * @param target The target resource to get/set RPs for.
+	 * 
+	 * @throws GenesisIISecurityException
+	 * @throws ConfigurationException
+	 * @throws ResourceException
+	 */
 	public RPInvoker(Collection<QName> likelyRPs, EndpointReferenceType target)
 		throws GenesisIISecurityException, ConfigurationException, 
 			ResourceException
@@ -445,6 +699,9 @@ public class RPInvoker implements InvocationHandler
 		_stub = ClientUtils.createProxy(GeniiCommon.class, target);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args)
 		throws Throwable
