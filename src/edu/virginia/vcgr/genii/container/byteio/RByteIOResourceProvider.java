@@ -22,17 +22,6 @@ public class RByteIOResourceProvider extends BasicDBResourceProvider
 	protected IResourceFactory instantiateResourceFactory(DatabaseConnectionPool pool)
 		throws SQLException, ResourceException
 	{
-		try
-		{
-			return new RByteIOResourceFactory(pool);
-		}
-		catch (IOException ioe)
-		{
-			throw new ResourceException(ioe.getLocalizedMessage(), ioe);
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new ResourceException(ce.getLocalizedMessage(), ce);
-		}
+		return new RByteIOResourceFactory(pool, getTranslater());
 	}
 }

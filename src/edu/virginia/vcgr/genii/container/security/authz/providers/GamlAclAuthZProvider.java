@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package edu.virginia.vcgr.genii.container.security.authz.handlers;
+package edu.virginia.vcgr.genii.container.security.authz.providers;
 
 import java.security.cert.PKIXBuilderParameters;
 import java.security.cert.X509CertSelector;
@@ -60,17 +60,17 @@ import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
  * @author dmerrill
  * 
  */
-public class GamlAuthZHandler extends AuthZHandler {
+public class GamlAclAuthZProvider implements IAuthZProvider {
 
-	static protected final String GAML_ACL_PROPERTY_NAME = "genii.container.security.authz.gaml-acl";
+	static public final String GAML_ACL_PROPERTY_NAME = "genii.container.security.authz.gaml-acl";
 
 	static protected final MessageLevelSecurity _defaultMinMsgSec = new MessageLevelSecurity(
 			MessageLevelSecurity.SIGN);
 
 	@SuppressWarnings("unused")
-	static private Log _logger = LogFactory.getLog(GamlAuthZHandler.class);
+	static private Log _logger = LogFactory.getLog(GamlAclAuthZProvider.class);
 	
-	protected GamlAuthZHandler() {}
+	public GamlAclAuthZProvider() {}
 	
 	/**
 	 * Presently configures the specified resource to have default access allowed
@@ -270,7 +270,7 @@ public class GamlAuthZHandler extends AuthZHandler {
 					// verify authenticity
 					SignedAssertion signedAssertion = (SignedAssertion) cred;
 					signedAssertion.checkValidity(new Date());
-					SignedAssertion.verifyAssertion(signedAssertion);
+					signedAssertion.validateAssertion();
 
 					// if the assertion is pre-authorized for us, unwrap one layer
 					if ((targetCertChain != null) && 

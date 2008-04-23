@@ -58,7 +58,7 @@ import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 
 import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
-import edu.virginia.vcgr.genii.container.security.authz.handlers.*;
+import edu.virginia.vcgr.genii.container.security.authz.providers.*;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
 
@@ -103,7 +103,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		try 
 		{
 			IResource resource = ResourceManager.getCurrentResource().dereference();
-			AuthZHandler authZHandler = AuthZHandler.getAuthZHandler(resource);
+			IAuthZProvider authZHandler = AuthZProviders.getProvider(
+					resource.getParentResourceKey().getServiceName());
 			
 			if ((authZHandler == null) || 
 				(authZHandler.getMinIncomingMsgLevelSecurity(resource).isNone())) 
@@ -146,7 +147,9 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
     		// get the resource's min messsage-sec level
     		MessageLevelSecurity resourceMinMsgSec;
     		IResource resource = ResourceManager.getCurrentResource().dereference();
-    		AuthZHandler authZHandler = AuthZHandler.getAuthZHandler(resource);
+    		IAuthZProvider authZHandler = AuthZProviders.getProvider(
+    				resource.getParentResourceKey().getServiceName());
+
     		if (authZHandler == null) {
     			resourceMinMsgSec = new MessageLevelSecurity();
     		} else {
@@ -309,7 +312,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
     		
 	    	// get the resource's authz handler
 	    	IResource resource = ResourceManager.getCurrentResource().dereference();
-    		AuthZHandler authZHandler = AuthZHandler.getAuthZHandler(resource);
+			IAuthZProvider authZHandler = AuthZProviders.getProvider(
+					resource.getParentResourceKey().getServiceName());
     		
     		// Let the authZ handler make the decision
     		return authZHandler.checkAccess(

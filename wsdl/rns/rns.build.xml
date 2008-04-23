@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project default="gen.rns">
+<project default="gen.enhanced-rns">
 
 	<fail message="wsdl.dir variable not set.">
 		<condition>
@@ -12,37 +12,45 @@
 	<import file="${wsdl.dir}/wsdl-build.xml"/>
 	<import file="${wsdl.dir}/common.build.xml"/>
 
-	<condition property="gen.rns.uptodate">
+	<condition property="gen.enhanced-rns.uptodate">
 		<and>
 			<common.source.files.uptodate
-				targetfile="${temporary.codegen.dir}/wsdl/rns.flag"/>
-			<uptodate targetfile="${temporary.codegen.dir}/wsdl/rns.flag">
+				targetfile="${temporary.codegen.dir}/wsdl/enhanced-rns.flag"/>
+			<uptodate targetfile="${temporary.codegen.dir}/wsdl/enhanced-rns.flag">
 				<srcfiles dir="${wsdl.dir}/rns">
+					<include name="enhanced-rns.xsd"/>
 					<include name="rns.xsd"/>
-					<include name="rns.gwsdl"/>
+					<include name="rns.wsdl"/>
+					<include name="enhanced-rns.gwsdl"/>
 				</srcfiles>
 			</uptodate>
 		</and>
 	</condition>
 
-	<target name="gen.rns" unless="gen.rns.uptodate">
+	<target name="gen.enhanced-rns" unless="gen.enhanced-rns.uptodate">
 		<copy todir="${temporary.codegen.dir}/wsdl">
 			<filelist refid="common.source.files"/>
 			<fileset dir="${wsdl.dir}/rns">
-				<include name="rns.gwsdl"/>
+				<include name="enhanced-rns.xsd"/>
 				<include name="rns.xsd"/>
+				<include name="rns.wsdl"/>
+				<include name="enhanced-rns.gwsdl"/>
 			</fileset>
 		</copy>
 
 		<echo message="Normalizing gwsdl."/>
-		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/rns.gwsdl"
-			target="${temporary.codegen.dir}/wsdl/rns-generated.wsdl"/>
+		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/enhanced-rns.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/enhanced-rns-generated.wsdl"/>
 
 		<echo message="Generating Service gwsdl."/>
 		<genii-service-generator
-			source="${temporary.codegen.dir}/wsdl/rns-generated.wsdl"
+			source="${temporary.codegen.dir}/wsdl/rns.wsdl"
 			target="${temporary.codegen.dir}/wsdl/rns-service.wsdl"
 			portType="{http://schemas.ggf.org/rns/2006/05/rns}RNSPortType"/>
+		<genii-service-generator
+			source="${temporary.codegen.dir}/wsdl/enhanced-rns-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/enhanced-rns-service.wsdl"
+			portType="{http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns}EnhancedRNSPortType"/>
 
 		<antcall target="gen.stub-generation">
 			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/rns"/>
@@ -51,13 +59,20 @@
 			<param name="stub.gen.target-flag-file"
 				value="${temporary.codegen.dir}/wsdl/rns.flag"/>
 		</antcall>
-		<move file="${temporary.codegen.dir}/rns/org/ggf/rns/deploy.wsdd"
-			tofile="${wsdd.dir}/rns.deploy.wsdd"/>
-		<replace file="${wsdd.dir}/rns.deploy.wsdd"
-			token="org.ggf.rns.RNSSOAPBindingImpl"
-			value="edu.virginia.vcgr.genii.container.rns.RNSServiceImpl"
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/enhanced-rns"/>
+			<param name="stub.gen.source-wsdl"
+				value="${temporary.codegen.dir}/wsdl/enhanced-rns-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${temporary.codegen.dir}/wsdl/enhanced-rns.flag"/>
+		</antcall>
+		<move file="${temporary.codegen.dir}/enhanced-rns/edu/virginia/vcgr/genii/enhancedrns/deploy.wsdd"
+			tofile="${wsdd.dir}/enhancedrns.deploy.wsdd"/>
+		<replace file="${wsdd.dir}/enhancedrns.deploy.wsdd"
+			token="edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.rns.EnhancedRNSServiceImpl"
 			summary="yes"/>
-		<copy file="${wsdd.dir}/rns.deploy.wsdd"
+		<copy file="${wsdd.dir}/enhancedrns.deploy.wsdd"
 			todir="${services.dir}"/>
 	</target>
 

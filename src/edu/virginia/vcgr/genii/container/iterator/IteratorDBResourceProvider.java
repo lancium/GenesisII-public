@@ -20,6 +20,6 @@ public class IteratorDBResourceProvider extends BasicDBResourceProvider
 	protected IResourceFactory instantiateResourceFactory(DatabaseConnectionPool pool)
 		throws SQLException
 	{
-		return new IteratorDBResourceFactory(pool);
+		return new IteratorDBResourceFactory(pool, getTranslater());
 	}
 }

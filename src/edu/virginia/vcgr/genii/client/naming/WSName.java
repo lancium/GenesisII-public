@@ -166,6 +166,8 @@ public class WSName implements Comparable<WSName>
 			MessageElement []any = mdt.get_any();
 			if (any == null || any.length == 0)
 				return;
+			
+			// extact epi first
 			for (MessageElement element : any)
 			{
 				if (element.getQName().equals(WSName.ENDPOINT_IDENTIFIER_QNAME))
@@ -186,14 +188,21 @@ public class WSName implements Comparable<WSName>
 						}
 					}
 				}
-				else if (element.getQName().equals(WSName.REFERENCE_RESOLVER_QNAME))
+			}
+
+			for (MessageElement element : any)
+			{
+				if (element.getQName().equals(WSName.REFERENCE_RESOLVER_QNAME))
 				{
 					try 
 					{
 						EndpointReferenceType resolverEPR = (EndpointReferenceType) element.getObjectValue(EndpointReferenceType.class);
 						if (resolverEPR != null)
 						{
-							ResolverDescription resolver = new ResolverDescription(resolverEPR, ResolverDescription.ResolverType.REFERENCE_RESOLVER);
+							ResolverDescription resolver = new ResolverDescription(
+									_endpointIdentifier, 
+									resolverEPR, 
+									ResolverDescription.ResolverType.REFERENCE_RESOLVER);
 							_resolvers.add(resolver);
 						}
 					}
@@ -209,7 +218,10 @@ public class WSName implements Comparable<WSName>
 						EndpointReferenceType resolverEPR = (EndpointReferenceType) element.getObjectValue(EndpointReferenceType.class);
 						if (resolverEPR != null)
 						{
-							ResolverDescription resolver = new ResolverDescription(resolverEPR, ResolverDescription.ResolverType.EPI_RESOLVER);
+							ResolverDescription resolver = new ResolverDescription(
+									_endpointIdentifier, 
+									resolverEPR, 
+									ResolverDescription.ResolverType.EPI_RESOLVER);
 							_resolvers.add(resolver);
 						}
 					}
@@ -225,14 +237,16 @@ public class WSName implements Comparable<WSName>
 	public void addReferenceResolver(EndpointReferenceType resolverEPR)
 	{
 		doExtraction();
-		ResolverDescription newResolverDesc = new ResolverDescription(resolverEPR, ResolverType.REFERENCE_RESOLVER);
+		ResolverDescription newResolverDesc = new ResolverDescription(
+				_endpointIdentifier, resolverEPR, ResolverType.REFERENCE_RESOLVER);
 		_epr = addResolverToEPR(_epr, newResolverDesc);
 		_resolvers.add(newResolverDesc);
 	}
 	
 	public void addEndpointIdentifierReferenceResolver(EndpointReferenceType resolverEPR)
 	{
-		ResolverDescription newResolverDesc = new ResolverDescription(resolverEPR, ResolverType.EPI_RESOLVER);
+		ResolverDescription newResolverDesc = new ResolverDescription(
+				_endpointIdentifier, resolverEPR, ResolverType.EPI_RESOLVER);
 		_epr = addResolverToEPR(_epr, newResolverDesc);
 		_resolvers.add(newResolverDesc);
 	}

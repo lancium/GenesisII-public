@@ -26,6 +26,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.resource.QueueDBResourceFactory;
 import edu.virginia.vcgr.genii.container.resource.IResource;
+import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
@@ -40,17 +41,19 @@ public class DBBESResourceFactory extends BasicDBResourceFactory
 			"screensaverinactiveaction VARCHAR(64) NOT NULL)"
 	};
 	
-	public DBBESResourceFactory(DatabaseConnectionPool connectionPool)
+	public DBBESResourceFactory(
+			DatabaseConnectionPool pool, 
+			IResourceKeyTranslater translator)
 		throws SQLException
 	{
-		super(connectionPool);
+		super(pool, translator);
 	}
 	
 	public IResource instantiate(ResourceKey parentKey) throws ResourceException
 	{
 		try
 		{
-			return new DBBESResource(parentKey, _pool);
+			return new DBBESResource(parentKey, _pool, _translater);
 		}
 		catch (SQLException sqe)
 		{

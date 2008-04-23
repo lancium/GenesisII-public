@@ -139,10 +139,19 @@ public class TypeInformation
 		return hasPortType(WellKnownPortTypes.RNS_SERVICE_PORT_TYPE);
 	}
 	
+	public boolean isEnhancedRNS()
+	{
+		return hasPortType(WellKnownPortTypes.ENHANCED_RNS_SERVICE_PORT_TYPE);
+	}
+
 	public boolean isIDP() {
-		return hasPortType(WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE);
+		return hasPortType(WellKnownPortTypes.STS_SERVICE_PORT_TYPE);
 	}
 	
+	public boolean isX509IDP() {
+		return hasPortType(WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE);
+	}
+
 	public boolean isCounter()
 	{
 		return hasPortType(WellKnownPortTypes.COUNTER_PORT_TYPE);

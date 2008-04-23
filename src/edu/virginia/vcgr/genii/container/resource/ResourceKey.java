@@ -34,7 +34,6 @@ public class ResourceKey implements Closeable
 	
 	private boolean _closed = false;
 	
-	private IResourceKeyTranslater _translater;
 	private IResourceFactory _factory;
 	private IResource _cachedResource = null;
 	private IResourceProvider _provider = null;
@@ -105,7 +104,6 @@ public class ResourceKey implements Closeable
 		try
 		{
 			IResourceProvider provider = ResourceProviders.getProvider(serviceName);
-			_translater = provider.getTranslater();
 			_factory = provider.getFactory();
 			_cachedResource = _factory.instantiate(this);
 			translateConstructionParameters(serviceName,
@@ -140,18 +138,15 @@ public class ResourceKey implements Closeable
 	ResourceKey(String serviceName, ReferenceParametersType refParams)
 		throws ResourceUnknownFaultType, ResourceException
 	{
-		Object key;
 		boolean noExceptions = false;
 		_serviceName = serviceName;
 		
 		try
 		{
 			_provider = ResourceProviders.getProvider(serviceName);
-			_translater = _provider.getTranslater();
 			_factory = _provider.getFactory();
-			key = _translater.unwrap(refParams);
 			_cachedResource = _factory.instantiate(this);
-			_cachedResource.load(key);
+			_cachedResource.load(refParams);
 			incrementCounter(_cachedResource);
 			_incrementedCounter = true;
 			noExceptions = true;
@@ -184,7 +179,7 @@ public class ResourceKey implements Closeable
 	public ReferenceParametersType getResourceParameters()
 		throws ResourceException
 	{
-		return _translater.wrap(dereference().getKey());
+		return dereference().getResourceParameters(); 
 	}
 	
 	/**
@@ -297,6 +292,9 @@ public class ResourceKey implements Closeable
 	
 	public Object getKey()
 	{
+		if (_cachedResource == null) {
+			return null;
+		}
 		return _cachedResource.getKey();
 	}
 }

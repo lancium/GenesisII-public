@@ -20,6 +20,6 @@ public class QueueDBResourceProvider extends BasicDBResourceProvider
 	protected IResourceFactory instantiateResourceFactory(DatabaseConnectionPool pool)
 		throws SQLException
 	{
-		return new QueueDBResourceFactory(pool);
+		return new QueueDBResourceFactory(pool, getTranslater());
 	}
 }

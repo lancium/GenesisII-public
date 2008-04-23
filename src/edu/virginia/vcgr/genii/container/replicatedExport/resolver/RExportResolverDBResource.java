@@ -13,6 +13,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
@@ -37,10 +38,13 @@ implements IRExportResolverResource
 	static public final String _RESOLVER_SERVICE_EPR_PROPERTY_NAME = 
 		"rexport-resolver-service-epr";
 	
-	public RExportResolverDBResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool)
+	public RExportResolverDBResource(
+			ResourceKey parentKey, 
+			DatabaseConnectionPool connectionPool,
+			IResourceKeyTranslater translater)
 		throws SQLException
 	{
-		super(parentKey, connectionPool);
+		super(parentKey, connectionPool, translater);
 	}
 	
 	public void update(RExportResolverEntry entry) 

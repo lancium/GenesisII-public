@@ -10,6 +10,8 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+import org.ws.addressing.ReferenceParametersType;
+
 import edu.virginia.vcgr.genii.container.common.notification.SubscriptionInformation;
 
 /**
@@ -60,11 +62,11 @@ public interface IResource extends Closeable
 	 * Load a resources state from persistent storage (or do nothing if no
 	 * loading needs to take place).
 	 * 
-	 * @param key The key that identifies this resource.  The type can be of any
+	 * @param refParams The refParams that identifies this resource.  The type can be of any
 	 * type as long as it matches the IResourceKeyTranslater being used.
 	 * @throws ResourceException If anything goes wrong.
 	 */
-	public void load(Object key) throws ResourceUnknownFaultType, ResourceException;
+	public void load(ReferenceParametersType refParams) throws ResourceUnknownFaultType, ResourceException;
 	
 	/**
 	 * Retrieve the internal key that represents this resource.  This method is
@@ -135,4 +137,13 @@ public interface IResource extends Closeable
 	 * Return whether or not the resource is a service resource
 	 */
 	public boolean isServiceResource();
+	
+	/**
+	 * Retrieve the WS-Addressing ReferenceParameters that match this resource.
+	 * 
+	 * @return The Addressing information for WS-Addressing.
+	 * @throws ResourceException If anything goes wrong.
+	 */
+	public ReferenceParametersType getResourceParameters()
+		throws ResourceException;	
 }

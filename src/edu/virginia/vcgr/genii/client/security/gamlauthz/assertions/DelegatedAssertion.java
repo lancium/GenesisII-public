@@ -33,7 +33,7 @@ import java.util.Date;
  * 
  * @author dmerrill
  */
-public class DelegatedAssertion extends SignedAssertion {
+public class DelegatedAssertion extends SignedAssertionBaseImpl {
 
 	static public final long serialVersionUID = 0L;
 	
@@ -111,7 +111,7 @@ public class DelegatedAssertion extends SignedAssertion {
 	 * Verify the assertion.  It is verified if all signatures successfully
 	 * authenticate the signed-in authorizing identities
 	 */	
-	public void verifyAssertion() throws GeneralSecurityException {
+	public void validateAssertion() throws GeneralSecurityException {
 		
 		if ((_delegatorSignature == null) || (_delegatedAttribute == null)) {
  			throw new AssertionInvalidException("No signature or data to verify");
@@ -134,7 +134,7 @@ public class DelegatedAssertion extends SignedAssertion {
 	 		}
 	 		
 	 		// verify the delegated assertion
-	 		_delegatedAttribute.getSignedAssertion().verifyAssertion();
+	 		_delegatedAttribute.getSignedAssertion().validateAssertion();
 
  		} catch (IOException e) {
  			throw new GeneralSecurityException(e.getMessage(), e);

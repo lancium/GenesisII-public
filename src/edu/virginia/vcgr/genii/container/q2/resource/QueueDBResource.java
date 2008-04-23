@@ -7,15 +7,19 @@ import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
 public class QueueDBResource extends BasicDBResource implements IQueueResource
 {
-	public QueueDBResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool)
+	public QueueDBResource(
+			ResourceKey parentKey, 
+			DatabaseConnectionPool connectionPool,
+			IResourceKeyTranslater translater)
 		throws SQLException
 	{
-		super(parentKey, connectionPool);
+		super(parentKey, connectionPool, translater);
 	}
 	
 	public void destroy() throws ResourceException

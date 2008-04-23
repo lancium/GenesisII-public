@@ -172,7 +172,7 @@ public class CertTool {
     }	
 
 	@SuppressWarnings("unchecked")
-	public static String getUID(X509Certificate cert) {
+	public static String getSN(X509Certificate cert) {
 		X509Name dn = new X509Name(cert.getSubjectDN().toString());
 		Vector<DERObjectIdentifier> oids = dn.getOIDs();
 		Vector<String> values = dn.getValues();
@@ -181,7 +181,7 @@ public class CertTool {
 		while (oidItr.hasNext()) {
         	DERObjectIdentifier oid = oidItr.next();
         	String value = valItr.next();
-        	if (oid.equals(X509Name.UID)) {
+        	if (oid.equals(X509Name.SN)) {
         		return value;
         	}
 		}
@@ -205,34 +205,60 @@ public class CertTool {
 		return null;
 	}
 	
-	
 	@SuppressWarnings("unchecked")
 	public static X509Certificate[] createResourceCertChain(
 			String epi, 
 			String newCN, 
 			CertCreationSpec certSpec) throws GeneralSecurityException {
 		
-		// replace the UID and the CN, if necessary
+		ArrayList<String> newCNs = new ArrayList<String>();
+		newCNs.add(newCN);
+		return createResourceCertChain(epi, newCNs, null, certSpec);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static X509Certificate[] createResourceCertChain(
+			String epi, 
+			ArrayList<String> newCNs,
+			String uid,
+			CertCreationSpec certSpec) throws GeneralSecurityException {
+		
+		// replace the SN and the old CNs, if necessary
+		
 		X509Name dn = new X509Name(certSpec.issuerChain[0].getSubjectDN().toString());
 		Vector<DERObjectIdentifier> oids = dn.getOIDs();
 		Vector<String> values = dn.getValues();
+
 		Iterator<DERObjectIdentifier> oidItr = oids.iterator();
 		ListIterator<String> valItr = values.listIterator();
-		boolean uidSet = false;
+
 		while (oidItr.hasNext()) {
         	DERObjectIdentifier oid = oidItr.next();
         	valItr.next();
-        	if (oid.equals(X509Name.UID)) {
-        		valItr.set(epi);
-        		uidSet = true;
-        	} else if ((newCN != null) && (oid.equals(X509Name.CN))) {
-        		valItr.set(newCN);
+        	if (oid.equals(X509Name.SN)) {
+        		valItr.remove();
+        		oidItr.remove();
+        	} else if (oid.equals(X509Name.CN)) {
+        		valItr.remove();
+        		oidItr.remove();
         	}
 		}
-		if (!uidSet) {
-			oids.add(X509Name.UID);
+
+		if (epi != null) {
+			oids.add(X509Name.SN);
 			values.add(epi);
 		}
+		if (uid != null) {
+			oids.add(X509Name.UID);
+			values.add(uid);
+		}
+		if (newCNs != null) {
+			for (String cn : newCNs) {
+				oids.add(X509Name.CN);
+				values.add(cn);
+			}
+		}
+
 		dn = new X509Name(oids, values);
 		
 		X509Certificate newCert = CertTool.createIntermediateCert(

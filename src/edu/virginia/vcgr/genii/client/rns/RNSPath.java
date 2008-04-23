@@ -30,11 +30,15 @@ import org.ggf.rns.RNSEntryNotDirectoryFaultType;
 import org.ggf.rns.RNSPortType;
 import org.ggf.rns.Remove;
 import org.morgan.util.configuration.ConfigurationException;
+import org.morgan.util.io.StreamUtils;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.ws.addressing.EndpointReferenceType;
+import edu.virginia.vcgr.genii.enhancedrns.*;
+import edu.virginia.vcgr.genii.queue.JobInformationType;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
+import edu.virginia.vcgr.genii.client.iterator.WSIterable;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
@@ -66,8 +70,40 @@ public class RNSPath implements Externalizable  {
 	{
 		EntryType[] ret = null;
 
-		RNSPortType rpt = ClientUtils.createProxy(RNSPortType.class, epr);
-		ret = rpt.list(new List(entryExpression)).getEntryList();
+		TypeInformation ti = new TypeInformation(epr);
+		if (ti.isEnhancedRNS() && ti.isIDP() && entryExpression.equals(".*")) {		// TODO: make iteration faster for regular contexts so we can use it for them too
+
+			// Enhanced: use iterator
+			EnhancedRNSPortType rpt = ClientUtils.createProxy(EnhancedRNSPortType.class, epr);
+			IterateListResponseType responseIterator = 
+				rpt.iterateList(new IterateListRequestType(entryExpression));
+			
+			WSIterable<EntryType> iterable = null;
+			try
+			{
+				iterable = new WSIterable<EntryType>(
+						EntryType.class, responseIterator.getIterator(), 50, true);
+				
+				ArrayList<EntryType> aggregate = new ArrayList<EntryType>();
+				Iterator<EntryType> itr = iterable.iterator();
+				
+				while (itr.hasNext()) {
+					aggregate.add(itr.next());
+				}
+				
+				return aggregate.toArray(new EntryType[0]);
+			}
+			finally
+			{
+				StreamUtils.close(iterable);
+			}
+			
+		} else {
+			// Not enhanced: don't use the iterator
+			
+			RNSPortType rpt = ClientUtils.createProxy(RNSPortType.class, epr);
+			ret = rpt.list(new List(entryExpression)).getEntryList();
+		}
 
 		return ret;
 	}
@@ -289,6 +325,20 @@ public class RNSPath implements Externalizable  {
 			return false;
 		TypeInformation ti = new TypeInformation(epr);
 		return ti.isIDP();
+	}	
+
+	/**
+	 * Indicates whether the current entry is an idp or not.
+	 * 
+	 * @return True if the current indicated entry is an idp, false otherwise.
+	 */
+	public boolean isX509IDP() {
+		PathElement last = _path.getLast();
+		EndpointReferenceType epr = last.getEndpoint();
+		if (epr == null)
+			return false;
+		TypeInformation ti = new TypeInformation(epr);
+		return ti.isX509IDP();
 	}	
 
 	/**
@@ -651,9 +701,7 @@ public class RNSPath implements Externalizable  {
 			TypeInformation ti = new TypeInformation(epr);
 			if (ti.isRNS())
 			{
-				RNSPortType rpt = ClientUtils.createProxy(RNSPortType.class, epr);
-
-				if (rpt.list(new List(".*")).getEntryList().length > 0)
+				if (lookupContents(epr, ".*").length > 0)
 					throw new RNSException("Path \"" + pwd() + "\" is not empty.");
 			}
 

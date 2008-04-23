@@ -406,10 +406,23 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	{
 	}
 	
+	/**
+	 * Quick test for overriding classes to implement should they desire
+	 * to disable resource creation on this endpoint
+	 * @return true if vcgrCreate is applicable, false otherwise.
+	 */
+	protected boolean allowVcgrCreate() {
+		return true;
+	}
+	
 	@RWXMapping(RWXCategory.EXECUTE)
 	public final VcgrCreateResponse vcgrCreate(VcgrCreate createRequest)
 		throws RemoteException, ResourceCreationFaultType
 	{
+		if (!allowVcgrCreate()) {
+			throw new RemoteException("\"vcgrCreate\" not applicable.");
+		}
+		
 		EndpointReferenceType myEPR = 
 			(EndpointReferenceType)WorkingContext.getCurrentWorkingContext().getProperty(
 					WorkingContext.EPR_PROPERTY_NAME);

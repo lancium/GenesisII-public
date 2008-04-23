@@ -8,6 +8,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.IResourceFactory;
+import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
@@ -20,17 +21,19 @@ public class RNSDBResourceFactory extends BasicDBResourceFactory implements
 		"attrs VARCHAR (8192) FOR BIT DATA, " +
 		"CONSTRAINT contextsconstraint1 PRIMARY KEY (resourceid, name))";
 	
-	public RNSDBResourceFactory(DatabaseConnectionPool connectionPool)
+	public RNSDBResourceFactory(
+			DatabaseConnectionPool pool, 
+			IResourceKeyTranslater translator)
 		throws SQLException
 	{
-		super(connectionPool);
+		super(pool, translator);
 	}
 	
 	public IResource instantiate(ResourceKey parentKey) throws ResourceException
 	{
 		try
 		{
-			return new RNSDBResource(parentKey, _pool);
+			return new RNSDBResource(parentKey, _pool, _translater);
 		}
 		catch (SQLException sqe)
 		{

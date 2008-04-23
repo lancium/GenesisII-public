@@ -10,7 +10,6 @@
 	<classpathentry kind="lib" path="ext/axis/ext/xml-apis.jar"/>
 	<classpathentry kind="lib" path="ext/axis/ext/xmlParserAPIs.jar"/>
 	<classpathentry kind="lib" path="ext/axis/ext/xmlsec-1.4.Beta2.jar"/>
-	<classpathentry kind="lib" path="ext/bouncycastle/bcprov-jdk15-133.jar"/>
 	<classpathentry kind="lib" path="ext/jetty/ext/ant.jar"/>
 	<classpathentry kind="lib" path="ext/jetty/ext/commons-el.jar"/>
 	<classpathentry kind="lib" path="ext/jetty/ext/commons-logging.jar"/>
@@ -36,11 +35,13 @@
 	<classpathentry kind="lib" path="ext/hypersonic/hsqldb.jar"/>
 	<classpathentry kind="lib" path="lib"/>
 	<classpathentry kind="lib" path="security"/>
-	<classpathentry kind="lib" path="ext/wss4j/wss4j-1.5.1.jar"/>
+	<classpathentry kind="lib" path="ext/wss4j/wss4j-1.5.1.jar" sourcepath="D:/Dev/wss4j/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="ext/derby/derby.jar"/>
 	<classpathentry kind="lib" path="ext/xmldb/db.jar"/>
 	<classpathentry kind="lib" path="ext/xmldb/dbxml.jar"/>
 	<classpathentry kind="lib" path="lib/GenesisII-ws.jar" sourcepath="genned-src"/>
+	<classpathentry kind="lib" path="ext/jndi/nis.jar"/>
+	<classpathentry kind="lib" path="ext/bouncycastle/bcprov-jdk16-139.jar" sourcepath="D:/Dev/bcprov-jdk16-139/src.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

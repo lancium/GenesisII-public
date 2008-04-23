@@ -11,6 +11,7 @@ import org.apache.axis.message.MessageElement;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 
 public class SByteIOResource extends RByteIOResource implements
@@ -21,10 +22,13 @@ public class SByteIOResource extends RByteIOResource implements
 	static private final String _INTERNAL_MUST_DESTROY_PROPERTY =
 		"edu.virginia.vcgr.genii.byteio.sbyteio.must-destroy";
 	
-	public SByteIOResource(ResourceKey rKey, DatabaseConnectionPool pool)
+	public SByteIOResource(
+			ResourceKey parentKey, 
+			DatabaseConnectionPool connectionPool,
+			IResourceKeyTranslater translater)
 		throws SQLException
 	{
-		super(rKey, pool);
+		super(parentKey, connectionPool, translater);
 	}
 	
 	public File chooseFile(HashMap<QName, Object> creationProperties)

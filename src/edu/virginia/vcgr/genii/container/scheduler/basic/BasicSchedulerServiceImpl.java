@@ -21,13 +21,13 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
-import edu.virginia.vcgr.genii.container.rns.RNSServiceImpl;
+import edu.virginia.vcgr.genii.container.rns.EnhancedRNSServiceImpl;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.scheduler.NoMatchingScheduleFaultType;
 import edu.virginia.vcgr.genii.scheduler.ScheduleCriteriaType;
 import edu.virginia.vcgr.genii.scheduler.basic.BasicSchedulerPortType;
 
-public class BasicSchedulerServiceImpl extends RNSServiceImpl implements
+public class BasicSchedulerServiceImpl extends EnhancedRNSServiceImpl implements
 		BasicSchedulerPortType
 {
 	static private final String _NEXT_PROPERTY_NAME = 

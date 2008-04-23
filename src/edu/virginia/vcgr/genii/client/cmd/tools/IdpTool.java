@@ -87,8 +87,7 @@ public class IdpTool extends GamlLoginTool {
 			// log in
 			URI authnSource = (_authnUri == null) ? null : new URI(_authnUri);
 			ArrayList<SignedAssertion> assertions = 
-				delegateToIdentity(ContextManager.getCurrentContext(),
-					authnSource, delegateeAttribute);
+				delegateToIdentity(authnSource, ContextManager.getCurrentContext());
 	
 			if ((assertions == null) || (assertions.size() == 0)) {
 				return 0;
@@ -98,7 +97,7 @@ public class IdpTool extends GamlLoginTool {
 					+ assertions.get(0).getAttribute() + "\".");
 	
 			// serialize the delegatedAssertion and put into construction params
-			String encodedAssertion = SignedAssertion.base64encodeAssertion(assertions.get(0));
+			String encodedAssertion = SignedAssertionBaseImpl.base64encodeAssertion(assertions.get(0));
 			MessageElement delegatedIdentParm = new MessageElement(
 					SecurityConstants.IDP_DELEGATED_IDENITY_QNAME, encodedAssertion);
 			constructionParms = 

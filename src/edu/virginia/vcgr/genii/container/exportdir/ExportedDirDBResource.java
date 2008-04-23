@@ -23,6 +23,7 @@ import org.ggf.rns.RNSEntryExistsFaultType;
 import org.morgan.util.GUID;
 import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
+import org.ws.addressing.ReferenceParametersType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
@@ -41,6 +42,7 @@ import edu.virginia.vcgr.genii.container.byteio.IRByteIOResource;
 import edu.virginia.vcgr.genii.container.byteio.RandomByteIOAttributeHandlers;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
+import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
@@ -110,10 +112,13 @@ public class ExportedDirDBResource extends BasicDBResource implements
 	protected static EndpointReferenceType _dirServiceEPR;
 	
 	
-	public ExportedDirDBResource(ResourceKey rKey, DatabaseConnectionPool pool)
+	public ExportedDirDBResource(
+			ResourceKey parentKey, 
+			DatabaseConnectionPool connectionPool,
+			IResourceKeyTranslater translater)
 		throws SQLException
 	{
-		super(rKey, pool);
+		super(parentKey, connectionPool, translater);
 	}
 	
 	public void initialize(HashMap<QName, Object> constructionParams)
@@ -134,11 +139,11 @@ public class ExportedDirDBResource extends BasicDBResource implements
 			insertDirInfo();
 	}
 	
-	public void load(Object key) throws ResourceUnknownFaultType, ResourceException
+	public void load(ReferenceParametersType refParams) throws ResourceUnknownFaultType, ResourceException
 	{
-		super.load(key);
+		super.load(refParams);
 		
-		if (key == null)
+		if (isServiceResource())
 			return;
 		
 		loadDirInfo();

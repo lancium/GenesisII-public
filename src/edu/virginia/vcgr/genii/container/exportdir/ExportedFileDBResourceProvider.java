@@ -22,17 +22,6 @@ public class ExportedFileDBResourceProvider extends BasicDBResourceProvider
 	protected IResourceFactory instantiateResourceFactory(DatabaseConnectionPool pool)
 		throws SQLException, ResourceException
 	{
-		try
-		{
-			return new ExportedFileDBResourceFactory(pool);
-		}
-		catch (IOException ioe)
-		{
-			throw new ResourceException(ioe.getLocalizedMessage(), ioe);
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new ResourceException(ce.getLocalizedMessage(), ce);
-		}
+		return new ExportedFileDBResourceFactory(pool, getTranslater());
 	}
 }

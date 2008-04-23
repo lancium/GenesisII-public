@@ -19,6 +19,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
+import java.net.URI;
+
 public class ResolverDescription
 {
 	@SuppressWarnings("unused")
@@ -26,12 +28,17 @@ public class ResolverDescription
 	static public enum ResolverType { REFERENCE_RESOLVER, EPI_RESOLVER };
 	
 	private EndpointReferenceType _epr;
+	private URI _epi ;
 	private ResolverType _type;
 	
-	public ResolverDescription(EndpointReferenceType epr, ResolverType type)
+	public ResolverDescription(
+			URI epi, 
+			EndpointReferenceType epr, 
+			ResolverType type)
 	{
 		_epr = epr;
 		_type = type;
+		_epi = epi;
 	}
 	
 	public EndpointReferenceType getEPR()
@@ -39,6 +46,11 @@ public class ResolverDescription
 		return _epr;
 	}
 	
+	public URI getEPI()
+	{
+		return _epi;
+	}
+
 	public ResolverType getType()
 	{
 		return _type;

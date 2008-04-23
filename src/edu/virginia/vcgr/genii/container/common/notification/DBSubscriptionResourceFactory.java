@@ -7,6 +7,7 @@ import java.sql.Statement;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
+import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
@@ -18,17 +19,19 @@ public class DBSubscriptionResourceFactory extends BasicDBResourceFactory
 		"topic VARCHAR(256), targetendpoint BLOB(128K)," +
 		"userdata VARCHAR (8192) FOR BIT DATA)";
 	
-	public DBSubscriptionResourceFactory(DatabaseConnectionPool pool)
+	public DBSubscriptionResourceFactory(
+			DatabaseConnectionPool pool, 
+			IResourceKeyTranslater translator)
 		throws SQLException
 	{
-		super(pool);
+		super(pool, translator);
 	}
 	
 	public IResource instantiate(ResourceKey parentKey) throws ResourceException
 	{
 		try
 		{
-			return new DBSubscriptionResource(parentKey, _pool);
+			return new DBSubscriptionResource(parentKey, _pool, _translater);
 		}
 		catch (SQLException sqe)
 		{

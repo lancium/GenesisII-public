@@ -78,7 +78,7 @@ public class RenewableClientAttribute extends DelegatedAttribute
 		_delegateeIdentity = clientKeyMaterial._clientCertChain;
 	}
 	
-	public void setAssertion(RenewableAttributeAssertion assertion) throws GeneralSecurityException {
+	public void setAssertion(SignedAssertion assertion) throws GeneralSecurityException {
 		if (assertion == null) {
 			throw new java.lang.IllegalArgumentException(
 					"DelegatedAttribute assertion cannot accept null parameters");

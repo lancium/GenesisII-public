@@ -18,6 +18,7 @@ import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.common.notification.UserDataType;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
@@ -38,10 +39,12 @@ public class DBSubscriptionResource
 		"DELETE FROM subscriptions WHERE sourcekey = ?";
 	
 	public DBSubscriptionResource(
-		ResourceKey parentKey, DatabaseConnectionPool connectionPool)
-			throws SQLException
+			ResourceKey parentKey, 
+			DatabaseConnectionPool connectionPool,
+			IResourceKeyTranslater translater)
+		throws SQLException
 	{
-		super(parentKey, connectionPool);
+		super(parentKey, connectionPool, translater);
 	}
 	
 	public void initialize(HashMap<QName, Object> constructionParams)

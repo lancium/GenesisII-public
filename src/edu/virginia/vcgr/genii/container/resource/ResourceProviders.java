@@ -63,7 +63,7 @@ class ResourceProviders
 				desc = services.get(serviceName);
 				if (desc != null)
 				{
-					provider = desc.retrieveProvider();
+					provider = desc.retrieveResourceProvider();
 					synchronized(_providerCache)
 					{
 						_providerCache.put(serviceName, provider);

@@ -20,6 +20,12 @@ public class IdentityAttribute extends BasicAttribute {
 	public IdentityAttribute() {}
 	
 	public IdentityAttribute(
+			AssertableIdentity identity) {
+		super(null);
+		_identity = identity;
+	}
+	
+	public IdentityAttribute(
 			AttributeConstraints constraints,
 			AssertableIdentity identity) {
 		super(constraints);

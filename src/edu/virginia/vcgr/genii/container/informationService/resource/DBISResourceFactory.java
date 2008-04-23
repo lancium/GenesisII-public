@@ -14,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
+import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.rns.RNSDBResourceFactory;
 
@@ -31,17 +32,19 @@ public class DBISResourceFactory extends RNSDBResourceFactory{
 		"callingcontext BLOB (128K)," +
 		"CONSTRAINT isconstraint PRIMARY KEY (containerid))";
 
-	public DBISResourceFactory(DatabaseConnectionPool pool) 
-		throws SQLException 
+	public DBISResourceFactory(
+			DatabaseConnectionPool pool, 
+			IResourceKeyTranslater translator)
+		throws SQLException
 	{
-		super(pool);
+		super(pool, translator);
 	}
 
 	public IResource instantiate(ResourceKey parentKey) throws ResourceException
 	{
 		try
 		{
-			return new DBISResource(parentKey, _pool);
+			return new DBISResource(parentKey, _pool, _translater);
 		}
 		catch (SQLException sqe)
 		{

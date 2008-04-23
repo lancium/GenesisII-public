@@ -18,7 +18,9 @@ package edu.virginia.vcgr.genii.container.rns;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.sql.SQLException;
 import java.util.Collection;
+import java.util.LinkedList;
 
 import javax.xml.namespace.QName;
 
@@ -42,7 +44,6 @@ import org.ggf.rns.RNSDirectoryNotEmptyFaultType;
 import org.ggf.rns.RNSEntryExistsFaultType;
 import org.ggf.rns.RNSEntryNotDirectoryFaultType;
 import org.ggf.rns.RNSFaultType;
-import org.ggf.rns.RNSPortType;
 import org.ggf.rns.Remove;
 import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
@@ -61,6 +62,9 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
+import edu.virginia.vcgr.genii.client.ser.AnyHelper;
+
+import edu.virginia.vcgr.genii.enhancedrns.*;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
@@ -72,18 +76,19 @@ import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
-public class RNSServiceImpl extends GenesisIIBase implements RNSPortType
+public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNSPortType
 {	
-	static private Log _logger = LogFactory.getLog(RNSServiceImpl.class);
+	static private Log _logger = LogFactory.getLog(EnhancedRNSServiceImpl.class);
 	
-	public RNSServiceImpl() throws RemoteException
+	public EnhancedRNSServiceImpl() throws RemoteException
 	{
-		super("RNSPortType");
+		super("EnhancedRNSPortType");
 		
 		addImplementedPortType(WellKnownPortTypes.RNS_SERVICE_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.ENHANCED_RNS_SERVICE_PORT_TYPE);
 	}
 	
-	protected RNSServiceImpl(String serviceName) throws RemoteException
+	protected EnhancedRNSServiceImpl(String serviceName) throws RemoteException
 	{
 		super(serviceName);
 		
@@ -207,6 +212,47 @@ public class RNSServiceImpl extends GenesisIIBase implements RNSPortType
     	
     	return new ListResponse(ret);
     }
+	
+	@RWXMapping(RWXCategory.READ)
+    public IterateListResponseType iterateList(IterateListRequestType list) 
+    	throws RemoteException, ResourceUnknownFaultType, 
+    		RNSEntryNotDirectoryFaultType, RNSFaultType
+    {
+    	_logger.debug("Entered list method.");
+    	
+    	String entry_name_regexp = list.getEntry_name_regexp();
+    	IRNSResource resource = null;
+    	Collection<InternalEntry> entries;
+    	
+    	ResourceKey rKey = ResourceManager.getCurrentResource();
+    	resource = (IRNSResource)rKey.dereference();
+	    entries = resource.retrieveEntries(entry_name_regexp);
+
+		Collection<MessageElement> col = new LinkedList<MessageElement>();
+    	for (InternalEntry internalEntry : entries)
+    	{
+    		EntryType entry = new EntryType(
+    				internalEntry.getName(), 
+    				internalEntry.getAttributes(), 
+    				internalEntry.getEntryReference());
+
+    		col.add(AnyHelper.toAny(entry));
+    	}
+		
+		try
+		{
+			return new IterateListResponseType(super.createWSIterator(col.iterator()));
+		}
+		catch (ConfigurationException ce)
+		{
+			throw new RemoteException("Unable to create iterator.", ce);
+		}
+		catch (SQLException sqe)
+		{
+			throw new RemoteException("Unable to create iterator.", sqe);
+		} 
+	    
+    }	
     
 	@RWXMapping(RWXCategory.WRITE)
     public MoveResponse move(Move move) 

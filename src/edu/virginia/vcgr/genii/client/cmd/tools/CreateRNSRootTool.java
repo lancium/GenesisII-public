@@ -83,7 +83,7 @@ public class CreateRNSRootTool extends BaseGridTool
 		throws SAXException, ParserConfigurationException, IOException,
 			ConfigurationException
 	{
-		RNSPath root = RNSSpace.createNewSpace(baseURL + "/RNSPortType");
+		RNSPath root = RNSSpace.createNewSpace(baseURL + "/EnhancedRNSPortType");
 		ICallingContext ctxt = ContextManager.bootstrap(root);
 		String userConfigDir = ConfigurationManager.getUserConfigDir();
 		ConnectTool connect = new ConnectTool();

@@ -35,6 +35,9 @@ import edu.virginia.vcgr.genii.common.security.*;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.cmd.tools.GamlLoginTool;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.naming.ResolverUtils;
+
+import org.ws.addressing.EndpointReferenceType;
 
 public class GamlClientTool {
 
@@ -191,11 +194,11 @@ public class GamlClientTool {
 			} finally {
 				StreamUtils.close(in);
 			}
-		} else if (path.isIDP()) {
+		} else if (path.isX509IDP()) {
 			// get the identity represented by the idp
 			try {
 				ArrayList<SignedAssertion> identities = 
-					GamlLoginTool.doIdpLogin(path.getEndpoint(), null, 0);
+					GamlLoginTool.doIdpLogin(path.getEndpoint(), 0, null);
 				Attribute firstAttr = identities.get(0).getAttribute();
 				if (firstAttr instanceof IdentityAttribute) {
 					IdentityAttribute identAttr = (IdentityAttribute) firstAttr;
@@ -206,7 +209,14 @@ public class GamlClientTool {
 			}
 		} else {
 			// get the identity of the resource
-			X509Certificate[] chain = EPRUtils.extractCertChain(path.getEndpoint());
+			
+			// make sure it's not an unbound epr
+			EndpointReferenceType epr = path.getEndpoint();
+			if (EPRUtils.isUnboundEPR(epr)) {
+				epr = ResolverUtils.resolve(epr);
+			}
+			
+			X509Certificate[] chain = EPRUtils.extractCertChain(epr);
 			return new X509Identity(chain);
 		}
 		

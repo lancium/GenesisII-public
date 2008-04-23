@@ -28,6 +28,7 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.TransientCredentials;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.UsernameTokenIdentity;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.X509Identity;
+import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.client.security.SecurityConstants;
 import edu.virginia.vcgr.genii.client.utils.PathUtils;
 import edu.virginia.vcgr.genii.client.utils.dialog.DialogException;
@@ -48,6 +49,8 @@ import org.apache.axis.message.MessageElement;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.X509Security;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_utility_1_0_xsd.*;
+
+import java.security.cert.X509Certificate;
 
 public class GamlLoginTool extends BaseGridTool {
 
@@ -158,8 +161,22 @@ public class GamlLoginTool extends BaseGridTool {
 	 * Calls requestSecurityToken2() on the specified idp.  If delegateAttribute is
 	 * non-null, the returned tokens are delegated to that identity (the common-case).
 	 */
-	public static ArrayList<SignedAssertion> doIdpLogin(EndpointReferenceType idpEpr,
-			RenewableClientAttribute delegateAttribute, long validMillis) throws Throwable {
+	public static ArrayList<SignedAssertion> doIdpLogin(
+			EndpointReferenceType idpEpr,
+			long validMillis,
+			X509Certificate[] delegateeIdentity) throws Throwable {
+
+		// get the calling context (or create one if necessary)
+		ICallingContext callContext = ContextManager.getCurrentContext(false);
+		if (callContext == null) {
+			callContext = new CallingContextImpl(new ContextType());
+			ContextManager.storeCurrentContext(callContext);
+		}
+		
+		// grab the delegatee identity from the calling context (renewing it 
+		// if necesssary -- dont want to sign to stale creds
+		KeyAndCertMaterial clientKeyMaterial = ClientUtils.checkAndRenewCredentials(
+				callContext);
 
 		// assemble the request message
 		RequestSecurityTokenType request = new RequestSecurityTokenType();
@@ -197,13 +214,13 @@ public class GamlLoginTool extends BaseGridTool {
 		elements.add(element);
 
 		// Add DelegateTo
-		if (delegateAttribute != null) {
+		if (delegateeIdentity != null) {
 			MessageElement binaryToken = new MessageElement(
 					BinarySecurity.TOKEN_BST);
 			binaryToken.setAttributeNS(null, "ValueType", X509Security.getType());
 			binaryToken.addTextNode("");
 			BinarySecurity bstToken = new X509Security(binaryToken);
-			((X509Security) bstToken).setX509Certificate(delegateAttribute.getDelegateeIdentity()[0]);
+			((X509Security) bstToken).setX509Certificate(delegateeIdentity[0]);
 
 			MessageElement embedded = new MessageElement(new QName(
 					org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
@@ -243,9 +260,16 @@ public class GamlLoginTool extends BaseGridTool {
 	}
 
 	protected ArrayList<SignedAssertion> doKeystoreLogin(
-			InputStream keystoreInput, 
-			RenewableClientAttribute delegateAttribute)
-			throws Throwable {
+			InputStream keystoreInput, ICallingContext callContext) throws Throwable {
+
+		// create the delegateeAttribute
+		RenewableClientAttribute delegateeAttribute = 
+			new RenewableClientAttribute(
+				new BasicConstraints(
+					System.currentTimeMillis() - (1000L * 60 * 15), 	// 15 minutes ago
+					_validMillis, 										// default 24 hours valid
+					10),												// delegation depth 10 
+				callContext);
 
 		ArrayList<SignedAssertion> retval = new ArrayList<SignedAssertion>();
 
@@ -266,52 +290,38 @@ public class GamlLoginTool extends BaseGridTool {
 				+ certEntry._certChain[0].getSubjectDN().getName() + "\".");
 
 		// Create identity assertion
-		RenewableIdentityAttribute identityAttr = new RenewableIdentityAttribute(
-			new BasicConstraints(
-				System.currentTimeMillis() - (1000L * 60 * 15), // 15 minutes ago
-				_validMillis, // valid 24 hours
-				10),
-			new X509Identity(certEntry._certChain));
-		RenewableAttributeAssertion identityAssertion = new RenewableAttributeAssertion(
-				identityAttr, certEntry._privateKey);
-
-		// get the calling context (or create one if necessary)
-		ICallingContext callContext = ContextManager.getCurrentContext(false);
-		if (callContext == null) {
-			callContext = new CallingContextImpl(new ContextType());
-		}
-
+		SignedAssertion identityAssertion = 
+			new X509Identity(certEntry._certChain);
+		
 		// Delegate the identity assertion to the temporary client
 		// identity
-		delegateAttribute.setAssertion(identityAssertion);
-		retval.add(new RenewableClientAssertion(delegateAttribute, certEntry._privateKey));
+		delegateeAttribute.setAssertion(identityAssertion);
+		retval.add(new RenewableClientAssertion(delegateeAttribute, certEntry._privateKey));
 
 		return retval;
 	}
 
 	protected ArrayList<SignedAssertion> delegateToIdentity(
-			ICallingContext callingContext,
-			URI authnUri, 
-			RenewableClientAttribute delegateAttribute)
-			throws Throwable {
+		URI authnUri, ICallingContext callingContext) throws Throwable {
 
 		String protocol = (authnUri == null) ? null : authnUri.getScheme();
 
 		if (authnUri == null) {
 			// login to keystore built into the user's OS
-			return doKeystoreLogin(null, delegateAttribute);
+			return doKeystoreLogin(null, callingContext);
 		}
 
 		if ((protocol == null) || protocol.equals("file")) {
 			// log into keystore from a specific file
 			BufferedInputStream fis = new BufferedInputStream(new FileInputStream(authnUri.getSchemeSpecificPart()));
 			try {
-				return doKeystoreLogin(fis, delegateAttribute);
+				return doKeystoreLogin(fis, callingContext);
 			} finally {
 				fis.close();
 			}
 		}
-
+		
+		
 		if (protocol.equals("rns")) {
 			RNSPath authnPath = callingContext.getCurrentPath().lookup(authnUri.getSchemeSpecificPart(),
 					RNSPathQueryFlags.MUST_EXIST);
@@ -320,17 +330,23 @@ public class GamlLoginTool extends BaseGridTool {
 			if (type.isIDP()) {
 				// we're going to use the WS-TRUST token-issue operation
 				// to log in to a security tokens service
-				return doIdpLogin(epr, delegateAttribute, _validMillis);
+				KeyAndCertMaterial clientKeyMaterial = 
+					ClientUtils.checkAndRenewCredentials(callingContext);
+				return doIdpLogin(
+						epr, 
+						_validMillis, 
+						(clientKeyMaterial == null) ? null : clientKeyMaterial._clientCertChain);
 			} else if (type.isByteIO()) {
 	
 				// log into keystore from rns path to keystore file
 				InputStream in = ByteIOStreamFactory.createInputStream(epr);
 				try {
-					return doKeystoreLogin(in, delegateAttribute);
+					return doKeystoreLogin(in, callingContext);
 				} finally {
 					in.close();
 				}
 			}
+			throw new IOException("Not a supported identity provider");
 		}
 
 		throw new IOException("No such protocol handler");
@@ -384,17 +400,12 @@ public class GamlLoginTool extends BaseGridTool {
 			}
 		}
 		
-		
-		// create the delegateeAttribute
-		RenewableClientAttribute delegateeAttribute = 
-			new RenewableClientAttribute(null, callContext);
-		
 		TransientCredentials transientCredentials = TransientCredentials
 				.getTransientCredentials(callContext);
 		try {
 			// log in
 			ArrayList<SignedAssertion> signedAssertions = 
-				delegateToIdentity(callContext, authnSource, delegateeAttribute);
+				delegateToIdentity(authnSource, callContext);
 	
 			if (signedAssertions == null) {
 				return 0;

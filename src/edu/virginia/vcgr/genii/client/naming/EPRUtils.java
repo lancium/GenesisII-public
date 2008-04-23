@@ -161,27 +161,7 @@ public class EPRUtils
 				element = element.getChildElement(
 						new QName(org.apache.ws.security.WSConstants.WSSE11_NS, "SecurityTokenReference"));
 				if (element != null) {
-					element = element.getChildElement(
-							new QName(org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
-					if (element != null) {
-						element = element.getChildElement(
-								BinarySecurity.TOKEN_BST);
-						if (element != null) {
-							try {
-								PKIPathSecurity bstToken = new PKIPathSecurity(element);
-								return bstToken.getX509Certificates(false, 
-									new edu.virginia.vcgr.genii.client.comm.axis.security.FlexibleBouncyCrypto());
-						    } catch (GenesisIISecurityException e) {
-								throw new GeneralSecurityException(e.getMessage(), e);
-							} catch (WSSecurityException e) {
-								throw new GeneralSecurityException(e.getMessage(), e);
-							} catch (IOException e) {
-								throw new GeneralSecurityException(e.getMessage(), e);
-							} catch (CredentialException e) {
-								throw new GeneralSecurityException(e.getMessage(), e);
-							}				
-						}
-					}
+					return SecurityUtils.getChainFromPkiPathSecTokenRef(element);
 				}
 			}
 		}
@@ -387,9 +367,16 @@ public class EPRUtils
 		}
 	}
 	
+	static public boolean isUnboundEPR(EndpointReferenceType epr) {
+		return ((epr.getAddress() == null) ||
+				(epr.getAddress().get_value() == null) ||
+				(epr.getAddress().get_value().toString().equals(WSName.UNBOUND_ADDRESS)));
+	}
+	
 	static public EndpointReferenceType makeUnboundEPR(EndpointReferenceType epr)
 	{
-		return new EndpointReferenceType(new org.ws.addressing.AttributedURIType(WSName.UNBOUND_ADDRESS),
+		return new EndpointReferenceType(
+				new org.ws.addressing.AttributedURIType(WSName.UNBOUND_ADDRESS),
 				epr.getReferenceParameters(),
 				epr.getMetadata(),
 				epr.get_any());

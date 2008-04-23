@@ -10,6 +10,7 @@ import javax.xml.namespace.QName;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.CertGeneratorUtils;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
@@ -19,10 +20,13 @@ public class CertGeneratorDBResource extends BasicDBResource implements ICertGen
 	static public final String _ISSUER_CERT_CHAIN_PROPERTY_NAME =	"cert-generator-issuer-cert-chain";
 	static public final String _ISSUER_PRIVATE_KEY_PROPERTY_NAME =	"cert-generator-issuer-private-key";
 	
-	public CertGeneratorDBResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool)
+	public CertGeneratorDBResource(
+			ResourceKey parentKey, 
+			DatabaseConnectionPool connectionPool,
+			IResourceKeyTranslater translater)
 		throws SQLException
 	{
-		super(parentKey, connectionPool);
+		super(parentKey, connectionPool, translater);
 	}
 	
 	public void setCertificateIssuerInfo(HashMap<QName, Object> creationParameters) 

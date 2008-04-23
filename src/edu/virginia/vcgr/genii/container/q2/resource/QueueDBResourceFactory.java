@@ -10,6 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
+import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
@@ -43,17 +44,19 @@ public class QueueDBResourceFactory extends BasicDBResourceFactory
 			"CONSTRAINT q2jobsticket UNIQUE (jobticket, queueid))"
 	};
 	
-	public QueueDBResourceFactory(DatabaseConnectionPool connectionPool)
+	public QueueDBResourceFactory(
+			DatabaseConnectionPool pool, 
+			IResourceKeyTranslater translator)
 		throws SQLException
 	{
-		super(connectionPool);
+		super(pool, translator);
 	}
 	
 	public IResource instantiate(ResourceKey parentKey) throws ResourceException
 	{
 		try
 		{
-			return new QueueDBResource(parentKey, _pool);
+			return new QueueDBResource(parentKey, _pool, _translater);
 		}
 		catch (SQLException sqe)
 		{

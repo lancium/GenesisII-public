@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.container.resource;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
+import java.util.ArrayList;
 
 import org.apache.axis.message.MessageElement;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
@@ -29,17 +30,21 @@ public class StringResourceKeyTranslater implements IResourceKeyTranslater
 		if (elements == null || elements.length == 0)
 			return null;
 		
-		if (elements.length != 1)
-			throw FaultManipulator.fillInFault(new ResourceUnknownFaultType());
-		
 		try
 		{
-			MessageElement element = elements[0];
-			
-			QName name = element.getQName();
-			if (!name.equals(getRefParamQName()))
+			// find the first "simple-string"
+			ArrayList<MessageElement> simpleStringRefParams = new ArrayList<MessageElement>();
+			for (MessageElement element : elements) {
+				QName name = element.getQName();
+				if (name.equals(getRefParamQName())) {
+					simpleStringRefParams.add(element);
+				}
+			}
+	
+			if (simpleStringRefParams.size() != 1)
 				throw FaultManipulator.fillInFault(new ResourceUnknownFaultType());
-			return fromString(element.getFirstChild().getNodeValue());
+		
+			return fromString(simpleStringRefParams.get(0).getFirstChild().getNodeValue());
 		}
 		catch (ResourceException re)
 		{

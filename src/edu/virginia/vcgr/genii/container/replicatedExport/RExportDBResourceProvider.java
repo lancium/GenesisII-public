@@ -22,16 +22,6 @@ public class RExportDBResourceProvider extends BasicDBResourceProvider
 	protected IResourceFactory instantiateResourceFactory(DatabaseConnectionPool pool)
 		throws SQLException, ResourceException
 	{
-		try{
-			return new RExportDBResourceFactory(pool);
-		}
-		catch (IOException ioe){
-			throw new ResourceException(
-					"I/O exception with creating rexport resource factory", ioe);
-		}
-		catch (ConfigurationException ce){
-			throw new ResourceException(
-					"Config exceptiong with creating rexport resource factory", ce);
-		}
+		return new RExportDBResourceFactory(pool, getTranslater());
 	}
 }

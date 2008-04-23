@@ -30,7 +30,7 @@ import java.util.Date;
  * 
  * @author dmerrill
  */
-public class SignedAttributeAssertion extends SignedAssertion {
+public class SignedAttributeAssertion extends SignedAssertionBaseImpl {
 
 	static public final long serialVersionUID = 0L;
 
@@ -80,7 +80,7 @@ public class SignedAttributeAssertion extends SignedAssertion {
 	 * Verify the assertion.  It is verified if all signatures successfully
 	 * authenticate the signed-in authorizing identities
 	 */	
-	public void verifyAssertion() throws GeneralSecurityException {
+	public void validateAssertion() throws GeneralSecurityException {
 		
 		if ((_signature == null) || (_attribute == null)) {
  			throw new GeneralSecurityException("No signature or data to verify");

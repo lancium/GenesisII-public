@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
 public class SharedRExportBaseFactory extends BasicDBResourceFactory
@@ -26,10 +27,12 @@ public class SharedRExportBaseFactory extends BasicDBResourceFactory
 		"(resourceEPI VARCHAR(60) PRIMARY KEY, resolverEPI VARCHAR(60), " +
 		"resolverEPR BLOB (128K))";
 	
-	protected SharedRExportBaseFactory(DatabaseConnectionPool pool)
+	protected SharedRExportBaseFactory(
+			DatabaseConnectionPool pool, 
+			IResourceKeyTranslater translator)
 		throws SQLException
 	{
-		super(pool);
+		super(pool, translator);
 	}
 
 	protected void createTables() throws SQLException

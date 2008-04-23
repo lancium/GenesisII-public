@@ -144,6 +144,7 @@
 				<include name="edu/virginia/vcgr/genii/client/utils/deployment/DeploymentRelativeFile.class"/>
 				<include name="edu/virginia/vcgr/genii/client/comm/axis/security/VcgrSslSocketFactory.class"/>
 				<include name="edu/virginia/vcgr/genii/client/security/x509/*.class"/>
+				<include name="edu/virginia/vcgr/genii/client/security/SecurityUtils.class"/>
 				<include name="edu/virginia/vcgr/genii/client/configuration/UserConfig.class"/>
 			</fileset>
 		</jar>
@@ -161,7 +162,6 @@
 		<ant antfile="${wsdl.dir}/byteio/sbyteio.build.xml"/>
 		<ant antfile="${wsdl.dir}/byteio/interop/sbyteiointerop.build.xml"/>
 		<ant antfile="${wsdl.dir}/byteio/sbyteio-factory.build.xml"/>
-		<ant antfile="${wsdl.dir}/authn/x509-authn.build.xml"/>
 		<ant antfile="${wsdl.dir}/container/container.build.xml"/>
 		<ant antfile="${wsdl.dir}/bes/bes-activity.build.xml"/>
 		<ant antfile="${wsdl.dir}/bes/bes.build.xml"/>
@@ -170,6 +170,8 @@
 		<ant antfile="${wsdl.dir}/exported/exported-dir.build.xml"/>
 		<ant antfile="${wsdl.dir}/exported/exported-root.build.xml"/>
 		<ant antfile="${wsdl.dir}/naming.build.xml"/>
+		<ant antfile="${wsdl.dir}/authn/x509-authn.build.xml"/>
+		<ant antfile="${wsdl.dir}/authn/nis-authn.build.xml"/>
 		<ant antfile="${wsdl.dir}/resolver/simple-resolver.build.xml"/>
 		<ant antfile="${wsdl.dir}/resolver/simple-resolver-factory.build.xml"/>
 		<ant antfile="${wsdl.dir}/queue/queue.build.xml"/>

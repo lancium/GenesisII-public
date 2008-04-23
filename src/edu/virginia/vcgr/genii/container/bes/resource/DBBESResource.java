@@ -36,6 +36,7 @@ import edu.virginia.vcgr.genii.container.bes.BESPolicy;
 import edu.virginia.vcgr.genii.container.bes.BESPolicyActions;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.StringResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
@@ -84,10 +85,13 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 		super.destroy();
 	}
 
-	public DBBESResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool)
+	public DBBESResource(
+			ResourceKey parentKey, 
+			DatabaseConnectionPool connectionPool,
+			IResourceKeyTranslater translater)
 		throws SQLException
 	{
-		super(parentKey, connectionPool);
+		super(parentKey, connectionPool, translater);
 	}
 
 	@Override

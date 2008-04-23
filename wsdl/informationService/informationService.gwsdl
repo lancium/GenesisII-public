@@ -15,6 +15,7 @@
 	xmlns:wsrf-rw="http://docs.oasis-open.org/wsrf/rw-2" 
     xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
 	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:enhanced-rns="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
 	xmlns:rns="http://schemas.ggf.org/rns/2006/05/rns">
 	
     <wsdl:import
@@ -27,7 +28,11 @@
     
     <wsdl:import
         namespace="http://schemas.ggf.org/rns/2006/05/rns"
-        location="./rns-generated.wsdl"/>
+        location="./rns.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
+        location="./enhanced-rns-generated.wsdl"/>
 
 	<wsdl:import
 		namespace="http://docs.oasis-open.org/wsrf/rw-2"

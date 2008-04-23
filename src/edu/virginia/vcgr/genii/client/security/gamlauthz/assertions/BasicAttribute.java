@@ -52,7 +52,7 @@ public abstract class BasicAttribute implements Attribute {
 		
 		try {
 			for (X509Certificate cert : this.getAssertingIdentityCertChain()) {
-				cert.checkValidity();
+				cert.checkValidity(date);
 			}
 		} catch (CertificateException e) {
 			throw new AttributeInvalidException("Security attribute asserting identity contains an invalid certificate: " + e.getMessage(), e);

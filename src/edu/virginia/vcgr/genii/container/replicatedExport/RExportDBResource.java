@@ -22,6 +22,7 @@ import org.ggf.rns.RNSEntryExistsFaultType;
 import org.morgan.util.GUID;
 import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
+import org.ws.addressing.ReferenceParametersType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
@@ -39,6 +40,7 @@ import edu.virginia.vcgr.genii.container.byteio.RandomByteIOAttributeHandlers;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverUtils;
 import edu.virginia.vcgr.genii.container.resource.IResource;
+import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
@@ -119,10 +121,13 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 	static private final String _DESTROY_ALL_DIRS_FOR_PARENT_STMT = 
 		"DELETE FROM rexport WHERE parentIds LIKE ?";
 	
-	public RExportDBResource(ResourceKey rKey, DatabaseConnectionPool pool)
+	public RExportDBResource(
+			ResourceKey parentKey, 
+			DatabaseConnectionPool connectionPool,
+			IResourceKeyTranslater translater)
 		throws SQLException
 	{
-		super(rKey, pool);
+		super(parentKey, connectionPool, translater);
 	}
 	
 	public void initialize(HashMap<QName, Object> constructionParams)
@@ -142,12 +147,12 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 			insertDirInfo();
 	}
 	
-	public void load(Object key) 
+	public void load(ReferenceParametersType refParams) 
 		throws ResourceUnknownFaultType, ResourceException
 	{
-		super.load(key);
+		super.load(refParams);
 		
-		if (key == null)
+		if (isServiceResource())
 			return;
 		
 		loadDirInfo();

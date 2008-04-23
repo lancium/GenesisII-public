@@ -1,6 +1,8 @@
 package edu.virginia.vcgr.genii.container.resource;
 
 import java.security.cert.X509Certificate;
+import java.security.GeneralSecurityException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.io.IOException;
@@ -31,7 +33,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.common.security.*;
-import edu.virginia.vcgr.genii.container.security.authz.handlers.*;
+import edu.virginia.vcgr.genii.container.security.authz.providers.*;
 import edu.virginia.vcgr.genii.client.security.*;
 
 
@@ -165,21 +167,7 @@ public class ResourceManager
 			
 				if (certChain != null)
 				{
-			
-					MessageElement binaryToken = new MessageElement(BinarySecurity.TOKEN_BST);
-					binaryToken.setAttributeNS(null, "ValueType", PKIPathSecurity.getType());
-					binaryToken.addTextNode("");
-					BinarySecurity bstToken = new PKIPathSecurity(binaryToken);
-					((PKIPathSecurity) bstToken).setX509Certificates(certChain, false,
-							new edu.virginia.vcgr.genii.client.comm.axis.security.FlexibleBouncyCrypto());
-
-					MessageElement embedded = new MessageElement(
-						new QName(org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
-					embedded.addChild(binaryToken);
-
-					MessageElement wseTokenRef = new MessageElement(
-						new QName(org.apache.ws.security.WSConstants.WSSE11_NS, "SecurityTokenReference"));
-					wseTokenRef.addChild(embedded);
+					MessageElement wseTokenRef = SecurityUtils.makePkiPathSecTokenRef(certChain); 
 					
 					MessageElement keyInfo = new MessageElement(
 						new QName(GenesisIIConstants.OGSA_BSP_NS, "EndpointKeyInfo"));
@@ -189,7 +177,8 @@ public class ResourceManager
 				}
 				
 				// add minimum level of message level security
-				AuthZHandler handler = AuthZHandler.getAuthZHandler(resource);
+				IAuthZProvider handler = AuthZProviders.getProvider(
+						resource.getParentResourceKey().getServiceName());
 				if (handler != null) {
 					MessageLevelSecurity minMsgSec = handler.getMinIncomingMsgLevelSecurity(resource);
 
@@ -205,15 +194,13 @@ public class ResourceManager
 					
 					any.add(mel);
 				}
-			} catch (GenesisIISecurityException e) {
+			} catch (GeneralSecurityException e) {
 				throw new ResourceException(e.getMessage(), e);
-			} catch (WSSecurityException e) {
+			} catch (GenesisIISecurityException e) {
 				throw new ResourceException(e.getMessage(), e);
 			} catch (SOAPException e) {
 				throw new ResourceException(e.getMessage(), e);
 			} catch (IOException e) {
-				throw new ResourceException(e.getMessage(), e);
-			} catch (CredentialException e) {
 				throw new ResourceException(e.getMessage(), e);
 			}
 				

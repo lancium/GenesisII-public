@@ -23,10 +23,13 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+import org.ws.addressing.ReferenceParametersType;
+
 import edu.virginia.vcgr.genii.container.common.notification.DBSubscriptionResource;
 import edu.virginia.vcgr.genii.container.common.notification.SubscriptionInformation;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
+import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
@@ -55,14 +58,19 @@ public class BasicDBResource implements IResource
 	protected DatabaseConnectionPool _connectionPool;
 	protected Connection _connection;
 	protected String _resourceKey;
-	private ResourceKey _parentKey;
-	
-	public BasicDBResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool)
+	protected ResourceKey _parentKey;
+	protected IResourceKeyTranslater _translater;
+
+	public BasicDBResource(
+			ResourceKey parentKey, 
+			DatabaseConnectionPool connectionPool,
+			IResourceKeyTranslater translater)
 		throws SQLException
 	{
 		_parentKey = parentKey;
 		_connectionPool = connectionPool;
 		_connection = _connectionPool.acquire();
+		_translater = translater;
 	}
 	
 	public Connection getConnection()
@@ -127,9 +135,10 @@ public class BasicDBResource implements IResource
 		}
 	}
 	
-	public void load(Object key) throws ResourceUnknownFaultType, ResourceException
+	public void load(ReferenceParametersType refParams) throws ResourceUnknownFaultType, ResourceException
 	{
-		_resourceKey = (String)key;
+		_resourceKey = (String) _translater.unwrap(refParams);
+
 		if (_resourceKey == null)
 			_resourceKey = _SPECIAL_SERVICE_KEY_TEMPLATE + _parentKey.getServiceName();
 		
@@ -143,7 +152,7 @@ public class BasicDBResource implements IResource
 			rs = stmt.executeQuery();
 			if (!rs.next())
 			{
-				_logger.error("Unable to load resource \"" + key + "\".  Throwing resource unknown fault.");
+				_logger.error("Unable to load resource \"" + _resourceKey + "\".  Throwing resource unknown fault.");
 				
 				throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(
 					null, null, null, null, new BaseFaultTypeDescription[] {
@@ -396,5 +405,17 @@ public class BasicDBResource implements IResource
 			return true;
 		} 
 		return false;
+	}
+	
+	/**
+	 * Retrieve the WS-Addressing ReferenceParameters that match this resource.
+	 * 
+	 * @return The Addressing information for WS-Addressing.
+	 * @throws ResourceException If anything goes wrong.
+	 */
+	public ReferenceParametersType getResourceParameters()
+		throws ResourceException {
+
+		return _translater.wrap(getKey());
 	}
 }

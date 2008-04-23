@@ -2,6 +2,7 @@
 <wsdl:definitions name="X509Authn"
 	targetNamespace="http://vcgr.cs.virginia.edu/container/2007/11/x509-authn"
 	xmlns:rns="http://schemas.ggf.org/rns/2006/05/rns"
+	xmlns:enhanced-rns="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
 	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
 	xmlns:wst="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
 	xmlns:x509authn="http://vcgr.cs.virginia.edu/container/2007/11/x509-authn"
@@ -17,7 +18,11 @@
 
     <wsdl:import
         namespace="http://schemas.ggf.org/rns/2006/05/rns"
-        location="./rns-generated.wsdl"/>
+        location="./rns.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
+        location="./enhanced-rns-generated.wsdl"/>
 
 	<wsdl:import
 		namespace="http://docs.oasis-open.org/wsrf/rw-2"

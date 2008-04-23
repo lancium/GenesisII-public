@@ -53,11 +53,11 @@ import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
-import edu.virginia.vcgr.genii.container.rns.RNSServiceImpl;
+import edu.virginia.vcgr.genii.container.rns.EnhancedRNSServiceImpl;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
 public class ApplicationDescriptionServiceImpl 
-	extends RNSServiceImpl implements ApplicationDescriptionPortType
+	extends EnhancedRNSServiceImpl implements ApplicationDescriptionPortType
 {
 	static private Log _logger = LogFactory.getLog(
 		ApplicationDescriptionServiceImpl.class);

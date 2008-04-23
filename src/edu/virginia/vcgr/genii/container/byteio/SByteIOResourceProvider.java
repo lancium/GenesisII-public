@@ -22,17 +22,6 @@ public class SByteIOResourceProvider extends BasicDBResourceProvider
 	protected IResourceFactory instantiateResourceFactory(DatabaseConnectionPool pool)
 		throws SQLException, ResourceException
 	{
-		try
-		{
-			return new SByteIOResourceFactory(pool);
-		}
-		catch (IOException ioe)
-		{
-			throw new ResourceException(ioe.getLocalizedMessage(), ioe);
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new ResourceException(ce.getLocalizedMessage(), ce);
-		}
+		return new SByteIOResourceFactory(pool, getTranslater());
 	}
 }

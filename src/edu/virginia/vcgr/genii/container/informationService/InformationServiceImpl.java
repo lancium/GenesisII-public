@@ -76,7 +76,7 @@ import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rns.IRNSResource;
 
-import edu.virginia.vcgr.genii.container.rns.RNSServiceImpl;
+import edu.virginia.vcgr.genii.container.rns.EnhancedRNSServiceImpl;
 import edu.virginia.vcgr.genii.informationService.AddContainerRequestType;
 import edu.virginia.vcgr.genii.informationService.BESAttributesDocumentRequestType;
 import edu.virginia.vcgr.genii.informationService.BESAttributesDocumentResponseType;
@@ -86,7 +86,7 @@ import edu.virginia.vcgr.genii.informationService.QueryResponseType;
 import edu.virginia.vcgr.genii.informationService.RemoveContainerRequestType;
 import edu.virginia.vcgr.genii.informationService.RemoveContainerResponseType;
 
-public class InformationServiceImpl extends RNSServiceImpl implements
+public class InformationServiceImpl extends EnhancedRNSServiceImpl implements
 	InformationServicePortType {
 	
 	static private Log _logger = LogFactory.getLog(InformationServiceImpl.class);

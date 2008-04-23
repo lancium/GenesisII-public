@@ -20,6 +20,6 @@ public class BasicSchedulerDBResourceProvider extends RNSDBResourceProvider
 	protected IResourceFactory instantiateResourceFactory(DatabaseConnectionPool pool)
 		throws SQLException
 	{
-		return new BasicSchedulerDBResourceFactory(pool);
+		return new BasicSchedulerDBResourceFactory(pool, getTranslater());
 	}
 }

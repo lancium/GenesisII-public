@@ -65,6 +65,7 @@ import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.MessageLevelSecurity;
+import edu.virginia.vcgr.genii.client.security.SecurityUtils;
 import edu.virginia.vcgr.genii.client.security.x509.*;
 import edu.virginia.vcgr.genii.client.utils.deployment.DeploymentRelativeFile;
 import edu.virginia.vcgr.genii.client.invoke.IFinalInvoker;
@@ -79,7 +80,7 @@ import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
 import edu.virginia.vcgr.genii.client.comm.axis.security.*;
 
 import edu.virginia.vcgr.genii.context.ContextType;
-import edu.virginia.vcgr.genii.naming.ReferenceResolver;
+import edu.virginia.vcgr.genii.naming.*;
 
 public class AxisClientInvocationHandler implements InvocationHandler, IFinalInvoker
 {
@@ -88,12 +89,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 // STATIC CONSTANT MEMBERS
 //-----------------------------------------------------------------------------
 
-	private static final String TS_LOCATION = 
-		"edu.virginia.vcgr.genii.client.security.resource-identity.trust-store-location";
-	private static final String TS_TYPE = 
-		"edu.virginia.vcgr.genii.client.security.resource-identity.trust-store-type";
-	private static final String TS_PASSWORD = 
-		"edu.virginia.vcgr.genii.client.security.resource-identity.trust-store-password";
+	private static final String STUB_CONFIGURED = 
+		"edu.virginia.vcgr.genii.client.security.stub-configured";
 	private static final String MIN_MESSAGE_SECURITY = 
 		"edu.virginia.vcgr.genii.client.security.message.min-config";
 
@@ -126,17 +123,22 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 // STATIC CONFIGURATION MEMBERS
 //-----------------------------------------------------------------------------
 	
-	static private KeyStore __trustStore = null;
 	static private MessageLevelSecurity __minClientMessageSec = null;
 
 	/**
 	 * Class to wipe our loaded config stuff in the event the config manager
 	 * reloads. 
 	 */
+	static {
+		// configure the JVM to use the SSL socket factory that obtains
+		// trust material from our own trust store
+		java.security.Security.setProperty("ssl.SocketFactory.provider", 
+				VcgrSslSocketFactory.class.getName());
+		ConfigurationManager.addConfigurationUnloadListener(new ConfigUnloadListener());
+	}
 	public static class ConfigUnloadListener implements ConfigurationUnloadedListener {
 		public void notifyUnloaded() {
 			synchronized(AxisClientInvocationHandler.class) { 
-				__trustStore = null;
 				__minClientMessageSec = null;
 			}
 		}
@@ -146,59 +148,9 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(AxisClientInvocationHandler.class);
 
-	// configure the JVM to use the SSL socket factory that obtains
-	// trust material from our own trust store
-	static {
-		java.security.Security.setProperty("ssl.SocketFactory.provider", 
-			VcgrSslSocketFactory.class.getName());
-		ConfigurationManager.addConfigurationUnloadListener(new ConfigUnloadListener());
-	}
 	
-	static public synchronized void configurationUnloaded() {
-		__trustStore = null;
-		__minClientMessageSec = null;
-	}
 	
-	/**
-	 * Establishes the trust manager for use in verifying resource identities 
-	 */
-	static private synchronized KeyStore getTrustStore() throws GeneralSecurityException {
 
-		if (__trustStore != null) {
-			return __trustStore;
-		}
-		
-		try {
-			XMLConfiguration conf = 
-				ConfigurationManager.getCurrentConfiguration().getClientConfiguration();
-			Properties resourceIdSecProps = (Properties) conf.retrieveSection(
-					GenesisIIConstants.RESOURCE_IDENTITY_PROPERTIES_SECTION_NAME);			
-
-			String trustStoreLoc = resourceIdSecProps.getProperty(
-				TS_LOCATION);
-			String trustStoreType = resourceIdSecProps.getProperty(
-				TS_TYPE, GenesisIIConstants.TRUST_STORE_TYPE_DEFAULT);
-			String trustStorePass = resourceIdSecProps.getProperty(
-				TS_PASSWORD);
-			
-			// open the trust store
-			if (trustStoreLoc == null) {
-				throw new GenesisIISecurityException("Could not load TrustManager: no identity trust store location specified");
-			}
-			char[] trustStorePassChars = null;
-			if (trustStorePass != null) {
-				trustStorePassChars = trustStorePass.toCharArray();
-			}
-			__trustStore = CertTool.openStoreDirectPath(
-				new DeploymentRelativeFile(trustStoreLoc), trustStoreType, trustStorePassChars);
-			return __trustStore;
-
-		} catch (ConfigurationException e) { 
-			throw new GeneralSecurityException("Could not load TrustManager: " + e.getMessage(), e);
-		} catch (IOException e) {
-			throw new GeneralSecurityException("Could not load TrustManager: " + e.getMessage(), e);
-		}
-	}
 	
 	/**
 	 * Retrieves the client's minimum allowable level of message security
@@ -249,6 +201,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 	private Class<?> [] _locators = null;
 	private AxisClientInvocationHandler _parentHandler = null;
+	private FileProvider _providerConfig = null;
 	
 	// cache of signed, serialized delegation assertions
 	static private int VALIDATED_CERT_CACHE_SIZE = 32;
@@ -263,6 +216,98 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		this(new Class [] {locator}, epr, callContext);
 	}
 		
+	public synchronized void configureSecurity(Stub stubInstance) 
+		throws GenesisIISecurityException, GeneralSecurityException, ResourceException {
+
+		if (stubInstance._getProperty(STUB_CONFIGURED) != null) {
+			return;
+		}
+		stubInstance._setProperty(STUB_CONFIGURED, STUB_CONFIGURED);
+		
+		
+		X509Certificate[] chain = EPRUtils.extractCertChain(_epr);
+		URI epi = EPRUtils.extractEndpointIdentifier(_epr);
+		
+		// determine the level of message security we need
+		MessageLevelSecurity minClientMessageSec = getMinClientMessageSec();
+		MessageLevelSecurity minResourceSec = EPRUtils.extractMinMessageSecurity(_epr);
+		MessageLevelSecurity neededMsgSec = minClientMessageSec.computeUnion(minResourceSec); 
+		
+		// perform resource-AuthN as specified in the client config file
+		try {
+			if (chain == null) {
+				throw new GenesisIISecurityException("EPR for " + _epr.getAddress().toString() + " does not contain a certificate chain.");
+			}
+			_resourceCert = chain[0];
+			
+			synchronized(validatedCerts) {
+				if (!validatedCerts.containsKey(_resourceCert)) {
+
+					// make sure the epi's match
+					String certEpi = CertTool.getSN(chain[0]);
+					if (!certEpi.equals(epi.toString())) {
+						throw new GenesisIISecurityException("EPI for " + _epr.getAddress().toString() + " (" + epi.toString() + ") does not match that in the certificate (" + certEpi + ")");
+					}
+					
+					// run it through the trust manager
+					SecurityUtils.validateCertPath(chain);
+			        
+			        // insert into valid certs cache
+			        validatedCerts.put(_resourceCert, Boolean.TRUE);
+				}
+			}
+		} catch (Exception e) {
+			if (minClientMessageSec.isWarn()) {
+				Exception ex = new GenesisIISecurityException(
+						"Cannot confirm trusted identity for " + _epr.getAddress().toString() + ": " + e.getMessage(), e);
+				_logger.warn(ex.getMessage());
+			} else {
+				throw new GenesisIISecurityException("EPR for " + _epr.getAddress().toString() + " is untrusted: " + e.getMessage(), e);
+			}
+		}
+
+		// prepare a message security datastructure for the message context
+		// if needed
+		MessageSecurityData msgSecData = null;
+		if (!neededMsgSec.isNone()) {
+			msgSecData = new MessageSecurityData(
+					neededMsgSec,
+					chain,
+					epi);
+		}
+		if (msgSecData != null) {
+			stubInstance._setProperty(CommConstants.MESSAGE_SEC_CALL_DATA, 
+					msgSecData);
+		}
+		
+		try {
+			// configure the send handler(s), working backwards so as to set the 
+			// last one that actually does work to serialize the message
+			ArrayList<ISecuritySendHandler> sendHandlers = getHandler(
+					(SimpleChain) _providerConfig.getGlobalRequest(), 
+					ISecuritySendHandler.class);
+			boolean serializerFound = false;
+			for (int i = sendHandlers.size() - 1; i >= 0; i--) {
+				ISecuritySendHandler h = sendHandlers.get(i);
+				if (h.configure(_callContext, msgSecData) && !serializerFound) {
+					serializerFound = true;
+					h.setToSerialize();
+				}
+			}
+	    	
+			// configure the recv handler(s)
+			ArrayList<ISecurityRecvHandler> recvHandlers = getHandler(
+					(SimpleChain) _providerConfig.getGlobalResponse(), 
+					ISecurityRecvHandler.class);
+			for (ISecurityRecvHandler h : recvHandlers) {
+				h.configure(_callContext);
+			}
+			
+		} catch (Exception e) {
+			throw new ResourceException("Unable to create locator instance: " + e.getMessage(),
+				e);
+		}
+	}
 		
 	public AxisClientInvocationHandler(
 			Class<?> []locators, 
@@ -281,82 +326,15 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			_callContext.setSingleValueProperty(GenesisIIConstants.NAMING_CLIENT_CONFORMANCE_PROPERTY, "true");
 			_locators = locators;
 			
-			X509Certificate[] chain = EPRUtils.extractCertChain(epr);
-			
-			URI epi = EPRUtils.extractEndpointIdentifier(epr);
-			
-			// deterimine the level of message security we need
-			MessageLevelSecurity minClientMessageSec = getMinClientMessageSec();
-			MessageLevelSecurity minResourceSec = EPRUtils.extractMinMessageSecurity(epr);
-			MessageLevelSecurity neededMsgSec = minClientMessageSec.computeUnion(minResourceSec); 
-			
-			// perform resource-AuthN as specified in the client config file
-			try {
-				if (chain == null) {
-					throw new GenesisIISecurityException("EPR for " + epr.getAddress().toString() + " does not contain a certificate chain.");
-				}
-				_resourceCert = chain[0];
-				
-				synchronized(validatedCerts) {
-					if (!validatedCerts.containsKey(_resourceCert)) {
-
-						// make sure the epi's match
-						String certEpi = CertTool.getUID(chain[0]);
-						if (!certEpi.equals(epi.toString())) {
-							throw new GenesisIISecurityException("EPI for " + epr.getAddress().toString() + " (" + epi.toString() + ") does not match that in the certificate (" + certEpi + ")");
-						}
-						
-						// run it through the trust manager
-						ArrayList<X509Certificate> certList = new ArrayList<X509Certificate>();
-						for (int i = 0; i < chain.length - 1; i++) {
-							certList.add(chain[i]);
-						}
-						CertPath cp = CertificateFactory.getInstance("X.509", "BC").
-				        	generateCertPath(certList);
-				        CertPathValidator cpv = CertPathValidator.getInstance(
-				        		"PKIX", "BC");
-				        PKIXParameters param = new PKIXParameters(getTrustStore());
-				        param.setRevocationEnabled(false);
-				        cpv.validate(cp, param); // throws exception if not valid
-				        
-				        // insert into valid certs cache
-				        validatedCerts.put(_resourceCert, Boolean.TRUE);
-					}
-				}
-			} catch (Exception e) {
-				if (minClientMessageSec.isWarn()) {
-					Exception ex = new GenesisIISecurityException(
-							"Cannot confirm trusted identity for " + epr.getAddress().toString() + ": " + e.getMessage(), e);
-					_logger.warn(ex.getMessage());
-				} else {
-					throw new GenesisIISecurityException("EPR for " + epr.getAddress().toString() + " is untrusted: " + e.getMessage(), e);
-				}
-			}
-
-			// prepare a message security datastructure for the message context
-			// if needed
-			MessageSecurityData msgSecData = null;
-			if (!neededMsgSec.isNone()) {
-				msgSecData = new MessageSecurityData(
-						neededMsgSec,
-						chain,
-						epi);
-			}
 			
 			// create the locator and add the methods
 			for (Class<?> locator : locators) {
-				Object locatorInstance = createLocatorInstance(
-						locator,
-						_callContext, 
-						msgSecData);
-				addMethods(locatorInstance, epr, msgSecData);
+				Object locatorInstance = createLocatorInstance(locator);
+				addMethods(locatorInstance, epr);
 			}
 		} catch (IOException ioe) {
 			throw new ResourceException(
 				"Error creating secure client stub: " + ioe.getMessage(), ioe);
- 		} catch (GeneralSecurityException gse) {
-			throw new ResourceException(
-				"Error creating secure client stub: " + gse.getMessage(), gse);
 		}
 
 	}	
@@ -373,39 +351,15 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		return newHandler;
 	}
 	
-	static private Object createLocatorInstance(
-			Class<?> loc,
-			ICallingContext callingContext, 
-			MessageSecurityData msgSecData)
+	private Object createLocatorInstance(
+			Class<?> loc)
 		throws ResourceException
 	{
 		try
 		{
 			Constructor<?> cons = loc.getConstructor(org.apache.axis.EngineConfiguration.class);
-			FileProvider config = new FileProvider("client-config.wsdd");
-			Object retval = cons.newInstance(config);
-
-			// configure the send handler(s), working backwards so as to set the 
-			// last one that actually does work to serialize the message
-			ArrayList<ISecuritySendHandler> sendHandlers = getHandler(
-					(SimpleChain) config.getGlobalRequest(), 
-					ISecuritySendHandler.class);
-			boolean serializerFound = false;
-			for (int i = sendHandlers.size() - 1; i >= 0; i--) {
-				ISecuritySendHandler h = sendHandlers.get(i);
-				if (h.configure(callingContext, msgSecData) && !serializerFound) {
-					serializerFound = true;
-					h.setToSerialize();
-				}
-			}
-        	
-			// configure the recv handler(s)
-			ArrayList<ISecurityRecvHandler> recvHandlers = getHandler(
-					(SimpleChain) config.getGlobalResponse(), 
-					ISecurityRecvHandler.class);
-			for (ISecurityRecvHandler h : recvHandlers) {
-				h.configure(callingContext);
-			}
+			_providerConfig = new FileProvider("client-config.wsdd");
+			Object retval = cons.newInstance(_providerConfig);
         	
         	return retval;
 		}
@@ -422,8 +376,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	}
 	
 	
-	private void addMethods(Object locatorInstance,
-		EndpointReferenceType epr, MessageSecurityData msgSecData) 
+	private void addMethods(Object locatorInstance, EndpointReferenceType epr) 
 			throws MalformedURLException, ResourceException
 	{
 		Method locatorPortTypeMethod;
@@ -455,10 +408,6 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			if (_callContext != null) {
 				stubInstance._setProperty(CommConstants.CALLING_CONTEXT_PROPERTY_NAME, 
 						_callContext);
-			}
-			if (msgSecData != null) {
-				stubInstance._setProperty(CommConstants.MESSAGE_SEC_CALL_DATA, 
-						msgSecData);
 			}
 			
 			// Use the return type to get the methods that this stub supports
@@ -578,6 +527,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		MethodDescription methodDesc = new MethodDescription(arg1);
 		Stub stubInstance = (Stub) _portMethods.get(methodDesc);
 
+		configureSecurity(stubInstance);
+		
 		if (_outAttachments != null)
 		{
 			if (_attachmentType == AttachmentType.DIME)
@@ -734,8 +685,9 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		{
 			if (resolver.getType() == ResolverDescription.ResolverType.EPI_RESOLVER)
 			{
-				/* We don't handle EPI resolution yet */
-				throw new NameResolutionFailedException();
+				EndpointIdentifierResolver resolverPT = ClientUtils.createProxy(EndpointIdentifierResolver.class, resolver.getEPR());
+				return resolverPT.resolveEPI(
+						new org.apache.axis.types.URI(resolver.getEPI().toString()));
 			}
 			else if (resolver.getType() == ResolverDescription.ResolverType.REFERENCE_RESOLVER)
 			{
@@ -743,6 +695,10 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 				return resolverPT.resolve(null);
 			}
 			throw new NameResolutionFailedException();
+		}
+		catch(org.apache.axis.types.URI.MalformedURIException mfe)
+		{
+			throw new NameResolutionFailedException(mfe);
 		}
 		catch(ResolveFailedWithReferralFaultType rfe)
 		{

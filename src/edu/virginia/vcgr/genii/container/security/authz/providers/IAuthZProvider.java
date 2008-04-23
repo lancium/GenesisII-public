@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package edu.virginia.vcgr.genii.container.security.authz.handlers;
+package edu.virginia.vcgr.genii.container.security.authz.providers;
 
 import java.lang.reflect.Method;
 import java.security.cert.X509Certificate;
@@ -26,20 +26,17 @@ import edu.virginia.vcgr.genii.client.security.MessageLevelSecurity;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.AuthZSecurityException;
 import edu.virginia.vcgr.genii.common.security.AuthZConfig;
 
-public abstract class AuthZHandler {
+public interface IAuthZProvider {
 
 	static public final String CALLING_CONTEXT_CALLER_CERT = 
 		"genii.container.security.authz.caller-cert";
-	
-	static private final AuthZHandler handler = new GamlAuthZHandler();
-	
 	
 	/**
 	 * Configures the resource with default access control state.
 	 * This configuration may be based upon informatin within the 
 	 * specified working context   
 	 */
-	public abstract void setDefaultAccess(
+	public void setDefaultAccess(
 			ICallingContext callingContext, 
 			IResource resource,
 			X509Certificate[] serviceCertChain) 
@@ -50,7 +47,7 @@ public abstract class AuthZHandler {
 	 * on the target resource is allowable with the given working 
 	 * context 
 	 */
-	public abstract boolean checkAccess(
+	public boolean checkAccess(
 			ICallingContext callingContext, 
 			X509Certificate callerCert,
 			IResource resource,
@@ -60,28 +57,18 @@ public abstract class AuthZHandler {
 	 * Returns the minimum level of incoming message level security required
 	 * for the specified resource  
 	 */
-	public abstract MessageLevelSecurity getMinIncomingMsgLevelSecurity(IResource resource) 
+	public MessageLevelSecurity getMinIncomingMsgLevelSecurity(IResource resource) 
 		throws AuthZSecurityException, ResourceException;
 
 	/**
 	 * Returns the entire AuthZ configuration for the resource  
 	 */
-	public abstract AuthZConfig getAuthZConfig(IResource resource) throws AuthZSecurityException, ResourceException;
+	public AuthZConfig getAuthZConfig(IResource resource) throws AuthZSecurityException, ResourceException;
 	
 	/**
 	 * Sets the entire AuthZ configuration for the resource 
 	 */
-	public abstract void setAuthZConfig(AuthZConfig config, IResource resource) 
+	public void setAuthZConfig(AuthZConfig config, IResource resource) 
 		throws AuthZSecurityException, ResourceException;
 
-	/**
-	 * Stub for possibly having different authz handlers per-resource
-	 * @param resource
-	 */
-	public static AuthZHandler getAuthZHandler(IResource resource) {
-		// currently return the GAML authz handler
-		return handler;
-	}
-	
-	
 }

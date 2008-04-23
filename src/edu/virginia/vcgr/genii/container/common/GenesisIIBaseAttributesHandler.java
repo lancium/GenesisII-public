@@ -28,7 +28,7 @@ import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
-import edu.virginia.vcgr.genii.container.security.authz.handlers.AuthZHandler;
+import edu.virginia.vcgr.genii.container.security.authz.providers.*;
 
 public class GenesisIIBaseAttributesHandler 
 	extends AbstractAttributeHandler
@@ -127,7 +127,8 @@ public class GenesisIIBaseAttributesHandler
 			throws ResourceUnknownFaultType, ResourceException, AuthZSecurityException
 	{
 		IResource resource = ResourceManager.getCurrentResource().dereference();
-		AuthZHandler authZHandler = AuthZHandler.getAuthZHandler(resource);
+		IAuthZProvider authZHandler = AuthZProviders.getProvider(
+				resource.getParentResourceKey().getServiceName());
 		AuthZConfig config = null;
 		if (authZHandler != null) {
 			config = authZHandler.getAuthZConfig(resource);
@@ -159,7 +160,8 @@ public class GenesisIIBaseAttributesHandler
 		}
 		
 		// get the authZ handler 			
-		AuthZHandler authZHandler = AuthZHandler.getAuthZHandler(resource);
+		IAuthZProvider authZHandler = AuthZProviders.getProvider(
+				resource.getParentResourceKey().getServiceName());
 		if (authZHandler == null) {
 			throw new ResourceException("Resource does not have an AuthZ module");
 		}

@@ -32,6 +32,7 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
@@ -52,10 +53,13 @@ public class RByteIOResource extends BasicDBResource implements IRByteIOResource
 	
 	static private Log _logger = LogFactory.getLog(RByteIOResource.class);
 	
-	protected RByteIOResource(ResourceKey rKey, DatabaseConnectionPool pool)
+	protected RByteIOResource(
+			ResourceKey parentKey, 
+			DatabaseConnectionPool connectionPool,
+			IResourceKeyTranslater translater)
 		throws SQLException
 	{
-		super(rKey, pool);
+		super(parentKey, connectionPool, translater);
 	}
 	
 	public File chooseFile(HashMap<QName, Object> creationProperties)

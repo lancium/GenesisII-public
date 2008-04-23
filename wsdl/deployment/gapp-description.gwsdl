@@ -15,13 +15,18 @@
 	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
 	xmlns:sfact="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory"
 	xmlns:rns="http://schemas.ggf.org/rns/2006/05/rns"
+	xmlns:enhanced-rns="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
 	xmlns:rpw-2="http://docs.oasis-open.org/wsrf/rpw-2"
     xmlns:rw-2="http://docs.oasis-open.org/wsrf/rw-2"
     targetNamespace="http://vcgr.cs.virginia.edu/genii/application-description">
 
     <wsdl:import
         namespace="http://schemas.ggf.org/rns/2006/05/rns"
-        location="./rns-generated.wsdl"/>
+        location="./rns.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
+        location="./enhanced-rns-generated.wsdl"/>
 
 	<wsdl:import
 		namespace="http://docs.oasis-open.org/wsrf/rw-2"

@@ -20,6 +20,6 @@ public class BESDBResourceProvider extends BasicDBResourceProvider
 	protected IResourceFactory instantiateResourceFactory(DatabaseConnectionPool pool)
 		throws SQLException
 	{
-		return new DBBESResourceFactory(pool);
+		return new DBBESResourceFactory(pool, getTranslater());
 	}
 }

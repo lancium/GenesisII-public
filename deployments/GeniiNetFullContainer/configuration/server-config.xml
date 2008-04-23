@@ -157,6 +157,16 @@
 				value="connection-pool"/>
 		</mconf:instance>
 		
+		<mconf:instance name="nis-resource-provider"
+			type="edu.virginia.vcgr.genii.container.nisauthn.NISResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.nisauthn.yphost"
+				value=""/>
+			<mconf:property name="edu.virginia.vcgr.genii.nisauthn.ypdomain"
+				value=""/>
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
+		
 		<mconf:instance name="queue-db-resource-provider"
 			type="edu.virginia.vcgr.genii.container.q2.resource.QueueDBResourceProvider">
 			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
@@ -283,7 +293,7 @@
 -->
 		</genii:service>
 		
-		<genii:service name="RNSPortType">
+		<genii:service name="EnhancedRNSPortType">
 			<genii:resource-provider name="rns-db-resource-provider"/>
 <!--  turns on making resolver for new instances of this type
 			<genii:default-resolver-factory-settings>
@@ -393,6 +403,10 @@
 
 		<genii:service name="X509AuthnPortType">
 			<genii:resource-provider name="rns-db-resource-provider"/>
+		</genii:service>
+
+		<genii:service name="NISAuthnPortType">
+			<genii:resource-provider name="nis-resource-provider"/>
 		</genii:service>
 
 		<genii:service name="CertGeneratorPortType">

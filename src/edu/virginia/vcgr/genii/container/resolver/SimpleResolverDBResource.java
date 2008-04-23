@@ -12,6 +12,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
@@ -26,10 +27,13 @@ public class SimpleResolverDBResource extends BasicDBResource implements ISimple
 	static public final String _RESOLVER_EPI_PROPERTY_NAME =	"resolver-epi";
 	static public final String _RESOLVER_EPR_PROPERTY_NAME = "simple-resolver-epr";
 	
-	public SimpleResolverDBResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool)
+	public SimpleResolverDBResource(
+			ResourceKey parentKey, 
+			DatabaseConnectionPool connectionPool,
+			IResourceKeyTranslater translater)
 		throws SQLException
 	{
-		super(parentKey, connectionPool);
+		super(parentKey, connectionPool, translater);
 	}
 	
 	public void update(SimpleResolverEntry entry) 

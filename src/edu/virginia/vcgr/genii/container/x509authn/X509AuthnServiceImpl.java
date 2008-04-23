@@ -105,6 +105,7 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 		super(serviceName);
 
 		addImplementedPortType(WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.STS_SERVICE_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.RNS_SERVICE_PORT_TYPE);
 	}
 
@@ -165,7 +166,7 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 			// that we're being supplied
 			
 			try {
-				identityAssertion = SignedAssertion.base64decodeAssertion(encodedAssertion);
+				identityAssertion = SignedAssertionBaseImpl.base64decodeAssertion(encodedAssertion);
 				
 				// Delegate from the service to the resource
 				DelegatedAttribute delegatedAttribute = new DelegatedAttribute(
@@ -198,7 +199,7 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 						new IdentityAttribute(
 							new BasicConstraints(
 								System.currentTimeMillis() - (1000L * 60 * 15), // 15 minutes ago
-								validMillis, // valid 24 hours
+								validMillis, 
 								10), 
 							identity),
 						Container.getContainerPrivateKey());
@@ -286,7 +287,7 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 		try {
 			binaryToken = new MessageElement(
 				BinarySecurity.TOKEN_BST, 
-				SignedAssertion.base64encodeAssertion(signedAssertion));
+				SignedAssertionBaseImpl.base64encodeAssertion(signedAssertion));
 			binaryToken.setAttributeNS(null, "ValueType", SecurityConstants.GAML_TOKEN_TYPE);
 		} catch (IOException e) {
 	    	throw new GeneralSecurityException(e.getMessage(), e);	

@@ -26,6 +26,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
+import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
 public class DBBESActivityResourceFactory extends BasicDBResourceFactory
@@ -61,10 +62,12 @@ public class DBBESActivityResourceFactory extends BasicDBResourceFactory
 	};
 	
 	
-	public DBBESActivityResourceFactory(DatabaseConnectionPool pool)
+	public DBBESActivityResourceFactory(
+			DatabaseConnectionPool pool, 
+			IResourceKeyTranslater translator)
 		throws SQLException
 	{
-		super(pool);
+		super(pool, translator);
 	}
 	
 	protected void createTables() throws SQLException
@@ -102,7 +105,7 @@ public class DBBESActivityResourceFactory extends BasicDBResourceFactory
 	{
 		try
 		{
-			return new DBBESActivityResource(rKey, _pool);
+			return new DBBESActivityResource(rKey, _pool, _translater);
 		}
 		catch (SQLException sqe)
 		{

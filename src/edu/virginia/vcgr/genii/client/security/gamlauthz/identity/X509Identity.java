@@ -5,10 +5,15 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.security.GeneralSecurityException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
+import java.security.cert.*;
 
-public class X509Identity implements AssertableIdentity {
+import java.util.*;
+
+
+import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
+import edu.virginia.vcgr.genii.client.security.SecurityUtils;
+
+public class X509Identity implements AssertableIdentity, SignedAssertion {
 
 	static public final long serialVersionUID = 0L;
 	
@@ -26,6 +31,49 @@ public class X509Identity implements AssertableIdentity {
 		// corresponding private key
 		return _identity;
 	}
+	
+	/**
+	 * Returns the primary attribute that is being asserted
+	 */
+	public Attribute getAttribute() {
+		return new IdentityAttribute(this);
+	}
+
+	/**
+	 * Returns the certchain of the identity authorized to use this 
+	 * assertion (same as the asserter)
+	 */
+	public X509Certificate[] getAuthorizedIdentity() {
+		return _identity;
+	}
+
+	/**
+	 * Verify the assertion.  It is verified if all signatures successfully
+	 * authenticate the signed-in authorizing identities
+	 */	
+	public void validateAssertion() throws GeneralSecurityException {
+		edu.virginia.vcgr.genii.client.security.x509.CertTool.loadBCProvider();
+
+		SecurityUtils.validateCertPath(_identity);
+	}
+
+	
+	/**
+	 * Checks that the attribute is time-valid with respect to the supplied 
+	 * date and any delegation depth requirements are met by the supplied
+	 * delegationDepth.
+	 */
+	public void checkValidity(Date date) throws AttributeInvalidException {
+		
+		try {
+			for (X509Certificate cert : getAssertingIdentityCertChain()) {
+				cert.checkValidity(date);
+			}
+		} catch (CertificateException e) {
+			throw new AttributeInvalidException("Security attribute asserting identity contains an invalid certificate: " + e.getMessage(), e);
+		}
+	}	
+	
 	
 	public String toString() {
 		return "[X509Identity] \"" + _identity[0].getSubjectX500Principal() + "\"";

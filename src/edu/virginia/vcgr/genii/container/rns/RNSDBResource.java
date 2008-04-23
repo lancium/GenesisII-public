@@ -15,6 +15,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
@@ -30,10 +31,13 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 	static private final String _REMOVE_ENTRIES_STMT =
 		"DELETE FROM entries WHERE resourceid = ? AND name = ?";
 	
-	public RNSDBResource(ResourceKey parentKey, DatabaseConnectionPool connectionPool)
+	public RNSDBResource(
+			ResourceKey parentKey, 
+			DatabaseConnectionPool connectionPool,
+			IResourceKeyTranslater translater)
 		throws SQLException
 	{
-		super(parentKey, connectionPool);
+		super(parentKey, connectionPool, translater);
 	}
 	
 	public void addEntry(InternalEntry entry) throws ResourceException,

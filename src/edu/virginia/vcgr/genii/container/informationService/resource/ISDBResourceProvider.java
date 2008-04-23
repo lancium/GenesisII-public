@@ -24,6 +24,6 @@ public class ISDBResourceProvider extends RNSDBResourceProvider{
 	protected IResourceFactory instantiateResourceFactory(DatabaseConnectionPool pool)
 	throws SQLException
 	{
-		return new DBISResourceFactory(pool);
+		return new DBISResourceFactory(pool, getTranslater());
 	}
 }

@@ -20,6 +20,6 @@ public class CertGeneratorDBResourceProvider extends BasicDBResourceProvider
 	protected IResourceFactory instantiateResourceFactory(DatabaseConnectionPool pool)
 		throws SQLException
 	{
-		return new CertGeneratorDBResourceFactory(pool);
+		return new CertGeneratorDBResourceFactory(pool, getTranslater());
 	}
 }

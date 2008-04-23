@@ -23,6 +23,7 @@ import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.resolver.IResolverFactoryProxy;
 import edu.virginia.vcgr.genii.container.resource.IResourceProvider;
+import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider;
 
 public class ServiceDescription
 {
@@ -34,13 +35,18 @@ public class ServiceDescription
 		"edu.virginia.vcgr.genii.container.resolver.default-resolver-factory-proxy-class";
 	
 	private IResourceProvider _resourceProvider;
+	private IAuthZProvider _authZProvider;
 	private Long _serviceCertificateLifetime = null;
 	private Long _resourceCertificateLifetime = null;
 	private Properties _defaultResolverFactoryProps = null;
 	private Class<? extends IResolverFactoryProxy> _defaultResolverFactoryProxyClass = null;
 	
 	@SuppressWarnings("unchecked")
-	public ServiceDescription(String providerName, Properties securityProperties, Properties defaultResolverFactoryProps)
+	public ServiceDescription(
+			String resourceProviderName, 
+			String authzProviderName, 
+			Properties securityProperties, 
+			Properties defaultResolverFactoryProps)
 		throws ConfigurationException
 	{
 		if (securityProperties != null)
@@ -77,22 +83,31 @@ public class ServiceDescription
 			}
 		}
 		
-		Object obj = NamedInstances.getServerInstances().lookup(providerName);
-		if (obj != null)
-		{
-			_resourceProvider = (IResourceProvider)obj;
-			return;
+		Object obj = NamedInstances.getServerInstances().lookup(resourceProviderName);
+		if (obj == null) {
+			throw new ConfigurationException("Couldn't locate instance \"" +
+					resourceProviderName + "\".");
 		}
-		
-		throw new ConfigurationException("Couldn't locate instance \"" +
-			providerName + "\".");
+		_resourceProvider = (IResourceProvider)obj;
+
+		obj = NamedInstances.getServerInstances().lookup(authzProviderName);
+		if (obj == null) {
+			throw new ConfigurationException("Couldn't locate instance \"" +
+					authzProviderName + "\".");
+		}
+		_authZProvider = (IAuthZProvider)obj;
 	}
 	
-	public IResourceProvider retrieveProvider()
+	public IResourceProvider retrieveResourceProvider()
 	{
 		return _resourceProvider;
 	}
 	
+	public IAuthZProvider retrieveAuthZProvider()
+	{
+		return _authZProvider;
+	}
+
 	public long getServiceCertificateLifetime()
 	{
 		if (_serviceCertificateLifetime != null)

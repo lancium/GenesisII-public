@@ -11,6 +11,7 @@ import java.util.HashMap;
 
 import javax.xml.namespace.QName;
 import org.ws.addressing.EndpointReferenceType;
+import org.ws.addressing.ReferenceParametersType;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,6 +26,7 @@ import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverUtils;
 import edu.virginia.vcgr.genii.container.resource.IResource;
+import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
@@ -137,10 +139,13 @@ public class ExportedFileDBResource extends RByteIOResource
 		}
 	}
 	
-	public ExportedFileDBResource(ResourceKey rKey, DatabaseConnectionPool pool)
+	public ExportedFileDBResource(
+			ResourceKey parentKey, 
+			DatabaseConnectionPool connectionPool,
+			IResourceKeyTranslater translater)
 		throws SQLException
 	{
-		super(rKey, pool);
+		super(parentKey, connectionPool, translater);
 	}
 	
 	public void initialize(HashMap<QName, Object> constructionParams)
@@ -178,12 +183,13 @@ public class ExportedFileDBResource extends RByteIOResource
 		}
 	}
 	
-	public void load(Object key) throws ResourceUnknownFaultType, ResourceException
+	public void load(ReferenceParametersType refParams) throws ResourceUnknownFaultType, ResourceException
 	{
-		super.load(key);
+		super.load(refParams);
 		
-		if (key == null)
+		if (isServiceResource()) {
 			return;
+		}
 		
 		loadFileInfo();
 		if (!fileExists())

@@ -111,6 +111,8 @@
 			locator-type="edu.virginia.vcgr.genii.counter.CounterServiceLocator"/>
 		<locator interface="org.ggf.rns.RNSPortType"
 			locator-type="org.ggf.rns.RNSServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType"
+			locator-type="edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.scheduler.basic.BasicSchedulerPortType"
 			locator-type="edu.virginia.vcgr.genii.scheduler.basic.BasicSchedulerServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.bes.GeniiBESPortType"
@@ -143,6 +145,8 @@
 			locator-type="edu.virginia.vcgr.genii.common.notification.GeniiNotificationConsumerServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.common.notification.GeniiSubscriptionPortType"
 			locator-type="edu.virginia.vcgr.genii.common.notification.GeniiSubscriptionServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.naming.EndpointIdentifierResolver"
+			locator-type="edu.virginia.vcgr.genii.naming.EndpointIdentifierResolverServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.naming.ReferenceResolver"
 			locator-type="edu.virginia.vcgr.genii.naming.ReferenceResolverServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.resolver.simple.SimpleResolverPortType"
@@ -165,6 +169,8 @@
 			locator-type="edu.virginia.vcgr.genii.informationService.InformationServiceServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.x509authn.X509AuthnPortType"
 			locator-type="edu.virginia.vcgr.genii.x509authn.X509AuthnServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.nisauthn.NISAuthnPortType"
+			locator-type="edu.virginia.vcgr.genii.nisauthn.NISAuthnServiceLocator"/>
 		<locator interface="org.ogf.ogsa.ticker.TickerFactory"
 			locator-type="org.ogf.ogsa.ticker.TickerFactoryServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.tty.TTYPortType"
@@ -178,14 +184,14 @@
 		<mconf:instance name="context-resolver" 
 			type="edu.virginia.vcgr.genii.client.context.ClientContextResolver"
 			base="edu.virginia.vcgr.genii.client.context.IContextResolver"/>		
-<!--
 		<mconf:instance name="exception-handler"
 			type="edu.virginia.vcgr.genii.client.cmd.DebugExceptionHandler"
 			base="edu.virginia.vcgr.genii.client.cmd.IExceptionHandler"/>
--->
+<!--
 		<mconf:instance name="exception-handler"
 			type="edu.virginia.vcgr.genii.client.cmd.SimpleExceptionHandler"
 			base="edu.virginia.vcgr.genii.client.cmd.IExceptionHandler"/>
+-->
 		<mconf:instance name="debug-list-handler"
 			type="edu.virginia.vcgr.genii.client.invoke.handlers.DebugListHandler"
 			base="java.lang.Object"/>

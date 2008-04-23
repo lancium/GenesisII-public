@@ -20,6 +20,6 @@ public class RExportResolverFactoryDBResourceProvider  extends BasicDBResourcePr
 	protected IResourceFactory instantiateResourceFactory(DatabaseConnectionPool pool)
 		throws SQLException
 	{
-		return new RExportResolverFactoryDBResourceFactory(pool);
+		return new RExportResolverFactoryDBResourceFactory(pool, getTranslater());
 	}
 }

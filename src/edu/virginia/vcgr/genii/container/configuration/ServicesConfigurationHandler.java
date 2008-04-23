@@ -37,11 +37,15 @@ public class ServicesConfigurationHandler implements
 	static final public String SERVICE_NAME_NAME = "name";
 	static final public String RESOURCE_PROVIDER_NAME = "resource-provider";
 	static final public String RESOURCE_PROVIDER_NAME_NAME = "name";
+	static final public String AUTHZ_PROVIDER_NAME = "authz-provider";
+	static final public String AUTHZ_PROVIDER_NAME_NAME = "name";
 	
 	static public QName SERVICE_ELEMENT_QNAME =
 		new QName(GenesisIIConstants.GENESISII_NS, SERVICE_NAME);
 	static public QName RESOURCE_FACTORY_ELEMENT_QNAME =
 		new QName(GenesisIIConstants.GENESISII_NS, RESOURCE_PROVIDER_NAME);
+	static public QName AUTHZ_PROVIDER_ELEMENT_QNAME =
+		new QName(GenesisIIConstants.GENESISII_NS, AUTHZ_PROVIDER_NAME);
 	static public QName SECURITY_SETTINGS_ELEMENT_QNAME =
 		new QName(GenesisIIConstants.GENESISII_NS, "security-settings");
 	static public QName DEFAULT_RESOLVER_FACTORY_ELEMENT_QNAME =
@@ -87,7 +91,8 @@ public class ServicesConfigurationHandler implements
 		Properties defaultResolverFactoryProps = null;
 		NodeList children = n.getChildNodes();
 		int length = children.getLength();
-		Node nameNode = null;
+		Node resourceNameNode = null;
+		Node authzNameNode = null;
 		
 		for (int lcv = 0; lcv < length; lcv++)
 		{
@@ -97,12 +102,21 @@ public class ServicesConfigurationHandler implements
 				QName childQName = XMLConfiguration.getQName(child);
 				if (childQName.equals(RESOURCE_FACTORY_ELEMENT_QNAME))
 				{
-					NamedNodeMap attrs = child.getAttributes();
-					nameNode = attrs.getNamedItem(RESOURCE_PROVIDER_NAME_NAME);
-					if (nameNode == null)
+					NamedNodeMap resourceAttrs = child.getAttributes();
+					resourceNameNode = resourceAttrs.getNamedItem(RESOURCE_PROVIDER_NAME_NAME);
+					if (resourceNameNode == null)
 						throw new ConfigurationException(
 							"Couldn't find name attribute.");
-				} else if (childQName.equals(SECURITY_SETTINGS_ELEMENT_QNAME))
+				} 
+				else if (childQName.equals(AUTHZ_PROVIDER_ELEMENT_QNAME))
+				{
+					NamedNodeMap authzAttrs = child.getAttributes();
+					authzNameNode = authzAttrs.getNamedItem(AUTHZ_PROVIDER_NAME_NAME);
+					if (authzNameNode == null)
+						throw new ConfigurationException(
+							"Couldn't find name attribute.");
+				} 
+				else if (childQName.equals(SECURITY_SETTINGS_ELEMENT_QNAME))
 				{
 					securityProps =
 						(Properties)(new PropertiesConfigurationSectionHandler().parse(child));
@@ -113,10 +127,17 @@ public class ServicesConfigurationHandler implements
 				}
 			}
 		}
-		if (nameNode == null)
+		if (resourceNameNode == null)
 			throw new ConfigurationException(
 			"Couldn't locate name of resource provider.");
+		if (authzNameNode == null)
+			throw new ConfigurationException(
+			"Couldn't locate name of authz provider.");
 				
-		return new ServiceDescription(nameNode.getTextContent(), securityProps, defaultResolverFactoryProps);
+		return new ServiceDescription(
+				resourceNameNode.getTextContent(), 
+				authzNameNode.getTextContent(), 
+				securityProps, 
+				defaultResolverFactoryProps);
 	}
 }

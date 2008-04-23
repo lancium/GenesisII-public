@@ -13,6 +13,7 @@
     xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
 	xmlns:genii-not="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
     xmlns:rns="http://schemas.ggf.org/rns/2006/05/rns"
+	xmlns:enhanced-rns="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
     xmlns:naming-w="http://schemas.ogf.org/naming/2006/08/naming/wsdl"
     xmlns:naming="http://schemas.ogf.org/naming/2006/08/naming"
 	xmlns:rexport-resolver="http://vcgr.cs.virginia.edu/rns/2007/08/replicatedExport/resolver"
@@ -56,7 +57,11 @@
 
     <wsdl:import
         namespace="http://schemas.ggf.org/rns/2006/05/rns"
-        location="./rns-generated.wsdl"/>
+        location="./rns.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
+        location="./enhanced-rns-generated.wsdl"/>
 
 	<wsdl:types>
 		<xsd:schema
