@@ -2,7 +2,7 @@ package edu.virginia.vcgr.genii.container.resource;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.net.URI;
+import org.apache.axis.types.URI;
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
 

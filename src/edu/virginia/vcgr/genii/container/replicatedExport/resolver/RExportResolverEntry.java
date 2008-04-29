@@ -1,6 +1,6 @@
 package edu.virginia.vcgr.genii.container.replicatedExport.resolver;
 
-import java.net.URI;
+import org.apache.axis.types.URI;
 
 import org.ws.addressing.EndpointReferenceType;
 

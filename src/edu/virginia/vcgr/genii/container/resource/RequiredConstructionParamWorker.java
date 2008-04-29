@@ -1,6 +1,6 @@
 package edu.virginia.vcgr.genii.container.resource;
 
-import java.net.URI;
+import org.apache.axis.types.URI;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.io.IOException;

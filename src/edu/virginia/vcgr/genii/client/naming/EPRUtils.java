@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
-import java.net.URI;
+import org.apache.axis.types.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.Blob;
@@ -129,7 +129,7 @@ public class EPRUtils
 				{
 					return new URI(s);
 				}
-				catch (URISyntaxException e)
+				catch (URI.MalformedURIException e)
 				{
 					_logger.warn("Found EPR with WSName \"" +
 						s + "\" which isn't a URI.");

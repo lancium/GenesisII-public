@@ -15,7 +15,7 @@
  */
 package edu.virginia.vcgr.genii.container.jndiauthn;
 
-import java.net.URI;
+import org.apache.axis.types.URI;
 import java.net.URISyntaxException;
 
 import javax.xml.namespace.QName;
@@ -43,6 +43,6 @@ public interface IJNDIResource extends IRNSResource {
 	
 	public StsType getStsType() throws ResourceException;
 	
-	public URI createChildIdpEpi(String childName) throws URISyntaxException,
+	public URI createChildIdpEpi(String childName) throws URI.MalformedURIException,
 			ResourceException;	
 }

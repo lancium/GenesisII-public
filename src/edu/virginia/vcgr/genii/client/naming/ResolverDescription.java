@@ -19,7 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
-import java.net.URI;
+import org.apache.axis.types.URI;
 
 public class ResolverDescription
 {

@@ -23,7 +23,7 @@ import java.sql.SQLException;
 import java.text.*;
 import java.util.*;
 import java.util.regex.Pattern;
-import java.net.URI;
+import org.apache.axis.types.URI;
 import java.net.URISyntaxException;
 
 import javax.xml.namespace.QName;
@@ -118,28 +118,25 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 	/**
 	 * Return different implemented port types depending on who we are
 	 */
-	public QName[] getImplementedPortTypes() throws ResourceException, ResourceUnknownFaultType {
+	public QName[] getImplementedPortTypes(ResourceKey rKey) throws ResourceException, ResourceUnknownFaultType {
 
-		ResourceKey serviceKey = ResourceManager.getCurrentResource();
-		
-		IResource currentResource = serviceKey.dereference();
-		if (!(currentResource instanceof IJNDIResource)) {
+		if ((rKey == null) || (!(rKey.dereference() instanceof IJNDIResource))) {
 			// JNDIAuthnPortType
 			QName[] response = {
 				WellKnownPortTypes.RNS_SERVICE_PORT_TYPE, 
-				WellKnownPortTypes.GENII_FACTORY_PORT_TYPE
+				WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE
 			};
 			
 			return response;
 		}
 		
-		IJNDIResource serviceResource = (IJNDIResource) currentResource;
+		IJNDIResource serviceResource = (IJNDIResource) rKey.dereference();
 
 		if (serviceResource.isServiceResource()) {
 			// JNDIAuthnPortType
 			QName[] response = {
 				WellKnownPortTypes.RNS_SERVICE_PORT_TYPE, 
-				WellKnownPortTypes.GENII_FACTORY_PORT_TYPE
+				WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE
 			};
 			
 			return response;
@@ -216,29 +213,28 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		myResource.addEntry(new InternalEntry(newStsName, newEPR, null));
 		myResource.commit();
 
-		// get the IDP resource's db resource 
-		IJNDIResource newResource = (IJNDIResource) rKey.dereference();
-		newResource.setProperty(
-				SecurityConstants.NEW_JNDI_STS_NAME_QNAME.getLocalPart(), 
-				newStsName);
-		
-		newResource.setProperty(
-				SecurityConstants.NEW_JNDI_STS_TYPE_QNAME.getLocalPart(), 
-				constructionParameters.get(SecurityConstants.NEW_JNDI_STS_TYPE_QNAME));
-		
-		newResource.setProperty(
-				SecurityConstants.NEW_JNDI_STS_HOST_QNAME.getLocalPart(), 
-				constructionParameters.get(SecurityConstants.NEW_JNDI_STS_HOST_QNAME));
-
-		newResource.setProperty(
-				SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME.getLocalPart(), 
-				constructionParameters.get(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME));
-
-
-		
 		super.postCreate(rKey, newEPR, constructionParameters, resolverCreationParams);
 	}
 
+	protected Object translateConstructionParameter(MessageElement property)
+		throws Exception {
+
+			// decodes the base64-encoded delegated assertion construction param
+		QName name = property.getQName();
+		if (name.equals(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME)) {
+			return property.getValue();
+		} else if (name.equals(SecurityConstants.NEW_JNDI_STS_HOST_QNAME)) {
+			return property.getValue();
+		} else if (name.equals(SecurityConstants.NEW_JNDI_STS_NAME_QNAME)) {
+			return property.getValue();
+		} else if (name.equals(SecurityConstants.NEW_JNDI_STS_SEARCHBASE_QNAME)) {
+			return property.getValue();
+		} else if (name.equals(SecurityConstants.NEW_JNDI_STS_TYPE_QNAME)) {
+			return property.getValue();
+		} else {
+			return super.translateConstructionParameter(property);
+		}
+	}	
 	
 	protected CertCreationSpec getChildCertSpec() 
 		throws ResourceException, ResourceUnknownFaultType, ConfigurationException {
@@ -554,7 +550,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		
 		// Note: May rethink about keeping this check... It does prevent us from
     	// going OOM accidently, but it's not complete...
-    	if (list.getEntry_name_regexp().equals("*.")) {
+    	if (list.getEntry_name_regexp().equals(".*")) {
     		throw new RemoteException("\"unconstrained list\" not applicable.");
     	}
 
@@ -629,6 +625,8 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 
  			return new IterateListResponseType(super.createWSIterator(iterator));
 		
+		} catch (java.io.IOException e) {
+			throw new RemoteException("Unable to create iterator.", e);
 		} catch (ConfigurationException e) {
 			throw new RemoteException("Unable to create iterator.", e);
 		} catch (SQLException sqe) {
@@ -637,12 +635,12 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 	    
     }	
 	
-	protected X509Certificate[] createCertChainForListing(ResourceKey idpKey) 
-			throws RemoteException, GeneralSecurityException {
+	protected X509Certificate[] createCertChainForListing(
+			IJNDIResource idpResource, 
+			IJNDIResource stsResource) 
+				throws RemoteException, GeneralSecurityException {
 		
 		try {
-			
-			IJNDIResource idpResource = (IJNDIResource) idpKey.dereference();
 			
 			// the expensive part: we finally generate a certificate for this guy
 			X509Certificate[] containerChain = Container.getContainerCertChain();
@@ -651,7 +649,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 				return null;
 			}
 			
-			String epiString = (String) idpKey.getKey();
+			String epiString = (String) idpResource.getKey();
 			String userName = idpResource.getIdpName();
 			
 			CertCreationSpec certSpec = new CertCreationSpec(
@@ -664,16 +662,17 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 			String providerUrl = null;
 			String queryUri = null;
 
-			switch (idpResource.getStsType()) {
+			switch (stsResource.getStsType()) {
 			case NIS:
 			
 				jndiEnv.setProperty(Context.INITIAL_CONTEXT_FACTORY,
 				"com.sun.jndi.nis.NISCtxFactory");
 				providerUrl = 
 					"nis://" + 
-					idpResource.getProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME.getLocalPart()) +  
+					stsResource.getProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME.getLocalPart()) +  
 					"/" + 
-					idpResource.getProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME.getLocalPart());  
+					stsResource.getProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME.getLocalPart());  
+				jndiEnv.setProperty(Context.PROVIDER_URL, providerUrl);
 
 				InitialDirContext initialContext = new InitialDirContext(jndiEnv);
 				queryUri = providerUrl + "/system/passwd/" + userName;
@@ -683,7 +682,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 				
 				// get CNs for cert (gecos common string)
 				ArrayList<String> cnList = new ArrayList<String>();
-				cnList.add(idpKey.getServiceName());
+				cnList.add(idpResource.getParentResourceKey().getServiceName());
 				if (attrs.get("gecos") != null) {
 					cnList.add((String) attrs.get("gecos").get());
 				}
@@ -731,9 +730,9 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 			(EndpointReferenceType)WorkingContext.getCurrentWorkingContext().getProperty(
 					WorkingContext.EPR_PROPERTY_NAME);
 		
-		ResourceKey serviceKey = ResourceManager.getCurrentResource();
-		IResource serviceResource = serviceKey.dereference();
-		if (!serviceResource.isServiceResource()) {
+		ResourceKey stsKey = ResourceManager.getCurrentResource();
+		IJNDIResource stsResource = (IJNDIResource) stsKey.dereference();
+		if (stsResource.isServiceResource() || stsResource.isIdpResource()) {
 			throw new RemoteException("\"resolveEPI\" not applicable.");
 		}
 		
@@ -747,12 +746,12 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 					IJNDIResource.IS_IDP_RESOURCE_CONSTRUCTION_PARAM, 
 					Boolean.TRUE);
 			
-			ResourceKey listingKey = createResource(creationParameters);
-			IResource listingResource = listingKey.dereference();
+			ResourceKey idpKey = createResource(creationParameters);
+			IJNDIResource idpResource = (IJNDIResource) idpKey.dereference();
 
 			X509Certificate[] resourceCertChain = 
-				createCertChainForListing(listingKey);
-			listingResource.setProperty(
+				createCertChainForListing(idpResource, stsResource);
+			idpResource.setProperty(
 					IResource.CERTIFICATE_CHAIN_PROPERTY_NAME, 
 					resourceCertChain);
 			
@@ -760,7 +759,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 					WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE, 
 					WellKnownPortTypes.STS_SERVICE_PORT_TYPE}; 
 			EndpointReferenceType retval = ResourceManager.createEPR(
-					listingKey, 
+					idpKey, 
 					myEPR.getAddress().toString(), 
 					implementedPortTypes);
 			
@@ -768,7 +767,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 
 		} catch (GeneralSecurityException e) {
 			throw new ResourceException(e.getMessage(), e);
-		} catch (URISyntaxException e) {
+		} catch (URI.MalformedURIException e) {
 			throw new ResourceException(e.getMessage(), e);
 		}
 			
@@ -830,6 +829,8 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		throw new RemoteException("\"query\" not applicable.");
 	}
 
+
+	
 	
 	public class EntryIterator implements Iterator<MessageElement> {
 
@@ -933,7 +934,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 						.getMessage());
 				nee.initCause(e);
 				throw nee;
-			} catch (URISyntaxException e) {
+			} catch (URI.MalformedURIException e) {
 				NoSuchElementException nee = new NoSuchElementException(e
 						.getMessage());
 				nee.initCause(e);

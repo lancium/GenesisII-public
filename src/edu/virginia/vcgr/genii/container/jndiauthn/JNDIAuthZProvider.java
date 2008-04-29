@@ -73,8 +73,10 @@ public class JNDIAuthZProvider implements IAuthZProvider {
 			IResource resource,
 			X509Certificate[] serviceCertChain) throws AuthZSecurityException,
 			ResourceException {
+
+		JNDIResource jndiResource = (JNDIResource) resource;
 		
-		if (resource.isServiceResource()) {
+		if (!jndiResource.isIdpResource()) {
 			_gamlAclProvider.setDefaultAccess(callingContext, resource, serviceCertChain);
 		}
 	}
@@ -119,7 +121,8 @@ public class JNDIAuthZProvider implements IAuthZProvider {
 							resource.getProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME.getLocalPart()) +  
 							"/" + 
 							resource.getProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME.getLocalPart());  
-	
+						jndiEnv.setProperty(Context.PROVIDER_URL, providerUrl);
+
 						InitialDirContext initialContext = new InitialDirContext(jndiEnv);
 						queryUri = providerUrl + "/system/passwd/" + userName;
 						String[] attrIDs = {"userPassword"}; 
@@ -139,6 +142,7 @@ public class JNDIAuthZProvider implements IAuthZProvider {
 								ypPassword).equals(ypPassword)) {
 							return true;
 						}
+						break;
 	
 					case LDAP:
 						jndiEnv.setProperty(Context.INITIAL_CONTEXT_FACTORY,
@@ -167,7 +171,9 @@ public class JNDIAuthZProvider implements IAuthZProvider {
 			IResource resource) throws AuthZSecurityException,
 			ResourceException {
 
-		if (resource.isServiceResource()) {
+		JNDIResource jndiResource = (JNDIResource) resource;
+		
+		if (!jndiResource.isIdpResource()) {
 			return _gamlAclProvider.getMinIncomingMsgLevelSecurity(resource);
 		}
 		

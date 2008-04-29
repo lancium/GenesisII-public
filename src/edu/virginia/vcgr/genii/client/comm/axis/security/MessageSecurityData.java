@@ -18,7 +18,7 @@ package edu.virginia.vcgr.genii.client.comm.axis.security;
 
 import java.security.cert.X509Certificate;
 
-import java.net.URI;
+import org.apache.axis.types.URI;
 
 import edu.virginia.vcgr.genii.client.security.MessageLevelSecurity;
 

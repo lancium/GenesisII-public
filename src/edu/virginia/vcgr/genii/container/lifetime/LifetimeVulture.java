@@ -15,7 +15,7 @@
  */
 package edu.virginia.vcgr.genii.container.lifetime;
 
-import java.net.URI;
+import org.apache.axis.types.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;

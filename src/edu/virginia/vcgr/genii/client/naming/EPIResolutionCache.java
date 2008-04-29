@@ -16,7 +16,7 @@
 package edu.virginia.vcgr.genii.client.naming;
 
 
-import java.net.URI;
+import org.apache.axis.types.URI;
 
 import org.ws.addressing.EndpointReferenceType;
 

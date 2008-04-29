@@ -52,7 +52,7 @@ public class CreateJndiStsTool extends BaseGridTool
 			false);
 	}
 	
-	public void setJndiType(String jndiType) {
+	public void setJnditype(String jndiType) {
 		_jndiType = jndiType.toUpperCase();
 	}
 	

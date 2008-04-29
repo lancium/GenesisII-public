@@ -326,7 +326,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 			return property;
 	}
 	
-	public QName[] getImplementedPortTypes() throws ResourceException, ResourceUnknownFaultType
+	public QName[] getImplementedPortTypes(ResourceKey rKey) throws ResourceException, ResourceUnknownFaultType
 	{
 		QName []ret;
 		
@@ -465,7 +465,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		
 		ResourceKey rKey = createResource(constructionParameters);
 		EndpointReferenceType epr = ResourceManager.createEPR(rKey, 
-			myEPR.getAddress().get_value().toString(), getImplementedPortTypes());
+			myEPR.getAddress().get_value().toString(), getImplementedPortTypes(rKey));
 
 		try
 		{
@@ -870,7 +870,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	    		ResourceManager.createEPR(
 	    			ResourceManager.getCurrentResource(), 
 	    			Container.getServiceURL(_serviceName),
-	    			getImplementedPortTypes()));
+	    			getImplementedPortTypes(null)));
 	    	
 	    	getTopicSpace().getTopic(WellknownTopics.TERMINATED).notifyAll(
 	    		payload);

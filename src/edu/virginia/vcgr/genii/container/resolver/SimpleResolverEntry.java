@@ -15,7 +15,7 @@
  */
 package edu.virginia.vcgr.genii.container.resolver;
 
-import java.net.URI;
+import org.apache.axis.types.URI;
 
 import org.apache.axis.message.MessageElement;
 import org.ws.addressing.EndpointReferenceType;

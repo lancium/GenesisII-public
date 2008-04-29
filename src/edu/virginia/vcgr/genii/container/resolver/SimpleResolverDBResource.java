@@ -1,6 +1,6 @@
 package edu.virginia.vcgr.genii.container.resolver;
 
-import java.net.URI;
+import org.apache.axis.types.URI;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;

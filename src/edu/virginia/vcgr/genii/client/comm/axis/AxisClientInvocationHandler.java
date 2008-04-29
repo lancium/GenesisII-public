@@ -38,7 +38,7 @@ import org.morgan.util.configuration.ConfigurationException;
 import org.ogf.schemas.naming._2006._08.naming.ResolveFailedWithReferralFaultType;
 
 import java.io.IOException;
-import java.net.URI;
+import org.apache.axis.types.URI;
 import java.security.GeneralSecurityException;
 
 import javax.activation.DataHandler;

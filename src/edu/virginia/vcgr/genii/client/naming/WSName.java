@@ -15,7 +15,7 @@
  */
 package edu.virginia.vcgr.genii.client.naming;
 
-import java.net.URI;
+import org.apache.axis.types.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -112,7 +112,7 @@ public class WSName implements Comparable<WSName>
 		URI me = getEndpointIdentifier();
 		URI you = other.getEndpointIdentifier();
 		
-		return me.compareTo(you);
+		return me.toString().compareTo(you.toString());
 	}
 	
 	public boolean isValidWSName()
@@ -136,7 +136,7 @@ public class WSName implements Comparable<WSName>
 		{
 			return new URI("urn:ws-naming:epi:" + new GUID().toString());
 		}
-		catch (URISyntaxException use)
+		catch (URI.MalformedURIException use)
 		{
 			// Can't Happen
 			_logger.fatal(use);
@@ -181,7 +181,7 @@ public class WSName implements Comparable<WSName>
 						{
 							_endpointIdentifier = new URI(s);
 						}
-						catch (URISyntaxException e)
+						catch (URI.MalformedURIException e)
 						{
 							_logger.warn("Found EPR with WSName \"" +
 								s + "\" which isn't a URI.");

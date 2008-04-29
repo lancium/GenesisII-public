@@ -339,13 +339,6 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		public void handle(Callback[] callbacks) throws IOException,
     			UnsupportedCallbackException {
 
-			ICallingContext callContext = null;
-			try {
-				callContext = ContextManager.getCurrentContext();
-			} catch (ConfigurationException e) {
-				throw new IOException(e.getMessage());
-			}
-    		
     		for (int i = 0; i < callbacks.length; i++) {
     			if (callbacks[i] instanceof WSPasswordCallback) {
     				WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
@@ -361,6 +354,13 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
     					break;
     					
     				case WSPasswordCallback.USERNAME_TOKEN_UNKNOWN: 
+    					ICallingContext callContext = null;
+    					try {
+    						callContext = ContextManager.getCurrentContext();
+    					} catch (ConfigurationException e) {
+    						throw new IOException(e.getMessage());
+    					}
+
     					// check to make sure the username and password match
 
     					// add the identity to the current calling context

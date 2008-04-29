@@ -11,7 +11,7 @@ import edu.virginia.vcgr.genii.container.resource.IResource;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
+import org.apache.axis.types.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 
@@ -74,7 +74,7 @@ public class RExportUtils {
 		try{
 			epi = ClientConstructionParameters.getEndpointIdentifierProperty(epiElement);
 		}
-		catch(URISyntaxException use){
+		catch(URI.MalformedURIException use){
 			throw new ResourceException("malformed epi for RExport: " + use);
 		}
 		if (epi == null)

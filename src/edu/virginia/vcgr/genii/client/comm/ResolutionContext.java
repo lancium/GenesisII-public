@@ -15,7 +15,7 @@
  */
 package edu.virginia.vcgr.genii.client.comm;
 
-import java.net.URI;
+import org.apache.axis.types.URI;
 import java.util.ListIterator;
 
 import org.ws.addressing.AttributedURIType;

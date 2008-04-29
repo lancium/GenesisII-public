@@ -1,6 +1,6 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
-import java.net.URI;
+import org.apache.axis.types.URI;
 import java.rmi.RemoteException;
 
 import javax.xml.namespace.QName;

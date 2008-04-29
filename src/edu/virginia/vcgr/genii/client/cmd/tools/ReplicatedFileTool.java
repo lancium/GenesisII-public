@@ -21,7 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
+import org.apache.axis.types.URI;
 import java.rmi.RemoteException;
 import java.util.List;
 

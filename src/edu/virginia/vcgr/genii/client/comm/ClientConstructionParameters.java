@@ -25,7 +25,7 @@ public class ClientConstructionParameters
 		return Long.parseLong(m.getValue());
 	}
 	
-	static public MessageElement createEndpointIdentifierProperty(java.net.URI epiURI)
+	static public MessageElement createEndpointIdentifierProperty(org.apache.axis.types.URI epiURI)
 	{
 		MessageElement ret = new MessageElement(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM);
 		ret.setValue(epiURI.toString());
@@ -33,10 +33,10 @@ public class ClientConstructionParameters
 		return ret;
 	}
 	
-	static public java.net.URI getEndpointIdentifierProperty(MessageElement m)
-		throws java.net.URISyntaxException
+	static public org.apache.axis.types.URI getEndpointIdentifierProperty(MessageElement m)
+		throws org.apache.axis.types.URI.MalformedURIException
 	{
-		return new java.net.URI((m.getValue()));
+		return new org.apache.axis.types.URI((m.getValue()));
 	}
 
 }

@@ -264,7 +264,7 @@ public class VCGRContainerServiceImpl extends GenesisIIBase
 			Constructor<?> cons = jClass.getConstructor(new Class[0]);
 			Object obj = cons.newInstance(new Object[0]);
 			GenesisIIBase base = (GenesisIIBase)obj;
-			return base.getImplementedPortTypes();
+			return base.getImplementedPortTypes(null);
 		}
 		catch (NoSuchMethodException nsme)
 		{

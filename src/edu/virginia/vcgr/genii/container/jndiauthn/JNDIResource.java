@@ -1,6 +1,6 @@
 package edu.virginia.vcgr.genii.container.jndiauthn;
 
-import java.net.URI;
+import org.apache.axis.types.URI;
 import java.net.URISyntaxException;
 import java.security.cert.X509Certificate;
 import java.sql.SQLException;
@@ -99,9 +99,8 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource {
 
 		if (isIdpResource()) {
 			// IDP for a specific identity
-			String chunk = _resourceKey.substring(0, _resourceKey
-					.lastIndexOf(':') - 1);
-			StsType.valueOf(chunk.substring(_resourceKey.lastIndexOf(':') + 1));
+			String type = _resourceKey.substring(0, _resourceKey.indexOf(':'));
+			return StsType.valueOf(type.toUpperCase());
 		}
 
 		// STS for a JNDI directory resource
@@ -112,7 +111,7 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource {
 
 	}
 
-	public URI createChildIdpEpi(String childName) throws URISyntaxException,
+	public URI createChildIdpEpi(String childName) throws URI.MalformedURIException,
 			ResourceException {
 
 		if (isServiceResource() || isIdpResource()) {
@@ -122,7 +121,9 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource {
 		String type = (String) getProperty(SecurityConstants.NEW_JNDI_STS_TYPE_QNAME
 				.getLocalPart());
 
-		return new URI(_resourceKey + ":IDP:" + type + ":" + childName);
+		String epiStr = type + ":" + _resourceKey + ":IDP:" + childName;
+		
+		return new URI(epiStr);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -156,12 +157,13 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource {
 	public void load(ReferenceParametersType refParams)
 			throws ResourceUnknownFaultType, ResourceException {
 
+		_resourceKey = (String) _translater.unwrap(refParams);
+
 		if (!isIdpResource()) {
 			super.load(refParams);
 			return;
 		}
 
-		_resourceKey = (String) _translater.unwrap(refParams);
 
 
 		for (MessageElement element : refParams.get_any()) {
@@ -179,6 +181,15 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource {
 						throw new ResourceException(e.getMessage(), e);
 					}
 				}
+			
+			} else if (element.getQName().equals(SecurityConstants.NEW_JNDI_STS_HOST_QNAME)) {
+				setProperty(
+						SecurityConstants.NEW_JNDI_STS_HOST_QNAME.getLocalPart(), 
+						element.getFirstChild().getNodeValue());
+			} else if (element.getQName().equals(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME)) {
+				setProperty(
+						SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME.getLocalPart(), 
+						element.getFirstChild().getNodeValue());
 			}
 		}
 	}
@@ -188,11 +199,32 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource {
 
 		Boolean isIdpResource = (Boolean) constructionParams
 				.get(IJNDIResource.IS_IDP_RESOURCE_CONSTRUCTION_PARAM);
+		Boolean isServiceResource = (Boolean)constructionParams.get(
+				IResource.IS_SERVICE_CONSTRUCTION_PARAM);
 
 		if (isIdpResource != null && isIdpResource.booleanValue()) {
+
 			_resourceKey = ((URI) constructionParams
 					.get(ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM)).toString();
+		} else if (isServiceResource == null || !isServiceResource.booleanValue()) {
+
+			super.initialize(constructionParams);
+
+			setProperty(
+				SecurityConstants.NEW_JNDI_STS_NAME_QNAME.getLocalPart(), 
+				constructionParams.get(SecurityConstants.NEW_JNDI_STS_NAME_QNAME));
+			setProperty(
+				SecurityConstants.NEW_JNDI_STS_TYPE_QNAME.getLocalPart(), 
+				constructionParams.get(SecurityConstants.NEW_JNDI_STS_TYPE_QNAME));
+			setProperty(
+				SecurityConstants.NEW_JNDI_STS_HOST_QNAME.getLocalPart(), 
+				constructionParams.get(SecurityConstants.NEW_JNDI_STS_HOST_QNAME));
+			setProperty(
+				SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME.getLocalPart(), 
+				constructionParams.get(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME));
+
 		} else {
+		
 			super.initialize(constructionParams);
 		}
 	}
@@ -216,7 +248,7 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource {
 			// calculate the epi
 			try {
 				return new URI(_resourceKey);
-			} catch (URISyntaxException e) {
+			} catch (URI.MalformedURIException e) {
 				throw new ResourceException(e.getMessage(), e);
 			}
 		}
@@ -285,13 +317,16 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource {
 
 		ReferenceParametersType refParams = super.getResourceParameters();
 
+		if (!isIdpResource()) {
+			return refParams;
+		}
+
+		ArrayList<MessageElement> mels = new ArrayList<MessageElement>(
+				Arrays.asList(refParams.get_any()));
+
 		// add the end-certificate as a new reference parameter
-
 		X509Certificate[] certChain = (X509Certificate[]) getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
-
 		if (certChain != null && (refParams != null)) {
-			ArrayList<MessageElement> mels = new ArrayList<MessageElement>(
-					Arrays.asList(refParams.get_any()));
 
 			try {
 				MessageElement certRef = new MessageElement(
@@ -304,9 +339,30 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource {
 			} catch (GeneralSecurityException e) {
 				throw new ResourceException(e.getMessage(), e);
 			}
-
-			refParams.set_any(mels.toArray(new MessageElement[0]));
 		}
+
+		// add all of our creation params
+		try {
+			ResourceKey stsKey = ResourceManager.getCurrentResource();
+			IResource stsResource = stsKey.dereference();
+
+			MessageElement stsParm = null;
+			
+			stsParm = new MessageElement(
+					SecurityConstants.NEW_JNDI_STS_HOST_QNAME, 
+					stsResource.getProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME.getLocalPart()));
+			mels.add(stsParm);
+			stsParm = new MessageElement(
+					SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME, 
+					stsResource.getProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME.getLocalPart()));
+			mels.add(stsParm);
+
+		} catch (ResourceUnknownFaultType e) {
+			throw new ResourceException(e.getMessage(), e);
+		}
+		
+		
+		refParams.set_any(mels.toArray(new MessageElement[0]));
 
 		return refParams;
 	}

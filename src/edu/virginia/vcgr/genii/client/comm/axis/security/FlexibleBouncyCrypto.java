@@ -30,24 +30,6 @@ public class FlexibleBouncyCrypto extends Merlin
 		CertTool.loadBCProvider();
 	}
 	
-    /**
-     * Lookup a X509 Certificate in the keystore according to a given serial number and
-     * the issuer of a Certficate.
-     * <p/>
-     * The search gets all alias names of the keystore and gets the certificate chain
-     * for each alias. Then the SerialNumber and Issuer fo each certificate of the chain
-     * is compared with the parameters.
-     *
-     * @param issuer       The issuer's name for the certificate
-     * @param serialNumber The serial number of the certificate from the named issuer
-     * @return alias name of the certificate that matches serialNumber and issuer name
-     *         or null if no such certificate was found.
-     */
-    public String getAliasForX509Cert(String issuer, BigInteger serialNumber)
-            throws WSSecurityException {
-        return getAliasForX509Cert(issuer);
-    }
-	
 	public FlexibleBouncyCrypto() throws CredentialException,
 			IOException {
 		

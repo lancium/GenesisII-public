@@ -15,7 +15,7 @@
  */
 package edu.virginia.vcgr.genii.container.lifetime;
 
-import java.net.URI;
+import org.apache.axis.types.URI;
 import java.util.Comparator;
 import java.util.Date;
 
@@ -63,7 +63,7 @@ public class LifetimePrey
 				int value = arg0._termintationTime.compareTo(
 					arg1._termintationTime);
 				if (value == 0)
-					value = arg0._epi.compareTo(arg1._epi);
+					value = arg0._epi.toString().compareTo(arg1._epi.toString());
 				
 				return value;
 			}
