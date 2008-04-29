@@ -16,7 +16,6 @@
 
 package edu.virginia.vcgr.genii.container.jndiauthn;
 
-import java.rmi.RemoteException;
 import java.security.cert.X509Certificate;
 
 import java.util.*;
@@ -38,7 +37,6 @@ import edu.virginia.vcgr.genii.client.security.SecurityConstants;
 import edu.virginia.vcgr.genii.common.security.*;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
-import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 import edu.virginia.vcgr.genii.container.resource.*;
 import edu.virginia.vcgr.genii.client.resource.*;
 

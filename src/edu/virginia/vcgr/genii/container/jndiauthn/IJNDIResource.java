@@ -16,13 +16,11 @@
 package edu.virginia.vcgr.genii.container.jndiauthn;
 
 import org.apache.axis.types.URI;
-import java.net.URISyntaxException;
 
 import javax.xml.namespace.QName;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.SecurityConstants;
 import edu.virginia.vcgr.genii.container.rns.IRNSResource;
 
 public interface IJNDIResource extends IRNSResource {

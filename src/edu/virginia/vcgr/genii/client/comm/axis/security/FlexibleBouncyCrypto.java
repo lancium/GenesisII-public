@@ -16,10 +16,8 @@
 package edu.virginia.vcgr.genii.client.comm.axis.security;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.Properties;
 
-import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.CredentialException;
 import org.apache.ws.security.components.crypto.Merlin;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;

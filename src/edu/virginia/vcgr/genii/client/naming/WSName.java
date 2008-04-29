@@ -16,7 +16,6 @@
 package edu.virginia.vcgr.genii.client.naming;
 
 import org.apache.axis.types.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 

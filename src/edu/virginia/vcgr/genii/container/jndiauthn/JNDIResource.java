@@ -1,54 +1,37 @@
 package edu.virginia.vcgr.genii.container.jndiauthn;
 
 import org.apache.axis.types.URI;
-import java.net.URISyntaxException;
 import java.security.cert.X509Certificate;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.regex.Pattern;
 import java.security.GeneralSecurityException;
 
-import javax.naming.Context;
-import javax.naming.NameClassPair;
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
-import javax.naming.directory.InitialDirContext;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 
 import org.apache.axis.message.MessageElement;
-import org.ggf.rns.EntryType;
 import org.ggf.rns.RNSEntryExistsFaultType;
-import org.ws.addressing.AttributedURIType;
-import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.ReferenceParametersType;
 
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
-import org.oasis_open.wsrf.basefaults.BaseFaultType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
-import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
-import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.SecurityConstants;
 import edu.virginia.vcgr.genii.client.security.SecurityUtils;
-import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 import edu.virginia.vcgr.genii.container.common.notification.SubscriptionInformation;
 import edu.virginia.vcgr.genii.container.configuration.ServiceDescription;
-import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
-import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 import edu.virginia.vcgr.genii.container.rns.RNSDBResource;
 
-import edu.virginia.vcgr.genii.client.context.ContextException;
 
 public class JNDIResource extends RNSDBResource implements IJNDIResource {
 

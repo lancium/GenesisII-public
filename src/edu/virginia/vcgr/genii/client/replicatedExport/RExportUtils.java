@@ -12,7 +12,6 @@ import edu.virginia.vcgr.genii.container.resource.IResource;
 import java.io.File;
 import java.io.IOException;
 import org.apache.axis.types.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 
 public class RExportUtils {

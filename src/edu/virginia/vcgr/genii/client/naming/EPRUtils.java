@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import org.apache.axis.types.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.Blob;
 import javax.sql.rowset.serial.SerialBlob;

@@ -24,7 +24,6 @@ import java.text.*;
 import java.util.*;
 import java.util.regex.Pattern;
 import org.apache.axis.types.URI;
-import java.net.URISyntaxException;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
@@ -50,20 +49,16 @@ import org.ggf.rns.*;
 import org.ggf.rns.List;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
-import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.TransientCredentials;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
 import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
 import edu.virginia.vcgr.genii.enhancedrns.IterateListResponseType;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
-import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
-import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.resource.IResource;
@@ -71,7 +66,6 @@ import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rns.IRNSResource;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
-import edu.virginia.vcgr.genii.container.security.authz.providers.AuthZProviders;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.client.security.*;
 import edu.virginia.vcgr.genii.client.comm.axis.security.FlexibleBouncyCrypto;
