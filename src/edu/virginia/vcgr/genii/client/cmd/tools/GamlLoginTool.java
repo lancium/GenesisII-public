@@ -173,11 +173,6 @@ public class GamlLoginTool extends BaseGridTool {
 			ContextManager.storeCurrentContext(callContext);
 		}
 		
-		// grab the delegatee identity from the calling context (renewing it 
-		// if necesssary -- dont want to sign to stale creds
-		KeyAndCertMaterial clientKeyMaterial = ClientUtils.checkAndRenewCredentials(
-				callContext);
-
 		// assemble the request message
 		RequestSecurityTokenType request = new RequestSecurityTokenType();
 		ArrayList<MessageElement> elements = new ArrayList<MessageElement>();

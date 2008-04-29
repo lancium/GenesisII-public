@@ -19,12 +19,8 @@ package edu.virginia.vcgr.genii.client.security.gamlauthz.assertions;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.io.*;
-import java.util.*;
 
-import edu.virginia.vcgr.genii.client.cache.LRUCache;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.GamlCredential;
-
-import edu.virginia.vcgr.genii.client.ser.Base64;
 
 public interface SignedAssertion extends Externalizable, GamlCredential {
 	

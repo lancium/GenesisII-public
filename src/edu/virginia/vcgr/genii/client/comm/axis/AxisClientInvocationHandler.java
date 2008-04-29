@@ -40,11 +40,6 @@ import org.ogf.schemas.naming._2006._08.naming.ResolveFailedWithReferralFaultTyp
 import java.io.IOException;
 import java.net.URI;
 import java.security.GeneralSecurityException;
-import java.security.KeyStore;
-import java.security.cert.CertPath;
-import java.security.cert.CertPathValidator;
-import java.security.cert.CertificateFactory;
-import java.security.cert.PKIXParameters;
 
 import javax.activation.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
@@ -67,7 +62,6 @@ import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.MessageLevelSecurity;
 import edu.virginia.vcgr.genii.client.security.SecurityUtils;
 import edu.virginia.vcgr.genii.client.security.x509.*;
-import edu.virginia.vcgr.genii.client.utils.deployment.DeploymentRelativeFile;
 import edu.virginia.vcgr.genii.client.invoke.IFinalInvoker;
 import edu.virginia.vcgr.genii.client.invoke.InvocationInterceptorManager;
 import edu.virginia.vcgr.genii.client.naming.EPIResolutionCache;

@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.genii.container.nisauthn;
+package edu.virginia.vcgr.genii.container.jndiauthn;
 
 import java.sql.SQLException;
 import java.util.Properties;

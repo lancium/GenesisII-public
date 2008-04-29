@@ -13,14 +13,12 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package edu.virginia.vcgr.genii.container.nisauthn;
+package edu.virginia.vcgr.genii.container.jndiauthn;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.*;
 import java.util.*;
@@ -34,11 +32,7 @@ import javax.naming.Context;
 import javax.naming.NameClassPair;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
-import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
-import javax.naming.directory.SearchControls;
-import javax.naming.directory.SearchResult;
-import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 
 import org.apache.axis.message.MessageElement;
@@ -52,7 +46,7 @@ import org.apache.ws.security.message.token.X509Security;
 
 import org.ws.addressing.AttributedURIType;
 
-import org.ggf.rns.Add;
+import org.ggf.rns.*;
 import org.ggf.rns.AddResponse;
 import org.ggf.rns.CreateFile;
 import org.ggf.rns.CreateFileResponse;
@@ -71,26 +65,15 @@ import org.ggf.rns.Remove;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
-import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
-import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.TransientCredentials;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
-import edu.virginia.vcgr.genii.container.resolver.ISimpleResolverResource;
-import edu.virginia.vcgr.genii.container.resolver.SimpleResolverEntry;
-import edu.virginia.vcgr.genii.container.resolver.SimpleResolverUtils;
 import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
-import edu.virginia.vcgr.genii.client.naming.WSName;
-import edu.virginia.vcgr.genii.container.resource.SerializerResourceKeyTranslater;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
-import edu.virginia.vcgr.genii.client.cache.TimedOutLRUCache;
-import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
@@ -99,12 +82,8 @@ import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rns.IRNSResource;
-import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 import edu.virginia.vcgr.genii.container.security.authz.providers.AuthZProviders;
-import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider;
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.client.security.*;
-import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.axis.security.FlexibleBouncyCrypto;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
@@ -118,35 +97,32 @@ import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.enhancedrns.*;
 
 
-import edu.virginia.vcgr.genii.nisauthn.*;
+import edu.virginia.vcgr.genii.jndiauthn.*;
 
 import org.oasis_open.docs.ws_sx.ws_trust._200512.*;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
-import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ogf.schemas.naming._2006._08.naming.ResolveFailedFaultType;
-import org.ws.addressing.AttributedURIType;
 import org.ws.addressing.EndpointReferenceType;
-import org.ws.addressing.ReferenceParametersType;
 
 import org.apache.axis.AxisFault;
 
 import org.morgan.util.configuration.ConfigurationException;
 
 
-public class NISAuthnServiceImpl extends GenesisIIBase implements
-		NISAuthnPortType, EnhancedRNSPortType {
+public class JNDIAuthnServiceImpl extends GenesisIIBase implements
+		JNDIAuthnPortType, EnhancedRNSPortType {
 	
 	@SuppressWarnings("unused")
-	static private Log _logger = LogFactory.getLog(NISAuthnServiceImpl.class);
+	static private Log _logger = LogFactory.getLog(JNDIAuthnServiceImpl.class);
 
-	public NISAuthnServiceImpl() throws RemoteException {
-		this(WellKnownPortTypes.NIS_AUTHN_SERVICE_PORT_TYPE.getLocalPart());
+	public JNDIAuthnServiceImpl() throws RemoteException {
+		this(WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE.getLocalPart());
 	}
 
-	protected NISAuthnServiceImpl(String serviceName) throws RemoteException {
+	protected JNDIAuthnServiceImpl(String serviceName) throws RemoteException {
 		super(serviceName);
 
-		addImplementedPortType(WellKnownPortTypes.NIS_AUTHN_SERVICE_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.ENHANCED_RNS_SERVICE_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.RNS_SERVICE_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.STS_SERVICE_PORT_TYPE);
@@ -155,7 +131,7 @@ public class NISAuthnServiceImpl extends GenesisIIBase implements
 
 	public QName getFinalWSResourceInterface()
 	{
-		return WellKnownPortTypes.NIS_AUTHN_SERVICE_PORT_TYPE;
+		return WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE;
 	}
 	
 	protected URI createChildEPI(URI serviceUri, String childName) throws URISyntaxException {
@@ -504,7 +480,7 @@ public class NISAuthnServiceImpl extends GenesisIIBase implements
 				ResourceKey listingKey = createResource(creationParameters);
 			
 				QName[] implementedPortTypes = {
-						WellKnownPortTypes.NIS_AUTHN_SERVICE_PORT_TYPE, 
+						WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE, 
 						WellKnownPortTypes.STS_SERVICE_PORT_TYPE}; 
 				WSName wsName = new WSName(ResourceManager.createEPR(
 						listingKey, 
@@ -704,7 +680,7 @@ public class NISAuthnServiceImpl extends GenesisIIBase implements
 					resourceCertChain);
 			
 			QName[] implementedPortTypes = {
-					WellKnownPortTypes.NIS_AUTHN_SERVICE_PORT_TYPE, 
+					WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE, 
 					WellKnownPortTypes.STS_SERVICE_PORT_TYPE}; 
 			EndpointReferenceType retval = ResourceManager.createEPR(
 					listingKey, 

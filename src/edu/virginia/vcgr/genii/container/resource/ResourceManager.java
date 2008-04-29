@@ -12,10 +12,6 @@ import javax.xml.soap.SOAPException;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.message.MessageElement;
-import org.apache.ws.security.message.token.BinarySecurity;
-import org.apache.ws.security.message.token.PKIPathSecurity;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.CredentialException;
 
 import org.morgan.util.GUID;
 import org.ws.addressing.AttributedURIType;

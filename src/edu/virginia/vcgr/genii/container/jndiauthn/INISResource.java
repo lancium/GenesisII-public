@@ -13,16 +13,8 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package edu.virginia.vcgr.genii.container.nisauthn;
+package edu.virginia.vcgr.genii.container.jndiauthn;
 
-import java.util.Collection;
-
-import javax.xml.namespace.QName;
-
-import edu.virginia.vcgr.genii.client.GenesisIIConstants;
-import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.x509.CertCreationSpec;
-import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public interface INISResource extends IResource {

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="gen.jndi-authn">
+
+	<fail message="wsdl.dir variable not set.">
+		<condition>
+			<not>
+				<isset property="wsdl.dir"/>
+			</not>
+		</condition>
+	</fail>
+
+	<import file="${wsdl.dir}/wsdl-build.xml"/>
+	<import file="${wsdl.dir}/common.build.xml"/>
+
+	<condition property="gen.jndi-authn.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${temporary.codegen.dir}/wsdl/jndi-authn.flag"/>
+			<uptodate targetfile="${temporary.codegen.dir}/wsdl/jndi-authn.flag">
+				<srcfiles dir="${wsdl.dir}/authn">
+					<include name="ws-trust-1.3.xsd"/>
+					<include name="ws-trust-1.3.wsdl"/>
+					<include name="jndi-authn.gwsdl"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.jndi-authn" unless="gen.jndi-authn.uptodate">
+		<copy todir="${temporary.codegen.dir}/wsdl">
+			<filelist refid="common.source.files"/>
+			<fileset dir="${wsdl.dir}/authn">
+				<include name="ws-trust-1.3.xsd"/>
+				<include name="ws-trust-1.3.wsdl"/>
+				<include name="jndi-authn.gwsdl"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/jndi-authn.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/jndi-authn-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${temporary.codegen.dir}/wsdl/jndi-authn-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/jndi-authn-service.wsdl"
+			portType="{http://vcgr.cs.virginia.edu/container/2007/11/jndi-authn}JNDIAuthnPortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/jndi-authn"/>
+			<param name="stub.gen.source-wsdl"
+				value="${temporary.codegen.dir}/wsdl/jndi-authn-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${temporary.codegen.dir}/wsdl/jndi-authn.flag"/>
+		</antcall>
+		<move file="${temporary.codegen.dir}/jndi-authn/edu/virginia/vcgr/genii/JNDIAuthn/deploy.wsdd"
+			tofile="${wsdd.dir}/JNDIAuthn.deploy.wsdd"/>
+		<replace file="${wsdd.dir}/JNDIAuthn.deploy.wsdd"
+			token="edu.virginia.vcgr.genii.jndiauthn.JNDIAuthnSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.jndiauthn.JNDIAuthnServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd.dir}/JNDIAuthn.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>

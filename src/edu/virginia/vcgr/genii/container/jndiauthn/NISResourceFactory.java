@@ -1,8 +1,6 @@
-package edu.virginia.vcgr.genii.container.nisauthn;
+package edu.virginia.vcgr.genii.container.jndiauthn;
 
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;

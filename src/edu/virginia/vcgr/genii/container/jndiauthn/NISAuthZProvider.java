@@ -14,46 +14,30 @@
  * under the License.
  */
 
-package edu.virginia.vcgr.genii.container.nisauthn;
+package edu.virginia.vcgr.genii.container.jndiauthn;
 
-import java.security.cert.PKIXBuilderParameters;
-import java.security.cert.X509CertSelector;
 import java.security.cert.X509Certificate;
-import java.security.GeneralSecurityException;
-import java.security.KeyStore;
-import java.security.cert.CertificateException;
 
 import java.util.*;
 import java.io.*;
 import java.lang.reflect.Method;
-import java.util.HashSet;
 
 import javax.naming.Context;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.NamingException;
-import javax.net.ssl.CertPathTrustManagerParameters;
-import javax.net.ssl.ManagerFactoryParameters;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.morgan.util.configuration.ConfigurationException;
 
 import edu.virginia.vcgr.genii.client.context.*;
 import edu.virginia.vcgr.genii.client.security.MessageLevelSecurity;
 import edu.virginia.vcgr.genii.common.security.*;
-import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
-import edu.virginia.vcgr.genii.client.security.authz.RWXManager;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
 import edu.virginia.vcgr.genii.container.resource.*;
 import edu.virginia.vcgr.genii.client.resource.*;
-import edu.virginia.vcgr.genii.container.Container;
-import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 
 import edu.virginia.vcgr.genii.container.security.authz.providers.*;
 

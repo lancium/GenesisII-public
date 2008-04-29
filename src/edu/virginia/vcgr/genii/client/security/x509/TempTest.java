@@ -70,7 +70,7 @@ public class TempTest
         v1CertGen.setPublicKey(pubKey);
         v1CertGen.setSignatureAlgorithm("SHA1WithRSAEncryption");
 
-        X509Certificate cert = v1CertGen.generateX509Certificate(privKey);
+        X509Certificate cert = v1CertGen.generate(privKey, "BC");
 
         cert.checkValidity(new Date());
 
@@ -147,7 +147,7 @@ public class TempTest
             false,
             new NetscapeCertType(NetscapeCertType.objectSigning | NetscapeCertType.smime));
 
-        X509Certificate cert = v3CertGen.generateX509Certificate(caPrivKey);
+        X509Certificate cert = v3CertGen.generate(caPrivKey, "BC");
 
         cert.checkValidity(new Date());
 
@@ -255,7 +255,7 @@ public class TempTest
 
         //      finally create the AC
         X509V2AttributeCertificate att = (X509V2AttributeCertificate)acGen
-                .generateCertificate(caPrivKey, "BC");
+                .generate(caPrivKey, "BC");
 
         //
         // starting here, we parse the newly generated AC

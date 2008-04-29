@@ -10,10 +10,8 @@ import java.security.KeyStore;
 import java.security.PublicKey;
 import java.security.cert.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
 import javax.xml.soap.SOAPException;
 import javax.xml.namespace.QName;
@@ -22,12 +20,9 @@ import javax.xml.namespace.QName;
 import edu.virginia.vcgr.genii.common.security.CertificateChainType;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.comm.axis.AxisClientInvocationHandler;
-import edu.virginia.vcgr.genii.client.comm.axis.AxisClientInvocationHandler.ConfigUnloadListener;
 import edu.virginia.vcgr.genii.client.comm.axis.security.FlexibleBouncyCrypto;
-import edu.virginia.vcgr.genii.client.comm.axis.security.VcgrSslSocketFactory;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationUnloadedListener;
-import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 import edu.virginia.vcgr.genii.client.utils.deployment.DeploymentRelativeFile;
 
@@ -245,8 +240,6 @@ public class SecurityUtils
 		} catch (WSSecurityException e) {
 			throw new GeneralSecurityException(e.getMessage(), e);
 		} catch (SOAPException e) {
-			throw new GeneralSecurityException(e.getMessage(), e);
-		} catch (IOException e) {
 			throw new GeneralSecurityException(e.getMessage(), e);
 		}			
 	}

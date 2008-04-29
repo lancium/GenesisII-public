@@ -34,7 +34,6 @@ import org.morgan.util.io.StreamUtils;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.enhancedrns.*;
-import edu.virginia.vcgr.genii.queue.JobInformationType;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;

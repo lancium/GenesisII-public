@@ -80,10 +80,6 @@ public class IdpTool extends GamlLoginTool {
 			
 		} else {
 		
-			// create the delegateeAttribute
-			RenewableClientAttribute delegateeAttribute = 
-				new RenewableClientAttribute(null, idpCertChain);
-			
 			// log in
 			URI authnSource = (_authnUri == null) ? null : new URI(_authnUri);
 			ArrayList<SignedAssertion> assertions = 

@@ -158,10 +158,10 @@
 		</mconf:instance>
 		
 		<mconf:instance name="nis-resource-provider"
-			type="edu.virginia.vcgr.genii.container.nisauthn.NISResourceProvider">
-			<mconf:property name="edu.virginia.vcgr.genii.nisauthn.yphost"
+			type="edu.virginia.vcgr.genii.container.jndiauthn.NISResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.jndiauthn.yphost"
 				value=""/>
-			<mconf:property name="edu.virginia.vcgr.genii.nisauthn.ypdomain"
+			<mconf:property name="edu.virginia.vcgr.genii.jndiauthn.ypdomain"
 				value=""/>
 			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
 				value="connection-pool"/>
@@ -405,7 +405,7 @@
 			<genii:resource-provider name="rns-db-resource-provider"/>
 		</genii:service>
 
-		<genii:service name="NISAuthnPortType">
+		<genii:service name="JNDIAuthnPortType">
 			<genii:resource-provider name="nis-resource-provider"/>
 		</genii:service>
 

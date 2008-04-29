@@ -1,6 +1,5 @@
 package edu.virginia.vcgr.genii.container.replicatedExport;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Properties;
 

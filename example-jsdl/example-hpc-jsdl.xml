@@ -13,8 +13,8 @@
 			<jsdl:ApplicationName>hostname</jsdl:ApplicationName>
 			<jsdl-hpcp:HPCProfileApplication>
 				<jsdl-hpcp:Executable>hostname</jsdl-hpcp:Executable>
-				<jsdl-hpcp:WorkingDirectory>/home/mmm2a/results</jsdl-hpcp:WorkingDirectory>
-				<jsdl-hpcp:Output>mark.hostname.out</jsdl-hpcp:Output>
+				<jsdl-hpcp:WorkingDirectory>/home/dgm4d/temp</jsdl-hpcp:WorkingDirectory>
+				<jsdl-hpcp:Output>hostname.out</jsdl-hpcp:Output>
 			</jsdl-hpcp:HPCProfileApplication>
 		</jsdl:Application>
 	</jsdl:JobDescription>

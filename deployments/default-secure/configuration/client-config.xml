@@ -163,8 +163,8 @@
 			locator-type="edu.virginia.vcgr.genii.informationService.InformationServiceServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.x509authn.X509AuthnPortType"
 			locator-type="edu.virginia.vcgr.genii.x509authn.X509AuthnServiceLocator"/>
-		<locator interface="edu.virginia.vcgr.genii.nisauthn.NISAuthnPortType"
-			locator-type="edu.virginia.vcgr.genii.nisauthn.NISAuthnServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.jndiauthn.JNDIAuthnPortType"
+			locator-type="edu.virginia.vcgr.genii.jndiauthn.JNDIAuthnServiceLocator"/>
 		<locator interface="org.ogf.ogsa.ticker.TickerFactory"
 			locator-type="org.ogf.ogsa.ticker.TickerFactoryServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.tty.TTYPortType"
@@ -293,6 +293,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.InfoSQueryTool</mconf:class>
 		<mconf:class name="create-user"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CreateUserTool</mconf:class>
+		<mconf:class name="create-jndi-sts"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CreateJndiSts</mconf:class>
 		<mconf:class name="create-user-delegate"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CreateUserDelegateTool</mconf:class>
 		<mconf:class name="bes-policy"
