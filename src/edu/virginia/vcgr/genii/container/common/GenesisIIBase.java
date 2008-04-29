@@ -546,8 +546,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		}
 		catch(Throwable t)
 		{
-			_logger.error("Could not create resolver for new instance of service \"" + _serviceName, t);
-//			throw new ResourceException("Could not create resolver for new instance of service \"" + _serviceName, t);
+			_logger.error("Could not create resolver for new instance of service " + _serviceName, t);
+//			throw new ResourceException("Could not create resolver for new instance of service " + _serviceName, t);
 		}
 		
 		return resolveEPR;
