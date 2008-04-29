@@ -261,7 +261,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 			    	getTopicSpace().getTopic(WellknownTopics.RANDOM_BYTEIO_OP).notifyAll(
 			    		payload);
 			    	
-			    	_logger.info("RandomByteIO write notification sent");
+			    	_logger.debug("RandomByteIO write notification sent");
 				}
 				catch (InvalidTopicException ite){
 					_logger.warn(ite.getLocalizedMessage(), ite);
@@ -321,7 +321,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 			    	getTopicSpace().getTopic(WellknownTopics.RANDOM_BYTEIO_OP).notifyAll(
 			    		payload);
 			    	
-			    	_logger.info("RandomByteIO append notification sent");
+			    	_logger.debug("RandomByteIO append notification sent");
 				}
 				catch (InvalidTopicException ite){
 					_logger.warn(ite.getLocalizedMessage(), ite);
@@ -383,7 +383,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 			    	getTopicSpace().getTopic(WellknownTopics.RANDOM_BYTEIO_OP).notifyAll(
 			    		payload);
 			    	
-			    	_logger.info("RandomByteIO truncAppend notification sent");
+			    	_logger.debug("RandomByteIO truncAppend notification sent");
 				}
 				catch (InvalidTopicException ite){
 					_logger.warn(ite.getLocalizedMessage(), ite);
