@@ -320,6 +320,36 @@ namespace ogrsh
 			return desc->fsync();
 		}
 
+		SHIM_DEF(int, ftruncate, (int fd, off_t length), (fd, length))
+		{
+			OGRSH_TRACE("ftruncate(" << fd << ", " << length << ") called.");
+
+			FileDescriptor *desc = FileDescriptorTable::getInstance().lookup(
+				fd);
+			if (desc == NULL)
+			{
+				// It's not one we have control of -- pass it through
+				return ogrsh::shims::real_ftruncate(fd, length);
+			}
+
+			return desc->ftruncate64(length);
+		}
+
+		SHIM_DEF(int, ftruncate64, (int fd, off64_t length), (fd, length))
+		{
+			OGRSH_TRACE("ftruncate64(" << fd << ", " << length << ") called.");
+
+			FileDescriptor *desc = FileDescriptorTable::getInstance().lookup(
+				fd);
+			if (desc == NULL)
+			{
+				// It's not one we have control of -- pass it through
+				return ogrsh::shims::real_ftruncate64(fd, length);
+			}
+
+			return desc->ftruncate64(length);
+		}
+
 		SHIM_DEF(int, fchmod, (int fd, mode_t mode), (fd, mode))
 		{
 			OGRSH_TRACE("fchmod(" << fd << ", " << mode << ") called.");
@@ -415,12 +445,16 @@ namespace ogrsh
 			START_SHIM(fdopen);
 			START_SHIM(fcntl);
 			START_SHIM(fsync);
+			START_SHIM(ftruncate);
+			START_SHIM(ftruncate64);
 			START_SHIM(fchmod);
 		}
 
 		void stopFileShims()
 		{
 			STOP_SHIM(fchmod);
+			STOP_SHIM(ftruncate64);
+			STOP_SHIM(ftruncate);
 			STOP_SHIM(fsync);
 			STOP_SHIM(fcntl);
 			STOP_SHIM(fdopen);

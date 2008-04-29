@@ -34,6 +34,8 @@ namespace ogrsh
 		SHIM_DECL(ssize_t, read, (int fd, void *buf, size_t count));
 		SHIM_DECL(ssize_t, write, (int fd, const void *buf, size_t count));
 		SHIM_DECL(int, fsync, (int fd));
+		SHIM_DECL(int, ftruncate, (int fd, off_t length));
+		SHIM_DECL(int, ftruncate64, (int fd, off64_t length));
 
 		SHIM_DECL(FILE*, fopen, (const char *path, const char *modes));
 		SHIM_DECL(FILE*, fopen64, (const char *path, const char *modes));

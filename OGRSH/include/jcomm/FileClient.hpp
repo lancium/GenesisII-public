@@ -29,6 +29,8 @@ namespace jcomm
 			off64_t lseek64(const std::string &fileDesc,
 				off64_t offset, int whence)
 				throw (OGRSHException, IOException);
+			int truncate64(const std::string &fileDesc,
+				off64_t length) throw (OGRSHException, IOException);
 
 			void close(const std::string &fileDesc)
 				throw (OGRSHException, IOException);

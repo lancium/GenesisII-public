@@ -17,6 +17,7 @@ OBJECTS			=		$(OOBJ_DIR)/XMLUtilities.o							\
 						$(OOBJ_DIR)/MountTree.o								\
 						$(OOBJ_DIR)/Directory.o								\
 						$(OOBJ_DIR)/File.o									\
+						$(OOBJ_DIR)/Java.o									\
 						$(OOBJ_DIR)/Execute.o								\
 						$(OOBJ_DIR)/Threads.o								\
 						$(OOBJ_DIR)/ExecuteState.o							\
@@ -106,6 +107,9 @@ $(OOBJ_DIR)/Directory.o:		Directory.cpp
 
 $(OOBJ_DIR)/File.o:		File.cpp
 		$(CPP) $(CPPFLAGS) -c File.cpp -o $@
+
+$(OOBJ_DIR)/Java.o:		Java.cpp
+		$(CPP) $(CPPFLAGS) -c Java.cpp -o $@
 
 $(OOBJ_DIR)/Execute.o:		Execute.cpp
 		$(CPP) $(CPPFLAGS) -c Execute.cpp -o $@

@@ -96,6 +96,12 @@ namespace ogrsh
 		return -1;
 	}
 
+	int VirtualFileDescriptor::ftruncate64(off64_t length)
+	{
+		errno = EROFS;
+		return -1;
+	}
+
 	int VirtualFileDescriptor::fchmod(mode_t mode)
 	{
 		errno = EROFS;

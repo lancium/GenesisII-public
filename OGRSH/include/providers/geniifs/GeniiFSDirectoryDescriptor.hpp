@@ -38,6 +38,7 @@ namespace ogrsh
 
 				virtual int fcntl(int cmd, long arg);
 				virtual int fsync();
+				virtual int ftruncate64(off64_t length);
 				virtual int fchmod(mode_t mode);
 
 				virtual ogrsh::DirectoryStream* opendir();

@@ -59,8 +59,7 @@ namespace ogrsh
 			OGRSH_TRACE("GeniiFSFileDescriptor::lseek64(" << _fileDesc
 				<< ", " << offset << ", " << whence << "). called.");
 
-			jcomm::FileClient client(*(_session->getSocket()));
-			return client.lseek64(_fileDesc, offset, whence);
+			jcomm::FileClient client(*(_session->getSocket())); return client.lseek64(_fileDesc, offset, whence);
 		}
 
 		int GeniiFSFileDescriptor::__fxstat(int version, struct stat *statbuf)
@@ -158,6 +157,15 @@ namespace ogrsh
 
 			// Genesis II files are automatically flushed at this level.
 			return 0;
+		}
+
+		int GeniiFSFileDescriptor::ftruncate64(off64_t length)
+		{
+			OGRSH_TRACE("GeniiFSFileDescriptor::ftruncate64(" <<
+				_fileDesc << ", " << length << ") called.");
+
+			jcomm::FileClient client(*(_session->getSocket()));
+			return client.truncate64(_fileDesc, length);
 		}
 
 		int GeniiFSFileDescriptor::fchmod(mode_t mode)

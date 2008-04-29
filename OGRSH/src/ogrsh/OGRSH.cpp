@@ -8,6 +8,7 @@
 #include "ogrsh/shims/Directory.hpp"
 #include "ogrsh/shims/System.hpp"
 #include "ogrsh/shims/File.hpp"
+#include "ogrsh/shims/Java.hpp"
 #include "ogrsh/shims/Execute.hpp"
 #include "ogrsh/shims/Threads.hpp"
 
@@ -21,6 +22,7 @@ namespace ogrsh
 		ogrsh::shims::startDirectoryShims();
 		ogrsh::shims::startACLShims();
 		ogrsh::shims::startFileShims();
+		ogrsh::shims::startJavaShims();
 		ogrsh::shims::startExecuteShims();
 		ogrsh::shims::startThreadShims();
 	}
@@ -29,6 +31,7 @@ namespace ogrsh
 	{
 		ogrsh::shims::stopThreadShims();
 		ogrsh::shims::stopExecuteShims();
+		ogrsh::shims::stopJavaShims();
 		ogrsh::shims::stopFileShims();
 		ogrsh::shims::stopACLShims();
 		ogrsh::shims::stopDirectoryShims();

@@ -87,6 +87,18 @@ namespace ogrsh
 			return ret;
 		}
 
+		int LocalFSFileDescriptor::ftruncate64(off64_t length)
+		{
+			int fd = getFD();
+
+			OGRSH_TRACE("LocalFSFileDescriptor::ftruncate64(" <<
+				fd << ", " << length << ") called.");
+
+			int ret = ogrsh::shims::real_ftruncate64(fd, length);
+			OGRSH_TRACE("LocalFSFileDescriptor::ftruncate64 returning " << ret);
+			return ret;
+		}
+
 		int LocalFSFileDescriptor::fchmod(mode_t mode)
 		{
 			int fd = getFD();

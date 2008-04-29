@@ -156,6 +156,15 @@ namespace ogrsh
 			return -1;
 		}
 
+		int GeniiFSDirectoryDescriptor::ftruncate64(off64_t length)
+		{
+			OGRSH_TRACE("GeniiFSDirectoryDescriptor::ftruncate64(" << _fullpath
+				<< ", " << length << ") called.");
+
+			errno = EINVAL;
+			return -1;
+		}
+
 		int GeniiFSDirectoryDescriptor::fchmod(mode_t mode)
 		{
 			// TODO We probalby ought to implement this in genesis II.

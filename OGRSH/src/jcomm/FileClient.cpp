@@ -116,4 +116,19 @@ namespace jcomm
 		delete buffer;
 		return result;
 	}
+
+	int FileClient::truncate64(const std::string &fileDesc,
+		off64_t length) throw (OGRSHException, IOException)
+	{
+		Invocation inv(_socket, "truncate");
+
+		inv.addString(fileDesc);
+		inv.addLongLong(length);
+
+		int ret;
+		IOGRSHReadBuffer *buffer = inv.invoke();
+		buffer->readInt(ret);
+		delete buffer;
+		return ret;
+	}
 }
