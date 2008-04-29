@@ -75,7 +75,7 @@ public class CreateUserTool extends BaseGridTool
 	 * Set the login name for the new IDP service instance.
 	 * @param loginName The new login name.
 	 */
-	public void setLogin_Name(String loginName)
+	public void setLogin_name(String loginName)
 	{
 		_loginName = loginName;
 	}
@@ -85,7 +85,7 @@ public class CreateUserTool extends BaseGridTool
 	 * 
 	 * @param password The new password
 	 */
-	public void setLogin_Password(String password)
+	public void setLogin_password(String password)
 	{
 		_password = password;
 	}
