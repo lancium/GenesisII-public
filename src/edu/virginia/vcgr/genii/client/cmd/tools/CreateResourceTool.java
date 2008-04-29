@@ -108,11 +108,6 @@ public class CreateResourceTool extends BaseGridTool
 			{
 				LnTool.link(epr, optTargetName);
 			}
-			catch (IOException ioe)
-			{
-				ResourceCreator.terminate(epr);
-				throw new RNSException(ioe.getMessage(), ioe);
-			}
 			catch (RNSException re)
 			{
 				ResourceCreator.terminate(epr);
