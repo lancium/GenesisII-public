@@ -91,7 +91,7 @@ public class LnTool extends BaseGridTool
 	}
 	
 	static public void link(EndpointReferenceType epr, String target)
-		throws RNSException, ConfigurationException, IOException
+		throws RNSException, ConfigurationException
 	{
 		RNSPath currentPath = RNSPath.getCurrent();
 		RNSPath path = currentPath.lookup(target, RNSPathQueryFlags.MUST_NOT_EXIST);
