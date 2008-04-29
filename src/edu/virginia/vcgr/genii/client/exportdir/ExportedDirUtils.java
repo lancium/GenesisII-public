@@ -32,7 +32,8 @@ public class ExportedDirUtils
 {
 	static final protected String _PATH_ELEM_NAME = "path";
 	static final protected String _PARENT_IDS_ELEM_NAME = "parent-ids";
-	static final protected String _REPLICATION_INDICATOR_ = "replicate";
+	static final protected String _REPLICATION_INDICATOR = "replicate";
+	static final protected String _LAST_MODIFIED_TIME = "modify-time";
 	static final protected String _REXPORT_RESOLVER_EPR = "rexport-resolver-service-epr";
 	static final public String _PARENT_ID_BEGIN_DELIMITER = ":";
 	static final public String _PARENT_ID_END_DELIMITER = ":";
@@ -42,21 +43,23 @@ public class ExportedDirUtils
 		private String _path = null;
 		private String _parentIds = null;
 		private String _isReplicated = null;
+		private Long _lastModified = null;
 		private EndpointReferenceType _resolverServiceEPR = null;
 	
-		public ExportedDirInitInfo(String path, String parentIds, String isReplicated)
+		/*public ExportedDirInitInfo(String path, String parentIds, String isReplicated)
 		{
 			_path = path;
 			_parentIds = parentIds;
 			_isReplicated = isReplicated;
 		}
-		
+		*/
 		public ExportedDirInitInfo(String path, String parentIds, String isReplicated,
-				EndpointReferenceType resolverServiceEPR)
+				Long lastModified, EndpointReferenceType resolverServiceEPR)
 		{
 			_path = path;
 			_parentIds = parentIds;
 			_isReplicated = isReplicated;
+			_lastModified = lastModified;
 			_resolverServiceEPR = resolverServiceEPR;
 		}
 		
@@ -75,6 +78,10 @@ public class ExportedDirUtils
 			return _isReplicated;
 		}
 		
+		public Long getLastModifiedTime(){
+			return _lastModified;
+		}
+		
 		public EndpointReferenceType getResolverFactoryEPR()
 		{
 			return _resolverServiceEPR;
@@ -84,16 +91,19 @@ public class ExportedDirUtils
 	static public MessageElement[] createCreationProperties(
 		String path, String parentIds, String isReplicated)
 	{
-		MessageElement []any = new MessageElement[4];
+		MessageElement []any = new MessageElement[5];
 		any[0] = new MessageElement(new QName(
 			GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME), path);
 		any[1] = new MessageElement(new QName(
 			GenesisIIConstants.GENESISII_NS, _PARENT_IDS_ELEM_NAME), parentIds);
 		any[2] = new MessageElement(new QName(
-			GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR_), isReplicated);
+			GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR), isReplicated);
 		any[3] = new MessageElement(new QName(
-				GenesisIIConstants.GENESISII_NS, _REXPORT_RESOLVER_EPR),
-				null);
+			GenesisIIConstants.GENESISII_NS, _LAST_MODIFIED_TIME), 
+			getLastModifiedTime(path));
+		any[4] = new MessageElement(new QName(
+			GenesisIIConstants.GENESISII_NS, _REXPORT_RESOLVER_EPR),
+			null);
 		
 		return any;
 	}
@@ -102,16 +112,19 @@ public class ExportedDirUtils
 			String path, String parentIds, String isReplicated,
 			EndpointReferenceType replicationServiceEPR)
 		{
-			MessageElement []any = new MessageElement[4];
+			MessageElement []any = new MessageElement[5];
 			any[0] = new MessageElement(new QName(
 				GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME), path);
 			any[1] = new MessageElement(new QName(
 				GenesisIIConstants.GENESISII_NS, _PARENT_IDS_ELEM_NAME), parentIds);
 			any[2] = new MessageElement(new QName(
-				GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR_), isReplicated);
+				GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR), isReplicated);
 			any[3] = new MessageElement(new QName(
-					GenesisIIConstants.GENESISII_NS, _REXPORT_RESOLVER_EPR),
-					replicationServiceEPR);
+				GenesisIIConstants.GENESISII_NS, _LAST_MODIFIED_TIME), 
+				getLastModifiedTime(path));
+			any[4] = new MessageElement(new QName(
+				GenesisIIConstants.GENESISII_NS, _REXPORT_RESOLVER_EPR),
+				replicationServiceEPR);
 			
 			return any;
 		}
@@ -133,14 +146,6 @@ public class ExportedDirUtils
 		resolverCreationParams.add(new MessageElement(new QName(
 				GenesisIIConstants.GENESISII_NS, _REXPORT_RESOLVER_EPR), 
 				initInfo.getResolverFactoryEPR()));
-		
-				/*
-		params[0] = new MessageElement(new QName(
-			GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME), initInfo.getPath());
-		params[1] = new MessageElement(new QName(
-				GenesisIIConstants.GENESISII_NS, _REXPORT_RESOLVER_EPR), 
-				initInfo.getResolverFactoryEPR());
-		*/
 	}
 	
 	static public ExportedDirInitInfo extractCreationProperties(
@@ -149,6 +154,7 @@ public class ExportedDirUtils
 		String path = null;
 		String parentIds = null;
 		String isReplicated = null;
+		Long lastModified = null;
 		EndpointReferenceType resolverServiceEPR = null;
 		
 		if (properties == null)
@@ -178,7 +184,7 @@ public class ExportedDirUtils
 		//get replication state
 		MessageElement replicationElement = 
 			(MessageElement)properties.get(new QName(
-				GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR_));
+				GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR));
 		if (replicationElement == null)
 			throw new IllegalArgumentException(
 				"Couldn't find replication indicator in export creation properties.");
@@ -200,9 +206,6 @@ public class ExportedDirUtils
 					+ e.getMessage());
 		}
 		
-		//isReplicated = (String) properties.get(new QName(
-		//		GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR_));
-		
 		//ensure all properties filled in
 		if (path == null)
 			throw new IllegalArgumentException(
@@ -214,7 +217,11 @@ public class ExportedDirUtils
 			throw new IllegalArgumentException(
 				"Couldn't find replication indicator in export creation properties.");
 		
-		return new ExportedDirInitInfo(path, parentIds, isReplicated, resolverServiceEPR);
+		//get last modified time
+		lastModified = getLastModifiedTime(path);
+		
+		return new ExportedDirInitInfo(path, parentIds, 
+				isReplicated, lastModified, resolverServiceEPR);
 	}
 	
 	static public String createParentIdsString(String ancestorIdString, String parentId)
@@ -257,5 +264,22 @@ public class ExportedDirUtils
 		if (testFile.exists() && testFile.isDirectory() && testFile.canRead())
 			return true;
 		return false;
+	}
+	
+	/**
+	 * 
+	 */
+	static public long getLastModifiedTime(String path){
+		Long lastModifiedTime = null;
+		File testFile = new File(path);
+		
+		if ((testFile.exists()) && testFile.isDirectory())
+			lastModifiedTime = testFile.lastModified();
+		else
+			//should never happen
+			System.out.println(
+			"ERROR: could not get last modified time because dir dne/is not readable");
+		
+		return lastModifiedTime;
 	}
 }
