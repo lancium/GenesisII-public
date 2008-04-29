@@ -5,6 +5,8 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.sql.SQLException;
 
 import javax.xml.namespace.QName;
 
@@ -32,6 +34,7 @@ import org.morgan.util.GUID;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
+import org.morgan.util.configuration.ConfigurationException;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
@@ -40,6 +43,7 @@ import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
+import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
@@ -51,6 +55,8 @@ import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.exportdir.ExportedDirPortType;
+import edu.virginia.vcgr.genii.enhancedrns.IterateListRequestType;
+import edu.virginia.vcgr.genii.enhancedrns.IterateListResponseType;
 
 public class ExportedDirServiceImpl extends GenesisIIBase implements
 		ExportedDirPortType
@@ -243,6 +249,44 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 		return new AddResponse(newRef);
 	}
 
+	@RWXMapping(RWXCategory.READ)
+    public IterateListResponseType iterateList(IterateListRequestType list) 
+    	throws RemoteException, ResourceUnknownFaultType, 
+    		RNSEntryNotDirectoryFaultType, RNSFaultType
+    {
+		String entry_name_regexp = list.getEntry_name_regexp();
+		
+		_logger.debug("ExportDir asked to lookup iter for \"" + entry_name_regexp + "\".");
+		
+		IExportedDirResource resource = 
+			(IExportedDirResource)ResourceManager.getCurrentResource().dereference();
+		Collection<ExportedDirEntry> entries = null;
+		
+		entries = resource.retrieveEntries(entry_name_regexp);
+		
+		//create collection of MessageElement entries
+		Collection<MessageElement> entryCollection = new LinkedList<MessageElement>();
+    	for (ExportedDirEntry exportDirEntry : entries){
+    		EntryType entry = new EntryType(
+    				exportDirEntry.getName(), 
+    				exportDirEntry.getAttributes(), 
+    				exportDirEntry.getEntryReference());
+
+    		entryCollection.add(AnyHelper.toAny(entry));
+    	}
+		
+		try{
+			return new IterateListResponseType(super.createWSIterator(
+					entryCollection.iterator()));
+		}
+		catch (ConfigurationException ce){
+			throw new RemoteException("Unable to create iterator for exportDir lookup.", ce);
+		}
+		catch (SQLException sqe){
+			throw new RemoteException("Unable to create iterator for exportDir lookup.", sqe);
+		} 
+    }	
+	
 	@RWXMapping(RWXCategory.READ)
 	public ListResponse list(List listRequest) throws RemoteException,
 			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType,
