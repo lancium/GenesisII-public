@@ -242,4 +242,15 @@ public class FileHandler
 				"Attempt to lseek64 from non-existant file descriptor.");
 		return fd.lseek64(offset, whence);
 	}
+	
+	@OGRSHOperation
+	public int truncate(String fileDesc, long offset) throws OGRSHException
+	{
+		IFileDescriptor fd = _openFiles.get(fileDesc);
+		if (fd == null)
+			throw new OGRSHException(OGRSHException.EBADF,
+				"Attempt to truncate from non-existant file descriptor.");
+		fd.truncate(offset);
+		return 0;
+	}
 }

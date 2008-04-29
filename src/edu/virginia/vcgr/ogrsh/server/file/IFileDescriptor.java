@@ -17,4 +17,5 @@ public interface IFileDescriptor extends Closeable
 	public long lseek64(long offset, int whence) throws OGRSHException;
 	
 	public StatBuffer fxstat() throws OGRSHException;
+	public void truncate(long length) throws OGRSHException;
 }

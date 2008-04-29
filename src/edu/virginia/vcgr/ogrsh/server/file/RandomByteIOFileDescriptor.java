@@ -122,4 +122,16 @@ public class RandomByteIOFileDescriptor extends AbstractFileDescriptor
 		
 		return _offset;
 	}
+	
+	public void truncate(long offset) throws OGRSHException
+	{
+		try
+		{
+			_transferer.truncAppend(offset, new byte[0]);
+		}
+		catch (Throwable cause)
+		{
+			throw new OGRSHException(cause);
+		}
+	}
 }

@@ -147,4 +147,9 @@ public class StreamableByteIOFileDescriptor extends AbstractFileDescriptor
 			throw new IOException("Unable to close streamable resource.", ce);
 		}
 	}
+	
+	public void truncate(long offset) throws OGRSHException
+	{
+		throw new OGRSHException("Operation not supported.", OGRSHException.EROFS);
+	}
 }
