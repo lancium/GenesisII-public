@@ -157,8 +157,8 @@
 				value="connection-pool"/>
 		</mconf:instance>
 		
-		<mconf:instance name="nis-resource-provider"
-			type="edu.virginia.vcgr.genii.container.jndiauthn.NISResourceProvider">
+		<mconf:instance name="jndi-resource-provider"
+			type="edu.virginia.vcgr.genii.container.jndiauthn.JNDIResourceProvider">
 			<mconf:property name="edu.virginia.vcgr.genii.jndiauthn.yphost"
 				value=""/>
 			<mconf:property name="edu.virginia.vcgr.genii.jndiauthn.ypdomain"
@@ -406,7 +406,7 @@
 		</genii:service>
 
 		<genii:service name="JNDIAuthnPortType">
-			<genii:resource-provider name="nis-resource-provider"/>
+			<genii:resource-provider name="jndi-resource-provider"/>
 		</genii:service>
 
 		<genii:service name="CertGeneratorPortType">

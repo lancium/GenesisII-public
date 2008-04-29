@@ -16,6 +16,7 @@
 
 package edu.virginia.vcgr.genii.container.jndiauthn;
 
+import java.rmi.RemoteException;
 import java.security.cert.X509Certificate;
 
 import java.util.*;
@@ -33,9 +34,11 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.context.*;
 import edu.virginia.vcgr.genii.client.security.MessageLevelSecurity;
+import edu.virginia.vcgr.genii.client.security.SecurityConstants;
 import edu.virginia.vcgr.genii.common.security.*;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
+import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 import edu.virginia.vcgr.genii.container.resource.*;
 import edu.virginia.vcgr.genii.client.resource.*;
 
@@ -50,34 +53,16 @@ import edu.virginia.vcgr.genii.container.security.authz.providers.*;
  * @author dmerrill
  * 
  */
-public class NISAuthZProvider implements IAuthZProvider {
+public class JNDIAuthZProvider implements IAuthZProvider {
 
-	static private final String _NIS_HOST = 
-		"edu.virginia.vcgr.genii.container.nisauthn.host";
-	static private final String _NIS_DOMAIN = 
-		"edu.virginia.vcgr.genii.container.nisauthn.domain";
-	
 	static protected final MessageLevelSecurity _defaultMinMsgSec = new MessageLevelSecurity(
 			MessageLevelSecurity.SIGN | MessageLevelSecurity.ENCRYPT);
 
 	@SuppressWarnings("unused")
-	static private Log _logger = LogFactory.getLog(NISAuthZProvider.class);
+	static private Log _logger = LogFactory.getLog(JNDIAuthZProvider.class);
 	static private GamlAclAuthZProvider _gamlAclProvider = new GamlAclAuthZProvider();
 	
-	private String _nisHost = null;
-	private String _nisDomain = null;
-	
-	public NISAuthZProvider(Properties properties) {
-		_nisHost = properties.getProperty(_NIS_HOST);		
-		_nisDomain = properties.getProperty(_NIS_DOMAIN);		
-	}
-	
-	public String getNisHost() {
-		return _nisHost;
-	}
-
-	public String getNisDomain() {
-		return _nisDomain;
+	public JNDIAuthZProvider(Properties properties) {
 	}
 	
 	/**
@@ -103,7 +88,9 @@ public class NISAuthZProvider implements IAuthZProvider {
 			Method operation)
 				throws AuthZSecurityException, ResourceException {
 
-		if (resource.isServiceResource()) {
+		JNDIResource jndiResource = (JNDIResource) resource;
+		
+		if (!jndiResource.isIdpResource()) {
 			return _gamlAclProvider.checkAccess(callingContext, callerCert, resource, operation);
 		}
 		
@@ -114,40 +101,54 @@ public class NISAuthZProvider implements IAuthZProvider {
 			
 			if (cred instanceof UsernameTokenIdentity) {
 				
-				UsernameTokenIdentity utIdentity = (UsernameTokenIdentity) cred;
-
-				// lookup the human name
-				NISAuthZProvider authZHandler = (NISAuthZProvider) AuthZProviders.getProvider(
-						resource.getParentResourceKey().getServiceName());
-				String nameService = 
-					"nis://" + 
-					authZHandler.getNisHost() + 
-					"/" + 
-					authZHandler.getNisDomain();
-
 				try {
-					Properties nisEnv = new Properties();
-					nisEnv.setProperty(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.nis.NISCtxFactory");
-					nisEnv.setProperty(Context.PROVIDER_URL, nameService);
-					InitialDirContext initialContext = new InitialDirContext(nisEnv);
-					String epiString = (String) resource.getParentResourceKey().getKey();
-					String userName = epiString.substring(epiString.lastIndexOf(':') + 1);
-					String lookupString = nameService + "/system/passwd/" + userName;
-					String[] attrIDs = {"userPassword"}; 
-					Attributes attrs = initialContext.getAttributes(lookupString, attrIDs); 
-					initialContext.close();
-
-					Attribute passwordAttr = attrs.get("userPassword");
-					byte[] ypPasswordBytes = (byte[]) passwordAttr.get();
+					UsernameTokenIdentity utIdentity = (UsernameTokenIdentity) cred;
+					String userName = jndiResource.getIdpName();
+	
+					Properties jndiEnv = new Properties();
+					String providerUrl = null;
+					String queryUri = null;
+	
+					switch (jndiResource.getStsType()) {
+					case NIS:
 					
-					String ypPassword = (new String(ypPasswordBytes, "UTF8"));
-					ypPassword = ypPassword.substring("{crypt}".length());
-					String utPassword = utIdentity.getToken();
-					
-					if (org.mortbay.util.UnixCrypt.crypt(
-							utPassword, 
-							ypPassword).equals(ypPassword)) {
-						return true;
+						jndiEnv.setProperty(Context.INITIAL_CONTEXT_FACTORY,
+						"com.sun.jndi.nis.NISCtxFactory");
+						providerUrl = 
+							"nis://" + 
+							resource.getProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME.getLocalPart()) +  
+							"/" + 
+							resource.getProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME.getLocalPart());  
+	
+						InitialDirContext initialContext = new InitialDirContext(jndiEnv);
+						queryUri = providerUrl + "/system/passwd/" + userName;
+						String[] attrIDs = {"userPassword"}; 
+						Attributes attrs = initialContext.getAttributes(
+								queryUri, attrIDs); 
+						initialContext.close();
+	
+						Attribute passwordAttr = attrs.get("userPassword");
+						byte[] ypPasswordBytes = (byte[]) passwordAttr.get();
+						
+						String ypPassword = (new String(ypPasswordBytes, "UTF8"));
+						ypPassword = ypPassword.substring("{crypt}".length());
+						String utPassword = utIdentity.getToken();
+						
+						if (org.mortbay.util.UnixCrypt.crypt(
+								utPassword, 
+								ypPassword).equals(ypPassword)) {
+							return true;
+						}
+	
+					case LDAP:
+						jndiEnv.setProperty(Context.INITIAL_CONTEXT_FACTORY,
+						"com.sun.jndi.ldap.LdapCtxFactory");
+	
+						throw new ResourceException("\"LDAP not implemented\" not applicable.");
+						
+					default :
+	
+						throw new ResourceException("Unknown STS type.");
 					}
 					
 				} catch (NamingException e) {
@@ -155,6 +156,7 @@ public class NISAuthZProvider implements IAuthZProvider {
 				} catch (UnsupportedEncodingException e) {
 		    		throw new AuthZSecurityException(e.getMessage(), e);
 				}			
+					
 			}
 		}
 		

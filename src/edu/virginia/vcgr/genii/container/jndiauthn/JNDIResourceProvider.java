@@ -9,9 +9,9 @@ import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResourceFactory;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceProvider;
 
-public class NISResourceProvider extends BasicDBResourceProvider
+public class JNDIResourceProvider extends BasicDBResourceProvider
 {
-	public NISResourceProvider(Properties props)
+	public JNDIResourceProvider(Properties props)
 		throws ConfigurationException, SQLException
 	{
 		super(props);
@@ -20,6 +20,6 @@ public class NISResourceProvider extends BasicDBResourceProvider
 	protected IResourceFactory instantiateResourceFactory(DatabaseConnectionPool pool)
 		throws SQLException
 	{
-		return new NISResourceFactory(pool, getTranslater());
+		return new JNDIResourceFactory(pool, getTranslater());
 	}
 }

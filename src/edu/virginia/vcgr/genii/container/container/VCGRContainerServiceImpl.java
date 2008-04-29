@@ -282,5 +282,9 @@ public class VCGRContainerServiceImpl extends GenesisIIBase
 		{
 			throw new ResourceException(ia.getLocalizedMessage(), ia);
 		}
+		catch (ResourceUnknownFaultType rue)
+		{
+			throw new ResourceException(rue.getLocalizedMessage(), rue);
+		}
 	}
 }

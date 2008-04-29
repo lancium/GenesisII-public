@@ -326,7 +326,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 			return property;
 	}
 	
-	public final QName[] getImplementedPortTypes()
+	public QName[] getImplementedPortTypes() throws ResourceException, ResourceUnknownFaultType
 	{
 		QName []ret;
 		
@@ -411,7 +411,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	 * to disable resource creation on this endpoint
 	 * @return true if vcgrCreate is applicable, false otherwise.
 	 */
-	protected boolean allowVcgrCreate() {
+	protected boolean allowVcgrCreate() throws ResourceException, ResourceUnknownFaultType {
 		return true;
 	}
 	
@@ -685,7 +685,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	// If we decided to make the resource certificates children of the service certificate
 	// we would revisit this spot.
 	protected CertCreationSpec getChildCertSpec() 
-		throws ResourceException, ConfigurationException
+		throws ResourceException, ResourceUnknownFaultType, ConfigurationException
 	{
 		X509Certificate[] containerChain = Container.getContainerCertChain();
 			// If this is null, then security isn't turned on.

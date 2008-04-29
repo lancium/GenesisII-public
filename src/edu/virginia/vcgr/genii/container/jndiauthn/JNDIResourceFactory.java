@@ -10,10 +10,10 @@ import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
-public class NISResourceFactory extends BasicDBResourceFactory implements
+public class JNDIResourceFactory extends BasicDBResourceFactory implements
 		IResourceFactory
 {
-	public NISResourceFactory(
+	public JNDIResourceFactory(
 			DatabaseConnectionPool pool, 
 			IResourceKeyTranslater translator)
 		throws SQLException
@@ -25,7 +25,7 @@ public class NISResourceFactory extends BasicDBResourceFactory implements
 	{
 		try
 		{
-			return new NISResource(parentKey, _pool, _translater);
+			return new JNDIResource(parentKey, _pool, _translater);
 		}
 		catch (SQLException sqe)
 		{

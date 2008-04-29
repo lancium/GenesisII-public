@@ -309,7 +309,7 @@
 		<mconf:class name="create-user"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CreateUserTool</mconf:class>
 		<mconf:class name="create-jndi-sts"
-			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CreateJndiSts</mconf:class>
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CreateJndiStsTool</mconf:class>
 		<mconf:class name="create-user-delegate"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CreateUserDelegateTool</mconf:class>
 		<mconf:class name="bes-policy"

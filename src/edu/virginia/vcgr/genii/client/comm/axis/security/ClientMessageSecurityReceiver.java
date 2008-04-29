@@ -158,17 +158,8 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements IS
         	// create an in-memory keystore for the client and resource's key material
             KeyStore keyStore = KeyStore.getInstance("JKS");
         	keyStore.load(null, null);
-        	
-        	// set the client's key material
-        	KeyAndCertMaterial keyMaterial = _callContext.getActiveKeyAndCertMaterial();
-            keyStore.setKeyEntry(
-            		CRYPTO_ALIAS, 
-            		keyMaterial._clientPrivateKey, 
-            		CRYTO_PASS.toCharArray(), 
-            		keyMaterial._clientCertChain);
-            
+
             // set the server resource's identity as trusted
-            
             if ((_messageSec != null) && (_messageSec._resourceEpi != null) && (_messageSec._resourceCertChain != null)) {
 	        	keyStore.setCertificateEntry(
 	        			_messageSec._resourceEpi.toString(), 

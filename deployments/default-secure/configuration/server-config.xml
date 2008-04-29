@@ -148,8 +148,8 @@
 			type="edu.virginia.vcgr.genii.container.security.authz.providers.GamlAclAuthZProvider">
 		</mconf:instance>
 		
-		<mconf:instance name="nis-authz-provider"
-			type="edu.virginia.vcgr.genii.container.jndiauthn.NISAuthZProvider">
+		<mconf:instance name="jndi-authz-provider"
+			type="edu.virginia.vcgr.genii.container.jndiauthn.JNDIAuthZProvider">
 			<mconf:property name="edu.virginia.vcgr.genii.container.jndiauthn.host"
 				value="argo.cs.virginia.edu"/>
 			<mconf:property name="edu.virginia.vcgr.genii.container.jndiauthn.domain"
@@ -171,8 +171,8 @@
 				value="connection-pool"/>
 		</mconf:instance>
 		
-		<mconf:instance name="nis-resource-provider"
-			type="edu.virginia.vcgr.genii.container.jndiauthn.NISResourceProvider">
+		<mconf:instance name="jndi-resource-provider"
+			type="edu.virginia.vcgr.genii.container.jndiauthn.JNDIResourceProvider">
 			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
 				value="connection-pool"/>
 		</mconf:instance>
@@ -520,8 +520,8 @@
 		</genii:service>
 
 		<genii:service name="JNDIAuthnPortType">
-			<genii:resource-provider name="nis-resource-provider"/>
-			<genii:authz-provider name="nis-authz-provider"/>
+			<genii:resource-provider name="jndi-resource-provider"/>
+			<genii:authz-provider name="jndi-authz-provider"/>
 		</genii:service>
 
 		<genii:service name="CertGeneratorPortType">
