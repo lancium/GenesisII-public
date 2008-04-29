@@ -30,7 +30,7 @@
     <wsdl:import
         namespace="http://schemas.ggf.org/rns/2006/05/rns"
         location="./rns.wsdl"/>
-
+        
     <wsdl:import
         namespace="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
         location="./enhanced-rns-generated.wsdl"/>
@@ -104,7 +104,7 @@
 
 	<wsdl:portType name="ExportedRootPortType">
 		<genii-ext:extend portType="genii-common:GeniiCommon"/>
-		<genii-ext:extend portType="rns:RNSPortType"/>
+		<genii-ext:extend portType="enhanced-rns:EnhancedRNSPortType"/>
 		<genii-ext:extend portType="rpw-2:GetResourceProperty"/>
 		<genii-ext:extend portType="rpw-2:GetMultipleResourceProperties"/>
 		<genii-ext:extend portType="exported-dir:ExportedDirPortType"/>
