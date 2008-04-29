@@ -51,7 +51,7 @@ public class ExportedFileServiceImpl extends RandomByteIOServiceImpl
 	protected ResourceKey createResource(HashMap<QName, Object> constructionParameters)
 		throws ResourceException, BaseFaultType
 	{
-		_logger.info("Creating new ExportedFile Resource.");
+		_logger.debug("Creating new ExportedFile Resource.");
 		
 		if (constructionParameters == null)
 		{

@@ -56,9 +56,11 @@ public class ExportedDirDBResource extends BasicDBResource implements
 	static private Log _logger = LogFactory.getLog(ExportedDirDBResource.class);
 	
 	static private final String _RETRIEVE_DIR_INFO =
-		"SELECT path, parentIds, isReplicated FROM exporteddir WHERE dirid = ?";
+		"SELECT path, parentIds, isReplicated, lastModified FROM exporteddir WHERE dirid = ?";
 	static private final String _CREATE_DIR_INFO =
-		"INSERT INTO exporteddir VALUES(?, ?, ?, ?)";
+		"INSERT INTO exporteddir VALUES(?, ?, ?, ?, ?)";
+	static private final String _UPDATE_MODIFY_TIME = 
+		"UPDATE exporteddir SET lastModified = ? WHERE dirid = ?";
 	static private final String _ADD_ENTRY_STMT =
 		"INSERT INTO exporteddirentry VALUES(?, ?, ?, ?, ?)";
 	static private final String _ADD_DIR_ATTR_STMT =
@@ -107,6 +109,7 @@ public class ExportedDirDBResource extends BasicDBResource implements
 	private String _myLocalPath = null;
 	private String _myParentIds = null;
 	private String _isReplicated = null;
+	private Long _lastModified = null;
 	
 	protected static EndpointReferenceType _fileServiceEPR;
 	protected static EndpointReferenceType _dirServiceEPR;
@@ -124,12 +127,16 @@ public class ExportedDirDBResource extends BasicDBResource implements
 	public void initialize(HashMap<QName, Object> constructionParams)
 		throws ResourceException
 	{
-		_myParentIds= (String)constructionParams.get(
+		_myParentIds = (String)constructionParams.get(
 			IExportedFileResource.PARENT_IDS_CONSTRUCTION_PARAM);
 		_myLocalPath = (String)constructionParams.get(
 			IExportedFileResource.PATH_CONSTRUCTION_PARAM);
 		_isReplicated = (String)constructionParams.get(
 			IExportedFileResource.REPLICATION_INDICATOR); 
+		_lastModified = (Long)constructionParams.get(
+			IExportedDirResource.LAST_MODIFIED_TIME);
+		_logger.debug("Initializing exportDir " +_myLocalPath 
+				+ " with modifed time: " + _lastModified);
 		
 		super.initialize(constructionParams);
 		
@@ -149,7 +156,7 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		loadDirInfo();
 		if (!dirExists())
 		{
-			_logger.error("Local file does not exist for ExportedFileResource.");
+			_logger.error("Local dir does not exist for ExportedDirResource.");
 			
 			destroy(_connection, false);
 			throw FaultManipulator.fillInFault(new ResourceUnknownFaultType());
@@ -191,11 +198,60 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		return ret;
 	}
 
+	private boolean dirNotModified() 
+		throws ResourceException
+	{
+		Long latestModifyTime = ExportedDirUtils.getLastModifiedTime(_myLocalPath);
+		if (_lastModified.equals(latestModifyTime)){
+			_logger.debug("ExportDir's last modify time has not changed; proceeding without sync.");
+			return true;
+		}
+		else{
+			//set new modify time
+			_lastModified = latestModifyTime;
+			updateModifyTime();
+			_logger.debug("ExportDir's last modify time has changed; initiating sync.");
+			return false;
+		}
+	}
+	
+	private void updateModifyTime()
+		throws ResourceException
+	{
+		_logger.debug("Updating ExportDir modify time with: " + _lastModified);
+		PreparedStatement stmt = null;
+		
+		try{
+			stmt = _connection.prepareStatement(_UPDATE_MODIFY_TIME);
+			stmt.setLong(1, _lastModified);
+			stmt.setString(2, _resourceKey);
+			stmt.executeUpdate();
+		}
+		catch (SQLException sqe){
+			throw new ResourceException(
+				"Could not update modify time for exportDir resource entry", sqe);
+		}
+		finally{
+			close(stmt);
+		}
+	}
+	
+	
 	public Collection<ExportedDirEntry> retrieveEntries(String regex)
 		throws ResourceException
 	{
-		Collection<File> allLocalEntries = listEntriesAsFiles();
+		//get all known entries from db
 		Collection<ExportedDirEntry> allKnownEntries = retrieveKnownEntries();
+		
+		//before syncing, check if directory has been modified
+		//force sync if dir is empty as this means no sync may have yet occurred
+		if (allKnownEntries.isEmpty())
+			_logger.debug("ExportDir is empty; forcing sync.");
+		else if (dirNotModified())
+			return allKnownEntries;
+		
+		//get all entries on local file system
+		Collection<File> allLocalEntries = listEntriesAsFiles();
 		Collection<ExportedDirEntry> syncedEntries = null;
 		
 		syncedEntries = syncEntries(allKnownEntries, allLocalEntries);
@@ -300,7 +356,7 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		//if replicated, delete resolver mapping and notify resolver of termination
 		if (getReplicationState().equals("true")){
 			try{
-				_logger.info("Notifying resolver of exportedDir termination.");
+				_logger.debug("Notifying resolver of exportedDir termination.");
 				RExportResolverUtils.destroyResolverByEPI(
 						getResourceEPIasString(), null);
 			}
@@ -376,11 +432,12 @@ public class ExportedDirDBResource extends BasicDBResource implements
 				_myLocalPath = rs.getString(1);
 				_myParentIds = rs.getString(2);
 				_isReplicated = rs.getString(3);
-			} else
-			{
+				_lastModified = rs.getLong(4);
+			} else{
 				_myLocalPath = null;
 				_myParentIds = null;
 				_isReplicated = null;
+				_lastModified = null;
 			}
 		}
 		catch (SQLException sqe)
@@ -409,6 +466,7 @@ public class ExportedDirDBResource extends BasicDBResource implements
 			stmt.setString(2, _myLocalPath);
 			stmt.setString(3, _myParentIds);
 			stmt.setString(4, _isReplicated);
+			stmt.setLong(5, _lastModified);
 			if (stmt.executeUpdate() != 1)
 				throw new ResourceException(
 					"Unable to insert ExportedDir resource information.");
@@ -682,7 +740,7 @@ public class ExportedDirDBResource extends BasicDBResource implements
 	{
 		try
 		{
-			_logger.info("Creating new export entries");
+			_logger.debug("Creating new export entries");
 			
 			/* create new Export resource */
 			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, serviceEPR);
@@ -838,7 +896,8 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		catch (ResourceException ruft)
 		{
 			// Ignore so we can keep cleaning up.
-			_logger.error("Unable to destroy resource.", ruft);
+			_logger.error("(EXPECTED) Unable to destroy resource.  " +
+					"If file/dir no longer exists, then it was already cleaned up.");
 		}
 			
 		/* remove entry information */
@@ -935,7 +994,7 @@ public class ExportedDirDBResource extends BasicDBResource implements
 					
 					//notify exportDirs resolver of termination
 					try {
-						_logger.info("Notifying resolver of (contained) exportedDir termination");
+						_logger.debug("Notifying resolver of (contained) exportedDir termination");
 						
 						RExportResolverUtils.destroyResolverByEPR(exportEPR);
 					}

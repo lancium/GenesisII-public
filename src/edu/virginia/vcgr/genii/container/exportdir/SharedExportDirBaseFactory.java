@@ -16,7 +16,7 @@ public class SharedExportDirBaseFactory extends BasicDBResourceFactory
 	static private final String _CREATE_EXPORTED_DIR_TABLE_STMT =
 		"CREATE TABLE exporteddir " +
 		"(dirid VARCHAR(40) PRIMARY KEY, path VARCHAR(512), parentIds VARCHAR(4096), " +
-		"isReplicated VARCHAR(5))";
+		"isReplicated VARCHAR(5), lastModified BIGINT)";
 	static private final String _CREATE_EXPORTED_DIR_ENTRY_TABLE_STMT =
 		"CREATE TABLE exporteddirentry " +
 		"(dirid VARCHAR(40), name VARCHAR(256), endpoint BLOB (128K), " +

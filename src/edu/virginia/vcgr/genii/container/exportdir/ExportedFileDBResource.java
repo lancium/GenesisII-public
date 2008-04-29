@@ -106,7 +106,7 @@ public class ExportedFileDBResource extends RByteIOResource
 					
 					//notify exportFiles resolver of termination
 					try {
-						_logger.info("Notifying resolver of (contained) exportedFile termination");
+						_logger.debug("Notifying resolver of (contained) exportedFile termination");
 						
 						RExportResolverUtils.destroyResolverByEPR(exportEPR);
 					}

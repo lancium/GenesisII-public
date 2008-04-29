@@ -78,7 +78,7 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 	protected ResourceKey createResource(HashMap<QName, Object> constructionParameters)
 		throws ResourceException, BaseFaultType
 	{
-		_logger.info("Creating new ExportedDir Resource.");
+		_logger.debug("Creating new ExportedDir Resource.");
 		
 		if (constructionParameters == null)
 		{
@@ -100,6 +100,8 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 			IExportedDirResource.PARENT_IDS_CONSTRUCTION_PARAM, initInfo.getParentIds());
 		constructionParameters.put(
 			IExportedDirResource.REPLICATION_INDICATOR, initInfo.getReplicationState());
+		constructionParameters.put(
+			IExportedDirResource.LAST_MODIFIED_TIME, initInfo.getLastModifiedTime());
 		
 		return super.createResource(constructionParameters);
 	}
@@ -228,7 +230,9 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 		String isReplicated = resource.getReplicationState();
 		EndpointReferenceType newRef =
 			vcgrCreate(new VcgrCreate(ExportedDirUtils.createCreationProperties(
-				fullPath, parentIds, isReplicated))).getEndpoint();
+				fullPath, 
+				parentIds, 
+				isReplicated))).getEndpoint();
 		
 		String newEntryId = (new GUID()).toString();
 		ExportedDirEntry newEntry = new ExportedDirEntry(
@@ -246,7 +250,7 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 	{
 		String entry_name_regexp = listRequest.getEntry_name_regexp();
 		
-		_logger.info("ExportDir asked to lookup \"" + entry_name_regexp + "\".");
+		_logger.debug("ExportDir asked to lookup \"" + entry_name_regexp + "\".");
 		
 		IExportedDirResource resource = 
 			(IExportedDirResource)ResourceManager.getCurrentResource().dereference();

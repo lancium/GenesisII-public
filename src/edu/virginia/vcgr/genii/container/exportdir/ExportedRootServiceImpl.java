@@ -61,7 +61,7 @@ public class ExportedRootServiceImpl extends ExportedDirServiceImpl implements
 	protected ResourceKey createResource(HashMap<QName, Object> creationParameters)
 		throws ResourceException, BaseFaultType
 	{
-		_logger.info("Creating new ExportedRoot Resource.");
+		_logger.debug("Creating new ExportedRoot Resource.");
 		
 		ExportedDirUtils.ExportedDirInitInfo initInfo = 
 			ExportedDirUtils.extractCreationProperties(creationParameters);
@@ -97,7 +97,7 @@ public class ExportedRootServiceImpl extends ExportedDirServiceImpl implements
 		RNSEntryExistsFaultType, ResourceUnknownFaultType,
 		RNSEntryNotDirectoryFaultType, RNSFaultType
 	{
-		_logger.info("ADDING Exported Root");
+		_logger.debug("ADDING Exported Root");
 		try
 		{
 			EndpointReferenceType myEPR = 
