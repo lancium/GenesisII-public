@@ -109,6 +109,9 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 			while (true)
 			{
 				_state = queue.getStatus(_jobToken);
+				context.updateState(new ActivityState(
+					ActivityStateEnumeration.Running, 
+					_state.toString(), false));
 				if (_state.isFinalState())
 					break;
 				

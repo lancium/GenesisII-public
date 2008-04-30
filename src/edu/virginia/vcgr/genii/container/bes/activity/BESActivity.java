@@ -404,6 +404,12 @@ public class BESActivity implements Closeable
 		return new ExecutionContext()
 		{
 			@Override
+			public void updateState(ActivityState newState)
+			{
+				_state = (ActivityState)newState.clone();
+			}
+			
+			@Override
 			public ICallingContext getCallingContext()
 					throws ExecutionException
 			{

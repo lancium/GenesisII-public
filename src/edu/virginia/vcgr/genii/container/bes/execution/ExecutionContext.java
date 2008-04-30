@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.container.bes.execution;
 import java.io.File;
 import java.io.Serializable;
 
+import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 
 /**
@@ -37,4 +38,6 @@ public interface ExecutionContext
 		throws ExecutionException;
 	public Serializable getProperty(String name)
 		throws ExecutionException;
+	
+	public void updateState(ActivityState newState);
 }
