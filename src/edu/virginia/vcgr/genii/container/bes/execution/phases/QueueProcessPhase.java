@@ -27,7 +27,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 	
 	static private final String JOB_TOKEN_PROPERTY = 
 		"edu.virginia.vcgr.genii.container.bes.phases.queue.job-token";
-	static private final long DEFAULT_LOOP_CYCLE = 1000L * 30;
+	static private final long DEFAULT_LOOP_CYCLE = 1000L * 10;
 	
 	private String _phaseShiftLock = new String();
 	
