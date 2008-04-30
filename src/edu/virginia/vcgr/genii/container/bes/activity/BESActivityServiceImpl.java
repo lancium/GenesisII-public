@@ -190,7 +190,11 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 				if (!ret.exists())
 				{
 					if (ret.mkdirs())
+					{
+						_logger.debug("BES Activity will run in directory \"" 
+							+ ret.getAbsolutePath() + "\".");
 						return ret;
+					}
 				}
 			}
 			
