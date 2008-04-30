@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -68,6 +70,7 @@ import org.morgan.util.io.GuaranteedDirectory;
 import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
+import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.ws.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
 
@@ -76,6 +79,7 @@ import edu.virginia.vcgr.genii.bes.activity.BESActivityPortType;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
+import edu.virginia.vcgr.genii.client.bes.GeniiBESConstants;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.comm.ClientConstructionParameters;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
@@ -87,6 +91,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
+import edu.virginia.vcgr.genii.client.utils.creation.CreationProperties;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.notification.Notify;
 import edu.virginia.vcgr.genii.common.notification.Subscribe;
@@ -103,6 +108,7 @@ import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
+import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.sysinfo.SystemInfoUtils;
 
@@ -154,6 +160,31 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 		super.setAttributeHandlers();
 
 		new BESAttributesHandler(getAttributePackage());
+	}
+	
+	@Override
+	protected void postCreate(ResourceKey key, EndpointReferenceType newEPR,
+			HashMap<QName, Object> constructionParameters,
+			Collection<MessageElement> resolverCreationParameters)
+			throws ResourceException, BaseFaultType, RemoteException
+	{
+		super.postCreate(key, newEPR, constructionParameters,
+			resolverCreationParameters);
+		
+		Properties props = (Properties)constructionParameters.get(
+			CreationProperties.CREATION_PROPERTIES_QNAME);
+		if (props != null)
+		{
+			String queueProvider = props.getProperty(
+				GeniiBESConstants.NATIVEQ_PROVIDER_PROPERTY);
+			if (queueProvider != null)
+			{
+				IResource resource = key.dereference();
+				resource.setProperty(
+					GeniiBESConstants.NATIVEQ_PROVIDER_PROPERTY, 
+					props);
+			}
+		}
 	}
 
 	static private EndpointReferenceType _localActivityServiceEPR = null;
@@ -216,7 +247,9 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 			VcgrCreateResponse resp = activity.vcgrCreate(
 				new VcgrCreate(
 					BESActivityUtils.createCreationProperties(
-						jdt, (String)resource.getKey())));
+						jdt, (String)resource.getKey(), 
+						(Properties)resource.getProperty(
+							GeniiBESConstants.NATIVEQ_PROVIDER_PROPERTY))));
 			return new CreateActivityResponseType(resp.getEndpoint(), adt, null);
 		}
 		catch (ConfigurationException ce)

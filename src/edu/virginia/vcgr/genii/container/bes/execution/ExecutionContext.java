@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.container.bes.execution;
 
 import java.io.File;
+import java.io.Serializable;
 
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 
@@ -30,5 +31,10 @@ public interface ExecutionContext
 	 * @return The current working directory for this activity.
 	 */
 	public File getCurrentWorkingDirectory()
+		throws ExecutionException;
+	
+	public void setProperty(String name, Serializable value)
+		throws ExecutionException;
+	public Serializable getProperty(String name)
 		throws ExecutionException;
 }

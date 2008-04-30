@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.container.bes.jsdl.personality.simpleexec;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Properties;
 import java.util.Vector;
 
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
@@ -58,7 +59,8 @@ public class SimpleExecutionUnderstanding
 		_requiredOGRSHVersion = version;
 	}
 	
-	public Vector<ExecutionPhase> createExecutionPlan() throws JSDLException
+	public Vector<ExecutionPhase> createExecutionPlan(
+		Properties creationProperties) throws JSDLException
 	{
 		Vector<ExecutionPhase> ret = new Vector<ExecutionPhase>();
 		Vector<ExecutionPhase> cleanups = new Vector<ExecutionPhase>();
@@ -84,8 +86,8 @@ public class SimpleExecutionUnderstanding
 		}
 		
 		if (_application != null)
-			_application.addExecutionPhases(ret, cleanups, 
-				_requiredOGRSHVersion);
+			_application.addExecutionPhases(creationProperties,
+				ret, cleanups, _requiredOGRSHVersion);
 		
 		for (DataStagingUnderstanding stage : _stageOuts)
 		{

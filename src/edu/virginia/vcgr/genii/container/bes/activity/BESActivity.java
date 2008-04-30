@@ -4,6 +4,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.NotSerializableException;
+import java.io.Serializable;
 import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -440,6 +441,86 @@ public class BESActivity implements Closeable
 			public File getCurrentWorkingDirectory() throws ExecutionException
 			{
 				return _activityCWD;
+			}
+
+			@Override
+			public Serializable getProperty(String name)
+					throws ExecutionException
+			{
+				Connection connection = null;
+				PreparedStatement stmt = null;
+				ResultSet rs = null;
+				
+				try
+				{
+					connection = _connectionPool.acquire();
+					stmt = connection.prepareStatement(
+						"SELECT propertyvalue FROM besactivitypropertiestable " +
+						"WHERE activityid = ? AND propertyname = ?");
+					stmt.setString(1, _activityid);
+					stmt.setString(2, name);
+					
+					rs = stmt.executeQuery();
+					if (!rs.next())
+						return null;
+					
+					return (Serializable)DBSerializer.fromBlob(rs.getBlob(1));
+				}
+				catch (SQLException sqe)
+				{
+					throw new ExecutionException(
+						"Database error trying to get activity property.", sqe);
+				}
+				finally
+				{
+					StreamUtils.close(rs);
+					StreamUtils.close(stmt);
+					_connectionPool.release(connection);
+				}
+			}
+
+			@Override
+			public void setProperty(String name, Serializable value)
+					throws ExecutionException
+			{
+				Connection connection = null;
+				PreparedStatement stmt = null;
+				
+				try
+				{
+					connection = _connectionPool.acquire();
+					stmt = connection.prepareStatement(
+						"DELETE FROM besactivitypropertiestable " +
+						"WHERE activityid = ? AND propertyname = ?");
+					stmt.setString(1, _activityid);
+					stmt.setString(2, name);
+					stmt.executeUpdate();
+					stmt.close();
+					stmt = null;
+					if (value != null)
+					{
+						stmt = connection.prepareStatement(
+							"INSERT INTO besactivitypropertiestable " +
+							"VALUES (?, ?, ?)");
+						
+						stmt.setString(1, _activityid);
+						stmt.setString(2, name);
+						stmt.setBlob(3, DBSerializer.toBlob(value));
+						stmt.executeUpdate();
+					}
+					
+					connection.commit();
+				}
+				catch (SQLException sqe)
+				{
+					throw new ExecutionException(
+						"Database error trying to get activity property.", sqe);
+				}
+				finally
+				{
+					StreamUtils.close(stmt);
+					_connectionPool.release(connection);
+				}
 			}
 		};
 	}

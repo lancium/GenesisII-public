@@ -5,11 +5,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.client.bes.GeniiBESConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.jsdl.InvalidJSDLException;
@@ -21,6 +23,7 @@ import edu.virginia.vcgr.genii.container.bes.execution.phases.ByteIORedirectionS
 import edu.virginia.vcgr.genii.container.bes.execution.phases.FileRedirectionSink;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.FileRedirectionSource;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.PrepareApplicationPhase;
+import edu.virginia.vcgr.genii.container.bes.execution.phases.QueueProcessPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.RunProcessPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.StreamRedirectionDescription;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.StreamRedirectionSink;
@@ -78,10 +81,63 @@ public class ForkExecUnderstanding implements Application
 	}
 
 	@Override
-	public void addExecutionPhases(Vector<ExecutionPhase> executionPlan,
+	public void addExecutionPhases(Properties creationProperties,
+		Vector<ExecutionPhase> executionPlan,
 		Vector<ExecutionPhase> cleanupPhases, String ogrshVersion)
 			throws JSDLException
 	{
+		if (creationProperties != null && creationProperties.getProperty(
+			GeniiBESConstants.NATIVEQ_PROVIDER_PROPERTY) != null)
+		{
+			addQueuePhases(creationProperties, executionPlan,
+				cleanupPhases, ogrshVersion);
+		} else
+		{
+			addForkExecPhases(creationProperties, executionPlan,
+				cleanupPhases, ogrshVersion);
+		}
+	}
+	
+	private void addQueuePhases(Properties creationProperties, 
+		Vector<ExecutionPhase> executionPlan,
+		Vector<ExecutionPhase> cleanupPhases, 
+		String ogrshVersion) throws JSDLException
+	{
+		executionPlan.add(new PrepareApplicationPhase(_executable));
+		
+		if (ogrshVersion == null)
+		{
+			executionPlan.add(new QueueProcessPhase(
+				_executable, _arguments, _environment,
+				_stdinRedirect, _stdoutRedirect, _stderrRedirect,
+				creationProperties));
+		} else
+		{
+			_environment.put("BES_HOME", "/home/bes-job");
+			_environment.put("OGRSH_CONFIG", "ogrsh-config.xml");
+			
+			Vector<String> args = new Vector<String>();
+			args.add(_executable);
+			args.addAll(_arguments);
+			
+			File shim = new File(ConfigurationManager.getInstallDir(), 
+				"OGRSH");
+			shim = new File(shim, "shim-" + ogrshVersion + ".sh");
+			_executable = shim.getAbsolutePath();
+			
+			executionPlan.add(new QueueProcessPhase(
+				_executable, args, _environment,
+				_stdinRedirect, _stdoutRedirect, _stderrRedirect,
+				creationProperties));
+		}
+	}
+	
+	private void addForkExecPhases(Properties creationProperties, 
+		Vector<ExecutionPhase> executionPlan,
+		Vector<ExecutionPhase> cleanupPhases, 
+		String ogrshVersion) throws JSDLException
+	{
+
 		StreamRedirectionSource stdin = null;
 		StreamRedirectionSink stdout = null;
 		StreamRedirectionSink stderr = null;

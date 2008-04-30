@@ -131,6 +131,7 @@ import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
+import edu.virginia.vcgr.genii.client.utils.creation.CreationProperties;
 import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
 import edu.virginia.vcgr.genii.iterator.IteratorMemberType;
 import edu.virginia.vcgr.genii.iterator.IteratorPortType;
@@ -322,6 +323,9 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		} else if (name.equals(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM))
 		{
 			return ClientConstructionParameters.getEndpointIdentifierProperty(property);
+		} else if (name.equals(CreationProperties.CREATION_PROPERTIES_QNAME))
+		{
+			return CreationProperties.translate(property);
 		} else
 			return property;
 	}

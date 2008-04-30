@@ -53,7 +53,7 @@
 			<param name="stub.gen.target-flag-file"
 				value="${temporary.codegen.dir}/wsdl/jndi-authn.flag"/>
 		</antcall>
-		<move file="${temporary.codegen.dir}/jndi-authn/edu/virginia/vcgr/genii/JNDIAuthn/deploy.wsdd"
+		<move file="${temporary.codegen.dir}/jndi-authn/edu/virginia/vcgr/genii/jndiauthn/deploy.wsdd"
 			tofile="${wsdd.dir}/JNDIAuthn.deploy.wsdd"/>
 		<replace file="${wsdd.dir}/JNDIAuthn.deploy.wsdd"
 			token="edu.virginia.vcgr.genii.jndiauthn.JNDIAuthnSOAPBindingImpl"

@@ -15,7 +15,10 @@
  */
 package edu.virginia.vcgr.genii.container.bes.activity;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Properties;
 
 import javax.xml.namespace.QName;
 
@@ -25,6 +28,7 @@ import org.ggf.jsdl.JobDefinition_Type;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
+import edu.virginia.vcgr.genii.client.utils.creation.CreationProperties;
 
 public class BESActivityUtils
 {
@@ -56,14 +60,18 @@ public class BESActivityUtils
 	}
 	
 	static public MessageElement[] createCreationProperties(
-		JobDefinition_Type jobDefinition, String containerID)
+		JobDefinition_Type jobDefinition, String containerID, 
+		Properties nativeqProperties)
 	{
-		MessageElement []ret = new MessageElement[2];
+		Collection<MessageElement> ret = new LinkedList<MessageElement>();
 		
-		ret[0] = new MessageElement(JOB_DEF_QNAME, jobDefinition);
-		ret[1] = new MessageElement(CONTAINER_ID_QNAME, containerID);
+		ret.add(new MessageElement(JOB_DEF_QNAME, jobDefinition));
+		ret.add(new MessageElement(CONTAINER_ID_QNAME, containerID));
 		
-		return ret;
+		if (nativeqProperties != null)
+			ret.add(CreationProperties.translate(nativeqProperties));
+		
+		return ret.toArray(new MessageElement[0]);
 	}
 	
 	static public BESActivityInitInfo extractCreationProperties(

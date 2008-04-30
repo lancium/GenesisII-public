@@ -22,6 +22,7 @@ import java.io.PrintStream;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Properties;
 import java.sql.SQLException;
 
 import javax.xml.namespace.QName;
@@ -44,6 +45,7 @@ import edu.virginia.vcgr.genii.byteio.streamable.factory.OpenStreamResponse;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.BESActivityConstants;
+import edu.virginia.vcgr.genii.client.bes.GeniiBESConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.context.*;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
@@ -53,6 +55,7 @@ import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.Identity;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
+import edu.virginia.vcgr.genii.client.utils.creation.CreationProperties;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
@@ -105,6 +108,9 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 		BESActivityInitInfo initInfo = BESActivityUtils.extractCreationProperties(
 			creationParameters);
 		
+		Properties creationProperties = (Properties)creationParameters.get(
+			CreationProperties.CREATION_PROPERTIES_QNAME);
+		
 		String activityServiceName = "BESActivityPortType";
 		Collection<Identity> owners = QueueSecurity.getCallerIdentities();
 		
@@ -129,7 +135,9 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 			bes.createActivity(
 				resource.getKey().toString(), jsdl,	owners, 
 				ContextManager.getCurrentContext(), 
-				chooseDirectory(5), seUnderstanding.createExecutionPlan(),
+				chooseDirectory(creationParameters, 5),
+				seUnderstanding.createExecutionPlan(
+					creationProperties),
 				activityEPR, activityServiceName, seUnderstanding.getJobName());
 		}
 		catch (IOException fnfe)
@@ -150,19 +158,38 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 		}
 	}
 	
-	static private File chooseDirectory(int attempts) throws ResourceException
+	static private File chooseDirectory(
+		HashMap<QName, Object> creationParameters, 
+		int attempts) throws ResourceException
 	{
+		File basedir = null;
+		
+		Properties props = (Properties)creationParameters.get(
+			CreationProperties.CREATION_PROPERTIES_QNAME);
+		if (props != null)
+		{
+			String dir = props.getProperty(
+				GeniiBESConstants.SHARED_DIRECTORY_PROPERTY);
+			if (dir != null)
+				basedir = new File(dir);
+		}
+			
 		try
 		{
-			File configDir = ConfigurationManager.getCurrentConfiguration().getUserDirectory();
-			configDir = new GuaranteedDirectory(configDir, "bes-activities");
+			File configDir = null;
+			if (basedir == null)
+			{
+				basedir = ConfigurationManager.getCurrentConfiguration().getUserDirectory();
+				configDir = new GuaranteedDirectory(basedir, "bes-activities");
+			} else
+				configDir = basedir;
 			
 			for (int lcv = 0; lcv < attempts; lcv++)
 			{
 				File ret = new File(configDir, new GUID().toString());
 				if (!ret.exists())
 				{
-					if (ret.mkdir())
+					if (ret.mkdirs())
 						return ret;
 				}
 			}

@@ -246,6 +246,13 @@
 			<fileset dir="../../../example-dep" targetdir="$INSTALL_PATH/example-dep"/>
 		</pack>
 
+		<pack name="Example Native Queue Configurations" required="no"
+			preselected="no">
+			<description>Example Native Queue Configurations</description>
+			<fileset dir="../../../example-nativeq"
+				targetdir="$INSTALL_PATH/example-nativeq"/>
+		</pack>
+
 		<pack name="Documentation" required="no" preselected="yes">
 			<description>Documentation for Genesis II</description>
 			<fileset dir="../../../doc" targetdir="$INSTALL_PATH/doc"/>

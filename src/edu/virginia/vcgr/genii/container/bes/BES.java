@@ -350,6 +350,12 @@ public class BES implements Closeable
 				"DELETE FROM besactivitiestable WHERE activityid = ?");
 			stmt.setString(1, activityid);
 			stmt.executeUpdate();
+			stmt.close();
+			stmt = null;
+			stmt = connection.prepareStatement(
+				"DELETE FROM besactivitypropertiestable WHERE activityid = ?");
+			stmt.setString(1, activityid);
+			stmt.executeUpdate();
 			connection.commit();
 			
 			_containedActivities.remove(activityid);
