@@ -8,15 +8,21 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.util.Collection;
+import java.util.List;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
 public abstract class ScriptBasedQueueConnection 
 	extends AbstractNativeQueueConnection
 {
+	static private Log _logger = LogFactory.getLog(
+		ScriptBasedQueueConnection.class);
+	
 	static public final String QUEUE_SCRIPT_RESULT_FILENAME = 
 		"queue.script.result";
 	
@@ -145,11 +151,15 @@ public abstract class ScriptBasedQueueConnection
 		try
 		{
 			Collection<String> commandLine = builder.command();
+			logProcess(commandLine);
+			
 			Process proc = builder.start();
 			proc.getOutputStream().close();
 			StreamCopier stdoutCopy = new StreamCopier(proc.getInputStream());
 			StreamCopier stderrCopy = new StreamCopier(proc.getErrorStream());
 			int result = proc.waitFor();
+			
+			logProcessResult(result, stdoutCopy, stderrCopy);
 			
 			if (result == 0)
 				return stdoutCopy.getResult();
@@ -243,6 +253,77 @@ public abstract class ScriptBasedQueueConnection
 		catch (IOException ioe)
 		{
 			// This won't happen.
+		}
+	}
+	
+	static private void logProcess(Collection<String> commandLine)
+	{
+		_logger.debug(new LazyEvaluatorList(commandLine));
+	}
+	
+	static private void logProcessResult(int result,
+		StreamCopier stdout, StreamCopier stderr)
+	{
+		_logger.debug(new LazyEvaluatorResult(result, stdout, stderr));
+	}
+	
+	static private class LazyEvaluatorResult
+	{
+		private int _result;
+		private StreamCopier _stdout;
+		private StreamCopier _stderr;
+		
+		public LazyEvaluatorResult(int result,
+			StreamCopier stdout, StreamCopier stderr)
+		{
+			_result = result;
+			_stdout = stdout;
+			_stderr = stderr;
+		}
+		
+		public String toString()
+		{
+			try
+			{
+				StringBuilder builder = new StringBuilder("Result:  " + _result + "\n");
+				builder.append("Standard Out:\n");
+				builder.append(_stdout.getResult());
+				builder.append("\nStandard Err:\n");
+				builder.append(_stderr.getResult());
+				
+				return builder.toString();
+			}
+			catch (IOException ioe)
+			{
+				return "Unable to get result from stream:  " 
+					+ ioe.getLocalizedMessage();
+			}
+		}
+	}
+	
+	static private class LazyEvaluatorList
+	{
+		private Collection<String> _list;
+		
+		public LazyEvaluatorList(Collection<String> list)
+		{
+			_list = list;
+		}
+		
+		public String toString()
+		{
+			StringBuilder builder = new StringBuilder("Executing:  ");
+			
+			boolean first = true;
+			for (String entry : _list)
+			{
+				if (!first)
+					builder.append(" ");
+				first = false;
+				builder.append("\"" + entry + "\"");
+			}
+			
+			return builder.toString();
 		}
 	}
 }

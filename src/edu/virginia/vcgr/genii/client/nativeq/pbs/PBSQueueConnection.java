@@ -13,6 +13,9 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
 import edu.virginia.vcgr.genii.client.nativeq.ApplicationDescription;
 import edu.virginia.vcgr.genii.client.nativeq.BasicResourceAttributes;
@@ -26,6 +29,9 @@ import edu.virginia.vcgr.genii.client.nativeq.ScriptLineParser;
 
 public class PBSQueueConnection extends ScriptBasedQueueConnection
 {
+	@SuppressWarnings("unused")
+	static private Log _logger = LogFactory.getLog(PBSQueueConnection.class);
+	
 	static final public URI PBS_MANAGER_TYPE = URI.create(
 		"http://vcgr.cs.virginia.edu/genesisII/nativeq/pbs");
 	
