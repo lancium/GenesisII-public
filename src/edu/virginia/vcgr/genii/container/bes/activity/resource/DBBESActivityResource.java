@@ -15,6 +15,7 @@
  */
 package edu.virginia.vcgr.genii.container.bes.activity.resource;
 
+import java.io.File;
 import java.sql.SQLException;
 
 import org.ggf.bes.factory.UnknownActivityIdentifierFaultType;
@@ -43,7 +44,7 @@ public class DBBESActivityResource extends BasicDBResource implements
 			throw new ResourceException(
 				"Unable to find bes for activity " + _resourceKey);
 		BESActivity activity = bes.findActivity(_resourceKey);
-		activity.getActivityCWD().delete();
+		recursiveDelete(activity.getActivityCWD());
 		try
 		{
 			bes.deleteActivity(_resourceKey);
@@ -89,5 +90,19 @@ public class DBBESActivityResource extends BasicDBResource implements
 				}, null));
 		
 		return activity;
+	}
+	
+	static private void recursiveDelete(File file)
+	{
+		if (!file.exists())
+			return;
+		
+		if (file.isDirectory())
+		{
+			for (File subfile : file.listFiles())
+				recursiveDelete(subfile);
+		}
+		
+		file.delete();	
 	}
 }
