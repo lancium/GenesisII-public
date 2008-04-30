@@ -119,7 +119,10 @@ public abstract class ScriptBasedQueueConnection
 	{
 		script.format("cd \"%s\"\n", workingDirectory.getAbsolutePath());
 		
-		script.format("\"%s\"", application.getExecutableName());
+		String execName = application.getExecutableName();
+		if (!execName.contains("/"))
+			execName = String.format("./%s", execName);
+		script.format("\"%s\"", execName);
 		
 		for (String arg : application.getArguments())
 			script.format(" \"%s\"", arg);
