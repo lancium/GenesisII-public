@@ -10,6 +10,8 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
 import edu.virginia.vcgr.genii.client.security.*;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.rns.*;
@@ -68,34 +70,57 @@ public class IdpTool extends GamlLoginTool {
 		MessageElement[] constructionParms = null;
 		MessageElement newIdpNameParm = new MessageElement(
 				SecurityConstants.NEW_IDP_NAME_QNAME, newIdpName);
+
+		
 		if ((_authnUri == null) && (_storeType == null)) {
-			// we're creating a new-identity from scratch, not 
-			// delegating one into the grid
-			
+
 			MessageElement validMillisParm = new MessageElement(
 					SecurityConstants.IDP_VALID_MILLIS_QNAME, _validMillis);
 
-			constructionParms = 
-				new MessageElement[] { newIdpNameParm, validMillisParm };
+			if ((_username != null) && (_password != null)) {
+				
+				// actually create a new idp that delegates a 
+				// usernametoken credential
+				UsernamePasswordIdentity ut = 
+					new UsernamePasswordIdentity(_username, _password);
+				MessageElement delegatedIdentParm = new MessageElement(
+						SecurityConstants.IDP_DELEGATED_CREDENTIAL_QNAME);
+				delegatedIdentParm.addChild(ut.toMessageElement());
+				
+				constructionParms = 
+					new MessageElement[] { delegatedIdentParm, newIdpNameParm, validMillisParm};
+				
+			} else {
+
+				// we're creating a new-identity from scratch, not 
+				// delegating one into the grid
+				
+				constructionParms = 
+					new MessageElement[] { validMillisParm, newIdpNameParm };
+			}
 			
 		} else {
 		
+			// create a new IDP that further delegates a delegated token
+			
 			// log in
 			URI authnSource = (_authnUri == null) ? null : new URI(_authnUri);
-			ArrayList<SignedAssertion> assertions = 
-				delegateToIdentity(authnSource, ContextManager.getCurrentContext());
+			ArrayList<GamlCredential> assertions = delegateToIdentity(
+					authnSource, 
+					ContextManager.getCurrentContext(), 
+					idpCertChain);
 	
 			if ((assertions == null) || (assertions.size() == 0)) {
 				return 0;
 			}
 			
 			stdout.println("Creating idp for attribute for \""
-					+ assertions.get(0).getAttribute() + "\".");
+					+ assertions.get(0) + "\".");
 	
 			// serialize the delegatedAssertion and put into construction params
-			String encodedAssertion = SignedAssertionBaseImpl.base64encodeAssertion(assertions.get(0));
 			MessageElement delegatedIdentParm = new MessageElement(
-					SecurityConstants.IDP_DELEGATED_IDENITY_QNAME, encodedAssertion);
+					SecurityConstants.IDP_DELEGATED_CREDENTIAL_QNAME);
+			delegatedIdentParm.addChild(assertions.get(0).toMessageElement());
 			constructionParms = 
 				new MessageElement[] { delegatedIdentParm, newIdpNameParm };
 	

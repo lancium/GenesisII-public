@@ -53,7 +53,7 @@ public class GamlMessageSendHandler {
 			while (itr.hasNext()) {
 				GamlCredential cred = itr.next();
 		
-				if (cred instanceof UsernameTokenIdentity) {
+				if (cred instanceof UsernamePasswordIdentity) {
 					// Do nothing: do not serialize UT tokens: we will be sending
 					// it in its own header the old fashioned way.
 					

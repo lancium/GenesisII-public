@@ -51,25 +51,12 @@ public class GamlAcl implements Serializable {
 					}
 					retval.add(new X509Identity(certChain));
 					
-				} else if  (identityType instanceof IDPIdentityType) {
-
-					IDPIdentityType idt = (IDPIdentityType) identityType;
-					String name = idt.getName();
-					int numCerts = idt.getCertificateChain().getCount();
-					X509Certificate[] certChain = new X509Certificate[numCerts];
-					for (int i = 0; i < numCerts; i++) {
-						InputStream inputStream = new ByteArrayInputStream(
-								idt.getCertificateChain().getCertificate(i));
-						certChain[i] = (X509Certificate) cf.generateCertificate(inputStream);
-					}
-					retval.add(new IDPIdentity(name, certChain));
-
 				} else if  (identityType instanceof UTIdentityType) {
 
 					UTIdentityType idt = (UTIdentityType) identityType;
 					String name = idt.getName();
 					String token = idt.getToken();
-					retval.add(new UsernameTokenIdentity(name, token));
+					retval.add(new UsernamePasswordIdentity(name, token));
 				}
 			}
 
@@ -100,19 +87,9 @@ public class GamlAcl implements Serializable {
 					}
 					idtList[i] = new X509IdentityType(new CertificateChainType(certList.length, certListBytes));
 					
-				} else if (acl.get(i) instanceof IDPIdentity) {
-					IDPIdentity idt = (IDPIdentity) acl.get(i);
-					X509Certificate[] certList = idt.getAssertingIdentityCertChain();
-					byte[][] certListBytes = new byte[certList.length][];
-					for (int j = 0; j < certList.length; j++) {
-						certListBytes[j] = certList[j].getEncoded();
-					}
-					idtList[i] = new IDPIdentityType(idt.getName(),
-							new CertificateChainType(certList.length, certListBytes));
-					
-				} else if (acl.get(i) instanceof UsernameTokenIdentity) {
-					UsernameTokenIdentity idt = (UsernameTokenIdentity) acl.get(i);
-					idtList[i] = new UTIdentityType(idt.getUserName(), idt.getToken());
+				} else if (acl.get(i) instanceof UsernamePasswordIdentity) {
+					UsernamePasswordIdentity idt = (UsernamePasswordIdentity) acl.get(i);
+					idtList[i] = new UTIdentityType(idt.getUserName(), idt.getPassword());
 				}
 			}
 

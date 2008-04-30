@@ -27,6 +27,15 @@ import java.security.Signature;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
+import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
+
+import org.apache.axis.message.MessageElement;
+import org.apache.ws.security.message.token.BinarySecurity;
+import org.apache.ws.security.message.token.X509Security;
+
+import edu.virginia.vcgr.genii.client.security.WSSecurityUtils;
+
 
 /**
  * A signed, delegated attribute assertion
@@ -57,6 +66,47 @@ public class DelegatedAssertion extends SignedAssertionBaseImpl {
 		_delegatorSignature = SignedAttributeAssertion.sign(delegatedAttribute, privateKey);
 	}
 	
+	/**
+	 * Returns a URI (e.g., a WS-Security Token Profile URI) indicating the token type
+	 */
+	public String getTokenType() {
+		return WSSecurityUtils.DELEGATED_GAML_TOKEN_TYPE;
+	}	
+	
+	/**
+	 * Converts this credential to an Axis Message Element
+	 * @return
+	 * @throws GeneralSecurityException
+	 */
+	public MessageElement toMessageElement() throws GeneralSecurityException {
+
+		try {
+			// Add RequestedSecurityToken element
+			MessageElement binaryToken = null;
+			try {
+				binaryToken = new MessageElement(
+					BinarySecurity.TOKEN_BST, 
+					SignedAssertionBaseImpl.base64encodeAssertion(this));
+				binaryToken.setAttributeNS(null, "ValueType", WSSecurityUtils.DELEGATED_GAML_TOKEN_TYPE);
+			} catch (IOException e) {
+		    	throw new GeneralSecurityException(e.getMessage(), e);	
+			}
+	
+			MessageElement embedded = new MessageElement(new QName(
+					org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
+			embedded.addChild(binaryToken);
+	
+			MessageElement wseTokenRef = new MessageElement(new QName(
+					org.apache.ws.security.WSConstants.WSSE11_NS,
+					"SecurityTokenReference"));
+			wseTokenRef.addChild(embedded);
+			
+			return wseTokenRef;
+
+		} catch (SOAPException e) {
+			throw new GeneralSecurityException(e.getMessage(), e);
+		}
+	}
 	
 	/**
 	 * Returns the identity of the original attribute asserter

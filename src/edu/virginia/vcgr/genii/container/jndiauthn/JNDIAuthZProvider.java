@@ -99,10 +99,10 @@ public class JNDIAuthZProvider implements IAuthZProvider {
 			callingContext.getTransientProperty(GamlCredential.CALLER_CREDENTIALS_PROPERTY);
 		for (GamlCredential cred : callerCredentials) {
 			
-			if (cred instanceof UsernameTokenIdentity) {
+			if (cred instanceof UsernamePasswordIdentity) {
 				
 				try {
-					UsernameTokenIdentity utIdentity = (UsernameTokenIdentity) cred;
+					UsernamePasswordIdentity utIdentity = (UsernamePasswordIdentity) cred;
 					String userName = jndiResource.getIdpName();
 	
 					Properties jndiEnv = new Properties();
@@ -133,7 +133,7 @@ public class JNDIAuthZProvider implements IAuthZProvider {
 						
 						String ypPassword = (new String(ypPasswordBytes, "UTF8"));
 						ypPassword = ypPassword.substring("{crypt}".length());
-						String utPassword = utIdentity.getToken();
+						String utPassword = utIdentity.getPassword();
 						
 						if (org.mortbay.util.UnixCrypt.crypt(
 								utPassword, 

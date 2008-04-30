@@ -32,6 +32,7 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.CredentialException;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.PKIPathSecurity;
+import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.message.token.X509Security;
 
 import org.ggf.rns.Add;
@@ -57,8 +58,9 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.TransientCredentials;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
+import edu.virginia.vcgr.genii.client.security.WSSecurityUtils;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
@@ -119,9 +121,7 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 
 		// decodes the base64-encoded delegated assertion construction param
 		QName name = property.getQName();
-		if (name.equals(SecurityConstants.IDP_DELEGATED_IDENITY_QNAME)) {
-			return property.getValue();
-		} else if (name.equals(SecurityConstants.NEW_IDP_NAME_QNAME)) {
+		if (name.equals(SecurityConstants.NEW_IDP_NAME_QNAME)) {
 			return property.getValue();
 		} else if (name.equals(SecurityConstants.IDP_VALID_MILLIS_QNAME)) {
 			return Long.decode(property.getValue());
@@ -130,6 +130,17 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 		}
 	}
 
+	protected ResourceKey createResource(HashMap<QName, Object> constructionParameters)
+		throws ResourceException, BaseFaultType {
+		
+		String[] newCNs = {(String) constructionParameters
+			.get(SecurityConstants.NEW_IDP_NAME_QNAME)};
+		
+		constructionParameters.put(IResource.ADDITIONAL_CNS_CONSTRUCTION_PARAM, newCNs);
+		
+		return super.createResource(constructionParameters);
+	}
+	
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
 			HashMap<QName, Object> constructionParameters,
 			Collection<MessageElement> resolverCreationParams)
@@ -152,50 +163,49 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 
 		// get the IDP resource's db resource 
 		IResource resource = rKey.dereference();
-		resource.setProperty(SecurityConstants.IDP_IDENITY_QNAME.getLocalPart(), newIdpName);
-
-		SignedAssertion identityAssertion = null;
-		String encodedAssertion = (String) constructionParameters
-				.get(SecurityConstants.IDP_DELEGATED_IDENITY_QNAME);
 		X509Certificate[] resourceCertChain = 
 			(X509Certificate[])resource.getProperty(
 					IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
 
-		if (encodedAssertion != null) { 
-			// we're an authentication proxy for some delegated credentials
-			// that we're being supplied
-			
-			try {
-				identityAssertion = SignedAssertionBaseImpl.base64decodeAssertion(encodedAssertion);
-				
-				// Delegate from the service to the resource
-				DelegatedAttribute delegatedAttribute = new DelegatedAttribute(
-						null,
-						identityAssertion, 
-						resourceCertChain);
-				
-				identityAssertion = new DelegatedAssertion(
-					delegatedAttribute, 
-					Container.getContainerPrivateKey());
+		// store the name in the idp resource
+		resource.setProperty(SecurityConstants.NEW_IDP_NAME_QNAME.getLocalPart(), newIdpName);
 
-			} catch (IOException e) {
-				throw new RemoteException(e.getMessage(), e);
-			} catch (ClassNotFoundException e) {
-				throw new RemoteException(e.getMessage(), e);
-			} catch (GeneralSecurityException e) {
-				throw new RemoteException(e.getMessage(), e);
-			}
-		} else {
-			// we're not an authentication proxy, create our own signed assertion
-			// to give out
+		// determine the credential the idp will front
+		GamlCredential credential = null;
+		MessageElement encodedCredential = (MessageElement) constructionParameters
+				.get(SecurityConstants.IDP_DELEGATED_CREDENTIAL_QNAME);
+		try {
+
+			if (encodedCredential != null) { 
+				// we're an authentication proxy for some delegated credentials
+				// that we're being supplied
+				
+					credential = WSSecurityUtils.decodeTokenElement(
+							(MessageElement) encodedCredential.getChildElements().next());
+					
+					if (credential instanceof SignedAssertion) {
+						// Delegate from the service to the resource
+						DelegatedAttribute delegatedAttribute = new DelegatedAttribute(
+								null,
+								(SignedAssertion) credential, 
+								resourceCertChain);
+						
+						credential = new DelegatedAssertion(
+							delegatedAttribute, 
+							Container.getContainerPrivateKey());
+					}
 			
-			IDPIdentity identity = new IDPIdentity(newIdpName, resourceCertChain);
+			} else {
 			
-			Long validMillis = (Long) constructionParameters
-				.get(SecurityConstants.IDP_VALID_MILLIS_QNAME);
+				// we're not an authentication proxy, create our own signed assertion
+				// to give out
+				
+				X509Identity identity = new X509Identity(resourceCertChain);
+				
+				Long validMillis = (Long) constructionParameters
+					.get(SecurityConstants.IDP_VALID_MILLIS_QNAME);
 			
-			try {
-				identityAssertion = new SignedAttributeAssertion(
+				credential = new SignedAttributeAssertion(
 						new IdentityAttribute(
 							new BasicConstraints(
 								System.currentTimeMillis() - (1000L * 60 * 15), // 15 minutes ago
@@ -203,23 +213,26 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 								10), 
 							identity),
 						Container.getContainerPrivateKey());
-			
-			} catch (GeneralSecurityException e) {
-				throw new RemoteException(e.getMessage(), e);
 			}
+				
+			// add the identity to the resource's saved calling context
+			ICallingContext resourceContext = (ICallingContext) 
+				resource.getProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME);
+			TransientCredentials transientCredentials = 
+				TransientCredentials.getTransientCredentials(resourceContext);
+			transientCredentials._credentials.add(credential);
+			resource.setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME, resourceContext);
+			
+			// add the identity to our resource state
+			resource.setProperty(SecurityConstants.IDP_DELEGATED_CREDENTIAL_QNAME
+				.getLocalPart(), credential);			
+				
+		} catch (IOException e) {
+			throw new RemoteException(e.getMessage(), e);
+		} catch (GeneralSecurityException e) {
+			throw new RemoteException(e.getMessage(), e);
 		}
 		
-		// add the identity to the resource's saved calling context
-		ICallingContext resourceContext = (ICallingContext) 
-			resource.getProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME);
-		TransientCredentials transientCredentials = 
-			TransientCredentials.getTransientCredentials(resourceContext);
-		transientCredentials._credentials.add(identityAssertion);
-		resource.setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME, resourceContext);
-			
-		// add the identity to our resource state
-		resource.setProperty(SecurityConstants.IDP_DELEGATED_IDENITY_QNAME
-			.getLocalPart(), identityAssertion);
 		
 		super.postCreate(rKey, newEPR, constructionParameters, resolverCreationParams);
 	}
@@ -229,18 +242,18 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 		new X509AuthnAttributeHandlers(getAttributePackage());
 	}
 	
-	protected RequestSecurityTokenResponseType delegateMyToken(
-			X509Certificate[] delegateToChain, Date created, Date expiry) 
-			throws GeneralSecurityException, SOAPException, ConfigurationException, RemoteException {
-		
-		// load up the resource's assertion 
+	protected RequestSecurityTokenResponseType delegateCredential(
+			X509Certificate[] delegateToChain, 
+			Date created, 
+			Date expiry) 
+		throws GeneralSecurityException, SOAPException, ConfigurationException, RemoteException {
+
 		ResourceKey rKey = ResourceManager.getCurrentResource();
-		IResource resource = rKey.dereference();
-		SignedAssertion signedAssertion = (SignedAssertion) resource
-				.getProperty(SecurityConstants.IDP_DELEGATED_IDENITY_QNAME
-						.getLocalPart());
-	
-		if (delegateToChain != null) {
+		IRNSResource resource = (IRNSResource) rKey.dereference();
+		GamlCredential credential = (GamlCredential) resource.getProperty(
+				SecurityConstants.IDP_DELEGATED_CREDENTIAL_QNAME.getLocalPart());
+		
+		if ((credential instanceof SignedAssertion) && (delegateToChain != null)) {
 			// do delegation if necessary
 		
 			// Get this resource's assertion, key and cert material
@@ -259,9 +272,9 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 					created.getTime(), 
 					expiry.getTime() - created.getTime(), 
 					10), 
-				signedAssertion, 
+				(SignedAssertion) credential, 
 				delegateToChain);
-			signedAssertion = new DelegatedAssertion(
+			credential = new DelegatedAssertion(
 				delegatedAttribute, 
 				resourceKeyMaterial._clientPrivateKey);
 		}
@@ -278,29 +291,11 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 		elements[0] = new MessageElement(
 			new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
 				"TokenType"), 
-			SecurityConstants.GAML_TOKEN_TYPE);
+			credential.getTokenType());
 		elements[0].setType(new QName("http://www.w3.org/2001/XMLSchema",
 				"anyURI"));
 
-		// Add RequestedSecurityToken element
-		MessageElement binaryToken = null;
-		try {
-			binaryToken = new MessageElement(
-				BinarySecurity.TOKEN_BST, 
-				SignedAssertionBaseImpl.base64encodeAssertion(signedAssertion));
-			binaryToken.setAttributeNS(null, "ValueType", SecurityConstants.GAML_TOKEN_TYPE);
-		} catch (IOException e) {
-	    	throw new GeneralSecurityException(e.getMessage(), e);	
-		}
-
-		MessageElement embedded = new MessageElement(new QName(
-				org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
-		embedded.addChild(binaryToken);
-
-		MessageElement wseTokenRef = new MessageElement(new QName(
-				org.apache.ws.security.WSConstants.WSSE11_NS,
-				"SecurityTokenReference"));
-		wseTokenRef.addChild(embedded);
+		MessageElement wseTokenRef = credential.toMessageElement();
 
 		elements[1] = new MessageElement(
 			new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
@@ -310,6 +305,7 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 		
 		return response;
 	}
+		
 
 	protected ArrayList<RequestSecurityTokenResponseType> aggregateBaggageTokens(
 			RequestSecurityTokenType request) throws java.rmi.RemoteException {
@@ -425,21 +421,23 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 				}
 			}
 		}
-		
+
+/* Don't care at the moment: they get what they get		
 		// check requested token type
-		if ((tokenType == null) || !tokenType.equals(SecurityConstants.GAML_TOKEN_TYPE)) {
+		if ((tokenType == null) || !tokenType.equals(WSSecurityUtils.GAML_TOKEN_TYPE)) {
 			throw new AxisFault(
 					new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "BadRequest"), 
 					"IDP cannot provide tokens of type " + tokenType, 
 					null, 
 					null);
 		}
+*/		
 		
 		// check request type
-		if ((tokenType == null) || !requestType.getRequestTypeEnumValue().toString().equals(RequestTypeEnum._value1.toString())) {
+		if ((requestType == null) || !requestType.getRequestTypeEnumValue().toString().equals(RequestTypeEnum._value1.toString())) {
 			throw new AxisFault(
 					new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "BadRequest"), 
-					"IDP cannot service a request of type " + requestType.getRequestTypeEnumValue(), 
+					"IDP cannot service a request of type " + ((requestType == null) ? "null" : requestType.getRequestTypeEnumValue()), 
 					null, 
 					null);
 		}
@@ -472,7 +470,7 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 		
 		try {
 			// add the local token
-			responseArray.add(delegateMyToken(delegateToChain, created, expiry));
+			responseArray.add(delegateCredential(delegateToChain, created, expiry));
 			
 			// add the listed tokens
 			responseArray.addAll(aggregateBaggageTokens(request));

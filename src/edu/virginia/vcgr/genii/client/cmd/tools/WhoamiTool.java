@@ -38,7 +38,7 @@ public class WhoamiTool extends BaseGridTool
 				stdout.println("Not logged in");
 			} else {
 				for (GamlCredential cred : transientCredentials._credentials) {
-					stdout.println(cred.toString());
+					stdout.println(cred.toString() + "\n");
 				}
 			}
 		}

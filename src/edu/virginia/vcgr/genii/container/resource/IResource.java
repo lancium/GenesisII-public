@@ -40,6 +40,8 @@ public interface IResource extends Closeable
 		new QName(GenesisIIConstants.GENESISII_NS, "service-certificate-chain");
 	static public QName CERTIFICATE_CREATION_SPEC_CONSTRUCTION_PARAM =
 		new QName(GenesisIIConstants.GENESISII_NS, "certificate-creation-spec");
+	static public QName ADDITIONAL_CNS_CONSTRUCTION_PARAM =
+		new QName(GenesisIIConstants.GENESISII_NS, "additional-CNs-creation-spec");
 	static public QName ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM =
 		new QName(GenesisIIConstants.GENESISII_NS, "endpoint-identifier");
 	static public QName IS_SERVICE_CONSTRUCTION_PARAM =

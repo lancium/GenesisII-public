@@ -280,7 +280,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 				"anyURI"));
 
 		MessageElement wseTokenRef = 
-			SecurityUtils.makePkiPathSecTokenRef(identity);
+			WSSecurityUtils.makePkiPathSecTokenRef(identity);
 		
 		elements[1] = new MessageElement(
 			new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
@@ -337,29 +337,11 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		elements[0] = new MessageElement(
 			new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
 				"TokenType"), 
-			SecurityConstants.GAML_TOKEN_TYPE);
+				signedAssertion.getTokenType());
 		elements[0].setType(new QName("http://www.w3.org/2001/XMLSchema",
 				"anyURI"));
 
-		// Add RequestedSecurityToken element
-		MessageElement binaryToken = null;
-		try {
-			binaryToken = new MessageElement(
-				BinarySecurity.TOKEN_BST, 
-				SignedAssertionBaseImpl.base64encodeAssertion(signedAssertion));
-			binaryToken.setAttributeNS(null, "ValueType", SecurityConstants.GAML_TOKEN_TYPE);
-		} catch (IOException e) {
-	    	throw new GeneralSecurityException(e.getMessage(), e);	
-		}
-
-		MessageElement embedded = new MessageElement(new QName(
-				org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
-		embedded.addChild(binaryToken);
-
-		MessageElement wseTokenRef = new MessageElement(new QName(
-				org.apache.ws.security.WSConstants.WSSE11_NS,
-				"SecurityTokenReference"));
-		wseTokenRef.addChild(embedded);
+		MessageElement wseTokenRef = signedAssertion.toMessageElement();
 
 		elements[1] = new MessageElement(
 			new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
@@ -446,18 +428,21 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 				}
 			}
 		}
-		
+	
+
+/* Don't care at the moment: they get what they get	
 		// check requested token type
-		if ((tokenType == null) || !tokenType.equals(SecurityConstants.GAML_TOKEN_TYPE)) {
+		if ((tokenType == null) || !tokenType.equals(WSSecurityUtils.GAML_TOKEN_TYPE)) {
 			throw new AxisFault(
 					new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "BadRequest"), 
 					"IDP cannot provide tokens of type " + tokenType, 
 					null, 
 					null);
 		}
+*/		
 		
 		// check request type
-		if ((tokenType == null) || !requestType.getRequestTypeEnumValue().toString().equals(RequestTypeEnum._value1.toString())) {
+		if ((requestType == null) || !requestType.getRequestTypeEnumValue().toString().equals(RequestTypeEnum._value1.toString())) {
 			throw new AxisFault(
 					new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "BadRequest"), 
 					"IDP cannot service a request of type " + requestType.getRequestTypeEnumValue(), 

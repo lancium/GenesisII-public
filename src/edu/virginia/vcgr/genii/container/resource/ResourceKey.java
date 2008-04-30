@@ -4,7 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import org.apache.axis.types.URI;
 import java.security.GeneralSecurityException;
-import java.util.HashMap;
+import java.util.*;
 
 import javax.xml.namespace.QName;
 
@@ -274,9 +274,21 @@ public class ResourceKey implements Closeable
 		{	
 			try
 			{
-				consParms.put(IResource.CERTIFICATE_CHAIN_CONSTRUCTION_PARAM,
-						CertTool.createResourceCertChain(epi.toString(), 
-								serviceName, spec));
+				ArrayList<String> CNs = new ArrayList<String>();
+				String[] additionalCNs = (String[]) consParms.get(
+						IResource.ADDITIONAL_CNS_CONSTRUCTION_PARAM);
+				if (additionalCNs != null) {
+					CNs.addAll(Arrays.asList(additionalCNs));
+				}
+				CNs.add(serviceName);
+				
+				consParms.put(
+						IResource.CERTIFICATE_CHAIN_CONSTRUCTION_PARAM,
+						CertTool.createResourceCertChain(
+								epi.toString(), 
+								CNs, 
+								null,
+								spec));
 			}
 			catch (GeneralSecurityException gse)
 			{

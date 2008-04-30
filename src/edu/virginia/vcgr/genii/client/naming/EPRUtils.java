@@ -156,7 +156,7 @@ public class EPRUtils
 				element = element.getChildElement(
 						new QName(org.apache.ws.security.WSConstants.WSSE11_NS, "SecurityTokenReference"));
 				if (element != null) {
-					return SecurityUtils.getChainFromPkiPathSecTokenRef(element);
+					return WSSecurityUtils.getChainFromPkiPathSecTokenRef(element);
 				}
 			}
 		}

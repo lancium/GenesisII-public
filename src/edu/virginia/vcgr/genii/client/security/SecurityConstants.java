@@ -4,20 +4,12 @@ import javax.xml.namespace.QName;
 
 public class SecurityConstants {
 
-	static public final String GAML_TOKEN_TYPE = 
-		"http://vcgr.cs.virginia.edu/security/2007/11/delegated-saml";
-
-
 	//--- IDP CONSTANTS ----------------------------------------------
 
-	static public final QName IDP_DELEGATED_IDENITY_QNAME = new QName(
+	static public final QName IDP_DELEGATED_CREDENTIAL_QNAME = new QName(
 			"http://vcgr.cs.virginia.edu/security/2007/11/x509-authn",
-			"delegated-identity-param");
+			"delegated-credential-param");
 
-	static public final QName IDP_IDENITY_QNAME = new QName(
-			"http://vcgr.cs.virginia.edu/security/2007/11/x509-authn",
-			"identity-param");
-	
 	static public final QName IDP_VALID_MILLIS_QNAME = new QName(
 			"http://vcgr.cs.virginia.edu/security/2007/11/x509-authn",
 			"valid-millis");

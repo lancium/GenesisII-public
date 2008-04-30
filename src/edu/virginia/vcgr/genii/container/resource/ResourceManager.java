@@ -163,7 +163,7 @@ public class ResourceManager
 			
 				if (certChain != null)
 				{
-					MessageElement wseTokenRef = SecurityUtils.makePkiPathSecTokenRef(certChain); 
+					MessageElement wseTokenRef = WSSecurityUtils.makePkiPathSecTokenRef(certChain); 
 					
 					MessageElement keyInfo = new MessageElement(
 						new QName(GenesisIIConstants.OGSA_BSP_NS, "EndpointKeyInfo"));

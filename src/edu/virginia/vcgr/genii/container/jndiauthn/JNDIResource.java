@@ -21,7 +21,7 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.SecurityConstants;
-import edu.virginia.vcgr.genii.client.security.SecurityUtils;
+import edu.virginia.vcgr.genii.client.security.WSSecurityUtils;
 import edu.virginia.vcgr.genii.container.common.notification.SubscriptionInformation;
 import edu.virginia.vcgr.genii.container.configuration.ServiceDescription;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
@@ -156,7 +156,7 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource {
 						"SecurityTokenReference"));
 				if (element != null) {
 					try {
-						X509Certificate[] callersNotionOfMe = SecurityUtils
+						X509Certificate[] callersNotionOfMe = WSSecurityUtils
 								.getChainFromPkiPathSecTokenRef(element);
 						setProperty(CERTIFICATE_CHAIN_PROPERTY_NAME,
 								callersNotionOfMe);
@@ -314,7 +314,7 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource {
 			try {
 				MessageElement certRef = new MessageElement(
 						_RESOURCE_CERT_QNAME);
-				certRef.addChild(SecurityUtils
+				certRef.addChild(WSSecurityUtils
 						.makePkiPathSecTokenRef(certChain));
 				mels.add(certRef);
 			} catch (SOAPException e) {

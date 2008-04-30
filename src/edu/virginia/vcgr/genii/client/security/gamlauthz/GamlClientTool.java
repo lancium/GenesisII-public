@@ -194,19 +194,7 @@ public class GamlClientTool {
 			} finally {
 				StreamUtils.close(in);
 			}
-		} else if (path.isX509IDP()) {
-			// get the identity represented by the idp
-			try {
-				ArrayList<SignedAssertion> identities = 
-					GamlLoginTool.doIdpLogin(path.getEndpoint(), 0, null);
-				Attribute firstAttr = identities.get(0).getAttribute();
-				if (firstAttr instanceof IdentityAttribute) {
-					IdentityAttribute identAttr = (IdentityAttribute) firstAttr;
-					return identAttr.getIdentity();
-				}
-			} catch (Throwable t) {
-				throw new GeneralSecurityException(t.getMessage(), t);
-			}
+
 		} else {
 			// get the identity of the resource
 			
@@ -220,7 +208,6 @@ public class GamlClientTool {
 			return new X509Identity(chain);
 		}
 		
-		throw new RNSException(sourcePath + " is not of a valid identity type.");
 	}
 
 	public AuthZConfig modifyAuthZConfig(AuthZConfig config, PrintStream out,
@@ -345,7 +332,7 @@ public class GamlClientTool {
 		if (password != null) {
 		
 			// username password
-			identity = new UsernameTokenIdentity(user, password);
+			identity = new UsernamePasswordIdentity(user, password);
 
 		} else {
 			

@@ -1,6 +1,9 @@
 package edu.virginia.vcgr.genii.client.security.gamlauthz;
 
+import java.security.GeneralSecurityException;
 import java.util.Date;
+
+import org.apache.axis.message.MessageElement;
 
 import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.AttributeInvalidException;
 
@@ -22,5 +25,17 @@ public interface GamlCredential {
 	 * date
 	 */
 	public void checkValidity(Date date) throws AttributeInvalidException;
+	
+	/**
+	 * Returns a URI (e.g., a WS-Security Token Profile URI) indicating the token type
+	 */
+	public String getTokenType();
+	
+	/**
+	 * Converts this credential to an Axis Message Element
+	 * @return
+	 * @throws GeneralSecurityException
+	 */
+	public MessageElement toMessageElement() throws GeneralSecurityException;
 
 }

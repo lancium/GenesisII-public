@@ -45,7 +45,7 @@ public class ClientUsernameTokenSender extends WSDoAllSender implements ISecurit
 	public static final String CRYPTO_ALIAS = "CRYPTO_ALIAS";
 	private static final String CRYTO_PASS = "pwd";
 	
-	private UsernameTokenIdentity _utIdentity;
+	private UsernamePasswordIdentity _utIdentity;
 	private boolean _serialize = false;
 	private String _securityActions = "";
 	
@@ -71,11 +71,11 @@ public class ClientUsernameTokenSender extends WSDoAllSender implements ISecurit
 			TransientCredentials.getTransientCredentials(callContext)._credentials;
 
 		for (GamlCredential cred : credentials) {
-			if (cred instanceof UsernameTokenIdentity) {
+			if (cred instanceof UsernamePasswordIdentity) {
 				if (_utIdentity != null) {
 					throw new GeneralSecurityException("Cannot have more than one username-token credential");
 				}
-				_utIdentity = (UsernameTokenIdentity) cred;
+				_utIdentity = (UsernamePasswordIdentity) cred;
 			}
 		}
 
@@ -115,7 +115,7 @@ public class ClientUsernameTokenSender extends WSDoAllSender implements ISecurit
     	if ((doAction == WSConstants.UT) && (_utIdentity != null)) {
     		WSPasswordCallback pwCb = new WSPasswordCallback(username, 
     				WSPasswordCallback.USERNAME_TOKEN_UNKNOWN);
-    		pwCb.setPassword(_utIdentity.getToken());
+    		pwCb.setPassword(_utIdentity.getPassword());
     		
     		return pwCb;
     	}

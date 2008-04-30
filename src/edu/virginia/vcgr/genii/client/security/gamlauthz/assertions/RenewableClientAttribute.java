@@ -17,48 +17,10 @@ public class RenewableClientAttribute extends DelegatedAttribute
 	
 	// zero-arg contstructor for externalizable use only!
 	public RenewableClientAttribute() {}
-	
-	public RenewableClientAttribute(
-			AttributeConstraints constraints, 
-			ICallingContext callingContext) 
-		throws GeneralSecurityException {	
-		
-		_constraints = constraints;
-		
-		if (callingContext == null) {		
-			throw new java.lang.IllegalArgumentException(
-					"DelegatedAttribute constructor cannot accept null parameters");
-		}
 
-		_callingContext = callingContext;
-
-		// grab the delegatee identity from the calling context (renewing it 
-		// if necesssary -- dont want to sign to stale creds
-		KeyAndCertMaterial clientKeyMaterial = ClientUtils.checkAndRenewCredentials(
-				_callingContext);
-		
-		_delegateeIdentity = clientKeyMaterial._clientCertChain;
-	}
-	
 	public RenewableClientAttribute(
 			AttributeConstraints constraints,
-			X509Certificate[] delegateeIdentity) 
-		throws GeneralSecurityException {	
-
-		_constraints = constraints;
-		
-		if ((delegateeIdentity == null) || (delegateeIdentity.length < 1) || (delegateeIdentity[0] == null)) {		
-			throw new java.lang.IllegalArgumentException(
-					"DelegatedAttribute constructor cannot accept null parameters");
-		}
-	
-		_callingContext = null;
-		_delegateeIdentity = delegateeIdentity;
-	}
-	
-	public RenewableClientAttribute(
-			AttributeConstraints constraints,
-			RenewableAttributeAssertion assertion,
+			SignedAssertion assertion,
 			ICallingContext callingContext) throws GeneralSecurityException {	
 		
 		_constraints = constraints;

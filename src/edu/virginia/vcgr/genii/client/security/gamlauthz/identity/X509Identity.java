@@ -9,9 +9,12 @@ import java.security.cert.*;
 
 import java.util.*;
 
+import org.apache.axis.message.MessageElement;
+
 
 import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
 import edu.virginia.vcgr.genii.client.security.SecurityUtils;
+import edu.virginia.vcgr.genii.client.security.WSSecurityUtils;
 
 public class X509Identity implements AssertableIdentity, SignedAssertion {
 
@@ -26,10 +29,25 @@ public class X509Identity implements AssertableIdentity, SignedAssertion {
 		_identity = identity;
 	}
 	
+	public X509Identity(MessageElement secRef) throws GeneralSecurityException {
+		_identity = WSSecurityUtils.getChainFromPkiPathSecTokenRef(secRef);
+	}
+
 	public X509Certificate[] getAssertingIdentityCertChain() {
 		// X509 certificates assert themselves via their own 
 		// corresponding private key
 		return _identity;
+	}
+
+	/**
+	 * Returns a URI (e.g., a WS-Security Token Profile URI) indicating the token type
+	 */
+	public String getTokenType() {
+		return WSSecurityUtils.X509PKIPathv1_URI;
+	}	
+	
+	public MessageElement toMessageElement() throws GeneralSecurityException {
+		return WSSecurityUtils.makePkiPathSecTokenRef(_identity);
 	}
 	
 	/**

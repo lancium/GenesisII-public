@@ -364,8 +364,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
     					// check to make sure the username and password match
 
     					// add the identity to the current calling context
-    					UsernameTokenIdentity identity = 
-    						new UsernameTokenIdentity(pc.getIdentifer(), pc.getPassword());
+    					UsernamePasswordIdentity identity = 
+    						new UsernamePasswordIdentity(pc.getIdentifer(), pc.getPassword());
     					TransientCredentials transientCredentials = 
     						TransientCredentials.getTransientCredentials(callContext);
     					transientCredentials._credentials.add(identity);
