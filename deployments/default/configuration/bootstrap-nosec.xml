@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<gsh:script
+	xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
+	xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+
+
+	<gsh:define name="BOOT_SRVS"
+		source="/containers/BootstrapContainer/Services"/>
+	
+	<gsh:default name="GENII_INSTALL_DIR" value="."/>
+	<gsh:default name="DEPLOYMENT_NAME" value="default"/>
+	
+	<gsh:echo
+		message="GENII_INSTALL_DIR is ${GENII_INSTALL_DIR}"/>
+	<gsh:echo
+		message="DEPLOYMENT_NAME is ${DEPLOYMENT_NAME}"/>
+
+	<gsh:echo
+		message="Setting user's current deployment to ${DEPLOYMENT_NAME}."/>
+	<geniix:set-user-config>
+		<gsh:param>${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}</gsh:param>
+	</geniix:set-user-config>
+	
+	<gsh:echo
+		message="Creating Root of RNS space."/>
+	<geniix:create-rns-root>
+		<gsh:param>--protocol=https</gsh:param>
+		<gsh:param>--host=localhost</gsh:param>
+		<gsh:param>--port=18080</gsh:param>
+		<gsh:param>context.xml</gsh:param>
+	</geniix:create-rns-root>
+
+	<geniix:mkdir>
+		<gsh:param>/containers</gsh:param>
+	</geniix:mkdir>
+	
+	<geniix:ln>
+		<gsh:param>--service-url=https://localhost:18080/axis/services/VCGRContainerPortType</gsh:param>
+		<gsh:param>/containers/BootstrapContainer</gsh:param>
+	</geniix:ln>
+
+	<gsh:echo message="Forming general directory structure."/>
+	<geniix:mkdir>
+		<gsh:param>/bes-containers</gsh:param>
+		<gsh:param>/schedulers</gsh:param>
+		<gsh:param>/users</gsh:param>
+		<gsh:param>/groups</gsh:param>
+		<gsh:param>/home</gsh:param>
+		<gsh:param>/etc</gsh:param>
+	</geniix:mkdir>
+
+	<geniix:create-resource>
+		<gsh:param>${BOOT_SRVS}/BasicSchedulerPortType</gsh:param>
+		<gsh:param>/schedulers/BootstrapScheduler</gsh:param>
+	</geniix:create-resource>
+
+	<gsh:echo message="Adding machines"/>
+	<gsh:foreach param-name="URL" source-file="machines">
+
+		<gsh:define name="MACHINE" source="${URL}"
+			pattern="^https?://" replacement="" global="true"/>
+		<gsh:define name="MACHINE" source="${MACHINE}"
+			pattern=":.+$" replacement="" global="true"/>
+
+		<gsh:echo message="Adding machine ${MACHINE}"/>
+		<geniix:attach-host>
+			<gsh:param>${URL}/axis/services/VCGRContainerPortType</gsh:param>
+			<gsh:param>/containers/${MACHINE}</gsh:param>
+		</geniix:attach-host>
+	</gsh:foreach>
+
+	<gsh:foreach param-name="CONTAINER" source-rns="/containers">
+		<gsh:echo message="Creating BES resource for ${CONTAINER}."/>
+		<geniix:create-resource>
+			<gsh:param>/containers/${CONTAINER}/Services/GeniiBESPortType</gsh:param>
+			<gsh:param>/bes-containers/${CONTAINER}</gsh:param>
+		</geniix:create-resource>
+
+		<gsh:echo message="Linking bes ${CONTAINER} into scheduler"/>
+		<geniix:ln>
+			<gsh:param>/bes-containers/${CONTAINER}</gsh:param>
+			<gsh:param>/schedulers/BootstrapScheduler/${CONTAINER}</gsh:param>
+		</geniix:ln>
+		
+		<gsh:echo message="Setting deployer for bes ${CONTAINER}."/>
+		<geniix:set-deployers>
+			<gsh:param>/bes-containers/${CONTAINER}</gsh:param>
+			<gsh:param>/containers/${CONTAINER}/Services/ApplicationDeployerPortType</gsh:param>
+		</geniix:set-deployers>
+	</gsh:foreach>
+
+</gsh:script>

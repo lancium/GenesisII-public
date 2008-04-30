@@ -147,13 +147,15 @@
 		<mconf:instance name="gamlacl-authz-provider"
 			type="edu.virginia.vcgr.genii.container.security.authz.providers.GamlAclAuthZProvider">
 		</mconf:instance>
+
+<!-- Swap in instead of above for no security
+		<mconf:instance name="gamlacl-authz-provider"
+			type="edu.virginia.vcgr.genii.container.security.authz.providers.OpenAuthZProvider">
+		</mconf:instance>
+-->		
 		
 		<mconf:instance name="jndi-authz-provider"
 			type="edu.virginia.vcgr.genii.container.jndiauthn.JNDIAuthZProvider">
-			<mconf:property name="edu.virginia.vcgr.genii.container.jndiauthn.host"
-				value="argo.cs.virginia.edu"/>
-			<mconf:property name="edu.virginia.vcgr.genii.container.jndiauthn.domain"
-				value="csyp"/>
 		</mconf:instance>
 
 
