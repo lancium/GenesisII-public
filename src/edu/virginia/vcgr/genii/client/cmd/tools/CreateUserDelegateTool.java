@@ -3,12 +3,11 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 import java.text.ParseException;
 import java.util.LinkedList;
 
-import javax.xml.namespace.QName;
-
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.io.FileResource;
+import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.utils.dialog.DialogException;
@@ -129,7 +128,7 @@ public class CreateUserDelegateTool extends CreateUserTool
 		} else
 			idpServiceRNS = RNSUtilities.findService(
 				"/containers/BootstrapContainer", "X509AuthnPortType", 
-				new QName[] { WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE },
+				new PortType[] { WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE },
 				idpServicePath);
 		
 		if (idpName == null)

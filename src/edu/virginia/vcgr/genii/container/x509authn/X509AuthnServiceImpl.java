@@ -54,6 +54,7 @@ import org.ggf.rns.Remove;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
+import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
@@ -100,7 +101,7 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 	static private Log _logger = LogFactory.getLog(X509AuthnServiceImpl.class);
 
 	public X509AuthnServiceImpl() throws RemoteException {
-		this(WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE.getLocalPart());
+		this(WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE.getQName().getLocalPart());
 	}
 
 	protected X509AuthnServiceImpl(String serviceName) throws RemoteException {
@@ -111,7 +112,7 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 		addImplementedPortType(WellKnownPortTypes.RNS_SERVICE_PORT_TYPE);
 	}
 
-	public QName getFinalWSResourceInterface()
+	public PortType getFinalWSResourceInterface()
 	{
 		return WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE;
 	}

@@ -30,6 +30,7 @@ import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
+import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
@@ -65,7 +66,7 @@ public class SimpleResolverFactoryServiceImpl extends GenesisIIBase implements S
 		addImplementedPortType(WellKnownPortTypes.GENII_NOTIFICATION_CONSUMER_PORT_TYPE);
 	}
 	
-	public QName getFinalWSResourceInterface()
+	public PortType getFinalWSResourceInterface()
 	{
 		return WellKnownPortTypes.GENII_SIMPLE_RESOLVER_FACTORY_PORT_TYPE;
 	}

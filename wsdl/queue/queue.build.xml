@@ -21,6 +21,9 @@
 					<include name="queue.xsd"/>
 					<include name="queue.gwsdl"/>
 				</srcfiles>
+				<srcfiles dir="${wsdl.dir}/iterator">
+					<include name="iterator.xsd"/>
+				</srcfiles>
 			</uptodate>
 		</and>
 	</condition>
@@ -32,6 +35,9 @@
 				<include name="queue.gwsdl"/>
 				<include name="queue.xsd"/>
 				<include name="jsdl.xsd"/>
+			</fileset>
+			<fileset dir="${wsdl.dir}/iterator">
+				<include name="iterator.xsd"/>
 			</fileset>
 		</copy>
 

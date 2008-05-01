@@ -3,11 +3,15 @@
 	xmlns="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:iterator="http://vcgr.cs.virginia.edu/genii/iterator"
 	xmlns:EnhancedRNS="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
 	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
 	targetNamespace="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
 	elementFormDefault="qualified"
 	attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://vcgr.cs.virginia.edu/genii/iterator"
+		schemaLocation="./iterator.xsd"/>
 
 	<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"
 		schemaLocation="./wsrf/basefaults.xsd"/>
@@ -29,8 +33,9 @@
 			
 	<xsd:complexType name="IterateListResponseType">
 		<xsd:sequence>
-			<xsd:element name="iterator" type="wsa:EndpointReferenceType"
-				minOccurs="1" maxOccurs="1" nillable="false"/>
+			<xsd:element name="result"
+				type="iterator:IteratorInitializationType"
+				minOccurs="1" maxOccurs="1"/>
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:element name="IterateListResponseType"

@@ -24,6 +24,7 @@ import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
 import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
+import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
@@ -117,7 +118,7 @@ public class ResourceManager
 	static public EndpointReferenceType createEPR(
 		ResourceKey resource,
 		String targetServiceURL,
-		QName []implementedPortTypes) throws ResourceException
+		PortType []implementedPortTypes) throws ResourceException
 	{
 		ReferenceParametersType refParams = null;
 		AttributedURIType address = new AttributedURITypeSmart(targetServiceURL);
@@ -128,21 +129,17 @@ public class ResourceManager
 			createMetadata(implementedPortTypes, resource), null);
 	}
 	
-	static private MetadataType createMetadata(QName []portTypes,
+	static private MetadataType createMetadata(PortType []portTypes,
 		ResourceKey resourceKey) throws ResourceException
 	{
 		if (portTypes == null)
-			portTypes = new QName[0];
+			portTypes = new PortType[0];
 		
 		ArrayList<MessageElement> any = new ArrayList<MessageElement>();
 		
-		// add implemented porttypes
-		for (QName portType : portTypes)
-		{
-			any.add(new MessageElement(
-				OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME,
-				portType.toString()));
-		}
+		any.add(new MessageElement(
+			OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME,
+			PortType.translate(portTypes)));
 		
 		if (resourceKey != null) 
 		{

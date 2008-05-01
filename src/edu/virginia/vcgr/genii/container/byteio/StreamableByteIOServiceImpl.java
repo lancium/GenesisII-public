@@ -37,6 +37,7 @@ import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
 import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
+import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
@@ -78,7 +79,7 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements
 		new StreamableByteIOAttributeHandlers(getAttributePackage());
 	}
 	
-	public QName getFinalWSResourceInterface()
+	public PortType getFinalWSResourceInterface()
 	{
 		return WellKnownPortTypes.SBYTEIO_SERVICE_PORT_TYPE;
 	}

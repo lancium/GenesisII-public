@@ -70,7 +70,9 @@ public class RNSPath implements Externalizable  {
 		EntryType[] ret = null;
 
 		TypeInformation ti = new TypeInformation(epr);
-		if (ti.isEnhancedRNS() && ti.isIDP() && entryExpression.equals(".*")) {		// TODO: make iteration faster for regular contexts so we can use it for them too
+		if ((ti.isEnhancedRNS() || ti.isIDP()) && entryExpression.equals(".*"))
+		{
+			// TODO: make iteration faster for regular contexts so we can use it for them too
 
 			// Enhanced: use iterator
 			EnhancedRNSPortType rpt = ClientUtils.createProxy(EnhancedRNSPortType.class, epr);
@@ -81,7 +83,7 @@ public class RNSPath implements Externalizable  {
 			try
 			{
 				iterable = new WSIterable<EntryType>(
-						EntryType.class, responseIterator.getIterator(), 50, true);
+						EntryType.class, responseIterator.getResult(), 50, true);
 				
 				ArrayList<EntryType> aggregate = new ArrayList<EntryType>();
 				Iterator<EntryType> itr = iterable.iterator();

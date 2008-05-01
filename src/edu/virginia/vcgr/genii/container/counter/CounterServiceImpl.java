@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import javax.xml.namespace.QName;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
 
@@ -24,13 +25,13 @@ public class CounterServiceImpl extends GenesisIIBase implements
 	{
 		super("CounterPortType");
 		
-		addImplementedPortType(new QName(
-			GenesisIIConstants.GENESISII_NS, "CounterPortType"));
+		addImplementedPortType(PortType.get(new QName(
+			GenesisIIConstants.GENESISII_NS, "CounterPortType")));
 	}
 	
-	public QName getFinalWSResourceInterface()
+	public PortType getFinalWSResourceInterface()
 	{
-		return new QName(GenesisIIConstants.GENESISII_NS, "CounterPortType");
+		return PortType.get(new QName(GenesisIIConstants.GENESISII_NS, "CounterPortType"));
 	}
 	
 	@RWXMapping(RWXCategory.EXECUTE)

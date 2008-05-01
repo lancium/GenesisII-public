@@ -87,6 +87,7 @@ import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
+import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
@@ -193,16 +194,16 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 	{
 		super("GeniiBESPortType");
 		
-		addImplementedPortType(BES_FACTORY_PORT_TYPE_QNAME);
-		addImplementedPortType(BES_MANAGEMENT_PORT_TYPE_QNAME);
-		addImplementedPortType(GENII_BES_PORT_TYPE_QNAME);
+		addImplementedPortType(BES_FACTORY_PORT_TYPE);
+		addImplementedPortType(BES_MANAGEMENT_PORT_TYPE);
+		addImplementedPortType(GENII_BES_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.RNS_SERVICE_PORT_TYPE);
 	}
 	
 	@Override
-	public QName getFinalWSResourceInterface()
+	public PortType getFinalWSResourceInterface()
 	{
-		return GENII_BES_PORT_TYPE_QNAME;
+		return GENII_BES_PORT_TYPE;
 	}
 
 	@Override

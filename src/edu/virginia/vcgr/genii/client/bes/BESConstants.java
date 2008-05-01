@@ -2,6 +2,8 @@ package edu.virginia.vcgr.genii.client.bes;
 
 import javax.xml.namespace.QName;
 
+import edu.virginia.vcgr.genii.client.resource.PortType;
+
 public interface BESConstants
 {
 	static public final String BES_FACTORY_NS =
@@ -18,12 +20,12 @@ public interface BESConstants
 	static public final String GENII_BES_PORT_TYPE_NAME =
 		"GeniiBESPortType";
 	
-	static public final QName BES_FACTORY_PORT_TYPE_QNAME =
-		new QName(BES_FACTORY_NS, BES_FACTORY_PORT_TYPE_NAME);
-	static public final QName BES_MANAGEMENT_PORT_TYPE_QNAME =
-		new QName(BES_MANAGEMENT_NS, BES_MANAGEMENT_PORT_TYPE_NAME);
-	static public final QName GENII_BES_PORT_TYPE_QNAME =
-		new QName(GENII_BES_NS, GENII_BES_PORT_TYPE_NAME);
+	static public final PortType BES_FACTORY_PORT_TYPE =
+		PortType.get(new QName(BES_FACTORY_NS, BES_FACTORY_PORT_TYPE_NAME));
+	static public final PortType BES_MANAGEMENT_PORT_TYPE =
+		PortType.get(new QName(BES_MANAGEMENT_NS, BES_MANAGEMENT_PORT_TYPE_NAME));
+	static public final PortType GENII_BES_PORT_TYPE =
+		PortType.get(new QName(GENII_BES_NS, GENII_BES_PORT_TYPE_NAME));
 	
 	static public final QName DEPLOYER_EPR_ATTR =
 		new QName(GENII_BES_NS, "deployer");

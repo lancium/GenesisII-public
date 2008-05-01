@@ -28,6 +28,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.iterator.IteratorConstants;
+import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
@@ -64,14 +65,14 @@ public class IteratorServiceImpl extends GenesisIIBase implements
 	{
 		super("IteratorPortType");
 		
-		addImplementedPortType(IteratorConstants.ITERATOR_PORT_TYPE_QNAME);
+		addImplementedPortType(IteratorConstants.ITERATOR_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.RNS_SERVICE_PORT_TYPE);
 	}
 	
 	@Override
-	public QName getFinalWSResourceInterface()
+	public PortType getFinalWSResourceInterface()
 	{
-		return IteratorConstants.ITERATOR_PORT_TYPE_QNAME;
+		return IteratorConstants.ITERATOR_PORT_TYPE;
 	}
 
 	@Override

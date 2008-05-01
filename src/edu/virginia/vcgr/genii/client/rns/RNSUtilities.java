@@ -1,9 +1,8 @@
 package edu.virginia.vcgr.genii.client.rns;
 
-import javax.xml.namespace.QName;
-
 import org.morgan.util.configuration.ConfigurationException;
 
+import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 
 /**
@@ -44,7 +43,7 @@ public class RNSUtilities
 	 */
 	static public RNSPath findService(
 		String pathToDefaultContainer, String defaultServiceName,
-		QName []requiredPortTypes, String userHints)
+		PortType []requiredPortTypes, String userHints)
 		throws ConfigurationException, RNSException
 	{
 		RNSPath current = RNSPath.getCurrent();
@@ -86,7 +85,7 @@ public class RNSUtilities
 		 * container, or to the service itself
 		 */
 		TypeInformation typeInfo = new TypeInformation(result.getEndpoint());
-		QName []implementedPortTypes = typeInfo.getImplementedPortTypes();
+		PortType []implementedPortTypes = typeInfo.getImplementedPortTypes();
 		if (implementedPortTypes == null || implementedPortTypes.length == 0)
 		{
 			/* It isn't a service that indicates port types, so we can only guess
@@ -96,7 +95,7 @@ public class RNSUtilities
 		}
 		
 		boolean missedOne = false;
-		for (QName requiredPortType : requiredPortTypes)
+		for (PortType requiredPortType : requiredPortTypes)
 		{
 			if (!typeInfo.hasPortType(requiredPortType))
 			{
@@ -118,7 +117,7 @@ public class RNSUtilities
 				result = result.lookup("Services/" + defaultServiceName, 
 					RNSPathQueryFlags.MUST_EXIST);
 				typeInfo = new TypeInformation(result.getEndpoint());
-				for (QName requiredPortType : requiredPortTypes)
+				for (PortType requiredPortType : requiredPortTypes)
 				{
 					if (!typeInfo.hasPortType(requiredPortType))
 					{

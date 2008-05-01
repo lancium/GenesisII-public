@@ -8,6 +8,7 @@ import org.apache.axis.message.MessageElement;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
+import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.common.notification.GeniiSubscriptionPortType;
 import edu.virginia.vcgr.genii.common.notification.UserDataType;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
@@ -22,7 +23,7 @@ public class GeniiSubscriptionServiceImpl extends GenesisIIBase implements
 		addImplementedPortType(WellKnownPortTypes.GENII_SUBSCRIPTION_PORT_TYPE);
 	}
 	
-	public QName getFinalWSResourceInterface()
+	public PortType getFinalWSResourceInterface()
 	{
 		return WellKnownPortTypes.GENII_SUBSCRIPTION_PORT_TYPE;
 	}

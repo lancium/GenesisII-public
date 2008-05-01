@@ -26,6 +26,7 @@ import edu.virginia.vcgr.genii.client.appdesc.ApplicationDescriptionUtils;
 import edu.virginia.vcgr.genii.client.appdesc.DeploymentException;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.naming.WSName;
+import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
@@ -53,7 +54,7 @@ public class ApplicationDeployerServiceImpl extends GenesisIIBase implements
 		ApplicationDeployerServiceImpl.class);
 
 	static private QName DEPLOYMENT_CONSTRUCTION_PARAM =
-		new QName(WellKnownPortTypes.DEPLOYER_PORT_TYPE.getNamespaceURI(),
+		new QName(WellKnownPortTypes.DEPLOYER_PORT_TYPE.getQName().getNamespaceURI(),
 			"deployment");
 	
 	static private final String _DEPLOYMENT_PROPERTY =
@@ -75,7 +76,7 @@ public class ApplicationDeployerServiceImpl extends GenesisIIBase implements
 		addImplementedPortType(WellKnownPortTypes.DEPLOYER_PORT_TYPE);
 	}
 
-	public QName getFinalWSResourceInterface()
+	public PortType getFinalWSResourceInterface()
 	{
 		return WellKnownPortTypes.DEPLOYER_PORT_TYPE;
 	}

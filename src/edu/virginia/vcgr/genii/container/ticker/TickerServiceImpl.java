@@ -14,6 +14,7 @@ import org.ogf.ogsa.ticker.TickerFactory;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.byteio.streamable.factory.OpenStreamResponse;
+import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
@@ -33,15 +34,15 @@ public class TickerServiceImpl
 	{
 		super("TickerFactory");
 		
-		addImplementedPortType(new QName(
-			TICKER_FACTORY_NS, TICKER_FACTORY_PORT_NAME));
-		addImplementedPortType(new QName(
-			TICKER_NS, TICKER_PORT_NAME));
+		addImplementedPortType(PortType.get(new QName(
+			TICKER_FACTORY_NS, TICKER_FACTORY_PORT_NAME)));
+		addImplementedPortType(PortType.get(new QName(
+			TICKER_NS, TICKER_PORT_NAME)));
 	}
 
-	public QName getFinalWSResourceInterface()
+	public PortType getFinalWSResourceInterface()
 	{
-		return new QName(TICKER_NS, TICKER_PORT_NAME);
+		return PortType.get(new QName(TICKER_NS, TICKER_PORT_NAME));
 	}
 	
 	@Override

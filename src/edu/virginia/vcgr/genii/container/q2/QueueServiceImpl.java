@@ -50,6 +50,8 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
+import edu.virginia.vcgr.genii.client.queue.QueueConstants;
+import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
@@ -113,13 +115,13 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		/* Now we have to add our own port types to the list of port types
 		 * implemented by this service.
 		 */
-		addImplementedPortType(WellKnownPortTypes.QUEUE_PORT_TYPE);
+		addImplementedPortType(QueueConstants.QUEUE_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.RNS_SERVICE_PORT_TYPE);
 	}
 	
-	public QName getFinalWSResourceInterface()
+	public PortType getFinalWSResourceInterface()
 	{
-		return WellKnownPortTypes.QUEUE_PORT_TYPE;
+		return QueueConstants.QUEUE_PORT_TYPE;
 	}
 	
 	@Override
@@ -281,7 +283,8 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		
 		try
 		{
-			return new IterateStatusResponseType(super.createWSIterator(col.iterator()));
+			return new IterateStatusResponseType(super.createWSIterator(
+				col.iterator(), 100));
 		}
 		catch (ConfigurationException ce)
 		{
@@ -365,7 +368,8 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		
 		try
 		{
-			return new IterateListResponseType(super.createWSIterator(col.iterator()));
+			return new IterateListResponseType(
+				super.createWSIterator(col.iterator(), 100));
 		}
 		catch (ConfigurationException ce)
 		{

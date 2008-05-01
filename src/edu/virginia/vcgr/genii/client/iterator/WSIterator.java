@@ -19,6 +19,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.iterator.IterateRequestType;
+import edu.virginia.vcgr.genii.iterator.IteratorInitializationType;
 import edu.virginia.vcgr.genii.iterator.IteratorMemberType;
 import edu.virginia.vcgr.genii.iterator.IteratorPortType;
 
@@ -40,6 +41,38 @@ class WSIterator<Type> implements Iterator<Type>, Closeable
 		
 		if (_nextIndex < 0)
 			return;
+		
+		IteratorMemberType []initMembers = _target.getInitialValues();
+		if (_nextIndex == 0 && initMembers != null)
+		{
+			tmp = new ArrayList<IteratorMemberType>(initMembers.length);
+			for (IteratorMemberType member : initMembers)
+			{
+				tmp.add(member);
+			}
+			
+			_internalIter = tmp.iterator();
+			
+			_nextIndex = initMembers.length;
+			
+			if (_target.getTarget() == null)
+			{
+				_target.releaseReference();
+				_target = null;
+				_nextIndex = -1L;
+			}
+			
+			return;
+		}
+		
+		if (_target.getTarget() == null)
+		{
+			_target.releaseReference();
+			_target = null;
+			_nextIndex = -1L;
+			
+			return;
+		}
 		
 		_logger.debug("Making out call to fill iterator buffer.");
 		IteratorMemberType []results = _target.getTarget().iterate(
@@ -102,6 +135,12 @@ class WSIterator<Type> implements Iterator<Type>, Closeable
 				}
 			}
 		}
+	}
+	
+	public WSIterator(Class<Type> cl, IteratorInitializationType init, int batchSize,
+		boolean mustDestroy) throws RemoteException, ConfigurationException
+	{
+		this(cl, new WSIteratorTarget(init, mustDestroy), batchSize);
 	}
 	
 	public WSIterator(Class<Type> cl, IteratorPortType target, int batchSize, 

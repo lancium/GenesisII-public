@@ -3,12 +3,11 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 import java.io.IOException;
 import java.text.ParseException;
 
-import javax.xml.namespace.QName;
-
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.io.FileResource;
+import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
@@ -255,7 +254,7 @@ public class CreateUserTool extends BaseGridTool
 				RNSPath idpService = RNSUtilities.findService(
 					"/containers/BootstrapContainer",
 					"X509AuthnPortType",
-					new QName[] { WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE },
+					new PortType[] { WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE },
 					answer);
 				return idpService;
 			}

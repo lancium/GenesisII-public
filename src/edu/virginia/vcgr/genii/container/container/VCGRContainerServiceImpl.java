@@ -21,8 +21,6 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axis.description.JavaServiceDesc;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -48,6 +46,7 @@ import org.ws.addressing.ReferenceParametersType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
@@ -77,7 +76,7 @@ public class VCGRContainerServiceImpl extends GenesisIIBase
 		addImplementedPortType(WellKnownPortTypes.VCGR_CONTAINER_SERVICE_PORT_TYPE);
 	}
 	
-	public QName getFinalWSResourceInterface()
+	public PortType getFinalWSResourceInterface()
 	{
 		return WellKnownPortTypes.VCGR_CONTAINER_SERVICE_PORT_TYPE;
 	}
@@ -256,7 +255,7 @@ public class VCGRContainerServiceImpl extends GenesisIIBase
 		return retval;
 	}
 	
-	private QName[] findImplementedPortTypes(Class<?> jClass)
+	private PortType[] findImplementedPortTypes(Class<?> jClass)
 		throws ResourceException
 	{
 		try

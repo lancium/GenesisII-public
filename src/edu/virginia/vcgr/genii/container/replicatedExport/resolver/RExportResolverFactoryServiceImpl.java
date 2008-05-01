@@ -17,8 +17,6 @@ package edu.virginia.vcgr.genii.container.replicatedExport.resolver;
 
 import java.rmi.RemoteException;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,6 +24,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
@@ -52,7 +51,7 @@ public class RExportResolverFactoryServiceImpl extends GenesisIIBase implements 
 		this("RExportResolverFactoryPortType");
 	}
 	
-	public QName getFinalWSResourceInterface()
+	public PortType getFinalWSResourceInterface()
 	{
 		return WellKnownPortTypes.REXPORT_RESOLVER_FACTORY_PORT_TYPE;
 	}

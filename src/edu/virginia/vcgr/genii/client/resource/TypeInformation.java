@@ -48,7 +48,7 @@ public class TypeInformation
 	private EndpointReferenceType _epr;
 	
 	private boolean _pureURL;
-	private QName []_implementedPortTypes;
+	private PortType []_implementedPortTypes;
 	
 	public TypeInformation(EndpointReferenceType epr)
 	{
@@ -58,7 +58,7 @@ public class TypeInformation
 		
 		if (_implementedPortTypes == null)
 		{
-			_implementedPortTypes = new QName[0];
+			_implementedPortTypes = new PortType[0];
 			if (epr.getAddress() != null &&
 				epr.getAddress().get_value() != null &&
 				epr.get_any() == null &&
@@ -73,14 +73,14 @@ public class TypeInformation
 		return _epr;
 	}
 	
-	public QName[] getImplementedPortTypes()
+	public PortType[] getImplementedPortTypes()
 	{
 		return _implementedPortTypes;
 	}
 	
-	public boolean hasPortType(QName targetPortType)
+	public boolean hasPortType(PortType targetPortType)
 	{
-		for (QName portType : _implementedPortTypes)
+		for (PortType portType : _implementedPortTypes)
 		{
 			if (portType.equals(targetPortType))
 				return true;
@@ -96,17 +96,17 @@ public class TypeInformation
 	
 	public boolean isBESContainer()
 	{
-		return hasPortType(BESConstants.GENII_BES_PORT_TYPE_QNAME);
+		return hasPortType(BESConstants.GENII_BES_PORT_TYPE);
 	}
 	
 	public boolean isBESActivity()
 	{
-		return hasPortType(BESActivityConstants.GENII_BES_ACTIVITY_PORT_TYPE_QNAME);
+		return hasPortType(BESActivityConstants.GENII_BES_ACTIVITY_PORT_TYPE);
 	}
 
 	public boolean isBES()
 	{
-		return hasPortType(BESConstants.GENII_BES_PORT_TYPE_QNAME);
+		return hasPortType(BESConstants.GENII_BES_PORT_TYPE);
 	}
 	
 	public boolean isContainer()
@@ -159,7 +159,7 @@ public class TypeInformation
 	
 	public boolean isTTY()
 	{
-		return hasPortType(TTYConstants.TTY_PORT_TYPE_QNAME);
+		return hasPortType(TTYConstants.TTY_PORT_TYPE);
 	}
 	
 	public boolean isUnknown()

@@ -15,6 +15,7 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
 import edu.virginia.vcgr.genii.client.ogsa.OGSAQNameList;
 import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
+import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.AuthZSecurityException;
 
@@ -64,7 +65,12 @@ public class GenesisIIBaseAttributesHandler
 	{
 		synchronized(_baseService._implementedPortTypes)
 		{
-			OGSAQNameList list = new OGSAQNameList(_baseService._implementedPortTypes);
+			Collection<QName> names = new ArrayList<QName>(
+				_baseService._implementedPortTypes.size());
+			for (PortType pt : _baseService._implementedPortTypes)
+				names.add(pt.getQName());
+			
+			OGSAQNameList list = new OGSAQNameList(names);
 			return list.toMessageElement(
 				OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME);
 		}
@@ -73,7 +79,7 @@ public class GenesisIIBaseAttributesHandler
 	public MessageElement getFinalResourceInterface() throws SOAPException
 	{
 		return new MessageElement(OGSAWSRFBPConstants.WS_FINAL_RESOURCE_INTERFACE_ATTR_QNAME,
-			_baseService.getFinalWSResourceInterface());
+			_baseService.getFinalWSResourceInterface().getQName());
 	}
 	
 	public MessageElement getScheduledTerminationTimeAttr()
@@ -114,7 +120,7 @@ public class GenesisIIBaseAttributesHandler
 		EndpointReferenceType myEPR = (EndpointReferenceType)WorkingContext.getCurrentWorkingContext(
 			).getProperty(WorkingContext.EPR_PROPERTY_NAME);
 		ResourceKey rKey = ResourceManager.getCurrentResource();
-		QName []implementedPortTypes = new QName[_baseService._implementedPortTypes.size()];
+		PortType []implementedPortTypes = new PortType[_baseService._implementedPortTypes.size()];
 		_baseService._implementedPortTypes.toArray(implementedPortTypes);
 		EndpointReferenceType epr = ResourceManager.createEPR(
 			rKey, myEPR.getAddress().get_value().toString(), implementedPortTypes);

@@ -5,10 +5,14 @@
 	xmlns:wsa="http://www.w3.org/2005/08/addressing"
 	xmlns:queue="http://vcgr.cs.virginia.edu/genii/queue"
 	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	xmlns:iterator="http://vcgr.cs.virginia.edu/genii/iterator"
 	xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
 	targetNamespace="http://vcgr.cs.virginia.edu/genii/queue"
 	elementFormDefault="qualified"
 	attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://vcgr.cs.virginia.edu/genii/iterator"
+		schemaLocation="./iterator.xsd"/>
 
 	<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"
 		schemaLocation="./wsrf/basefaults.xsd"/>
@@ -94,7 +98,8 @@
 	
 	<xsd:complexType name="IterateStatusResponseType">
 		<xsd:sequence>
-			<xsd:element name="iterator" type="wsa:EndpointReferenceType"
+			<xsd:element name="result"
+				type="iterator:IteratorInitializationType"
 				minOccurs="1" maxOccurs="1" nillable="false"/>
 		</xsd:sequence>
 	</xsd:complexType>
@@ -104,7 +109,8 @@
 	<xsd:element name="IterateListRequest"/>
 	<xsd:complexType name="IterateListResponseType">
 		<xsd:sequence>
-			<xsd:element name="iterator" type="wsa:EndpointReferenceType"
+			<xsd:element name="result"
+				type="iterator:IteratorInitializationType"
 				minOccurs="1" maxOccurs="1" nillable="false"/>
 		</xsd:sequence>
 	</xsd:complexType>

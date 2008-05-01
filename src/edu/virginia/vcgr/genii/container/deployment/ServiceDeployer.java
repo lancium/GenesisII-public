@@ -244,23 +244,23 @@ public class ServiceDeployer extends Thread
 				}
 				catch (NoSuchMethodException nsme)
 				{
-					_logger.error(nsme);
+					_logger.error("Unable to deploy service.", nsme);
 				}
 				catch (ClassNotFoundException cnfe)
 				{
-					_logger.error(cnfe);
+					_logger.error("Unable to deploy service.", cnfe);
 				}
 				catch (InstantiationException ia)
 				{
-					_logger.error(ia);
+					_logger.error("Unable to deploy service.", ia);
 				}
 				catch (IllegalAccessException iae)
 				{
-					_logger.error(iae);
+					_logger.error("Unable to deploy service.", iae);
 				}
 				catch (InvocationTargetException ite)
 				{
-					_logger.error(ite);
+					_logger.error("Unable to deploy service.", ite);
 				}
 			}
 		}

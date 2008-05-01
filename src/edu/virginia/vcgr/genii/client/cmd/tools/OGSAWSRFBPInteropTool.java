@@ -218,10 +218,10 @@ public class OGSAWSRFBPInteropTool extends BaseGridTool
 			OGSAQNameList list = new OGSAQNameList(any[0]);
 			
 			HashSet<QName> expected = new HashSet<QName>();
-			expected.add(WSRFConstants.WSRF_RLW_IMMEDIATE_TERMINATE_PORT_QNAME);
-			expected.add(WSRFConstants.WSRF_RLW_SCHEDULED_TERMINATE_PORT_QNAME);
-			expected.add(WSRFConstants.WSRF_RPW_GET_MULTIPLE_RP_PORT_QNAME);
-			expected.add(WSRFConstants.WSRF_RPW_GET_RP_PORT_QNAME);
+			expected.add(WSRFConstants.WSRF_RLW_IMMEDIATE_TERMINATE_PORT.getQName());
+			expected.add(WSRFConstants.WSRF_RLW_SCHEDULED_TERMINATE_PORT.getQName());
+			expected.add(WSRFConstants.WSRF_RPW_GET_MULTIPLE_RP_PORT.getQName());
+			expected.add(WSRFConstants.WSRF_RPW_GET_RP_PORT.getQName());
 			expected.add(new QName(TickerConstants.TICKER_NS, TickerConstants.TICKER_PORT_NAME));
 			
 			for (QName item : list)

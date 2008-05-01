@@ -40,6 +40,7 @@ import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedFileUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
@@ -74,9 +75,10 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 		
 		addImplementedPortType(WellKnownPortTypes.EXPORTED_DIR_SERVICE_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.RNS_SERVICE_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.ENHANCED_RNS_SERVICE_PORT_TYPE);
 	}
 	
-	public QName getFinalWSResourceInterface()
+	public PortType getFinalWSResourceInterface()
 	{
 		return WellKnownPortTypes.EXPORTED_DIR_SERVICE_PORT_TYPE;
 	}
@@ -277,7 +279,7 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 		
 		try{
 			return new IterateListResponseType(super.createWSIterator(
-					entryCollection.iterator()));
+					entryCollection.iterator(), 25));
 		}
 		catch (ConfigurationException ce){
 			throw new RemoteException("Unable to create iterator for exportDir lookup.", ce);

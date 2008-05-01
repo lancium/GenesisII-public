@@ -2,11 +2,16 @@ package edu.virginia.vcgr.genii.client.queue;
 
 import javax.xml.namespace.QName;
 
-import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
+import edu.virginia.vcgr.genii.client.resource.PortType;
 
-public class QueueConstants
+public interface QueueConstants
 {
+	static final public String QUEUE_NS = "http://vcgr.cs.virginia.edu/genii/queue";
+	static final public String QUEUE_PORT_TYPE_NAME = "QueuePortType";
+	
+	static final public PortType QUEUE_PORT_TYPE =
+		PortType.get(new QName(QUEUE_NS, QUEUE_PORT_TYPE_NAME));
+	
 	static public QName RESOURCE_SLOTS_QNAME =
-		new QName(WellKnownPortTypes.QUEUE_PORT_TYPE.getNamespaceURI(),
-			"total-slots");
+		new QName(QUEUE_NS, "total-slots");
 }

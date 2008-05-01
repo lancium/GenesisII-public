@@ -9,6 +9,7 @@ import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.iterator.IteratorInitializationType;
 import edu.virginia.vcgr.genii.iterator.IteratorPortType;
 
 public class WSIterable<Type> implements Iterable<Type>, Closeable
@@ -17,14 +18,25 @@ public class WSIterable<Type> implements Iterable<Type>, Closeable
 	private WSIteratorTarget _target;
 	private int _batchSize;
 	
-	public WSIterable(Class<Type> cl, EndpointReferenceType target,
+	public WSIterable(Class<Type> cl,
+		EndpointReferenceType target,
+		int batchSize, boolean mustDestroy)
+		throws GenesisIISecurityException, ConfigurationException,
+			RemoteException
+	{
+		this(cl, new IteratorInitializationType(target, null),
+			batchSize, mustDestroy);
+	}
+	
+	public WSIterable(Class<Type> cl,
+		IteratorInitializationType iterator,
 		int batchSize, boolean mustDestroy)
 		throws GenesisIISecurityException, ConfigurationException,
 			RemoteException
 	{
 		_class = cl;
 		_batchSize = batchSize;
-		_target = new WSIteratorTarget(target, mustDestroy);
+		_target = new WSIteratorTarget(iterator, mustDestroy);
 		_target.addReference();
 	}
 	

@@ -23,6 +23,7 @@ import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.rcreate.CreationException;
 import edu.virginia.vcgr.genii.client.rcreate.ResourceCreator;
+import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
@@ -97,7 +98,7 @@ public class ExportTool extends BaseGridTool
 			{
 				exportServiceEPR = RNSUtilities.findService(
 					"/containers/BootstrapContainer", "ExportedRootPortType", 
-					new QName[] {
+					new PortType[] {
 							WellKnownPortTypes.EXPORTED_ROOT_SERVICE_PORT_TYPE
 					}, serviceLocation).getEndpoint();
 			}
@@ -140,13 +141,13 @@ public class ExportTool extends BaseGridTool
 			else{
 				exportServiceEPR = RNSUtilities.findService(
 					"/containers/BootstrapContainer", "ExportedRootPortType", 
-					new QName[] {
+					new PortType[] {
 							WellKnownPortTypes.EXPORTED_ROOT_SERVICE_PORT_TYPE
 					}, primaryLocation).getEndpoint();
 				
 				replicationServiceEPR = RNSUtilities.findService(
 					"/containers/BootstrapContainer", "RExportResolverPortType", 
-					new QName[] {
+					new PortType[] {
 							WellKnownPortTypes.REXPORT_RESOLVER_PORT_TYPE
 					}, replicationLocation).getEndpoint();
 			}

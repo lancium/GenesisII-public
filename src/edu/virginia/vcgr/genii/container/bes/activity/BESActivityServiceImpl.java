@@ -50,6 +50,7 @@ import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.context.*;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLInterpreter;
+import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
@@ -81,14 +82,14 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 	{
 		super("BESActivityPortType");
 		
-		addImplementedPortType(GENII_BES_ACTIVITY_PORT_TYPE_QNAME);
+		addImplementedPortType(GENII_BES_ACTIVITY_PORT_TYPE);
 		addImplementedPortType(
 			WellKnownPortTypes.SBYTEIO_FACTORY_PORT_TYPE);
 	}
 	
-	public QName getFinalWSResourceInterface()
+	public PortType getFinalWSResourceInterface()
 	{
-		return GENII_BES_ACTIVITY_PORT_TYPE_QNAME;
+		return GENII_BES_ACTIVITY_PORT_TYPE;
 	}
 	
 	protected void setAttributeHandlers() throws NoSuchMethodException

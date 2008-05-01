@@ -58,6 +58,7 @@ import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
 import edu.virginia.vcgr.genii.client.notification.UnknownTopicException;
 import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
+import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
@@ -93,11 +94,12 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		super(serviceName);
 		
 		addImplementedPortType(WellKnownPortTypes.RNS_SERVICE_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.ENHANCED_RNS_SERVICE_PORT_TYPE);
 	}
 	
-	public QName getFinalWSResourceInterface()
+	public PortType getFinalWSResourceInterface()
 	{
-		return WellKnownPortTypes.RNS_SERVICE_PORT_TYPE;
+		return WellKnownPortTypes.ENHANCED_RNS_SERVICE_PORT_TYPE;
 	}
 	
 	protected void registerTopics(TopicSpace topicSpace)
@@ -218,7 +220,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
     	throws RemoteException, ResourceUnknownFaultType, 
     		RNSEntryNotDirectoryFaultType, RNSFaultType
     {
-    	_logger.debug("Entered list method.");
+    	_logger.debug("Entered iterate list method.");
     	
     	String entry_name_regexp = list.getEntry_name_regexp();
     	IRNSResource resource = null;
@@ -241,7 +243,8 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		
 		try
 		{
-			return new IterateListResponseType(super.createWSIterator(col.iterator()));
+			return new IterateListResponseType(
+				super.createWSIterator(col.iterator(), 25));
 		}
 		catch (ConfigurationException ce)
 		{

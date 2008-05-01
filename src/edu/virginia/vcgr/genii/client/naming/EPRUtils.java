@@ -11,7 +11,6 @@ import org.apache.axis.types.URI;
 import java.net.URL;
 import java.sql.Blob;
 import javax.sql.rowset.serial.SerialBlob;
-import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,6 +33,7 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.ogsa.OGSARP;
 import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
 import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
+import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
@@ -311,7 +311,7 @@ public class EPRUtils
 		}
 	}
 
-	static public QName[] getImplementedPortTypes(
+	static public PortType[] getImplementedPortTypes(
 		EndpointReferenceType epr)
 	{
 		MetadataType mdt = epr.getMetadata();
@@ -321,28 +321,17 @@ public class EPRUtils
 		if (any == null || any.length == 0)
 			return null;
 
-		ArrayList<QName> tRet = new ArrayList<QName>();
 		for (MessageElement element : any)
 		{
 			if (element.getQName().equals(
 				OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME))
 			{
 				String s = element.getValue().toString();
-				int firstIndex = s.indexOf('{');
-				int secondIndex = s.indexOf('}');
-				if (firstIndex >= 0 && firstIndex < secondIndex)
-				{
-					tRet.add(new QName(
-						s.substring(firstIndex + 1,
-							secondIndex), s.substring(secondIndex + 1)));
-				} else
-					tRet.add(new QName(s));
+				return PortType.translate(s).toArray(new PortType[0]);
 			}
 		}
 		
-		QName []ret = new QName[tRet.size()];
-		tRet.toArray(ret);
-		return ret;
+		return null;
 	}
 	
 	static public EndpointReferenceType readEPR(String filename)

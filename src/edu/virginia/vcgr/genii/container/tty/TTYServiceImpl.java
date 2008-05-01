@@ -25,6 +25,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
+import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
@@ -45,7 +46,7 @@ public class TTYServiceImpl extends GenesisIIBase implements TTYPortType
 	{
 		super("TTYPortType");
 		
-		addImplementedPortType(TTYConstants.TTY_PORT_TYPE_QNAME);
+		addImplementedPortType(TTYConstants.TTY_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.SBYTEIO_SERVICE_PORT_TYPE);
 	}
 	
@@ -57,9 +58,9 @@ public class TTYServiceImpl extends GenesisIIBase implements TTYPortType
 	}
 	
 	@Override
-	public QName getFinalWSResourceInterface()
+	public PortType getFinalWSResourceInterface()
 	{
-		return TTYConstants.TTY_PORT_TYPE_QNAME;
+		return TTYConstants.TTY_PORT_TYPE;
 	}
 
 	private void handleSeek(URI seekOrigin, long offset)

@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Vector;
 import java.util.Date;
 import java.util.HashMap;
@@ -90,6 +91,7 @@ import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
 import edu.virginia.vcgr.genii.client.notification.UnknownTopicException;
 import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
+import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.x509.CertCreationSpec;
@@ -133,6 +135,7 @@ import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.client.utils.creation.CreationProperties;
 import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
+import edu.virginia.vcgr.genii.iterator.IteratorInitializationType;
 import edu.virginia.vcgr.genii.iterator.IteratorMemberType;
 import edu.virginia.vcgr.genii.iterator.IteratorPortType;
 
@@ -148,22 +151,24 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	static private HashMap<Class<? extends GenesisIIBase>, TopicSpace> _topicSpaces =
 		new HashMap<Class<? extends GenesisIIBase>, TopicSpace>();
 	
+	static private EndpointReferenceType _iteratorServiceEPR = null;
+	
 	protected String _serviceName;
-	public ArrayList<QName> _implementedPortTypes =
-		new ArrayList<QName>();
+	public ArrayList<PortType> _implementedPortTypes =
+		new ArrayList<PortType>();
 	private AttributePackage _attributePackage = new AttributePackage();
 	
 	private Properties _defaultResolverFactoryProperties = null;
 	private Class<? extends IResolverFactoryProxy> _defaultResolverFactoryProxyClass = null;
 	
-	public abstract QName getFinalWSResourceInterface();
+	public abstract PortType getFinalWSResourceInterface();
 	
 	protected AttributePackage getAttributePackage()
 	{
 		return _attributePackage;
 	}
 	
-	protected void addImplementedPortType(QName portType)
+	protected void addImplementedPortType(PortType portType)
 	{
 		synchronized(_implementedPortTypes)
 		{
@@ -185,10 +190,10 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		addImplementedPortType(WellKnownPortTypes.GENII_RESOURCE_FACTORY_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.GENII_NOTIFICATION_PRODUCER_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.VCGR_COMMON_PORT_TYPE);
-		addImplementedPortType(WSRFConstants.WSRF_RLW_IMMEDIATE_TERMINATE_PORT_QNAME);
-		addImplementedPortType(WSRFConstants.WSRF_RLW_SCHEDULED_TERMINATE_PORT_QNAME);
-		addImplementedPortType(WSRFConstants.WSRF_RPW_GET_RP_PORT_QNAME);
-		addImplementedPortType(WSRFConstants.WSRF_RPW_GET_MULTIPLE_RP_PORT_QNAME);
+		addImplementedPortType(WSRFConstants.WSRF_RLW_IMMEDIATE_TERMINATE_PORT);
+		addImplementedPortType(WSRFConstants.WSRF_RLW_SCHEDULED_TERMINATE_PORT);
+		addImplementedPortType(WSRFConstants.WSRF_RPW_GET_RP_PORT);
+		addImplementedPortType(WSRFConstants.WSRF_RPW_GET_MULTIPLE_RP_PORT);
 		
 		try
 		{
@@ -330,13 +335,14 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 			return property;
 	}
 	
-	public QName[] getImplementedPortTypes(ResourceKey rKey) throws ResourceException, ResourceUnknownFaultType
+	public PortType[] getImplementedPortTypes(ResourceKey rKey) 
+		throws ResourceException, ResourceUnknownFaultType
 	{
-		QName []ret;
+		PortType[]ret;
 		
 		synchronized(_implementedPortTypes)
 		{
-			ret = new QName[_implementedPortTypes.size()];
+			ret = new PortType[_implementedPortTypes.size()];
 			_implementedPortTypes.toArray(ret);
 		}
 		
@@ -711,19 +717,35 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		return new SByteIOFactory(Container.getServiceURL("StreamableByteIOPortType"));
 	}
 	
-	protected EndpointReferenceType createWSIterator(
-		Iterator<MessageElement> contents) 
+	protected IteratorInitializationType createWSIterator(
+		Iterator<MessageElement> contents, int defaultBatchSize) 
 			throws ResourceException, ResourceUnknownFaultType,
 				SQLException, ConfigurationException,
 				GenesisIISecurityException, RemoteException
 	{
+		Collection<IteratorMemberType> initMembers = 
+			new LinkedList<IteratorMemberType>();
+		
+		for (int lcv = 0; lcv < defaultBatchSize; lcv++)
+		{
+			if (!contents.hasNext())
+				break;
+			initMembers.add(new IteratorMemberType(
+				new MessageElement[] { contents.next() }, 
+				new UnsignedInt((long)lcv)));
+		}
+		
+		if (!contents.hasNext())
+			return new IteratorInitializationType(
+				null, initMembers.toArray(new IteratorMemberType[0]));
+		
 		String id = (new GUID()).toString();
 		DatabaseConnectionPool pool =
 			((BasicDBResourceFactory)ResourceManager.getCurrentResource(
 				).getProvider().getFactory()).getConnectionPool();
 		Connection connection = null;
 		PreparedStatement stmt = null;
-		long count = 0L;
+		long count = defaultBatchSize;
 		boolean needsExecute = false;
 		
 		try
@@ -755,9 +777,15 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 			if (needsExecute)
 				stmt.executeBatch();
 			
+			synchronized(GenesisIIBase.class)
+			{
+				if (_iteratorServiceEPR == null)
+					_iteratorServiceEPR = EPRUtils.makeEPR(
+						Container.getServiceURL("IteratorPortType"));
+			}
+			
 			IteratorPortType iter = ClientUtils.createProxy(
-				IteratorPortType.class, 
-				EPRUtils.makeEPR(Container.getServiceURL("IteratorPortType")));
+				IteratorPortType.class, _iteratorServiceEPR);
 			
 			MessageElement []createRequest =
 				new MessageElement[2];
@@ -771,7 +799,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 				new VcgrCreate(createRequest)).getEndpoint();
 			
 			connection.commit();
-			return epr;
+			return new IteratorInitializationType(epr, 
+				initMembers.toArray(new IteratorMemberType[0]));
 		}
 		finally
 		{

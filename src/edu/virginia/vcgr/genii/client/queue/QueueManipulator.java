@@ -92,13 +92,12 @@ public class QueueManipulator
 				jobTickets[lcv++] = ticket.toString();
 		}
 		
-		EndpointReferenceType iter = null;
-		iter = queue.iterateStatus(jobTickets).getIterator();
 		WSIterable<JobInformationType> iterable = null;
 		try
 		{
 			iterable = new WSIterable<JobInformationType>(
-				JobInformationType.class, iter, 200, true);
+				JobInformationType.class, 
+				queue.iterateStatus(jobTickets).getResult(), 200, true);
 			return new JobInformationIterator(iterable.iterator());
 		}
 		finally
@@ -112,13 +111,12 @@ public class QueueManipulator
 	{
 		QueuePortType queue = ClientUtils.createProxy(QueuePortType.class, _queue);
 		
-		EndpointReferenceType iter = null;
-		iter = queue.iterateListJobs(null).getIterator();
 		WSIterable<ReducedJobInformationType> iterable = null;
 		try
 		{
 			iterable = new WSIterable<ReducedJobInformationType>(
-				ReducedJobInformationType.class, iter, 200, true);
+				ReducedJobInformationType.class, 
+				queue.iterateListJobs(null).getResult(), 200, true);
 			return new ReducedJobInformationIterator(iterable.iterator());
 		}
 		finally

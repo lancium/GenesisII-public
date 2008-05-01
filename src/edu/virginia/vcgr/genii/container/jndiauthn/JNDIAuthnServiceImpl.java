@@ -50,6 +50,7 @@ import org.ggf.rns.List;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.naming.WSName;
+import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
@@ -100,8 +101,9 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(JNDIAuthnServiceImpl.class);
 
-	public JNDIAuthnServiceImpl() throws RemoteException {
-		this(WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE.getLocalPart());
+	public JNDIAuthnServiceImpl() throws RemoteException
+	{
+		this(WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE.getQName().getLocalPart());
 	}
 
 	protected JNDIAuthnServiceImpl(String serviceName) throws RemoteException {
@@ -112,11 +114,13 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 	/**
 	 * Return different implemented port types depending on who we are
 	 */
-	public QName[] getImplementedPortTypes(ResourceKey rKey) throws ResourceException, ResourceUnknownFaultType {
+	public PortType[] getImplementedPortTypes(
+		ResourceKey rKey) throws ResourceException, ResourceUnknownFaultType {
 
-		if ((rKey == null) || (!(rKey.dereference() instanceof IJNDIResource))) {
+		if ((rKey == null) || (!(rKey.dereference() instanceof IJNDIResource)))
+		{
 			// JNDIAuthnPortType
-			QName[] response = {
+			PortType[] response = {
 				WellKnownPortTypes.RNS_SERVICE_PORT_TYPE, 
 				WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE
 			};
@@ -128,15 +132,17 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 
 		if (serviceResource.isServiceResource()) {
 			// JNDIAuthnPortType
-			QName[] response = {
+			PortType[] response =
+			{
 				WellKnownPortTypes.RNS_SERVICE_PORT_TYPE, 
 				WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE
 			};
 			
 			return response;
-		} else if (serviceResource.isIdpResource()) {
+		} else if (serviceResource.isIdpResource()) 
+		{
 			// individual IDP resource
-			QName[] response = {
+			PortType[] response = {
 				WellKnownPortTypes.STS_SERVICE_PORT_TYPE, 
 			};
 				
@@ -144,7 +150,8 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		}
 
 		// STS for a JNDI directory resource
-		QName[] response = {
+		PortType[] response = 
+		{
 			WellKnownPortTypes.STS_SERVICE_PORT_TYPE, 
 			WellKnownPortTypes.ENHANCED_RNS_SERVICE_PORT_TYPE, 
 			WellKnownPortTypes.RNS_SERVICE_PORT_TYPE, 
@@ -153,7 +160,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		return response;
 	}	
 	
-	public QName getFinalWSResourceInterface()
+	public PortType getFinalWSResourceInterface()
 	{
 		return WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE;
 	}
@@ -583,7 +590,8 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 			
 			try
 			{
-				return new IterateListResponseType(super.createWSIterator(col.iterator()));
+				return new IterateListResponseType(
+					super.createWSIterator(col.iterator(), 50));
 			}
 			catch (ConfigurationException ce)
 			{
@@ -602,7 +610,8 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
  					myResource,
  					list.getEntry_name_regexp());
 
- 			return new IterateListResponseType(super.createWSIterator(iterator));
+ 			return new IterateListResponseType(
+ 				super.createWSIterator(iterator, 50));
 		
 		} catch (java.io.IOException e) {
 			throw new RemoteException("Unable to create iterator.", e);
@@ -734,7 +743,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 					IResource.CERTIFICATE_CHAIN_PROPERTY_NAME, 
 					resourceCertChain);
 			
-			QName[] implementedPortTypes = {
+			PortType[] implementedPortTypes = {
 					WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE, 
 					WellKnownPortTypes.STS_SERVICE_PORT_TYPE}; 
 			EndpointReferenceType retval = ResourceManager.createEPR(
@@ -892,7 +901,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 						Boolean.TRUE);
 				ResourceKey listingKey = createResource(creationParameters);
 
-				QName[] implementedPortTypes = {
+				PortType[] implementedPortTypes = {
 						WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE,
 						WellKnownPortTypes.STS_SERVICE_PORT_TYPE };
 				WSName wsName = new WSName(ResourceManager.createEPR(

@@ -25,6 +25,17 @@
 			use="required"/>
 	</xsd:complexType>
 
+	<xsd:complexType name="IteratorInitializationType">
+		<xsd:sequence>
+			<xsd:element name="iterator-endpoint"
+				type="wsa:EndpointReferenceType"
+				minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="batch-element"
+				type="iterator:IteratorMemberType"
+				minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
 <!-- Message Types -->
 	<xsd:complexType name="IterateRequestType">
 		<xsd:sequence>
