@@ -32,7 +32,6 @@ import javax.xml.soap.SOAPException;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.ws.security.message.token.BinarySecurity;
-import org.apache.ws.security.message.token.X509Security;
 
 import edu.virginia.vcgr.genii.client.security.WSSecurityUtils;
 

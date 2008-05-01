@@ -229,13 +229,6 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 			creationParameters.put(IResource.SERVICE_CERTIFICATE_CHAIN_CONSTRUCTION_PARAM,
 					serviceChain);
 			
-			// set the default authz for the resource 
-			XMLConfiguration conf = 
-				ConfigurationManager.getCurrentConfiguration().getContainerConfiguration();
-			Properties resourceIdSecProps = (Properties) conf.retrieveSection(
-					GenesisIIConstants.AUTHZ_PROPERTIES_SECTION_NAME);
-			creationParameters.put(IResource.AUTHZ_ENABLED_CONSTRUCTION_PARAM,
-					Boolean.valueOf(resourceIdSecProps.getProperty(GenesisIIConstants.AUTHZ_ENABLED_CONFIG_PROPERTY)));
 		}
 		catch (ConfigurationException ce)
 		{
@@ -612,14 +605,6 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 						IResource.CERTIFICATE_CREATION_SPEC_CONSTRUCTION_PARAM,
 						serviceCertSpec);
 				}
-				
-				// set the default authz classname the resource 
-				XMLConfiguration conf = 
-					ConfigurationManager.getCurrentConfiguration().getContainerConfiguration();
-				Properties resourceIdSecProps = (Properties) conf.retrieveSection(
-						GenesisIIConstants.AUTHZ_PROPERTIES_SECTION_NAME);
-				constructionParameters.put(IResource.AUTHZ_ENABLED_CONSTRUCTION_PARAM,
-						Boolean.valueOf(resourceIdSecProps.getProperty(GenesisIIConstants.AUTHZ_ENABLED_CONFIG_PROPERTY)));
 				
 				rKey = ResourceManager.createServiceResource(_serviceName, 
 					constructionParameters);

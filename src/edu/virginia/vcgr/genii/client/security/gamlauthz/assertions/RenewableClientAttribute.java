@@ -6,7 +6,6 @@ import java.security.GeneralSecurityException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
-import java.security.cert.X509Certificate;
 
 public class RenewableClientAttribute extends DelegatedAttribute 
 		implements Renewable {

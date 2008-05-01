@@ -32,7 +32,6 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.CredentialException;
 import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.PKIPathSecurity;
-import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.message.token.X509Security;
 
 import org.ggf.rns.Add;
@@ -352,7 +351,6 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 
 		//------ Parse and perform syntactic checks (has correct form) --------		
 
-		String tokenType = null;
 		RequestTypeOpenEnum requestType = null;
 		LifetimeType lifetime = null;
 		X509Certificate[] delegateToChain = null;
@@ -360,7 +358,7 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 		for (MessageElement element : request.get_any()) {
 			if (element.getName().equals("TokenType")) {
 				// process TokenType element
-				tokenType = element.getValue();
+				// String tokenType = element.getValue();
 				
 			} else if (element.getName().equals("RequestType")) {
 				// process RequestType element

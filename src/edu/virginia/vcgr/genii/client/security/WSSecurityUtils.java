@@ -1,32 +1,16 @@
 package edu.virginia.vcgr.genii.client.security;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.security.GeneralSecurityException;
-import java.security.KeyStore;
-import java.security.PublicKey;
 import java.security.cert.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
 
 import javax.xml.soap.SOAPException;
 import javax.xml.namespace.QName;
 
-import edu.virginia.vcgr.genii.common.security.CertificateChainType;
-import edu.virginia.vcgr.genii.client.GenesisIIConstants;
-import edu.virginia.vcgr.genii.client.comm.axis.AxisClientInvocationHandler;
 import edu.virginia.vcgr.genii.client.comm.axis.security.FlexibleBouncyCrypto;
-import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
-import edu.virginia.vcgr.genii.client.configuration.ConfigurationUnloadedListener;
-import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
-import edu.virginia.vcgr.genii.client.utils.deployment.DeploymentRelativeFile;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.ws.security.WSConstants;
@@ -36,13 +20,6 @@ import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.message.token.X509Security;
-import org.apache.ws.security.util.WSSecurityUtil;
-import org.morgan.util.configuration.ConfigurationException;
-import org.morgan.util.configuration.XMLConfiguration;
-import org.morgan.util.io.StreamUtils;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * Operations for converting popular token types to/from MessageElements

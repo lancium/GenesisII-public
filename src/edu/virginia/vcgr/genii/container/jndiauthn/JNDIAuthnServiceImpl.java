@@ -365,7 +365,6 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 
 		//------ Parse and perform syntactic checks (has correct form) --------		
 
-		String tokenType = null;
 		RequestTypeOpenEnum requestType = null;
 		LifetimeType lifetime = null;
 		X509Certificate[] delegateToChain = null;
@@ -373,7 +372,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		for (MessageElement element : request.get_any()) {
 			if (element.getName().equals("TokenType")) {
 				// process TokenType element
-				tokenType = element.getValue();
+				// String tokenType = element.getValue();
 				
 			} else if (element.getName().equals("RequestType")) {
 				// process RequestType element

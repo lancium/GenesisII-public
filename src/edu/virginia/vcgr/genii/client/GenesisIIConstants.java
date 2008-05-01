@@ -73,8 +73,6 @@ public class GenesisIIConstants
 		new QName(GENESISII_NS, "resource-identity");
 	static public QName MESSAGE_SECURITY_PROPERTIES_SECTION_NAME =
 		new QName(GENESISII_NS, "message-security");
-	static public QName AUTHZ_PROPERTIES_SECTION_NAME =
-		new QName(GENESISII_NS, "authorization");
 	static public final String AUTHZ_ENABLED_CONFIG_PROPERTY = 
 		"genii.security.authz.authz-enabled";
 	static public final String BOOTSTRAP_OWNER_CERTPATH = 

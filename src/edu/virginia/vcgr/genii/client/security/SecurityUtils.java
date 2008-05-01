@@ -13,33 +13,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import javax.xml.soap.SOAPException;
-import javax.xml.namespace.QName;
-
 import edu.virginia.vcgr.genii.common.security.CertificateChainType;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.comm.axis.AxisClientInvocationHandler;
-import edu.virginia.vcgr.genii.client.comm.axis.security.FlexibleBouncyCrypto;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationUnloadedListener;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 import edu.virginia.vcgr.genii.client.utils.deployment.DeploymentRelativeFile;
 
-import org.apache.axis.message.MessageElement;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.CredentialException;
-import org.apache.ws.security.message.token.BinarySecurity;
-import org.apache.ws.security.message.token.PKIPathSecurity;
-import org.apache.ws.security.message.token.UsernameToken;
-import org.apache.ws.security.message.token.X509Security;
-import org.apache.ws.security.util.WSSecurityUtil;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
 import org.morgan.util.io.StreamUtils;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 public class SecurityUtils {
 	private static final String TS_LOCATION = "edu.virginia.vcgr.genii.client.security.resource-identity.trust-store-location";

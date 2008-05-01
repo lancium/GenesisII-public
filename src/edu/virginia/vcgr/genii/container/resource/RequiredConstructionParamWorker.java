@@ -32,31 +32,27 @@ public class RequiredConstructionParamWorker
 			resource.setProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME, certChain);
 		}
 		
-		Boolean authzEnabled = (Boolean) consParms.get(
-				IResource.AUTHZ_ENABLED_CONSTRUCTION_PARAM);
-		if ((authzEnabled != null) && (authzEnabled.booleanValue())) {
+		try {
+			// perform any authz initialization of the resource for the authz 
+			// handler specified
+			IAuthZProvider handler = AuthZProviders.getProvider(
+					resource.getParentResourceKey().getServiceName());
+			ICallingContext context = null;
 			try {
-				// perform any authz initialization of the resource for the authz 
-				// handler specified
-				IAuthZProvider handler = AuthZProviders.getProvider(
-						resource.getParentResourceKey().getServiceName());
-				ICallingContext context = null;
-				try {
-						context = ContextManager.getCurrentContext(false);
-				}
-				catch (Throwable t) {
-					// No current context
-				}
-
-				X509Certificate[] serviceCertChain = (X509Certificate[])consParms.get(
-						IResource.SERVICE_CERTIFICATE_CHAIN_CONSTRUCTION_PARAM);
-				
-				handler.setDefaultAccess(context, resource, serviceCertChain);
-				
-			} catch (IOException e) {
-				throw new ResourceException(
-					"Could not initialize AuthZ for resource: " + e.getMessage(), e);
+					context = ContextManager.getCurrentContext(false);
 			}
+			catch (Throwable t) {
+				// No current context
+			}
+
+			X509Certificate[] serviceCertChain = (X509Certificate[])consParms.get(
+					IResource.SERVICE_CERTIFICATE_CHAIN_CONSTRUCTION_PARAM);
+			
+			handler.setDefaultAccess(context, resource, serviceCertChain);
+			
+		} catch (IOException e) {
+			throw new ResourceException(
+				"Could not initialize AuthZ for resource: " + e.getMessage(), e);
 		}
 	}
 }

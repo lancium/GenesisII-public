@@ -10,7 +10,6 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.*;
 
@@ -63,7 +62,6 @@ public class Container extends ApplicationBase
 	*/
 	static private String _containerURL;
 	
-	static private X509Certificate _defaultInitialResourceOwner;
 	static private X509Certificate[] _containerCertChain;
 	static private PrivateKey _containerPrivateKey;
 	
@@ -286,13 +284,10 @@ public class Container extends ApplicationBase
 			GeneralSecurityException, IOException
 	{
 		Properties resourceIdSecProps = null;
-		Properties authzSecProps = null;
 		try
 		{
 			resourceIdSecProps = (Properties)serverConf.retrieveSection(
 				GenesisIIConstants.RESOURCE_IDENTITY_PROPERTIES_SECTION_NAME);
-			authzSecProps = (Properties)serverConf.retrieveSection(
-					GenesisIIConstants.AUTHZ_PROPERTIES_SECTION_NAME);
 		}
 		catch (ConfigurationException ce)
 		{
@@ -340,15 +335,6 @@ public class Container extends ApplicationBase
 		_containerCertChain = new X509Certificate[chain.length];
 		for (int i = 0; i < chain.length; i++)
 			_containerCertChain[i] = (X509Certificate) chain[i];
-		
-		// read in the certificate that is to serve as default owner
-		String defaultOwnerCertPath = authzSecProps.getProperty(
-				GenesisIIConstants.BOOTSTRAP_OWNER_CERTPATH);
-		if (defaultOwnerCertPath != null) {
-			CertificateFactory cf = CertificateFactory.getInstance("X.509");
-			_defaultInitialResourceOwner = (X509Certificate) 
-				cf.generateCertificate(new FileInputStream(new DeploymentRelativeFile(defaultOwnerCertPath)));
-		}
 		
 	}
 	
@@ -415,18 +401,6 @@ public class Container extends ApplicationBase
 		return _containerCertChain;
 	}
 
-	static public X509Certificate getDefaultInitialOwnerCert() 
-	{
-		if (_defaultInitialResourceOwner != null) {
-			return _defaultInitialResourceOwner;
-		}
-		if ((_containerCertChain != null) && (_containerCertChain.length > 0)) {
-			return _containerCertChain[0];
-		}
-		
-		return null;
-	}
-	
 	static public PrivateKey getContainerPrivateKey() 
 	{
 		return _containerPrivateKey;

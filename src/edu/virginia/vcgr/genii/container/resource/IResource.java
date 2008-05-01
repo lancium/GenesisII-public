@@ -46,8 +46,6 @@ public interface IResource extends Closeable
 		new QName(GenesisIIConstants.GENESISII_NS, "endpoint-identifier");
 	static public QName IS_SERVICE_CONSTRUCTION_PARAM =
 		new QName(GenesisIIConstants.GENESISII_NS, "is-service");
-	static public QName AUTHZ_ENABLED_CONSTRUCTION_PARAM =
-		new QName(GenesisIIConstants.GENESISII_NS, "authz-enabled");
 	
 	/**
 	 * Initialize the resource (construct a new one) using the given construction

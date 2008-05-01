@@ -21,6 +21,7 @@ import java.security.cert.X509Certificate;
 import java.util.*;
 import java.io.*;
 import java.lang.reflect.Method;
+import java.security.GeneralSecurityException;
 
 import javax.naming.Context;
 import javax.naming.directory.Attributes;
@@ -58,9 +59,10 @@ public class JNDIAuthZProvider implements IAuthZProvider {
 
 	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(JNDIAuthZProvider.class);
-	static private GamlAclAuthZProvider _gamlAclProvider = new GamlAclAuthZProvider();
+	static private GamlAclAuthZProvider _gamlAclProvider = null;
 	
-	public JNDIAuthZProvider(Properties properties) {
+	public JNDIAuthZProvider(Properties properties) throws GeneralSecurityException, IOException {
+		_gamlAclProvider = new GamlAclAuthZProvider(properties);
 	}
 	
 	/**

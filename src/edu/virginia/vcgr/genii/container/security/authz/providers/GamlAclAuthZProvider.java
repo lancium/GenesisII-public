@@ -19,6 +19,7 @@ package edu.virginia.vcgr.genii.container.security.authz.providers;
 import java.security.cert.PKIXBuilderParameters;
 import java.security.cert.X509CertSelector;
 import java.security.cert.X509Certificate;
+import java.security.cert.CertificateFactory;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.cert.CertificateException;
@@ -47,9 +48,11 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
 import edu.virginia.vcgr.genii.container.resource.*;
 import edu.virginia.vcgr.genii.client.resource.*;
-import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
+import edu.virginia.vcgr.genii.container.Container;
 
+
+import edu.virginia.vcgr.genii.client.utils.deployment.DeploymentRelativeFile;
 
 
 /**
@@ -62,15 +65,45 @@ import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
  */
 public class GamlAclAuthZProvider implements IAuthZProvider {
 
-	static public final String GAML_ACL_PROPERTY_NAME = "genii.container.security.authz.gaml-acl";
+	static public final String GAML_ACL_PROPERTY_NAME = 
+		"genii.container.security.authz.gaml-acl";
 
+	static public final String GAML_DEFAULT_OWNER_CERT_PATH = 
+		"genii.security.authz.bootstrapOwnerCertPath";
+	
+	
 	static protected final MessageLevelSecurity _defaultMinMsgSec = new MessageLevelSecurity(
 			MessageLevelSecurity.SIGN);
+	
+	static protected HashMap<String, X509Certificate> _defaultCertCache = 
+		new HashMap<String, X509Certificate>();
 
 	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(GamlAclAuthZProvider.class);
+
+	X509Certificate _defaultInitialResourceOwner = null;
 	
-	public GamlAclAuthZProvider() {}
+	public GamlAclAuthZProvider(Properties properties) throws GeneralSecurityException, IOException {
+		// read in the certificate that is to serve as default owner
+		String defaultOwnerCertPath = 
+			properties.getProperty(GAML_DEFAULT_OWNER_CERT_PATH);
+		
+		
+		if (defaultOwnerCertPath != null) {
+			synchronized (_defaultCertCache) {
+				_defaultInitialResourceOwner = _defaultCertCache.get(defaultOwnerCertPath);
+				if (_defaultInitialResourceOwner == null) {
+					CertificateFactory cf = CertificateFactory.getInstance("X.509");
+					_defaultInitialResourceOwner = (X509Certificate) cf.generateCertificate(
+							new FileInputStream(new DeploymentRelativeFile(defaultOwnerCertPath)));
+					_defaultCertCache.put(defaultOwnerCertPath, _defaultInitialResourceOwner);
+					
+				}
+			}
+		} else {
+			_defaultInitialResourceOwner = Container.getContainerCertChain()[0];
+		}
+	}
 	
 	/**
 	 * Presently configures the specified resource to have default access allowed
@@ -107,8 +140,8 @@ public class GamlAclAuthZProvider implements IAuthZProvider {
 		// if no incoming credentials, use the default owner identity indicated 
 		// by the container
 		if (defaultOwners.isEmpty()) {
-			X509Certificate[] defaultOwner = { Container.getDefaultInitialOwnerCert() };
-			if (defaultOwner != null) {
+			X509Certificate[] defaultOwner = { _defaultInitialResourceOwner };
+			if (_defaultInitialResourceOwner != null) {
 				defaultOwners.add(new X509Identity(defaultOwner));
 			}
 		}
