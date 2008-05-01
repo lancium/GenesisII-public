@@ -10,6 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.GUID;
 
 import edu.virginia.vcgr.genii.client.ApplicationBase;
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.ogrsh.server.session.OGRSHContextResolver;
 import edu.virginia.vcgr.ogrsh.server.session.SessionManager;
@@ -20,6 +21,15 @@ public class OGRSHServer extends ApplicationBase
 
 	static public void main(String []args)
 	{
+		String deploymentName = System.getenv("GENII_DEPLOYMENT_NAME");
+		if (deploymentName != null)
+		{
+			_logger.debug("Using Deployment \"" + deploymentName + "\".");
+			System.setProperty(GenesisIIConstants.DEPLOYMENT_NAME_PROPERTY, deploymentName);
+		} else
+		{
+			_logger.debug("Using Deployment \"default\".");
+		}
 		prepareClientApplication();
 		
 		boolean _done = false;

@@ -62,13 +62,13 @@ public class ConnectTool extends BaseGridTool
 	}
 	
 
-	public void connect(ICallingContext ctxt)
+	static public void connect(ICallingContext ctxt)
 		throws ConfigurationException, ResourceException, IOException
 	{
 		ContextManager.storeCurrentContext(ctxt);
 	}
 
-	public void connect(String connectURL)
+	static public void connect(String connectURL)
 		throws ResourceException, MalformedURLException, IOException,
 			ConfigurationException
 	{
@@ -79,7 +79,7 @@ public class ConnectTool extends BaseGridTool
 		connect(ContextStreamUtils.load(url), null);
 	}
 
-	public void connect(ICallingContext ctxt, String deploymentDir)
+	static public void connect(ICallingContext ctxt, String deploymentDir)
 		throws ConfigurationException, ResourceException, IOException
 	{
 		ContextManager.storeCurrentContext(ctxt);
@@ -105,7 +105,7 @@ public class ConnectTool extends BaseGridTool
 		}
 	}
 	
-	public void connect(String connectURL, String deploymentDir)
+	static public void connect(String connectURL, String deploymentDir)
 		throws ResourceException, MalformedURLException, IOException,
 			ConfigurationException
 	{

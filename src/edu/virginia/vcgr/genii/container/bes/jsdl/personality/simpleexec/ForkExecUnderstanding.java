@@ -11,6 +11,7 @@ import java.util.Vector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.bes.GeniiBESConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
@@ -105,6 +106,14 @@ public class ForkExecUnderstanding implements Application
 	{
 		executionPlan.add(new PrepareApplicationPhase(_executable));
 		
+		String depName = System.getProperty(
+			GenesisIIConstants.DEPLOYMENT_NAME_PROPERTY);
+		if (depName != null)
+		{
+			_logger.debug("Setting deployment name to \"" + depName + "\".");
+			_environment.put("GENII_DEPLOYMENT_NAME", depName);
+		}
+		
 		if (ogrshVersion == null)
 		{
 			executionPlan.add(new QueueProcessPhase(
@@ -174,6 +183,14 @@ public class ForkExecUnderstanding implements Application
 		}
 		
 		executionPlan.add(new PrepareApplicationPhase(_executable));
+		
+		String depName = System.getProperty(
+			GenesisIIConstants.DEPLOYMENT_NAME_PROPERTY);
+		if (depName != null)
+		{
+			_logger.debug("Setting deployment name to \"" + depName + "\".");
+			_environment.put("GENII_DEPLOYMENT_NAME", depName);
+		}
 		
 		if (ogrshVersion == null)
 		{
