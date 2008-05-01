@@ -101,6 +101,16 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 			_jobToken = (JobToken)context.getProperty(JOB_TOKEN_PROPERTY);
 			if (_jobToken == null)
 			{
+				if (_environment != null)
+				{
+					String ogrshConfig = _environment.get("OGRSH_CONFIG");
+					if (ogrshConfig != null)
+					{
+						File f = new File(context.getCurrentWorkingDirectory(), ogrshConfig);
+						_environment.put("OGRSH_CONFIG", f.getAbsolutePath());
+					}
+				}
+				
 				_jobToken = queue.submit(new ApplicationDescription(_executable, _arguments,
 					_environment, _stdin, _stdout, _stderr));
 				context.setProperty(JOB_TOKEN_PROPERTY, _jobToken);
