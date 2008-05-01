@@ -777,12 +777,9 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 			if (needsExecute)
 				stmt.executeBatch();
 			
-			synchronized(GenesisIIBase.class)
-			{
-				if (_iteratorServiceEPR == null)
-					_iteratorServiceEPR = EPRUtils.makeEPR(
-						Container.getServiceURL("IteratorPortType"));
-			}
+			if (_iteratorServiceEPR == null)
+				_iteratorServiceEPR = EPRUtils.makeEPR(
+					Container.getServiceURL("IteratorPortType"));
 			
 			IteratorPortType iter = ClientUtils.createProxy(
 				IteratorPortType.class, _iteratorServiceEPR);

@@ -31,7 +31,15 @@ import edu.virginia.vcgr.genii.client.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.invoke.InvocationContext;
 import edu.virginia.vcgr.genii.client.invoke.PipelineProcessor;
 import edu.virginia.vcgr.genii.client.naming.WSName;
+import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
+import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
+import edu.virginia.vcgr.genii.enhancedrns.IterateListRequestType;
+import edu.virginia.vcgr.genii.enhancedrns.IterateListResponseType;
+import edu.virginia.vcgr.genii.iterator.IterateRequestType;
+import edu.virginia.vcgr.genii.iterator.IteratorInitializationType;
+import edu.virginia.vcgr.genii.iterator.IteratorMemberType;
+import edu.virginia.vcgr.genii.iterator.IteratorPortType;
 
 public class AttributeCacheHandler
 {
@@ -42,6 +50,13 @@ public class AttributeCacheHandler
 	
 	private TimedOutLRUCache<WSName, CachedAttributeData> _attrCache =
 		new TimedOutLRUCache<WSName, CachedAttributeData>(_MAX_CACHE_ELEMENTS, _DEFAULT_TIMEOUT_MS);
+	
+	static private QName xferMechs = new QName(ByteIOConstants.RANDOM_BYTEIO_NS,
+			ByteIOConstants.XFER_MECHS_ATTR_NAME);
+	static private QName size = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.SIZE_ATTR_NAME);
+	static private QName accessTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.ACCESSTIME_ATTR_NAME);
+	static private QName modTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME);
+	static private QName creatTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME);
 	
 	public AttributeCacheHandler()
 	{
@@ -294,13 +309,6 @@ public class AttributeCacheHandler
 		// We're going to let the list proceed, and then see if any meta data came back with it.
 		ListResponse resp = (ListResponse)ctxt.proceed();
 		
-		QName xferMechs = new QName(ByteIOConstants.RANDOM_BYTEIO_NS,
-			ByteIOConstants.XFER_MECHS_ATTR_NAME);
-		QName size = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.SIZE_ATTR_NAME);
-		QName accessTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.ACCESSTIME_ATTR_NAME);
-		QName modTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME);
-		QName creatTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME);
-		
 		for (EntryType entry : resp.getEntryList())
 		{
 			WSName name = new WSName(entry.getEntry_reference());
@@ -325,6 +333,112 @@ public class AttributeCacheHandler
 					synchronized(_attrCache)
 					{
 						_attrCache.put(name, data);
+					}
+				}
+			}
+		}
+		
+		return resp;
+	}
+	
+	@PipelineProcessor(portType = EnhancedRNSPortType.class)
+	public IterateListResponseType iterateList(InvocationContext ctxt, 
+		IterateListRequestType list) throws Throwable
+	{
+		_logger.debug("Doing an RNS iterator listing so we can cache attribute data.");
+		
+		// We're going to let the list proceed, and then see if any meta data came back with it.
+		IterateListResponseType resp = (IterateListResponseType)ctxt.proceed();
+		
+		IteratorInitializationType result = resp.getResult();
+		if (result != null)
+		{
+			IteratorMemberType []initMembers = result.getBatchElement();
+			if (initMembers != null)
+			{
+				for (IteratorMemberType member : initMembers)
+				{
+					MessageElement []any = member.get_any();
+					if (any != null && any.length == 1)
+					{
+						EntryType entry = ObjectDeserializer.toObject(any[0], 
+							EntryType.class);
+						WSName name = new WSName(entry.getEntry_reference());
+						if (name.isValidWSName())
+						{
+							any = entry.get_any();
+							if (any != null)
+							{
+								ArrayList<MessageElement> cachedAttrs = new ArrayList<MessageElement>();
+								for (MessageElement elem : any)
+								{
+									QName elemName = elem.getQName();
+									if (elemName.equals(xferMechs) || elemName.equals(size) ||
+										elemName.equals(accessTime) || elemName.equals(modTime) ||
+										elemName.equals(creatTime))
+									{
+										cachedAttrs.add(elem);
+									}
+								}
+								
+								CachedAttributeData data = new CachedAttributeData(cachedAttrs);
+								synchronized(_attrCache)
+								{
+									_attrCache.put(name, data);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return resp;
+	}
+	
+	@PipelineProcessor(portType = IteratorPortType.class)
+	public IteratorMemberType[] iterate(InvocationContext ctxt,
+		IterateRequestType iterateRequest) throws Throwable
+	{
+		_logger.debug("Doing an iterator iterate so we can cache attribute data.");
+		
+		// We're going to let the iterate proceed, and then see if any meta data came back with it.
+		IteratorMemberType []resp = (IteratorMemberType[])ctxt.proceed();
+		
+		for (IteratorMemberType member : resp)
+		{
+			MessageElement []any = member.get_any();
+			if (any != null && any.length == 1)
+			{
+				QName type = any[0].getType();
+				if (type != null && type.equals(EntryType.getTypeDesc().getXmlType()))
+				{
+					EntryType entry = ObjectDeserializer.toObject(any[0], 
+						EntryType.class);
+					WSName name = new WSName(entry.getEntry_reference());
+					if (name.isValidWSName())
+					{
+						any = entry.get_any();
+						if (any != null)
+						{
+							ArrayList<MessageElement> cachedAttrs = new ArrayList<MessageElement>();
+							for (MessageElement elem : any)
+							{
+								QName elemName = elem.getQName();
+								if (elemName.equals(xferMechs) || elemName.equals(size) ||
+									elemName.equals(accessTime) || elemName.equals(modTime) ||
+									elemName.equals(creatTime))
+								{
+									cachedAttrs.add(elem);
+								}
+							}
+							
+							CachedAttributeData data = new CachedAttributeData(cachedAttrs);
+							synchronized(_attrCache)
+							{
+								_attrCache.put(name, data);
+							}
+						}
 					}
 				}
 			}
