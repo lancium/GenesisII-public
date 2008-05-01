@@ -216,8 +216,9 @@ public class ExportTool extends BaseGridTool
 			if (numArgs != 1)
 				throw new InvalidToolUsageException(
 					"Invalid number of arguments.");
-		} else{
-			throw new InvalidToolUsageException(
+		}else{
+			if (numArgs != 0)
+				throw new InvalidToolUsageException(
 					"Invalid arguments.");
 		}
 	}
