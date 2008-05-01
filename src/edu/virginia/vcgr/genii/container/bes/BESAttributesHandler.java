@@ -212,10 +212,12 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 			= new ArrayList<EndpointReferenceType>();
 		IResource resource;
 		resource = ResourceManager.getCurrentResource().dereference();
-		for (byte[] bytes : (Collection<byte[]>)resource.getProperty(
-			_DEPLOYER_PROPERTY))
+		Collection<byte[]> ret = (Collection<byte[]>)resource.getProperty(
+			_DEPLOYER_PROPERTY);
+		if (ret != null)
 		{
-			eprs.add(EPRUtils.fromBytes(bytes));
+			for (byte[] bytes : ret)
+				eprs.add(EPRUtils.fromBytes(bytes));
 		}
 		
 		return eprs;
