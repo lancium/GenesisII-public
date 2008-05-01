@@ -242,27 +242,25 @@ public class ExportedDirDBResource extends BasicDBResource implements
 	{
 		//get all known entries from db
 		Collection<ExportedDirEntry> allKnownEntries = retrieveKnownEntries();
-		
-		//before syncing, check if directory has been modified
-		//force sync if dir is empty as this means no sync may have yet occurred
-		if (allKnownEntries.isEmpty())
-			_logger.debug("ExportDir is empty; forcing sync.");
-		else if (dirNotModified())
-			return allKnownEntries;
-		
-		//get all entries on local file system
-		Collection<File> allLocalEntries = listEntriesAsFiles();
 		Collection<ExportedDirEntry> syncedEntries = null;
 		
-		syncedEntries = syncEntries(allKnownEntries, allLocalEntries);
+		//if dir not modified and not empty, known entries are synced
+		if (dirNotModified() && (!allKnownEntries.isEmpty()))
+			syncedEntries = allKnownEntries;
+		//else force sync for modified or empty dirs
+		else {
+			//get all entries on local file system
+			Collection<File> allLocalEntries = listEntriesAsFiles();
+			
+			//sync entries
+			syncedEntries = syncEntries(allKnownEntries, allLocalEntries);
+		}
 		
 		Pattern p = Pattern.compile(regex);
 		
 		Collection<ExportedDirEntry> ret = new ArrayList<ExportedDirEntry>();
-		for (ExportedDirEntry nextEntry : syncedEntries)
-		{
-			if (p.matcher(nextEntry.getName()).matches())
-			{
+		for (ExportedDirEntry nextEntry : syncedEntries){
+			if (p.matcher(nextEntry.getName()).matches()){
 				// We are going to pre-fill in the attributes document for this entry
 				// so that we can send it back for pre-fetching.
 				fillInAttributes(nextEntry);
