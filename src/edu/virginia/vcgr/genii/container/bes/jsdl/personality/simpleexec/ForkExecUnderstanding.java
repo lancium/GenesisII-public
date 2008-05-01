@@ -123,7 +123,7 @@ public class ForkExecUnderstanding implements Application
 		} else
 		{
 			_environment.put("BES_HOME", "/home/bes-job");
-			_environment.put("OGRSH_CONFIG", "ogrsh-config.xml");
+			_environment.put("OGRSH_CONFIG", "./ogrsh-config.xml");
 			_environment.put("GENII_USER_DIR", ".");
 			
 			Vector<String> args = new Vector<String>();
@@ -202,7 +202,7 @@ public class ForkExecUnderstanding implements Application
 		} else
 		{
 			_environment.put("BES_HOME", "/home/bes-job");
-			_environment.put("OGRSH_CONFIG", "ogrsh-config.xml");
+			_environment.put("OGRSH_CONFIG", "./ogrsh-config.xml");
 			_environment.put("GENII_USER_DIR", ".");
 			
 			Vector<String> args = new Vector<String>();
