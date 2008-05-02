@@ -9,7 +9,6 @@
 		<mkdir dir="${generated.obj.dir}"/>
 		<mkdir dir="${obj.dir}"/>
 		<mkdir dir="${deployments.dir}/default"/>
-		<mkdir dir="${deployments.dir}/default-secure/services"/>
 	</target>
 	
 </project>
