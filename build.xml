@@ -274,6 +274,8 @@
 		<delete dir="${generated.obj.dir}"/>
 		<delete dir="${obj.dir}"/>
 		<delete dir="${deployments.dir}/default/services" quiet="true"/>
+		<delete dir="${deployments.dir}/GeniiNetFullContainer/services" quiet="true"/>
+		<delete dir="${deployments.dir}/GeniiNetBootstrapContainer/services" quiet="true"/>
 		<delete quiet="true">
 			<fileset dir="${lib.dir}" includes="**/*.jar"/>
 		</delete>
