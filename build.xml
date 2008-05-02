@@ -71,9 +71,6 @@
 		<copy todir="${deployments.dir}/default/services">
 			<fileset dir="${basedir}/services" includes="**/*.wsdd"/>
 		</copy>
-		<copy todir="${deployments.dir}/default-secure/services">
-			<fileset dir="${basedir}/services" includes="**/*.wsdd"/>
-		</copy>
 		<copy todir="${deployments.dir}/GeniiNetBootstrapContainer/services">
 			<fileset dir="${basedir}/services" includes="**/*.wsdd"/>
 		</copy>
@@ -277,7 +274,6 @@
 		<delete dir="${generated.obj.dir}"/>
 		<delete dir="${obj.dir}"/>
 		<delete dir="${deployments.dir}/default/services" quiet="true"/>
-		<delete dir="${deployments.dir}/default-secure/services" quiet="true"/>
 		<delete quiet="true">
 			<fileset dir="${lib.dir}" includes="**/*.jar"/>
 		</delete>
