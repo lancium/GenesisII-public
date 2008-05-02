@@ -72,16 +72,16 @@
 	<genii:ssl-properties>
 		<mconf:property 
 			name="edu.virginia.vcgr.genii.container.security.ssl.key-store"
-			value="security/keys.pfx"/>
+			value="security/container.pfx"/>
 		<mconf:property 
 			name="edu.virginia.vcgr.genii.container.security.ssl.key-store-type"
 			value="PKCS12"/>
 		<mconf:property 
 			name="edu.virginia.vcgr.genii.container.security.ssl.key-password"
-			value="keys"/>
+			value="container"/>
 		<mconf:property 
 			name="edu.virginia.vcgr.genii.container.security.ssl.key-store-password"
-			value="keys"/>
+			value="container"/>
 	</genii:ssl-properties>
 	
 	
