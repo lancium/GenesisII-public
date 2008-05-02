@@ -146,6 +146,15 @@
 		
 		<mconf:instance name="jndi-authz-provider"
 			type="edu.virginia.vcgr.genii.container.jndiauthn.JNDIAuthZProvider">
+			
+			<!-- Denotes the X.509 identity to be used for *new* resources are created 
+			     without the presence of a caller credential (e.g., service resources
+			     that are created upon container-startup).  If not specified, then 
+		    	 the identity of the container will be used in these circumstances. 
+			-->
+			<mconf:property name="genii.security.authz.bootstrapOwnerCertPath"
+				value="security/admin.cer"/>
+						
 		</mconf:instance>
 
 
