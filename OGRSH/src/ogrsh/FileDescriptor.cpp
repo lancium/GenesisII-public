@@ -51,4 +51,16 @@ namespace ogrsh
 	{
 		return _fd;
 	}
+
+	int FileDescriptor::acquireDupDescriptor(int oldfd, int newfd)
+	{
+		int ret;
+
+		if (newfd >= 0)
+			ret = ogrsh::shims::real_dup2(oldfd, newfd);
+		else
+			ret = ogrsh::shims::real_dup(oldfd);
+
+		return ret;
+	}
 }

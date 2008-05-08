@@ -102,6 +102,7 @@ import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivityUtils;
+import edu.virginia.vcgr.genii.container.bes.activity.NoSuchActivityFault;
 import edu.virginia.vcgr.genii.container.bes.resource.DBBESResourceFactory;
 import edu.virginia.vcgr.genii.container.bes.resource.IBESResource;
 import edu.virginia.vcgr.genii.container.byteio.RByteIOResource;
@@ -472,8 +473,17 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 				Matcher matcher = regex.matcher(name);
 				if (matcher.matches())
 				{
-					response.add(new EntryType(
-						name, null, activity.getActivityEPR()));
+					try
+					{
+						response.add(new EntryType(
+							name, null, activity.getActivityEPR()));
+					}
+					catch (NoSuchActivityFault nsaf)
+					{
+						_logger.debug("We lost an activity between the " +
+							"time we looked it up and the time we got " +
+							"it's EPR.", nsaf);
+					}
 				}
 			}
 			
@@ -701,14 +711,23 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 				if (matcher.matches())
 				{
 					TerminateActivitiesResponseType tat;
-					tat = terminateActivities(new TerminateActivitiesType(
-						new EndpointReferenceType[] { 
-							activity.getActivityEPR() }, null));
-					if (tat.getResponse(0).getFault() == null)
-						response.add(name);
-					else
-						_logger.error("Unable to remove activity \"" + 
-							name + "\":  " + tat.getResponse(0).getFault());
+					try
+					{
+						tat = terminateActivities(new TerminateActivitiesType(
+							new EndpointReferenceType[] { 
+								activity.getActivityEPR() }, null));
+						if (tat.getResponse(0).getFault() == null)
+							response.add(name);
+						else
+							_logger.error("Unable to remove activity \"" + 
+								name + "\":  " + tat.getResponse(0).getFault());
+					}
+					catch (NoSuchActivityFault nsaf)
+					{
+						_logger.debug("We lost an activity between the time " +
+							"we looked it up and when we asked for it's EPR.", 
+							nsaf);
+					}
 				}
 			}
 			

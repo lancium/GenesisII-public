@@ -9,12 +9,23 @@
 
 namespace ogrsh
 {
+	VirtualFileDescriptor::VirtualFileDescriptor(int fd)
+		: FileDescriptor(fd)
+	{
+	}
+
 	VirtualFileDescriptor::VirtualFileDescriptor()
 	{
 	}
 
 	VirtualFileDescriptor::~VirtualFileDescriptor()
 	{
+	}
+
+	FileDescriptor* VirtualFileDescriptor::dup(int newfd)
+	{
+		newfd = acquireDupDescriptor(getFD(), newfd);
+		return new VirtualFileDescriptor(newfd);
 	}
 
 	ssize_t VirtualFileDescriptor::read(void *buf, size_t count)

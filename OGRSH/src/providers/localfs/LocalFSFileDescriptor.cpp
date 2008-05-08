@@ -20,6 +20,22 @@ namespace ogrsh
 		{
 		}
 
+		FileDescriptor* LocalFSFileDescriptor::dup(int newfd)
+		{
+			OGRSH_TRACE("LocalFSFileDescriptor::dup(" << getFD() << ", "
+				<< newfd << ") called.");
+
+			if (newfd >= 0)
+				newfd = ogrsh::shims::real_dup2(getFD(), newfd);
+			else
+				newfd = ogrsh::shims::real_dup(getFD());
+
+			if (newfd < 0)
+				return NULL;
+
+			return new LocalFSFileDescriptor(newfd, true);
+		}
+
 		ssize_t LocalFSFileDescriptor::read(void *buf, size_t count)
 		{
 			OGRSH_TRACE("LocalFSFileDescriptor::read(" << getFD() << ", ..., "

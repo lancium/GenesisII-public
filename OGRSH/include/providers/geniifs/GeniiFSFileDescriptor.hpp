@@ -23,12 +23,16 @@ namespace ogrsh
 				GeniiFSSession *_session;
 				GeniiFSMount *_mount;
 
+				GeniiFSFileDescriptor(GeniiFSSession *session,
+					GeniiFSMount *mount,
+					const std::string &fileDesc, int fd);
 			public:
 				GeniiFSFileDescriptor(GeniiFSSession *session,
 					GeniiFSMount *mount,
 					const std::string &fileDesc);
 				virtual ~GeniiFSFileDescriptor();
 
+				virtual FileDescriptor* dup(int newfd);
 				virtual ssize_t read(void *buf, size_t count);
 				virtual ssize_t write(const void *buf, size_t count);
 

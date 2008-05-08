@@ -29,6 +29,20 @@ namespace jcomm
 		return result;
 	}
 
+	std::string FileClient::duplicate(const std::string &fileDesc)
+		throw (OGRSHException, IOException)
+	{
+		Invocation inv(_socket, "duplicate");
+
+		inv.addString(fileDesc);
+
+		std::string result;
+		IOGRSHReadBuffer *buffer = inv.invoke();
+		buffer->readString(result);
+		delete buffer;
+		return result;
+	}
+
 	ssize_t FileClient::read(const std::string &fileDesc,
 		void *buf, size_t length)
 		throw (OGRSHException, IOException)

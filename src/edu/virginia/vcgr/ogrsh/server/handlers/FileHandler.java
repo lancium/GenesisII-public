@@ -21,7 +21,7 @@ import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.ogrsh.server.comm.OGRSHOperation;
 import edu.virginia.vcgr.ogrsh.server.dir.StatBuffer;
 import edu.virginia.vcgr.ogrsh.server.exceptions.OGRSHException;
-import edu.virginia.vcgr.ogrsh.server.file.IFileDescriptor;
+import edu.virginia.vcgr.ogrsh.server.file.FileSession;
 import edu.virginia.vcgr.ogrsh.server.file.RandomByteIOFileDescriptor;
 import edu.virginia.vcgr.ogrsh.server.file.StreamableByteIOFileDescriptor;
 
@@ -56,8 +56,8 @@ public class FileHandler
 		return f.openStream(null).getEndpoint();
 	}
 	
-	private HashMap<String, IFileDescriptor> _openFiles =
-		new HashMap<String, IFileDescriptor>();
+	private HashMap<String, FileSession> _openFiles =
+		new HashMap<String, FileSession>();
 	
 	@OGRSHOperation
 	public String open(String fullPath, int flags, int mode)
@@ -100,11 +100,11 @@ public class FileHandler
 					key = "F" + (new GUID()).toString();
 				} while (_openFiles.containsKey(key));
 				
-				_openFiles.put(key, new RandomByteIOFileDescriptor(
+				_openFiles.put(key, new FileSession(new RandomByteIOFileDescriptor(
 					path.getEndpoint(),
 					((twobits == 0) || (twobits == 2)),
 					((twobits == 1) || (twobits == 2)),
-					((flags & APPEND) > 0), ((flags & TRUNC) > 0)));
+					((flags & APPEND) > 0), ((flags & TRUNC) > 0))));
 				
 				return key;
 			} else if (typeInfo.isSByteIO())
@@ -115,11 +115,12 @@ public class FileHandler
 					key = "F" + (new GUID()).toString();
 				} while (_openFiles.containsKey(key));
 				
-				_openFiles.put(key, new StreamableByteIOFileDescriptor(
+				_openFiles.put(key, new FileSession(
+					new StreamableByteIOFileDescriptor(
 					path.getEndpoint(),
 					((twobits == 0) || (twobits == 2)),
 					((twobits == 1) || (twobits == 2)),
-					((flags & APPEND) > 0)));
+					((flags & APPEND) > 0))));
 				
 				return key;
 			} else if (typeInfo.isSByteIOFactory())
@@ -133,11 +134,12 @@ public class FileHandler
 				EndpointReferenceType endpoint = openSByteIOFromFactory(
 					typeInfo.getEndpoint());
 				
-				_openFiles.put(key, new StreamableByteIOFileDescriptor(
+				_openFiles.put(key, new FileSession(
+					new StreamableByteIOFileDescriptor(
 					endpoint,
 					((twobits == 0) || (twobits == 2)),
 					((twobits == 1) || (twobits == 2)),
-					((flags & APPEND) > 0)));
+					((flags & APPEND) > 0))));
 				
 				return key;
 			} else if (typeInfo.isRNS())
@@ -159,21 +161,21 @@ public class FileHandler
 	@OGRSHOperation
 	public byte[] read(String fileDesc, int length) throws OGRSHException
 	{
-		IFileDescriptor fd = _openFiles.get(fileDesc);
-		if (fd == null)
+		FileSession session = _openFiles.get(fileDesc);
+		if (session == null)
 			throw new OGRSHException(OGRSHException.EBADF,
 				"Attempt to read from non-existant file descriptor.");
-		return fd.read(length);
+		return session.getDescriptor().read(length);
 	}
 	
 	@OGRSHOperation
 	public int write(String fileDesc, byte []data) throws OGRSHException
 	{
-		IFileDescriptor fd = _openFiles.get(fileDesc);
+		FileSession fd = _openFiles.get(fileDesc);
 		if (fd == null)
 			throw new OGRSHException(OGRSHException.EBADF,
 				"Attempt to read from non-existant file descriptor.");
-		fd.write(data);
+		fd.getDescriptor().write(data);
 		return data.length;
 	}
 	
@@ -182,9 +184,9 @@ public class FileHandler
 	{
 		try
 		{
-			IFileDescriptor desc = _openFiles.get(fileDesc);
+			FileSession desc = _openFiles.get(fileDesc);
 			if (desc != null)
-				desc.close();
+				desc.removeReference();
 			
 			_openFiles.remove(fileDesc);
 		}
@@ -223,31 +225,50 @@ public class FileHandler
 	@OGRSHOperation
 	public StatBuffer fxstat(String fileDesc) throws OGRSHException
 	{
-		IFileDescriptor fd = _openFiles.get(fileDesc);
+		FileSession fd = _openFiles.get(fileDesc);
 		if (fd == null)
 			throw new OGRSHException(OGRSHException.EBADF,
 				"Attempt to fxstat from non-existant file descriptor.");
-		return fd.fxstat();
+		return fd.getDescriptor().fxstat();
 	}
 	
 	@OGRSHOperation
 	public long lseek64(String fileDesc, long offset, int whence) throws OGRSHException
 	{
-		IFileDescriptor fd = _openFiles.get(fileDesc);
+		FileSession fd = _openFiles.get(fileDesc);
 		if (fd == null)
 			throw new OGRSHException(OGRSHException.EBADF,
 				"Attempt to lseek64 from non-existant file descriptor.");
-		return fd.lseek64(offset, whence);
+		return fd.getDescriptor().lseek64(offset, whence);
 	}
 	
 	@OGRSHOperation
 	public int truncate(String fileDesc, long offset) throws OGRSHException
 	{
-		IFileDescriptor fd = _openFiles.get(fileDesc);
+		FileSession fd = _openFiles.get(fileDesc);
 		if (fd == null)
 			throw new OGRSHException(OGRSHException.EBADF,
 				"Attempt to truncate from non-existant file descriptor.");
-		fd.truncate(offset);
+		fd.getDescriptor().truncate(offset);
 		return 0;
+	}
+	
+	@OGRSHOperation
+	public String duplicate(String fileDesc) throws OGRSHException
+	{
+		FileSession old = _openFiles.get(fileDesc);
+		if (old == null)
+			throw new OGRSHException(OGRSHException.EBADF,
+				"Attempt to truncate from non-existant file descriptor.");
+		
+		String key;
+		do
+		{
+			key = "F" + (new GUID()).toString();
+		} while (_openFiles.containsKey(key));
+		
+		old.addReference();
+		_openFiles.put(key, old);
+		return key;
 	}
 }

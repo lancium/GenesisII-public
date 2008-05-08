@@ -127,7 +127,7 @@ public class BESActivity implements Closeable
 	}
 	
 	synchronized public EndpointReferenceType getActivityEPR()
-		throws SQLException, ResourceException
+		throws SQLException, ResourceException, NoSuchActivityFault
 	{
 		Connection connection = null;
 		PreparedStatement stmt = null;
@@ -142,7 +142,7 @@ public class BESActivity implements Closeable
 			stmt.setString(1, _activityid);
 			rs = stmt.executeQuery();
 			if (!rs.next())
-				throw new SQLException("Unable to find activity in database.");
+				throw new NoSuchActivityFault(_activityid);
 			return EPRUtils.fromBlob(rs.getBlob(1));
 		}
 		finally

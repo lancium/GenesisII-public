@@ -44,6 +44,7 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
+import edu.virginia.vcgr.genii.container.bes.activity.NoSuchActivityFault;
 import edu.virginia.vcgr.genii.container.bes.resource.IBESResource;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
@@ -140,11 +141,11 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 			{
 				eprs.add(activity.getActivityEPR());
 			}
-			catch (SQLException sqe)
+			catch (NoSuchActivityFault nsaf)
 			{
 				// We lost the activity while we were waiting...just ignore it
 				_logger.debug("Lost an activity between the time we got it's " +
-					"key and asked for it's EPR.", sqe);
+					"key and asked for it's EPR.", nsaf);
 			}
 		}
 		

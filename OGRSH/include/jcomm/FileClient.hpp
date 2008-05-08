@@ -20,6 +20,9 @@ namespace jcomm
 				int flags, mode_t mode)
 				throw (OGRSHException, IOException);
 
+			std::string duplicate(const std::string &fileDesc)
+				throw (OGRSHException, IOException);
+
 			ssize_t read(const std::string &fileDesc,
 				void *buf, size_t length)
 				throw (OGRSHException, IOException);

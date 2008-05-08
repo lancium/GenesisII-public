@@ -12,10 +12,14 @@ namespace ogrsh
 {
 	class VirtualFileDescriptor : public FileDescriptor
 	{
+		protected:
+			VirtualFileDescriptor(int fd);
+
 		public:
 			VirtualFileDescriptor();
 			virtual ~VirtualFileDescriptor();
 
+			virtual FileDescriptor* dup(int newfd);
 			virtual ssize_t read(void *buf, size_t count);
 			virtual ssize_t write(const void *buf, size_t count);
 

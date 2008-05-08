@@ -30,6 +30,15 @@ namespace ogrsh
 		{
 		}
 
+		FileDescriptor* GeniiFSDirectoryDescriptor::dup(int newfd)
+		{
+			OGRSH_FATAL("GeniiFSDirectoryDescriptor::dup(" << getFD()
+				<< ", " << newfd << ") not implemented.");
+			ogrsh::shims::real_exit(1);
+
+			return NULL;
+		}
+
 		ssize_t GeniiFSDirectoryDescriptor::read(void *buf, size_t count)
 		{
 			OGRSH_FATAL("GeniiFSDirectoryDescriptor::read(" << _fullpath

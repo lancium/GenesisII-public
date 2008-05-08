@@ -123,6 +123,67 @@ namespace ogrsh
 			return ret;
 		}
 
+		SHIM_DEF(int, dup, (int oldfd), (oldfd))
+		{
+			OGRSH_DEBUG("dup(" << oldfd << ") called.");
+
+			if (oldfd < 0)
+			{
+				errno = EBADF;
+				return -1;
+			}
+
+			FileDescriptor* desc = FileDescriptorTable::getInstance().lookup(
+				oldfd);
+			if (desc == NULL)
+			{
+				// It's not one we have control of -- pass it through.
+				return ogrsh::shims::real_dup(oldfd);
+			}
+
+			desc = desc->dup(-1);
+			if (desc == NULL)
+				return -1;
+
+			int ret = FileDescriptorTable::getInstance().insert(desc);
+			if (ret < 0)
+				delete desc;
+
+			return ret;
+		}
+
+		SHIM_DEF(int, dup2, (int oldfd, int newfd), (oldfd, newfd))
+		{
+			OGRSH_DEBUG("dup2(" << oldfd << ", " << newfd << ") called.");
+
+			if ((oldfd < 0) || (newfd < 0))
+			{
+				errno = EBADF;
+				return -1;
+			}
+
+			close(newfd);
+			errno = 0;
+
+			FileDescriptor* desc = FileDescriptorTable::getInstance().lookup(
+				oldfd);
+			if (desc == NULL)
+			{
+				// It's not one we have control of -- pass it through.
+				return ogrsh::shims::real_dup2(oldfd, newfd);
+			}
+
+			desc = desc->dup(newfd);
+			if (desc == NULL)
+				return -1;
+
+			int ret = FileDescriptorTable::getInstance().insert(desc);
+			if (ret < 0)
+				delete desc;
+
+			return ret;
+		}
+
 		SHIM_DEF(int, close, (int fd), (fd))
 		{
 			OGRSH_DEBUG("close(" << fd << ") called.");
@@ -428,6 +489,8 @@ namespace ogrsh
 			START_SHIM(openat);
 			START_SHIM(openat64);
 			START_SHIM(open);
+			START_SHIM(dup2);
+			START_SHIM(dup);
 			START_SHIM(open64);
 			START_SHIM(creat);
 			START_SHIM(creat64);
@@ -469,6 +532,8 @@ namespace ogrsh
 			STOP_SHIM(creat64);
 			STOP_SHIM(creat);
 			STOP_SHIM(open64);
+			STOP_SHIM(dup);
+			STOP_SHIM(dup2);
 			STOP_SHIM(open);
 			STOP_SHIM(openat64);
 			STOP_SHIM(openat);

@@ -24,6 +24,8 @@ namespace ogrsh
 			FileDescriptor& operator= (const FileDescriptor&);
 
 		protected:
+			static int acquireDupDescriptor(int old, int desired);
+
 			FileDescriptor(int fd = -1, bool mustClose = true);
 
 		public:
@@ -33,6 +35,7 @@ namespace ogrsh
 			void setFullVirtualPath(const std::string &fullVirtualPath);
 			int getFD() const;
 
+			virtual FileDescriptor* dup(int newfd) = 0;
 			virtual ssize_t read(void *buf, size_t count) = 0;
 			virtual ssize_t write(const void *buf, size_t count) = 0;
 

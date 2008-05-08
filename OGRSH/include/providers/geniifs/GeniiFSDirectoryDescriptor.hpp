@@ -28,6 +28,7 @@ namespace ogrsh
 					GeniiFSMount *mount, const std::string &fullpath);
 				virtual ~GeniiFSDirectoryDescriptor();
 
+				virtual FileDescriptor* dup(int newfd);
 				virtual ssize_t read(void *buf, size_t count);
 				virtual ssize_t write(const void *buf, size_t count);
 

@@ -18,6 +18,8 @@ namespace ogrsh
 		SHIM_DECL(int, creat64, (const char *path, mode_t mode));
 		SHIM_DECL(int, open, (const char *path, int flags, mode_t mode));
 		SHIM_DECL(int, open64, (const char *path, int flags, mode_t mode));
+		SHIM_DECL(int, dup, (int oldfd));
+		SHIM_DECL(int, dup2, (int oldfd, int newfd));
 		SHIM_DECL(int, openat,
 			(int fd, const char *pathname, int flags, mode_t mode));
 		SHIM_DECL(int, openat64,

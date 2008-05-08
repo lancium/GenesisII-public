@@ -18,6 +18,15 @@ namespace ogrsh
 	{
 		GeniiFSFileDescriptor::GeniiFSFileDescriptor(
 			GeniiFSSession *session, GeniiFSMount *mount, 
+				const std::string &fd, int newfd)
+			: ogrsh::FileDescriptor(newfd), _fileDesc(fd)
+		{
+			_session = session;
+			_mount = mount;
+		}
+
+		GeniiFSFileDescriptor::GeniiFSFileDescriptor(
+			GeniiFSSession *session, GeniiFSMount *mount, 
 				const std::string &fd)
 			: ogrsh::FileDescriptor(), _fileDesc(fd)
 		{
@@ -32,6 +41,29 @@ namespace ogrsh
 
 			jcomm::FileClient client(*(_session->getSocket()));
 			client.close(_fileDesc);
+		}
+
+		FileDescriptor* GeniiFSFileDescriptor::dup(int newfd)
+		{
+			OGRSH_DEBUG("Calling dup on open GeniFS File \""
+				<< _fileDesc << "\" with new fd of " << newfd << ".");
+
+			newfd = acquireDupDescriptor(getFD(), newfd);
+			if (newfd < 0)
+				return NULL;
+
+			jcomm::FileClient client(*(_session->getSocket()));
+			try
+			{
+				std::string key = client.duplicate(_fileDesc);
+				return new GeniiFSFileDescriptor(
+					_session, _mount, key, newfd);
+			}
+			catch (jcomm::OGRSHException oe)
+			{
+				oe.setErrno();
+				return NULL;
+			}
 		}
 
 		ssize_t GeniiFSFileDescriptor::read(void *buf, size_t count)
@@ -142,9 +174,11 @@ namespace ogrsh
 					return FD_CLOEXEC;
 					break;
 				default :
-					OGRSH_FATAL("GeniiFSFileDescriptor::fcntl(cmd = "
+					OGRSH_DEBUG("GeniiFSFileDescriptor::fcntl(cmd = "
 						<< cmd << ") is unimplemented.");
+/*
 					ogrsh::shims::real_exit(1);
+*/
 			}
 
 			return -1;
