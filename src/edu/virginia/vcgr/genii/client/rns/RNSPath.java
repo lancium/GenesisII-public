@@ -70,7 +70,7 @@ public class RNSPath implements Externalizable  {
 		EntryType[] ret = null;
 
 		TypeInformation ti = new TypeInformation(epr);
-		if ((ti.isEnhancedRNS() || ti.isIDP()) && entryExpression.equals(".*"))
+		if ((ti.isEnhancedRNS()) && entryExpression.equals(".*"))
 		{
 			// TODO: make iteration faster for regular contexts so we can use it for them too
 

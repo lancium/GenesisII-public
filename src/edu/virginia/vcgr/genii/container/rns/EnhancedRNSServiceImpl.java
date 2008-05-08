@@ -128,32 +128,36 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		String filename = createFile.getFilename();
 		IRNSResource resource = null;
 		ResourceKey rKey = ResourceManager.getCurrentResource();
-		resource = (IRNSResource)rKey.dereference();
-		Collection<String> entries = resource.listEntries();
-			
-		if (entries.contains(filename))
-			throw FaultManipulator.fillInFault(
-				new RNSEntryExistsFaultType(null, null, null, null,
-					null, null, filename));
 		
-		try
+		synchronized(rKey.getLockObject())
 		{
-			RandomByteIOPortType byteio = ClientUtils.createProxy(
-				RandomByteIOPortType.class,
-				EPRUtils.makeEPR(Container.getServiceURL("RandomByteIOPortType")));
-			EndpointReferenceType entryReference = 
-				byteio.vcgrCreate(new VcgrCreate(null)).getEndpoint();
+			resource = (IRNSResource)rKey.dereference();
+			Collection<String> entries = resource.listEntries();
+				
+			if (entries.contains(filename))
+				throw FaultManipulator.fillInFault(
+					new RNSEntryExistsFaultType(null, null, null, null,
+						null, null, filename));
 			
-			/* if entry has a resolver, set address to unbound */
-			EndpointReferenceType eprToStore = prepareEPRToStore(entryReference);
-			resource.addEntry(new InternalEntry(filename, eprToStore, 
-				attributes));
-			resource.commit();
-			return new CreateFileResponse(entryReference);
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new ResourceException(ce.getLocalizedMessage(), ce);
+			try
+			{
+				RandomByteIOPortType byteio = ClientUtils.createProxy(
+					RandomByteIOPortType.class,
+					EPRUtils.makeEPR(Container.getServiceURL("RandomByteIOPortType")));
+				EndpointReferenceType entryReference = 
+					byteio.vcgrCreate(new VcgrCreate(null)).getEndpoint();
+				
+				/* if entry has a resolver, set address to unbound */
+				EndpointReferenceType eprToStore = prepareEPRToStore(entryReference);
+				resource.addEntry(new InternalEntry(filename, eprToStore, 
+					attributes));
+				resource.commit();
+				return new CreateFileResponse(entryReference);
+			}
+			catch (ConfigurationException ce)
+			{
+				throw new ResourceException(ce.getLocalizedMessage(), ce);
+			}
 		}
 	}
 	
@@ -163,9 +167,11 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 			ResourceUnknownFaultType, 
 			RNSEntryNotDirectoryFaultType, RNSFaultType
 	{
-		IRNSResource resource = null;
+		ResourceKey rKey = ResourceManager.getCurrentResource();
 		EndpointReferenceType entryReference;
 		
+		IRNSResource resource = null;
+			
 		if (addRequest == null)
 		{
 			// Pure factory operation
@@ -178,12 +184,14 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		
 		if (entryReference == null)
 			entryReference = vcgrCreate(new VcgrCreate()).getEndpoint();
-		
 		EndpointReferenceType eprToStore = prepareEPRToStore(entryReference);
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		resource = (IRNSResource)rKey.dereference();
-		resource.addEntry(new InternalEntry(name, eprToStore, attrs));
-		resource.commit();
+		
+		synchronized(rKey.getLockObject())
+		{
+			resource = (IRNSResource)rKey.dereference();
+			resource.addEntry(new InternalEntry(name, eprToStore, attrs));
+			resource.commit();
+		}
 		
 		fireRNSEntryAdded(name, entryReference);
 		return new AddResponse(entryReference);
@@ -201,8 +209,11 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
     	Collection<InternalEntry> entries;
     	
     	ResourceKey rKey = ResourceManager.getCurrentResource();
-    	resource = (IRNSResource)rKey.dereference();
-	    entries = resource.retrieveEntries(entry_name_regexp);
+    	synchronized(rKey.getLockObject())
+    	{
+	    	resource = (IRNSResource)rKey.dereference();
+		    entries = resource.retrieveEntries(entry_name_regexp);
+    	}
     	
     	EntryType []ret = new EntryType[entries.size()];
     	int lcv = 0;
@@ -227,8 +238,11 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
     	Collection<InternalEntry> entries;
     	
     	ResourceKey rKey = ResourceManager.getCurrentResource();
-    	resource = (IRNSResource)rKey.dereference();
-	    entries = resource.retrieveEntries(entry_name_regexp);
+    	synchronized (rKey.getLockObject())
+    	{
+    		resource = (IRNSResource)rKey.dereference();
+    		entries = resource.retrieveEntries(entry_name_regexp);
+    	}
 
 		Collection<MessageElement> col = new LinkedList<MessageElement>();
     	for (InternalEntry internalEntry : entries)
@@ -293,10 +307,15 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
     	String entry_name = remove.getEntry_name();
     	String []ret;
     	IRNSResource resource = null;
+    	Collection<String> removed;
     	
     	ResourceKey rKey = ResourceManager.getCurrentResource();
-    	resource = (IRNSResource)rKey.dereference();
-	    Collection<String> removed = resource.removeEntries(entry_name);
+    	synchronized(rKey.getLockObject())
+    	{
+	    	resource = (IRNSResource)rKey.dereference();
+		    removed = resource.removeEntries(entry_name);
+    	}
+    	
 	    ret = new String[removed.size()];
 	    removed.toArray(ret);
 	    resource.commit();

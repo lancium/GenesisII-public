@@ -226,6 +226,14 @@ namespace ogrsh
 			return 0;
 		}
 
+		SHIM_DEF_VOID(rewinddir, (DIR *dir), (dir))
+		{
+			OGRSH_TRACE("rewinddir(...) called.");
+
+			DirectoryStream *realDir = (DirectoryStream*)dir;
+			return realDir->rewinddir();
+		}
+
 		SHIM_DEF(dirent*, readdir, (DIR *dir), (dir))
 		{
 			OGRSH_TRACE("readdir() called.");
@@ -446,6 +454,7 @@ namespace ogrsh
 			START_SHIM(closedir);
 			START_SHIM(readdir);
 			START_SHIM(readdir64);
+			START_SHIM(rewinddir);
 			START_SHIM(dirfd);
 			START_SHIM(__xstat);
 			START_SHIM(__xstat64);
@@ -469,6 +478,7 @@ namespace ogrsh
 			STOP_SHIM(get_current_dir_name);
 			STOP_SHIM(getcwd);
 			STOP_SHIM(dirfd);
+			STOP_SHIM(rewinddir);
 			STOP_SHIM(fdopendir);
 			STOP_SHIM(opendir);
 			STOP_SHIM(closedir);

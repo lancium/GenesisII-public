@@ -43,6 +43,11 @@ namespace ogrsh
 			return ogrsh::shims::real_readdir64(_dir);
 		}
 
+		void LocalFSDirectoryStream::rewinddir()
+		{
+			ogrsh::shims::real_rewinddir(_dir);
+		}
+
 		int LocalFSDirectoryStream::dirfd()
 		{
 			return getFileDescriptor()->getFD();

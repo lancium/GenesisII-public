@@ -25,6 +25,8 @@ namespace jcomm
 				throw (OGRSHException, IOException);
 			DirectoryEntry* readdir(const std::string &directorySession)
 				throw (OGRSHException, IOException);
+			void rewinddir(const std::string &directorySession)
+				throw (OGRSHException, IOException);
 			int closedir(const std::string &directorySession)
 				throw (OGRSHException, IOException);
 			StatBuffer xstat(const std::string &fullPath)

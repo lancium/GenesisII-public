@@ -26,6 +26,7 @@ namespace ogrsh
 
 			virtual dirent* readdir() = 0;
 			virtual dirent64* readdir64() = 0;
+			virtual void rewinddir() = 0;
 
 			virtual int dirfd() = 0;
 	};

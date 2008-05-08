@@ -3,7 +3,6 @@ package edu.virginia.vcgr.genii.container.bes.activity;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
-import java.io.NotSerializableException;
 import java.io.Serializable;
 import java.sql.Blob;
 import java.sql.Connection;
@@ -548,16 +547,13 @@ public class BESActivity implements Closeable
 			}
 			catch (SQLException sqe)
 			{
-				Throwable cause2 = sqe.getCause();
-				if (cause2 instanceof NotSerializableException)
-				{
-					_logger.error("Attempt to serialize an unserializable exception into the database.", sqe);
-					addFault(new Exception(
-						"Unserializable fault occurred in BES activity (" + 
-						cause.getLocalizedMessage() + 
-						") -- no further information available."), attemptsLeft - 1);
+				_logger.error("Attempt to serialize an unserializable " +
+					"exception into the database.", cause);
+				addFault(new Exception(
+					"Unserializable fault occurred in BES activity (" + 
+					cause.getLocalizedMessage() + 
+					") -- no further information available."), attemptsLeft - 1);
 					return;
-				}
 			}
 			
 			connection = _connectionPool.acquire();

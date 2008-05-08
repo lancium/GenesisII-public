@@ -88,6 +88,17 @@ namespace jcomm
 		return result;
 	}
 
+	void DirectoryClient::rewinddir(const std::string &session)
+		throw (OGRSHException, IOException)
+	{
+		Invocation inv(_socket, "rewinddir");
+
+		inv.addString(session);
+
+		IOGRSHReadBuffer *buffer = inv.invoke();
+		delete buffer;
+	}
+
 	int DirectoryClient::closedir(const std::string &session)
 		throw (OGRSHException, IOException)
 	{

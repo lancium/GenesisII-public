@@ -142,53 +142,42 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 		IExportedDirResource resource;
 		
 		ResourceKey rKey = ResourceManager.getCurrentResource();
-		resource = (IExportedDirResource)rKey.dereference();
-		
-		Collection<ExportedDirEntry> entries = resource.retrieveEntries(".*");
-		for (ExportedDirEntry entry : entries)
+		synchronized(rKey.getLockObject())
 		{
-			if (filename.equals(entry.getName()))
-				throw FaultManipulator.fillInFault(new RNSEntryExistsFaultType(
-					null, null, null, null, null, null, filename));
-		}
-		
-		String fullPath = ExportedFileUtils.createFullPath(
-			resource.getLocalPath(), filename);
-		String parentIds = ExportedDirUtils.createParentIdsString(
-			resource.getParentIds(), resource.getId());
-		try
-		{
-			/*
-			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class,
+			resource = (IExportedDirResource)rKey.dereference();
+			
+			Collection<ExportedDirEntry> entries = resource.retrieveEntries(".*");
+			for (ExportedDirEntry entry : entries)
+			{
+				if (filename.equals(entry.getName()))
+					throw FaultManipulator.fillInFault(new RNSEntryExistsFaultType(
+						null, null, null, null, null, null, filename));
+			}
+			
+			String fullPath = ExportedFileUtils.createFullPath(
+				resource.getLocalPath(), filename);
+			String parentIds = ExportedDirUtils.createParentIdsString(
+				resource.getParentIds(), resource.getId());
+			try
+			{
+				WorkingContext.temporarilyAssumeNewIdentity(
 					EPRUtils.makeEPR(Container.getServiceURL("ExportedFilePortType")));
-			entryReference = 
-				common.vcgrCreate(new VcgrCreate(
+				entryReference = new ExportedFileServiceImpl().vcgrCreate(new VcgrCreate(
 					ExportedFileUtils.createCreationProperties(
-					fullPath, parentIds))).getEndpoint();
-			*/
-			WorkingContext.temporarilyAssumeNewIdentity(
-				EPRUtils.makeEPR(Container.getServiceURL("ExportedFilePortType")));
-			entryReference = new ExportedFileServiceImpl().vcgrCreate(new VcgrCreate(
-				ExportedFileUtils.createCreationProperties(
-						fullPath, parentIds, resource.getReplicationState()))).getEndpoint();
+							fullPath, parentIds, resource.getReplicationState()))).getEndpoint();
+			}
+			finally
+			{
+				WorkingContext.releaseAssumedIdentity();
+			}
+			
+			String newEntryId = (new GUID()).toString();
+			ExportedDirEntry newEntry = new ExportedDirEntry(
+				resource.getId(), filename, entryReference,
+				newEntryId, ExportedDirEntry._FILE_TYPE, null);
+			resource.addEntry(newEntry, true);
+			resource.commit();
 		}
-		finally
-		{
-			WorkingContext.releaseAssumedIdentity();
-		}
-		/*
-		catch (ConfigurationException ce)
-		{
-			throw new ResourceException(ce.getLocalizedMessage(), ce);
-		}
-		*/
-		
-		String newEntryId = (new GUID()).toString();
-		ExportedDirEntry newEntry = new ExportedDirEntry(
-			resource.getId(), filename, entryReference,
-			newEntryId, ExportedDirEntry._FILE_TYPE, null);
-		resource.addEntry(newEntry, true);
-		resource.commit();
 		
 		return new CreateFileResponse(entryReference);
 	}
@@ -229,24 +218,33 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 		
 		IExportedDirResource resource;
 		ResourceKey rKey = ResourceManager.getCurrentResource();
+		EndpointReferenceType newRef;
 		
-		resource = (IExportedDirResource)rKey.dereference();
-		String fullPath = ExportedFileUtils.createFullPath(
-			resource.getLocalPath(), name);
-		String parentIds = ExportedDirUtils.createParentIdsString(
-			resource.getParentIds(), resource.getId());
-		String isReplicated = resource.getReplicationState();
-		EndpointReferenceType newRef =
-			vcgrCreate(new VcgrCreate(ExportedDirUtils.createCreationProperties(
-				fullPath, 
-				parentIds, 
-				isReplicated))).getEndpoint();
+		synchronized(rKey.getLockObject())
+		{
+			resource = (IExportedDirResource)rKey.dereference();
+			String fullPath = ExportedFileUtils.createFullPath(
+				resource.getLocalPath(), name);
+			String parentIds = ExportedDirUtils.createParentIdsString(
+				resource.getParentIds(), resource.getId());
+			String isReplicated = resource.getReplicationState();
+			newRef =
+				vcgrCreate(new VcgrCreate(ExportedDirUtils.createCreationProperties(
+					fullPath, 
+					parentIds, 
+					isReplicated))).getEndpoint();
+			
+			String newEntryId = (new GUID()).toString();
+			ExportedDirEntry newEntry = new ExportedDirEntry(
+				resource.getId(), name, newRef, newEntryId, ExportedDirEntry._DIR_TYPE, attrs);
+			resource.addEntry(newEntry, true);
+			resource.commit();
+		}
 		
-		String newEntryId = (new GUID()).toString();
-		ExportedDirEntry newEntry = new ExportedDirEntry(
-			resource.getId(), name, newRef, newEntryId, ExportedDirEntry._DIR_TYPE, attrs);
-		resource.addEntry(newEntry, true);
-		resource.commit();
+		//get and set modify time for newly created Dir
+		ResourceKey newRefKey = ResourceManager.getTargetResource(newRef);
+		IExportedDirResource newResource = (IExportedDirResource)newRefKey.dereference();
+		newResource.getAndSetModifyTime();
 		
 		return new AddResponse(newRef);
 	}
@@ -257,17 +255,21 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
     		RNSEntryNotDirectoryFaultType, RNSFaultType
     {
 		String entry_name_regexp = list.getEntry_name_regexp();
+		ResourceKey rKey = ResourceManager.getCurrentResource();
+		Collection<MessageElement> entryCollection;
+		Collection<ExportedDirEntry> entries = null;
 		
 		_logger.debug("ExportDir asked to lookup iter for \"" + entry_name_regexp + "\".");
 		
-		IExportedDirResource resource = 
-			(IExportedDirResource)ResourceManager.getCurrentResource().dereference();
-		Collection<ExportedDirEntry> entries = null;
-		
-		entries = resource.retrieveEntries(entry_name_regexp);
-		
+		synchronized(rKey.getLockObject())
+		{
+			IExportedDirResource resource = 
+				(IExportedDirResource)rKey.dereference();
+			
+			entries = resource.retrieveEntries(entry_name_regexp);
+		}
 		//create collection of MessageElement entries
-		Collection<MessageElement> entryCollection = new LinkedList<MessageElement>();
+		entryCollection = new LinkedList<MessageElement>();
     	for (ExportedDirEntry exportDirEntry : entries){
     		EntryType entry = new EntryType(
     				exportDirEntry.getName(), 
@@ -295,14 +297,19 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 			RNSFaultType
 	{
 		String entry_name_regexp = listRequest.getEntry_name_regexp();
+		ResourceKey rKey = ResourceManager.getCurrentResource();
+		Collection<ExportedDirEntry> entries;
 		
 		_logger.debug("ExportDir asked to lookup \"" + entry_name_regexp + "\".");
 		
-		IExportedDirResource resource = 
-			(IExportedDirResource)ResourceManager.getCurrentResource().dereference();
-		Collection<ExportedDirEntry> entries;
+		synchronized(rKey.getLockObject())
+		{
+			IExportedDirResource resource = 
+				(IExportedDirResource)rKey.dereference();
+			
+			entries = resource.retrieveEntries(entry_name_regexp);
+		}
 		
-		entries = resource.retrieveEntries(entry_name_regexp);
 		EntryType []ret = new EntryType[entries.size()];
 		int lcv = 0;
 		for (ExportedDirEntry entry : entries)
@@ -350,14 +357,21 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 			ResourceUnknownFaultType, RNSDirectoryNotEmptyFaultType,
 			RNSFaultType
 	{
+		ResourceKey rKey = ResourceManager.getCurrentResource();
 		String entry_name = removeRequest.getEntry_name();
 		String []ret;
-		IExportedDirResource resource = 
-			(IExportedDirResource)ResourceManager.getCurrentResource().dereference();
-		Collection<String> removed = resource.removeEntries(entry_name, true);
+		Collection<String> removed; 
+		
+		synchronized(rKey.getLockObject())
+		{
+			IExportedDirResource resource = 
+				(IExportedDirResource)rKey.dereference();
+			removed = resource.removeEntries(entry_name, true);
+			resource.commit();
+		}
+		
 		ret = new String[removed.size()];
 		removed.toArray(ret);
-		resource.commit();
 		
 		return ret;
 	}

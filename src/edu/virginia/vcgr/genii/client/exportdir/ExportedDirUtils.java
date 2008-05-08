@@ -23,10 +23,13 @@ import java.util.HashMap;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.container.exportdir.ExportedDirServiceImpl;
 
 public class ExportedDirUtils
 {
@@ -37,6 +40,8 @@ public class ExportedDirUtils
 	static final protected String _REXPORT_RESOLVER_EPR = "rexport-resolver-service-epr";
 	static final public String _PARENT_ID_BEGIN_DELIMITER = ":";
 	static final public String _PARENT_ID_END_DELIMITER = ":";
+	
+	static private Log _logger = LogFactory.getLog(ExportedDirUtils.class);
 	
 	static public class ExportedDirInitInfo
 	{
@@ -198,8 +203,9 @@ public class ExportedDirUtils
 			throw new IllegalArgumentException(
 				"Couldn't find resolver service epr in export creation properties.");
 		try{
-			resolverServiceEPR = (EndpointReferenceType) resolverServiceElement.getObjectValue(
-				EndpointReferenceType.class);
+			if (resolverServiceElement.getObjectValue()!= null)
+				resolverServiceEPR = (EndpointReferenceType) resolverServiceElement.getObjectValue(
+						EndpointReferenceType.class);
 		}
 		catch(Exception e){
 			throw new ResourceException("Uable to extract resolver factory epr: " 
@@ -270,15 +276,11 @@ public class ExportedDirUtils
 	 * 
 	 */
 	static public long getLastModifiedTime(String path){
-		Long lastModifiedTime = null;
+		long lastModifiedTime = 0;
 		File testFile = new File(path);
 		
 		if ((testFile.exists()) && testFile.isDirectory())
 			lastModifiedTime = testFile.lastModified();
-		else
-			//should never happen
-			System.out.println(
-			"ERROR: could not get last modified time because dir dne/is not readable");
 		
 		return lastModifiedTime;
 	}

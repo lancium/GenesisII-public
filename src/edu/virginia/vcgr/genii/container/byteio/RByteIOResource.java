@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Random;
 
 import javax.xml.namespace.QName;
 
@@ -92,7 +93,7 @@ public class RByteIOResource extends BasicDBResource implements IRByteIOResource
 			if (file == null)
 			{
 				superDir = new GuaranteedDirectory(superDir, "rbyteio-data");
-				file = File.createTempFile("rbyteio", ".dat", superDir);
+				file = getNewFile(superDir, "rbyteio", ".dat");
 			}
 		}
 		catch (IOException ioe)
@@ -102,6 +103,23 @@ public class RByteIOResource extends BasicDBResource implements IRByteIOResource
 			
 		setProperty(_INTERNAL_FILE_PATH_PROP_NAME, file.getAbsolutePath());
 		return file;
+	}
+	
+	static private Random _directoryBalancer = new Random();
+	static private final int DISPERSION_LEVELS = 2;
+	static private final int DISPERSION_WIDTH = 32;
+	
+	synchronized static private File getNewFile(File superDir, 
+			String filePrefix, String fileSuffix) throws IOException
+	{
+		File baseDir = superDir;
+		for (int lcv = 0; lcv < DISPERSION_LEVELS; lcv++)
+		{
+			int value = _directoryBalancer.nextInt(DISPERSION_WIDTH);
+			baseDir = new GuaranteedDirectory(baseDir, String.format("dir.%d", value));
+		}
+		
+		return File.createTempFile(filePrefix, fileSuffix, baseDir);
 	}
 	
 	public File getCurrentFile() throws ResourceException

@@ -215,6 +215,14 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		}
 	}
 	
+	public void getAndSetModifyTime()
+		throws ResourceException
+	{
+		Long latestModifyTime = ExportedDirUtils.getLastModifiedTime(_myLocalPath);
+		_lastModified = latestModifyTime;
+		updateModifyTime();
+	}
+	
 	private void updateModifyTime()
 		throws ResourceException
 	{

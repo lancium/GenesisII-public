@@ -2,6 +2,7 @@ package edu.virginia.vcgr.ogrsh.server.handlers;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -113,8 +114,30 @@ public class DirectoryHandler
 		}
 	}
 	
-	private HashMap<String, Iterator<DirectoryEntry>> _openSessions =
-		new HashMap<String, Iterator<DirectoryEntry>>();
+	static private class DirectorySession
+	{
+		private Collection<DirectoryEntry> _entries;
+		private Iterator<DirectoryEntry> _currentIterator;
+		
+		public DirectorySession(Collection<DirectoryEntry> entries)
+		{
+				_entries = entries;
+				_currentIterator = _entries.iterator();
+		}
+		
+		public Iterator<DirectoryEntry> getIterator()
+		{
+			return _currentIterator;
+		}
+		
+		public void rewind()
+		{
+			_currentIterator = _entries.iterator();
+		}
+	}
+	
+	private HashMap<String, DirectorySession> _openSessions =
+		new HashMap<String, DirectorySession>();
 	
 	public DirectoryHandler()
 	{
@@ -156,7 +179,7 @@ public class DirectoryHandler
 				}
 			}
 			String key = new GUID().toString();
-			_openSessions.put(key, entries.iterator());
+			_openSessions.put(key, new DirectorySession(entries));
 			return key;
 		}
 		catch (Throwable cause)
@@ -177,10 +200,26 @@ public class DirectoryHandler
 	public DirectoryEntry readdir(String dirSession)
 		throws OGRSHException
 	{
-		Iterator<DirectoryEntry> iter = _openSessions.get(dirSession);
+		DirectorySession session = _openSessions.get(dirSession);
+		if (session == null)
+			throw new OGRSHException(OGRSHException.EBADF, 
+				"Unknown directory session.");
+		Iterator<DirectoryEntry> iter = session.getIterator();
 		if (iter.hasNext())
 			return iter.next();
 		return null;
+	}
+	
+	@OGRSHOperation
+	public int rewinddir(String dirSession)
+		throws OGRSHException
+	{
+		DirectorySession session = _openSessions.get(dirSession);
+		if (session == null)
+			throw new OGRSHException(OGRSHException.EBADF, 
+				"Unknown directory session.");
+		session.rewind();
+		return 0;
 	}
 
 	@OGRSHOperation
@@ -354,7 +393,7 @@ public class DirectoryHandler
 			if (resp.getEntryList().length != 0)
 				throw new OGRSHException(OGRSHException.DIRECTORY_NOT_EMPTY,
 					"Directory \"" + fullpath + "\" is not empty.");
-			full.unlink();
+			full.delete();
 		}
 		catch (Throwable cause)
 		{

@@ -211,10 +211,7 @@ public class FileHandler
 					"Path \"" + path + "\" refers to a directory.");
 			}
 			
-			// TODO
-			// Warning, this next line leaks resources (it only removes the
-			// the entry from RNS space, it doesn't actually delete it).
-			path.unlink();
+			path.delete();
 			return 0;
 		}
 		catch (Throwable cause)

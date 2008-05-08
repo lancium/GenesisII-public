@@ -84,6 +84,15 @@ namespace ogrsh
 			return &_dent64;
 		}
 
+		void GeniiFSDirectoryStream::rewinddir()
+		{
+			OGRSH_DEBUG("Calling rewinddir on open GeniFS Directory \""
+				<< _directoryKey << "\".");
+
+			jcomm::DirectoryClient client(*(_session->getSocket()));
+			client.rewinddir(_directoryKey);
+		}
+
 		int GeniiFSDirectoryStream::dirfd()
 		{
 			return getFileDescriptor()->getFD();

@@ -31,6 +31,7 @@ namespace ogrsh
 		SHIM_DECL(dirent*, readdir, (DIR *dir));
 		SHIM_DECL(dirent64*, readdir64, (DIR *dir));
 		SHIM_DECL(int, dirfd, (DIR *dir));
+		SHIM_DECL_VOID(rewinddir, (DIR *dir));
 
 		SHIM_DECL(int, link, (const char *oldPath, const char *newPath));
 

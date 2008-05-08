@@ -15,4 +15,6 @@ public interface IExportedDirResource extends IExportedEntryResource
 		throws ResourceException;
 	public Collection<String> removeEntries(String regex, boolean hardDestroy)
 		throws ResourceException;
+	public void getAndSetModifyTime()
+		throws ResourceException; 
 }

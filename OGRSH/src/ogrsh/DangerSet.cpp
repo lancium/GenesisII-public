@@ -63,13 +63,6 @@ extern "C" {
 		return NULL;
 	}
 
-	void rewinddir(DIR*)
-	{
-		OGRSH_FATAL(
-			"Attempt to use un-intercepted method rewinddir(...)");
-		ogrsh::shims::real_exit(1);
-	}
-
 /*
 	int scandir(const char *dir, struct dirent ***namelist,
 		int (*filter)(const struct dirent *),

@@ -56,6 +56,11 @@ namespace ogrsh
 		return &_currentDirent64;
 	}
 
+	void VirtualDirectoryStream::rewinddir()
+	{
+		_iterator = _entries.begin();
+	}
+
 	int VirtualDirectoryStream::dirfd()
 	{
 		return getFileDescriptor()->getFD();
