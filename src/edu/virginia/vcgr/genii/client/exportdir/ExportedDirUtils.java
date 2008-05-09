@@ -29,7 +29,6 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.container.exportdir.ExportedDirServiceImpl;
 
 public class ExportedDirUtils
 {
@@ -41,6 +40,7 @@ public class ExportedDirUtils
 	static final public String _PARENT_ID_BEGIN_DELIMITER = ":";
 	static final public String _PARENT_ID_END_DELIMITER = ":";
 	
+	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(ExportedDirUtils.class);
 	
 	static public class ExportedDirInitInfo

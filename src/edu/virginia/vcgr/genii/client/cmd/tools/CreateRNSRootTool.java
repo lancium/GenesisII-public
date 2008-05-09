@@ -86,8 +86,7 @@ public class CreateRNSRootTool extends BaseGridTool
 		RNSPath root = RNSSpace.createNewSpace(baseURL + "/EnhancedRNSPortType");
 		ICallingContext ctxt = ContextManager.bootstrap(root);
 		String userConfigDir = ConfigurationManager.getUserConfigDir();
-		ConnectTool connect = new ConnectTool();
-		connect.connect(ctxt, userConfigDir);
+		ConnectTool.connect(ctxt, userConfigDir);
 		stdout.println("Storing configuration to \"" +
 			filename + "\".");
 		ContextFileSystem.store(new File(filename), null, ctxt);

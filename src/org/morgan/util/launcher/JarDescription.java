@@ -212,13 +212,6 @@ public class JarDescription
 	
 	public ClassLoader createClassLoader() throws IOException
 	{
-		/*
-		URL []jars = new URL[_jarFiles.size()];
-		_jarFiles.toArray(jars);
-		return new URLClassLoader(jars,
-			Thread.currentThread().getContextClassLoader());
-		*/
-		
 		URLClassLoader sysloader = (URLClassLoader)ClassLoader.getSystemClassLoader();
 		Class<URLClassLoader> sysclass = URLClassLoader.class;
 		

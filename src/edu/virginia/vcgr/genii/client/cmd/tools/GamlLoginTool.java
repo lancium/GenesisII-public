@@ -9,8 +9,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.Text;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
@@ -30,7 +28,6 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.X509Identity;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
-import edu.virginia.vcgr.genii.client.security.SecurityConstants;
 import edu.virginia.vcgr.genii.client.utils.PathUtils;
 import edu.virginia.vcgr.genii.client.utils.dialog.DialogException;
 import edu.virginia.vcgr.genii.client.utils.dialog.GenericQuestionWidget;
@@ -48,7 +45,6 @@ import edu.virginia.vcgr.genii.x509authn.X509AuthnPortType;
 import org.oasis_open.docs.ws_sx.ws_trust._200512.*;
 import org.apache.axis.message.MessageElement;
 import org.apache.ws.security.message.token.BinarySecurity;
-import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.message.token.X509Security;
 import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_utility_1_0_xsd.*;
 
