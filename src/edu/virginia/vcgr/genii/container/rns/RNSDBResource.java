@@ -5,7 +5,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.regex.Pattern;
 
 import org.ggf.rns.RNSEntryExistsFaultType;
 import org.morgan.util.GUID;
@@ -26,7 +25,9 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 		"INSERT INTO entries VALUES(?, ?, ?, ?, ?)";
 	static private final String _SELECT_ENTRIES_STMT =
 		"SELECT name FROM entries WHERE resourceid = ?";
-	static private final String _RETRIEVE_STMT =
+	static private final String _RETRIEVE_ONE_STMT =
+		"SELECT name, endpoint, id, attrs FROM entries WHERE resourceid = ? AND name = ?";
+	static private final String _RETRIEVE_ALL_STMT =
 		"SELECT name, endpoint, id, attrs FROM entries WHERE resourceid = ?";
 	static private final String _REMOVE_ENTRIES_STMT =
 		"DELETE FROM entries WHERE resourceid = ? AND name = ?";
@@ -106,28 +107,20 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 		}
 	}
 
-	public Collection<String> removeEntries(String regex)
-			throws ResourceException
+	public Collection<String> removeEntries(String entryName)
+		throws ResourceException
 	{
-		Pattern p = Pattern.compile(regex);
 		ArrayList<String> ret = new ArrayList<String>();
 		PreparedStatement stmt = null;
-		Collection<String> entries = listEntries();
 		
 		try
 		{
 			stmt = _connection.prepareStatement(_REMOVE_ENTRIES_STMT);
 			stmt.setString(1, _resourceKey);
+			stmt.setString(2, entryName);
 			
-			for (String entry : entries)
-			{
-				if (p.matcher(entry).matches())
-				{
-					stmt.setString(2, entry);
-					stmt.executeUpdate();
-					ret.add(entry);
-				}
-			}
+			stmt.executeUpdate();
+			ret.add(entryName);
 			
 			return ret;
 		}
@@ -141,10 +134,9 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 		}
 	}
 
-	public Collection<InternalEntry> retrieveEntries(String regex)
+	public Collection<InternalEntry> retrieveEntries(String entryName)
 			throws ResourceException
 	{
-		Pattern p = Pattern.compile(regex);
 		ArrayList<InternalEntry> ret = new ArrayList<InternalEntry>();
 		
 		PreparedStatement stmt = null;
@@ -152,17 +144,23 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 		
 		try
 		{
-			stmt = _connection.prepareStatement(_RETRIEVE_STMT);
+			if (entryName == null)
+				stmt = _connection.prepareStatement(_RETRIEVE_ALL_STMT);
+			else
+			{
+				stmt = _connection.prepareStatement(_RETRIEVE_ONE_STMT);
+				stmt.setString(2, entryName);
+			}
+			
 			stmt.setString(1, _resourceKey);
 			rs = stmt.executeQuery();
 			
 			while (rs.next())
 			{
 				InternalEntry entry = new InternalEntry(
-						rs.getString(1), EPRUtils.fromBlob(rs.getBlob(2)),
-						ObjectDeserializer.anyFromBytes(rs.getBytes(4)));
-				if (p.matcher(entry.getName()).matches())
-					ret.add(entry);
+					rs.getString(1), EPRUtils.fromBlob(rs.getBlob(2)),
+					ObjectDeserializer.anyFromBytes(rs.getBytes(4)));
+				ret.add(entry);
 			}
 			
 			return ret;

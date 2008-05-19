@@ -2,6 +2,7 @@
 <xsd:schema
 	xmlns="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:rns="http://schemas.ggf.org/rns/2006/05/rns"
 	xmlns:wsa="http://www.w3.org/2005/08/addressing"
 	xmlns:iterator="http://vcgr.cs.virginia.edu/genii/iterator"
 	xmlns:EnhancedRNS="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
@@ -19,15 +20,12 @@
 	<xsd:import
 		namespace="http://www.w3.org/2005/08/addressing"
 		schemaLocation="./ws-addr.xsd"/>
+
+	<xsd:import
+		namespace="http://schemas.ggf.org/rns/2006/05/rns"
+		schemaLocation="./rns.xsd"/>
 	
-	<xsd:complexType name="IterateListRequestType">
-		<xsd:sequence>
-			<xsd:element
-				name="entry_name_regexp" type="xsd:string"
-				minOccurs="1" maxOccurs="1"
-				nillable="true"/>
-		</xsd:sequence>
-	</xsd:complexType>
+	<xsd:complexType name="IterateListRequestType"/>
 	<xsd:element name="IterateListRequestType" 
 		type="EnhancedRNS:IterateListRequestType" />
 			

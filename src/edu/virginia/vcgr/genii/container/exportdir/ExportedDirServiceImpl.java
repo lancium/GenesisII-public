@@ -146,7 +146,7 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 		{
 			resource = (IExportedDirResource)rKey.dereference();
 			
-			Collection<ExportedDirEntry> entries = resource.retrieveEntries(".*");
+			Collection<ExportedDirEntry> entries = resource.retrieveEntries(null);
 			for (ExportedDirEntry entry : entries)
 			{
 				if (filename.equals(entry.getName()))
@@ -254,19 +254,16 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
     	throws RemoteException, ResourceUnknownFaultType, 
     		RNSEntryNotDirectoryFaultType, RNSFaultType
     {
-		String entry_name_regexp = list.getEntry_name_regexp();
 		ResourceKey rKey = ResourceManager.getCurrentResource();
 		Collection<MessageElement> entryCollection;
 		Collection<ExportedDirEntry> entries = null;
-		
-		_logger.debug("ExportDir asked to lookup iter for \"" + entry_name_regexp + "\".");
 		
 		synchronized(rKey.getLockObject())
 		{
 			IExportedDirResource resource = 
 				(IExportedDirResource)rKey.dereference();
 			
-			entries = resource.retrieveEntries(entry_name_regexp);
+			entries = resource.retrieveEntries(null);
 		}
 		//create collection of MessageElement entries
 		entryCollection = new LinkedList<MessageElement>();
@@ -296,18 +293,15 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType,
 			RNSFaultType
 	{
-		String entry_name_regexp = listRequest.getEntry_name_regexp();
 		ResourceKey rKey = ResourceManager.getCurrentResource();
 		Collection<ExportedDirEntry> entries;
-		
-		_logger.debug("ExportDir asked to lookup \"" + entry_name_regexp + "\".");
 		
 		synchronized(rKey.getLockObject())
 		{
 			IExportedDirResource resource = 
 				(IExportedDirResource)rKey.dereference();
 			
-			entries = resource.retrieveEntries(entry_name_regexp);
+			entries = resource.retrieveEntries(listRequest.getEntryName());
 		}
 		
 		EntryType []ret = new EntryType[entries.size()];
@@ -358,7 +352,6 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 			RNSFaultType
 	{
 		ResourceKey rKey = ResourceManager.getCurrentResource();
-		String entry_name = removeRequest.getEntry_name();
 		String []ret;
 		Collection<String> removed; 
 		
@@ -366,7 +359,7 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 		{
 			IExportedDirResource resource = 
 				(IExportedDirResource)rKey.dereference();
-			removed = resource.removeEntries(entry_name, true);
+			removed = resource.removeEntries(removeRequest.getEntryName(), true);
 			resource.commit();
 		}
 		

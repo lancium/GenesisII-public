@@ -191,7 +191,6 @@ namespace ogrsh
 		int GeniiFSDirectoryFunctions::rename(
 			const ogrsh::Path &oldPath, const ogrsh::Path &newPath)
 		{
-/* MOOCH
 			OGRSH_DEBUG("GeniiFSDirectoryFunctions::rename(\""
 				<< (const std::string&)oldPath << "\", \""
 				<< (const std::string&)newPath << "\") called.");
@@ -215,10 +214,6 @@ namespace ogrsh
 				return -1;
 			}
 
-			return -1;
-*/
-			OGRSH_FATAL("GeniiFSDirectoryFunctions::rename is unimplemented.");
-			ogrsh::shims::real_exit(1);
 			return -1;
 		}
 

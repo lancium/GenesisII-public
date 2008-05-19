@@ -33,8 +33,9 @@
 				<xsd:complexType>
 					<xsd:sequence>
 						<xsd:element
-							name="entry_name_regexp" type="xsd:string"
-							minOccurs="1" maxOccurs="1"
+							name="entry-name"
+							type="xsd:string"
+							minOccurs="0" maxOccurs="1"
 							nillable="true"/>
 					</xsd:sequence>
 				</xsd:complexType>
@@ -49,7 +50,7 @@
 					</xsd:sequence>
 				</xsd:complexType>
 			</xsd:element>
-	
+
 			<xsd:element name="createFile">
 				<xsd:complexType>
 					<xsd:sequence>
@@ -149,8 +150,10 @@
 				<xsd:complexType>
 					<xsd:sequence>
 						<xsd:element
-							name="entry_name" type="xsd:string"
-							minOccurs="1" maxOccurs="1"/>
+							name="entry-name"
+							type="xsd:string"
+							minOccurs="0" maxOccurs="1"
+							nillable="true"/>
 					</xsd:sequence>
 				</xsd:complexType>
 			</xsd:element>

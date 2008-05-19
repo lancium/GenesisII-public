@@ -88,7 +88,7 @@ public class FileHandler
 						"Path \"" + fullPath + "\" does not exist.");
 				}
 				
-				path.createFile();
+				path.createNewFile();
 			}
 				
 			TypeInformation typeInfo = new TypeInformation(path.getEndpoint());

@@ -57,14 +57,14 @@ public class JNIGetInformationTool extends JNILibraryBase {
 					RNSPath filePath = current.lookup(path, RNSPathQueryFlags.MUST_EXIST);
 					String name;
 					
+					TypeInformation type = new TypeInformation(
+						filePath.getEndpoint());		
 					//Fill in directory information
-					if(filePath.isDirectory()){ 
+					if(type.isRNS()){ 
 						isDirectory = true;
 						fileSize = -1;
 					}
 					else{
-						TypeInformation type = new TypeInformation(
-								filePath.getEndpoint());						
 						fileSize = type.getByteIOSize();																		
 					}
 					name = filePath.getName();
@@ -121,19 +121,19 @@ public class JNIGetInformationTool extends JNILibraryBase {
 				{
 					cacheEntry = JNICacheEntry.createNonExistingEntry(path.pwd());
 				}
-				else{				
+				else{	
+					TypeInformation type = new TypeInformation(
+						path.getEndpoint());
 					//Fill in directory information
-					if(path.isDirectory()){ 
+					if(type.isRNS()){ 
 						fileSize = -1;
 					}
-					else{
-						TypeInformation type = new TypeInformation(
-								path.getEndpoint());						
+					else{						
 						fileSize = type.getByteIOSize();																		
 					}
 					
 					name = path.getName();
-					cacheEntry = new JNICacheEntry(path.pwd(), path.isDirectory(), fileSize, name, null);
+					cacheEntry = new JNICacheEntry(path.pwd(), type.isRNS(), fileSize, name, null);
 				}
 				
 				//Add it to the cache!

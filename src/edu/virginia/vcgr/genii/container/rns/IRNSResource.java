@@ -27,8 +27,8 @@ public interface IRNSResource extends IResource
 	public void addEntry(InternalEntry entry) 
 		throws ResourceException, RNSEntryExistsFaultType;
 	public Collection<String> listEntries() throws ResourceException;
-	public Collection<InternalEntry> retrieveEntries(String regex)
+	public Collection<InternalEntry> retrieveEntries(String entryName)
 		throws ResourceException;
-	public Collection<String> removeEntries(String regex)
+	public Collection<String> removeEntries(String entryName)
 		throws ResourceException;
 }

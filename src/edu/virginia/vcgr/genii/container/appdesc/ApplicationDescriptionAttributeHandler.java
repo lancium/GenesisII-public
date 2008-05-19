@@ -80,7 +80,7 @@ public class ApplicationDescriptionAttributeHandler extends
 		ResourceKey rKey = ResourceManager.getCurrentResource();
 		resource = (IRNSResource)rKey.dereference();
 		
-		Collection<InternalEntry> entries = resource.retrieveEntries(".*");
+		Collection<InternalEntry> entries = resource.retrieveEntries(null);
 		for (InternalEntry entry : entries)
 		{
 			MessageElement supportDocument = null;

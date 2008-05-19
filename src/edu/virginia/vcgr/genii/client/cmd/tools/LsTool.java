@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -90,13 +91,9 @@ public class LsTool extends BaseGridTool
 		
 		for (String arg : arguments)
 		{
-			RNSPath []paths = ctxt.getCurrentPath().list(arg, 
+			RNSPath path = ctxt.getCurrentPath().lookup(arg, 
 				RNSPathQueryFlags.MUST_EXIST);
-			
-			for (RNSPath path : paths)
-			{
-				targets.add(path);
-			}
+			targets.add(path);
 		}
 		
 		if (isDirectory)
@@ -127,22 +124,10 @@ public class LsTool extends BaseGridTool
 					stdout.println(path.getName() + ":");
 		
 
-				RNSPath []entries = null;
-				entries = path.list(".*", RNSPathQueryFlags.DONT_CARE);
-
-/*
-				RNSPortType rpt = ClientUtils.createProxy(RNSPortType.class,
-					path.getEndpoint());
-				List req = new List(".*");
-				java.util.Date start = new java.util.Date();
-				for (int lcv = 0; lcv < 1000; lcv++)
-					rpt.list(req);
-				java.util.Date stop = new java.util.Date();
-
-				System.err.println("Total MS:  " + (stop.getTime() - start.getTime()));
-*/
+				Collection<RNSPath> entries = null;
+				entries = path.listContents();
 				
-				if (entries.length > 1 || entries[0].exists())
+				if (entries.size() > 0)
 				{
 					for (RNSPath entry : entries)
 					{

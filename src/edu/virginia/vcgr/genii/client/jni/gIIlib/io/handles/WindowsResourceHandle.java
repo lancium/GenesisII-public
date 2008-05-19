@@ -4,6 +4,7 @@ import edu.virginia.vcgr.genii.client.jni.gIIlib.ResourceInformation;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.cache.CacheManager;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.cache.CachedDir;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.cache.CachedResource;
+import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 
@@ -100,7 +101,7 @@ public abstract class WindowsResourceHandle {
 		RNSPath filePath =  current.lookup(pathToLookup, RNSPathQueryFlags.DONT_CARE);
 		
 		//Save some time and use "Special" constructors
-		if(filePath.isDirectory()){
+		if(new TypeInformation(filePath.getEndpoint()).isRNS()){
 			return new WindowsDirHandle(filePath, desiredAccess);
 		}else{
 			return new WindowsFileHandle(filePath, requestedDeposition, 

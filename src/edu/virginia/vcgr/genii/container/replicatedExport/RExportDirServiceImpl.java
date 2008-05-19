@@ -154,16 +154,13 @@ public class RExportDirServiceImpl extends GenesisIIBase
 		throws RemoteException, ResourceUnknownFaultType, 
 			RNSEntryNotDirectoryFaultType, RNSFaultType
 	{
-		//get list regex
-		String entry_name_regexp = listRequest.getEntry_name_regexp();
-		_logger.info("RExportDir asked to lookup \"" + entry_name_regexp + "\".");
-		
 		//get current resource
 		IRExportResource resource = 
 			(IRExportResource)ResourceManager.getCurrentResource().dereference();
 		
 		//retrieve entries associated with resource 
-		Collection<RExportEntry>  entries = resource.retrieveEntries(entry_name_regexp);
+		Collection<RExportEntry>  entries = resource.retrieveEntries(
+			listRequest.getEntryName());
 		
 		if (entries.size() == 0)
 			_logger.info("empty RExportDir lookup results");

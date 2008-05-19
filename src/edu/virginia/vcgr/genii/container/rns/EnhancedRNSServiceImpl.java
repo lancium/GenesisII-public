@@ -204,7 +204,6 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
     {
     	_logger.debug("Entered list method.");
     	
-    	String entry_name_regexp = list.getEntry_name_regexp();
     	IRNSResource resource = null;
     	Collection<InternalEntry> entries;
     	
@@ -212,7 +211,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
     	synchronized(rKey.getLockObject())
     	{
 	    	resource = (IRNSResource)rKey.dereference();
-		    entries = resource.retrieveEntries(entry_name_regexp);
+		    entries = resource.retrieveEntries(list.getEntryName());
     	}
     	
     	EntryType []ret = new EntryType[entries.size()];
@@ -233,7 +232,6 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
     {
     	_logger.debug("Entered iterate list method.");
     	
-    	String entry_name_regexp = list.getEntry_name_regexp();
     	IRNSResource resource = null;
     	Collection<InternalEntry> entries;
     	
@@ -241,7 +239,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
     	synchronized (rKey.getLockObject())
     	{
     		resource = (IRNSResource)rKey.dereference();
-    		entries = resource.retrieveEntries(entry_name_regexp);
+    		entries = resource.retrieveEntries(null);
     	}
 
 		Collection<MessageElement> col = new LinkedList<MessageElement>();
@@ -304,7 +302,6 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
     	throws RemoteException, ResourceUnknownFaultType, 
     		RNSDirectoryNotEmptyFaultType, RNSFaultType
     {
-    	String entry_name = remove.getEntry_name();
     	String []ret;
     	IRNSResource resource = null;
     	Collection<String> removed;
@@ -313,7 +310,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
     	synchronized(rKey.getLockObject())
     	{
 	    	resource = (IRNSResource)rKey.dereference();
-		    removed = resource.removeEntries(entry_name);
+		    removed = resource.removeEntries(remove.getEntryName());
     	}
     	
 	    ret = new String[removed.size()];

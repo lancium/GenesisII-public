@@ -9,6 +9,7 @@ import edu.virginia.vcgr.genii.client.jni.gIIlib.cache.CacheManager;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.cache.CachedDir;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.cache.CachedFile;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.cache.CachedResource;
+import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
@@ -80,7 +81,7 @@ public class WindowsFileHandle extends WindowsResourceHandle {
 				if(filePath.exists()){
 					filePath.delete();						
 				}							
-				filePath.createFile();												
+				filePath.createNewFile();												
 				fileInCache = new CachedFile(filePath, desiredAccess, false);
 				fileInCache.attach(this, desiredAccess, false);
 				
@@ -145,7 +146,7 @@ public class WindowsFileHandle extends WindowsResourceHandle {
 					filePath = searchRoot.lookup(pathToLookup, RNSPathQueryFlags.MUST_NOT_EXIST);
 				}
 				
-				filePath.createFile();												
+				filePath.createNewFile();												
 				fileInCache = new CachedFile(filePath, desiredAccess, truncate);
 				fileInCache.attach(this, desiredAccess, false);
 				if(cachedParent != null) cachedParent.addEntry(filePath.getName(), makeCopy());
@@ -160,7 +161,7 @@ public class WindowsFileHandle extends WindowsResourceHandle {
 					fileInCache.attach(this, desiredAccess, truncate);
 				}else{
 					filePath = searchRoot.lookup(pathToLookup, RNSPathQueryFlags.MUST_EXIST);
-					if(!filePath.isDirectory()){
+					if(!(new TypeInformation(filePath.getEndpoint()).isRNS())){
 						fileInCache = new CachedFile(filePath, desiredAccess, truncate);
 						fileInCache.attach(this, desiredAccess, false);
 						manager.putResource(resourceName, fileInCache);
@@ -179,7 +180,7 @@ public class WindowsFileHandle extends WindowsResourceHandle {
 					boolean created = false;
 					filePath = searchRoot.lookup(pathToLookup, RNSPathQueryFlags.DONT_CARE);
 					if(!filePath.exists()){
-						filePath.createFile();
+						filePath.createNewFile();
 						created = true;
 					}
 										
@@ -272,7 +273,8 @@ public class WindowsFileHandle extends WindowsResourceHandle {
 				if(cachedParent != null){
 					cachedParent.removeEntry(filename);
 				}
-			}catch(RNSException re){
+			}
+			catch(RNSException re){
 				re.printStackTrace();
 			}
 		}else{

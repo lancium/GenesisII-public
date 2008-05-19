@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.io.File;
 import java.io.IOException;
 
@@ -648,20 +647,19 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 		return fileList;
 	}
 	
-	public Collection<RExportEntry> retrieveEntries(String regex)
+	public Collection<RExportEntry> retrieveEntries(String entryName)
 		throws ResourceException
 	{
 		//assume synced already
 		//retrieve what entries exist currently in db
 		Collection<RExportEntry> allKnownEntries = retrieveKnownEntries();
 		
-		Pattern p = Pattern.compile(regex);
-		
 		//collection of RExport entries whose names match regex
 		Collection<RExportEntry> ret = new ArrayList<RExportEntry>();
 		for (RExportEntry nextEntry : allKnownEntries)
 		{
-			if (p.matcher(nextEntry.getName()).matches()){
+			if (entryName == null || entryName.equals(nextEntry.getName()))
+			{
 				// pre-fill in attributes document for this entry
 				// to send it back for pre-fetching.
 				fillInAttributes(nextEntry);

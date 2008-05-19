@@ -14,6 +14,7 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.JNILibraryBase;
+import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSMultiLookupResultException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
@@ -86,7 +87,7 @@ public class JNICpTool extends JNILibraryBase {
 			} else
 			{
 				RNSPath path = current.lookup(targetPath, RNSPathQueryFlags.DONT_CARE);
-				if (path.exists() && path.isDirectory())
+				if (path.exists() && new TypeInformation(path.getEndpoint()).isRNS())
 					path = path.lookup(sourceName, RNSPathQueryFlags.DONT_CARE);
 				out = ByteIOStreamFactory.createOutputStream(path);
 			}

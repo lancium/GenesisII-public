@@ -55,7 +55,7 @@ public class BasicSchedulerServiceImpl extends EnhancedRNSServiceImpl implements
 	{
 		ResourceKey rKey = ResourceManager.getCurrentResource();
     	IBasicSchedulerResource resource = (IBasicSchedulerResource)rKey.dereference();
-	    Collection<InternalEntry> entries = resource.retrieveEntries(".*");
+	    Collection<InternalEntry> entries = resource.retrieveEntries(null);
 	    int choicesSize = entries.size();
 	    InternalEntry []entriesA = new InternalEntry[choicesSize];
 	    entries.toArray(entriesA);

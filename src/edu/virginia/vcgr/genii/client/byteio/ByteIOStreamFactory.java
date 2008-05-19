@@ -268,7 +268,7 @@ public class ByteIOStreamFactory
 				ConfigurationException, RNSException
 	{
 		if (!target.exists())
-			target.createFile();
+			target.createNewFile();
 		
 		return createOutputStream(target.getEndpoint(), desiredTransferType, 
 			createBuffered);

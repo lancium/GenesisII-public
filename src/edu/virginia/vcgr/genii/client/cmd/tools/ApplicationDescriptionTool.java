@@ -15,6 +15,8 @@ import org.ggf.jsdl.OperatingSystem_Type;
 import org.ggf.jsdl.ProcessorArchitectureEnumeration;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
+import org.oasis_open.docs.wsrf.rl_2.Destroy;
+import org.ws.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
 
 import edu.virginia.vcgr.genii.appdesc.ApplicationDescriptionPortType;
@@ -38,6 +40,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
+import edu.virginia.vcgr.genii.common.GeniiCommon;
 
 public class ApplicationDescriptionTool extends BaseGridTool
 {
@@ -150,25 +153,38 @@ public class ApplicationDescriptionTool extends BaseGridTool
 	public int createApplication(
 		String descriptionServicePath, String newApplication, String version)
 		throws RemoteException, RNSException, ConfigurationException,
-			CreationException
+			CreationException, FileNotFoundException
 	{
 		RNSPath path = RNSPath.getCurrent().lookup(newApplication, 
 			RNSPathQueryFlags.MUST_NOT_EXIST);
-			
+		EndpointReferenceType epr;
+		
 		if (descriptionServicePath == null)
 		{
-			path.link(
-				ApplicationDescriptionCreator.createApplicationDescription(
+			epr = ApplicationDescriptionCreator.createApplicationDescription(
 					"ApplicationDescriptionPortType", newApplication,
-					(version == null) ? null : new ApplicationVersion(version)));
+					(version == null) ? null : new ApplicationVersion(version));	
 		} else
 		{
 			RNSPath servicePath = RNSPath.getCurrent().lookup(
 				descriptionServicePath, RNSPathQueryFlags.MUST_EXIST);
-			path.link(
-				ApplicationDescriptionCreator.createApplicationDescription(
+			epr = ApplicationDescriptionCreator.createApplicationDescription(
 					servicePath.getEndpoint(), newApplication, 
-					(version == null) ? null : new ApplicationVersion(version)));
+					(version == null) ? null : new ApplicationVersion(version));
+		}
+		
+		try
+		{
+			path.link(epr);
+			epr = null;
+		} finally
+		{
+			if (epr != null)
+			{
+				GeniiCommon common = ClientUtils.createProxy(
+					GeniiCommon.class, epr);
+				common.destroy(new Destroy());
+			}
 		}
 
 		return 0;

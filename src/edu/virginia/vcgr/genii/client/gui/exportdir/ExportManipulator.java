@@ -12,8 +12,10 @@ import org.morgan.util.configuration.ConfigurationException;
 import edu.virginia.vcgr.genii.client.cmd.tools.ExportTool;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.rcreate.CreationException;
+import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 
@@ -48,13 +50,13 @@ public class ExportManipulator
 	}
 	
 	static public void validate(RNSPath rnsPath)
-		throws ExportException
+		throws ExportException, RNSPathDoesNotExistException
 	{
 		RNSPath parent = rnsPath.getParent();
 		if (!parent.exists())
 			throw new ExportException("Cannot create export because target RNS path \"" +
 				parent.pwd() + "\" does not exist.");
-		if (!parent.isDirectory())
+		if (!(new TypeInformation(parent.getEndpoint())).isRNS())
 			throw new ExportException("RNS path \"" + parent.pwd() + "\" is not an RNS capable endpoint.");
 	}
 	

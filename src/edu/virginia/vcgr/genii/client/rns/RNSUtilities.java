@@ -1,5 +1,7 @@
 package edu.virginia.vcgr.genii.client.rns;
 
+import java.io.FileNotFoundException;
+
 import org.morgan.util.configuration.ConfigurationException;
 
 import edu.virginia.vcgr.genii.client.resource.PortType;
@@ -44,7 +46,7 @@ public class RNSUtilities
 	static public RNSPath findService(
 		String pathToDefaultContainer, String defaultServiceName,
 		PortType []requiredPortTypes, String userHints)
-		throws ConfigurationException, RNSException
+		throws ConfigurationException, RNSException, FileNotFoundException
 	{
 		RNSPath current = RNSPath.getCurrent();
 		RNSPath result;
@@ -62,22 +64,21 @@ public class RNSUtilities
 		/* The user gave us some information on what service to find, let's
 		 * see if he or she fully qualified the service
 		 */
-		result = current.lookup(userHints, RNSPathQueryFlags.DONT_CARE);
+		result = current.lookup(userHints);
 		if (!result.exists())
 		{
 			/* Whatever the user entered, it can't be directly resolved, now
 			 * let's check and see if they gave us the name of a container.
 			 */
 			result = current.lookup(
-				"/containers/" + userHints, RNSPathQueryFlags.DONT_CARE);
+				"/containers/" + userHints);
 			if (!result.exists())
 			{
 				/* Well, it wasn't a container.  Maybe it's the name of the
 				 * service IN the default container.
 				 */
 				result = current.lookup(
-					pathToDefaultContainer + "/Services/" + userHints,
-					RNSPathQueryFlags.DONT_CARE);
+					pathToDefaultContainer + "/Services/" + userHints);
 			}
 		}
 		
@@ -138,5 +139,14 @@ public class RNSUtilities
 		}
 		
 		return result;
+	}
+	
+	static public void recursiveDelete(RNSPath path)
+		throws RNSException
+	{
+		for (RNSPath contained : path.listContents())
+		{
+			recursiveDelete(contained);
+		}
 	}
 }

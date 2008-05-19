@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.regex.Pattern;
 import java.lang.Thread;
 
 import javax.xml.namespace.QName;
@@ -146,7 +145,6 @@ public class InformationServiceImpl extends EnhancedRNSServiceImpl implements
 		protected void performOperation() 
 			throws ResourceUnknownFaultType, ResourceException 
 		{
-			Pattern pattern = null;
 			/*
 			 * the thread will run untill there are containers in the Information Service Resource
 			 */
@@ -156,7 +154,7 @@ public class InformationServiceImpl extends EnhancedRNSServiceImpl implements
 			 */
 			
 			
-			int numberOfContainersWatched = resource.listResources(pattern).size();
+			int numberOfContainersWatched = resource.listResources(null).size();
 			while (numberOfContainersWatched >0)
 			{
 				
@@ -170,7 +168,7 @@ public class InformationServiceImpl extends EnhancedRNSServiceImpl implements
 				
 				if (numberOfContainersWatched>0)
 				{
-					EntryType[] ServiceEntries = resource.listResources(pattern).toArray(new EntryType[0]);
+					EntryType[] ServiceEntries = resource.listResources(null).toArray(new EntryType[0]);
 					AddContainerRequestType request= new AddContainerRequestType();
 					
 					/*
@@ -207,7 +205,7 @@ public class InformationServiceImpl extends EnhancedRNSServiceImpl implements
 				 * check the number of containers that are still being watched
 				 */
 				
-				numberOfContainersWatched = resource.listResources(pattern).size();
+				numberOfContainersWatched = resource.listResources(null).size();
 			}			
 		}	
 	}
@@ -435,21 +433,15 @@ public class InformationServiceImpl extends EnhancedRNSServiceImpl implements
     	throws RemoteException, ResourceUnknownFaultType, 
     		RNSEntryNotDirectoryFaultType, RNSFaultType
     {
-    	String regex = listRequest.getEntry_name_regexp();
-    	Pattern pattern = Pattern.compile(regex);
     	Collection<EntryType> entries;
     	IISResource resource = (IISResource)ResourceManager.getCurrentResource().dereference();
     	
-    	entries = resource.listResources(pattern);
+    	entries = resource.listResources(listRequest.getEntryName());
     	ArrayList<EntryType> aRet = new ArrayList<EntryType>(entries.size());
     	for (EntryType entry : entries)
     	{
-    		String name = entry.getEntry_name().toString();
-    		if (pattern.matcher(name).matches())
-    		{
     		aRet.add(new EntryType(
-    				entry.getEntry_name(), entry.get_any(), entry.getEntry_reference()));
-    		}
+    			entry.getEntry_name(), entry.get_any(), entry.getEntry_reference()));
     	}
     	
     	EntryType []ret = new EntryType[aRet.size()];
@@ -513,8 +505,7 @@ public class InformationServiceImpl extends EnhancedRNSServiceImpl implements
 			 * starting the update thread. a thread is started only if that's the first entry to the
 			 * IS's table
 			 */
-			Pattern pattern = null;
-			int resourceNumber = resource.listResources(pattern).size();
+			int resourceNumber = resource.listResources(null).size();
 			if (resourceNumber==1)
 			{	
 				Thread t = new Thread(new Updates(serviceEPR, this));			
@@ -548,15 +539,23 @@ public class InformationServiceImpl extends EnhancedRNSServiceImpl implements
 		RNSDirectoryNotEmptyFaultType, RNSFaultType
 	{
 		
-		String entry_name = remove.getEntry_name();
 		String []ret;
 		
 		ResourceKey rKey = ResourceManager.getCurrentResource();
 		IRNSResource resource = (IISResource)rKey.dereference();
-	    Collection<String> removed = resource.removeEntries(entry_name);
+		
+		/*
+		 * This isn't even remotely correct, but the behavior of this 
+		 * function is inconsistent with the specification for RNS, so
+		 * unfortunately, without re-writing a large portion of this service,
+		 * it simply won't work.
+		 * 
+		 * mmm2a.
+		 */
+	    Collection<String> removed = resource.removeEntries(remove.getEntryName());
 	    
 	    RemoveContainerRequestType documentToRemove= new RemoveContainerRequestType();
-	    documentToRemove.setPathToContainer(entry_name);
+	    documentToRemove.setPathToContainer(remove.getEntryName());
 	    /*
 	     * deleting the container's attributes document from the XML database
 	     */

@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
 
@@ -214,9 +213,9 @@ public class SimpleResolverServiceImpl extends GenesisIIBase implements SimpleRe
 		ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType,
 		RNSFaultType
     {
+		String entryQuery = listRequest.getEntryName();
 		EntryType []entryList = null;
-		Pattern p = Pattern.compile(listRequest.getEntry_name_regexp());
-	
+		
 		ISimpleResolverResource resource = null;
 		
 		ResourceKey rKey = ResourceManager.getCurrentResource();
@@ -235,7 +234,7 @@ public class SimpleResolverServiceImpl extends GenesisIIBase implements SimpleRe
 				while (epiIter.hasNext())
 				{
 					String nextEPI = epiIter.next();
-					if (p.matcher(nextEPI).matches())
+					if (entryQuery == null || entryQuery.equals(nextEPI))
 					{
 						EndpointReferenceType nextEPR = resolvers.get(nextEPI);
 						entryArray.add(new EntryType(nextEPI, null, nextEPR));
@@ -260,7 +259,7 @@ public class SimpleResolverServiceImpl extends GenesisIIBase implements SimpleRe
 	
 			SimpleResolverEntry entry = resource.getEntry();
 		
-			if (p.matcher(entry.getTargetEPI().toString()).matches())
+			if (entryQuery == null || entryQuery.equals(entry.getTargetEPI().toString()))
 			{
 				entryList = new EntryType[1];
 				entryList[0] = new EntryType(entry.getTargetEPI().toString(), null, entry.getTargetEPR());

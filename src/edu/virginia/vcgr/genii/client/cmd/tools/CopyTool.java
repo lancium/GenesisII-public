@@ -15,6 +15,7 @@ import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSMultiLookupResultException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
@@ -113,9 +114,9 @@ public class CopyTool extends BaseGridTool
 				out = new FileOutputStream(targetFile);
 			} else
 			{
-				RNSPath path = current.lookup(targetPath, RNSPathQueryFlags.DONT_CARE);
-				if (path.exists() && path.isDirectory())
-					path = path.lookup(sourceName, RNSPathQueryFlags.DONT_CARE);
+				RNSPath path = current.lookup(targetPath);
+				if (path.exists() && new TypeInformation(path.getEndpoint()).isRNS())
+					path = path.lookup(sourceName);
 				out = ByteIOStreamFactory.createOutputStream(path);
 			}
 			

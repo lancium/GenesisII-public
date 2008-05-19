@@ -496,7 +496,6 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		return responseArray.toArray(new RequestSecurityTokenResponseType[responseArray.size()]);
 	}
 
-
 	@RWXMapping(RWXCategory.READ)
 	public ListResponse list(List list) throws RemoteException,
 			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType,
@@ -513,13 +512,12 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		if (myResource.isServiceResource()) {
 			// list the directory contents from state
 			
-			String entry_name_regexp = list.getEntry_name_regexp();
 			IRNSResource resource = null;
 			Collection<InternalEntry> entries;
 
 			ResourceKey rKey = ResourceManager.getCurrentResource();
 			resource = (IRNSResource) rKey.dereference();
-			entries = resource.retrieveEntries(entry_name_regexp);
+			entries = resource.retrieveEntries(list.getEntryName());
 
 			EntryType[] ret = new EntryType[entries.size()];
 			int lcv = 0;
@@ -535,14 +533,13 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		
 		// Note: May rethink about keeping this check... It does prevent us from
     	// going OOM accidently, but it's not complete...
-    	if (list.getEntry_name_regexp().equals(".*")) {
+		if (list.getEntryName() == null)
+    	{
     		throw new RemoteException("\"unconstrained list\" not applicable.");
     	}
 
 
-		EntryIterator iterator = new EntryIterator(
-				myResource, 
-				list.getEntry_name_regexp());
+		EntryIterator iterator = new EntryIterator(myResource, list.getEntryName());
 
 		ArrayList<EntryType> accumulator = new ArrayList<EntryType>();
 		while (iterator.hasNext()) {
@@ -572,9 +569,8 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		if (myResource.isServiceResource()) {
 			// list the directory contents from state
 
-	    	String entry_name_regexp = list.getEntry_name_regexp();
 	    	Collection<InternalEntry> entries;
-		    entries = myResource.retrieveEntries(entry_name_regexp);
+		    entries = myResource.retrieveEntries(null);
 
 			Collection<MessageElement> col = new LinkedList<MessageElement>();
 	    	for (InternalEntry internalEntry : entries)
@@ -605,9 +601,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		// STS for a JNDI directory resource
 		
  		try {
- 			EntryIterator iterator = new EntryIterator(
- 					myResource,
- 					list.getEntry_name_regexp());
+ 			EntryIterator iterator = new EntryIterator(myResource, null);
 
  			return new IterateListResponseType(
  				super.createWSIterator(iterator, 50));
@@ -773,13 +767,12 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 			throw new RemoteException("\"remove\" not applicable.");
 		}
 		
-		String entry_name = remove.getEntry_name();
-    	String []ret;
+		String []ret;
     	IRNSResource resource = null;
     	
     	ResourceKey rKey = ResourceManager.getCurrentResource();
     	resource = (IRNSResource)rKey.dereference();
-	    Collection<String> removed = resource.removeEntries(entry_name);
+	    Collection<String> removed = resource.removeEntries(remove.getEntryName());
 	    ret = new String[removed.size()];
 	    removed.toArray(ret);
 	    resource.commit();
@@ -829,7 +822,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 
 		protected NameClassPair _next = null;
 
-		public EntryIterator(IJNDIResource stsResource, String regExp) 
+		public EntryIterator(IJNDIResource stsResource, String entryName) 
 			throws ResourceException, RemoteException {
 
 			_stsResource = stsResource;
@@ -843,7 +836,10 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 						.getCurrentWorkingContext().getProperty(
 								WorkingContext.EPR_PROPERTY_NAME);
 	
-				_pattern = Pattern.compile(regExp);
+				if (entryName != null)
+					_pattern = Pattern.compile("^\\Q" + entryName + "\\E$");
+				else
+					_pattern = Pattern.compile("^.*$");
 	
 				Properties jndiEnv = new Properties();
 				String providerUrl = null;

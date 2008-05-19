@@ -6,6 +6,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 
 public class JNIRmTool extends JNILibraryBase {
 
@@ -27,13 +28,9 @@ public class JNIRmTool extends JNILibraryBase {
 	throws RNSPathDoesNotExistException, RNSPathAlreadyExistsException, 
 		RNSException			
 	{
-		RNSPath [] files = currentPath.list(
+		RNSPath file = currentPath.lookup(
 			filePath, RNSPathQueryFlags.MUST_EXIST);
-		
-		for (RNSPath file : files)
-		{
-			rm(file, recursive, force);
-		}
+		rm(file, recursive, force);
 		return true;
 	}
 	
@@ -43,7 +40,7 @@ public class JNIRmTool extends JNILibraryBase {
 			try
 			{
 				if (recursive)
-					path.recursiveDelete();
+					RNSUtilities.recursiveDelete(path);
 				else
 					path.delete();
 			}

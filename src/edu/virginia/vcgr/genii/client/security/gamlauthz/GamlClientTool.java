@@ -25,6 +25,7 @@ import org.morgan.util.cmdline.*;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
@@ -180,7 +181,7 @@ public class GamlClientTool {
 		RNSPath path = current.lookup(sourcePath,
 				RNSPathQueryFlags.MUST_EXIST);
 		
-		if (path.isFile()) {
+		if (new TypeInformation(path.getEndpoint()).isByteIO()) {
 			// read the file as an encoded X.509 .cer file
 			InputStream in = ByteIOStreamFactory.createInputStream(path);
 			try {

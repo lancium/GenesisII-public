@@ -9,8 +9,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
 
@@ -463,15 +461,14 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 		
 		IBESResource resource = 
 			(IBESResource)ResourceManager.getCurrentResource().dereference();
-		Pattern regex = Pattern.compile(listRequest.getEntry_name_regexp());
 		
 		try
 		{
+			String query = listRequest.getEntryName();
 			for (BESActivity activity : resource.getContainedActivities())
 			{
 				String name = activity.getJobName();
-				Matcher matcher = regex.matcher(name);
-				if (matcher.matches())
+				if (query == null || query.equals(name))
 				{
 					try
 					{
@@ -700,15 +697,14 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 		
 		IBESResource resource = 
 			(IBESResource)ResourceManager.getCurrentResource().dereference();
-		Pattern regex = Pattern.compile(removeRequest.getEntry_name());
 		
 		try
 		{
+			String query = removeRequest.getEntryName();
 			for (BESActivity activity : resource.getContainedActivities())
 			{
 				String name = activity.getJobName();
-				Matcher matcher = regex.matcher(name);
-				if (matcher.matches())
+				if (query == null || query.equals(name))
 				{
 					TerminateActivitiesResponseType tat;
 					try

@@ -317,8 +317,9 @@ public class GamlLoginTool extends BaseGridTool {
 		
 		
 		if (protocol.equals("rns")) {
-			RNSPath authnPath = callingContext.getCurrentPath().lookup(authnUri.getSchemeSpecificPart(),
-					RNSPathQueryFlags.MUST_EXIST);
+			RNSPath authnPath = callingContext.getCurrentPath().lookup(
+				authnUri.getSchemeSpecificPart(),
+				RNSPathQueryFlags.MUST_EXIST);
 			EndpointReferenceType epr = authnPath.getEndpoint();
 			TypeInformation type = new TypeInformation(epr);
 			if (type.isIDP()) {

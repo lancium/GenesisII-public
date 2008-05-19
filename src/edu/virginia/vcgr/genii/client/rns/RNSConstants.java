@@ -1,6 +1,6 @@
 package edu.virginia.vcgr.genii.client.rns;
 
-public class RNSConstants
+public interface RNSConstants
 {
 	static public final String RESOLVED_ENTRY_UNBOUND_PROPERTY =
 		"rns-resolved-entry-unbound-property";

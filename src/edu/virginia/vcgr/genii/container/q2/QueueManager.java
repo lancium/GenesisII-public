@@ -8,7 +8,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -309,7 +308,7 @@ public class QueueManager implements Closeable
 		}
 	}
 	
-	public Collection<EntryType> listBESs(Pattern pattern)
+	public Collection<EntryType> listBESs(String entryName)
 		throws SQLException, ResourceException
 	{
 		Connection connection = null;
@@ -317,7 +316,7 @@ public class QueueManager implements Closeable
 		try
 		{
 			connection = _connectionPool.acquire();
-			return _besManager.listBESs(connection, pattern);
+			return _besManager.listBESs(connection, entryName);
 		}
 		finally
 		{
@@ -325,14 +324,14 @@ public class QueueManager implements Closeable
 		}
 	}
 	
-	public Collection<String> removeBESs(Pattern pattern) throws SQLException
+	public Collection<String> removeBESs(String entryName) throws SQLException
 	{
 		Connection connection = null;
 		
 		try
 		{
 			connection = _connectionPool.acquire();
-			return _besManager.removeBESs(connection, pattern);
+			return _besManager.removeBESs(connection, entryName);
 		}
 		finally
 		{

@@ -76,7 +76,7 @@ public class JNIOpen extends JNILibraryBase{
 						filePath.mkdir();
 					}
 					else{
-						filePath.createFile();
+						filePath.createNewFile();
 					}					
 					break;					
 				case OPEN:
@@ -101,7 +101,7 @@ public class JNIOpen extends JNILibraryBase{
 							filePath.mkdir();
 						}
 						else{
-							filePath.createFile();
+							filePath.createNewFile();
 						}	
 					}
 					break;
@@ -112,14 +112,15 @@ public class JNIOpen extends JNILibraryBase{
 			
 			fileHandle = tracker.atomicGetAndIncrementHandle();
 			
+			EndpointReferenceType epr = filePath.getEndpoint();
+			TypeInformation typeInfo = new TypeInformation(epr);
 			//If Directory, all we need is local copy, otherwise open file
-			if(filePath.isDirectory()){		
+			if(typeInfo.isRNS()){		
 				resource = new IFSDirectory(filePath);
 			}
 			else{
 				//Check the type of ByteIO and create it according to the options specified
-				EndpointReferenceType epr = filePath.getEndpoint();
-				TypeInformation typeInfo = new TypeInformation(epr);
+				
 				if (typeInfo.isRByteIO()){	
 					resource = new RandomByteIOFileDescriptor(filePath, epr, isRead, isWrite, isAppend, isTruncate);
 																												

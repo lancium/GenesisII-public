@@ -5,6 +5,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import org.apache.axis.types.URI;
@@ -379,6 +381,35 @@ public class EPRUtils
 		catch (MalformedURLException mue)
 		{
 			return false;
+		}
+	}
+	
+	final static public void serializeEPR(ObjectOutputStream oos, 
+		EndpointReferenceType epr) throws IOException
+	{
+		if (epr == null)
+		{
+			oos.writeInt(-1);
+		} else
+		{
+			byte []data = toBytes(epr);
+			oos.writeInt(data.length);
+			oos.write(data);
+		}
+	}
+	
+	final static public EndpointReferenceType deserializeEPR(ObjectInputStream ois)
+		throws IOException
+	{
+		int length = ois.readInt();
+		if (length < 0)
+		{
+			return null;
+		} else
+		{
+			byte []data = new byte[length];
+			ois.readFully(data);
+			return fromBytes(data);
 		}
 	}
 }

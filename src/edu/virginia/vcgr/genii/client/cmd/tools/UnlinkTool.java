@@ -45,12 +45,9 @@ public class UnlinkTool extends BaseGridTool
 		String filePath)
 		throws RNSException, ConfigurationException, IOException
 	{
-		RNSPath [] files = currentPath.list(
+		RNSPath file = currentPath.lookup(
 			filePath, RNSPathQueryFlags.MUST_EXIST);
 		
-		for (RNSPath file : files)
-		{
-			file.unlink();
-		}
+		file.unlink();
 	}
 }

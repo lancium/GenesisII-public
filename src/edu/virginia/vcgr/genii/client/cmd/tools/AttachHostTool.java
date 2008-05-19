@@ -39,7 +39,6 @@ public class AttachHostTool extends BaseGridTool
 		EndpointReferenceType epr = rp.getResourceEndpoint();
 		
 		path.link(epr);
-		
 		return 0;
 	}
 

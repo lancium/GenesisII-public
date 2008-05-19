@@ -48,10 +48,8 @@ import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
-import edu.virginia.vcgr.genii.client.rns.RNSMultiLookupResultException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
-import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 
 public class RNSTree extends JTree implements Autoscroll
 {
@@ -342,25 +340,11 @@ public class RNSTree extends JTree implements Autoscroll
 			{
 				String newName = null;
 				
-				try
-				{
-					newName = (lcv == 0) ? 
-						origName : String.format("%s (%d)", origName, lcv);
-					RNSPath ret = parent.lookup(newName, RNSPathQueryFlags.DONT_CARE);
-					if (!ret.exists())
-						return ret;
-				}
-				catch (RNSMultiLookupResultException rme)
-				{
-					_logger.warn("Multi lookup exception -- pattern \"" + 
-						newName + "\" matched too many names.", rme);
-				}
-				catch (RNSException re)
-				{
-					_logger.error("Generic RNSException occurred.", re);
-					throw new IOException(
-						"Unable to talk to target grid directory.", re);
-				}
+				newName = (lcv == 0) ? 
+					origName : String.format("%s (%d)", origName, lcv);
+				RNSPath ret = parent.lookup(newName);
+				if (!ret.exists())
+					return ret;
 			}
 			
 			throw new IOException("Unable to create new name for \"" 

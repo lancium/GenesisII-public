@@ -46,6 +46,9 @@ namespace jcomm
 				throw (OGRSHException, IOException);
 			int rmdir(const std::string &fullPath)
 				throw (OGRSHException, IOException);
+			int rename(const std::string &oldFullPath,
+				const std::string &newFullPath)
+				throw (OGRSHException, IOException);
 	};
 }
 

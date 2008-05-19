@@ -9,8 +9,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -235,7 +233,7 @@ public class BESManager implements Closeable
 	 * @throws ResourceException
 	 */
 	synchronized public Collection<EntryType> listBESs(
-		Connection connection, Pattern pattern) 
+		Connection connection, String entryName) 
 		throws SQLException, ResourceException
 	{
 		HashMap<Long, EntryType> ret = new HashMap<Long, EntryType>();
@@ -245,8 +243,7 @@ public class BESManager implements Closeable
 		for (BESData data : _containersByID.values())
 		{
 			/* See if this container matches the pattern */
-			Matcher matcher = pattern.matcher(data.getName());
-			if (matcher.matches())
+			if (entryName == null || entryName.equals(data.getName()))
 			{
 				/* If so, add it's entry information (but leave the EPR 
 				 * blank, we'll back-fill that in a second. */
@@ -272,7 +269,7 @@ public class BESManager implements Closeable
 	 * @throws SQLException
 	 */
 	synchronized public Collection<String> removeBESs(Connection connection, 
-		Pattern pattern) throws SQLException
+		String entryName) throws SQLException
 	{
 		Collection<String> ret = new LinkedList<String>();
 		Collection<BESData> toRemove = new LinkedList<BESData>();
@@ -280,8 +277,7 @@ public class BESManager implements Closeable
 		/* As with list, find all containers that match the given pattern */
 		for (BESData data : _containersByID.values())
 		{
-			Matcher matcher = pattern.matcher(data.getName());
-			if (matcher.matches())
+			if (entryName == null || entryName.equals(data.getName()))
 			{
 				/* We found a match.  Add the name to a return list.  We'll
 				 * also keep a list of matching data structures for containers

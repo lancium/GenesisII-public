@@ -554,8 +554,8 @@ public class RunTool extends BaseGridTool
 		ApplicationDescriptionPortType application =
 			ClientUtils.createProxy(ApplicationDescriptionPortType.class,
 				applicationDescription);
-		ListResponse resp = application.list(new List(".*"));
-		
+		ListResponse resp = application.list(new List(
+			null));
 		for (EntryType entry : resp.getEntryList())
 		{
 			for (MessageElement element : entry.get_any())

@@ -12,7 +12,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
 
@@ -245,7 +244,7 @@ public class ExportedDirDBResource extends BasicDBResource implements
 	}
 	
 	
-	public Collection<ExportedDirEntry> retrieveEntries(String regex)
+	public Collection<ExportedDirEntry> retrieveEntries(String entryName)
 		throws ResourceException
 	{
 		//get all known entries from db
@@ -264,11 +263,11 @@ public class ExportedDirDBResource extends BasicDBResource implements
 			syncedEntries = syncEntries(allKnownEntries, allLocalEntries);
 		}
 		
-		Pattern p = Pattern.compile(regex);
-		
 		Collection<ExportedDirEntry> ret = new ArrayList<ExportedDirEntry>();
-		for (ExportedDirEntry nextEntry : syncedEntries){
-			if (p.matcher(nextEntry.getName()).matches()){
+		for (ExportedDirEntry nextEntry : syncedEntries)
+		{
+			if (entryName == null || entryName.equals(nextEntry.getName()))
+			{
 				// We are going to pre-fill in the attributes document for this entry
 				// so that we can send it back for pre-fetching.
 				fillInAttributes(nextEntry);
@@ -279,12 +278,12 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		return ret;
 	}
 	
-	public Collection<String> removeEntries(String regex, boolean hardDestroy)
+	public Collection<String> removeEntries(String entryName, boolean hardDestroy)
 			throws ResourceException
 	{
 		ArrayList<String> ret = new ArrayList<String>();
 		
-		Collection<ExportedDirEntry> entries = retrieveEntries(regex);
+		Collection<ExportedDirEntry> entries = retrieveEntries(entryName);
 		for (ExportedDirEntry nextEntry : entries)
 		{
 			try

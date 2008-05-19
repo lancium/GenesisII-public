@@ -160,4 +160,20 @@ namespace jcomm
 		delete buffer;
 		return result;
 	}
+
+	int DirectoryClient::rename(const std::string &oldFullPath,
+		const std::string &newFullPath)
+		throw (OGRSHException, IOException)
+	{
+		Invocation inv(_socket, "rename");
+
+		inv.addString(oldFullPath);
+		inv.addString(newFullPath);
+		
+		int result;
+		IOGRSHReadBuffer *buffer = inv.invoke();
+		buffer->readInt(result);
+		delete buffer;
+		return result;
+	}
 }

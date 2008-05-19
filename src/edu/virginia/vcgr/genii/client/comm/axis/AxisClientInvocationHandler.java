@@ -19,6 +19,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
@@ -464,54 +465,105 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		return mgr.invoke(getTargetEPR(), _callContext, this, m, params);
 	}
 	
+	static private boolean isConnectionException(Throwable cause)
+	{
+		while (cause != null)
+		{
+			if (cause instanceof ConnectException)
+				return true;
+			cause = cause.getCause();
+		}
+		
+		return false;
+	}
+	
+	static private Random _expBackoffTwitter = new Random();
 	// added resolution code - 1/07 - jfk3w
 	// revamped resolution code 4/11/07 - jfk3w.
 	public Object finalInvoke(Object arg0, Method arg1, Object[] arg2)
 			throws Throwable 
 	{
 		EndpointReferenceType origEPR = getTargetEPR();
-		ResolutionContext context = new ResolutionContext(origEPR, (_parentHandler == null));
-		_inAttachments = null;
-
-		try
+		ResolutionContext context = null;
+		int baseDelay = 100;
+		int baseTwitter = 25;
+		int attempt = 0;
+		
+		while(true)
 		{
-			while (true)
+			attempt++;
+			context = new ResolutionContext(origEPR, (_parentHandler == null));
+			_inAttachments = null;
+	
+			try
 			{
-				AxisClientInvocationHandler handler = resolve(context);
-				try
+				while (true)
 				{
-					Object ret = handler.doInvoke(arg0, arg1, arg2);
-					return ret;
+					AxisClientInvocationHandler handler = resolve(context);
+					try
+					{
+						Object ret = handler.doInvoke(arg0, arg1, arg2);
+						return ret;
+					}
+					catch(Throwable t)
+					{
+						// call failed
+						//  ...As per discussion with mmm2a, it is difficult to 
+						// determine which type of exceptions are "permanent" failures
+						// and which are not - all depends on the semantics of the 
+						// target and the resolver.  So, we punt and rebind on all 
+						// exceptions.
+						context.setErrorToReport(t);
+					}
 				}
-				catch(Throwable t)
-				{
-					// call failed
-					//  ...As per discussion with mmm2a, it is difficult to 
-					// determine which type of exceptions are "permanent" failures
-					// and which are not - all depends on the semantics of the 
-					// target and the resolver.  So, we punt and rebind on all 
-					// exceptions.
+			}
+			catch (Throwable t)
+			{
+				// report last non-resolution error if possible
+				if (context.getErrorToReport() == null)
 					context.setErrorToReport(t);
+				
+				// strip exception down to base error
+				while (!(context.getErrorToReport() instanceof RemoteException))
+				{
+					Throwable next = context.getErrorToReport().getCause();
+					if (next == null)
+						throw context.getErrorToReport();
+					context.setErrorToReport(next);
+				}
+	
+				Throwable cause = context.getErrorToReport();
+				if (attempt <= 5 && isConnectionException(cause))
+				{
+					try
+					{
+						int sleepTime = baseDelay + (_expBackoffTwitter.nextInt(
+								baseTwitter) - (baseTwitter >> 1));
+						_logger.debug("Exponential backoff delay of " +
+							sleepTime + " for an exception.", cause);
+						Thread.sleep(sleepTime);
+					}
+					catch (InterruptedException ie)
+					{
+						Thread.currentThread().isInterrupted();
+						// Don't have to worry about it.
+					}
+					finally
+					{
+						baseDelay <<= 1;
+						baseTwitter <<= 1;
+					}
+				} else
+				{
+					_logger.error("Unable to communicate with endpoint " +
+						"(not a retryable-exception).", cause);
+					throw cause;
 				}
 			}
-		}
-		catch (Throwable t) {
-			// report last non-resolution error if possible
-			if (context.getErrorToReport() == null)
-				context.setErrorToReport(t);
-			// strip exception down to base error
-			while (!(context.getErrorToReport() instanceof RemoteException)) {
-				Throwable next = context.getErrorToReport().getCause();
-				if (next == null)
-					throw context.getErrorToReport();
-				context.setErrorToReport(next);
+			finally
+			{
+				_outAttachments = null;
 			}
-
-			throw context.getErrorToReport();
-		}
-		finally
-		{
-			_outAttachments = null;
 		}
 	}
 

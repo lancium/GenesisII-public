@@ -10,6 +10,7 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.io.FileResource;
+import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
@@ -104,7 +105,8 @@ public class MkdirTool extends BaseGridTool
 					return 1;
 				}
 				
-				if (!parent.isDirectory())
+				TypeInformation typeInfo = new TypeInformation(parent.getEndpoint());
+				if (!typeInfo.isRNS())
 				{
 					stderr.println("\"" + parent.pwd() + 
 						"\" is not a directory.");

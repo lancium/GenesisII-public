@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.client.jni.gIIlib.cache;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -17,7 +18,6 @@ import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
-import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 
 /** 
  * This class is responsible for caching all information obtained from RNS for a directory
@@ -135,7 +135,7 @@ public class CachedDir extends CachedResource {
 		
 		//ALWAYS get all entries
 		try{
-			RNSPath []entries = rnsPath.list(".*", RNSPathQueryFlags.DONT_CARE);
+			Collection<RNSPath> entries = rnsPath.listContents();
 			
 			for(RNSPath entry : entries){
 				EndpointReferenceType et = entry.getEndpoint();

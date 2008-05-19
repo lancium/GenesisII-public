@@ -19,7 +19,7 @@ public interface IRExportResource extends IRExportEntryResource
 	public String getLocalPath() throws ResourceException;
 	public String getId() throws ResourceException;
 	
-	public Collection<RExportEntry> retrieveEntries(String regex)
+	public Collection<RExportEntry> retrieveEntries(String entryName)
 		throws ResourceException;
 	
 	public void addEntry(RExportEntry entry, boolean createOnDisk)

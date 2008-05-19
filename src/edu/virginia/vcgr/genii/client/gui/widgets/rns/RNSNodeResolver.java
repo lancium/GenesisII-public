@@ -1,11 +1,12 @@
 package edu.virginia.vcgr.genii.client.gui.widgets.rns;
 
+import java.util.Collection;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
-import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 
 public class RNSNodeResolver implements Runnable
 {
@@ -25,8 +26,8 @@ public class RNSNodeResolver implements Runnable
 		try
 		{
 			RNSPath target = _parent.getRNSPath();
-			RNSPath []entries = target.list(".*", RNSPathQueryFlags.MUST_EXIST);
-			_parent.resolveChildren(_model, entries);
+			Collection<RNSPath> entries = target.listContents();
+			_parent.resolveChildren(_model, entries.toArray(new RNSPath[0]));
 		}
 		catch (RNSPathDoesNotExistException rpde)
 		{

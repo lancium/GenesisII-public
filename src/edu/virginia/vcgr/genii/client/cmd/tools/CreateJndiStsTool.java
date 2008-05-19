@@ -11,7 +11,6 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
-import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.security.SecurityConstants;
 import edu.virginia.vcgr.genii.client.utils.dialog.DialogException;
@@ -249,7 +248,7 @@ public class CreateJndiStsTool extends BaseGridTool
 				if (answer.equalsIgnoreCase("CANCEL"))
 					return null;
 				
-				RNSPath namePath = idpServicePath.lookup(answer, RNSPathQueryFlags.DONT_CARE);
+				RNSPath namePath = idpServicePath.lookup(answer);
 				if (namePath.exists())
 				{
 					widget.showErrorMessage("Name \"" + answer + 

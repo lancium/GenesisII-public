@@ -201,9 +201,6 @@
 		<mconf:instance name="attribute-cache"
 			type="edu.virginia.vcgr.genii.client.invoke.handlers.AttributeCacheHandler"
 			base="java.lang.Object"/>
-		<mconf:instance name="ogrsh-ls-cache"
-			type="edu.virginia.vcgr.genii.client.invoke.handlers.OGRSHListingCache"
-			base="java.lang.Object"/>
 	</genii:configured-instances>
 
 	<genii:tools>
@@ -313,6 +310,5 @@
 	
 	<genii:client-pipeline>
 		<genii:pipeline-handler>attribute-cache</genii:pipeline-handler>
-		<genii:pipeline-handler>ogrsh-ls-cache</genii:pipeline-handler>
 	</genii:client-pipeline>
 </mconf:configuration>

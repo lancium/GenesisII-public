@@ -155,7 +155,7 @@ public class DirectoryHandler
 			RNSPath full = currentPath.lookup(fullpath, RNSPathQueryFlags.MUST_EXIST);
 			RNSPortType dirPT = ClientUtils.createProxy(
 				RNSPortType.class, full.getEndpoint());
-			ListResponse resp = dirPT.list(new List(".*"));
+			ListResponse resp = dirPT.list(new List(null));
 			LinkedList<DirectoryEntry> entries = new LinkedList<DirectoryEntry>();
 			for (EntryType et : resp.getEntryList())
 			{
@@ -345,7 +345,7 @@ public class DirectoryHandler
 			RNSPath path = ctxt.getCurrentPath().lookup(fullpath,
 				RNSPathQueryFlags.MUST_EXIST);
 	
-			if (!path.isDirectory())
+			if (!(new TypeInformation(path.getEndpoint()).isRNS()))
 				throw new OGRSHException("Path \"" + path.pwd() + 
 					"\" is not an RNS directory.", OGRSHException.NOT_A_DIRECTORY);
 			
@@ -389,11 +389,34 @@ public class DirectoryHandler
 				RNSPathQueryFlags.MUST_EXIST);
 			RNSPortType dirPT = ClientUtils.createProxy(
 				RNSPortType.class, full.getEndpoint());
-			ListResponse resp = dirPT.list(new List(".*"));
+			ListResponse resp = dirPT.list(
+				new List(null));
 			if (resp.getEntryList().length != 0)
 				throw new OGRSHException(OGRSHException.DIRECTORY_NOT_EMPTY,
 					"Directory \"" + fullpath + "\" is not empty.");
 			full.delete();
+		}
+		catch (Throwable cause)
+		{
+			throw new OGRSHException(cause);
+		}
+		
+		return 0;
+	}
+	
+	@OGRSHOperation
+	public int rename(String oldFullPath, String newFullPath) 
+		throws OGRSHException
+	{
+		try
+		{
+			RNSPath currentPath = RNSPath.getCurrent();
+			RNSPath o = currentPath.lookup(oldFullPath, 
+				RNSPathQueryFlags.MUST_EXIST);
+			RNSPath n = currentPath.lookup(newFullPath, 
+				RNSPathQueryFlags.MUST_NOT_EXIST);
+			n.link(o.getEndpoint());
+			o.unlink();
 		}
 		catch (Throwable cause)
 		{

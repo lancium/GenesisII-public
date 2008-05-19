@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.ftp;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
@@ -105,19 +106,18 @@ public class GeniiBackend implements IBackend
 		
 		try
 		{
-			RNSPath []paths = _configuration.getCallingContext().getCurrentPath().list(".*",
-				RNSPathQueryFlags.DONT_CARE);
-			if (paths.length == 1 && !paths[0].exists())
-				paths = new RNSPath[0];
+			Collection<RNSPath> _paths = _configuration.getCallingContext().getCurrentPath().listContents();
+			RNSPath []paths = _paths.toArray(new RNSPath[0]);
 			ListEntry []ret = new ListEntry[paths.length];
 			for (int lcv = 0; lcv < paths.length; lcv++)
 			{
-				if (paths[lcv].isDirectory())
+				TypeInformation typeInfo = new TypeInformation(paths[lcv].getEndpoint());
+				if (typeInfo.isRNS())
 				{
 					ret[lcv] = new ListEntry(paths[lcv].getName(), new Date(), 0, _username, "genii", rwx, 1, true);
-				} else if (paths[lcv].isFile())
+				} else if (typeInfo.isByteIO())
 				{
-					String typeDesc = new TypeInformation(paths[lcv].getEndpoint()).getTypeDescription();
+					String typeDesc = typeInfo.getTypeDescription();
 					
 					long size = 0;
 					try
@@ -229,7 +229,7 @@ public class GeniiBackend implements IBackend
 					throw new PathDoesNotExistException(entry);
 			}
 			
-			if (path.isFile())
+			if (new TypeInformation(path.getEndpoint()).isByteIO())
 				return ByteIOStreamFactory.createInputStream(path);
 			else
 				return (new RedirectFile(path.getEndpoint())).getStream();
@@ -265,8 +265,9 @@ public class GeniiBackend implements IBackend
 					throw new PathDoesNotExistException(entry);
 			}
 			
-			if (path.isFile())
-				return new TypeInformation(path.getEndpoint()).getByteIOSize();
+			TypeInformation typeInfo = new TypeInformation(path.getEndpoint());
+			if (typeInfo.isByteIO())
+				return typeInfo.getByteIOSize();
 			else
 				return (new RedirectFile(path.getEndpoint())).getSize();
 		}
@@ -292,11 +293,11 @@ public class GeniiBackend implements IBackend
 			
 			if (path.exists())
 			{
-				if (!path.isFile())
+				if (!(new TypeInformation(path.getEndpoint()).isByteIO()))
 					throw new FTPException(451, "Path is not a file.");
 			} else
 			{
-				path.createFile();
+				path.createNewFile();
 			}
 			
 			return ByteIOStreamFactory.createOutputStream(path);

@@ -41,6 +41,7 @@ import edu.virginia.vcgr.genii.client.naming.ResolverDescription;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.rcreate.CreationException;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSMultiLookupResultException;
@@ -118,7 +119,7 @@ public class ReplicatedFileTool extends BaseGridTool
 		
 		// get target RNS path.
 		RNSPath targetRNS = currentPath.lookup(targetPath, RNSPathQueryFlags.DONT_CARE);
-		if (targetRNS.exists() && targetRNS.isDirectory())
+		if (targetRNS.exists() && new TypeInformation(targetRNS.getEndpoint()).isRNS())
 		{
 			String sourceName = getSourceName(sourcePath, isLocalSource);
 			targetRNS = targetRNS.lookup(sourceName, RNSPathQueryFlags.DONT_CARE);

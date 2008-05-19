@@ -9,7 +9,10 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -645,27 +648,26 @@ public class XScriptRunner
 	}
 	
 	static private ArrayList<String> getSourceRNSList(String sourceRNS,
-		String filter) throws RNSException, ConfigurationException
+		String filter) throws RemoteException, FileNotFoundException, 
+			RNSException, ConfigurationException
 	{
 		ArrayList<String> ret = new ArrayList<String>();
 		
 		if (filter == null)
-			filter = ".*";
+			filter = "^.*$";
 		
-		try
+		RNSPath current = RNSPath.getCurrent();
+		RNSPath source = current.lookup(sourceRNS, RNSPathQueryFlags.MUST_EXIST);
+		Collection<RNSPath> results = source.listContents();
+		Iterator<RNSPath> iter = results.iterator();
+		Pattern regex = Pattern.compile(filter);
+		while (iter.hasNext())
 		{
-			RNSPath []results = RNSPath.getCurrent().list(
-					sourceRNS + "/" + filter, RNSPathQueryFlags.MUST_EXIST);
-		
-			for (RNSPath path : results)
-			{
-				ret.add(path.getName());
-			}
+			RNSPath next = iter.next();
+			if (regex.matcher(next.getName()).matches())
+				ret.add(next.getName());
 		}
-		catch (RNSException rne)
-		{
-		}
-		
+	
 		return ret;
 	}
 	

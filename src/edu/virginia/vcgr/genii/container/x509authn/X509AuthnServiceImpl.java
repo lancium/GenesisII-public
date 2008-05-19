@@ -318,7 +318,7 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 
 		ResourceKey rKey = ResourceManager.getCurrentResource();
 		resource = (IRNSResource) rKey.dereference();
-		entries = resource.retrieveEntries(".*");
+		entries = resource.retrieveEntries(null);
 		
 		for (InternalEntry entry : entries) {
 			
@@ -535,13 +535,12 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType,
 			RNSFaultType {
 
-		String entry_name_regexp = list.getEntry_name_regexp();
 		IRNSResource resource = null;
 		Collection<InternalEntry> entries;
 
 		ResourceKey rKey = ResourceManager.getCurrentResource();
 		resource = (IRNSResource) rKey.dereference();
-		entries = resource.retrieveEntries(entry_name_regexp);
+		entries = resource.retrieveEntries(list.getEntryName());
 
 		EntryType[] ret = new EntryType[entries.size()];
 		int lcv = 0;
@@ -570,13 +569,12 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 			ResourceUnknownFaultType, RNSDirectoryNotEmptyFaultType,
 			RNSFaultType {
     	
-		String entry_name = remove.getEntry_name();
-    	String []ret;
+		String []ret;
     	IRNSResource resource = null;
     	
     	ResourceKey rKey = ResourceManager.getCurrentResource();
     	resource = (IRNSResource)rKey.dereference();
-	    Collection<String> removed = resource.removeEntries(entry_name);
+	    Collection<String> removed = resource.removeEntries(remove.getEntryName());
 	    ret = new String[removed.size()];
 	    removed.toArray(ret);
 	    resource.commit();

@@ -43,12 +43,9 @@ public class TerminationScheduleTool extends BaseGridTool
 		
 		for (int lcv = 0; lcv < (numArgs - 1); lcv++)
 		{
-			RNSPath []targets = path.list(getArgument(lcv),
+			RNSPath target = path.lookup(getArgument(lcv),
 				RNSPathQueryFlags.MUST_EXIST);
-			for (RNSPath target : targets)
-			{
-				schedTerm(target, targetTime);
-			}
+			schedTerm(target, targetTime);
 		}
 		
 		return 0;

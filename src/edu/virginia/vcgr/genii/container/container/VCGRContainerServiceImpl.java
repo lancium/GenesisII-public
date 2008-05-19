@@ -19,7 +19,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.regex.Pattern;
 
 import org.apache.axis.description.JavaServiceDesc;
 import org.apache.commons.logging.Log;
@@ -113,8 +112,8 @@ public class VCGRContainerServiceImpl extends GenesisIIBase
 		throws RemoteException, ResourceUnknownFaultType, 
 			RNSEntryNotDirectoryFaultType, RNSFaultType
 	{
-		Pattern p = Pattern.compile(list.getEntry_name_regexp());
 		ArrayList<EntryType> results = null;
+		String entryName = list.getEntryName();
 		
 		WorkingContext wcontext = WorkingContext.getCurrentWorkingContext();
 		EndpointReferenceType epr = 
@@ -126,7 +125,7 @@ public class VCGRContainerServiceImpl extends GenesisIIBase
 			(refParams.get_any().length == 0))
 		{
 			// top level
-			if (p.matcher("Services").matches())
+			if (entryName == null || entryName.equals("Services"))
 			{
 				return new ListResponse(
 					new EntryType[] { 
@@ -134,7 +133,7 @@ public class VCGRContainerServiceImpl extends GenesisIIBase
 			}
 		} else
 		{
-			results = getServiceListing(p);
+			results = getServiceListing(entryName);
 		}
 
 		if (results == null)
@@ -180,7 +179,7 @@ public class VCGRContainerServiceImpl extends GenesisIIBase
 		return epr;
 	}
 	
-	private ArrayList<EntryType> getServiceListing(Pattern p)
+	private ArrayList<EntryType> getServiceListing(String entryName)
 		throws ResourceException, ResourceUnknownFaultType
 	{
 		EndpointReferenceType myEPR = 
@@ -197,7 +196,7 @@ public class VCGRContainerServiceImpl extends GenesisIIBase
 		for (JavaServiceDesc desc : Container.getInstalledServices())
 		{
 			String serviceName = desc.getName();
-			if (p.matcher(serviceName).matches())
+			if (entryName == null || entryName.equals(serviceName))
 			{
 				ResourceKey targetKey = ResourceManager.getServiceResource(serviceName);
 				

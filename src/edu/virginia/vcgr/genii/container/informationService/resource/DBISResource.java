@@ -9,7 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.regex.Pattern;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
@@ -145,8 +144,8 @@ public class DBISResource extends RNSDBResource implements IISResource{
 	static private final String _LIST_RESOURCES_STMT =
 		"SELECT resourcename, endpoint FROM isbescontainers WHERE servicekey = ?";
 	
-	public Collection<EntryType> listResources(Pattern pattern) throws ResourceException {
-		
+	public Collection<EntryType> listResources(String _entryName) throws ResourceException
+	{
 		ResultSet rs = null;
 		PreparedStatement stmt = null;
 		
@@ -215,7 +214,7 @@ public class DBISResource extends RNSDBResource implements IISResource{
 		}
 	}
 
-	public Collection<String> remove(Pattern pattern) throws ResourceException {
+	public Collection<String> remove(String entryName) throws ResourceException {
 		_logger.warn("Method remove(Pattern pattern) in not implemented");
 		return null;
 	}

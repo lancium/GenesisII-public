@@ -8,7 +8,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
 
@@ -321,13 +320,12 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 			RNSEntryNotDirectoryFaultType
 	{
 		ResourceKey rKey = ResourceManager.getCurrentResource();
-		Pattern pattern = Pattern.compile(listRequest.getEntry_name_regexp());
 		Collection<EntryType> entries;
 		
 		try
 		{
 			QueueManager mgr = QueueManager.getManager((String)rKey.getKey());
-			entries = mgr.listBESs(pattern);
+			entries = mgr.listBESs(listRequest.getEntryName());
 			return new ListResponse(entries.toArray(new EntryType[0]));
 		}
 		catch (SQLException sqe)
@@ -405,14 +403,13 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 			RNSFaultType, ResourceUnknownFaultType,
 			RNSDirectoryNotEmptyFaultType
 	{
-		Pattern pattern = Pattern.compile(removeRequest.getEntry_name());
 		ResourceKey rKey = ResourceManager.getCurrentResource();
 		Collection<String> entries = new ArrayList<String>();
 		
 		try
 		{
 			QueueManager mgr = QueueManager.getManager((String)rKey.getKey());
-			entries = mgr.removeBESs(pattern);
+			entries = mgr.removeBESs(removeRequest.getEntryName());
 			
 			return entries.toArray(new String[0]);
 		}

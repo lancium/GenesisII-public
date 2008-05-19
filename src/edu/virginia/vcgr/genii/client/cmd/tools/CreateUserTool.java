@@ -307,7 +307,7 @@ public class CreateUserTool extends BaseGridTool
 				if (answer.equalsIgnoreCase("CANCEL"))
 					return null;
 				
-				RNSPath namePath = idpServicePath.lookup(answer, RNSPathQueryFlags.DONT_CARE);
+				RNSPath namePath = idpServicePath.lookup(answer);
 				if (namePath.exists())
 				{
 					widget.showErrorMessage("Name \"" + answer + 

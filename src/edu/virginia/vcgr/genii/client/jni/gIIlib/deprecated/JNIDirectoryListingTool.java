@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.client.jni.gIIlib.deprecated;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
@@ -56,13 +57,15 @@ public class JNIDirectoryListingTool extends JNILibraryBase
 						RNSPathQueryFlags.MUST_EXIST);												
 					
 				//ALWAYS get all entries
-				RNSPath []entries = path.list(".*", RNSPathQueryFlags.DONT_CARE);
+				Collection<RNSPath> entries = path.listContents();
 		
-				if (entries.length > 1 || entries[0].exists())
+				if (entries.size() > 0)
 				{
 					for (RNSPath entry : entries)
 					{
-						if(entry.isDirectory()){														
+						TypeInformation type = new TypeInformation(
+							entry.getEndpoint());
+						if(type.isRNS()){														
 							toAdd = new JNICacheEntry(entry.pwd(), 
 									true, -1, entry.getName(), null);													
 							
@@ -70,9 +73,7 @@ public class JNIDirectoryListingTool extends JNILibraryBase
 							manager.putCacheEntry(entry.pwd(), toAdd);
 							cacheEntries.add(toAdd);
 						}
-						else{
-							TypeInformation type = new TypeInformation(
-									entry.getEndpoint());							
+						else{						
 							
 							toAdd = new JNICacheEntry(entry.pwd(), 
 									false, type.getByteIOSize(), entry.getName(), null);

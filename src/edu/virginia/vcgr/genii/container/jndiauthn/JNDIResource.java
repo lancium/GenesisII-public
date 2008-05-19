@@ -370,21 +370,21 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource {
 		throw new ResourceException("Resource is not a JNDIAuthnPortType resource");
 	}
 
-	public Collection<InternalEntry> retrieveEntries(String regex)
+	public Collection<InternalEntry> retrieveEntries(String entryName)
 			throws ResourceException {
 
 		if (isServiceResource()) {
-			return super.retrieveEntries(regex);
+			return super.retrieveEntries(entryName);
 		}
 		
 		throw new ResourceException("Resource is not a JNDIAuthnPortType resource");
 	}
 
-	public Collection<String> removeEntries(String regex)
+	public Collection<String> removeEntries(String entryName)
 			throws ResourceException {
 
 		if (isServiceResource()) {
-			return super.removeEntries(regex);
+			return super.removeEntries(entryName);
 		}
 		
 		throw new ResourceException("Resource is not a JNDIAuthnPortType resource");

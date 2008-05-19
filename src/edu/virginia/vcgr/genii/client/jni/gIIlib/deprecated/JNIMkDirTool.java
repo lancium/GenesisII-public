@@ -7,6 +7,7 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.JNILibraryBase;
+import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 
@@ -46,7 +47,7 @@ public class JNIMkDirTool extends JNILibraryBase {
 					return false;
 				}
 				
-				if (!parent.isDirectory())
+				if (!(new TypeInformation(parent.getEndpoint()).isRNS()))
 				{
 					System.out.println("\"" + parent.pwd() + 
 						"\" is not a directory.");

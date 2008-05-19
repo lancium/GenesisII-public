@@ -9,6 +9,7 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
@@ -46,13 +47,10 @@ public class CatTool extends BaseGridTool
 		String filePath)
 		throws RNSException, ConfigurationException, IOException
 	{
-		RNSPath [] files = currentPath.list(
-			filePath, RNSPathQueryFlags.MUST_EXIST);
+		RNSPath file = currentPath.lookup(filePath, 
+			RNSPathQueryFlags.MUST_EXIST);
 		
-		for (RNSPath file : files)
-		{
-			cat(file);
-		}
+		cat(file);
 	}
 	
 	 public void cat(RNSPath file)
@@ -60,7 +58,8 @@ public class CatTool extends BaseGridTool
 	{
 		byte []data = new byte[ByteIOConstants.PREFERRED_SIMPLE_XFER_BLOCK_SIZE];
 		int read;
-		if (!file.isFile())
+		TypeInformation typeInfo = new TypeInformation(file.getEndpoint());
+		if (!typeInfo.isByteIO())
 			throw new RNSException("Path \"" + file.pwd() +
 				"\" is not a file.");
 		
