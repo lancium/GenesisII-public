@@ -69,6 +69,7 @@
 		<genii-ext:extend portType="rpw-2:GetResourceProperty"/>
 		<genii-ext:extend portType="rpw-2:GetMultipleResourceProperties"/>
 		<genii-ext:extend portType="rns:RNSPortType"/>
+		<genii-ext:extend portType="enhanced-rns:EnhancedRNSPortType"/>
 		<genii-ext:extend portType="sched:SchedulerPortType"/>
 		<genii-ext:extend
 			portType="genii-not:GeniiNotificationConsumerPortType"/>

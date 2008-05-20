@@ -46,6 +46,10 @@ import edu.virginia.vcgr.genii.client.iterator.WSIterable;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
+import edu.virginia.vcgr.genii.client.rns.filters.FilePatternFilterFactory;
+import edu.virginia.vcgr.genii.client.rns.filters.Filter;
+import edu.virginia.vcgr.genii.client.rns.filters.FilterFactory;
+import edu.virginia.vcgr.genii.client.rns.filters.RNSFilter;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
@@ -390,6 +394,101 @@ public class RNSPath implements Serializable
 		}
 		
 		return next;
+	}
+	
+	private Collection<RNSPath> expand(
+		RNSPath parent, String []pathElements, int nextElement,
+		FilterFactory filterType)
+	{
+		Collection<RNSPath> ret = new LinkedList<RNSPath>();
+		Collection<RNSPath> tmp;
+			
+		if (nextElement >= pathElements.length)
+			ret.add(parent);
+		else
+		{
+			Filter filter = filterType.createFilter(pathElements[nextElement]);
+			try
+			{
+				TypeInformation typeInfo = new TypeInformation(
+					parent.getEndpoint());
+				if (typeInfo.isRNS())
+				{
+					_logger.debug("Attempting to list contents of \"" + parent + "\".");
+					
+					for (RNSPath candidate : parent.listContents())
+					{
+						if (filter.matches(candidate.getName()))
+						{
+							tmp = expand(candidate, pathElements, 
+								nextElement + 1, filterType);
+							if (tmp != null)
+								ret.addAll(tmp);
+						}
+					}
+				}
+			}
+			catch (RNSException rne)
+			{
+				_logger.debug(
+					"Skipping a directory in an RSNPath expansion which " +
+					"can't be expanded.", rne);
+			}
+		}
+		
+		if (ret.size() == 0)
+			return null;
+		
+		return ret;
+	}
+
+	public Collection<RNSPath> expand(String pathExpression)
+	{
+		return expand(pathExpression, new FilePatternFilterFactory());
+	}
+	
+	public Collection<RNSPath> expand(String pathExpression,
+		FilterFactory filterType)
+	{
+		if (pathExpression == null)
+			throw new IllegalArgumentException(
+				"Cannot lookup a path which is null.");
+		
+		try
+		{
+			String[] pathElements = PathUtils.normalizePath(pwd(), 
+				pathExpression);
+			
+			Collection<RNSPath> ret = expand(getRoot(), pathElements, 
+				0, filterType);
+			if (ret == null)
+			{
+				ret = new ArrayList<RNSPath>(1);
+				ret.add(lookup(pathExpression, 
+					RNSPathQueryFlags.DONT_CARE));
+			}
+			
+			return ret;
+		}
+		catch (RNSException rne)
+		{
+			throw new RuntimeException(
+				"Unexpected RNS path expansion exception.", rne);
+		}
+	}
+	
+	public Collection<RNSPath> listContents(RNSFilter filter)
+		throws RNSPathDoesNotExistException, RNSException
+	{
+		Collection<RNSPath> ret = new LinkedList<RNSPath>();
+		
+		for (RNSPath path : listContents())
+		{
+			if (filter.matches(path))
+				ret.add(path);
+		}
+		
+		return ret;
 	}
 	
 	public Collection<RNSPath> listContents()

@@ -15,7 +15,6 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
-import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 
 public class LsTool extends BaseGridTool
@@ -91,9 +90,14 @@ public class LsTool extends BaseGridTool
 		
 		for (String arg : arguments)
 		{
+			for (RNSPath path : ctxt.getCurrentPath().expand(arg))
+				targets.add(path);
+			
+			/* Old code
 			RNSPath path = ctxt.getCurrentPath().lookup(arg, 
 				RNSPathQueryFlags.MUST_EXIST);
 			targets.add(path);
+			*/
 		}
 		
 		if (isDirectory)
