@@ -15,6 +15,7 @@
  */
 package edu.virginia.vcgr.genii.container.container;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.rmi.RemoteException;
@@ -49,10 +50,13 @@ import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
+import edu.virginia.vcgr.genii.client.ser.DBSerializer;
+import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.container.Container;
+import edu.virginia.vcgr.genii.container.ContainerStatisticsResultType;
 import edu.virginia.vcgr.genii.container.VCGRContainerPortType;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
@@ -65,7 +69,6 @@ public class VCGRContainerServiceImpl extends GenesisIIBase
 	static private Log _logger = LogFactory.getLog(VCGRContainerServiceImpl.class);
 	static public final String _WELLKNOWN_SERVICEDIR_KEY = 
 		"edu.virginia.vcgr.htc.container.container.service-dir-key";
-	
 	
 	public VCGRContainerServiceImpl() throws RemoteException
 	{
@@ -283,6 +286,26 @@ public class VCGRContainerServiceImpl extends GenesisIIBase
 		catch (ResourceUnknownFaultType rue)
 		{
 			throw new ResourceException(rue.getLocalizedMessage(), rue);
+		}
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.READ)
+	public ContainerStatisticsResultType containerStatistics(
+			Object containerStatistics) throws RemoteException
+	{
+		ContainerStatistics stats = ContainerStatistics.instance();
+		
+		try
+		{
+			return new ContainerStatisticsResultType(stats.getStartTime(),
+				DBSerializer.serialize(stats.getDatabaseStatistics().report()),
+				DBSerializer.serialize(stats.getMethodStatistics().report()));
+		}
+		catch (IOException ioe)
+		{
+			throw new RemoteException(
+				"An IO exception occurred trying to serialize statistics.", ioe);
 		}
 	}
 }

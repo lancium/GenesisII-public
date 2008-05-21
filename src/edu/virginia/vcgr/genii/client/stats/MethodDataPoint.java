@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.genii.container.stats;
+package edu.virginia.vcgr.genii.client.stats;
 
 import java.lang.reflect.Method;
 
@@ -22,7 +22,7 @@ public class MethodDataPoint implements DataPoint
 	public void complete(boolean successfull)
 	{
 		_completeTime = System.currentTimeMillis();
-		_successfull = true;
+		_successfull = successfull;
 	}
 	
 	public Class<?> serviceClass()

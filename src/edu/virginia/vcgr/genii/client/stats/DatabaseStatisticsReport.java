@@ -1,7 +1,11 @@
-package edu.virginia.vcgr.genii.container.stats;
+package edu.virginia.vcgr.genii.client.stats;
 
-public class DatabaseStatisticsReport
+import java.io.Serializable;
+
+public class DatabaseStatisticsReport implements Serializable
 {
+	static final long serialVersionUID = 0L;
+	
 	private long _numOpened;
 	private long _numClosed;
 	private long _totalDuration;

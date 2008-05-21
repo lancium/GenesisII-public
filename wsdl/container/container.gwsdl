@@ -63,10 +63,26 @@
 			elementFormDefault="qualified"
 			targetNamespace="http://vcgr.cs.virginia.edu/container/2006/07/container">
 
+			<xsd:import
+				namespace="http://vcgr.cs.virginia.edu/container/2006/07/container"
+				schemaLocation="./container.xsd"/>
+
 			<xsd:element name="shutdown"/>
 			<xsd:element name="shutdownResponse"/>
+
+			<xsd:element name="ContainerStatistics"/>
 		</xsd:schema>
 	</wsdl:types>
+
+	<wsdl:message name="containerStatistics">
+		<wsdl:part name="containerStatistics"
+			element="container:ContainerStatistics"/>
+	</wsdl:message>
+
+	<wsdl:message name="containerStatisticsResponse">
+		<wsdl:part name="containerStatisticsResponse"
+			element="container:ContainerStatisticsResultType"/>
+	</wsdl:message>
 
 	<wsdl:message name="shutdownRequest">
 		<wsdl:part name="shutdownRequest" element="container:shutdown"/>
@@ -86,6 +102,11 @@
 		<wsdl:operation name="shutdown">
 			<wsdl:input message="container:shutdownRequest"/>
 			<wsdl:output message="container:shutdownResponse"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="containerStatistics">
+			<wsdl:input message="container:containerStatistics"/>
+			<wsdl:output message="container:containerStatisticsResponse"/>
 		</wsdl:operation>
 	</wsdl:portType>
 </wsdl:definitions>

@@ -8,7 +8,6 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
-import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 
 public class RmTool extends BaseGridTool
@@ -73,9 +72,8 @@ public class RmTool extends BaseGridTool
 		String filePath, boolean recursive, boolean force)
 		throws RNSException, ConfigurationException, IOException
 	{
-		RNSPath file = currentPath.lookup(
-			filePath, RNSPathQueryFlags.MUST_EXIST);
-		rm(file, recursive, force);
+		for (RNSPath file : currentPath.expand(filePath))
+			rm(file, recursive, force);
 	}
 	
 	public void rm(RNSPath path, boolean recursive, 

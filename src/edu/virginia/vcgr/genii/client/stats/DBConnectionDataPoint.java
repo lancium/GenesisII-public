@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.genii.container.stats;
+package edu.virginia.vcgr.genii.client.stats;
 
 public class DBConnectionDataPoint implements DataPoint
 {

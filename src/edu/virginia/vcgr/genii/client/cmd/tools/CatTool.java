@@ -12,7 +12,6 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
-import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 
 public class CatTool extends BaseGridTool
 {
@@ -47,10 +46,8 @@ public class CatTool extends BaseGridTool
 		String filePath)
 		throws RNSException, ConfigurationException, IOException
 	{
-		RNSPath file = currentPath.lookup(filePath, 
-			RNSPathQueryFlags.MUST_EXIST);
-		
-		cat(file);
+		for (RNSPath file : currentPath.expand(filePath))		
+			cat(file);
 	}
 	
 	 public void cat(RNSPath file)

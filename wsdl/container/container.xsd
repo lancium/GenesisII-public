@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+	xmlns="http://vcgr.cs.virginia.edu/container/2006/07/container"
+	targetNamespace="http://vcgr.cs.virginia.edu/container/2006/07/container"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:container="http://vcgr.cs.virginia.edu/container/2006/07/container"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified">
+
+	<xsd:complexType name="ContainerStatisticsResultType">
+		<xsd:sequence>
+			<xsd:element name="container-start-time" type="xsd:long"
+				minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="db-statistics-report"
+				type="xsd:base64Binary" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="method-statistics-report"
+				type="xsd:base64Binary" minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="ContainerStatisticsResultType"
+		type="container:ContainerStatisticsResultType"/>
+
+</xsd:schema>

@@ -1,13 +1,24 @@
-package edu.virginia.vcgr.genii.container.stats;
+package edu.virginia.vcgr.genii.client.stats;
 
-public class MethodStatisticsReportPoint
+import java.io.Serializable;
+
+public class MethodStatisticsReportPoint implements Serializable
 {
+	static final long serialVersionUID = 0L;
+	
 	private long _totalCallsStarted;
 	private long _totalSucceeded;
 	private long _totalFailed;
 	
 	private long _totalSuccessfullCallDuration;
 	private long _totalFailedCallDuration;
+	
+	public String toString()
+	{
+		return String.format("Calls Started = %d, Calls Succeeded = %d, Calls Failed = %d, Failure Rate = %.2f%%, Average Duration = %d ms",
+			totalCallsStarted(), totalSucceeded(), totalFailed(), failureRate() * 100,
+			averageDuration());
+	}
 	
 	public MethodStatisticsReportPoint()
 	{
@@ -59,21 +70,35 @@ public class MethodStatisticsReportPoint
 	
 	public double failureRate()
 	{
+		long completed = totalCompleted();
+		if (completed == 0)
+			return Double.NaN;
+		
 		return (double)_totalFailed / totalCompleted();
 	}
 	
 	public long averageSuccessfullDuration()
 	{
+		if (_totalSucceeded == 0)
+			return -1L;
+		
 		return _totalSuccessfullCallDuration / _totalSucceeded;
 	}
 	
 	public long averageFailedDuration()
 	{
+		if (_totalFailed == 0)
+			return -1L;
+		
 		return _totalFailedCallDuration / _totalFailed;
 	}
 	
 	public long averageDuration()
 	{
-		return (_totalSuccessfullCallDuration + _totalFailedCallDuration) / (_totalSucceeded + _totalFailed);
+		long div = totalCompleted();
+		if (div == 0)
+			return -1L;
+		
+		return (_totalSuccessfullCallDuration + _totalFailedCallDuration) / (div);
 	}
 }

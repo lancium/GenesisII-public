@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.genii.container.stats;
+package edu.virginia.vcgr.genii.client.stats;
 
 import java.util.EnumMap;
 import java.util.Iterator;

@@ -313,6 +313,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.BesPolicyTool</mconf:class>
 		<mconf:class name="tty"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.TTYTool</mconf:class>
+		<mconf:class name="container-stats"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ContainerStatsTool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

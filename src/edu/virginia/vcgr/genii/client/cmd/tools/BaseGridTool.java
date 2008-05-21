@@ -75,6 +75,7 @@ public abstract class BaseGridTool implements ITool
 			{
 				err.print(itue.getLocalizedMessage());
 				err.print(usage());
+				err.println();
 				return -1;
 			}
 		}

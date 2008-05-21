@@ -40,6 +40,7 @@ import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.install.InstallationState;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
+import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
 import edu.virginia.vcgr.genii.client.utils.deployment.DeploymentRelativeFile;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 import edu.virginia.vcgr.genii.container.configuration.ContainerConfiguration;
@@ -79,6 +80,8 @@ public class Container extends ApplicationBase
 			usage();
 			System.exit(1);
 		}
+		
+		ContainerStatistics.instance();
 		
 		if (args.length == 1) {
 			System.setProperty(GenesisIIConstants.DEPLOYMENT_NAME_PROPERTY, args[0]);
