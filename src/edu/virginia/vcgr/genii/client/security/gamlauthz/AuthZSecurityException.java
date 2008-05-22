@@ -22,8 +22,8 @@ public class AuthZSecurityException extends GenesisIISecurityException
 {
 	static final long serialVersionUID = 0;
 
-	protected Throwable _myCause = null; 
-	
+	protected Throwable _myCause = null;
+
 	public AuthZSecurityException(String msg)
 	{
 		super(msg);

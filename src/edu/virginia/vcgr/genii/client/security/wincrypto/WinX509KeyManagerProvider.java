@@ -17,7 +17,6 @@ package edu.virginia.vcgr.genii.client.security.wincrypto;
 
 import java.security.Security;
 
-
 /**
  * Provider class for the X.509 MS Windows Key Manager
  * 
@@ -26,33 +25,33 @@ import java.security.Security;
 public class WinX509KeyManagerProvider extends java.security.Provider
 {
 	static final long serialVersionUID = 0L;
-	
-	/** String identifiying the instance-name to be supplied to KeyManagerFactory
-	  * for obtaining a WinX509KeyManagerFactory */
-	public static final String KM_NAME = "WinX509KM";
-	
-
-	public WinX509KeyManagerProvider() { 
-		super(KM_NAME, 1.0, KM_NAME + " implements MS Windows Key Factory"); 
-		
-		put("KeyManagerFactory." + KM_NAME, WinX509KeyManagerFactorySpi.class.getName()); 
-	}
-
 
 	/**
-	 * Installs the WinX509KeyManagerProvider into the provider hierarchy
-	 * if it was not done in the JDK/JRE's lib/security/java.security file.
-	 * Using this mechanism may require that the codebase comprising this code
-	 * be signed appropriately
+	 * String identifiying the instance-name to be supplied to KeyManagerFactory
+	 * for obtaining a WinX509KeyManagerFactory
 	 */
-	public static synchronized void install() { 
-		
-		if (Security.getProvider(KM_NAME) == null) {
-			Security.insertProviderAt (new WinX509KeyManagerProvider(), 1);
+	public static final String KM_NAME = "WinX509KM";
+
+	public WinX509KeyManagerProvider()
+	{
+		super(KM_NAME, 1.0, KM_NAME + " implements MS Windows Key Factory");
+
+		put("KeyManagerFactory." + KM_NAME, WinX509KeyManagerFactorySpi.class
+				.getName());
+	}
+
+	/**
+	 * Installs the WinX509KeyManagerProvider into the provider hierarchy if it
+	 * was not done in the JDK/JRE's lib/security/java.security file. Using this
+	 * mechanism may require that the codebase comprising this code be signed
+	 * appropriately
+	 */
+	public static synchronized void install()
+	{
+
+		if (Security.getProvider(KM_NAME) == null)
+		{
+			Security.insertProviderAt(new WinX509KeyManagerProvider(), 1);
 		}
-	} 
+	}
 }
-
-
-
-

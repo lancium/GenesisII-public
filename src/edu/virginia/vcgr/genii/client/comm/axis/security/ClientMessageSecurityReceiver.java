@@ -57,482 +57,565 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver;
 
-public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements ISecurityRecvHandler
+public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements
+		ISecurityRecvHandler
 {
 	static final long serialVersionUID = 0L;
-	
+
 	public static final String CRYPTO_ALIAS = "RECEIVER_CRYPTO_ALIAS";
 	private static final String CRYTO_PASS = "pwd";
 	public static final String RESOURCE_ALIAS = "RESOURCE_ALIAS";
-	
+
 	private MessageSecurityData _messageSec = null;
 	private ICallingContext _callContext = null;
-	
+
 	@SuppressWarnings("unchecked")
-	protected boolean checkReceiverResults(Vector wsResult, Vector actions) 
+	protected boolean checkReceiverResults(Vector wsResult, Vector actions)
 	{
-    	// checks to see if the security operations performed are the 
-    	// same as those that we required
-		return true;    	
-    }
-	
-	public ClientMessageSecurityReceiver() {}
-
-	public void configure(ICallingContext callContext) {
-
-		setOption(WSHandlerConstants.ACTION, 
-			WSHandlerConstants.USERNAME_TOKEN
-			+ " " + 
-			WSHandlerConstants.TIMESTAMP        			
-			+ " " + 
-			WSHandlerConstants.SIGNATURE
-			+ " " + 
-			WSHandlerConstants.ENCRYPT
-    	);
-    	setOption(WSHandlerConstants.PW_CALLBACK_CLASS, 
-			ClientMessageSecurityReceiver.ClientPWCallback.class.getName());
-    	setOption(WSHandlerConstants.USER, ServerWSDoAllReceiver.CRYPTO_ALIAS);		
-    	setOption(WSHandlerConstants.USER, ClientMessageSecurityReceiver.CRYPTO_ALIAS);
-		
+		// checks to see if the security operations performed are the
+		// same as those that we required
+		return true;
 	}
 
-    public void invoke(MessageContext msgContext) throws AxisFault {
+	public ClientMessageSecurityReceiver()
+	{
+	}
 
-		_messageSec = (MessageSecurityData) msgContext.getProperty(
-				CommConstants.MESSAGE_SEC_CALL_DATA);
-		_callContext = (ICallingContext) msgContext.getProperty(
-				CommConstants.CALLING_CONTEXT_PROPERTY_NAME);
-    	
-    	// perform a quick check to see if the message has security 
-		// headers... (the parent implementation throws a fault and 
-		// we'd rather let the insecure request happen since we don't 
-		// force security).  Swallow any exceptions and let the 
+	public void configure(ICallingContext callContext)
+	{
+
+		setOption(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN
+				+ " " + WSHandlerConstants.TIMESTAMP + " "
+				+ WSHandlerConstants.SIGNATURE + " "
+				+ WSHandlerConstants.ENCRYPT);
+		setOption(WSHandlerConstants.PW_CALLBACK_CLASS,
+				ClientMessageSecurityReceiver.ClientPWCallback.class.getName());
+		setOption(WSHandlerConstants.USER, ServerWSDoAllReceiver.CRYPTO_ALIAS);
+		setOption(WSHandlerConstants.USER,
+				ClientMessageSecurityReceiver.CRYPTO_ALIAS);
+
+	}
+
+	public void invoke(MessageContext msgContext) throws AxisFault
+	{
+
+		_messageSec =
+				(MessageSecurityData) msgContext
+						.getProperty(CommConstants.MESSAGE_SEC_CALL_DATA);
+		_callContext =
+				(ICallingContext) msgContext
+						.getProperty(CommConstants.CALLING_CONTEXT_PROPERTY_NAME);
+
+		// perform a quick check to see if the message has security
+		// headers... (the parent implementation throws a fault and
+		// we'd rather let the insecure request happen since we don't
+		// force security). Swallow any exceptions and let the
 		// parent implementation re-throw them.
-		try {
+		try
+		{
 			Message sm = msgContext.getCurrentMessage();
-	        if (sm == null) {
-				// We did not receive anything...Usually happens when we get a 
+			if (sm == null)
+			{
+				// We did not receive anything...Usually happens when we get a
 				// HTTP 202 message (with no content)
-	        	return;
-	        }
-	       	Document doc = sm.getSOAPEnvelope().getAsDocument();
-	        String actor = (String) getOption(WSHandlerConstants.ACTOR);
-	        SOAPConstants sc = WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
-	        if (WSSecurityUtil.getSecurityHeader(doc, actor, sc) == null) {
-	        	return;
-	        }
-	        
-		} catch (Exception e) {
+				return;
+			}
+			Document doc = sm.getSOAPEnvelope().getAsDocument();
+			String actor = (String) getOption(WSHandlerConstants.ACTOR);
+			SOAPConstants sc =
+					WSSecurityUtil.getSOAPConstants(doc.getDocumentElement());
+			if (WSSecurityUtil.getSecurityHeader(doc, actor, sc) == null)
+			{
+				return;
+			}
+
 		}
-		
+		catch (Exception e)
+		{
+		}
+
 		superinvoke(msgContext);
-//		super.invoke(msgContext);
-    }
-	
-    protected boolean verifyTrust(X509Certificate cert, RequestData reqData) throws WSSecurityException {
-    	
-    	// If there was no public key/cert material for the server 
-    	// resource, trust its signature key as its valid
-        if (_messageSec._resourceEpi == null) {
-	    	Crypto crypto = reqData.getSigCrypto();
-	    	KeyStore ks = crypto.getKeyStore();
-	    	try {
-	    		ks.setCertificateEntry(RESOURCE_ALIAS, cert);
-	    	} catch (java.security.GeneralSecurityException e) {
+		// super.invoke(msgContext);
+	}
+
+	protected boolean verifyTrust(X509Certificate cert, RequestData reqData)
+			throws WSSecurityException
+	{
+
+		// If there was no public key/cert material for the server
+		// resource, trust its signature key as its valid
+		if (_messageSec._resourceEpi == null)
+		{
+			Crypto crypto = reqData.getSigCrypto();
+			KeyStore ks = crypto.getKeyStore();
+			try
+			{
+				ks.setCertificateEntry(RESOURCE_ALIAS, cert);
+			}
+			catch (java.security.GeneralSecurityException e)
+			{
 				throw new WSSecurityException(e.getMessage(), e);
-	    	}
-        }
-    	
-    	return super.verifyTrust(cert, reqData);
-    }    
-    
-    /**
-     * Hook to allow subclasses to load their Signature Crypto however they see
-     * fit.
-     */
-    public Crypto loadSignatureCrypto(RequestData reqData) 
-			throws WSSecurityException {
+			}
+		}
 
-    	AbstractCrypto crypto = null;
-        try {
-        	// create an in-memory keystore for the client and resource's key material
-            KeyStore keyStore = KeyStore.getInstance("JKS");
-        	keyStore.load(null, null);
+		return super.verifyTrust(cert, reqData);
+	}
 
-            // set the server resource's identity as trusted
-            if ((_messageSec != null) && (_messageSec._resourceEpi != null) && (_messageSec._resourceCertChain != null)) {
-	        	keyStore.setCertificateEntry(
-	        			_messageSec._resourceEpi.toString(), 
-	        			_messageSec._resourceCertChain[0]);
-            }
+	/**
+	 * Hook to allow subclasses to load their Signature Crypto however they see
+	 * fit.
+	 */
+	public Crypto loadSignatureCrypto(RequestData reqData)
+			throws WSSecurityException
+	{
 
-    		crypto = new FlexibleBouncyCrypto("sigCrypto");
-    		crypto.setKeyStore(keyStore);
-    		
-    		return crypto;
+		AbstractCrypto crypto = null;
+		try
+		{
+			// create an in-memory keystore for the client and resource's key
+			// material
+			KeyStore keyStore = KeyStore.getInstance("JKS");
+			keyStore.load(null, null);
 
-        } catch (IOException e) {
-    		throw new WSSecurityException(e.getMessage(), e);
-        } catch (java.security.GeneralSecurityException e) {
-    		throw new WSSecurityException(e.getMessage(), e);
-		} catch (org.apache.ws.security.components.crypto.CredentialException e) {
+			// set the server resource's identity as trusted
+			if ((_messageSec != null) && (_messageSec._resourceEpi != null)
+					&& (_messageSec._resourceCertChain != null))
+			{
+				keyStore.setCertificateEntry(_messageSec._resourceEpi
+						.toString(), _messageSec._resourceCertChain[0]);
+			}
+
+			crypto = new FlexibleBouncyCrypto("sigCrypto");
+			crypto.setKeyStore(keyStore);
+
+			return crypto;
+
+		}
+		catch (IOException e)
+		{
 			throw new WSSecurityException(e.getMessage(), e);
 		}
-    }
-
-    /**
-     * Hook to allow subclasses to load their Encryption Crypto however they
-     * see fit.
-     */
-    protected Crypto loadDecryptionCrypto(RequestData reqData) 
-			throws WSSecurityException {
-    	
-    	AbstractCrypto crypto = null;
-        try {
-        	
-        	// create an in-memory keystore for the client's key material
-            KeyStore keyStore = KeyStore.getInstance("JKS");
-        	keyStore.load(null, null);
-
-        	KeyAndCertMaterial keyMaterial = _callContext.getActiveKeyAndCertMaterial();
-            keyStore.setKeyEntry(
-            		CRYPTO_ALIAS, 
-            		keyMaterial._clientPrivateKey, 
-            		CRYTO_PASS.toCharArray(), 
-            		keyMaterial._clientCertChain);
-        	
-    		crypto = new FlexibleBouncyCrypto("enc&dec crypto");
-    		crypto.setKeyStore(keyStore);
-    		
-    		return crypto;
-
-        } catch (IOException e) {
-    		throw new WSSecurityException(e.getMessage(), e);
-        } catch (java.security.GeneralSecurityException e) {
-    		throw new WSSecurityException(e.getMessage(), e);
-		} catch (org.apache.ws.security.components.crypto.CredentialException e) {
+		catch (java.security.GeneralSecurityException e)
+		{
 			throw new WSSecurityException(e.getMessage(), e);
 		}
-    }	
-	
-    public static class ClientPWCallback implements CallbackHandler {
+		catch (org.apache.ws.security.components.crypto.CredentialException e)
+		{
+			throw new WSSecurityException(e.getMessage(), e);
+		}
+	}
 
-    	/**
-    	 * 
-    	 * @see javax.security.auth.callback.CallbackHandler#handle(javax.security.auth.callback.Callback[])
-    	 * 
-    	 */
+	/**
+	 * Hook to allow subclasses to load their Encryption Crypto however they see
+	 * fit.
+	 */
+	protected Crypto loadDecryptionCrypto(RequestData reqData)
+			throws WSSecurityException
+	{
 
-    	public void handle(Callback[] callbacks) throws IOException,
-    			UnsupportedCallbackException {
-    		for (int i = 0; i < callbacks.length; i++) {
-    			if (callbacks[i] instanceof WSPasswordCallback) {
-    				WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
+		AbstractCrypto crypto = null;
+		try
+		{
 
-    				switch (pc.getUsage()) {
-    				case WSPasswordCallback.USERNAME_TOKEN:
-    					System.err.println("Hmmm, probably bad -- need to lookup a password");
-    				case WSPasswordCallback.USERNAME_TOKEN_UNKNOWN: 
-    					// don't care
-    					return;
-    				case WSPasswordCallback.DECRYPT: 
-    				case WSPasswordCallback.SIGNATURE: 
-    					pc.setPassword(CRYTO_PASS);
-        				break;
-    				default:
-        				throw new UnsupportedCallbackException(callbacks[i],
-        					"Unrecognized Callback");
-    				}    				
+			// create an in-memory keystore for the client's key material
+			KeyStore keyStore = KeyStore.getInstance("JKS");
+			keyStore.load(null, null);
 
-    			} else {
-    				throw new UnsupportedCallbackException(callbacks[i],
-    						"Unrecognized Callback");
-    			}
+			KeyAndCertMaterial keyMaterial =
+					_callContext.getActiveKeyAndCertMaterial();
+			keyStore.setKeyEntry(CRYPTO_ALIAS, keyMaterial._clientPrivateKey,
+					CRYTO_PASS.toCharArray(), keyMaterial._clientCertChain);
 
-    		}
-    	}
-    }    
-    
-    
-    /**
-     * (Duane: Copied from org.apache.ws.axis.security.WSDoAllReciever, modified to
-     * allow processing of fault messages)
-     * 
-     * Axis calls invoke to handle a message.
-     * <p/>
-     *
-     * @param msgContext message context.
-     * @throws AxisFault
-     */
-    @SuppressWarnings("unchecked")
-	public void superinvoke(MessageContext msgContext) throws AxisFault {
+			crypto = new FlexibleBouncyCrypto("enc&dec crypto");
+			crypto.setKeyStore(keyStore);
 
-    	boolean doDebug = log.isDebugEnabled();
+			return crypto;
 
-        if (doDebug) {
-            log.debug("WSDoAllReceiver: enter invoke() with msg type: "
-                    + msgContext.getCurrentMessage().getMessageType());
-        }
+		}
+		catch (IOException e)
+		{
+			throw new WSSecurityException(e.getMessage(), e);
+		}
+		catch (java.security.GeneralSecurityException e)
+		{
+			throw new WSSecurityException(e.getMessage(), e);
+		}
+		catch (org.apache.ws.security.components.crypto.CredentialException e)
+		{
+			throw new WSSecurityException(e.getMessage(), e);
+		}
+	}
 
-        RequestData reqData = new RequestData();
-        /*
-        * The overall try, just to have a finally at the end to perform some
-        * housekeeping.
-        */
-        try {
-            reqData.setMsgContext(msgContext);
+	public static class ClientPWCallback implements CallbackHandler
+	{
 
-            Vector<String> actions = new Vector<String>();
-            String action = null;
-            if ((action = (String) getOption(WSHandlerConstants.ACTION)) == null) {
-                action = (String) msgContext
-                        .getProperty(WSHandlerConstants.ACTION);
-            }
-            if (action == null) {
-                throw new AxisFault("WSDoAllReceiver: No action defined");
-            }
-            int doAction = WSSecurityUtil.decodeAction(action, actions);
+		/**
+		 * 
+		 * @see javax.security.auth.callback.CallbackHandler#handle(javax.security.auth.callback.Callback[])
+		 * 
+		 */
 
-            String actor = (String) getOption(WSHandlerConstants.ACTOR);
+		public void handle(Callback[] callbacks) throws IOException,
+				UnsupportedCallbackException
+		{
+			for (int i = 0; i < callbacks.length; i++)
+			{
+				if (callbacks[i] instanceof WSPasswordCallback)
+				{
+					WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
 
-            Message sm = msgContext.getCurrentMessage();
-            Document doc = null;
+					switch (pc.getUsage())
+					{
+					case WSPasswordCallback.USERNAME_TOKEN:
+						System.err
+								.println("Hmmm, probably bad -- need to lookup a password");
+					case WSPasswordCallback.USERNAME_TOKEN_UNKNOWN:
+						// don't care
+						return;
+					case WSPasswordCallback.DECRYPT:
+					case WSPasswordCallback.SIGNATURE:
+						pc.setPassword(CRYTO_PASS);
+						break;
+					default:
+						throw new UnsupportedCallbackException(callbacks[i],
+								"Unrecognized Callback");
+					}
 
-            /**
-             * We did not receive anything...Usually happens when we get a
-             * HTTP 202 message (with no content)
-             */
-            if(sm == null){
-                return;
-            }
+				}
+				else
+				{
+					throw new UnsupportedCallbackException(callbacks[i],
+							"Unrecognized Callback");
+				}
 
-            try {
-                doc = sm.getSOAPEnvelope().getAsDocument();
-                if (doDebug) {
-                    log.debug("Received SOAP request: ");
-                    log.debug(org.apache.axis.utils.XMLUtils
-                            .PrettyDocumentToString(doc));
-                }
-            } catch (Exception ex) {
-                throw new AxisFault(
-                        "WSDoAllReceiver: cannot convert into document", ex);
-            }
+			}
+		}
+	}
 
-            /*
-             * Duane: Commented out to allow for security header processing
-             * of fault messages.
-            String msgType = sm.getMessageType();
-            if (msgType != null && msgType.equals(Message.RESPONSE)) {
-                SOAPConstants soapConstants = WSSecurityUtil
-                        .getSOAPConstants(doc.getDocumentElement());
-                if (WSSecurityUtil.findElement(doc.getDocumentElement(),
-                        "Fault", soapConstants.getEnvelopeURI()) != null) {
-                    return;
-                }
-            }
-             */
+	/**
+	 * (Duane: Copied from org.apache.ws.axis.security.WSDoAllReciever, modified
+	 * to allow processing of fault messages)
+	 * 
+	 * Axis calls invoke to handle a message. <p/>
+	 * 
+	 * @param msgContext
+	 *            message context.
+	 * @throws AxisFault
+	 */
+	@SuppressWarnings("unchecked")
+	public void superinvoke(MessageContext msgContext) throws AxisFault
+	{
 
-            /*
-            * To check a UsernameToken or to decrypt an encrypted message we
-            * need a password.
-            */
-            CallbackHandler cbHandler = null;
-            if ((doAction & (WSConstants.ENCR | WSConstants.UT)) != 0) {
-                cbHandler = getPasswordCB(reqData);
-            }
+		boolean doDebug = log.isDebugEnabled();
 
-            /*
-            * Get and check the Signature specific parameters first because
-            * they may be used for encryption too.
-            */
-            doReceiverAction(doAction, reqData);
-            
-            Vector<?> wsResult = null;
+		if (doDebug)
+		{
+			log.debug("WSDoAllReceiver: enter invoke() with msg type: "
+					+ msgContext.getCurrentMessage().getMessageType());
+		}
 
-            try {
-                wsResult = secEngine.processSecurityHeader(doc, actor,
-                        cbHandler, reqData.getSigCrypto(), reqData.getDecCrypto());
-            } catch (WSSecurityException ex) {
-                ex.printStackTrace();
-                throw new AxisFault(
-                        "WSDoAllReceiver: security processing failed", ex);
-            }
+		RequestData reqData = new RequestData();
+		/*
+		 * The overall try, just to have a finally at the end to perform some
+		 * housekeeping.
+		 */
+		try
+		{
+			reqData.setMsgContext(msgContext);
 
-            if (wsResult == null) { // no security header found
-                if (doAction == WSConstants.NO_SECURITY) {
-                    return;
-                } else {
-                    throw new AxisFault(
-                            "WSDoAllReceiver: Request does not contain required Security header");
-                }
-            }
+			Vector<String> actions = new Vector<String>();
+			String action = null;
+			if ((action = (String) getOption(WSHandlerConstants.ACTION)) == null)
+			{
+				action =
+						(String) msgContext
+								.getProperty(WSHandlerConstants.ACTION);
+			}
+			if (action == null)
+			{
+				throw new AxisFault("WSDoAllReceiver: No action defined");
+			}
+			int doAction = WSSecurityUtil.decodeAction(action, actions);
 
-            if (reqData.getWssConfig().isEnableSignatureConfirmation() && msgContext.getPastPivot()) {
-                checkSignatureConfirmation(reqData, wsResult);
-            }
-            /*
-            * save the processed-header flags
-            */
-            ArrayList<QName> processedHeaders = 
-            	new ArrayList<QName>();
-            Iterator<?> iterator = sm.getSOAPEnvelope().getHeaders().iterator();
-            while (iterator.hasNext()) {
-                org.apache.axis.message.SOAPHeaderElement tempHeader = (org.apache.axis.message.SOAPHeaderElement) iterator
-                        .next();
-                if (tempHeader.isProcessed()) {
-                    processedHeaders.add(tempHeader.getQName());
-                }
-            }
+			String actor = (String) getOption(WSHandlerConstants.ACTOR);
 
-            /*
-            * If we had some security processing, get the original SOAP part of
-            * Axis' message and replace it with new SOAP part. This new part
-            * may contain decrypted elements.
-            */
-            SOAPPart sPart = (org.apache.axis.SOAPPart) sm.getSOAPPart();
+			Message sm = msgContext.getCurrentMessage();
+			Document doc = null;
 
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            XMLUtils.outputDOM(doc, os, true);
-            sPart.setCurrentMessage(os.toByteArray(), SOAPPart.FORM_BYTES);
-            if (doDebug) {
-                log.debug("Processed received SOAP request");
-                log.debug(org.apache.axis.utils.XMLUtils
-                        .PrettyDocumentToString(doc));
-            }
+			/**
+			 * We did not receive anything...Usually happens when we get a HTTP
+			 * 202 message (with no content)
+			 */
+			if (sm == null)
+			{
+				return;
+			}
 
-            /*
-            * set the original processed-header flags
-            */
-            iterator = processedHeaders.iterator();
-            while (iterator.hasNext()) {
-                QName qname = (QName) iterator.next();
-                Enumeration<?> headersByName = sm.getSOAPEnvelope().getHeadersByName(
-                        qname.getNamespaceURI(), qname.getLocalPart());
-                while (headersByName.hasMoreElements()) {
-                    org.apache.axis.message.SOAPHeaderElement tempHeader =
-                        (org.apache.axis.message.SOAPHeaderElement) headersByName.nextElement();
-                    tempHeader.setProcessed(true);
-                }
-            }
+			try
+			{
+				doc = sm.getSOAPEnvelope().getAsDocument();
+				if (doDebug)
+				{
+					log.debug("Received SOAP request: ");
+					log.debug(org.apache.axis.utils.XMLUtils
+							.PrettyDocumentToString(doc));
+				}
+			}
+			catch (Exception ex)
+			{
+				throw new AxisFault(
+						"WSDoAllReceiver: cannot convert into document", ex);
+			}
 
-            /*
-            * After setting the new current message, probably modified because
-            * of decryption, we need to locate the security header. That is, we
-            * force Axis (with getSOAPEnvelope()) to parse the string, build
-            * the new header. Then we examine, look up the security header and
-            * set the header as processed.
-            *
-            * Please note: find all header elements that contain the same actor
-            * that was given to processSecurityHeader(). Then check if there is
-            * a security header with this actor.
-            */
+			/*
+			 * Duane: Commented out to allow for security header processing of
+			 * fault messages. String msgType = sm.getMessageType(); if (msgType !=
+			 * null && msgType.equals(Message.RESPONSE)) { SOAPConstants
+			 * soapConstants = WSSecurityUtil
+			 * .getSOAPConstants(doc.getDocumentElement()); if
+			 * (WSSecurityUtil.findElement(doc.getDocumentElement(), "Fault",
+			 * soapConstants.getEnvelopeURI()) != null) { return; } }
+			 */
 
-            SOAPHeader sHeader = null;
-            try {
-                sHeader = sm.getSOAPEnvelope().getHeader();
-            } catch (Exception ex) {
-                throw new AxisFault(
-                        "WSDoAllReceiver: cannot get SOAP header after security processing",
-                        ex);
-            }
+			/*
+			 * To check a UsernameToken or to decrypt an encrypted message we
+			 * need a password.
+			 */
+			CallbackHandler cbHandler = null;
+			if ((doAction & (WSConstants.ENCR | WSConstants.UT)) != 0)
+			{
+				cbHandler = getPasswordCB(reqData);
+			}
 
-            Iterator<?> headers = sHeader.examineHeaderElements(actor);
+			/*
+			 * Get and check the Signature specific parameters first because
+			 * they may be used for encryption too.
+			 */
+			doReceiverAction(doAction, reqData);
 
-            SOAPHeaderElement headerElement = null;
-            while (headers.hasNext()) {
-                org.apache.axis.message.SOAPHeaderElement hE = (org.apache.axis.message.SOAPHeaderElement) headers.next();
-                if (hE.getLocalName().equals(WSConstants.WSSE_LN)
-                        && hE.getNamespaceURI().equals(WSConstants.WSSE_NS)) {
-                    headerElement = hE;
-                    break;
-                }
-            }
-            ((org.apache.axis.message.SOAPHeaderElement) headerElement)
-                    .setProcessed(true);
+			Vector<?> wsResult = null;
 
-            /*
-            * Now we can check the certificate used to sign the message. In the
-            * following implementation the certificate is only trusted if
-            * either it itself or the certificate of the issuer is installed in
-            * the keystore.
-            *
-            * Note: the method verifyTrust(X509Certificate) allows custom
-            * implementations with other validation algorithms for subclasses.
-            */
+			try
+			{
+				wsResult =
+						secEngine.processSecurityHeader(doc, actor, cbHandler,
+								reqData.getSigCrypto(), reqData.getDecCrypto());
+			}
+			catch (WSSecurityException ex)
+			{
+				ex.printStackTrace();
+				throw new AxisFault(
+						"WSDoAllReceiver: security processing failed", ex);
+			}
 
-            // Extract the signature action result from the action vector
-            WSSecurityEngineResult actionResult = WSSecurityUtil
-                    .fetchActionResult(wsResult, WSConstants.SIGN);
+			if (wsResult == null)
+			{ // no security header found
+				if (doAction == WSConstants.NO_SECURITY)
+				{
+					return;
+				}
+				else
+				{
+					throw new AxisFault(
+							"WSDoAllReceiver: Request does not contain required Security header");
+				}
+			}
 
-            if (actionResult != null) {
-                X509Certificate returnCert = actionResult.getCertificate();
+			if (reqData.getWssConfig().isEnableSignatureConfirmation()
+					&& msgContext.getPastPivot())
+			{
+				checkSignatureConfirmation(reqData, wsResult);
+			}
+			/*
+			 * save the processed-header flags
+			 */
+			ArrayList<QName> processedHeaders = new ArrayList<QName>();
+			Iterator<?> iterator = sm.getSOAPEnvelope().getHeaders().iterator();
+			while (iterator.hasNext())
+			{
+				org.apache.axis.message.SOAPHeaderElement tempHeader =
+						(org.apache.axis.message.SOAPHeaderElement) iterator
+								.next();
+				if (tempHeader.isProcessed())
+				{
+					processedHeaders.add(tempHeader.getQName());
+				}
+			}
 
-                if (returnCert != null) {
-                    if (!verifyTrust(returnCert, reqData)) {
-                        throw new AxisFault(
-                                "WSDoAllReceiver: The certificate used for the signature is not trusted");
-                    }
-                }
-            }
+			/*
+			 * If we had some security processing, get the original SOAP part of
+			 * Axis' message and replace it with new SOAP part. This new part
+			 * may contain decrypted elements.
+			 */
+			SOAPPart sPart = (org.apache.axis.SOAPPart) sm.getSOAPPart();
 
-            /*
-            * Perform further checks on the timestamp that was transmitted in
-            * the header. In the following implementation the timestamp is
-            * valid if it was created after (now-ttl), where ttl is set on
-            * server side, not by the client.
-            *
-            * Note: the method verifyTimestamp(Timestamp) allows custom
-            * implementations with other validation algorithms for subclasses.
-            */
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			XMLUtils.outputDOM(doc, os, true);
+			sPart.setCurrentMessage(os.toByteArray(), SOAPPart.FORM_BYTES);
+			if (doDebug)
+			{
+				log.debug("Processed received SOAP request");
+				log.debug(org.apache.axis.utils.XMLUtils
+						.PrettyDocumentToString(doc));
+			}
 
-            // Extract the timestamp action result from the action vector
-            actionResult = WSSecurityUtil.fetchActionResult(wsResult,
-                    WSConstants.TS);
+			/*
+			 * set the original processed-header flags
+			 */
+			iterator = processedHeaders.iterator();
+			while (iterator.hasNext())
+			{
+				QName qname = (QName) iterator.next();
+				Enumeration<?> headersByName =
+						sm.getSOAPEnvelope().getHeadersByName(
+								qname.getNamespaceURI(), qname.getLocalPart());
+				while (headersByName.hasMoreElements())
+				{
+					org.apache.axis.message.SOAPHeaderElement tempHeader =
+							(org.apache.axis.message.SOAPHeaderElement) headersByName
+									.nextElement();
+					tempHeader.setProcessed(true);
+				}
+			}
 
-            if (actionResult != null) {
-                Timestamp timestamp = actionResult.getTimestamp();
+			/*
+			 * After setting the new current message, probably modified because
+			 * of decryption, we need to locate the security header. That is, we
+			 * force Axis (with getSOAPEnvelope()) to parse the string, build
+			 * the new header. Then we examine, look up the security header and
+			 * set the header as processed.
+			 * 
+			 * Please note: find all header elements that contain the same actor
+			 * that was given to processSecurityHeader(). Then check if there is
+			 * a security header with this actor.
+			 */
 
-                if (timestamp != null) {
-                    if (!verifyTimestamp(timestamp, decodeTimeToLive(reqData))) {
-                        throw new AxisFault(
-                                "WSDoAllReceiver: The timestamp could not be validated");
-                    }
-                }
-            }
+			SOAPHeader sHeader = null;
+			try
+			{
+				sHeader = sm.getSOAPEnvelope().getHeader();
+			}
+			catch (Exception ex)
+			{
+				throw new AxisFault(
+						"WSDoAllReceiver: cannot get SOAP header after security processing",
+						ex);
+			}
 
-            /*
-            * now check the security actions: do they match, in right order?
-            */
-            if (!checkReceiverResults(wsResult, actions)) {
-                throw new AxisFault(
-                    "WSDoAllReceiver: security processing failed (actions mismatch)");                
-                
-            }
-            /*
-            * All ok up to this point. Now construct and setup the security
-            * result structure. The service may fetch this and check it.
-            */
-            Vector<Object> results = null;
-            if ((results = (Vector<Object>) msgContext
-                    .getProperty(WSHandlerConstants.RECV_RESULTS)) == null) {
-                results = new Vector<Object>();
-                msgContext
-                        .setProperty(WSHandlerConstants.RECV_RESULTS, results);
-            }
-            WSHandlerResult rResult = new WSHandlerResult(actor, wsResult);
-            results.add(0, rResult);
+			Iterator<?> headers = sHeader.examineHeaderElements(actor);
 
-            if (doDebug) {
-                log.debug("WSDoAllReceiver: exit invoke()");
-            }
-        } catch (WSSecurityException e) {
-            throw new AxisFault(e.getMessage(), e);
-        } finally {
-            reqData.clear();
-            reqData = null;
-        }
-    }
-    
-    
-	
+			SOAPHeaderElement headerElement = null;
+			while (headers.hasNext())
+			{
+				org.apache.axis.message.SOAPHeaderElement hE =
+						(org.apache.axis.message.SOAPHeaderElement) headers
+								.next();
+				if (hE.getLocalName().equals(WSConstants.WSSE_LN)
+						&& hE.getNamespaceURI().equals(WSConstants.WSSE_NS))
+				{
+					headerElement = hE;
+					break;
+				}
+			}
+			((org.apache.axis.message.SOAPHeaderElement) headerElement)
+					.setProcessed(true);
+
+			/*
+			 * Now we can check the certificate used to sign the message. In the
+			 * following implementation the certificate is only trusted if
+			 * either it itself or the certificate of the issuer is installed in
+			 * the keystore.
+			 * 
+			 * Note: the method verifyTrust(X509Certificate) allows custom
+			 * implementations with other validation algorithms for subclasses.
+			 */
+
+			// Extract the signature action result from the action vector
+			WSSecurityEngineResult actionResult =
+					WSSecurityUtil
+							.fetchActionResult(wsResult, WSConstants.SIGN);
+
+			if (actionResult != null)
+			{
+				X509Certificate returnCert = actionResult.getCertificate();
+
+				if (returnCert != null)
+				{
+					if (!verifyTrust(returnCert, reqData))
+					{
+						throw new AxisFault(
+								"WSDoAllReceiver: The certificate used for the signature is not trusted");
+					}
+				}
+			}
+
+			/*
+			 * Perform further checks on the timestamp that was transmitted in
+			 * the header. In the following implementation the timestamp is
+			 * valid if it was created after (now-ttl), where ttl is set on
+			 * server side, not by the client.
+			 * 
+			 * Note: the method verifyTimestamp(Timestamp) allows custom
+			 * implementations with other validation algorithms for subclasses.
+			 */
+
+			// Extract the timestamp action result from the action vector
+			actionResult =
+					WSSecurityUtil.fetchActionResult(wsResult, WSConstants.TS);
+
+			if (actionResult != null)
+			{
+				Timestamp timestamp = actionResult.getTimestamp();
+
+				if (timestamp != null)
+				{
+					if (!verifyTimestamp(timestamp, decodeTimeToLive(reqData)))
+					{
+						throw new AxisFault(
+								"WSDoAllReceiver: The timestamp could not be validated");
+					}
+				}
+			}
+
+			/*
+			 * now check the security actions: do they match, in right order?
+			 */
+			if (!checkReceiverResults(wsResult, actions))
+			{
+				throw new AxisFault(
+						"WSDoAllReceiver: security processing failed (actions mismatch)");
+
+			}
+			/*
+			 * All ok up to this point. Now construct and setup the security
+			 * result structure. The service may fetch this and check it.
+			 */
+			Vector<Object> results = null;
+			if ((results =
+					(Vector<Object>) msgContext
+							.getProperty(WSHandlerConstants.RECV_RESULTS)) == null)
+			{
+				results = new Vector<Object>();
+				msgContext
+						.setProperty(WSHandlerConstants.RECV_RESULTS, results);
+			}
+			WSHandlerResult rResult = new WSHandlerResult(actor, wsResult);
+			results.add(0, rResult);
+
+			if (doDebug)
+			{
+				log.debug("WSDoAllReceiver: exit invoke()");
+			}
+		}
+		catch (WSSecurityException e)
+		{
+			throw new AxisFault(e.getMessage(), e);
+		}
+		finally
+		{
+			reqData.clear();
+			reqData = null;
+		}
+	}
+
 }

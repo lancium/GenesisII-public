@@ -24,22 +24,25 @@ import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 
 public class FlexibleBouncyCrypto extends Merlin
 {
-	static {
+	static
+	{
 		CertTool.loadBCProvider();
 	}
-	
-	public FlexibleBouncyCrypto() throws CredentialException,
-			IOException {
-		
+
+	public FlexibleBouncyCrypto() throws CredentialException, IOException
+	{
+
 		super(null);
-		
-    	properties = new Properties();
-    	properties.setProperty("org.apache.ws.security.crypto.merlin.cert.provider", "BC");
+
+		properties = new Properties();
+		properties.setProperty(
+				"org.apache.ws.security.crypto.merlin.cert.provider", "BC");
 	}
-	
-	public FlexibleBouncyCrypto(String name) throws CredentialException, IOException 
+
+	public FlexibleBouncyCrypto(String name) throws CredentialException,
+			IOException
 	{
 		this();
 	}
-	
+
 }

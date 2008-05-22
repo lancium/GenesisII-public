@@ -27,21 +27,22 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 
 /**
- * A delegated attribute.  The pairing of an existing signed
- * assertion with the identity of a delegatee
- *  
+ * A delegated attribute. The pairing of an existing signed assertion with the
+ * identity of a delegatee
+ * 
  * @author dmerrill
  */
-public class DelegatedAttribute implements Attribute {
+public class DelegatedAttribute implements Attribute
+{
 
 	static public final long serialVersionUID = 0L;
-	
+
 	// An existing signed assertion
 	protected SignedAssertion _assertion;
-	
+
 	// The certchain of the identity to be authorized for the above assertion
 	protected X509Certificate[] _delegateeIdentity = null;
-	
+
 	// The constraints placed upon this attribute
 	protected AttributeConstraints _constraints = null;
 
@@ -49,18 +50,20 @@ public class DelegatedAttribute implements Attribute {
 	protected transient String _encodedValue = null;
 
 	// zero-arg contstructor for externalizable use only!
-	public DelegatedAttribute() {}
-	
-	public DelegatedAttribute(
-			AttributeConstraints constraints, 
-			SignedAssertion assertion, 
-			X509Certificate[] delegateeIdentity) {
-		
-		if ((assertion == null) || (delegateeIdentity == null)) {
+	public DelegatedAttribute()
+	{
+	}
+
+	public DelegatedAttribute(AttributeConstraints constraints,
+			SignedAssertion assertion, X509Certificate[] delegateeIdentity)
+	{
+
+		if ((assertion == null) || (delegateeIdentity == null))
+		{
 			throw new java.lang.IllegalArgumentException(
 					"DelegatedAttribute constructor cannot accept null parameters");
 		}
-		
+
 		_assertion = assertion;
 		_delegateeIdentity = delegateeIdentity;
 		_constraints = constraints;
@@ -69,119 +72,156 @@ public class DelegatedAttribute implements Attribute {
 	/**
 	 * Returns the identity needed to authorize the delegatee
 	 */
-	public X509Certificate[] getAuthorizedIdentity() {
+	public X509Certificate[] getAuthorizedIdentity()
+	{
 		return _assertion.getAuthorizedIdentity();
 	}
-	
+
 	/**
 	 * Returns the identity of the original attribute asserter
 	 */
-	public X509Certificate[] getAssertingIdentityCertChain() {
+	public X509Certificate[] getAssertingIdentityCertChain()
+	{
 		return _assertion.getAttribute().getAssertingIdentityCertChain();
 	}
-	
+
 	/**
 	 * Returns the delegatee identity
 	 */
-	public X509Certificate[] getDelegateeIdentity() {
+	public X509Certificate[] getDelegateeIdentity()
+	{
 		return _delegateeIdentity;
 	}
-	
+
 	/**
-	 * Checks that the attribute is time-valid with respect to the supplied 
-	 * date and any delegation depth requirements are met by the supplied
+	 * Checks that the attribute is time-valid with respect to the supplied date
+	 * and any delegation depth requirements are met by the supplied
 	 * delegationDepth.
 	 */
-	public void checkValidity(int delegationDepth, Date date) throws AttributeInvalidException {
+	public void checkValidity(int delegationDepth, Date date)
+			throws AttributeInvalidException
+	{
 
 		// check constraints if they exist
-		if (_constraints != null) { 
+		if (_constraints != null)
+		{
 			_constraints.checkValidity(delegationDepth, date);
 		}
-		
+
 		// check the encapsulated assertion
-		if (_assertion instanceof DelegatedAssertion) {
-			((DelegatedAssertion) _assertion).checkValidity(delegationDepth + 1, date);
-		} else {
+		if (_assertion instanceof DelegatedAssertion)
+		{
+			((DelegatedAssertion) _assertion).checkValidity(
+					delegationDepth + 1, date);
+		}
+		else
+		{
 			_assertion.checkValidity(date);
 		}
 
 		// make sure the delegatee's identity is still valid
-		try {
-			for (X509Certificate cert : _delegateeIdentity) {
+		try
+		{
+			for (X509Certificate cert : _delegateeIdentity)
+			{
 				cert.checkValidity();
 			}
-		} catch (CertificateException e) {
-			throw new AttributeInvalidException("Delegatee identity contains an invalid certificate: " + e.getMessage(), e);
-		}	
+		}
+		catch (CertificateException e)
+		{
+			throw new AttributeInvalidException(
+					"Delegatee identity contains an invalid certificate: "
+							+ e.getMessage(), e);
+		}
 	}
-	
+
 	/**
 	 * Returns the signed assertion component
 	 */
-	public SignedAssertion getSignedAssertion() {
+	public SignedAssertion getSignedAssertion()
+	{
 		return _assertion;
 	}
-	
-	public String toString() {
-		return "(DelegatedAttribute) delegateeIdentity(" + _delegateeIdentity.length + "): \"" + 
-			_delegateeIdentity[0].getSubjectX500Principal().getName() + "\" " + 
-			((_constraints == null) ? "" : _constraints.toString() + " ") +  
-			" subAssertion: [" + _assertion + "]";
+
+	public String toString()
+	{
+		return "(DelegatedAttribute) delegateeIdentity("
+				+ _delegateeIdentity.length + "): \""
+				+ _delegateeIdentity[0].getSubjectX500Principal().getName()
+				+ "\" "
+				+ ((_constraints == null) ? "" : _constraints.toString() + " ")
+				+ " subAssertion: [" + _assertion + "]";
 	}
-	
-	public void writeExternal(ObjectOutput out) throws IOException {
+
+	public void writeExternal(ObjectOutput out) throws IOException
+	{
 		out.writeObject(_assertion);
 		out.writeObject(_constraints);
 		out.writeInt(_delegateeIdentity.length);
-		try {
-			for (int i = 0; i < _delegateeIdentity.length; i++) {
+		try
+		{
+			for (int i = 0; i < _delegateeIdentity.length; i++)
+			{
 				byte[] encoded = _delegateeIdentity[i].getEncoded();
 				out.writeInt(encoded.length);
 				out.write(encoded);
 			}
-		} catch (GeneralSecurityException e) { 
+		}
+		catch (GeneralSecurityException e)
+		{
 			throw new IOException(e.getMessage());
 		}
 	}
 
-	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException
+	{
 		_assertion = (SignedAssertion) in.readObject();
 		_constraints = (AttributeConstraints) in.readObject();
 		int numCerts = in.readInt();
 		_delegateeIdentity = new X509Certificate[numCerts];
-		try {
+		try
+		{
 			CertificateFactory cf = CertificateFactory.getInstance("X.509");
-			for (int i = 0; i < numCerts; i++) {
+			for (int i = 0; i < numCerts; i++)
+			{
 				byte[] encoded = new byte[in.readInt()];
 				in.readFully(encoded);
-				_delegateeIdentity[i] = (X509Certificate) cf.generateCertificate(
-						new ByteArrayInputStream(encoded));
+				_delegateeIdentity[i] =
+						(X509Certificate) cf
+								.generateCertificate(new ByteArrayInputStream(
+										encoded));
 			}
-		} catch (GeneralSecurityException e) { 
+		}
+		catch (GeneralSecurityException e)
+		{
 			throw new IOException(e.getMessage());
 		}
-	}	
-	
-	public int hashCode() {
+	}
+
+	public int hashCode()
+	{
 		return _assertion.hashCode();
 	}
-	
-	public boolean equals(Object o) {
+
+	public boolean equals(Object o)
+	{
 		DelegatedAttribute other = (DelegatedAttribute) o;
 
-
 		// force encoded values to represent signed assertion
-		if (!_assertion.equals(other._assertion)) {
+		if (!_assertion.equals(other._assertion))
+		{
 			return false;
 		}
-		
+
 		// check for delegatee equiv
-		if (!java.util.Arrays.equals(_delegateeIdentity, other._delegateeIdentity)) {
+		if (!java.util.Arrays.equals(_delegateeIdentity,
+				other._delegateeIdentity))
+		{
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 }

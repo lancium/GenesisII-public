@@ -21,51 +21,66 @@ import java.security.cert.*;
 import java.util.Date;
 
 /**
- * Simple GAML attribute that restricts the lifetime of a GAML
- * assertion and how many times it can be delegated
- *  
+ * Simple GAML attribute that restricts the lifetime of a GAML assertion and how
+ * many times it can be delegated
+ * 
  * @author dmerrill
  */
-public abstract class BasicAttribute implements Attribute {
+public abstract class BasicAttribute implements Attribute
+{
 
 	static public final long serialVersionUID = 0L;
 
 	protected AttributeConstraints _constraints;
-	
+
 	// zero-arg contstructor for externalizable use only!
-	public BasicAttribute() {}
-	
-	public BasicAttribute(AttributeConstraints constraints) {
+	public BasicAttribute()
+	{
+	}
+
+	public BasicAttribute(AttributeConstraints constraints)
+	{
 		_constraints = constraints;
 	}
-	
+
 	/**
-	 * Checks that the attribute is time-valid with respect to the supplied 
-	 * date and any delegation depth requirements are met by the supplied
+	 * Checks that the attribute is time-valid with respect to the supplied date
+	 * and any delegation depth requirements are met by the supplied
 	 * delegationDepth.
 	 */
-	public void checkValidity(int delegationDepth, Date date) throws AttributeInvalidException {
-		
-		if (_constraints != null) {
+	public void checkValidity(int delegationDepth, Date date)
+			throws AttributeInvalidException
+	{
+
+		if (_constraints != null)
+		{
 			_constraints.checkValidity(delegationDepth, date);
 		}
-		
-		try {
-			for (X509Certificate cert : this.getAssertingIdentityCertChain()) {
+
+		try
+		{
+			for (X509Certificate cert : this.getAssertingIdentityCertChain())
+			{
 				cert.checkValidity(date);
 			}
-		} catch (CertificateException e) {
-			throw new AttributeInvalidException("Security attribute asserting identity contains an invalid certificate: " + e.getMessage(), e);
+		}
+		catch (CertificateException e)
+		{
+			throw new AttributeInvalidException(
+					"Security attribute asserting identity contains an invalid certificate: "
+							+ e.getMessage(), e);
 		}
 	}
-	
-	public void writeExternal(ObjectOutput out) throws IOException {
+
+	public void writeExternal(ObjectOutput out) throws IOException
+	{
 		out.writeObject(_constraints);
 	}
 
-	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException
+	{
 		_constraints = (AttributeConstraints) in.readObject();
 	}
-	
-	
+
 }

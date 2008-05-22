@@ -4,12 +4,14 @@ import java.security.GeneralSecurityException;
 
 /**
  * Interface indicating that this type of object can be renewed
+ * 
  * @author dgm4d
  */
-public interface Renewable {
+public interface Renewable
+{
 
 	/**
-	 * Renew this object 
+	 * Renew this object
 	 */
 	public void renew() throws GeneralSecurityException;
 }

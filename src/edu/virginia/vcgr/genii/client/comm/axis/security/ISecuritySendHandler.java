@@ -19,19 +19,20 @@ package edu.virginia.vcgr.genii.client.comm.axis.security;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import java.security.GeneralSecurityException;
 
-public interface ISecuritySendHandler extends org.apache.axis.Handler{
+public interface ISecuritySendHandler extends org.apache.axis.Handler
+{
 
 	/**
-	 * Indicates that this handler is the final handler and should 
-	 * serialize the message context
+	 * Indicates that this handler is the final handler and should serialize the
+	 * message context
 	 */
 	public void setToSerialize();
-	
+
 	/**
-	 * Configures the Send handler. Returns whether or not this handler is to 
+	 * Configures the Send handler. Returns whether or not this handler is to
 	 * perform any actions
 	 */
-	public boolean configure(ICallingContext callContext, MessageSecurityData msgSecData) throws GeneralSecurityException;	
-	
+	public boolean configure(ICallingContext callContext,
+			MessageSecurityData msgSecData) throws GeneralSecurityException;
 
 }

@@ -13,15 +13,14 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 public class JNDIResourceFactory extends BasicDBResourceFactory implements
 		IResourceFactory
 {
-	public JNDIResourceFactory(
-			DatabaseConnectionPool pool, 
-			IResourceKeyTranslater translator)
-		throws SQLException
+	public JNDIResourceFactory(DatabaseConnectionPool pool,
+			IResourceKeyTranslater translator) throws SQLException
 	{
 		super(pool, translator);
 	}
-	
-	public IResource instantiate(ResourceKey parentKey) throws ResourceException
+
+	public IResource instantiate(ResourceKey parentKey)
+			throws ResourceException
 	{
 		try
 		{
@@ -32,5 +31,5 @@ public class JNDIResourceFactory extends BasicDBResourceFactory implements
 			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
 		}
 	}
-	
+
 }

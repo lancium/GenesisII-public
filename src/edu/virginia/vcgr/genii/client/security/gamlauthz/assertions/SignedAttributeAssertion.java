@@ -31,14 +31,14 @@ import org.apache.ws.security.message.token.BinarySecurity;
 
 import edu.virginia.vcgr.genii.client.security.WSSecurityUtils;
 
-
 /**
- * Signed Attribute Assertion.  If you trust the asserting identity, 
- * then you establish the attribute as fact.
+ * Signed Attribute Assertion. If you trust the asserting identity, then you
+ * establish the attribute as fact.
  * 
  * @author dmerrill
  */
-public class SignedAttributeAssertion extends SignedAssertionBaseImpl {
+public class SignedAttributeAssertion extends SignedAssertionBaseImpl
+{
 
 	static public final long serialVersionUID = 0L;
 
@@ -48,153 +48,188 @@ public class SignedAttributeAssertion extends SignedAssertionBaseImpl {
 	// The signature of the above attribute by the above
 	// asserting identity
 	protected byte[] _signature = null;
-	
+
 	// zero-arg contstructor for externalizable use only!
-	public SignedAttributeAssertion() {}
-	
-	public SignedAttributeAssertion(
-			Attribute attribute, 
-			PrivateKey privateKey) throws GeneralSecurityException {
-		
+	public SignedAttributeAssertion()
+	{
+	}
+
+	public SignedAttributeAssertion(Attribute attribute, PrivateKey privateKey)
+			throws GeneralSecurityException
+	{
+
 		_attribute = attribute;
 		_signature = sign(attribute, privateKey);
 	}
 
 	/**
-	 * Returns a URI (e.g., a WS-Security Token Profile URI) indicating the token type
+	 * Returns a URI (e.g., a WS-Security Token Profile URI) indicating the
+	 * token type
 	 */
-	public String getTokenType() {
+	public String getTokenType()
+	{
 		return WSSecurityUtils.GAML_ATTR_TOKEN_TYPE;
-	}	
+	}
 
 	/**
 	 * Converts this credential to an Axis Message Element
+	 * 
 	 * @return
 	 * @throws GeneralSecurityException
 	 */
-	public MessageElement toMessageElement() throws GeneralSecurityException {
+	public MessageElement toMessageElement() throws GeneralSecurityException
+	{
 
-		try {
+		try
+		{
 			// Add RequestedSecurityToken element
 			MessageElement binaryToken = null;
-			try {
-				binaryToken = new MessageElement(
-					BinarySecurity.TOKEN_BST, 
-					SignedAssertionBaseImpl.base64encodeAssertion(this));
-				binaryToken.setAttributeNS(null, "ValueType", WSSecurityUtils.GAML_ATTR_TOKEN_TYPE);
-			} catch (IOException e) {
-		    	throw new GeneralSecurityException(e.getMessage(), e);	
+			try
+			{
+				binaryToken =
+						new MessageElement(BinarySecurity.TOKEN_BST,
+								SignedAssertionBaseImpl
+										.base64encodeAssertion(this));
+				binaryToken.setAttributeNS(null, "ValueType",
+						WSSecurityUtils.GAML_ATTR_TOKEN_TYPE);
 			}
-	
-			MessageElement embedded = new MessageElement(new QName(
-					org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
+			catch (IOException e)
+			{
+				throw new GeneralSecurityException(e.getMessage(), e);
+			}
+
+			MessageElement embedded =
+					new MessageElement(new QName(
+							org.apache.ws.security.WSConstants.WSSE11_NS,
+							"Embedded"));
 			embedded.addChild(binaryToken);
-	
-			MessageElement wseTokenRef = new MessageElement(new QName(
-					org.apache.ws.security.WSConstants.WSSE11_NS,
-					"SecurityTokenReference"));
+
+			MessageElement wseTokenRef =
+					new MessageElement(new QName(
+							org.apache.ws.security.WSConstants.WSSE11_NS,
+							"SecurityTokenReference"));
 			wseTokenRef.addChild(embedded);
-			
+
 			return wseTokenRef;
 
-		} catch (SOAPException e) {
+		}
+		catch (SOAPException e)
+		{
 			throw new GeneralSecurityException(e.getMessage(), e);
 		}
 	}
-	
-	
+
 	/**
-	 * Returns the certchain of the identity authorized to use this 
-	 * assertion (same as the asserter)
+	 * Returns the certchain of the identity authorized to use this assertion
+	 * (same as the asserter)
 	 */
-	public X509Certificate[] getAuthorizedIdentity() {
+	public X509Certificate[] getAuthorizedIdentity()
+	{
 		return _attribute.getAssertingIdentityCertChain();
 	}
-	
+
 	/**
 	 * Returns the attribute that is being asserted
 	 */
-	public Attribute getAttribute() {
+	public Attribute getAttribute()
+	{
 		return _attribute;
 	}
-	
+
 	/**
-	 * Checks that the assertion is time-valid with respect to the supplied 
-	 * date
+	 * Checks that the assertion is time-valid with respect to the supplied date
 	 */
-	public void checkValidity(Date date) throws AttributeInvalidException {
- 		// check the validity of the attribute
+	public void checkValidity(Date date) throws AttributeInvalidException
+	{
+		// check the validity of the attribute
 		_attribute.checkValidity(0, date);
 	}
-		
+
 	/**
-	 * Verify the assertion.  It is verified if all signatures successfully
+	 * Verify the assertion. It is verified if all signatures successfully
 	 * authenticate the signed-in authorizing identities
-	 */	
-	public void validateAssertion() throws GeneralSecurityException {
-		
-		if ((_signature == null) || (_attribute == null)) {
- 			throw new GeneralSecurityException("No signature or data to verify");
- 		}
-		
- 		try { 
- 			// verify that the signature is from the authorizing identity 
-	 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	 		ObjectOutputStream oos = new ObjectOutputStream(baos);
-	 		oos.writeObject(_attribute);
-	 		
+	 */
+	public void validateAssertion() throws GeneralSecurityException
+	{
+
+		if ((_signature == null) || (_attribute == null))
+		{
+			throw new GeneralSecurityException("No signature or data to verify");
+		}
+
+		try
+		{
+			// verify that the signature is from the authorizing identity
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(baos);
+			oos.writeObject(_attribute);
+
 			Signature rsa = Signature.getInstance("SHA1withRSA");
-	 		rsa.initVerify(getAuthorizedIdentity()[0]);
-	 		rsa.update(baos.toByteArray());
-	 		if (!rsa.verify(_signature)) {
-	 			throw new AssertionInvalidException("Delegation signature does not authenticate authorizing identity");
-	 		}
-	 		
- 		} catch (IOException e) {
- 			throw new GeneralSecurityException(e.getMessage(), e);
- 		}
-	}	
-	
-	public String toString() {
+			rsa.initVerify(getAuthorizedIdentity()[0]);
+			rsa.update(baos.toByteArray());
+			if (!rsa.verify(_signature))
+			{
+				throw new AssertionInvalidException(
+						"Delegation signature does not authenticate authorizing identity");
+			}
+
+		}
+		catch (IOException e)
+		{
+			throw new GeneralSecurityException(e.getMessage(), e);
+		}
+	}
+
+	public String toString()
+	{
 		return "(SignedAttributeAssertion)\n attribute : [" + _attribute + "]";
-	}	
-	
-	
+	}
+
 	/**
 	 * Signs the assertion with the specified private key
 	 */
-	static byte[] sign(Attribute attribute, PrivateKey privateKey) throws GeneralSecurityException {
- 		if (attribute == null) {
- 			return null;
- 		}
-		
- 		try { 
-	 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	 		ObjectOutputStream oos = new ObjectOutputStream(baos);
-	 		oos.writeObject(attribute);
-	 		oos.close();
+	static byte[] sign(Attribute attribute, PrivateKey privateKey)
+			throws GeneralSecurityException
+	{
+		if (attribute == null)
+		{
+			return null;
+		}
 
-			Signature rsa = Signature.getInstance("SHA1with" + privateKey.getAlgorithm());
-	 		rsa.initSign(privateKey);
-	 		rsa.update(baos.toByteArray());
-	 		return rsa.sign();
- 		} catch (IOException e) {
- 			throw new GeneralSecurityException(e.getMessage(), e);
- 		}
-	}		
-	
-	public void writeExternal(ObjectOutput out) throws IOException {
+		try
+		{
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(baos);
+			oos.writeObject(attribute);
+			oos.close();
+
+			Signature rsa =
+					Signature.getInstance("SHA1with"
+							+ privateKey.getAlgorithm());
+			rsa.initSign(privateKey);
+			rsa.update(baos.toByteArray());
+			return rsa.sign();
+		}
+		catch (IOException e)
+		{
+			throw new GeneralSecurityException(e.getMessage(), e);
+		}
+	}
+
+	public void writeExternal(ObjectOutput out) throws IOException
+	{
 		out.writeObject(_attribute);
 		out.writeInt(_signature.length);
 		out.write(_signature);
 	}
 
-	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException
+	{
 		_attribute = (Attribute) in.readObject();
 		int sigLen = in.readInt();
 		_signature = new byte[sigLen];
 		in.readFully(_signature);
-	}	
-	
-	
+	}
+
 }

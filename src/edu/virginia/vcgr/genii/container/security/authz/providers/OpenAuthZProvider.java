@@ -30,8 +30,6 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
 import edu.virginia.vcgr.genii.container.resource.*;
 import edu.virginia.vcgr.genii.client.resource.*;
 
-
-
 /**
  * 
  * NOTES: - Returns true for all access-control decisions
@@ -39,58 +37,61 @@ import edu.virginia.vcgr.genii.client.resource.*;
  * @author dmerrill
  * 
  */
-public class OpenAuthZProvider implements IAuthZProvider {
+public class OpenAuthZProvider implements IAuthZProvider
+{
 
-	static public final String GAML_ACL_PROPERTY_NAME = "genii.container.security.authz.gaml-acl";
+	static public final String GAML_ACL_PROPERTY_NAME =
+			"genii.container.security.authz.gaml-acl";
 
-	static protected final MessageLevelSecurity _defaultMinMsgSec = new MessageLevelSecurity(
-			MessageLevelSecurity.NONE);
+	static protected final MessageLevelSecurity _defaultMinMsgSec =
+			new MessageLevelSecurity(MessageLevelSecurity.NONE);
 
 	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(OpenAuthZProvider.class);
-	
-	public OpenAuthZProvider() {}
-	
+
+	public OpenAuthZProvider()
+	{
+	}
+
 	/**
-	 * Presently configures the specified resource to have default access allowed
-	 * for every GAML credential in the bag of credentials.  We may want to look
-	 * at restricting this in the future to special credentials.
+	 * Presently configures the specified resource to have default access
+	 * allowed for every GAML credential in the bag of credentials. We may want
+	 * to look at restricting this in the future to special credentials.
 	 */
-	public void setDefaultAccess(
-			ICallingContext callingContext,
-			IResource resource,
-			X509Certificate[] serviceCertChain) throws AuthZSecurityException,
-			ResourceException {
+	public void setDefaultAccess(ICallingContext callingContext,
+			IResource resource, X509Certificate[] serviceCertChain)
+			throws AuthZSecurityException, ResourceException
+	{
 
 	}
 
-	
 	@SuppressWarnings("unchecked")
-	public boolean checkAccess(
-			ICallingContext callingContext,
-			X509Certificate callerCert, 
-			IResource resource, 
-			Method operation)
-				throws AuthZSecurityException, ResourceException {
+	public boolean checkAccess(ICallingContext callingContext,
+			X509Certificate callerCert, IResource resource, Method operation)
+			throws AuthZSecurityException, ResourceException
+	{
 
 		return true;
 	}
 
 	public MessageLevelSecurity getMinIncomingMsgLevelSecurity(
 			IResource resource) throws AuthZSecurityException,
-			ResourceException {
+			ResourceException
+	{
 
 		return _defaultMinMsgSec;
 	}
 
 	public AuthZConfig getAuthZConfig(IResource resource)
-			throws AuthZSecurityException, ResourceException {
+			throws AuthZSecurityException, ResourceException
+	{
 
 		return new AuthZConfig(null);
 	}
 
 	public void setAuthZConfig(AuthZConfig config, IResource resource)
-			throws AuthZSecurityException, ResourceException {
+			throws AuthZSecurityException, ResourceException
+	{
 
 	}
 

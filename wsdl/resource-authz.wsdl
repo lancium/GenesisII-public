@@ -34,7 +34,15 @@
 			<xsd:import
 				namespace="http://vcgr.cs.virginia.edu/genii/2006/12/security"
 				schemaLocation="./security.xsd"/>
-				
+
+			<xsd:import
+				namespace="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+				schemaLocation="./ws-securitypolicy-1.2.xsd"/>
+
+			<xsd:import
+				namespace="http://www.w3.org/ns/ws-policy"
+				schemaLocation="./ws-policy.xsd"/>
+
 			<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"
 				schemaLocation="./wsrf/basefaults.xsd"/>				
 

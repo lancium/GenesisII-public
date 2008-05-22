@@ -35,184 +35,218 @@ import org.apache.ws.security.message.token.BinarySecurity;
 
 import edu.virginia.vcgr.genii.client.security.WSSecurityUtils;
 
-
 /**
  * A signed, delegated attribute assertion
  * 
  * @author dmerrill
  */
-public class DelegatedAssertion extends SignedAssertionBaseImpl {
+public class DelegatedAssertion extends SignedAssertionBaseImpl
+{
 
 	static public final long serialVersionUID = 0L;
-	
+
 	// A delegate attribute containing an existing signed assertion
 	// and the identity of a delegatee
 	protected DelegatedAttribute _delegatedAttribute = null;
-	
-	// The signature of the above delegated attribute by its signed 
-	// assertion's authorized identity 
+
+	// The signature of the above delegated attribute by its signed
+	// assertion's authorized identity
 	protected byte[] _delegatorSignature = null;
 
-	
 	// zero-arg contstructor for externalizable use only!
-	public DelegatedAssertion() {}
-	
-	public DelegatedAssertion(
-			DelegatedAttribute delegatedAttribute, 
-			PrivateKey privateKey) throws GeneralSecurityException {
-		
-		_delegatedAttribute = delegatedAttribute;
-		_delegatorSignature = SignedAttributeAssertion.sign(delegatedAttribute, privateKey);
+	public DelegatedAssertion()
+	{
 	}
-	
+
+	public DelegatedAssertion(DelegatedAttribute delegatedAttribute,
+			PrivateKey privateKey) throws GeneralSecurityException
+	{
+
+		_delegatedAttribute = delegatedAttribute;
+		_delegatorSignature =
+				SignedAttributeAssertion.sign(delegatedAttribute, privateKey);
+	}
+
 	/**
-	 * Returns a URI (e.g., a WS-Security Token Profile URI) indicating the token type
+	 * Returns a URI (e.g., a WS-Security Token Profile URI) indicating the
+	 * token type
 	 */
-	public String getTokenType() {
+	public String getTokenType()
+	{
 		return WSSecurityUtils.DELEGATED_GAML_TOKEN_TYPE;
-	}	
-	
+	}
+
 	/**
 	 * Converts this credential to an Axis Message Element
+	 * 
 	 * @return
 	 * @throws GeneralSecurityException
 	 */
-	public MessageElement toMessageElement() throws GeneralSecurityException {
+	public MessageElement toMessageElement() throws GeneralSecurityException
+	{
 
-		try {
+		try
+		{
 			// Add RequestedSecurityToken element
 			MessageElement binaryToken = null;
-			try {
-				binaryToken = new MessageElement(
-					BinarySecurity.TOKEN_BST, 
-					SignedAssertionBaseImpl.base64encodeAssertion(this));
-				binaryToken.setAttributeNS(null, "ValueType", WSSecurityUtils.DELEGATED_GAML_TOKEN_TYPE);
-			} catch (IOException e) {
-		    	throw new GeneralSecurityException(e.getMessage(), e);	
+			try
+			{
+				binaryToken =
+						new MessageElement(BinarySecurity.TOKEN_BST,
+								SignedAssertionBaseImpl
+										.base64encodeAssertion(this));
+				binaryToken.setAttributeNS(null, "ValueType",
+						WSSecurityUtils.DELEGATED_GAML_TOKEN_TYPE);
 			}
-	
-			MessageElement embedded = new MessageElement(new QName(
-					org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
+			catch (IOException e)
+			{
+				throw new GeneralSecurityException(e.getMessage(), e);
+			}
+
+			MessageElement embedded =
+					new MessageElement(new QName(
+							org.apache.ws.security.WSConstants.WSSE11_NS,
+							"Embedded"));
 			embedded.addChild(binaryToken);
-	
-			MessageElement wseTokenRef = new MessageElement(new QName(
-					org.apache.ws.security.WSConstants.WSSE11_NS,
-					"SecurityTokenReference"));
+
+			MessageElement wseTokenRef =
+					new MessageElement(new QName(
+							org.apache.ws.security.WSConstants.WSSE11_NS,
+							"SecurityTokenReference"));
 			wseTokenRef.addChild(embedded);
-			
+
 			return wseTokenRef;
 
-		} catch (SOAPException e) {
+		}
+		catch (SOAPException e)
+		{
 			throw new GeneralSecurityException(e.getMessage(), e);
 		}
 	}
-	
+
 	/**
 	 * Returns the identity of the original attribute asserter
 	 */
-	public X509Certificate[] getAssertingIdentityCertChain() {
+	public X509Certificate[] getAssertingIdentityCertChain()
+	{
 		return _delegatedAttribute.getAssertingIdentityCertChain();
 	}
 
 	/**
 	 * Returns the identity of the delegator
 	 */
-	public X509Certificate[] getDelegatorIdentity() {
+	public X509Certificate[] getDelegatorIdentity()
+	{
 		return _delegatedAttribute.getAuthorizedIdentity();
 	}
-	
-	
+
 	/**
-	 * Returns the identity authorized to use this 
-	 * assertion (the delegatee)
+	 * Returns the identity authorized to use this assertion (the delegatee)
 	 */
-	public X509Certificate[] getAuthorizedIdentity() {
+	public X509Certificate[] getAuthorizedIdentity()
+	{
 		return _delegatedAttribute.getDelegateeIdentity();
 	}
-	
-	
+
 	/**
 	 * Returns the primary attribute that is being asserted
 	 */
-	public Attribute getAttribute() {
+	public Attribute getAttribute()
+	{
 		return _delegatedAttribute.getSignedAssertion().getAttribute();
 	}
 
 	/**
-	 * Checks that the attribute time-valid with respect to the supplied 
-	 * date
+	 * Checks that the attribute time-valid with respect to the supplied date
 	 */
-	public void checkValidity(Date date) throws AttributeInvalidException {
+	public void checkValidity(Date date) throws AttributeInvalidException
+	{
 		checkValidity(0, date);
-	}
-	
-	/**
-	 * Checks that the assertion is time-valid with respect to the supplied 
-	 * date and any delegation depth requirements are met by the supplied
-	 * delegationDepth.
-	 */
-	public void checkValidity(int delegationDepth, Date date) throws AttributeInvalidException {
- 		// check the validity of the attribute
- 		_delegatedAttribute.checkValidity(delegationDepth, date);
 	}
 
 	/**
-	 * Verify the assertion.  It is verified if all signatures successfully
+	 * Checks that the assertion is time-valid with respect to the supplied date
+	 * and any delegation depth requirements are met by the supplied
+	 * delegationDepth.
+	 */
+	public void checkValidity(int delegationDepth, Date date)
+			throws AttributeInvalidException
+	{
+		// check the validity of the attribute
+		_delegatedAttribute.checkValidity(delegationDepth, date);
+	}
+
+	/**
+	 * Verify the assertion. It is verified if all signatures successfully
 	 * authenticate the signed-in authorizing identities
-	 */	
-	public void validateAssertion() throws GeneralSecurityException {
-		
-		if ((_delegatorSignature == null) || (_delegatedAttribute == null)) {
- 			throw new AssertionInvalidException("No signature or data to verify");
- 		}
-		
- 		try {
- 			
- 			// verify that the signature is from the authorizing identity (delegator)
-	 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	 		ObjectOutputStream oos = new ObjectOutputStream(baos);
-	 		oos.writeObject(_delegatedAttribute);
-	 		oos.close();
-	 		
+	 */
+	public void validateAssertion() throws GeneralSecurityException
+	{
+
+		if ((_delegatorSignature == null) || (_delegatedAttribute == null))
+		{
+			throw new AssertionInvalidException(
+					"No signature or data to verify");
+		}
+
+		try
+		{
+
+			// verify that the signature is from the authorizing identity
+			// (delegator)
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(baos);
+			oos.writeObject(_delegatedAttribute);
+			oos.close();
+
 			Signature rsa = Signature.getInstance("SHA1withRSA");
 
 			rsa.initVerify(getDelegatorIdentity()[0]);
-	 		rsa.update(baos.toByteArray());
-	 		if (!rsa.verify(_delegatorSignature)) {
-	 			throw new AssertionInvalidException("Delegation signature does not authenticate authorizing identity");
-	 		}
-	 		
-	 		// verify the delegated assertion
-	 		_delegatedAttribute.getSignedAssertion().validateAssertion();
+			rsa.update(baos.toByteArray());
+			if (!rsa.verify(_delegatorSignature))
+			{
+				throw new AssertionInvalidException(
+						"Delegation signature does not authenticate authorizing identity");
+			}
 
- 		} catch (IOException e) {
- 			throw new GeneralSecurityException(e.getMessage(), e);
- 		}
-	}	
-	
+			// verify the delegated assertion
+			_delegatedAttribute.getSignedAssertion().validateAssertion();
+
+		}
+		catch (IOException e)
+		{
+			throw new GeneralSecurityException(e.getMessage(), e);
+		}
+	}
+
 	/**
 	 * Unwraps the delegated assertion by one layer
 	 */
-	public SignedAssertion unwrap() {
+	public SignedAssertion unwrap()
+	{
 		return _delegatedAttribute._assertion;
 	}
-	
-	public String toString() {
-		return "(DelegatedAttribute)\n attribute : [" + _delegatedAttribute + "]";
-	}	
-	
-	public void writeExternal(ObjectOutput out) throws IOException {
+
+	public String toString()
+	{
+		return "(DelegatedAttribute)\n attribute : [" + _delegatedAttribute
+				+ "]";
+	}
+
+	public void writeExternal(ObjectOutput out) throws IOException
+	{
 		out.writeObject(_delegatedAttribute);
 		out.writeInt(_delegatorSignature.length);
 		out.write(_delegatorSignature);
 	}
 
-	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException
+	{
 		_delegatedAttribute = (DelegatedAttribute) in.readObject();
 		int sigLen = in.readInt();
 		_delegatorSignature = new byte[sigLen];
 		in.readFully(_delegatorSignature);
-	}	
-	
-	
+	}
+
 }

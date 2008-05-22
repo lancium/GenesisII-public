@@ -37,7 +37,8 @@ import edu.virginia.vcgr.genii.client.naming.ResolverUtils;
 
 import org.ws.addressing.EndpointReferenceType;
 
-public class GamlClientTool {
+public class GamlClientTool
+{
 
 	static private final int NOT_READ = 32;
 	static private final int NOT_WRITE = 16;
@@ -46,95 +47,117 @@ public class GamlClientTool {
 	static private final int WRITE = 2;
 	static private final int EXECUTE = 1;
 
-	static public final String CHMOD_SYNTAX = 
-		"( <[<+|->r][<+|->w][<+|->x]> | <octal mode> ) ( [--local-src] <cert-file> | --everyone | --username=<username> --password=<password>)";
+	static public final String CHMOD_SYNTAX =
+			"( <[<+|->r][<+|->w][<+|->x]> | <octal mode> ) ( [--local-src] <cert-file> | --everyone | --username=<username> --password=<password>)";
 
-	public AuthZConfig getEmptyAuthZConfig() throws AuthZSecurityException {
+	public AuthZConfig getEmptyAuthZConfig() throws AuthZSecurityException
+	{
 		return GamlAcl.encodeAcl(new GamlAcl());
 	}
 
 	public void displayAuthZConfig(AuthZConfig config, PrintStream out,
-			PrintStream err, BufferedReader in) throws AuthZSecurityException {
+			PrintStream err, BufferedReader in) throws AuthZSecurityException
+	{
 
-		if (config == null) {
+		if (config == null)
+		{
 			return;
 		}
 
 		GamlAcl acl = GamlAcl.decodeAcl(config);
 
-		out.println("  Requires message-level encryption: " + acl.requireEncryption);
+		out.println("  Requires message-level encryption: "
+				+ acl.requireEncryption);
 		out.println("  Read-authorized trust certificates: ");
-		for (int i = 0; i < acl.readAcl.size(); i++) {
+		for (int i = 0; i < acl.readAcl.size(); i++)
+		{
 			Identity ident = acl.readAcl.get(i);
-			if (ident == null) {
+			if (ident == null)
+			{
 				out.println("    [" + i + "] EVERYONE");
-			} else {
+			}
+			else
+			{
 				out.println("    [" + i + "] " + ident);
 			}
 		}
 		out.println("  Write-authorized trust certificates: ");
-		for (int i = 0; i < acl.writeAcl.size(); i++) {
+		for (int i = 0; i < acl.writeAcl.size(); i++)
+		{
 			Identity ident = acl.writeAcl.get(i);
-			if (ident == null) {
+			if (ident == null)
+			{
 				out.println("    [" + i + "] EVERYONE");
-			} else {
+			}
+			else
+			{
 				out.println("    [" + i + "] " + ident);
 			}
 		}
 		out.println("  Execute-authorized trust certificates: ");
-		for (int i = 0; i < acl.executeAcl.size(); i++) {
+		for (int i = 0; i < acl.executeAcl.size(); i++)
+		{
 			Identity ident = acl.executeAcl.get(i);
-			if (ident == null) {
+			if (ident == null)
+			{
 				out.println("    [" + i + "] EVERYONE");
-			} else {
+			}
+			else
+			{
 				out.println("    [" + i + "] " + ident);
 			}
 		}
 	}
 
 	public static int parseMode(String modeString)
-			throws IllegalArgumentException {
+			throws IllegalArgumentException
+	{
 
-		try {
+		try
+		{
 			// this is precicely what they want: everything is either on or off
-			return Integer.parseInt(modeString) | NOT_READ | NOT_WRITE | NOT_EXECUTE;
-		} catch (NumberFormatException e) {
+			return Integer.parseInt(modeString) | NOT_READ | NOT_WRITE
+					| NOT_EXECUTE;
+		}
+		catch (NumberFormatException e)
+		{
 		}
 
-		if ( modeString.length() / 2 < 1) {
+		if (modeString.length() / 2 < 1)
+		{
 			throw new IllegalArgumentException();
 		}
 
 		int retval = 0;
 
-		while (true) 
+		while (true)
 		{
 			int borderIndex;
 			int plusIndex = modeString.indexOf('+', 1);
 			int minusIndex = modeString.indexOf('-', 1);
-			if (plusIndex==-1 && minusIndex==-1)
-				borderIndex=modeString.length();
-			else if (plusIndex>minusIndex)
-				borderIndex=plusIndex;
+			if (plusIndex == -1 && minusIndex == -1)
+				borderIndex = modeString.length();
+			else if (plusIndex > minusIndex)
+				borderIndex = plusIndex;
 			else
-				borderIndex=minusIndex;
-			
+				borderIndex = minusIndex;
+
 			switch (modeString.charAt(0))
 			{
 			case '+':
-				for (int i=1; i<borderIndex; i++)
+				for (int i = 1; i < borderIndex; i++)
 				{
 					if (modeString.charAt(i) == 'r')
-						retval |=READ;
+						retval |= READ;
 					else if (modeString.charAt(i) == 'w')
-						retval |=WRITE;
+						retval |= WRITE;
 					else if (modeString.charAt(i) == 'x')
 						retval |= EXECUTE;
 				}
 				break;
-			
+
 			case '-':
-				for (int i=1; i<borderIndex; i++)
+				for (int i = 1; i < borderIndex; i++)
 				{
 					if (modeString.charAt(i) == 'r')
 						retval |= NOT_READ;
@@ -144,15 +167,15 @@ public class GamlClientTool {
 						retval |= NOT_EXECUTE;
 				}
 				break;
-			
+
 			default:
 				throw new IllegalArgumentException();
-			}	
-			if (borderIndex == (modeString.length())) 
+			}
+			if (borderIndex == (modeString.length()))
 			{
 				break;
-			} 
-			else 
+			}
+			else
 			{
 				modeString = modeString.substring(borderIndex);
 			}
@@ -162,76 +185,95 @@ public class GamlClientTool {
 
 	public Identity downloadIdentity(String sourcePath, boolean isLocalSource)
 			throws ConfigurationException, FileNotFoundException, IOException,
-			RNSException, GeneralSecurityException {
+			RNSException, GeneralSecurityException
+	{
 
-		
-		if (isLocalSource) {
-			InputStream in = new FileInputStream(sourcePath);;
-			try {
+		if (isLocalSource)
+		{
+			InputStream in = new FileInputStream(sourcePath);
+			;
+			try
+			{
 				CertificateFactory cf = CertificateFactory.getInstance("X.509");
-				X509Certificate cert = (X509Certificate) cf.generateCertificate(in);
-				X509Certificate[] chain = {cert};
+				X509Certificate cert =
+						(X509Certificate) cf.generateCertificate(in);
+				X509Certificate[] chain = { cert };
 				return new X509Identity(chain);
-			} finally {
+			}
+			finally
+			{
 				StreamUtils.close(in);
 			}
-		} 
-		
+		}
+
 		RNSPath current = RNSPath.getCurrent();
-		RNSPath path = current.lookup(sourcePath,
-				RNSPathQueryFlags.MUST_EXIST);
-		
-		if (new TypeInformation(path.getEndpoint()).isByteIO()) {
+		RNSPath path = current.lookup(sourcePath, RNSPathQueryFlags.MUST_EXIST);
+
+		if (new TypeInformation(path.getEndpoint()).isByteIO())
+		{
 			// read the file as an encoded X.509 .cer file
 			InputStream in = ByteIOStreamFactory.createInputStream(path);
-			try {
+			try
+			{
 				CertificateFactory cf = CertificateFactory.getInstance("X.509");
-				X509Certificate cert = (X509Certificate) cf.generateCertificate(in);
-				X509Certificate[] chain = {cert};
+				X509Certificate cert =
+						(X509Certificate) cf.generateCertificate(in);
+				X509Certificate[] chain = { cert };
 				return new X509Identity(chain);
-			} finally {
+			}
+			finally
+			{
 				StreamUtils.close(in);
 			}
 
-		} else {
+		}
+		else
+		{
 			// get the identity of the resource
-			
+
 			// make sure it's not an unbound epr
 			EndpointReferenceType epr = path.getEndpoint();
-			if (EPRUtils.isUnboundEPR(epr)) {
+			if (EPRUtils.isUnboundEPR(epr))
+			{
 				epr = ResolverUtils.resolve(epr);
 			}
-			
+
 			X509Certificate[] chain = EPRUtils.extractCertChain(epr);
 			return new X509Identity(chain);
 		}
-		
+
 	}
 
 	public AuthZConfig modifyAuthZConfig(AuthZConfig config, PrintStream out,
 			PrintStream err, BufferedReader in) throws IOException,
-			AuthZSecurityException {
+			AuthZSecurityException
+	{
 
 		boolean chosen = false;
-		while (!chosen) {
+		while (!chosen)
+		{
 			out.println("\nOptions:");
 			out.println("  [1] Toggle message-level encryption requirement");
 			out.println("  [2] Modify access control lists");
 			out.println("  [3] Cancel");
 			out.print("Please make a selection: ");
 			out.flush();
-		
+
 			String input = in.readLine();
 			out.println();
-			int choice = 0;					
-			try {
+			int choice = 0;
+			try
+			{
 				choice = Integer.parseInt(input);
-			} catch (NumberFormatException e) {
+			}
+			catch (NumberFormatException e)
+			{
 				out.println("Invalid choice.");
 				continue;
 			}
-				
-			switch (choice) {
+
+			switch (choice)
+			{
 			case 1:
 				GamlAcl acl = GamlAcl.decodeAcl(config);
 				acl.requireEncryption = !acl.requireEncryption;
@@ -240,33 +282,35 @@ public class GamlClientTool {
 				break;
 			case 2:
 				CommandLine cLine;
-				while (true) {
+				while (true)
+				{
 					out.println("Modification syntax:");
 					out.println("  " + CHMOD_SYNTAX);
 					out.print(">");
 					out.flush();
-		
+
 					cLine = new CommandLine(in.readLine(), false);
-					if (!validateChmodSyntax(cLine)) {
+					if (!validateChmodSyntax(cLine))
+					{
 						out.println("Invalid syntax");
 						continue;
 					}
 					break;
 				}
-				if (cLine.hasOption("username")) {
-					config = chmod(config,
-							cLine.hasFlag("local-src"),
-							cLine.hasFlag("everyone"),
-							cLine.getArgument(0),
-							cLine.getOptionValue("username"), 
-							cLine.getOptionValue("password"));
-				} else {
-					config = chmod(config,
-							cLine.hasFlag("local-src"),
-							cLine.hasFlag("everyone"),
-							cLine.getArgument(0),
-							cLine.getArgument(1), 
-							null);
+				if (cLine.hasOption("username"))
+				{
+					config =
+							chmod(config, cLine.hasFlag("local-src"), cLine
+									.hasFlag("everyone"), cLine.getArgument(0),
+									cLine.getOptionValue("username"), cLine
+											.getOptionValue("password"));
+				}
+				else
+				{
+					config =
+							chmod(config, cLine.hasFlag("local-src"), cLine
+									.hasFlag("everyone"), cLine.getArgument(0),
+									cLine.getArgument(1), null);
 				}
 				chosen = true;
 				break;
@@ -274,32 +318,44 @@ public class GamlClientTool {
 				chosen = true;
 			}
 		}
-		
+
 		return config;
 	}
 
-	public boolean validateChmodSyntax(ICommandLine cLine) {
-		
+	public boolean validateChmodSyntax(ICommandLine cLine)
+	{
+
 		// make sure we have the new perms and the cert file
-		if (cLine.hasFlag("everyone")) {
-			if ((cLine.numArguments() != 1) || (cLine.hasOption("local-src"))) {
-				return false;
-			}
-		} else if (cLine.hasOption("username")) {
-			// make sure password also supplied
-			if (!cLine.hasOption("password")) {
-				return false;
-			}
-		} else {
-			if (cLine.numArguments() != 2) {
+		if (cLine.hasFlag("everyone"))
+		{
+			if ((cLine.numArguments() != 1) || (cLine.hasOption("local-src")))
+			{
 				return false;
 			}
 		}
-		
+		else if (cLine.hasOption("username"))
+		{
+			// make sure password also supplied
+			if (!cLine.hasOption("password"))
+			{
+				return false;
+			}
+		}
+		else
+		{
+			if (cLine.numArguments() != 2)
+			{
+				return false;
+			}
+		}
+
 		// make sure the new perms parses
-		try {
+		try
+		{
 			parseMode(cLine.getArgument(0));
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e)
+		{
 			return false;
 		}
 
@@ -307,75 +363,101 @@ public class GamlClientTool {
 	}
 
 	/**
-	 * Parses the given command line and applies the indicated
-	 * authz changes to the specified authz configuration.  Assumes
-	 * that the syntax is valid (having been checked with 
-	 * validateChmodSyntax())
+	 * Parses the given command line and applies the indicated authz changes to
+	 * the specified authz configuration. Assumes that the syntax is valid
+	 * (having been checked with validateChmodSyntax())
 	 */
-	public AuthZConfig chmod(AuthZConfig config,
-		boolean localSrc, boolean everyone, String permission, String user, String password)
-			throws IOException, AuthZSecurityException 
+	public AuthZConfig chmod(AuthZConfig config, boolean localSrc,
+			boolean everyone, String permission, String user, String password)
+			throws IOException, AuthZSecurityException
 	{
-		if (config.get_any() == null) {
+		if (config.get_any() == null)
+		{
 			return config;
 		}
-		
+
 		int mode;
 		String target;
-		
+
 		mode = parseMode(permission);
 
 		Identity identity = null;
 
-		if (password != null) {
-		
+		if (password != null)
+		{
+
 			// username password
 			identity = new UsernamePasswordIdentity(user, password);
 
-		} else {
-			
-			if (!everyone) {
-	
+		}
+		else
+		{
+
+			if (!everyone)
+			{
+
 				target = user;
-				try {
-					
+				try
+				{
+
 					identity = downloadIdentity(target, localSrc);
-		
-				} catch (ConfigurationException e) {
+
+				}
+				catch (ConfigurationException e)
+				{
 					throw new AuthZSecurityException(
-							"Could not load certificate file: " + e.getMessage(), e);
-				} catch (FileNotFoundException e) {
+							"Could not load certificate file: "
+									+ e.getMessage(), e);
+				}
+				catch (FileNotFoundException e)
+				{
 					throw new AuthZSecurityException(
-							"Could not load certificate file: " + e.getMessage(), e);
-				} catch (RNSException e) {
+							"Could not load certificate file: "
+									+ e.getMessage(), e);
+				}
+				catch (RNSException e)
+				{
 					throw new AuthZSecurityException(
-							"Could not load certificate file: " + e.getMessage(), e);
-				} catch (GeneralSecurityException e) {
+							"Could not load certificate file: "
+									+ e.getMessage(), e);
+				}
+				catch (GeneralSecurityException e)
+				{
 					throw new AuthZSecurityException(
-							"Could not load certificate file: " + e.getMessage(), e);
+							"Could not load certificate file: "
+									+ e.getMessage(), e);
 				}
 			}
 		}
 
 		GamlAcl acl = GamlAcl.decodeAcl(config);
-		if ((mode & READ) > 0) {
+		if ((mode & READ) > 0)
+		{
 			if (!acl.readAcl.contains(identity))
 				acl.readAcl.add(identity);
-		} else if ((mode & NOT_READ) > 0) {
+		}
+		else if ((mode & NOT_READ) > 0)
+		{
 			acl.readAcl.remove(identity);
 		}
 
-		if ((mode & WRITE) > 0) {
+		if ((mode & WRITE) > 0)
+		{
 			if (!acl.writeAcl.contains(identity))
 				acl.writeAcl.add(identity);
-		} else if ((mode & NOT_WRITE) > 0) {
+		}
+		else if ((mode & NOT_WRITE) > 0)
+		{
 			acl.writeAcl.remove(identity);
 		}
 
-		if ((mode & EXECUTE) > 0) {
+		if ((mode & EXECUTE) > 0)
+		{
 			if (!acl.executeAcl.contains(identity))
 				acl.executeAcl.add(identity);
-		} else if ((mode & NOT_EXECUTE) > 0) {
+		}
+		else if ((mode & NOT_EXECUTE) > 0)
+		{
 			acl.executeAcl.remove(identity);
 		}
 

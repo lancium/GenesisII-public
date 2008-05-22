@@ -22,24 +22,25 @@ import java.io.*;
 
 import edu.virginia.vcgr.genii.client.security.gamlauthz.GamlCredential;
 
-public interface SignedAssertion extends Externalizable, GamlCredential {
-	
+public interface SignedAssertion extends Externalizable, GamlCredential
+{
+
 	/**
 	 * Returns the primary attribute that is being asserted
 	 */
 	public Attribute getAttribute();
 
 	/**
-	 * Returns the certchain of the identity authorized to use this 
-	 * assertion (same as the asserter)
+	 * Returns the certchain of the identity authorized to use this assertion
+	 * (same as the asserter)
 	 */
 	public X509Certificate[] getAuthorizedIdentity();
 
 	/**
-	 * Validate the assertion.  It is validated if all signatures successfully
-	 * authenticate the signed-in authorizing identities, it maps to a 
-	 * trusted root, if applicable, and any other time/etc. contstraints are met
-	 */	
+	 * Validate the assertion. It is validated if all signatures successfully
+	 * authenticate the signed-in authorizing identities, it maps to a trusted
+	 * root, if applicable, and any other time/etc. contstraints are met
+	 */
 	public void validateAssertion() throws GeneralSecurityException;
-		
+
 }

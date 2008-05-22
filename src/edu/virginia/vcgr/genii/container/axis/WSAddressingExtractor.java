@@ -39,21 +39,24 @@ import org.ws.addressing.ReferenceParametersType;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.container.Container;
 
-public class WSAddressingExtractor extends BasicHandler {
-	static public final String AXIS_MESSAGE_CTXT_EPR_PROPERTY = "edu.virginia.vcgr.genii.container.axis.epr-property";
+public class WSAddressingExtractor extends BasicHandler
+{
+	static public final String AXIS_MESSAGE_CTXT_EPR_PROPERTY =
+			"edu.virginia.vcgr.genii.container.axis.epr-property";
 
 	static final long serialVersionUID = 0L;
 
 	static private Log _logger = LogFactory.getLog(WSAddressingExtractor.class);
 
-	static private String _WSA_NS = EndpointReferenceType.getTypeDesc()
-			.getXmlType().getNamespaceURI();
+	static private String _WSA_NS =
+			EndpointReferenceType.getTypeDesc().getXmlType().getNamespaceURI();
 
 	static private QName _WSA_TO_QNAME = new QName(_WSA_NS, "To");
 
 	static private QName _WSA_METADATA_QName = new QName(_WSA_NS, "Metadata");
 
-	public void invoke(MessageContext ctxt) throws AxisFault {
+	public void invoke(MessageContext ctxt) throws AxisFault
+	{
 		Vector<MessageElement> refParams = new Vector<MessageElement>();
 		_logger.debug("WSAddressingExtractor extracting EPR from header.");
 
@@ -61,32 +64,41 @@ public class WSAddressingExtractor extends BasicHandler {
 
 		SOAPMessage m = ctxt.getMessage();
 		SOAPHeader header;
-		try {
+		try
+		{
 			header = m.getSOAPHeader();
-		} catch (SOAPException se) {
+		}
+		catch (SOAPException se)
+		{
 			throw new AxisFault(se.getLocalizedMessage(), se);
 		}
 		Iterator<?> iter = header.examineAllHeaderElements();
-		while (iter.hasNext()) {
+		while (iter.hasNext())
+		{
 			SOAPHeaderElement he = (SOAPHeaderElement) iter.next();
 			QName heName = new QName(he.getNamespaceURI(), he.getLocalName());
-			if (heName.equals(_WSA_METADATA_QName)) {
+			if (heName.equals(_WSA_METADATA_QName))
+			{
 				epr.setMetadata((MetadataType) ObjectDeserializer.toObject(he,
 						MetadataType.class));
 				;
-			} else if (heName.equals(_WSA_TO_QNAME)) {
+			}
+			else if (heName.equals(_WSA_TO_QNAME))
+			{
 				epr.setAddress(new AttributedURIType(he.getFirstChild()
 						.getNodeValue()));
 				_logger
 						.debug("WSAddressingExtractor found target address of \""
 								+ epr.getAddress().get_value() + "\".");
-			} else {
-				String isRefParam = he.getAttributeNS(_WSA_NS,
-						"IsReferenceParameter");
+			}
+			else
+			{
+				String isRefParam =
+						he.getAttributeNS(_WSA_NS, "IsReferenceParameter");
 				if (isRefParam != null)
 				{
-					if (isRefParam.equalsIgnoreCase("true") ||
-						isRefParam.equals("1"))
+					if (isRefParam.equalsIgnoreCase("true")
+							|| isRefParam.equals("1"))
 					{
 						he.removeAttribute("actor");
 						he.removeAttribute("mustUnderstand");
@@ -96,15 +108,17 @@ public class WSAddressingExtractor extends BasicHandler {
 			}
 		}
 
-		if (refParams.size() > 0) {
-			MessageElement[] referenceParameters = new MessageElement[refParams
-					.size()];
+		if (refParams.size() > 0)
+		{
+			MessageElement[] referenceParameters =
+					new MessageElement[refParams.size()];
 			refParams.toArray(referenceParameters);
 			epr.setReferenceParameters(new ReferenceParametersType(
 					referenceParameters));
 		}
 
-		if (epr.getAddress() == null) {
+		if (epr.getAddress() == null)
+		{
 			epr.setAddress(new AttributedURIType(Container
 					.getCurrentServiceURL(ctxt)));
 			_logger.debug("WSAddressingExtractor setting target address to \""

@@ -18,101 +18,128 @@ package edu.virginia.vcgr.genii.client.security;
 
 import java.util.StringTokenizer;
 
-public class MessageLevelSecurity {
+public class MessageLevelSecurity
+{
 
 	public static final int NONE = 0x00;
 	public static final int SIGN = 0x01;
 	public static final int ENCRYPT = 0x02;
 	public static final int WARN = 0x04;
-	
-	
+
 	private final int _value;
 
-	public MessageLevelSecurity() {
+	public MessageLevelSecurity()
+	{
 		_value = NONE;
 	}
 
-	public MessageLevelSecurity(int value) {
+	public MessageLevelSecurity(int value)
+	{
 		_value = value;
 	}
-	
-	public MessageLevelSecurity(String value) {
-		
+
+	public MessageLevelSecurity(String value)
+	{
+
 		int temp = NONE;
-		if (value != null) {
+		if (value != null)
+		{
 			StringTokenizer tokenizer = new StringTokenizer(value, "|");
-			while (tokenizer.hasMoreTokens()) {
+			while (tokenizer.hasMoreTokens())
+			{
 				String token = tokenizer.nextToken();
-				if (token.equals("NONE")) {
-				} else if (token.equals("SIGN")) {
+				if (token.equals("NONE"))
+				{
+				}
+				else if (token.equals("SIGN"))
+				{
 					temp = temp | SIGN;
-				} else if (token.equals("ENCRYPT")) {
+				}
+				else if (token.equals("ENCRYPT"))
+				{
 					temp = temp | ENCRYPT;
-				} else if (token.equals("WARN")) {
+				}
+				else if (token.equals("WARN"))
+				{
 					temp = temp | WARN;
-				} else { 
-					throw new TypeNotPresentException(token, null); 
+				}
+				else
+				{
+					throw new TypeNotPresentException(token, null);
 				}
 			}
 		}
 		_value = temp;
 	}
-	
-	public MessageLevelSecurity computeUnion(MessageLevelSecurity other) {
-		if (other == null) {
+
+	public MessageLevelSecurity computeUnion(MessageLevelSecurity other)
+	{
+		if (other == null)
+		{
 			return new MessageLevelSecurity(_value);
 		}
 		return new MessageLevelSecurity(_value | other._value);
 	}
 
-	public boolean equals(Object other) {
+	public boolean equals(Object other)
+	{
 		return (((MessageLevelSecurity) other)._value == _value);
 	}
-	
-	public boolean superset(MessageLevelSecurity other) {
-		if ((other._value & _value) == other._value) {
+
+	public boolean superset(MessageLevelSecurity other)
+	{
+		if ((other._value & _value) == other._value)
+		{
 			return true;
-		} 
-		
+		}
+
 		return false;
 	}
-	
-	public boolean isNone() {
+
+	public boolean isNone()
+	{
 		return ((_value == NONE) || (_value == WARN));
 	}
 
-	public boolean isSign() {
+	public boolean isSign()
+	{
 		return ((_value & SIGN) > 0);
 	}
 
-	public boolean isEncrypt() {
+	public boolean isEncrypt()
+	{
 		return ((_value & ENCRYPT) > 0);
 	}
 
-	public boolean isWarn() {
+	public boolean isWarn()
+	{
 		return ((_value & WARN) > 0);
 	}
 
-	public String toString() {
-		if (_value == NONE) {
-			return "NONE"; 
+	public String toString()
+	{
+		if (_value == NONE)
+		{
+			return "NONE";
 		}
-		
+
 		String retval = "";
-		if ((_value & SIGN) > 0) {
+		if ((_value & SIGN) > 0)
+		{
 			retval += "|SIGN";
 		}
 
-		if ((_value & ENCRYPT) > 0) {
+		if ((_value & ENCRYPT) > 0)
+		{
 			retval += "|ENCRYPT";
 		}
 
-		if ((_value & WARN) > 0) {
+		if ((_value & WARN) > 0)
+		{
 			retval += "|WARN";
 		}
 
 		return retval.substring(1);
 	}
-	
-	
+
 }

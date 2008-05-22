@@ -23,95 +23,120 @@ import org.apache.ws.security.message.token.X509Security;
 
 /**
  * Operations for converting popular token types to/from MessageElements
- *  
+ * 
  * @author dmerrill
- *
+ * 
  */
-public class WSSecurityUtils {
+public class WSSecurityUtils
+{
 
+	public static final String GAML_ATTR_TOKEN_TYPE =
+			"http://vcgr.cs.virginia.edu/security/2007/11/attr-saml";
+	public static final String DELEGATED_GAML_TOKEN_TYPE =
+			"http://vcgr.cs.virginia.edu/security/2007/11/delegated-saml";
 
-	public static final String GAML_ATTR_TOKEN_TYPE = 
-		"http://vcgr.cs.virginia.edu/security/2007/11/attr-saml";
-	public static final String DELEGATED_GAML_TOKEN_TYPE = 
-		"http://vcgr.cs.virginia.edu/security/2007/11/delegated-saml";
-	
-	public static final String PKCS7_URI = 
-		"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#PKCS7";
-	public static final String X509v3_URI = 
-		"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3";
-	public static final String X509PKIPathv1_URI = 
-		"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509PKIPathv1";
-	
-	public static final String PASSWORD_DIGEST_URI = 
-		"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest";
-	public static final String PASSWORD_TEXT_URI = 
-		"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText";
-	public static final String USERNAME_TOKEN_URI = 
-		"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#UsernameToken";
-	
+	public static final String PKCS7_URI =
+			"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#PKCS7";
+	public static final String X509v3_URI =
+			"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3";
+	public static final String X509PKIPathv1_URI =
+			"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509PKIPathv1";
+
+	public static final String PASSWORD_DIGEST_URI =
+			"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest";
+	public static final String PASSWORD_TEXT_URI =
+			"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText";
+	public static final String USERNAME_TOKEN_URI =
+			"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#UsernameToken";
 
 	static public String getNameTokenFromUTSecTokenRef(
-			MessageElement wseTokenRef) throws GeneralSecurityException {
+			MessageElement wseTokenRef) throws GeneralSecurityException
+	{
 
-		try {
+		try
+		{
 			UsernameToken bstToken = new UsernameToken(wseTokenRef);
 			return bstToken.getName();
-		} catch (WSSecurityException e) {
+		}
+		catch (WSSecurityException e)
+		{
 			throw new GeneralSecurityException(e.getMessage(), e);
 		}
 	}
 
 	static public String getPasswordTokenFromUTSecTokenRef(
-			MessageElement wseTokenRef) throws GeneralSecurityException {
+			MessageElement wseTokenRef) throws GeneralSecurityException
+	{
 
-		try {
+		try
+		{
 			UsernameToken bstToken = new UsernameToken(wseTokenRef);
 			return bstToken.getPassword();
-		} catch (WSSecurityException e) {
+		}
+		catch (WSSecurityException e)
+		{
 			throw new GeneralSecurityException(e.getMessage(), e);
 		}
 	}
-	
-	static public MessageElement makeUTSecTokenRef(
-			String username, String password) throws GeneralSecurityException {
 
-		try {
-			MessageElement userElem = new MessageElement(WSConstants.WSSE_NS, "Username");
+	static public MessageElement makeUTSecTokenRef(String username,
+			String password) throws GeneralSecurityException
+	{
+
+		try
+		{
+			MessageElement userElem =
+					new MessageElement(WSConstants.WSSE_NS, "Username");
 			userElem.addTextNode(username);
-			MessageElement passElem = new MessageElement(WSConstants.WSSE_NS, "Password");
+			MessageElement passElem =
+					new MessageElement(WSConstants.WSSE_NS, "Password");
 			passElem.addTextNode(password);
-			MessageElement token = new MessageElement(
-					UsernameToken.TOKEN);
+			MessageElement token = new MessageElement(UsernameToken.TOKEN);
 			token.addChild(userElem);
 			token.addChild(passElem);
-			
+
 			return token;
-			
-		} catch (Exception e) {
+
+		}
+		catch (Exception e)
+		{
 			throw new GeneralSecurityException(e.getMessage(), e);
 		}
 	}
-	
-	
-	static public X509Certificate[] getChainFromPkiPathSecTokenRef(
-			MessageElement wseTokenRef) throws GeneralSecurityException {
 
-		MessageElement element = wseTokenRef.getChildElement(new QName(
-				org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
-		if (element != null) {
+	static public X509Certificate[] getChainFromPkiPathSecTokenRef(
+			MessageElement wseTokenRef) throws GeneralSecurityException
+	{
+
+		MessageElement element =
+				wseTokenRef.getChildElement(new QName(
+						org.apache.ws.security.WSConstants.WSSE11_NS,
+						"Embedded"));
+		if (element != null)
+		{
 			element = element.getChildElement(BinarySecurity.TOKEN_BST);
-			if (element != null) {
-				try {
+			if (element != null)
+			{
+				try
+				{
 					PKIPathSecurity bstToken = new PKIPathSecurity(element);
 					return bstToken.getX509Certificates(false,
 							new FlexibleBouncyCrypto());
-				} catch (GenesisIISecurityException e) {
+				}
+				catch (GenesisIISecurityException e)
+				{
 					throw new GeneralSecurityException(e.getMessage(), e);
-				} catch (WSSecurityException e) {
+				}
+				catch (WSSecurityException e)
+				{
 					throw new GeneralSecurityException(e.getMessage(), e);
-				} catch (IOException e) {
+				}
+				catch (IOException e)
+				{
 					throw new GeneralSecurityException(e.getMessage(), e);
-				} catch (CredentialException e) {
+				}
+				catch (CredentialException e)
+				{
 					throw new GeneralSecurityException(e.getMessage(), e);
 				}
 			}
@@ -121,62 +146,102 @@ public class WSSecurityUtils {
 	}
 
 	static public MessageElement makePkiPathSecTokenRef(
-			X509Certificate[] certChain) throws GeneralSecurityException {
+			X509Certificate[] certChain) throws GeneralSecurityException
+	{
+		return makePkiPathSecTokenRef(certChain, null);
+	}
 
-		try {
+	static public MessageElement makePkiPathSecTokenRef(
+			X509Certificate[] certChain, String wsuId)
+			throws GeneralSecurityException
+	{
 
-			MessageElement binaryToken = new MessageElement(
-					BinarySecurity.TOKEN_BST);
+		try
+		{
+
+			MessageElement binaryToken =
+					new MessageElement(BinarySecurity.TOKEN_BST);
 			binaryToken.setAttributeNS(null, "ValueType", PKIPathSecurity
 					.getType());
+			if (wsuId != null)
+			{
+				binaryToken.setAttribute(WSConstants.WSU_NS, "Id", wsuId);
+			}
 			binaryToken.addTextNode("");
 			BinarySecurity bstToken = new PKIPathSecurity(binaryToken);
 			((PKIPathSecurity) bstToken).setX509Certificates(certChain, false,
 					new FlexibleBouncyCrypto());
 
-			MessageElement embedded = new MessageElement(new QName(
-					org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
+			MessageElement embedded =
+					new MessageElement(new QName(
+							org.apache.ws.security.WSConstants.WSSE11_NS,
+							"Embedded"));
 			embedded.addChild(binaryToken);
 
-			MessageElement wseTokenRef = new MessageElement(new QName(
-					org.apache.ws.security.WSConstants.WSSE11_NS,
-					"SecurityTokenReference"));
+			MessageElement wseTokenRef =
+					new MessageElement(new QName(
+							org.apache.ws.security.WSConstants.WSSE11_NS,
+							"SecurityTokenReference"));
 			wseTokenRef.addChild(embedded);
 
 			return wseTokenRef;
 
-		} catch (GenesisIISecurityException e) {
+		}
+		catch (GenesisIISecurityException e)
+		{
 			throw new GeneralSecurityException(e.getMessage(), e);
-		} catch (WSSecurityException e) {
+		}
+		catch (WSSecurityException e)
+		{
 			throw new GeneralSecurityException(e.getMessage(), e);
-		} catch (SOAPException e) {
+		}
+		catch (SOAPException e)
+		{
 			throw new GeneralSecurityException(e.getMessage(), e);
-		} catch (IOException e) {
+		}
+		catch (IOException e)
+		{
 			throw new GeneralSecurityException(e.getMessage(), e);
-		} catch (CredentialException e) {
+		}
+		catch (CredentialException e)
+		{
 			throw new GeneralSecurityException(e.getMessage(), e);
 		}
 	}
 
 	static public X509Certificate getX509v3FromSecTokenRef(
-			MessageElement wseTokenRef) throws GeneralSecurityException {
+			MessageElement wseTokenRef) throws GeneralSecurityException
+	{
 
-		MessageElement element = wseTokenRef.getChildElement(new QName(
-				org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
-		if (element != null) {
+		MessageElement element =
+				wseTokenRef.getChildElement(new QName(
+						org.apache.ws.security.WSConstants.WSSE11_NS,
+						"Embedded"));
+		if (element != null)
+		{
 			element = element.getChildElement(BinarySecurity.TOKEN_BST);
-			if (element != null) {
-				try {
+			if (element != null)
+			{
+				try
+				{
 					X509Security bstToken = new X509Security(element);
 					return bstToken
 							.getX509Certificate(new FlexibleBouncyCrypto());
-				} catch (GenesisIISecurityException e) {
+				}
+				catch (GenesisIISecurityException e)
+				{
 					throw new GeneralSecurityException(e.getMessage(), e);
-				} catch (WSSecurityException e) {
+				}
+				catch (WSSecurityException e)
+				{
 					throw new GeneralSecurityException(e.getMessage(), e);
-				} catch (IOException e) {
+				}
+				catch (IOException e)
+				{
 					throw new GeneralSecurityException(e.getMessage(), e);
-				} catch (CredentialException e) {
+				}
+				catch (CredentialException e)
+				{
 					throw new GeneralSecurityException(e.getMessage(), e);
 				}
 			}
@@ -186,67 +251,94 @@ public class WSSecurityUtils {
 	}
 
 	static public MessageElement makeX509v3TokenRef(X509Certificate cert)
-			throws GeneralSecurityException {
+			throws GeneralSecurityException
+	{
 
-		try {
+		try
+		{
 
-			MessageElement binaryToken = new MessageElement(
-					BinarySecurity.TOKEN_BST);
+			MessageElement binaryToken =
+					new MessageElement(BinarySecurity.TOKEN_BST);
 			binaryToken.setAttributeNS(null, "ValueType", X509Security
 					.getType());
 			binaryToken.addTextNode("");
 			X509Security bstToken = new X509Security(binaryToken);
 			bstToken.setX509Certificate(cert);
 
-			MessageElement embedded = new MessageElement(new QName(
-					org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
+			MessageElement embedded =
+					new MessageElement(new QName(
+							org.apache.ws.security.WSConstants.WSSE11_NS,
+							"Embedded"));
 			embedded.addChild(binaryToken);
 
-			MessageElement wseTokenRef = new MessageElement(new QName(
-					org.apache.ws.security.WSConstants.WSSE11_NS,
-					"SecurityTokenReference"));
+			MessageElement wseTokenRef =
+					new MessageElement(new QName(
+							org.apache.ws.security.WSConstants.WSSE11_NS,
+							"SecurityTokenReference"));
 			wseTokenRef.addChild(embedded);
 
 			return wseTokenRef;
 
-		} catch (WSSecurityException e) {
+		}
+		catch (WSSecurityException e)
+		{
 			throw new GeneralSecurityException(e.getMessage(), e);
-		} catch (SOAPException e) {
+		}
+		catch (SOAPException e)
+		{
 			throw new GeneralSecurityException(e.getMessage(), e);
 		}
 	}
 
+	public static GamlCredential decodeTokenElement(MessageElement tokenElement)
+			throws GeneralSecurityException
+	{
 
-	public static GamlCredential decodeTokenElement(MessageElement tokenElement) 
-			throws GeneralSecurityException {
-		
 		// try delegated/signed assertion
-		try {
-			MessageElement element = tokenElement; 
-			if (element.getQName().equals(new QName(org.apache.ws.security.WSConstants.WSSE11_NS, "SecurityTokenReference"))) {
-				element = element.getChildElement(
-						new QName(org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
-				if (element != null) {
+		try
+		{
+			MessageElement element = tokenElement;
+			if (element.getQName().equals(
+					new QName(org.apache.ws.security.WSConstants.WSSE11_NS,
+							"SecurityTokenReference")))
+			{
+				element =
+						element.getChildElement(new QName(
+								org.apache.ws.security.WSConstants.WSSE11_NS,
+								"Embedded"));
+				if (element != null)
+				{
 					element = element.getChildElement(BinarySecurity.TOKEN_BST);
-					if (element != null) {
-						String valueAttr = element.getAttributeValue("ValueType");
-						if ((valueAttr != null) && (valueAttr.equals(WSSecurityUtils.DELEGATED_GAML_TOKEN_TYPE))) {
+					if (element != null)
+					{
+						String valueAttr =
+								element.getAttributeValue("ValueType");
+						if ((valueAttr != null)
+								&& (valueAttr
+										.equals(WSSecurityUtils.DELEGATED_GAML_TOKEN_TYPE)))
+						{
 							String encodedValue = element.getValue();
-							return SignedAssertionBaseImpl.base64decodeAssertion(encodedValue);
+							return SignedAssertionBaseImpl
+									.base64decodeAssertion(encodedValue);
 						}
 					}
 				}
 			}
 			// try X509 identity
 			return new X509Identity(tokenElement);
-		} catch (Exception e) {
-			try {
+		}
+		catch (Exception e)
+		{
+			try
+			{
 				return new UsernamePasswordIdentity(tokenElement);
-			} catch (Exception e2) {
+			}
+			catch (Exception e2)
+			{
 			}
 		}
 
 		return null;
 	}
-	
+
 }

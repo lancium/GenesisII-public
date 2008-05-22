@@ -22,19 +22,19 @@ import org.apache.axis.types.URI;
 
 import edu.virginia.vcgr.genii.client.security.MessageLevelSecurity;
 
-public class MessageSecurityData {
+public class MessageSecurityData
+{
 	public MessageLevelSecurity _neededMsgSec;
 	public X509Certificate[] _resourceCertChain;
 	public URI _resourceEpi;
-	
-	public MessageSecurityData(
-			MessageLevelSecurity neededMsgSec,
-			X509Certificate[] resourceCertChain,
-			URI resourceEpi) {
-		
+
+	public MessageSecurityData(MessageLevelSecurity neededMsgSec,
+			X509Certificate[] resourceCertChain, URI resourceEpi)
+	{
+
 		_resourceCertChain = resourceCertChain;
 		_neededMsgSec = neededMsgSec;
 		_resourceEpi = resourceEpi;
-		
+
 	}
 }

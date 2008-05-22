@@ -16,6 +16,8 @@
 		<file name="context.xsd"/>
 		<file name="resource-authz.wsdl"/>
 		<file name="security.xsd"/>
+		<file name="ws-securitypolicy-1.2.xsd"/>
+		<file name="ws-policy.xsd"/>
 		<file name="resource-factory.wsdl"/>
 		<file name="resource-factory.xsd"/>
 		<file name="wsrf/basefaults.xsd"/>
@@ -32,6 +34,8 @@
 		<file name="xml.xsd"/>
 		<file name="soapenv.xsd"/>
 		<file name="ogsa-wsrf-bp.xsd"/>
+		<file name="oasis-200401-wss-wssecurity-secext-1.0.xsd"/>
+		<file name="oasis-200401-wss-wssecurity-utility-1.0.xsd"/>
 	</filelist>
 
 	<presetdef name="common.source.files.uptodate">

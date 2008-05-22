@@ -25,15 +25,17 @@ import java.util.Date;
  * 
  * @author dmerrill
  */
-public interface Attribute extends Externalizable {
+public interface Attribute extends Externalizable
+{
 
 	/**
-	 * Checks that the attribute is time-valid with respect to the supplied 
-	 * date and any delegation depth requirements are met by the supplied
+	 * Checks that the attribute is time-valid with respect to the supplied date
+	 * and any delegation depth requirements are met by the supplied
 	 * delegationDepth.
 	 */
-	public void checkValidity(int delegationDepth, Date date) throws AttributeInvalidException;
-	
+	public void checkValidity(int delegationDepth, Date date)
+			throws AttributeInvalidException;
+
 	/**
 	 * Returns the identity of the attribute asserter
 	 */

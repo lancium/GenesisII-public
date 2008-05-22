@@ -24,36 +24,34 @@ import edu.virginia.vcgr.genii.common.security.*;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.comm.axis.security.MessageSecurityData;
 
-public interface AuthZSubTool {
+public interface AuthZSubTool
+{
 
 	// Methods to handle resource AuthZ configurations
-	
-	public void displayAuthZConfig(AuthZConfig config, PrintStream out, PrintStream err, BufferedReader in) throws AuthZSecurityException;
 
-	public AuthZConfig modifyAuthZConfig(AuthZConfig config, PrintStream out, PrintStream err, BufferedReader in) throws AuthZSecurityException, IOException;
-	
+	public void displayAuthZConfig(AuthZConfig config, PrintStream out,
+			PrintStream err, BufferedReader in) throws AuthZSecurityException;
+
+	public AuthZConfig modifyAuthZConfig(AuthZConfig config, PrintStream out,
+			PrintStream err, BufferedReader in) throws AuthZSecurityException,
+			IOException;
+
 	public AuthZConfig getEmptyAuthZConfig() throws AuthZSecurityException;
-	
-	
-	
+
 	// Methods to handle outgoing credentials
-	
+
 	/**
-	 * Intended to manipulate the calling context as necessary before 
-	 * it is sent in an outgoing message
+	 * Intended to manipulate the calling context as necessary before it is sent
+	 * in an outgoing message
 	 */
-	public void messageSendPrepareHandler(
-			ICallingContext callingContext, 
-			GamlCredential credential,
-			MessageSecurityData msgSecData, 
+	public void messageSendPrepareHandler(ICallingContext callingContext,
+			GamlCredential credential, MessageSecurityData msgSecData,
 			Method method) throws GenesisIISecurityException;
 
 	/**
 	 * Displays the credential to the specified output streams
 	 */
-	public void displayWhoami(
-			GamlCredential credential, 
-			PrintStream out, 
+	public void displayWhoami(GamlCredential credential, PrintStream out,
 			PrintStream err) throws GenesisIISecurityException;
-	
+
 }

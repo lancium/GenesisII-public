@@ -14,43 +14,45 @@
  * under the License.
  */
 
-
 package edu.virginia.vcgr.genii.client.security.wincrypto;
 
 import java.security.Security;
-
 
 /**
  * Provider class for the X.509 MS Windows Trust Manager
  * 
  * @author Duane Merrill
  */
-public class WinX509TrustManagerProvider extends java.security.Provider {
+public class WinX509TrustManagerProvider extends java.security.Provider
+{
 	static final long serialVersionUID = 0L;
-	/** String identifiying the instance-name to be supplied to TrustManagerFactory
-	  * for obtaining a WinX509TrustManagerFactory */
+	/**
+	 * String identifiying the instance-name to be supplied to
+	 * TrustManagerFactory for obtaining a WinX509TrustManagerFactory
+	 */
 	public static final String TM_NAME = "WinX509TM";
-	
 
 	/** Constructor */
-	public WinX509TrustManagerProvider() { 
-		super(TM_NAME, 1.0, TM_NAME + " implements MS Windows Trust Factory"); 
-		
-		put("TrustManagerFactory." + TM_NAME, WinX509TrustManagerFactorySpi.class.getName()); 
+	public WinX509TrustManagerProvider()
+	{
+		super(TM_NAME, 1.0, TM_NAME + " implements MS Windows Trust Factory");
+
+		put("TrustManagerFactory." + TM_NAME,
+				WinX509TrustManagerFactorySpi.class.getName());
 	}
 
-
 	/**
-	 * Installs the WinX509TrustManagerProvider into the provider hierarchy
-	 * if it was not done in the JDK/JRE's lib/security/java.security file.
-	 * Using this mechanism may require that the codebase comprising this code
-	 * be signed appropriately
+	 * Installs the WinX509TrustManagerProvider into the provider hierarchy if
+	 * it was not done in the JDK/JRE's lib/security/java.security file. Using
+	 * this mechanism may require that the codebase comprising this code be
+	 * signed appropriately
 	 */
-	public static synchronized void install() { 
-		
-		if (Security.getProvider(TM_NAME) == null) {
-			Security.insertProviderAt (new WinX509TrustManagerProvider(), 1);
-		}
-	} 
-}
+	public static synchronized void install()
+	{
 
+		if (Security.getProvider(TM_NAME) == null)
+		{
+			Security.insertProviderAt(new WinX509TrustManagerProvider(), 1);
+		}
+	}
+}

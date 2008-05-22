@@ -81,7 +81,6 @@ import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
 import edu.virginia.vcgr.genii.container.Container;
 
-
 import edu.virginia.vcgr.genii.x509authn.*;
 
 import org.oasis_open.docs.ws_sx.ws_trust._200512.*;
@@ -92,18 +91,21 @@ import org.apache.axis.AxisFault;
 
 import org.morgan.util.configuration.ConfigurationException;
 
-
 public class X509AuthnServiceImpl extends GenesisIIBase implements
-		X509AuthnPortType {
-	
+		X509AuthnPortType
+{
+
 	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(X509AuthnServiceImpl.class);
 
-	public X509AuthnServiceImpl() throws RemoteException {
-		this(WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE.getQName().getLocalPart());
+	public X509AuthnServiceImpl() throws RemoteException
+	{
+		this(WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE.getQName()
+				.getLocalPart());
 	}
 
-	protected X509AuthnServiceImpl(String serviceName) throws RemoteException {
+	protected X509AuthnServiceImpl(String serviceName) throws RemoteException
+	{
 		super(serviceName);
 
 		addImplementedPortType(WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE);
@@ -115,44 +117,57 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 	{
 		return WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE;
 	}
-	
+
 	protected Object translateConstructionParameter(MessageElement property)
-			throws Exception {
+			throws Exception
+	{
 
 		// decodes the base64-encoded delegated assertion construction param
 		QName name = property.getQName();
-		if (name.equals(SecurityConstants.NEW_IDP_NAME_QNAME)) {
+		if (name.equals(SecurityConstants.NEW_IDP_NAME_QNAME))
+		{
 			return property.getValue();
-		} else if (name.equals(SecurityConstants.IDP_VALID_MILLIS_QNAME)) {
+		}
+		else if (name.equals(SecurityConstants.IDP_VALID_MILLIS_QNAME))
+		{
 			return Long.decode(property.getValue());
-		} else {
+		}
+		else
+		{
 			return super.translateConstructionParameter(property);
 		}
 	}
 
-	protected ResourceKey createResource(HashMap<QName, Object> constructionParameters)
-		throws ResourceException, BaseFaultType {
-		
-		String[] newCNs = {(String) constructionParameters
-			.get(SecurityConstants.NEW_IDP_NAME_QNAME)};
-		
-		constructionParameters.put(IResource.ADDITIONAL_CNS_CONSTRUCTION_PARAM, newCNs);
-		
+	protected ResourceKey createResource(
+			HashMap<QName, Object> constructionParameters)
+			throws ResourceException, BaseFaultType
+	{
+
+		String[] newCNs =
+				{ (String) constructionParameters
+						.get(SecurityConstants.NEW_IDP_NAME_QNAME) };
+
+		constructionParameters.put(IResource.ADDITIONAL_CNS_CONSTRUCTION_PARAM,
+				newCNs);
+
 		return super.createResource(constructionParameters);
 	}
-	
+
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
 			HashMap<QName, Object> constructionParameters,
 			Collection<MessageElement> resolverCreationParams)
-			throws ResourceException, BaseFaultType, RemoteException {
+			throws ResourceException, BaseFaultType, RemoteException
+	{
 
 		// make sure the specific IDP doesn't yet exist
-		String newIdpName = (String) constructionParameters
-				.get(SecurityConstants.NEW_IDP_NAME_QNAME);
+		String newIdpName =
+				(String) constructionParameters
+						.get(SecurityConstants.NEW_IDP_NAME_QNAME);
 		ResourceKey serviceKey = ResourceManager.getCurrentResource();
 		IRNSResource serviceResource = (IRNSResource) serviceKey.dereference();
 		Collection<String> entries = serviceResource.listEntries();
-		if (entries.contains(newIdpName)) {
+		if (entries.contains(newIdpName))
+		{
 			throw FaultManipulator.fillInFault(new RNSEntryExistsFaultType(
 					null, null, null, null, null, null, newIdpName));
 		}
@@ -161,257 +176,365 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 		serviceResource.addEntry(new InternalEntry(newIdpName, newEPR, null));
 		serviceResource.commit();
 
-		// get the IDP resource's db resource 
+		// get the IDP resource's db resource
 		IResource resource = rKey.dereference();
-		X509Certificate[] resourceCertChain = 
-			(X509Certificate[])resource.getProperty(
-					IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
+		X509Certificate[] resourceCertChain =
+				(X509Certificate[]) resource
+						.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
 
 		// store the name in the idp resource
-		resource.setProperty(SecurityConstants.NEW_IDP_NAME_QNAME.getLocalPart(), newIdpName);
+		resource.setProperty(SecurityConstants.NEW_IDP_NAME_QNAME
+				.getLocalPart(), newIdpName);
 
 		// determine the credential the idp will front
 		GamlCredential credential = null;
-		MessageElement encodedCredential = (MessageElement) constructionParameters
-				.get(SecurityConstants.IDP_DELEGATED_CREDENTIAL_QNAME);
-		try {
+		MessageElement encodedCredential =
+				(MessageElement) constructionParameters
+						.get(SecurityConstants.IDP_DELEGATED_CREDENTIAL_QNAME);
+		try
+		{
 
-			if (encodedCredential != null) { 
+			if (encodedCredential != null)
+			{
 				// we're an authentication proxy for some delegated credentials
 				// that we're being supplied
-				
-					credential = WSSecurityUtils.decodeTokenElement(
-							(MessageElement) encodedCredential.getChildElements().next());
-					
-					if (credential instanceof SignedAssertion) {
-						// Delegate from the service to the resource
-						DelegatedAttribute delegatedAttribute = new DelegatedAttribute(
-								null,
-								(SignedAssertion) credential, 
-								resourceCertChain);
-						
-						credential = new DelegatedAssertion(
-							delegatedAttribute, 
-							Container.getContainerPrivateKey());
-					}
-			
-			} else {
-			
-				// we're not an authentication proxy, create our own signed assertion
-				// to give out
-				
-				X509Identity identity = new X509Identity(resourceCertChain);
-				
-				Long validMillis = (Long) constructionParameters
-					.get(SecurityConstants.IDP_VALID_MILLIS_QNAME);
-			
-				credential = new SignedAttributeAssertion(
-						new IdentityAttribute(
-							new BasicConstraints(
-								System.currentTimeMillis() - (1000L * 60 * 15), // 15 minutes ago
-								validMillis, 
-								10), 
-							identity),
-						Container.getContainerPrivateKey());
+
+				credential =
+						WSSecurityUtils
+								.decodeTokenElement((MessageElement) encodedCredential
+										.getChildElements().next());
+
+				if (credential instanceof SignedAssertion)
+				{
+					// Delegate from the service to the resource
+					DelegatedAttribute delegatedAttribute =
+							new DelegatedAttribute(null,
+									(SignedAssertion) credential,
+									resourceCertChain);
+
+					credential =
+							new DelegatedAssertion(delegatedAttribute,
+									Container.getContainerPrivateKey());
+				}
+
 			}
-				
+			else
+			{
+
+				// we're not an authentication proxy, create our own signed
+				// assertion
+				// to give out
+
+				X509Identity identity = new X509Identity(resourceCertChain);
+
+				Long validMillis =
+						(Long) constructionParameters
+								.get(SecurityConstants.IDP_VALID_MILLIS_QNAME);
+
+				credential =
+						new SignedAttributeAssertion(new IdentityAttribute(
+								new BasicConstraints(System.currentTimeMillis()
+										- (1000L * 60 * 15), // 15 minutes
+																// ago
+										validMillis, 10), identity), Container
+								.getContainerPrivateKey());
+			}
+
 			// add the identity to the resource's saved calling context
-			ICallingContext resourceContext = (ICallingContext) 
-				resource.getProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME);
-			TransientCredentials transientCredentials = 
-				TransientCredentials.getTransientCredentials(resourceContext);
+			ICallingContext resourceContext =
+					(ICallingContext) resource
+							.getProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME);
+			TransientCredentials transientCredentials =
+					TransientCredentials
+							.getTransientCredentials(resourceContext);
 			transientCredentials._credentials.add(credential);
-			resource.setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME, resourceContext);
-			
+			resource.setProperty(
+					IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME,
+					resourceContext);
+
 			// add the identity to our resource state
-			resource.setProperty(SecurityConstants.IDP_DELEGATED_CREDENTIAL_QNAME
-				.getLocalPart(), credential);			
-				
-		} catch (IOException e) {
-			throw new RemoteException(e.getMessage(), e);
-		} catch (GeneralSecurityException e) {
+			resource.setProperty(
+					SecurityConstants.IDP_DELEGATED_CREDENTIAL_QNAME
+							.getLocalPart(), credential);
+
+		}
+		catch (IOException e)
+		{
 			throw new RemoteException(e.getMessage(), e);
 		}
-		
-		
-		super.postCreate(rKey, newEPR, constructionParameters, resolverCreationParams);
+		catch (GeneralSecurityException e)
+		{
+			throw new RemoteException(e.getMessage(), e);
+		}
+
+		super.postCreate(rKey, newEPR, constructionParameters,
+				resolverCreationParams);
 	}
 
-	protected void setAttributeHandlers() throws NoSuchMethodException {
+	protected void setAttributeHandlers() throws NoSuchMethodException
+	{
 		super.setAttributeHandlers();
 		new X509AuthnAttributeHandlers(getAttributePackage());
 	}
-	
+
 	protected RequestSecurityTokenResponseType delegateCredential(
-			X509Certificate[] delegateToChain, 
-			Date created, 
-			Date expiry) 
-		throws GeneralSecurityException, SOAPException, ConfigurationException, RemoteException {
+			X509Certificate[] delegateToChain, Date created, Date expiry)
+			throws GeneralSecurityException, SOAPException,
+			ConfigurationException, RemoteException
+	{
 
 		ResourceKey rKey = ResourceManager.getCurrentResource();
 		IRNSResource resource = (IRNSResource) rKey.dereference();
-		GamlCredential credential = (GamlCredential) resource.getProperty(
-				SecurityConstants.IDP_DELEGATED_CREDENTIAL_QNAME.getLocalPart());
-		
-		if ((credential instanceof SignedAssertion) && (delegateToChain != null)) {
+		GamlCredential credential =
+				(GamlCredential) resource
+						.getProperty(SecurityConstants.IDP_DELEGATED_CREDENTIAL_QNAME
+								.getLocalPart());
+
+		if ((credential instanceof SignedAssertion)
+				&& (delegateToChain != null))
+		{
 			// do delegation if necessary
-		
+
 			// Get this resource's assertion, key and cert material
 			ICallingContext callingContext = null;
 			KeyAndCertMaterial resourceKeyMaterial = null;
-			try {
+			try
+			{
 				callingContext = ContextManager.getCurrentContext();
-				resourceKeyMaterial = callingContext.getActiveKeyAndCertMaterial();
-			} catch (IOException e) {
-		    	throw new GeneralSecurityException(e.getMessage(), e);	
+				resourceKeyMaterial =
+						callingContext.getActiveKeyAndCertMaterial();
 			}
-			
-			// Delegate the assertion to delegateTo 
-			DelegatedAttribute delegatedAttribute = new DelegatedAttribute(
-				new BasicConstraints(
-					created.getTime(), 
-					expiry.getTime() - created.getTime(), 
-					10), 
-				(SignedAssertion) credential, 
-				delegateToChain);
-			credential = new DelegatedAssertion(
-				delegatedAttribute, 
-				resourceKeyMaterial._clientPrivateKey);
+			catch (IOException e)
+			{
+				throw new GeneralSecurityException(e.getMessage(), e);
+			}
+
+			// Delegate the assertion to delegateTo
+			DelegatedAttribute delegatedAttribute =
+					new DelegatedAttribute(new BasicConstraints(created
+							.getTime(), expiry.getTime() - created.getTime(),
+							10), (SignedAssertion) credential, delegateToChain);
+			credential =
+					new DelegatedAssertion(delegatedAttribute,
+							resourceKeyMaterial._clientPrivateKey);
 		}
-		
-		
-		//----- assemble the response document -----------------------------------------
-		
-		
-		RequestSecurityTokenResponseType response = new RequestSecurityTokenResponseType();
+
+		// ----- assemble the response document
+		// -----------------------------------------
+
+		RequestSecurityTokenResponseType response =
+				new RequestSecurityTokenResponseType();
 		MessageElement[] elements = new MessageElement[2];
 		response.set_any(elements);
 
 		// Add TokenType element
-		elements[0] = new MessageElement(
-			new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
-				"TokenType"), 
-			credential.getTokenType());
+		elements[0] =
+				new MessageElement(new QName(
+						"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
+						"TokenType"), credential.getTokenType());
 		elements[0].setType(new QName("http://www.w3.org/2001/XMLSchema",
 				"anyURI"));
 
 		MessageElement wseTokenRef = credential.toMessageElement();
 
-		elements[1] = new MessageElement(
-			new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
-				"RequestedSecurityToken"), 
-			new RequestedSecurityTokenType(new MessageElement[] { wseTokenRef }));
+		elements[1] =
+				new MessageElement(new QName(
+						"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
+						"RequestedSecurityToken"),
+						new RequestedSecurityTokenType(
+								new MessageElement[] { wseTokenRef }));
 		elements[1].setType(RequestedProofTokenType.getTypeDesc().getXmlType());
-		
+
 		return response;
 	}
-		
 
 	protected ArrayList<RequestSecurityTokenResponseType> aggregateBaggageTokens(
-			RequestSecurityTokenType request) throws java.rmi.RemoteException {
-		
-		ArrayList<RequestSecurityTokenResponseType> gatheredResponses = 
-			new ArrayList<RequestSecurityTokenResponseType>();
-		
+			RequestSecurityTokenType request) throws java.rmi.RemoteException
+	{
+
+		ArrayList<RequestSecurityTokenResponseType> gatheredResponses =
+				new ArrayList<RequestSecurityTokenResponseType>();
+
 		IRNSResource resource = null;
 		Collection<InternalEntry> entries;
 
 		ResourceKey rKey = ResourceManager.getCurrentResource();
 		resource = (IRNSResource) rKey.dereference();
 		entries = resource.retrieveEntries(null);
-		
-		for (InternalEntry entry : entries) {
-			
-			try {
+
+		for (InternalEntry entry : entries)
+		{
+
+			try
+			{
 				EndpointReferenceType idpEpr = entry.getEntryReference();
-				
+
 				// create a proxy to the remote idp and invoke it
-				X509AuthnPortType idp = ClientUtils.createProxy(
-						X509AuthnPortType.class, idpEpr);
-				RequestSecurityTokenResponseType[] responses = idp
-						.requestSecurityToken2(request);
-				
-				if (responses != null) {
-					for (RequestSecurityTokenResponseType response : responses) {
+				X509AuthnPortType idp =
+						ClientUtils
+								.createProxy(X509AuthnPortType.class, idpEpr);
+				RequestSecurityTokenResponseType[] responses =
+						idp.requestSecurityToken2(request);
+
+				if (responses != null)
+				{
+					for (RequestSecurityTokenResponseType response : responses)
+					{
 						gatheredResponses.add(response);
 					}
 				}
-			} catch (Exception e) { 
-				throw new RuntimeException("Could not retrieve token for IDP" + 
-						entry.getName() + ": " + e.getMessage(), e);
+			}
+			catch (Exception e)
+			{
+				throw new RuntimeException("Could not retrieve token for IDP"
+						+ entry.getName() + ": " + e.getMessage(), e);
 			}
 		}
-		
+
 		return gatheredResponses;
 	}
 
 	@RWXMapping(RWXCategory.EXECUTE)
 	public RequestSecurityTokenResponseType[] requestSecurityToken2(
-			RequestSecurityTokenType request) throws java.rmi.RemoteException {
+			RequestSecurityTokenType request) throws java.rmi.RemoteException
+	{
 
-		//------ Parse and perform syntactic checks (has correct form) --------		
+		// ------ Parse and perform syntactic checks (has correct form) --------
 
 		RequestTypeOpenEnum requestType = null;
 		LifetimeType lifetime = null;
 		X509Certificate[] delegateToChain = null;
-		
-		for (MessageElement element : request.get_any()) {
-			if (element.getName().equals("TokenType")) {
+
+		for (MessageElement element : request.get_any())
+		{
+			if (element.getName().equals("TokenType"))
+			{
 				// process TokenType element
 				// String tokenType = element.getValue();
-				
-			} else if (element.getName().equals("RequestType")) {
+
+			}
+			else if (element.getName().equals("RequestType"))
+			{
 				// process RequestType element
-				try {
-					requestType = (RequestTypeOpenEnum) element.getObjectValue(RequestTypeOpenEnum.class);
-				} catch (Exception e) {}
-				
-			} else if (element.getName().equals("Lifetime")) {
+				try
+				{
+					requestType =
+							(RequestTypeOpenEnum) element
+									.getObjectValue(RequestTypeOpenEnum.class);
+				}
+				catch (Exception e)
+				{
+				}
+
+			}
+			else if (element.getName().equals("Lifetime"))
+			{
 				// process LifeTime element
-				try {
-					lifetime = (LifetimeType) element.getObjectValue(LifetimeType.class);
-				} catch (Exception e) {}
-				
-			} else if (element.getName().equals("DelegateTo")) {
+				try
+				{
+					lifetime =
+							(LifetimeType) element
+									.getObjectValue(LifetimeType.class);
+				}
+				catch (Exception e)
+				{
+				}
+
+			}
+			else if (element.getName().equals("DelegateTo"))
+			{
 				// process DelegateTo element
 				DelegateToType dt = null;
-				try {
-					dt = (DelegateToType) element.getObjectValue(DelegateToType.class);
-				} catch (Exception e) {}
-				if (dt != null) {
-					for (MessageElement subElement : dt.get_any()) {
-						if (subElement.getQName().equals(new QName(org.apache.ws.security.WSConstants.WSSE11_NS, "SecurityTokenReference"))) {
-							subElement = subElement.getChildElement(
-								new QName(org.apache.ws.security.WSConstants.WSSE11_NS, "Embedded"));
-							if (subElement != null) {
-								subElement = subElement.getChildElement(BinarySecurity.TOKEN_BST);
-								if (subElement != null) {
-									try {
-										if (subElement.getAttributeValue("ValueType").equals(X509Security.getType())) {
-											X509Security bstToken = new X509Security(subElement);
-											X509Certificate delegateTo = bstToken.getX509Certificate(new FlexibleBouncyCrypto());
-											delegateToChain = new X509Certificate[] { delegateTo };
-										} else if (subElement.getAttributeValue("ValueType").equals(X509Security.getType())) {
-											PKIPathSecurity bstToken = new PKIPathSecurity(element);
-											delegateToChain = bstToken.getX509Certificates(false, 
-												new edu.virginia.vcgr.genii.client.comm.axis.security.FlexibleBouncyCrypto());											
-										} else {
-											if (delegateToChain == null) {
+				try
+				{
+					dt =
+							(DelegateToType) element
+									.getObjectValue(DelegateToType.class);
+				}
+				catch (Exception e)
+				{
+				}
+				if (dt != null)
+				{
+					for (MessageElement subElement : dt.get_any())
+					{
+						if (subElement
+								.getQName()
+								.equals(
+										new QName(
+												org.apache.ws.security.WSConstants.WSSE11_NS,
+												"SecurityTokenReference")))
+						{
+							subElement =
+									subElement
+											.getChildElement(new QName(
+													org.apache.ws.security.WSConstants.WSSE11_NS,
+													"Embedded"));
+							if (subElement != null)
+							{
+								subElement =
+										subElement
+												.getChildElement(BinarySecurity.TOKEN_BST);
+								if (subElement != null)
+								{
+									try
+									{
+										if (subElement.getAttributeValue(
+												"ValueType").equals(
+												X509Security.getType()))
+										{
+											X509Security bstToken =
+													new X509Security(subElement);
+											X509Certificate delegateTo =
+													bstToken
+															.getX509Certificate(new FlexibleBouncyCrypto());
+											delegateToChain =
+													new X509Certificate[] { delegateTo };
+										}
+										else if (subElement.getAttributeValue(
+												"ValueType").equals(
+												X509Security.getType()))
+										{
+											PKIPathSecurity bstToken =
+													new PKIPathSecurity(element);
+											delegateToChain =
+													bstToken
+															.getX509Certificates(
+																	false,
+																	new edu.virginia.vcgr.genii.client.comm.axis.security.FlexibleBouncyCrypto());
+										}
+										else
+										{
+											if (delegateToChain == null)
+											{
 												throw new AxisFault(
-														new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "BadRequest"), 
-														"Missing or unsupported DelegateTo security ValueType", 
-														null, 
-														null);
+														new QName(
+																"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
+																"BadRequest"),
+														"Missing or unsupported DelegateTo security ValueType",
+														null, null);
 											}
 										}
-								    } catch (GenesisIISecurityException e) {
-								    	throw new WSSecurityException(e.getMessage(), e);	
-									} catch (WSSecurityException e) {
-								    	throw new WSSecurityException(e.getMessage(), e);	
-									} catch (IOException e) {
-								    	throw new WSSecurityException(e.getMessage(), e);	
-									} catch (CredentialException e) {
-								    	throw new WSSecurityException(e.getMessage(), e);	
+									}
+									catch (GenesisIISecurityException e)
+									{
+										throw new WSSecurityException(e
+												.getMessage(), e);
+									}
+									catch (WSSecurityException e)
+									{
+										throw new WSSecurityException(e
+												.getMessage(), e);
+									}
+									catch (IOException e)
+									{
+										throw new WSSecurityException(e
+												.getMessage(), e);
+									}
+									catch (CredentialException e)
+									{
+										throw new WSSecurityException(e
+												.getMessage(), e);
 									}
 								}
 							}
@@ -421,119 +544,142 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 			}
 		}
 
-/* Don't care at the moment: they get what they get		
-		// check requested token type
-		if ((tokenType == null) || !tokenType.equals(WSSecurityUtils.GAML_TOKEN_TYPE)) {
-			throw new AxisFault(
-					new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "BadRequest"), 
-					"IDP cannot provide tokens of type " + tokenType, 
-					null, 
-					null);
-		}
-*/		
-		
+		/*
+		 * Don't care at the moment: they get what they get // check requested
+		 * token type if ((tokenType == null) ||
+		 * !tokenType.equals(WSSecurityUtils.GAML_TOKEN_TYPE)) { throw new
+		 * AxisFault( new
+		 * QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
+		 * "BadRequest"), "IDP cannot provide tokens of type " + tokenType,
+		 * null, null); }
+		 */
+
 		// check request type
-		if ((requestType == null) || !requestType.getRequestTypeEnumValue().toString().equals(RequestTypeEnum._value1.toString())) {
-			throw new AxisFault(
-					new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "BadRequest"), 
-					"IDP cannot service a request of type " + ((requestType == null) ? "null" : requestType.getRequestTypeEnumValue()), 
-					null, 
-					null);
+		if ((requestType == null)
+				|| !requestType.getRequestTypeEnumValue().toString().equals(
+						RequestTypeEnum._value1.toString()))
+		{
+			throw new AxisFault(new QName(
+					"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
+					"BadRequest"), "IDP cannot service a request of type "
+					+ ((requestType == null) ? "null" : requestType
+							.getRequestTypeEnumValue()), null, null);
 		}
-		
+
 		// check lifetime element
-		if (lifetime == null) {
-			throw new AxisFault(
-					new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "InvalidRequest"), 
-					"Missing Lifetime parameter", 
-					null, 
+		if (lifetime == null)
+		{
+			throw new AxisFault(new QName(
+					"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
+					"InvalidRequest"), "Missing Lifetime parameter", null, null);
+		}
+
+		SimpleDateFormat zulu =
+				new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		Date created =
+				zulu.parse(lifetime.getCreated().get_value(),
+						new ParsePosition(0));
+		Date expiry =
+				zulu.parse(lifetime.getExpires().get_value(),
+						new ParsePosition(0));
+
+		if ((created == null) || (expiry == null))
+		{
+			throw new AxisFault(new QName(
+					"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
+					"InvalidRequest"), "Could not parse lifetime dates", null,
 					null);
 		}
 
-	    SimpleDateFormat zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-		Date created = zulu.parse(lifetime.getCreated().get_value(), new ParsePosition(0));
-		Date expiry = zulu.parse(lifetime.getExpires().get_value(), new ParsePosition(0));
+		// ------ Assemble response ------------------------------------------
 
-		if ((created == null) || (expiry == null)) {
-			throw new AxisFault(
-					new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "InvalidRequest"), 
-					"Could not parse lifetime dates", 
-					null, 
-					null);
-		}
-		
-		//------ Assemble response ------------------------------------------		
-		
-		ArrayList<RequestSecurityTokenResponseType> responseArray = 
-			new ArrayList<RequestSecurityTokenResponseType>();
-		
-		try {
+		ArrayList<RequestSecurityTokenResponseType> responseArray =
+				new ArrayList<RequestSecurityTokenResponseType>();
+
+		try
+		{
 			// add the local token
-			responseArray.add(delegateCredential(delegateToChain, created, expiry));
-			
+			responseArray.add(delegateCredential(delegateToChain, created,
+					expiry));
+
 			// add the listed tokens
 			responseArray.addAll(aggregateBaggageTokens(request));
-		} catch (GeneralSecurityException e) {
-	    	throw new WSSecurityException(e.getMessage(), e);	
-		} catch (SOAPException se) {
+		}
+		catch (GeneralSecurityException e)
+		{
+			throw new WSSecurityException(e.getMessage(), e);
+		}
+		catch (SOAPException se)
+		{
 			throw new AxisFault(se.getLocalizedMessage(), se);
-		} catch (ConfigurationException ce) {
+		}
+		catch (ConfigurationException ce)
+		{
 			throw new RemoteException(ce.getMessage(), ce);
 		}
 
-		return responseArray.toArray(new RequestSecurityTokenResponseType[responseArray.size()]);
+		return responseArray
+				.toArray(new RequestSecurityTokenResponseType[responseArray
+						.size()]);
 	}
 
 	@RWXMapping(RWXCategory.EXECUTE)
 	public CreateFileResponse createFile(CreateFile createFile)
 			throws RemoteException, RNSEntryExistsFaultType,
 			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType,
-			RNSFaultType {
+			RNSFaultType
+	{
 		throw new RemoteException("\"createFile\" not applicable.");
 	}
 
 	@RWXMapping(RWXCategory.WRITE)
 	public AddResponse add(Add addRequest) throws RemoteException,
 			RNSEntryExistsFaultType, ResourceUnknownFaultType,
-			RNSEntryNotDirectoryFaultType, RNSFaultType {
+			RNSEntryNotDirectoryFaultType, RNSFaultType
+	{
 
 		IRNSResource resource = null;
 		EndpointReferenceType entryReference;
-		
-		if (addRequest == null) {
+
+		if (addRequest == null)
+		{
 			throw new RemoteException("Incomplete add request.");
 		}
-		
+
 		String name = addRequest.getEntry_name();
 		entryReference = addRequest.getEntry_reference();
-		MessageElement []attrs = addRequest.get_any();
-		
-		if (entryReference == null) {
+		MessageElement[] attrs = addRequest.get_any();
+
+		if (entryReference == null)
+		{
 			throw new RemoteException("Incomplete add request.");
 		}
 
 		TypeInformation type = new TypeInformation(entryReference);
-		if (!type.isIDP()) {
+		if (!type.isIDP())
+		{
 			throw new RemoteException("Entry is not an IDP.");
 		}
 
 		ResourceKey rKey = ResourceManager.getCurrentResource();
-		resource = (IRNSResource)rKey.dereference();
-		
-		if (resource.isServiceResource()) {
+		resource = (IRNSResource) rKey.dereference();
+
+		if (resource.isServiceResource())
+		{
 			throw new RemoteException("Cannot add entries to this service.");
 		}
-		
+
 		resource.addEntry(new InternalEntry(name, entryReference, attrs));
 		resource.commit();
-		
-    	return new AddResponse(entryReference);
+
+		return new AddResponse(entryReference);
 	}
 
 	@RWXMapping(RWXCategory.READ)
 	public ListResponse list(List list) throws RemoteException,
 			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType,
-			RNSFaultType {
+			RNSFaultType
+	{
 
 		IRNSResource resource = null;
 		Collection<InternalEntry> entries;
@@ -544,9 +690,11 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 
 		EntryType[] ret = new EntryType[entries.size()];
 		int lcv = 0;
-		for (InternalEntry entry : entries) {
-			ret[lcv++] = new EntryType(entry.getName(), entry.getAttributes(),
-					entry.getEntryReference());
+		for (InternalEntry entry : entries)
+		{
+			ret[lcv++] =
+					new EntryType(entry.getName(), entry.getAttributes(), entry
+							.getEntryReference());
 		}
 
 		return new ListResponse(ret);
@@ -554,44 +702,49 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 
 	@RWXMapping(RWXCategory.WRITE)
 	public MoveResponse move(Move move) throws RemoteException,
-			ResourceUnknownFaultType, RNSFaultType {
+			ResourceUnknownFaultType, RNSFaultType
+	{
 		throw new RemoteException("\"move\" not applicable.");
 	}
 
 	@RWXMapping(RWXCategory.READ)
 	public QueryResponse query(Query q) throws RemoteException,
-			ResourceUnknownFaultType, RNSFaultType {
+			ResourceUnknownFaultType, RNSFaultType
+	{
 		throw new RemoteException("\"query\" not applicable.");
 	}
 
 	@RWXMapping(RWXCategory.WRITE)
 	public String[] remove(Remove remove) throws RemoteException,
 			ResourceUnknownFaultType, RNSDirectoryNotEmptyFaultType,
-			RNSFaultType {
-    	
-		String []ret;
-    	IRNSResource resource = null;
-    	
-    	ResourceKey rKey = ResourceManager.getCurrentResource();
-    	resource = (IRNSResource)rKey.dereference();
-	    Collection<String> removed = resource.removeEntries(remove.getEntryName());
-	    ret = new String[removed.size()];
-	    removed.toArray(ret);
-	    resource.commit();
-    
-	    return ret;	
+			RNSFaultType
+	{
+
+		String[] ret;
+		IRNSResource resource = null;
+
+		ResourceKey rKey = ResourceManager.getCurrentResource();
+		resource = (IRNSResource) rKey.dereference();
+		Collection<String> removed =
+				resource.removeEntries(remove.getEntryName());
+		ret = new String[removed.size()];
+		removed.toArray(ret);
+		resource.commit();
+
+		return ret;
 	}
 
-
-
 	static public class X509AuthnAttributeHandlers extends
-			AbstractAttributeHandler {
+			AbstractAttributeHandler
+	{
 		public X509AuthnAttributeHandlers(AttributePackage pkg)
-				throws NoSuchMethodException {
+				throws NoSuchMethodException
+		{
 			super(pkg);
 		}
 
-		public Collection<MessageElement> getTransferMechsAttr() {
+		public Collection<MessageElement> getTransferMechsAttr()
+		{
 			ArrayList<MessageElement> ret = new ArrayList<MessageElement>();
 
 			ret.add(new MessageElement(new QName(
@@ -611,7 +764,8 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 		}
 
 		@Override
-		protected void registerHandlers() throws NoSuchMethodException {
+		protected void registerHandlers() throws NoSuchMethodException
+		{
 			addHandler(new QName(ByteIOConstants.RANDOM_BYTEIO_NS,
 					ByteIOConstants.XFER_MECHS_ATTR_NAME),
 					"getTransferMechsAttr");

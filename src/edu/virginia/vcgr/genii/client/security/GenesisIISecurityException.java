@@ -25,47 +25,49 @@ public class GenesisIISecurityException extends BaseFaultType
 {
 	static final long serialVersionUID = 0;
 
-	protected Throwable _myCause = null; 
-	
+	protected Throwable _myCause = null;
+
 	public GenesisIISecurityException(String msg)
 	{
 		super(null, Calendar.getInstance(), null, null,
-			new BaseFaultTypeDescription[] {
-				new BaseFaultTypeDescription(msg)}, null);
+				new BaseFaultTypeDescription[] { new BaseFaultTypeDescription(
+						msg) }, null);
 		this.setFaultString(msg);
 	}
 
 	public GenesisIISecurityException(String msg, Throwable cause)
 	{
-		super(null, Calendar.getInstance(), null, null,
-			getDescriptions(msg, cause), null);
-		
+		super(null, Calendar.getInstance(), null, null, getDescriptions(msg,
+				cause), null);
+
 		_myCause = cause;
 		this.setFaultString(msg);
 	}
 
-	public Throwable getCause() {
+	public Throwable getCause()
+	{
 		return _myCause;
-	}	
-	
-	public String getMessage() {
+	}
+
+	public String getMessage()
+	{
 		BaseFaultTypeDescription[] descs = getDescription();
-		if ((descs != null) && (descs.length > 0)) {
+		if ((descs != null) && (descs.length > 0))
+		{
 			return getDescription(0).get_value();
 		}
 		return super.getMessage();
 	}
-	
-	static private BaseFaultTypeDescription[] getDescriptions(
-		String msg, Throwable cause)
+
+	static private BaseFaultTypeDescription[] getDescriptions(String msg,
+			Throwable cause)
 	{
 		if (msg == null)
 			msg = cause.toString();
-		
+
 		return new BaseFaultTypeDescription[] {
-			new BaseFaultTypeDescription(msg),
-			new BaseFaultTypeDescription("Caused by:"),
-			new BaseFaultTypeDescription(cause.toString())
-		};
+				new BaseFaultTypeDescription(msg),
+				new BaseFaultTypeDescription("Caused by:"),
+				new BaseFaultTypeDescription(cause.toString()) };
 	}
 }

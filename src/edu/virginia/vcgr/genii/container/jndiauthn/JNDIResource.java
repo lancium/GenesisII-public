@@ -32,55 +32,64 @@ import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 import edu.virginia.vcgr.genii.container.rns.RNSDBResource;
 
-
-public class JNDIResource extends RNSDBResource implements IJNDIResource {
+public class JNDIResource extends RNSDBResource implements IJNDIResource
+{
 
 	// used for pulling out the credential duration
-	static private final QName _SERVICES_QNAME = new QName(
-			GenesisIIConstants.GENESISII_NS, "services");
+	static private final QName _SERVICES_QNAME =
+			new QName(GenesisIIConstants.GENESISII_NS, "services");
 	static protected Long _resourceCertificateLifetime = null;
 
 	// used for encoding the end certificate into the resource properties
 	static private final String _RESOURCE_CERT_NAME = "resource-cert";
-	static private QName _RESOURCE_CERT_QNAME = new QName(
-			GenesisIIConstants.GENESISII_NS, _RESOURCE_CERT_NAME);
+	static private QName _RESOURCE_CERT_QNAME =
+			new QName(GenesisIIConstants.GENESISII_NS, _RESOURCE_CERT_NAME);
 
 	// transient properties for the resource
-	transient protected HashMap<String, Object> _properties = new HashMap<String, Object>();
-
+	transient protected HashMap<String, Object> _properties =
+			new HashMap<String, Object>();
 
 	public JNDIResource(ResourceKey parentKey,
 			DatabaseConnectionPool connectionPool,
-			IResourceKeyTranslater translater) throws SQLException {
+			IResourceKeyTranslater translater) throws SQLException
+	{
 
 		super(parentKey, connectionPool, translater);
 	}
 
-	public boolean isIdpResource() {
-		if (_resourceKey == null) {
+	public boolean isIdpResource()
+	{
+		if (_resourceKey == null)
+		{
 			return false;
 		}
-		if (_resourceKey.contains("IDP")) {
+		if (_resourceKey.contains("IDP"))
+		{
 			return true;
 		}
 		return false;
 	}
-	
-	public String getIdpName() throws ResourceException {
 
-		if (!isIdpResource()) {
+	public String getIdpName() throws ResourceException
+	{
+
+		if (!isIdpResource())
+		{
 			throw new ResourceException("Not an IDP resource");
 		}
 
 		return _resourceKey.substring(_resourceKey.lastIndexOf(':') + 1);
 	}
 
-	public StsType getStsType() throws ResourceException {
-		if (isServiceResource()) {
+	public StsType getStsType() throws ResourceException
+	{
+		if (isServiceResource())
+		{
 			throw new ResourceException("Not a STS or IDP resource");
 		}
 
-		if (isIdpResource()) {
+		if (isIdpResource())
+		{
 			// IDP for a specific identity
 			String type = _resourceKey.substring(0, _resourceKey.indexOf(':'));
 			return StsType.valueOf(type.toUpperCase());
@@ -94,41 +103,52 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource {
 
 	}
 
-	public URI createChildIdpEpi(String childName) throws URI.MalformedURIException,
-			ResourceException {
+	public URI createChildIdpEpi(String childName)
+			throws URI.MalformedURIException, ResourceException
+	{
 
-		if (isServiceResource() || isIdpResource()) {
+		if (isServiceResource() || isIdpResource())
+		{
 			throw new ResourceException("Not a STS resource");
 		}
 
-		String type = (String) getProperty(SecurityConstants.NEW_JNDI_STS_TYPE_QNAME
-				.getLocalPart());
+		String type =
+				(String) getProperty(SecurityConstants.NEW_JNDI_STS_TYPE_QNAME
+						.getLocalPart());
 
 		String epiStr = type + ":" + _resourceKey + ":IDP:" + childName;
-		
+
 		return new URI(epiStr);
 	}
 
 	@SuppressWarnings("unchecked")
 	protected long getResourceCertLifetime() throws ResourceException,
-			ConfigurationException {
-		synchronized (this.getClass()) {
+			ConfigurationException
+	{
+		synchronized (this.getClass())
+		{
 
-			if (_resourceCertificateLifetime != null) {
+			if (_resourceCertificateLifetime != null)
+			{
 				return _resourceCertificateLifetime.longValue();
 			}
 
-			XMLConfiguration conf = ConfigurationManager
-					.getCurrentConfiguration().getContainerConfiguration();
+			XMLConfiguration conf =
+					ConfigurationManager.getCurrentConfiguration()
+							.getContainerConfiguration();
 			ArrayList<Object> sections;
 			sections = conf.retrieveSections(_SERVICES_QNAME);
-			for (Object obj : sections) {
-				HashMap<String, ServiceDescription> services = (HashMap<String, ServiceDescription>) obj;
-				ServiceDescription desc = services.get(this
-						.getParentResourceKey().getServiceName());
-				if (desc != null) {
-					_resourceCertificateLifetime = new Long(desc
-							.getResourceCertificateLifetime());
+			for (Object obj : sections)
+			{
+				HashMap<String, ServiceDescription> services =
+						(HashMap<String, ServiceDescription>) obj;
+				ServiceDescription desc =
+						services.get(this.getParentResourceKey()
+								.getServiceName());
+				if (desc != null)
+				{
+					_resourceCertificateLifetime =
+							new Long(desc.getResourceCertificateLifetime());
 					break;
 				}
 			}
@@ -136,78 +156,99 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource {
 		}
 	}
 
-
 	public void load(ReferenceParametersType refParams)
-			throws ResourceUnknownFaultType, ResourceException {
+			throws ResourceUnknownFaultType, ResourceException
+	{
 
 		_resourceKey = (String) _translater.unwrap(refParams);
 
-		if (!isIdpResource()) {
+		if (!isIdpResource())
+		{
 			super.load(refParams);
 			return;
 		}
 
-
-
-		for (MessageElement element : refParams.get_any()) {
-			if (element.getQName().equals(_RESOURCE_CERT_QNAME)) {
-				element = element.getChildElement(new QName(
-						org.apache.ws.security.WSConstants.WSSE11_NS,
-						"SecurityTokenReference"));
-				if (element != null) {
-					try {
-						X509Certificate[] callersNotionOfMe = WSSecurityUtils
-								.getChainFromPkiPathSecTokenRef(element);
+		for (MessageElement element : refParams.get_any())
+		{
+			if (element.getQName().equals(_RESOURCE_CERT_QNAME))
+			{
+				element =
+						element.getChildElement(new QName(
+								org.apache.ws.security.WSConstants.WSSE11_NS,
+								"SecurityTokenReference"));
+				if (element != null)
+				{
+					try
+					{
+						X509Certificate[] callersNotionOfMe =
+								WSSecurityUtils
+										.getChainFromPkiPathSecTokenRef(element);
 						setProperty(CERTIFICATE_CHAIN_PROPERTY_NAME,
 								callersNotionOfMe);
-					} catch (GeneralSecurityException e) {
+					}
+					catch (GeneralSecurityException e)
+					{
 						throw new ResourceException(e.getMessage(), e);
 					}
 				}
-			
-			} else if (element.getQName().equals(SecurityConstants.NEW_JNDI_STS_HOST_QNAME)) {
-				setProperty(
-						SecurityConstants.NEW_JNDI_STS_HOST_QNAME.getLocalPart(), 
-						element.getFirstChild().getNodeValue());
-			} else if (element.getQName().equals(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME)) {
-				setProperty(
-						SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME.getLocalPart(), 
-						element.getFirstChild().getNodeValue());
+
+			}
+			else if (element.getQName().equals(
+					SecurityConstants.NEW_JNDI_STS_HOST_QNAME))
+			{
+				setProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME
+						.getLocalPart(), element.getFirstChild().getNodeValue());
+			}
+			else if (element.getQName().equals(
+					SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME))
+			{
+				setProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME
+						.getLocalPart(), element.getFirstChild().getNodeValue());
 			}
 		}
 	}
 
 	public void initialize(HashMap<QName, Object> constructionParams)
-			throws ResourceException {
+			throws ResourceException
+	{
 
-		Boolean isIdpResource = (Boolean) constructionParams
-				.get(IJNDIResource.IS_IDP_RESOURCE_CONSTRUCTION_PARAM);
-		Boolean isServiceResource = (Boolean)constructionParams.get(
-				IResource.IS_SERVICE_CONSTRUCTION_PARAM);
+		Boolean isIdpResource =
+				(Boolean) constructionParams
+						.get(IJNDIResource.IS_IDP_RESOURCE_CONSTRUCTION_PARAM);
+		Boolean isServiceResource =
+				(Boolean) constructionParams
+						.get(IResource.IS_SERVICE_CONSTRUCTION_PARAM);
 
-		if (isIdpResource != null && isIdpResource.booleanValue()) {
+		if (isIdpResource != null && isIdpResource.booleanValue())
+		{
 
-			_resourceKey = ((URI) constructionParams
-					.get(ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM)).toString();
-		} else if (isServiceResource == null || !isServiceResource.booleanValue()) {
+			_resourceKey =
+					((URI) constructionParams
+							.get(ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM))
+							.toString();
+		}
+		else if (isServiceResource == null || !isServiceResource.booleanValue())
+		{
 
 			super.initialize(constructionParams);
 
-			setProperty(
-				SecurityConstants.NEW_JNDI_STS_NAME_QNAME.getLocalPart(), 
-				constructionParams.get(SecurityConstants.NEW_JNDI_STS_NAME_QNAME));
-			setProperty(
-				SecurityConstants.NEW_JNDI_STS_TYPE_QNAME.getLocalPart(), 
-				constructionParams.get(SecurityConstants.NEW_JNDI_STS_TYPE_QNAME));
-			setProperty(
-				SecurityConstants.NEW_JNDI_STS_HOST_QNAME.getLocalPart(), 
-				constructionParams.get(SecurityConstants.NEW_JNDI_STS_HOST_QNAME));
-			setProperty(
-				SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME.getLocalPart(), 
-				constructionParams.get(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME));
+			setProperty(SecurityConstants.NEW_JNDI_STS_NAME_QNAME
+					.getLocalPart(), constructionParams
+					.get(SecurityConstants.NEW_JNDI_STS_NAME_QNAME));
+			setProperty(SecurityConstants.NEW_JNDI_STS_TYPE_QNAME
+					.getLocalPart(), constructionParams
+					.get(SecurityConstants.NEW_JNDI_STS_TYPE_QNAME));
+			setProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME
+					.getLocalPart(), constructionParams
+					.get(SecurityConstants.NEW_JNDI_STS_HOST_QNAME));
+			setProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME
+					.getLocalPart(), constructionParams
+					.get(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME));
 
-		} else {
-		
+		}
+		else
+		{
+
 			super.initialize(constructionParams);
 		}
 	}
@@ -221,17 +262,23 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource {
 	 * @throws ResourceException
 	 *             If anything goes wrong.
 	 */
-	public Object getProperty(String propertyName) throws ResourceException {
+	public Object getProperty(String propertyName) throws ResourceException
+	{
 
-		if (!isIdpResource()) {
+		if (!isIdpResource())
+		{
 			return super.getProperty(propertyName);
 		}
 
-		if (propertyName.equals(IResource.ENDPOINT_IDENTIFIER_PROPERTY_NAME)) {
+		if (propertyName.equals(IResource.ENDPOINT_IDENTIFIER_PROPERTY_NAME))
+		{
 			// calculate the epi
-			try {
+			try
+			{
 				return new URI(_resourceKey);
-			} catch (URI.MalformedURIException e) {
+			}
+			catch (URI.MalformedURIException e)
+			{
 				throw new ResourceException(e.getMessage(), e);
 			}
 		}
@@ -251,9 +298,11 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource {
 	 *             If anything goes wrong.
 	 */
 	public void setProperty(String propertyName, Object value)
-			throws ResourceException {
+			throws ResourceException
+	{
 
-		if (!isIdpResource()) {
+		if (!isIdpResource())
+		{
 			super.setProperty(propertyName, value);
 			return;
 		}
@@ -267,9 +316,11 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource {
 	 * @throws ResourceException
 	 *             If anything goes wrong.
 	 */
-	public void destroy() throws ResourceException {
+	public void destroy() throws ResourceException
+	{
 
-		if (!isIdpResource()) {
+		if (!isIdpResource())
+		{
 			super.destroy();
 			return;
 		}
@@ -278,9 +329,11 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource {
 	}
 
 	public Collection<SubscriptionInformation> matchSubscriptions(
-			String topicExpression) throws ResourceException {
+			String topicExpression) throws ResourceException
+	{
 
-		if (!isIdpResource()) {
+		if (!isIdpResource())
+		{
 			return super.matchSubscriptions(topicExpression);
 		}
 
@@ -296,98 +349,128 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource {
 	 *             If anything goes wrong.
 	 */
 	public ReferenceParametersType getResourceParameters()
-			throws ResourceException {
+			throws ResourceException
+	{
 
 		ReferenceParametersType refParams = super.getResourceParameters();
 
-		if (!isIdpResource()) {
+		if (!isIdpResource())
+		{
 			return refParams;
 		}
 
-		ArrayList<MessageElement> mels = new ArrayList<MessageElement>(
-				Arrays.asList(refParams.get_any()));
+		ArrayList<MessageElement> mels =
+				new ArrayList<MessageElement>(Arrays
+						.asList(refParams.get_any()));
 
 		// add the end-certificate as a new reference parameter
-		X509Certificate[] certChain = (X509Certificate[]) getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
-		if (certChain != null && (refParams != null)) {
+		X509Certificate[] certChain =
+				(X509Certificate[]) getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
+		if (certChain != null && (refParams != null))
+		{
 
-			try {
-				MessageElement certRef = new MessageElement(
-						_RESOURCE_CERT_QNAME);
+			try
+			{
+				MessageElement certRef =
+						new MessageElement(_RESOURCE_CERT_QNAME);
 				certRef.addChild(WSSecurityUtils
 						.makePkiPathSecTokenRef(certChain));
 				mels.add(certRef);
-			} catch (SOAPException e) {
+			}
+			catch (SOAPException e)
+			{
 				throw new ResourceException(e.getMessage(), e);
-			} catch (GeneralSecurityException e) {
+			}
+			catch (GeneralSecurityException e)
+			{
 				throw new ResourceException(e.getMessage(), e);
 			}
 		}
 
 		// add all of our creation params
-		try {
+		try
+		{
 			ResourceKey stsKey = ResourceManager.getCurrentResource();
 			IResource stsResource = stsKey.dereference();
 
 			MessageElement stsParm = null;
-			
-			stsParm = new MessageElement(
-					SecurityConstants.NEW_JNDI_STS_HOST_QNAME, 
-					stsResource.getProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME.getLocalPart()));
+
+			stsParm =
+					new MessageElement(
+							SecurityConstants.NEW_JNDI_STS_HOST_QNAME,
+							stsResource
+									.getProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME
+											.getLocalPart()));
 			mels.add(stsParm);
-			stsParm = new MessageElement(
-					SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME, 
-					stsResource.getProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME.getLocalPart()));
+			stsParm =
+					new MessageElement(
+							SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME,
+							stsResource
+									.getProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME
+											.getLocalPart()));
 			mels.add(stsParm);
 
-		} catch (ResourceUnknownFaultType e) {
+		}
+		catch (ResourceUnknownFaultType e)
+		{
 			throw new ResourceException(e.getMessage(), e);
 		}
-		
-		
+
 		refParams.set_any(mels.toArray(new MessageElement[0]));
 
 		return refParams;
 	}
 
 	public void addEntry(InternalEntry entry) throws ResourceException,
-			RNSEntryExistsFaultType {
-		
-		if (isServiceResource()) {
+			RNSEntryExistsFaultType
+	{
+
+		if (isServiceResource())
+		{
 			super.addEntry(entry);
 			return;
 		}
-		
-		throw new ResourceException("Resource is not a JNDIAuthnPortType resource");
+
+		throw new ResourceException(
+				"Resource is not a JNDIAuthnPortType resource");
 	}
 
-	public Collection<String> listEntries() throws ResourceException {
+	public Collection<String> listEntries() throws ResourceException
+	{
 
-		if (isServiceResource()) {
+		if (isServiceResource())
+		{
 			return super.listEntries();
 		}
-		
-		throw new ResourceException("Resource is not a JNDIAuthnPortType resource");
+
+		throw new ResourceException(
+				"Resource is not a JNDIAuthnPortType resource");
 	}
 
 	public Collection<InternalEntry> retrieveEntries(String entryName)
-			throws ResourceException {
+			throws ResourceException
+	{
 
-		if (isServiceResource()) {
+		if (isServiceResource())
+		{
 			return super.retrieveEntries(entryName);
 		}
-		
-		throw new ResourceException("Resource is not a JNDIAuthnPortType resource");
+
+		throw new ResourceException(
+				"Resource is not a JNDIAuthnPortType resource");
 	}
 
 	public Collection<String> removeEntries(String entryName)
-			throws ResourceException {
+			throws ResourceException
+	{
 
-		if (isServiceResource()) {
+		if (isServiceResource())
+		{
 			return super.removeEntries(entryName);
 		}
-		
-		throw new ResourceException("Resource is not a JNDIAuthnPortType resource");
+
+		throw new ResourceException(
+				"Resource is not a JNDIAuthnPortType resource");
 	}
 
 };

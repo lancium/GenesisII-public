@@ -12,13 +12,13 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceProvider;
 public class JNDIResourceProvider extends BasicDBResourceProvider
 {
 	public JNDIResourceProvider(Properties props)
-		throws ConfigurationException, SQLException
+			throws ConfigurationException, SQLException
 	{
 		super(props);
 	}
-	
-	protected IResourceFactory instantiateResourceFactory(DatabaseConnectionPool pool)
-		throws SQLException
+
+	protected IResourceFactory instantiateResourceFactory(
+			DatabaseConnectionPool pool) throws SQLException
 	{
 		return new JNDIResourceFactory(pool, getTranslater());
 	}

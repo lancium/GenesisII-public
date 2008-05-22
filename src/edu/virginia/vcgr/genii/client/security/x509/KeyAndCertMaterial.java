@@ -19,14 +19,17 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.io.*;
 
-public class KeyAndCertMaterial implements Serializable {
+public class KeyAndCertMaterial implements Serializable
+{
 
 	static final long serialVersionUID = 0L;
-	
+
 	public X509Certificate[] _clientCertChain = null;
 	public PrivateKey _clientPrivateKey = null;
 
-	public KeyAndCertMaterial(X509Certificate[] clientCertChain, PrivateKey clientPrivateKey) {
+	public KeyAndCertMaterial(X509Certificate[] clientCertChain,
+			PrivateKey clientPrivateKey)
+	{
 		_clientCertChain = clientCertChain;
 		_clientPrivateKey = clientPrivateKey;
 	}

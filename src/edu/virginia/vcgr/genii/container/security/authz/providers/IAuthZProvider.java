@@ -26,49 +26,47 @@ import edu.virginia.vcgr.genii.client.security.MessageLevelSecurity;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.AuthZSecurityException;
 import edu.virginia.vcgr.genii.common.security.AuthZConfig;
 
-public interface IAuthZProvider {
+public interface IAuthZProvider
+{
 
-	static public final String CALLING_CONTEXT_CALLER_CERT = 
-		"genii.container.security.authz.caller-cert";
-	
-	/**
-	 * Configures the resource with default access control state.
-	 * This configuration may be based upon informatin within the 
-	 * specified working context   
-	 */
-	public void setDefaultAccess(
-			ICallingContext callingContext, 
-			IResource resource,
-			X509Certificate[] serviceCertChain) 
-				throws AuthZSecurityException, ResourceException;
-	
-	/**
-	 * Returns whether or not an invocation of the specified method 
-	 * on the target resource is allowable with the given working 
-	 * context 
-	 */
-	public boolean checkAccess(
-			ICallingContext callingContext, 
-			X509Certificate callerCert,
-			IResource resource,
-			Method operation) throws AuthZSecurityException, ResourceException;
-	
-	/**
-	 * Returns the minimum level of incoming message level security required
-	 * for the specified resource  
-	 */
-	public MessageLevelSecurity getMinIncomingMsgLevelSecurity(IResource resource) 
-		throws AuthZSecurityException, ResourceException;
+	static public final String CALLING_CONTEXT_CALLER_CERT =
+			"genii.container.security.authz.caller-cert";
 
 	/**
-	 * Returns the entire AuthZ configuration for the resource  
+	 * Configures the resource with default access control state. This
+	 * configuration may be based upon informatin within the specified working
+	 * context
 	 */
-	public AuthZConfig getAuthZConfig(IResource resource) throws AuthZSecurityException, ResourceException;
-	
+	public void setDefaultAccess(ICallingContext callingContext,
+			IResource resource, X509Certificate[] serviceCertChain)
+			throws AuthZSecurityException, ResourceException;
+
 	/**
-	 * Sets the entire AuthZ configuration for the resource 
+	 * Returns whether or not an invocation of the specified method on the
+	 * target resource is allowable with the given working context
 	 */
-	public void setAuthZConfig(AuthZConfig config, IResource resource) 
-		throws AuthZSecurityException, ResourceException;
+	public boolean checkAccess(ICallingContext callingContext,
+			X509Certificate callerCert, IResource resource, Method operation)
+			throws AuthZSecurityException, ResourceException;
+
+	/**
+	 * Returns the minimum level of incoming message level security required for
+	 * the specified resource
+	 */
+	public MessageLevelSecurity getMinIncomingMsgLevelSecurity(
+			IResource resource) throws AuthZSecurityException,
+			ResourceException;
+
+	/**
+	 * Returns the entire AuthZ configuration for the resource
+	 */
+	public AuthZConfig getAuthZConfig(IResource resource)
+			throws AuthZSecurityException, ResourceException;
+
+	/**
+	 * Sets the entire AuthZ configuration for the resource
+	 */
+	public void setAuthZConfig(AuthZConfig config, IResource resource)
+			throws AuthZSecurityException, ResourceException;
 
 }
