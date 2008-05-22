@@ -9,7 +9,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.ws.addressing.EndpointReferenceType;
@@ -79,7 +78,7 @@ public class ApplicationDescriptionUtils
 		File deployDirectory,
 		DeploymentDocumentType deploymentDocument,
 		IUploadProgressListener listener)
-		throws IOException, RNSException, ConfigurationException
+		throws IOException, RNSException
 	{
 		MessageElement []any = deploymentDocument.get_any();
 		if (any == null || any.length != 1)
@@ -122,7 +121,7 @@ public class ApplicationDescriptionUtils
 	static private ZipJarDeploymentType uploadLocalSources(
 		File deployDirectory, ZipJarDeploymentType deploymentInfo,
 		IUploadProgressListener listener)
-			throws IOException, RNSException, ConfigurationException
+			throws IOException, RNSException
 	{
 		ZipJarSourceType source = deploymentInfo.getSource();
 		
@@ -136,7 +135,7 @@ public class ApplicationDescriptionUtils
 	static private BinDeploymentType uploadLocalSources(
 		File deployDirectory, BinDeploymentType deploymentInfo,
 		IUploadProgressListener listener)
-			throws IOException, RNSException, ConfigurationException
+			throws IOException, RNSException
 	{
 		NamedSourceType []sources = deploymentInfo.getBinary();
 		if (sources != null)
@@ -183,7 +182,7 @@ public class ApplicationDescriptionUtils
 	static private MessageElement[] uploadLocalSource(
 		File deployDirectory, MessageElement []any,
 		IUploadProgressListener listener)
-		throws IOException, RNSException, ConfigurationException
+		throws IOException, RNSException
 	{
 		if (any == null)
 			return null;
@@ -232,11 +231,6 @@ public class ApplicationDescriptionUtils
 			newFile = null;
 			
 			return ret;
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new IOException("Unable to create ByteIO Resource:  " +
-				ce.getLocalizedMessage());
 		}
 		catch (CreationException ce)
 		{

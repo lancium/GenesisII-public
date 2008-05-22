@@ -8,7 +8,6 @@ import java.util.jar.JarInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -93,10 +92,6 @@ public class ZipJarDeploymentProvider extends AbstractDeploymentProvider
 			}
 			File binary = new File(cwd, _deploymentDescription.getBinaryName());
 			FileSystemUtils.makeExecutable(binary);
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new DeploymentException("Unable to deploy application.", ce);
 		}
 		catch (IOException ioe)
 		{

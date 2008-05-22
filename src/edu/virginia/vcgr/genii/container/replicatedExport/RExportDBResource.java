@@ -19,7 +19,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.RNSEntryExistsFaultType;
 import org.morgan.util.GUID;
-import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.ReferenceParametersType;
 
@@ -267,46 +266,40 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 				String entryType, String localPath, String parentIds)
 		throws ResourceException, RemoteException
 	{
-		try
-		{
-			_logger.info("Creating new rexport entries");
+		_logger.info("Creating new rexport entries");
 			
-			MessageElement []creationProperties = RExportUtils.createCreationProperties(
-					localPath, parentIds, null);
-			
-			/* create new RExport resource */
-			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, serviceEPR);
-			VcgrCreateResponse resp = common.vcgrCreate(
-				new VcgrCreate(creationProperties));
-			
-			EndpointReferenceType entryReference = resp.getEndpoint();
+		MessageElement []creationProperties = RExportUtils.createCreationProperties(
+				localPath, parentIds, null);
 		
-			//update entryref to include resolver epr
-			try{
-				entryReference = RExportResolverUtils.setupRExport(
-						entryReference, 
-						entryType,
-						creationProperties[0].getValue(),
-						null,
-						nextRealName);
-			}
-			catch (Exception e){
-				_logger.error("Unable to create rexport resolver: " + e.getLocalizedMessage());
-				throw new ResourceException("Unable to create rexport resolver.", e);
-			}
+		/* create new RExport resource */
+		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, serviceEPR);
+		VcgrCreateResponse resp = common.vcgrCreate(
+			new VcgrCreate(creationProperties));
 		
-			//create entry for new export resource in export DB
-			String newId = (new GUID()).toString();
-			RExportEntry newEntry = new RExportEntry(
-					getId(), nextRealName, entryReference, newId, 
-					entryType, null);
-				addEntry(newEntry, false);
-				
-			return newEntry;
+		EndpointReferenceType entryReference = resp.getEndpoint();
+	
+		//update entryref to include resolver epr
+		try{
+			entryReference = RExportResolverUtils.setupRExport(
+					entryReference, 
+					entryType,
+					creationProperties[0].getValue(),
+					null,
+					nextRealName);
 		}
-		catch (ConfigurationException ce){
-			throw new ResourceException("Could not create new expot entry.", ce);
+		catch (Exception e){
+			_logger.error("Unable to create rexport resolver: " + e.getLocalizedMessage());
+			throw new ResourceException("Unable to create rexport resolver.", e);
 		}
+	
+		//create entry for new export resource in export DB
+		String newId = (new GUID()).toString();
+		RExportEntry newEntry = new RExportEntry(
+				getId(), nextRealName, entryReference, newId, 
+				entryType, null);
+			addEntry(newEntry, false);
+			
+		return newEntry;
 	}
 	
 	/*

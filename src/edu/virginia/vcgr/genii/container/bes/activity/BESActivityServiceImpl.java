@@ -32,7 +32,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.morgan.util.GUID;
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.GuaranteedDirectory;
 import org.morgan.util.io.StreamUtils;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
@@ -145,10 +144,6 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 		{
 			throw new RemoteException("Unable to create new activity.", fnfe);
 		}
-		catch (ConfigurationException ce)
-		{
-			throw new RemoteException("Unable to create new activity.", ce);
-		}
 		catch (SQLException sqe)
 		{
 			throw new RemoteException("Unable to create new activity.", sqe);
@@ -248,14 +243,6 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 				new ResourceCreationFaultType(null, null, null, null,
 					new BaseFaultTypeDescription[] {
 						new BaseFaultTypeDescription(sqe.getLocalizedMessage()) },
-					null));
-		}
-		catch (ConfigurationException ce)
-		{
-			throw FaultManipulator.fillInFault(
-				new ResourceCreationFaultType(null, null, null, null,
-					new BaseFaultTypeDescription[] {
-						new BaseFaultTypeDescription(ce.getLocalizedMessage()) },
 					null));
 		}
 		catch (IOException ioe)

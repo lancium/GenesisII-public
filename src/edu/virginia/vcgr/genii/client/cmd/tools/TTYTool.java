@@ -4,8 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.rmi.RemoteException;
 
-import org.morgan.util.configuration.ConfigurationException;
-
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
@@ -63,7 +61,7 @@ public class TTYTool extends BaseGridTool
 	}
 	
 	public void watch(String path) 
-		throws RNSException, ConfigurationException, 
+		throws RNSException,
 			ToolException, TTYException, FileNotFoundException,
 			RemoteException, IOException
 	{
@@ -79,7 +77,7 @@ public class TTYTool extends BaseGridTool
 			TTYConstants.TTY_CALLING_CONTEXT_PROPERTY, EPRUtils.toBytes(rPath.getEndpoint()));
 	}
 	
-	public void unwatch() throws TTYException, IOException, ConfigurationException
+	public void unwatch() throws TTYException, IOException
 	{
 		TTYWatcher.unwatch();
 		ContextManager.getCurrentContext().removeProperty(

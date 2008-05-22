@@ -22,7 +22,6 @@ import java.util.Date;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
-import org.morgan.util.configuration.ConfigurationException;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyResponse;
 import org.ws.addressing.EndpointReferenceType;
@@ -254,7 +253,7 @@ public class TypeInformation
 	}
 	
 	private Date getTimeAttribute(String attrName)
-		throws RemoteException, ConfigurationException
+		throws RemoteException
 	{
 		QName attrQName = new QName(
 			(isRByteIO() ? ByteIOConstants.RANDOM_BYTEIO_NS : ByteIOConstants.STREAMABLE_BYTEIO_NS),

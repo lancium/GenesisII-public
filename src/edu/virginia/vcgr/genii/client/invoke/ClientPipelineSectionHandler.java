@@ -22,7 +22,7 @@ public class ClientPipelineSectionHandler implements IXMLConfigurationSectionHan
 	static private QName _PIPELINE_HANDLER_QNAME = new QName(_GENII_NS, _PIPELINE_HANDLER_NAME);
 	
 	@Override
-	public Object parse(Node n) throws ConfigurationException
+	public Object parse(Node n)
 	{
 		InvocationInterceptorManager mgr = new InvocationInterceptorManager();
 		

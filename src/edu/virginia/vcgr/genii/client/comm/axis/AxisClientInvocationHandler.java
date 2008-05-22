@@ -35,7 +35,6 @@ import org.ws.addressing.EndpointReferenceType;
 import org.apache.axis.configuration.FileProvider;
 
 import org.morgan.util.configuration.XMLConfiguration;
-import org.morgan.util.configuration.ConfigurationException;
 import org.ogf.schemas.naming._2006._08.naming.ResolveFailedWithReferralFaultType;
 
 import java.io.IOException;
@@ -156,22 +155,17 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			return __minClientMessageSec;
 		}
 		
-		try {
-			XMLConfiguration conf = 
-				ConfigurationManager.getCurrentConfiguration().getClientConfiguration();
+		XMLConfiguration conf = 
+			ConfigurationManager.getCurrentConfiguration().getClientConfiguration();
 	
-			Properties resourceIdSecProps = (Properties) conf.retrieveSection(
-					GenesisIIConstants.MESSAGE_SECURITY_PROPERTIES_SECTION_NAME);			
+		Properties resourceIdSecProps = (Properties) conf.retrieveSection(
+				GenesisIIConstants.MESSAGE_SECURITY_PROPERTIES_SECTION_NAME);			
 	
-			String minMessageSecurity = resourceIdSecProps.getProperty(
-				MIN_MESSAGE_SECURITY);
+		String minMessageSecurity = resourceIdSecProps.getProperty(
+			MIN_MESSAGE_SECURITY);
 			
-			__minClientMessageSec =  new MessageLevelSecurity(minMessageSecurity);
-			return __minClientMessageSec;
-			
-		} catch (ConfigurationException e) {
-			throw new GeneralSecurityException("Could not read minimum message level security configuration: " + e.getMessage(), e);
-		}
+		__minClientMessageSec =  new MessageLevelSecurity(minMessageSecurity);
+		return __minClientMessageSec;
 	}
 	
 	
@@ -435,30 +429,22 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	static private InvocationInterceptorManager _manager = null;
 	synchronized static private InvocationInterceptorManager getManager()
 	{
-		try
+		if (_manager == null)
 		{
-			if (_manager == null)
-			{
-				_manager = (InvocationInterceptorManager)ConfigurationManager.getCurrentConfiguration(
-					).getClientConfiguration().retrieveSection(
-							new QName("http://vcgr.cs.virginia.edu/Genesis-II", "client-pipeline"));
-			}
-			
-			if (_manager == null)
-			{
-				_logger.error("Couldn't find client pipeline configuration.");
-				return new InvocationInterceptorManager();
-			}
-			
-			return _manager;
+			_manager = (InvocationInterceptorManager)ConfigurationManager.getCurrentConfiguration(
+				).getClientConfiguration().retrieveSection(
+						new QName("http://vcgr.cs.virginia.edu/Genesis-II", "client-pipeline"));
 		}
-		catch (ConfigurationException ce)
+		
+		if (_manager == null)
 		{
-			_logger.error("Couldn't find client pipeline configuration.", ce);
+			_logger.error("Couldn't find client pipeline configuration.");
 			return new InvocationInterceptorManager();
 		}
-			
+		
+		return _manager;			
 	}
+	
 	public Object invoke(Object target, Method m, Object []params) throws Throwable
 	{
 		InvocationInterceptorManager mgr = getManager();
@@ -725,7 +711,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	
 	protected EndpointReferenceType callResolve(ResolverDescription resolver)
 		throws NameResolutionFailedException, ResourceException, 
-			GenesisIISecurityException, ConfigurationException, RemoteException
+			GenesisIISecurityException, RemoteException
 	{
 		try
 		{

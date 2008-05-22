@@ -63,14 +63,13 @@ public class ConnectTool extends BaseGridTool
 	
 
 	static public void connect(ICallingContext ctxt)
-		throws ConfigurationException, ResourceException, IOException
+		throws ResourceException, IOException
 	{
 		ContextManager.storeCurrentContext(ctxt);
 	}
 
 	static public void connect(String connectURL)
-		throws ResourceException, MalformedURLException, IOException,
-			ConfigurationException
+		throws ResourceException, MalformedURLException, IOException
 	{
 		boolean isWindows = SupportedOperatingSystems.current().equals(
 			SupportedOperatingSystems.WINDOWS);
@@ -80,7 +79,7 @@ public class ConnectTool extends BaseGridTool
 	}
 
 	static public void connect(ICallingContext ctxt, String deploymentDir)
-		throws ConfigurationException, ResourceException, IOException
+		throws ResourceException, IOException
 	{
 		ContextManager.storeCurrentContext(ctxt);
 		if (deploymentDir != null)
@@ -106,8 +105,7 @@ public class ConnectTool extends BaseGridTool
 	}
 	
 	static public void connect(String connectURL, String deploymentDir)
-		throws ResourceException, MalformedURLException, IOException,
-			ConfigurationException
+		throws ResourceException, MalformedURLException, IOException
 	{
 		boolean isWindows = SupportedOperatingSystems.current().equals(
 			SupportedOperatingSystems.WINDOWS);

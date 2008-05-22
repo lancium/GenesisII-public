@@ -21,7 +21,6 @@ import java.util.Properties;
 
 import org.apache.axis.message.MessageElement;
 
-import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
@@ -44,26 +43,20 @@ public class RExportResolverFactoryProxy implements IResolverFactoryProxy
 		EndpointReferenceType resolverReference = null;
 		EndpointReferenceType resolutionEPR = null;
 		
-		try{
-			RExportResolverFactoryPortType resolverFactoryService = 
-				ClientUtils.createProxy(
-					RExportResolverFactoryPortType.class,
-					EPRUtils.makeEPR(Container.getServiceURL(
-							"RExportResolverFactoryPortType")));
-			CreateResolverResponseType resp = resolverFactoryService.createResolver(
-					new CreateResolverRequestType(targetEPR, creationProps));
-			
-			if (resp == null)
-				return null;
-			
-			resolverReference = resp.getResolver_EPR();
-			resolutionEPR = resp.getResolution_EPR();
-		}
-		catch(ConfigurationException ce){
-			throw new ResourceException(
-					"Factory could not create RExortResolver.", ce);
-		}
+		RExportResolverFactoryPortType resolverFactoryService = 
+			ClientUtils.createProxy(
+				RExportResolverFactoryPortType.class,
+				EPRUtils.makeEPR(Container.getServiceURL(
+						"RExportResolverFactoryPortType")));
+		CreateResolverResponseType resp = resolverFactoryService.createResolver(
+				new CreateResolverRequestType(targetEPR, creationProps));
 		
+		if (resp == null)
+			return null;
+		
+		resolverReference = resp.getResolver_EPR();
+		resolutionEPR = resp.getResolution_EPR();
+				
 		return new Resolution(resolutionEPR, resolverReference);
 	}
 }

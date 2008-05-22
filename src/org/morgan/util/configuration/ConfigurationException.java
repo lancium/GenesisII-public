@@ -20,7 +20,7 @@ package org.morgan.util.configuration;
   *
   * @author Mark Morgan (mark@mark-morgan.org)
   */
-public class ConfigurationException extends Exception
+public class ConfigurationException extends RuntimeException
 {
 	static final long serialVersionUID = 0;
 	

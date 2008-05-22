@@ -17,9 +17,7 @@ import org.ggf.rns.RNSEntryExistsFaultType;
 import org.ggf.rns.RNSEntryNotDirectoryFaultType;
 import org.ggf.rns.RNSFaultType;
 
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
-import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 
 
@@ -40,7 +38,6 @@ import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverUtils;
 import edu.virginia.vcgr.genii.container.resource.IResource;
-import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
 public class RExportUtils
 {
@@ -98,20 +95,12 @@ public class RExportUtils
 		EndpointReferenceType replicaEPR = null;
 		
 		/*create instance of correct (dir or file) replication service*/
-		try {
-			GeniiCommon replicaCommon = ClientUtils.createProxy(
-					GeniiCommon.class, replicaServiceEPR);
-			VcgrCreateResponse replicaResp = replicaCommon.vcgrCreate(
-				new VcgrCreate(replicaCreationProperties));
-			//get EPR to created replica
-			replicaEPR = replicaResp.getEndpoint();
-		}
-		catch (ConfigurationException ce){
-			throw FaultManipulator.fillInFault(new RNSFaultType(null, null, null, null,
-				new BaseFaultTypeDescription[] {
-					new BaseFaultTypeDescription(ce.getLocalizedMessage())
-			}, null, null));
-		}
+		GeniiCommon replicaCommon = ClientUtils.createProxy(
+				GeniiCommon.class, replicaServiceEPR);
+		VcgrCreateResponse replicaResp = replicaCommon.vcgrCreate(
+			new VcgrCreate(replicaCreationProperties));
+		//get EPR to created replica
+		replicaEPR = replicaResp.getEndpoint();
 		
 		//copy data from primary to replica if file
 		if (entryType.equals(RExportResolverUtils._FILE_TYPE)){

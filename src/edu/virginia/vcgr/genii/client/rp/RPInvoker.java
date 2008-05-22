@@ -14,7 +14,6 @@ import javax.xml.namespace.QName;
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.morgan.util.configuration.ConfigurationException;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnavailableFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -688,11 +687,11 @@ public class RPInvoker implements InvocationHandler
 	 * @param target The target resource to get/set RPs for.
 	 * 
 	 * @throws GenesisIISecurityException
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws ResourceException
 	 */
 	public RPInvoker(Collection<QName> likelyRPs, EndpointReferenceType target)
-		throws GenesisIISecurityException, ConfigurationException, 
+		throws GenesisIISecurityException, 
 			ResourceException
 	{
 		_likelyRPs = likelyRPs;

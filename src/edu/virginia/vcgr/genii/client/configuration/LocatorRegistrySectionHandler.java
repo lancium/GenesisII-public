@@ -30,7 +30,6 @@ public class LocatorRegistrySectionHandler implements
 	static public final String LOCATOR_TYPE_NAME = "locator-type";
 	
 	static private Class<?> findClass(String className)
-		throws ConfigurationException
 	{
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		
@@ -45,7 +44,7 @@ public class LocatorRegistrySectionHandler implements
 		}
 	}
 	
-	public Object parse(Node n) throws ConfigurationException
+	public Object parse(Node n)
 	{
 		HashMap<String, Class<?>> locators = new HashMap<String, Class<?>>();
 		

@@ -3,8 +3,6 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 import java.io.IOException;
 import java.rmi.RemoteException;
 
-import org.morgan.util.configuration.ConfigurationException;
-
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
@@ -44,7 +42,7 @@ public class CdTool extends BaseGridTool
 
 	static public void chdir(String target)
 		throws ResourceException, RNSException, RemoteException,
-			ConfigurationException, IOException
+			IOException
 	{
 		ICallingContext ctxt = ContextManager.getCurrentContext();
 		RNSPath path = ctxt.getCurrentPath().lookup(

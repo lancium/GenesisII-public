@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Iterator;
 
-import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
@@ -21,7 +20,7 @@ public class WSIterable<Type> implements Iterable<Type>, Closeable
 	public WSIterable(Class<Type> cl,
 		EndpointReferenceType target,
 		int batchSize, boolean mustDestroy)
-		throws GenesisIISecurityException, ConfigurationException,
+		throws GenesisIISecurityException,
 			RemoteException
 	{
 		this(cl, new IteratorInitializationType(target, null),
@@ -31,7 +30,7 @@ public class WSIterable<Type> implements Iterable<Type>, Closeable
 	public WSIterable(Class<Type> cl,
 		IteratorInitializationType iterator,
 		int batchSize, boolean mustDestroy)
-		throws GenesisIISecurityException, ConfigurationException,
+		throws GenesisIISecurityException,
 			RemoteException
 	{
 		_class = cl;

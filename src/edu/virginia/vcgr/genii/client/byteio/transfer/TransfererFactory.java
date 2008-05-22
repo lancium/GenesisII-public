@@ -1,12 +1,12 @@
 package edu.virginia.vcgr.genii.client.byteio.transfer;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.TreeSet;
 
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
-import org.morgan.util.configuration.ConfigurationException;
 import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyResponse;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -61,11 +61,11 @@ abstract class TransfererFactory
 	 * and don't have any thing in common with each other (code-wise) so
 	 * a parameterized type here wouldn't help.
 	 * 
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws RemoteException
 	 */
 	protected TransfererFactory(Object clientStub)
-		throws ConfigurationException, RemoteException
+		throws RemoteException, IOException
 	{
 		_clientStub = clientStub;
 		
@@ -95,11 +95,11 @@ abstract class TransfererFactory
 	 * Given a target ByteIO, ask for it's attributes and figure out
 	 * which transfer protocols it supports.
 	 * 
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws RemoteException
 	 */
 	private void fillInPreferences()
-		throws ConfigurationException, RemoteException
+		throws RemoteException, IOException
 	{
 		EndpointReferenceType epr = ClientUtils.extractEPR(_clientStub);
 		GeniiCommon stub = ClientUtils.createProxy(GeniiCommon.class, epr);
@@ -138,7 +138,7 @@ abstract class TransfererFactory
 		
 		if (_supportedTransferTypes.size() == 0 ||
 			_preferredTransferType == null)
-			throw new ConfigurationException(
+			throw new IOException(
 				"Unable to determine supported or preferred " +
 				"transfer type for ByteIO.");
 	}
@@ -183,16 +183,16 @@ abstract class TransfererFactory
 	 * 
 	 * @return A newly create transferer.
 	 * 
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 */
 	protected Object createTransferer(String requestedTransferType)
-		throws ConfigurationException
+		throws IOException
 	{
 		if (requestedTransferType == null)
 			requestedTransferType = _preferredTransferType;
 		
 		if (!_supportedTransferTypes.contains(requestedTransferType))
-			throw new ConfigurationException(
+			throw new IOException(
 				"Target ByteIO does not support the \"" + 
 				requestedTransferType + "\" transfer type.");
 		
@@ -203,7 +203,7 @@ abstract class TransfererFactory
 		else if (requestedTransferType.equals(ByteIOConstants.TRANSFER_TYPE_SIMPLE))
 			return createSimpleTransferer(_clientStub);
 		else
-			throw new ConfigurationException("Internal error -- Don't know " +
+			throw new IOException("Internal error -- Don't know " +
 				"how to create a transferer for transfer type \"" + 
 				requestedTransferType + "\".");
 	}
@@ -213,10 +213,10 @@ abstract class TransfererFactory
 	 * 
 	 * @return The newly created transferer.
 	 * 
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 */
 	protected Object createTransferer()
-		throws ConfigurationException
+		throws IOException
 	{
 		return createTransferer(_preferredTransferType);
 	}

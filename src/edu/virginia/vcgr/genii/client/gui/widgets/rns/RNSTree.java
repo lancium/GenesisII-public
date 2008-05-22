@@ -41,7 +41,6 @@ import javax.swing.tree.TreePath;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
@@ -80,7 +79,7 @@ public class RNSTree extends JTree implements Autoscroll
 		addTreeExpansionListener(model);
 	}
 	
-	public RNSTree() throws ConfigurationException, RNSException
+	public RNSTree() throws RNSException
 	{
 		this(RNSPath.getCurrent().getRoot());
 	}

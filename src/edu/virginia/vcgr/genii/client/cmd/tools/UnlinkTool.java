@@ -2,8 +2,6 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.io.IOException;
 
-import org.morgan.util.configuration.ConfigurationException;
-
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
@@ -43,7 +41,7 @@ public class UnlinkTool extends BaseGridTool
 	
 	static public void unlink(RNSPath currentPath,
 		String filePath)
-		throws RNSException, ConfigurationException, IOException
+		throws RNSException, IOException
 	{
 		RNSPath file = currentPath.lookup(
 			filePath, RNSPathQueryFlags.MUST_EXIST);

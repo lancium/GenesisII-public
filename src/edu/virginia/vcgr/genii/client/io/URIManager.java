@@ -25,9 +25,6 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
@@ -36,8 +33,6 @@ import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 @SuppressWarnings("unchecked")
 public class URIManager
 {
-	static private Log _logger = LogFactory.getLog(URIManager.class);
-	
 	static private QName _URI_HANDLER_QNAME =
 		new QName(GenesisIIConstants.GENESISII_NS, "uri-handlers");
 	
@@ -46,26 +41,19 @@ public class URIManager
 	
 	static
 	{
-		try
+		XMLConfiguration conf = 
+			ConfigurationManager.getCurrentConfiguration().getClientConfiguration();
+		
+		Collection<IURIHandler> handlers =
+			(Collection<IURIHandler>)conf.retrieveSection(_URI_HANDLER_QNAME);
+		
+		for (IURIHandler handler : handlers)
 		{
-			XMLConfiguration conf = 
-				ConfigurationManager.getCurrentConfiguration().getClientConfiguration();
-			
-			Collection<IURIHandler> handlers =
-				(Collection<IURIHandler>)conf.retrieveSection(_URI_HANDLER_QNAME);
-			
-			for (IURIHandler handler : handlers)
+			String []schemes = handler.getHandledProtocols();
+			for (String scheme : schemes)
 			{
-				String []schemes = handler.getHandledProtocols();
-				for (String scheme : schemes)
-				{
-					_handlers.put(scheme, handler);
-				}
+				_handlers.put(scheme, handler);
 			}
-		}
-		catch (ConfigurationException ce)
-		{
-			_logger.error(ce);
 		}
 	}
 	

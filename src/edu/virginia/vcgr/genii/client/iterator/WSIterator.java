@@ -11,7 +11,6 @@ import java.util.NoSuchElementException;
 import org.apache.axis.types.UnsignedInt;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
@@ -138,21 +137,21 @@ class WSIterator<Type> implements Iterator<Type>, Closeable
 	}
 	
 	public WSIterator(Class<Type> cl, IteratorInitializationType init, int batchSize,
-		boolean mustDestroy) throws RemoteException, ConfigurationException
+		boolean mustDestroy) throws RemoteException
 	{
 		this(cl, new WSIteratorTarget(init, mustDestroy), batchSize);
 	}
 	
 	public WSIterator(Class<Type> cl, IteratorPortType target, int batchSize, 
 		boolean mustDestroy) throws GenesisIISecurityException, ResourceException, 
-			ConfigurationException, RemoteException
+			RemoteException
 	{
 		this(cl, new WSIteratorTarget(target, mustDestroy), batchSize);
 	}
 	
 	public WSIterator(Class<Type> cl, EndpointReferenceType target, int batchSize, 
 		boolean mustDestroy) throws GenesisIISecurityException, ResourceException, 
-			ConfigurationException, RemoteException
+			RemoteException
 	{
 		this(cl, ClientUtils.createProxy(
 			IteratorPortType.class, target), batchSize, mustDestroy);

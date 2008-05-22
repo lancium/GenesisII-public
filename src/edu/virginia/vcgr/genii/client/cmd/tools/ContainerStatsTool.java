@@ -48,29 +48,29 @@ public class ContainerStatsTool extends BaseGridTool
 		stdout.format("Database Statistics:\n");
 		for (TimeInterval ti : dbReport.keySet())
 		{
-			stdout.format("\t%s:\n", ti.longDescription());
+			stdout.format("  %s:\n", ti.longDescription());
 			DatabaseStatisticsReport report = dbReport.get(ti);
-			stdout.format("\t\tNum Opened = %d, Num Closed = %d, Average Duration = %d ms\n",
+			stdout.format("    Num Opened = %d, Num Closed = %d, Average Duration = %d ms\n",
 				report.numOpened(), report.numClosed(), report.averageDuration());
 		}
 		stdout.format("Method Statistics:\n");
 		for (TimeInterval ti : methodReport.keySet())
 		{
-			stdout.format("\t%s:\n", ti.longDescription());
+			stdout.format("  %s:\n", ti.longDescription());
 			MethodStatisticsReport report = methodReport.get(ti);
-			stdout.format("\t\tTotals:  %s\n", report.totals());
+			stdout.format("    Totals:  %s\n", report.totals());
 			Map<String, MethodStatisticsReportPoint> classes = report.classTotals();
 			Map<String, Map<String, MethodStatisticsReportPoint>> methods = report.methodTotals();
 			for (String className : classes.keySet())
 			{
-				stdout.format("\t\tClass Totals(%s):  %s\n",
+				stdout.format("    Class Totals(%s):  %s\n",
 					className, classes.get(className));
 				Map<String, MethodStatisticsReportPoint> methodMap = methods.get(className);
 				if (methodMap != null)
 				{
 					for (String methodName : methodMap.keySet())
 					{
-						stdout.format("\t\t\tMethod (%s):  %s\n", methodName, methodMap.get(methodName));
+						stdout.format("      Method (%s):  %s\n", methodName, methodMap.get(methodName));
 					}
 				}
 			}

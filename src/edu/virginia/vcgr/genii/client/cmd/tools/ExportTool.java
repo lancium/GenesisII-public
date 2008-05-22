@@ -6,7 +6,6 @@ import java.rmi.RemoteException;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
-import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
@@ -226,7 +225,7 @@ public class ExportTool extends BaseGridTool
 	static public EndpointReferenceType createExportedRoot(
 			EndpointReferenceType exportServiceEPR, String localPath, 
 			String RNSPath, boolean isReplicated) 
-		throws ConfigurationException, ResourceException,
+		throws ResourceException,
 			ResourceCreationFaultType, RemoteException, RNSException,
 			CreationException, IOException
 	{
@@ -261,7 +260,7 @@ public class ExportTool extends BaseGridTool
 	 * @param optTargetName
 	 * @param createProperties
 	 * @return
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws ResourceException
 	 * @throws ResourceCreationFaultType
 	 * @throws RemoteException
@@ -273,7 +272,7 @@ public class ExportTool extends BaseGridTool
 			EndpointReferenceType service,
 			String optTargetName,
 			MessageElement [] createProperties) 
-		throws ConfigurationException, ResourceException,
+		throws ResourceException,
 			ResourceCreationFaultType, RemoteException, RNSException, 
 			CreationException, IOException
 	{
@@ -298,7 +297,7 @@ public class ExportTool extends BaseGridTool
 			EndpointReferenceType exportServiceEPR, String localPath, 
 			String RNSPath, boolean isReplicated, 
 			EndpointReferenceType replicationService) 
-		throws ConfigurationException, ResourceException,
+		throws ResourceException,
 			ResourceCreationFaultType, RemoteException, RNSException,
 			CreationException, IOException
 	{
@@ -326,7 +325,7 @@ public class ExportTool extends BaseGridTool
 	}
 	
 	static public boolean quitExportedRootFromRNS(String exportedRootRNSPath) 
-		throws IOException, ConfigurationException, RNSException
+		throws IOException, RNSException
 	{
 		RNSPath path = RNSPath.getCurrent();
 		path = path.lookup(exportedRootRNSPath, RNSPathQueryFlags.MUST_EXIST);
@@ -339,13 +338,13 @@ public class ExportTool extends BaseGridTool
 	}
 	
 	static public boolean quitExportedRootFromURL(String exportedRootURL) 
-		throws IOException, ConfigurationException, RNSException
+		throws IOException, RNSException
 	{
 		return quitExportedRoot(EPRUtils.makeEPR(exportedRootURL), false);
 	}
 	
 	static public boolean quitExportedRoot(EndpointReferenceType epr, boolean deleteDirectory)
-		throws IOException, ConfigurationException, RNSException
+		throws IOException, RNSException
 	{
 		ExportedRootPortType exportedRoot = ClientUtils.createProxy(ExportedRootPortType.class, epr);
 		QuitExport request = new QuitExport();

@@ -9,7 +9,6 @@ import java.rmi.RemoteException;
 
 import org.apache.axis.message.MessageElement;
 import org.ggf.sbyteio.StreamableByteIOPortType;
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.GuaranteedDirectory;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
@@ -73,7 +72,7 @@ public class SByteIOFactory implements Closeable
 	}
 	
 	public EndpointReferenceType create()
-		throws ConfigurationException, ResourceCreationFaultType, 
+		throws ResourceCreationFaultType, 
 			GenesisIISecurityException, ResourceException, RemoteException, IOException
 	{
 		synchronized(this)

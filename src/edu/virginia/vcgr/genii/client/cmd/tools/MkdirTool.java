@@ -1,7 +1,6 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import org.ggf.rns.RNSPortType;
-import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
@@ -60,7 +59,7 @@ public class MkdirTool extends BaseGridTool
 	}
 	
 	private EndpointReferenceType lookupPath(String path)
-		throws ConfigurationException, RNSPathDoesNotExistException, RNSException
+		throws RNSPathDoesNotExistException, RNSException
 	{
 		RNSPath current = RNSPath.getCurrent();
 		return current.lookup(path, RNSPathQueryFlags.MUST_EXIST).getEndpoint();

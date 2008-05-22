@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
@@ -51,7 +50,7 @@ public class JNICpTool extends JNILibraryBase {
 	
 	public static void copy(String sourcePath, boolean isLocalSource,
 		String targetPath, boolean isLocalTarget)
-	throws ConfigurationException, FileNotFoundException, IOException,
+	throws FileNotFoundException, IOException,
 		RNSException
 	{
 		String sourceName = null;

@@ -7,8 +7,6 @@ import java.net.URL;
 import java.rmi.RemoteException;
 import java.rmi.server.ExportException;
 
-import org.morgan.util.configuration.ConfigurationException;
-
 import edu.virginia.vcgr.genii.client.cmd.tools.ExportTool;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.rcreate.CreationException;
@@ -24,7 +22,7 @@ public class ExportManipulator
 	static public RNSPath createExport(
 		URL containerURL, File localPath, String rnsPath)
 			throws FileNotFoundException, ExportException,
-				RNSException, ConfigurationException, CreationException,
+				RNSException, CreationException,
 				ResourceCreationFaultType, RemoteException, IOException
 	{
 		validate(localPath);
@@ -61,7 +59,7 @@ public class ExportManipulator
 	}
 	
 	static public void quitExport(
-		RNSPath exportRoot) throws RNSException, IOException, ConfigurationException
+		RNSPath exportRoot) throws RNSException, IOException
 	{
 		ExportTool.quitExportedRoot(exportRoot.getEndpoint(), false);
 		exportRoot.unlink();

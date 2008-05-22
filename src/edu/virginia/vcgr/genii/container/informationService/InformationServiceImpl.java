@@ -44,7 +44,6 @@ import org.ggf.rns.RNSEntryExistsFaultType;
 import org.ggf.rns.RNSEntryNotDirectoryFaultType;
 import org.ggf.rns.RNSFaultType;
 import org.ggf.rns.Remove;
-import org.morgan.util.configuration.ConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -374,8 +373,6 @@ public class InformationServiceImpl extends EnhancedRNSServiceImpl implements
 			} 
 		catch (FileNotFoundException fnotf) {
 			_logger.warn(fnotf.getLocalizedMessage(), fnotf);} 
-		catch (ConfigurationException confe) {
-			_logger.warn(confe.getLocalizedMessage(), confe);} 
 		catch (IOException ioe) {
 			_logger.warn(ioe.getLocalizedMessage(), ioe);}
 		
@@ -386,31 +383,24 @@ public class InformationServiceImpl extends EnhancedRNSServiceImpl implements
 	
 		EndpointReferenceType myEPR = BESAttributesDocumentRequest.getResourceEndpoint();
 		
-		try 
-		{
-			GeniiBESPortType bes = null;
-			/*
-			 * it's done in this way so that the update thread can also perform those functions
-			 * while using the calling context of the parent thread.
-			 */
-			if (_serviceCallingContext != null) {
-				bes = ClientUtils.createProxy(GeniiBESPortType.class, myEPR, _serviceCallingContext);
-			}
-			else {
-				bes = ClientUtils.createProxy(GeniiBESPortType.class, myEPR, callingContext);
-			}
-			GetFactoryAttributesDocumentResponseType resp =
-				bes.getFactoryAttributesDocument(new GetFactoryAttributesDocumentType());
-			
-			StringWriter writer = new StringWriter();
-			ObjectSerializer.serialize(writer, resp, 
-					new QName("http://tempuri.org", "bes-factory-attributes"));
-			result = writer.toString();
-
-		} 
-		catch (ConfigurationException confe) {
-			_logger.warn(confe.getLocalizedMessage(), confe);
-		}			
+		GeniiBESPortType bes = null;
+		/*
+		 * it's done in this way so that the update thread can also perform those functions
+		 * while using the calling context of the parent thread.
+		 */
+		if (_serviceCallingContext != null) {
+			bes = ClientUtils.createProxy(GeniiBESPortType.class, myEPR, _serviceCallingContext);
+		}
+		else {
+			bes = ClientUtils.createProxy(GeniiBESPortType.class, myEPR, callingContext);
+		}
+		GetFactoryAttributesDocumentResponseType resp =
+			bes.getFactoryAttributesDocument(new GetFactoryAttributesDocumentType());
+		
+		StringWriter writer = new StringWriter();
+		ObjectSerializer.serialize(writer, resp, 
+				new QName("http://tempuri.org", "bes-factory-attributes"));
+		result = writer.toString();
 	
 		BESAttributesDocumentResponseType res = new BESAttributesDocumentResponseType();
 		res.setResult(result);
@@ -485,8 +475,6 @@ public class InformationServiceImpl extends EnhancedRNSServiceImpl implements
 			} 
 			catch (FileNotFoundException fnotf) {
 				_logger.warn(fnotf.getLocalizedMessage(), fnotf);} 
-			catch (ConfigurationException confe) {
-				_logger.warn(confe.getLocalizedMessage(), confe);} 
 			catch (IOException ioe) {
 				_logger.warn(ioe.getLocalizedMessage(), ioe);}
 			_serviceCallingContext = callingContext;

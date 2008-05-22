@@ -35,7 +35,6 @@ import org.apache.axis.types.UnsignedLong;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 import org.morgan.util.GUID;
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
 import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnavailableFaultType;
@@ -213,27 +212,19 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 			creationParameters.put(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM,
 					WSName.generateNewEPI());
 		
-		try
-		{
-			CertCreationSpec spec = getChildCertSpec();
-			if (spec != null) {
-				creationParameters.put(
-					IResource.CERTIFICATE_CREATION_SPEC_CONSTRUCTION_PARAM,
-					spec);
-			}
-			
-			// set the identity of the service into the creation params
-			X509Certificate[] serviceChain = (X509Certificate[]) 
-				ResourceManager.getCurrentResource().dereference().
-				getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
-			creationParameters.put(IResource.SERVICE_CERTIFICATE_CHAIN_CONSTRUCTION_PARAM,
-					serviceChain);
-			
+		CertCreationSpec spec = getChildCertSpec();
+		if (spec != null) {
+			creationParameters.put(
+				IResource.CERTIFICATE_CREATION_SPEC_CONSTRUCTION_PARAM,
+				spec);
 		}
-		catch (ConfigurationException ce)
-		{
-			throw new ResourceException(ce.getLocalizedMessage(), ce);
-		}
+		
+		// set the identity of the service into the creation params
+		X509Certificate[] serviceChain = (X509Certificate[]) 
+			ResourceManager.getCurrentResource().dereference().
+			getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
+		creationParameters.put(IResource.SERVICE_CERTIFICATE_CHAIN_CONSTRUCTION_PARAM,
+				serviceChain);
 		
 		return ResourceManager.createNewResource(_serviceName, creationParameters);
 	}
@@ -611,10 +602,6 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 				rKey.dereference().commit();
 			}
 		}
-		catch (ConfigurationException ce)
-		{
-			_logger.error(ce);
-		}
 		catch (ResourceException re)
 		{
 			_logger.error(re);
@@ -633,7 +620,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	static private Long _resourceCertificateLifetime = null;
 	
 	@SuppressWarnings("unchecked")
-	private void setLifetimes() throws ConfigurationException
+	private void setLifetimes()
 	{
 		synchronized(GenesisIIBase.class)
 		{
@@ -661,7 +648,6 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	}
 	
 	protected long getServiceCertificateLifetime()
-		throws ConfigurationException
 	{
 		setLifetimes();
 		
@@ -669,7 +655,6 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	}
 	
 	protected long getResourceCertificateLifetime()
-		throws ConfigurationException
 	{
 		setLifetimes();
 		
@@ -680,7 +665,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	// If we decided to make the resource certificates children of the service certificate
 	// we would revisit this spot.
 	protected CertCreationSpec getChildCertSpec() 
-		throws ResourceException, ResourceUnknownFaultType, ConfigurationException
+		throws ResourceException, ResourceUnknownFaultType
 	{
 		X509Certificate[] containerChain = Container.getContainerCertChain();
 			// If this is null, then security isn't turned on.
@@ -705,8 +690,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	protected IteratorInitializationType createWSIterator(
 		Iterator<MessageElement> contents, int defaultBatchSize) 
 			throws ResourceException, ResourceUnknownFaultType,
-				SQLException, ConfigurationException,
-				GenesisIISecurityException, RemoteException
+				SQLException, GenesisIISecurityException, RemoteException
 	{
 		Collection<IteratorMemberType> initMembers = 
 			new LinkedList<IteratorMemberType>();
@@ -800,34 +784,27 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		Token topic = subscribeRequest.getTopic();
 		UserDataType userData = subscribeRequest.getUserData();
 		
-		try
-		{
-			GeniiSubscriptionPortType subscription =
-				ClientUtils.createProxy(GeniiSubscriptionPortType.class,
-				EPRUtils.makeEPR(Container.getServiceURL("GeniiSubscriptionPortType")));
+		GeniiSubscriptionPortType subscription =
+			ClientUtils.createProxy(GeniiSubscriptionPortType.class,
+			EPRUtils.makeEPR(Container.getServiceURL("GeniiSubscriptionPortType")));
 
-			HashMap<QName, MessageElement> constructionParameters =
-				new HashMap<QName, MessageElement>();
-			SubscriptionConstructionParameters.insertSubscriptionParameters(
-				constructionParameters, 
-				(String)ResourceManager.getCurrentResource().dereference().getKey(),
-				target, topic.toString(), 
-				(ttl == null) ? null : new Long(ttl.longValue()),
-				userData);
-			MessageElement []params = new MessageElement[constructionParameters.size()];
-			constructionParameters.values().toArray(params);
-			return new SubscribeResponse(
-				subscription.vcgrCreate(
-					new VcgrCreate(params)).getEndpoint());
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new RemoteException(ce.getLocalizedMessage(), ce);
-		}
+		HashMap<QName, MessageElement> constructionParameters =
+			new HashMap<QName, MessageElement>();
+		SubscriptionConstructionParameters.insertSubscriptionParameters(
+			constructionParameters, 
+			(String)ResourceManager.getCurrentResource().dereference().getKey(),
+			target, topic.toString(), 
+			(ttl == null) ? null : new Long(ttl.longValue()),
+			userData);
+		MessageElement []params = new MessageElement[constructionParameters.size()];
+		constructionParameters.values().toArray(params);
+		return new SubscribeResponse(
+			subscription.vcgrCreate(
+				new VcgrCreate(params)).getEndpoint());
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void setDefaultResolverFactoryDescription() throws ConfigurationException
+	private void setDefaultResolverFactoryDescription()
 	{
 		synchronized(GenesisIIBase.class)
 		{
@@ -854,7 +831,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		}
 	}
 
-	protected Properties getDefaultResolverFactoryProperties() throws ConfigurationException
+	protected Properties getDefaultResolverFactoryProperties()
 	{
 		setDefaultResolverFactoryDescription();
 		return _defaultResolverFactoryProperties;
@@ -862,7 +839,6 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 
 	
 	protected Class<? extends IResolverFactoryProxy> getDefaultResolverFactoryProxyClass()
-		throws ConfigurationException
 	{
 		setDefaultResolverFactoryDescription();
 		return _defaultResolverFactoryProxyClass;

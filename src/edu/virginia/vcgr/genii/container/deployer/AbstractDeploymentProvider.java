@@ -11,7 +11,6 @@ import java.util.Calendar;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -88,10 +87,6 @@ public abstract class AbstractDeploymentProvider implements IDeployerProvider
 				rnsPath, RNSPathQueryFlags.MUST_EXIST);
 			return path.getEndpoint();
 		}
-		catch (ConfigurationException ce)
-		{
-			throw new DeploymentException("Unable to get deploy facet.", ce);
-		}
 		catch (RNSException rne)
 		{
 			throw new DeploymentException(
@@ -109,7 +104,7 @@ public abstract class AbstractDeploymentProvider implements IDeployerProvider
 	}
 	
 	static protected InputStream openSource(SourceElementType source)
-		throws DeploymentException, IOException, ConfigurationException
+		throws DeploymentException, IOException
 	{
 		EndpointReferenceType epr = getSourceEndpoint(source);
 		return ByteIOStreamFactory.createInputStream(epr);
@@ -141,11 +136,6 @@ public abstract class AbstractDeploymentProvider implements IDeployerProvider
 				target.setReadOnly();
 			if (makeExecutable)
 				FileSystemUtils.makeExecutable(target);
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new DeploymentException("Unable to deploy component to "
-				+ target, ce);
 		}
 		catch (IOException ioe)
 		{

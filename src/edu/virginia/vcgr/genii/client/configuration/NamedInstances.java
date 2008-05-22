@@ -5,15 +5,10 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
 
 public class NamedInstances
 {
-	static private Log _logger = LogFactory.getLog(NamedInstances.class);
-	
 	static private QName _instancesSectionName =
 		new QName("http://vcgr.cs.virginia.edu/Genesis-II", "configured-instances");
 	
@@ -25,20 +20,13 @@ public class NamedInstances
 	@SuppressWarnings("unchecked")
 	private NamedInstances(XMLConfiguration configuration)
 	{
-		try
+		for (Object obj : configuration.retrieveSections(_instancesSectionName))
 		{
-			for (Object obj : configuration.retrieveSections(_instancesSectionName))
+			Map<String, Object> instances = (Map<String, Object>)obj;
+			for (String name : instances.keySet())
 			{
-				Map<String, Object> instances = (Map<String, Object>)obj;
-				for (String name : instances.keySet())
-				{
-					_instances.put(name, instances.get(name));
-				}
+				_instances.put(name, instances.get(name));
 			}
-		}
-		catch (ConfigurationException ce)
-		{
-			_logger.error("Error using configuration file.", ce);
 		}
 	}
 	

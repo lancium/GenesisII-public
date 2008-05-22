@@ -1,10 +1,10 @@
 package edu.virginia.vcgr.genii.client.byteio.transfer;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 
 import org.apache.axis.types.URI;
 import org.ggf.rbyteio.RandomByteIOPortType;
-import org.morgan.util.configuration.ConfigurationException;
 
 import edu.virginia.vcgr.genii.client.byteio.transfer.dime.DimeRByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.transfer.mtom.MTOMRByteIOTransferer;
@@ -25,11 +25,11 @@ public class RandomByteIOTransfererFactory extends TransfererFactory
 	 * @param clientStub The RandomByteIO client stub to use for outcalls
 	 * from created transferers.
 	 * 
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws RemoteException
 	 */
 	public RandomByteIOTransfererFactory(RandomByteIOPortType clientStub)
-		throws ConfigurationException, RemoteException
+		throws RemoteException, IOException
 	{
 		super(clientStub);
 	}
@@ -72,11 +72,10 @@ public class RandomByteIOTransfererFactory extends TransfererFactory
 	 * 
 	 * @return A newly created random byteio transferer.
 	 * 
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 */
 	public RandomByteIOTransferer createRandomByteIOTransferer(
-		URI desiredTransferType)
-			throws ConfigurationException
+		URI desiredTransferType) throws IOException
 	{
 		if (desiredTransferType == null)
 			return createRandomByteIOTransferer();
@@ -90,10 +89,10 @@ public class RandomByteIOTransfererFactory extends TransfererFactory
 	 * 
 	 * @return A newly created random byteio transferer.
 	 * 
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 */
 	public RandomByteIOTransferer createRandomByteIOTransferer()
-		throws ConfigurationException
+		throws IOException
 	{
 		return (RandomByteIOTransferer)createTransferer();
 	}
@@ -107,12 +106,12 @@ public class RandomByteIOTransfererFactory extends TransfererFactory
 	 * 
 	 * @return A newly create random byteio transferer.
 	 * 
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws RemoteException
 	 */
 	static public RandomByteIOTransferer createRandomByteIOTransferer(
 		RandomByteIOPortType target)
-			throws ConfigurationException, RemoteException
+			throws RemoteException, IOException
 	{
 		return (new RandomByteIOTransfererFactory(
 			target)).createRandomByteIOTransferer();
@@ -129,12 +128,12 @@ public class RandomByteIOTransfererFactory extends TransfererFactory
 	 * 
 	 * @return A newly create transferer.
 	 * 
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws RemoteException
 	 */
 	static public RandomByteIOTransferer createRandomByteIOTransferer(
 		RandomByteIOPortType target, URI desiredTransferType)
-			throws ConfigurationException, RemoteException
+			throws RemoteException, IOException
 	{
 		return (new RandomByteIOTransfererFactory(
 			target)).createRandomByteIOTransferer(desiredTransferType);

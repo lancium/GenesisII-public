@@ -20,7 +20,6 @@ import java.rmi.RemoteException;
 import java.util.Properties;
 
 import org.apache.axis.message.MessageElement;
-import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
@@ -42,21 +41,14 @@ public class SimpleResolverFactoryProxy implements IResolverFactoryProxy
 		EndpointReferenceType resolutionEPR = null;
 		
 		/* current implementation is to use SimpleResolverFactory service on current node */
-		try
-		{
-			SimpleResolverFactoryPortType resolverFactoryService = ClientUtils.createProxy(
-					SimpleResolverFactoryPortType.class,
-					EPRUtils.makeEPR(Container.getServiceURL(
-							"SimpleResolverFactoryPortType")));
-			CreateResolverResponseType resp = resolverFactoryService.createResolver(
-					new CreateResolverRequestType(targetEPR, resolverProperties));
-			resolverReference = resp.getResolver_EPR();
-			resolutionEPR = resp.getResolution_EPR();
-		}
-		catch(ConfigurationException ce)
-		{
-			throw new ResourceException("Could not create new SimpleResolver", ce);
-		}
+		SimpleResolverFactoryPortType resolverFactoryService = ClientUtils.createProxy(
+			SimpleResolverFactoryPortType.class,
+			EPRUtils.makeEPR(Container.getServiceURL(
+					"SimpleResolverFactoryPortType")));
+		CreateResolverResponseType resp = resolverFactoryService.createResolver(
+				new CreateResolverRequestType(targetEPR, resolverProperties));
+		resolverReference = resp.getResolver_EPR();
+		resolutionEPR = resp.getResolution_EPR();
 		
 		return new Resolution(resolutionEPR, resolverReference);
 	}

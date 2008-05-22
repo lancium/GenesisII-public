@@ -18,7 +18,6 @@ package edu.virginia.vcgr.genii.client.rns;
 import java.rmi.RemoteException;
 
 import org.ggf.rns.RNSPortType;
-import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
@@ -27,13 +26,13 @@ import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 public class RNSSpace
 {
 	static public RNSPath createNewSpace(String serviceURL)
-		throws RemoteException, ConfigurationException
+		throws RemoteException
 	{
 		return RNSSpace.createNewSpace(EPRUtils.makeEPR(serviceURL));
 	}
 	
 	static public RNSPath createNewSpace(EndpointReferenceType serviceEPR)
-		throws ConfigurationException, RemoteException
+		throws RemoteException
 	{
 		RNSPortType factory = ClientUtils.createProxy(RNSPortType.class, serviceEPR);
 

@@ -36,7 +36,7 @@ public class URIHandlerSectionHandler
 	static private QName _CHILD_QNAME = new QName(GenesisIIConstants.GENESISII_NS,
 		"uri-handler");
 	
-	public Object parse(Node n) throws ConfigurationException
+	public Object parse(Node n)
 	{
 		NodeList children = n.getChildNodes();
 		int length = children.getLength();

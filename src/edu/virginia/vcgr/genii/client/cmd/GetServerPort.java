@@ -1,7 +1,5 @@
 package edu.virginia.vcgr.genii.client.cmd;
 
-import org.morgan.util.configuration.ConfigurationException;
-
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.container.configuration.ContainerConfiguration;
@@ -15,7 +13,7 @@ public class GetServerPort
 		System.out.print(_USAGE + "\n");
 	}
 	
-	static public int getServerPort(String deployName) throws ConfigurationException
+	static public int getServerPort(String deployName)
 	{
 		System.setProperty(GenesisIIConstants.DEPLOYMENT_NAME_PROPERTY, deployName);
 		String userDir = GetUserDir.getUserDir();
@@ -26,7 +24,7 @@ public class GetServerPort
 		return serverConf.getListenPort();
 	}
 	
-	static public void main(String [] args) throws ConfigurationException
+	static public void main(String [] args)
 	{
 		if (args.length != 1)
 		{

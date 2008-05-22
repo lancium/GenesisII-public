@@ -29,7 +29,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.GUID;
-import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
@@ -223,7 +222,7 @@ public class ClientUtils
 	static private IProxyFactory _proxyFactory = null;
 	@SuppressWarnings("unchecked")
 	synchronized static private IProxyFactory getProxyFactory()
-		throws ResourceException, ConfigurationException
+		throws ResourceException
 	{
 		if (_proxyFactory == null)
 		{
@@ -247,7 +246,7 @@ public class ClientUtils
 	 */
 	static public <IFace> IFace createProxy(Class<IFace> iface, 
 		EndpointReferenceType epr) 
-		throws ResourceException, ConfigurationException, GenesisIISecurityException
+		throws ResourceException, GenesisIISecurityException
 	{
 		try
 		{
@@ -285,7 +284,7 @@ public class ClientUtils
 	 */
 	static public <IFace> IFace createProxy(ClassLoader loader,
 		Class<IFace> iface, EndpointReferenceType epr)
-			throws ResourceException, ConfigurationException, GenesisIISecurityException
+			throws ResourceException, GenesisIISecurityException
 	{
 		try
 		{
@@ -312,7 +311,7 @@ public class ClientUtils
 	 */
 	static public <IFace> IFace createProxy(Class<IFace> iface, 
 		EndpointReferenceType epr, ICallingContext callContext)
-			throws ResourceException, ConfigurationException, GenesisIISecurityException
+			throws ResourceException, GenesisIISecurityException
 	{
 		return createProxy(Thread.currentThread().getContextClassLoader(),
 			iface, epr, callContext);
@@ -335,7 +334,7 @@ public class ClientUtils
 	 */
 	static public <IFace> IFace createProxy(ClassLoader loader,
 		Class<IFace> iface, EndpointReferenceType epr, ICallingContext callContext)
-			throws ResourceException, ConfigurationException, GenesisIISecurityException
+			throws ResourceException, GenesisIISecurityException
 	{
 		IProxyFactory factory = getProxyFactory();
 		IFace face = factory.createProxy(loader, iface, epr, callContext);
@@ -352,7 +351,7 @@ public class ClientUtils
 	 * communicate with.
 	 */
 	static public EndpointReferenceType extractEPR(Object clientProxy)
-		throws ResourceException, ConfigurationException
+		throws ResourceException
 	{
 		return getProxyFactory().extractTargetEPR(clientProxy);
 	}
@@ -361,7 +360,7 @@ public class ClientUtils
 		Object clientProxy,
 		Collection<GeniiAttachment> attachments,
 		AttachmentType attachmentType) 
-			throws ResourceException, ConfigurationException
+			throws ResourceException
 	{
 		getProxyFactory().setAttachments(clientProxy, attachments,
 			attachmentType);
@@ -369,7 +368,7 @@ public class ClientUtils
 	
 	static public Collection<GeniiAttachment> getAttachments(
 		Object clientProxy) 
-			throws ResourceException, ConfigurationException
+			throws ResourceException
 	{
 		return getProxyFactory().getAttachments(clientProxy);
 	}

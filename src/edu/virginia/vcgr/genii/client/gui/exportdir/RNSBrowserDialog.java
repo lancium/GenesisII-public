@@ -20,8 +20,6 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 
-import org.morgan.util.configuration.ConfigurationException;
-
 import edu.virginia.vcgr.genii.client.gui.widgets.rns.RNSTree;
 import edu.virginia.vcgr.genii.client.gui.widgets.rns.RNSTreeNode;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
@@ -37,7 +35,7 @@ public class RNSBrowserDialog extends JDialog
 	private String _selectedPath = null;
 	
 	public RNSBrowserDialog(JDialog owner)
-		throws ConfigurationException, RNSException
+		throws RNSException
 	{
 		super(owner);
 		

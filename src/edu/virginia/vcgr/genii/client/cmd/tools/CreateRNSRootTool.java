@@ -5,7 +5,6 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.morgan.util.configuration.ConfigurationException;
 import org.xml.sax.SAXException;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
@@ -80,8 +79,7 @@ public class CreateRNSRootTool extends BaseGridTool
 	}
 	
 	public void createRNSRoot(String filename, String baseURL)
-		throws SAXException, ParserConfigurationException, IOException,
-			ConfigurationException
+		throws SAXException, ParserConfigurationException, IOException
 	{
 		RNSPath root = RNSSpace.createNewSpace(baseURL + "/EnhancedRNSPortType");
 		ICallingContext ctxt = ContextManager.bootstrap(root);

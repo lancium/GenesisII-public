@@ -13,7 +13,6 @@ import java.util.LinkedList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.EntryType;
-import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
@@ -106,7 +105,7 @@ public class BESManager implements Closeable
 		SchedulingEvent schedulingEvent, Connection connection, 
 		DatabaseConnectionPool connectionPool) 
 			throws SQLException, ResourceException, 
-				ConfigurationException, GenesisIISecurityException
+				GenesisIISecurityException
 	{
 		_connectionPool = connectionPool;
 		_database = database;
@@ -146,12 +145,12 @@ public class BESManager implements Closeable
 	 * 
 	 * @throws SQLException
 	 * @throws ResourceException
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws GenesisIISecurityException
 	 */
 	synchronized private void loadFromDatabase(Connection connection)
 		throws SQLException, ResourceException, 
-			ConfigurationException, GenesisIISecurityException
+			GenesisIISecurityException
 	{
 		/* Ask the database manager for all BES records located 
 		 * in the database */
@@ -181,12 +180,12 @@ public class BESManager implements Closeable
 	 * 
 	 * @throws SQLException
 	 * @throws ResourceException
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws GenesisIISecurityException
 	 */
 	synchronized public void addNewBES(Connection connection, String name,
 			EndpointReferenceType epr)
-		throws SQLException, ResourceException, ConfigurationException,
+		throws SQLException, ResourceException,
 			GenesisIISecurityException
 	{
 		BESUpdateInformation updateInfo;
@@ -373,12 +372,12 @@ public class BESManager implements Closeable
 	 * 
 	 * @throws SQLException
 	 * @throws ResourceException
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws GenesisIISecurityException
 	 */
 	synchronized private void updateResources(Connection connection,
 		Collection<BESUpdateInformation> resourcesToUpdate)
-		throws SQLException, ResourceException, ConfigurationException,
+		throws SQLException, ResourceException,
 			GenesisIISecurityException
 	{
 		/* The queue uses the same calling context for ALL BES updates 
@@ -415,11 +414,11 @@ public class BESManager implements Closeable
 	 * 
 	 * @throws SQLException
 	 * @throws ResourceException
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws GenesisIISecurityException
 	 */
 	synchronized public void updateResources(Connection connection)
-		throws SQLException, ResourceException, ConfigurationException,
+		throws SQLException, ResourceException,
 			GenesisIISecurityException
 	{
 		/* We need to collect a list of BES resources that are ready for

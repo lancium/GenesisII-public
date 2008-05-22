@@ -51,7 +51,7 @@ public class UserConfig
 	}
 
 	public UserConfig(File file)
-		throws FileNotFoundException, IOException, ConfigurationException
+		throws FileNotFoundException, IOException
 	{
 		FileInputStream fin = null;
 		
@@ -95,13 +95,11 @@ public class UserConfig
 	}
 
 	public UserConfig(Node node)
-		throws ConfigurationException
 	{
 		initialize(node);
 	}
 	
 	public void store(File location)
-		throws ConfigurationException
 	{
 		if (_deploymentPath == null)
 			throw new ConfigurationException("Cannot store UserConfig with empty deployment path");
@@ -146,7 +144,7 @@ public class UserConfig
 	}
 	
 	
-	private void initialize(Node node) throws ConfigurationException
+	private void initialize(Node node)
 	{
 		QName rootNodeQName = XMLConfiguration.getQName(node);
 		if (!rootNodeQName.equals(USER_CONFIG_QNAME))
@@ -170,8 +168,7 @@ public class UserConfig
 	}
 	
 	private void initialize(InputStream in)
-		throws ParserConfigurationException, IOException, SAXException,
-			ConfigurationException
+		throws ParserConfigurationException, IOException, SAXException
 	{
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setNamespaceAware(true);
@@ -181,7 +178,6 @@ public class UserConfig
 	}
 	
 	private void handleDeploymentPath(Node deployPathNode)
-		throws ConfigurationException
 	{
 		NodeList children = deployPathNode.getChildNodes();
 		int length = children.getLength();

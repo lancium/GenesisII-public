@@ -13,7 +13,6 @@ import org.ggf.bes.factory.GetActivityStatusesResponseType;
 import org.ggf.bes.factory.GetActivityStatusesType;
 import org.ggf.bes.factory.TerminateActivitiesType;
 import org.ggf.jsdl.JobDefinition_Type;
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
@@ -120,7 +119,7 @@ public class TestQueueBehaviorTool extends BaseGridTool {
 	}
 	
 	private void storeInformation()
-		throws SQLException, IOException, ConfigurationException
+		throws SQLException, IOException
 	{
 		ICallingContext callingContext = ContextManager.getCurrentContext();
 		Collection<Identity> identities = getCallerIdentities();
@@ -185,11 +184,6 @@ public class TestQueueBehaviorTool extends BaseGridTool {
 			}
 			
 			return ret;
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new AuthZSecurityException("Unable to load current context.",
-				ce);
 		}
 		catch (IOException ioe)
 		{

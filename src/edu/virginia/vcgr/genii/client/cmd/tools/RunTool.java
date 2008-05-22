@@ -308,7 +308,7 @@ public class RunTool extends BaseGridTool
 	}
 	
 	static public ActivityState checkStatus(String jobPath)
-		throws RemoteException, ConfigurationException, RNSException, IOException
+		throws RemoteException, RNSException, IOException
 	{
 		RNSPath path = RNSPath.getCurrent();
 		path = path.lookup(jobPath, RNSPathQueryFlags.MUST_EXIST);
@@ -317,7 +317,7 @@ public class RunTool extends BaseGridTool
 	}
 	
 	static public ActivityState checkStatus(EndpointReferenceType activity)
-		throws ConfigurationException, ResourceException, RemoteException
+		throws ResourceException, RemoteException
 	{
 		GeniiCommon common = ClientUtils.createProxy(
 				GeniiCommon.class, activity);
@@ -330,7 +330,7 @@ public class RunTool extends BaseGridTool
 	
 	static public ActivityState checkStatus(
 		EndpointReferenceType besContainer, EndpointReferenceType activity)
-		throws ResourceException, RemoteException, ConfigurationException,
+		throws ResourceException, RemoteException,
 			RNSPathDoesNotExistException
 	{
 		GeniiBESPortType bes = ClientUtils.createProxy(
@@ -342,7 +342,7 @@ public class RunTool extends BaseGridTool
 	
 	static public EndpointReferenceType submitJob(String jsdlFileName,
 		EndpointReferenceType besContainer, String optJobName)
-			throws IOException, ResourceException, ConfigurationException,
+			throws IOException, ResourceException,
 				RNSException
 	{
 		FileInputStream fin = null;
@@ -378,7 +378,7 @@ public class RunTool extends BaseGridTool
 	
 	static public EndpointReferenceType submitJob(JobDefinition_Type jobDef,
 		EndpointReferenceType besContainer) 
-		throws ResourceException, ConfigurationException,
+		throws ResourceException,
 			RNSException, RemoteException
 	{
 		GeniiBESPortType bes = ClientUtils.createProxy(
@@ -398,7 +398,7 @@ public class RunTool extends BaseGridTool
 	
 	static private EndpointReferenceType getBESContainer(RNSPath besOrSchedPath)
 		throws RNSPathDoesNotExistException, GenesisIISecurityException, 
-			ResourceException, ConfigurationException, RemoteException
+			ResourceException, RemoteException
 	{
 		EndpointReferenceType target = besOrSchedPath.getEndpoint();
 		TypeInformation tInfo = new TypeInformation(target);
@@ -428,7 +428,7 @@ public class RunTool extends BaseGridTool
 	
 	static private JobDefinition_Type deployAndReify(
 		GeniiBESPortType bes, JobDefinition_Type jobDef)
-		throws RNSException, ConfigurationException, ResourceException,
+		throws RNSException, ResourceException,
 			RemoteException
 	{
 		EndpointReferenceType applicationDescriptionEPR = null;
@@ -488,7 +488,7 @@ public class RunTool extends BaseGridTool
 	}
 	
 	static private EndpointReferenceType getApplicationDescriptionEndpoint(
-		String path) throws RNSException, ConfigurationException
+		String path) throws RNSException
 	{
 		if (path == null)
 			throw new RuntimeException("Missing required JSDL attribute" +
@@ -524,7 +524,7 @@ public class RunTool extends BaseGridTool
 	static private EndpointReferenceType createDeployment(
 		EndpointReferenceType deployerService,
 		EndpointReferenceType applicationDescription)
-		throws RemoteException, ConfigurationException
+		throws RemoteException
 	{
 		ApplicationDeployerPortType deployer =
 			ClientUtils.createProxy(ApplicationDeployerPortType.class,
@@ -544,7 +544,7 @@ public class RunTool extends BaseGridTool
 	static private EndpointReferenceType pickDeploymentDescription(
 		ApplicationDeployerPortType deployer,
 		EndpointReferenceType applicationDescription)
-		throws RemoteException, ConfigurationException
+		throws RemoteException
 	{
 		ArrayList<EntryType> _acceptableChoices = 
 			new ArrayList<EntryType>();
@@ -594,7 +594,7 @@ public class RunTool extends BaseGridTool
 	}
 	
 	static private Throwable getError(EndpointReferenceType activity)
-		throws RemoteException, ConfigurationException, IOException, ClassNotFoundException
+		throws RemoteException, IOException, ClassNotFoundException
 	{
 		BESActivityPortType act = ClientUtils.createProxy(BESActivityPortType.class, activity);
 		byte []serializedFault = act.getError(null).getSerializedFault();

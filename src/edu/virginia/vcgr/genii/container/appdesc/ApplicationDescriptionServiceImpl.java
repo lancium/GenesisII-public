@@ -20,7 +20,6 @@ import org.ggf.rns.CreateFileResponse;
 import org.ggf.rns.RNSEntryExistsFaultType;
 import org.ggf.rns.RNSEntryNotDirectoryFaultType;
 import org.ggf.rns.RNSFaultType;
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
@@ -151,10 +150,6 @@ public class ApplicationDescriptionServiceImpl
 				new CreateDeploymentDocumentResponseType(newFile);
 			newFile = null;
 			return ret;
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new RemoteException(ce.getLocalizedMessage(), ce);
 		}
 		catch (IOException ioe)
 		{

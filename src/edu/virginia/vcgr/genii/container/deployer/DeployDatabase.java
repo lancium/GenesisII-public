@@ -342,7 +342,6 @@ public class DeployDatabase implements Closeable
 	}
 	
 	static private DatabaseConnectionPool getConnectionPool()
-		throws ConfigurationException
 	{
 		XMLConfiguration xmlConf =
 			ConfigurationManager.getCurrentConfiguration().getContainerConfiguration();
@@ -354,7 +353,7 @@ public class DeployDatabase implements Closeable
 	
 	@SuppressWarnings("unchecked")
 	static private DatabaseConnectionPool getConnectionPool(
-		String poolName) throws ConfigurationException
+		String poolName)
 	{
 		DatabaseConnectionPool pool = null;
 		Object obj = NamedInstances.getServerInstances().lookup(poolName);

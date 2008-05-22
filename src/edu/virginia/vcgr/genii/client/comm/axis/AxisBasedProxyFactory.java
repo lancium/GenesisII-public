@@ -49,7 +49,7 @@ public class AxisBasedProxyFactory implements IProxyFactory
 	@SuppressWarnings("unchecked")
 	public <IFace> IFace createProxy(ClassLoader loader, Class<IFace> iface, 
 		EndpointReferenceType epr, ICallingContext callContext) 
-		throws ConfigurationException, ResourceException, GenesisIISecurityException
+		throws ResourceException, GenesisIISecurityException
 	{
 		XMLConfiguration conf = 
 			ConfigurationManager.getCurrentConfiguration().getClientConfiguration();

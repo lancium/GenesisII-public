@@ -2,8 +2,6 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.io.IOException;
 
-import org.morgan.util.configuration.ConfigurationException;
-
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
@@ -70,7 +68,7 @@ public class RmTool extends BaseGridTool
 	
 	public void rm(RNSPath currentPath,
 		String filePath, boolean recursive, boolean force)
-		throws RNSException, ConfigurationException, IOException
+		throws RNSException, IOException
 	{
 		for (RNSPath file : currentPath.expand(filePath))
 			rm(file, recursive, force);

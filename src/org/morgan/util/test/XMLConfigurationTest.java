@@ -58,7 +58,7 @@ public class XMLConfigurationTest extends TestCase
 		TestCase.assertNotNull(_conf);
 	}
 	
-	public void testPropertiesHandler() throws ConfigurationException
+	public void testPropertiesHandler()
 	{
 		Properties props = (Properties)_conf.retrieveSection(
 			new QName("http://www.mark-morgan.net/org/morgan/util/test",
@@ -79,7 +79,7 @@ public class XMLConfigurationTest extends TestCase
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void testClassHandler() throws ConfigurationException
+	public void testClassHandler()
 	{
 		HashMap<String, Class> classes = (HashMap<String, Class>)_conf.retrieveSection(
 			new QName("http://www.mark-morgan.net/org/morgan/util/test",

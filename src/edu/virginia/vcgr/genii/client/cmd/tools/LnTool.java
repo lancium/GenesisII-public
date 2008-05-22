@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.rmi.RemoteException;
 
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
@@ -74,7 +73,7 @@ public class LnTool extends BaseGridTool
 	
 
 	static public void link(File eprFile, String target)
-		throws RNSException, IOException, ConfigurationException
+		throws RNSException, IOException
 	{
 		FileInputStream fin = null;
 		
@@ -92,7 +91,7 @@ public class LnTool extends BaseGridTool
 	}
 	
 	static public void link(EndpointReferenceType epr, String target)
-		throws RNSException, ConfigurationException, RemoteException
+		throws RNSException, RemoteException
 	{
 		RNSPath currentPath = RNSPath.getCurrent();
 		RNSPath path = currentPath.lookup(target, RNSPathQueryFlags.MUST_NOT_EXIST);
@@ -101,7 +100,7 @@ public class LnTool extends BaseGridTool
 	}
 	
 	static public void link(String source, String target)
-		throws RNSException, ConfigurationException, IOException
+		throws RNSException, IOException
 	{
 		RNSPath currentPath = RNSPath.getCurrent();
 		RNSPath sourcePath;

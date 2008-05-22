@@ -26,7 +26,6 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 import org.apache.axis.message.MessageElement;
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -111,7 +110,7 @@ public class ReplicatedFileTool extends BaseGridTool
 
 	static public void makeReplicatedFile(String sourcePath, boolean isLocalSource,
 			String targetPath, String [] containerNames) 
-		throws ConfigurationException, FileNotFoundException, IOException,
+		throws FileNotFoundException, IOException,
 		RNSException, CreationException, RNSPathAlreadyExistsException
 	{
 		RNSPath currentPath = RNSPath.getCurrent();
@@ -181,7 +180,7 @@ public class ReplicatedFileTool extends BaseGridTool
 	}
 	
 	static protected EndpointReferenceType createFile(RNSPath currentPath, URI epi, String replicaRNSPath, String containerName)
-	throws ConfigurationException, ResourceException,
+	throws ResourceException,
 		ResourceCreationFaultType, RemoteException, RNSException,
 		CreationException, FileNotFoundException, IOException
 	{
@@ -222,7 +221,7 @@ public class ReplicatedFileTool extends BaseGridTool
 			URI epi,
 			String targetFileRNSPath,
 			int replicaNumber)
-	throws ConfigurationException, FileNotFoundException, IOException,
+	throws FileNotFoundException, IOException,
 		RNSException, RNSPathDoesNotExistException, CreationException
 	{
 		OutputStream out = null;

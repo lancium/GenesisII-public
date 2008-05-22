@@ -15,7 +15,6 @@ import javax.xml.namespace.QName;
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
@@ -118,13 +117,6 @@ public class ExportedFileServiceImpl extends RandomByteIOServiceImpl
 			outputStream.flush();
 
 			return new OpenStreamResponse(factory.create());
-		}
-		catch (ConfigurationException ce){
-			throw FaultManipulator.fillInFault(
-				new ResourceCreationFaultType(null, null, null, null,
-					new BaseFaultTypeDescription[] {
-						new BaseFaultTypeDescription(ce.getLocalizedMessage()) },
-					null));
 		}
 		catch (IOException ioe){
 			throw FaultManipulator.fillInFault(

@@ -20,8 +20,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 
-import org.morgan.util.configuration.ConfigurationException;
-
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
@@ -60,10 +58,6 @@ public class RNSURIHandler implements IURIHandler
 		{
 			throw new IOException(re.getMessage());
 		}
-		catch (ConfigurationException ce)
-		{
-			throw new IOException("Unable to open input stream.", ce);
-		}
 	}
 
 	public OutputStream openOutputStream(URI uri) throws IOException
@@ -78,10 +72,6 @@ public class RNSURIHandler implements IURIHandler
 		catch (RNSException re)
 		{
 			throw new IOException(re.getMessage());
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new IOException(ce.getMessage());
 		}
 	}
 }

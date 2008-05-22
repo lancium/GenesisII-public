@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.morgan.util.configuration.ConfigurationException;
-
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.AuthZSecurityException;
@@ -82,11 +80,6 @@ public class QueueSecurity
 			}
 			
 			return ret;
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new AuthZSecurityException("Unable to load current context.",
-				ce);
 		}
 		catch (IOException ioe)
 		{

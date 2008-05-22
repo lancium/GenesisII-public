@@ -5,7 +5,6 @@ import java.util.LinkedList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
@@ -52,7 +51,7 @@ public class NotificationPool implements Runnable
 		}
 		
 		public void doNotify()
-			throws RemoteException, ConfigurationException
+			throws RemoteException
 		{
 			try
 			{

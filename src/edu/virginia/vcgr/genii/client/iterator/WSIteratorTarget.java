@@ -2,7 +2,6 @@ package edu.virginia.vcgr.genii.client.iterator;
 
 import java.rmi.RemoteException;
 
-import org.morgan.util.configuration.ConfigurationException;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnavailableFaultType;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.rl_2.ResourceNotDestroyedFaultType;
@@ -32,7 +31,7 @@ class WSIteratorTarget
 	}
 	
 	WSIteratorTarget(IteratorInitializationType iterator, boolean mustDestroy)
-		throws ConfigurationException, ResourceException, 
+		throws ResourceException, 
 			GenesisIISecurityException
 	{
 		this(iterator.getIteratorEndpoint() == null ? null : ClientUtils.createProxy(
@@ -46,7 +45,7 @@ class WSIteratorTarget
 	}
 	
 	WSIteratorTarget(EndpointReferenceType target, boolean mustDestroy)
-		throws ConfigurationException, ResourceException, GenesisIISecurityException
+		throws ResourceException, GenesisIISecurityException
 	{
 		this(target == null ? null : ClientUtils.createProxy(
 			IteratorPortType.class, target), mustDestroy);

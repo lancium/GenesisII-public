@@ -29,7 +29,6 @@ public class ContainerConfiguration
 	private int _notificationPoolSize;
 	
 	public ContainerConfiguration(ConfigurationManager manager)
-		throws ConfigurationException
 	{
 		_configuration = manager.getContainerConfiguration();
 		

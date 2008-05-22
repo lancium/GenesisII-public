@@ -20,7 +20,6 @@ import org.ggf.bes.factory.TerminateActivitiesType;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.rns.EntryType;
 import org.morgan.util.GUID;
-import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
@@ -101,7 +100,7 @@ public class JobManager implements Closeable
 		ThreadPool outcallThreadPool, QueueDatabase database, SchedulingEvent schedulingEvent,
 		Connection connection, DatabaseConnectionPool connectionPool) 
 		throws SQLException, ResourceException, 
-			ConfigurationException, GenesisIISecurityException
+			GenesisIISecurityException
 	{
 		_connectionPool = connectionPool;
 		_database = database;
@@ -321,12 +320,12 @@ public class JobManager implements Closeable
 	 * @return The job ticket assigned to this job.
 	 * 
 	 * @throws SQLException
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws ResourceException
 	 */
 	synchronized public String submitJob(Connection connection,
 		JobDefinition_Type jsdl, short priority) 
-		throws SQLException, ConfigurationException, ResourceException
+		throws SQLException, ResourceException
 	{
 		try
 		{
@@ -780,11 +779,11 @@ public class JobManager implements Closeable
 	 * 
 	 * @throws SQLException
 	 * @throws ResourceException
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws GenesisIISecurityException
 	 */
 	synchronized public void checkJobStatuses(Connection connection)
-		throws SQLException, ResourceException, ConfigurationException,
+		throws SQLException, ResourceException,
 			GenesisIISecurityException
 	{
 		/* Iterate through all running jobs and enqueue a worker to

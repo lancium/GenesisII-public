@@ -35,7 +35,6 @@ import org.ggf.rns.RNSEntryNotDirectoryFaultType;
 import org.ggf.rns.RNSFaultType;
 import org.ggf.rns.Remove;
 import org.ggf.sbyteio.StreamableByteIOPortType;
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.GuaranteedDirectory;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
@@ -141,10 +140,6 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 			mgr.addNewBES(addRequest.getEntry_name(), addRequest.getEntry_reference());
 			return new AddResponse(addRequest.getEntry_reference());
 		}
-		catch (ConfigurationException ce)
-		{
-			throw new RemoteException("Unable to add bes container.", ce);
-		}
 		catch (SQLException sqe)
 		{
 			throw new RemoteException("Unable to add bes container.", sqe);
@@ -235,19 +230,12 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 				_DEFAULT_TIME_TO_LIVE)
 		};
 		
-		try
-		{
-			StreamableByteIOPortType sbyteio = ClientUtils.createProxy(
-				StreamableByteIOPortType.class, EPRUtils.makeEPR(
-					Container.getServiceURL("StreamableByteIOPortType")));
-			VcgrCreateResponse resp = sbyteio.vcgrCreate(new VcgrCreate(parameters));
-			
-			return new CreateFileResponse(resp.getEndpoint());
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new ResourceException(ce.getLocalizedMessage(), ce);
-		}
+		StreamableByteIOPortType sbyteio = ClientUtils.createProxy(
+			StreamableByteIOPortType.class, EPRUtils.makeEPR(
+				Container.getServiceURL("StreamableByteIOPortType")));
+		VcgrCreateResponse resp = sbyteio.vcgrCreate(new VcgrCreate(parameters));
+		
+		return new CreateFileResponse(resp.getEndpoint());
 	}
 
 	private JobInformationType[] getStatus(String[] getStatusRequest)
@@ -284,10 +272,6 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		{
 			return new IterateStatusResponseType(super.createWSIterator(
 				col.iterator(), 100));
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new RemoteException("Unable to create iterator.", ce);
 		}
 		catch (SQLException sqe)
 		{
@@ -369,10 +353,6 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 			return new IterateListResponseType(
 				super.createWSIterator(col.iterator(), 100));
 		}
-		catch (ConfigurationException ce)
-		{
-			throw new RemoteException("Unable to create iterator.", ce);
-		}
 		catch (SQLException sqe)
 		{
 			throw new RemoteException("Unable to create iterator.", sqe);
@@ -433,10 +413,6 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 				submitJobRequest.getJobDefinition());
 			
 			return new SubmitJobResponseType(ticket);
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new RemoteException("Unable to submit job to queue.", ce);
 		}
 		catch (SQLException sqe)
 		{

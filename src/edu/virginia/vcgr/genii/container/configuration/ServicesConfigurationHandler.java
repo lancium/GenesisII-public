@@ -51,7 +51,7 @@ public class ServicesConfigurationHandler implements
 	static public QName DEFAULT_RESOLVER_FACTORY_ELEMENT_QNAME =
 		new QName(GenesisIIConstants.GENESISII_NS, "default-resolver-factory-settings");
 	
-	public Object parse(Node n) throws ConfigurationException
+	public Object parse(Node n)
 	{
 		HashMap<String, ServiceDescription> serviceDescriptions
 			= new HashMap<String, ServiceDescription>();
@@ -85,7 +85,6 @@ public class ServicesConfigurationHandler implements
 	}
 	
 	private ServiceDescription parseServiceDescription(Node n)
-		throws ConfigurationException
 	{
 		Properties securityProps = null;
 		Properties defaultResolverFactoryProps = null;

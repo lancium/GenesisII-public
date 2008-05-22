@@ -3,7 +3,6 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
@@ -44,14 +43,14 @@ public class CatTool extends BaseGridTool
 	
 	public void cat(RNSPath currentPath,
 		String filePath)
-		throws RNSException, ConfigurationException, IOException
+		throws RNSException, IOException
 	{
 		for (RNSPath file : currentPath.expand(filePath))		
 			cat(file);
 	}
 	
 	 public void cat(RNSPath file)
-		throws RNSException, ConfigurationException, IOException
+		throws RNSException, IOException
 	{
 		byte []data = new byte[ByteIOConstants.PREFERRED_SIMPLE_XFER_BLOCK_SIZE];
 		int read;

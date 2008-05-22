@@ -20,7 +20,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.RNSEntryExistsFaultType;
 import org.morgan.util.GUID;
-import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.ReferenceParametersType;
 
@@ -743,49 +742,42 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		String entryType, MessageElement []creationProperties)
 		throws ResourceException, RemoteException
 	{
-		try
-		{
-			_logger.debug("Creating new export entries");
+		_logger.debug("Creating new export entries");
 			
-			/* create new Export resource */
-			GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, serviceEPR);
-			VcgrCreateResponse resp = common.vcgrCreate(
-				new VcgrCreate(creationProperties));
-			
-			EndpointReferenceType entryReference = resp.getEndpoint();
-			
-			//replicate if flag is set
-			if (getReplicationState().equals("true")){
-			
-				//creates resolver and replica for new export entry
-				//returns augmented EPR with resolver to replica
-				try{
-					entryReference = RExportResolverUtils.setupRExport(
-						entryReference,  //primary epr
-						entryType,       //file or dir primary type
-						creationProperties[0].getValue(),  //primary localpath of export
-						getResourceEPIasString(),	 //EPI of dir resource containing new entry
-						nextRealName);   //name of file/dir
-				}
-				catch (Exception e){
-					_logger.error("Unable to create/replicate/fill exportdir's rexport resolver: " + e.getLocalizedMessage());
-					throw new ResourceException("Unable to create/replicate/fill exportdir's  rexport resolver: " + e.getLocalizedMessage());
-				}
-			}
+		/* create new Export resource */
+		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, serviceEPR);
+		VcgrCreateResponse resp = common.vcgrCreate(
+			new VcgrCreate(creationProperties));
 		
-			//create entry for new export resource in export DB
-			String newId = (new GUID()).toString();
-			ExportedDirEntry newEntry = new ExportedDirEntry(
-				getId(), nextRealName, entryReference, newId, 
-				entryType, null);
-			addEntry(newEntry, false);
-			
-			return newEntry;
+		EndpointReferenceType entryReference = resp.getEndpoint();
+		
+		//replicate if flag is set
+		if (getReplicationState().equals("true")){
+		
+			//creates resolver and replica for new export entry
+			//returns augmented EPR with resolver to replica
+			try{
+				entryReference = RExportResolverUtils.setupRExport(
+					entryReference,  //primary epr
+					entryType,       //file or dir primary type
+					creationProperties[0].getValue(),  //primary localpath of export
+					getResourceEPIasString(),	 //EPI of dir resource containing new entry
+					nextRealName);   //name of file/dir
+			}
+			catch (Exception e){
+				_logger.error("Unable to create/replicate/fill exportdir's rexport resolver: " + e.getLocalizedMessage());
+				throw new ResourceException("Unable to create/replicate/fill exportdir's  rexport resolver: " + e.getLocalizedMessage());
+			}
 		}
-		catch (ConfigurationException ce)
-		{
-			throw new ResourceException(ce.getLocalizedMessage(), ce);
-		}
+	
+		//create entry for new export resource in export DB
+		String newId = (new GUID()).toString();
+		ExportedDirEntry newEntry = new ExportedDirEntry(
+			getId(), nextRealName, entryReference, newId, 
+			entryType, null);
+		addEntry(newEntry, false);
+		
+		return newEntry;
 	}
 	
 	/*

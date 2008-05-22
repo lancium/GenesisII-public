@@ -22,7 +22,6 @@ import java.rmi.RemoteException;
 
 import org.apache.axis.types.URI;
 import org.ggf.rbyteio.RandomByteIOPortType;
-import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransferer;
@@ -51,12 +50,12 @@ public class RandomByteIOOutputStream extends OutputStream
 	 * @param desiredTransferProtocol The desired transfer protocol to use when
 	 * writing bytes.
 	 * 
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws RemoteException
 	 */
 	public RandomByteIOOutputStream(EndpointReferenceType target, 
 		URI desiredTransferType)
-			throws ConfigurationException, RemoteException
+			throws IOException, RemoteException
 	{
 		RandomByteIOPortType clientStub = ClientUtils.createProxy(
 			RandomByteIOPortType.class, target);
@@ -71,11 +70,11 @@ public class RandomByteIOOutputStream extends OutputStream
 	 * 
 	 * @param target The target ByteIO to write bytes to.
 	 * 
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws RemoteException
 	 */
 	public RandomByteIOOutputStream(EndpointReferenceType target)
-		throws ConfigurationException, RemoteException
+		throws IOException, RemoteException
 	{
 		this(target, null);
 	}

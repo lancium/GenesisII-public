@@ -13,7 +13,6 @@ import javax.xml.soap.SOAPMessage;
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.Token;
 import org.morgan.util.GUID;
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 import org.mortbay.http.HttpContext;
 import org.mortbay.http.HttpException;
@@ -165,12 +164,12 @@ public class NotificationServer
 	 * @param listener A notification listener to call when a notification comes in.
 	 * @return A subscription instance which can be used later to cancel the subscription.
 	 * 
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws IOException
 	 */
 	public ISubscription addNotificationListener(EndpointReferenceType target,
 		String topic, INotificationListener listener) 
-		throws ConfigurationException, IOException
+		throws IOException
 	{
 		GUID userKey = _listeners.addEntry(listener);
 		
@@ -201,12 +200,12 @@ public class NotificationServer
 	 * @return A subscription instance which can be used later to cancel the subscription.
 	 * 
 	 * @throws RNSPathDoesNotExistException
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws IOException
 	 */
 	public ISubscription addNotificationListener(RNSPath target,
 		String topic, INotificationListener listener) 
-			throws RNSPathDoesNotExistException, ConfigurationException, IOException
+			throws RNSPathDoesNotExistException, IOException
 	{
 		return addNotificationListener(target.getEndpoint(), topic, listener);
 	}

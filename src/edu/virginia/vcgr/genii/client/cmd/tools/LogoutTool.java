@@ -80,7 +80,9 @@ public class LogoutTool extends BaseGridTool
 			while (true) {
 				ArrayList <GamlCredential> credentials = 
 					TransientCredentials.getTransientCredentials(callContext)._credentials;
-				stdout.println("Please select a credential to remove:");
+				if (credentials.size() == 0)
+					break;
+				stdout.println("Please select a credential to logout from:");
 				for (int lcv = 0; lcv < credentials.size(); lcv++) {
 					stdout.println("\t[" + lcv + "]:  " + credentials.get(lcv));
 				}

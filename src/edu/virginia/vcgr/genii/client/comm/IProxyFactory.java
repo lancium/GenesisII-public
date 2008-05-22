@@ -17,7 +17,6 @@ package edu.virginia.vcgr.genii.client.comm;
 
 import java.util.Collection;
 
-import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.comm.attachments.AttachmentType;
@@ -30,7 +29,7 @@ public interface IProxyFactory
 {
 	public <IFace> IFace createProxy(ClassLoader loader,
 		Class<IFace> iface, EndpointReferenceType epr, ICallingContext callContext)
-			throws ConfigurationException, ResourceException, GenesisIISecurityException;
+			throws ResourceException, GenesisIISecurityException;
 	
 	/**
 	 * This method can be used to determine the EPR that a proxy (created by this

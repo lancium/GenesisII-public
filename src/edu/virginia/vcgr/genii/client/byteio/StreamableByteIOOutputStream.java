@@ -10,7 +10,6 @@ import javax.xml.namespace.QName;
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
 import org.ggf.sbyteio.StreamableByteIOPortType;
-import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.MetadataType;
 
@@ -45,12 +44,12 @@ public class StreamableByteIOOutputStream extends OutputStream
 	 * @param desiredTransferProtocol The desired transfer protocol to use when
 	 * reading bytes.
 	 * 
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws RemoteException
 	 */
 	public StreamableByteIOOutputStream(EndpointReferenceType epr,
 		URI desiredTransferProtocol) 
-			throws ConfigurationException, RemoteException
+			throws IOException, RemoteException
 	{
 		TypeInformation tInfo = new TypeInformation(epr);
 		
@@ -72,7 +71,7 @@ public class StreamableByteIOOutputStream extends OutputStream
 		}
 		catch (ResourcePropertyException rpe)
 		{
-			throw new ConfigurationException("Unable to create RP interface.", rpe);
+			throw new IOException("Unable to create RP interface.", rpe);
 		}
 		
 		_targetByteIO = epr;
@@ -89,11 +88,11 @@ public class StreamableByteIOOutputStream extends OutputStream
 	 * 
 	 * @param epr The target ByteIO to write bytes to.
 	 * 
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws RemoteException
 	 */
 	public StreamableByteIOOutputStream(EndpointReferenceType epr)
-		throws ConfigurationException, RemoteException
+		throws IOException, RemoteException
 	{
 		this(epr, null);
 	}
@@ -133,21 +132,14 @@ public class StreamableByteIOOutputStream extends OutputStream
 	@Override
 	synchronized public void close() throws IOException
 	{
-		try
+		if (_createdSByteIO != null || destroyOnClose())
 		{
-			if (_createdSByteIO != null || destroyOnClose())
-			{
-				GeniiCommon common = ClientUtils.createProxy(
-					GeniiCommon.class, _targetByteIO);
-				common.destroy(null);
-				
-				_createdSByteIO = null;
-				_targetByteIO = null;
-			}
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new IOException("Unable to close streamble byteio.", ce);
+			GeniiCommon common = ClientUtils.createProxy(
+				GeniiCommon.class, _targetByteIO);
+			common.destroy(null);
+			
+			_createdSByteIO = null;
+			_targetByteIO = null;
 		}
 	}
 	

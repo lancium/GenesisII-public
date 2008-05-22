@@ -203,11 +203,26 @@ public class DatabaseConnectionPool
 			}
 			catch (Throwable cause)
 			{
-				_logger.info("Expected exception for rejuvenation.", cause);
+				_logger.debug("Expected exception for rejuvenation.", cause);
 			}
 			finally
 			{
 				StreamUtils.close(connection);
+			}
+			
+			
+			for (Connection conn : _connPool)
+			{
+				try
+				{
+					((ConnectionInterceptor)Proxy.getInvocationHandler(
+						conn)).getConnection().close();
+				}
+				catch (Throwable cause)
+				{
+					_logger.debug(
+						"Exception occurred trying to close connection.", cause);
+				}
 			}
 			
 			/* Force the GC to unload the database driver.  It'll get reloaded
@@ -237,6 +252,7 @@ public class DatabaseConnectionPool
 		finally
 		{
 			_lock.writeLock().unlock();
+			_logger.info("Done rejuvenating database.");
 		}
 	}
 	

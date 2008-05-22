@@ -45,13 +45,13 @@ public class ContextManager
 		new ResolverThreadLocal();
 	
 	static public ICallingContext getCurrentContext()
-		throws ConfigurationException, FileNotFoundException, IOException
+		throws FileNotFoundException, IOException
 	{
 		return getCurrentContext(true);
 	}
 	
 	static public ICallingContext getCurrentContext(boolean mustExist)
-		throws ConfigurationException, FileNotFoundException, IOException
+		throws FileNotFoundException, IOException
 	{
 		ICallingContext ctxt = getResolver().load();
 		if (ctxt == null && mustExist)
@@ -63,12 +63,12 @@ public class ContextManager
 	}
 	
 	static public void storeCurrentContext(ICallingContext context)
-		throws ConfigurationException, FileNotFoundException, IOException
+		throws FileNotFoundException, IOException
 	{
 		getResolver().store(context);
 	}
 	
-	static public ICallingContext bootstrap(RNSPath root) throws IOException, ConfigurationException
+	static public ICallingContext bootstrap(RNSPath root) throws IOException
 	{
 		ICallingContext bootContext = new CallingContextImpl(root);
 		
@@ -83,7 +83,7 @@ public class ContextManager
 	}
 	
 	@SuppressWarnings("unchecked")
-	static public IContextResolver getResolver() throws ConfigurationException
+	static public IContextResolver getResolver()
 	{
 		IContextResolver resolver = _resolver.get();
 		if (resolver == null)

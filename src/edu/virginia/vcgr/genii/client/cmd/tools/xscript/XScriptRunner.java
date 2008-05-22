@@ -21,7 +21,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -649,7 +648,7 @@ public class XScriptRunner
 	
 	static private ArrayList<String> getSourceRNSList(String sourceRNS,
 		String filter) throws RemoteException, FileNotFoundException, 
-			RNSException, ConfigurationException
+			RNSException
 	{
 		ArrayList<String> ret = new ArrayList<String>();
 		

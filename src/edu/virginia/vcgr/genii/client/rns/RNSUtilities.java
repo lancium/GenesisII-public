@@ -2,8 +2,6 @@ package edu.virginia.vcgr.genii.client.rns;
 
 import java.io.FileNotFoundException;
 
-import org.morgan.util.configuration.ConfigurationException;
-
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 
@@ -40,13 +38,13 @@ public class RNSUtilities
 	 * name of service, name of container, or empty string).
 	 * @return The path to the service we are looking for.
 	 * 
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws RNSException
 	 */
 	static public RNSPath findService(
 		String pathToDefaultContainer, String defaultServiceName,
 		PortType []requiredPortTypes, String userHints)
-		throws ConfigurationException, RNSException, FileNotFoundException
+		throws RNSException, FileNotFoundException
 	{
 		RNSPath current = RNSPath.getCurrent();
 		RNSPath result;

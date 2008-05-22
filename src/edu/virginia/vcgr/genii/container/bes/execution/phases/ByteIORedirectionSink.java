@@ -7,7 +7,6 @@ import java.io.ObjectStreamException;
 import java.io.OutputStream;
 import java.io.StreamCorruptedException;
 
-import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
@@ -28,15 +27,7 @@ public class ByteIORedirectionSink implements StreamRedirectionSink
 	@Override
 	public OutputStream openSink(ExecutionContext context) throws IOException
 	{
-		try
-		{
-			return ByteIOStreamFactory.createOutputStream(_target);
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new IOException(
-				"Unable to open stream to remote object for redirect.", ce);
-		}
+		return ByteIOStreamFactory.createOutputStream(_target);
 	}
 	
 	private void writeObject(ObjectOutputStream out)

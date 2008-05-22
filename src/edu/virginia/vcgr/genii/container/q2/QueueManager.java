@@ -13,7 +13,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.rns.EntryType;
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -240,10 +239,6 @@ public class QueueManager implements Closeable
 		{
 			throw new ResourceException("UInable to create BES Manager.", gse);
 		}
-		catch (ConfigurationException ce)
-		{
-			throw new ResourceException("Unable to create BES Manager.", ce);
-		}
 		finally
 		{
 			_connectionPool.release(connection);
@@ -276,8 +271,7 @@ public class QueueManager implements Closeable
 	/************************************************************************/
 	
 	public void addNewBES(String name, EndpointReferenceType epr)
-		throws SQLException, ResourceException, ConfigurationException,
-			GenesisIISecurityException
+		throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		Connection connection = null;
 		
@@ -340,7 +334,7 @@ public class QueueManager implements Closeable
 	}
 	
 	public String submitJob(short priority, JobDefinition_Type jsdl)
-		throws SQLException, ResourceException, ConfigurationException
+		throws SQLException, ResourceException
 	{
 		Connection connection = null;
 		

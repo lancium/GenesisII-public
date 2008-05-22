@@ -10,7 +10,6 @@ import java.util.Iterator;
 
 import org.apache.axis.types.UnsignedInt;
 import org.ggf.jsdl.JobDefinition_Type;
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
@@ -35,7 +34,7 @@ public class QueueManipulator
 	private EndpointReferenceType _queue;
 
 	public QueueManipulator(String queuePath)
-		throws RNSException, ConfigurationException
+		throws RNSException
 	{
 		RNSPath path = RNSPath.getCurrent().lookup(queuePath, RNSPathQueryFlags.MUST_EXIST);
 		_queue = path.getEndpoint();
@@ -48,7 +47,7 @@ public class QueueManipulator
 	
 	public JobTicket submit(File jsdlFile, int priority)
 		throws FileNotFoundException, ResourceException,
-			RemoteException, ConfigurationException
+			RemoteException
 	{
 		FileInputStream fin = null;
 		try
@@ -62,7 +61,7 @@ public class QueueManipulator
 	}
 	
 	public JobTicket submit(InputStream in, int priority)
-		throws ResourceException, RemoteException, ConfigurationException
+		throws ResourceException, RemoteException
 	{
 		return submit(
 			(JobDefinition_Type)ObjectDeserializer.deserialize(
@@ -71,7 +70,7 @@ public class QueueManipulator
 	}
 	
 	public JobTicket submit(JobDefinition_Type jobDef, int priority)
-		throws RemoteException, ConfigurationException
+		throws RemoteException
 	{
 		QueuePortType queue = ClientUtils.createProxy(QueuePortType.class, _queue);
 		return new JobTicket(queue.submitJob(new SubmitJobRequestType(
@@ -79,7 +78,7 @@ public class QueueManipulator
 	}
 	
 	public Iterator<JobInformation> status(Collection<JobTicket> jobs)
-		throws RemoteException, ConfigurationException
+		throws RemoteException
 	{
 		QueuePortType queue = ClientUtils.createProxy(QueuePortType.class, _queue);
 		String []jobTickets = null;
@@ -107,7 +106,7 @@ public class QueueManipulator
 	}
 	
 	public Iterator<ReducedJobInformation> list()
-		throws RemoteException, ConfigurationException
+		throws RemoteException
 	{
 		QueuePortType queue = ClientUtils.createProxy(QueuePortType.class, _queue);
 		
@@ -126,7 +125,7 @@ public class QueueManipulator
 	}
 	
 	public void kill(Collection<JobTicket> jobs)
-		throws RemoteException, ConfigurationException
+		throws RemoteException
 	{
 		String []tickets = new String[jobs.size()];
 		int lcv = 0;
@@ -140,7 +139,7 @@ public class QueueManipulator
 	}
 	
 	public void complete(Collection<JobTicket> jobs)
-		throws RemoteException, ConfigurationException
+		throws RemoteException
 	{
 		String []tickets = new String[jobs.size()];
 		int lcv = 0;
@@ -154,14 +153,14 @@ public class QueueManipulator
 	}
 	
 	public void completeAll()
-		throws RemoteException, ConfigurationException
+		throws RemoteException
 	{
 		QueuePortType queue = ClientUtils.createProxy(QueuePortType.class, _queue);
 		queue.completeJobs(null);
 	}
 	
 	public void configure(String resourceName, int numSlots)
-		throws RemoteException, ConfigurationException
+		throws RemoteException
 	{
 		QueuePortType queue = ClientUtils.createProxy(QueuePortType.class, _queue);
 		queue.configureResource(new ConfigureRequestType(resourceName,

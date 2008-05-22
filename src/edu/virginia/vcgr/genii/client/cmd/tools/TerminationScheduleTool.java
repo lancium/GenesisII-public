@@ -6,7 +6,6 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.morgan.util.configuration.ConfigurationException;
 import org.oasis_open.docs.wsrf.rl_2.SetTerminationTime;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
@@ -66,8 +65,7 @@ public class TerminationScheduleTool extends BaseGridTool
 	}
 	
 	static public void schedTerm(RNSPath target, Date targetTime)
-		throws ConfigurationException, RemoteException,
-			RNSPathDoesNotExistException
+		throws RemoteException, RNSPathDoesNotExistException
 	{
 		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class,
 			target.getEndpoint());

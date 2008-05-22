@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import org.morgan.util.configuration.ConfigurationException;
-
 import edu.virginia.vcgr.genii.client.cmd.tools.GamlLoginTool;
 import edu.virginia.vcgr.genii.client.cmd.tools.LogoutTool;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
@@ -22,7 +20,7 @@ public class GeniiBackendConfiguration implements Cloneable
 	private RNSPath _root;
 	
 	private GeniiBackendConfiguration(ICallingContext callingContext, RNSPath root)
-		throws ConfigurationException, IOException
+		throws IOException
 	{
 		_callingContext = callingContext;
 		_root = root;
@@ -91,10 +89,6 @@ public class GeniiBackendConfiguration implements Cloneable
 		try
 		{
 			return new GeniiBackendConfiguration(_callingContext.deriveNewContext(), _root);
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new RuntimeException("Unexpected internal exception.", ce);
 		}
 		catch (IOException ioe)
 		{

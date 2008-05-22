@@ -74,7 +74,6 @@ public class RNSPath implements Serializable
 	static private Log _logger = LogFactory.getLog(RNSPath.class);
 	
 	static public RNSPath getCurrent()
-		throws ConfigurationException
 	{
 		try
 		{
@@ -98,12 +97,6 @@ public class RNSPath implements Serializable
 		{
 			throw new SecurityException(
 				"Unable to create Genesis II proxy.", gse);
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new RuntimeException(
-				"Genesis II appears to be misconfigured.  " +
-				"Unable to create proxy.", ce);
 		}
 		catch (ResourceException re)
 		{
@@ -442,6 +435,25 @@ public class RNSPath implements Serializable
 		return ret;
 	}
 
+	public RNSPath expandSingleton(String pathExpression)
+		throws RNSMultiLookupResultException
+	{
+		return expandSingleton(pathExpression, null);
+	}
+	
+	public RNSPath expandSingleton(String pathExpression, 
+		FilterFactory filterType) throws RNSMultiLookupResultException
+	{
+		Collection<RNSPath> ret = expand(pathExpression, filterType);
+		
+		if (ret.size() < 1)
+			return null;
+		else if (ret.size() > 1)
+			throw new RNSMultiLookupResultException(pathExpression);
+		
+		return ret.iterator().next();
+	}
+	
 	public Collection<RNSPath> expand(String pathExpression)
 	{
 		return expand(pathExpression, new FilePatternFilterFactory());
@@ -453,6 +465,9 @@ public class RNSPath implements Serializable
 		if (pathExpression == null)
 			throw new IllegalArgumentException(
 				"Cannot lookup a path which is null.");
+		
+		if (filterType == null)
+			filterType = new FilePatternFilterFactory();
 		
 		try
 		{
@@ -522,10 +537,6 @@ public class RNSPath implements Serializable
 			{
 				throw new RNSException("Unable to list contents -- " +
 					"security exception.", gse);
-			}
-			catch (ConfigurationException ce)
-			{
-				throw new RNSException("Unable to list contents.", ce);
 			}
 			catch (RemoteException re)
 			{

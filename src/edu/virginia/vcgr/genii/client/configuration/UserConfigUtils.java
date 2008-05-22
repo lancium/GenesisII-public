@@ -3,8 +3,6 @@ package edu.virginia.vcgr.genii.client.configuration;
 import java.io.File;
 import java.io.IOException;
 
-import org.morgan.util.configuration.ConfigurationException;
-
 import edu.virginia.vcgr.genii.client.cmd.GetUserDir;
 import edu.virginia.vcgr.genii.client.utils.deployment.DeploymentRelativeFile;
 
@@ -24,7 +22,7 @@ public class UserConfigUtils
 	 * @return
 	 */
 	static public void setCurrentUserConfig(UserConfig userConfig) 
-		throws IOException, ConfigurationException
+		throws IOException
 	{
 		String userConfigFilePath = getUserConfigFilePath();
 		File userConfigFile = new File(userConfigFilePath);
@@ -42,7 +40,7 @@ public class UserConfigUtils
 	 * @return UserConfig Structure describing user's current config info.
 	 */
 	static public UserConfig getCurrentUserConfig() 
-		throws IOException, ConfigurationException
+		throws IOException
 	{
 		String userConfigFilePath = getUserConfigFilePath();
 		File userConfigFile = new File(userConfigFilePath);

@@ -1,12 +1,12 @@
 package edu.virginia.vcgr.genii.client.byteio;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.rmi.RemoteException;
 
 import org.apache.axis.types.URI;
-import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
@@ -37,12 +37,11 @@ public class ByteIOStreamFactory
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 */
 	static public InputStream createInputStream(EndpointReferenceType target, 
 		URI desiredTransferType, boolean createBuffered)
-			throws FileNotFoundException, RemoteException,
-				ConfigurationException
+			throws FileNotFoundException, IOException, RemoteException
 	{
 		TypeInformation tInfo = new TypeInformation(target);
 		if (tInfo.isRByteIO())
@@ -78,11 +77,11 @@ public class ByteIOStreamFactory
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 */
 	static public InputStream createInputStream(EndpointReferenceType target,
 		boolean createBuffered) throws FileNotFoundException, RemoteException,
-			ConfigurationException
+			IOException
 	{
 		return createInputStream(target, null, createBuffered);
 	}
@@ -98,18 +97,18 @@ public class ByteIOStreamFactory
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 */
 	static public InputStream createInputStream(EndpointReferenceType target)
-		throws FileNotFoundException, RemoteException, ConfigurationException
+		throws FileNotFoundException, RemoteException, IOException
 	{
 		return createInputStream(target, null, true);
 	}
 	
 	static public InputStream createInputStream(RNSPath target, 
 		URI desiredTransferType, boolean createBuffered)
-			throws FileNotFoundException, RemoteException,
-				ConfigurationException, RNSException
+			throws FileNotFoundException, RemoteException, RNSException,
+				IOException
 	{
 		if (!target.exists())
 			throw new FileNotFoundException("Couldn't find file \"" + 
@@ -131,12 +130,12 @@ public class ByteIOStreamFactory
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws RNSException
 	 */
 	static public InputStream createInputStream(RNSPath target,
 		boolean createBuffered)	throws FileNotFoundException, RemoteException,
-			ConfigurationException, RNSException
+			RNSException, IOException
 	{
 			return createInputStream(target, null, createBuffered);
 	}
@@ -152,12 +151,12 @@ public class ByteIOStreamFactory
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws RNSException
 	 */
 	static public InputStream createInputStream(RNSPath target)
 		throws FileNotFoundException, RemoteException,
-			ConfigurationException, RNSException
+			RNSException, IOException
 	{
 			return createInputStream(target, null, true);
 	}
@@ -176,12 +175,11 @@ public class ByteIOStreamFactory
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 */
 	static public OutputStream createOutputStream(EndpointReferenceType target, 
 		URI desiredTransferType, boolean createBuffered)
-			throws FileNotFoundException, RemoteException,
-				ConfigurationException
+			throws FileNotFoundException, RemoteException, IOException
 	{
 		TypeInformation tInfo = new TypeInformation(target);
 		if (tInfo.isRByteIO())
@@ -217,11 +215,11 @@ public class ByteIOStreamFactory
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 */
 	static public OutputStream createOutputStream(EndpointReferenceType target,
 		boolean createBuffered) throws FileNotFoundException, RemoteException,
-			ConfigurationException
+			IOException
 	{
 		return createOutputStream(target, null, createBuffered);
 	}
@@ -237,10 +235,10 @@ public class ByteIOStreamFactory
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 */
 	static public OutputStream createOutputStream(EndpointReferenceType target)
-		throws FileNotFoundException, RemoteException, ConfigurationException
+		throws FileNotFoundException, RemoteException, IOException
 	{
 		return createOutputStream(target, null, true);
 	}
@@ -259,13 +257,13 @@ public class ByteIOStreamFactory
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws RNSException
 	 */
 	static public OutputStream createOutputStream(RNSPath target, 
 		URI desiredTransferType, boolean createBuffered)
 			throws FileNotFoundException, RemoteException,
-				ConfigurationException, RNSException
+				RNSException, IOException
 	{
 		if (!target.exists())
 			target.createNewFile();
@@ -286,12 +284,12 @@ public class ByteIOStreamFactory
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws RNSException
 	 */
 	static public OutputStream createOutputStream(RNSPath target,
 		boolean createBuffered)	throws FileNotFoundException, RemoteException,
-			ConfigurationException, RNSException
+			RNSException, IOException
 	{
 			return createOutputStream(target, null, createBuffered);
 	}
@@ -306,12 +304,12 @@ public class ByteIOStreamFactory
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws RNSException
 	 */
 	static public OutputStream createOutputStream(RNSPath target)
 		throws FileNotFoundException, RemoteException,
-			ConfigurationException, RNSException
+			RNSException, IOException
 	{
 			return createOutputStream(target, null, true);
 	}

@@ -3,8 +3,6 @@ package edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.morgan.util.configuration.ConfigurationException;
-
 import edu.virginia.vcgr.genii.client.jni.gIIlib.ResourceInformation;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.cache.CacheManager;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.cache.CachedDir;
@@ -38,7 +36,7 @@ public class WindowsDirHandle extends WindowsResourceHandle {
 	 * Opens a file with given access and filePath (i.e. deposition == OPEN) 
 	 * **/
 	public WindowsDirHandle(RNSPath filePath, Integer desiredAccess) 
-		throws IOException, ConfigurationException, RNSException {
+		throws IOException, RNSException {
 		
 		super();
 		

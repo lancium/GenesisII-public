@@ -10,7 +10,6 @@ import javax.xml.namespace.QName;
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
 import org.ggf.sbyteio.StreamableByteIOPortType;
-import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.MetadataType;
 
@@ -49,12 +48,12 @@ public class StreamableByteIOInputStream extends InputStream
 	 * @param desiredTransferProtocol The desired transfer protocol to use when
 	 * reading bytes.
 	 * 
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws RemoteException
 	 */
 	public StreamableByteIOInputStream(EndpointReferenceType epr,
 		URI desiredTransferProtocol)
-			throws ConfigurationException, RemoteException
+			throws IOException, RemoteException
 	{
 		TypeInformation tInfo = new TypeInformation(epr);
 		
@@ -76,7 +75,7 @@ public class StreamableByteIOInputStream extends InputStream
 		}
 		catch (ResourcePropertyException rpe)
 		{
-			throw new ConfigurationException("Unable to create RP interface.", rpe);
+			throw new IOException("Unable to create RP interface.", rpe);
 		}
 		
 		_targetByteIO = epr;
@@ -93,11 +92,11 @@ public class StreamableByteIOInputStream extends InputStream
 	 * 
 	 * @param epr The source ByteIO to read bytes from.
 	 * 
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws RemoteException
 	 */
 	public StreamableByteIOInputStream(EndpointReferenceType epr)
-		throws ConfigurationException, RemoteException
+		throws IOException, RemoteException
 	{
 		this(epr, null);
 	}
@@ -216,9 +215,7 @@ public class StreamableByteIOInputStream extends InputStream
 	@Override
 	synchronized public void close() throws IOException
 	{
-		try
-		{
-			if (_createdSByteIO != null || destroyOnClose())
+		if (_createdSByteIO != null || destroyOnClose())
 			{
 				GeniiCommon common = ClientUtils.createProxy(
 					GeniiCommon.class, _targetByteIO);
@@ -227,11 +224,6 @@ public class StreamableByteIOInputStream extends InputStream
 				_createdSByteIO = null;
 				_targetByteIO = null;
 			}
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new IOException("Unable to close streamble byteio.", ce);
-		}
 	}
 	
 	/**

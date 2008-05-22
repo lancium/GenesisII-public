@@ -11,7 +11,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.RNSFaultType;
 import org.ggf.sbyteio.StreamableByteIOPortType;
-import org.morgan.util.configuration.ConfigurationException;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
@@ -181,7 +180,7 @@ public class RExportResolverUtils
 			String exportDirEPI, 
 			String replicaName)
 		throws CreationException, ResourceException, RemoteException, 
-		ResourceException, ConfigurationException
+		ResourceException
 	{
 		//create proxy to resolver factory 
 		//  at current (primary) container where new export entry was created
@@ -360,7 +359,7 @@ public class RExportResolverUtils
 	static protected void recordReplicaUnderDir(EndpointReferenceType dirResolverEPR, 
 			EndpointReferenceType replicaEPR, String replicaName, 
 			String replicaType)
-		throws ResourceException, RemoteException, ConfigurationException
+		throws ResourceException, RemoteException
 	{
 		_logger.info("RExportDir resource population beings here");
 		

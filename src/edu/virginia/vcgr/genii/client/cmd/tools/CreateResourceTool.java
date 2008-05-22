@@ -9,7 +9,6 @@ import java.util.Properties;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -111,8 +110,7 @@ public class CreateResourceTool extends BaseGridTool
 	
 	static public EndpointReferenceType createFromRNSService(String rnsPath, 
 		String optTargetName, Properties creationProperties)
-		throws IOException, ConfigurationException, 
-			RNSException, CreationException
+		throws IOException, RNSException, CreationException
 	{
 		RNSPath path = RNSPath.getCurrent();
 		path = path.lookup(rnsPath, RNSPathQueryFlags.MUST_EXIST);
@@ -122,7 +120,7 @@ public class CreateResourceTool extends BaseGridTool
 	
 	static public EndpointReferenceType createFromURLService(
 		String url, String optTargetName, Properties creationProperties)
-			throws ConfigurationException, ResourceException,
+			throws ResourceException,
 				ResourceCreationFaultType, RemoteException, RNSException,
 				CreationException
 	{
@@ -134,7 +132,7 @@ public class CreateResourceTool extends BaseGridTool
 		EndpointReferenceType service,
 		String optTargetName,
 		MessageElement [] createProperties) 
-		throws ConfigurationException, ResourceException,
+		throws ResourceException,
 			ResourceCreationFaultType, RemoteException, RNSException, 
 			CreationException
 	{
@@ -160,7 +158,7 @@ public class CreateResourceTool extends BaseGridTool
 	static public EndpointReferenceType createInstance(
 		EndpointReferenceType service, String optTargetName,
 		Properties creationProperties)
-		throws ConfigurationException, ResourceException,
+		throws ResourceException,
 			ResourceCreationFaultType, RemoteException, RNSException, 
 			CreationException
 	{

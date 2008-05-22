@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.GUID;
-import org.morgan.util.configuration.ConfigurationException;
 
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
@@ -27,10 +26,6 @@ public class Session
 			{
 				ContextManager.storeCurrentContext(originalCtxt);
 				_ctxt = originalCtxt;
-			}
-			catch (ConfigurationException ce)
-			{
-				// can't happen.
 			}
 			catch (IOException fnfe)
 			{

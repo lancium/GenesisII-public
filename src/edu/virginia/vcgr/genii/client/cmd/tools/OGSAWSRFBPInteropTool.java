@@ -8,7 +8,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
-import org.morgan.util.configuration.ConfigurationException;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.oasis_open.docs.wsrf.rl_2.SetTerminationTime;
@@ -45,14 +44,14 @@ public class OGSAWSRFBPInteropTool extends BaseGridTool
 	}
 	
 	static private EndpointReferenceType lookupTickerFactory(String path)
-		throws RNSException, ConfigurationException
+		throws RNSException
 	{
 		return RNSPath.getCurrent().lookup(
 			path, RNSPathQueryFlags.MUST_EXIST).getEndpoint();
 	}
 	
 	static private TickerFactory createTicker(TickerFactory factory)
-		throws RemoteException, ConfigurationException
+		throws RemoteException
 	{
 		EndpointReferenceType epr = factory.createTicker(new CreateTicker()).getTickerReference();
 		return ClientUtils.createProxy(TickerFactory.class, epr);

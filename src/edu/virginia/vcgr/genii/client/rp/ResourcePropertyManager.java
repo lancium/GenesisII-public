@@ -4,7 +4,6 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -64,11 +63,6 @@ public class ResourcePropertyManager
 		{
 			return (ResourcePropertyRefresher)Proxy.newProxyInstance(
 				loader, classes.toArray(new Class<?>[0]), new RPInvoker(likelyRPs, target));
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new ResourcePropertyException(
-				"Configuration exception in Genesis II.", ce);
 		}
 		catch (GenesisIISecurityException gse)
 		{

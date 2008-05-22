@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.Enumeration;
 
 import org.apache.axis.message.MessageElement;
-import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 import org.bouncycastle.asn1.x509.X509Name;
 
@@ -205,10 +204,11 @@ public class CertGeneratorTool extends BaseGridTool
 	}
 	
 	public EndpointReferenceType createGenerator(String service, boolean url,
-		String optTargetName, String issuerCertKSPath, String issuerCertKSPassword, String issuerCertAlias, String issuerCertEntryPassword,
-		Long defaultValidity) 
-		throws IOException, ConfigurationException, 
-				RNSException, CreationException, KeyStoreException, GeneralSecurityException
+		String optTargetName, String issuerCertKSPath, 
+		String issuerCertKSPassword, String issuerCertAlias, 
+		String issuerCertEntryPassword, Long defaultValidity) 
+		throws IOException, RNSException, CreationException, KeyStoreException,
+			GeneralSecurityException
 	{
 		EndpointReferenceType epr;
 		PrivateKey issuerPrivateKey = null;
@@ -295,8 +295,8 @@ public class CertGeneratorTool extends BaseGridTool
 		String o, 
 		String ou, 
 		String email) 
-		throws IOException, ConfigurationException, 
-			RNSException, CreationException, GeneralSecurityException
+		throws IOException, RNSException, CreationException, 
+			GeneralSecurityException
 	{
 		RNSPath path = RNSPath.getCurrent();
 		path = path.lookup(generatorPath, RNSPathQueryFlags.MUST_EXIST);

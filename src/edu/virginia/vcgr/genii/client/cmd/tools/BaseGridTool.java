@@ -15,6 +15,9 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.genii.client.cmd.ITool;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.io.FileResource;
+import edu.virginia.vcgr.genii.client.rns.RNSMultiLookupResultException;
+import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.rns.filters.FilterFactory;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 
 public abstract class BaseGridTool implements ITool
@@ -324,6 +327,36 @@ public abstract class BaseGridTool implements ITool
 			throw new ToolException(
 				"Tool cannot handle flag \"" + flag +
 				"\" due to protection issue.", iae);
+		}
+	}
+	
+	protected RNSPath expandSingleton(String pathExpression)
+		throws InvalidToolUsageException
+	{
+		return expandSingleton(null, pathExpression);
+	}
+	
+	protected RNSPath expandSingleton(RNSPath current, String pathExpression)
+		throws InvalidToolUsageException
+	{
+		return expandSingleton(current, pathExpression, null);
+	}
+	
+	protected RNSPath expandSingleton(
+		RNSPath current, String pathExpression, FilterFactory factoryType)
+		throws InvalidToolUsageException
+	{
+		if (current == null)
+			current = RNSPath.getCurrent();
+		
+		try
+		{
+			return current.expandSingleton(pathExpression, factoryType);
+		}
+		catch (RNSMultiLookupResultException rmlre)
+		{
+			throw new InvalidToolUsageException(
+				"Path expanded to too many entries.");
 		}
 	}
 }

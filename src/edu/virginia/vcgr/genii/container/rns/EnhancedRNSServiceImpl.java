@@ -45,7 +45,6 @@ import org.ggf.rns.RNSEntryExistsFaultType;
 import org.ggf.rns.RNSEntryNotDirectoryFaultType;
 import org.ggf.rns.RNSFaultType;
 import org.ggf.rns.Remove;
-import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
@@ -139,25 +138,18 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 					new RNSEntryExistsFaultType(null, null, null, null,
 						null, null, filename));
 			
-			try
-			{
-				RandomByteIOPortType byteio = ClientUtils.createProxy(
-					RandomByteIOPortType.class,
-					EPRUtils.makeEPR(Container.getServiceURL("RandomByteIOPortType")));
-				EndpointReferenceType entryReference = 
-					byteio.vcgrCreate(new VcgrCreate(null)).getEndpoint();
-				
-				/* if entry has a resolver, set address to unbound */
-				EndpointReferenceType eprToStore = prepareEPRToStore(entryReference);
-				resource.addEntry(new InternalEntry(filename, eprToStore, 
-					attributes));
-				resource.commit();
-				return new CreateFileResponse(entryReference);
-			}
-			catch (ConfigurationException ce)
-			{
-				throw new ResourceException(ce.getLocalizedMessage(), ce);
-			}
+			RandomByteIOPortType byteio = ClientUtils.createProxy(
+				RandomByteIOPortType.class,
+				EPRUtils.makeEPR(Container.getServiceURL("RandomByteIOPortType")));
+			EndpointReferenceType entryReference = 
+				byteio.vcgrCreate(new VcgrCreate(null)).getEndpoint();
+			
+			/* if entry has a resolver, set address to unbound */
+			EndpointReferenceType eprToStore = prepareEPRToStore(entryReference);
+			resource.addEntry(new InternalEntry(filename, eprToStore, 
+				attributes));
+			resource.commit();
+			return new CreateFileResponse(entryReference);
 		}
 	}
 	
@@ -257,10 +249,6 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		{
 			return new IterateListResponseType(
 				super.createWSIterator(col.iterator(), 25));
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new RemoteException("Unable to create iterator.", ce);
 		}
 		catch (SQLException sqe)
 		{
@@ -364,11 +352,6 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		catch(FileNotFoundException fe)
 		{
     		_logger.warn(fe.getLocalizedMessage(), fe);
-			throw FaultManipulator.fillInFault(new RNSFaultType());
-		}
-		catch(ConfigurationException ce)
-		{
-    		_logger.warn(ce.getLocalizedMessage(), ce);
 			throw FaultManipulator.fillInFault(new RNSFaultType());
 		}
 		catch(IOException ie)

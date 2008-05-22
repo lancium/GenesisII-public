@@ -63,7 +63,6 @@ import org.ggf.rns.RNSEntryNotDirectoryFaultType;
 import org.ggf.rns.RNSFaultType;
 import org.ggf.rns.Remove;
 import org.ggf.sbyteio.StreamableByteIOPortType;
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.GuaranteedDirectory;
 import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
@@ -238,24 +237,17 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 				EPRUtils.makeEPR(Container.getServiceURL("BESActivityPortType"));
 		}
 		
-		try
-		{
-			BESActivityPortType activity = ClientUtils.createProxy(
-			BESActivityPortType.class,
-			_localActivityServiceEPR);
-			
-			VcgrCreateResponse resp = activity.vcgrCreate(
-				new VcgrCreate(
-					BESActivityUtils.createCreationProperties(
-						jdt, (String)resource.getKey(), 
-						(Properties)resource.getProperty(
-							GeniiBESConstants.NATIVEQ_PROVIDER_PROPERTY))));
-			return new CreateActivityResponseType(resp.getEndpoint(), adt, null);
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new RemoteException("Unable to create client proxy.", ce);
-		}
+		BESActivityPortType activity = ClientUtils.createProxy(
+		BESActivityPortType.class,
+		_localActivityServiceEPR);
+		
+		VcgrCreateResponse resp = activity.vcgrCreate(
+			new VcgrCreate(
+				BESActivityUtils.createCreationProperties(
+					jdt, (String)resource.getKey(), 
+					(Properties)resource.getProperty(
+						GeniiBESConstants.NATIVEQ_PROVIDER_PROPERTY))));
+		return new CreateActivityResponseType(resp.getEndpoint(), adt, null);
 	}
 	
 	static private UserDataType createUserData(String filename, String filepath)
@@ -314,19 +306,12 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
                 _DEFAULT_TIME_TO_LIVE)
         };
 
-        try
-        {
-            StreamableByteIOPortType sbyteio = ClientUtils.createProxy(
-                StreamableByteIOPortType.class, EPRUtils.makeEPR(
-                    Container.getServiceURL("StreamableByteIOPortType")));
-            VcgrCreateResponse resp = sbyteio.vcgrCreate(new VcgrCreate(parameters));
+        StreamableByteIOPortType sbyteio = ClientUtils.createProxy(
+        	StreamableByteIOPortType.class, EPRUtils.makeEPR(
+        		Container.getServiceURL("StreamableByteIOPortType")));
+        VcgrCreateResponse resp = sbyteio.vcgrCreate(new VcgrCreate(parameters));
 
-            return new CreateFileResponse(resp.getEndpoint());
-        }
-        catch (ConfigurationException ce)
-        {
-        	 throw new ResourceException(ce.getLocalizedMessage(), ce);
-        }
+        return new CreateFileResponse(resp.getEndpoint());
     }
 
 	@Override

@@ -7,7 +7,6 @@ import java.util.HashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.GUID;
-import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.byteio.streamable.factory.StreamableByteIOFactory;
@@ -48,7 +47,7 @@ public class FileHandler
 	
 	static private EndpointReferenceType openSByteIOFromFactory(
 		EndpointReferenceType factory)
-		throws GenesisIISecurityException, ConfigurationException,
+		throws GenesisIISecurityException,
 			ResourceException, ResourceCreationFaultType, RemoteException
 	{
 		StreamableByteIOFactory f = ClientUtils.createProxy(

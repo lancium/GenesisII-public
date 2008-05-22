@@ -25,7 +25,6 @@ public class SslInformation
 	private String _keyPassword;
 	
 	public SslInformation(Properties properties)
-		throws ConfigurationException
 	{
 		_keystoreFilename = properties.getProperty(_KEY_STORE_PROPERTY);
 		_keystoreType = properties.getProperty(_KEY_STORE_TYPE_PROPERTY);

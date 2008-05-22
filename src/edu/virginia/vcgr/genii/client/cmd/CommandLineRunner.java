@@ -8,9 +8,6 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
@@ -18,23 +15,13 @@ import edu.virginia.vcgr.genii.client.cmd.tools.HelpTool;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 
 public class CommandLineRunner
-{
-	static private Log _logger = LogFactory.getLog(CommandLineRunner.class);
-	
+{	
 	private Map<String, ToolDescription> _tools;
 	
 	public CommandLineRunner()
 	{
-		try
-		{
-			_tools = getToolList(
-				ConfigurationManager.getCurrentConfiguration().getClientConfiguration());
-		}
-		catch (ConfigurationException ce)
-		{
-			_logger.error("Unable to initialize the command line runner.", ce);
-			throw new RuntimeException(ce);
-		}
+		_tools = getToolList(
+			ConfigurationManager.getCurrentConfiguration().getClientConfiguration());
 	}
 	
 	public int runCommand(String []cLine, 
@@ -61,7 +48,7 @@ public class CommandLineRunner
 	
 	@SuppressWarnings("unchecked")
 	static public Map<String, ToolDescription> 
-		getToolList(XMLConfiguration conf) throws ConfigurationException
+		getToolList(XMLConfiguration conf)
 	{
 		HashMap<String, ToolDescription> ret;
 		

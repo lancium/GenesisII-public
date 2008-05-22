@@ -11,8 +11,6 @@ import java.util.Collection;
 
 import javax.swing.AbstractAction;
 
-import org.morgan.util.configuration.ConfigurationException;
-
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.client.rcreate.CreationException;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
@@ -78,7 +76,7 @@ class ExportDataAction extends AbstractAction
 	}
 	
 	private void createExport(ExportCreationInformation creationInfo)
-		throws FileLockException, IOException, ExportException, RNSException, ConfigurationException,
+		throws FileLockException, IOException, ExportException, RNSException,
 		CreationException, ResourceCreationFaultType, RemoteException
 	{
 		String rnsPath = creationInfo.getRNSPath();

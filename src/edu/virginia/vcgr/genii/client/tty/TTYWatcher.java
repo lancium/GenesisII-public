@@ -2,11 +2,11 @@ package edu.virginia.vcgr.genii.client.tty;
 
 import java.io.Closeable;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.rmi.RemoteException;
 
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -20,7 +20,7 @@ public class TTYWatcher
 	
 	synchronized static public void watch(PrintStream stdout, PrintStream stderr,
 		EndpointReferenceType tty) throws TTYException, RemoteException, 
-			FileNotFoundException, ConfigurationException
+			FileNotFoundException, IOException
 	{
 		if (_watcherThread != null)
 			throw new TTYException("Already watching a tty object.");
@@ -48,7 +48,7 @@ public class TTYWatcher
 		
 		public WatcherThread(PrintStream out, PrintStream err,
 			EndpointReferenceType epr)
-				throws RemoteException, ConfigurationException, 
+				throws RemoteException, IOException,
 					FileNotFoundException
 		{
 			super("TTY Watcher Thread");

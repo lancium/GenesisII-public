@@ -6,7 +6,6 @@ import java.util.LinkedList;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
-import org.morgan.util.configuration.ConfigurationException;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
@@ -68,20 +67,12 @@ public abstract class AbstractByteIOTransferer<Type> implements ByteIOTransferer
 	static protected byte[] receiveResponseAttachmentData(Object clientProxy) 
 		throws RemoteException
 	{
-		try
-		{
-			Collection<GeniiAttachment> attachments =
-				ClientUtils.getAttachments(clientProxy);
-			if (attachments == null || attachments.size() != 1)
-				throw new RemoteException("Invalid attachment data received.");
+		Collection<GeniiAttachment> attachments =
+			ClientUtils.getAttachments(clientProxy);
+		if (attachments == null || attachments.size() != 1)
+			throw new RemoteException("Invalid attachment data received.");
 			
-			return attachments.iterator().next().getData();
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new RemoteException(
-				"Unable to get attachments from client proxy.", ce);
-		}
+		return attachments.iterator().next().getData();
 	}
 	
 	/**
@@ -100,19 +91,11 @@ public abstract class AbstractByteIOTransferer<Type> implements ByteIOTransferer
 	static protected void sendRequestAttachmentData(Object clientProxy,
 		byte []data, AttachmentType attachmentType) throws RemoteException
 	{
-		try
-		{
-			LinkedList<GeniiAttachment> attachments =
-				new LinkedList<GeniiAttachment>();
-			attachments.add(new GeniiAttachment(data));
-			ClientUtils.setAttachments(
-				clientProxy, attachments, attachmentType);
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new RemoteException(
-				"Unable to set attachments for client proxy.", ce);
-		}
+		LinkedList<GeniiAttachment> attachments =
+			new LinkedList<GeniiAttachment>();
+		attachments.add(new GeniiAttachment(data));
+		ClientUtils.setAttachments(
+			clientProxy, attachments, attachmentType);
 	}
 	
 	protected Type _clientStub;

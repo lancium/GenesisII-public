@@ -34,8 +34,6 @@ import org.morgan.util.GUID;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
-import org.morgan.util.configuration.ConfigurationException;
-
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedFileUtils;
@@ -279,9 +277,6 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 		try{
 			return new IterateListResponseType(super.createWSIterator(
 					entryCollection.iterator(), 25));
-		}
-		catch (ConfigurationException ce){
-			throw new RemoteException("Unable to create iterator for exportDir lookup.", ce);
 		}
 		catch (SQLException sqe){
 			throw new RemoteException("Unable to create iterator for exportDir lookup.", sqe);

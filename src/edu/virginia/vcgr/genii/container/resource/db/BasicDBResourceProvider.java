@@ -24,7 +24,7 @@ public class BasicDBResourceProvider implements IResourceProvider
 	
 	@SuppressWarnings("unchecked")
 	public BasicDBResourceProvider(Properties properties)
-		throws SQLException, ConfigurationException
+		throws SQLException
 	{	
 		_translater = instantiateTranslater();
 		_connectionPoolName = properties.getProperty(
@@ -37,7 +37,7 @@ public class BasicDBResourceProvider implements IResourceProvider
 	
 	@SuppressWarnings("unchecked")
 	private DatabaseConnectionPool createConnectionPool()
-		throws ConfigurationException
+
 	{
 		DatabaseConnectionPool pool = null;
 		

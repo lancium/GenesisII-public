@@ -13,7 +13,6 @@ import org.ggf.jsdl.OperatingSystemTypeEnumeration;
 import org.ggf.jsdl.OperatingSystemType_Type;
 import org.ggf.jsdl.OperatingSystem_Type;
 import org.ggf.jsdl.ProcessorArchitectureEnumeration;
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.ws.addressing.EndpointReferenceType;
@@ -152,8 +151,8 @@ public class ApplicationDescriptionTool extends BaseGridTool
 
 	public int createApplication(
 		String descriptionServicePath, String newApplication, String version)
-		throws RemoteException, RNSException, ConfigurationException,
-			CreationException, FileNotFoundException
+		throws RemoteException, RNSException, CreationException, 
+			FileNotFoundException
 	{
 		RNSPath path = RNSPath.getCurrent().lookup(newApplication, 
 			RNSPathQueryFlags.MUST_NOT_EXIST);
@@ -193,8 +192,7 @@ public class ApplicationDescriptionTool extends BaseGridTool
 	public int registerApplication(
 		String applicationName, String registrationName,
 		String deploymentDocumentPath)
-		throws FileNotFoundException, IOException, RNSException,
-			ConfigurationException
+		throws FileNotFoundException, IOException, RNSException
 	{
 		File deployDirectory = null;
 		DeploymentDocumentType deployDocument;
@@ -214,8 +212,7 @@ public class ApplicationDescriptionTool extends BaseGridTool
 	}
 	
 	public int registerProgram(String applicationPath, String binaryPath)
-		throws ToolException, FileNotFoundException, IOException, RNSException,
-		ConfigurationException
+		throws ToolException, FileNotFoundException, IOException, RNSException
 	{
 		PlatformDescriptionType []platforms;
 		
@@ -259,8 +256,7 @@ public class ApplicationDescriptionTool extends BaseGridTool
 	
 	private int register(String applicationPath, String registrationName,
 		File deployDirectory, DeploymentDocumentType deployDocument)
-			throws FileNotFoundException, IOException, RNSException,
-				ConfigurationException
+			throws FileNotFoundException, IOException, RNSException
 	{
 		deployDocument = ApplicationDescriptionUtils.uploadLocalSources(
 			deployDirectory, deployDocument,

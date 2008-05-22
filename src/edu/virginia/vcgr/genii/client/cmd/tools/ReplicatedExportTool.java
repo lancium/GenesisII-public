@@ -9,7 +9,6 @@ import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.Token;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
@@ -233,7 +232,7 @@ public class ReplicatedExportTool extends BaseGridTool
 
 	static public EndpointReferenceType createPrimaryExportedRoot(
 			EndpointReferenceType exportServiceEPR, String localPath, String RNSPath) 
-		throws ConfigurationException, ResourceException,
+		throws ResourceException,
 			ResourceCreationFaultType, RemoteException, RNSException,
 			CreationException
 	{

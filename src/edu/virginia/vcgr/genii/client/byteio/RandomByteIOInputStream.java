@@ -7,7 +7,6 @@ import java.rmi.RemoteException;
 
 import org.apache.axis.types.URI;
 import org.ggf.rbyteio.RandomByteIOPortType;
-import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransferer;
@@ -36,12 +35,12 @@ public class RandomByteIOInputStream extends InputStream
 	 * @param desiredTransferProtocol The desired transfer protocol to use when
 	 * reading bytes.
 	 * 
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws RemoteException
 	 */
 	public RandomByteIOInputStream(EndpointReferenceType source,
 		URI desiredTransferProtocol)
-			throws ConfigurationException, RemoteException
+			throws RemoteException, IOException
 	{
 		RandomByteIOPortType clientStub = ClientUtils.createProxy(
 			RandomByteIOPortType.class, source);
@@ -55,11 +54,11 @@ public class RandomByteIOInputStream extends InputStream
 	 * 
 	 * @param source The source ByteIO to read bytes from.
 	 * 
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws RemoteException
 	 */
 	public RandomByteIOInputStream(EndpointReferenceType source)
-		throws ConfigurationException, RemoteException
+		throws IOException, RemoteException
 	{
 		this(source, null);
 	}

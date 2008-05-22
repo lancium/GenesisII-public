@@ -25,7 +25,6 @@ import javax.swing.tree.TreePath;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.morgan.util.configuration.ConfigurationException;
 
 import edu.virginia.vcgr.genii.client.gui.browser.grid.IActionContext;
 import edu.virginia.vcgr.genii.client.gui.browser.grid.ILongRunningAction;
@@ -88,10 +87,10 @@ public class BrowserDialog extends JFrame
 	 * to use for this browser.
 	 * 
 	 * @throws RNSException
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 */
 	public BrowserDialog(PluginManager pluginManager)
-		throws RNSException, ConfigurationException
+		throws RNSException
 	{
 		setTitle(GENESISII_BROWSER_TITLE);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

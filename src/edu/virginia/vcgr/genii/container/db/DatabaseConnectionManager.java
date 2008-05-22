@@ -56,7 +56,7 @@ public class DatabaseConnectionManager
 		new HashMap<String, DatabaseConnectionPool>();
 	
 	static public Connection acquireConnection(String connectionPoolName)
-		throws ConfigurationException, SQLException
+		throws SQLException
 	{
 		DatabaseConnectionPool pool;
 		synchronized (_pools)
@@ -100,7 +100,6 @@ public class DatabaseConnectionManager
 	
 	@SuppressWarnings("unchecked")
 	static private DatabaseConnectionPool findConnectionPool(String poolName)
-		throws ConfigurationException
 	{
 		DatabaseConnectionPool pool = null;
 		Object obj = NamedInstances.getServerInstances().lookup(poolName);

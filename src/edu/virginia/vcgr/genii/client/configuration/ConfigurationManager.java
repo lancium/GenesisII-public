@@ -138,13 +138,8 @@ public class ConfigurationManager
 				throw new RuntimeException("A configuration manager has already been initialized");
 			}
 			
-			try {
-				_manager = new ConfigurationManager(userDir);
-			}
-			catch (ConfigurationException ce)
-			{
-				throw new RuntimeException(ce.getLocalizedMessage(), ce);
-			}
+			_manager = new ConfigurationManager(userDir);
+			
 			return _manager;
 		}
 	}		
@@ -157,28 +152,21 @@ public class ConfigurationManager
 	{
 		synchronized (ConfigurationManager.class)
 		{
-			try {
-				if (_manager == null)
-					throw new RuntimeException("Cannot call reloadConfiguration() before initializing configuration manager first.");
+			if (_manager == null)
+				throw new RuntimeException("Cannot call reloadConfiguration() before initializing configuration manager first.");
 
-				// notify interested parties that they might want to unload
-				// any cached items from the configuration(s)
-				for (ConfigurationUnloadedListener listener : _unloadListeners) {
-					listener.notifyUnloaded();
-				}
-				
-				_manager = new ConfigurationManager(userDir);
+			// notify interested parties that they might want to unload
+			// any cached items from the configuration(s)
+			for (ConfigurationUnloadedListener listener : _unloadListeners) {
+				listener.notifyUnloaded();
 			}
-			catch (ConfigurationException ce)
-			{
-				throw new RuntimeException(ce.getLocalizedMessage(), ce);
-			}
+			
+			_manager = new ConfigurationManager(userDir);
 			return _manager;
 		}
 	}		
 
 	protected ConfigurationManager(String userDir)
-		throws ConfigurationException
 	{
 		_userDir = new File(userDir);
 		

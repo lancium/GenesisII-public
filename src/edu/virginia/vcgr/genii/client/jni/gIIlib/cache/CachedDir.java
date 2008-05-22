@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.morgan.util.configuration.ConfigurationException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.jni.gIIlib.ResourceInformation;
@@ -44,7 +43,7 @@ public class CachedDir extends CachedResource {
 	private ArrayList <WindowsDirHandle> myHandles = new ArrayList<WindowsDirHandle>();	
 	
 	public CachedDir(RNSPath dirPath, Integer desiredAccess) 
-			throws IOException, RNSException,ConfigurationException{
+			throws IOException, RNSException{
 		super();
 		
 		rnsPath = dirPath;		

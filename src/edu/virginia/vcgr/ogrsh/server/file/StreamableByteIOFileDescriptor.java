@@ -6,7 +6,6 @@ import java.rmi.RemoteException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.sbyteio.StreamableByteIOPortType;
-import org.morgan.util.configuration.ConfigurationException;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -135,17 +134,10 @@ public class StreamableByteIOFileDescriptor extends AbstractFileDescriptor
 
 	public void close() throws IOException
 	{
-		try
-		{
-			StreamableByteIOPortType stub =
-				ClientUtils.createProxy(StreamableByteIOPortType.class, _epr);
+		StreamableByteIOPortType stub =
+			ClientUtils.createProxy(StreamableByteIOPortType.class, _epr);
 			
-			stub.destroy(new Destroy());
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new IOException("Unable to close streamable resource.", ce);
-		}
+		stub.destroy(new Destroy());
 	}
 	
 	public void truncate(long offset) throws OGRSHException

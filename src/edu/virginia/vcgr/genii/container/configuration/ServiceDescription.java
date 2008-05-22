@@ -47,7 +47,6 @@ public class ServiceDescription
 			String authzProviderName, 
 			Properties securityProperties, 
 			Properties defaultResolverFactoryProps)
-		throws ConfigurationException
 	{
 		if (securityProperties != null)
 		{

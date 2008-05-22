@@ -1,10 +1,10 @@
 package edu.virginia.vcgr.genii.client.byteio.transfer;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 
 import org.apache.axis.types.URI;
 import org.ggf.sbyteio.StreamableByteIOPortType;
-import org.morgan.util.configuration.ConfigurationException;
 
 import edu.virginia.vcgr.genii.client.byteio.transfer.dime.DimeSByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.transfer.mtom.MTOMSByteIOTransferer;
@@ -24,12 +24,12 @@ public class StreamableByteIOTransfererFactory extends TransfererFactory
 	 * 
 	 * @param clientStub The remote client stub to use for outcoing calls.
 	 * 
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws RemoteException
 	 */
 	public StreamableByteIOTransfererFactory(
 		StreamableByteIOPortType clientStub)
-			throws ConfigurationException, RemoteException
+			throws RemoteException, IOException
 	{
 		super(clientStub);
 	}
@@ -73,12 +73,11 @@ public class StreamableByteIOTransfererFactory extends TransfererFactory
 	 * 
 	 * @return A newly created streamable byteio transferer.
 	 * 
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 */
 	
 	public StreamableByteIOTransferer createStreamableByteIOTransferer(
-		URI desiredTransferType)
-			throws ConfigurationException
+		URI desiredTransferType) throws IOException
 	{
 		if (desiredTransferType == null)
 			return createStreamableByteIOTransferer();
@@ -92,10 +91,10 @@ public class StreamableByteIOTransfererFactory extends TransfererFactory
 	 * 
 	 * @return A newly created streamable byteio transferer.
 	 * 
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 */
 	public StreamableByteIOTransferer createStreamableByteIOTransferer()
-		throws ConfigurationException
+		throws IOException
 	{
 		return (StreamableByteIOTransferer)createTransferer();
 	}
@@ -109,13 +108,13 @@ public class StreamableByteIOTransfererFactory extends TransfererFactory
 	 * 
 	 * @return A newly create streamable byteio transferer.
 	 * 
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws RemoteException
 	 */
 	
 	static public StreamableByteIOTransferer createStreamableByteIOTransferer(
 		StreamableByteIOPortType target)
-			throws ConfigurationException, RemoteException
+			throws RemoteException, IOException
 	{
 		return (new StreamableByteIOTransfererFactory(
 			target)).createStreamableByteIOTransferer();
@@ -132,12 +131,12 @@ public class StreamableByteIOTransfererFactory extends TransfererFactory
 	 * 
 	 * @return A newly create transferer.
 	 * 
-	 * @throws ConfigurationException
+	 * @throws ConfigurationExceptionMOOCH
 	 * @throws RemoteException
 	 */
 	static public StreamableByteIOTransferer createStreamableByteIOTransferer(
 		StreamableByteIOPortType target, URI desiredTransferType)
-			throws ConfigurationException, RemoteException
+			throws RemoteException, IOException
 	{
 		return (new StreamableByteIOTransfererFactory(
 			target)).createStreamableByteIOTransferer(desiredTransferType);

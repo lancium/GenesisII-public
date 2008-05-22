@@ -15,7 +15,6 @@ import org.ggf.rns.AddResponse;
 import org.ggf.rns.RNSEntryExistsFaultType;
 import org.ggf.rns.RNSEntryNotDirectoryFaultType;
 import org.ggf.rns.RNSFaultType;
-import org.morgan.util.configuration.ConfigurationException;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
@@ -98,23 +97,14 @@ public class ExportedRootServiceImpl extends ExportedDirServiceImpl implements
 		RNSEntryNotDirectoryFaultType, RNSFaultType
 	{
 		_logger.debug("ADDING Exported Root");
-		try
-		{
-			EndpointReferenceType myEPR = 
-				(EndpointReferenceType)WorkingContext.getCurrentWorkingContext().getProperty(
-					WorkingContext.EPR_PROPERTY_NAME);
-			myEPR.setAddress(new AttributedURITypeSmart(
-				Container.getServiceURL("ExportedDirPortType")));
-			ExportedDirPortType ed = ClientUtils.createProxy(ExportedDirPortType.class, myEPR);
-			return ed.add(addRequest);
-		}
-		catch (ConfigurationException ce)
-		{
-			throw FaultManipulator.fillInFault(new RNSFaultType(null, null, null, null,
-				new BaseFaultTypeDescription[] {
-					new BaseFaultTypeDescription(ce.getLocalizedMessage())
-			}, null, null));
-		}
+		
+		EndpointReferenceType myEPR = 
+			(EndpointReferenceType)WorkingContext.getCurrentWorkingContext().getProperty(
+				WorkingContext.EPR_PROPERTY_NAME);
+		myEPR.setAddress(new AttributedURITypeSmart(
+			Container.getServiceURL("ExportedDirPortType")));
+		ExportedDirPortType ed = ClientUtils.createProxy(ExportedDirPortType.class, myEPR);
+		return ed.add(addRequest);
 	}
 	
 	@RWXMapping(RWXCategory.EXECUTE)

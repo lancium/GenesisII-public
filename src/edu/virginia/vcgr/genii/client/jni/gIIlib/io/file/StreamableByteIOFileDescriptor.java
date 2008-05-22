@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 
 import org.ggf.sbyteio.StreamableByteIOPortType;
-import org.morgan.util.configuration.ConfigurationException;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -100,17 +99,10 @@ public class StreamableByteIOFileDescriptor extends IFSFile
 	@Override
 	public void doClose() throws IOException
 	{
-		try
-		{
-			StreamableByteIOPortType stub =
-				ClientUtils.createProxy(StreamableByteIOPortType.class, _epr);
+		StreamableByteIOPortType stub =
+			ClientUtils.createProxy(StreamableByteIOPortType.class, _epr);
 			
-			stub.destroy(new Destroy());
-		}
-		catch (ConfigurationException ce)
-		{
-			throw new IOException("Unable to close streamable resource.");
-		}
+		stub.destroy(new Destroy());
 	}
 	
 	@Override
