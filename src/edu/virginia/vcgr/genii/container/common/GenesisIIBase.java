@@ -775,7 +775,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		}
 	}
 	
-	@RWXMapping(RWXCategory.WRITE)
+	@RWXMapping(RWXCategory.EXECUTE)
 	public SubscribeResponse subscribe(Subscribe subscribeRequest) 
 		throws RemoteException, ResourceUnknownFaultType
 	{
@@ -845,7 +845,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	}
 
 	@Override
-	@RWXMapping(RWXCategory.EXECUTE)
+	@RWXMapping(RWXCategory.WRITE)
 	public DestroyResponse destroy(Destroy destroyRequest)
 			throws RemoteException, ResourceUnknownFaultType,
 			ResourceNotDestroyedFaultType, ResourceUnavailableFaultType
@@ -890,7 +890,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	}
 
 	@Override
-	@RWXMapping(RWXCategory.EXECUTE)
+	@RWXMapping(RWXCategory.WRITE)
 	public SetTerminationTimeResponse setTerminationTime(
 			SetTerminationTime setTerminationTimeRequest)
 			throws RemoteException, ResourceUnknownFaultType,
@@ -908,7 +908,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	}
 
 	@Override
-	@RWXMapping(RWXCategory.EXECUTE)
+	@RWXMapping(RWXCategory.WRITE)
 	public DeleteResourcePropertiesResponse deleteResourceProperties(
 			DeleteResourceProperties deleteResourcePropertiesRequest)
 			throws RemoteException, InvalidResourcePropertyQNameFaultType,
@@ -943,7 +943,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	}
 
 	@Override
-	@RWXMapping(RWXCategory.EXECUTE)
+	@RWXMapping(RWXCategory.WRITE)
 	public InsertResourcePropertiesResponse insertResourceProperties(
 			InsertResourceProperties insertResourcePropertiesRequest)
 			throws RemoteException,
@@ -1017,7 +1017,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	}
 
 	@Override
-	@RWXMapping(RWXCategory.EXECUTE)
+	@RWXMapping(RWXCategory.WRITE)
 	public SetResourcePropertiesResponse setResourceProperties(
 			SetResourceProperties setResourcePropertiesRequest)
 			throws RemoteException, InvalidResourcePropertyQNameFaultType,
@@ -1034,7 +1034,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	}
 
 	@Override
-	@RWXMapping(RWXCategory.EXECUTE)
+	@RWXMapping(RWXCategory.WRITE)
 	public UpdateResourcePropertiesResponse updateResourceProperties(
 			UpdateResourceProperties updateResourcePropertiesRequest)
 			throws RemoteException, InvalidResourcePropertyQNameFaultType,
