@@ -61,18 +61,31 @@ public class ActivityState implements Serializable, Cloneable
 		_geniiState = null;
 		_isSuspended = false;
 		
-		_besState = wireState.getState().getValue();
-		
-		MessageElement []any = wireState.get_any();
-		if (any != null)
+		if (wireState == null)
 		{
-			for (MessageElement me : any)
+			_besState = ActivityStateEnumeration._Failed;
+		} else
+		{
+			MessageElement []any = wireState.get_any();
+			if (any != null)
 			{
-				QName eName = me.getQName();
-				if (eName.getNamespaceURI().equals(_GENII_NS))
-					_geniiState = eName.getLocalPart();
-				else if (eName.equals(_SUSPEND_STATE_ELEMENT_QNAME))
-					_isSuspended = true;
+				for (MessageElement me : any)
+				{
+					QName eName = me.getQName();
+					if (eName.getNamespaceURI().equals(_GENII_NS))
+						_geniiState = eName.getLocalPart();
+					else if (eName.equals(_SUSPEND_STATE_ELEMENT_QNAME))
+						_isSuspended = true;
+				}
+			}
+			
+			ActivityStateEnumeration stateE = wireState.getState();
+			if (stateE == null)
+			{
+				_besState = ActivityStateEnumeration._Failed;
+			} else
+			{
+				_besState = wireState.getState().getValue();
 			}
 		}
 	}

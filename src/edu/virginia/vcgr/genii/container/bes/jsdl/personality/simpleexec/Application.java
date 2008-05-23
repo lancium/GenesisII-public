@@ -8,6 +8,8 @@ import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 
 public interface Application
 {
+	public String getWorkingDirectory();
+	
 	public void addExecutionPhases(
 		Properties creationProperties,
 		Vector<ExecutionPhase> executionPlan, 

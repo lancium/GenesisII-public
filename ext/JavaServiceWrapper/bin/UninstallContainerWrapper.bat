@@ -83,7 +83,7 @@ goto cleanup
 
 :removecontainerdir
 echo Removing directory for container: %_CONTAINER_DIR%.
-rmdir "%_CONTAINER_DIR%" /s
+rmdir /S /Q "%_CONTAINER_DIR%"
 
 
 :cleanup

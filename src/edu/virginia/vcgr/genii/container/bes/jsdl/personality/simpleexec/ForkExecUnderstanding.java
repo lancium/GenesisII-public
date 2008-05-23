@@ -35,6 +35,7 @@ public class ForkExecUnderstanding implements Application
 {
 	static private Log _logger = LogFactory.getLog(ForkExecUnderstanding.class);
 	
+	private String _workingDirectory = null;
 	private String _executable = null;
 	private Collection<String> _arguments =
 		new LinkedList<String>();
@@ -47,6 +48,16 @@ public class ForkExecUnderstanding implements Application
 	public void setExecutable(String executable)
 	{
 		_executable = executable;
+	}
+	
+	public void setWorkingDirectory(String wd)
+	{
+		_workingDirectory = wd;
+	}
+	
+	public String getWorkingDirectory()
+	{
+		return _workingDirectory;
 	}
 	
 	public void addArgument(String arg)

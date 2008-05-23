@@ -6,6 +6,7 @@ import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.UnsupportedJSDLElement;
 import edu.virginia.vcgr.genii.client.jsdl.personality.def.DefaultPOSIXApplicationFacet;
 import edu.virginia.vcgr.genii.client.jsdl.posix.JSDLPosixConstants;
+import edu.virginia.vcgr.genii.container.bes.BESUtilities;
 
 public class SEPOSIXApplicationFacet extends DefaultPOSIXApplicationFacet
 {
@@ -40,6 +41,24 @@ public class SEPOSIXApplicationFacet extends DefaultPOSIXApplicationFacet
 		((ForkExecUnderstanding)currentUnderstanding).addArgument(argument);
 	}
 
+
+	@Override
+	public void consumeWorkingDirectory(Object currentUnderstanding,
+			String filesystemName, String workingDirectory)
+			throws JSDLException
+	{
+		if (filesystemName != null)
+			throw new UnsupportedJSDLElement(
+				new QName(JSDLPosixConstants.JSDL_POSIX_NS, "filesystemName"));
+		
+		if (!BESUtilities.canOverrideBESWorkerDir())
+			throw new UnsupportedJSDLElement(
+				new QName(JSDLPosixConstants.JSDL_POSIX_NS, "WorkingDirectory"));
+		
+		((ForkExecUnderstanding)currentUnderstanding).setWorkingDirectory(
+			workingDirectory);
+	}
+	
 	@Override
 	public void consumeEnvironment(Object currentUnderstanding, String name,
 			String filesystemName, String environment) throws JSDLException

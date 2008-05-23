@@ -2,6 +2,8 @@ package edu.virginia.vcgr.genii.client;
 
 import java.io.File;
 
+import org.morgan.util.io.GuaranteedDirectory;
+
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 
 public class ApplicationBase
@@ -74,6 +76,16 @@ public class ApplicationBase
 		if (userDir == null) 
 			userDir = System.getProperty("user.home") + "/.genesisII";
 
-		return userDir;
+		try
+		{
+			File userDirFile = new GuaranteedDirectory(userDir);
+			
+			return userDirFile.getCanonicalPath();
+		}
+		catch (Throwable cause)
+		{
+			throw new RuntimeException(
+				"Unable to access or create state directory.", cause);
+		}
 	}
 }

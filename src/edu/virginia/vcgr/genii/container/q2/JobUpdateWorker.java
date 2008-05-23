@@ -94,7 +94,7 @@ public class JobUpdateWorker implements Runnable
 				} else if (state.isCancelledState())
 				{
 					/* If the job was cancelled, then finish it here */
-					_jobManager.finishJob(connection, _jobInfo.getJobID());
+					_jobManager.failJob(connection, _jobInfo.getJobID(), false);
 				} else if (state.isFinishedState())
 				{
 					/* If the job finished on the bes, finish it here */

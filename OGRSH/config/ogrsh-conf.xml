@@ -19,7 +19,7 @@
 		provider-library="libGenesisIIOGRSHProvider.so"
 		provider-creator="createGenesisIIOGRSHProvider">
 		<ogrsh:session name="uva-geniinet-session"
-			root-rns-url="file:///home/mmm2a/Work/eclipse-workspace/GenesisII/OGRSH/../context.xml"/>
+			root-rns-url="file:///home/mmm2a/Work/eclipse-workspace/GenesisII-Release-1.2.1/OGRSH/../context.xml"/>
 	</ogrsh:fs-provider>
 
 	<ogrsh:mount location="/home/mmm2a" provider="local-fs-provider"

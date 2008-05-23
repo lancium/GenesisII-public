@@ -339,7 +339,7 @@ namespace ogrsh
 			{
 				jcomm::StatBuffer statBuf = dc.xstat(fullPath);
 
-				statbuf->st_dev = 0;
+				statbuf->st_dev = _mount->getDeviceID();
 				statbuf->st_ino = statBuf.st_ino;
 				statbuf->st_mode = statBuf.st_mode;
 				statbuf->st_nlink = 0;
@@ -378,7 +378,7 @@ namespace ogrsh
 			{
 				jcomm::StatBuffer statBuf = dc.xstat(fullPath);
 
-				statbuf->st_dev = 0;
+				statbuf->st_dev = _mount->getDeviceID();
 				statbuf->st_ino = statBuf.st_ino;
 				statbuf->st_mode = statBuf.st_mode;
 				statbuf->st_nlink = 0;

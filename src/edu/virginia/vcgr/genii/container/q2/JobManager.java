@@ -16,7 +16,11 @@ import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityDocumentType;
 import org.ggf.bes.factory.CreateActivityResponseType;
 import org.ggf.bes.factory.CreateActivityType;
+import org.ggf.bes.factory.InvalidRequestMessageFaultType;
+import org.ggf.bes.factory.NotAcceptingNewActivitiesFaultType;
+import org.ggf.bes.factory.NotAuthorizedFaultType;
 import org.ggf.bes.factory.TerminateActivitiesType;
+import org.ggf.bes.factory.UnsupportedFeatureFaultType;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.rns.EntryType;
 import org.morgan.util.GUID;
@@ -69,6 +73,7 @@ public class JobManager implements Closeable
 	private SchedulingEvent _schedulingEvent;
 	private JobStatusChecker _statusChecker;
 	private DatabaseConnectionPool _connectionPool;
+	private BESManager _besManager;
 	
 	/**
 	 * A map of all jobs in the queue based off of the job's key in 
@@ -98,7 +103,7 @@ public class JobManager implements Closeable
 	
 	public JobManager(
 		ThreadPool outcallThreadPool, QueueDatabase database, SchedulingEvent schedulingEvent,
-		Connection connection, DatabaseConnectionPool connectionPool) 
+		BESManager manager, Connection connection, DatabaseConnectionPool connectionPool) 
 		throws SQLException, ResourceException, 
 			GenesisIISecurityException
 	{
@@ -106,6 +111,7 @@ public class JobManager implements Closeable
 		_database = database;
 		_schedulingEvent = schedulingEvent;
 		_outcallThreadPool = outcallThreadPool;
+		_besManager = manager;
 		
 		loadFromDatabase(connection);
 		
@@ -1166,10 +1172,39 @@ public class JobManager implements Closeable
 			catch (Throwable cause)
 			{
 				_logger.warn("Unable to start job " + _jobID, cause);
+				boolean countAgainstJob;
+				boolean countAgainstBES;
+				
+				if (cause instanceof NotAcceptingNewActivitiesFaultType)
+				{
+					countAgainstJob = false;
+					countAgainstBES = true;
+				} else if (cause instanceof InvalidRequestMessageFaultType)
+				{
+					countAgainstJob = false;
+					countAgainstBES = true;
+				} else if (cause instanceof UnsupportedFeatureFaultType)
+				{
+					countAgainstJob = true;
+					countAgainstBES = false;
+				} else if (cause instanceof NotAuthorizedFaultType)
+				{
+					countAgainstJob = true;
+					countAgainstBES = false;
+				} else
+				{
+					countAgainstJob = false;
+					countAgainstBES = true;
+				}
+				
+				if (countAgainstBES)
+					_besManager.markBESAsUnavailable(_besID);
+				
 				try 
 				{
 					/* We got an exception, so fail the job. */
-					failJob(connection, _jobID, true); 
+					failJob(connection, _jobID, countAgainstJob);
+					_schedulingEvent.notifySchedulingEvent();
 				}
 				catch (Throwable cause2)
 				{

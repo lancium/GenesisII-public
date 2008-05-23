@@ -27,15 +27,16 @@ public class ContainerConfiguration
 	private int _listenPort;
 	private SslInformation _sslInformation = null;
 	private int _notificationPoolSize;
+	private Properties _globalProperties;
 	
 	public ContainerConfiguration(ConfigurationManager manager)
 	{
 		_configuration = manager.getContainerConfiguration();
 		
-		Properties globalProperties =
+		_globalProperties =
 			(Properties)_configuration.retrieveSection(
 				GenesisIIConstants.GLOBAL_PROPERTY_SECTION_NAME);
-		setupProperties(globalProperties);
+		setupProperties(_globalProperties);
 		
 		Properties sslProps = null;
 		try
@@ -49,6 +50,11 @@ public class ContainerConfiguration
 			if (sslProps != null)
 				throw ce;
 		}
+	}
+	
+	public Properties getGlobalProperties()
+	{
+		return _globalProperties;
 	}
 	
 	public int getNotificationPoolSize()

@@ -32,7 +32,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.morgan.util.GUID;
-import org.morgan.util.io.GuaranteedDirectory;
 import org.morgan.util.io.StreamUtils;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
@@ -45,7 +44,6 @@ import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.BESActivityConstants;
 import edu.virginia.vcgr.genii.client.bes.GeniiBESConstants;
-import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.context.*;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLInterpreter;
@@ -60,6 +58,7 @@ import edu.virginia.vcgr.genii.client.utils.creation.CreationProperties;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.container.bes.BES;
+import edu.virginia.vcgr.genii.container.bes.BESUtilities;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivityUtils.BESActivityInitInfo;
 import edu.virginia.vcgr.genii.container.bes.activity.resource.IBESActivityResource;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.simpleexec.SimpleExecutionPersonalityProvider;
@@ -135,7 +134,7 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 			bes.createActivity(
 				resource.getKey().toString(), jsdl,	owners, 
 				ContextManager.getCurrentContext(), 
-				chooseDirectory(creationParameters, 5),
+				chooseDirectory(seUnderstanding, creationParameters, 5),
 				seUnderstanding.createExecutionPlan(
 					creationProperties),
 				activityEPR, activityServiceName, seUnderstanding.getJobName());
@@ -155,10 +154,37 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 	}
 	
 	static private File chooseDirectory(
+		SimpleExecutionUnderstanding understanding,
 		HashMap<QName, Object> creationParameters, 
 		int attempts) throws ResourceException
 	{
 		File basedir = null;
+		
+		String overrideWD = understanding.getWorkingDirectory();
+		if (overrideWD != null)
+		{
+			File workingDir = new File(overrideWD);
+			if (!workingDir.exists())
+			{
+				if (workingDir.mkdirs())
+				{
+					try
+					{
+						BESUtilities.markDeletable(workingDir);
+					}
+					catch (IOException ioe)
+					{
+						_logger.warn("Unable to mark directory as deletable.",
+							ioe);
+					}
+				} else
+					throw new ResourceException(
+						"Unable to create working directory \"" + 
+						workingDir + "\".");
+			}
+			
+			return workingDir;
+		}
 		
 		Properties props = (Properties)creationParameters.get(
 			CreationProperties.CREATION_PROPERTIES_QNAME);
@@ -175,8 +201,7 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 			File configDir = null;
 			if (basedir == null)
 			{
-				basedir = ConfigurationManager.getCurrentConfiguration().getUserDirectory();
-				configDir = new GuaranteedDirectory(basedir, "bes-activities");
+				configDir = BESUtilities.getBESWorkerDir();
 			} else
 				configDir = basedir;
 			
@@ -189,6 +214,17 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 					{
 						_logger.debug("BES Activity will run in directory \"" 
 							+ ret.getAbsolutePath() + "\".");
+						
+						try
+						{
+							BESUtilities.markDeletable(ret);
+						}
+						catch (IOException ioe)
+						{
+							_logger.warn("Unable to mark directory as deletable.",
+								ioe);
+						}
+						
 						return ret;
 					}
 				}

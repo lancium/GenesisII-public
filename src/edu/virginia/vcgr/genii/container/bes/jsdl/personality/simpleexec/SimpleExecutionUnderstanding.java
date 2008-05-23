@@ -59,6 +59,11 @@ public class SimpleExecutionUnderstanding
 		_requiredOGRSHVersion = version;
 	}
 	
+	public String getWorkingDirectory()
+	{
+		return _application.getWorkingDirectory();
+	}
+	
 	public Vector<ExecutionPhase> createExecutionPlan(
 		Properties creationProperties) throws JSDLException
 	{

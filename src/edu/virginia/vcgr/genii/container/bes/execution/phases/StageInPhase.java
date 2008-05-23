@@ -2,7 +2,6 @@ package edu.virginia.vcgr.genii.container.bes.execution.phases;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
@@ -55,8 +54,8 @@ public class StageInPhase extends AbstractExecutionPhase
 			context.getCurrentWorkingDirectory(), _targetName);
 		if (_creationFlag.equals(CreationFlagEnumeration.dontOverwrite)
 			&& target.exists())
-			throw new IOException("File \"" + target.getAbsolutePath() +
-				"\" already exists.");
+			return;
+		
 		boolean append = _creationFlag.equals(CreationFlagEnumeration.append);
 		
 		try

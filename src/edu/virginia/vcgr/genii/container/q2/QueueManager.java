@@ -231,7 +231,7 @@ public class QueueManager implements Closeable
 				_database, _schedulingEvent, 
 				connection, _connectionPool);
 			_jobManager = new JobManager(_outcallThreadPool,
-				_database, _schedulingEvent, connection, _connectionPool);
+				_database, _schedulingEvent, _besManager, connection, _connectionPool);
 			_scheduler = new Scheduler(_schedulingEvent, _connectionPool,
 				_jobManager, _besManager);
 		}

@@ -29,6 +29,12 @@
 		<mconf:property 
 			name="edu.virginia.vcgr.genii.container.notification.work-pool-size"
 			value="5"/>
+		<mconf:property
+			name="edu.virginia.vcgr.genii.container.bes.worker-dir"
+			value="${edu.virginia.vcgr.genii.client.configuration.user-dir}/bes-activities"/>
+		<mconf:property
+			name="edu.virginia.vcgr.genii.container.bes.worker-dir.allow-override"
+			value="true"/>
 	</genii:global-properties>
 
 

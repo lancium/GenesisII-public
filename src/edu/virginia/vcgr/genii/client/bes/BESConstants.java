@@ -37,4 +37,9 @@ public interface BESConstants
 	
 	static public final String LOCAL_RESOURCE_MANAGER_TYPE_SIMPLE =
 		"http://vcgr.cs.virginia.edu/2008/03/resource-manager-type/simple";
+	
+	static public final String CONFIG_PROPERTY_WORKER_DIR =
+		"edu.virginia.vcgr.genii.container.bes.worker-dir";
+	static public final String CONFIG_PROPERTY_WORKER_DIR_ALLOW_OVERRIDE =
+		"edu.virginia.vcgr.genii.container.bes.worker-dir.allow-override";
 }

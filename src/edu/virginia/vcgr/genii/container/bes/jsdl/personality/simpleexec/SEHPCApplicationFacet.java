@@ -1,7 +1,12 @@
 package edu.virginia.vcgr.genii.container.bes.jsdl.personality.simpleexec;
 
+import javax.xml.namespace.QName;
+
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
+import edu.virginia.vcgr.genii.client.jsdl.UnsupportedJSDLElement;
+import edu.virginia.vcgr.genii.client.jsdl.hpc.HPCConstants;
 import edu.virginia.vcgr.genii.client.jsdl.personality.def.DefaultHPCApplicationFacet;
+import edu.virginia.vcgr.genii.container.bes.BESUtilities;
 
 public class SEHPCApplicationFacet extends DefaultHPCApplicationFacet
 {
@@ -25,6 +30,17 @@ public class SEHPCApplicationFacet extends DefaultHPCApplicationFacet
 		parent.setApplication(child);
 	}
 
+	@Override
+	public void consumeWorkingDirectory(Object currentUnderstanding,
+			String workingDirectory) throws JSDLException
+	{
+		if (!BESUtilities.canOverrideBESWorkerDir())
+			throw new UnsupportedJSDLElement(
+				new QName(HPCConstants.HPC_NS, "WorkingDirectory"));
+		((ForkExecUnderstanding)currentUnderstanding).setWorkingDirectory(
+			workingDirectory);
+	}
+	
 	@Override
 	public void consumeArgument(Object currentUnderstanding,
 		String argument) throws JSDLException
