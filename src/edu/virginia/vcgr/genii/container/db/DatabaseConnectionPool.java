@@ -125,6 +125,7 @@ public class DatabaseConnectionPool
 	
 	public void release(Connection conn)
 	{
+		boolean needRejuvenation = false;
 		_logger.debug("Releasing a database connection [" + _connPool.size() + "].");
 		
 		if (conn == null)
@@ -146,6 +147,7 @@ public class DatabaseConnectionPool
 			}
 			catch (SQLException sqe)
 			{
+				needRejuvenation = true;
 				_logger.error("Exception releasing connection.", sqe);
 			}
 	
@@ -156,6 +158,7 @@ public class DatabaseConnectionPool
 			}
 			catch (Throwable t) 
 			{ 
+				needRejuvenation = true;
 				_logger.error("Error closing the connection.", t); 
 			}
 		}
@@ -165,6 +168,14 @@ public class DatabaseConnectionPool
 				conn)).setReleased();
 			
 			_lock.readLock().unlock();
+		}
+		
+		if (needRejuvenation)
+		{
+			// If we got this far, something is seriously wrong with the 
+			// database.  Do a rejuvenation in the hopes that that will
+			// fix it.
+			rejuvenate();
 		}
 	}
 	
@@ -193,24 +204,6 @@ public class DatabaseConnectionPool
 			// we have the only thread, because of the write lock, that
 			// could be in here.
 			
-			try
-			{
-				/* I know that this breaks the pluggability of our database,
-				 * but I don't have enough time to do this right right now.
-				 */
-				connection = DriverManager.getConnection(
-					"jdbc:derby:;shutdown=true");
-			}
-			catch (Throwable cause)
-			{
-				_logger.debug("Expected exception for rejuvenation.", cause);
-			}
-			finally
-			{
-				StreamUtils.close(connection);
-			}
-			
-			
 			for (Connection conn : _connPool)
 			{
 				try
@@ -229,6 +222,23 @@ public class DatabaseConnectionPool
 			 * when the next connection is made. 
 			 */
 			_connPool.clear();
+			
+			try
+			{
+				/* I know that this breaks the pluggability of our database,
+				 * but I don't have enough time to do this right right now.
+				 */
+				connection = DriverManager.getConnection(
+					"jdbc:derby:;shutdown=true");
+			}
+			catch (Throwable cause)
+			{
+				_logger.debug("Expected exception for rejuvenation.", cause);
+			}
+			finally
+			{
+				StreamUtils.close(connection);
+			}
 			
 			/* There's no way in our system to "guarantee" that all references
 			 * to all connections are released to the system, so we are just
