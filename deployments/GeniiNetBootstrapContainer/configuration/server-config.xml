@@ -48,7 +48,7 @@
 	<genii:resource-identity>
 		<mconf:property 
 			name="edu.virginia.vcgr.genii.container.security.resource-identity.use-ogsa-eap"
-			value="false"/>
+			value="true"/>
 
 		<!-- The following four properties are used for specifying which CA 
 		     certificate/keypair to use for generating resource identity 
