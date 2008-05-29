@@ -14,7 +14,7 @@ _UCW_GENII_INSTALL_DIR="%{INSTALL_PATH}"
 _UCW_LOCAL_JAVA_DIR="$_UCW_GENII_INSTALL_DIR/Java/linux-i586/jre"
 
 # get user's data directory...
-_GENII_USER_DIR=`$_UCW_LOCAL_JAVA_DIR/bin/java -classpath "$_UCW_GENII_INSTALL_DIR/lib/GenesisII-client.jar" edu.virginia.vcgr.genii.client.cmd.GetUserDir`
+_GENII_USER_DIR=`$_UCW_LOCAL_JAVA_DIR/bin/java -classpath "$_UCW_GENII_INSTALL_DIR/lib/GenesisII-client.jar:$_UCW_GENII_INSTALL_DIR/lib/morgan-utilities.jar" edu.virginia.vcgr.genii.client.cmd.GetUserDir`
 echo "_GENII_USER_DIR is now set to ....     $_GENII_USER_DIR"
 
 # check if deployment name arg was passed in
@@ -41,7 +41,7 @@ echo "Removing init.d script $_MANAGE_CONTAINER_SCRIPT_PATH"
 rm -f "$_MANAGE_CONTAINER_SCRIPT_PATH"
 
 # get user's data directory...
-_GENII_USER_DIR=`$_UCW_LOCAL_JAVA_DIR/bin/java -classpath "$_UCW_GENII_INSTALL_DIR/lib/GenesisII-client.jar" edu.virginia.vcgr.genii.client.cmd.GetUserDir`
+_GENII_USER_DIR=`$_UCW_LOCAL_JAVA_DIR/bin/java -classpath "$_UCW_GENII_INSTALL_DIR/lib/GenesisII-client.jar:$_UCW_GENII_INSTALL_DIR/lib/morgan-utilities.jar" edu.virginia.vcgr.genii.client.cmd.GetUserDir`
 echo "_GENII_USER_DIR is now set to ....     $_GENII_USER_DIR"
 
 # remove container console output file if it exists 

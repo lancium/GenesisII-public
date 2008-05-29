@@ -18,7 +18,7 @@ rem get user's data directory...
 
 set _TEMP_FILE=tmpUninstallContainer.bat
 "%_UCW_LOCAL_JAVA_DIR%\bin\java.exe" -classpath "%_UCW_GENII_INSTALL_DIR%\lib\GenesisII-client.jar" edu.virginia.vcgr.genii.client.cmd.MyEcho "set _GENII_USER_DIR=" > %_TEMP_FILE%
-"%_UCW_LOCAL_JAVA_DIR%\bin\java.exe" -classpath "%_UCW_GENII_INSTALL_DIR%\lib\GenesisII-client.jar" edu.virginia.vcgr.genii.client.cmd.GetUserDir >> %_TEMP_FILE%
+"%_UCW_LOCAL_JAVA_DIR%\bin\java.exe" -classpath "%_UCW_GENII_INSTALL_DIR%\lib\GenesisII-client.jar;%_UCW_GENII_INSTALL_DIR%\lib\morgan-utilities.jar" edu.virginia.vcgr.genii.client.cmd.GetUserDir >> %_TEMP_FILE%
 call "%_TEMP_FILE%"
 del %_TEMP_FILE%
 echo _GENII_USER_DIR is now set to ....     %_GENII_USER_DIR%

@@ -13,7 +13,7 @@ _ICW_GENII_INSTALL_DIR="%{INSTALL_PATH}"
 _ICW_LOCAL_JAVA_DIR="$_ICW_GENII_INSTALL_DIR/Java/linux-i586/jre"
 
 # get user's data directory...
-_GENII_USER_DIR=`"$_ICW_LOCAL_JAVA_DIR/bin/java" -classpath "$_ICW_GENII_INSTALL_DIR/lib/GenesisII-client.jar" edu.virginia.vcgr.genii.client.cmd.GetUserDir`
+_GENII_USER_DIR=`"$_ICW_LOCAL_JAVA_DIR/bin/java" -classpath "$_ICW_GENII_INSTALL_DIR/lib/GenesisII-client.jar:$_ICW_GENII_INSTALL_DIR/lib/morgan-utilities.jar" edu.virginia.vcgr.genii.client.cmd.GetUserDir`
 echo "_GENII_USER_DIR is now set to ....     $_GENII_USER_DIR"
 
 # check if deployment name arg was passed in
