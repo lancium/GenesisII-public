@@ -31,7 +31,7 @@ public abstract class WindowsResourceHandle {
 	private static int nextFileHandle=0;
 	
 	WindowsResourceHandle(){
-		fileHandle = INVALID_HANDLE;
+		fileHandle = nextHandle();
 	}
 	
 	/**
@@ -46,7 +46,7 @@ public abstract class WindowsResourceHandle {
 		
 		//Obtain file from the cache first
 		CacheManager manager = CacheManager.getInstance();
-		CachedResource resource = manager.getResource(fileName);		
+		CachedResource resource = manager.getResource(fileName, true);		
 		
 		//Also get name of the file
 		String tailName = fileName;
@@ -72,7 +72,7 @@ public abstract class WindowsResourceHandle {
 		
 		//Obtain file from the cache first
 		CacheManager manager = CacheManager.getInstance();
-		CachedResource resource = manager.getResource(fileName);
+		CachedResource resource = manager.getResource(fileName, true);
 		
 		//Automatically use this type
 		if(resource != null)
@@ -102,7 +102,7 @@ public abstract class WindowsResourceHandle {
 		
 		//Save some time and use "Special" constructors
 		if(new TypeInformation(filePath.getEndpoint()).isRNS()){
-			return new WindowsDirHandle(filePath, desiredAccess);
+			return new WindowsDirHandle(filePath, desiredAccess, true);
 		}else{
 			return new WindowsFileHandle(filePath, requestedDeposition, 
 					desiredAccess, cachedParent);
@@ -144,12 +144,16 @@ public abstract class WindowsResourceHandle {
 				
 		if(!childPath.equals("/") && childPath.lastIndexOf('/') > 0){									
 			parent = childPath.substring(0, childPath.lastIndexOf('/'));					
-		}	
+		}
+		if(!childPath.equals("/") && childPath.lastIndexOf('/') == 0){
+			parent = "/";			
+		}
 		
 		//Get cache entry for the parent
 		CachedDir cachedParent = null;
 		if(parent != null){
-			CachedResource parentResource = manager.getResource(parent);
+			//I only need RNSPath (no need to propagate new entries
+			CachedResource parentResource = manager.getResource(parent, false);
 			if(parentResource != null){
 				cachedParent = parentResource.isDirectory() ? (CachedDir) parentResource :
 					null;

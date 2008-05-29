@@ -141,20 +141,28 @@ public class CachedDir extends CachedResource {
 				TypeInformation ti = new TypeInformation(et);
 				if(ti.isRNS()){
 					WindowsDirHandle dirEntry = new WindowsDirHandle(entry, 
-							WindowsResourceHandle.INFORMATION_ONLY);
-					directoryEntries.put(entry.getName(), dirEntry);
+							WindowsResourceHandle.INFORMATION_ONLY, false);
+					WindowsDirHandle oldHandle = 
+						(WindowsDirHandle)directoryEntries.put(entry.getName(), dirEntry);
+					
+					if(oldHandle != null)	oldHandle.close(false);
 				}
 				else if(ti.isByteIO()){
 					WindowsFileHandle fileEntry = new WindowsFileHandle(entry, 
-							WindowsResourceHandle.OPEN,
-							WindowsResourceHandle.INFORMATION_ONLY, null);
-					directoryEntries.put(entry.getName(), fileEntry);
+						WindowsResourceHandle.OPEN,
+						WindowsResourceHandle.INFORMATION_ONLY, null);
+					WindowsFileHandle oldHandle = 
+						(WindowsFileHandle)directoryEntries.put(entry.getName(), fileEntry);					
+					
+					if(oldHandle != null)	oldHandle.close(false);
 				}	
 				setDirty(false);
 			}
 		}catch(RNSPathDoesNotExistException rnse){
 			//No entries
 		}catch(Exception e){
+			System.out.println("G-ICING:  Error reading directory: " + 
+					rnsPath.pwd());
 			e.printStackTrace();
 		}finally{
 			dirEntriesLock.writeLock().unlock();

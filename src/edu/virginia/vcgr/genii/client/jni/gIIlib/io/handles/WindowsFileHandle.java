@@ -53,7 +53,7 @@ public class WindowsFileHandle extends WindowsResourceHandle {
 		
 		String fileName = filePath.pwd();
 		CacheManager manager = CacheManager.getInstance();
-		CachedResource resource = manager.getResource(fileName);
+		CachedResource resource = manager.getResource(fileName, true);
 		if(resource != null && resource.isDirectory()){
 			throw new RNSException("Directory exists where file is desired to be opened");
 		}
@@ -273,8 +273,7 @@ public class WindowsFileHandle extends WindowsResourceHandle {
 				if(cachedParent != null){
 					cachedParent.removeEntry(filename);
 				}
-			}
-			catch(RNSException re){
+			}catch(RNSException re){
 				re.printStackTrace();
 			}
 		}else{

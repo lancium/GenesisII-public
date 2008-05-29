@@ -9,9 +9,36 @@ import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.WindowsResourceHandl
 public class JNITest {
 
 	public static void main(String[] args) throws Exception {
-		testReadWriteCachedInfo();
+		testOpenStuff();
 
 		
+	}
+	
+	public static void testOpenStuff(){
+		
+		//Open /home 1 0 0
+		ArrayList<String> homeDir = JNIOpen.open("/home", WindowsResourceHandle.OPEN, 
+				0, false);
+		
+		JNIDirectoryListing.getDirectoryListing(Integer.parseInt(homeDir.get(0)), "*");
+		
+		JNIClose.close(Integer.parseInt(homeDir.get(0)), false);
+				
+		
+		ArrayList<String> markDir = JNIOpen.open("/home/morgan", WindowsResourceHandle.OPEN, 
+				0, false);
+		
+		JNIDirectoryListing.getDirectoryListing(Integer.parseInt(markDir.get(0)), "*");
+		
+		JNIClose.close(Integer.parseInt(markDir.get(0)), false);
+						
+		//Open /home 1 0 0 again
+		ArrayList<String> homeDir2 = JNIOpen.open("/home", WindowsResourceHandle.OPEN, 
+				0, false);
+		
+		JNIDirectoryListing.getDirectoryListing(Integer.parseInt(homeDir2.get(0)), "*");
+		
+		JNIClose.close(Integer.parseInt(homeDir2.get(0)), false);
 	}
 	
 	/** 

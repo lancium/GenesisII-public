@@ -35,14 +35,14 @@ public class WindowsDirHandle extends WindowsResourceHandle {
 	/** 
 	 * Opens a file with given access and filePath (i.e. deposition == OPEN) 
 	 * **/
-	public WindowsDirHandle(RNSPath filePath, Integer desiredAccess) 
+	public WindowsDirHandle(RNSPath filePath, Integer desiredAccess, boolean refreshDirectory) 
 		throws IOException, RNSException {
 		
 		super();
 		
 		String fileName = filePath.pwd();
 		CacheManager manager = CacheManager.getInstance();
-		CachedResource resource = manager.getResource(fileName);
+		CachedResource resource = manager.getResource(fileName, refreshDirectory);
 		if(resource != null && !resource.isDirectory()){
 			throw new RNSException("Directory exists where file is desired to be opened");
 		}
@@ -54,11 +54,12 @@ public class WindowsDirHandle extends WindowsResourceHandle {
 		}				
 				
 		if(cachedDir != null){			
-			dirInCache = cachedDir;
+			dirInCache = cachedDir;			
 		}else{			
 			dirInCache = new CachedDir(filePath, desiredAccess);
 			manager.putResource(fileName, dirInCache);
-		}																			
+		}							
+		dirInCache.attach(this);
 	}
 		
 	void finishOpen(String resourceName, Integer requestedDeposition, Integer desiredAccess, CachedResource cachedResource,  

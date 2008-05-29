@@ -33,7 +33,7 @@ public class CacheManager {
 		return _manager;
 	}
 	
-	public CachedResource getResource(String path){
+	public CachedResource getResource(String path, boolean doRefresh){
 		CachedResource resource;
 		long currentTime = System.currentTimeMillis();
 		cacheLock.lock();					
@@ -42,9 +42,16 @@ public class CacheManager {
 			//If cache entry is stale (refresh entry)
 			if((resource != null && 
 					(currentTime - resource.getTimeOfEntry()) > (CACHE_LIFE * 1000))){
-				if(resource instanceof CachedDir){
+				
+				//Only refresh if gotten before
+				if((resource instanceof CachedDir) && 
+						doRefresh){
 					((CachedDir)resource).refreshDirectoryEntries();
-				}else{
+				}else if(resource instanceof CachedDir &&
+						!doRefresh){
+					//DO NOTHING
+				}				
+				else{
 					try{
 						((CachedFile)resource).reconnectToEpr(false);
 					}catch(Exception e)
