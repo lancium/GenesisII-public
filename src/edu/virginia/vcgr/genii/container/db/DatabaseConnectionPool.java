@@ -10,14 +10,14 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.Properties;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
+import edu.virginia.vcgr.genii.client.locking.GReadWriteLock;
+import edu.virginia.vcgr.genii.client.locking.UnfairReadWriteLock;
 import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
 import edu.virginia.vcgr.genii.client.stats.DBConnectionDataPoint;
 import edu.virginia.vcgr.genii.container.Container;
@@ -41,8 +41,10 @@ public class DatabaseConnectionPool
 	static private final long REJUVENATION_CYCLE = 1000L * 60 * 60;
 	
 	static private Log _logger = LogFactory.getLog(DatabaseConnectionPool.class);
+
+	static private int _poolInstances = 0;
 	
-	private ReadWriteLock _lock = new ReentrantReadWriteLock(true);
+	private GReadWriteLock _lock = new UnfairReadWriteLock();
 	private int _poolSize;
 	private LinkedList<Connection> _connPool;
 	private String _connectString;
@@ -71,6 +73,16 @@ public class DatabaseConnectionPool
 	public DatabaseConnectionPool(Properties connectionProperties)
 		throws IllegalAccessException, ClassNotFoundException, InstantiationException
 	{
+		synchronized(DatabaseConnectionPool.class)
+		{
+			_poolInstances++;
+			if (_poolInstances != 1)
+			{
+				_logger.error("We don't have exactly one connection pool instance -- we have " + _poolInstances);
+				System.exit(1);
+			}
+		}
+		
 		_poolSize = Integer.parseInt(connectionProperties.getProperty(
 			_DB_POOL_SIZE_PROPERTY, _DB_POOL_SIZE_DEFAULT));
 		
@@ -104,23 +116,33 @@ public class DatabaseConnectionPool
 	{
 		Connection connection = null;
 		_logger.debug("Acquiring DB connection[" + _connPool.size() + "]");
+		boolean succeeded = false;
 		
-		_lock.readLock().lock();
-		synchronized(_connPool)
+		try
 		{
-			if (!_connPool.isEmpty())
+			_lock.readLock().lock();
+			synchronized(_connPool)
 			{
-				connection = _connPool.removeFirst();
+				if (!_connPool.isEmpty())
+				{
+					connection = _connPool.removeFirst();
+				}
 			}
-		}
+				
+			if (connection == null)
+				connection = createConnection();
 			
-		if (connection == null)
-			connection = createConnection();
-		
-		((ConnectionInterceptor)Proxy.getInvocationHandler(
-			connection)).setAcquired();
-		
-		return connection;
+			((ConnectionInterceptor)Proxy.getInvocationHandler(
+				connection)).setAcquired();
+			
+			succeeded = true;
+			return connection;
+		}
+		finally
+		{
+			if (!succeeded)
+				_lock.readLock().unlock();
+		}
 	}
 	
 	public void release(Connection conn)
@@ -164,10 +186,10 @@ public class DatabaseConnectionPool
 		}
 		finally
 		{
+			_lock.readLock().unlock();
+	
 			((ConnectionInterceptor)Proxy.getInvocationHandler(
 				conn)).setReleased();
-			
-			_lock.readLock().unlock();
 		}
 		
 		if (needRejuvenation)
@@ -213,7 +235,7 @@ public class DatabaseConnectionPool
 				}
 				catch (Throwable cause)
 				{
-					_logger.debug(
+					_logger.error(
 						"Exception occurred trying to close connection.", cause);
 				}
 			}
@@ -238,6 +260,7 @@ public class DatabaseConnectionPool
 			finally
 			{
 				StreamUtils.close(connection);
+				connection = null;
 			}
 			
 			/* There's no way in our system to "guarantee" that all references
@@ -253,8 +276,9 @@ public class DatabaseConnectionPool
 			}
 			catch (Throwable cause)
 			{
-				_logger.error("Unable to reload database after rejuvenation.",
+				_logger.error("Unable to reload database after rejuvenation -- shutting down.",
 					cause);
+				System.exit(1);
 			}
 			
 			ContainerStatistics.instance().getDatabaseStatistics().resetDatabase();
