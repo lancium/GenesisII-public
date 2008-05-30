@@ -185,7 +185,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 	}
 
 	@Override
-	@RWXMapping(RWXCategory.WRITE)
+	@RWXMapping(RWXCategory.EXECUTE)
 	public CreateFileResponse createFile(CreateFile createFileRequest)
 			throws RemoteException, RNSEntryExistsFaultType, RNSFaultType,
 			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType
