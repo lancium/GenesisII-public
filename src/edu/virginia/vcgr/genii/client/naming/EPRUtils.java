@@ -275,7 +275,7 @@ public class EPRUtils
 										"EncryptedParts")))
 						{
 
-							retval.computeUnion(new MessageLevelSecurity(
+							retval = retval.computeUnion(new MessageLevelSecurity(
 									MessageLevelSecurity.ENCRYPT));
 						}
 					}
