@@ -159,7 +159,7 @@ public class GenesisIIBaseAttributesHandler
 			config = (AuthZConfig) 
 				mel.getObjectValue(AuthZConfig.class);
 		} catch (Exception e) { 
-			throw new AuthZSecurityException("Invalid AuthZ config: " + e.getMessage(), e);
+			throw new AuthZSecurityException("Invalid AuthZ config.", e);
 		}
 		if (config == null) {
 			throw new AuthZSecurityException("Invalid AuthZ config");

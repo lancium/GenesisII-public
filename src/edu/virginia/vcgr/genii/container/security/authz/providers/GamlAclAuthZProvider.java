@@ -280,11 +280,11 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 				}
 				catch (IOException e)
 				{
-					throw new AuthZSecurityException(e.getMessage(), e);
+					throw new AuthZSecurityException("Unable to check ACLs.", e);
 				}
 				catch (java.security.GeneralSecurityException e)
 				{
-					throw new AuthZSecurityException(e.getMessage(), e);
+					throw new AuthZSecurityException("Unable to check ACLs.", e);
 				}
 			}
 		}
@@ -400,27 +400,30 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 
 			if (!allowed)
 			{
-				throw new AuthZSecurityException("Access denied for method "
-						+ operation.getName());
+				throw new PermissionDeniedException(operation.getName());
 			}
 
 			return true;
 
 		}
+		catch (AuthZSecurityException ase)
+		{
+			throw ase;
+		}
 		catch (IOException e)
 		{
 			throw new AuthZSecurityException(
-					"Error processing GAML credential: " + e.getMessage(), e);
+					"Error processing GAML credential.", e);
 		}
 		catch (ConfigurationException e)
 		{
 			throw new AuthZSecurityException(
-					"Error processing GAML credential: " + e.getMessage(), e);
+					"Error processing GAML credential.", e);
 		}
 		catch (GeneralSecurityException e)
 		{
 			throw new AuthZSecurityException(
-					"Error processing GAML credential: " + e.getMessage(), e);
+					"Error processing GAML credential.", e);
 		}
 	}
 
@@ -455,8 +458,7 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 		catch (ResourceException e)
 		{
 			throw new AuthZSecurityException(
-					"Could not retrieve minimum incoming message level security: "
-							+ e.getMessage(), e);
+				"Could not retrieve minimum incoming message level security.", e);
 		}
 	}
 
@@ -481,7 +483,7 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 		catch (ResourceException e)
 		{
 			throw new AuthZSecurityException(
-					"Unable to load GAML AuthZ config: " + e.getMessage(), e);
+					"Unable to load GAML AuthZ config.", e);
 		}
 	}
 

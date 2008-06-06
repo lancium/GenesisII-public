@@ -79,7 +79,7 @@ public class GamlAcl implements Serializable
 		catch (Exception e)
 		{
 			throw new AuthZSecurityException(
-					"Unable to load GAML AuthZ config: " + e.getMessage(), e);
+					"Unable to load GAML AuthZ config.", e);
 		}
 
 		return retval;
@@ -130,7 +130,7 @@ public class GamlAcl implements Serializable
 		catch (GeneralSecurityException e)
 		{
 			throw new AuthZSecurityException(
-					"Unable to load GAML AuthZ config: " + e.getMessage(), e);
+					"Unable to load GAML AuthZ config.", e);
 		}
 	}
 
@@ -198,7 +198,7 @@ public class GamlAcl implements Serializable
 		catch (Exception e)
 		{
 			throw new AuthZSecurityException(
-					"Unable to load GAML AuthZ config: " + e.getMessage(), e);
+					"Unable to load GAML AuthZ config.", e);
 		}
 	}
 

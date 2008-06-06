@@ -249,7 +249,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			if (minClientMessageSec.isWarn()) {
 				Exception ex = new GenesisIISecurityException(
 						"Cannot confirm trusted identity for " + _epr.getAddress().toString() + ": " + e.getMessage(), e);
-				_logger.warn(ex.getMessage());
+				_logger.debug(ex.getMessage());
 			} else {
 				throw new GenesisIISecurityException("EPR for " + _epr.getAddress().toString() + " is untrusted: " + e.getMessage(), e);
 			}
@@ -541,7 +541,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 					}
 				} else
 				{
-					_logger.error("Unable to communicate with endpoint " +
+					_logger.debug("Unable to communicate with endpoint " +
 						"(not a retryable-exception).", cause);
 					throw cause;
 				}

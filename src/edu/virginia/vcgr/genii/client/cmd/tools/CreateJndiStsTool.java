@@ -8,15 +8,18 @@ import org.apache.axis.message.MessageElement;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.dialog.DialogException;
+import edu.virginia.vcgr.genii.client.dialog.DialogFactory;
+import edu.virginia.vcgr.genii.client.dialog.DialogProvider;
+import edu.virginia.vcgr.genii.client.dialog.InputDialog;
+import edu.virginia.vcgr.genii.client.dialog.InputValidator;
+import edu.virginia.vcgr.genii.client.dialog.TextContent;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.security.SecurityConstants;
-import edu.virginia.vcgr.genii.client.utils.dialog.DialogException;
-import edu.virginia.vcgr.genii.client.utils.dialog.GenericQuestionWidget;
-import edu.virginia.vcgr.genii.client.utils.dialog.WidgetProvider;
-import edu.virginia.vcgr.genii.client.utils.dialog.text.TextWidgetProvider;
 
 
 /**
@@ -91,7 +94,8 @@ public class CreateJndiStsTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		TextWidgetProvider twp = new TextWidgetProvider(stdout, stderr, stdin);
+		DialogProvider provider = DialogFactory.getProvider(
+			stdout, stderr, stdin, useGui());
 		
 		String jndiAuthnPortTypePath = null;
 		String stsName = null;
@@ -107,7 +111,7 @@ public class CreateJndiStsTool extends BaseGridTool
 		RNSPath jndiAuthnPortTypeRNS;
 		if (jndiAuthnPortTypePath == null)
 		{
-			jndiAuthnPortTypeRNS = getJndiAuthnPortTypePathFromUser(twp);
+			jndiAuthnPortTypeRNS = getJndiAuthnPortTypePathFromUser(provider);
 			if (jndiAuthnPortTypeRNS == null)
 				return 0;
 		} else
@@ -118,7 +122,7 @@ public class CreateJndiStsTool extends BaseGridTool
 		
 		if (stsName == null)
 		{
-			stsName = getStsNameFromUser(twp, jndiAuthnPortTypeRNS);
+			stsName = getStsNameFromUser(provider, jndiAuthnPortTypeRNS);
 			if (stsName == null)
 				return 0;
 		}
@@ -174,23 +178,21 @@ public class CreateJndiStsTool extends BaseGridTool
 	 * @throws DialogException
 	 * @throws IOException
 	 */
-	protected RNSPath getJndiAuthnPortTypePathFromUser(WidgetProvider wp)
-		throws DialogException, IOException
+	protected RNSPath getJndiAuthnPortTypePathFromUser(DialogProvider wp)
+		throws DialogException, UserCancelException
 	{
-		GenericQuestionWidget widget = wp.createGenericQuestionDialog(
-			"IDP Service Path");
-		widget.setDetailedHelp(new FileResource(
-			"edu/virginia/vcgr/genii/client/cmd/tools/resources/create-user-idp-path-help.txt"));
-		widget.setPrompt("IDP service to use?");
+		InputDialog input = wp.createInputDialog(
+			"IDP Service Path", "IDP service to use?");
+		input.setHelp(new TextContent(new FileResource(
+			"edu/virginia/vcgr/genii/client/cmd/tools/resources/create-user-idp-path-help.txt")));
+		input.setDefaultAnswer("");
 		
 		while (true)
 		{
 			try
 			{
-				widget.showWidget();
-				String answer = widget.getAnswer();
-				if (answer.equalsIgnoreCase("CANCEL"))
-					return null;
+				input.showDialog();
+				String answer = input.getAnswer();
 				
 				RNSPath idpService = RNSUtilities.findService(
 					"/containers/BootstrapContainer",
@@ -203,10 +205,14 @@ public class CreateJndiStsTool extends BaseGridTool
 			{
 				throw de;
 			}
+			catch (UserCancelException uce)
+			{
+				throw uce;
+			}
 			catch (Throwable cause)
 			{
-				widget.showErrorMessage("Unable to locate IDP service.  " +
-					"Please try again or type \"Cancel\" to quit.");
+				wp.createErrorDialog("Bad IDP Service", new TextContent(
+					"Unable to locate IDP service.", "Please try again.")).showDialog();
 			}
 		}
 	}
@@ -222,37 +228,29 @@ public class CreateJndiStsTool extends BaseGridTool
 	 * 
 	 * @throws DialogException
 	 */
-	protected String getStsNameFromUser(WidgetProvider wp, RNSPath idpServicePath)
-		throws DialogException
+	protected String getStsNameFromUser(DialogProvider wp,
+		RNSPath idpServicePath) throws DialogException,
+			UserCancelException
 	{
-		GenericQuestionWidget widget = wp.createGenericQuestionDialog(
-			"New Instance IDP Name");
-		widget.setDetailedHelp(
-			"The IDP name is the new name inside the IDP service by \n" +
-			"which this instance will be known.");
-		widget.setPrompt("New IDP Instance Name?");
+		InputDialog dialog = wp.createInputDialog(
+			"New Instance IDP Name", "New IDP instance name?");
+		dialog.setHelp(new TextContent(
+			"The IDP name is the new name inside the IDP service by",
+			"which this instance will be known."));
+		dialog.setInputValidator(new IDPInstanceInputValidator());
 		
 		while (true)
 		{
 			try
 			{
-				widget.showWidget();
-				String answer = widget.getAnswer();
-				if (answer == null || answer.length() == 0)
-				{
-					widget.showErrorMessage(
-						"Please enter a new name to give the IDP service (or Cancel to quit).");
-					continue;
-				}
-				
-				if (answer.equalsIgnoreCase("CANCEL"))
-					return null;
-				
+				dialog.showDialog();
+				String answer = dialog.getAnswer();
 				RNSPath namePath = idpServicePath.lookup(answer);
 				if (namePath.exists())
 				{
-					widget.showErrorMessage("Name \"" + answer + 
-						"\" already exists in the IDP service.");
+					wp.createErrorDialog("IDP Instance Already Exists",
+						new TextContent("Name \"" + answer + 
+						"\" already exists in the IDP service.")).showDialog();
 					continue;
 				}
 				
@@ -262,11 +260,31 @@ public class CreateJndiStsTool extends BaseGridTool
 			{
 				throw de;
 			}
+			catch (UserCancelException uce)
+			{
+				throw uce;
+			}
 			catch (Throwable cause)
 			{
-				widget.showErrorMessage("Unable to locate IDP service.  " +
-					"Please try again or type \"Cancel\" to quit.");
+				wp.createErrorDialog("IDP Service Error", 
+					new TextContent("Unable to locate IDP service.",
+					"Please try again or type \"Cancel\" to quit.")).showDialog();
 			}
 		}
+	}
+	
+	static private class IDPInstanceInputValidator implements InputValidator
+	{
+		@Override
+		public String validateInput(String input)
+		{
+			if (input.length() == 0)
+				return "Invalid IDP instance name.";
+			if (input.contains("/"))
+				return "Invalid IDP instance name.  " +
+					"Names cannot contain '/' characters.";
+			
+			return null;
+		}	
 	}
 }

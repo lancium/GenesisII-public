@@ -5,12 +5,16 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.bes.BESRP;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.dialog.ComboBoxDialog;
+import edu.virginia.vcgr.genii.client.dialog.DialogFactory;
+import edu.virginia.vcgr.genii.client.dialog.DialogProvider;
+import edu.virginia.vcgr.genii.client.dialog.SimpleMenuItem;
+import edu.virginia.vcgr.genii.client.dialog.TextContent;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
-import edu.virginia.vcgr.genii.client.utils.dialog.MenuWidget;
-import edu.virginia.vcgr.genii.client.utils.dialog.text.TextWidgetProvider;
 import edu.virginia.vcgr.genii.container.bes.BESPolicy;
 import edu.virginia.vcgr.genii.container.bes.BESPolicyActions;
 
@@ -58,35 +62,44 @@ public class BesPolicyTool extends BaseGridTool
 				_userLoggedInAction, _screenSaverInactiveAction);
 		else
 		{
-			TextWidgetProvider twp = new TextWidgetProvider(
-				stdout, stderr, stdin);
-			
-			MenuWidget menu = twp.createMenuDialog("User Logged In Action");
-			menu.setDetailedHelp(
-				"Please select the action to take when a user logs in to the target computer.");
-			menu.setPrompt("User Logged In Action?");
-			menu.setChoices(BESPolicyActions.NOACTION,
-				BESPolicyActions.SUSPEND, BESPolicyActions.SUSPENDORKILL,
-				BESPolicyActions.KILL);
-			menu.showWidget();
-			_userLoggedInAction = (BESPolicyActions)menu.getSelectedChoice();
-			if (_userLoggedInAction == null)
+			try
+			{
+				DialogProvider provider = DialogFactory.getProvider(
+					stdout, stderr, stdin, useGui());
+				
+				ComboBoxDialog dialog = provider.createComboBoxDialog(
+					"User Logged In Action", "User logged in action?",
+					null, 
+					new SimpleMenuItem("N", BESPolicyActions.NOACTION),
+					new SimpleMenuItem("S", BESPolicyActions.SUSPEND),
+					new SimpleMenuItem("SK", BESPolicyActions.SUSPENDORKILL),
+					new SimpleMenuItem("K", BESPolicyActions.KILL));
+				dialog.setHelp(
+					new TextContent(
+						"Please select the action to take when a user logs in to the target computer."));
+				dialog.showDialog();
+				_userLoggedInAction = (BESPolicyActions)dialog.getSelectedItem().getContent();
+				
+				dialog = provider.createComboBoxDialog(
+					"Screensaver Inactive Action", "Screensaver inactive action?",
+					null, 
+					new SimpleMenuItem("N", BESPolicyActions.NOACTION),
+					new SimpleMenuItem("S", BESPolicyActions.SUSPEND),
+					new SimpleMenuItem("SK", BESPolicyActions.SUSPENDORKILL),
+					new SimpleMenuItem("K", BESPolicyActions.KILL));
+				dialog.setHelp(
+					new TextContent(
+						"Please select the action to take when the screensaver is de-activated on the target computer."));
+				dialog.showDialog();
+				_screenSaverInactiveAction = (BESPolicyActions)dialog.getSelectedItem().getContent();
+					
+				setPolicy(bes.getEndpoint(),
+					_userLoggedInAction, _screenSaverInactiveAction);
+			}
+			catch (UserCancelException uce)
+			{
 				return 0;
-			
-			menu = twp.createMenuDialog("Screensaver Inactive Action");
-			menu.setDetailedHelp(
-				"Please select the action to take when the screensaver is de-activated on the target computer.");
-			menu.setPrompt("Screensaver Inactive Action?");
-			menu.setChoices(BESPolicyActions.NOACTION,
-				BESPolicyActions.SUSPEND, BESPolicyActions.SUSPENDORKILL,
-				BESPolicyActions.KILL);
-			menu.showWidget();
-			_screenSaverInactiveAction = (BESPolicyActions)menu.getSelectedChoice();
-			if (_screenSaverInactiveAction == null)
-				return 0;
-			
-			setPolicy(bes.getEndpoint(),
-				_userLoggedInAction, _screenSaverInactiveAction);
+			}
 		}
 		
 		return 0;

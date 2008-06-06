@@ -184,14 +184,6 @@
 		<mconf:instance name="context-resolver" 
 			type="edu.virginia.vcgr.genii.client.context.ClientContextResolver"
 			base="edu.virginia.vcgr.genii.client.context.IContextResolver"/>		
-		<mconf:instance name="exception-handler"
-			type="edu.virginia.vcgr.genii.client.cmd.DebugExceptionHandler"
-			base="edu.virginia.vcgr.genii.client.cmd.IExceptionHandler"/>
-<!--
-		<mconf:instance name="exception-handler"
-			type="edu.virginia.vcgr.genii.client.cmd.SimpleExceptionHandler"
-			base="edu.virginia.vcgr.genii.client.cmd.IExceptionHandler"/>
--->
 		<mconf:instance name="debug-list-handler"
 			type="edu.virginia.vcgr.genii.client.invoke.handlers.DebugListHandler"
 			base="java.lang.Object"/>
@@ -315,6 +307,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.TTYTool</mconf:class>
 		<mconf:class name="container-stats"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ContainerStatsTool</mconf:class>
+		<mconf:class name="user-preferences"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.UserPreferencesTool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

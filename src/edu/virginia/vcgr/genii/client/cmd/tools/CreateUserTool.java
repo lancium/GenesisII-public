@@ -6,16 +6,20 @@ import java.text.ParseException;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.dialog.DialogException;
+import edu.virginia.vcgr.genii.client.dialog.DialogFactory;
+import edu.virginia.vcgr.genii.client.dialog.DialogProvider;
+import edu.virginia.vcgr.genii.client.dialog.InputDialog;
+import edu.virginia.vcgr.genii.client.dialog.TextContent;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
+import edu.virginia.vcgr.genii.client.dialog.validators.ChainedInputValidator;
+import edu.virginia.vcgr.genii.client.dialog.validators.ContainsTextValidator;
+import edu.virginia.vcgr.genii.client.dialog.validators.NonEmptyValidator;
 import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
-import edu.virginia.vcgr.genii.client.utils.dialog.DialogException;
-import edu.virginia.vcgr.genii.client.utils.dialog.GenericQuestionWidget;
-import edu.virginia.vcgr.genii.client.utils.dialog.PasswordWidget;
-import edu.virginia.vcgr.genii.client.utils.dialog.WidgetProvider;
-import edu.virginia.vcgr.genii.client.utils.dialog.text.TextWidgetProvider;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 
 /**
@@ -104,7 +108,7 @@ public class CreateUserTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		TextWidgetProvider twp = new TextWidgetProvider(stdout, stderr, stdin);
+		DialogProvider twp = DialogFactory.getProvider(stdout, stderr, stdin, useGui());
 		
 		String idpServicePath = getArgument(0);
 		String idpName = getArgument(1);
@@ -233,23 +237,20 @@ public class CreateUserTool extends BaseGridTool
 	 * @throws DialogException
 	 * @throws IOException
 	 */
-	protected RNSPath getIDPServicePathFromUser(WidgetProvider wp)
-		throws DialogException, IOException
+	protected RNSPath getIDPServicePathFromUser(DialogProvider wp)
+		throws DialogException, IOException, UserCancelException
 	{
-		GenericQuestionWidget widget = wp.createGenericQuestionDialog(
-			"IDP Service Path");
-		widget.setDetailedHelp(new FileResource(
-			"edu/virginia/vcgr/genii/client/cmd/tools/resources/create-user-idp-path-help.txt"));
-		widget.setPrompt("IDP service to use?");
+		InputDialog input = wp.createInputDialog("IDP Service Path", "IDP service to use?");
+		input.setDefaultAnswer("");
+		input.setHelp(new TextContent(new FileResource(
+			"edu/virginia/vcgr/genii/client/cmd/tools/resources/create-user-idp-path-help.txt")));
 		
 		while (true)
 		{
 			try
 			{
-				widget.showWidget();
-				String answer = widget.getAnswer();
-				if (answer.equalsIgnoreCase("CANCEL"))
-					return null;
+				input.showDialog();
+				String answer = input.getAnswer();
 				
 				RNSPath idpService = RNSUtilities.findService(
 					"/containers/BootstrapContainer",
@@ -264,8 +265,9 @@ public class CreateUserTool extends BaseGridTool
 			}
 			catch (Throwable cause)
 			{
-				widget.showErrorMessage("Unable to locate IDP service.  " +
-					"Please try again or type \"Cancel\" to quit.");
+				wp.createErrorDialog("Unable to Locate IDP Service",
+					new TextContent("Unable to locate IDP service.",
+						"Please try again or type \"Cancel\" to quit.")).showDialog();
 			}
 		}
 	}
@@ -281,37 +283,32 @@ public class CreateUserTool extends BaseGridTool
 	 * 
 	 * @throws DialogException
 	 */
-	protected String getIDPNameFromUser(WidgetProvider wp, RNSPath idpServicePath)
-		throws DialogException
+	protected String getIDPNameFromUser(DialogProvider wp, RNSPath idpServicePath)
+		throws DialogException, UserCancelException
 	{
-		GenericQuestionWidget widget = wp.createGenericQuestionDialog(
-			"New Instance IDP Name");
-		widget.setDetailedHelp(
-			"The IDP name is the new name inside the IDP service by \n" +
-			"which this instance will be known.");
-		widget.setPrompt("New IDP Instance Name?");
+		InputDialog input = wp.createInputDialog("New Instance IDP Name", 
+			"New IDP instance name?");
+		input.setHelp(new TextContent(
+			"The IDP name is the new name inside the IDP service by",
+			"which this instance will be known."));
+		input.setInputValidator(new ChainedInputValidator(
+			new NonEmptyValidator("You must supply a non-empty IDP instance name."),
+			ContainsTextValidator.mustNotContainText("/", 
+				"IDP instance names cannot contain the '/' character.")));
 		
 		while (true)
 		{
 			try
 			{
-				widget.showWidget();
-				String answer = widget.getAnswer();
-				if (answer == null || answer.length() == 0)
-				{
-					widget.showErrorMessage(
-						"Please enter a new name to give the IDP service (or Cancel to quit).");
-					continue;
-				}
-				
-				if (answer.equalsIgnoreCase("CANCEL"))
-					return null;
+				input.showDialog();
+				String answer = input.getAnswer();
 				
 				RNSPath namePath = idpServicePath.lookup(answer);
 				if (namePath.exists())
 				{
-					widget.showErrorMessage("Name \"" + answer + 
-						"\" already exists in the IDP service.");
+					wp.createErrorDialog("Bad IDP Instance Name",
+						new TextContent("Name \"" + answer + 
+						"\" already exists in the IDP service.")).showDialog();
 					continue;
 				}
 				
@@ -321,10 +318,15 @@ public class CreateUserTool extends BaseGridTool
 			{
 				throw de;
 			}
+			catch (UserCancelException uce)
+			{
+				throw uce;
+			}
 			catch (Throwable cause)
 			{
-				widget.showErrorMessage("Unable to locate IDP service.  " +
-					"Please try again or type \"Cancel\" to quit.");
+				wp.createErrorDialog("Bad IDP Service",
+					new TextContent("Unable to locate IDP service.",
+					"Please try again.")).showDialog();
 			}
 		}
 	}
@@ -337,29 +339,21 @@ public class CreateUserTool extends BaseGridTool
 	 * 
 	 * @throws DialogException
 	 */
-	protected String getLoginNameFromUser(WidgetProvider wp)
-		throws DialogException
+	protected String getLoginNameFromUser(DialogProvider wp)
+		throws DialogException, UserCancelException
 	{
-		GenericQuestionWidget widget = wp.createGenericQuestionDialog(
-		"Login user name");
-		widget.setDetailedHelp(
-			"The login user name is the user name used when authenticating to\n"
-			+ "the new IDP service to log in to it.");
-		widget.setPrompt("Login user name?");
+		InputDialog input = wp.createInputDialog("Login User Name", 
+			"Login user name?");
+		input.setHelp(new TextContent(
+			"The login user name is the user name used when authenticating to",
+			"the new IDP service to log in to it."));
+		input.setInputValidator(new NonEmptyValidator(
+			"You must supply a non-empty login name."));
 		
 		while (true)
 		{
-			widget.showWidget();
-			String answer = widget.getAnswer();
-			if (answer == null || answer.length() == 0)
-			{
-				widget.showErrorMessage(
-					"Please supply a login user name (or type in Cancel to quit).");
-				continue;
-			}
-			
-			if (answer.equalsIgnoreCase("Cancel"))
-				return null;
+			input.showDialog();
+			String answer = input.getAnswer();
 			
 			return answer;
 		}
@@ -373,28 +367,21 @@ public class CreateUserTool extends BaseGridTool
 	 * 
 	 * @throws DialogException
 	 */
-	protected String getLoginPasswordFromUser(WidgetProvider wp)
-		throws DialogException
+	protected String getLoginPasswordFromUser(DialogProvider wp)
+		throws DialogException, UserCancelException
 	{
-		PasswordWidget widget = wp.createPasswordDialog("Login Password");
-		widget.setDetailedHelp(
-			"The login password is the password used when authenticating to\n"
-			+ "the new IDP service to log in to it.");
-		widget.setPrompt("Login password?");
+		InputDialog input = wp.createHiddenInputDialog(
+			"Login Password", "Login password?");
+		input.setHelp(new TextContent(
+			"The login password is the password used when authenticating to",
+			"the new IDP service to log in to it."));
+		input.setInputValidator(new NonEmptyValidator(
+			"You must supply a non-empty password."));
 		
 		while (true)
 		{
-			widget.showWidget();
-			String answer = widget.getAnswer();
-			if (answer == null || answer.length() == 0)
-			{
-				widget.showErrorMessage(
-					"Please supply a login password (or type in Cancel to quit).");
-				continue;
-			}
-			
-			if (answer.equalsIgnoreCase("Cancel"))
-				return null;
+			input.showDialog();
+			String answer = input.getAnswer();
 			
 			return answer;
 		}

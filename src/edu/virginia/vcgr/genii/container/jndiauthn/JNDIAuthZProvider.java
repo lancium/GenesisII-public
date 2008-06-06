@@ -174,18 +174,19 @@ public class JNDIAuthZProvider implements IAuthZProvider
 				}
 				catch (NamingException e)
 				{
-					throw new AuthZSecurityException(e.getMessage(), e);
+					throw new AuthZSecurityException(
+						"Naming exception in JNDIAuthZProvider.", e);
 				}
 				catch (UnsupportedEncodingException e)
 				{
-					throw new AuthZSecurityException(e.getMessage(), e);
+					throw new AuthZSecurityException(
+						"Naming exception in JNDIAuthZProvider.", e);
 				}
 
 			}
 		}
 
-		throw new AuthZSecurityException("Access denied for method "
-				+ operation.getName());
+		throw new PermissionDeniedException(operation.getName());
 	}
 
 	public MessageLevelSecurity getMinIncomingMsgLevelSecurity(

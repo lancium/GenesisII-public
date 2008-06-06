@@ -138,7 +138,30 @@
 			<gsh:param>+r</gsh:param>
 			<gsh:param>--everyone</gsh:param>
 		</geniix:chmod>
+
+		<gsh:echo message="Adding group BootstrapX509AuthN"/>
+		<geniix:cp>
+			<gsh:param>--local-src</gsh:param>
+			<gsh:param>${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/certs/groups/${FILE}</gsh:param>
+			<gsh:param>/groups/${GROUP}</gsh:param>
+		</geniix:cp>
+
+		<geniix:chmod>
+			<gsh:param>/groups/${GROUP}</gsh:param>
+			<gsh:param>+r</gsh:param>
+			<gsh:param>--everyone</gsh:param>
+		</geniix:chmod>
 	</gsh:foreach>
+
+	<gsh:echo message="Adding uva-idp-group"/>
+	<geniix:idp>
+		<gsh:param>/containers/BootstrapContainer/Services/X509AuthnPortType</gsh:param>
+		<gsh:param>uva-idp-group</gsh:param>
+	</geniix:idp>
+	<geniix:ln>
+		<gsh:param>/containers/BootstrapContainer/Services/X509AuthnPortType/uva-idp-group</gsh:param>
+		<gsh:param>/groups/uva-idp-group</gsh:param>
+	</geniix:ln>
 
 	<gsh:echo message="Adding users"/>
 	<gsh:foreach param-name="FILE" source-dir="${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/certs/users"

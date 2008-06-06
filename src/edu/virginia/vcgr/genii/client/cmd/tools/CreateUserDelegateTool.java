@@ -6,16 +6,20 @@ import java.util.LinkedList;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.dialog.ComboBoxDialog;
+import edu.virginia.vcgr.genii.client.dialog.DialogException;
+import edu.virginia.vcgr.genii.client.dialog.DialogFactory;
+import edu.virginia.vcgr.genii.client.dialog.DialogProvider;
+import edu.virginia.vcgr.genii.client.dialog.InputDialog;
+import edu.virginia.vcgr.genii.client.dialog.MenuItem;
+import edu.virginia.vcgr.genii.client.dialog.SimpleMenuItem;
+import edu.virginia.vcgr.genii.client.dialog.TextContent;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
+import edu.virginia.vcgr.genii.client.dialog.validators.NonEmptyValidator;
 import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
-import edu.virginia.vcgr.genii.client.utils.dialog.DialogException;
-import edu.virginia.vcgr.genii.client.utils.dialog.GenericQuestionWidget;
-import edu.virginia.vcgr.genii.client.utils.dialog.MenuChoice;
-import edu.virginia.vcgr.genii.client.utils.dialog.MenuWidget;
-import edu.virginia.vcgr.genii.client.utils.dialog.WidgetProvider;
-import edu.virginia.vcgr.genii.client.utils.dialog.text.TextWidgetProvider;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.container.sysinfo.SupportedOperatingSystems;
 
@@ -81,20 +85,20 @@ public class CreateUserDelegateTool extends CreateUserTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		TextWidgetProvider twp = new TextWidgetProvider(stdout, stderr, stdin);
-		
+		DialogProvider provider = DialogFactory.getProvider(
+			stdout, stderr, stdin, useGui());
 		LinkedList<String> args = new LinkedList<String>(getArguments());
 		
 		String sourceURI = null;
 		
 		if (_storeType == null)
 		{
-			_storeType = getStoreTypeFromUser(twp);
+			_storeType = getStoreTypeFromUser(provider);
 			if (_storeType == null)
 				return 0;
 			if (!_storeType.equalsIgnoreCase("WIN"))
 			{
-				sourceURI = getSourceURIFromUser(twp);
+				sourceURI = getSourceURIFromUser(provider);
 				if (sourceURI == null)
 					return 0;
 			}
@@ -122,7 +126,7 @@ public class CreateUserDelegateTool extends CreateUserTool
 		
 		if (idpServicePath == null)
 		{
-			idpServiceRNS = getIDPServicePathFromUser(twp);
+			idpServiceRNS = getIDPServicePathFromUser(provider);
 			if (idpServiceRNS == null)
 				return 0;
 		} else
@@ -133,21 +137,21 @@ public class CreateUserDelegateTool extends CreateUserTool
 		
 		if (idpName == null)
 		{
-			idpName = getIDPNameFromUser(twp, idpServiceRNS);
+			idpName = getIDPNameFromUser(provider, idpServiceRNS);
 			if (idpName == null)
 				return 0;
 		}
 		
 		if (_loginName == null)
 		{
-			_loginName = getLoginNameFromUser(twp);
+			_loginName = getLoginNameFromUser(provider);
 			if (_loginName == null)
 				return 0;
 		}
 		
 		if (_password == null)
 		{
-			_password = getLoginPasswordFromUser(twp);
+			_password = getLoginPasswordFromUser(provider);
 			if (_password == null)
 				return 0;
 		}
@@ -171,36 +175,34 @@ public class CreateUserDelegateTool extends CreateUserTool
 	 * 
 	 * @throws DialogException
 	 */
-	private String getStoreTypeFromUser(WidgetProvider wp)
-		throws DialogException
+	private String getStoreTypeFromUser(DialogProvider wp)
+		throws DialogException, UserCancelException
 	{
-		MenuWidget menu = wp.createMenuDialog("Store Type Selection");
-		menu.setDetailedHelp(
-			"The source keystore format is the format of the keystore from\n"
-			+ "which to retrieve the certificate that will be delegate to\n"
-			+ "the new IDP instance.");
+		ComboBoxDialog menu;
 		
 		boolean isWindows = SupportedOperatingSystems.current().equals(
 			SupportedOperatingSystems.WINDOWS);
 		
+		MenuItem pkcs12 = new SimpleMenuItem("P", "PKCS12");
+		MenuItem jks = new SimpleMenuItem("J", "JKS");
+		MenuItem win = new SimpleMenuItem("W", "WIN");
+		
 		if (isWindows)
-			menu.setChoices(
-				new MenuChoice("P", "PKCS12"), 
-				new MenuChoice("J", "JKS"),
-				new MenuChoice("W", "WIN"),
-				new MenuChoice("x", "Cancel"));
+			menu = wp.createComboBoxDialog("Store Type Selection", 
+				"Source keystore format?", pkcs12,
+				pkcs12, jks, win);
 		else
-			menu.setChoices(
-				new MenuChoice("P", "PKCS12"), 
-				new MenuChoice("J", "JKS"),
-				new MenuChoice("x", "Cancel"));
+			menu = wp.createComboBoxDialog("Store Type Selection", 
+				"Source keystore format?", pkcs12,
+				pkcs12, jks);
 		
-		menu.setPrompt("Source keystore format?");
+		menu.setHelp(new TextContent(
+			"The source keystore format is the format of the keystore from",
+			"which to retrieve the certificate that will be delegate to",
+			"the new IDP instance."));
 		
-		menu.showWidget();
-		String answer = menu.getSelectedChoice().toString();
-		if (answer.equalsIgnoreCase("Cancel"))
-			return null;
+		menu.showDialog();
+		String answer = menu.getSelectedItem().toString();
 		
 		return answer;
 	}
@@ -213,30 +215,20 @@ public class CreateUserDelegateTool extends CreateUserTool
 	 * 
 	 * @throws DialogException
 	 */
-	private String getSourceURIFromUser(WidgetProvider wp)
-		throws DialogException
+	private String getSourceURIFromUser(DialogProvider wp)
+		throws DialogException, UserCancelException
 	{
-		GenericQuestionWidget widget = wp.createGenericQuestionDialog(
-			"Source URI");
-		widget.setDetailedHelp(
-			"The Source URI is the path to the source keystore from which\n"
-			+ "a certificate will be delegated.");
-		widget.setPrompt("Source keystore URI?");
+		InputDialog input = wp.createInputDialog("Source URI", 
+			"Source keystore URI?");
+		input.setHelp(new TextContent(
+			"The Source URI is the path to the source keystore from which",
+			"a certificate will be delegated."));
+		input.setInputValidator(new NonEmptyValidator("You must enter a source URI!"));
 		
 		while (true)
 		{
-			widget.showWidget();
-			String answer = widget.getAnswer();
-			
-			if (answer == null || answer.isEmpty())
-			{
-				widget.showErrorMessage(
-					"Please enter the uri (path) for source certificate store (or Cancel to quit).");
-				continue;
-			}
-			
-			if (answer.equalsIgnoreCase("Cancel"))
-				return null;
+			input.showDialog();
+			String answer = input.getAnswer();
 			
 			return answer;
 		}

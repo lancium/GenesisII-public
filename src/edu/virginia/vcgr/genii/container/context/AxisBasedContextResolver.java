@@ -92,9 +92,9 @@ public class AxisBasedContextResolver implements IContextResolver
 					}
 				}
 			} catch (SOAPException se) {
-				throw new AxisFault(se.getLocalizedMessage(), se);
+				throw new AxisFault("SOAP Exception loadding calling context.", se);
 			} catch (IOException e) {
-				throw new AuthZSecurityException(e.getMessage(), e);
+				throw new AuthZSecurityException("Unknown exception loading calling context.", e);
 			}
 		}
 			

@@ -406,26 +406,22 @@ public class GamlClientTool
 				catch (ConfigurationException e)
 				{
 					throw new AuthZSecurityException(
-							"Could not load certificate file: "
-									+ e.getMessage(), e);
+							"Could not load certificate file.", e);
 				}
 				catch (FileNotFoundException e)
 				{
 					throw new AuthZSecurityException(
-							"Could not load certificate file: "
-									+ e.getMessage(), e);
+							"Could not load certificate file.", e);
 				}
 				catch (RNSException e)
 				{
 					throw new AuthZSecurityException(
-							"Could not load certificate file: "
-									+ e.getMessage(), e);
+							"Could not load certificate file.", e);
 				}
 				catch (GeneralSecurityException e)
 				{
 					throw new AuthZSecurityException(
-							"Could not load certificate file: "
-									+ e.getMessage(), e);
+							"Could not load certificate file.", e);
 				}
 			}
 		}

@@ -19,6 +19,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSMultiLookupResultException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.filters.FilterFactory;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 
 public abstract class BaseGridTool implements ITool
 {
@@ -81,6 +82,10 @@ public abstract class BaseGridTool implements ITool
 				err.println();
 				return -1;
 			}
+		}
+		catch (UserCancelException uce)
+		{
+			return 0;
 		}
 		finally
 		{

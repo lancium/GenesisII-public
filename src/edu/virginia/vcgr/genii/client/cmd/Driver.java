@@ -58,8 +58,6 @@ public class Driver extends ApplicationBase
 	static private void doShell(BufferedReader in) throws ReloadShellException
 	{
 		CommandLineRunner runner = new CommandLineRunner();
-		IExceptionHandler exceptionHandler =
-			ExceptionHandlerManager.getExceptionHandler();
 		
 		while (true)
 		{
@@ -84,7 +82,8 @@ public class Driver extends ApplicationBase
 				}
 				catch (IOException ioe)
 				{
-					exceptionHandler.handleException(ioe, System.err);
+					ExceptionHandlerManager.getExceptionHandler().
+						handleException(ioe, System.err);
 					break;
 				}
 	
@@ -135,7 +134,8 @@ public class Driver extends ApplicationBase
 			} catch (ReloadShellException e) {
 				throw e;
 			} catch (Throwable cause) {
-				exceptionHandler.handleException(cause, System.err);
+				ExceptionHandlerManager.getExceptionHandler().
+					handleException(cause, System.err);
 			}
 		}
 		
@@ -146,8 +146,6 @@ public class Driver extends ApplicationBase
 		throws ReloadShellException
 	{
 		CommandLineRunner runner = new CommandLineRunner();
-		IExceptionHandler exceptionHandler =
-			ExceptionHandlerManager.getExceptionHandler();
 		
 		try
 		{	
@@ -160,7 +158,8 @@ public class Driver extends ApplicationBase
 		}
 		catch (Throwable cause)
 		{
-			exceptionHandler.handleException(cause, System.err);
+			ExceptionHandlerManager.getExceptionHandler().
+				handleException(cause, System.err);
 			System.exit(1);
 		}
 	}
