@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 
 import edu.virginia.vcgr.genii.client.cmd.GetUserDir;
-import edu.virginia.vcgr.genii.client.utils.deployment.DeploymentRelativeFile;
 
 public class UserConfigUtils
 {
@@ -51,9 +50,10 @@ public class UserConfigUtils
 	
 	static public void reloadConfiguration()
 	{
+		Installation.reload();
+		
 		synchronized(UserConfigUtils.class)
 		{
-			DeploymentRelativeFile.evaluateDeploymentDirectory();
 			ConfigurationManager manager = ConfigurationManager.getCurrentConfiguration();
 			if (manager != null)
 			{

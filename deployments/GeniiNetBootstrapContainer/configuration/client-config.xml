@@ -70,7 +70,7 @@
 		     be used in verifying resource identity -->
 		<mconf:property 
 			name="edu.virginia.vcgr.genii.client.security.resource-identity.trust-store-location"
-			value="security/trusted.pfx"/>
+			value="trusted.pfx"/>
 		<mconf:property 
 			name="edu.virginia.vcgr.genii.client.security.resource-identity.trust-store-type"
 			value="PKCS12"/>
@@ -86,7 +86,7 @@
 	<genii:ssl-properties>
 		<mconf:property 
 			name="edu.virginia.vcgr.genii.client.security.ssl.trust-store-location"
-			value="security/trusted.pfx"/>
+			value="trusted.pfx"/>
 		<mconf:property 
 			name="edu.virginia.vcgr.genii.client.security.ssl.trust-store-type"
 			value="PKCS12"/>

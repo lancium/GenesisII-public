@@ -8,7 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.ApplicationBase;
-import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.configuration.Deployment;
 
 public class Driver extends ApplicationBase
 {
@@ -25,7 +25,8 @@ public class Driver extends ApplicationBase
 		if (deploymentName != null)
 		{
 			_logger.debug("Using Deployment \"" + deploymentName + "\".");
-			System.setProperty(GenesisIIConstants.DEPLOYMENT_NAME_PROPERTY, deploymentName);
+			System.setProperty(Deployment.DEPLOYMENT_NAME_PROPERTY,
+				deploymentName);
 		} else
 		{
 			_logger.debug("Using Deployment \"default\".");

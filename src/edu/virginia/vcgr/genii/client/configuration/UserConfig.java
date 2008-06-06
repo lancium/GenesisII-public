@@ -38,7 +38,7 @@ public class UserConfig
 	static public QName USER_CONFIG_QNAME =
 		new QName(NAMESPACE, USER_CONFIG_ELEMENT);
 
-	private String _deploymentPath;
+	private File _deploymentPath;
 	
 	static private final String [] _nonEscapedElementNames = {
 		DEPLOYMENT_PATH_ELEMENT,
@@ -47,7 +47,7 @@ public class UserConfig
 
 	public UserConfig(String deploymentPath)
 	{
-		_deploymentPath = deploymentPath;
+		_deploymentPath = new File(deploymentPath);
 	}
 
 	public UserConfig(File file)
@@ -133,12 +133,12 @@ public class UserConfig
 		}
 	}
 
-	public String getDeploymentPath()
+	public File getDeploymentPath()
 	{
 		return _deploymentPath;
 	}
 	
-	public void setDeploymentPath(String deploymentPath)
+	public void setDeploymentPath(File deploymentPath)
 	{
 		_deploymentPath = deploymentPath;
 	}
@@ -188,7 +188,7 @@ public class UserConfig
 		if (deployText.getNodeType() != Node.TEXT_NODE)
 			throw new ConfigurationException("Element " + DEPLOYMENT_PATH_ELEMENT + " must be a TEXT_NODE");
 		
-		_deploymentPath = deployText.getTextContent();
+		_deploymentPath = new File(deployText.getTextContent());
 	}
 	
 	private Element createUserConfigElement(Document doc)
@@ -206,7 +206,7 @@ public class UserConfig
 		// create root element
 		Element deployElem = doc.createElementNS(NAMESPACE, DEPLOYMENT_PATH_ELEMENT);
 
-		Text deployPathValue = doc.createTextNode(_deploymentPath);
+		Text deployPathValue = doc.createTextNode(_deploymentPath.getAbsolutePath());
 		
 		deployElem.appendChild(deployPathValue);
 

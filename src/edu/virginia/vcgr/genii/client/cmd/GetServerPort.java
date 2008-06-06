@@ -1,7 +1,7 @@
 package edu.virginia.vcgr.genii.client.cmd;
 
-import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
+import edu.virginia.vcgr.genii.client.configuration.Deployment;
 import edu.virginia.vcgr.genii.container.configuration.ContainerConfiguration;
 
 public class GetServerPort
@@ -15,7 +15,7 @@ public class GetServerPort
 	
 	static public int getServerPort(String deployName)
 	{
-		System.setProperty(GenesisIIConstants.DEPLOYMENT_NAME_PROPERTY, deployName);
+		System.setProperty(Deployment.DEPLOYMENT_NAME_PROPERTY, deployName);
 		String userDir = GetUserDir.getUserDir();
 		ConfigurationManager configurationManager = 
 			ConfigurationManager.initializeConfiguration(userDir);

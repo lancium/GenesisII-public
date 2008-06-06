@@ -11,9 +11,10 @@ import java.util.Vector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.bes.GeniiBESConstants;
-import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
+import edu.virginia.vcgr.genii.client.configuration.Deployment;
+import edu.virginia.vcgr.genii.client.configuration.Installation;
+import edu.virginia.vcgr.genii.client.configuration.OGRSHVersion;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.jsdl.InvalidJSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
@@ -115,15 +116,12 @@ public class ForkExecUnderstanding implements Application
 		Vector<ExecutionPhase> cleanupPhases, 
 		String ogrshVersion) throws JSDLException
 	{
+		Deployment deployment = Installation.getDeployment();
 		executionPlan.add(new PrepareApplicationPhase(_executable));
 		
-		String depName = System.getProperty(
-			GenesisIIConstants.DEPLOYMENT_NAME_PROPERTY);
-		if (depName != null)
-		{
-			_logger.debug("Setting deployment name to \"" + depName + "\".");
-			_environment.put("GENII_DEPLOYMENT_NAME", depName);
-		}
+		String depName = deployment.getName();
+		_logger.debug("Setting deployment name to \"" + depName + "\".");
+		_environment.put("GENII_DEPLOYMENT_NAME", depName);
 		
 		if (ogrshVersion == null)
 		{
@@ -141,9 +139,9 @@ public class ForkExecUnderstanding implements Application
 			args.add(_executable);
 			args.addAll(_arguments);
 			
-			File shim = new File(ConfigurationManager.getInstallDir(), 
-				"OGRSH");
-			shim = new File(shim, "shim-" + ogrshVersion + ".sh");
+			OGRSHVersion oVersion = Installation.getOGRSH(
+				).getInstalledVersions().get(ogrshVersion);
+			File shim = oVersion.shimScript();
 			_executable = shim.getAbsolutePath();
 			
 			executionPlan.add(new QueueProcessPhase(
@@ -194,15 +192,12 @@ public class ForkExecUnderstanding implements Application
 			_logger.warn("Error trying to get the TTY property.", e);
 		}
 		
+		Deployment deployment = Installation.getDeployment();
 		executionPlan.add(new PrepareApplicationPhase(_executable));
 		
-		String depName = System.getProperty(
-			GenesisIIConstants.DEPLOYMENT_NAME_PROPERTY);
-		if (depName != null)
-		{
-			_logger.debug("Setting deployment name to \"" + depName + "\".");
-			_environment.put("GENII_DEPLOYMENT_NAME", depName);
-		}
+		String depName = deployment.getName();
+		_logger.debug("Setting deployment name to \"" + depName + "\".");
+		_environment.put("GENII_DEPLOYMENT_NAME", depName);
 		
 		if (ogrshVersion == null)
 		{
@@ -220,9 +215,8 @@ public class ForkExecUnderstanding implements Application
 			args.add(_executable);
 			args.addAll(_arguments);
 			
-			File shim = new File(ConfigurationManager.getInstallDir(), 
-				"OGRSH");
-			shim = new File(shim, "shim-" + ogrshVersion + ".sh");
+			File shim = Installation.getOGRSH(
+				).getInstalledVersions().get(ogrshVersion).shimScript();
 			_executable = shim.getAbsolutePath();
 			
 			executionPlan.add(new RunProcessPhase(

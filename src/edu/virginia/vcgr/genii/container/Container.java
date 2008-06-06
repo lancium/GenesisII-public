@@ -37,11 +37,12 @@ import org.mortbay.jetty.servlet.WebApplicationContext;
 import edu.virginia.vcgr.genii.client.ApplicationBase;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
+import edu.virginia.vcgr.genii.client.configuration.Deployment;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
+import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.install.InstallationState;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
-import edu.virginia.vcgr.genii.client.utils.deployment.DeploymentRelativeFile;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 import edu.virginia.vcgr.genii.container.configuration.ContainerConfiguration;
 import edu.virginia.vcgr.genii.container.deployment.ServiceDeployer;
@@ -84,11 +85,11 @@ public class Container extends ApplicationBase
 		ContainerStatistics.instance();
 		
 		if (args.length == 1) {
-			System.setProperty(GenesisIIConstants.DEPLOYMENT_NAME_PROPERTY, args[0]);
+			System.setProperty(Deployment.DEPLOYMENT_NAME_PROPERTY, args[0]);
 			_logger.info("Container deployment is " + args[0]);
 		} 
 		else {
-			System.setProperty(GenesisIIConstants.DEPLOYMENT_NAME_PROPERTY, "default");
+			System.setProperty(Deployment.DEPLOYMENT_NAME_PROPERTY, "default");
 			_logger.info("Container deployment is default");
 		}
 		
@@ -190,21 +191,17 @@ public class Container extends ApplicationBase
 		
 		webAppCtxt = server.addWebApplication(
 				"/axis",
-				new File(ConfigurationManager.getInstallDir(),"webapps/axis").getAbsolutePath());
+				Installation.axisWebApplicationPath().getAbsolutePath());
 		
 		recordInstallationState(System.getProperty(
-			GenesisIIConstants.DEPLOYMENT_NAME_PROPERTY, "default"), 
+			Deployment.DEPLOYMENT_NAME_PROPERTY, "default"), 
 			new URL(_containerURL));
 		
 		server.start();
 		initializeServices(webAppCtxt);
 	
-		// This line was checked in and clearly breaks the system.
-		//
-		// ServiceDeployer.startServiceDeployer(_axisServer,
-		//	new File(getConfigurationManager().getConfigDirectory(), "services"));
 		ServiceDeployer.startServiceDeployer(_axisServer,
-			new DeploymentRelativeFile("services"));
+			Installation.getDeployment().getServicesDirectory());
 	}
 	
 	static private void initializeServices(WebApplicationContext ctxt)
@@ -327,7 +324,8 @@ public class Container extends ApplicationBase
 		if (keyPassword != null)
 			keyPassChars = keyPassword.toCharArray();
 
-		KeyStore ks = CertTool.openStoreDirectPath(new DeploymentRelativeFile(keyStoreLoc),
+		KeyStore ks = CertTool.openStoreDirectPath(
+			Installation.getDeployment().getSecurityFile(keyStoreLoc),
 			keyStoreType, keyStorePassChars);
 		// load the container private key and certificate
 		_containerPrivateKey = (PrivateKey) ks.getKey(

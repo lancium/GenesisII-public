@@ -18,8 +18,8 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.comm.axis.AxisClientInvocationHandler;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationUnloadedListener;
+import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
-import edu.virginia.vcgr.genii.client.utils.deployment.DeploymentRelativeFile;
 
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
@@ -101,11 +101,9 @@ public class SecurityUtils
 			{
 				trustStorePassChars = trustStorePass.toCharArray();
 			}
-			__trustStore =
-					CertTool
-							.openStoreDirectPath(new DeploymentRelativeFile(
-									trustStoreLoc), trustStoreType,
-									trustStorePassChars);
+			__trustStore =CertTool.openStoreDirectPath(
+				Installation.getDeployment().getSecurityFile(trustStoreLoc),
+				trustStoreType, trustStorePassChars);
 			return __trustStore;
 
 		}

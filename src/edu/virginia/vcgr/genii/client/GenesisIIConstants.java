@@ -10,13 +10,6 @@ public class GenesisIIConstants
 	static public final String OGSA_BP_NS =
 		"http://schemas.ggc.org/ogsa/2006/05/wsrf-bp";
 	
-	/// System property to indicate the installtion location 
-	static public final String INSTALL_DIR_SYSTEM_PROPERTY = 
-		"edu.virginia.vcgr.genii.install-base-dir";
-	
-	static public final String DEPLOYMENT_NAME_PROPERTY =
-		"edu.virginia.vcgr.genii.client.deployment-name";
-	
 	static public final long CredentialExpirationMillis = 1000 * 60 * 60 * 24; // valid 24 hours
  
 	static public final String NAMING_CLIENT_CONFORMANCE_PROPERTY = "IsWSNamingClient";
@@ -82,8 +75,6 @@ public class GenesisIIConstants
 	
 	static public final String USER_CONFIG_ENVIRONMENT_VARIABLE =
 		"GENII_USER_CONFIG_DIR";
-	static public final String DEPLOYMENT_NAME_ENVIRONMENT_VARIABLE =
-		"GENII_DEPLOYMENT_NAME";
 
 	static public QName RNS_CACHED_METADATA_DOCUMENT_QNAME =
 		new QName(GENESISII_NS, "rns-cached-metadata");

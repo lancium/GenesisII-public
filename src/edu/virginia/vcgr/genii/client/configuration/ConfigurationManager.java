@@ -8,7 +8,6 @@ import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
-import edu.virginia.vcgr.genii.client.utils.deployment.DeploymentRelativeFile;
 
 public class ConfigurationManager
 {
@@ -46,26 +45,12 @@ public class ConfigurationManager
 		_unloadListeners.add(listener);
 	}
 	
-	/**
-	 * Gets the default configuration directory, which is one directory below
-	 * wherever directory is indicated by the install-dir system property. 
-	 * @return
-	 */
-	static public String getInstallDir() {
-		String installDir = System.getProperty(
-				GenesisIIConstants.INSTALL_DIR_SYSTEM_PROPERTY);
-		if (installDir == null) {
-			throw new RuntimeException("Couldn't read \"" + 
-				GenesisIIConstants.INSTALL_DIR_SYSTEM_PROPERTY + "\" system property.");
-		}
-		return installDir;
-	}
-
-	static public String getUserConfigDir() {
+	static public File getUserConfigDir()
+	{
 		// try USER_CONFIG_ENVIRONMENT_VARIABLE
 		String userConfigEnvVar = System.getenv(GenesisIIConstants.USER_CONFIG_ENVIRONMENT_VARIABLE);
 		if (userConfigEnvVar != null && userConfigEnvVar.length() != 0)
-			return userConfigEnvVar;
+			return new File(userConfigEnvVar);
 
 		// try reading user's config file from USER_DIR
 		try
@@ -79,20 +64,7 @@ public class ConfigurationManager
 		catch(Throwable t)
 		{}
 		
-		String installDir = ConfigurationManager.getInstallDir();
-
-		// try INSTALL_DIR/DEPLOYMENT_NAME_PROPERTY.
-		String deploymentName = System.getProperty(GenesisIIConstants.DEPLOYMENT_NAME_PROPERTY);
-		if (deploymentName != null)
-			return new String(installDir + File.separator + deploymentName);
-
-		// try deployment environment variable
-		deploymentName = System.getenv(GenesisIIConstants.DEPLOYMENT_NAME_ENVIRONMENT_VARIABLE);
-		if (deploymentName != null)
-			return new String(installDir + File.separator + deploymentName);
-		
-		// last but not least.... use INSTALL_DIR/deployments/default
-		return new String(installDir + File.separator + "deployments" + File.separator + "default");
+		return null;
 	}
 	
 	/**
@@ -172,12 +144,13 @@ public class ConfigurationManager
 		
 		System.setProperty(_USER_DIR_PROPERTY, _userDir.getAbsolutePath());
 		
+		Deployment deployment = Installation.getDeployment();
 		try
 		{
-			_clientConf = new XMLConfiguration(new DeploymentRelativeFile(
-				"configuration/" + _CLIENT_CONF_FILENAME));
-			_serverConf = new XMLConfiguration(new DeploymentRelativeFile(
-				"configuration/" + _SERVER_CONF_FILENAME));
+			_clientConf = new XMLConfiguration(
+				deployment.getConfigurationFile(_CLIENT_CONF_FILENAME));
+			_serverConf = new XMLConfiguration(
+				deployment.getConfigurationFile(_SERVER_CONF_FILENAME));
 		}
 		catch (IOException ioe)
 		{

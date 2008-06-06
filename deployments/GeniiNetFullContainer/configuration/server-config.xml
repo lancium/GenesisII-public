@@ -55,7 +55,7 @@
 		     certificates -->
 		<mconf:property 
 			name="edu.virginia.vcgr.genii.container.security.resource-identity.key-store"
-			value="security/installer.pfx"/>
+			value="installer.pfx"/>
 		<mconf:property 
 			name="edu.virginia.vcgr.genii.container.security.resource-identity.key-store-type"
 			value="PKCS12"/>
@@ -82,7 +82,7 @@
 	<genii:ssl-properties>
 		<mconf:property 
 			name="edu.virginia.vcgr.genii.container.security.ssl.key-store"
-			value="security/installer.pfx"/>
+			value="installer.pfx"/>
 		<mconf:property 
 			name="edu.virginia.vcgr.genii.container.security.ssl.key-store-type"
 			value="PKCS12"/>
@@ -143,7 +143,7 @@
 			     that are created upon container-startup).  If not specified, then 
 		    	 the identity of the container will be used in these circumstances. 
 			<mconf:property name="genii.security.authz.bootstrapOwnerCertPath"
-				value="security/admin.cer"/>
+				value="admin.cer"/>
 			-->
 						
 		</mconf:instance>
@@ -162,7 +162,7 @@
 			     that are created upon container-startup).  If not specified, then 
 		    	 the identity of the container will be used in these circumstances. 
 			<mconf:property name="genii.security.authz.bootstrapOwnerCertPath"
-				value="security/admin.cer"/>
+				value="admin.cer"/>
 			-->
 						
 		</mconf:instance>

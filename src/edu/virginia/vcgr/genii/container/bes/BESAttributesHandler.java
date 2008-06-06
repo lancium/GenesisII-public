@@ -35,6 +35,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
+import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -294,7 +295,8 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 	public ArrayList<MessageElement> getOGRSHVersionsAttr()
 	{
 		ArrayList<MessageElement> ret = new ArrayList<MessageElement>();
-		for (String version : OGRSHUtils.ogrshVersionsSupported())
+		for (String version : 
+			Installation.getOGRSH().getInstalledVersions().keySet())
 		{
 			ret.add(new MessageElement(OGRSH_VERSIONS_ATTR, version));
 		}

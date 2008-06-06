@@ -4,11 +4,11 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 
+import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLMatchException;
 import edu.virginia.vcgr.genii.client.jsdl.personality.def.DefaultResourcesFacet;
 import edu.virginia.vcgr.genii.container.bes.OGRSHConstants;
-import edu.virginia.vcgr.genii.container.bes.OGRSHUtils;
 
 public class SEResourcesFacet extends DefaultResourcesFacet
 {
@@ -23,7 +23,8 @@ public class SEResourcesFacet extends DefaultResourcesFacet
 		if (name.equals(OGRSH_VERSION_QNAME))
 		{
 			String version = any.getValue();
-			for (String acceptedVersion : OGRSHUtils.ogrshVersionsSupported())
+			for (String acceptedVersion : 
+				Installation.getOGRSH().getInstalledVersions().keySet())
 			{
 				if (version.equals(acceptedVersion))
 				{
