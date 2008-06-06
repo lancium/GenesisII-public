@@ -4,12 +4,6 @@
 	xmlns:genii="http://vcgr.cs.virginia.edu/Genesis-II">
 
 	<mconf:config-sections>
-		<mconf:config-section name="genii:message-security"
-			class="org.morgan.util.configuration.PropertiesConfigurationSectionHandler"/>
-		<mconf:config-section name="genii:resource-identity"
-			class="org.morgan.util.configuration.PropertiesConfigurationSectionHandler"/>
-		<mconf:config-section name="genii:ssl-properties"
-			class="org.morgan.util.configuration.PropertiesConfigurationSectionHandler"/>
 		<mconf:config-section name="genii:gaml-keystore"
 			class="org.morgan.util.configuration.PropertiesConfigurationSectionHandler"/>
 		<mconf:config-section name="genii:locator-registry"
@@ -34,66 +28,6 @@
 			value="ip"/>
 	</genii:global-properties>
 
-	
-<!-- Message security section.  Contains properties that impact the  
-     message-level security of outgoing and response messages.
--->     
-	<genii:message-security>
-		<!-- Property that sets the minimum configuration for outgoing and 
-		     response message-level security.  Acceptable values are 
-		       "NONE" : The client does not require a minimum configuration 
-		         message-level communication.  (The client will auto-upgrade
-		         to the level of message-level security required by the 
-		         remote container.)
-		       "SIGN" : Provides (for outgoing messages) and requires (for 
-		         response messages) proof of data integrity. (The client will
-		         often auto-upgrade as needed to this configuration to accomodate 
-		         AuthZ within certain containers.)
-		       "ENCRYPT" : Provides (for outgoing messages) and requires (for 
-		         response messages) confidentiality.  (When set, this value
-		         necessitates proper resource AuthN, which requires that the 
-		         edu.virginia.vcgr.genii.client.security.resource-identity.authn-tolerance
-		         property below be set to "FAIL".)
-		       "WARN" : Allows the client to communicate with resources that cannot 
-		         be authenticated -->
-		<mconf:property 
-			name="edu.virginia.vcgr.genii.client.security.message.min-config"
-			value="SIGN|WARN"/>
-	</genii:message-security>
-	
-<!-- Resource identity properties section.  This section contains properties
-     that indicate what trust store to use for verification of resource 
-     identity 
--->
-	<genii:resource-identity>
-		<!-- The following three properties specify the trust store to
-		     be used in verifying resource identity -->
-		<mconf:property 
-			name="edu.virginia.vcgr.genii.client.security.resource-identity.trust-store-location"
-			value="trusted.pfx"/>
-		<mconf:property 
-			name="edu.virginia.vcgr.genii.client.security.resource-identity.trust-store-type"
-			value="PKCS12"/>
-		<mconf:property 
-			name="edu.virginia.vcgr.genii.client.security.resource-identity.trust-store-password"
-			value="trusted"/>
-	</genii:resource-identity>	
-	
-	
-<!-- SSL properties section.  Presently contains properties that identify the 
-     trust-store that should be used to authenticate server SSL certificates.
--->
-	<genii:ssl-properties>
-		<mconf:property 
-			name="edu.virginia.vcgr.genii.client.security.ssl.trust-store-location"
-			value="trusted.pfx"/>
-		<mconf:property 
-			name="edu.virginia.vcgr.genii.client.security.ssl.trust-store-type"
-			value="PKCS12"/>
-		<mconf:property 
-			name="edu.virginia.vcgr.genii.client.security.ssl.trust-store-password"
-			value="trusted"/>
-	</genii:ssl-properties>
 	
 	<genii:smtp-properties>
 		<mconf:property name="mail.smtp.auth" value="false"/>

@@ -40,6 +40,8 @@ import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.Deployment;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
+import edu.virginia.vcgr.genii.client.configuration.Security;
+import edu.virginia.vcgr.genii.client.configuration.SecurityConstants;
 import edu.virginia.vcgr.genii.client.install.InstallationState;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
@@ -283,31 +285,24 @@ public class Container extends ApplicationBase
 		throws ConfigurationException, KeyStoreException, 
 			GeneralSecurityException, IOException
 	{
-		Properties resourceIdSecProps = null;
-		try
-		{
-			resourceIdSecProps = (Properties)serverConf.retrieveSection(
-				GenesisIIConstants.RESOURCE_IDENTITY_PROPERTIES_SECTION_NAME);
-		}
-		catch (ConfigurationException ce)
-		{
-			return;
-		}
+		Security resourceIdSecProps = 
+			Installation.getDeployment().security();
 		
 		String keyStoreLoc = resourceIdSecProps.getProperty(
-			"edu.virginia.vcgr.genii.container.security.resource-identity.key-store");
+			SecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PROP);
 		String keyStoreType = resourceIdSecProps.getProperty(
-			"edu.virginia.vcgr.genii.container.security.resource-identity.key-store-type", "PKCS12");
+			SecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_TYPE_PROP,
+			"PKCS12");
 		String keyPassword = resourceIdSecProps.getProperty(
-			"edu.virginia.vcgr.genii.container.security.resource-identity.key-password");
+			SecurityConstants.Container.RESOURCE_IDENTITY_KEY_PASSWORD_PROP);
 		String keyStorePassword = resourceIdSecProps.getProperty(
-			"edu.virginia.vcgr.genii.container.security.resource-identity.key-store-password");
+			SecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PASSWORD_PROP);
 		String containerAlias = resourceIdSecProps.getProperty(
-			"edu.virginia.vcgr.genii.container.security.resource-identity.container-alias", 
+			SecurityConstants.Container.RESOURCE_IDENTITY_CONTAINER_ALIAS_PROP, 
 			GenesisIIConstants.CONTAINER_CERT_ALIAS);
 		
 		String certificateLifetime = resourceIdSecProps.getProperty(
-			"edu.virginia.vcgr.genii.container.security.resource-identity.default-certificate-lifetime");
+			SecurityConstants.Container.RESOURCE_IDENTITY_DEFAULT_CERT_LIFETIME_PROP);
 		if (certificateLifetime != null)
 			_defaultCertificateLifetime = Long.parseLong(certificateLifetime);
 		
@@ -325,7 +320,7 @@ public class Container extends ApplicationBase
 			keyPassChars = keyPassword.toCharArray();
 
 		KeyStore ks = CertTool.openStoreDirectPath(
-			Installation.getDeployment().getSecurityFile(keyStoreLoc),
+			Installation.getDeployment().security().getSecurityFile(keyStoreLoc),
 			keyStoreType, keyStorePassChars);
 		// load the container private key and certificate
 		_containerPrivateKey = (PrivateKey) ks.getKey(

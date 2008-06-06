@@ -100,7 +100,7 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 					_defaultInitialResourceOwner =
 						(X509Certificate) cf.generateCertificate(
 							new FileInputStream(Installation.getDeployment(
-								).getSecurityFile(defaultOwnerCertPath)));
+								).security().getSecurityFile(defaultOwnerCertPath)));
 					_defaultCertCache.put(defaultOwnerCertPath,
 							_defaultInitialResourceOwner);
 

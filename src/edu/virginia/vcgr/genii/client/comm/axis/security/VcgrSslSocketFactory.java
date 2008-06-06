@@ -23,14 +23,11 @@ import java.net.Socket;
 import javax.net.SocketFactory;
 
 import java.security.*;
-import java.util.Properties;
 
 import javax.net.ssl.*;
 
-import org.morgan.util.configuration.XMLConfiguration;
-
-import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.configuration.*;
+import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 
 public class VcgrSslSocketFactory extends SSLSocketFactory implements ConfigurationUnloadedListener
@@ -49,14 +46,15 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 			TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
 
 			// open the trust store and init the trust manager factory, if possible
-			Properties sslProps = getSSLProperties();
+			Security sslProps = getSSLProperties();
+			
 			String trustStoreLoc = sslProps.getProperty(
-				GenesisIIConstants.TRUST_STORE_LOCATION_PROPERTY);
+				SecurityConstants.Client.SSL_TRUST_STORE_LOCATION_PROP);
 			String trustStoreType = sslProps.getProperty(
-				GenesisIIConstants.TRUST_STORE_TYPE_PROPERTY, 
-				GenesisIIConstants.TRUST_STORE_TYPE_DEFAULT);
+				SecurityConstants.Client.SSL_TRUST_STORE_TYPE_PROP, 
+				SecurityConstants.TRUST_STORE_TYPE_DEFAULT);
 			String trustStorePass = sslProps.getProperty(
-				GenesisIIConstants.TRUST_STORE_PASSWORD_PROPERTY);
+				SecurityConstants.Client.SSL_TRUST_STORE_PASSWORD_PROP);
 			
 			char[] trustStorePassChars = null;
 			
@@ -66,7 +64,8 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 			
 			if (trustStoreLoc != null) {
 				KeyStore ks = CertTool.openStoreDirectPath(
-					Installation.getDeployment().getSecurityFile(trustStoreLoc),
+					Installation.getDeployment().security(
+						).getSecurityFile(trustStoreLoc),
 					trustStoreType, trustStorePassChars);
 		    	tmf.init(ks);
 
@@ -134,11 +133,8 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 		return _factory.getSupportedCipherSuites();
 	}
 	
-	static private Properties getSSLProperties()
+	static private Security getSSLProperties()
 	{
-		XMLConfiguration conf = 
-			ConfigurationManager.getCurrentConfiguration().getClientConfiguration();
-		return (Properties)conf.retrieveSection(
-			GenesisIIConstants.SSL_PROPERTIES_SECTION_NAME);
+		return Installation.getDeployment().security();
 	}
 }

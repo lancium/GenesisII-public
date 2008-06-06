@@ -34,7 +34,6 @@ import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 import org.apache.axis.configuration.FileProvider;
 
-import org.morgan.util.configuration.XMLConfiguration;
 import org.ogf.schemas.naming._2006._08.naming.ResolveFailedWithReferralFaultType;
 
 import java.io.IOException;
@@ -85,8 +84,6 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 	private static final String STUB_CONFIGURED = 
 		"edu.virginia.vcgr.genii.client.security.stub-configured";
-	private static final String MIN_MESSAGE_SECURITY = 
-		"edu.virginia.vcgr.genii.client.security.message.min-config";
 
 	
 	
@@ -155,14 +152,9 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			return __minClientMessageSec;
 		}
 		
-		XMLConfiguration conf = 
-			ConfigurationManager.getCurrentConfiguration().getClientConfiguration();
-	
-		Properties resourceIdSecProps = (Properties) conf.retrieveSection(
-				GenesisIIConstants.MESSAGE_SECURITY_PROPERTIES_SECTION_NAME);			
-	
-		String minMessageSecurity = resourceIdSecProps.getProperty(
-			MIN_MESSAGE_SECURITY);
+		String minMessageSecurity = 
+			Installation.getDeployment().security().getProperty(
+				SecurityConstants.Client.MESSAGE_MIN_CONFIG_PROP);
 			
 		__minClientMessageSec =  new MessageLevelSecurity(minMessageSecurity);
 		return __minClientMessageSec;

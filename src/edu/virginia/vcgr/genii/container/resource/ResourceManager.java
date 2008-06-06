@@ -5,7 +5,6 @@ import java.security.GeneralSecurityException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Properties;
 import java.io.IOException;
 
 import javax.xml.namespace.QName;
@@ -22,12 +21,17 @@ import org.ws.addressing.MetadataType;
 import org.ws.addressing.ReferenceParametersType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
 import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.client.security.MessageLevelSecurity;
+import edu.virginia.vcgr.genii.client.security.SecurityConstants;
+import edu.virginia.vcgr.genii.client.security.WSSecurityUtils;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.ws_sx.ws_securitypolicy._200702.*;
@@ -38,7 +42,6 @@ import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.common.security.*;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.security.authz.providers.*;
-import edu.virginia.vcgr.genii.client.security.*;
 
 public class ResourceManager
 {
@@ -189,8 +192,8 @@ public class ResourceManager
 				if (includeServerTls)
 				{
 					org.apache.axis.types.URI serverTlsUri =
-							new org.apache.axis.types.URI(
-									SecurityConstants.SERVER_TLS_URI);
+						new org.apache.axis.types.URI(
+							SecurityConstants.SERVER_TLS_URI);
 					PolicyReference serverTlsReference = new PolicyReference();
 					serverTlsReference.setURI(serverTlsUri);
 					MessageElement tlsMel =
@@ -423,16 +426,9 @@ public class ResourceManager
 			// config setting)
 			try
 			{
-				Properties resourceIdSecProps =
-						(Properties) Container
-								.getConfigurationManager()
-								.getContainerConfiguration()
-								.retrieveSection(
-										GenesisIIConstants.RESOURCE_IDENTITY_PROPERTIES_SECTION_NAME);
-
-				String useEap =
-						resourceIdSecProps
-								.getProperty("edu.virginia.vcgr.genii.container.security.resource-identity.use-ogsa-eap");
+				String useEap = 
+					Installation.getDeployment().security().getProperty(
+						edu.virginia.vcgr.genii.client.configuration.SecurityConstants.Container.RESOURCE_IDENTITY_USE_OGSA_EAP_PROP);
 				if (useEap.equalsIgnoreCase("true"))
 				{
 					addSecureAddressingElements(any, resource);

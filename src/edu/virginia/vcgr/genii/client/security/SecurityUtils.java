@@ -11,29 +11,21 @@ import java.security.PublicKey;
 import java.security.cert.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import edu.virginia.vcgr.genii.common.security.CertificateChainType;
-import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.comm.axis.AxisClientInvocationHandler;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationUnloadedListener;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
+import edu.virginia.vcgr.genii.client.configuration.Security;
+import edu.virginia.vcgr.genii.client.configuration.SecurityConstants;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 
 import org.morgan.util.configuration.ConfigurationException;
-import org.morgan.util.configuration.XMLConfiguration;
 import org.morgan.util.io.StreamUtils;
 
 public class SecurityUtils
 {
-	private static final String TS_LOCATION =
-			"edu.virginia.vcgr.genii.client.security.resource-identity.trust-store-location";
-	private static final String TS_TYPE =
-			"edu.virginia.vcgr.genii.client.security.resource-identity.trust-store-type";
-	private static final String TS_PASSWORD =
-			"edu.virginia.vcgr.genii.client.security.resource-identity.trust-store-password";
-
 	static
 	{
 		CertTool.loadBCProvider();
@@ -77,18 +69,14 @@ public class SecurityUtils
 
 		try
 		{
-			XMLConfiguration conf =
-					ConfigurationManager.getCurrentConfiguration()
-							.getClientConfiguration();
-			Properties resourceIdSecProps =
-					(Properties) conf
-							.retrieveSection(GenesisIIConstants.RESOURCE_IDENTITY_PROPERTIES_SECTION_NAME);
-
-			String trustStoreLoc = resourceIdSecProps.getProperty(TS_LOCATION);
-			String trustStoreType =
-					resourceIdSecProps.getProperty(TS_TYPE,
-							GenesisIIConstants.TRUST_STORE_TYPE_DEFAULT);
-			String trustStorePass = resourceIdSecProps.getProperty(TS_PASSWORD);
+			Security security = Installation.getDeployment().security();
+			String trustStoreLoc = security.getProperty(
+				SecurityConstants.Client.RESOURCE_IDENTITY_TRUST_STORE_LOCATION_PROP);
+			String trustStoreType = security.getProperty(
+				SecurityConstants.Client.RESOURCE_IDENTITY_TRUST_STORE_TYPE_PROP,
+				SecurityConstants.TRUST_STORE_TYPE_DEFAULT);
+			String trustStorePass = security.getProperty(
+				SecurityConstants.Client.RESOURCE_IDENTITY_TRUST_STORE_PASSWORD_PROP);
 
 			// open the trust store
 			if (trustStoreLoc == null)
@@ -102,7 +90,7 @@ public class SecurityUtils
 				trustStorePassChars = trustStorePass.toCharArray();
 			}
 			__trustStore =CertTool.openStoreDirectPath(
-				Installation.getDeployment().getSecurityFile(trustStoreLoc),
+				Installation.getDeployment().security().getSecurityFile(trustStoreLoc),
 				trustStoreType, trustStorePassChars);
 			return __trustStore;
 

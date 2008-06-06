@@ -6,12 +6,6 @@
 	<mconf:config-sections>
 		<mconf:config-section name="genii:global-properties"
 			class="org.morgan.util.configuration.PropertiesConfigurationSectionHandler"/>
-		<mconf:config-section name="genii:message-security"
-			class="org.morgan.util.configuration.PropertiesConfigurationSectionHandler"/>
-		<mconf:config-section name="genii:resource-identity"
-			class="org.morgan.util.configuration.PropertiesConfigurationSectionHandler"/>
-		<mconf:config-section name="genii:ssl-properties"
-			class="org.morgan.util.configuration.PropertiesConfigurationSectionHandler"/>
 		<mconf:config-section name="genii:configured-instances"
 			class="org.morgan.util.configuration.InstanceConfigurationSectionHandler"/>
 		<mconf:config-section name="genii:services"
@@ -21,8 +15,6 @@
 	</mconf:config-sections>
 	
 	<genii:global-properties>
-		<mconf:property name="edu.virginia.vcgr.genii.container.listen-port"
-			value="18080"/>
 		<mconf:property 
 			name="edu.virginia.vcgr.genii.container.production.bes.thread-pool-size"
 			value="20"/>
@@ -40,61 +32,6 @@
 			value="true"/>	
 	</genii:global-properties>
 
-
-<!-- Resource identity properties section.  This section contains properties
-     relevant to the generation of resource identities to be used for AuthN
-     of resources to clients.
--->
-	<genii:resource-identity>
-		<mconf:property 
-			name="edu.virginia.vcgr.genii.container.security.resource-identity.use-ogsa-eap"
-			value="true"/>
-
-		<!-- The following four properties are used for specifying which CA 
-		     certificate/keypair to use for generating resource identity 
-		     certificates -->
-		<mconf:property 
-			name="edu.virginia.vcgr.genii.container.security.resource-identity.key-store"
-			value="container.pfx"/>
-		<mconf:property 
-			name="edu.virginia.vcgr.genii.container.security.resource-identity.key-store-type"
-			value="PKCS12"/>
-		<mconf:property 
-			name="edu.virginia.vcgr.genii.container.security.resource-identity.key-password"
-			value="container"/>
-		<mconf:property 
-			name="edu.virginia.vcgr.genii.container.security.resource-identity.key-store-password"
-			value="container"/>
-		<mconf:property 
-			name="edu.virginia.vcgr.genii.container.security.resource-identity.container-alias"
-			value="VCGR Container"/>
-
-		<mconf:property 
-			name="edu.virginia.vcgr.genii.container.security.resource-identity.default-certificate-lifetime"
-			value="31536000000"/>	<!-- Default to 1 year -->
-	</genii:resource-identity>
-
-
-<!-- SSL properties section.  Presently contains properties that identify the 
-     certificate and keypair that the container should use for incoming SSL 
-     connections.  Comment out this section to turn off SSL/HTTPS.
--->
-	<genii:ssl-properties>
-		<mconf:property 
-			name="edu.virginia.vcgr.genii.container.security.ssl.key-store"
-			value="container.pfx"/>
-		<mconf:property 
-			name="edu.virginia.vcgr.genii.container.security.ssl.key-store-type"
-			value="PKCS12"/>
-		<mconf:property 
-			name="edu.virginia.vcgr.genii.container.security.ssl.key-password"
-			value="container"/>
-		<mconf:property 
-			name="edu.virginia.vcgr.genii.container.security.ssl.key-store-password"
-			value="container"/>
-	</genii:ssl-properties>
-	
-	
 	<genii:configured-instances>
 		<mconf:instance name="thread-factory"
 			type="edu.virginia.vcgr.genii.client.utils.threads.MainThreadThreadFactory"/>

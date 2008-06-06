@@ -52,20 +52,6 @@ public class GenesisIIConstants
 	static public final String EXECUTION_ENGINE_THREAD_POOL_SIZE_PROPERTY =
 		"edu.virginia.vcgr.genii.container.production.bes.thread-pool-size";
 	
-	static public QName SSL_PROPERTIES_SECTION_NAME =
-		new QName(GENESISII_NS, "ssl-properties");
-	static public final String TRUST_STORE_LOCATION_PROPERTY =
-		"edu.virginia.vcgr.genii.client.security.ssl.trust-store-location";
-	static public final String TRUST_STORE_TYPE_PROPERTY =
-		"edu.virginia.vcgr.genii.client.security.ssl.trust-store-type";
-	static public final String TRUST_STORE_TYPE_DEFAULT = "PKCS12";
-	static public final String TRUST_STORE_PASSWORD_PROPERTY =
-		"edu.virginia.vcgr.genii.client.security.ssl.trust-store-password";
-	
-	static public QName RESOURCE_IDENTITY_PROPERTIES_SECTION_NAME =
-		new QName(GENESISII_NS, "resource-identity");
-	static public QName MESSAGE_SECURITY_PROPERTIES_SECTION_NAME =
-		new QName(GENESISII_NS, "message-security");
 	static public final String AUTHZ_ENABLED_CONFIG_PROPERTY = 
 		"genii.security.authz.authz-enabled";
 	static public final String BOOTSTRAP_OWNER_CERTPATH = 

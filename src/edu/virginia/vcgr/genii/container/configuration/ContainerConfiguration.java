@@ -2,13 +2,12 @@ package edu.virginia.vcgr.genii.container.configuration;
 
 import java.util.Properties;
 
-import javax.xml.namespace.QName;
-
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
+import edu.virginia.vcgr.genii.client.configuration.Installation;
+import edu.virginia.vcgr.genii.client.configuration.WebContainerConstants;
 
 public class ContainerConfiguration
 {
@@ -16,11 +15,6 @@ public class ContainerConfiguration
 		"edu.virginia.vcgr.genii.container.notification.work-pool-size";
 	static private final String _NOTIFICATION_POOL_SIZE_DEFAULT = "5";
 	
-	static public QName SSL_PROPERTY_SECTION_NAME =
-		new QName(GenesisIIConstants.GENESISII_NS, "ssl-properties");
-	
-	static final private String _LISTEN_PORT_PROPERTY =
-		"edu.virginia.vcgr.genii.container.listen-port";
 	static private final String _DEFAULT_LISTEN_PORT_VALUE = "18080";	
 	
 	private XMLConfiguration _configuration;
@@ -38,18 +32,14 @@ public class ContainerConfiguration
 				GenesisIIConstants.GLOBAL_PROPERTY_SECTION_NAME);
 		setupProperties(_globalProperties);
 		
-		Properties sslProps = null;
-		try
-		{
-			sslProps = (Properties)_configuration.retrieveSection(
-				SSL_PROPERTY_SECTION_NAME);
-			_sslInformation = new SslInformation(sslProps);
-		}
-		catch (ConfigurationException ce)
-		{
-			if (sslProps != null)
-				throw ce;
-		}
+		String useSSLString = 
+			Installation.getDeployment().webContainerProperties().getProperty(
+				WebContainerConstants.USE_SSL_PROP);
+		if (useSSLString != null && useSSLString.equalsIgnoreCase("true"))
+			_sslInformation = 
+				new SslInformation(Installation.getDeployment().security());
+		else
+			_sslInformation = null;
 	}
 	
 	public Properties getGlobalProperties()
@@ -79,8 +69,10 @@ public class ContainerConfiguration
 	
 	private void setupProperties(Properties props)
 	{
-		String sListenPort = props.getProperty(
-			_LISTEN_PORT_PROPERTY, _DEFAULT_LISTEN_PORT_VALUE);
+		String sListenPort = 
+			Installation.getDeployment().webContainerProperties().getProperty(
+					WebContainerConstants.LISTEN_PORT_PROP, 
+					_DEFAULT_LISTEN_PORT_VALUE);
 		_listenPort = Integer.parseInt(sListenPort);
 		
 		String notSize = props.getProperty(
