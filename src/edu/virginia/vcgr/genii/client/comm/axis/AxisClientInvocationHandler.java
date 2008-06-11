@@ -85,8 +85,10 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	private static final String STUB_CONFIGURED = 
 		"edu.virginia.vcgr.genii.client.security.stub-configured";
 
-	
-	
+	/** We'll wait 16 seconds for a connection failure before it's considered
+	 * TOO long for the exponential back-off retry.
+	 */
+	static private final long MAX_FAILURE_TIME_RETRY = 1000L * 16;
 		
 //----------------------------------------------------------------------------
 // STATIC UTILITY METHODS
@@ -466,6 +468,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		int baseDelay = 100;
 		int baseTwitter = 25;
 		int attempt = 0;
+		long startCommunicate = 0L;
+		long deltaCommunicate = 0L;
 		
 		while(true)
 		{
@@ -480,6 +484,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 					AxisClientInvocationHandler handler = resolve(context);
 					try
 					{
+						startCommunicate = System.currentTimeMillis();
 						Object ret = handler.doInvoke(arg0, arg1, arg2);
 						return ret;
 					}
@@ -492,6 +497,10 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 						// target and the resolver.  So, we punt and rebind on all 
 						// exceptions.
 						context.setErrorToReport(t);
+					}
+					finally
+					{
+						deltaCommunicate = System.currentTimeMillis() - startCommunicate;
 					}
 				}
 			}
@@ -513,23 +522,34 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 				Throwable cause = context.getErrorToReport();
 				if (attempt <= 5 && isConnectionException(cause))
 				{
-					try
+					if (deltaCommunicate > MAX_FAILURE_TIME_RETRY)
 					{
-						int sleepTime = baseDelay + (_expBackoffTwitter.nextInt(
-								baseTwitter) - (baseTwitter >> 1));
-						_logger.debug("Exponential backoff delay of " +
-							sleepTime + " for an exception.", cause);
-						Thread.sleep(sleepTime);
-					}
-					catch (InterruptedException ie)
+						_logger.warn(
+							"Waited too long for a connection failure -- " +
+							"it's not worth retrying so we'll give up.");
+						_logger.debug("Unable to communicate with endpoint " +
+								"(not a retryable-exception).", cause);
+						throw cause;
+					} else
 					{
-						Thread.currentThread().isInterrupted();
-						// Don't have to worry about it.
-					}
-					finally
-					{
-						baseDelay <<= 1;
-						baseTwitter <<= 1;
+						try
+						{
+							int sleepTime = baseDelay + (_expBackoffTwitter.nextInt(
+									baseTwitter) - (baseTwitter >> 1));
+							_logger.debug("Exponential backoff delay of " +
+								sleepTime + " for an exception.", cause);
+							Thread.sleep(sleepTime);
+						}
+						catch (InterruptedException ie)
+						{
+							Thread.currentThread().isInterrupted();
+							// Don't have to worry about it.
+						}
+						finally
+						{
+							baseDelay <<= 1;
+							baseTwitter <<= 1;
+						}
 					}
 				} else
 				{

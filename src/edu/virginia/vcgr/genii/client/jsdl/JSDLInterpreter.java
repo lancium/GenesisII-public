@@ -2,7 +2,9 @@ package edu.virginia.vcgr.genii.client.jsdl;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.GeneralSecurityException;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import javax.xml.namespace.QName;
@@ -56,6 +58,7 @@ import edu.virginia.vcgr.genii.client.jsdl.posix.JSDLPosixConstants;
 import edu.virginia.vcgr.genii.client.jsdl.range.RangeExpression;
 import edu.virginia.vcgr.genii.client.jsdl.range.RangeFactory;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 
 public class JSDLInterpreter
@@ -700,6 +703,8 @@ public class JSDLInterpreter
 		Object parentUnderstanding, DataStaging_Type stage)
 			throws JSDLException
 	{
+		Collection<MessageElement> any = new LinkedList<MessageElement>();
+
 		if (stage == null)
 			return;
 		
@@ -707,8 +712,6 @@ public class JSDLInterpreter
 			parentUnderstanding);
 		Object understanding = facet.createFacetUnderstanding(
 			parentUnderstanding);
-		
-		understandAny(facet, understanding, stage.get_any());
 		
 		String str = stage.getFileName();
 		if (str != null)
@@ -728,6 +731,51 @@ public class JSDLInterpreter
 		
 		understandSource(provider, understanding, stage.getSource());
 		understandTarget(provider, understanding, stage.getTarget());
+		
+		MessageElement []anyArray = stage.get_any();
+		if (anyArray != null)
+		{
+			for (MessageElement a : anyArray)
+			{
+				QName elementName = a.getQName();
+				if (elementName.equals(
+					HPCConstants.HPCP_CREDENTIAL_QNAME))
+				{
+					Iterator<?> iter = a.getChildElements();
+					if (iter != null)
+					{
+						while (iter.hasNext())
+						{
+							MessageElement elem = (MessageElement)iter.next();
+							QName childName = elem.getQName();
+							if (childName.equals(
+								HPCConstants.USERNAME_TOKEN_QNAME))
+							{
+								try
+								{
+									facet.consumeCredential(understanding,
+										new UsernamePasswordIdentity(elem));
+								}
+								catch (GeneralSecurityException cause)
+								{
+									throw new InvalidJSDLException(
+										"Unable to understand credential element.",
+										cause);
+								}
+							} else
+							{
+								throw new InvalidJSDLException(
+									"Unable to understand credential element.");
+							}
+						}
+					}
+				} else
+				{
+					any.add(a);
+				}
+			}
+		}
+		understandAny(facet, understanding, any.toArray(new MessageElement[0]));
 		
 		facet.completeFacet(parentUnderstanding, understanding);
 	}

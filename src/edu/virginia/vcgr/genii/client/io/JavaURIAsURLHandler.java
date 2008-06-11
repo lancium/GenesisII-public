@@ -19,9 +19,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
-public class JavaURIAsURLHandler implements IURIHandler
+import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.UsernamePasswordIdentity;
+
+public class JavaURIAsURLHandler extends AbstractURIHandler
+	implements IURIHandler
 {
 	static private final String []_HANDLED_PROTOCOLS = 
 		new String [] {"http", "https", "ftp"};
@@ -44,16 +48,52 @@ public class JavaURIAsURLHandler implements IURIHandler
 		return false;
 	}
 	
-	public InputStream openInputStream(URI uri) throws IOException
+	static private URI swizzleURICredentials(URI uri,
+		UsernamePasswordIdentity credentials) throws URISyntaxException
 	{
-		URL url = uri.toURL();
-		return url.openConnection().getInputStream();
+		if (credentials == null)
+			return uri;
+		
+		int port = uri.getPort();
+		String portString;
+		if (port >= 0)
+			portString = String.format(":%d", port);
+		else
+			portString = "";
+		
+		return new URI(
+			uri.getScheme(), 
+			String.format("%s:%s@%s%s", credentials.getUserName(),
+				credentials.getPassword(), uri.getHost(), portString),
+			uri.getPath(), uri.getQuery(), uri.getFragment());
+	}
+	
+	public InputStream openInputStream(URI uri,
+		UsernamePasswordIdentity credential) throws IOException
+	{
+		try
+		{
+			URL url = swizzleURICredentials(uri, credential).toURL();
+			return url.openConnection().getInputStream();
+		}
+		catch (URISyntaxException use)
+		{
+			throw new IOException("Unable to parse URI.", use);
+		}
 	}
 
-	public OutputStream openOutputStream(URI uri) throws IOException
+	public OutputStream openOutputStream(URI uri,
+		UsernamePasswordIdentity credential) throws IOException
 	{
-		URL url = uri.toURL();
-		return url.openConnection().getOutputStream();
+		try
+		{
+			URL url = swizzleURICredentials(uri, credential).toURL();
+			return url.openConnection().getOutputStream();
+		}
+		catch (URISyntaxException use)
+		{
+			throw new IOException("Unable to parse URI.", use);
+		}
 	}
 
 	static private boolean isHandledProtocol(String protocol)

@@ -1288,6 +1288,11 @@ public class JobManager implements Closeable
 					_jobData.getRunAttempts(), _newState, new Date(), null, null, null);
 				connection.commit();
 				
+				/* Finally, note the new state in memory and clear the 
+				 * old BES information. */
+				_jobData.setJobState(_newState);
+				_jobData.clearBESID();
+				
 				/* If we were asked to re-queue the job, then put it back in 
 				 * the queued jobs list. */
 				if (_newState.equals(QueueStates.REQUEUED))
@@ -1302,11 +1307,6 @@ public class JobManager implements Closeable
 						+ "\" to the " + _newState + " state.");
 				}
 				
-				/* Finally, note the new state in memory and clear the 
-				 * old BES information. */
-				_jobData.setJobState(_newState);
-				_jobData.clearBESID();
-				
 				/* Because a job was terminated (whether because it finished 
 				 * or failed or whatnot) we have a new opportunity to 
 				 * schedule a new job. */
@@ -1314,7 +1314,7 @@ public class JobManager implements Closeable
 			}
 			catch (Throwable cause)
 			{
-				_logger.error("Error killing job " + _jobData.getJobTicket());
+				_logger.error("Error killing job " + _jobData.getJobTicket(), cause);
 			}
 			finally
 			{

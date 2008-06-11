@@ -21,7 +21,10 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.util.Properties;
 
-public class MailtoURIHandler implements IURIHandler
+import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.UsernamePasswordIdentity;
+
+public class MailtoURIHandler extends AbstractURIHandler
+	implements IURIHandler
 {
 	public String[] getHandledProtocols()
 	{
@@ -38,13 +41,19 @@ public class MailtoURIHandler implements IURIHandler
 		return (uriScheme != null && uriScheme.equals("mailto"));
 	}
 
-	public InputStream openInputStream(URI uri) throws IOException
+	public InputStream openInputStream(URI uri,
+		UsernamePasswordIdentity credential) throws IOException
 	{
 		throw new IOException("Cannot read from mailto URIs.");
 	}
 
-	public OutputStream openOutputStream(URI uri) throws IOException
+	public OutputStream openOutputStream(URI uri, 
+		UsernamePasswordIdentity credential) throws IOException
 	{
+		if (credential != null)
+			throw new IOException(
+				"Don't know how to perform mailto with a credential.");
+		
 		String address;
 		Properties headers = new Properties();
 		

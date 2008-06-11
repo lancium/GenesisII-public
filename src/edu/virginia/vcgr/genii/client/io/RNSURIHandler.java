@@ -24,8 +24,10 @@ import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.UsernamePasswordIdentity;
 
-public class RNSURIHandler implements IURIHandler
+public class RNSURIHandler extends AbstractURIHandler
+	implements IURIHandler
 {
 	static private final String []_HANDLED_PROTOCOLS =
 		new String[] { "rns" };
@@ -45,8 +47,13 @@ public class RNSURIHandler implements IURIHandler
 		return _HANDLED_PROTOCOLS;
 	}
 
-	public InputStream openInputStream(URI uri) throws IOException
+	public InputStream openInputStream(URI uri, 
+		UsernamePasswordIdentity credential) throws IOException
 	{
+		if (credential != null)
+			throw new IOException(
+				"Don't know how to perform rns: with a credential.");
+						
 		try
 		{
 			RNSPath path = RNSPath.getCurrent();
@@ -60,8 +67,13 @@ public class RNSURIHandler implements IURIHandler
 		}
 	}
 
-	public OutputStream openOutputStream(URI uri) throws IOException
+	public OutputStream openOutputStream(URI uri,
+		UsernamePasswordIdentity credential) throws IOException
 	{
+		if (credential != null)
+			throw new IOException(
+				"Don't know how to perform rns: with a credential.");
+						
 		try
 		{
 			RNSPath path = RNSPath.getCurrent();

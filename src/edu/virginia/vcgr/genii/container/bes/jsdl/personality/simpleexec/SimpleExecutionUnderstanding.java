@@ -74,7 +74,7 @@ public class SimpleExecutionUnderstanding
 		{
 			ret.add(new StageInPhase(
 				stage.getSourceURI(), stage.getFilename(), 
-				stage.getCreationFlag()));
+				stage.getCreationFlag(), stage.getCredential()));
 			
 			if (stage.isDeleteOnTerminate())
 				cleanups.add(new CleanupPhase(stage.getFilename()));
@@ -97,7 +97,8 @@ public class SimpleExecutionUnderstanding
 		for (DataStagingUnderstanding stage : _stageOuts)
 		{
 			ret.add(new StageOutPhase(
-				stage.getFilename(), stage.getTargetURI()));
+				stage.getFilename(), stage.getTargetURI(),
+				stage.getCredential()));
 			
 			if (stage.isDeleteOnTerminate())
 				cleanups.add(new CleanupPhase(stage.getFilename()));

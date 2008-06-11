@@ -15,10 +15,11 @@
  */
 package edu.virginia.vcgr.genii.client.io;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
+
+import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.UsernamePasswordIdentity;
 
 public interface IURIHandler
 {
@@ -44,6 +45,8 @@ public interface IURIHandler
 	 */
 	public boolean canWrite(String uriScheme);
 	
-	public InputStream openInputStream(URI uri) throws IOException;
-	public OutputStream openOutputStream(URI uri) throws IOException;
+	public void get(URI source, File target,
+		UsernamePasswordIdentity credential) throws IOException;
+	public void put(File source, URI target,
+		UsernamePasswordIdentity credential) throws IOException;
 }

@@ -1,17 +1,14 @@
 package edu.virginia.vcgr.genii.container.bes.execution.phases;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
 import java.net.URI;
 
 import org.ggf.bes.factory.ActivityStateEnumeration;
-import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.io.URIManager;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.container.bes.execution.ContinuableExecutionException;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
 
@@ -24,11 +21,15 @@ public class StageOutPhase extends AbstractExecutionPhase
 	
 	private URI _target;
 	private String _sourceName;
+	private UsernamePasswordIdentity _credential;
 	
-	public StageOutPhase(String sourceName, URI target)
+	public StageOutPhase(String sourceName, URI target, 
+		UsernamePasswordIdentity credential)
 	{
 		super(new ActivityState(ActivityStateEnumeration.Running,
 			STAGING_OUT_STATE, false));
+		
+		_credential = credential;
 		
 		if (sourceName == null)
 			throw new IllegalArgumentException("Parameter \"sourceName\" cannot be null.");
@@ -43,26 +44,17 @@ public class StageOutPhase extends AbstractExecutionPhase
 	@Override
 	public void execute(ExecutionContext context) throws Throwable
 	{
-		InputStream in = null;
-		OutputStream out = null;
-		
 		try
 		{
-			in = new FileInputStream(new File(
-				context.getCurrentWorkingDirectory(), _sourceName));
-			out = URIManager.openOutputStream(_target);
-			StreamUtils.copyStream(in, out);
+			URIManager.put(
+				new File(context.getCurrentWorkingDirectory(), _sourceName), 
+				_target, _credential);
 		}
 		catch (Throwable cause)
 		{
 			throw new ContinuableExecutionException(
 				"A continuable exception has occurred while " +
 					"running a BES activity.", cause);
-		}
-		finally
-		{
-			StreamUtils.close(out);
-			StreamUtils.close(in);
 		}
 	}
 }

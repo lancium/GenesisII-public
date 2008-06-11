@@ -17,6 +17,14 @@
 		<fileset dir="${axis.home}" includes="**/log4j*.jar"/>
 	</path>
 
+	<path id="jsch.classpath">
+		<fileset dir="${jsch.home}" includes="**/*.jar"/>
+	</path>
+
+	<path id="ant.classpath">
+		<fileset dir="${ant.home}" includes="**/*.jar"/>
+	</path>
+
 	<path id="axis.classpath">
 		<fileset dir="${axis.home}" includes="**/*.jar"/>
 	</path>
@@ -48,6 +56,8 @@
 	<path id="project.classpath">
 		<pathelement location="${obj-dir}"/>
 		<pathelement location="${gennedobj-dir}"/>
+		<path refid="jsch.classpath"/>
+		<path refid="ant.classpath"/>
 		<path refid="axis.classpath"/>
 		<path refid="jetty.classpath"/>
 		<path refid="junit.classpath"/>
@@ -65,7 +75,7 @@
 	<!-- Build Targets -->
 	<target name="build" depends="jars,scripts,deployments"/>
 
-	<target name="jars" depends="genii.container.jar,genii.client.jar,ogrsh.jar,genii.ws.jar,genii.wsdl.jar,morgan.utilities.jar,genii.security.jar"/>
+	<target name="jars" depends="genii.container.jar,genii.client.jar,ogrsh.jar,genii.ws.jar,genii.wsdl.jar,morgan.utilities.jar"/>
 
 	<target name="deployments" depends="generate.ws.source">
 		<copy todir="${deployments.dir}/default/services">
@@ -130,21 +140,6 @@
 			</fileset>
 		</jar>
 		<path id="morganu.classpath" path="${lib.dir}/morgan-utilities.jar"/>
-	</target>
-
-	<target name="genii.security.jar" depends="genii.security.compile">
-		<jar destfile="${lib.dir}/GenesisII-security.jar">
-			<fileset dir="${obj.dir}">
-				<include name="edu/virginia/vcgr/genii/client/GenesisIIConstants.class"/>
-				<include name="edu/virginia/vcgr/genii/client/io/PreferredFiles.class"/>
-				<include name="edu/virginia/vcgr/genii/client/configuration/ConfigurationManager.class"/>
-				<include name="edu/virginia/vcgr/genii/client/utils/deployment/DeploymentRelativeFile.class"/>
-				<include name="edu/virginia/vcgr/genii/client/comm/axis/security/VcgrSslSocketFactory.class"/>
-				<include name="edu/virginia/vcgr/genii/client/security/x509/*.class"/>
-				<include name="edu/virginia/vcgr/genii/client/security/SecurityUtils.class"/>
-				<include name="edu/virginia/vcgr/genii/client/configuration/UserConfig.class"/>
-			</fileset>
-		</jar>
 	</target>
 
 	<target name="generate.ws.source" depends="genii.wsdl.tools">
@@ -213,19 +208,6 @@
 		<javac debug="${debug.on}" destdir="${generated.obj.dir}">
 			<src path="${generated.source.dir}"/>
 			<classpath refid="project.classpath"/>
-		</javac>
-	</target>
-
-	<target name="genii.security.compile" depends="init">
-		<javac debug="${debug.on}" destdir="${obj.dir}">
-			<src path="${src.dir}"/>
-			<include name="edu/virginia/vcgr/genii/client/GenesisIIConstants.class"/>
-			<include name="edu/virginia/vcgr/genii/client/io/PreferredFiles.class"/>
-			<include name="edu/virginia/vcgr/genii/client/configuration/ConfigurationManager.class"/>
-			<include name="edu/virginia/vcgr/genii/client/utils/deployment/DeploymentRelativeFile.class"/>
-			<include name="edu/virginia/vcgr/genii/client/comm/axis/security/VcgrSslSocketFactory.class"/>
-			<include name="edu/virginia/vcgr/genii/client/security/x509/*.class"/>
-			<include name="edu/virginia/vcgr/genii/client/configuration/UserConfig.class"/>
 		</javac>
 	</target>
 

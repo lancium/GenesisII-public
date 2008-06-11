@@ -4,6 +4,8 @@ import java.net.URI;
 
 import org.ggf.jsdl.CreationFlagEnumeration;
 
+import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.UsernamePasswordIdentity;
+
 public class DataStagingUnderstanding
 {
 	private CreationFlagEnumeration _creationFlag = null;
@@ -11,6 +13,7 @@ public class DataStagingUnderstanding
 	private String _filename = null;
 	private URI _sourceURI = null;
 	private URI _targetURI = null;
+	private UsernamePasswordIdentity _credential;
 	
 	public CreationFlagEnumeration getCreationFlag()
 	{
@@ -60,5 +63,15 @@ public class DataStagingUnderstanding
 	public void setTargetURI(URI _targeturi)
 	{
 		_targetURI = _targeturi;
+	}
+	
+	public void setCredential(UsernamePasswordIdentity cred)
+	{
+		_credential = cred;
+	}
+	
+	public UsernamePasswordIdentity getCredential()
+	{
+		return _credential;
 	}
 }

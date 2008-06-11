@@ -33,6 +33,7 @@
 		<genii:uri-handler>edu.virginia.vcgr.genii.client.io.JavaURIAsURLHandler</genii:uri-handler>
 		<genii:uri-handler>edu.virginia.vcgr.genii.client.io.MailtoURIHandler</genii:uri-handler>
 		<genii:uri-handler>edu.virginia.vcgr.genii.client.io.RNSURIHandler</genii:uri-handler>
+		<genii:uri-handler>edu.virginia.vcgr.genii.client.io.ScpURIHandler</genii:uri-handler>
 	</genii:uri-handlers>
 	
 	<genii:locator-registry>

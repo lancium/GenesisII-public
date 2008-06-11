@@ -15,9 +15,8 @@
  */
 package edu.virginia.vcgr.genii.client.io;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,6 +28,7 @@ import org.morgan.util.configuration.XMLConfiguration;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.UsernamePasswordIdentity;
 
 @SuppressWarnings("unchecked")
 public class URIManager
@@ -79,31 +79,31 @@ public class URIManager
 		return ((handler != null) && handler.canWrite(scheme));
 	}
 	
-	static public InputStream openInputStream(URI uri)
-		throws IOException
+	static public void get(URI source, File target, 
+		UsernamePasswordIdentity credential) throws IOException
 	{
-		String scheme = uri.getScheme();
+		String scheme = source.getScheme();
 		if (scheme == null)
-			throw new IOException("Don't know how to handle \"" + uri + "\".");
+			throw new IOException("Don't know how to handle \"" + source + "\".");
 		
 		IURIHandler handler = _handlers.get(scheme);
 		if (handler == null)
-			throw new IOException("Don't know how to handle \"" + uri + "\".");
+			throw new IOException("Don't know how to handle \"" + source + "\".");
 		
-		return handler.openInputStream(uri);
+		handler.get(source, target, credential);
 	}
 	
-	static public OutputStream openOutputStream(URI uri)
-		throws IOException
+	static public void put(File source, URI target,
+		UsernamePasswordIdentity credential) throws IOException
 	{
-		String scheme = uri.getScheme();
+		String scheme = target.getScheme();
 		if (scheme == null)
-			throw new IOException("Don't know how to handle \"" + uri + "\".");
+			throw new IOException("Don't know how to handle \"" + target + "\".");
 		
 		IURIHandler handler = _handlers.get(scheme);
 		if (handler == null)
-			throw new IOException("Don't know how to handle \"" + uri + "\".");
+			throw new IOException("Don't know how to handle \"" + target + "\".");
 		
-		return handler.openOutputStream(uri);
+		handler.put(source, target, credential);
 	}
 }

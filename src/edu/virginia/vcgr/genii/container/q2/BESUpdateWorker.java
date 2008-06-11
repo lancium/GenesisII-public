@@ -55,6 +55,11 @@ public class BESUpdateWorker implements Runnable
 			GeniiBESPortType clientStub = _portTypeResolver.createClientStub(
 				connection, _besID);
 			
+			/* Go ahead and Mark the BES as missed until we have actually
+			 * communicated with it.
+			 */
+			_manager.markBESAsMissed(_besID);
+			
 			/* Make the out call to the BES object to get it's factory 
 			 * attributes */
 			GetFactoryAttributesDocumentResponseType resp =

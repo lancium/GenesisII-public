@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.client.jsdl.personality;
 import org.ggf.jsdl.CreationFlagEnumeration;
 
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.UsernamePasswordIdentity;
 
 public interface DataStagingFacet extends PersonalityFacet
 {
@@ -18,4 +19,6 @@ public interface DataStagingFacet extends PersonalityFacet
 	public void consumeDeleteOnTerminateFlag(
 		Object currentUnderstanding,
 		boolean deleteOnTerminate) throws JSDLException;
+	public void consumeCredential(Object currentUnderstanding,
+		UsernamePasswordIdentity upi) throws JSDLException;
 }

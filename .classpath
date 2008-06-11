@@ -36,6 +36,9 @@
 	<classpathentry kind="lib" path="lib"/>
 	<classpathentry kind="lib" path="security"/>
 	<classpathentry kind="lib" path="ext/wss4j/wss4j-1.5.1.jar" sourcepath="D:/Dev/wss4j/src"/>
+	<classpathentry kind="lib" path="ext/jsch/jsch-0.1.38.jar"/>
+	<classpathentry kind="lib" path="ext/ant/ant.jar"/>
+	<classpathentry kind="lib" path="ext/ant/ant-jsch.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="ext/derby/derby.jar"/>
 	<classpathentry kind="lib" path="ext/xmldb/db.jar"/>
