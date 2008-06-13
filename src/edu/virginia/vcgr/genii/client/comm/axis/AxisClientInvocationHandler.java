@@ -155,7 +155,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		}
 		
 		String minMessageSecurity = 
-			Installation.getDeployment().security().getProperty(
+			Installation.getDeployment(new DeploymentName()).security().getProperty(
 				SecurityConstants.Client.MESSAGE_MIN_CONFIG_PROP);
 			
 		__minClientMessageSec =  new MessageLevelSecurity(minMessageSecurity);

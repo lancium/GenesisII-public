@@ -30,24 +30,24 @@ public class UserConfig
 	static public final String NAMESPACE_SHORT_CUT =
 		"user-config";
 
-	static public final String DEPLOYMENT_PATH_ELEMENT = "deployment-path";
-	static public QName DEPLOYMENT_PATH_QNAME =
-		new QName(NAMESPACE, DEPLOYMENT_PATH_ELEMENT);
+	static public final String DEPLOYMENT_NAME_ELEMENT = "deployment-name";
+	static public QName DEPLOYMENT_NAME_QNAME =
+		new QName(NAMESPACE, DEPLOYMENT_NAME_ELEMENT);
 
 	static public final String USER_CONFIG_ELEMENT = "configuration";
 	static public QName USER_CONFIG_QNAME =
 		new QName(NAMESPACE, USER_CONFIG_ELEMENT);
 
-	private File _deploymentPath;
+	private DeploymentName _deploymentName;
 	
 	static private final String [] _nonEscapedElementNames = {
-		DEPLOYMENT_PATH_ELEMENT,
+		DEPLOYMENT_NAME_ELEMENT,
 		USER_CONFIG_ELEMENT
 	};
 
-	public UserConfig(String deploymentPath)
+	public UserConfig(DeploymentName deploymentName)
 	{
-		_deploymentPath = new File(deploymentPath);
+		_deploymentName = deploymentName;
 	}
 
 	public UserConfig(File file)
@@ -101,8 +101,8 @@ public class UserConfig
 	
 	public void store(File location)
 	{
-		if (_deploymentPath == null)
-			throw new ConfigurationException("Cannot store UserConfig with empty deployment path");
+		if (_deploymentName == null)
+			throw new ConfigurationException("Cannot store UserConfig with empty deployment name");
 		try
 		{
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -133,14 +133,14 @@ public class UserConfig
 		}
 	}
 
-	public File getDeploymentPath()
+	public DeploymentName getDeploymentName()
 	{
-		return _deploymentPath;
+		return _deploymentName;
 	}
 	
-	public void setDeploymentPath(File deploymentPath)
+	public void setDeploymentName(DeploymentName deploymentName)
 	{
-		_deploymentPath = deploymentPath;
+		_deploymentName = deploymentName;
 	}
 	
 	
@@ -159,7 +159,7 @@ public class UserConfig
 			if (n.getNodeType() == Node.ELEMENT_NODE)
 			{
 				QName nodeQName = XMLConfiguration.getQName(n);
-				if (nodeQName.equals(DEPLOYMENT_PATH_QNAME))
+				if (nodeQName.equals(DEPLOYMENT_NAME_QNAME))
 					handleDeploymentPath(n);
 				else
 					throw new ConfigurationException("Invalid format - unrecognized XML element " + nodeQName.toString());
@@ -183,12 +183,12 @@ public class UserConfig
 		int length = children.getLength();
 		
 		if (length != 1)
-			throw new ConfigurationException("Invalid format for " + DEPLOYMENT_PATH_ELEMENT + " element in user config XML file");
+			throw new ConfigurationException("Invalid format for " + DEPLOYMENT_NAME_ELEMENT + " element in user config XML file");
 		Node deployText = children.item(0);
 		if (deployText.getNodeType() != Node.TEXT_NODE)
-			throw new ConfigurationException("Element " + DEPLOYMENT_PATH_ELEMENT + " must be a TEXT_NODE");
+			throw new ConfigurationException("Element " + DEPLOYMENT_NAME_ELEMENT + " must be a TEXT_NODE");
 		
-		_deploymentPath = new File(deployText.getTextContent());
+		_deploymentName = new DeploymentName(deployText.getTextContent());
 	}
 	
 	private Element createUserConfigElement(Document doc)
@@ -204,9 +204,9 @@ public class UserConfig
 	private Element createDeploymentPathElement(Document doc)
 	{
 		// create root element
-		Element deployElem = doc.createElementNS(NAMESPACE, DEPLOYMENT_PATH_ELEMENT);
+		Element deployElem = doc.createElementNS(NAMESPACE, DEPLOYMENT_NAME_ELEMENT);
 
-		Text deployPathValue = doc.createTextNode(_deploymentPath.getAbsolutePath());
+		Text deployPathValue = doc.createTextNode(_deploymentName.toString());
 		
 		deployElem.appendChild(deployPathValue);
 

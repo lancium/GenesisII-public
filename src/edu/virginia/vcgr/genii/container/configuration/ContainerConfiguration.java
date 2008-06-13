@@ -6,6 +6,7 @@ import org.morgan.util.configuration.XMLConfiguration;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
+import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.WebContainerConstants;
 
@@ -32,12 +33,13 @@ public class ContainerConfiguration
 				GenesisIIConstants.GLOBAL_PROPERTY_SECTION_NAME);
 		setupProperties(_globalProperties);
 		
+		DeploymentName name = new DeploymentName();
 		String useSSLString = 
-			Installation.getDeployment().webContainerProperties().getProperty(
+			Installation.getDeployment(name).webContainerProperties().getProperty(
 				WebContainerConstants.USE_SSL_PROP);
 		if (useSSLString != null && useSSLString.equalsIgnoreCase("true"))
 			_sslInformation = 
-				new SslInformation(Installation.getDeployment().security());
+				new SslInformation(Installation.getDeployment(name).security());
 		else
 			_sslInformation = null;
 	}
@@ -70,7 +72,7 @@ public class ContainerConfiguration
 	private void setupProperties(Properties props)
 	{
 		String sListenPort = 
-			Installation.getDeployment().webContainerProperties().getProperty(
+			Installation.getDeployment(new DeploymentName()).webContainerProperties().getProperty(
 					WebContainerConstants.LISTEN_PORT_PROP, 
 					_DEFAULT_LISTEN_PORT_VALUE);
 		_listenPort = Integer.parseInt(sListenPort);

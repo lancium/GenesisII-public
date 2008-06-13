@@ -9,6 +9,7 @@
 
 	<variables>
 		<variable name="LOG4JCONFIG" value="production.log4j.properties"/>
+		<variable name="RELEASE_VERSION" value="@{genesisII.version}"/>
 	</variables>
 
 	<info>
@@ -72,6 +73,8 @@
 			<file src="../../../scripts/jar-desc.xml"
 				targetdir="$INSTALL_PATH"/>
 			<file src="../../../RELEASE" targetdir="$INSTALL_PATH"/>
+			<file src="../../../scripts/current-version.dat"
+				targetdir="$INSTALL_PATH/updates"/>
 			<fileset dir="../../../deployments" targetdir="$INSTALL_PATH/deployments"/>
 			<fileset dir="../../../ext/jce" includes="**/*"
 				targetdir="$INSTALL_PATH/jce-policies"/>
@@ -198,6 +201,8 @@
 				targetfile="$INSTALL_PATH/lib/production.log4j.properties"/>
 			<parsable type="plain"
 				targetfile="$INSTALL_PATH/RELEASE"/>
+			<parsable type="plain"
+				targetfile="$INSTALL_PATH/updates/current-version.dat"/>
 			<parsable type="xml"
 				targetfile="$INSTALL_PATH/jar-desc.xml"/>
 			<parsable type="shell"

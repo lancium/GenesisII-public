@@ -10,7 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.GUID;
 
 import edu.virginia.vcgr.genii.client.ApplicationBase;
-import edu.virginia.vcgr.genii.client.configuration.Deployment;
+import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.ogrsh.server.session.OGRSHContextResolver;
 import edu.virginia.vcgr.ogrsh.server.session.SessionManager;
@@ -25,7 +25,7 @@ public class OGRSHServer extends ApplicationBase
 		if (deploymentName != null)
 		{
 			_logger.debug("Using Deployment \"" + deploymentName + "\".");
-			System.setProperty(Deployment.DEPLOYMENT_NAME_PROPERTY, deploymentName);
+			System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, deploymentName);
 		} else
 		{
 			_logger.debug("Using Deployment \"default\".");

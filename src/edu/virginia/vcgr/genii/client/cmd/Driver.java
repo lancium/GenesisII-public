@@ -8,7 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.ApplicationBase;
-import edu.virginia.vcgr.genii.client.configuration.Deployment;
+import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 
 public class Driver extends ApplicationBase
 {
@@ -25,7 +25,7 @@ public class Driver extends ApplicationBase
 		if (deploymentName != null)
 		{
 			_logger.debug("Using Deployment \"" + deploymentName + "\".");
-			System.setProperty(Deployment.DEPLOYMENT_NAME_PROPERTY,
+			System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY,
 				deploymentName);
 		} else
 		{

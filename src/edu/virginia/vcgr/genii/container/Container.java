@@ -37,7 +37,7 @@ import org.mortbay.jetty.servlet.WebApplicationContext;
 import edu.virginia.vcgr.genii.client.ApplicationBase;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
-import edu.virginia.vcgr.genii.client.configuration.Deployment;
+import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.Security;
@@ -87,11 +87,11 @@ public class Container extends ApplicationBase
 		ContainerStatistics.instance();
 		
 		if (args.length == 1) {
-			System.setProperty(Deployment.DEPLOYMENT_NAME_PROPERTY, args[0]);
+			System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, args[0]);
 			_logger.info("Container deployment is " + args[0]);
 		} 
 		else {
-			System.setProperty(Deployment.DEPLOYMENT_NAME_PROPERTY, "default");
+			System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, "default");
 			_logger.info("Container deployment is default");
 		}
 		
@@ -196,14 +196,15 @@ public class Container extends ApplicationBase
 				Installation.axisWebApplicationPath().getAbsolutePath());
 		
 		recordInstallationState(System.getProperty(
-			Deployment.DEPLOYMENT_NAME_PROPERTY, "default"), 
+				DeploymentName.DEPLOYMENT_NAME_PROPERTY, "default"), 
 			new URL(_containerURL));
 		
 		server.start();
 		initializeServices(webAppCtxt);
 	
 		ServiceDeployer.startServiceDeployer(_axisServer,
-			Installation.getDeployment().getServicesDirectory());
+			Installation.getDeployment(
+				new DeploymentName()).getServicesDirectory());
 	}
 	
 	static private void initializeServices(WebApplicationContext ctxt)
@@ -286,7 +287,7 @@ public class Container extends ApplicationBase
 			GeneralSecurityException, IOException
 	{
 		Security resourceIdSecProps = 
-			Installation.getDeployment().security();
+			Installation.getDeployment(new DeploymentName()).security();
 		
 		String keyStoreLoc = resourceIdSecProps.getProperty(
 			SecurityConstants.Container.RESOURCE_IDENTITY_KEY_STORE_PROP);
@@ -320,7 +321,8 @@ public class Container extends ApplicationBase
 			keyPassChars = keyPassword.toCharArray();
 
 		KeyStore ks = CertTool.openStoreDirectPath(
-			Installation.getDeployment().security().getSecurityFile(keyStoreLoc),
+			Installation.getDeployment(
+				new DeploymentName()).security().getSecurityFile(keyStoreLoc),
 			keyStoreType, keyStorePassChars);
 		// load the container private key and certificate
 		_containerPrivateKey = (PrivateKey) ks.getKey(

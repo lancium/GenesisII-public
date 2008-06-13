@@ -64,7 +64,7 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 			
 			if (trustStoreLoc != null) {
 				KeyStore ks = CertTool.openStoreDirectPath(
-					Installation.getDeployment().security(
+					Installation.getDeployment(new DeploymentName()).security(
 						).getSecurityFile(trustStoreLoc),
 					trustStoreType, trustStorePassChars);
 		    	tmf.init(ks);
@@ -135,6 +135,6 @@ public class VcgrSslSocketFactory extends SSLSocketFactory implements Configurat
 	
 	static private Security getSSLProperties()
 	{
-		return Installation.getDeployment().security();
+		return Installation.getDeployment(new DeploymentName()).security();
 	}
 }

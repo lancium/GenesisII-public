@@ -38,6 +38,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.configuration.ConfigurationException;
 
+import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.context.*;
 import edu.virginia.vcgr.genii.client.security.MessageLevelSecurity;
@@ -100,6 +101,7 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 					_defaultInitialResourceOwner =
 						(X509Certificate) cf.generateCertificate(
 							new FileInputStream(Installation.getDeployment(
+								new DeploymentName()
 								).security().getSecurityFile(defaultOwnerCertPath)));
 					_defaultCertCache.put(defaultOwnerCertPath,
 							_defaultInitialResourceOwner);

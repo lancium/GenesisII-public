@@ -59,9 +59,6 @@ public class GenesisIIConstants
 	
 	static public final String CONTAINER_CERT_ALIAS = "VCGR Container";
 	
-	static public final String USER_CONFIG_ENVIRONMENT_VARIABLE =
-		"GENII_USER_CONFIG_DIR";
-
 	static public QName RNS_CACHED_METADATA_DOCUMENT_QNAME =
 		new QName(GENESISII_NS, "rns-cached-metadata");
 }

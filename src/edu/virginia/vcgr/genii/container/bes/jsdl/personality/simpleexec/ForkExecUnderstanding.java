@@ -13,6 +13,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.bes.GeniiBESConstants;
 import edu.virginia.vcgr.genii.client.configuration.Deployment;
+import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.OGRSHVersion;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
@@ -116,12 +117,13 @@ public class ForkExecUnderstanding implements Application
 		Vector<ExecutionPhase> cleanupPhases, 
 		String ogrshVersion) throws JSDLException
 	{
-		Deployment deployment = Installation.getDeployment();
+		Deployment deployment = Installation.getDeployment(
+			new DeploymentName());
 		executionPlan.add(new PrepareApplicationPhase(_executable));
 		
-		String depName = deployment.getName();
+		DeploymentName depName = deployment.getName();
 		_logger.debug("Setting deployment name to \"" + depName + "\".");
-		_environment.put("GENII_DEPLOYMENT_NAME", depName);
+		_environment.put("GENII_DEPLOYMENT_NAME", depName.toString());
 		
 		if (ogrshVersion == null)
 		{
@@ -192,12 +194,12 @@ public class ForkExecUnderstanding implements Application
 			_logger.warn("Error trying to get the TTY property.", e);
 		}
 		
-		Deployment deployment = Installation.getDeployment();
+		Deployment deployment = Installation.getDeployment(new DeploymentName());
 		executionPlan.add(new PrepareApplicationPhase(_executable));
 		
-		String depName = deployment.getName();
+		DeploymentName depName = deployment.getName();
 		_logger.debug("Setting deployment name to \"" + depName + "\".");
-		_environment.put("GENII_DEPLOYMENT_NAME", depName);
+		_environment.put("GENII_DEPLOYMENT_NAME", depName.toString());
 		
 		if (ogrshVersion == null)
 		{

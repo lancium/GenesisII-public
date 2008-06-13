@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
 
-import edu.virginia.vcgr.genii.client.GenesisIIConstants;
-
 public class ConfigurationManager
 {
 	static public final String _USER_DIR_PROPERTY =
@@ -43,28 +41,6 @@ public class ConfigurationManager
 			ConfigurationUnloadedListener listener) {
 		
 		_unloadListeners.add(listener);
-	}
-	
-	static public File getUserConfigDir()
-	{
-		// try USER_CONFIG_ENVIRONMENT_VARIABLE
-		String userConfigEnvVar = System.getenv(GenesisIIConstants.USER_CONFIG_ENVIRONMENT_VARIABLE);
-		if (userConfigEnvVar != null && userConfigEnvVar.length() != 0)
-			return new File(userConfigEnvVar);
-
-		// try reading user's config file from USER_DIR
-		try
-		{	
-			UserConfig userConfig = UserConfigUtils.getCurrentUserConfig();
-			if (userConfig != null && userConfig.getDeploymentPath() != null)
-			{
-				return userConfig.getDeploymentPath();
-			}
-		}
-		catch(Throwable t)
-		{}
-		
-		return null;
 	}
 	
 	/**
@@ -144,7 +120,7 @@ public class ConfigurationManager
 		
 		System.setProperty(_USER_DIR_PROPERTY, _userDir.getAbsolutePath());
 		
-		Deployment deployment = Installation.getDeployment();
+		Deployment deployment = Installation.getDeployment(new DeploymentName());
 		try
 		{
 			_clientConf = new XMLConfiguration(

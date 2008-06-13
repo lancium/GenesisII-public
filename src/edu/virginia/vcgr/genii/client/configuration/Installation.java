@@ -50,14 +50,9 @@ public class Installation
 		reload();
 	}
 	
-	static public Deployment getDeployment()
+	static public Deployment getDeployment(DeploymentName depName)
 	{
-		return getDeployment(null);
-	}
-	
-	static public Deployment getDeployment(String deploymentName)
-	{
-		return Deployment.getDeployment(_deploymentsDirectory, deploymentName);
+		return Deployment.getDeployment(_deploymentsDirectory, depName);
 	}
 	
 	static public OGRSH getOGRSH()

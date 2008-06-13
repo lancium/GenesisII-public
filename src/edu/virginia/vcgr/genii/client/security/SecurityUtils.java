@@ -16,6 +16,7 @@ import edu.virginia.vcgr.genii.common.security.CertificateChainType;
 import edu.virginia.vcgr.genii.client.comm.axis.AxisClientInvocationHandler;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationUnloadedListener;
+import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.configuration.SecurityConstants;
@@ -69,7 +70,8 @@ public class SecurityUtils
 
 		try
 		{
-			Security security = Installation.getDeployment().security();
+			Security security = Installation.getDeployment(
+				new DeploymentName()).security();
 			String trustStoreLoc = security.getProperty(
 				SecurityConstants.Client.RESOURCE_IDENTITY_TRUST_STORE_LOCATION_PROP);
 			String trustStoreType = security.getProperty(
@@ -90,7 +92,8 @@ public class SecurityUtils
 				trustStorePassChars = trustStorePass.toCharArray();
 			}
 			__trustStore =CertTool.openStoreDirectPath(
-				Installation.getDeployment().security().getSecurityFile(trustStoreLoc),
+				Installation.getDeployment(
+					new DeploymentName()).security().getSecurityFile(trustStoreLoc),
 				trustStoreType, trustStorePassChars);
 			return __trustStore;
 

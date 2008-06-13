@@ -159,7 +159,7 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 			try
 			{
 				WorkingContext.temporarilyAssumeNewIdentity(
-					EPRUtils.makeEPR(Container.getServiceURL("ExportedFilePortType")));
+					EPRUtils.makeEPR(Container.getServiceURL("ExportedFilePortType"), false));
 				entryReference = new ExportedFileServiceImpl().vcgrCreate(new VcgrCreate(
 					ExportedFileUtils.createCreationProperties(
 							fullPath, parentIds, resource.getReplicationState()))).getEndpoint();

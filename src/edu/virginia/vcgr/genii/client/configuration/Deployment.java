@@ -15,12 +15,6 @@ public class Deployment
 {
 	static private Log _logger = LogFactory.getLog(Deployment.class);
 	
-	static public final String DEPLOYMENT_NAME_PROPERTY =
-		"edu.virginia.vcgr.genii.client.deployment-name";
-	static public final String DEPLOYMENT_NAME_ENVIRONMENT_VARIABLE =
-		"GENII_DEPLOYMENT_NAME";
-	
-	static private final String DEFAULT_DEPLOYMENT_NAME = "default";
 	static private final String CONFIGURATION_DIRECTORY_NAME = "configuration";
 	static private final String SERVICES_DIRECTORY_NAME = "services";
 	static private final String WEB_CONTAINER_PROPERTIES_FILENAME = 
@@ -104,9 +98,9 @@ public class Deployment
 		return _webContainerProperties;
 	}
 	
-	public String getName()
+	public DeploymentName getName()
 	{
-		return _deploymentDirectory.getName();
+		return new DeploymentName(_deploymentDirectory.getName());
 	}
 	
 	static void reload()
@@ -118,43 +112,28 @@ public class Deployment
 	}
 	
 	static Deployment getDeployment(File deploymentsDirectory,
-		String deploymentName)
+		DeploymentName deploymentName)
 	{
 		Deployment ret;
-		if (deploymentName == null)
-			deploymentName = figureOutDefaultDeploymentName();
+		
+		String deploymentNameString = deploymentName.toString();
 		
 		synchronized(_knownDeployments)
 		{
-			ret = _knownDeployments.get(deploymentName);
+			ret = _knownDeployments.get(deploymentNameString);
 			if (ret == null)
 			{
-				File dep = new File(deploymentsDirectory, deploymentName);
+				File dep = new File(deploymentsDirectory, deploymentNameString);
 				if (!dep.exists())
-					throw new NoSuchDeploymentException(deploymentName);
+					throw new NoSuchDeploymentException(deploymentNameString);
 				if (!dep.isDirectory())
-					throw new InvalidDeploymentException(deploymentName, 
+					throw new InvalidDeploymentException(deploymentNameString, 
 						"Not a directory");
-				_knownDeployments.put(deploymentName,
+				_knownDeployments.put(deploymentNameString,
 					ret = new Deployment(dep));
 			}
 		}
 		
 		return ret;
-	}
-	
-	static private String figureOutDefaultDeploymentName()
-	{
-		String deploymentName = System.getProperty(DEPLOYMENT_NAME_PROPERTY);
-		
-		// jfk3w - added user config information - including user's deployment path
-		if (deploymentName == null)
-			deploymentName = System.getenv(DEPLOYMENT_NAME_ENVIRONMENT_VARIABLE);
-		
-		// if all else fails, try "default"
-		if (deploymentName == null)
-			deploymentName = DEFAULT_DEPLOYMENT_NAME;
-		
-		return deploymentName;
 	}
 }

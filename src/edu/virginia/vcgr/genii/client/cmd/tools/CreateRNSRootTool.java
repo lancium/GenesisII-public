@@ -9,7 +9,7 @@ import org.xml.sax.SAXException;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
-import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
+import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.context.ContextFileSystem;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
@@ -83,8 +83,8 @@ public class CreateRNSRootTool extends BaseGridTool
 	{
 		RNSPath root = RNSSpace.createNewSpace(baseURL + "/EnhancedRNSPortType");
 		ICallingContext ctxt = ContextManager.bootstrap(root);
-		File userConfigDir = ConfigurationManager.getUserConfigDir();
-		ConnectTool.connect(ctxt, userConfigDir.getAbsolutePath());
+		DeploymentName deploymentName = new DeploymentName();
+		ConnectTool.connect(ctxt, deploymentName);
 		stdout.println("Storing configuration to \"" +
 			filename + "\".");
 		ContextFileSystem.store(new File(filename), null, ctxt);

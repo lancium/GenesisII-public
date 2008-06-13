@@ -1,9 +1,8 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
-import java.io.File;
-
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.UserConfig;
 import edu.virginia.vcgr.genii.client.configuration.UserConfigUtils;
 
@@ -12,7 +11,7 @@ public class SetUserConfigTool extends BaseGridTool
 	static private final String _DESCRIPTION =
 		"Sets up the user's current configuration information (and stores it in user's directory).";
 	static private final String _USAGE =
-		"set-user-config <user config dir>";
+		"set-user-config <deployment name>";
 	
 	public SetUserConfigTool()
 	{
@@ -22,15 +21,8 @@ public class SetUserConfigTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		String userConfigDir = getArgument(0);
-		File testDir = new File(userConfigDir);
-		if (!testDir.exists())
-			throw new InvalidToolUsageException("Path " + userConfigDir + " does not exist");
-		if (!testDir.isDirectory())
-			throw new InvalidToolUsageException("Path " + userConfigDir + " is not a directory");
-		if (!testDir.canRead())
-			throw new InvalidToolUsageException("Path " + userConfigDir + " is not readable");
-		UserConfig userConfig = new UserConfig(testDir.getAbsolutePath());
+		DeploymentName deploymentName = new DeploymentName(getArgument(0));
+		UserConfig userConfig = new UserConfig(deploymentName);
 		UserConfigUtils.setCurrentUserConfig(userConfig);
 		
 		// reload configuration information so that rest of application uses new configuration information 

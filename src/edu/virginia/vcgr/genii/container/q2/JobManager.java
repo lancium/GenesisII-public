@@ -1193,7 +1193,7 @@ public class JobManager implements Closeable
 					countAgainstBES = false;
 				} else
 				{
-					countAgainstJob = false;
+					countAgainstJob = true;
 					countAgainstBES = true;
 				}
 				

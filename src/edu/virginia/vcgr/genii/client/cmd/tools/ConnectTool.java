@@ -1,13 +1,11 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.morgan.util.configuration.ConfigurationException;
-
 import edu.virginia.vcgr.genii.client.cmd.*;
+import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.UserConfig;
 import edu.virginia.vcgr.genii.client.configuration.UserConfigUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
@@ -22,7 +20,7 @@ public class ConnectTool extends BaseGridTool
 	static private final String _DESCRIPTION =
 		"Connects to an existing net.";
 	static private final String _USAGE =
-		"connect <connect-url|connect-path> [<deployment dir>]";
+		"connect <connect-url|connect-path> [<deployment name>]";
 	
 	public ConnectTool()
 	{
@@ -32,24 +30,12 @@ public class ConnectTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		File testUserDir = null;
 		String connectURL = getArgument(0);
-		String deploymentDir = null;
+		String deploymentName = null;
 		if (numArguments() > 1)
-		{
-			deploymentDir = getArgument(1);
-			testUserDir = new File(deploymentDir);
-			if (!testUserDir.exists())
-				throw new ConfigurationException("Deployment directory " + deploymentDir + " does not exist.");
-			if (!testUserDir.isDirectory())
-				throw new ConfigurationException("Deployment path " + deploymentDir + " is not a directory.");
-			if (!testUserDir.canRead())
-				throw new ConfigurationException("Deployment directory " + deploymentDir + " is not readable - check permissions.");
-		}
-//		else
-//			userConfigDir = ConfigurationManager.getUserConfigDir();
+			deploymentName = getArgument(1);
 
-		connect(connectURL, (testUserDir == null) ? null : testUserDir.getAbsolutePath());
+		connect(connectURL, deploymentName == null ? null : new DeploymentName(deploymentName));
 		
 		throw new ReloadShellException();
 	}
@@ -78,13 +64,13 @@ public class ConnectTool extends BaseGridTool
 		connect(ContextStreamUtils.load(url), null);
 	}
 
-	static public void connect(ICallingContext ctxt, String deploymentDir)
+	static public void connect(ICallingContext ctxt, DeploymentName deploymentName)
 		throws ResourceException, IOException
 	{
 		ContextManager.storeCurrentContext(ctxt);
-		if (deploymentDir != null)
+		if (deploymentName != null)
 		{
-			UserConfig userConfig = new UserConfig(deploymentDir);
+			UserConfig userConfig = new UserConfig(deploymentName);
 			UserConfigUtils.setCurrentUserConfig(userConfig);
 			
 			// reload the configuration manager so that all
@@ -104,13 +90,13 @@ public class ConnectTool extends BaseGridTool
 		}
 	}
 	
-	static public void connect(String connectURL, String deploymentDir)
+	static public void connect(String connectURL, DeploymentName deploymentName)
 		throws ResourceException, MalformedURLException, IOException
 	{
 		boolean isWindows = SupportedOperatingSystems.current().equals(
 			SupportedOperatingSystems.WINDOWS);
 		
 		URL url = URLUtilities.formURL(connectURL, isWindows);
-		connect(ContextStreamUtils.load(url), deploymentDir);
+		connect(ContextStreamUtils.load(url), deploymentName);
 	}
 }

@@ -21,6 +21,7 @@ import org.ws.addressing.MetadataType;
 import org.ws.addressing.ReferenceParametersType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
@@ -427,7 +428,7 @@ public class ResourceManager
 			try
 			{
 				String useEap = 
-					Installation.getDeployment().security().getProperty(
+					Installation.getDeployment(new DeploymentName()).security().getProperty(
 						edu.virginia.vcgr.genii.client.configuration.SecurityConstants.Container.RESOURCE_IDENTITY_USE_OGSA_EAP_PROP);
 				if (useEap.equalsIgnoreCase("true"))
 				{
