@@ -18,7 +18,7 @@
 	<gsh:echo
 		message="Setting user's current deployment to ${DEPLOYMENT_NAME}."/>
 	<geniix:set-user-config>
-		<gsh:param>${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}</gsh:param>
+		<gsh:param>${DEPLOYMENT_NAME}</gsh:param>
 	</geniix:set-user-config>
 	
 	<gsh:echo
