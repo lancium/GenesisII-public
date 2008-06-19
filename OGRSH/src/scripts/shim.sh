@@ -1,5 +1,46 @@
 #!/bin/sh
 
+function waitForFile() # Filepath wait-time
+{
+	local COUNT=0
+	while [ $COUNT -lt $2 ]
+	do
+		if [ -r "$1" ]
+		then
+			return
+		fi
+
+		sleep 1
+		COUNT=$(( $COUNT + 1 ))
+	done
+
+	echo "Error:  Server file didn't show up in $2 seconds."
+	exit 1
+}
+
+function setServerInfo() # filepath wait-time
+{
+	local COUNT=0
+	local LINE=""
+
+	while [ $COUNT -lt $2 ]
+	do
+		LINE=`cat "$1" | grep "listening on port" 2> /dev/null`
+		if [ $? -eq 0 ]
+		then
+			export OGRSH_JSERVER_SECRET=`echo $LINE | sed -e 's/^Server.//' | sed -e 's/].*//'`
+			export OGRSH_JSERVER_PORT=`echo $LINE | sed -e 's/^.*port //'`
+			return
+		fi
+
+		sleep 1
+		COUNT=$(( $COUNT + 1 ))
+	done
+
+	echo "Error:  Server file didn't exhibit the format expected."
+	exit 1
+}
+
 # Some Constants
 GENII_CRED_URI_PARM="--genii-credential-uri="
 GENII_CRED_USER_PARM="--genii-credential-user="
@@ -71,23 +112,9 @@ cd "$JSERVER_LOCATION"
 "./jserver.sh" > $TMP_FILENAME &
 JSERVER_PID=$!
 
-while [ ! -e $TMP_FILE ]
-do
-	sleep 1
-done
-
-LINES=0
-while [[ $LINES -eq 0 ]]
-do
-	LINES=`wc -l $TMP_FILENAME | sed -e "s/ .*//" 2> /dev/null`
-done
-export LINES=
-
-LINE=`head -1 $TMP_FILENAME`
+waitForFile "$TMP_FILENAME" 5
+setServerInfo "$TMP_FILENAME" 5
 export OGRSH_JSERVER_ADDRESS="127.0.0.1"
-export OGRSH_JSERVER_SECRET=`echo $LINE | sed -e 's/^Server.//' | sed -e 's/].*//'`
-export OGRSH_JSERVER_PORT=`echo $LINE | sed -e 's/^.*port //'`
-export LINE=
 
 if [ -n "$BES_HOME" ]
 then
