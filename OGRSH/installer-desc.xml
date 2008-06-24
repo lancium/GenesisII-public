@@ -52,7 +52,7 @@
 	</panels>
 
 	<packs>
-		<pack name="Core" required="yes">
+		<pack name="OGRSH Core" required="no" os="linux" preselected="yes">
 			<description>OGRSH Core System</description>
 
 			<singlefile src="config/config.template"
@@ -80,7 +80,8 @@
 				targetfile="$INSTALL_PATH/jserver.sh" os="unix"/>
 		</pack>
 
-		<pack name="OGRSH for Linux x86" required="no" preselected="no">
+		<pack name="OGRSH for Linux x86" required="no" preselected="no"
+			os="linux" depends="OGRSH Core">
 			<description>OGRSH for x86 Linux</description>
 
 			<fileset dir="lib/x86" targetdir="$INSTALL_PATH/OGRSH/lib/x86"/>
@@ -103,7 +104,8 @@
 			</executable>
 		</pack>
 
-		<pack name="OGRSH for Linux x86-64" required="no" preselected="no">
+		<pack name="OGRSH for Linux x86-64" required="no" preselected="no"
+			os="linux" depends="OGRSH Core">
 			<description>OGRSH for x86-64 Linux</description>
 
 			<fileset dir="lib/x86-64"
@@ -126,6 +128,5 @@
 				</args>
 			</executable>
 		</pack>
-
 	</packs>
 </installation>

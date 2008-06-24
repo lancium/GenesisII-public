@@ -15,6 +15,7 @@ import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.configuration.UserPreferences;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
@@ -378,7 +379,9 @@ public class GamlLoginTool extends BaseGridTool {
 		if (_username != null) {
 			if (_password == null) {
 				AbstractGamlLoginHandler handler = null;
-				if (!useGui() || !GuiUtils.supportsGraphics()) {
+				if (!useGui() || !GuiUtils.supportsGraphics() 
+					|| !UserPreferences.preferences().preferGUI()) 
+				{
 					handler = new TextGamlLoginHandler(stdout, stderr, stdin);
 				} else {
 					handler = new GuiGamlLoginHandler(stdout, stderr, stdin);

@@ -9,6 +9,9 @@
 
 	<variables>
 		<variable name="LOG4JCONFIG" value="production.log4j.properties"/>
+		<variable name="OGRSH_HOME" value="$INSTALL_PATH/OGRSH"/>
+		<variable name="GENII_ROOT_SESSION_URL"
+			value="http://www.cs.virginia.edu/~vcgr/GeniiNet/root.xml"/>
 		<variable name="RELEASE_VERSION" value="@{genesisII.version}"/>
 		<variable name="BUILD_NUMBER" value="@{build.number}"/>
 	</variables>
@@ -353,5 +356,7 @@
 		    </args>
 		  </executable>		  		  
 		</pack>
+
+		<refpack file="../../../OGRSH/installer-desc.xml"/>
 	</packs>
 </installation>
