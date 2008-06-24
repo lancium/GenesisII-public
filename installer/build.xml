@@ -54,6 +54,11 @@
 			<target name="deployments"/>
 <!--			<target name="scripts"/> -->
 		</ant>
+		<ant antfile="${basedir}/../OGRSH/build-installer.xml"
+			dir="${basedir}/../OGRSH" inheritAll="true">
+			<target name="compile-code.x86"/>
+			<target name="compile-code.x86-64"/>
+		</ant>
 	</target>
 
 </project>

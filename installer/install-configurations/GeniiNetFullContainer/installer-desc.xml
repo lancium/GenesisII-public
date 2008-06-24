@@ -357,6 +357,79 @@
 		  </executable>		  		  
 		</pack>
 
-		<refpack file="../../../OGRSH/installer-desc.xml"/>
+		<pack name="OGRSH Core" required="no" os="linux" preselected="yes">
+			<description>OGRSH Core System</description>
+
+			<singlefile src="../../../OGRSH/config/config.template"
+				target="$INSTALL_PATH/OGRSH/config/ogrsh-conf.xml"/>
+			<file src="../../../scripts/jserver-jar-desc.xml"
+				targetdir="$INSTALL_PATH"/>
+			<file src="../../../scripts/jserver.sh"
+				targetdir="$INSTALL_PATH"/>
+			<file src="../../../OGRSH/src/scripts/patch-file.sh"
+				targetdir="$INSTALL_PATH/OGRSH"/>
+
+			<executable targetfile="$INSTALL_PATH/jserver.sh"
+				stage="never"/>
+
+			<parsable type="xml"
+				targetfile="$INSTALL_PATH/OGRSH/config/ogrsh-conf.xml"/>
+			<parsable type="xml"
+				targetfile="$INSTALL_PATH/jserver-jar-desc.xml"/>
+			<parsable type="shell"
+				targetfile="$INSTALL_PATH/jserver.sh" os="unix"/>
+		</pack>
+
+		<pack name="OGRSH for Linux x86" required="no" preselected="no"
+			os="linux">
+			<description>OGRSH for x86 Linux</description>
+			<depends packname="OGRSH Core"/>
+
+			<fileset dir="../../../OGRSH/lib/x86"
+				targetdir="$INSTALL_PATH/OGRSH/lib/x86"/>
+			<singlefile src="../../../OGRSH/src/scripts/shim.sh"
+				target="$INSTALL_PATH/OGRSH/shim-x86.sh"/>
+
+			<parsable type="shell"
+				targetfile="$INSTALL_PATH/OGRSH/shim-x86.sh" os="unix"/>
+
+			<executable targetfile="$INSTALL_PATH/OGRSH/shim-x86.sh"
+				os="unix" stage="never" keep="true"/>
+
+			<executable targetfile="$INSTALL_PATH/OGRSH/patch-file.sh"
+				stage="postinstall" keep="true">
+				<args>
+					<arg value="$INSTALL_PATH/OGRSH/shim-x86.sh"/>
+					<arg value="%{OGRSH_ARCH}"/>
+					<arg value="x86"/>
+				</args>
+			</executable>
+		</pack>
+
+		<pack name="OGRSH for Linux x86-64" required="no" preselected="no"
+			os="linux">
+			<description>OGRSH for x86-64 Linux</description>
+			<depends packname="OGRSH Core"/>
+
+			<fileset dir="../../../OGRSH/lib/x86-64"
+				targetdir="$INSTALL_PATH/OGRSH/lib/x86-64"/>
+			<singlefile src="../../../OGRSH/src/scripts/shim.sh"
+				target="$INSTALL_PATH/OGRSH/shim-x86-64.sh"/>
+
+			<parsable type="shell"
+				targetfile="$INSTALL_PATH/OGRSH/shim-x86-64.sh" os="unix"/>
+
+			<executable targetfile="$INSTALL_PATH/OGRSH/shim-x86-64.sh"
+				os="unix" stage="never" keep="true"/>
+
+			<executable targetfile="$INSTALL_PATH/OGRSH/patch-file.sh"
+				stage="postinstall" keep="true">
+				<args>
+					<arg value="$INSTALL_PATH/OGRSH/shim-x86-64.sh"/>
+					<arg value="%{OGRSH_ARCH}"/>
+					<arg value="x86-64"/>
+				</args>
+			</executable>
+		</pack>
 	</packs>
 </installation>
