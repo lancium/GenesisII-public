@@ -45,12 +45,7 @@ public class WellKnownPortTypes
 	static public PortType COUNTER_PORT_TYPE =
 		PortType.get(new QName("http://vcgr.cs.virginia.edu/counter/2006/06/counter",
 			"CounterPortType"));
-	static public PortType RNS_SERVICE_PORT_TYPE =
-		PortType.get(new QName("http://schemas.ggf.org/rns/2006/05/rns",
-			"RNSPortType"));
-	static public PortType ENHANCED_RNS_SERVICE_PORT_TYPE =
-		PortType.get(new QName("http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns",
-			"EnhancedRNSPortType"));
+	
 	static public PortType APPDESC_PORT_TYPE =
 		PortType.get(new QName("http://vcgr.cs.virginia.edu/genii/application-description",
 			"ApplicationDescriptionPortType"));

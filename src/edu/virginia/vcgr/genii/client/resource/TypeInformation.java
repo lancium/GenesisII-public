@@ -36,6 +36,7 @@ import edu.virginia.vcgr.genii.client.byteio.StreamableByteIORP;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.ogsa.OGSARP;
+import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.tty.TTYConstants;
@@ -135,12 +136,12 @@ public class TypeInformation
 	
 	public boolean isRNS()
 	{
-		return hasPortType(WellKnownPortTypes.RNS_SERVICE_PORT_TYPE);
+		return hasPortType(RNSConstants.RNS_PORT_TYPE);
 	}
 	
 	public boolean isEnhancedRNS()
 	{
-		return hasPortType(WellKnownPortTypes.ENHANCED_RNS_SERVICE_PORT_TYPE);
+		return hasPortType(RNSConstants.ENHANCED_RNS_PORT_TYPE);
 	}
 
 	public boolean isIDP() {

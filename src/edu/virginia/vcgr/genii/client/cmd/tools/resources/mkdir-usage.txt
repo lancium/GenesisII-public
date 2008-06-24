@@ -1,5 +1,5 @@
-mkdir [-p] [--parents] [--rns-service=<service-path>] <target-dir> ...
+mkdir [-p] [--parents] [--rns-service=<service-path-hint>] <target-dir> ...
 
 	WHERE
 		-p|--parents indicats to create all necessary parent directories as well
-		--rns-services gives the path of an RNS service to use for creation.
+		--rns-service gives the path (or path hint) of an RNS service to use for creation.

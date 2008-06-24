@@ -48,6 +48,7 @@ import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
@@ -74,7 +75,7 @@ public class VCGRContainerServiceImpl extends GenesisIIBase
 	{
 		super("VCGRContainerPortType");
 		
-		addImplementedPortType(WellKnownPortTypes.RNS_SERVICE_PORT_TYPE);
+		addImplementedPortType(RNSConstants.RNS_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.VCGR_CONTAINER_SERVICE_PORT_TYPE);
 	}
 	

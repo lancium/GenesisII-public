@@ -74,7 +74,6 @@ import org.xml.sax.InputSource;
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.bes.activity.BESActivityPortType;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
-import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.bes.GeniiBESConstants;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
@@ -86,6 +85,7 @@ import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
@@ -195,7 +195,7 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 		addImplementedPortType(BES_FACTORY_PORT_TYPE);
 		addImplementedPortType(BES_MANAGEMENT_PORT_TYPE);
 		addImplementedPortType(GENII_BES_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.RNS_SERVICE_PORT_TYPE);
+		addImplementedPortType(RNSConstants.RNS_PORT_TYPE);
 	}
 	
 	@Override

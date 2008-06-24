@@ -41,7 +41,6 @@ import org.ws.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
-import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.comm.ClientConstructionParameters;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
@@ -51,6 +50,7 @@ import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.queue.QueueConstants;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
 import edu.virginia.vcgr.genii.client.ser.AnyHelper;
@@ -114,7 +114,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		 * implemented by this service.
 		 */
 		addImplementedPortType(QueueConstants.QUEUE_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.RNS_SERVICE_PORT_TYPE);
+		addImplementedPortType(RNSConstants.RNS_PORT_TYPE);
 	}
 	
 	public PortType getFinalWSResourceInterface()

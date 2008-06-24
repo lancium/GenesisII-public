@@ -34,6 +34,7 @@ import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
 import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
 import edu.virginia.vcgr.genii.common.notification.Notify;
@@ -67,7 +68,7 @@ public class RExportDirServiceImpl extends GenesisIIBase
 				WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE);
 
 		addImplementedPortType(
-				WellKnownPortTypes.RNS_SERVICE_PORT_TYPE);
+			RNSConstants.RNS_PORT_TYPE);
 		
 	}
 	

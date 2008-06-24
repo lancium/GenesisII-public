@@ -48,7 +48,6 @@ import org.ggf.rns.Remove;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
-import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
@@ -84,21 +83,21 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 	{
 		super("EnhancedRNSPortType");
 		
-		addImplementedPortType(WellKnownPortTypes.RNS_SERVICE_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.ENHANCED_RNS_SERVICE_PORT_TYPE);
+		addImplementedPortType(RNSConstants.RNS_PORT_TYPE);
+		addImplementedPortType(RNSConstants.ENHANCED_RNS_PORT_TYPE);
 	}
 	
 	protected EnhancedRNSServiceImpl(String serviceName) throws RemoteException
 	{
 		super(serviceName);
 		
-		addImplementedPortType(WellKnownPortTypes.RNS_SERVICE_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.ENHANCED_RNS_SERVICE_PORT_TYPE);
+		addImplementedPortType(RNSConstants.RNS_PORT_TYPE);
+		addImplementedPortType(RNSConstants.ENHANCED_RNS_PORT_TYPE);
 	}
 	
 	public PortType getFinalWSResourceInterface()
 	{
-		return WellKnownPortTypes.ENHANCED_RNS_SERVICE_PORT_TYPE;
+		return RNSConstants.ENHANCED_RNS_PORT_TYPE;
 	}
 	
 	protected void registerTopics(TopicSpace topicSpace)
