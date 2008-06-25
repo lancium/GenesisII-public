@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
@@ -107,6 +109,8 @@ import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.IContainerManaged;
+import edu.virginia.vcgr.genii.container.alarms.AlarmIdentifier;
+import edu.virginia.vcgr.genii.container.alarms.AlarmManager;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
 import edu.virginia.vcgr.genii.container.attrs.IAttributeManipulator;
 import edu.virginia.vcgr.genii.container.common.notification.SubscriptionConstructionParameters;
@@ -256,23 +260,34 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 			IResource.SCHEDULED_TERMINATION_TIME_PROPERTY_NAME);
 	}
 	
+	final protected void terminationAlarm(
+		AlarmIdentifier alarmID, Object userData)
+		throws ResourceNotDestroyedFaultType, RemoteException
+	{
+		_logger.info(
+			"Resource is self-terminating due to scheduled termination time.");
+		destroy(null);
+	}
+	
 	static protected void setScheduledTerminationTime(Calendar termTime)
 		throws ResourceUnknownFaultType, ResourceException
 	{
+		AlarmIdentifier alarmID;
 		ResourceKey rKey = ResourceManager.getCurrentResource();
-		rKey.dereference().setProperty(
+		IResource resource = rKey.dereference();
+		
+		resource.setProperty(
 			IResource.SCHEDULED_TERMINATION_TIME_PROPERTY_NAME, termTime);
 		
-/* MOOCH
-		Container.getLifetimeVulture().setLifetimeWatch(
-			(URI)(rKey.dereference().getProperty(
-				IResource.ENDPOINT_IDENTIFIER_PROPERTY_NAME)),
-			(EndpointReferenceType)(WorkingContext.getCurrentWorkingContext().getProperty(
-				WorkingContext.EPR_PROPERTY_NAME)),
-			termTime.getTime());
-*/
+		alarmID = (AlarmIdentifier)resource.getProperty(IResource.TERM_TIME_ALARM);
+		if (alarmID != null)
+			alarmID.cancel();
 		
-		rKey.dereference().commit();
+		if (termTime != null)
+			alarmID = AlarmManager.getManager().addAlarm(
+				termTime.getTime(), 15 * 1000L, null, null, "terminationAlarm", null);
+		
+		resource.commit();
 	}
 	
 	protected TopicSpace getTopicSpace() throws InvalidTopicException
@@ -317,6 +332,80 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 			return CreationProperties.translate(property);
 		} else
 			return property;
+	}
+	
+	static private Method findAlarmMethod(
+		Class<?> cl, String methodName, Object userData)
+	{
+		if (cl == null)
+			return null;
+		
+		if (userData != null)
+		{
+			try
+			{
+				return cl.getDeclaredMethod(methodName, AlarmIdentifier.class,
+					userData.getClass());
+			}
+			catch (NoSuchMethodException nsme)
+			{
+				return findAlarmMethod(cl.getSuperclass(), methodName, userData);
+			}
+		} else
+		{
+			try
+			{
+				return cl.getDeclaredMethod(methodName,
+					AlarmIdentifier.class, Object.class);
+			}
+			catch (NoSuchMethodException nsme)
+			{
+				try
+				{
+					return cl.getDeclaredMethod(methodName, 
+						AlarmIdentifier.class);
+				}
+				catch (NoSuchMethodException nsme2)
+				{
+					return findAlarmMethod(cl.getSuperclass(),
+						methodName, userData);
+				}
+			}
+		}
+	}
+	
+	final public void callAlarmMethod(AlarmIdentifier alarm, 
+		String methodName, Object userData) throws ResourceUnknownFaultType
+	{
+		Method m = findAlarmMethod(getClass(), methodName, userData);
+		if (m == null)
+		{
+			_logger.warn("Attempt to call alarm method \"" + 
+				methodName + "\" which couldn't be found.");
+		} else
+		{
+			try
+			{
+				if (m.getParameterTypes().length == 1)
+					m.invoke(this, alarm);
+				else
+					m.invoke(this, alarm, userData);
+			}
+			catch (InvocationTargetException ite)
+			{
+				Throwable cause = ite.getCause();
+				if (cause instanceof ResourceUnknownFaultType)
+					throw (ResourceUnknownFaultType)cause;
+				
+				_logger.warn("Calling alarm method \"" + methodName +
+					"\" resulted in exception.", ite.getCause());
+			}
+			catch (Throwable cause)
+			{
+				_logger.warn("Couldn't call alarm method \"" + methodName +
+					"\".", cause);
+			}
+		}
 	}
 	
 	public PortType[] getImplementedPortTypes(ResourceKey rKey) 
@@ -610,8 +699,6 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		{
 			WorkingContext.setCurrentWorkingContext(null);
 		}
-
-		// TODO have to register the scheduled terminations with the vulture.
 
 		return serviceCreated;
 	}

@@ -70,7 +70,10 @@ public class WorkingContext implements Closeable, Cloneable
 	{
 		Stack<WorkingContext> stack = _currentWorkingContext.get();
 		if (stack == null || stack.isEmpty())
-			throw new ContextException("Working context is null.");
+		{
+			_currentWorkingContext.set(stack = new Stack<WorkingContext>());
+			stack.push(new WorkingContext());
+		}
 		
 		String serviceName = newTarget.getAddress().get_value().toString();
 		int index = serviceName.lastIndexOf('/');
@@ -78,7 +81,8 @@ public class WorkingContext implements Closeable, Cloneable
 			throw new ContextException("Couldn't determine service name for service at URI \"" +
 				serviceName + "\".");
 		serviceName = serviceName.substring(index + 1);
-		WorkingContext newContext = (WorkingContext)stack.peek().clone();
+		WorkingContext newContext = stack.peek();
+		newContext = (WorkingContext)newContext.clone();
 		newContext.setProperty(EPR_PROPERTY_NAME, newTarget);
 		newContext.setProperty(TARGETED_SERVICE_NAME, serviceName);
 		stack.push(newContext);

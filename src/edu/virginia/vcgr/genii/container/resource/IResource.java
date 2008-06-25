@@ -32,6 +32,8 @@ public interface IResource extends Closeable
 		"genesisII.resource.property.endpoint-identifier";
 	static public final String SCHEDULED_TERMINATION_TIME_PROPERTY_NAME =
 		"genesisII.resource.property.sched-term-time";
+	static public final String TERM_TIME_ALARM =
+		"genesisII.resource.term-time-alarm";
 
 	
 	static public final QName CERTIFICATE_CHAIN_CONSTRUCTION_PARAM =

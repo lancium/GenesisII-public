@@ -21,8 +21,10 @@ import org.apache.axis.MessageContext;
 import org.apache.axis.SimpleChain;
 import org.apache.axis.deployment.wsdd.WSDDProvider;
 import org.apache.axis.description.JavaServiceDesc;
+import org.apache.axis.handlers.soap.SOAPService;
 import org.apache.axis.server.AxisServer;
 import org.apache.axis.transport.http.AxisServletBase;
+import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.configuration.ConfigurationException;
@@ -33,6 +35,8 @@ import org.mortbay.http.SslListener;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.jetty.servlet.WebApplicationContext;
+import org.ws.addressing.AttributedURIType;
+import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.ApplicationBase;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
@@ -49,6 +53,7 @@ import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 import edu.virginia.vcgr.genii.container.configuration.ContainerConfiguration;
 import edu.virginia.vcgr.genii.container.deployment.ServiceDeployer;
 import edu.virginia.vcgr.genii.container.invoker.GAroundInvokerFactory;
+import edu.virginia.vcgr.genii.container.alarms.AlarmManager;
 import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver;
 import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllSender;
 
@@ -109,6 +114,7 @@ public class Container extends ApplicationBase
 
 			runContainer();
 			System.out.println("Container Started");
+			AlarmManager.initializeAlarmManager();
 		}
 		catch (Throwable t)
 		{
@@ -336,6 +342,41 @@ public class Container extends ApplicationBase
 		
 	}
 	
+	static public JavaServiceDesc findService(EndpointReferenceType epr)
+		throws AxisFault
+	{
+		return findService(epr.getAddress());
+	}
+	
+	static public JavaServiceDesc findService(AttributedURIType uri)
+		throws AxisFault
+	{
+		return findService(uri.get_value());
+	}
+	
+	static public JavaServiceDesc findService(URI uri)
+		throws AxisFault
+	{
+		return findService(uri.getPath());
+	}
+	
+	static public JavaServiceDesc findService(java.net.URI uri)
+		throws AxisFault
+	{
+		return findService(uri.getPath());
+	}
+	
+	static public JavaServiceDesc findService(String pathOrName)
+		throws AxisFault
+	{
+		int index = pathOrName.lastIndexOf('/');
+		if (index >= 0)
+			pathOrName = pathOrName.substring(index + 1);
+		
+		SOAPService ss = _axisServer.getService(pathOrName);
+		return (JavaServiceDesc)ss.getServiceDescription(); 
+	}
+	
 	static public ArrayList<JavaServiceDesc> getInstalledServices()
 	{
 		ArrayList<JavaServiceDesc> installedServices = 
@@ -345,7 +386,6 @@ public class Container extends ApplicationBase
 		try
 		{
         	iter = _axisServer.getConfig().getDeployedServices();
-        
 	        while (iter.hasNext())
 	        {
 	        	Object obj = iter.next();
