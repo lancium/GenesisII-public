@@ -177,6 +177,11 @@
 		<ant antfile="${wsdl.dir}/replicatedExport/rexport-dir.build.xml"/>
 		<ant antfile="${wsdl.dir}/replicatedExport/rexport-resolver.build.xml"/>
 		<ant antfile="${wsdl.dir}/replicatedExport/rexport-resolver-factory.build.xml"/>
+		<ant antfile="${wsdl.dir}/genesis_dai/CoreDataAccessCombined.build.xml"/>
+		<ant antfile="${wsdl.dir}/genesis_dai/WSRFDataResource.build.xml"/>
+		<ant antfile="${wsdl.dir}/genesis_dair/SQLAccessCombined.build.xml"/>
+		<ant antfile="${wsdl.dir}/genesis_dair/SQLRowsetAccess.build.xml"/>
+		<ant antfile="${wsdl.dir}/genesis_dair/SQLResponseCombined.build.xml"/>
 	</target>
 
 	<target name="genii.wsdl.tools"

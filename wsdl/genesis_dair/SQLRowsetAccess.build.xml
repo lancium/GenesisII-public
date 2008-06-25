@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="gen.SQLRowsetAccess">
+
+	<fail message="wsdl.dir variable not set.">
+		<condition>
+			<not>
+				<isset property="wsdl.dir"/>
+			</not>
+		</condition>
+	</fail>
+
+	<import file="${wsdl.dir}/wsdl-build.xml"/>
+	<import file="${wsdl.dir}/common.build.xml"/>
+
+	<condition property="gen.SQLRowsetAccess.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${temporary.codegen.dir}/wsdl/SQLRowsetAccess.flag"/>
+			<uptodate targetfile="${temporary.codegen.dir}/wsdl/SQLRowsetAccess.flag">
+				<srcfiles dir="${wsdl.dir}/genesis_dair">
+					<include name="SQLRowsetAccess.xsd"/>
+					<include name="SQLRowsetAccess.gwsdl"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.SQLRowsetAccess" unless="gen.SQLRowsetAccess.uptodate">
+		<copy todir="${temporary.codegen.dir}/wsdl">
+			<filelist refid="common.source.files"/>
+			<fileset dir="${wsdl.dir}/genesis_dair">
+				<include name="SQLRowsetAccess.gwsdl"/>
+				<include name="SQLRowsetAccess.xsd"/>
+				<include name="jsdl.xsd"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/SQLRowsetAccess.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/SQLRowsetAccess-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${temporary.codegen.dir}/wsdl/SQLRowsetAccess-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/SQLRowsetAccess-service.wsdl"
+			portType="{http://vcgr.cs.virginia.edu/genii/genesis_dair}SQLRowsetAccessPortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/genesis_dair"/>
+			<param name="stub.gen.source-wsdl"
+				value="${temporary.codegen.dir}/wsdl/SQLRowsetAccess-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${temporary.codegen.dir}/wsdl/SQLRowsetAccess.flag"/>
+		</antcall>
+		<move file="${temporary.codegen.dir}/genesis_dair/edu/virginia/vcgr/genii/genesis_dair/deploy.wsdd"
+			tofile="${wsdd.dir}/SQLRowsetAccess.deploy.wsdd"/>
+		<replace file="${wsdd.dir}/SQLRowsetAccess.deploy.wsdd"
+			token="edu.virginia.vcgr.genii.genesis_dair.SQLRowsetAccessSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.genesis_dair.SQLRowsetAccessServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd.dir}/SQLRowsetAccess.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>

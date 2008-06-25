@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<wsdl:definitions
+	name="genesis_dai"
+	targetNamespace="http://vcgr.cs.virginia.edu/genii/genesis_dai"
+	xmlns:genesis_dai="http://vcgr.cs.virginia.edu/genii/genesis_dai"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	xmlns:rpw-2="http://docs.oasis-open.org/wsrf/rpw-2"
+    xmlns:rw-2="http://docs.oasis-open.org/wsrf/rw-2"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+	xmlns:wsrf-r="http://docs.oasis-open.org/wsrf/r-2" 
+    xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:enhanced-rns="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
+	xmlns:rns="http://schemas.ggf.org/rns/2006/05/rns">
+	
+	
+	<!-- WSDL IMPORTS ################################## -->
+    <wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rw-2"
+		location="./wsrf/wsResourceFaults.wsdl"/>
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rpw-2"
+		location="./wsrf/wsResourceProperties.wsdl"/>
+    
+    <wsdl:import
+        namespace="http://schemas.ggf.org/rns/2006/05/rns"
+        location="./rns.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
+        location="./enhanced-rns-generated.wsdl"/>
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rw-2"
+		location="wsrf/wsResourceFaults.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple"
+		location="./resource-simple.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
+		location="./resource-factory.wsdl"/>
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rlw-2"
+		location="wsrf/wsResourceLifetime.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-authz"
+		location="./resource-authz.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+        location="./common-generated.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
+        location="./notification.wsdl"/>
+
+	<!-- WSDL TYPES ############################## -->
+	<wsdl:types>
+		<xsd:schema
+			xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			attributeFormDefault="unqualified"
+			elementFormDefault="qualified"
+			targetNamespace="http://vcgr.cs.virginia.edu/genii/genesis_dai">
+
+			<xsd:import
+				namespace="http://vcgr.cs.virginia.edu/genii/genesis_dai"
+				schemaLocation="./CoreDataAccessCombined.xsd"/>
+
+			
+				<!-- ####################### -->
+				<!-- ### GetResourceList ### -->
+				<!-- ####################### -->
+
+			<xsd:element name="GetResourceListRequest">
+				<xsd:complexType/>
+			</xsd:element>
+			
+			<xsd:element name="GetResourceListResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element ref="genesis_dai:DataResourceAddress" minOccurs="0" maxOccurs="unbounded" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+
+
+				<!-- ############### -->
+				<!-- ### Resolve ### -->
+				<!-- ############### -->
+			
+			<xsd:element name="ResolveRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element ref="genesis_dai:DataResourceAbstractName" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			
+			<xsd:element name="ResolveResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element ref="genesis_dai:DataResourceAddress" maxOccurs="unbounded" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>			
+
+
+				<!-- ####################################### -->
+				<!-- ### GetDataResourcePropertyDocument ### -->
+				<!-- ####################################### -->
+			
+			<xsd:element name="GetDataResourcePropertyDocumentRequest">
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="genesis_dai:RequestType" />
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+			
+			<xsd:element name="GetDataResourcePropertyDocumentResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element ref="genesis_dai:PropertyDocument" minOccurs="0" maxOccurs="unbounded" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			
+
+				<!-- ########################### -->
+				<!-- ### DestroyDataResource ### -->
+				<!-- ########################### -->
+			
+			<xsd:element name="DestroyDataResourceRequest">
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="genesis_dai:BaseRequestType" />
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+			
+			<xsd:element name="DestroyDataResourceResponse">
+				<xsd:complexType />
+			</xsd:element>
+			
+
+				<!-- ############################# -->
+				<!-- ### GenericQuery Messages ### -->
+				<!-- ############################# -->
+			
+			<xsd:element name="GenericExpression">
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="genesis_dai:ExpressionType">
+							<xsd:sequence>
+								<xsd:any namespace="##any" />
+							</xsd:sequence>
+						</xsd:extension>
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+			
+			
+			<xsd:element name="GenericQueryRequest">
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="genesis_dai:RequestType">
+							<xsd:sequence>
+								<xsd:element ref="genesis_dai:GenericExpression" />
+							</xsd:sequence>
+						</xsd:extension>
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+			
+			<xsd:element name="GenericQueryResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element ref="genesis_dai:Dataset" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>			
+			
+		</xsd:schema>
+	</wsdl:types>
+
+
+	<!-- WSDL MESSAGES ####################### -->
+	
+	<wsdl:message name="ServiceBusyFault">
+		<wsdl:part name="ServiceBusyFault"
+			element="genesis_dai:ServiceBusyFault"/>
+	</wsdl:message>
+
+	<wsdl:message name="DataResourceUnavailableFault">
+		<wsdl:part name="DataResourceUnavailableFault"
+			element="genesis_dai:DataResourceUnavailableFault"/>
+	</wsdl:message>
+	
+	<wsdl:message name="NotAuthorizedFault">
+		<wsdl:part name="NotAuthorizedFault"
+			element="genesis_dai:NotAuthorizedFault"/>
+	</wsdl:message>
+	
+	<wsdl:message name="InvalidResourceNameFault">
+		<wsdl:part name="InvalidResourceNameFault"
+			element="genesis_dai:InvalidResourceNameFault"/>
+	</wsdl:message>
+	
+	<wsdl:message name="InvalidExpressionFault">
+		<wsdl:part name="InvalidExpressionFault"
+			element="genesis_dai:InvalidExpressionFault"/>
+	</wsdl:message>
+	
+	<wsdl:message name="InvalidLanguageFault">
+		<wsdl:part name="InvalidLanguageFault"
+			element="genesis_dai:InvalidLanguageFault"/>
+	</wsdl:message>
+	
+	<wsdl:message name="InvalidDatasetFormatFault">
+		<wsdl:part name="InvalidDatasetFormatFault"
+			element="genesis_dai:InvalidDatasetFormatFault"/>
+	</wsdl:message>
+	
+	<wsdl:message name="InvalidPortTypeQNameFault">
+		<wsdl:part name="InvalidPortTypeQNameFault"
+			element="genesis_dai:InvalidPortTypeQNameFault"/>
+	</wsdl:message>
+	
+	<wsdl:message name="InvalidConfigurationDocumentFault">
+		<wsdl:part name="InvalidConfigurationDocumentFault"
+			element="genesis_dai:InvalidConfigurationDocumentFault"/>
+	</wsdl:message>
+	
+	<wsdl:message name="GetResourceListRequest">
+		<wsdl:part name="GetResourceListRequest"
+			element="genesis_dai:GetResourceListRequest"/>
+	</wsdl:message>
+	
+	<wsdl:message name="GetResourceListResponse">
+		<wsdl:part name="GetResourceListResponse"
+			element="genesis_dai:GetResourceListResponse"/>
+	</wsdl:message>
+	
+	<wsdl:message name="ResolveRequest">
+		<wsdl:part name="ResolveRequest"
+			element="genesis_dai:ResolveRequest"/>
+	</wsdl:message>
+	
+	<wsdl:message name="ResolveResponse">
+		<wsdl:part name="ResolveResponse"
+			element="genesis_dai:ResolveResponse"/>
+	</wsdl:message>
+	
+	<wsdl:message name="GetDataResourcePropertyDocumentRequest">
+		<wsdl:part name="GetDataResourcePropertyDocumentRequest"
+			element="genesis_dai:GetDataResourcePropertyDocumentRequest"/>
+	</wsdl:message>
+	
+	<wsdl:message name="GetDataResourcePropertyDocumentResponse">
+		<wsdl:part name="GetDataResourcePropertyDocumentResponse"
+			element="genesis_dai:GetDataResourcePropertyDocumentResponse"/>
+	</wsdl:message>
+	
+	<wsdl:message name="DestroyDataResourceRequest">
+		<wsdl:part name="DestroyDataResourceRequest"
+			element="genesis_dai:DestroyDataResourceRequest"/>
+	</wsdl:message>
+	
+	<wsdl:message name="DestroyDataResourceResponse">
+		<wsdl:part name="DestroyDataResourceResponse"
+			element="genesis_dai:DestroyDataResourceResponse"/>
+	</wsdl:message>
+	
+	<wsdl:message name="GenericQueryRequest">
+		<wsdl:part name="GenericQueryRequest"
+			element="genesis_dai:GenericQueryRequest"/>
+	</wsdl:message>
+	
+	<wsdl:message name="GenericQueryResponse">
+		<wsdl:part name="GenericQueryResponse"
+			element="genesis_dai:GenericQueryResponse"/>
+	</wsdl:message>
+	
+	<!-- WSDL PORTTYPES ################################ -->
+	
+		
+	<wsdl:portType name="CoreDataAccessPortType">
+		<genii-ext:extend portType="genii-common:GeniiCommon"/>
+		<genii-ext:extend portType="rpw-2:GetResourceProperty"/>
+		<genii-ext:extend portType="rpw-2:GetMultipleResourceProperties"/>
+		<genii-ext:extend portType="rns:RNSPortType"/>
+		<genii-ext:extend portType="enhanced-rns:EnhancedRNSPortType"/>
+
+		<wsdl:operation name="GetDataResourcePropertyDocument">
+			<wsdl:input message="genesis_dai:GetDataResourcePropertyDocumentRequest" name="GetDataResourcePropertyDocumentRequest" />
+			<wsdl:output message="genesis_dai:GetDataResourcePropertyDocumentResponse" name="GetDataResourcePropertyDocumentResponse" />
+			<wsdl:fault message="genesis_dai:InvalidResourceNameFault" name="InvalidResourceNameFault" />
+			<wsdl:fault message="genesis_dai:NotAuthorizedFault" name="NotAuthorizedFault" />
+			<wsdl:fault message="genesis_dai:ServiceBusyFault" name="ServiceBusyFault" />
+			<wsdl:fault message="genesis_dai:DataResourceUnavailableFault" name="DataResourceUnavailableFault" />
+		</wsdl:operation>
+		
+		<wsdl:operation name="DestroyDataResource">
+			<wsdl:input message="genesis_dai:DestroyDataResourceRequest" name="DestroyDataResourceRequest" />
+			<wsdl:output message="genesis_dai:DestroyDataResourceResponse" name="DestroyDataResourceResponse" />
+			<wsdl:fault message="genesis_dai:InvalidResourceNameFault" name="InvalidResourceNameFault" />
+			<wsdl:fault message="genesis_dai:NotAuthorizedFault" name="NotAuthorizedFault" />
+			<wsdl:fault message="genesis_dai:ServiceBusyFault" name="ServiceBusyFault" />
+			<wsdl:fault message="genesis_dai:DataResourceUnavailableFault" name="DataResourceUnavailableFault" />
+		</wsdl:operation>
+		
+		<wsdl:operation name="GenericQuery">
+			<wsdl:input message="genesis_dai:GenericQueryRequest" name="GenericQueryRequest" />
+			<wsdl:output message="genesis_dai:GenericQueryResponse" name="GenericQueryResponse" />
+			<wsdl:fault message="genesis_dai:InvalidResourceNameFault" name="InvalidResourceNameFault" />
+			<wsdl:fault message="genesis_dai:InvalidExpressionFault" name="InvalidExpressionFault" />
+			<wsdl:fault message="genesis_dai:InvalidLanguageFault" name="InvalidLanguageFault" />
+			<wsdl:fault message="genesis_dai:InvalidDatasetFormatFault" name="InvalidDatasetFormatFault" />
+			<wsdl:fault message="genesis_dai:NotAuthorizedFault" name="NotAuthorizedFault" />
+			<wsdl:fault message="genesis_dai:ServiceBusyFault" name="ServiceBusyFault" />
+			<wsdl:fault message="genesis_dai:DataResourceUnavailableFault" name="DataResourceUnavailableFault" />
+		</wsdl:operation>
+				
+	</wsdl:portType>
+	
+	<wsdl:portType name="CoreResourceListPortType">
+		<genii-ext:extend portType="genii-common:GeniiCommon"/>
+		<genii-ext:extend portType="rpw-2:GetResourceProperty"/>
+		<genii-ext:extend portType="rpw-2:GetMultipleResourceProperties"/>
+		<genii-ext:extend portType="rns:RNSPortType"/>
+		<genii-ext:extend portType="enhanced-rns:EnhancedRNSPortType"/>
+
+		<wsdl:operation name="GetResosurceList">
+			<wsdl:input message="genesis_dai:GetResourceListRequest" name="GetResourceListRequest" />
+			<wsdl:output message="genesis_dai:GetResourceListResponse" name="GetResourceListResponse" />
+			<wsdl:fault message="genesis_dai:NotAuthorizedFault" name="NotAuthorizedFault" />
+			<wsdl:fault message="genesis_dai:ServiceBusyFault" name="ServiceBusyFault" />
+		</wsdl:operation>
+		
+		<wsdl:operation name="Resolve">
+			<wsdl:input message="genesis_dai:ResolveRequest" name="ResolveRequest" />
+			<wsdl:output message="genesis_dai:ResolveResponse" name="ResolveResponse" />
+			<wsdl:fault message="genesis_dai:InvalidResourceNameFault" name="InvalidResourceNameFault" />
+			<wsdl:fault message="genesis_dai:NotAuthorizedFault" name="NotAuthorizedFault" />
+			<wsdl:fault message="genesis_dai:ServiceBusyFault" name="ServiceBusyFault" />
+		</wsdl:operation>
+			
+	</wsdl:portType>
+	
+	<wsdl:portType name="CoreDataAccessCombinedPortType">
+		<genii-ext:extend portType="genesis_dai:CoreDataAccessPortType"/>
+		<genii-ext:extend portType="genesis_dai:CoreResourceListPortType"/>
+	</wsdl:portType>
+
+</wsdl:definitions>

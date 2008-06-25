@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<wsdl:definitions
+	name="genesis_dair"
+	targetNamespace="http://vcgr.cs.virginia.edu/genii/genesis_dair"
+	xmlns:genesis_dair="http://vcgr.cs.virginia.edu/genii/genesis_dair"
+	xmlns:genesis_dai="http://vcgr.cs.virginia.edu/genii/genesis_dai"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+    xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
+    xmlns:rns="http://schemas.ggf.org/rns/2006/05/rns"
+    xmlns:enhanced-rns="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
+    xmlns:rpw-2="http://docs.oasis-open.org/wsrf/rpw-2"
+    xmlns:rw-2="http://docs.oasis-open.org/wsrf/rw-2"
+    xmlns:rlw-2="http://docs.oasis-open.org/wsrf/rlw-2">
+	
+	
+	<!-- WSDL IMPORTS ################################## -->
+
+    <wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rw-2"
+		location="./wsrf/wsResourceFaults.wsdl"/>
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rpw-2"
+		location="./wsrf/wsResourceProperties.wsdl"/>
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rlw-2"
+		location="./wsrf/wsResourceLifetime.wsdl"/>
+    
+    <wsdl:import
+        namespace="http://schemas.ggf.org/rns/2006/05/rns"
+        location="./rns.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
+        location="./enhanced-rns-generated.wsdl"/>
+        
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple"
+		location="./resource-simple.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
+		location="./resource-factory.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-authz"
+		location="./resource-authz.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+        location="./common-generated.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
+        location="./notification.wsdl"/>
+        
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/genii/genesis_dai"
+        location="./CoreDataAccessCombined-generated.wsdl"/>
+
+	<!-- WSDL TYPES ############################## -->
+	<wsdl:types>
+		<xsd:schema
+			xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			attributeFormDefault="unqualified"
+			elementFormDefault="qualified"
+			targetNamespace="http://vcgr.cs.virginia.edu/genii/genesis_dair">
+			<xsd:include schemaLocation="./SQLRowsetAccess.xsd" />
+			<xsd:include schemaLocation="./SQLAccessCombined.xsd" />
+			
+			
+			<xsd:complexType name="InvalidGetTuplesRequestFaultType" />
+			<xsd:element name="InvalidGetTuplesRequestFault" type="genesis_dair:InvalidGetTuplesRequestFaultType" />
+
+			<xsd:complexType name="InvalidPositionFaultType" />
+			<xsd:element name="InvalidPositionFault" type="genesis_dair:InvalidPositionFaultType" />
+			
+			<xsd:complexType name="InvalidCountFaultType" />
+			<xsd:element name="InvalidCountFault" type="genesis_dair:InvalidCountFaultType" />
+			
+				<!-- ######################################## -->
+				<!-- ### GetTuples Message Types ### -->
+				<!-- ######################################## -->		
+			
+			<xsd:element name="GetTuplesRequest">
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="genesis_dai:RequestType">
+							<xsd:sequence>
+								<xsd:element name="Position" type="xsd:unsignedInt" minOccurs="1" maxOccurs="1" />
+								<xsd:element name="Count" type="xsd:unsignedInt" minOccurs="0" maxOccurs="1" />
+							</xsd:sequence>
+						</xsd:extension>
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+			
+			<xsd:element name="GetTuplesResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Dataset" minOccurs="1" maxOccurs="1" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+	
+		</xsd:schema>
+	</wsdl:types>
+
+
+	<!-- WSDL MESSAGES ####################### -->
+
+	<wsdl:message name="InvalidGetTuplesRequestFault">
+		<wsdl:part name="InvalidGetTuplesRequestFault"
+			element="genesis_dair:InvalidGetTuplesRequestFault"/>
+	</wsdl:message>
+	
+	<wsdl:message name="InvalidPositionFault">
+		<wsdl:part name="InvalidPositionFault"
+			element="genesis_dair:InvalidPositionFault"/>
+	</wsdl:message>
+
+	<wsdl:message name="InvalidCountFault">
+		<wsdl:part name="InvalidCountFault"
+			element="genesis_dair:InvalidCountFault"/>
+	</wsdl:message>
+
+			<!-- ######################################### -->
+			<!-- ### GetRowsetPropertyDocument Message ### -->
+			<!-- ######################################### -->
+
+	<wsdl:message name="GetSQLRowsetPropertyDocumentRequest">
+		<wsdl:part name="GetSQLRowsetPropertyDocumentRequest"
+			element="genesis_dai:GetDataResourcePropertyDocumentRequest"/>
+	</wsdl:message>
+	
+	<wsdl:message name="GetSQLRowsetPropertyDocumentResponse">
+		<wsdl:part name="GetRowsetPropertyDocumentResponse"
+			element="genesis_dair:SQLRowsetPropertyDocument"/>
+	</wsdl:message>
+
+			<!-- ######################### -->
+			<!-- ### GetTuples Message ### -->
+			<!-- ######################### -->
+
+	<wsdl:message name="GetTuplesRequest">
+		<wsdl:part name="GetTuplesRequest"
+			element="genesis_dair:GetTuplesRequest"/>
+	</wsdl:message>
+	
+	<wsdl:message name="GetTuplesResponse">
+		<wsdl:part name="GetTuplesResponse"
+			element="genesis_dair:GetTuplesResponse"/>
+	</wsdl:message>
+
+
+<!-- WSDL PORT TYPES ############################# -->
+	<wsdl:portType name="SQLRowsetAccessPortType">
+		<genii-ext:extend portType="genii-common:GeniiCommon"/>
+		<genii-ext:extend portType="rns:RNSPortType"/>
+		<genii-ext:extend portType="rpw-2:GetMultipleResourceProperties"/>
+		<genii-ext:extend portType="rpw-2:GetResourceProperty"/>
+		<genii-ext:extend portType="enhanced-rns:EnhancedRNSPortType"/>
+
+		<wsdl:operation name="GetSQLRowsetPropertyDocument">
+			<wsdl:input message="genesis_dair:GetSQLRowsetPropertyDocumentRequest" name="GetSQLRowsetPropertyDocumentRequest"/>
+			<wsdl:output message="genesis_dair:GetSQLRowsetPropertyDocumentResponse" name="GetSQLRowsetPropertyDocumentResponse"/>
+			<wsdl:fault message="genesis_dai:InvalidResourceNameFault" name="InvalidResourceNameFault" />
+			<wsdl:fault message="genesis_dai:ServiceBusyFault" name="ServiceBusyFault" />
+			<wsdl:fault message="genesis_dai:DataResourceUnavailableFault" name="DataResourceUnavailableFault" />
+			<wsdl:fault message="genesis_dai:NotAuthorizedFault" name="NotAuthorizedFault" />
+		</wsdl:operation>
+		
+		<wsdl:operation name="GetTuples">
+			<wsdl:input message="genesis_dair:GetTuplesRequest" name="GetTuplesRequest"/>
+			<wsdl:output message="genesis_dair:GetTuplesResponse" name="GetTuplesResponse"/>
+			<wsdl:fault message="genesis_dai:InvalidResourceNameFault" name="InvalidResourceNameFault" />
+			<wsdl:fault message="genesis_dai:InvalidDatasetFormatFault" name="InvalidDatasetFormatFault" />
+			<wsdl:fault message="genesis_dair:InvalidPositionFault" name="InvalidPositionFault" />
+			<wsdl:fault message="genesis_dair:InvalidCountFault" name="InvalidCountFault" />
+			<wsdl:fault message="genesis_dai:ServiceBusyFault" name="ServiceBusyFault" />
+			<wsdl:fault message="genesis_dai:DataResourceUnavailableFault" name="DataResourceUnavailableFault" />
+			<wsdl:fault message="genesis_dai:NotAuthorizedFault" name="NotAuthorizedFault" />
+			<wsdl:fault message="genesis_dair:InvalidGetTuplesRequestFault" name="InvalidGetTuplesRequestFault" />
+		</wsdl:operation>		
+		
+	</wsdl:portType>
+	
+</wsdl:definitions>

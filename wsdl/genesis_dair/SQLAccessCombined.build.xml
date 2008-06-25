@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="gen.SQLAccessCombined">
+
+	<fail message="wsdl.dir variable not set.">
+		<condition>
+			<not>
+				<isset property="wsdl.dir"/>
+			</not>
+		</condition>
+	</fail>
+
+	<import file="${wsdl.dir}/wsdl-build.xml"/>
+	<import file="${wsdl.dir}/common.build.xml"/>
+
+	<condition property="gen.SQLAccessCombined.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${temporary.codegen.dir}/wsdl/SQLAccessCombined.flag"/>
+			<uptodate targetfile="${temporary.codegen.dir}/wsdl/SQLAccessCombined.flag">
+				<srcfiles dir="${wsdl.dir}/genesis_dair">
+					<include name="SQLAccessCombined.xsd"/>
+					<include name="SQLAccessCombined.gwsdl"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.SQLAccessCombined" unless="gen.SQLAccessCombined.uptodate">
+		<copy todir="${temporary.codegen.dir}/wsdl">
+			<filelist refid="common.source.files"/>
+			<fileset dir="${wsdl.dir}/genesis_dair">
+				<include name="SQLAccessCombined.gwsdl"/>
+				<include name="SQLAccessCombined.xsd"/>
+				<include name="jsdl.xsd"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/SQLAccessCombined.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/SQLAccessCombined-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${temporary.codegen.dir}/wsdl/SQLAccessCombined-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/SQLAccessCombined-service.wsdl"
+			portType="{http://vcgr.cs.virginia.edu/genii/genesis_dair}SQLAccessCombinedPortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/genesis_dair"/>
+			<param name="stub.gen.source-wsdl"
+				value="${temporary.codegen.dir}/wsdl/SQLAccessCombined-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${temporary.codegen.dir}/wsdl/SQLAccessCombined.flag"/>
+		</antcall>
+		<move file="${temporary.codegen.dir}/genesis_dair/edu/virginia/vcgr/genii/genesis_dair/deploy.wsdd"
+			tofile="${wsdd.dir}/SQLAccessCombined.deploy.wsdd"/>
+		<replace file="${wsdd.dir}/SQLAccessCombined.deploy.wsdd"
+			token="edu.virginia.vcgr.genii.genesis_dair.SQLAccessCombinedSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.genesis_dair.SQLAccessCombinedServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd.dir}/SQLAccessCombined.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>

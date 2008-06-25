@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="gen.WSRFDataResource">
+
+	<fail message="wsdl.dir variable not set.">
+		<condition>
+			<not>
+				<isset property="wsdl.dir"/>
+			</not>
+		</condition>
+	</fail>
+
+	<import file="${wsdl.dir}/wsdl-build.xml"/>
+	<import file="${wsdl.dir}/common.build.xml"/>
+
+	<condition property="gen.WSRFDataResource.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${temporary.codegen.dir}/wsdl/WSRFDataResource.flag"/>
+			<uptodate targetfile="${temporary.codegen.dir}/wsdl/WSRFDataResource.flag">
+				<srcfiles dir="${wsdl.dir}/genesis_dai">
+					<include name="WSRFDataResource.xsd"/>
+					<include name="WSRFDataResource.gwsdl"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.WSRFDataResource" unless="gen.WSRFDataResource.uptodate">
+		<copy todir="${temporary.codegen.dir}/wsdl">
+			<filelist refid="common.source.files"/>
+			<fileset dir="${wsdl.dir}/genesis_dai">
+				<include name="WSRFDataResource.gwsdl"/>
+				<include name="WSRFDataResource.xsd"/>
+				<include name="jsdl.xsd"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/WSRFDataResource.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/WSRFDataResource-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${temporary.codegen.dir}/wsdl/WSRFDataResource-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/WSRFDataResource-service.wsdl"
+			portType="{http://vcgr.cs.virginia.edu/genii/genesis_dai}WSRFDataResourcePortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/genesis_dai"/>
+			<param name="stub.gen.source-wsdl"
+				value="${temporary.codegen.dir}/wsdl/WSRFDataResource-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${temporary.codegen.dir}/wsdl/WSRFDataResource.flag"/>
+		</antcall>
+		<move file="${temporary.codegen.dir}/genesis_dai/edu/virginia/vcgr/genii/genesis_dai/deploy.wsdd"
+			tofile="${wsdd.dir}/WSRFDataResource.deploy.wsdd"/>
+		<replace file="${wsdd.dir}/WSRFDataResource.deploy.wsdd"
+			token="edu.virginia.vcgr.genii.genesis_dai.WSRFDataResourceSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.genesis_dai.WSRFDataResourceServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd.dir}/WSRFDataResource.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>

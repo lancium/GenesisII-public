@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+	targetNamespace="http://vcgr.cs.virginia.edu/genii/genesis_dair"
+	xmlns:genesis_dair="http://vcgr.cs.virginia.edu/genii/genesis_dair"
+	xmlns:genesis_dai="http://vcgr.cs.virginia.edu/genii/genesis_dai"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified">
+
+	<xsd:import 
+		namespace="http://docs.oasis-open.org/wsrf/bf-2"
+		schemaLocation="./wsrf/basefaults.xsd"/>
+
+	<xsd:import
+		namespace="http://www.w3.org/2005/08/addressing"
+		schemaLocation="./ws-addr.xsd"/>
+		
+	<xsd:include schemaLocation="./SQLAccessCombined.xsd" />
+	
+	<!-- sql response description -->
+	
+	<xsd:complexType name="SQLResponseItemType">
+		<xsd:sequence>
+			<xsd:element name="SequenceNumber" type="xsd:unsignedInt" />
+			<xsd:element name="Name">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:token">
+						<xsd:enumeration value="Rowset" />
+						<xsd:enumeration value="UpdateCount" />
+						<xsd:enumeration value="ReturnValue" />
+						<xsd:enumeration value="OutputParameter" />
+						<xsd:enumeration value="CommunicationsArea" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>	
+	</xsd:complexType>
+	<xsd:element name="SQLResponseItem" type="genesis_dair:SQLResponseItemType" />
+	
+	<xsd:element name="NumberOfSQLRowsets" type="xsd:unsignedInt" />
+	<xsd:element name="NumberOfSQLUpdateCounts" type="xsd:unsignedInt" />
+	<xsd:element name="NumberOfSQLReturnValues" type="xsd:unsignedInt" />
+	<xsd:element name="NumberOfSQLOutputParameters" type="xsd:unsignedInt" />
+	<xsd:element name="NumberOfSQLCommunicationAreas" type="xsd:unsignedInt" />
+	
+	<!-- properties that describe an SQL response data service -->
+	
+	<xsd:complexType name="SQLResponsePropertyDocumentType">
+		<xsd:complexContent>
+			<xsd:extension base="genesis_dai:PropertyDocumentType">
+				<xsd:sequence>
+					<xsd:element ref="genesis_dair:SQLResponseItem" minOccurs="0" maxOccurs="unbounded" />
+					<xsd:element ref="genesis_dair:NumberOfSQLRowsets" />
+					<xsd:element ref="genesis_dair:NumberOfSQLUpdateCounts" />
+					<xsd:element ref="genesis_dair:NumberOfSQLReturnValues" />
+					<xsd:element ref="genesis_dair:NumberOfSQLOutputParameters" />
+					<xsd:element ref="genesis_dair:NumberOfSQLCommunicationAreas" />
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	
+	<xsd:element name="SQLResponsePropertyDocument" type="genesis_dair:SQLResponsePropertyDocumentType" />
+	
+	<!-- the core configuration document is used as no extra configuration properties are defined for SQL response -->
+	
+</xsd:schema>

@@ -108,6 +108,16 @@
 			locator-type="org.ogf.ogsa.ticker.TickerFactoryServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.tty.TTYPortType"
 			locator-type="edu.virginia.vcgr.genii.tty.TTYServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.genesis_dai.CoreDataAccessCombinedPortType"
+			locator-type="edu.virginia.vcgr.genii.genesis_dai.CoreDataAccessCombinedServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.genesis_dai.WSRFDataResourcePortType"
+			locator-type="edu.virginia.vcgr.genii.genesis_dai.WSRFDataResourceServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.genesis_dair.SQLAccessCombinedPortType"
+			locator-type="edu.virginia.vcgr.genii.genesis_dair.SQLAccessCombinedServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.genesis_dair.SQLResponseCombinedPortType"
+			locator-type="edu.virginia.vcgr.genii.genesis_dair.SQLResponseCombinedServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.genesis_dair.SQLRowsetAccessPortType"
+			locator-type="edu.virginia.vcgr.genii.genesis_dair.SQLRowsetAccessServiceLocator"/>
 	</genii:locator-registry>
 	
 	<genii:configured-instances>
@@ -242,6 +252,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ContainerStatsTool</mconf:class>
 		<mconf:class name="user-preferences"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.UserPreferencesTool</mconf:class>
+		<mconf:class name="dair-query"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.dair.TestQuery</mconf:class>	
 	</genii:tools>
 	
 	<genii:client-pipeline>

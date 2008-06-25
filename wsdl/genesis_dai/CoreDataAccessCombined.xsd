@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+	targetNamespace="http://vcgr.cs.virginia.edu/genii/genesis_dai"
+	xmlns:genesis_dai="http://vcgr.cs.virginia.edu/genii/genesis_dai"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"
+		schemaLocation="./wsrf/basefaults.xsd"/>
+
+	<xsd:import
+		namespace="http://www.w3.org/2005/08/addressing"
+		schemaLocation="./ws-addr.xsd"/>
+	
+	
+	<!-- general types -->
+	
+	<!-- A type that holds the abstract name (URI) of a data resource -->
+	
+	<xsd:simpleType name="DataResourceAbstractNameType">
+		<xsd:restriction base="xsd:anyURI">
+		</xsd:restriction>
+	</xsd:simpleType >
+	<xsd:element name="DataResourceAbstractName" type="genesis_dai:DataResourceAbstractNameType"/>
+	
+	
+	<!-- The address of a data resource is a WS-Addressing End Point Reference -->	
+	
+	<xsd:complexType name="DataResourceAddressType">
+		<xsd:complexContent>
+			<xsd:extension base="wsa:EndpointReferenceType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="DataResourceAddress" type="genesis_dai:DataResourceAddressType"/>
+	
+	
+	<xsd:complexType name="DataResourceAddressListType">
+		<xsd:sequence>
+			<xsd:element ref="genesis_dai:DataResourceAddress" minOccurs="1" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="DataResourceAddressList" type="genesis_dai:DataResourceAddressListType"/>
+	
+	
+	<!-- the wrapper for input/output datasets -->
+	
+	<xsd:complexType name="DatasetDataType" mixed="true">
+		<xsd:sequence>
+			<xsd:any namespace="##any" minOccurs="0" maxoccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="DatasetData" type="genesis_dai:DatasetDataType"/>
+	
+	
+	<!-- the base type wrapper for input/output datasets -->
+	<!-- the DatasetFormatURI indicates the format of the ##any of DatasetData -->
+	<!-- It is expected that this type will be extended by the relations -->
+	
+	<xsd:complexType name="DatasetType">
+		<xsd:sequence>
+			<xsd:element ref="genesis_dai:DatasetFormatURI"/>
+			<xsd:element ref="genesis_dai:DatasetData"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="Dataset" type="genesis_dai:DatasetType"/>
+	
+	
+	<!-- the base type for query expressions -->
+	<xsd:complexType name="ExpressionType">
+		<xsd:attribute name="Language" type="xsd:anyURI"/>
+	</xsd:complexType>
+	<xsd:element name="Expression" type="genesis_dai:ExpressionType"/>
+	
+	<!-- the base type for requests that include an abstract resource name parameter -->
+	
+	<xsd:complexType name="BaseRequestType">
+		<xsd:sequence>
+			<xsd:element ref="genesis_dai:DataResourceAbstractName"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	<!-- the base type for requests that also specify a return type -->
+	<xsd:complexType name="RequestType">
+		<xsd:extension base="genesis_dai:BaseRequestType">
+			<xsd:sequence>
+				<xsd:element ref="genesis_dai:DatasetFormatURI" minOccurs="0" maxOccurs="1"/>
+			</xsd:sequence>
+		</xsd:extension>
+	</xsd:complexType>
+	<xsd:element name="Request" type="genesis_dai:RequestType"/>
+	
+	
+	<!-- the base type for factory requests that include an abstract resource name parameter-->
+	<!-- a port type QName and a configuration document -->
+	<xsd:complexType name="FactoryRequestType">
+		<xsd:complexContent>
+			<xsd:extension base="genesis_dai:BaseRequestType">
+				<xsd:sequence>
+					<xsd:element ref="genesis_dai:PortTypeQName" minOccurs="0" maxOccurs="1"/>
+					<xsd:element ref="genesis_dai:ConfigurationDocument" minOccurs="0" maxOccurs="1"/>
+					<xsd:element name="PreferredTargetService" type="wsa:EndpointReferenceType" minOccurs="0" maxOccurs="1"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="FactoryRequest" type="genesis_dai:FactoryRequestType"/>
+	
+	<!-- static properties -->
+	<!-- an open description of the data resources -->
+	
+	<xsd:element name="DataResourceDescription">
+		<xsd:complexType mixed="true">
+			<xsd:sequence>
+				<xsd:any minOccurs="0" maxOccurs="unbounded" processContents="lax" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<!-- The address of the data resource that created this data resource -->
+	<xsd:element name="ParentDataResource" type="genesis_dai:DataResourceAddressType"/>
+	
+	<!-- The mapping between message type and resource type -->
+	<!-- for direct access, where results are returned directly -->
+	<!-- The DatasetType refers to the supported dataset types -->
+	<xsd:element name="MessageQName" type="xsd:QName"/>
+	<xsd:element name="DatasetFormatURI" type="xsd:anyURI"/>
+	
+	<xsd:complexType name="DatasetMapType">
+		<xsd:sequence>
+			<xsd:element ref="genesis_dai:MessageQName"/>
+			<xsd:element ref="genesis_dai:DatasetFormatURI"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="DatasetMap" type="genesis_dai:DatasetMapType"/>
+	
+	<!-- For indirect access where a new resource results the ConfigurationType refers to the QName of the -->
+	<!-- configuration document that identifies the required port type and provides initial property values. -->
+	<xsd:element name="PortTypeQName" type="xsd:QName"/>
+	<xsd:element name="ConfigurationDocumentQName" type ="xsd:QName"/>
+	
+	<xsd:complexType name="ConfigurationMapType">
+		<xsd:sequence>
+			<xsd:element ref="genesis_dai:MessageQName"/>
+			<xsd:element ref="genesis_dai:PortTypeQName"/>
+			<xsd:element ref="genesis_dai:ConfigurationDocumentQName"/>
+			<xsd:element name="DefaultConfigurationDocument"/>
+				<xsd:complexType mixed="true">
+					<xsd:sequence>
+						<xsd:element ref="genesis_dai:ConfigurationDocument"/>
+					</xsd:sequence>
+				</xsd:complexType>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="ConfigurationMap" type="genesis_dai:ConfigurationMapType"/>
+	
+	<!-- The mapping between message type and a language type. -->
+	<!-- The language here is the language used to form the request expression, e.g. SQL99. -->
+	<xsd:element name="LanguageURI" type="xsd:anyURI"/>
+	
+	<xsd:complexType name="LanguageMapType">
+		<xsd:sequence>
+			<xsd:element ref="genesis_dai:MessageQName"/>
+			<xsd:element ref="genesis_dai:LanguageURI"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="LanguageMap" type="genesis_dai:LanguageMapType"/>
+	
+	<!-- Is the data resource managed by the data service or by an external data management system? -->
+	<xsd:element name="DataResourceManagement">
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:token">
+				<xsd:enumeration value="ExternallyManaged"/>
+				<xsd:enumeration value="ServiceManaged"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	
+	<!-- configurable properties -->
+	
+	<xsd:element name="Readable" type ="xsd:boolean" default="true"/>
+	<xsd:element name="Writeable" type ="xsd:boolean"/>
+	<xsd:element name="ConcurrentAccess" type ="xsd:boolean"/>
+	<xsd:element name="TransactionInitiation">
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:token">
+				<xsd:enumeration value="NotSupported"/>
+				<xsd:enumeration value="Automatic"/>
+				<xsd:enumeration value="Manual"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	
+	<xsd:element name="TransactionIsolation">
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:token">
+				<xsd:enumeration value="NotSupported"/>
+				<xsd:enumeration value="ReadUncommitted"/>
+				<xsd:enumeration value="ReadCommitted"/>
+				<xsd:enumeration value="RepeatableRead"/>
+				<xsd:enumeration value="Serialisable"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	
+	<xsd:element name="ChildSensitiveToParent">
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:token">
+				<xsd:enumeration value="Insensitive"/>
+				<xsd:enumeration value="Sensitive"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	
+	<xsd:element name="ParentSensitiveToChild">
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:token">
+				<xsd:enumeration value="Insensitive"/>
+				<xsd:enumeration value="Sensitive"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	
+	<!-- core property and configuration documents -->
+	
+	<xsd:complexType name="PropertyDocumentType">
+		<xsd:sequence>
+			<xsd:element ref="genesis_dai:DataResourceAbstractName"/>
+			<xsd:element ref="genesis_dai:DataResourceManagement"/>
+			<xsd:element ref="genesis_dai:ParentDataResource" minOccurs="0" maxOccurs="1"/>
+			<xsd:element ref="genesis_dai:DatasetMap" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="genesis_dai:ConfigurationMap" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="genesis_dai:LanguageMap" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="genesis_dai:DataResourceDescription"/>
+			<xsd:element ref="genesis_dai:Readable"/>
+			<xsd:element ref="genesis_dai:Writeable"/>
+			<xsd:element ref="genesis_dai:ConcurrentAccess"/>
+			<xsd:element ref="genesis_dai:TransactionInitiation"/>
+			<xsd:element ref="genesis_dai:TransactionIsolation"/>
+			<xsd:element ref="genesis_dai:ChildSensitiveToParent"/>
+			<xsd:element ref="genesis_dai:ParentSensitiveToChild"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="PropertyDocument" type="genesis_dai:PropertyDocumentType"/>
+	
+	<xsd:complexType name="ConfigurationDocumentType">
+		<xsd:sequence>
+			<xsd:element ref="genesis_dai:DataResourceDescription" minOccurs="0" maxOccurs="1"/>
+			<xsd:element ref="genesis_dai:Readable" minOccurs="0" maxOccurs="1"/>
+			<xsd:element ref="genesis_dai:Writeable" minOccurs="0" maxOccurs="1"/>
+			<xsd:element ref="genesis_dai:TransactionInitiation" minOccurs="0" maxOccurs="1"/>
+			<xsd:element ref="genesis_dai:TransactionIsolation" minOccurs="0" maxOccurs="1"/>
+			<xsd:element ref="genesis_dai:ChildSensitiveToParent" minOccurs="0" maxOccurs="1"/>
+			<xsd:element ref="genesis_dai:ParentSensitiveToChild" minOccurs="0" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	<!-- the head of the substitution group of configuration documents -->
+	<xsd:element name="ConfigurationDocument" type="genesis_dai:ConfigurationDocumentType"/>
+	
+	
+	<!-- Fault Types -->
+	<xsd:complexType name="DataResourceUnavailableFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="wsbf:BaseFaultType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="DataResourceUnavailableFault"
+		type="genesis_dai:DataResourceUnavailableFaultType"/>
+		
+	<xsd:complexType name="ServiceBusyFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="wsbf:BaseFaultType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="ServiceBusyFault"
+		type="genesis_dai:ServiceBusyFaultType"/>
+	
+	<xsd:complexType name="NotAuthorizedFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="wsbf:BaseFaultType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="NotAuthorizedFault"
+		type="genesis_dai:NotAuthorizedFaultType"/>	
+
+	<xsd:complexType name="InvalidResourceNameFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="wsbf:BaseFaultType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="InvalidResourceNameFault"
+		type="genesis_dai:InvalidResourceNameFaultType"/>
+
+	<xsd:complexType name="InvalidExpressionFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="wsbf:BaseFaultType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="InvalidExpressionFault"
+		type="genesis_dai:InvalidExpressionFaultType"/>
+
+	<xsd:complexType name="InvalidLanguageFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="wsbf:BaseFaultType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="InvalidLanguageFault"
+		type="genesis_dai:InvalidLanguageFaultType"/>
+
+	<xsd:complexType name="InvalidDatasetFormatFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="wsbf:BaseFaultType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="InvalidDatasetFormatFault"
+		type="genesis_dai:InvalidDatasetFormatFaultType"/>
+
+	<xsd:complexType name="InvalidPortTypeQNameFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="wsbf:BaseFaultType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="InvalidPortTypeQNameFault"
+		type="genesis_dai:InvalidPortTypeQNameFaultType"/>
+
+	<xsd:complexType name="InvalidConfigurationDocumentFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="wsbf:BaseFaultType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="InvalidConfigurationDocumentFault"
+		type="genesis_dai:InvalidConfigurationDocumentFaultType"/>
+
+</xsd:schema>

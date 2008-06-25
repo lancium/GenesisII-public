@@ -46,3 +46,8 @@
 {http://vcgr.cs.virginia.edu/rns/2007/08/rexport-dir}RExportDirPortType
 {http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory}StreamableByteIOFactory
 {http://vcgr.cs.virginia.edu/tty/2008/03/tty}TTYPortType
+{http://vcgr.cs.virginia.edu/genii/genesis_dai}CoreDataAccessCombinedPortType
+{http://vcgr.cs.virginia.edu/genii/genesis_dai}WSRFDataResourcePortType
+{http://vcgr.cs.virginia.edu/genii/genesis_dair}SQLAccessCombinedPortType
+{http://vcgr.cs.virginia.edu/genii/genesis_dair}SQLResponseCombinedPortType
+{http://vcgr.cs.virginia.edu/genii/genesis_dair}SQLRowsetAccessPortType

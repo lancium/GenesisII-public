@@ -131,4 +131,24 @@ public class WellKnownPortTypes
 	static public PortType INFORMATION_SERVICE_PORT_TYPE =
 		PortType.get(new QName("http://vcgr.cs.virginia.edu/genii/informationService",
 			"InformationServicePortType"));
+	
+	static public PortType GENESIS_DAI_CORE_DATA_ACCESS_COMBINED_PORT_TYPE =
+		PortType.get(new QName("http://vcgr.cs.virginia.edu/genii/genesis_dai",
+			"CoreDataAccessCombinedPortType"));
+	
+	static public PortType GENESIS_DAI_WSRF_DATA_RESOURCE_PORT_TYPE =
+		PortType.get(new QName("http://vcgr.cs.virginia.edu/genii/genesis_dai",
+			"WSRFDataResourcePortType"));
+	
+	static public PortType GENESIS_DAIR_SQL_ACCESS_COMBINED_PORT_TYPE =
+		PortType.get(new QName("http://vcgr.cs.virginia.edu/genii/genesis_dair",
+			"SQLAccessCombinedPortType"));
+	
+	static public PortType GENESIS_DAIR_SQL_RESPONSE_COMBINED_PORT_TYPE =
+		PortType.get(new QName("http://vcgr.cs.virginia.edu/genii/genesis_dair",
+			"SQLResponseCombinedPortType"));
+	
+	static public PortType GENESIS_DAIR_SQL_ROWSET_ACCESS_PORT_TYPE =
+		PortType.get(new QName("http://vcgr.cs.virginia.edu/genii/genesis_dair",
+			"SQLRowsetAccessPortType"));
 }

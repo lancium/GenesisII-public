@@ -248,6 +248,18 @@
 				value="connection-pool"/>
 		</mconf:instance>
 		
+		<mconf:instance name="dai-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.genesis_dai.resource.DAIDBResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
+		
+		<mconf:instance name="dair-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.genesis_dair.resource.DAIRDBResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
+		
 	</genii:configured-instances>
 	
 	<genii:services>
@@ -488,6 +500,32 @@
 			<genii:resource-provider name="basic-db-resource-provider"/>
 			<genii:authz-provider name="gamlacl-authz-provider"/>
 		</genii:service>
+		
+		<genii:service name="CoreDataAccessCombinedPortType">
+			<genii:resource-provider name="dai-db-resource-provider"/>
+			<genii:authz-provider name="gamlacl-authz-provider"/>
+		</genii:service>
+		
+		<genii:service name="WSRFDataResourcePortType">
+			<genii:resource-provider name="dai-db-resource-provider"/>
+			<genii:authz-provider name="gamlacl-authz-provider"/>
+		</genii:service>
+
+		<genii:service name="SQLAccessCombinedPortType">
+			<genii:resource-provider name="dair-db-resource-provider"/>
+			<genii:authz-provider name="gamlacl-authz-provider"/>
+		</genii:service>
+		
+		<genii:service name="SQLResponseCombinedPortType">
+			<genii:resource-provider name="dair-db-resource-provider"/>
+			<genii:authz-provider name="gamlacl-authz-provider"/>
+		</genii:service>
+		
+		<genii:service name="SQLRowsetAccessPortType">
+			<genii:resource-provider name="dair-db-resource-provider"/>
+			<genii:authz-provider name="gamlacl-authz-provider"/>
+		</genii:service>
+
 	</genii:services>
 	
 	<genii:deployment-configuration>

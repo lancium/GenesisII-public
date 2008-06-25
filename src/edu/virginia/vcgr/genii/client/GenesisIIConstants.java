@@ -54,6 +54,7 @@ public class GenesisIIConstants
 	
 	static public final String AUTHZ_ENABLED_CONFIG_PROPERTY = 
 		"genii.security.authz.authz-enabled";
+	
 	static public final String BOOTSTRAP_OWNER_CERTPATH = 
 		"genii.security.authz.bootstrapOwnerCertPath";
 	
@@ -61,4 +62,6 @@ public class GenesisIIConstants
 	
 	static public QName RNS_CACHED_METADATA_DOCUMENT_QNAME =
 		new QName(GENESISII_NS, "rns-cached-metadata");
+	
+	static public final String GENESIS_DAIR_RESULTS = "dair-results";
 }
