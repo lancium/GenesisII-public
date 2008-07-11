@@ -248,6 +248,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ContainerStatsTool</mconf:class>
 		<mconf:class name="user-preferences"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.UserPreferencesTool</mconf:class>
+		<mconf:class name="dairquery"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.dair.DAIRQueryTool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

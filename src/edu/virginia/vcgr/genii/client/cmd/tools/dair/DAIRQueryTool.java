@@ -1,12 +1,9 @@
 package edu.virginia.vcgr.genii.client.cmd.tools.dair;
 
-
 import java.io.ByteArrayInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.rmi.RemoteException;
 
 import javax.xml.namespace.QName;
 
@@ -22,22 +19,19 @@ import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
-import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.genesis_dair.CreateDataResourceRequest;
 import edu.virginia.vcgr.genii.genesis_dair.CreateDataResourceResponse;
 import edu.virginia.vcgr.genii.genesis_dair.SQLAccessCombinedPortType;
 
-
-public class TestQuery extends BaseGridTool{
-	
+public class DAIRQueryTool extends BaseGridTool {
 	static private final String _DESCRIPTION =
 		"You can use this tool to query tables through the GenesisII DAIR services";
 	static private final String _USAGE =
-		"dair-query <DAIR service> <query> <resourceName>";
+		"dair-query <DAIR service> <password> <resourceName>";
 	
-	public TestQuery() {
+	public DAIRQueryTool() {
 		super(_DESCRIPTION, _USAGE, false);
 	}
 
@@ -63,35 +57,38 @@ public class TestQuery extends BaseGridTool{
 	}
 
 	/**
+	 * @param databaseDriverPath
 	 * @param servicePath
 	 * @param query - the query to be executed
+	 * @param username 
+	 * @param password
 	 * @param resourceName - the name of the new DAIR resource
 	 * @throws Throwable
 	 */
-	private void query (String servicePath, String query, String resourceName) 
+	private void query ( String servicePath, String query, String resourceName) 
 		throws Throwable
 	{
-		RNSPath path = RNSPath.getCurrent().lookup(servicePath, RNSPathQueryFlags.MUST_EXIST);
 		
-		//preparing the parameters to be passed on
+		RNSPath path = RNSPath.getCurrent().lookup(servicePath, RNSPathQueryFlags.MUST_EXIST);
+
+		/*
+		 * preparing the parameters to be passed on
+		 */
 		
 		SQLAccessCombinedPortType SQLAccess = ClientUtils.createProxy(
 				SQLAccessCombinedPortType.class, path.getEndpoint());
 		CreateDataResourceRequest myRequest = new CreateDataResourceRequest(); 
 		myRequest.setQuery(query);
 		myRequest.setResourceName(resourceName);
-		CreateDataResourceResponse result =  (CreateDataResourceResponse) SQLAccess.createDataResource(myRequest);
-		
-		createFileStructure(path, result, resourceName);
-
-	}
-	
-	public void createFileStructure(RNSPath path,CreateDataResourceResponse result, 
-			String resourceName) throws RNSException, FileNotFoundException, RemoteException, IOException{
+		CreateDataResourceResponse result = (CreateDataResourceResponse) SQLAccess.createDataResource(myRequest);
 		System.out.println(result.getEPR());
 		
 		
-		//creating the new directory for the EPR results
+		/*
+		 * creating the new directory for the results
+		 */
+
+		@SuppressWarnings("unused")
 		RNSPath resultsDirRNS = createResultDir(path);
 		String trying = resultsDirRNS.pwd();
 		System.out.println(trying);
@@ -104,57 +101,36 @@ public class TestQuery extends BaseGridTool{
 		InputStream inStream = null;
 		OutputStream outStream = null;
 		
+		
 		EndpointReferenceType EPR = result.getEPR();
 		String EPRtoString = ObjectSerializer.toString(EPR, new QName(GenesisIIConstants.GENESISII_NS, "endpoint"), false);
 		inStream = new ByteArrayInputStream(EPRtoString.getBytes());
 		outStream = ByteIOStreamFactory.createOutputStream(fileEPR);
 		copy (inStream, outStream);
+		
+		
+		
 		StreamUtils.close(inStream);
 		StreamUtils.close(outStream);
 		
+		
+		/*File dataResource = new File (resultsDirRNS.toString(), resourceName+".txt");
+		dataResource.canWrite();
+		dataResource.canRead();
+		dataResource.createNewFile(); */
+		
+		
 		/*
-		 * creating a new directory for the schemas
-		 */
-		
-		RNSPath schemasDirRNS = createSchemasDir(path);
-		trying = schemasDirRNS.pwd();
-		System.out.println(trying);
-		
-		int numberOfTables = result.getTableName().length;
-		for (int i = 0; i< numberOfTables; i++)
-		{
-			String tableSchema = result.getTableName(i);
-			int tableNameLength = tableSchema.indexOf("\n");
-			String tableName = tableSchema.substring(0, tableNameLength);
-			
-			RNSPath schemaPath = new RNSPath(schemasDirRNS, tableName, null, false);
-			String schema = schemaPath.pwd();
-			System.out.println(schema);
-			try {
-			EndpointReferenceType schemaEPR = schemaPath.createNewFile();
-			
-			inStream = new ByteArrayInputStream(("table " +tableSchema).getBytes());
-			outStream = ByteIOStreamFactory.createOutputStream(schemaEPR);
-			copy (inStream, outStream);
-			StreamUtils.close(inStream);
-			StreamUtils.close(outStream);
-			}
-			catch (RNSPathAlreadyExistsException e)
-			{
-				/*
-				 * Don't do anything. If the path already exists then we've simply added the 
-				 * table schema before.
-				 */
-				
-			}
-		}
-		
+		File dataResource = new File (resultsDirRNS + File.separator + resourceName +".txt");
+	//	String filepath = dataResource.getCanonicalPath();
+		BufferedWriter output = new BufferedWriter(new FileWriter(dataResource));
+		output.write(result);
+		output.close();
+		*/
 	}
-	
 	/**
-	 * @param path
-	 * @return resutlsDirRNS - the path to the new directory where the table resulting EPRs will be kept
 	 * @throws RNSException
+	 * 
 	 * creates the directory where the results will be stored
 	 */
 	static public RNSPath createResultDir(RNSPath path) throws RNSException
@@ -166,23 +142,6 @@ public class TestQuery extends BaseGridTool{
 			resultsDirRNS.mkdir();
 		}
 		return resultsDirRNS;
-	}
-	
-	/**
-	 * @param path
-	 * @return schemasDirRNS - the path to the new directory where the table schemas will be kept
-	 * @throws RNSException
-	 */
-	
-	static public RNSPath createSchemasDir(RNSPath path) throws RNSException
-	{
-		String schemasDirRNSPath = path.pwd() + "-schemas";
-		RNSPath schemasDirRNS = RNSPath.getCurrent().lookup(schemasDirRNSPath, RNSPathQueryFlags.DONT_CARE);
-		if (!schemasDirRNS.exists())
-		{
-			schemasDirRNS.mkdir();
-		}
-		return schemasDirRNS;
 	}
 	
 	static private final int _BLOCK_SIZE = ByteIOConstants.PREFERRED_SIMPLE_XFER_BLOCK_SIZE;
@@ -197,4 +156,5 @@ public class TestQuery extends BaseGridTool{
 			out.write(data, 0, r);
 		}
 	}
+
 }

@@ -39,55 +39,26 @@ import edu.virginia.vcgr.genii.genesis_dair.SchemaDescription;
 
 public class SQLPropertyAttributesHandler extends AbstractAttributeHandler {
 	
-	static public final String DAI_NS = "http://vcgr.cs.virginia.edu/genii/genesis_dai";
+	static public final String DAIR_NS = "http://vcgr.cs.virginia.edu/genii/genesis_dair";
 
 	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(SQLPropertyAttributesHandler.class);
 	
-	static public QName DATA_RESOURCE_ABSTRACT_NAME_ATTR= new QName(
-			DAI_NS, "DataResourceAbstractName");
-	
-	static public QName DATA_RESOURCE_MANAGEMENT_ATTR = new QName(
-			DAI_NS, "DataResourceManagement");
-	
-	static public QName PARENT_DATA_RESOURCE_ATTR = new QName(
-			DAI_NS, "ParentDataResource");
-	
-	static public QName DATASET_MAP_ATTR = new QName(
-			DAI_NS, "DatasetMap");
-	
-	static public QName CONFIGURATION_MAP_ATTR = new QName(
-			DAI_NS, "ConfigurationMap");
-	
-	static public QName LANGUAGE_MAP_ATTR = new QName(
-			DAI_NS, "LanguageMap");
-	
-	static public QName DATA_RESOURCE_DESCRIPTION_ATTR = new QName(
-			DAI_NS, "DataResourceDescription");
-	
-	static public QName READABLE_ATTR = new QName(
-			DAI_NS, "Readable");
-	
-	static public QName WRITEABLE_ATTR = new QName(
-			DAI_NS, "Writeable");
-	
-	static public QName CONCURRENT_ACCESS_ATTR = new QName(
-			DAI_NS, "ConcurrentAccess");
-	
-	static public QName TRANSACTION_INITIATION_ATTR = new QName(
-			DAI_NS, "TransactionInitiation");
-	
-	static public QName TRANSACTION_ISOLATION_ATTR = new QName(
-			DAI_NS, "TransactionIsolation");
-	
-	static public QName CHILD_SENSITIVE_TO_PARENT_ATTR = new QName(
-			DAI_NS, "ChildSensitiveToParent");
-	
-	static public QName PARENT_SENSITIVE_TO_CHILD_ATTR = new QName(
-			DAI_NS, "ParentSensitiveToChild");
-	
-	static public QName SCHEMA_DESCRIPTION_ATTR = new QName(
-			DAI_NS, "SchemaDescription");
+	static public QName DATA_RESOURCE_ABSTRACT_NAME_ATTR= new QName(DAIR_NS, "DataResourceAbstractName");
+	static public QName DATA_RESOURCE_MANAGEMENT_ATTR = new QName(DAIR_NS, "DataResourceManagement");
+	static public QName PARENT_DATA_RESOURCE_ATTR = new QName(DAIR_NS, "ParentDataResource");
+	static public QName DATASET_MAP_ATTR = new QName(DAIR_NS, "DatasetMap");
+	static public QName CONFIGURATION_MAP_ATTR = new QName(DAIR_NS, "ConfigurationMap");
+	static public QName LANGUAGE_MAP_ATTR = new QName(DAIR_NS, "LanguageMap");
+	static public QName DATA_RESOURCE_DESCRIPTION_ATTR = new QName(DAIR_NS, "DataResourceDescription");
+	static public QName READABLE_ATTR = new QName(DAIR_NS, "Readable");
+	static public QName WRITEABLE_ATTR = new QName(DAIR_NS, "Writeable");
+	static public QName CONCURRENT_ACCESS_ATTR = new QName(DAIR_NS, "ConcurrentAccess");
+	static public QName TRANSACTION_INITIATION_ATTR = new QName(DAIR_NS, "TransactionInitiation");
+	static public QName TRANSACTION_ISOLATION_ATTR = new QName(DAIR_NS, "TransactionIsolation");
+	static public QName CHILD_SENSITIVE_TO_PARENT_ATTR = new QName(DAIR_NS, "ChildSensitiveToParent");
+	static public QName PARENT_SENSITIVE_TO_CHILD_ATTR = new QName(DAIR_NS, "ParentSensitiveToChild");
+	static public QName SCHEMA_DESCRIPTION_ATTR = new QName(DAIR_NS, "SchemaDescription");
 	
 	private static Connection connection;
 	private static URI abstractName;
@@ -211,6 +182,7 @@ public class SQLPropertyAttributesHandler extends AbstractAttributeHandler {
 	}
 	
 	/**
+	 * NB! this is not what it's supposed to be
 	 * 
 	 * @return LanguageMapType[]
 	 * @throws SQLException
@@ -230,26 +202,28 @@ public class SQLPropertyAttributesHandler extends AbstractAttributeHandler {
 		LanguageMapType[] languageMap = new LanguageMapType[supportedSQLCount];
 		int position=0;
 		
-		
 		if (connection.getMetaData().supportsANSI92EntryLevelSQL())
 		{
 			languageMap[position] = new LanguageMapType();
-			languageMap[position].setMessageQName(new QName("MessageQName"));
-			languageMap[position].setLanguageURI(new URI("ANSI92EntryLevelSQL"));
+			languageMap[position].setMessageQName(new QName("SupportedSQLStandard", "ANSI 92 Entry Level SQL"));
+			
+		//	languageMap[position].setLanguageURI(new URI("ANSI92EntryLevelSQL"));
 			position++;
 		}
 		
 		if (connection.getMetaData().supportsANSI92FullSQL())
 		{
-			languageMap[position].setMessageQName(new QName("MessageQName"));
-			languageMap[position].setLanguageURI(new URI("ANSI92FullSQL"));
+			languageMap[position] = new LanguageMapType();
+			languageMap[position].setMessageQName(new QName("SupportedSQLStandard", "ANSI 92 Full SQL"));
+			//languageMap[position].setLanguageURI(new URI("ANSI92FullSQL"));
 			position++;
 		}
 		
 		if (connection.getMetaData().supportsANSI92IntermediateSQL())
 		{
-			languageMap[position].setMessageQName(new QName("MessageQName"));
-			languageMap[position].setLanguageURI(new URI("ANSI92IntermediateSQL"));
+			languageMap[position] = new LanguageMapType();
+			languageMap[position].setMessageQName(new QName("SupportedSQLStandard", "ANSI 92 Intermediate SQL"));
+			//languageMap[position].setLanguageURI(new URI("ANSI92IntermediateSQL"));
 			position++;
 		}
 		
@@ -268,8 +242,47 @@ public class SQLPropertyAttributesHandler extends AbstractAttributeHandler {
 	{
 		MessageElement[] myMessage = new MessageElement[1];
 		String description = null;
-		String tableName = null;
-		tableName = rs.getMetaData().getTableName(1);
+		
+		int columnCount = rs.getMetaData().getColumnCount();
+		String [] tables = new String[columnCount];
+		int newTablesCount = 0;
+		for (int i = 0; i<columnCount; i++)
+		{
+			String name = rs.getMetaData().getTableName(i+1);
+			if (i==0){
+				tables[newTablesCount] = name;
+				newTablesCount++;
+			}
+			else{
+				boolean unique = false;
+			
+			for (int j = 0; j<i; j++){
+				if (!name.equals(tables[j]) && tables[j]!= null)
+					unique = true;
+			}
+				if (unique)
+				{
+					tables[newTablesCount] = name;
+					newTablesCount++;
+				}
+			}
+			
+		}
+		
+		String[] uniqueTableNames = new String[newTablesCount];
+		
+		for (int i=0; i<tables.length; i++)
+		{
+			if (tables[i]!=null)
+				uniqueTableNames[i] = tables[i];
+		}
+		
+		String tableName = "";
+		for (int i = 0; i<uniqueTableNames.length; i++)
+		{
+			tableName = tableName.concat(uniqueTableNames[i] + " ");
+		}
+		
 		if (tableName!= null)
 			description = "This resource has been created from table " +tableName +".";
 		else

@@ -25,8 +25,8 @@ public class DBDAIRResourceFactory extends RNSDBResourceFactory {
 		"serviceEPR BLOB (128K) NOT NULL, " +
 		"resourcename VARCHAR (128) NOT NULL, " +
 		"resourceEPR BLOB (128K) NOT NULL, " +
+		"query VARCHAR (512), " +
 		"CONSTRAINT dataresourcesC1 UNIQUE (resourcename))";
-	
 		
 	public DBDAIRResourceFactory(DatabaseConnectionPool connectionPool,
 			IResourceKeyTranslater translator)

@@ -6,7 +6,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.regex.Pattern;
+
+import javax.xml.namespace.QName;
 
 
 import org.apache.axis.message.MessageElement;
@@ -31,7 +34,7 @@ public class DBDAIRResource extends RNSDBResource implements IDAIRResource{
 	static private Log _logger = LogFactory.getLog(DBDAIRResource.class);
 	
 	static private final String _ADD_DATARESOURCE_ENTRY_STATEMENT =
-		"INSERT INTO dataresources(servicekey, serviceEPR, resourcename, resourceEPR) VALUES(?, ?, ?, ? )";
+		"INSERT INTO dataresources(servicekey, serviceEPR, resourcename, resourceEPR, query) VALUES(?, ?, ?, ?, ? )";
 	static private final String _REMOVE_ENTRIES_STMT =
 		"DELETE FROM dataresources WHERE resourcename = ?";
 
@@ -44,7 +47,7 @@ public class DBDAIRResource extends RNSDBResource implements IDAIRResource{
 	}
 
 	public void addEntry( EndpointReferenceType serviceEPR, String resourceName, 
-			EndpointReferenceType resourceEPR) 
+			EndpointReferenceType resourceEPR, String query) 
 		throws ResourceException {
 		PreparedStatement stmt = null;
 		
@@ -55,6 +58,7 @@ public class DBDAIRResource extends RNSDBResource implements IDAIRResource{
 			stmt.setBlob(2, EPRUtils.toBlob(serviceEPR));
 			stmt.setString(3, resourceName);
 			stmt.setBlob(4, EPRUtils.toBlob(resourceEPR));
+			stmt.setString(5, query);
 			if (stmt.executeUpdate() != 1)
 				throw new ResourceException("Unable to update database.");
 			stmt.close();
@@ -171,4 +175,44 @@ public class DBDAIRResource extends RNSDBResource implements IDAIRResource{
 		
 	}
 	
+	
+	// database connection parameters
+	private String DBDriverString = null;
+	private String DBConnectString = null;
+	private String username = null;
+	private String password = null;
+	
+	
+	public void initialize(HashMap<QName, Object> constructionParams)
+	throws ResourceException
+	{
+		DBDriverString = (String) constructionParams.get(IDAIRResource._DB_DRIVER_NAME_PARAM);
+		DBConnectString = (String) constructionParams.get(IDAIRResource._CONNECT_STRING_PARAM);
+		username = (String) constructionParams.get(IDAIRResource._USERNAME_PARAM);
+		password = (String) constructionParams.get(IDAIRResource._PASSWORD_PARAM);
+		
+		super.initialize(constructionParams);
+		
+	}
+	
+	public String getDBDriverString()
+	{
+		return DBDriverString;
+	}
+	
+	public String getDBConnectString()
+	{
+		return DBConnectString;
+	}
+	
+	public String getUsername()
+	{
+		return username;
+	}
+	
+	public String getPassword()
+	{
+		return password;
+	}
+
 }
