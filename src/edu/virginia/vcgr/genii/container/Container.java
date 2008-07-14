@@ -201,9 +201,18 @@ public class Container extends ApplicationBase
 				"/axis",
 				Installation.axisWebApplicationPath().getAbsolutePath());
 		
-		recordInstallationState(System.getProperty(
-				DeploymentName.DEPLOYMENT_NAME_PROPERTY, "default"), 
-			new URL(_containerURL));
+		try
+		{
+			recordInstallationState(System.getProperty(
+					DeploymentName.DEPLOYMENT_NAME_PROPERTY, "default"), 
+				new URL(_containerURL));
+		}
+		catch (Throwable cause)
+		{
+			_logger.error(
+				"Unable to record installation state -- continuing anyways.", 
+				cause);
+		}
 		
 		server.start();
 		initializeServices(webAppCtxt);

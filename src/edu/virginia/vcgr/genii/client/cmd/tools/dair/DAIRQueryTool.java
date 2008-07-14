@@ -88,7 +88,6 @@ public class DAIRQueryTool extends BaseGridTool {
 		 * creating the new directory for the results
 		 */
 
-		@SuppressWarnings("unused")
 		RNSPath resultsDirRNS = createResultDir(path);
 		String trying = resultsDirRNS.pwd();
 		System.out.println(trying);
