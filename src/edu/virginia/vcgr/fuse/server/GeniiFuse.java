@@ -113,6 +113,8 @@ public class GeniiFuse
 			{
 				_error = e;
 			}
+
+			System.err.println("Exiting fuse mount.");
 		}
 		
 		public Exception getError()
