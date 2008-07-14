@@ -3,7 +3,6 @@ package edu.virginia.vcgr.genii.client.jni.gIIlib;
 import java.util.ArrayList;
 import java.util.Date;
 
-@SuppressWarnings(value={"unused"})
 public class ResourceInformation {
 	public boolean isDirectory;
 	public Integer resourceHandle;	

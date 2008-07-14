@@ -86,7 +86,6 @@ import edu.virginia.vcgr.genii.queue.SubmitJobResponseType;
  */
 public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 {
-	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(QueueServiceImpl.class);
 	
 	static private final long _DEFAULT_TIME_TO_LIVE = 1000L * 60 * 60;

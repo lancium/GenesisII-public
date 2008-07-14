@@ -207,7 +207,7 @@ public class Container extends ApplicationBase
 		
 		server.start();
 		initializeServices(webAppCtxt);
-	
+		
 		ServiceDeployer.startServiceDeployer(_axisServer,
 			Installation.getDeployment(
 				new DeploymentName()).getServicesDirectory());

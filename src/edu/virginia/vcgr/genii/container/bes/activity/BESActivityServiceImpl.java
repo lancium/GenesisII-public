@@ -73,7 +73,6 @@ import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 public class BESActivityServiceImpl extends GenesisIIBase implements
 		BESActivityPortType, BESActivityConstants
 {
-	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(BESActivityServiceImpl.class);
 	
 	public BESActivityServiceImpl() throws RemoteException
@@ -95,7 +94,6 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 		super.setAttributeHandlers();
 	}
 	
-	@SuppressWarnings("unchecked")
 	protected void postCreate(ResourceKey rKey,
 		EndpointReferenceType activityEPR, HashMap<QName, Object> creationParameters,
 		Collection<MessageElement> resolverCreationParams)

@@ -82,7 +82,6 @@ public class ContextManager
 		return bootContext;
 	}
 	
-	@SuppressWarnings("unchecked")
 	static public IContextResolver getResolver()
 	{
 		IContextResolver resolver = _resolver.get();

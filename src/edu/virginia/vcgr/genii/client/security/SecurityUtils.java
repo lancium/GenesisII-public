@@ -10,9 +10,11 @@ import java.security.KeyStore;
 import java.security.PublicKey;
 import java.security.cert.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import edu.virginia.vcgr.genii.common.security.CertificateChainType;
+import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.axis.AxisClientInvocationHandler;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationUnloadedListener;
@@ -20,6 +22,14 @@ import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.configuration.SecurityConstants;
+import edu.virginia.vcgr.genii.client.context.ContextManager;
+import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.AuthZSecurityException;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.GamlCredential;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.TransientCredentials;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.IdentityAttribute;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.SignedAssertion;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.Identity;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 
 import org.morgan.util.configuration.ConfigurationException;
@@ -266,5 +276,66 @@ public class SecurityUtils
 									encoded));
 		}
 		return certs;
+	}
+	
+	static public Collection<Identity> getCallerIdentities(
+		ICallingContext callingContext) 
+			throws AuthZSecurityException, GeneralSecurityException
+	{
+		try
+		{
+			
+			Collection<Identity> ret = new ArrayList<Identity>();
+			
+			if (callingContext == null)
+				throw new AuthZSecurityException(
+					"Error processing GAML credential: No calling context");
+			
+			// remove/renew stale creds/attributes
+			ClientUtils.checkAndRenewCredentials(callingContext);
+
+			TransientCredentials transientCredentials = 
+				TransientCredentials.getTransientCredentials(callingContext);
+			
+			for (GamlCredential cred : transientCredentials._credentials) 
+			{
+				/* If the cred is an Identity, then we simply add that idendity
+				 * to our identity list.
+				 */
+				if (cred instanceof Identity) 
+				{
+					ret.add((Identity)cred);
+				} else if (cred instanceof SignedAssertion) 
+				{
+					/* If the cred is a signed assertion, then we have to
+					 * get the identity out of the assertion.
+					 */
+					SignedAssertion signedAssertion = (SignedAssertion)cred;
+					
+					// if its an identity assertion, check it against our ACLs
+					if (signedAssertion.getAttribute() 
+						instanceof IdentityAttribute) 
+					{
+						IdentityAttribute identityAttr = 
+							(IdentityAttribute) signedAssertion.getAttribute();
+	
+						ret.add(identityAttr.getIdentity());
+					}
+				}
+			}
+			
+			return ret;
+		}
+		catch (IOException ioe)
+		{
+			throw new AuthZSecurityException("Unable to load current context.", 
+				ioe);
+		}
+	}
+	
+	static public Collection<Identity> getCallerIdentities()
+		throws AuthZSecurityException, IOException, GeneralSecurityException
+	{
+		return getCallerIdentities(ContextManager.getCurrentContext());
 	}
 }

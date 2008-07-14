@@ -201,7 +201,6 @@ public class CertTool
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	public static X509Certificate[] createResourceCertChain(String epi,
 			String newCN, CertCreationSpec certSpec)
 			throws GeneralSecurityException

@@ -351,7 +351,6 @@ public class DeployDatabase implements Closeable
 		return getConnectionPool(instanceName);
 	}
 	
-	@SuppressWarnings("unchecked")
 	static private DatabaseConnectionPool getConnectionPool(
 		String poolName)
 	{

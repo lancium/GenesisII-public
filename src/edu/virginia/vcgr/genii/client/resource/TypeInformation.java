@@ -44,7 +44,6 @@ import edu.virginia.vcgr.genii.common.GeniiCommon;
 
 public class TypeInformation
 {
-	@SuppressWarnings("unused")
 	private EndpointReferenceType _epr;
 	
 	private boolean _pureURL;

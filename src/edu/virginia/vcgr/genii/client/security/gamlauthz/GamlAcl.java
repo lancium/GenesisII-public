@@ -24,6 +24,20 @@ public class GamlAcl implements Serializable
 	public GamlAcl()
 	{
 	}
+	
+	@Override
+	public Object clone()
+	{
+		GamlAcl ret = new GamlAcl();
+		
+		ret.requireEncryption = requireEncryption;
+		
+		ret.readAcl = new ArrayList<Identity>(readAcl);
+		ret.writeAcl = new ArrayList<Identity>(writeAcl);
+		ret.executeAcl = new ArrayList<Identity>(executeAcl);
+		
+		return ret;
+	}
 
 	static public ArrayList<Identity> decodeIdentityList(
 			GamlIdentityListType identityList) throws AuthZSecurityException

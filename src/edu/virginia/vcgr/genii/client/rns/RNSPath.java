@@ -70,7 +70,6 @@ public class RNSPath implements Serializable
 {
 	static final long serialVersionUID = -5879165350773440573L;
 	
-	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(RNSPath.class);
 	
 	static public RNSPath getCurrent()

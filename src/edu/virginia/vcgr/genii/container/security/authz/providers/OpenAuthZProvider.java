@@ -65,7 +65,6 @@ public class OpenAuthZProvider implements IAuthZProvider
 
 	}
 
-	@SuppressWarnings("unchecked")
 	public boolean checkAccess(ICallingContext callingContext,
 			X509Certificate callerCert, IResource resource, Method operation)
 			throws AuthZSecurityException, ResourceException

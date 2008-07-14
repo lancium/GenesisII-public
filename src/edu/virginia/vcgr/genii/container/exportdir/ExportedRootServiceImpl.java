@@ -42,7 +42,6 @@ import edu.virginia.vcgr.genii.exportdir.QuitExportResponse;
 public class ExportedRootServiceImpl extends ExportedDirServiceImpl implements
 		ExportedRootPortType
 {
-	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(ExportedRootServiceImpl.class);
 	
 	public ExportedRootServiceImpl() throws RemoteException

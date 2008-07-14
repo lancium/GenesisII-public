@@ -40,6 +40,7 @@ public class TestJUnit
 		Assert.assertEquals(7, 2 + 5);
 	}
 	
+	@SuppressWarnings("null")
 	@Test(expected=NullPointerException.class)
 	public void testException()
 	{

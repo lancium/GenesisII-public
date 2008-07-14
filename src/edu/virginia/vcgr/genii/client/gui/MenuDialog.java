@@ -118,8 +118,7 @@ static final long serialVersionUID = 0L;
 		//	Swing thread-safe initializer
         javax.swing.SwingUtilities.invokeLater(new Runnable() {        	
         	
-            @SuppressWarnings("unchecked")
-			public void run() {
+           public void run() {
             	MenuDialog<EntryType> mDialog = new MenuDialog<EntryType>(
             			title, prompt, entries);
         		mDialog.pack();

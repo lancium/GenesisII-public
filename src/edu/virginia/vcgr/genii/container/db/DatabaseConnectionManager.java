@@ -98,7 +98,6 @@ public class DatabaseConnectionManager
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	static private DatabaseConnectionPool findConnectionPool(String poolName)
 	{
 		DatabaseConnectionPool pool = null;

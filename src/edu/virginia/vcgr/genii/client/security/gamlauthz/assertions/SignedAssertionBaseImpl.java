@@ -169,7 +169,6 @@ public abstract class SignedAssertionBaseImpl implements SignedAssertion,
 		return Base64.byteArrayToBase64(baos.toByteArray());
 	}
 
-	@SuppressWarnings("unchecked")
 	public static SignedAssertion base64decodeAssertion(String encoded)
 			throws IOException, ClassNotFoundException
 	{

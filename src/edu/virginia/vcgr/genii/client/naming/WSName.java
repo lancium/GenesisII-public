@@ -34,7 +34,6 @@ import edu.virginia.vcgr.genii.client.naming.ResolverDescription.ResolverType;
 
 public class WSName implements Comparable<WSName>
 {
-	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(WSName.class);
 	
 	static public final String NAMING_NS =

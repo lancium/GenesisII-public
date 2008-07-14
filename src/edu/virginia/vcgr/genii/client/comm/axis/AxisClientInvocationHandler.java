@@ -138,12 +138,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	}
 	
 	
-	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(AxisClientInvocationHandler.class);
-
-	
-	
-
 	
 	/**
 	 * Retrieves the client's minimum allowable level of message security
@@ -169,9 +164,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	
 	private EndpointReferenceType _epr;
 	
-	@SuppressWarnings("unused")
 	private ICallingContext _callContext;
-	@SuppressWarnings("unused")
 	private X509Certificate _resourceCert;
 	
 	private AttachmentType _attachmentType =

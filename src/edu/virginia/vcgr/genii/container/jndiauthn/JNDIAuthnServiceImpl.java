@@ -98,7 +98,6 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		JNDIAuthnPortType, EnhancedRNSPortType
 {
 
-	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(JNDIAuthnServiceImpl.class);
 
 	public JNDIAuthnServiceImpl() throws RemoteException

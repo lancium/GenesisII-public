@@ -32,7 +32,6 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 public class DBBESActivityResourceFactory extends BasicDBResourceFactory
 	implements IBESActivityResourceFactory
 {
-	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(
 		DBBESActivityResourceFactory.class);
 	

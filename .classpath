@@ -39,6 +39,7 @@
 	<classpathentry kind="lib" path="ext/jsch/jsch-0.1.38.jar"/>
 	<classpathentry kind="lib" path="ext/ant/ant.jar"/>
 	<classpathentry kind="lib" path="ext/ant/ant-jsch.jar"/>
+	<classpathentry kind="lib" path="ext/fuse/fuse-j.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="ext/derby/derby.jar"/>
 	<classpathentry kind="lib" path="ext/xmldb/db.jar"/>

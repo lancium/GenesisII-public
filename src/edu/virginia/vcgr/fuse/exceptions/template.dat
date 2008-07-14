@@ -1,0 +1,20 @@
+package edu.virginia.vcgr.fuse.server.exceptions;
+
+import fuse.FuseException;
+
+public class ENOException extends FuseException
+{
+	static final long serialVersionUID = 0L;
+	
+	public ENOException(String msg)
+	{
+		this(msg, null);
+	}
+
+	public ENOException(String msg, Throwable cause)
+	{
+		super(msg, cause);
+
+		initErrno(FuseException.ENO);
+	}
+}

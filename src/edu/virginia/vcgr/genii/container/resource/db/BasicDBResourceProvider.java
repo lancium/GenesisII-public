@@ -22,7 +22,6 @@ public class BasicDBResourceProvider implements IResourceProvider
 	private IResourceFactory _factory = null;
 	private IResourceKeyTranslater _translater;
 	
-	@SuppressWarnings("unchecked")
 	public BasicDBResourceProvider(Properties properties)
 		throws SQLException
 	{	
@@ -35,7 +34,6 @@ public class BasicDBResourceProvider implements IResourceProvider
 					+ _CONNECTION_POOL_NAME + "\".");
 	}
 	
-	@SuppressWarnings("unchecked")
 	private DatabaseConnectionPool createConnectionPool()
 
 	{

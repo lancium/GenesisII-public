@@ -50,8 +50,12 @@
 	</path>
 	
 	<path id="xmldb.classpath">
-			<fileset dir="${xmldb.home}" includes="**/*.jar"/>
-		</path>
+		<fileset dir="${xmldb.home}" includes="**/*.jar"/>
+	</path>
+
+	<path id="fuse.classpath">
+		<fileset dir="${fuse.home}" includes="**/*.jar"/>
+	</path>
 
 	<path id="project.classpath">
 		<pathelement location="${obj-dir}"/>
@@ -65,6 +69,7 @@
 		<path refid="bouncycastle.classpath"/>
 		<path refid="wss4j.classpath"/>
 		<path refid="xmldb.classpath"/>
+		<path refid="fuse.classpath"/>
 	</path>
 			
 	<!-- Imports -->	
@@ -101,6 +106,7 @@
 		<jar destfile="${lib.dir}/GenesisII-client.jar">
 			<fileset dir="${obj.dir}">
 				<include name="edu/virginia/vcgr/genii/client/**/*"/>
+				<include name="edu/virginia/vcgr/fuse/**/*"/>
 				<include name="edu/virginia/vcgr/genii/ftp/**/*"/>
 				<include name="edu/virginia/vcgr/genii/testing/**/*"/>
 			</fileset>
@@ -276,6 +282,10 @@
 		<delete file="${basedir}/cert-tool.bat"/>
 		<delete file="${basedir}/jar-desc.xml"/>
 		<delete file="${basedir}/jserver-jar-desc.xml"/>
+		<delete>
+			<fileset dir="${basedir}/ApplicationWatcher"
+				includes="**/*.properties"/>
+		</delete>
 	</target>
 	
 	<target name="wipestate">

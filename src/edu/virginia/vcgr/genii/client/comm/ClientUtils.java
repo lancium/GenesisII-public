@@ -54,7 +54,6 @@ import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
  */
 public class ClientUtils
 {
-	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(ClientUtils.class);
 
 	static private final String _PROXY_FACTORY_INSTANCE_NAME =
@@ -220,7 +219,7 @@ public class ClientUtils
 	}
 
 	static private IProxyFactory _proxyFactory = null;
-	@SuppressWarnings("unchecked")
+	
 	synchronized static private IProxyFactory getProxyFactory()
 		throws ResourceException
 	{

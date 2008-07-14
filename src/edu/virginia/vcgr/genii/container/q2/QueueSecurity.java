@@ -1,15 +1,13 @@
 package edu.virginia.vcgr.genii.container.q2;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.security.GeneralSecurityException;
 import java.util.Collection;
 
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.security.SecurityUtils;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.AuthZSecurityException;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.GamlCredential;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.IdentityAttribute;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.SignedAssertion;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.Identity;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 
@@ -31,55 +29,21 @@ public class QueueSecurity
 	 * 
 	 * @throws AuthZSecurityException
 	 */
-	@SuppressWarnings("unchecked")
 	static public Collection<Identity> getCallerIdentities() 
 		throws AuthZSecurityException
 	{
 		try
 		{
-			Collection<Identity> ret = new ArrayList<Identity>();
-			
 			/* Retrieve the current calling context */
 			ICallingContext callingContext = 
 				ContextManager.getCurrentContext(false);
 			
-			if (callingContext == null)
-				throw new AuthZSecurityException(
-					"Error processing GAML credential: No calling context");
-			
-			/* The caller's identities are kept in the "transient" credentials 
-			 * space for the calling context.
-			 */
-			ArrayList<GamlCredential> callerCredentials = (ArrayList<GamlCredential>)
-				callingContext.getTransientProperty(GamlCredential.CALLER_CREDENTIALS_PROPERTY);
-			for (GamlCredential cred : callerCredentials) 
-			{
-				/* If the cred is an Identity, then we simply add that idendity
-				 * to our identity list.
-				 */
-				if (cred instanceof Identity) 
-				{
-					ret.add((Identity)cred);
-				} else if (cred instanceof SignedAssertion) 
-				{
-					/* If the cred is a signed assertion, then we have to
-					 * get the identity out of the assertion.
-					 */
-					SignedAssertion signedAssertion = (SignedAssertion)cred;
-					
-					// if its an identity assertion, check it against our ACLs
-					if (signedAssertion.getAttribute() 
-						instanceof IdentityAttribute) 
-					{
-						IdentityAttribute identityAttr = 
-							(IdentityAttribute) signedAssertion.getAttribute();
-	
-						ret.add(identityAttr.getIdentity());
-					}
-				}
-			}
-			
-			return ret;
+			return SecurityUtils.getCallerIdentities(callingContext);
+		}
+		catch (GeneralSecurityException gse)
+		{
+			throw new AuthZSecurityException("Unable to load current context.", 
+				gse);
 		}
 		catch (IOException ioe)
 		{
