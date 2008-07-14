@@ -224,6 +224,7 @@
 				<xsd:complexType>
 					<xsd:sequence>
 						<xsd:element name="EPR" type="wsa:EndpointReferenceType" minOccurs="1" maxOccurs="1"/>
+						<xsd:element name = "resultset" type="xsd:string" minOccurs="1" maxOccurs ="1"/>
 						<xsd:element name="tableName" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
 					</xsd:sequence>
 				</xsd:complexType>

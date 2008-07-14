@@ -54,7 +54,6 @@ import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
-import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
@@ -120,6 +119,7 @@ public class SQLAccessCombinedServiceImpl extends EnhancedRNSServiceImpl
 	private HashMap<String, SQLDataResource> SQLDataResources = new HashMap<String, SQLDataResource>(40);
 	
 	private EndpointReferenceType EPRofNewDataResource;
+	private String resultsetToString = null;
 	
 	/*
 	 * (non-Javadoc)
@@ -329,7 +329,7 @@ public class SQLAccessCombinedServiceImpl extends EnhancedRNSServiceImpl
 					while(rs.next()){
 						for(int i=0; i<columnNumber; i++){
 							
-							row = row.concat(rs.getString(i+1) + " ");
+							row = row.concat(rs.getString(i+1) + "\t");
 						}
 						toPrintOut = toPrintOut.concat(row + "\n") ;
 						row = "";
@@ -338,6 +338,7 @@ public class SQLAccessCombinedServiceImpl extends EnhancedRNSServiceImpl
 					stmt.close();
 					stmt = null;
 					System.out.println(toPrintOut);
+					resultsetToString = toPrintOut;
 		
 					MessageElement [] me = new MessageElement[tableSchemas.length +1];
 			
@@ -525,6 +526,7 @@ public class SQLAccessCombinedServiceImpl extends EnhancedRNSServiceImpl
 		catch (SQLException e1) { _logger.warn(e1.getLocalizedMessage(), e1);}
 		CreateDataResourceResponse results = new CreateDataResourceResponse();
 		results.setEPR(EPRofNewDataResource);
+		results.setResultset(resultsetToString);
 		results.setTableName(tableNames);
 
 		return results;
@@ -778,21 +780,21 @@ public class SQLAccessCombinedServiceImpl extends EnhancedRNSServiceImpl
 								
 				/**
 				 * must find a way to get the name of the current service!!
-				 */
+				*/
 				RNSPath servicePath = RNSPath.getCurrent();
 				
 				SQLQueriesPath =servicePath.pwd() + "SQLQueries";
 				RNSPath queriesDirRNS = null;
 				try {
 					queriesDirRNS = RNSPath.getCurrent().lookup(SQLQueriesPath, RNSPathQueryFlags.DONT_CARE);
+					/*
 					if (!queriesDirRNS.exists())
 					{
 						queriesDirRNS.mkdir();
-					}
+					} */
 				} 
 				catch (RNSPathDoesNotExistException e) { _logger.warn(e.getLocalizedMessage(), e);} 
-				catch (RNSPathAlreadyExistsException e) { _logger.warn(e.getLocalizedMessage(), e);} 
-				catch (RNSException e) { _logger.warn(e.getLocalizedMessage(), e);}
+				catch (RNSPathAlreadyExistsException e) { _logger.warn(e.getLocalizedMessage(), e);}
 
 				
 				CreateDataResourceRequest createDataResourceRequest = new CreateDataResourceRequest();

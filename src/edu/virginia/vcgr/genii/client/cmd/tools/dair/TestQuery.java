@@ -92,11 +92,11 @@ public class TestQuery extends BaseGridTool{
 		
 		
 		//creating the new directory for the EPR results
-		RNSPath resultsDirRNS = createResultDir(path);
-		String trying = resultsDirRNS.pwd();
+		RNSPath EPRDirRNS = createEPRDir(path);
+		String trying = EPRDirRNS.pwd();
 		System.out.println(trying);
 		
-		RNSPath filePath = new RNSPath(resultsDirRNS, resourceName, null, false);
+		RNSPath filePath = new RNSPath(EPRDirRNS, resourceName, null, false);
 		String file = filePath.pwd();
 		System.out.println(file);
 		EndpointReferenceType fileEPR = filePath.createNewFile();
@@ -111,6 +111,28 @@ public class TestQuery extends BaseGridTool{
 		copy (inStream, outStream);
 		StreamUtils.close(inStream);
 		StreamUtils.close(outStream);
+		
+		/*
+		 * creating a new directory for the data results
+		 */
+		
+		RNSPath resultsDirRNS = createResultsDir(path);
+		String resultstrying = resultsDirRNS.pwd();
+		System.out.println(resultstrying);
+		
+		RNSPath resultsFilePath = new RNSPath(resultsDirRNS, resourceName, null, false);
+		String resultsfile = resultsFilePath.pwd();
+		System.out.println(resultsfile);
+		EndpointReferenceType resultsFileEPR = resultsFilePath.createNewFile();
+		
+		String sqlQueryResult = result.getResultset();
+		
+		inStream = new ByteArrayInputStream(sqlQueryResult.getBytes());
+		outStream = ByteIOStreamFactory.createOutputStream(resultsFileEPR);
+		copy (inStream, outStream);
+		StreamUtils.close(inStream);
+		StreamUtils.close(outStream);
+		
 		
 		/*
 		 * creating a new directory for the schemas
@@ -157,15 +179,15 @@ public class TestQuery extends BaseGridTool{
 	 * @throws RNSException
 	 * creates the directory where the results will be stored
 	 */
-	static public RNSPath createResultDir(RNSPath path) throws RNSException
+	static public RNSPath createEPRDir(RNSPath path) throws RNSException
 	{
-		String resultsDirRNSPath = path.pwd() + "-results";
-		RNSPath resultsDirRNS = RNSPath.getCurrent().lookup(resultsDirRNSPath, RNSPathQueryFlags.DONT_CARE);
-		if (!resultsDirRNS.exists())
+		String EPRDirRNSPath = path.getParent().pwd() + "SQLQueries-EPRs";
+		RNSPath EPRDirRNS = RNSPath.getCurrent().lookup(EPRDirRNSPath, RNSPathQueryFlags.DONT_CARE);
+		if (!EPRDirRNS.exists())
 		{
-			resultsDirRNS.mkdir();
+			EPRDirRNS.mkdir();
 		}
-		return resultsDirRNS;
+		return EPRDirRNS;
 	}
 	
 	/**
@@ -176,13 +198,24 @@ public class TestQuery extends BaseGridTool{
 	
 	static public RNSPath createSchemasDir(RNSPath path) throws RNSException
 	{
-		String schemasDirRNSPath = path.pwd() + "-schemas";
+		String schemasDirRNSPath = path.getParent().pwd() + "SQLQueries-schemas";
 		RNSPath schemasDirRNS = RNSPath.getCurrent().lookup(schemasDirRNSPath, RNSPathQueryFlags.DONT_CARE);
 		if (!schemasDirRNS.exists())
 		{
 			schemasDirRNS.mkdir();
 		}
 		return schemasDirRNS;
+	}
+	
+	static public RNSPath createResultsDir(RNSPath path) throws RNSException
+	{
+		String resultsDirRNSPath = path.getParent().pwd() + "SQLQueries-results";
+		RNSPath resultsDirRNS = RNSPath.getCurrent().lookup(resultsDirRNSPath, RNSPathQueryFlags.DONT_CARE);
+		if (!resultsDirRNS.exists())
+		{
+			resultsDirRNS.mkdir();
+		}
+		return resultsDirRNS;
 	}
 	
 	static private final int _BLOCK_SIZE = ByteIOConstants.PREFERRED_SIMPLE_XFER_BLOCK_SIZE;
