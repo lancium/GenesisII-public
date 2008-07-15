@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.fuse.server;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
@@ -8,6 +9,7 @@ import java.security.GeneralSecurityException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.fuse.FuseUtils;
 import edu.virginia.vcgr.fuse.fs.genii.GeniiFuseFileSystem;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
@@ -22,10 +24,20 @@ public class GeniiFuse
 	
 	static public GeniiFuseConnection mountGenesisII(
 		File mountPoint, String []additionalArguments, 
-		ICallingContext callingContext, String sandbox, int uid) 
+		ICallingContext callingContext, String sandbox, int uid,
+		boolean daemon) 
 		throws IOException, RemoteException, RNSException, 
 			GeneralSecurityException
 	{
+		if (!mountPoint.exists())
+			throw new FileNotFoundException(String.format(
+				"Unable to locate mount point \"%s\".",
+				mountPoint.getAbsolutePath()));
+		
+		String msg = FuseUtils.supportsFuse();
+		if (msg != null)
+			throw new IOException(msg);
+			
 		GeniiFuseFileSystem fs = new GeniiFuseFileSystem(
 			callingContext, null, sandbox);
 		
@@ -36,20 +48,25 @@ public class GeniiFuse
 		System.arraycopy(additionalArguments, 0, args, 1, additionalArguments.length);
 		
 		GeniiMountRunner runner = new GeniiMountRunner(mount, args);
-		Thread th = new Thread(runner);
-		th.setName("Genesis II FUSE Mount Runner");
-		th.setDaemon(false);
-		th.start();
+		if (daemon)
+		{
+			Thread th = new Thread(runner);
+			th.setName("Genesis II FUSE Mount Runner");
+			th.setDaemon(false);
+			th.start();
+		} else
+			runner.run();
 		
 		return new GeniiFuseConnectionImpl(mountPoint);	
 	}
 	
 	static public GeniiFuseConnection mountGenesisII(
-		File mountpoint, String []additionalArguments, int uid)
+		File mountpoint, String []additionalArguments, int uid, boolean daemon)
 		throws IOException, RemoteException, RNSException, 
 			GeneralSecurityException
 	{
-		return mountGenesisII(mountpoint, additionalArguments, null, null, uid);
+		return mountGenesisII(mountpoint, additionalArguments,
+			null, null, uid, daemon);
 	}
 	
 	static public void unmountGenesisII(

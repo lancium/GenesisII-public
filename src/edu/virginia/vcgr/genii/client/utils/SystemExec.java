@@ -15,7 +15,10 @@ public class SystemExec
 {
 	static public File findExecutableInPath(String executableName)
 	{
-		String path = System.getenv(executableName);
+		String path = System.getenv("PATH");
+		if (path == null)
+			return null;
+		
 		for (String pathElement : path.split(
 			Pattern.quote(File.pathSeparator)))
 		{

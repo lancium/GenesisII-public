@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsdl:JobDefinition xmlns="http://www.example.org/"
+	xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
+	xmlns:jsdl-posix="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"
+	xmlns:ogrsh="http://vcgr.cs.virginia.edu/ogrsh"
+	xmlns:gfuse="http://vcgr.cs.virginia.edu/gfuse"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	
+	<jsdl:JobDescription>
+		<jsdl:JobIdentification>
+			<jsdl:JobName>FUSE ls</jsdl:JobName>
+		</jsdl:JobIdentification>
+		
+		<jsdl:Application>
+			<jsdl:ApplicationName>fuse</jsdl:ApplicationName>
+			<jsdl-posix:POSIXApplication>
+				<jsdl-posix:Executable>
+					/bin/ls
+				</jsdl-posix:Executable>
+				<jsdl-posix:Output>stdout</jsdl-posix:Output>
+				<jsdl-posix:Error>stderr</jsdl-posix:Error>
+				<jsdl-posix:Argument>-la</jsdl-posix:Argument>
+				<jsdl-posix:Argument>mnt</jsdl-posix:Argument>
+			</jsdl-posix:POSIXApplication>
+		</jsdl:Application>
+
+		<jsdl:Resources>
+			<gfuse:FuseDirectory>mnt</gfuse:FuseDirectory>
+		</jsdl:Resources>
+
+		<jsdl:DataStaging>
+			<jsdl:FileName>stdout</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Target>
+				<jsdl:URI>rns:ogrsh-out.txt</jsdl:URI>
+			</jsdl:Target>
+		</jsdl:DataStaging>
+
+		<jsdl:DataStaging>
+			<jsdl:FileName>stderr</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Target>
+				<jsdl:URI>rns:ogrsh-err.txt</jsdl:URI>
+			</jsdl:Target>
+		</jsdl:DataStaging>
+
+		<jsdl:DataStaging>
+			<jsdl:FileName>stdout</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Target>
+				<jsdl:URI>mailto:mmm2a@cs.virginia.edu?subject=jobOutput&amp;X-AttachmentFilename=stdout.txt</jsdl:URI>
+			</jsdl:Target>
+		</jsdl:DataStaging>
+	</jsdl:JobDescription>
+	
+</jsdl:JobDefinition>
