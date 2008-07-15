@@ -124,6 +124,7 @@ public class ForkExecUnderstanding implements Application
 		DeploymentName depName = deployment.getName();
 		_logger.debug("Setting deployment name to \"" + depName + "\".");
 		_environment.put("GENII_DEPLOYMENT_NAME", depName.toString());
+		_environment.put("GENII_USER_DIR", ".genesisII-bes-state");
 		
 		if (ogrshVersion == null)
 		{
@@ -200,6 +201,7 @@ public class ForkExecUnderstanding implements Application
 		DeploymentName depName = deployment.getName();
 		_logger.debug("Setting deployment name to \"" + depName + "\".");
 		_environment.put("GENII_DEPLOYMENT_NAME", depName.toString());
+		_environment.put("GENII_USER_DIR", ".genesisII-bes-state");
 		
 		if (ogrshVersion == null)
 		{

@@ -4,6 +4,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 
+import edu.virginia.vcgr.fuse.FuseUtils;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLMatchException;
@@ -14,6 +15,8 @@ public class SEResourcesFacet extends DefaultResourcesFacet
 {
 	static public final QName OGRSH_VERSION_QNAME = new QName(
 		OGRSHConstants.OGRSH_NS, "OGRSHVersion");
+	static public final QName FUSE_DIRECTORY_QNAME = new QName(
+		"http://vcgr.cs.virginia.edu/gfuse", "FuseDirectory");
 	
 	@Override
 	public void consumeAny(Object currentUnderstanding, MessageElement any)
@@ -35,6 +38,16 @@ public class SEResourcesFacet extends DefaultResourcesFacet
 			}
 			
 			throw new JSDLMatchException(name);
+		} else if (name.equals(FUSE_DIRECTORY_QNAME))
+		{
+			String fuseDirectory = any.getValue();
+			String msg = FuseUtils.supportsFuse();
+			if (msg != null)
+				throw new JSDLException(
+					"Fuse is not supported on this system:  " +
+					msg);
+			((SimpleExecutionUnderstanding)
+				currentUnderstanding).setFuseDirectory(fuseDirectory);
 		} else
 			super.consumeAny(currentUnderstanding, any);
 	}

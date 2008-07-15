@@ -8,10 +8,13 @@ import java.util.Vector;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.CleanupPhase;
+import edu.virginia.vcgr.genii.container.bes.execution.phases.SetupContextDirectoryPhase;
+import edu.virginia.vcgr.genii.container.bes.execution.phases.SetupFUSEPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.SetupOGRSHPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.StageInPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.StageOutPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.StoreContextPhase;
+import edu.virginia.vcgr.genii.container.bes.execution.phases.TeardownFUSEPhase;
 
 public class SimpleExecutionUnderstanding
 {
@@ -25,6 +28,8 @@ public class SimpleExecutionUnderstanding
 		new LinkedList<DataStagingUnderstanding>();
 	
 	private String _requiredOGRSHVersion = null;
+	private String _fuseDirectory = null;
+	
 	private Application _application = null;
 	
 	public void setJobName(String jobName)
@@ -59,6 +64,11 @@ public class SimpleExecutionUnderstanding
 		_requiredOGRSHVersion = version;
 	}
 	
+	public void setFuseDirectory(String fuseDirectory)
+	{
+		_fuseDirectory = fuseDirectory;
+	}
+	
 	public String getWorkingDirectory()
 	{
 		return _application.getWorkingDirectory();
@@ -78,6 +88,15 @@ public class SimpleExecutionUnderstanding
 			
 			if (stage.isDeleteOnTerminate())
 				cleanups.add(new CleanupPhase(stage.getFilename()));
+		}
+		
+		ret.add(new SetupContextDirectoryPhase(".genesisII-bes-state"));
+		cleanups.add(new CleanupPhase(".genesisII-bes-state"));
+		
+		if (_fuseDirectory != null)
+		{
+			ret.add(new SetupFUSEPhase(_fuseDirectory));
+			cleanups.add(new TeardownFUSEPhase(_fuseDirectory));
 		}
 		
 		if (_requiredOGRSHVersion != null)

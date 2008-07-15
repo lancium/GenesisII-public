@@ -447,7 +447,7 @@ public class BESActivity implements Closeable
 			{
 				return _activityCWD;
 			}
-
+			
 			@Override
 			public Serializable getProperty(String name)
 					throws ExecutionException

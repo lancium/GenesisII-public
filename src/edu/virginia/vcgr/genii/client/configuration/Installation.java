@@ -2,6 +2,10 @@ package edu.virginia.vcgr.genii.client.configuration;
 
 import java.io.File;
 
+import org.morgan.util.configuration.ConfigurationException;
+
+import edu.virginia.vcgr.genii.container.sysinfo.SupportedOperatingSystems;
+
 public class Installation
 {
 	/// System property to indicate the installtion location 
@@ -71,5 +75,25 @@ public class Installation
 		
 		_ogrsh = new OGRSH(
 			new File(_installationDirectory, OGRSH_DIRECTORY_NAME));
+	}
+	
+	static public File getGridCommand()
+	{
+		File ret;
+		SupportedOperatingSystems os = SupportedOperatingSystems.current();
+		
+		if (os.equals(SupportedOperatingSystems.LINUX))
+			ret = new File(_installationDirectory, "grid");
+		else
+			ret = new File(_installationDirectory, "grid.bat");
+		
+		if (!ret.exists())
+			throw new ConfigurationException("Unable to locate grid command.");
+		if (!ret.canExecute())
+			throw new ConfigurationException(String.format(
+				"Grid command \"%s\" is not executable.", 
+				ret.getAbsolutePath()));
+		
+		return ret;
 	}
 }

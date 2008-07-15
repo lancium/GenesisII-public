@@ -27,6 +27,20 @@ public class CleanupPhase extends AbstractExecutionPhase
 		_fileToCleanup = fileToCleanup;
 	}
 	
+	private void removeFile(File f)
+	{
+		if (f.exists())
+		{
+			if (f.isDirectory())
+			{
+				for (File ff : f.listFiles())
+					removeFile(ff);
+			}
+			
+			f.delete();
+		}
+	}
+	
 	@Override
 	public void execute(ExecutionContext context) throws Throwable
 	{
@@ -34,7 +48,7 @@ public class CleanupPhase extends AbstractExecutionPhase
 		{
 			File file = new File(context.getCurrentWorkingDirectory(), 
 				_fileToCleanup);
-			file.delete();
+			removeFile(file);
 		}
 		catch (Throwable cause)
 		{

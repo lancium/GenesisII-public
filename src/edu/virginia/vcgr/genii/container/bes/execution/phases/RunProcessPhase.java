@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.container.bes.execution.phases;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -74,6 +75,9 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 			
 			ProcessBuilder builder = new ProcessBuilder(command);
 			builder.directory(context.getCurrentWorkingDirectory());
+			if (_environment == null)
+				_environment = new HashMap<String, String>();
+			
 			if (_environment != null)
 			{
 				String ogrshConfig = _environment.get("OGRSH_CONFIG");
@@ -82,6 +86,15 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 					File f = new File(context.getCurrentWorkingDirectory(), ogrshConfig);
 					_environment.put("OGRSH_CONFIG", f.getAbsolutePath());
 				}
+				
+				String geniiUserDir = _environment.get("GENII_USER_DIR");
+				if (geniiUserDir != null && !geniiUserDir.startsWith("/"))
+				{
+					File f = new File(context.getCurrentWorkingDirectory(), 
+						geniiUserDir);
+					_environment.put("GENII_USER_DIR", f.getAbsolutePath());
+				}
+				
 				overloadEnvironment(builder.environment(), _environment);
 			}
 			resetCommand(builder);
