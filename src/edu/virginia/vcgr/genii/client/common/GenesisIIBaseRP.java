@@ -2,7 +2,9 @@ package edu.virginia.vcgr.genii.client.common;
 
 import javax.xml.namespace.QName;
 
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.rp.ResourceProperty;
+import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.common.security.AuthZConfig;
 
 public interface GenesisIIBaseRP
@@ -23,4 +25,16 @@ public interface GenesisIIBaseRP
 		namespace = AUTHZ_CONFIG_NAMESPACE,
 		localname = AUTHZ_CONFIG_NAME)
 	public void setAuthZConfig(AuthZConfig config);
+	
+	@ResourceProperty(
+		namespace = GenesisIIConstants.GENESISII_NS,
+		localname = GenesisIIConstants.CACHE_COHERENCE_WINDOW_ATTR_NAME,
+		translator = DurationTranslator.class)
+	public Duration getCacheCoherenceWindow();
+	
+	@ResourceProperty(
+		namespace = GenesisIIConstants.GENESISII_NS,
+		localname = GenesisIIConstants.CACHE_COHERENCE_WINDOW_ATTR_NAME,
+		translator = DurationTranslator.class)
+	public void setCacheCoherenceWindow(Duration aDur);
 }

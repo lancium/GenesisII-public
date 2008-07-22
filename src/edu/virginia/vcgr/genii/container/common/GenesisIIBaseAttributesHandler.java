@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.container.common;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -18,6 +19,7 @@ import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.AuthZSecurityException;
+import edu.virginia.vcgr.genii.client.utils.units.Duration;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.security.AuthZConfig;
@@ -129,6 +131,42 @@ public class GenesisIIBaseAttributesHandler
 			OGSAWSRFBPConstants.RESOURCE_ENDPOINT_REFERENCE_ATTR_QNAME, epr);
 	}
 	
+	public MessageElement getCacheCoherenceWindow()
+		throws RemoteException
+	{
+		Duration gDur = _baseService.getCacheCoherenceWindow();
+		if (gDur != null)
+		{
+			return new MessageElement(
+				GenesisIIConstants.CACHE_COHERENCE_WINDOW_ATTR_QNAME,
+				gDur.toApacheDuration());
+		} else
+			return null;
+	}
+	
+	public void setCacheCoherenceWindow(MessageElement mel)
+		throws RemoteException
+	{
+		Duration gDur = null;
+		if (mel != null)
+		{
+			try
+			{
+				org.apache.axis.types.Duration aDur =
+					(org.apache.axis.types.Duration)mel.getObjectValue(
+						org.apache.axis.types.Duration.class);
+				gDur = Duration.fromApacheDuration(aDur);
+			}
+			catch (Exception e)
+			{
+				throw new ResourceException(
+					"Unable to set cache coherence window.", e);
+			}
+		}
+		
+		_baseService.setCacheCoherenceWindow(gDur);
+	}
+	
 	public MessageElement getAuthZConfig()
 			throws ResourceUnknownFaultType, ResourceException, AuthZSecurityException
 	{
@@ -234,5 +272,9 @@ public class GenesisIIBaseAttributesHandler
 		addHandler(
 			OGSAWSRFBPConstants.RESOURCE_PROPERTY_NAMES_ATTR_QNAME,
 			"getResourcePropertyNames");
+		
+		addHandler(
+			GenesisIIConstants.CACHE_COHERENCE_WINDOW_ATTR_QNAME,
+			"getCacheCoherenceWindow", "setCacheCoherenceWindow");
 	}
 }

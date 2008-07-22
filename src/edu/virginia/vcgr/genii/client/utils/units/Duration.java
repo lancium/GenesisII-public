@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.utils.units;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.regex.Matcher;
@@ -13,8 +14,25 @@ import java.util.regex.Pattern;
  * 
  * @author mmm2a
  */
-public class Duration
+public class Duration implements Serializable
 {
+	static final long serialVersionUID = 0L;
+	
+	static private final long MILLISECONDS_PER_YEAR = 
+		365 * 24 * 60 * 60 * 1000L;
+	static private final long MILLISECONDS_PER_MONTH =
+		30 * 24 * 60 * 60 * 1000L;
+	static private final long MILLISECONDS_PER_WEEK =
+		7 * 24 * 60 * 60 * 1000L;
+	static private final long MILLISECONDS_PER_DAY =
+		24 * 60 * 60 * 1000L;
+	static private final long MILLISECONDS_PER_HOUR =
+		60 * 60 * 1000L;
+	static private final long MILLISECONDS_PER_MINUTE =
+		60 * 1000L;
+	static private final long MILLISECONDS_PER_SECOND =
+		1000L;
+	
 	static private HashMap<String, Long> _milliSecondMap;
 	
 	static
@@ -26,43 +44,43 @@ public class Duration
 		_milliSecondMap = new HashMap<String, Long>();
 		Long value;
 		
-		value = new Long(365 * 24 * 60 * 60 * 1000L);
+		value = new Long(MILLISECONDS_PER_YEAR);
 		_milliSecondMap.put("year", value);
 		_milliSecondMap.put("years", value);
 		_milliSecondMap.put("yr", value);
 		_milliSecondMap.put("yrs", value);
 		_milliSecondMap.put("y", value);
 		
-		value = new Long(30 * 24 * 60 * 60 * 1000L);
+		value = new Long(MILLISECONDS_PER_MONTH);
 		_milliSecondMap.put("month", value);
 		_milliSecondMap.put("months", value);
 		
-		value = new Long(7 * 24 * 60 * 60 * 1000L);
+		value = new Long(MILLISECONDS_PER_WEEK);
 		_milliSecondMap.put("week", value);
 		_milliSecondMap.put("weeks", value);
 		_milliSecondMap.put("wks", value);
 		_milliSecondMap.put("w", value);
 		
-		value = new Long(24 * 60 * 60 * 1000L);
+		value = new Long(MILLISECONDS_PER_DAY);
 		_milliSecondMap.put("day", value);
 		_milliSecondMap.put("days", value);
 		_milliSecondMap.put("d", value);
 		
-		value = new Long(60 * 60 * 1000L);
+		value = new Long(MILLISECONDS_PER_HOUR);
 		_milliSecondMap.put("hour", value);
 		_milliSecondMap.put("hours", value);
 		_milliSecondMap.put("hrs", value);
 		_milliSecondMap.put("hr", value);
 		_milliSecondMap.put("h", value);
 		
-		value = new Long(60 * 1000L);
+		value = new Long(MILLISECONDS_PER_MINUTE);
 		_milliSecondMap.put("minute", value);
 		_milliSecondMap.put("minutes", value);
 		_milliSecondMap.put("min", value);
 		_milliSecondMap.put("mins", value);
 		_milliSecondMap.put("m", value);
 		
-		value = new Long(1000L);
+		value = new Long(MILLISECONDS_PER_SECOND);
 		_milliSecondMap.put("second", value);
 		_milliSecondMap.put("seconds", value);
 		_milliSecondMap.put("sec", value);
@@ -99,6 +117,61 @@ public class Duration
 	public long getMilliseconds()
 	{
 		return _milliseconds;
+	}
+	
+	public org.apache.axis.types.Duration toApacheDuration()
+	{
+		int years;
+		int days;
+		int hours;
+		int minutes;
+		int seconds;
+		
+		long millis = _milliseconds;
+		years = (int)(millis / MILLISECONDS_PER_YEAR);
+		millis %= MILLISECONDS_PER_YEAR;
+		
+		days = (int)(millis / MILLISECONDS_PER_DAY);
+		millis %= MILLISECONDS_PER_DAY;
+		
+		hours = (int)(millis/ MILLISECONDS_PER_HOUR);
+		millis %= MILLISECONDS_PER_HOUR;
+		
+		minutes = (int)(millis / MILLISECONDS_PER_MINUTE);
+		millis %= MILLISECONDS_PER_MINUTE;
+		
+		seconds = (int)(millis / MILLISECONDS_PER_SECOND);
+		
+		return new org.apache.axis.types.Duration(
+			false, years, 0, days, hours, minutes, seconds);
+	}
+	
+	@Override
+	public String toString()
+	{
+		int years;
+		int days;
+		int hours;
+		int minutes;
+		int seconds;
+		
+		long millis = _milliseconds;
+		years = (int)(millis / MILLISECONDS_PER_YEAR);
+		millis %= MILLISECONDS_PER_YEAR;
+		
+		days = (int)(millis / MILLISECONDS_PER_DAY);
+		millis %= MILLISECONDS_PER_DAY;
+		
+		hours = (int)(millis/ MILLISECONDS_PER_HOUR);
+		millis %= MILLISECONDS_PER_HOUR;
+		
+		minutes = (int)(millis / MILLISECONDS_PER_MINUTE);
+		millis %= MILLISECONDS_PER_MINUTE;
+		
+		seconds = (int)(millis / MILLISECONDS_PER_SECOND);
+	
+		return String.format("%d years, %d days, %d hours, %d minutes, %d seconds", 
+			years, days, hours, minutes, seconds);
 	}
 	
 	static private Pattern _NUMBER_ONLY = Pattern.compile("^\\d+$");
@@ -165,6 +238,22 @@ public class Duration
 		}
 		
 		return new Duration(total);
+	}
+	
+	static public Duration fromApacheDuration(
+		org.apache.axis.types.Duration aDur)
+	{
+		if (aDur == null)
+			return null;
+		
+		long millis = aDur.getYears() * MILLISECONDS_PER_YEAR;
+		millis += aDur.getMonths() * MILLISECONDS_PER_MONTH;
+		millis += aDur.getDays() * MILLISECONDS_PER_DAY;
+		millis += aDur.getHours() * MILLISECONDS_PER_HOUR;
+		millis += aDur.getMinutes() * MILLISECONDS_PER_MINUTE;
+		millis += aDur.getSeconds() * MILLISECONDS_PER_SECOND;
+		
+		return new Duration(millis);
 	}
 	
 	static public void main(String []args) throws Throwable

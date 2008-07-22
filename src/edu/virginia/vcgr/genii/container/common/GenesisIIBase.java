@@ -29,7 +29,6 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.axis.message.MessageElement;
-import org.apache.axis.types.Duration;
 import org.apache.axis.types.Token;
 import org.apache.axis.types.URI;
 import org.apache.axis.types.UnsignedInt;
@@ -137,6 +136,7 @@ import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.client.utils.creation.CreationProperties;
+import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
 import edu.virginia.vcgr.genii.iterator.IteratorInitializationType;
 import edu.virginia.vcgr.genii.iterator.IteratorMemberType;
@@ -250,6 +250,11 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 			resource.setProperty(
 					IResource.SCHEDULED_TERMINATION_TIME_PROPERTY_NAME, termTime);
 		}
+		
+		Duration gDur = getInitialCacheCoherenceWindow();
+		if (gDur != null)
+			resource.setProperty(
+				IResource.CACHE_COHERENCE_WINDOW_PROPERTY, gDur);
 	}
 	
 	static protected Calendar getScheduledTerminationTime()
@@ -984,7 +989,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 			UnableToSetTerminationTimeFaultType, ResourceUnavailableFaultType,
 			TerminationTimeChangeRejectedFaultType
 	{
-		Duration duration = setTerminationTimeRequest.getRequestedLifetimeDuration();
+		org.apache.axis.types.Duration duration = 
+			setTerminationTimeRequest.getRequestedLifetimeDuration();
 		Calendar c = setTerminationTimeRequest.getRequestedTerminationTime();
 		
 		if (c == null)
@@ -1220,5 +1226,31 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 			
 			manip.setAttributeValues(newAttrs);
 		}
+	}
+	
+	protected Duration getInitialCacheCoherenceWindow()
+	{
+		return new Duration(0L);
+	}
+	
+	public Duration getCacheCoherenceWindow()
+		throws ResourceException, RemoteException
+	{
+		IResource resource = 
+			ResourceManager.getCurrentResource().dereference();
+		Duration gDur = (Duration)resource.getProperty(
+			IResource.CACHE_COHERENCE_WINDOW_PROPERTY);
+		if (gDur == null)
+			gDur = getInitialCacheCoherenceWindow();
+		return gDur;
+	}
+	
+	public void setCacheCoherenceWindow(Duration duration)
+		throws ResourceException, RemoteException
+	{
+		IResource resource = 
+			ResourceManager.getCurrentResource().dereference();
+		resource.setProperty(
+			IResource.CACHE_COHERENCE_WINDOW_PROPERTY, duration);
 	}
 }

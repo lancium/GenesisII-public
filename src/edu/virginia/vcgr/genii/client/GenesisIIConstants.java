@@ -24,6 +24,10 @@ public class GenesisIIConstants
 	static public final String AUTHZ_CONFIG_ATTR =
 		AUTHZ_CONFIG_ATTR_QNAME.getLocalPart();
 	
+	static public final String CACHE_COHERENCE_WINDOW_ATTR_NAME = "CacheCoherenceWindow";
+	static public QName CACHE_COHERENCE_WINDOW_ATTR_QNAME =
+		new QName(GENESISII_NS, CACHE_COHERENCE_WINDOW_ATTR_NAME);
+	
 	static public final String SCHED_TERM_TIME_PROPERTY_NAME =
 		"scheduled-termintation-time";
 	

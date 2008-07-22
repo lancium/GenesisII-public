@@ -34,6 +34,8 @@ public interface IResource extends Closeable
 		"genesisII.resource.property.sched-term-time";
 	static public final String TERM_TIME_ALARM =
 		"genesisII.resource.term-time-alarm";
+	static public final String CACHE_COHERENCE_WINDOW_PROPERTY =
+		"genesisII.resource.cache-coherence-window";
 
 	
 	static public final QName CERTIFICATE_CHAIN_CONSTRUCTION_PARAM =
