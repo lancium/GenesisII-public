@@ -61,8 +61,9 @@ import edu.virginia.vcgr.genii.container.bes.BES;
 import edu.virginia.vcgr.genii.container.bes.BESUtilities;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivityUtils.BESActivityInitInfo;
 import edu.virginia.vcgr.genii.container.bes.activity.resource.IBESActivityResource;
-import edu.virginia.vcgr.genii.container.bes.jsdl.personality.simpleexec.SimpleExecutionPersonalityProvider;
-import edu.virginia.vcgr.genii.container.bes.jsdl.personality.simpleexec.SimpleExecutionUnderstanding;
+import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.CommonExecutionUnderstanding;
+import edu.virginia.vcgr.genii.container.bes.jsdl.personality.forkexec.ForkExecPersonalityProvider;
+import edu.virginia.vcgr.genii.container.bes.jsdl.personality.qsub.QSubPersonalityProvider;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.common.SByteIOFactory;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
@@ -114,12 +115,31 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 		try
 		{
 			JobDefinition_Type jsdl = initInfo.getJobDefinition();
+			CommonExecutionUnderstanding executionUnderstanding;
 			
-			Object understanding = JSDLInterpreter.interpretJSDL(
-				new SimpleExecutionPersonalityProvider(), jsdl);
-			SimpleExecutionUnderstanding seUnderstanding =
-				(SimpleExecutionUnderstanding)understanding;
-				
+			if (creationProperties != null && 
+				creationProperties.getProperty(
+					GeniiBESConstants.NATIVEQ_PROVIDER_PROPERTY) != null)
+			{
+				Object understanding = JSDLInterpreter.interpretJSDL(
+					new QSubPersonalityProvider(), jsdl);
+				executionUnderstanding = 
+					(CommonExecutionUnderstanding)understanding;
+			} else
+			{
+				Object understanding = JSDLInterpreter.interpretJSDL(
+					new ForkExecPersonalityProvider(), jsdl);
+				executionUnderstanding = 
+					(CommonExecutionUnderstanding)understanding;
+			}
+			
+			String fuseMountDirectory = 
+				executionUnderstanding.getFuseMountDirectory();
+			
+			if (fuseMountDirectory != null)
+				resource.setProperty(IBESActivityResource.FUSE_MOUNT_PROPERTY,
+					fuseMountDirectory);	
+			
 			BES bes = BES.getBES(initInfo.getContainerID());
 			if (bes == null)
 				throw FaultManipulator.fillInFault(
@@ -132,10 +152,10 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 			bes.createActivity(
 				resource.getKey().toString(), jsdl,	owners, 
 				ContextManager.getCurrentContext(), 
-				chooseDirectory(seUnderstanding, creationParameters, 5),
-				seUnderstanding.createExecutionPlan(
+				chooseDirectory(executionUnderstanding, creationParameters, 5),
+				executionUnderstanding.createExecutionPlan(
 					creationProperties),
-				activityEPR, activityServiceName, seUnderstanding.getJobName());
+				activityEPR, activityServiceName, executionUnderstanding.getJobName());
 		}
 		catch (IOException fnfe)
 		{
@@ -152,7 +172,7 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 	}
 	
 	static private File chooseDirectory(
-		SimpleExecutionUnderstanding understanding,
+		CommonExecutionUnderstanding understanding,
 		HashMap<QName, Object> creationParameters, 
 		int attempts) throws ResourceException
 	{

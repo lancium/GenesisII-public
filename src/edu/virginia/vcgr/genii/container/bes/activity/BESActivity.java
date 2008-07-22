@@ -23,6 +23,9 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.postlog.JobEvent;
+import edu.virginia.vcgr.genii.client.postlog.PostTarget;
+import edu.virginia.vcgr.genii.client.postlog.PostTargets;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.Identity;
@@ -59,7 +62,7 @@ public class BESActivity implements Closeable
 	private ActivityRunner _runner;
 	
 	public BESActivity(DatabaseConnectionPool connectionPool,
-		BES bes, String activityid, 
+		BES bes, String activityid,
 		ActivityState state, File activityCWD, 
 		Vector<ExecutionPhase> executionPlan, int nextPhase, 
 		String activityServiceName, String jobName,
@@ -330,6 +333,19 @@ public class BESActivity implements Closeable
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException("Unable to update database.");
 			connection.commit();
+			
+			PostTarget pt = PostTargets.poster();
+			
+			if (state.isCancelledState())
+			{
+				pt.post(JobEvent.activityTerminated(null, _activityid));
+			} else if (state.isFailedState())
+			{
+				pt.post(JobEvent.activityFailed(null, _activityid));
+			} else if (state.isFinishedState())
+			{
+				pt.post(JobEvent.activityFinished(null, _activityid));
+			}
 			
 			_nextPhase = nextPhase;
 			_state = state;

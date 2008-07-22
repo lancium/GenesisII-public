@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.genii.container.bes.jsdl.personality.simpleexec;
+package edu.virginia.vcgr.genii.container.bes.jsdl.personality.common;
 
 import javax.xml.namespace.QName;
 
@@ -11,7 +11,7 @@ import edu.virginia.vcgr.genii.client.jsdl.JSDLMatchException;
 import edu.virginia.vcgr.genii.client.jsdl.personality.def.DefaultResourcesFacet;
 import edu.virginia.vcgr.genii.container.bes.OGRSHConstants;
 
-public class SEResourcesFacet extends DefaultResourcesFacet
+public class CommonResourcesFacet extends DefaultResourcesFacet
 {
 	static public final QName OGRSH_VERSION_QNAME = new QName(
 		OGRSHConstants.OGRSH_NS, "OGRSHVersion");
@@ -20,18 +20,18 @@ public class SEResourcesFacet extends DefaultResourcesFacet
 	
 	@Override
 	public void consumeAny(Object currentUnderstanding, MessageElement any)
-			throws JSDLException
+		throws JSDLException
 	{
 		QName name = any.getQName();
 		if (name.equals(OGRSH_VERSION_QNAME))
 		{
 			String version = any.getValue();
-			for (String acceptedVersion : 
+			for (String acceptedVersion :
 				Installation.getOGRSH().getInstalledVersions().keySet())
 			{
 				if (version.equals(acceptedVersion))
 				{
-					((SimpleExecutionUnderstanding)
+					((CommonExecutionUnderstanding)
 						currentUnderstanding).setRequiredOGRSHVersion(version);
 					return;
 				}
@@ -44,10 +44,9 @@ public class SEResourcesFacet extends DefaultResourcesFacet
 			String msg = FuseUtils.supportsFuse();
 			if (msg != null)
 				throw new JSDLException(
-					"Fuse is not supported on this system:  " +
-					msg);
-			((SimpleExecutionUnderstanding)
-				currentUnderstanding).setFuseDirectory(fuseDirectory);
+					"Fuse is not supported on this system:  " + msg);
+			((CommonExecutionUnderstanding)
+				currentUnderstanding).setFuseMountDirectory(fuseDirectory);
 		} else
 			super.consumeAny(currentUnderstanding, any);
 	}

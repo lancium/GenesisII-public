@@ -22,6 +22,8 @@ import org.ggf.bes.factory.UnknownActivityIdentifierFaultType;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 
+import edu.virginia.vcgr.genii.client.postlog.JobEvent;
+import edu.virginia.vcgr.genii.client.postlog.PostTargets;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.bes.BES;
 import edu.virginia.vcgr.genii.container.bes.BESUtilities;
@@ -38,6 +40,7 @@ public class DBBESActivityResource extends BasicDBResource implements
 	@Override
 	public void destroy() throws ResourceException
 	{
+		String fuseMountDirString = (String)getProperty(FUSE_MOUNT_PROPERTY);
 		super.destroy();
 		
 		BES bes = BES.findBESForActivity(_resourceKey);
@@ -47,12 +50,28 @@ public class DBBESActivityResource extends BasicDBResource implements
 		BESActivity activity = bes.findActivity(_resourceKey);
 		
 		File dir = activity.getActivityCWD();
-		if (BESUtilities.isDeletable(dir))
-			recursiveDelete(dir);
 		
+		if (fuseMountDirString != null)
+		{
+			File f;
+			if (fuseMountDirString.startsWith("/"))
+				f = new File(fuseMountDirString);
+			else
+				f = new File(dir, fuseMountDirString);
+			
+			File[] entries = f.listFiles();
+			if (entries == null || entries.length == 0)
+			{
+				if (BESUtilities.isDeletable(dir))
+					recursiveDelete(dir);				
+			}
+		}
+	
 		try
 		{
 			bes.deleteActivity(_resourceKey);
+			PostTargets.poster().post(JobEvent.activityDeleted(
+				null, _resourceKey));
 		}
 		catch (UnknownActivityIdentifierFaultType uaift)
 		{

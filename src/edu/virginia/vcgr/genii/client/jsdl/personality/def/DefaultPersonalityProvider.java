@@ -15,6 +15,7 @@ import edu.virginia.vcgr.genii.client.jsdl.personality.OperatingSystemTypeFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.POSIXApplicationFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.PersonalityProvider;
 import edu.virginia.vcgr.genii.client.jsdl.personality.ResourcesFacet;
+import edu.virginia.vcgr.genii.client.jsdl.personality.SPMDApplicationFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.SourceURIFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.TargetURIFacet;
 
@@ -66,6 +67,13 @@ public class DefaultPersonalityProvider implements PersonalityProvider
 			Object currentUnderstanding) throws JSDLException
 	{
 		return new DefaultHPCApplicationFacet();
+	}
+	
+	@Override
+	public SPMDApplicationFacet getSPMDApplicationFacet(
+		Object currentUnderstanding) throws JSDLException
+	{
+		return new DefaultSPMDApplicationFacet();
 	}
 
 	@Override

@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.virginia.vcgr.genii.client.utils.SystemExec;
+import edu.virginia.vcgr.genii.client.utils.exec.ExecutionEngine;
 
 class LinuxMachineInterrogator extends CommonMachineInterrogator
 {
@@ -45,7 +45,7 @@ class LinuxMachineInterrogator extends CommonMachineInterrogator
 	{
 		TreeSet<String> ret = new TreeSet<String>();
 		
-		for (String line : SystemExec.executeForMultiLineOutput("who"))
+		for (String line : ExecutionEngine.simpleMultilineExecute("who"))
 		{
 			Matcher matcher = _WHO_PATTERN.matcher(line);
 			if (!matcher.matches())

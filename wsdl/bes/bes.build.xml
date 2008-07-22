@@ -32,6 +32,7 @@
 					<include name="jsdl.xsd"/>
 					<include name="jsdl-hpcp.xsd"/>
 					<include name="jsdl-posix.xsd"/>
+					<include name="jsdl-spmd.xsd"/>
 				</srcfiles>
 			</uptodate>
 		</and>
@@ -51,6 +52,7 @@
 				<include name="jsdl.xsd"/>
 				<include name="jsdl-hpcp.xsd"/>
 				<include name="jsdl-posix.xsd"/>
+				<include name="jsdl-spmd.xsd"/>
 			</fileset>
 			<fileset dir="${wsdl.dir}/rns">
 				<include name="rns.xsd"/>

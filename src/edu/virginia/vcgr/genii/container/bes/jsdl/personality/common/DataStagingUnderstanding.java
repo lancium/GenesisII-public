@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.genii.container.bes.jsdl.personality.simpleexec;
+package edu.virginia.vcgr.genii.container.bes.jsdl.personality.common;
 
 import java.net.URI;
 

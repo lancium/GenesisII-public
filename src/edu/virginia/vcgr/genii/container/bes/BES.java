@@ -29,6 +29,8 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.postlog.JobEvent;
+import edu.virginia.vcgr.genii.client.postlog.PostTargets;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.Identity;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
@@ -267,7 +269,8 @@ public class BES implements Closeable
         return suggestedJobName;
 	}
 	
-	synchronized public BESActivity createActivity(String activityid,
+	synchronized public BESActivity createActivity(
+		String activityid,
 		JobDefinition_Type jsdl, Collection<Identity> owners,
 		ICallingContext callingContext, File activityCWD,
 		Vector<ExecutionPhase> executionPlan, 
@@ -311,6 +314,10 @@ public class BES implements Closeable
 				throw new SQLException(
 					"Unable to update database for bes activity creation.");
 			connection.commit();
+			
+			PostTargets.poster().post(
+				JobEvent.activityCreated(callingContext,
+				activityid));
 			
 			BESActivity activity = new BESActivity(_connectionPool, 
 				this, activityid, state, activityCWD, executionPlan,

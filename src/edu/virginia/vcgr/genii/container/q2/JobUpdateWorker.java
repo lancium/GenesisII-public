@@ -10,6 +10,8 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
+import edu.virginia.vcgr.genii.client.postlog.JobEvent;
+import edu.virginia.vcgr.genii.client.postlog.PostTargets;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 
 /**
@@ -90,15 +92,22 @@ public class JobUpdateWorker implements Runnable
 				if (state.isFailedState())
 				{
 					/* If the job failed in the BES, fail it in the queue */
-					_jobManager.failJob(connection, _jobInfo.getJobID(), true);
+					if (!_jobManager.failJob(connection, _jobInfo.getJobID(), true))
+						PostTargets.poster().post(
+							JobEvent.jobFailed(null, 
+								Long.toString(_jobInfo.getJobID())));
 				} else if (state.isCancelledState())
 				{
 					/* If the job was cancelled, then finish it here */
 					_jobManager.failJob(connection, _jobInfo.getJobID(), false);
+					PostTargets.poster().post(JobEvent.jobKilled(null,
+						Long.toString(_jobInfo.getJobID())));
 				} else if (state.isFinishedState())
 				{
 					/* If the job finished on the bes, finish it here */
 					_jobManager.finishJob(connection, _jobInfo.getJobID());
+					PostTargets.poster().post(JobEvent.jobFinished(null,
+						Long.toString(_jobInfo.getJobID())));
 				}
 			}
 		}

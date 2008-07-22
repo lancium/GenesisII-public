@@ -1,5 +1,6 @@
-package edu.virginia.vcgr.genii.container.bes.jsdl.personality.simpleexec;
+package edu.virginia.vcgr.genii.container.bes.jsdl.personality.common;
 
+import java.net.URI;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Properties;
@@ -16,9 +17,9 @@ import edu.virginia.vcgr.genii.container.bes.execution.phases.StageOutPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.StoreContextPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.TeardownFUSEPhase;
 
-public class SimpleExecutionUnderstanding
+public class CommonExecutionUnderstanding
 {
-	private String _jobName = null;
+	private String _jobName;
 	
 	private Collection<DataStagingUnderstanding> _stageIns =
 		new LinkedList<DataStagingUnderstanding>();
@@ -30,7 +31,7 @@ public class SimpleExecutionUnderstanding
 	private String _requiredOGRSHVersion = null;
 	private String _fuseDirectory = null;
 	
-	private Application _application = null;
+	private ApplicationUnderstanding _application = null;
 	
 	public void setJobName(String jobName)
 	{
@@ -42,19 +43,32 @@ public class SimpleExecutionUnderstanding
 		return _jobName;
 	}
 	
+	public void setFuseMountDirectory(String fuseDirectory)
+	{
+		_fuseDirectory = fuseDirectory;
+	}
+	
+	public String getFuseMountDirectory()
+	{
+		return _fuseDirectory;
+	}
+	
 	public void addDataStaging(DataStagingUnderstanding stage)
 	{
-		if (stage.getSourceURI() != null)
+		URI source = stage.getSourceURI();
+		URI target = stage.getTargetURI();
+		
+		if (source != null)
 			_stageIns.add(stage);
-		if (stage.getTargetURI() != null)
+		if (target != null)
 			_stageOuts.add(stage);
 		
-		if (stage.getSourceURI() == null && stage.getTargetURI() == null &&
+		if ( (source == null) && (target == null) && 
 			stage.isDeleteOnTerminate())
 			_pureCleans.add(stage);
 	}
 	
-	public void setApplication(Application application)
+	public void setApplication(ApplicationUnderstanding application)
 	{
 		_application = application;
 	}
@@ -64,13 +78,16 @@ public class SimpleExecutionUnderstanding
 		_requiredOGRSHVersion = version;
 	}
 	
-	public void setFuseDirectory(String fuseDirectory)
+	public String getRequiredOGRSHVersion()
 	{
-		_fuseDirectory = fuseDirectory;
+		return _requiredOGRSHVersion;
 	}
 	
 	public String getWorkingDirectory()
 	{
+		if (_application == null)
+			return null;
+		
 		return _application.getWorkingDirectory();
 	}
 	
@@ -83,7 +100,7 @@ public class SimpleExecutionUnderstanding
 		for (DataStagingUnderstanding stage : _stageIns)
 		{
 			ret.add(new StageInPhase(
-				stage.getSourceURI(), stage.getFilename(), 
+				stage.getSourceURI(), stage.getFilename(),
 				stage.getCreationFlag(), stage.getCredential()));
 			
 			if (stage.isDeleteOnTerminate())
@@ -103,15 +120,18 @@ public class SimpleExecutionUnderstanding
 		{
 			String storedOGRSHContextFilename = "stored-ogrsh-context.dat";
 			String OGRSHConfigFilename = "ogrsh-config.xml";
-			ret.add(new SetupOGRSHPhase(storedOGRSHContextFilename, OGRSHConfigFilename));
+			
+			ret.add(new SetupOGRSHPhase(
+				storedOGRSHContextFilename, OGRSHConfigFilename));
 			ret.add(new StoreContextPhase(storedOGRSHContextFilename));
+			
 			cleanups.add(new CleanupPhase(storedOGRSHContextFilename));
 			cleanups.add(new CleanupPhase(OGRSHConfigFilename));
 		}
 		
 		if (_application != null)
-			_application.addExecutionPhases(creationProperties,
-				ret, cleanups, _requiredOGRSHVersion);
+			_application.addExecutionPhases(
+				creationProperties, ret, cleanups, _requiredOGRSHVersion);
 		
 		for (DataStagingUnderstanding stage : _stageOuts)
 		{
@@ -124,9 +144,7 @@ public class SimpleExecutionUnderstanding
 		}
 		
 		for (DataStagingUnderstanding stage : _pureCleans)
-		{
 			cleanups.add(new CleanupPhase(stage.getFilename()));
-		}
 		
 		ret.addAll(cleanups);
 		return ret;

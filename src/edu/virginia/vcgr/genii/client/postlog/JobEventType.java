@@ -1,0 +1,17 @@
+package edu.virginia.vcgr.genii.client.postlog;
+
+public enum JobEventType
+{
+	JOB_SUBMITTED(),
+	JOB_LAUNCHED(),
+	JOB_REQUEUED(),
+	JOB_FAILED(),
+	JOB_KILLED(),
+	JOB_FINISHED(),
+	JOB_COMPLETED(),
+	ACTIVITY_CREATED(),
+	ACTIVITY_FINISHED(),
+	ACTIVITY_FAILED(),
+	ACTIVITY_TERMINATED(),
+	ACTIVITY_DELETED()
+}

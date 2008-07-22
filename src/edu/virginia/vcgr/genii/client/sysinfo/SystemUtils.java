@@ -13,7 +13,7 @@ import org.ggf.jsdl.OperatingSystem_Type;
 import org.ggf.jsdl.ProcessorArchitectureEnumeration;
 import org.morgan.util.io.StreamUtils;
 
-import edu.virginia.vcgr.genii.client.utils.SystemExec;
+import edu.virginia.vcgr.genii.client.utils.exec.ExecutionEngine;
 
 public class SystemUtils
 {	
@@ -64,7 +64,7 @@ public class SystemUtils
 				String osName = System.getProperty("os.name");
 				if (osName.equals("Linux"))
 					secondaryArchName = ProcessorArchitectureEnumeration.fromString(
-						SystemExec.executeForOutput(new String[] { "uname", "-m" }));
+						ExecutionEngine.simpleExecute("uname", "-m"));
 			}
 			catch (IOException ioe)
 			{

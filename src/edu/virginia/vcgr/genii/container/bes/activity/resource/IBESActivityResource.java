@@ -22,6 +22,9 @@ import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public interface IBESActivityResource extends IResource
 {
+	static public final String FUSE_MOUNT_PROPERTY =
+		"edu.virginia.vcgr.genii.container.bes.activity.fuse-mount-dir";
+	
 	public BESActivity findActivity()
 		throws ResourceUnknownFaultType;
 }

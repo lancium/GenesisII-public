@@ -4,5 +4,6 @@ import fuse.FuseException;
 
 public interface GeniiFuseConnection
 {
+	public void unmount(boolean lazy) throws FuseException;
 	public void unmount() throws FuseException;
 }

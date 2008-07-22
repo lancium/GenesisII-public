@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.genii.container.bes.jsdl.personality.simpleexec;
+package edu.virginia.vcgr.genii.container.bes.jsdl.personality.common;
 
 import javax.xml.namespace.QName;
 
@@ -8,80 +8,79 @@ import edu.virginia.vcgr.genii.client.jsdl.hpc.HPCConstants;
 import edu.virginia.vcgr.genii.client.jsdl.personality.def.DefaultHPCApplicationFacet;
 import edu.virginia.vcgr.genii.container.bes.BESUtilities;
 
-public class SEHPCApplicationFacet extends DefaultHPCApplicationFacet
+public class CommonPosixLikeHPCApplicationFacet extends
+		DefaultHPCApplicationFacet
 {
 	@Override
-	public Object createFacetUnderstanding(Object parentUnderstanding)
-			throws JSDLException
-	{
-		return new ForkExecUnderstanding();
-	}
-	
-	@Override
 	public void completeFacet(Object parentUnderstanding,
-			Object currentUnderstanding) throws JSDLException
+		Object currentUnderstanding) throws JSDLException
 	{
-		SimpleExecutionUnderstanding parent =
-			((SimpleExecutionUnderstanding)parentUnderstanding);
-		ForkExecUnderstanding child =
-			((ForkExecUnderstanding)currentUnderstanding);
+		CommonExecutionUnderstanding parent =
+			((CommonExecutionUnderstanding)parentUnderstanding);
+		PosixLikeApplicationUnderstanding child =
+			((PosixLikeApplicationUnderstanding)currentUnderstanding);
 		
 		child.validate();
 		parent.setApplication(child);
 	}
-
+	
 	@Override
 	public void consumeWorkingDirectory(Object currentUnderstanding,
-			String workingDirectory) throws JSDLException
+		String workingDirectory) throws JSDLException
 	{
 		if (!BESUtilities.canOverrideBESWorkerDir())
 			throw new UnsupportedJSDLElement(
 				new QName(HPCConstants.HPC_NS, "WorkingDirectory"));
-		((ForkExecUnderstanding)currentUnderstanding).setWorkingDirectory(
-			workingDirectory);
+		
+		((PosixLikeApplicationUnderstanding)
+			currentUnderstanding).setWorkingDirectory(workingDirectory);
 	}
 	
 	@Override
 	public void consumeArgument(Object currentUnderstanding,
 		String argument) throws JSDLException
 	{
-		((ForkExecUnderstanding)currentUnderstanding).addArgument(argument);
+		((PosixLikeApplicationUnderstanding)currentUnderstanding).addArgument(
+			argument);
 	}
-
+	
 	@Override
 	public void consumeEnvironment(Object currentUnderstanding, String name,
 		String environment) throws JSDLException
 	{
-		((ForkExecUnderstanding)currentUnderstanding).addEnvironment(
-			name, environment);
+		((PosixLikeApplicationUnderstanding)
+			currentUnderstanding).addEnvironment(name, environment);
 	}
-
+	
 	@Override
 	public void consumeInput(Object currentUnderstanding,
 		String input) throws JSDLException
 	{
-		((ForkExecUnderstanding)currentUnderstanding).setStdinRedirect(input);
+		((PosixLikeApplicationUnderstanding)
+			currentUnderstanding).setStdinRedirect(input);
 	}
 
 	@Override
 	public void consumeOutput(Object currentUnderstanding,
 		String output) throws JSDLException
 	{
-		((ForkExecUnderstanding)currentUnderstanding).setStdoutRedirect(output);
+		((PosixLikeApplicationUnderstanding)
+			currentUnderstanding).setStdoutRedirect(output);
 	}
 
 	@Override
 	public void consumeError(Object currentUnderstanding,
 		String error) throws JSDLException
 	{
-		((ForkExecUnderstanding)currentUnderstanding).setStderrRedirect(error);
+		((PosixLikeApplicationUnderstanding)
+			currentUnderstanding).setStderrRedirect(error);
 	}
 
 	@Override
 	public void consumeExecutable(Object currentUnderstanding,
 		String executable) throws JSDLException
 	{
-		((ForkExecUnderstanding)currentUnderstanding).setExecutable(
-			executable);
+		((PosixLikeApplicationUnderstanding)
+			currentUnderstanding).setExecutable(executable);
 	}
 }

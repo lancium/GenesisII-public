@@ -13,7 +13,8 @@ import edu.virginia.vcgr.fuse.FuseUtils;
 import edu.virginia.vcgr.fuse.fs.genii.GeniiFuseFileSystem;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
-import edu.virginia.vcgr.genii.client.utils.SystemExec;
+import edu.virginia.vcgr.genii.client.utils.exec.ExecutionEngine;
+import edu.virginia.vcgr.genii.client.utils.exec.SimpleExecutionResults;
 import fuse.Filesystem;
 import fuse.FuseException;
 import fuse.FuseMount;
@@ -69,10 +70,16 @@ public class GeniiFuse
 			null, null, uid, daemon);
 	}
 	
-	static public void unmountGenesisII(
-		File mountPoint) throws FuseException
+	static public void unmountGenesisII(File mountPoint)
+		throws FuseException
 	{
 		new GeniiFuseConnectionImpl(mountPoint).unmount();
+	}
+	
+	static public void unmountGenesisII(
+		File mountPoint, boolean lazy) throws FuseException
+	{
+		new GeniiFuseConnectionImpl(mountPoint).unmount(lazy);
 	}
 	
 	static private class GeniiFuseConnectionImpl implements GeniiFuseConnection
@@ -87,18 +94,39 @@ public class GeniiFuse
 		@Override
 		public void unmount() throws FuseException
 		{
+			unmount(false);
+		}
+		
+		@Override
+		public void unmount(boolean lazy) throws FuseException
+		{
 			try
 			{
-				StringBuilder builder = new StringBuilder();
+				SimpleExecutionResults results;
 				
-				for (String str : SystemExec.executeForMultiLineOutput(
-					"fusermount", "-u", _mountPoint.getAbsolutePath()))
+				if (lazy)
+					results = ExecutionEngine.execute(
+						"fusermount", "-u", "-z", _mountPoint.getAbsolutePath());
+				else
+					results = ExecutionEngine.execute(
+						"fusermount", "-u", _mountPoint.getAbsolutePath());
+				
+				if (results.getExitCode() == 0)
+					_logger.debug(String.format(
+						"Fuse unmount succeeded:\n" +
+						"Output:\n%s\nError:\n%s",
+						ExecutionEngine.formatOutput(results.getOutput()),
+						ExecutionEngine.formatOutput(results.getError())));
+				else
 				{
-					builder.append(str);
-					builder.append('\n');
+					_logger.error(String.format(
+						"Unable to unmount fuse filesystem:\n" +
+						"Output:\n%s\nError:\n%s",
+						ExecutionEngine.formatOutput(results.getOutput()),
+						ExecutionEngine.formatOutput(results.getError())));
+					throw new FuseException(
+						"Unable to unmount fuse file system.");
 				}
-				
-				_logger.debug(builder);
 			}
 			catch (IOException ioe)
 			{

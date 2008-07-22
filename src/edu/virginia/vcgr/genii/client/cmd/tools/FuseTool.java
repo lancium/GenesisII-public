@@ -9,7 +9,7 @@ import edu.virginia.vcgr.fuse.server.GeniiFuse;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.io.FileResource;
-import edu.virginia.vcgr.genii.client.utils.SystemExec;
+import edu.virginia.vcgr.genii.client.utils.exec.ExecutionEngine;
 
 public class FuseTool extends BaseGridTool
 {
@@ -57,7 +57,7 @@ public class FuseTool extends BaseGridTool
 		{
 			try
 			{
-				String str = SystemExec.executeForOutput("id", "-u");
+				String str = ExecutionEngine.simpleExecute("id", "-u");
 				_uid = Integer.parseInt(str);
 			}
 			catch (Throwable cause)

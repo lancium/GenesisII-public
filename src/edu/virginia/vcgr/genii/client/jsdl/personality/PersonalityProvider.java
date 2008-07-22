@@ -18,6 +18,8 @@ public interface PersonalityProvider
 		Object currentUnderstanding) throws JSDLException;
 	public HPCApplicationFacet getHPCApplicationFacet(
 		Object currentUnderstanding) throws JSDLException;
+	public SPMDApplicationFacet getSPMDApplicationFacet(
+		Object currentUnderstanding) throws JSDLException;
 	public ResourcesFacet getResourcesFacet(
 		Object currentUnderstanding) throws JSDLException;
 	public CandidateHostsFacet getCandidateHostsFacet(

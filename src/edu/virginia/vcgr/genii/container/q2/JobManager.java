@@ -30,6 +30,10 @@ import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.postlog.JobEvent;
+import edu.virginia.vcgr.genii.client.postlog.PostEvent;
+import edu.virginia.vcgr.genii.client.postlog.PostTarget;
+import edu.virginia.vcgr.genii.client.postlog.PostTargets;
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
@@ -217,20 +221,21 @@ public class JobManager implements Closeable
 	 * @param jobID The ID of the job to fail.
 	 * @param countAsAnAttempt Indicate whether or not this failure should
 	 * cound against the job's maximum attempt count.
-	 * 
+	 * @return True if the job was requed, false otherwise.
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
-	synchronized public void failJob(Connection connection, 
+	synchronized public boolean failJob(Connection connection, 
 		long jobID, boolean countAsAnAttempt)
 		throws SQLException, ResourceException
 	{
+		boolean ret = false;
 		/* Find the job's in-memory information */
 		JobData job = _jobsByID.get(new Long(jobID));
 		if (job == null)
 		{
 			// don't know where it went, but it's no longer our responsibility.
-			return;
+			return ret;
 		}
 		
 		/* Increment his attempt count if this counts against him. */
@@ -249,6 +254,7 @@ public class JobManager implements Closeable
 		{
 			/* Otherwise, we'll just requeue him */
 			newState = QueueStates.REQUEUED;
+			ret = true;
 		}
 		
 		// This is one of the few times we are going to break our pattern and
@@ -276,6 +282,7 @@ public class JobManager implements Closeable
 		 * updated and the outcall has been made).
 		 */
 		_outcallThreadPool.enqueue(new JobKiller(job, newState));
+		return ret;
 	}
 	
 	/**
@@ -366,6 +373,9 @@ public class JobManager implements Closeable
 				connection, ticket, priority, jsdl, callingContext, identities, 
 				state, submitTime);
 			connection.commit();
+			
+			PostTargets.poster().post(
+				JobEvent.jobSubmitted(callingContext, Long.toString(jobID)));
 			
 			/* The data has been committed into the database so we can reload
 			 * to this point from here on out.
@@ -639,6 +649,8 @@ public class JobManager implements Closeable
 		_database.completeJobs(connection, jobsToComplete);
 		connection.commit();
 		
+		PostTarget pt = PostTargets.poster();
+		
 		/* Now that it's committed to the database, go through the in memory
 		 * data structures and remove the job from all of those.
 		 */
@@ -656,6 +668,8 @@ public class JobManager implements Closeable
 				_queuedJobs.remove(new SortableJobKey(
 					data));
 				_runningJobs.remove(jobID);
+				
+				pt.post(JobEvent.jobCompleted(null, Long.toString(jobID)));
 			}
 		}
 	}
@@ -1095,6 +1109,7 @@ public class JobManager implements Closeable
 		
 		public void run()
 		{
+			ICallingContext startCtxt = null;
 			Connection connection = null;
 			EntryType entryType;
 			HashMap<Long, EntryType> entries = new HashMap<Long, EntryType>();
@@ -1139,12 +1154,17 @@ public class JobManager implements Closeable
 				/* We need to start the job, so go ahead and create a proxy to
 				 * call the container and then call it.
 				 */
+				startCtxt = startInfo.getCallingContext();
 				GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, 
 					entryType.getEntry_reference(), 
-					startInfo.getCallingContext());
+					startCtxt);
 				CreateActivityResponseType resp = bes.createActivity(
 					new CreateActivityType(
 						new ActivityDocumentType(startInfo.getJSDL(), null), null));
+				
+				EndpointReferenceType epr = resp.getActivityIdentifier();
+				PostTargets.poster().post(JobEvent.jobLaunched(startCtxt, epr, 
+					Long.toString(_jobID)));
 				
 				synchronized(_manager)
 				{
@@ -1204,6 +1224,8 @@ public class JobManager implements Closeable
 				{
 					/* We got an exception, so fail the job. */
 					failJob(connection, _jobID, countAgainstJob);
+					PostTargets.poster().post(JobEvent.jobFailed(
+						startCtxt, Long.toString(_jobID)));
 					_schedulingEvent.notifySchedulingEvent();
 				}
 				catch (Throwable cause2)
@@ -1244,7 +1266,7 @@ public class JobManager implements Closeable
 		 * @throws SQLException
 		 * @throws ResourceException
 		 */
-		private void terminateActivity(Connection connection)
+		private ICallingContext terminateActivity(Connection connection)
 			throws SQLException, ResourceException
 		{
 			/* Ask the database for all information needed to
@@ -1252,9 +1274,11 @@ public class JobManager implements Closeable
 			 */
 			KillInformation killInfo = _database.getKillInfo(
 				connection, _jobData.getJobID());
-				
+						
 			try
 			{
+				ICallingContext ctxt = killInfo.getCallingContext();
+				
 				/* Create the proxy and terminate the activity */
 				GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, 
 					killInfo.getBESEndpoint(), 
@@ -1263,15 +1287,18 @@ public class JobManager implements Closeable
 					new EndpointReferenceType[] {
 						killInfo.getJobEndpoint()
 					}, null ));
+				return ctxt;
 			}
 			catch (Throwable cause)
 			{
 				_logger.warn("Exception occurred while killing an activity.");
+				return null;
 			}
 		}
 		
 		public void run()
 		{
+			ICallingContext ctxt = null;
 			Connection connection = null;
 			
 			try
@@ -1281,7 +1308,7 @@ public class JobManager implements Closeable
 				
 				/* If the job is running, then we have to terminate it */
 				if (_jobData.getJobState().equals(QueueStates.RUNNING))
-					terminateActivity(connection);
+					ctxt = terminateActivity(connection);
 				
 				/* Ask the database to update the job state */
 				_database.modifyJobState(connection, _jobData.getJobID(),
@@ -1293,10 +1320,16 @@ public class JobManager implements Closeable
 				_jobData.setJobState(_newState);
 				_jobData.clearBESID();
 				
+				PostTarget pt = PostTargets.poster();
+				String jobid = Long.toString(_jobData.getJobID()); 
+				PostEvent event;
+				
 				/* If we were asked to re-queue the job, then put it back in 
 				 * the queued jobs list. */
 				if (_newState.equals(QueueStates.REQUEUED))
 				{
+					event = JobEvent.jobRequeued(ctxt, jobid);
+					pt.post(event);
 					_logger.debug("Re-queing job " + _jobData.getJobTicket());
 					_queuedJobs.put(new SortableJobKey(_jobData), _jobData);
 				} else

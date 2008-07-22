@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.genii.container.bes.jsdl.personality.simpleexec;
+package edu.virginia.vcgr.genii.container.bes.jsdl.personality.common;
 
 import javax.xml.namespace.QName;
 
@@ -10,7 +10,7 @@ import edu.virginia.vcgr.genii.client.jsdl.UnsupportedJSDLElement;
 import edu.virginia.vcgr.genii.client.jsdl.personality.def.DefaultDataStagingFacet;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.UsernamePasswordIdentity;
 
-public class SEDataStagingFacet extends DefaultDataStagingFacet
+public class CommonDataStagingFacet extends DefaultDataStagingFacet
 {
 	@Override
 	public Object createFacetUnderstanding(Object parentUnderstanding)
@@ -58,8 +58,8 @@ public class SEDataStagingFacet extends DefaultDataStagingFacet
 	public void completeFacet(Object parentUnderstanding,
 			Object currentUnderstanding) throws JSDLException
 	{
-		SimpleExecutionUnderstanding parent = 
-			(SimpleExecutionUnderstanding)parentUnderstanding;
+		CommonExecutionUnderstanding parent = 
+			(CommonExecutionUnderstanding)parentUnderstanding;
 		DataStagingUnderstanding child = 
 			(DataStagingUnderstanding)currentUnderstanding;
 		
