@@ -170,14 +170,22 @@ public class WSName implements Comparable<WSName>
 			{
 				if (element.getQName().equals(WSName.ENDPOINT_IDENTIFIER_QNAME))
 				{
+					String s = null;
 					Node n = element.getFirstChild();
-					if (n instanceof Text)
+					if (n == null)
 					{
-						String s = n.toString();
-						
+						Object value = element.getObjectValue();
+						if (value != null)
+							s = value.toString();
+					} else if (n instanceof Text)
+						s = n.toString();
+					
+					if (s != null)
+					{
 						try
 						{
 							_endpointIdentifier = new URI(s);
+							break;
 						}
 						catch (URI.MalformedURIException e)
 						{
