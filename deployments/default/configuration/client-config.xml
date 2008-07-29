@@ -258,6 +258,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.dair.DAIRQueryTool</mconf:class>	
 		<mconf:class name="fuse"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.FuseTool</mconf:class>
+		<mconf:class name="rns"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.RNSInteropTool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>
