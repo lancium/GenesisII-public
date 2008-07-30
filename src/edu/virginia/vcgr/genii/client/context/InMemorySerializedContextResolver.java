@@ -8,16 +8,16 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
 
-public class InMemoryContextResolver implements IContextResolver
+public class InMemorySerializedContextResolver implements IContextResolver
 {
 	private byte []_storedContext;
 	
-	public InMemoryContextResolver()
+	public InMemorySerializedContextResolver()
 	{
 		this(null);
 	}
 	
-	private InMemoryContextResolver(byte []newData)
+	private InMemorySerializedContextResolver(byte []newData)
 	{
 		_storedContext = newData;
 	}
@@ -59,9 +59,9 @@ public class InMemoryContextResolver implements IContextResolver
 	public Object clone()
 	{
 		if (_storedContext == null)
-			return new InMemoryContextResolver(null);
+			return new InMemorySerializedContextResolver(null);
 		
-		return new InMemoryContextResolver(
+		return new InMemorySerializedContextResolver(
 			Arrays.copyOf(_storedContext, _storedContext.length));
 	}
 }

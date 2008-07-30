@@ -11,7 +11,9 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.fuse.FuseUtils;
 import edu.virginia.vcgr.fuse.fs.genii.GeniiFuseFileSystem;
+import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.context.MemoryBasedContextResolver;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.utils.exec.ExecutionEngine;
 import edu.virginia.vcgr.genii.client.utils.exec.SimpleExecutionResults;
@@ -48,7 +50,8 @@ public class GeniiFuse
 		args[0] = mountPoint.getAbsolutePath();
 		System.arraycopy(additionalArguments, 0, args, 1, additionalArguments.length);
 		
-		GeniiMountRunner runner = new GeniiMountRunner(mount, args);
+		GeniiMountRunner runner = new GeniiMountRunner(mount, args, 
+			callingContext);
 		if (daemon)
 		{
 			Thread th = new Thread(runner);
@@ -141,17 +144,22 @@ public class GeniiFuse
 		
 		private String []_arguments;
 		private Filesystem _fs;
+		private ICallingContext _callingContext;
 		
-		public GeniiMountRunner(Filesystem fs, String []arguments)
+		public GeniiMountRunner(Filesystem fs, String []arguments,
+			ICallingContext callingContext)
 		{
 			_fs = fs;
 			_arguments = arguments;
+			_callingContext  = callingContext;
 		}
 		
 		public void run()
 		{
 			try
 			{
+				ContextManager.setResolver(
+					new MemoryBasedContextResolver(_callingContext));
 				FuseMount.mount(_arguments, _fs);
 			}
 			catch (Exception e)

@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.genii.client.byteio.cache;
+package edu.virginia.vcgr.genii.client.byteio.buffer;
 
 import java.io.IOException;
 

@@ -9,7 +9,7 @@ import edu.virginia.vcgr.genii.client.cmd.tools.LogoutTool;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.IContextResolver;
-import edu.virginia.vcgr.genii.client.context.InMemoryContextResolver;
+import edu.virginia.vcgr.genii.client.context.InMemorySerializedContextResolver;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
@@ -26,7 +26,7 @@ public class GeniiBackendConfiguration implements Cloneable
 		_root = root;
 		
 		// This always gets called in a new thread, so...
-		ContextManager.setResolver(new InMemoryContextResolver());
+		ContextManager.setResolver(new InMemorySerializedContextResolver());
 		ContextManager.storeCurrentContext(_callingContext);
 	}
 	
@@ -37,7 +37,7 @@ public class GeniiBackendConfiguration implements Cloneable
 		IContextResolver oldResolver = ContextManager.getResolver();
 		try
 		{
-			IContextResolver newResolver = new InMemoryContextResolver();
+			IContextResolver newResolver = new InMemorySerializedContextResolver();
 			ContextManager.setResolver(newResolver);
 	
 			newResolver.store(callingContext);
