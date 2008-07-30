@@ -47,18 +47,31 @@ public abstract class ResourceLeaser<ResourceType>
 	public LeaseableResource<ResourceType> obtainLease(
 		LeaseeAgreement<ResourceType> agreement)
 	{
-		synchronized(_outstandingLeases)
+		LeaseableResourceImpl lease;
+		LeaseableResource<ResourceType> tmp;
+		
+		while (true)
 		{
-			if (_outstandingLeases.size() < _resourceLimit)
+			synchronized(_outstandingLeases)
 			{
-				LeaseableResourceImpl lease = 
-					new LeaseableResourceImpl(createNewResource(), agreement);
-				_outstandingLeases.add(lease);
-				return lease;
-			} else
+				if (_outstandingLeases.size() < _resourceLimit)
+				{
+					lease =	new LeaseableResourceImpl(createNewResource(), 
+						agreement);
+					_outstandingLeases.add(lease);
+					return lease;
+				}
+	
+				lease = _outstandingLeases.pop();
+			}
+			
+			tmp = lease._agreement.relinquish(lease);
+			
+			synchronized(_outstandingLeases)
 			{
-				LeaseableResourceImpl lease = _outstandingLeases.pop();
-				lease._agreement.relinquish(lease);
+				if (tmp == null)
+					continue;
+				
 				lease._agreement = agreement;
 				_outstandingLeases.add(lease);
 				return lease;

@@ -99,7 +99,15 @@ public class WritableBuffer implements Closeable
 	{
 		synchronized(_lockObject)
 		{
-			flush();
+			if (_lease != null)
+			{
+				try { flush(); } catch (Throwable cause) {}
+				_lease.cancel();
+			}
+			
+			_blockOffsetInFile = -1L;
+			_nextWrite = -1;
+			_lease = null;
 		}
 	}
 	
@@ -220,6 +228,8 @@ public class WritableBuffer implements Closeable
 					_ioe = ioe;
 				}
 				_lease = null;
+				_blockOffsetInFile = -1L;
+				_nextWrite = -1;
 				return ret;
 			}
 		}

@@ -3,6 +3,8 @@ package edu.virginia.vcgr.genii.client.byteio.cache;
 import java.io.Closeable;
 import java.io.IOException;
 
+import org.morgan.util.io.StreamUtils;
+
 public class BasicFileOperator implements Closeable
 {
 	private ReadResolver _readResolver;
@@ -65,7 +67,11 @@ public class BasicFileOperator implements Closeable
 		int destinationOffset, int length) throws IOException
 	{
 		if (_writeBuffer != null)
-			_writeBuffer.close();
+		{
+			StreamUtils.close(_writeBuffer);
+			_writeBuffer = null;
+		}
+		
 		if (_readBuffer == null)
 			_readBuffer = new ReadableBuffer(_leaser, _readResolver);
 		
@@ -77,11 +83,35 @@ public class BasicFileOperator implements Closeable
 		int sourceOffset, int length) throws IOException
 	{
 		if (_readBuffer != null)
-			_readBuffer.close();
+		{
+			StreamUtils.close(_readBuffer);
+			_readBuffer = null;
+		}
+		
 		if (_writeBuffer == null)
 			_writeBuffer = new WritableBuffer(_leaser, _writeResolver);
 		
 		_writeBuffer.write(fileOffset, source, sourceOffset, length);
+	}
+	
+	public void truncate(long fileOffset) throws IOException
+	{
+		if (_readBuffer != null)
+		{
+			StreamUtils.close(_readBuffer);
+			_readBuffer = null;
+		}
+		
+		if (_writeBuffer == null)
+			_writeBuffer = new WritableBuffer(_leaser, _writeResolver);
+		
+		_writeBuffer.truncate(fileOffset);
+	}
+	
+	public void flush() throws IOException
+	{
+		if (_writeBuffer != null)
+			_writeBuffer.flush();
 	}
 	
 	static private class NonReadableReadResolver implements ReadResolver

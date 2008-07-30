@@ -83,6 +83,8 @@ public class ReadableBuffer implements Closeable
 			if (_lease != null)
 				_lease.cancel();
 			_lease = null;
+			_validSize = -1;
+			_blockOffsetInFile = -1L;
 		}
 	}
 	
@@ -108,6 +110,9 @@ public class ReadableBuffer implements Closeable
 			ensure(fileOffset);
 			int blockOffset = (int)(fileOffset - _blockOffsetInFile);
 			int blockLeft = _validSize - blockOffset;
+			if (blockLeft <= 0)
+				return 0;
+			
 			if (blockLeft < length)
 				length = blockLeft;
 			System.arraycopy(_lease.resource(), blockOffset,

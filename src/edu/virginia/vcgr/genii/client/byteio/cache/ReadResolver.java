@@ -15,7 +15,7 @@ public interface ReadResolver
 	/**
 	 * Read an array of bytes from some source.
 	 * 
-	 * @param fileOffset The offset within the target source frmo which to
+	 * @param fileOffset The offset within the target source from which to
 	 * begin reading.
 	 * @param destination The destination buffer into which the source bytes
 	 * should be placed.
