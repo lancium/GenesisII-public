@@ -1,9 +1,6 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
-import java.rmi.RemoteException;
-
 import org.ggf.rns.*;
-import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
@@ -62,6 +59,7 @@ public class RNSInteropTool extends BaseGridTool
 		
 		if (_addName != null){
 			stdout.println("Running add test");
+			testADD();
 		}
 		
 		if (_ls != null){
@@ -71,6 +69,7 @@ public class RNSInteropTool extends BaseGridTool
 		
 		if (_rm != null){
 			stdout.println("Running remove test");
+			testRM();
 		}
 			
 		stdout.println("***Testing completed***");
@@ -108,13 +107,13 @@ public class RNSInteropTool extends BaseGridTool
 		
 		return;
 	}
+	
 	/**
 	 * Test LIST - send list request to service host
 	 * @throws Throwable
 	 */
 
 	protected Boolean testLIST()
-		throws ResourceUnknownFaultType, RemoteException
 	{
 		//create list request
 		List listRequest = new List(_ls);
@@ -129,8 +128,63 @@ public class RNSInteropTool extends BaseGridTool
 		}
 		
 		//process response
+		stdout.println(_ls+":");
 		for (EntryType entry : listResponse.getEntryList()){
-			stdout.println(entry.getEntry_name());
+			stdout.println("  " + entry.getEntry_name());
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Test ADD - send add request to service host
+	 * @throws Throwable
+	 */
+
+	protected Boolean testADD()
+	{
+		//create list request
+		Add addRequest = new Add(_addName, null, null);
+		AddResponse addResponse;
+		
+		try{
+			addResponse = rnsPort.add(addRequest);
+		}
+		catch(Exception e){
+			stdout.println("Add test failed: " + e.getMessage());
+			return false;
+		}
+		
+		//process response
+		stdout.println("Added: " + 
+				addResponse.getEntry_reference().getAddress().toString());
+		
+		return true;
+	}
+	
+	/**
+	 * Test REMOVE - send remove request to service host
+	 * @throws Throwable
+	 */
+
+	protected Boolean testRM()
+	{
+		//create list request
+		Remove rmRequest = new Remove(_rm);
+		String[] rmResponse;
+		
+		try{
+			 rmResponse = rnsPort.remove(rmRequest);
+		}
+		catch(Exception e){
+			stdout.println("Remove test failed: " + e.getMessage());
+			return false;
+		}
+		
+		//process response
+		int i = 0;
+		for (i = 0; i < rmResponse.length; i++){
+			stdout.println("Removed: " +rmResponse[i]);
 		}
 		
 		return true;
