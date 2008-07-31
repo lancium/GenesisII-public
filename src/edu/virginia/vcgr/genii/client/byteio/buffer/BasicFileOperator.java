@@ -9,14 +9,17 @@ public class BasicFileOperator implements Closeable
 {
 	private ReadResolver _readResolver;
 	private WriteResolver _writeResolver;
+	private AppendResolver _appendResolver;
 	
 	private ByteIOBufferLeaser _leaser;
 	
 	private ReadableBuffer _readBuffer = null;
 	private WritableBuffer _writeBuffer = null;
+	private AppendableBuffer _appendBuffer = null;
 	
 	public BasicFileOperator(ByteIOBufferLeaser leaser, ReadResolver readResolver,
-		WriteResolver writeResolver, boolean truncate) throws IOException
+		WriteResolver writeResolver, AppendResolver appendResolver,
+		boolean truncate) throws IOException
 	{
 		_leaser = leaser;
 		
@@ -26,8 +29,12 @@ public class BasicFileOperator implements Closeable
 		if (writeResolver == null)
 			writeResolver = new NonWritableWriteResolver();
 		
+		if (appendResolver == null)
+			appendResolver = new NonWritableAppendResolver();
+		
 		_readResolver = readResolver;
 		_writeResolver = writeResolver;
+		_appendResolver = appendResolver;
 		
 		if (truncate)
 			_writeResolver.truncate(0L);
@@ -36,13 +43,13 @@ public class BasicFileOperator implements Closeable
 	public BasicFileOperator(ByteIOBufferLeaser leaser, ReadResolver readResolver)
 		throws IOException
 	{
-		this(leaser, readResolver, null, false);
+		this(leaser, readResolver, null, null, false);
 	}
 	
 	public BasicFileOperator(ByteIOBufferLeaser leaser, WriteResolver writeResolver,
-		boolean truncate) throws IOException
+		AppendResolver appendResolver, boolean truncate) throws IOException
 	{
-		this(leaser, null, writeResolver, truncate);
+		this(leaser, null, writeResolver, appendResolver, truncate);
 	}
 	
 	@Override
@@ -58,9 +65,12 @@ public class BasicFileOperator implements Closeable
 			_readBuffer.close();
 		if (_writeBuffer != null)
 			_writeBuffer.close();
+		if (_appendBuffer != null)
+			_appendBuffer.close();
 		
 		_readBuffer = null;
 		_writeBuffer = null;
+		_appendBuffer = null;
 	}
 	
 	public int read(long fileOffset, byte []destination,
@@ -70,6 +80,12 @@ public class BasicFileOperator implements Closeable
 		{
 			StreamUtils.close(_writeBuffer);
 			_writeBuffer = null;
+		}
+		
+		if (_appendBuffer != null)
+		{
+			StreamUtils.close(_appendBuffer);
+			_appendBuffer = null;
 		}
 		
 		if (_readBuffer == null)
@@ -88,6 +104,12 @@ public class BasicFileOperator implements Closeable
 			_readBuffer = null;
 		}
 		
+		if (_appendBuffer != null)
+		{
+			StreamUtils.close(_appendBuffer);
+			_appendBuffer = null;
+		}
+		
 		if (_writeBuffer == null)
 			_writeBuffer = new WritableBuffer(_leaser, _writeResolver);
 		
@@ -102,16 +124,45 @@ public class BasicFileOperator implements Closeable
 			_readBuffer = null;
 		}
 		
+		if (_appendBuffer != null)
+		{
+			StreamUtils.close(_appendBuffer);
+			_appendBuffer = null;
+		}
+		
 		if (_writeBuffer == null)
 			_writeBuffer = new WritableBuffer(_leaser, _writeResolver);
 		
 		_writeBuffer.truncate(fileOffset);
 	}
 	
+	public void append(byte []source, int start, int length)
+		throws IOException 
+	{
+		if (_readBuffer != null)
+		{
+			StreamUtils.close(_readBuffer);
+			_readBuffer = null;
+		}
+		
+		if (_writeBuffer != null)
+		{
+			StreamUtils.close(_writeBuffer);
+			_writeBuffer = null;
+		}
+		
+		if (_appendBuffer == null)
+			_appendBuffer = new AppendableBuffer(_leaser, _appendResolver);
+		
+		_appendBuffer.append(source, start, length);
+	}
+	
 	public void flush() throws IOException
 	{
 		if (_writeBuffer != null)
 			_writeBuffer.flush();
+		if (_appendBuffer != null)
+			_appendBuffer.flush();
 	}
 	
 	static private class NonReadableReadResolver implements ReadResolver
@@ -135,6 +186,16 @@ public class BasicFileOperator implements Closeable
 		
 		@Override
 		public void truncate(long offset) throws IOException
+		{
+			throw new IOException("File is not writable.");
+		}
+	}
+	
+	static private class NonWritableAppendResolver implements AppendResolver
+	{
+		@Override
+		public void append(byte[] data, int start, int length)
+				throws IOException
 		{
 			throw new IOException("File is not writable.");
 		}

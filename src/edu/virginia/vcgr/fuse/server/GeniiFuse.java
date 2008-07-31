@@ -41,6 +41,9 @@ public class GeniiFuse
 		if (msg != null)
 			throw new IOException(msg);
 			
+		if (callingContext == null)
+			callingContext = ContextManager.getCurrentContext();
+		
 		GeniiFuseFileSystem fs = new GeniiFuseFileSystem(
 			callingContext, null, sandbox);
 		
