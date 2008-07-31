@@ -167,6 +167,7 @@ public class GeniiFuse
 			}
 			catch (Exception e)
 			{
+				_logger.error("Error occurred in fuse mount.", e);
 				_error = e;
 			}
 
