@@ -168,7 +168,7 @@ public class ByteIOPerformanceTool extends BaseGridTool
 	protected int runCommand() throws Throwable
 	{
 		if (numArguments() == 3)
-			doPlannedRun(getArgument(1), getArgument(2), getArgument(3));
+			doPlannedRun(getArgument(0), getArgument(1), getArgument(2));
 		else
 		{
 			int numRuns = Integer.parseInt(getArgument(3));
