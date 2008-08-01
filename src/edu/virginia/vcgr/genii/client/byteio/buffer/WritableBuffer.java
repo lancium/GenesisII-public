@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.client.byteio.buffer;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import edu.virginia.vcgr.genii.client.lease.LeaseableResource;
 import edu.virginia.vcgr.genii.client.lease.LeaseeAgreement;
@@ -32,16 +33,9 @@ public class WritableBuffer implements Closeable
 	private long _blockOffsetInFile = -1L;
 	
 	/**
-	 * The location (within the byte array buffer) at which we expect the next
-	 * write to occur.  If the next write doesn't line up with this index, then
-	 * we flush what we have and start over.
-	 */
-	private int _nextWrite = -1;
-	
-	/**
 	 * The current leased byte array (if any).
 	 */
-	private LeaseableResource<byte[]> _lease = null;
+	private LeaseableResource<ByteBuffer> _lease = null;
 	
 	/** The leaser to use to obtain new buffers */
 	private ByteIOBufferLeaser _leaser;
@@ -61,16 +55,21 @@ public class WritableBuffer implements Closeable
 	 */
 	private void ensure(long fileOffset) throws IOException
 	{
+		ByteBuffer buffer;
+		
 		if (_lease == null)
+		{
 			_lease = _leaser.obtainLease(new LeaseeAgreementImpl());
+			buffer = _lease.resource();
+			buffer.clear();
+		} else
+			buffer = _lease.resource();
 		
-		byte[] buffer = _lease.resource();
-		
-		if ((_nextWrite + _blockOffsetInFile) != fileOffset || 
-			(_nextWrite >= (buffer.length)))
+		if ((buffer.position() + _blockOffsetInFile) != fileOffset || 
+			(buffer.remaining() <= 0))
 		{
 			flush();
-			_nextWrite = 0;
+			buffer.clear();
 			_blockOffsetInFile = fileOffset;
 		}
 	}
@@ -106,25 +105,11 @@ public class WritableBuffer implements Closeable
 			}
 			
 			_blockOffsetInFile = -1L;
-			_nextWrite = -1;
 			_lease = null;
 		}
 	}
 	
-	/**
-	 * Write a given set of bytes to the buffer (or target file).
-	 * 
-	 * @param fileOffset The offset within the target sink at which to begin
-	 * writing.
-	 * @param source The source array of bytes to write.
-	 * @param sourceOffset THe offset within the source array at which to begin
-	 * writing.
-	 * @param length THe number of bytes to write.
-	 * 
-	 * @throws IOException
-	 */
-	public void write(long fileOffset, byte []source,
-		int sourceOffset, int length) throws IOException
+	public void write(long fileOffset, ByteBuffer source) throws IOException
 	{
 		synchronized(_lockObject)
 		{
@@ -135,19 +120,16 @@ public class WritableBuffer implements Closeable
 				throw ioe;
 			}
 			
-			while (length > 0)
+			while (source.hasRemaining())
 			{
 				ensure(fileOffset);
-				byte []buffer = _lease.resource();
-				int space = buffer.length - _nextWrite;
-				if (space > length)
-					space = length;
-				System.arraycopy(source, sourceOffset, 
-					buffer, _nextWrite, space);
-				length -= space;
-				sourceOffset += space;
-				fileOffset += space;
-				_nextWrite += space;
+				ByteBuffer buffer = _lease.resource();
+				ByteBuffer sourceCopy = source.slice();
+				if (buffer.remaining() < sourceCopy.remaining())
+					sourceCopy.limit(buffer.remaining());
+				buffer.put(sourceCopy);
+				source.position(source.position() + sourceCopy.position());
+				fileOffset += sourceCopy.position();
 			}
 		}
 	}
@@ -193,12 +175,13 @@ public class WritableBuffer implements Closeable
 			
 			if (_lease != null)
 			{
-				byte []buffer = _lease.resource();
-				if (_nextWrite > 0)
-					_resolver.write(_blockOffsetInFile, buffer, 0, _nextWrite);
+				ByteBuffer buffer = _lease.resource();
+				buffer.flip();
+				if (buffer.hasRemaining())
+					_resolver.write(_blockOffsetInFile, buffer);
+				buffer.clear();
 				
 				_blockOffsetInFile = -1L;
-				_nextWrite = -1;
 			}
 		}
 	}
@@ -208,13 +191,13 @@ public class WritableBuffer implements Closeable
 	 * 
 	 * @author mmm2a
 	 */
-	private class LeaseeAgreementImpl implements LeaseeAgreement<byte[]>
+	private class LeaseeAgreementImpl implements LeaseeAgreement<ByteBuffer>
 	{
 		@Override
-		public LeaseableResource<byte[]> relinquish(
-				LeaseableResource<byte[]> lease)
+		public LeaseableResource<ByteBuffer> relinquish(
+				LeaseableResource<ByteBuffer> lease)
 		{
-			LeaseableResource<byte[]> ret;
+			LeaseableResource<ByteBuffer> ret;
 			
 			synchronized(_lockObject)
 			{
@@ -229,7 +212,6 @@ public class WritableBuffer implements Closeable
 				}
 				_lease = null;
 				_blockOffsetInFile = -1L;
-				_nextWrite = -1;
 				return ret;
 			}
 		}

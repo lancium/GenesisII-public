@@ -260,6 +260,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.FuseTool</mconf:class>
 		<mconf:class name="rns"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.RNSInteropTool</mconf:class>
+		<mconf:class name="byteioperf"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ByteIOPerformanceTool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

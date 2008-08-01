@@ -45,7 +45,17 @@ public class GeniiAttachment
 			DataHandler handler = part.getDataHandler();
 			in = handler.getInputStream();
 			byte []data = new byte[in.available()];
-			in.read(data);
+			int offset = 0;
+			int length = data.length;
+			while (length > 0)
+			{
+				int read = in.read(data, offset, length);
+				if (read <= 0)
+					break;
+				offset += read;
+				length -= read;
+			}
+			
 			return data;
 		}
 		finally

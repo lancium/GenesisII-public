@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.byteio.transfer;
 
+import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 
 /**
@@ -22,6 +23,58 @@ import java.rmi.RemoteException;
  */
 public interface RandomByteIOTransferer extends ByteIOTransferer
 {
+	/**
+	 * Read data from a remote ByteIO and put it into a ByteBuffer.
+	 * The amount of data to read is determined by the number of
+	 * bytes remaining in the ByteBuffer.  Short reads are possible
+	 * and will be determined by the ByteBuffer NOT being full when
+	 * done.
+	 * 
+	 * @param startOffset The offset in the remote byte io to start
+	 * reading at.
+	 * @param destination The destination byte buffer into which to
+	 * stuff the results.
+	 * 
+	 * @throws RemoteException
+	 */
+	public void read(long startOffset, ByteBuffer destination)
+		throws RemoteException;
+	
+	/**
+	 * Write a bunch of bytes out to a file.  THe bytes are taken
+	 * from the "remaining" bytes in the ByteBuffer.
+	 * 
+	 * @param startOffset The offset at which to start writing bytes
+	 * in the target byte IO.
+	 * @param source The source of the bytes to write.
+	 * 
+	 * @throws RemoteException
+	 */
+	public void write(long startOffset, ByteBuffer source)
+		throws RemoteException;
+	
+	/**
+	 * Append a series of bytes (determined by source.remaining()) to a target
+	 * ByteIO.
+	 * 
+	 * @param source The source of the bytes to append.
+	 * 
+	 * @throws RemoteException
+	 */
+	public void append(ByteBuffer source) throws RemoteException;
+	
+	/**
+	 * Truncate, and then append a series of bytes (determined by 
+	 * source.remaining()) to a target byteio.
+	 * 
+	 * @param offset The offset to truncate the file to.
+	 * @param source The bytes to append.
+	 * 
+	 * @throws RemoteException
+	 */
+	public void truncAppend(long offset, ByteBuffer source) 
+		throws RemoteException;
+	
 	/**
 	 * Read data from a remote Random ByteIO starting at a known
 	 * offset, and with the possibilty of a gather operation of

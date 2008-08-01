@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.client.byteio.buffer;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import org.morgan.util.io.StreamUtils;
 
@@ -73,8 +74,7 @@ public class BasicFileOperator implements Closeable
 		_appendBuffer = null;
 	}
 	
-	public int read(long fileOffset, byte []destination,
-		int destinationOffset, int length) throws IOException
+	public void read(long fileOffset, ByteBuffer destination) throws IOException
 	{
 		if (_writeBuffer != null)
 		{
@@ -91,12 +91,10 @@ public class BasicFileOperator implements Closeable
 		if (_readBuffer == null)
 			_readBuffer = new ReadableBuffer(_leaser, _readResolver);
 		
-		return _readBuffer.read(fileOffset, destination, 
-			destinationOffset, length);
+		_readBuffer.read(fileOffset, destination);
 	}
 	
-	public void write(long fileOffset, byte []source,
-		int sourceOffset, int length) throws IOException
+	public void write(long fileOffset, ByteBuffer source) throws IOException
 	{
 		if (_readBuffer != null)
 		{
@@ -113,7 +111,7 @@ public class BasicFileOperator implements Closeable
 		if (_writeBuffer == null)
 			_writeBuffer = new WritableBuffer(_leaser, _writeResolver);
 		
-		_writeBuffer.write(fileOffset, source, sourceOffset, length);
+		_writeBuffer.write(fileOffset, source);
 	}
 	
 	public void truncate(long fileOffset) throws IOException
@@ -136,7 +134,7 @@ public class BasicFileOperator implements Closeable
 		_writeBuffer.truncate(fileOffset);
 	}
 	
-	public void append(byte []source, int start, int length)
+	public void append(ByteBuffer source)
 		throws IOException 
 	{
 		if (_readBuffer != null)
@@ -154,7 +152,7 @@ public class BasicFileOperator implements Closeable
 		if (_appendBuffer == null)
 			_appendBuffer = new AppendableBuffer(_leaser, _appendResolver);
 		
-		_appendBuffer.append(source, start, length);
+		_appendBuffer.append(source);
 	}
 	
 	public void flush() throws IOException
@@ -168,24 +166,24 @@ public class BasicFileOperator implements Closeable
 	static private class NonReadableReadResolver implements ReadResolver
 	{
 		@Override
-		public int read(long fileOffset, byte[] destination,
-				int destinationOffset, int length) throws IOException
+		public void read(long fileOffset, ByteBuffer destination)
+				throws IOException
 		{
 			throw new IOException("File is not readable.");
-		}
+		}	
 	}
 	
 	static private class NonWritableWriteResolver implements WriteResolver
 	{
 		@Override
-		public void write(long fileOffset, byte[] source, int sourceOffset,
-				int length) throws IOException
+		public void truncate(long offset) throws IOException
 		{
 			throw new IOException("File is not writable.");
 		}
-		
+
 		@Override
-		public void truncate(long offset) throws IOException
+		public void write(long fileOffset, ByteBuffer source)
+				throws IOException
 		{
 			throw new IOException("File is not writable.");
 		}
@@ -194,8 +192,7 @@ public class BasicFileOperator implements Closeable
 	static private class NonWritableAppendResolver implements AppendResolver
 	{
 		@Override
-		public void append(byte[] data, int start, int length)
-				throws IOException
+		public void append(ByteBuffer source) throws IOException
 		{
 			throw new IOException("File is not writable.");
 		}

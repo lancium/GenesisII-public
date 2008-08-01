@@ -1,5 +1,7 @@
 package edu.virginia.vcgr.genii.client.byteio.buffer;
 
+import java.nio.ByteBuffer;
+
 import edu.virginia.vcgr.genii.client.lease.ResourceLeaser;
 
 /**
@@ -8,9 +10,9 @@ import edu.virginia.vcgr.genii.client.lease.ResourceLeaser;
  * 
  * @author mmm2a
  */
-public class ByteIOBufferLeaser extends ResourceLeaser<byte[]>
+public class ByteIOBufferLeaser extends ResourceLeaser<ByteBuffer>
 {
-	static final public int BUFFER_SIZE = 1024 * 1024;
+	static final public int BUFFER_SIZE = 1024 * 1024 * 8;
 	static final public int NUM_BUFFERS = 4;
 	
 	/**
@@ -25,9 +27,9 @@ public class ByteIOBufferLeaser extends ResourceLeaser<byte[]>
 	}
 	
 	@Override
-	protected byte[] createNewResource()
+	protected ByteBuffer createNewResource()
 	{
-		return new byte[BUFFER_SIZE];
+		return ByteBuffer.allocate(BUFFER_SIZE);
 	}
 	
 	/**

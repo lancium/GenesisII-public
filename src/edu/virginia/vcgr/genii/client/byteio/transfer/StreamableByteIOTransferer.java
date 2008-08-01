@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.byteio.transfer;
 
+import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 
 import edu.virginia.vcgr.genii.client.byteio.SeekOrigin;
@@ -24,6 +25,12 @@ import edu.virginia.vcgr.genii.client.byteio.SeekOrigin;
  */
 public interface StreamableByteIOTransferer extends ByteIOTransferer
 {
+	public void seekRead(SeekOrigin origin, long offset,
+		ByteBuffer destination) throws RemoteException;
+	
+	public void seekWrite(SeekOrigin origin, long offset,
+		ByteBuffer source) throws RemoteException;
+	
 	/**
 	 * This method first seeks (if indicated) to a specific place in
 	 * the target ByteIO's stream, and then reads a block of data

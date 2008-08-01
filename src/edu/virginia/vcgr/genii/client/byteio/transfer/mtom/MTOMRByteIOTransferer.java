@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.byteio.transfer.mtom;
 
+import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 
 import org.apache.axis.message.MessageElement;
@@ -97,5 +98,40 @@ public class MTOMRByteIOTransferer
 				new MessageElement[0], 
 				ByteIOConstants.TRANSFER_TYPE_MTOM_URI);
 		_clientStub.write(new Write(startOffset, bytesPerBlock, stride, transType));
+	}
+
+	@Override
+	public void append(ByteBuffer source) throws RemoteException
+	{
+		byte []data = new byte[source.remaining()];
+		source.get(data);
+		append(data);
+	}
+
+	@Override
+	public void read(long startOffset, ByteBuffer destination)
+			throws RemoteException
+	{
+		byte []data = read(startOffset, destination.remaining(), 1, 0);
+		if (data != null)
+			destination.put(data);
+	}
+
+	@Override
+	public void truncAppend(long offset, ByteBuffer source)
+			throws RemoteException
+	{
+		byte []data = new byte[source.remaining()];
+		source.get(data);
+		truncAppend(offset, data);
+	}
+
+	@Override
+	public void write(long startOffset, ByteBuffer source)
+			throws RemoteException
+	{
+		byte []data = new byte[source.remaining()];
+		source.get(data);
+		write(startOffset, data.length, 0, data);
 	}
 }

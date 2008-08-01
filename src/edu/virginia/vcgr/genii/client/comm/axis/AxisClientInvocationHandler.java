@@ -199,7 +199,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			return;
 		}
 		stubInstance._setProperty(STUB_CONFIGURED, STUB_CONFIGURED);
-		
+		stubInstance._setProperty("attachments.implementation", 
+			"org.apache.axis.attachments.AttachmentsImpl");
 		
 		X509Certificate[] chain = EPRUtils.extractCertChain(_epr);
 		URI epi = EPRUtils.extractEndpointIdentifier(_epr);
@@ -757,6 +758,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			_logger.warn("Tried to set outbound attachments on cloned AxisClientInvocationHandler.");
 		}
 		_outAttachments = attachments;
+		_attachmentType = attachmentType;
 	}
 	
 	public Collection<GeniiAttachment> getInAttachments()

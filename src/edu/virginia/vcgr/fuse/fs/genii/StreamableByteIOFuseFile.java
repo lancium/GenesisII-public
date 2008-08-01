@@ -55,9 +55,7 @@ class StreamableByteIOFuseFile extends FuseFileCommon
 	{
 		try
 		{
-			byte []data = new byte[buffer.remaining()];
-			buffer.get(data);
-			_operator.append(data, 0, data.length);
+			_operator.append(buffer);
 		}
 		catch (Throwable cause)
 		{
@@ -74,9 +72,12 @@ class StreamableByteIOFuseFile extends FuseFileCommon
 		{
 			while (buffer.hasRemaining())
 			{
-				byte []data = new byte[buffer.remaining()];
-				int read = _operator.read(offset, data, 0, data.length);
-				buffer.put(data, 0, read);
+				int start = buffer.position();
+				_operator.read(offset, buffer);
+				int read = buffer.position() - start;
+				if (read <= 0)
+					return;
+				offset += read;
 			}
 		}
 		catch (Throwable cause)
@@ -92,9 +93,7 @@ class StreamableByteIOFuseFile extends FuseFileCommon
 	{
 		try
 		{
-			byte []data = new byte[buffer.remaining()];
-			buffer.get(data);
-			_operator.write(offset, data, 0, data.length);
+			_operator.write(offset, buffer);
 		}
 		catch (Throwable cause)
 		{
@@ -149,13 +148,11 @@ class StreamableByteIOFuseFile extends FuseFileCommon
 		}
 
 		@Override
-		public int read(long fileOffset, byte[] destination,
-				int destinationOffset, int length) throws IOException
+		public void read(long fileOffset, ByteBuffer destination)
+				throws IOException
 		{
-			byte []data = _transferer.seekRead(SeekOrigin.SEEK_BEGINNING, 
-				fileOffset, length);
-			System.arraycopy(data, 0, destination, destinationOffset, length);
-			return data.length;
+			_transferer.seekRead(SeekOrigin.SEEK_BEGINNING, 
+				fileOffset, destination);
 		}
 	}
 	
@@ -175,12 +172,11 @@ class StreamableByteIOFuseFile extends FuseFileCommon
 		}
 
 		@Override
-		public void write(long fileOffset, byte[] source, int sourceOffset,
-				int length) throws IOException
+		public void write(long fileOffset, ByteBuffer source)
+				throws IOException
 		{
-			byte []data = new byte[length];
-			System.arraycopy(source, sourceOffset, data, 0, length);
-			_transferer.seekWrite(SeekOrigin.SEEK_BEGINNING, fileOffset, data);
+			_transferer.seekWrite(SeekOrigin.SEEK_BEGINNING, 
+				fileOffset, source);
 		}
 	}
 	
@@ -194,12 +190,9 @@ class StreamableByteIOFuseFile extends FuseFileCommon
 		}
 
 		@Override
-		public void append(byte[] data, int start, int length)
-				throws IOException
+		public void append(ByteBuffer source) throws IOException
 		{
-			byte []tmpData = new byte[length];
-			System.arraycopy(data, start, tmpData, 0, length);
-			_transferer.seekWrite(SeekOrigin.SEEK_END, 0, tmpData);
+			_transferer.seekWrite(SeekOrigin.SEEK_END, 0, source);
 		}
 	}
 }

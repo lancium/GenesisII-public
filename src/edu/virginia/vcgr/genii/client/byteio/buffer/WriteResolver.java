@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.client.byteio.buffer;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 /**
  * This interface denotes the ability of some entity to resolve a
@@ -13,18 +14,16 @@ import java.io.IOException;
 public interface WriteResolver
 {
 	/**
-	 * Write an array of bytes to some destination.
+	 * Write a bunch of bytes out to a target ByteIO.
 	 * 
-	 * @param fileOffset The offset within the target to which to
-	 * begin writing.
-	 * @param source The source buffer of bytes from which to flush.
-	 * @param sourceOffset The offset within the source buffer at which
-	 * to begin reading bytes.
-	 * @param length The number of bytes to flush.
+	 * @param fileOffset The offset at which to begin writing bytes
+	 * out.
+	 * @param source The source of the bytes to write.
+	 * 
 	 * @throws IOException
 	 */
-	public void write(long fileOffset, byte []source, 
-		int sourceOffset, int length) throws IOException;
+	public void write(long fileOffset, ByteBuffer source) 
+		throws IOException;
 	
 	/**
 	 * Truncate the target file to some known length.

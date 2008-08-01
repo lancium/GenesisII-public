@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.byteio.transfer.dime;
 
+import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 
 import org.apache.axis.message.MessageElement;
@@ -87,5 +88,23 @@ public class DimeSByteIOTransferer
 			offset, seekOrigin, transType);
 		
 		_clientStub.seekWrite(seekWriteRequest);
+	}
+
+	@Override
+	public void seekRead(SeekOrigin origin, long offset, ByteBuffer destination)
+			throws RemoteException
+	{
+		byte []data = seekRead(origin, offset, destination.remaining());
+		if (data != null)
+			destination.put(data);
+	}
+
+	@Override
+	public void seekWrite(SeekOrigin origin, long offset, ByteBuffer source)
+			throws RemoteException
+	{
+		byte []data = new byte[source.remaining()];
+		source.get(data);
+		seekWrite(origin, offset, data);
 	}
 }

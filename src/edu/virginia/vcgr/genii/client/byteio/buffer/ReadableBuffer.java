@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.client.byteio.buffer;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import edu.virginia.vcgr.genii.client.lease.LeaseableResource;
 import edu.virginia.vcgr.genii.client.lease.LeaseeAgreement;
@@ -24,11 +25,8 @@ public class ReadableBuffer implements Closeable
 	 */
 	private long _blockOffsetInFile = -1L;
 	
-	/** The number of valid bytes currently contained in the buffer. */
-	private int _validSize = -1;
-	
 	/** The currently leased buffer (if any) or null */
-	private LeaseableResource<byte[]> _lease = null;
+	private LeaseableResource<ByteBuffer> _lease = null;
 	
 	/** The leaser to use to obtain new buffers */
 	private ByteIOBufferLeaser _leaser;
@@ -47,12 +45,14 @@ public class ReadableBuffer implements Closeable
 	{
 		if (_lease == null)
 			_lease = _leaser.obtainLease(new LeaseeAgreementImpl());
-		byte[] buffer = _lease.resource();
+		ByteBuffer buffer = _lease.resource();
 		
 		if ((_blockOffsetInFile < 0) || (fileOffset < _blockOffsetInFile) || 
-			((_blockOffsetInFile + _validSize) <= fileOffset))
+			((_blockOffsetInFile + buffer.limit()) <= fileOffset))
 		{
-			_validSize = _resolver.read(fileOffset, buffer, 0, buffer.length);
+			buffer.clear();
+			_resolver.read(fileOffset, buffer);
+			buffer.flip();
 			_blockOffsetInFile = fileOffset;
 		}
 	}
@@ -83,41 +83,26 @@ public class ReadableBuffer implements Closeable
 			if (_lease != null)
 				_lease.cancel();
 			_lease = null;
-			_validSize = -1;
 			_blockOffsetInFile = -1L;
 		}
 	}
 	
-	/**
-	 * Read a section of bytes from the file into an array.
-	 * 
-	 * @param fileOffset The offset in the target file at which to begin
-	 * reading.
-	 * @param destination The destination byte buffer to fill in.
-	 * @param destinationOffset The offset within the destination byte buffer
-	 * at which to begin filling in.
-	 * @param length The number of bytes to read.
-	 * @return The number of bytes read.  This can be a short read, but will
-	 * be 0 or -1 if there are no bytes left in the target file.
-	 * 
-	 * @throws IOException
-	 */
-	public int read(long fileOffset, byte []destination, 
-		int destinationOffset, int length) throws IOException
+	public void read(long fileOffset, ByteBuffer destination) throws IOException
 	{
 		synchronized(_lockObject)
 		{
 			ensure(fileOffset);
+			ByteBuffer buffer = _lease.resource();
 			int blockOffset = (int)(fileOffset - _blockOffsetInFile);
-			int blockLeft = _validSize - blockOffset;
-			if (blockLeft <= 0)
-				return 0;
+			buffer.position(blockOffset);
+			buffer = buffer.slice();
+			if (buffer.remaining() <= 0)
+				return;
 			
-			if (blockLeft < length)
-				length = blockLeft;
-			System.arraycopy(_lease.resource(), blockOffset,
-				destination, destinationOffset, length);
-			return length;
+			if (buffer.remaining() > destination.remaining())
+				buffer.limit(destination.remaining());
+			
+			destination.put(buffer);
 		}
 	}
 	
@@ -126,18 +111,17 @@ public class ReadableBuffer implements Closeable
 	 * 
 	 * @author mmm2a
 	 */
-	private class LeaseeAgreementImpl implements LeaseeAgreement<byte[]>
+	private class LeaseeAgreementImpl implements LeaseeAgreement<ByteBuffer>
 	{
 		@Override
-		public LeaseableResource<byte[]> relinquish(
-				LeaseableResource<byte[]> lease)
+		public LeaseableResource<ByteBuffer> relinquish(
+				LeaseableResource<ByteBuffer> lease)
 		{
 			synchronized(_lockObject)
 			{
-				LeaseableResource<byte[]> ret = _lease;
+				LeaseableResource<ByteBuffer> ret = _lease;
 				_lease = null;
 				_blockOffsetInFile = -1L;
-				_validSize = -1;
 				return ret;
 			}
 		}

@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.client.byteio.buffer;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 /**
  * This interface denotes the ability of some entity to resolve a
@@ -13,18 +14,14 @@ import java.io.IOException;
 public interface ReadResolver
 {
 	/**
-	 * Read an array of bytes from some source.
+	 * Read a bunch of bytes from a target ByteIO.
 	 * 
-	 * @param fileOffset The offset within the target source from which to
-	 * begin reading.
-	 * @param destination The destination buffer into which the source bytes
-	 * should be placed.
-	 * @param destinationOffset The offset within the destination buffer at
-	 * which to begin placing bytes.
-	 * @param length The number of bytes to read.
-	 * @return The number of bytes actually read.
+	 * @param fileOffset The offset at which to begin reading bytes.
+	 * @param destination The destination buffer into which to place
+	 * the bytes.  This method CAN return a short read.
+	 * 
 	 * @throws IOException
 	 */
-	public int read(long fileOffset, byte []destination, 
-		int destinationOffset, int length) throws IOException;
+	public void read(long fileOffset,
+		ByteBuffer destination) throws IOException;
 }
