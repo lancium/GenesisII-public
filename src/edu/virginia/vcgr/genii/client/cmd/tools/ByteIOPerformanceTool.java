@@ -117,7 +117,7 @@ public class ByteIOPerformanceTool extends BaseGridTool
 			{
 				int bSize = blockSize.intValue();
 				writeBlocks.put(blockSize, new PerfRun());
-				System.out.format("Read[%d]\n", bSize);
+				System.out.format("Read[%d]:   ", bSize);
 				System.out.flush();
 				for (int run = 0; run < numRuns; run++)
 				{
@@ -130,7 +130,7 @@ public class ByteIOPerformanceTool extends BaseGridTool
 			for (Integer blockSize : blockSizes)
 			{
 				int bSize = blockSize.intValue();
-				System.out.format("Write[%d]\n", bSize);
+				System.out.format("Write[%d]:  ", bSize);
 				System.out.flush();
 				for (int run = 0; run < numRuns; run++)
 				{
@@ -291,7 +291,7 @@ public class ByteIOPerformanceTool extends BaseGridTool
 		
 		public double average(int trimSize)
 		{
-			if ((_values.size() - (trimSize * 2)) <= 1)
+			if ((_values.size() - (trimSize * 2)) <= 0)
 				throw new RuntimeException(
 					"Trim size is too large for data set.");
 			
