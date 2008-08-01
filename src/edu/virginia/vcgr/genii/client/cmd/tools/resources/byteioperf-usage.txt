@@ -1,0 +1,3 @@
+byteioperf <SIMPLE|DIME|MTOM> <block-size> <minimum-duration> <num-runs> <target>
+	OR
+byteioperf <ini-file> <target> <results-file>
