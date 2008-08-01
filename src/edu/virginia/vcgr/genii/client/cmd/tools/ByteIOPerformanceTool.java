@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.Random;
@@ -110,9 +111,12 @@ public class ByteIOPerformanceTool extends BaseGridTool
 					targetPT, xferMech);
 			
 			System.out.println(section);
-			for (Integer blockSize : readBlocks.keySet())
+			Integer []blockSizes = readBlocks.keySet().toArray(new Integer[0]);
+			Arrays.sort(blockSizes);
+			for (Integer blockSize : blockSizes)
 			{
 				int bSize = blockSize.intValue();
+				writeBlocks.put(blockSize, new PerfRun());
 				System.out.format("Read[%d]\n", bSize);
 				System.out.flush();
 				for (int run = 0; run < numRuns; run++)
@@ -123,7 +127,7 @@ public class ByteIOPerformanceTool extends BaseGridTool
 				}
 			}
 			
-			for (Integer blockSize : writeBlocks.keySet())
+			for (Integer blockSize : blockSizes)
 			{
 				int bSize = blockSize.intValue();
 				System.out.format("Write[%d]\n", bSize);
