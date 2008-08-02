@@ -297,9 +297,11 @@ public class ByteIOPerformanceTool extends BaseGridTool
 			
 			double total = 0.0;
 			int count = 0;
-			for (int lcv = trimSize; lcv < (_values.size() - trimSize); lcv++)
+			Double []values = _values.toArray(new Double[0]);
+			Arrays.sort(values);
+			for (int lcv = trimSize; lcv < (values.length - trimSize); lcv++)
 			{
-				total += _values.get(lcv).doubleValue();
+				total += values[lcv].doubleValue();
 				count++;
 			}
 			
