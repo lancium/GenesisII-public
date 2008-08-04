@@ -20,6 +20,10 @@ public interface ByteIOTransferer
 	 */
 	public URI getTransferProtocol();
 	
+	public int getMaximumReadSize();
+	
+	public int getMaximumWriteSize();
+	
 	/**
 	 * Different transfer mechanisms have different optimal transfer
 	 * sizes.  While that optimal number depends on some factors that

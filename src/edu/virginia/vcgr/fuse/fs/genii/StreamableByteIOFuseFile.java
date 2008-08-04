@@ -42,7 +42,7 @@ class StreamableByteIOFuseFile extends FuseFileCommon
 				_portType);
 		
 		_operator = new BasicFileOperator(
-			ByteIOBufferLeaser.leaser(),
+			ByteIOBufferLeaser.leaser(transferer.getTransferProtocol()),
 			new StreamableReadResolver(transferer),
 			new StreamableWriteResolver(transferer),
 			new StreamableAppendResolver(transferer), false);

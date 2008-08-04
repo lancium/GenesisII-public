@@ -25,6 +25,8 @@ public abstract class AbstractByteIOTransferer<Type> implements ByteIOTransferer
 	private URI _transferProtocol;
 	private int _preferredReadSize;
 	private int _preferredWriteSize;
+	private int _maximumReadSize;
+	private int _maximumWriteSize;
 
 	/**
 	 * {@inheritDoc}
@@ -48,6 +50,16 @@ public abstract class AbstractByteIOTransferer<Type> implements ByteIOTransferer
 	public int getPreferredWriteSize()
 	{
 		return _preferredWriteSize;
+	}
+	
+	public int getMaximumReadSize()
+	{
+		return _maximumReadSize;
+	}
+	
+	public int getMaximumWriteSize()
+	{
+		return _maximumWriteSize;
 	}
 	
 	/**
@@ -114,13 +126,16 @@ public abstract class AbstractByteIOTransferer<Type> implements ByteIOTransferer
 	 * this transferer.
 	 */
 	protected AbstractByteIOTransferer(Type clientStub,
-		URI transferProcotol, int preferredReadSize, int preferredWriteSize)
+		URI transferProcotol, int preferredReadSize, int maximumReadSize,
+		int preferredWriteSize, int maximumWriteSize)
 	{
 		_clientStub = clientStub;
 		
 		_transferProtocol = transferProcotol;
 		_preferredReadSize = preferredReadSize;
+		_maximumReadSize = maximumReadSize;
 		_preferredWriteSize = preferredWriteSize;
+		_maximumWriteSize = maximumWriteSize;
 	}
 	
 	/**

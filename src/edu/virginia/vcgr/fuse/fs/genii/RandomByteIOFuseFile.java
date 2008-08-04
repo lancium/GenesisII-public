@@ -38,7 +38,7 @@ class RandomByteIOFuseFile extends FuseFileCommon
 			ClientUtils.createProxy(RandomByteIOPortType.class, target));
 		
 		_operator = new BasicFileOperator(
-			ByteIOBufferLeaser.leaser(), 
+			ByteIOBufferLeaser.leaser(transferer.getTransferProtocol()), 
 			new RandomByteIOReadResolver(transferer),
 			new RandomByteIOWriteResolver(transferer),
 			new RandomByteIOAppendResolver(transferer), false);

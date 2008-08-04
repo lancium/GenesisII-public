@@ -34,7 +34,8 @@ public class DimeRByteIOTransferer
 	public DimeRByteIOTransferer(RandomByteIOPortType clientStub)
 	{
 		super(clientStub,
-			TRANSFER_PROTOCOL, PREFERRED_READ_SIZE, PREFERRED_WRITE_SIZE);
+			TRANSFER_PROTOCOL, PREFERRED_READ_SIZE, MAXIMUM_READ_SIZE,
+			PREFERRED_WRITE_SIZE, MAXIMUM_WRITE_SIZE);
 	}
 	
 	/**
