@@ -117,25 +117,31 @@ class StreamableByteIOFuseFile extends FuseFileCommon
 	}
 
 	@Override
-	public void release() throws FuseException
+	synchronized public void release() throws FuseException
 	{
-		try
+		if (_operator != null)
 		{
-			_operator.close();
-			_portType.destroy(new Destroy());
-		}
-		catch (Throwable cause)
-		{
-			throw FuseExceptions.translate(
-				"Unable to release Streamable byte io.", cause);
+			try
+			{
+				_operator.close();
+				_portType.destroy(new Destroy());
+			}
+			catch (Throwable cause)
+			{
+				throw FuseExceptions.translate(
+					"Unable to release Streamable byte io.", cause);
+			}
+			
+			_operator = null;
+			_portType = null;
 		}
 	}
 	
 	@Override
-	public void close() throws IOException
+	synchronized public void close() throws IOException
 	{
-		_operator.close();
-		_portType.destroy(new Destroy());
+		// We don't do this for streamable's -- they get closed later with
+		// release.
 	}
 	
 	static private class StreamableReadResolver implements ReadResolver
