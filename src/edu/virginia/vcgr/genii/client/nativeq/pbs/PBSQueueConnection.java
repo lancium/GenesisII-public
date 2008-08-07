@@ -188,12 +188,6 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 			
 			if (application.getStdinRedirect() != null)
 				script.format(" < \"%s\"", application.getStdinRedirect());
-			if (application.getStdoutRedirect() != null)
-				script.format(" > \"%s\"", application.getStdoutRedirect());
-			if (application.getStderrRedirect() != null)
-				script.format(" 2> \"%s\"", application.getStderrRedirect());
-			
-			script.format("\nexport QUEUE_SCRIPT_RESULT=$?\n");
 		} else
 			super.generateApplicationBody(script, workingDirectory, application);
 	}

@@ -82,7 +82,9 @@ public abstract class ScriptBasedQueueConnection
 			ps = new PrintStream(submitScript);
 			generateScriptHeader(ps, workingDirectory, application);
 			generateQueueHeaders(ps, workingDirectory, application);
+			generateQueueApplicationHeader(ps, workingDirectory, application);
 			generateApplicationBody(ps, workingDirectory, application);
+			generateQueueApplicationFooter(ps, workingDirectory, application);
 			generateScriptFooter(ps, workingDirectory, application);
 			
 			submitScript.setExecutable(true, true);
@@ -104,13 +106,33 @@ public abstract class ScriptBasedQueueConnection
 			throws NativeQueueException, IOException
 	{
 		script.format("#%s\n\n", getBashBinary().getAbsolutePath());
-		script.format("export QUEUE_SCRIPT_RESULT=0\n");
 	}
 	
 	protected void generateQueueHeaders(PrintStream script,
 		File workingDirectory, ApplicationDescription application)
 			throws NativeQueueException, IOException
 	{
+		String stdout = application.getStdoutRedirect();
+		String stderr = application.getStderrRedirect();
+		
+		if (stdout != null)
+			script.format("#PBS -o %s\n", stdout);
+		if (stderr != null)
+			script.format("#PBS -e %s\n", stderr);
+	}
+	
+	protected void generateQueueApplicationHeader(PrintStream script,
+		File workingDirectory, ApplicationDescription application)
+			throws NativeQueueException, IOException
+	{
+		script.format("export QUEUE_SCRIPT_RESULT=0\n");
+	}
+
+	protected void generateQueueApplicationFooter(PrintStream script,
+		File workingDirectory, ApplicationDescription application)
+			throws NativeQueueException, IOException
+	{
+		script.format("\nexport QUEUE_SCRIPT_RESULT=$?\n");
 	}
 	
 	protected void generateApplicationBody(PrintStream script,
@@ -129,12 +151,6 @@ public abstract class ScriptBasedQueueConnection
 		
 		if (application.getStdinRedirect() != null)
 			script.format(" < \"%s\"", application.getStdinRedirect());
-		if (application.getStdoutRedirect() != null)
-			script.format(" > \"%s\"", application.getStdoutRedirect());
-		if (application.getStderrRedirect() != null)
-			script.format(" 2> \"%s\"", application.getStderrRedirect());
-		
-		script.format("\nexport QUEUE_SCRIPT_RESULT=$?\n");
 	}
 	
 	protected void generateScriptFooter(PrintStream script,
