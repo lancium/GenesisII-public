@@ -2,13 +2,17 @@ package edu.virginia.vcgr.genii.client.nativeq;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 public abstract class AbstractNativeQueueConnection 
 	implements NativeQueueConnection
 {
 	transient private boolean _closed = false;
 	private File _workingDirectory = null;
+	private Set<URI> _supportedSPMDVariations = new HashSet<URI>(4);
 	
 	protected AbstractNativeQueueConnection(
 		File workingDirectory, Properties connectionProperties) 
@@ -16,10 +20,17 @@ public abstract class AbstractNativeQueueConnection
 	{
 		_workingDirectory = workingDirectory;
 		initialize(connectionProperties);
+		addSupportedSPMDVariations(_supportedSPMDVariations, 
+			connectionProperties);
 	}
 	
 	protected void initialize(Properties connectionProperties)
 		throws NativeQueueException
+	{
+	}
+	
+	protected void addSupportedSPMDVariations(
+		Set<URI> variations, Properties connectionProperties)
 	{
 	}
 	
@@ -45,6 +56,12 @@ public abstract class AbstractNativeQueueConnection
 	protected File getWorkingDirectory()
 	{
 		return _workingDirectory;
+	}
+	
+	@Override
+	public Set<URI> supportedSPMDVariations()
+	{
+		return _supportedSPMDVariations;
 	}
 	
 	@Override

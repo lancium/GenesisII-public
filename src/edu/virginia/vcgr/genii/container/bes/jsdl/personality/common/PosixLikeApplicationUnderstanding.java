@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.container.bes.jsdl.personality.common;
 
+import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -17,6 +18,9 @@ import edu.virginia.vcgr.genii.container.bes.execution.phases.TeeRedirectionSink
 public abstract class PosixLikeApplicationUnderstanding extends
 		CommonApplicationUnderstanding
 {
+	private Integer _numProcesses = null;
+	private URI _spmdVariation = null;
+	
 	private String _executable = null;
 	private Collection<String> _arguments =
 		new LinkedList<String>();
@@ -25,6 +29,26 @@ public abstract class PosixLikeApplicationUnderstanding extends
 	private String _stderrRedirect = null;
 	private Map<String, String> _environment =
 		new HashMap<String, String>();
+	
+	public void setSPMDVariation(URI spmdVariation)
+	{
+		_spmdVariation = spmdVariation;
+	}
+	
+	public URI getSPMDVariation()
+	{
+		return _spmdVariation;
+	}
+	
+	public void setNumProcesses(int numProcesses)
+	{
+		_numProcesses = new Integer(numProcesses);
+	}
+	
+	public Integer getNumProcesses()
+	{
+		return _numProcesses;
+	}
 	
 	public void setExecutable(String executable)
 	{

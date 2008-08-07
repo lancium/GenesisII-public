@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.container.bes.execution.phases;
 
 import java.io.File;
+import java.net.URI;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Properties;
@@ -34,6 +35,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 	transient private NativeQueueState _state = null;
 	transient private File _workingDirectory = null;
 	
+	private URI _spmdVariation;
+	private Integer _numProcesses;
 	private String _executable;
 	private Collection<String> _arguments;
 	private String _stdin;
@@ -45,13 +48,15 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 	transient private JobToken _jobToken = null;
 	transient private Boolean _terminate = null;
 	
-	public QueueProcessPhase(
+	public QueueProcessPhase(URI spmdVariation, Integer numProcesses,
 		String executable, Collection<String> arguments, Map<String, String> environment,
 		String stdin, String stdout, String stderr, Properties queueProperties)
 	{
 		super(new ActivityState(
 			ActivityStateEnumeration.Running, "Enqueing", false));
-		
+	
+		_spmdVariation = spmdVariation;
+		_numProcesses = numProcesses;
 		_executable = executable;
 		_arguments = arguments;
 		_environment = environment;
@@ -111,7 +116,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 					}
 				}
 				
-				_jobToken = queue.submit(new ApplicationDescription(_executable, _arguments,
+				_jobToken = queue.submit(new ApplicationDescription(
+					_spmdVariation, _numProcesses, _executable, _arguments,
 					_environment, _stdin, _stdout, _stderr));
 				context.setProperty(JOB_TOKEN_PROPERTY, _jobToken);
 			}

@@ -6,6 +6,7 @@ import java.util.Collection;
 
 import org.morgan.util.io.GuaranteedDirectory;
 
+import edu.virginia.vcgr.genii.client.jsdl.spmd.SPMDConstants;
 import edu.virginia.vcgr.genii.client.nativeq.ApplicationDescription;
 import edu.virginia.vcgr.genii.client.nativeq.JobToken;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueue;
@@ -22,6 +23,7 @@ public class TestPBSQueue
 		arggs.add("mmm2a@virginia.edu");
 		File workingDir = new GuaranteedDirectory("/home/mmm2a/queue");
 		ApplicationDescription application = new ApplicationDescription(
+			SPMDConstants.ANY_MPI, new Integer(5),
 			"mail", arggs, null, "/etc/passwd", "/dev/null", "/dev/null");
 		NativeQueue queue = NativeQueues.getNativeQueue("pbs");
 		

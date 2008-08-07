@@ -37,6 +37,7 @@ class QSubApplicationUnderstanding
 		if (ogrshVersion == null)
 		{
 			executionPlan.add(new QueueProcessPhase(
+				getSPMDVariation(), getNumProcesses(),
 				getExecutable(), getArguments(), env,
 				getStdinRedirect(), getStdoutRedirect(), getStderrRedirect(),
 				creationProperties));
@@ -55,6 +56,7 @@ class QSubApplicationUnderstanding
 			File shim = oVersion.shimScript();
 			
 			executionPlan.add(new QueueProcessPhase(
+				getSPMDVariation(), getNumProcesses(),
 				shim.getAbsolutePath(), args, env,
 				getStdinRedirect(), getStdoutRedirect(), getStderrRedirect(),
 				creationProperties));

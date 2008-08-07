@@ -27,6 +27,9 @@ public class PBSQueue extends AbstractNativeQueue
 	static final public String QUEUE_QSTAT_PATH_PROPERTY =
 		"edu.virginia.vcgr.genii.client.nativeq.pbs.qstat-path";
 	
+	static final public String QUEUE_SUPPORTED_SPMD_VARIATIONS_PROPERTY_BASE =
+		"edu.virginia.vcgr.genii.client.nativeq.pbs.spmd.variation";
+	
 	static final public String DEFAULT_QSUB_COMMAND = "qsub";
 	static final public String DEFAULT_QSTAT_COMMAND = "qstat";
 	static final public String DEFAULT_QDEL_COMMAND = "qdel";

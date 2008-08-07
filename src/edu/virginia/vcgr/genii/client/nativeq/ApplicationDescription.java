@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.nativeq;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -7,6 +8,8 @@ import java.util.Map;
 
 public class ApplicationDescription
 {
+	private URI _spmdVariation;
+	private Integer _numProcesses;
 	private String _executableName;
 	private Collection<String> _arguments;
 	private Map<String, String> _environment;
@@ -15,10 +18,14 @@ public class ApplicationDescription
 	private String _stderrRedirect;
 	
 	public ApplicationDescription(
+		URI spmdVariation, Integer numProcesses,
 		String executableName, Collection<String> arguments,
 		Map<String, String> environment,
 		String stdinRedirect, String stdoutRedirect, String stderrRedirect)
 	{
+		_spmdVariation = spmdVariation;
+		_numProcesses = numProcesses;
+		
 		if (executableName == null)
 			throw new IllegalArgumentException(
 				"Executable name cannot be null.");
@@ -36,6 +43,16 @@ public class ApplicationDescription
 		_stderrRedirect = stderrRedirect;
 	}
 
+	public URI getSPMDVariation()
+	{
+		return _spmdVariation;
+	}
+	
+	public Integer getNumProcesses()
+	{
+		return _numProcesses;
+	}
+	
 	public String getExecutableName()
 	{
 		return _executableName;

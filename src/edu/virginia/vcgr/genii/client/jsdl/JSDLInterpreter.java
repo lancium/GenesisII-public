@@ -11,6 +11,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.NormalizedString;
+import org.apache.axis.types.PositiveInteger;
 import org.ggf.jsdl.Application_Type;
 import org.ggf.jsdl.CPUArchitecture_Type;
 import org.ggf.jsdl.CreationFlagEnumeration;
@@ -35,6 +36,10 @@ import org.ggf.jsdl.posix.GroupName_Type;
 import org.ggf.jsdl.posix.Limits_Type;
 import org.ggf.jsdl.posix.POSIXApplication_Type;
 import org.ggf.jsdl.posix.UserName_Type;
+import org.ogf.jsdl.spmd.NumberOfProcesses_Type;
+import org.ogf.jsdl.spmd.ProcessesPerHost_Type;
+import org.ogf.jsdl.spmd.SPMDApplication_Type;
+import org.ogf.jsdl.spmd.ThreadsPerProcess_Type;
 
 import edu.virginia.vcgr.genii.client.jsdl.hpc.HPCConstants;
 import edu.virginia.vcgr.genii.client.jsdl.personality.ApplicationFacet;
@@ -52,11 +57,13 @@ import edu.virginia.vcgr.genii.client.jsdl.personality.POSIXApplicationFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.PersonalityFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.PersonalityProvider;
 import edu.virginia.vcgr.genii.client.jsdl.personality.ResourcesFacet;
+import edu.virginia.vcgr.genii.client.jsdl.personality.SPMDApplicationFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.SourceURIFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.TargetURIFacet;
 import edu.virginia.vcgr.genii.client.jsdl.posix.JSDLPosixConstants;
 import edu.virginia.vcgr.genii.client.jsdl.range.RangeExpression;
 import edu.virginia.vcgr.genii.client.jsdl.range.RangeFactory;
+import edu.virginia.vcgr.genii.client.jsdl.spmd.SPMDConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
@@ -238,6 +245,21 @@ public class JSDLInterpreter
 							"Unable to parse JSDL Application element " +
 								"into HPCProfileApplication element.", re);
 					}
+				} else if (elementName.equals(
+					SPMDConstants.JSDL_SPMD_APPLICATION_QNAME))
+				{
+					try
+					{
+						SPMDApplication_Type spmd = ObjectDeserializer.toObject(
+							a, SPMDApplication_Type.class);
+						understand(provider, understanding, spmd);
+					}
+					catch (ResourceException re)
+					{
+						throw new InvalidJSDLException(
+							"Unable to parse JSDL Application element " +
+								"into SPMDApplication element.", re);
+					}
 				} else
 				{
 					any.add(a);
@@ -341,6 +363,124 @@ public class JSDLInterpreter
 		{
 			understand(provider, parentUnderstanding, stage);
 		}
+	}
+	
+	static private void understand(PersonalityProvider provider,
+		Object parentUnderstanding, SPMDApplication_Type spmd)
+		throws JSDLException
+	{
+		if (spmd == null)
+			return;
+		
+		SPMDApplicationFacet facet = provider.getSPMDApplicationFacet(
+			parentUnderstanding);
+		Object understanding = facet.createFacetUnderstanding(
+			parentUnderstanding);
+		
+		NormalizedString nStr;
+		
+		FileName_Type file = spmd.getExecutable();
+		if (file != null)
+		{
+			nStr = file.getFilesystemName();
+			facet.consumeExecutable(understanding, 
+				nStr != null ? nStr.toString() : null, file.get_value());
+		}
+		
+		Argument_Type []args = spmd.getArgument();
+		if (args != null)
+		{
+			for (Argument_Type arg : args)
+			{
+				nStr = arg.getFilesystemName();
+				NormalizedString nStr2 = arg.get_value();
+				facet.consumeArgument(understanding, 
+					nStr != null ? nStr.toString() : null,
+					nStr2 != null ? nStr2.toString() : null);
+			}
+		}
+		
+		file = spmd.getInput();
+		if (file != null)
+		{
+			nStr = file.getFilesystemName();
+			facet.consumeInput(understanding, nStr != null ? nStr.toString() : null, 
+				file.get_value());
+		}
+		
+		file = spmd.getOutput();
+		if (file != null)
+		{
+			nStr = file.getFilesystemName();
+			facet.consumeOutput(understanding, nStr != null ? nStr.toString() : null, 
+				file.get_value());
+		}
+		file = spmd.getError();
+		if (file != null)
+		{
+			nStr = file.getFilesystemName();
+			facet.consumeError(understanding, nStr != null ? nStr.toString() : null, 
+				file.get_value());
+		}
+		
+		DirectoryName_Type dir = spmd.getWorkingDirectory();
+		if (dir != null)
+		{
+			nStr = dir.getFilesystemName();
+			facet.consumeWorkingDirectory(understanding, 
+				nStr != null ? nStr.toString() : null, dir.get_value());
+		}
+		
+		Environment_Type []env = spmd.getEnvironment();
+		if (env != null)
+		{
+			for (Environment_Type e : env)
+			{
+				nStr = e.getName();
+				NormalizedString nStr2 = e.getFilesystemName();
+				facet.consumeEnvironment(understanding, nStr != null ? nStr.toString() : null, 
+					nStr2 != null ? nStr2.toString() : null, e.get_value());
+			}
+		}
+		
+		UserName_Type user = spmd.getUserName();
+		if (user != null)
+			facet.consumeUserName(understanding, user.get_value());
+		
+		NumberOfProcesses_Type nProcs = spmd.getNumberOfProcesses();
+		if (nProcs != null)
+		{
+			PositiveInteger pi = nProcs.get_value();
+			Boolean b = nProcs.getActualtotalcpucount();
+			
+			facet.consumeNumberOfProcesses(understanding, 
+				pi != null ? pi.intValue() : null,
+				b != null ? b.booleanValue() : false);
+		}
+		
+		ProcessesPerHost_Type pph = spmd.getProcessesPerHost();
+		if (pph != null)
+		{
+			PositiveInteger pi = pph.get_value();
+			if (pi != null)
+				facet.consumeProcessesPerHost(understanding, pi.intValue());
+		}
+		
+		ThreadsPerProcess_Type tpp = spmd.getThreadsPerProcess();
+		if (tpp != null)
+		{
+			PositiveInteger pi = tpp.get_value();
+			Boolean b = tpp.getActualindividualcpucount();
+			facet.consumeThreadsPerProcess(understanding, 
+				pi != null ? pi.intValue() : null,
+				b != null ? b.booleanValue() : false);
+		}
+		
+		org.apache.axis.types.URI variation = spmd.getSPMDVariation();
+		facet.consumeSPMDVariation(understanding, URI.create(
+			variation.toString()));
+		
+		facet.completeFacet(parentUnderstanding, understanding);
 	}
 	
 	static private void understand(PersonalityProvider provider,

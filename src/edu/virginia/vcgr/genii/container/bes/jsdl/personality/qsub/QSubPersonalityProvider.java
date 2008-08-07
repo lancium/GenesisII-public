@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.container.bes.jsdl.personality.qsub;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.personality.HPCApplicationFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.POSIXApplicationFacet;
+import edu.virginia.vcgr.genii.client.jsdl.personality.SPMDApplicationFacet;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.CommonPersonalityProvider;
 
 public class QSubPersonalityProvider extends CommonPersonalityProvider
@@ -19,5 +20,12 @@ public class QSubPersonalityProvider extends CommonPersonalityProvider
 		Object currentUnderstanding) throws JSDLException
 	{
 		return new QSubHPCApplicationFacet();
+	}
+	
+	@Override
+	public SPMDApplicationFacet getSPMDApplicationFacet(
+		Object currentUnderstanding) throws JSDLException
+	{
+		return new QSubSPMDApplicationFacet();
 	}
 }
