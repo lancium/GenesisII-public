@@ -7,11 +7,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,6 +28,9 @@ import edu.virginia.vcgr.genii.client.nativeq.NativeQueueState;
 import edu.virginia.vcgr.genii.client.nativeq.ScriptBasedQueueConnection;
 import edu.virginia.vcgr.genii.client.nativeq.ScriptExecutionException;
 import edu.virginia.vcgr.genii.client.nativeq.ScriptLineParser;
+import edu.virginia.vcgr.genii.client.spmd.SPMDException;
+import edu.virginia.vcgr.genii.client.spmd.SPMDTranslator;
+import edu.virginia.vcgr.genii.client.spmd.SPMDTranslators;
 
 public class PBSQueueConnection extends ScriptBasedQueueConnection
 {
@@ -61,20 +64,45 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 	}
 	
 	@Override
-	protected void addSupportedSPMDVariations(Set<URI> variations,
-			Properties connectionProperties)
+	protected void addSupportedSPMDVariations(
+		Map<URI, SPMDTranslator> variations, Properties connectionProperties)
+			throws NativeQueueException
 	{
 		super.addSupportedSPMDVariations(variations, connectionProperties);
 		
-		for (int lcv = 0; true; lcv++)
+		try
 		{
-			String variation = connectionProperties.getProperty(
-				PBSQueue.QUEUE_SUPPORTED_SPMD_VARIATIONS_PROPERTY_BASE +
-					"." + lcv);
-			if (variation == null)
-				break;
-			
-			variations.add(URI.create(variation));
+			for (int lcv = 0; true; lcv++)
+			{
+				String variationProperty =
+					PBSQueue.QUEUE_SUPPORTED_SPMD_VARIATIONS_PROPERTY_BASE +
+					"." + lcv;
+				
+				String variation = connectionProperties.getProperty(
+					variationProperty);
+				
+				if (variation == null)
+					break;
+				
+				String providerName = connectionProperties.getProperty(
+					variationProperty + "." + 
+					PBSQueue.QUEUE_SUPPORTED_SPMD_VARIATION_PROVIDER_FOOTER);
+				
+				if (providerName == null)
+					throw new NativeQueueException(String.format(
+						"Native PBS Queue couldn't find SPMD Provider for type \"%s\".",
+						variation));
+				
+				SPMDTranslator translator = SPMDTranslators.getSPMDTranslator(
+					providerName);
+				
+				variations.put(URI.create(variation), translator);
+			}
+		}
+		catch (SPMDException se)
+		{
+			throw new NativeQueueException(
+				"Unable to instantiate queue provider.", se);
 		}
 	}
 
@@ -173,18 +201,44 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 			File workingDirectory, ApplicationDescription application)
 			throws NativeQueueException, IOException
 	{
-		if (application.getSPMDVariation() != null)
+		URI variation = application.getSPMDVariation();
+		if (variation != null)
 		{
+			SPMDTranslator translator = supportedSPMDVariations().get(
+				variation);
+			if (translator == null)
+				throw new NativeQueueException(String.format(
+					"Unable to find SPMD translator for variation \"%s\".",
+					variation));
+			
 			script.format("cd \"%s\"\n", workingDirectory.getAbsolutePath());
+			
+			List<String> commandLine = new ArrayList<String>(16);
 			
 			String execName = application.getExecutableName();
 			if (!execName.contains("/"))
 				execName = String.format("./%s", execName);
 			
-			script.format("mpiexec \"%s\"", execName);
+			commandLine.add(execName);
 			
 			for (String arg : application.getArguments())
-				script.format(" \"%s\"", arg);
+				commandLine.add(arg);
+			
+			try
+			{
+				commandLine = translator.translateCommandLine(commandLine);
+				boolean first = true;
+				for (String val : commandLine)
+				{
+					script.format("%s\"%s\"", (first ? "" : " "), val);
+					first = false;
+				}
+			}
+			catch (SPMDException se)
+			{
+				throw new NativeQueueException(
+					"Unable to translate SPMD command.", se);
+			}
 			
 			if (application.getStdinRedirect() != null)
 				script.format(" < \"%s\"", application.getStdinRedirect());

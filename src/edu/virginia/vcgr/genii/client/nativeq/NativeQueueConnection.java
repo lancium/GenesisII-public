@@ -2,11 +2,13 @@ package edu.virginia.vcgr.genii.client.nativeq;
 
 import java.io.Closeable;
 import java.net.URI;
-import java.util.Set;
+import java.util.Map;
+
+import edu.virginia.vcgr.genii.client.spmd.SPMDTranslator;
 
 public interface NativeQueueConnection extends Closeable
 {
-	public Set<URI> supportedSPMDVariations();
+	public Map<URI, SPMDTranslator> supportedSPMDVariations();
 	
 	public FactoryResourceAttributes describe() throws NativeQueueException;
 	

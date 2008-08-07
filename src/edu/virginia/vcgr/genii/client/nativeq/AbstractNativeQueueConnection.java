@@ -3,16 +3,19 @@ package edu.virginia.vcgr.genii.client.nativeq;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
+
+import edu.virginia.vcgr.genii.client.spmd.SPMDTranslator;
 
 public abstract class AbstractNativeQueueConnection 
 	implements NativeQueueConnection
 {
 	transient private boolean _closed = false;
 	private File _workingDirectory = null;
-	private Set<URI> _supportedSPMDVariations = new HashSet<URI>(4);
+	private Map<URI, SPMDTranslator> _supportedSPMDVariations = 
+		new HashMap<URI, SPMDTranslator>(4);
 	
 	protected AbstractNativeQueueConnection(
 		File workingDirectory, Properties connectionProperties) 
@@ -30,7 +33,8 @@ public abstract class AbstractNativeQueueConnection
 	}
 	
 	protected void addSupportedSPMDVariations(
-		Set<URI> variations, Properties connectionProperties)
+		Map<URI, SPMDTranslator> variations, Properties connectionProperties)
+			throws NativeQueueException
 	{
 	}
 	
@@ -59,7 +63,7 @@ public abstract class AbstractNativeQueueConnection
 	}
 	
 	@Override
-	public Set<URI> supportedSPMDVariations()
+	public Map<URI, SPMDTranslator> supportedSPMDVariations()
 	{
 		return _supportedSPMDVariations;
 	}

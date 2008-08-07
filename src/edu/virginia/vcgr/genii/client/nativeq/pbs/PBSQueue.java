@@ -29,6 +29,8 @@ public class PBSQueue extends AbstractNativeQueue
 	
 	static final public String QUEUE_SUPPORTED_SPMD_VARIATIONS_PROPERTY_BASE =
 		"edu.virginia.vcgr.genii.client.nativeq.pbs.spmd.variation";
+	static final public String QUEUE_SUPPORTED_SPMD_VARIATION_PROVIDER_FOOTER =
+		"spmd-provider";
 	
 	static final public String DEFAULT_QSUB_COMMAND = "qsub";
 	static final public String DEFAULT_QSTAT_COMMAND = "qstat";
