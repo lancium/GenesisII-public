@@ -1,5 +1,7 @@
 package edu.virginia.vcgr.genii.client.spmd;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.ServiceLoader;
 
 public class SPMDTranslators
@@ -18,5 +20,17 @@ public class SPMDTranslators
 		
 		throw new SPMDException("Unable to find SPMD Translator provider \"" 
 			+ providerName + "\".");
+	}
+	
+	static public Collection<String> listSPMDTranslators()
+	{
+		Collection<String> ret = new ArrayList<String>();
+		
+		for (SPMDTranslator translator : _translators)
+		{
+			ret.add(translator.getProviderName());
+		}
+		
+		return ret;
 	}
 }

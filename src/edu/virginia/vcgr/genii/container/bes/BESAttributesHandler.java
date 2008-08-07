@@ -40,6 +40,7 @@ import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
+import edu.virginia.vcgr.genii.client.spmd.SPMDTranslators;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
@@ -78,6 +79,9 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 	static public QName OGRSH_VERSIONS_ATTR = new QName(
 		GENII_BES_NS, "OGRSHVersion");
 	
+	static public QName SPMD_PROVIDER_ATTR = new QName(
+		GENII_BES_NS, "SPMDProvider");
+	
 	static public QName CPU_SPEED_ATTR = new QName(
 		GenesisIIConstants.JSDL_NS, "IndividualCPUSpeed");
 	static public QName PHYSICAL_MEMORY_ATTR = new QName(
@@ -105,6 +109,7 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		addHandler(CPU_ARCHITECTURE_ATTR, "getCPUArchitectureAttr");
 		addHandler(CPU_COUNT_ATTR, "getCPUCountAttr");
 		addHandler(IS_ACCEPTING_NEW_ACTIVITIES_ATTR, "getIsAcceptingNewActivitiesAttr");
+		addHandler(SPMD_PROVIDER_ATTR, "getSPMDProvidersAttr");
 		addHandler(BES_POLICY_ATTR, "getBESPolicyAttr", "setBESPolicyAttr");
 		addHandler(CPU_SPEED_ATTR, "getCPUSpeedAttr");
 		addHandler(PHYSICAL_MEMORY_ATTR, "getPhysicalMemoryAttr");
@@ -187,6 +192,12 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		Boolean isAccepting = new Boolean(resource.isAcceptingNewActivities());
 		
 		return isAccepting;
+	}
+	
+	static public Collection<String> getSPMDProviders()
+		throws RemoteException
+	{
+		return SPMDTranslators.listSPMDTranslators();
 	}
 	
 	public void setDescription(String description)
@@ -276,6 +287,20 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 	{
 		return new MessageElement(TOTAL_NUMBER_OF_ACTIVITIES_ATTR,
 			getTotalNumberOfActivities());
+	}
+	
+	public ArrayList<MessageElement> getSPMDProvidersAttr()
+		throws RemoteException
+	{
+		Collection<String> spmdProviders = getSPMDProviders();
+		ArrayList<MessageElement> ret = new ArrayList<MessageElement>(
+			spmdProviders.size());
+		for (String provider : spmdProviders)
+		{
+			ret.add(new MessageElement(SPMD_PROVIDER_ATTR, provider));
+		}
+		
+		return ret;
 	}
 	
 	public ArrayList<MessageElement> getActivityReferencesAttr()
