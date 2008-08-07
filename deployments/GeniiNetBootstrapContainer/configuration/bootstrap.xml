@@ -42,6 +42,10 @@
 	<geniix:mkdir>
 		<gsh:param>/containers</gsh:param>
 	</geniix:mkdir>
+
+	<geniix:mkdir>
+		<gsh:param>/uninitialized-containers</gsh:param>
+	</geniix:mkdir>
 	
 	<geniix:ln>
 		<gsh:param>--service-url=https://localhost:18080/axis/services/VCGRContainerPortType</gsh:param>
