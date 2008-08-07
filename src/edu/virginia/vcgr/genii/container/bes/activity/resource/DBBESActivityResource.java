@@ -65,6 +65,10 @@ public class DBBESActivityResource extends BasicDBResource implements
 				if (BESUtilities.isDeletable(dir))
 					recursiveDelete(dir);				
 			}
+		} else
+		{
+			if (BESUtilities.isDeletable(dir))
+				recursiveDelete(dir);	
 		}
 	
 		try
