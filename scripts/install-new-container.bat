@@ -58,7 +58,7 @@ netsh firewall add portopening protocol=TCP name="%_CONTAINER_NAME%" port=%_HOST
 
 REM connect to net
 echo connecting to %_CONNECT_URL%...
-call "%_INC_GENII_INSTALL_DIR%\grid.bat" connect "%_CONNECT_URL%" "%_DEPLOY_DIR%"
+call "%_INC_GENII_INSTALL_DIR%\grid.bat" connect "%_CONNECT_URL%" "%_DEPLOYMENT_NAME%"
 
 REM login as installer
 echo Logging in as installer.  Please type in password at prompt...

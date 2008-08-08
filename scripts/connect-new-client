@@ -29,8 +29,6 @@ then
 	usageExit
 fi
 
-_DEPLOY_DIR="$_INC_GENII_INSTALL_DIR/deployments/$_DEPLOYMENT_NAME"
-
 # connect to net
 echo connecting to $_CONNECT_URL...
-"$_INC_GENII_INSTALL_DIR/grid" connect "$_CONNECT_URL" "$_DEPLOY_DIR"
+"$_INC_GENII_INSTALL_DIR/grid" connect "$_CONNECT_URL" "$_DEPLOYMENT_NAME"

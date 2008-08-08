@@ -175,7 +175,7 @@ public class GamlLoginTool extends BaseGridTool {
 
 		// Add Lifetime element
 	    SimpleDateFormat zulu = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-//        zulu.setTimeZone(TimeZone.getTimeZone("GMT"));
+	    zulu.setTimeZone(TimeZone.getTimeZone("ZULU"));
 	    element = new MessageElement(
 				new QName(
 					"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",

@@ -47,7 +47,7 @@ _HOST_PORT=`"$_INC_GENII_INSTALL_DIR/simple-command" edu.virginia.vcgr.genii.cli
 
 # connect to net
 echo connecting to $_CONNECT_URL...
-"$_INC_GENII_INSTALL_DIR/grid" connect "$_CONNECT_URL" "$_DEPLOY_DIR"
+"$_INC_GENII_INSTALL_DIR/grid" connect "$_CONNECT_URL" "$_DEPLOYMENT_NAME"
 
 # login as installer
 echo Logging in as installer.  Please type in password at prompt...

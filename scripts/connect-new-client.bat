@@ -31,4 +31,4 @@ REM copy "%_INC_GENII_INSTALL_DIR%\ext\Java\lib\security\*.*" "%JAVA_HOME%\jre\l
 
 REM connect to net
 echo connecting to %_CONNECT_URL%...
-call "%_INC_GENII_INSTALL_DIR%\grid.bat" connect "%_CONNECT_URL%" "%_DEPLOY_DIR%"
+call "%_INC_GENII_INSTALL_DIR%\grid.bat" connect "%_CONNECT_URL%" "%_DEPLOYMENT_NAME%"

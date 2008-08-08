@@ -577,6 +577,7 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 
 		SimpleDateFormat zulu =
 				new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+		zulu.setTimeZone(TimeZone.getTimeZone("ZULU"));
 		Date created =
 				zulu.parse(lifetime.getCreated().get_value(),
 						new ParsePosition(0));
