@@ -76,6 +76,7 @@ import org.oasis_open.docs.wsrf.rp_2.UpdateResourcePropertiesResponse;
 import org.oasis_open.docs.wsrf.rp_2.UpdateType;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
+import org.ws.addressing.AttributedURIType;
 import org.ws.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
 
@@ -230,10 +231,10 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		creationParameters.put(IResource.SERVICE_CERTIFICATE_CHAIN_CONSTRUCTION_PARAM,
 				serviceChain);
 		
-		return ResourceManager.createNewResource(_serviceName, creationParameters);
+		return ResourceManager.createNewResource(_serviceName, creationParameters);	
 	}
 	
-	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
+		protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
 		HashMap<QName, Object> constructionParameters, 
 		Collection<MessageElement> resolverCreationParameters) 
 		throws ResourceException, BaseFaultType, RemoteException
@@ -503,6 +504,67 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		return true;
 	}
 	
+	public EndpointReferenceType CreateEPR(MessageElement []creationParameters, EndpointReferenceType targetServiceEPR )
+	throws RemoteException, ResourceCreationFaultType, BaseFaultType
+	{
+		HashMap<QName, Object> constructionParameters 
+		= new HashMap<QName, Object>();
+
+
+		if (creationParameters != null)
+		{
+			for (MessageElement property : creationParameters)
+			{
+				try
+				{
+					constructionParameters.put(property.getQName(),
+							translateConstructionParameter(property));
+				}
+				catch (Exception e)
+				{
+					throw FaultManipulator.fillInFault(
+							new ResourceCreationFaultType(null, null, null, null,
+									new BaseFaultTypeDescription[] {
+									new BaseFaultTypeDescription(e.getLocalizedMessage()) },
+									null));
+				}
+			}
+		}
+		
+
+		
+		ResourceKey rKey = createResource(constructionParameters);
+		EndpointReferenceType epr = ResourceManager.createEPR(rKey, 
+				targetServiceEPR.getAddress().get_value().toString(), getImplementedPortTypes(rKey));
+
+		
+		if (!(this instanceof GeniiNoOutCalls)){
+			try
+			{
+				CallingContextImpl context = new CallingContextImpl((CallingContextImpl)null);
+				context.setActiveKeyAndCertMaterial(new KeyAndCertMaterial(
+					(X509Certificate[])constructionParameters.get(IResource.CERTIFICATE_CHAIN_CONSTRUCTION_PARAM),
+					Container.getContainerPrivateKey()));
+				rKey.dereference().setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME, context);
+			}
+			catch (GeneralSecurityException gse)
+			{
+				throw FaultManipulator.fillInFault(
+					new ResourceCreationFaultType(null, null, null, null, new BaseFaultTypeDescription[] {
+						new BaseFaultTypeDescription("Security error while initializing new resource's calling context."),
+						new BaseFaultTypeDescription(gse.getLocalizedMessage()) }, null));
+			}
+		
+		}	
+		Collection<MessageElement> resolverCreationParams = new Vector<MessageElement>();
+		
+		// allow subclasses to do creation work
+		postCreate(rKey, epr, constructionParameters, resolverCreationParams);
+		return epr;
+	}
+
+	
+	
 	@RWXMapping(RWXCategory.EXECUTE)
 	public final VcgrCreateResponse vcgrCreate(VcgrCreate createRequest)
 		throws RemoteException, ResourceCreationFaultType
@@ -510,7 +572,6 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		if (!allowVcgrCreate()) {
 			throw new RemoteException("\"vcgrCreate\" not applicable.");
 		}
-		
 		EndpointReferenceType myEPR = 
 			(EndpointReferenceType)WorkingContext.getCurrentWorkingContext().getProperty(
 					WorkingContext.EPR_PROPERTY_NAME);
@@ -550,11 +611,10 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 				}
 			}
 		}
-		
+
 		ResourceKey rKey = createResource(constructionParameters);
 		EndpointReferenceType epr = ResourceManager.createEPR(rKey, 
 			myEPR.getAddress().get_value().toString(), getImplementedPortTypes(rKey));
-
 		try
 		{
 			CallingContextImpl context = new CallingContextImpl((CallingContextImpl)null);
@@ -580,7 +640,6 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		_logger.debug("Created resource \"" + rKey.getKey() + "\" for service \"" +
 			rKey.getServiceName() + "\".");
 		EndpointReferenceType resolveEPR = addResolvers(rKey, epr, resolverCreationParams);
-		
 		return new VcgrCreateResponse(resolveEPR);
 	}
 	
@@ -714,29 +773,41 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	@SuppressWarnings("unchecked")
 	private void setLifetimes()
 	{
-		synchronized(GenesisIIBase.class)
-		{
-			if (_serviceCertificateLifetime == null)
+		//if (_serviceCertificateLifetime == null)		
+			synchronized(GenesisIIBase.class)
+			/* ASG, August 10, 2008. The current code may over synchronize, 
+			 * and depending on the cost of synchronization, may take 
+			 * too much time. A (most times) lock free way to check is
+			 * if (_serviceCertificateLifetime == null)
+			 * 	{
+			 * 		synchronized(GenesisIIBase.class)
+			 * 	Rest of code as before
+			 *  }
+			 *  Basically, if is not null (the vast majority of times) no synch is performed.
+			 */
 			{
-				XMLConfiguration conf = 
-					ConfigurationManager.getCurrentConfiguration().getContainerConfiguration();
-				ArrayList<Object> sections;
-				sections = conf.retrieveSections(_SERVICES_QNAME);
-				for (Object obj : sections)
+				if (_serviceCertificateLifetime == null)
 				{
-					HashMap<String, ServiceDescription> services =
-						(HashMap<String, ServiceDescription>)obj;
-					ServiceDescription desc = services.get(_serviceName);
-					if (desc != null)
+					XMLConfiguration conf = 
+						ConfigurationManager.getCurrentConfiguration().getContainerConfiguration();
+					ArrayList<Object> sections;
+					sections = conf.retrieveSections(_SERVICES_QNAME);
+					for (Object obj : sections)
 					{
-						_serviceCertificateLifetime = 
-							new Long(desc.getServiceCertificateLifetime());
-						_resourceCertificateLifetime =
-							new Long(desc.getResourceCertificateLifetime());
+						HashMap<String, ServiceDescription> services =
+							(HashMap<String, ServiceDescription>)obj;
+						ServiceDescription desc = services.get(_serviceName);
+
+						if (desc != null)
+						{
+							_resourceCertificateLifetime =
+								new Long(desc.getResourceCertificateLifetime());
+							_serviceCertificateLifetime = 
+								new Long(desc.getServiceCertificateLifetime());
+						}
 					}
 				}
 			}
-		}
 	}
 	
 	protected long getServiceCertificateLifetime()

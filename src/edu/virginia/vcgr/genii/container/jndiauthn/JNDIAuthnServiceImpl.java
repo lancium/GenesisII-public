@@ -265,7 +265,6 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 			// new IDP resources
 			return null;
 		}
-
 		return super.getChildCertSpec();
 	}
 

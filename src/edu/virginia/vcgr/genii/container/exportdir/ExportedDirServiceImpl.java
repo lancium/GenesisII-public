@@ -50,6 +50,7 @@ import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
+import edu.virginia.vcgr.genii.container.common.GeniiNoOutCalls;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
@@ -59,7 +60,7 @@ import edu.virginia.vcgr.genii.enhancedrns.IterateListRequestType;
 import edu.virginia.vcgr.genii.enhancedrns.IterateListResponseType;
 
 public class ExportedDirServiceImpl extends GenesisIIBase implements
-		ExportedDirPortType
+		ExportedDirPortType, GeniiNoOutCalls
 {
 	static private Log _logger = LogFactory.getLog(ExportedDirServiceImpl.class);
 	
@@ -291,7 +292,6 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 	{
 		ResourceKey rKey = ResourceManager.getCurrentResource();
 		Collection<ExportedDirEntry> entries;
-		
 		synchronized(rKey.getLockObject())
 		{
 			IExportedDirResource resource = 
@@ -307,7 +307,6 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 			ret[lcv++] = new EntryType(
 				entry.getName(), entry.getAttributes(), entry.getEntryReference());
 		}
-		
 		return new ListResponse(ret);
 	}
 

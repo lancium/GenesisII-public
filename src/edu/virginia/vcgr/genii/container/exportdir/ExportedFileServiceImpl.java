@@ -30,13 +30,14 @@ import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.container.byteio.RandomByteIOServiceImpl;
+import edu.virginia.vcgr.genii.container.common.GeniiNoOutCalls;
 import edu.virginia.vcgr.genii.container.common.SByteIOFactory;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.exportdir.ExportedFilePortType;
 
 public class ExportedFileServiceImpl extends RandomByteIOServiceImpl
-	implements ExportedFilePortType
+	implements ExportedFilePortType, GeniiNoOutCalls
 {
 	static private Log _logger = LogFactory.getLog(ExportedFileServiceImpl.class);
 	

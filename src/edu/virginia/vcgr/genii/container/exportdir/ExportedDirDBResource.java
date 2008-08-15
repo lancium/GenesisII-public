@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.RNSEntryExistsFaultType;
 import org.morgan.util.GUID;
+import org.ws.addressing.AttributedURIType;
 import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.ReferenceParametersType;
 
@@ -28,6 +29,7 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedFileUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
 import edu.virginia.vcgr.genii.client.resource.MessageElementUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
@@ -46,6 +48,7 @@ import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverUtils;
+import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 
 public class ExportedDirDBResource extends BasicDBResource implements
@@ -120,6 +123,7 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		throws SQLException
 	{
 		super(parentKey, connectionPool, translater);
+
 	}
 	
 	public void initialize(HashMap<QName, Object> constructionParams)
@@ -612,7 +616,7 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		Collection<File> realEntries) throws ResourceException
 	{
 		Collection<ExportedDirEntry> results = new ArrayList<ExportedDirEntry>();
-		
+
 		/* Create HashMap (names --> entry) for known entries */
 		HashMap<String, ExportedDirEntry> knownEntriesHash = 
 			new HashMap<String, ExportedDirEntry>(knownEntries.size());
@@ -674,6 +678,20 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		String childrenParentIds = ExportedDirUtils.createParentIdsString(
 			getParentIds(), getId());
 		Iterator<File> realIter = realEntries.iterator();
+		/* ASG, August 10, 2008. Modified to do more initialization here
+		 * rather than constantly checking to see if things have been initialized later.
+		 * 
+		 */
+		synchronized(this.getClass()) {
+			if (_fileServiceEPR == null) {
+				_fileServiceEPR = EPRUtils.makeEPR(
+						Container.getServiceURL("ExportedFilePortType"));
+			}
+			if (_dirServiceEPR == null) {
+				_dirServiceEPR = EPRUtils.makeEPR(
+						Container.getServiceURL("ExportedDirPortType"));
+			}
+		}
 		while (realIter.hasNext())
 		{
 			File nextReal = realIter.next();
@@ -691,39 +709,39 @@ public class ExportedDirDBResource extends BasicDBResource implements
 				
 				if (nextReal.isFile())
 				{
+					/* Moved to constructor by ASG, 8/10/08
 					synchronized(this.getClass()) {
 						if (_fileServiceEPR == null) {
 							_fileServiceEPR = EPRUtils.makeEPR(
 									Container.getServiceURL("ExportedFilePortType"));
 						}
 					}
+					*/
 					serviceEPR = _fileServiceEPR; 
 					entryType = ExportedDirEntry._FILE_TYPE;
 					creationProperties = ExportedFileUtils.createCreationProperties(
 						newPath, childrenParentIds, getReplicationState());
+
+					
 				} else if (nextReal.isDirectory())
 				{
-					synchronized(this.getClass()) {
-						if (_dirServiceEPR == null) {
-							_dirServiceEPR = EPRUtils.makeEPR(
-									Container.getServiceURL("ExportedDirPortType"));
-						}
-					}
+					/* moved code to check if _dirServiceEPR set to constructor */
 					serviceEPR = _dirServiceEPR;
 					entryType = ExportedDirEntry._DIR_TYPE;
 					creationProperties = ExportedDirUtils.createCreationProperties(
 						newPath, childrenParentIds, getReplicationState());
+					
 				} else
 				{
 					throw new ResourceException("Local directory " + getLocalPath()
 						+ " has an entry (" + nextReal.getName() + 
 						") that is neither a directory nor a file.");
 				}
-				
+		
 				try
-				{
+				{			
 					newEntry = createEntryForRealFile(
-						nextReal.getName(), serviceEPR, entryType, creationProperties);
+						nextReal.getName(), serviceEPR, entryType, creationProperties,nextReal);
 					results.add(newEntry);
 				}
 				catch (RemoteException re)
@@ -736,20 +754,53 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		commit();
 		return results;
 	}
+
+	
 	
 	protected ExportedDirEntry createEntryForRealFile(String nextRealName,
 		EndpointReferenceType serviceEPR,
-		String entryType, MessageElement []creationProperties)
+		String entryType, MessageElement []creationProperties, File nextReal)
 		throws ResourceException, RemoteException
 	{
 		_logger.debug("Creating new export entries");
 			
 		/* create new Export resource */
+		
+		/* ASG changes on August 9, 2008 to make a direct call to create an EPR
+		 * rather than going through the whole WS stack.
+		 */
+
+		
+		
+		EndpointReferenceType entryReference = null;
+
+		if (nextReal.isFile()) {
+			try {
+				ExportedFileServiceImpl tmp = new ExportedFileServiceImpl();
+				
+				entryReference = tmp.CreateEPR(creationProperties, serviceEPR );
+			}
+			catch (RemoteException re){
+				throw new ResourceException(re.getLocalizedMessage(), re);
+			}
+		}
+		if (nextReal.isDirectory()) {
+			try {
+				ExportedDirServiceImpl tmp = new ExportedDirServiceImpl();
+				entryReference = tmp.CreateEPR(creationProperties, serviceEPR );
+			}
+			catch (RemoteException re){
+				throw new ResourceException(re.getLocalizedMessage(), re);
+			}
+		}
+		
+	/*
 		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, serviceEPR);
 		VcgrCreateResponse resp = common.vcgrCreate(
 			new VcgrCreate(creationProperties));
 		
 		EndpointReferenceType entryReference = resp.getEndpoint();
+	*/
 		
 		//replicate if flag is set
 		if (getReplicationState().equals("true")){
