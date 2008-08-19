@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import javax.xml.namespace.QName;
 
@@ -25,6 +26,7 @@ import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.ws.addressing.ReferenceParametersType;
 
+import edu.virginia.vcgr.genii.common.MatchingParameter;
 import edu.virginia.vcgr.genii.container.common.notification.DBSubscriptionResource;
 import edu.virginia.vcgr.genii.container.common.notification.SubscriptionInformation;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
@@ -52,6 +54,8 @@ public class BasicDBResource implements IResource
 		"DELETE FROM resources WHERE resourceid = ?";
 	static private final String _DESTROY_PROPERTIES_STMT =
 		"DELETE FROM properties WHERE resourceid = ?";
+	static private final String _DESTROY_MATCHING_PARAMS_STMT =
+		"DELETE FROM matchingparams WHERE resourceid = ?";
 	
 	static private Log _logger = LogFactory.getLog(BasicDBResource.class);
 	
@@ -283,6 +287,10 @@ public class BasicDBResource implements IResource
 			stmt = _connection.prepareStatement(_DESTROY_KEYS_STMT);
 			stmt.setString(1, _resourceKey);
 			stmt.executeUpdate();
+			stmt.close();
+			stmt = _connection.prepareStatement(_DESTROY_MATCHING_PARAMS_STMT);
+			stmt.setString(1, _resourceKey);
+			stmt.executeUpdate();
 			
 			DBSubscriptionResource.destroySubscriptions(this);
 		}
@@ -418,5 +426,107 @@ public class BasicDBResource implements IResource
 		throws ResourceException {
 
 		return _translater.wrap(getKey());
+	}
+
+	@Override
+	public Collection<MatchingParameter> getMatchingParameters() throws ResourceException
+	{
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		Collection<MatchingParameter> ret = new LinkedList<MatchingParameter>();
+		
+		try
+		{
+			stmt = _connection.prepareStatement(
+				"SELECT paramname, paramvalue FROM matchingparams " +
+					"WHERE resourceid = ?");
+			stmt.setString(1, _resourceKey);
+			rs = stmt.executeQuery();
+			while (rs.next())
+			{
+				ret.add(new MatchingParameter(
+					rs.getString(1), rs.getString(2)));
+			}
+			
+			return ret;
+		}
+		catch (SQLException sqe)
+		{
+			throw new ResourceException("Unable to get matching parameters.",
+				sqe);
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+	}
+
+	@Override
+	public void addMatchingParameter(MatchingParameter... parameters)
+			throws ResourceException
+	{
+		PreparedStatement stmt = null;
+		
+		try
+		{
+			stmt = _connection.prepareStatement(
+				"INSERT INTO matchingparams" +
+					"(resourceid, paramname, paramvalue) " +
+				"VALUES (?, ?, ?)");
+			
+			for (MatchingParameter param : parameters)
+			{
+				stmt.setString(1, _resourceKey);
+				stmt.setString(2, param.getName());
+				stmt.setString(3, param.getValue());
+				stmt.addBatch();
+			}
+			
+			stmt.executeBatch();
+		}
+		catch (SQLException sqe)
+		{
+			throw new ResourceException("Unable to add matching parameters.",
+				sqe);
+		}
+		finally
+		{
+			close(stmt);
+		}
+	}
+
+	@Override
+	public void removeMatchingParameter(MatchingParameter... parameters)
+			throws ResourceException
+	{
+		PreparedStatement stmt = null;
+		
+		try
+		{
+			stmt = _connection.prepareStatement(
+				"DELETE FROM matchingparams " +
+					"WHERE resourceid = ? AND paramname = ? " +
+						"AND paramvalue = ?");
+			
+			for (MatchingParameter param : parameters)
+			{
+				stmt.setString(1, _resourceKey);
+				stmt.setString(2, param.getName());
+				stmt.setString(3, param.getValue());
+				stmt.addBatch();
+			}
+			
+			stmt.executeBatch();
+		}
+		catch (SQLException sqe)
+		{
+			throw new ResourceException("Unable to delete matching parameters.",
+				sqe);
+		}
+		finally
+		{
+			close(stmt);
+		}
 	}
 }

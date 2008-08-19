@@ -262,6 +262,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.RNSInteropTool</mconf:class>
 		<mconf:class name="byteioperf"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ByteIOPerformanceTool</mconf:class>
+		<mconf:class name="matching-params"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.MatchingParamsTool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

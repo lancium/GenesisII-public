@@ -13,6 +13,7 @@ import org.apache.axis.message.MessageElement;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
 import edu.virginia.vcgr.genii.client.ogsa.OGSAQNameList;
 import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
@@ -22,6 +23,8 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+
+import edu.virginia.vcgr.genii.common.MatchingParameter;
 import edu.virginia.vcgr.genii.common.security.AuthZConfig;
 import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
@@ -61,6 +64,24 @@ public class GenesisIIBaseAttributesHandler
 		}
 		
 		return document;
+	}
+	
+	public Collection<MessageElement> getMatchingParameters()
+		throws ResourceException, ResourceUnknownFaultType
+	{
+		Collection<MessageElement> ret = new ArrayList<MessageElement>();
+		IResource resource = ResourceManager.getCurrentResource().dereference();
+		Collection<MatchingParameter> matchingParams = 
+			resource.getMatchingParameters();
+		for (MatchingParameter param : matchingParams)
+		{
+			MessageElement me = new MessageElement(
+				GenesisIIBaseRP.MATCHING_PARAMTER_ATTR_QNAME,
+				param);
+			ret.add(me);
+		}
+		
+		return ret;
 	}
 	
 	public MessageElement getImplementedPortTypes() throws SOAPException
@@ -239,6 +260,10 @@ public class GenesisIIBaseAttributesHandler
 	@Override
 	protected void registerHandlers() throws NoSuchMethodException
 	{
+		addHandler(
+			GenesisIIBaseRP.MATCHING_PARAMTER_ATTR_QNAME,
+			"getMatchingParameters");
+		
 		addHandler(
 			OGSAWSRFBPConstants.CURRENT_TIME_ATTR_QNAME,
 			"getCurrentTimeAttr");

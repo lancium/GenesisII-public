@@ -20,7 +20,13 @@ public class BasicDBResourceFactory implements IResourceFactory
 		"CREATE TABLE properties (resourceid VARCHAR(128), propname VARCHAR(256)," +
 			"propvalue BLOB (128K), CONSTRAINT propertiesconstraint1 " +
 			"PRIMARY KEY (resourceid, propname))";
-		
+	static private final String _CREATE_MATCHING_PARAMS_STMT =
+		"CREATE TABLE matchingparams (" +
+			"resourceid VARCHAR(128), paramname VARCHAR(256)," +
+			"paramvalue VARCHAR(256), " +
+			"CONSTRAINT matchingparamsconstraint1 PRIMARY KEY " +
+				"(resourceid, paramname, paramvalue))";
+	
 	protected DatabaseConnectionPool _pool;
 	protected IResourceKeyTranslater _translater;
 	
@@ -44,6 +50,18 @@ public class BasicDBResourceFactory implements IResourceFactory
 		}
 	}
 	
+	protected void createTable(Statement stmt, String statementString)
+	{
+		try
+		{
+			stmt.executeUpdate(statementString);
+		}
+		catch (SQLException sqe)
+		{
+			// Assume that the table already exists.
+		}
+	}
+	
 	protected void createTables() throws SQLException
 	{
 		Connection conn = null;
@@ -54,8 +72,10 @@ public class BasicDBResourceFactory implements IResourceFactory
 			conn = _pool.acquire();
 			stmt = conn.createStatement();
 			
-			stmt.executeUpdate(_CREATE_KEY_TABLE_STMT);
-			stmt.executeUpdate(_CREATE_PROPERTY_TABLE_STMT);
+			createTable(stmt, _CREATE_KEY_TABLE_STMT);
+			createTable(stmt, _CREATE_PROPERTY_TABLE_STMT);
+			createTable(stmt, _CREATE_MATCHING_PARAMS_STMT);
+			
 			conn.commit();
 		}
 		catch (SQLException sqe)

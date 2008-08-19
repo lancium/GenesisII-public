@@ -97,7 +97,10 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.x509.CertCreationSpec;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
+import edu.virginia.vcgr.genii.common.AddMatchingParameterResponseType;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
+import edu.virginia.vcgr.genii.common.MatchingParameter;
+import edu.virginia.vcgr.genii.common.RemoveMatchingParameterResponseType;
 import edu.virginia.vcgr.genii.common.notification.GeniiSubscriptionPortType;
 import edu.virginia.vcgr.genii.common.notification.Subscribe;
 import edu.virginia.vcgr.genii.common.notification.SubscribeResponse;
@@ -1323,5 +1326,29 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 			ResourceManager.getCurrentResource().dereference();
 		resource.setProperty(
 			IResource.CACHE_COHERENCE_WINDOW_PROPERTY, duration);
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.WRITE)
+	public AddMatchingParameterResponseType addMatchingParameter(
+			MatchingParameter[] addMatchingParameterRequest)
+			throws RemoteException
+	{
+		IResource resource = 
+			ResourceManager.getCurrentResource().dereference();
+		resource.addMatchingParameter(addMatchingParameterRequest);
+		return new AddMatchingParameterResponseType();
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.WRITE)
+	public RemoveMatchingParameterResponseType removeMatchingParameter(
+			MatchingParameter[] removeMatchingParameterRequest)
+			throws RemoteException
+	{
+		IResource resource = 
+			ResourceManager.getCurrentResource().dereference();
+		resource.removeMatchingParameter(removeMatchingParameterRequest);
+		return new RemoveMatchingParameterResponseType();
 	}
 }

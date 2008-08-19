@@ -12,6 +12,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.ws.addressing.ReferenceParametersType;
 
+import edu.virginia.vcgr.genii.common.MatchingParameter;
 import edu.virginia.vcgr.genii.container.common.notification.SubscriptionInformation;
 
 /**
@@ -149,5 +150,12 @@ public interface IResource extends Closeable
 	 * @throws ResourceException If anything goes wrong.
 	 */
 	public ReferenceParametersType getResourceParameters()
-		throws ResourceException;	
+		throws ResourceException;
+	
+	public Collection<MatchingParameter> getMatchingParameters()
+		throws ResourceException;
+	public void addMatchingParameter(MatchingParameter...parameters)
+		throws ResourceException;
+	public void removeMatchingParameter(MatchingParameter...parameters)
+		throws ResourceException;
 }

@@ -13,6 +13,7 @@
 
 	<filelist id="common.source.files" dir="${wsdl.dir}">
 		<file name="common.gwsdl"/>
+		<file name="common.xsd"/>
 		<file name="context.xsd"/>
 		<file name="resource-authz.wsdl"/>
 		<file name="security.xsd"/>

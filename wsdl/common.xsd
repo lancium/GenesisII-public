@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+	xmlns="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+	xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified">
+
+<!-- Types -->
+	<xsd:complexType name="MatchingParameter">
+		<xsd:attribute name="name" type="xsd:string" use="required"/>
+		<xsd:attribute name="value" type="xsd:string" use="required"/>
+	</xsd:complexType>
+
+<!-- Message Types -->
+	<xsd:complexType name="AddMatchingParameterRequestType">
+		<xsd:sequence>
+			<xsd:element name="matching-parameter"
+				type="genii-common:MatchingParameter"
+				minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="AddMatchingParameterRequestType"
+		type="genii-common:AddMatchingParameterRequestType"/>
+
+	<xsd:complexType name="AddMatchingParameterResponseType"/>
+	<xsd:element name="AddMatchingParameterResponseType"
+		type="genii-common:AddMatchingParameterResponseType"/>
+
+	<xsd:complexType name="RemoveMatchingParameterRequestType">
+		<xsd:sequence>
+			<xsd:element name="matching-parameter"
+				type="genii-common:MatchingParameter"
+				minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="RemoveMatchingParameterRequestType"
+		type="genii-common:RemoveMatchingParameterRequestType"/>
+
+	<xsd:complexType name="RemoveMatchingParameterResponseType"/>
+	<xsd:element name="RemoveMatchingParameterResponseType"
+		type="genii-common:RemoveMatchingParameterResponseType"/>
+	
+</xsd:schema>
