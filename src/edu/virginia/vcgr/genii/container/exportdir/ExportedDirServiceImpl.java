@@ -160,11 +160,17 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 				resource.getParentIds(), resource.getId());
 			try
 			{
+				long start = System.currentTimeMillis();
 				WorkingContext.temporarilyAssumeNewIdentity(
 					EPRUtils.makeEPR(Container.getServiceURL("ExportedFilePortType"), false));
+				System.err.println("ExportDir: makeEPR elapsed is " + (System.currentTimeMillis()- start));
+				
+				start = System.currentTimeMillis();
+
 				entryReference = new ExportedFileServiceImpl().vcgrCreate(new VcgrCreate(
 					ExportedFileUtils.createCreationProperties(
 							fullPath, parentIds, resource.getReplicationState()))).getEndpoint();
+				System.err.println("ExportDir: create file elapsed is " + (System.currentTimeMillis()- start));
 			}
 			finally
 			{

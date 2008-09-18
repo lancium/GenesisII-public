@@ -90,7 +90,6 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements
 			throws ResourceException, BaseFaultType, RemoteException
 	{
 		_logger.debug("Creating new StreamableByteIO Resource.");
-		
 		super.postCreate(rKey, newEPR, creationParameters, resolverCreationParams);
 		
 		ISByteIOResource resource = null;
@@ -147,6 +146,7 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements
 			{
 				throw new ResourceException(re.getLocalizedMessage(), re);
 			}
+
 			finally
 			{
 				rKey.dereference().commit();

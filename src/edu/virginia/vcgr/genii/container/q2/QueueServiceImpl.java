@@ -64,6 +64,7 @@ import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.byteio.RByteIOResource;
+import edu.virginia.vcgr.genii.container.byteio.StreamableByteIOServiceImpl;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
@@ -228,13 +229,21 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 			ClientConstructionParameters.createTimeToLiveProperty(
 				_DEFAULT_TIME_TO_LIVE)
 		};
-		
+
+		/* ASG August 28,2008, replaced RPC with direct call to CreateEPR */
+		EndpointReferenceType entryReference = 
+			new StreamableByteIOServiceImpl().CreateEPR(parameters,
+					Container.getServiceURL("StreamableByteIOPortType"));
+		return new CreateFileResponse(entryReference);
+
+		/*
 		StreamableByteIOPortType sbyteio = ClientUtils.createProxy(
 			StreamableByteIOPortType.class, EPRUtils.makeEPR(
 				Container.getServiceURL("StreamableByteIOPortType")));
 		VcgrCreateResponse resp = sbyteio.vcgrCreate(new VcgrCreate(parameters));
 		
 		return new CreateFileResponse(resp.getEndpoint());
+		*/
 	}
 
 	private JobInformationType[] getStatus(String[] getStatusRequest)

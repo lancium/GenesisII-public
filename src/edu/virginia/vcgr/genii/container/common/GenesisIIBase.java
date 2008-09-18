@@ -128,6 +128,7 @@ import edu.virginia.vcgr.genii.container.invoker.GAroundInvoke;
 import edu.virginia.vcgr.genii.container.invoker.ScheduledTerminationInvoker;
 import edu.virginia.vcgr.genii.container.invoker.WSAddressingHandler;
 import edu.virginia.vcgr.genii.container.iterator.IteratorResource;
+import edu.virginia.vcgr.genii.container.iterator.IteratorServiceImpl;
 import edu.virginia.vcgr.genii.container.resolver.IResolverFactoryProxy;
 import edu.virginia.vcgr.genii.container.resolver.Resolution;
 import edu.virginia.vcgr.genii.container.resource.IResource;
@@ -507,7 +508,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		return true;
 	}
 	
-	public EndpointReferenceType CreateEPR(MessageElement []creationParameters, EndpointReferenceType targetServiceEPR )
+	public EndpointReferenceType CreateEPR(MessageElement []creationParameters, 
+			String targetServiceURL )
 	throws RemoteException, ResourceCreationFaultType, BaseFaultType
 	{
 		HashMap<QName, Object> constructionParameters 
@@ -533,13 +535,11 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 				}
 			}
 		}
-		
+	
 
-		
 		ResourceKey rKey = createResource(constructionParameters);
 		EndpointReferenceType epr = ResourceManager.createEPR(rKey, 
-				targetServiceEPR.getAddress().get_value().toString(), getImplementedPortTypes(rKey));
-
+				targetServiceURL, getImplementedPortTypes(rKey));
 		
 		if (!(this instanceof GeniiNoOutCalls)){
 			try
@@ -618,20 +618,22 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		ResourceKey rKey = createResource(constructionParameters);
 		EndpointReferenceType epr = ResourceManager.createEPR(rKey, 
 			myEPR.getAddress().get_value().toString(), getImplementedPortTypes(rKey));
-		try
-		{
-			CallingContextImpl context = new CallingContextImpl((CallingContextImpl)null);
-			context.setActiveKeyAndCertMaterial(new KeyAndCertMaterial(
-				(X509Certificate[])constructionParameters.get(IResource.CERTIFICATE_CHAIN_CONSTRUCTION_PARAM),
-				Container.getContainerPrivateKey()));
-			rKey.dereference().setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME, context);
-		}
-		catch (GeneralSecurityException gse)
-		{
-			throw FaultManipulator.fillInFault(
-				new ResourceCreationFaultType(null, null, null, null, new BaseFaultTypeDescription[] {
-					new BaseFaultTypeDescription("Security error while initializing new resource's calling context."),
-					new BaseFaultTypeDescription(gse.getLocalizedMessage()) }, null));
+		if (!(this instanceof GeniiNoOutCalls)){
+			try
+			{
+				CallingContextImpl context = new CallingContextImpl((CallingContextImpl)null);
+				context.setActiveKeyAndCertMaterial(new KeyAndCertMaterial(
+						(X509Certificate[])constructionParameters.get(IResource.CERTIFICATE_CHAIN_CONSTRUCTION_PARAM),
+						Container.getContainerPrivateKey()));
+				rKey.dereference().setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME, context);
+			}
+			catch (GeneralSecurityException gse)
+			{
+				throw FaultManipulator.fillInFault(
+						new ResourceCreationFaultType(null, null, null, null, new BaseFaultTypeDescription[] {
+								new BaseFaultTypeDescription("Security error while initializing new resource's calling context."),
+								new BaseFaultTypeDescription(gse.getLocalizedMessage()) }, null));
+			}
 		}
 		//collection to hold creation parameters for default resolvers
 		Collection<MessageElement> resolverCreationParams = new Vector<MessageElement>();
@@ -776,7 +778,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	@SuppressWarnings("unchecked")
 	private void setLifetimes()
 	{
-		//if (_serviceCertificateLifetime == null)		
+		if (_serviceCertificateLifetime == null)		
 			synchronized(GenesisIIBase.class)
 			/* ASG, August 10, 2008. The current code may over synchronize, 
 			 * and depending on the cost of synchronization, may take 
@@ -860,8 +862,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	{
 		Collection<IteratorMemberType> initMembers = 
 			new LinkedList<IteratorMemberType>();
-		
-		for (int lcv = 0; lcv < defaultBatchSize; lcv++)
+		int lcv;
+		for ( lcv = 0; lcv < defaultBatchSize; lcv++)
 		{
 			if (!contents.hasNext())
 				break;
@@ -869,7 +871,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 				new MessageElement[] { contents.next() }, 
 				new UnsignedInt((long)lcv)));
 		}
-		
+
 		if (!contents.hasNext())
 			return new IteratorInitializationType(
 				null, initMembers.toArray(new IteratorMemberType[0]));
@@ -912,12 +914,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 			if (needsExecute)
 				stmt.executeBatch();
 			
-			if (_iteratorServiceEPR == null)
-				_iteratorServiceEPR = EPRUtils.makeEPR(
-					Container.getServiceURL("IteratorPortType"));
-			
-			IteratorPortType iter = ClientUtils.createProxy(
-				IteratorPortType.class, _iteratorServiceEPR);
+			EndpointReferenceType epr;
+
 			
 			MessageElement []createRequest =
 				new MessageElement[2];
@@ -926,10 +924,21 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 			createRequest[1] = 
 				ClientConstructionParameters.createTimeToLiveProperty(
 					1000L * 60 * 60);
-			
-			EndpointReferenceType epr = iter.vcgrCreate(
-				new VcgrCreate(createRequest)).getEndpoint();
-			
+
+			if (_iteratorServiceEPR == null)
+				_iteratorServiceEPR = EPRUtils.makeEPR(
+					Container.getServiceURL("IteratorPortType"));
+/*			
+			IteratorPortType iter = ClientUtils.createProxy(
+				IteratorPortType.class, _iteratorServiceEPR);
+			epr = iter.vcgrCreate(
+					new VcgrCreate(createRequest)).getEndpoint();
+*/							
+			//long start = System.currentTimeMillis();
+			// ASG Here is where we need to directly create in the current container */
+			epr = new IteratorServiceImpl().CreateEPR(createRequest, Container.getServiceURL("IteratorPortType"));
+			//System.err.println("createWSIterator: time to createEPR " + (System.currentTimeMillis()-start));
+
 			connection.commit();
 			return new IteratorInitializationType(epr, 
 				initMembers.toArray(new IteratorMemberType[0]));

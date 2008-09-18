@@ -682,16 +682,17 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		 * rather than constantly checking to see if things have been initialized later.
 		 * 
 		 */
-		synchronized(this.getClass()) {
-			if (_fileServiceEPR == null) {
-				_fileServiceEPR = EPRUtils.makeEPR(
-						Container.getServiceURL("ExportedFilePortType"));
+		if ((_fileServiceEPR == null) || (_dirServiceEPR == null))
+			synchronized(this.getClass()) {
+				if (_fileServiceEPR == null) {
+					_fileServiceEPR = EPRUtils.makeEPR(
+							Container.getServiceURL("ExportedFilePortType"));
+				}
+				if (_dirServiceEPR == null) {
+					_dirServiceEPR = EPRUtils.makeEPR(
+							Container.getServiceURL("ExportedDirPortType"));
+				}
 			}
-			if (_dirServiceEPR == null) {
-				_dirServiceEPR = EPRUtils.makeEPR(
-						Container.getServiceURL("ExportedDirPortType"));
-			}
-		}
 		while (realIter.hasNext())
 		{
 			File nextReal = realIter.next();
@@ -778,7 +779,8 @@ public class ExportedDirDBResource extends BasicDBResource implements
 			try {
 				ExportedFileServiceImpl tmp = new ExportedFileServiceImpl();
 				
-				entryReference = tmp.CreateEPR(creationProperties, serviceEPR );
+				entryReference = tmp.CreateEPR(creationProperties, serviceEPR.getAddress().get_value().toString() );
+				//entryReference = tmp.vcgrCreate(new VcgrCreate(creationProperties)).getEndpoint();
 			}
 			catch (RemoteException re){
 				throw new ResourceException(re.getLocalizedMessage(), re);
@@ -787,20 +789,23 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		if (nextReal.isDirectory()) {
 			try {
 				ExportedDirServiceImpl tmp = new ExportedDirServiceImpl();
-				entryReference = tmp.CreateEPR(creationProperties, serviceEPR );
+				entryReference = tmp.CreateEPR(creationProperties, serviceEPR.getAddress().get_value().toString() );
+				//entryReference =  tmp.vcgrCreate(new VcgrCreate(creationProperties)).getEndpoint();
+
 			}
 			catch (RemoteException re){
 				throw new ResourceException(re.getLocalizedMessage(), re);
 			}
 		}
 		
-	/*
+		/*	
 		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, serviceEPR);
 		VcgrCreateResponse resp = common.vcgrCreate(
 			new VcgrCreate(creationProperties));
 		
 		EndpointReferenceType entryReference = resp.getEndpoint();
-	*/
+		*/
+	
 		
 		//replicate if flag is set
 		if (getReplicationState().equals("true")){

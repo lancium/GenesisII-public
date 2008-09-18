@@ -68,9 +68,11 @@ import edu.virginia.vcgr.genii.enhancedrns.*;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.container.Container;
+import edu.virginia.vcgr.genii.container.byteio.RandomByteIOServiceImpl;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.common.notification.TopicSpace;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
+import edu.virginia.vcgr.genii.container.exportdir.ExportedFileServiceImpl;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
@@ -136,12 +138,18 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 				throw FaultManipulator.fillInFault(
 					new RNSEntryExistsFaultType(null, null, null, null,
 						null, null, filename));
-			
+			/* August 15, ASG, modified to make a direct create in the current container */
+			EndpointReferenceType entryReference = 
+				new RandomByteIOServiceImpl().CreateEPR(null,Container.getServiceURL("RandomByteIOPortType"));
+		
+	
+/*		
 			RandomByteIOPortType byteio = ClientUtils.createProxy(
 				RandomByteIOPortType.class,
 				EPRUtils.makeEPR(Container.getServiceURL("RandomByteIOPortType")));
 			EndpointReferenceType entryReference = 
 				byteio.vcgrCreate(new VcgrCreate(null)).getEndpoint();
+*/		
 			
 			/* if entry has a resolver, set address to unbound */
 			EndpointReferenceType eprToStore = prepareEPRToStore(entryReference);

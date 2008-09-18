@@ -58,6 +58,7 @@ import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
+import edu.virginia.vcgr.genii.container.common.GeniiNoOutCalls;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
@@ -67,7 +68,7 @@ import edu.virginia.vcgr.genii.client.notification.UnknownTopicException;
 import org.apache.axis.message.MessageElement;
 
 public class RandomByteIOServiceImpl extends GenesisIIBase
-	implements RandomByteIOPortType
+	implements RandomByteIOPortType, GeniiNoOutCalls
 {
 	static private Log _logger = LogFactory.getLog(RandomByteIOServiceImpl.class);
 	

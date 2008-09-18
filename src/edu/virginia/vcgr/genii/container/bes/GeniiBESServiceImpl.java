@@ -98,11 +98,14 @@ import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivityServiceImpl;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivityUtils;
 import edu.virginia.vcgr.genii.container.bes.activity.NoSuchActivityFault;
 import edu.virginia.vcgr.genii.container.bes.resource.DBBESResourceFactory;
 import edu.virginia.vcgr.genii.container.bes.resource.IBESResource;
 import edu.virginia.vcgr.genii.container.byteio.RByteIOResource;
+import edu.virginia.vcgr.genii.container.byteio.RandomByteIOServiceImpl;
+import edu.virginia.vcgr.genii.container.byteio.StreamableByteIOServiceImpl;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
@@ -228,7 +231,8 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 		 
 		if (!resource.isAcceptingNewActivities())
 			throw new NotAcceptingNewActivitiesFaultType(null);
-		
+	
+
 		if (_localActivityServiceEPR == null) 
 		{
 			// only need to make this epr from scratch once (which involves
@@ -236,7 +240,15 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 			_localActivityServiceEPR =
 				EPRUtils.makeEPR(Container.getServiceURL("BESActivityPortType"));
 		}
-		
+		/* ASG August 28,2008, replaced RPC with direct call to CreateEPR */
+		EndpointReferenceType entryReference = 
+			new BESActivityServiceImpl().CreateEPR(BESActivityUtils.createCreationProperties(
+							jdt, (String)resource.getKey(), 
+							(Properties)resource.getProperty(
+								GeniiBESConstants.NATIVEQ_PROVIDER_PROPERTY)),
+					Container.getServiceURL("BESActivityPortType"));
+
+/*		
 		BESActivityPortType activity = ClientUtils.createProxy(
 		BESActivityPortType.class,
 		_localActivityServiceEPR);
@@ -247,7 +259,12 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 					jdt, (String)resource.getKey(), 
 					(Properties)resource.getProperty(
 						GeniiBESConstants.NATIVEQ_PROVIDER_PROPERTY))));
+		System.err.println("Time to create activity " + (System.currentTimeMillis() - start));
 		return new CreateActivityResponseType(resp.getEndpoint(), adt, null);
+	*/	
+
+		return new CreateActivityResponseType(entryReference, adt, null);
+
 	}
 	
 	static private UserDataType createUserData(String filename, String filepath)
@@ -306,12 +323,19 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
                 _DEFAULT_TIME_TO_LIVE)
         };
 
+		/* ASG August 28,2008, replaced RPC with direct call to CreateEPR */
+		EndpointReferenceType entryReference = 
+			new StreamableByteIOServiceImpl().CreateEPR(parameters,
+					Container.getServiceURL("StreamableByteIOPortType"));
+        return new CreateFileResponse(entryReference);
+
+        /*
         StreamableByteIOPortType sbyteio = ClientUtils.createProxy(
         	StreamableByteIOPortType.class, EPRUtils.makeEPR(
         		Container.getServiceURL("StreamableByteIOPortType")));
         VcgrCreateResponse resp = sbyteio.vcgrCreate(new VcgrCreate(parameters));
-
         return new CreateFileResponse(resp.getEndpoint());
+         */
     }
 
 	@Override
