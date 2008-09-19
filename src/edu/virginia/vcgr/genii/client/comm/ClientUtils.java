@@ -371,4 +371,10 @@ public class ClientUtils
 	{
 		return getProxyFactory().getAttachments(clientProxy);
 	}
+	
+	static public void setTimeout(Object clientProxy, int timeoutMillis)
+		throws ResourceException
+	{
+		getProxyFactory().setTimeout(clientProxy, timeoutMillis);
+	}
 }

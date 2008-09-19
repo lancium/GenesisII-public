@@ -76,7 +76,6 @@ import org.oasis_open.docs.wsrf.rp_2.UpdateResourcePropertiesResponse;
 import org.oasis_open.docs.wsrf.rp_2.UpdateType;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
-import org.ws.addressing.AttributedURIType;
 import org.ws.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
 

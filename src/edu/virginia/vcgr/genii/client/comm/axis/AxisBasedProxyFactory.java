@@ -118,4 +118,11 @@ public class AxisBasedProxyFactory implements IProxyFactory
 		AxisClientInvocationHandler handler = getInvocationHandler(clientProxy);
 		handler.setOutAttachments(attachments, attachmentType);
 	}
+	
+	public void setTimeout(Object clientProxy,
+		int timeoutMillis) throws ResourceException
+	{
+		AxisClientInvocationHandler handler = getInvocationHandler(clientProxy);
+		handler.setTimeout(timeoutMillis);
+	}
 }

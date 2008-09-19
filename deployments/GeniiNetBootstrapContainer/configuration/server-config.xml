@@ -23,13 +23,13 @@
 			value="5"/>
 		<mconf:property 
 			name="edu.virginia.vcgr.genii.container.epr-addressing-mode"
-			value="ip"/>		
+			value="ip"/>	
 		<mconf:property
 			name="edu.virginia.vcgr.genii.container.bes.worker-dir"
 			value="${edu.virginia.vcgr.genii.client.configuration.user-dir}/bes-activities"/>
 		<mconf:property
 			name="edu.virginia.vcgr.genii.container.bes.worker-dir.allow-override"
-			value="true"/>	
+			value="true"/>		
 	</genii:global-properties>
 
 	<genii:configured-instances>
@@ -79,9 +79,9 @@
 			     without the presence of a caller credential (e.g., service resources
 			     that are created upon container-startup).  If not specified, then 
 		    	 the identity of the container will be used in these circumstances. 
-			-->
 			<mconf:property name="genii.security.authz.bootstrapOwnerCertPath"
 				value="admin.cer"/>
+			-->
 						
 		</mconf:instance>
 
@@ -98,9 +98,9 @@
 			     without the presence of a caller credential (e.g., service resources
 			     that are created upon container-startup).  If not specified, then 
 		    	 the identity of the container will be used in these circumstances. 
-			-->
 			<mconf:property name="genii.security.authz.bootstrapOwnerCertPath"
 				value="admin.cer"/>
+			-->
 						
 		</mconf:instance>
 
@@ -244,7 +244,6 @@
 			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
 				value="connection-pool"/>
 		</mconf:instance>
-
 		
 		<mconf:instance name="ticker-resource-provider"
 			type="edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceProvider">
@@ -265,223 +264,7 @@
 		</mconf:instance>
 	</genii:configured-instances>
 	
-	<genii:services>
-		<genii:service name="CounterPortType">
-			<genii:resource-provider name="basic-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-			<genii:security-settings>
-				<mconf:property 
-					name="edu.virginia.vcgr.genii.container.security.service-certificate-lifetime"
-					value="6000000"/>	<!-- 100 minutes -->
-				<mconf:property
-					name="edu.virginia.vcgr.genii.container.security.resource-certificate-lifetime"
-					value="600000"/>	<!-- 10 minutes -->
-			</genii:security-settings>
-<!--  turns on making resolver for new instances of this type
-			<genii:default-resolver-factory-settings>
-				<mconf:property 
-					name="edu.virginia.vcgr.genii.container.resolver.default-resolver-factory-proxy-class"
-					value="edu.virginia.vcgr.genii.container.resolver.SimpleResolverFactoryProxy"/>
-				<mconf:property
-					name="edu.virginia.vcgr.genii.container.resolver.simple.test-property"
-					value="TESTING"/>
-			</genii:default-resolver-factory-settings>
--->
-		</genii:service>
-		
-		<genii:service name="EnhancedRNSPortType">
-			<genii:resource-provider name="rns-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-<!--  turns on making resolver for new instances of this type
-			<genii:default-resolver-factory-settings>
-				<mconf:property 
-					name="edu.virginia.vcgr.genii.container.resolver.default-resolver-factory-proxy-class"
-					value="edu.virginia.vcgr.genii.container.resolver.SimpleResolverFactoryProxy"/>
-				<mconf:property
-					name="edu.virginia.vcgr.genii.container.resolver.simple.test-property"
-					value="TESTING"/>
-			</genii:default-resolver-factory-settings>
--->
-		</genii:service>
-		
-		<genii:service name="BasicSchedulerPortType">
-			<genii:resource-provider name="basic-scheduler-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-		</genii:service>
-		
-		<genii:service name="RandomByteIOPortType">
-			<genii:resource-provider name="rbyteio-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-<!--  turns on making resolver for new instances of this type
-			<genii:default-resolver-factory-settings>
-				<mconf:property 
-					name="edu.virginia.vcgr.genii.container.resolver.default-resolver-factory-proxy-class"
-					value="edu.virginia.vcgr.genii.container.resolver.SimpleResolverFactoryProxy"/>
-				<mconf:property
-					name="edu.virginia.vcgr.genii.container.resolver.simple.test-property"
-					value="TESTING"/>
-			</genii:default-resolver-factory-settings>
--->
-		</genii:service>
-
-		<genii:service name="StreamableByteIOPortType">
-			<genii:resource-provider name="sbyteio-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-<!--  turns on making resolver for new instances of this type
-			<genii:default-resolver-factory-settings>
-				<mconf:property 
-					name="edu.virginia.vcgr.genii.container.resolver.default-resolver-factory-proxy-class"
-					value="edu.virginia.vcgr.genii.container.resolver.SimpleResolverFactoryProxy"/>
-				<mconf:property
-					name="edu.virginia.vcgr.genii.container.resolver.simple.test-property"
-					value="TESTING"/>
-			</genii:default-resolver-factory-settings>
--->
-		</genii:service>
-
-		<!-- WSRF interop fest port types, feel free to remove later -->		
-		<genii:service name="RandomByteIOInteropPortType">
-			<genii:resource-provider name="rbyteio-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-		</genii:service>
-
-		<!-- WSRF interop fest port types, feel free to remove later -->		
-		<genii:service name="StreamableByteIOInteropPortType">
-			<genii:resource-provider name="sbyteio-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-		</genii:service>
-
-		<genii:service name="GeniiBESPortType">
-			<genii:resource-provider name="bes-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-		</genii:service>
-		
-		<genii:service name="BESActivityPortType">
-			<genii:resource-provider name="bes-activity-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-		</genii:service>
-		
-		<genii:service name="VCGRContainerPortType">
-			<genii:resource-provider name="basic-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-		</genii:service>
-		
-		<genii:service name="ExportedFilePortType">
-			<genii:resource-provider name="exported-file-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-<!--  turns on making rexport resolver for new instances of this type
-			<genii:default-resolver-factory-settings>
-				<mconf:property 
-					name="edu.virginia.vcgr.genii.container.resolver.default-resolver-factory-proxy-class"
-					value="edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverFactoryProxy"/>
-			</genii:default-resolver-factory-settings>
--->
-		</genii:service>
-		
-		<genii:service name="ExportedDirPortType">
-			<genii:resource-provider name="exported-dir-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-<!--  turns on making rexport resolver for new instances of this type 
-			<genii:default-resolver-factory-settings>
-				<mconf:property 
-					name="edu.virginia.vcgr.genii.container.resolver.default-resolver-factory-proxy-class"
-					value="edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverFactoryProxy"/>
-			</genii:default-resolver-factory-settings>
--->
-		</genii:service>
-		
-		<genii:service name="ExportedRootPortType">
-			<genii:resource-provider name="exported-root-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-
-<!--  turns on making rexport resolver for new instances of this type -->
-			<genii:default-resolver-factory-settings>
-				<mconf:property 
-					name="edu.virginia.vcgr.genii.container.resolver.default-resolver-factory-proxy-class"
-					value="edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverFactoryProxy"/>
-			</genii:default-resolver-factory-settings>
-
-		</genii:service>
-		
-		<genii:service name="RExportFilePortType">
-			<genii:resource-provider name="rbyteio-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-			
-<!--  turns on making resolver for new instances of this type
-			<genii:default-resolver-factory-settings>
-				<mconf:property 
-					name="edu.virginia.vcgr.genii.container.resolver.default-resolver-factory-proxy-class"
-					value="edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverFactoryProxy"/>
-			</genii:default-resolver-factory-settings>
--->	
-		</genii:service>
-		
-		<genii:service name="RExportDirPortType">
-			<genii:resource-provider name="rexport-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-			
-<!--  turns on making resolver for new instances of this type
-			<genii:default-resolver-factory-settings>
-				<mconf:property 
-					name="edu.virginia.vcgr.genii.container.resolver.default-resolver-factory-proxy-class"
-					value="edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverFactoryProxy"/>
-			</genii:default-resolver-factory-settings>
--->	
-		</genii:service>
-		
-		<genii:service name="RExportResolverPortType">
-			<genii:resource-provider name="rexport-resolver-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-		</genii:service>
-
-		<genii:service name="RExportResolverFactoryPortType">
-			<genii:resource-provider name="rexport-resolver-factory-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-		</genii:service>
-		
-		<genii:service name="GeniiSubscriptionPortType">
-			<genii:resource-provider name="subscription-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-		</genii:service>
-
-		<genii:service name="SimpleResolverPortType">
-			<genii:resource-provider name="simple-resolver-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-		</genii:service>
-
-		<genii:service name="SimpleResolverFactoryPortType">
-			<genii:resource-provider name="simple-resolver-factory-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-		</genii:service>
-		
-		<genii:service name="ApplicationDescriptionPortType">
-			<genii:resource-provider name="application-description-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-		</genii:service>
-		
-		<genii:service name="ApplicationDeployerPortType">
-			<genii:resource-provider name="application-deployer-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-		</genii:service>
-		
-		<genii:service name="QueuePortType">
-			<genii:resource-provider name="queue-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-		</genii:service>
-
-		<genii:service name="IteratorPortType">
-			<genii:resource-provider name="iterator-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-		</genii:service>
-
-		<genii:service name="X509AuthnPortType">
-			<genii:resource-provider name="rns-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-		</genii:service>
-		
-	</genii:configured-instances>
-	
-	<genii:services>
+<genii:services>
 		<genii:service name="CounterPortType">
 			<genii:resource-provider name="basic-db-resource-provider"/>
 			<genii:authz-provider name="gamlacl-authz-provider"/>
@@ -719,7 +502,7 @@
 			<genii:resource-provider name="basic-db-resource-provider"/>
 			<genii:authz-provider name="gamlacl-authz-provider"/>
 		</genii:service>
-
+		
 		<genii:service name="CoreDataAccessCombinedPortType">
 			<genii:resource-provider name="dai-db-resource-provider"/>
 			<genii:authz-provider name="gamlacl-authz-provider"/>

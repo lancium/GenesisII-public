@@ -20,23 +20,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.RNSEntryExistsFaultType;
 import org.morgan.util.GUID;
-import org.ws.addressing.AttributedURIType;
 import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.ReferenceParametersType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
-import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedFileUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
-import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
 import edu.virginia.vcgr.genii.client.resource.MessageElementUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.common.GeniiCommon;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
-import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
-import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.byteio.IRByteIOResource;
 import edu.virginia.vcgr.genii.container.byteio.RandomByteIOAttributeHandlers;
@@ -48,7 +42,6 @@ import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverUtils;
-import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 
 public class ExportedDirDBResource extends BasicDBResource implements

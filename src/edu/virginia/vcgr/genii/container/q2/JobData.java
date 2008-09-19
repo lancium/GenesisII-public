@@ -13,6 +13,16 @@ import edu.virginia.vcgr.genii.client.queue.QueueStates;
 public class JobData
 {
 	/**
+	 * This variable is used internally by the queue to maintain the current
+	 * "active" state of a job.  Is it in the process of being created or
+	 * having it's status checked?  If the value is null, then no action is
+	 * going on.
+	 */
+	private String _jobAction = null;
+	
+	private Object _jobActionLock = new Object();
+	
+	/**
 	 * An internal flag used to indicate that the job has been killed and 
 	 * needs to be cleaned up.
 	 */
@@ -147,5 +157,27 @@ public class JobData
 	synchronized public void incrementRunAttempts()
 	{
 		_runAttempts++;
+	}
+	
+	public String currentJobAction()
+	{
+		return _jobAction;
+	}
+	
+	public String setJobAction(String newAction)
+	{
+		synchronized(_jobActionLock)
+		{
+			if (_jobAction != null)
+				return _jobAction;
+			_jobAction = newAction;
+		}
+		
+		return null;
+	}
+	
+	public void clearJobAction()
+	{
+		_jobAction = null;
 	}
 }

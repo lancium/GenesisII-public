@@ -56,6 +56,8 @@ import edu.virginia.vcgr.genii.container.invoker.GAroundInvokerFactory;
 import edu.virginia.vcgr.genii.container.alarms.AlarmManager;
 import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver;
 import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllSender;
+import edu.virginia.vcgr.secrun.SecureRunnableHooks;
+import edu.virginia.vcgr.secrun.SecureRunnerManager;
 
 public class Container extends ApplicationBase
 {
@@ -81,6 +83,8 @@ public class Container extends ApplicationBase
 		System.out.println("Container [deployment-name]");
 	}
 	
+	static private SecureRunnerManager _secRunManager;
+	
 	static public void main(String []args)
 	{	
 		if (args.length > 1)
@@ -101,6 +105,11 @@ public class Container extends ApplicationBase
 		}
 		
 		prepareServerApplication();
+		_secRunManager = SecureRunnerManager.createSecureRunnerManager(
+			Installation.getDeployment(new DeploymentName()));
+		Properties secRunProperties = new Properties();
+		_secRunManager.run(SecureRunnableHooks.CONTAINER_PRE_STARTUP, 
+			secRunProperties);
 		
 		try
 		{
@@ -114,6 +123,8 @@ public class Container extends ApplicationBase
 
 			runContainer();
 			System.out.println("Container Started");
+			_secRunManager.run(SecureRunnableHooks.CONTAINER_POST_STARTUP, 
+				secRunProperties);
 			AlarmManager.initializeAlarmManager();
 		}
 		catch (Throwable t)

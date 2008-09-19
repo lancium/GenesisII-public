@@ -107,6 +107,7 @@
 			<fileset dir="${obj.dir}">
 				<include name="edu/virginia/vcgr/genii/client/**/*"/>
 				<include name="edu/virginia/vcgr/fuse/**/*"/>
+				<include name="edu/virginia/vcgr/secrun/**/*"/>
 				<include name="edu/virginia/vcgr/genii/ftp/**/*"/>
 				<include name="edu/virginia/vcgr/genii/testing/**/*"/>
 			</fileset>

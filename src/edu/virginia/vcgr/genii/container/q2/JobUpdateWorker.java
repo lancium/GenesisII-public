@@ -10,6 +10,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
+import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.postlog.JobEvent;
 import edu.virginia.vcgr.genii.client.postlog.PostTargets;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
@@ -29,18 +30,20 @@ public class JobUpdateWorker implements Runnable
 	private JobManager _jobManager;
 	private DatabaseConnectionPool _connectionPool;
 	private IJobEndpointResolver _jobEndpointResolver;
+	private JobData _data;
 	
 	public JobUpdateWorker(JobManager jobManager,
 		IBESPortTypeResolver clientStubResolver,
 		IJobEndpointResolver jobEndpointResolver,
 		DatabaseConnectionPool connectionPool,
-		JobCommunicationInfo jobInfo)
+		JobCommunicationInfo jobInfo, JobData data)
 	{
 		_jobManager = jobManager;
 		_clientStubResolver = clientStubResolver;
 		_jobInfo = jobInfo;
 		_connectionPool = connectionPool;
 		_jobEndpointResolver = jobEndpointResolver;
+		_data = data;
 	}
 	
 	public void run()
@@ -60,6 +63,7 @@ public class JobUpdateWorker implements Runnable
 				connection, _jobInfo.getJobID());
 			GeniiBESPortType clientStub = _clientStubResolver.createClientStub(
 				connection, _jobInfo.getBESID());
+			ClientUtils.setTimeout(clientStub, 8 * 1000);
 			
 			if (jobEndpoint == null)
 			{
@@ -70,10 +74,26 @@ public class JobUpdateWorker implements Runnable
 				return;
 			}
 			
-			/* call the BES container to get the activity's status. */
-			GetActivityStatusResponseType []activityStatuses 
-				= clientStub.getActivityStatuses(new GetActivityStatusesType(
-					new EndpointReferenceType[] { jobEndpoint }, null)).getResponse();
+			String oldAction = _data.setJobAction("Checking");
+			if (oldAction != null)
+			{
+				_logger.error("Attempting to check job status, found that " +
+					"we are in the process of doing action:  " + oldAction);
+				return;
+			}
+			
+			GetActivityStatusResponseType []activityStatuses;
+			try
+			{
+				/* call the BES container to get the activity's status. */
+				activityStatuses 
+					= clientStub.getActivityStatuses(new GetActivityStatusesType(
+						new EndpointReferenceType[] { jobEndpoint }, null)).getResponse();
+			}
+			finally
+			{
+				_data.clearJobAction();
+			}
 			
 			/* If we didn't get one back, then there was 
 			 * a weird internal error. */

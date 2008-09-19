@@ -60,11 +60,6 @@ public class QueueManager implements Closeable
 	static private DatabaseConnectionPool _connectionPool = null;
 	
 	/**
-	 * The outcall thread pool manager.
-	 */
-	static private ThreadPool _outcallThreadPool = null;
-	
-	/**
 	 * A map of queue key to queue manager for all instances running
 	 * on this container.
 	 */
@@ -150,15 +145,7 @@ public class QueueManager implements Closeable
 		{
 			mgr = _queueManager.get(queueid);
 			if (mgr == null)
-			{
-				synchronized(QueueManager.class)
-				{
-					if (_outcallThreadPool == null)
-						_outcallThreadPool = new ThreadPool(_MAX_SIMULTANEOUS_OUTCALLS);
-				}
-				
 				_queueManager.put(queueid, mgr = new QueueManager(queueid));
-			}
 		}
 		
 		return mgr;
@@ -174,30 +161,24 @@ public class QueueManager implements Closeable
 	 */
 	static public void destroyManager(String queueid)
 	{
-		boolean empty;
 		QueueManager mgr = null;
 		
 		synchronized(_queueManager)
 		{
 			mgr = _queueManager.remove(queueid);
-			empty = _queueManager.isEmpty();
 		}
 		
 		if (mgr != null)
 			StreamUtils.close(mgr);
-		
-		synchronized(QueueManager.class)
-		{
-			if (empty && _outcallThreadPool != null)
-			{
-				StreamUtils.close(_outcallThreadPool);
-				_outcallThreadPool = null;
-			}
-		}
 	}
 	
 	volatile private boolean _closed = false;
 	private String _queueid;
+	
+	/**
+	 * The outcall thread pool manager.
+	 */
+	private ThreadPool _outcallThreadPool = null;
 	
 	private BESManager _besManager;
 	private JobManager _jobManager;
@@ -220,6 +201,7 @@ public class QueueManager implements Closeable
 		throws SQLException, ResourceException
 	{
 		Connection connection = null;
+		_outcallThreadPool = new ThreadPool(_MAX_SIMULTANEOUS_OUTCALLS);
 		_queueid = queueid;
 		_database = new QueueDatabase(_queueid);
 		_schedulingEvent = new SchedulingEvent();
@@ -260,6 +242,7 @@ public class QueueManager implements Closeable
 		StreamUtils.close(_scheduler);
 		StreamUtils.close(_besManager);
 		StreamUtils.close(_jobManager);
+		StreamUtils.close(_outcallThreadPool);
 	}
 		
 	/************************************************************************/

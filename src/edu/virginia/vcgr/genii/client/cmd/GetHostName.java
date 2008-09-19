@@ -7,8 +7,9 @@ import edu.virginia.vcgr.genii.client.configuration.Hostname;
 
 public class GetHostName
 {
-	static private final String _USAGE = "Usage: GetHostName [--ip]";
+	static private final String _USAGE = "Usage: GetHostName [--ip] [--not-fully-qualified]";
 	static private final String _IP_ARG = "--ip";
+	static private final String _NOT_FULLY_QUALIFIED = "--not-fully-qualified";
 
 	static private void printUsage()
 	{
@@ -46,14 +47,34 @@ public class GetHostName
 	
 	static public void main(String [] args) throws SocketException
 	{
-		if (args.length > 1 || (args.length == 1 && !args[0].equals(_IP_ARG)))
+		boolean getIP = false;
+		boolean fullyQualified = true;
+
+		for (String arg : args)
 		{
-			printUsage();
-			return;
+			if (arg.equals(_IP_ARG))
+				getIP = true;
+			else if (arg.equals(_NOT_FULLY_QUALIFIED))
+				fullyQualified = false;
+			else
+			{
+				printUsage();
+				System.exit(1);
+			}
 		}
-		if (args.length == 1)
+
+		if (getIP)
 			System.out.print(getHostNameIP() + "\n");
 		else
-			System.out.print(getHostName() + "\n");
+		{
+			String hostname = getHostName();
+			if (!fullyQualified)
+			{
+				int index = hostname.indexOf('.');
+				if (index > 0)
+					hostname = hostname.substring(0, index);
+			}
+			System.out.print(hostname + "\n");
+		}
 	}
 }

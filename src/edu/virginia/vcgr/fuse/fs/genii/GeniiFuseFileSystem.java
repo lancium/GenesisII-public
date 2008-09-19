@@ -28,6 +28,7 @@ public class GeniiFuseFileSystem implements FuseFileSystem
 	
 	private ICallingContext _callingContext;
 	private RNSPath _root;
+	private RNSPath _lastPath;
 	private Collection<Identity> _callerIdentities;
 	
 	public GeniiFuseFileSystem(ICallingContext callingContext,
@@ -48,6 +49,7 @@ public class GeniiFuseFileSystem implements FuseFileSystem
 			_root = _root.lookup(sandbox);
 		
 		_root = _root.createSandbox();
+		_lastPath = _root;
 		
 		_callerIdentities = SecurityUtils.getCallerIdentities(callingContext);
 	}
@@ -76,7 +78,8 @@ public class GeniiFuseFileSystem implements FuseFileSystem
 		FuseFileSystemEntry entry = _lookupCache.get(path);
 		if (entry == null)
 		{
-			RNSPath target = _root.lookup(path);
+			RNSPath target = _lastPath.lookup(path);
+			_lastPath = target;
 			entry = new GeniiFuseEntryFacade(target, 
 				new GeniiFileSystemContextImpl());
 			_lookupCache.put(path, entry);

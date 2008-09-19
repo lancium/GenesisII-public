@@ -54,6 +54,11 @@ public class Installation
 		reload();
 	}
 	
+	static public File getInstallDirectory()
+	{
+		return _installationDirectory;
+	}
+	
 	static public Deployment getDeployment(DeploymentName depName)
 	{
 		return Deployment.getDeployment(_deploymentsDirectory, depName);

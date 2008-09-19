@@ -8,6 +8,7 @@ import org.ggf.bes.factory.GetFactoryAttributesDocumentResponseType;
 import org.ggf.bes.factory.GetFactoryAttributesDocumentType;
 
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
+import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 
 /**
@@ -54,6 +55,7 @@ public class BESUpdateWorker implements Runnable
 			 */
 			GeniiBESPortType clientStub = _portTypeResolver.createClientStub(
 				connection, _besID);
+			ClientUtils.setTimeout(clientStub, 8 * 1000);
 			
 			/* Go ahead and Mark the BES as missed until we have actually
 			 * communicated with it.

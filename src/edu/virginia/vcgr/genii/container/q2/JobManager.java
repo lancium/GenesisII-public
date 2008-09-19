@@ -806,6 +806,8 @@ public class JobManager implements Closeable
 		throws SQLException, ResourceException,
 			GenesisIISecurityException
 	{
+		int originalCount = _outcallThreadPool.size();
+		
 		/* Iterate through all running jobs and enqueue a worker to
 		 * check the status of that job.
 		 */
@@ -834,8 +836,15 @@ public class JobManager implements Closeable
 			
 			/* Enqueue the worker into the outcall thread pool */
 			_outcallThreadPool.enqueue(new JobUpdateWorker(
-				this, resolver, resolver, _connectionPool, info));
+				this, resolver, resolver, _connectionPool, info, job));
 		}
+		
+		int newCount = _outcallThreadPool.size();
+		
+		_logger.debug(String.format(
+			"Just finished enqueing a bunch of jobs into the thread pool " +
+			"and the thread pool size grew from %d jobs to %d jobs.", 
+			originalCount, newCount));
 	}
 	
 	/**
@@ -1130,11 +1139,12 @@ public class JobManager implements Closeable
 				 */
 				entries.put(new Long(_besID), entryType = new EntryType());
 				_database.fillInBESEPRs(connection, entries);
+				JobData data;
 				
 				synchronized(_manager)
 				{
 					/* Get the in-memory information for the job */
-					JobData data = _jobsByID.get(new Long(_jobID));
+					data = _jobsByID.get(new Long(_jobID));
 					if (data == null)
 					{
 						_logger.warn("Job " + _jobID + 
@@ -1151,20 +1161,38 @@ public class JobManager implements Closeable
 					}
 				}
 				
-				/* We need to start the job, so go ahead and create a proxy to
-				 * call the container and then call it.
-				 */
-				startCtxt = startInfo.getCallingContext();
-				GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, 
-					entryType.getEntry_reference(), 
-					startCtxt);
-				CreateActivityResponseType resp = bes.createActivity(
-					new CreateActivityType(
-						new ActivityDocumentType(startInfo.getJSDL(), null), null));
+				String oldAction = data.setJobAction("Creating");
+				if (oldAction != null)
+				{
+					_logger.error(
+						"We're trying to create an activity for a job that " +
+						"is already under going some action:  " + oldAction);
+					return;
+				}
 				
-				EndpointReferenceType epr = resp.getActivityIdentifier();
-				PostTargets.poster().post(JobEvent.jobLaunched(startCtxt, epr, 
-					Long.toString(_jobID)));
+				CreateActivityResponseType resp;
+				try
+				{
+					/* We need to start the job, so go ahead and create a proxy to
+					 * call the container and then call it.
+					 */
+					startCtxt = startInfo.getCallingContext();
+					GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, 
+						entryType.getEntry_reference(), 
+						startCtxt);
+					ClientUtils.setTimeout(bes, 8 * 1000);
+					resp = bes.createActivity(
+						new CreateActivityType(
+							new ActivityDocumentType(startInfo.getJSDL(), null), null));
+					
+					EndpointReferenceType epr = resp.getActivityIdentifier();
+					PostTargets.poster().post(JobEvent.jobLaunched(startCtxt, epr, 
+						Long.toString(_jobID)));
+				}
+				finally
+				{
+					data.clearJobAction();
+				}
 				
 				synchronized(_manager)
 				{
@@ -1177,7 +1205,7 @@ public class JobManager implements Closeable
 					/* Now it's stored in the database.  Note that it's started
 					 * in memory as well.
 					 */
-					JobData data = _jobsByID.get(new Long(_jobID));
+					data = _jobsByID.get(new Long(_jobID));
 					data.setJobState(
 						QueueStates.RUNNING);
 					
@@ -1274,7 +1302,15 @@ public class JobManager implements Closeable
 			 */
 			KillInformation killInfo = _database.getKillInfo(
 				connection, _jobData.getJobID());
-						
+				
+			String oldAction = _jobData.setJobAction("Terminating");
+			if (oldAction != null)
+			{
+				_logger.error(
+					"Attempted to kill an activity which was " +
+					"already undergoing another action:  " + oldAction);
+			}
+			
 			try
 			{
 				ICallingContext ctxt = killInfo.getCallingContext();
@@ -1283,6 +1319,7 @@ public class JobManager implements Closeable
 				GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, 
 					killInfo.getBESEndpoint(), 
 					killInfo.getCallingContext());
+				ClientUtils.setTimeout(bes, 8 * 1000);
 				bes.terminateActivities(new TerminateActivitiesType(
 					new EndpointReferenceType[] {
 						killInfo.getJobEndpoint()
@@ -1293,6 +1330,10 @@ public class JobManager implements Closeable
 			{
 				_logger.warn("Exception occurred while killing an activity.");
 				return null;
+			}
+			finally
+			{
+				_jobData.clearJobAction();
 			}
 		}
 		

@@ -94,7 +94,7 @@ call "%_INC_GENII_INSTALL_DIR%\simple-command.bat" edu.virginia.vcgr.genii.clien
 
 REM setup rest of container stuff - use script.
 echo setting up container using %_INC_GENII_INSTALL_DIR%\bootstrap-container.xml
-call "%_INC_GENII_INSTALL_DIR%\grid.bat" script "DEPLOYMENT_NAME=%_DEPLOYMENT_NAME%" "INC_GENII_INSTALL_DIR=%_INC_GENII_INSTALL_DIR%" "CONTAINER_NAME=%_HOST_NAME%" "CONTAINER_ADDR=https://localhost:%_HOST_PORT%" "%_INC_GENII_INSTALL_DIR%\bootstrap-container.xml"
+call "%_INC_GENII_INSTALL_DIR%\grid.bat" script "DEPLOYMENT_NAME=%_DEPLOYMENT_NAME%" "GENII_INSTALL_DIR=%_INC_GENII_INSTALL_DIR%" "CONTAINER_NAME=%_HOST_NAME%" "CONTAINER_ADDR=https://localhost:%_HOST_PORT%" "%_INC_GENII_INSTALL_DIR%\bootstrap-container.xml"
  
 echo "install-new-container finished successfully"
 pause

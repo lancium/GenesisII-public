@@ -3,12 +3,16 @@ package edu.virginia.vcgr.genii.client.cmd;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.ApplicationBase;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
+import edu.virginia.vcgr.genii.client.configuration.Installation;
+import edu.virginia.vcgr.secrun.SecureRunnableHooks;
+import edu.virginia.vcgr.secrun.SecureRunnerManager;
 
 public class Driver extends ApplicationBase
 {
@@ -19,6 +23,8 @@ public class Driver extends ApplicationBase
 		System.out.println("Driver");
 	}
 
+	static private SecureRunnerManager _secRunManager;
+	
 	static public void main(String []args)
 	{
 		String deploymentName = System.getenv("GENII_DEPLOYMENT_NAME");
@@ -33,6 +39,13 @@ public class Driver extends ApplicationBase
 		}
 		
 		prepareClientApplication();
+		_secRunManager = SecureRunnerManager.createSecureRunnerManager(
+			Installation.getDeployment(new DeploymentName()));
+		Properties secRunProperties = new Properties();
+		_secRunManager.run(SecureRunnableHooks.CLIENT_PRE_STARTUP, 
+			secRunProperties);
+		_secRunManager.run(SecureRunnableHooks.CLIENT_POST_STARTUP, 
+			secRunProperties);
 		
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		

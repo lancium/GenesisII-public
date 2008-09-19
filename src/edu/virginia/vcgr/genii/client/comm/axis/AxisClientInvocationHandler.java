@@ -164,6 +164,9 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	
 	private EndpointReferenceType _epr;
 	
+	static private final int _DEFAULT_TIMEOUT = 1000 * 120;
+	private Integer _timeout = null;
+	
 	private ICallingContext _callContext;
 	private X509Certificate _resourceCert;
 	
@@ -378,7 +381,6 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			Stub stubInstance = (Stub)locatorPortTypeMethod.invoke(
 				locatorInstance, new Object[] {url});
 			
-			stubInstance.setTimeout(1000 * 120);
 			if (epr != null) {
 				stubInstance._setProperty(CommConstants.TARGET_EPR_PROPERTY_NAME, epr);
 			}
@@ -454,8 +456,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	static private Random _expBackoffTwitter = new Random();
 	// added resolution code - 1/07 - jfk3w
 	// revamped resolution code 4/11/07 - jfk3w.
-	public Object finalInvoke(Object arg0, Method arg1, Object[] arg2)
-			throws Throwable 
+	public Object finalInvoke(Object obj, Method calledMethod, Object[] arguments)
+		throws Throwable 
 	{
 		EndpointReferenceType origEPR = getTargetEPR();
 		ResolutionContext context = null;
@@ -464,6 +466,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		int attempt = 0;
 		long startCommunicate = 0L;
 		long deltaCommunicate = 0L;
+		int timeout = (_timeout != null) ? _timeout.intValue() : _DEFAULT_TIMEOUT;
 		
 		while(true)
 		{
@@ -479,7 +482,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 					try
 					{
 						startCommunicate = System.currentTimeMillis();
-						Object ret = handler.doInvoke(arg0, arg1, arg2);
+						Object ret = handler.doInvoke(calledMethod, arguments, timeout);
 						return ret;
 					}
 					catch(Throwable t)
@@ -559,10 +562,10 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		}
 	}
 
-	protected Object doInvoke(Object arg0, Method arg1, Object[] arg2)
-		throws Throwable
+	protected Object doInvoke(Method calledMethod, Object[] arguments, 
+		int timeout) throws Throwable
 	{
-		MethodDescription methodDesc = new MethodDescription(arg1);
+		MethodDescription methodDesc = new MethodDescription(calledMethod);
 		Stub stubInstance = (Stub) _portMethods.get(methodDesc);
 
 		configureSecurity(stubInstance);
@@ -589,7 +592,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			}
 		}
 	
-		Object ret = arg1.invoke(stubInstance, arg2);
+		stubInstance.setTimeout(timeout);
+		Object ret = calledMethod.invoke(stubInstance, arguments);
 
 		Object [] inAttachments = stubInstance.getAttachments();
 		if (inAttachments != null)
@@ -759,6 +763,11 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		}
 		_outAttachments = attachments;
 		_attachmentType = attachmentType;
+	}
+	
+	public void setTimeout(int timeoutMillis)
+	{
+		_timeout = new Integer(timeoutMillis);
 	}
 	
 	public Collection<GeniiAttachment> getInAttachments()

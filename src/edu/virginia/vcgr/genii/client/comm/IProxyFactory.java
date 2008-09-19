@@ -47,4 +47,7 @@ public interface IProxyFactory
 		AttachmentType attachmentType) throws ResourceException;
 	public Collection<GeniiAttachment> getAttachments(Object clientProxy)
 		throws ResourceException;
+	
+	public void setTimeout(Object clientProxy, int timeoutMillis) 
+		throws ResourceException;
 }

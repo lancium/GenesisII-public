@@ -88,6 +88,14 @@ public class ThreadPool implements Closeable
 		}
 	}
 	
+	public int size()
+	{
+		synchronized(_queue)
+		{
+			return _queue.size();
+		}
+	}
+	
 	/**
 	 * This is the internal thread runner class.  It's job is to wait for a
 	 * worker task to get enqueue, then run it and go back to sleep.

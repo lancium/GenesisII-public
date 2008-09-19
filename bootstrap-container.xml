@@ -26,10 +26,11 @@
 	</geniix:login>
 
 	<gsh:echo
-		message="Logging in using installer cert - ${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/container.pfx."/>
+		message="Logging in using installer cert - ${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/installer.pfx."/>
 	<geniix:login>
 		<gsh:param>--no-gui</gsh:param>
 		<gsh:param>${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/installer.pfx</gsh:param>
+		<gsh:param>--password=installer</gsh:param>
 		<gsh:param>--pattern=installer</gsh:param>
 		<gsh:param>--alias</gsh:param>
 	</geniix:login>

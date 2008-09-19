@@ -19,12 +19,15 @@ public class Deployment
 	static private final String SERVICES_DIRECTORY_NAME = "services";
 	static private final String WEB_CONTAINER_PROPERTIES_FILENAME = 
 		"web-container.properties";
+	static private final String SECURE_RUNNABLE_DIRECTORY_NAME = 
+		"secure-runnable";
 	
 	static private Map<String, Deployment> _knownDeployments =
 		new HashMap<String, Deployment>(4);
 	
 	private File _deploymentDirectory;
 	private File _configurationDirectory;
+	private File _secureRunnableDirectory;
 	private Security _security;
 	private File _servicesDirectory;
 	private Properties _webContainerProperties;
@@ -51,6 +54,9 @@ public class Deployment
 		
 		_webContainerProperties = loadWebContainerProperties(
 			_deploymentDirectory.getName(), _configurationDirectory);
+		
+		_secureRunnableDirectory = new File(_deploymentDirectory, 
+			SECURE_RUNNABLE_DIRECTORY_NAME);
 	}
 	
 	static private Properties loadWebContainerProperties(
@@ -76,6 +82,11 @@ public class Deployment
 		{
 			StreamUtils.close(fin);
 		}
+	}
+	
+	public File secureRunnableDirectory()
+	{
+		return _secureRunnableDirectory;
 	}
 	
 	public File getConfigurationFile(String configurationFilename)
