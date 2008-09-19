@@ -144,7 +144,6 @@ import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
 import edu.virginia.vcgr.genii.iterator.IteratorInitializationType;
 import edu.virginia.vcgr.genii.iterator.IteratorMemberType;
-import edu.virginia.vcgr.genii.iterator.IteratorPortType;
 
 @GAroundInvoke({BaseFaultFixer.class, WSAddressingHandler.class, DatabaseHandler.class, 
 	DebugInvoker.class, ScheduledTerminationInvoker.class})

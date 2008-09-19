@@ -18,7 +18,7 @@ import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
  * 
  * @author mmm2a
  */
-public class BESUpdateWorker implements Runnable
+public class BESUpdateWorker implements OutcallHandler
 {
 	static private Log _logger = LogFactory.getLog(BESUpdateWorker.class);
 	
@@ -35,6 +35,28 @@ public class BESUpdateWorker implements Runnable
 		_manager = manager;
 		_besID = besID;
 		_portTypeResolver = clientStubResolver;
+	}
+	
+	public boolean equals(BESUpdateWorker other)
+	{
+		return (_manager == other._manager) && (_besID == other._besID);
+	}
+	
+	@Override
+	public boolean equals(OutcallHandler other)
+	{
+		if (other instanceof BESUpdateWorker)
+			return equals((BESUpdateWorker)other);
+		
+		return false;
+	}
+	
+	@Override public boolean equals(Object other)
+	{
+		if (other instanceof BESUpdateWorker)
+			return equals((BESUpdateWorker)other);
+		
+		return false;
 	}
 	
 	public void run()

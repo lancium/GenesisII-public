@@ -21,7 +21,7 @@ import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
  * 
  * @author mmm2a
  */
-public class JobUpdateWorker implements Runnable
+public class JobUpdateWorker implements OutcallHandler
 {
 	static private Log _logger = LogFactory.getLog(JobUpdateWorker.class);
 	
@@ -44,6 +44,29 @@ public class JobUpdateWorker implements Runnable
 		_connectionPool = connectionPool;
 		_jobEndpointResolver = jobEndpointResolver;
 		_data = data;
+	}
+	
+	public boolean equals(JobUpdateWorker other)
+	{
+		return (_data.getJobID() == other._data.getJobID());
+	}
+	
+	@Override
+	public boolean equals(OutcallHandler other)
+	{
+		if (other instanceof JobUpdateWorker)
+			return equals((JobUpdateWorker)other);
+		
+		return false;
+	}
+	
+	@Override
+	public boolean equals(Object other)
+	{
+		if (other instanceof JobUpdateWorker)
+			return equals((JobUpdateWorker)other);
+		
+		return false;
 	}
 	
 	public void run()

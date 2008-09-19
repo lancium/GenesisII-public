@@ -106,6 +106,9 @@ public class BESUpdateInformation
 		if (_lastUpdated == null)
 			return true;
 		
+		if (_available)
+			return false;
+		
 		/* Otherwise, see how long we are supposed to wait for the next
 		 * update based off of the update frequency and the number of misses
 		 * recorded so far.

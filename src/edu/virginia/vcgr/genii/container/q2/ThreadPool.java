@@ -23,7 +23,8 @@ public class ThreadPool implements Closeable
 	/**
 	 * The list of workers that are waiting for an opportunity to run.
 	 */
-	private LinkedList<Runnable> _queue = new LinkedList<Runnable>();
+	private LinkedList<OutcallHandler> _queue = 
+		new LinkedList<OutcallHandler>();
 	
 	/**
 	 * The array of threads in this thread pool.
@@ -76,10 +77,14 @@ public class ThreadPool implements Closeable
 	 * 
 	 * @param job The Worker looking for a thread to run on.
 	 */
-	public void enqueue(Runnable job)
+	public void enqueue(OutcallHandler job)
 	{
 		synchronized(_queue)
 		{
+			for (OutcallHandler handler : _queue)
+				if (handler.equals(job))
+					return;
+			
 			/* Add this worker to the end of the queue */
 			_queue.addLast(job);
 			
@@ -106,7 +111,7 @@ public class ThreadPool implements Closeable
 	{
 		public void run()
 		{
-			Runnable job;
+			OutcallHandler job;
 			
 			while(!_closing)
 			{

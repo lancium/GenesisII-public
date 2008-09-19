@@ -1103,7 +1103,7 @@ public class JobManager implements Closeable
 	 * 
 	 * @author mmm2a
 	 */
-	private class JobLauncher implements Runnable
+	private class JobLauncher implements OutcallHandler
 	{
 		private long _jobID;
 		private long _besID;
@@ -1114,6 +1114,30 @@ public class JobManager implements Closeable
 			_manager = manager;
 			_jobID = jobID;
 			_besID = besID;
+		}
+		
+		public boolean equals(JobLauncher other)
+		{
+			return (_jobID == other._jobID) && (_besID == other._besID) && 
+				(_manager == other._manager);
+		}
+		
+		@Override
+		public boolean equals(OutcallHandler other)
+		{
+			if (other instanceof JobLauncher)
+				return equals((JobLauncher)other);
+			
+			return false;
+		}
+		
+		@Override
+		public boolean equals(Object other)
+		{
+			if (other instanceof JobLauncher)
+				return equals((JobLauncher)other);
+			
+			return false;
 		}
 		
 		public void run()
@@ -1275,7 +1299,7 @@ public class JobManager implements Closeable
 	 * 
 	 * @author mmm2a
 	 */
-	private class JobKiller implements Runnable
+	private class JobKiller implements OutcallHandler
 	{
 		private JobData _jobData;
 		private QueueStates _newState;
@@ -1284,6 +1308,30 @@ public class JobManager implements Closeable
 		{
 			_jobData = jobData;
 			_newState = newState;
+		}
+		
+		public boolean equals(JobKiller other)
+		{
+			return (_newState == other._newState) && 
+				(_jobData.getJobID() == other._jobData.getJobID());
+		}
+		
+		@Override
+		public boolean equals(OutcallHandler other)
+		{
+			if (other instanceof JobKiller)
+				return equals((JobKiller)other);
+			
+			return false;
+		}
+		
+		@Override
+		public boolean equals(Object other)
+		{
+			if (other instanceof JobKiller)
+				return equals((JobKiller)other);
+			
+			return false;
 		}
 		
 		/**
