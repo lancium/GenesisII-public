@@ -284,7 +284,7 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 		
 		try{
 			return new IterateListResponseType(super.createWSIterator(
-					entryCollection.iterator(), 25));
+					entryCollection.iterator(), 100));
 		}
 		catch (SQLException sqe){
 			throw new RemoteException("Unable to create iterator for exportDir lookup.", sqe);

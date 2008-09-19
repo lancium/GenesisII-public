@@ -255,7 +255,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		try
 		{
 			return new IterateListResponseType(
-				super.createWSIterator(col.iterator(), 25));
+				super.createWSIterator(col.iterator(), 100));
 		}
 		catch (SQLException sqe)
 		{

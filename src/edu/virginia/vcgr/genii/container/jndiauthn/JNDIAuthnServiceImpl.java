@@ -712,7 +712,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 			try
 			{
 				return new IterateListResponseType(super.createWSIterator(col
-						.iterator(), 50));
+						.iterator(), 100));
 			}
 			catch (ConfigurationException ce)
 			{
@@ -731,7 +731,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 			EntryIterator iterator = new EntryIterator(myResource, null);
 
 			return new IterateListResponseType(super.createWSIterator(iterator,
-					50));
+					100));
 
 		}
 		catch (java.io.IOException e)
