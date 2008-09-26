@@ -277,11 +277,10 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		destroy(null);
 	}
 	
-	static protected void setScheduledTerminationTime(Calendar termTime)
+	static protected void setScheduledTerminationTime(Calendar termTime, ResourceKey rKey)
 		throws ResourceUnknownFaultType, ResourceException
 	{
 		AlarmIdentifier alarmID;
-		ResourceKey rKey = ResourceManager.getCurrentResource();
 		IResource resource = rKey.dereference();
 		
 		resource.setProperty(
@@ -296,6 +295,13 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 				termTime.getTime(), 15 * 1000L, null, null, "terminationAlarm", null);
 		
 		resource.commit();
+	}
+	
+	static protected void setScheduledTerminationTime(Calendar termTime)
+		throws ResourceUnknownFaultType, ResourceException
+	{
+		ResourceKey rKey = ResourceManager.getCurrentResource();
+		setScheduledTerminationTime(termTime, rKey);
 	}
 	
 	protected TopicSpace getTopicSpace() throws InvalidTopicException
@@ -539,29 +545,45 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		EndpointReferenceType epr = ResourceManager.createEPR(rKey, 
 				targetServiceURL, getImplementedPortTypes(rKey));
 		
-		if (!(this instanceof GeniiNoOutCalls)){
-			try
-			{
-				CallingContextImpl context = new CallingContextImpl((CallingContextImpl)null);
-				context.setActiveKeyAndCertMaterial(new KeyAndCertMaterial(
-					(X509Certificate[])constructionParameters.get(IResource.CERTIFICATE_CHAIN_CONSTRUCTION_PARAM),
-					Container.getContainerPrivateKey()));
-				rKey.dereference().setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME, context);
-			}
-			catch (GeneralSecurityException gse)
-			{
-				throw FaultManipulator.fillInFault(
-					new ResourceCreationFaultType(null, null, null, null, new BaseFaultTypeDescription[] {
-						new BaseFaultTypeDescription("Security error while initializing new resource's calling context."),
-						new BaseFaultTypeDescription(gse.getLocalizedMessage()) }, null));
-			}
+		EndpointReferenceType oldEPR = null;
+		oldEPR =
+			(EndpointReferenceType)WorkingContext.getCurrentWorkingContext().getProperty(
+				WorkingContext.EPR_PROPERTY_NAME);
+		WorkingContext.getCurrentWorkingContext().setProperty(
+			WorkingContext.EPR_PROPERTY_NAME, epr);
 		
-		}	
-		Collection<MessageElement> resolverCreationParams = new Vector<MessageElement>();
+		try
+		{	
+			if (!(this instanceof GeniiNoOutCalls))
+			{
+				try
+				{
+					CallingContextImpl context = new CallingContextImpl((CallingContextImpl)null);
+					context.setActiveKeyAndCertMaterial(new KeyAndCertMaterial(
+						(X509Certificate[])constructionParameters.get(IResource.CERTIFICATE_CHAIN_CONSTRUCTION_PARAM),
+						Container.getContainerPrivateKey()));
+					rKey.dereference().setProperty(IResource.STORED_CALLING_CONTEXT_PROPERTY_NAME, context);
+				}
+				catch (GeneralSecurityException gse)
+				{
+					throw FaultManipulator.fillInFault(
+						new ResourceCreationFaultType(null, null, null, null, new BaseFaultTypeDescription[] {
+							new BaseFaultTypeDescription("Security error while initializing new resource's calling context."),
+							new BaseFaultTypeDescription(gse.getLocalizedMessage()) }, null));
+				}
+			}	
 		
-		// allow subclasses to do creation work
-		postCreate(rKey, epr, constructionParameters, resolverCreationParams);
-		return epr;
+			Collection<MessageElement> resolverCreationParams = new Vector<MessageElement>();
+		
+			// allow subclasses to do creation work
+			postCreate(rKey, epr, constructionParameters, resolverCreationParams);
+			return epr;
+		}
+		finally
+		{
+			WorkingContext.getCurrentWorkingContext().setProperty(
+				WorkingContext.EPR_PROPERTY_NAME, oldEPR);
+		}
 	}
 
 	

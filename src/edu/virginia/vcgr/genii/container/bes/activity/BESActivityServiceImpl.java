@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.rmi.RemoteException;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Properties;
@@ -75,6 +76,9 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 		BESActivityPortType, BESActivityConstants
 {
 	static private Log _logger = LogFactory.getLog(BESActivityServiceImpl.class);
+
+	// One week of life
+	static private final long BES_ACTIVITY_LIFETIME = 1000L * 60 * 60 * 24 * 7;
 	
 	public BESActivityServiceImpl() throws RemoteException
 	{
@@ -101,6 +105,10 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 		throws ResourceException, BaseFaultType, RemoteException
 	{
 		super.postCreate(rKey, activityEPR, creationParameters, resolverCreationParams);
+		
+		_logger.debug(String.format(
+			"Post creating a BES Activity with resource key \"%s\".", 
+			rKey.getKey()));
 		
 		IBESActivityResource resource = (IBESActivityResource)rKey.dereference();
 		BESActivityInitInfo initInfo = BESActivityUtils.extractCreationProperties(
@@ -156,6 +164,13 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 				executionUnderstanding.createExecutionPlan(
 					creationProperties),
 				activityEPR, activityServiceName, executionUnderstanding.getJobName());
+			Calendar future = Calendar.getInstance();
+			future.setTimeInMillis(System.currentTimeMillis() +
+				BES_ACTIVITY_LIFETIME);
+			_logger.debug(String.format(
+				"Setting term. time for BES Activity with resource key \"%s\".", 
+				rKey.getKey()));
+			setScheduledTerminationTime(future, rKey);
 		}
 		catch (IOException fnfe)
 		{

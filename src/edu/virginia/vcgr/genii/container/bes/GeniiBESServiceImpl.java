@@ -220,9 +220,9 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 	{
 		ActivityDocumentType adt = parameters.getActivityDocument();
 		JobDefinition_Type jdt = adt.getJobDefinition();
-
-		IBESResource resource = 
-			(IBESResource)ResourceManager.getCurrentResource().dereference();
+		ResourceKey key = ResourceManager.getCurrentResource();
+		
+		IBESResource resource = (IBESResource)key.dereference();
 		 
 		if (!resource.isAcceptingNewActivities())
 			throw new NotAcceptingNewActivitiesFaultType(null);
@@ -235,6 +235,11 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 			_localActivityServiceEPR =
 				EPRUtils.makeEPR(Container.getServiceURL("BESActivityPortType"));
 		}
+		
+		_logger.debug(String.format(
+			"BES with resource key \"%s\" is creating an activity.",
+			key.getKey()));
+		
 		/* ASG August 28,2008, replaced RPC with direct call to CreateEPR */
 		EndpointReferenceType entryReference = 
 			new BESActivityServiceImpl().CreateEPR(BESActivityUtils.createCreationProperties(
