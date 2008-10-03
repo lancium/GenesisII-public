@@ -1,14 +1,17 @@
 package edu.virginia.vcgr.genii.container.bes.jsdl.personality.common;
 
+import java.io.File;
 import java.net.URI;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Properties;
 import java.util.Vector;
 
+import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.CleanupPhase;
+import edu.virginia.vcgr.genii.container.bes.execution.phases.CreateWorkingDirectoryPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.SetupContextDirectoryPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.SetupFUSEPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.SetupOGRSHPhase;
@@ -19,7 +22,10 @@ import edu.virginia.vcgr.genii.container.bes.execution.phases.TeardownFUSEPhase;
 
 public class CommonExecutionUnderstanding
 {
-	private String _jobName;
+	private FilesystemManager _fsManager;
+	
+	private String _jobAnnotation = null;
+	private String _jobName = null;
 	
 	private Collection<DataStagingUnderstanding> _stageIns =
 		new LinkedList<DataStagingUnderstanding>();
@@ -33,9 +39,24 @@ public class CommonExecutionUnderstanding
 	
 	private ApplicationUnderstanding _application = null;
 	
+	public CommonExecutionUnderstanding(FilesystemManager fsManager)
+	{
+		_fsManager = fsManager;
+	}
+	
+	public void setJobAnnotation(String jobAnnotation)
+	{
+		_jobAnnotation = jobAnnotation;
+	}
+	
 	public void setJobName(String jobName)
 	{
 		_jobName = jobName;
+	}
+	
+	public String getJobAnnotation()
+	{
+		return _jobAnnotation;
 	}
 	
 	public String getJobName()
@@ -68,6 +89,13 @@ public class CommonExecutionUnderstanding
 			_pureCleans.add(stage);
 	}
 	
+	public void addFilesystem(FilesystemUnderstanding understanding)
+		throws JSDLException
+	{
+		_fsManager.addFilesystem("SCRATCH", 
+			understanding.createScratchFilesystem(_jobAnnotation));
+	}
+	
 	public void setApplication(ApplicationUnderstanding application)
 	{
 		_application = application;
@@ -83,7 +111,7 @@ public class CommonExecutionUnderstanding
 		return _requiredOGRSHVersion;
 	}
 	
-	public String getWorkingDirectory()
+	public BESWorkingDirectory getWorkingDirectory()
 	{
 		if (_application == null)
 			return null;
@@ -97,18 +125,23 @@ public class CommonExecutionUnderstanding
 		Vector<ExecutionPhase> ret = new Vector<ExecutionPhase>();
 		Vector<ExecutionPhase> cleanups = new Vector<ExecutionPhase>();
 		
+		ret.add(new CreateWorkingDirectoryPhase(getWorkingDirectory()));
+		
 		for (DataStagingUnderstanding stage : _stageIns)
 		{
+			File stageFile = _fsManager.lookup(stage.getFilePath());
+			
 			ret.add(new StageInPhase(
-				stage.getSourceURI(), stage.getFilename(),
+				stage.getSourceURI(), 
+				stageFile,
 				stage.getCreationFlag(), stage.getCredential()));
 			
 			if (stage.isDeleteOnTerminate())
-				cleanups.add(new CleanupPhase(stage.getFilename()));
+				cleanups.add(new CleanupPhase(stageFile));
 		}
 		
 		ret.add(new SetupContextDirectoryPhase(".genesisII-bes-state"));
-		cleanups.add(new CleanupPhase(".genesisII-bes-state"));
+		cleanups.add(new CleanupPhase(new File(".genesisII-bes-state")));
 		
 		if (_fuseDirectory != null)
 		{
@@ -125,8 +158,10 @@ public class CommonExecutionUnderstanding
 				storedOGRSHContextFilename, OGRSHConfigFilename));
 			ret.add(new StoreContextPhase(storedOGRSHContextFilename));
 			
-			cleanups.add(new CleanupPhase(storedOGRSHContextFilename));
-			cleanups.add(new CleanupPhase(OGRSHConfigFilename));
+			cleanups.add(new CleanupPhase(
+				new File(storedOGRSHContextFilename)));
+			cleanups.add(new CleanupPhase(
+				new File(OGRSHConfigFilename)));
 		}
 		
 		if (_application != null)
@@ -135,16 +170,19 @@ public class CommonExecutionUnderstanding
 		
 		for (DataStagingUnderstanding stage : _stageOuts)
 		{
+			File stageFile = _fsManager.lookup(stage.getFilePath());
+			
 			ret.add(new StageOutPhase(
-				stage.getFilename(), stage.getTargetURI(),
+				stageFile, stage.getTargetURI(),
 				stage.getCredential()));
 			
 			if (stage.isDeleteOnTerminate())
-				cleanups.add(new CleanupPhase(stage.getFilename()));
+				cleanups.add(new CleanupPhase(stageFile));
 		}
 		
 		for (DataStagingUnderstanding stage : _pureCleans)
-			cleanups.add(new CleanupPhase(stage.getFilename()));
+			cleanups.add(new CleanupPhase(
+				_fsManager.lookup(stage.getFilePath())));
 		
 		ret.addAll(cleanups);
 		return ret;

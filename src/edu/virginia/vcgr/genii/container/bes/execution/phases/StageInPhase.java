@@ -11,6 +11,8 @@ import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.io.URIManager;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
+import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
+import edu.virginia.vcgr.genii.container.cservices.downloadmgr.DownloadManagerContainerService;
 
 public class StageInPhase extends AbstractExecutionPhase
 	implements Serializable
@@ -20,11 +22,11 @@ public class StageInPhase extends AbstractExecutionPhase
 	static private final String STAGING_IN_STATE = "staging-in";
 	
 	private URI _source;
-	private String _targetName;
+	private File _target;
 	private CreationFlagEnumeration _creationFlag;
 	private UsernamePasswordIdentity _credential;
 	
-	public StageInPhase(URI source, String targetName, 
+	public StageInPhase(URI source, File target, 
 		CreationFlagEnumeration creationFlag, 
 		UsernamePasswordIdentity credential)
 	{
@@ -36,11 +38,11 @@ public class StageInPhase extends AbstractExecutionPhase
 		if (source == null)
 			throw new IllegalArgumentException("Parameter \"source\" cannot be null.");
 		
-		if (targetName == null)
+		if (target == null)
 			throw new IllegalArgumentException("Parameter \"targetName\" cannot be null.");
 		
 		_source = source;
-		_targetName = targetName;
+		_target = target;
 		_creationFlag = 
 			(creationFlag == null) ? CreationFlagEnumeration.overwrite : creationFlag;
 	}
@@ -48,12 +50,14 @@ public class StageInPhase extends AbstractExecutionPhase
 	@Override
 	public void execute(ExecutionContext context) throws Throwable
 	{
-		File target = new File(
-			context.getCurrentWorkingDirectory(), _targetName);
-		if (_creationFlag.equals(CreationFlagEnumeration.dontOverwrite)
-			&& target.exists())
-			return;
-		
-		URIManager.get(_source, target, _credential);
+		File target = _target;
+		if (_creationFlag.equals(CreationFlagEnumeration.dontOverwrite))
+		{
+			DownloadManagerContainerService service =
+				(DownloadManagerContainerService)ContainerServices.findService(
+					DownloadManagerContainerService.SERVICE_NAME);
+			service.download(_source, target, _credential);
+		} else
+			URIManager.get(_source, target, _credential);
 	}
 }

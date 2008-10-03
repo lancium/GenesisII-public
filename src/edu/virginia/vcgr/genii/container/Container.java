@@ -1,6 +1,6 @@
 package edu.virginia.vcgr.genii.container;
 
-import java.io.*;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -51,6 +51,7 @@ import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 import edu.virginia.vcgr.genii.container.configuration.ContainerConfiguration;
+import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.deployment.ServiceDeployer;
 import edu.virginia.vcgr.genii.container.invoker.GAroundInvokerFactory;
 import edu.virginia.vcgr.genii.container.alarms.AlarmManager;
@@ -122,6 +123,11 @@ public class Container extends ApplicationBase
 				new GAroundInvokerFactory());
 
 			runContainer();
+			
+			_logger.info("Starting container services.");
+			ContainerServices.loadAll();
+			ContainerServices.startAll();
+			
 			System.out.println("Container Started");
 			_secRunManager.run(SecureRunnableHooks.CONTAINER_POST_STARTUP, 
 				secRunProperties);

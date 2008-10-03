@@ -22,10 +22,8 @@ import edu.virginia.vcgr.genii.client.io.FileSystemUtils;
 
 public class ApplicationManager
 {
-	static public File prepareApplication(File executeDirectory,
-		String applicationDescription) throws IOException
+	static public File prepareApplication(File executable) throws IOException
 	{
-		File executable = new File(executeDirectory, applicationDescription);
 		if (executable.exists())
 			return FileSystemUtils.makeExecutable(executable);
 		

@@ -1,10 +1,10 @@
 package edu.virginia.vcgr.genii.container.bes.execution;
 
-import java.io.File;
 import java.io.Serializable;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
 
 /**
  * An execution context is a context that is passed to execution phases
@@ -31,7 +31,7 @@ public interface ExecutionContext
 	 * 
 	 * @return The current working directory for this activity.
 	 */
-	public File getCurrentWorkingDirectory()
+	public BESWorkingDirectory getCurrentWorkingDirectory()
 		throws ExecutionException;
 	
 	public void setProperty(String name, Serializable value)

@@ -20,6 +20,7 @@ import edu.virginia.vcgr.genii.client.nativeq.NativeQueues;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionException;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
+import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
 
 public class QueueProcessPhase extends AbstractRunProcessPhase 
 	implements TerminateableExecutionPhase
@@ -33,15 +34,15 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 	private String _phaseShiftLock = new String();
 	
 	transient private NativeQueueState _state = null;
-	transient private File _workingDirectory = null;
+	transient private BESWorkingDirectory _workingDirectory = null;
 	
 	private URI _spmdVariation;
 	private Integer _numProcesses;
-	private String _executable;
+	private File _executable;
 	private Collection<String> _arguments;
-	private String _stdin;
-	private String _stdout;
-	private String _stderr;
+	private File _stdin;
+	private File _stdout;
+	private File _stderr;
 	private Map<String, String> _environment;
 	private Properties _queueProperties;
 	
@@ -49,8 +50,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 	transient private Boolean _terminate = null;
 	
 	public QueueProcessPhase(URI spmdVariation, Integer numProcesses,
-		String executable, Collection<String> arguments, Map<String, String> environment,
-		String stdin, String stdout, String stderr, Properties queueProperties)
+		File executable, Collection<String> arguments, Map<String, String> environment,
+		File stdin, File stdout, File stderr, Properties queueProperties)
 	{
 		super(new ActivityState(
 			ActivityStateEnumeration.Running, "Enqueing", false));
@@ -79,7 +80,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 					return;
 				}
 				
-				NativeQueueConnection queue = connectQueue(_workingDirectory);
+				NativeQueueConnection queue = connectQueue(
+					_workingDirectory.getWorkingDirectory());
 				queue.cancel(_jobToken);
 				
 				_phaseShiftLock.notifyAll();
@@ -101,7 +103,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 				return;
 			
 			_workingDirectory = context.getCurrentWorkingDirectory();
-			NativeQueueConnection queue = connectQueue(_workingDirectory);
+			NativeQueueConnection queue = connectQueue(
+				_workingDirectory.getWorkingDirectory());
 			
 			_jobToken = (JobToken)context.getProperty(JOB_TOKEN_PROPERTY);
 			if (_jobToken == null)
@@ -111,14 +114,19 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 					String ogrshConfig = _environment.get("OGRSH_CONFIG");
 					if (ogrshConfig != null)
 					{
-						File f = new File(context.getCurrentWorkingDirectory(), ogrshConfig);
+						File f = new File(
+							context.getCurrentWorkingDirectory(
+								).getWorkingDirectory(), 
+							ogrshConfig);
 						_environment.put("OGRSH_CONFIG", f.getAbsolutePath());
 					}
 				}
 				
 				_jobToken = queue.submit(new ApplicationDescription(
-					_spmdVariation, _numProcesses, _executable, _arguments,
-					_environment, _stdin, _stdout, _stderr));
+					_spmdVariation, _numProcesses, _executable.getAbsolutePath(),
+					_arguments,
+					_environment, fileToPath(_stdin),
+					fileToPath(_stdout), fileToPath(_stderr)));
 				context.setProperty(JOB_TOKEN_PROPERTY, _jobToken);
 			}
 			

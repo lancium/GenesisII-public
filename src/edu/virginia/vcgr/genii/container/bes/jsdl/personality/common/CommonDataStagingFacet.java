@@ -41,6 +41,14 @@ public class CommonDataStagingFacet extends DefaultDataStagingFacet
 	}
 
 	@Override
+	public void consumeFileSystemName(Object currentUnderstanding,
+			String fileSystemName) throws JSDLException
+	{
+		((DataStagingUnderstanding)currentUnderstanding).setFileSystemName(
+			fileSystemName);
+	}
+
+	@Override
 	public void consumeFileName(Object currentUnderstanding, String fileName)
 			throws JSDLException
 	{

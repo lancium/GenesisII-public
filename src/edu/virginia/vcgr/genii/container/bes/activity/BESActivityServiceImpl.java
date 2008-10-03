@@ -46,6 +46,7 @@ import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.BESActivityConstants;
 import edu.virginia.vcgr.genii.client.bes.GeniiBESConstants;
 import edu.virginia.vcgr.genii.client.context.*;
+import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLInterpreter;
 import edu.virginia.vcgr.genii.client.resource.PortType;
@@ -62,6 +63,7 @@ import edu.virginia.vcgr.genii.container.bes.BES;
 import edu.virginia.vcgr.genii.container.bes.BESUtilities;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivityUtils.BESActivityInitInfo;
 import edu.virginia.vcgr.genii.container.bes.activity.resource.IBESActivityResource;
+import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.CommonExecutionUnderstanding;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.forkexec.ForkExecPersonalityProvider;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.qsub.QSubPersonalityProvider;
@@ -120,6 +122,11 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 		String activityServiceName = "BESActivityPortType";
 		Collection<Identity> owners = QueueSecurity.getCallerIdentities();
 		
+		BESWorkingDirectory workingDirectory = new BESWorkingDirectory(
+			chooseDirectory(creationParameters, 5), true);
+		FilesystemManager fsManager = new FilesystemManager();
+		fsManager.setWorkingDirectory(workingDirectory.getWorkingDirectory());
+		
 		try
 		{
 			JobDefinition_Type jsdl = initInfo.getJobDefinition();
@@ -130,16 +137,19 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 					GeniiBESConstants.NATIVEQ_PROVIDER_PROPERTY) != null)
 			{
 				Object understanding = JSDLInterpreter.interpretJSDL(
-					new QSubPersonalityProvider(), jsdl);
+					new QSubPersonalityProvider(fsManager, workingDirectory), jsdl);
 				executionUnderstanding = 
 					(CommonExecutionUnderstanding)understanding;
 			} else
 			{
 				Object understanding = JSDLInterpreter.interpretJSDL(
-					new ForkExecPersonalityProvider(), jsdl);
+					new ForkExecPersonalityProvider(fsManager, workingDirectory), jsdl);
 				executionUnderstanding = 
 					(CommonExecutionUnderstanding)understanding;
 			}
+			
+			resource.setProperty(IBESActivityResource.FILESYSTEM_MANAGER, 
+				fsManager);
 			
 			String fuseMountDirectory = 
 				executionUnderstanding.getFuseMountDirectory();
@@ -160,7 +170,7 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 			bes.createActivity(
 				resource.getKey().toString(), jsdl,	owners, 
 				ContextManager.getCurrentContext(), 
-				chooseDirectory(executionUnderstanding, creationParameters, 5),
+				workingDirectory,
 				executionUnderstanding.createExecutionPlan(
 					creationProperties),
 				activityEPR, activityServiceName, executionUnderstanding.getJobName());
@@ -187,37 +197,10 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 	}
 	
 	static private File chooseDirectory(
-		CommonExecutionUnderstanding understanding,
 		HashMap<QName, Object> creationParameters, 
 		int attempts) throws ResourceException
 	{
 		File basedir = null;
-		
-		String overrideWD = understanding.getWorkingDirectory();
-		if (overrideWD != null)
-		{
-			File workingDir = new File(overrideWD);
-			if (!workingDir.exists())
-			{
-				if (workingDir.mkdirs())
-				{
-					try
-					{
-						BESUtilities.markDeletable(workingDir);
-					}
-					catch (IOException ioe)
-					{
-						_logger.warn("Unable to mark directory as deletable.",
-							ioe);
-					}
-				} else
-					throw new ResourceException(
-						"Unable to create working directory \"" + 
-						workingDir + "\".");
-			}
-			
-			return workingDir;
-		}
 		
 		Properties props = (Properties)creationParameters.get(
 			CreationProperties.CREATION_PROPERTIES_QNAME);
@@ -229,46 +212,14 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 				basedir = new File(dir);
 		}
 			
-		try
+		File configDir = null;
+		if (basedir == null)
 		{
-			File configDir = null;
-			if (basedir == null)
-			{
-				configDir = BESUtilities.getBESWorkerDir();
-			} else
-				configDir = basedir;
-			
-			for (int lcv = 0; lcv < attempts; lcv++)
-			{
-				File ret = new File(configDir, new GUID().toString());
-				if (!ret.exists())
-				{
-					if (ret.mkdirs())
-					{
-						_logger.debug("BES Activity will run in directory \"" 
-							+ ret.getAbsolutePath() + "\".");
-						
-						try
-						{
-							BESUtilities.markDeletable(ret);
-						}
-						catch (IOException ioe)
-						{
-							_logger.warn("Unable to mark directory as deletable.",
-								ioe);
-						}
-						
-						return ret;
-					}
-				}
-			}
-			
-			throw new ResourceException("Unable to create working directory.");
-		}
-		catch (IOException ioe)
-		{
-			throw new ResourceException(ioe.getMessage(), ioe);
-		}
+			configDir = BESUtilities.getBESWorkerDir();
+		} else
+			configDir = basedir;
+		
+		return new File(configDir, new GUID().toString());
 	}
 
 	@RWXMapping(RWXCategory.READ)

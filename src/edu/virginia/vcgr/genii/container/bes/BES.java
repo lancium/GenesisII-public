@@ -36,6 +36,7 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.Identity;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
+import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 
 public class BES implements Closeable
@@ -272,7 +273,7 @@ public class BES implements Closeable
 	synchronized public BESActivity createActivity(
 		String activityid,
 		JobDefinition_Type jsdl, Collection<Identity> owners,
-		ICallingContext callingContext, File activityCWD,
+		ICallingContext callingContext, BESWorkingDirectory activityCWD,
 		Vector<ExecutionPhase> executionPlan, 
 		EndpointReferenceType activityEPR, 
 		String activityServiceName, String suggestedJobName) 
@@ -304,7 +305,9 @@ public class BES implements Closeable
 			stmt.setTimestamp(7, new Timestamp(System.currentTimeMillis()));
 			stmt.setShort(8, (short)0);
 			stmt.setShort(9, (short)0);
-			stmt.setString(10, activityCWD.getAbsolutePath());
+			stmt.setString(10, String.format("%s%s", 
+				activityCWD.mustDelete() ? "d" : "k",
+				activityCWD.getWorkingDirectory().getAbsolutePath()));
 			stmt.setBlob(11, DBSerializer.toBlob(executionPlan));
 			stmt.setInt(12, 0);
 			stmt.setBlob(13, EPRUtils.toBlob(activityEPR));
@@ -412,7 +415,18 @@ public class BES implements Closeable
 					(rs.getShort(3) == 0) ? false : true;
 				boolean terminateRequested = 
 					(rs.getShort(4) == 0) ? false : true;
-				File activityCWD = new File(rs.getString(5));
+				
+				
+				String activityCWDString = rs.getString(5);
+				BESWorkingDirectory activityCWD;
+				
+				if (activityCWDString.startsWith("d|"))
+					activityCWD = new BESWorkingDirectory(
+						new File(activityCWDString.substring(2)), true);
+				else
+					activityCWD = new BESWorkingDirectory(
+						new File(activityCWDString.substring(2)), false);
+				
 				Vector<ExecutionPhase> executionPlan = 
 					(Vector<ExecutionPhase>)DBSerializer.fromBlob(
 						rs.getBlob(6));

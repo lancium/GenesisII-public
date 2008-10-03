@@ -26,6 +26,8 @@ abstract class AbstractFUSEPhases extends AbstractExecutionPhase
 		if (_mountPoint.startsWith("/"))
 			return new File(_mountPoint);
 		
-		return new File(context.getCurrentWorkingDirectory(), _mountPoint);
+		return new File(
+			context.getCurrentWorkingDirectory().getWorkingDirectory(),
+			_mountPoint);
 	}
 }

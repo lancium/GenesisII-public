@@ -22,7 +22,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 	
 	static final private String EXECUTING_STAGE = "executing";
 	
-	private String _executable;
+	private File _executable;
 	private String []_arguments;
 	private Map<String, String> _environment;
 	transient private Process _process = null;
@@ -31,7 +31,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 	
 	private StreamRedirectionDescription _redirects;
 	
-	public RunProcessPhase(String executable, String []arguments, 
+	public RunProcessPhase(File executable, String []arguments, 
 		Map<String, String> environment,
 		StreamRedirectionDescription redirects)
 	{
@@ -69,12 +69,13 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 		synchronized(_processLock)
 		{
 			List<String> command = new Vector<String>();
-			command.add(_executable);
+			command.add(_executable.getAbsolutePath());
 			for (String arg : _arguments)
 				command.add(arg);
 			
 			ProcessBuilder builder = new ProcessBuilder(command);
-			builder.directory(context.getCurrentWorkingDirectory());
+			builder.directory(
+				context.getCurrentWorkingDirectory().getWorkingDirectory());
 			if (_environment == null)
 				_environment = new HashMap<String, String>();
 			
@@ -83,14 +84,19 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 				String ogrshConfig = _environment.get("OGRSH_CONFIG");
 				if (ogrshConfig != null)
 				{
-					File f = new File(context.getCurrentWorkingDirectory(), ogrshConfig);
+					File f = new File(
+						context.getCurrentWorkingDirectory(
+							).getWorkingDirectory(), 
+						ogrshConfig);
 					_environment.put("OGRSH_CONFIG", f.getAbsolutePath());
 				}
 				
 				String geniiUserDir = _environment.get("GENII_USER_DIR");
 				if (geniiUserDir != null && !geniiUserDir.startsWith("/"))
 				{
-					File f = new File(context.getCurrentWorkingDirectory(), 
+					File f = new File(
+						context.getCurrentWorkingDirectory(
+							).getWorkingDirectory(), 
 						geniiUserDir);
 					_environment.put("GENII_USER_DIR", f.getAbsolutePath());
 				}

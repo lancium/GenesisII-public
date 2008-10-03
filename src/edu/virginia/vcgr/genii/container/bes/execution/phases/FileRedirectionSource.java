@@ -6,30 +6,21 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
-import edu.virginia.vcgr.genii.container.bes.execution.ExecutionException;
 
 public class FileRedirectionSource implements StreamRedirectionSource
 {
 	static final long serialVersionUID = 0L;
 	
-	private String _filename;
+	private File _file;
 	
-	public FileRedirectionSource(String filename)
+	public FileRedirectionSource(File file)
 	{
-		_filename = filename;
+		_file = file;
 	}
 	
 	@Override
 	public InputStream openSource(ExecutionContext context) throws IOException
 	{
-		try
-		{
-			return new FileInputStream(new File(
-				context.getCurrentWorkingDirectory(), _filename));
-		}
-		catch (ExecutionException ee)
-		{
-			throw new IOException("Unable to open redirect source.", ee);
-		}
+		return new FileInputStream(_file);
 	}
 }

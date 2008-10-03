@@ -143,4 +143,12 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 		
 		return null;
 	}
+	
+	static protected String fileToPath(File file)
+	{
+		if (file == null)
+			return null;
+		
+		return file.getAbsolutePath();
+	}
 }

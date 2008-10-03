@@ -27,7 +27,8 @@ public class SetupContextDirectoryPhase extends AbstractExecutionPhase
 	@Override
 	public void execute(ExecutionContext context) throws Throwable
 	{
-		File dir = new File(context.getCurrentWorkingDirectory(),
+		File dir = new File(
+			context.getCurrentWorkingDirectory().getWorkingDirectory(),
 			_contextDirectoryName);
 		dir.mkdirs();
 		ContextFileSystem.store(

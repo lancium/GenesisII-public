@@ -9,6 +9,8 @@ public class ResourceInformation {
 	public Date lastAccessedTime;
 	public Date lastModifiedTime;
 	public Date createTime;
+	
+	// For directories, num entries excluding . and ..
 	public int size;
 	public String name;
 	

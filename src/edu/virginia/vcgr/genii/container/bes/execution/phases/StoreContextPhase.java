@@ -34,7 +34,9 @@ public class StoreContextPhase extends AbstractExecutionPhase implements
 	@Override
 	public void execute(ExecutionContext context) throws Throwable
 	{
-		File callingContextFile = new File(context.getCurrentWorkingDirectory(), _filename);
+		File callingContextFile = new File(
+			context.getCurrentWorkingDirectory().getWorkingDirectory(), 
+			_filename);
 		FileOutputStream fos = null;
 		
 		try

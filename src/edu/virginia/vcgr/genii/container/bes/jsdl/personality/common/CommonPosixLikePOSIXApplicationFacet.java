@@ -1,7 +1,10 @@
 package edu.virginia.vcgr.genii.container.bes.jsdl.personality.common;
 
+import java.io.File;
+
 import javax.xml.namespace.QName;
 
+import edu.virginia.vcgr.genii.client.jsdl.FilesystemRelativePath;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.UnsupportedJSDLElement;
 import edu.virginia.vcgr.genii.client.jsdl.personality.def.DefaultPOSIXApplicationFacet;
@@ -28,12 +31,15 @@ public class CommonPosixLikePOSIXApplicationFacet extends
 	public void consumeArgument (Object currentUnderstanding,
 		String filesystemName, String argument) throws JSDLException
 	{
-		if (filesystemName != null)
-			throw new UnsupportedJSDLElement(
-				new QName(JSDLPosixConstants.JSDL_POSIX_NS, "filesystemName"));
+		StringOrPath arg;
+		if (filesystemName == null)
+			arg = new StringOrPath(argument);
+		else
+			arg = new StringOrPath(new FilesystemRelativePath(
+				filesystemName, argument));
 		
 		((PosixLikeApplicationUnderstanding)currentUnderstanding).addArgument(
-			argument);
+			arg);
 	}
 	
 	@Override
@@ -51,66 +57,59 @@ public class CommonPosixLikePOSIXApplicationFacet extends
 					"WorkingDirectory"));
 		
 		((PosixLikeApplicationUnderstanding)
-			currentUnderstanding).setWorkingDirectory(workingDirectory);
+			currentUnderstanding).setWorkingDirectory(
+				new File(workingDirectory));
 	}
 	
 	@Override
 	public void consumeEnvironment(Object currentUnderstanding, String name,
 		String filesystemName, String environment) throws JSDLException
 	{
-		if (filesystemName != null)
-			throw new UnsupportedJSDLElement(
-				new QName(JSDLPosixConstants.JSDL_POSIX_NS, "filesystemName"));
-			
+		StringOrPath env;
+		
+		if (filesystemName == null)
+			env = new StringOrPath(environment);
+		else
+			env = new StringOrPath(new FilesystemRelativePath(
+				filesystemName, environment));
+		
 		((PosixLikeApplicationUnderstanding)
-			currentUnderstanding).addEnvironment(name, environment);
+			currentUnderstanding).addEnvironment(name, env);
 	}
 	
 	@Override
 	public void consumeInput(Object currentUnderstanding,
 		String filesystemName, String input) throws JSDLException
 	{
-		if (filesystemName != null)
-			throw new UnsupportedJSDLElement(
-				new QName(JSDLPosixConstants.JSDL_POSIX_NS, "filesystemName"));
-			
 		((PosixLikeApplicationUnderstanding)
-			currentUnderstanding).setStdinRedirect(input);
+			currentUnderstanding).setStdinRedirect(
+				new FilesystemRelativePath(filesystemName, input));
 	}
 	
 	@Override
 	public void consumeOutput(Object currentUnderstanding,
 		String filesystemName, String output) throws JSDLException
 	{
-		if (filesystemName != null)
-			throw new UnsupportedJSDLElement(
-				new QName(JSDLPosixConstants.JSDL_POSIX_NS, "filesystemName"));
-			
 		((PosixLikeApplicationUnderstanding)
-			currentUnderstanding).setStdoutRedirect(output);
+			currentUnderstanding).setStdoutRedirect(
+				new FilesystemRelativePath(filesystemName, output));
 	}
 	
 	@Override
 	public void consumeError(Object currentUnderstanding,
 		String filesystemName, String error) throws JSDLException
 	{
-		if (filesystemName != null)
-			throw new UnsupportedJSDLElement(
-				new QName(JSDLPosixConstants.JSDL_POSIX_NS, "filesystemName"));
-			
 		((PosixLikeApplicationUnderstanding)
-			currentUnderstanding).setStderrRedirect(error);
+			currentUnderstanding).setStderrRedirect(
+				new FilesystemRelativePath(filesystemName, error));
 	}
 	
 	@Override
 	public void consumeExecutable(Object currentUnderstanding,
 		String filesystemName, String executable) throws JSDLException
 	{
-		if (filesystemName != null)
-			throw new UnsupportedJSDLElement(
-				new QName(JSDLPosixConstants.JSDL_POSIX_NS, "filesystemName"));
-			
 		((PosixLikeApplicationUnderstanding)
-			currentUnderstanding).setExecutable(executable);
+			currentUnderstanding).setExecutable(
+				new FilesystemRelativePath(filesystemName, executable));
 	}
 }

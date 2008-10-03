@@ -12,4 +12,12 @@ public class CommonJobIdentificationFacet extends DefaultJobIdentificationFacet
 		((CommonExecutionUnderstanding)currentUnderstanding).setJobName(
 			jobName);
 	}
+
+	@Override
+	public void consumeJobAnnotation(Object currentUnderstanding,
+			String annotation) throws JSDLException
+	{
+		((CommonExecutionUnderstanding)currentUnderstanding).setJobAnnotation(
+			annotation);
+	}
 }

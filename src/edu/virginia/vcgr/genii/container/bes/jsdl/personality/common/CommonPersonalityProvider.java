@@ -1,7 +1,9 @@
 package edu.virginia.vcgr.genii.container.bes.jsdl.personality.common;
 
+import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.personality.DataStagingFacet;
+import edu.virginia.vcgr.genii.client.jsdl.personality.FileSystemFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.JobIdentificationFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.ResourcesFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.SourceURIFacet;
@@ -10,12 +12,26 @@ import edu.virginia.vcgr.genii.client.jsdl.personality.def.DefaultPersonalityPro
 
 public class CommonPersonalityProvider extends DefaultPersonalityProvider
 {
+	private FilesystemManager _fsManager;
+	
+	public CommonPersonalityProvider(FilesystemManager fsManager)
+	{
+		_fsManager = fsManager;
+	}
+	
 	@Override
 	public Object createNewUnderstanding() throws JSDLException
 	{
-		return new CommonExecutionUnderstanding();
+		return new CommonExecutionUnderstanding(_fsManager);
 	}
 	
+	@Override
+	public FileSystemFacet getFileSystemFacet(Object currentUnderstanding)
+			throws JSDLException
+	{
+		return new CommonFilesystemFacet();
+	}
+
 	@Override
 	public ResourcesFacet getResourcesFacet(Object currentUnderstanding)
 		throws JSDLException

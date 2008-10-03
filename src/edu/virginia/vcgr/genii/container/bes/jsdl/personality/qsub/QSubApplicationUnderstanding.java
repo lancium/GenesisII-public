@@ -1,6 +1,9 @@
 package edu.virginia.vcgr.genii.container.bes.jsdl.personality.qsub;
 
 import java.io.File;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
@@ -9,15 +12,24 @@ import edu.virginia.vcgr.genii.client.configuration.Deployment;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.OGRSHVersion;
+import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.PrepareApplicationPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.QueueProcessPhase;
+import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.PosixLikeApplicationUnderstanding;
+import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.StringOrPath;
 
 class QSubApplicationUnderstanding 
 	extends PosixLikeApplicationUnderstanding
 {
+	public QSubApplicationUnderstanding(FilesystemManager fsManager,
+		BESWorkingDirectory workingDirectory)
+	{
+		super(fsManager, workingDirectory);
+	}
+	
 	@Override
 	public void addExecutionPhases(Properties creationProperties,
 		Vector<ExecutionPhase> executionPlan,
@@ -28,28 +40,48 @@ class QSubApplicationUnderstanding
 			new DeploymentName());
 		DeploymentName depName = deployment.getName();
 		
-		executionPlan.add(new PrepareApplicationPhase(getExecutable()));
+		FilesystemManager fsManager = getFilesystemManager();
+		executionPlan.add(new PrepareApplicationPhase(
+			fsManager.lookup(getExecutable())));
 		
-		Map<String, String> env = getEnvironment();
-		env.put("GENII_DEPLOYMENT_NAME", depName.toString());
-		env.put("GENII_USER_DIR", ".genesisII-bes-state");
+		Map<String, StringOrPath> env = getEnvironment();
+		env.put("GENII_DEPLOYMENT_NAME", 
+			new StringOrPath(depName.toString()));
+		env.put("GENII_USER_DIR", 
+			new StringOrPath(".genesisII-bes-state"));
+		
+		Map<String, String> stringEnv = new HashMap<String, String>();
+		for (String key : env.keySet())
+		{
+			StringOrPath sop = env.get(key);
+			stringEnv.put(key, sop.toString(fsManager));
+		}
+		
+		Collection<String> stringArgs = new LinkedList<String>();
+		for (StringOrPath sop : getArguments())
+		{
+			stringArgs.add(sop.toString(fsManager));
+		}
 		
 		if (ogrshVersion == null)
 		{
 			executionPlan.add(new QueueProcessPhase(
 				getSPMDVariation(), getNumProcesses(),
-				getExecutable(), getArguments(), env,
-				getStdinRedirect(), getStdoutRedirect(), getStderrRedirect(),
+				fsManager.lookup(getExecutable()),
+				stringArgs, stringEnv,
+				fsManager.lookup(getStdinRedirect()),
+				fsManager.lookup(getStdoutRedirect()),
+				fsManager.lookup(getStderrRedirect()),
 				creationProperties));
 		} else
 		{
-			env.put("BES_HOME", "/home/bes-job");
-			env.put("OGRSH_CONFIG", "./ogrsh-config.xml");
-			env.put("GENII_USER_DIR", ".");
+			stringEnv.put("BES_HOME", "/home/bes-job");
+			stringEnv.put("OGRSH_CONFIG", "./ogrsh-config.xml");
+			stringEnv.put("GENII_USER_DIR", ".");
 			
 			Vector<String> args = new Vector<String>();
-			args.add(getExecutable());
-			args.addAll(getArguments());
+			args.add(fsManager.lookup(getExecutable()).getAbsolutePath());
+			args.addAll(stringArgs);
 			
 			OGRSHVersion oVersion = Installation.getOGRSH(
 				).getInstalledVersions().get(ogrshVersion);
@@ -57,8 +89,10 @@ class QSubApplicationUnderstanding
 			
 			executionPlan.add(new QueueProcessPhase(
 				getSPMDVariation(), getNumProcesses(),
-				shim.getAbsolutePath(), args, env,
-				getStdinRedirect(), getStdoutRedirect(), getStderrRedirect(),
+				shim, args, stringEnv,
+				fsManager.lookup(getStdinRedirect()),
+				fsManager.lookup(getStdoutRedirect()),
+				fsManager.lookup(getStderrRedirect()),
 				creationProperties));
 		}
 	}

@@ -40,7 +40,8 @@ public class SetupFUSEPhase extends AbstractFUSEPhases
 			"fuse", "--mount", getMountPoint(context).getAbsolutePath());
 		builder.redirectErrorStream(true);
 		
-		StreamRedirectionSink sink = new FileRedirectionSink("fuse-output.log");
+		StreamRedirectionSink sink = new FileRedirectionSink(
+			new File("fuse-output.log"));
 		StreamRedirectionDescription desc = new StreamRedirectionDescription(
 			null, sink, null);
 		

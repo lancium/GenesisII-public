@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
+import edu.virginia.vcgr.genii.client.jsdl.FilesystemRelativePath;
 import edu.virginia.vcgr.genii.client.jsdl.InvalidJSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.FileRedirectionSink;
@@ -21,14 +23,21 @@ public abstract class PosixLikeApplicationUnderstanding extends
 	private Integer _numProcesses = null;
 	private URI _spmdVariation = null;
 	
-	private String _executable = null;
-	private Collection<String> _arguments =
-		new LinkedList<String>();
-	private String _stdinRedirect = null;
-	private String _stdoutRedirect = null;
-	private String _stderrRedirect = null;
-	private Map<String, String> _environment =
-		new HashMap<String, String>();
+	private FilesystemRelativePath _executable = null;
+	private Collection<StringOrPath> _arguments =
+		new LinkedList<StringOrPath>();
+	private FilesystemRelativePath _stdinRedirect = null;
+	private FilesystemRelativePath _stdoutRedirect = null;
+	private FilesystemRelativePath _stderrRedirect = null;
+	private Map<String, StringOrPath> _environment =
+		new HashMap<String, StringOrPath>();
+	
+	protected PosixLikeApplicationUnderstanding(
+		FilesystemManager fsManager,
+		BESWorkingDirectory workingDirectory)
+	{
+		super(fsManager, workingDirectory);
+	}
 	
 	public void setSPMDVariation(URI spmdVariation)
 	{
@@ -50,62 +59,62 @@ public abstract class PosixLikeApplicationUnderstanding extends
 		return _numProcesses;
 	}
 	
-	public void setExecutable(String executable)
+	public void setExecutable(FilesystemRelativePath executable)
 	{
 		_executable = executable;
 	}
 	
-	public String getExecutable()
+	public FilesystemRelativePath getExecutable()
 	{
 		return _executable;
 	}
 	
-	public void addArgument(String arg)
+	public void addArgument(StringOrPath arg)
 	{
 		_arguments.add(arg);
 	}
 	
-	public Collection<String> getArguments()
+	public Collection<StringOrPath> getArguments()
 	{
 		return _arguments;
 	}
 	
-	public void setStdinRedirect(String stdinRedirect)
+	public void setStdinRedirect(FilesystemRelativePath stdinRedirect)
 	{
 		_stdinRedirect = stdinRedirect;
 	}
 	
-	public String getStdinRedirect()
+	public FilesystemRelativePath getStdinRedirect()
 	{
 		return _stdinRedirect;
 	}
 	
-	public void setStdoutRedirect(String stdoutRedirect)
+	public void setStdoutRedirect(FilesystemRelativePath stdoutRedirect)
 	{
 		_stdoutRedirect = stdoutRedirect;
 	}
 	
-	public String getStdoutRedirect()
+	public FilesystemRelativePath getStdoutRedirect()
 	{
 		return _stdoutRedirect;
 	}
 	
-	public void setStderrRedirect(String stderrRedirect)
+	public void setStderrRedirect(FilesystemRelativePath stderrRedirect)
 	{
 		_stderrRedirect = stderrRedirect;
 	}
 	
-	public String getStderrRedirect()
+	public FilesystemRelativePath getStderrRedirect()
 	{
 		return _stderrRedirect;
 	}
 	
-	public void addEnvironment(String variable, String value)
+	public void addEnvironment(String variable, StringOrPath value)
 	{
 		_environment.put(variable, value);
 	}
 	
-	public Map<String, String> getEnvironment()
+	public Map<String, StringOrPath> getEnvironment()
 	{
 		return _environment;
 	}
@@ -118,21 +127,25 @@ public abstract class PosixLikeApplicationUnderstanding extends
 	}
 	
 	protected StreamRedirectionDescription getStreamRedirectionDescription()
+		throws JSDLException
 	{
 		StreamRedirectionSource stdin = null;
 		StreamRedirectionSink stdout = null;
 		StreamRedirectionSink stderr = null;
 		
-		String stdinRedirect = getStdinRedirect();
-		String stdoutRedirect = getStdoutRedirect();
-		String stderrRedirect = getStderrRedirect();
+		FilesystemRelativePath stdinRedirect = getStdinRedirect();
+		FilesystemRelativePath stdoutRedirect = getStdoutRedirect();
+		FilesystemRelativePath stderrRedirect = getStderrRedirect();
 		
 		if (stdinRedirect != null)
-			stdin = new FileRedirectionSource(stdinRedirect);
+			stdin = new FileRedirectionSource(
+				getFilesystemManager().lookup(stdinRedirect));
 		if (stdoutRedirect != null)
-			stdout = new FileRedirectionSink(stdoutRedirect);
+			stdout = new FileRedirectionSink(
+				getFilesystemManager().lookup(stdoutRedirect));
 		if (stderrRedirect != null)
-			stderr = new FileRedirectionSink(stderrRedirect);
+			stderr = new FileRedirectionSink(
+				getFilesystemManager().lookup(stderrRedirect));
 		
 		StreamRedirectionSink tty = discoverTTYRedirectionSink();
 		if (tty != null)

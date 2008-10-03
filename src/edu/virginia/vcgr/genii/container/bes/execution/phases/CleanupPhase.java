@@ -16,9 +16,9 @@ public class CleanupPhase extends AbstractExecutionPhase
 	
 	static final private String CLEANUP_STAGE = "cleanup";
 	
-	private String _fileToCleanup;
+	private File _fileToCleanup;
 	
-	public CleanupPhase(String fileToCleanup)
+	public CleanupPhase(File fileToCleanup)
 	{
 		super(
 			new ActivityState(
@@ -46,9 +46,7 @@ public class CleanupPhase extends AbstractExecutionPhase
 	{
 		try
 		{
-			File file = new File(context.getCurrentWorkingDirectory(), 
-				_fileToCleanup);
-			removeFile(file);
+			removeFile(_fileToCleanup);
 		}
 		catch (Throwable cause)
 		{

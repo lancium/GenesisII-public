@@ -91,4 +91,16 @@ public class GUID extends RandomToken implements Serializable
 	{
 		return toString(true);
 	}
+	
+	static public GUID fromRandomBytes(byte []data)
+	{
+		byte []seed = new byte[_NUM_BYTES];
+		for (int lcv = 0; lcv < _NUM_BYTES; lcv++)
+			seed[lcv] = 0;
+		
+		for (int lcv = 0; lcv < data.length; lcv++)
+			seed[lcv % _NUM_BYTES] ^= data[lcv]; 
+		
+		return new GUID(seed);
+	}
 }

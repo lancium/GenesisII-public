@@ -31,9 +31,11 @@ public class SetupOGRSHPhase extends AbstractExecutionPhase
 	public void execute(ExecutionContext context) throws Throwable
 	{
 		File configFile = new File(
-			context.getCurrentWorkingDirectory(), _configFilename);
+			context.getCurrentWorkingDirectory().getWorkingDirectory(),
+			_configFilename);
 		File contextFile = new File(
-			context.getCurrentWorkingDirectory(), _storedContextFilename);
+			context.getCurrentWorkingDirectory().getWorkingDirectory(),
+			_storedContextFilename);
 		PrintStream config = null;
 		
 		try
@@ -45,7 +47,8 @@ public class SetupOGRSHPhase extends AbstractExecutionPhase
 			writeLocalProvider(config);
 			writeGridProvider(config, contextFile);
 			writeMount(config, "/home/bes-job", "local-fs-provider", "local-fs-session",
-				context.getCurrentWorkingDirectory().getAbsolutePath());
+				context.getCurrentWorkingDirectory().getWorkingDirectory(
+					).getAbsolutePath());
 			writeMount(config, "/bin", "local-fs-provider", 
 				"local-fs-session", "/bin");
 			writeMount(config, "/proc", "local-fs-provider", 

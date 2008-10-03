@@ -22,12 +22,14 @@ import org.ggf.bes.factory.UnknownActivityIdentifierFaultType;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 
+import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.postlog.JobEvent;
 import edu.virginia.vcgr.genii.client.postlog.PostTargets;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.bes.BES;
 import edu.virginia.vcgr.genii.container.bes.BESUtilities;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
+import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -40,6 +42,10 @@ public class DBBESActivityResource extends BasicDBResource implements
 	@Override
 	public void destroy() throws ResourceException
 	{
+		FilesystemManager fsManager = 
+			(FilesystemManager)getProperty(FILESYSTEM_MANAGER);
+		fsManager.releaseAll();
+	
 		String fuseMountDirString = (String)getProperty(FUSE_MOUNT_PROPERTY);
 		super.destroy();
 		
@@ -49,7 +55,7 @@ public class DBBESActivityResource extends BasicDBResource implements
 				"Unable to find bes for activity " + _resourceKey);
 		BESActivity activity = bes.findActivity(_resourceKey);
 		
-		File dir = activity.getActivityCWD();
+		BESWorkingDirectory dir = activity.getActivityCWD();
 		
 		if (fuseMountDirString != null)
 		{
@@ -57,20 +63,23 @@ public class DBBESActivityResource extends BasicDBResource implements
 			if (fuseMountDirString.startsWith("/"))
 				f = new File(fuseMountDirString);
 			else
-				f = new File(dir, fuseMountDirString);
+				f = new File(dir.getWorkingDirectory(),
+					fuseMountDirString);
 			
 			File[] entries = f.listFiles();
 			if (entries == null || entries.length == 0)
 			{
-				if (BESUtilities.isDeletable(dir))
-					recursiveDelete(dir);				
+				if (BESUtilities.isDeletable(dir.getWorkingDirectory())
+					|| dir.mustDelete())
+					recursiveDelete(dir.getWorkingDirectory());				
 			}
 		} else
 		{
-			if (BESUtilities.isDeletable(dir))
-				recursiveDelete(dir);	
+			if (BESUtilities.isDeletable(dir.getWorkingDirectory()) 
+				|| dir.mustDelete())
+				recursiveDelete(dir.getWorkingDirectory());	
 		}
-	
+		
 		try
 		{
 			bes.deleteActivity(_resourceKey);

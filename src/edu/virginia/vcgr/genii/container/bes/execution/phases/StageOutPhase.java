@@ -20,10 +20,10 @@ public class StageOutPhase extends AbstractExecutionPhase
 	static private final String STAGING_OUT_STATE = "staging-out";
 	
 	private URI _target;
-	private String _sourceName;
+	private File _source;
 	private UsernamePasswordIdentity _credential;
 	
-	public StageOutPhase(String sourceName, URI target, 
+	public StageOutPhase(File source, URI target, 
 		UsernamePasswordIdentity credential)
 	{
 		super(new ActivityState(ActivityStateEnumeration.Running,
@@ -31,13 +31,13 @@ public class StageOutPhase extends AbstractExecutionPhase
 		
 		_credential = credential;
 		
-		if (sourceName == null)
+		if (source == null)
 			throw new IllegalArgumentException("Parameter \"sourceName\" cannot be null.");
 		
 		if (target == null)
 			throw new IllegalArgumentException("Parameter \"target\" cannot be null.");
 		
-		_sourceName = sourceName;
+		_source = source;
 		_target = target;
 	}
 	
@@ -46,8 +46,7 @@ public class StageOutPhase extends AbstractExecutionPhase
 	{
 		try
 		{
-			URIManager.put(
-				new File(context.getCurrentWorkingDirectory(), _sourceName), 
+			URIManager.put(_source,
 				_target, _credential);
 		}
 		catch (Throwable cause)

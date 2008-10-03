@@ -1,7 +1,6 @@
 package edu.virginia.vcgr.genii.container.bes.activity;
 
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Blob;
@@ -38,6 +37,7 @@ import edu.virginia.vcgr.genii.container.bes.execution.ExecutionException;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.SuspendableExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
+import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
@@ -54,7 +54,7 @@ public class BESActivity implements Closeable
 	private ActivityState _state;
 	private boolean _suspendRequested;
 	private boolean _terminateRequested;
-	private File _activityCWD;
+	private BESWorkingDirectory _activityCWD;
 	private Vector<ExecutionPhase> _executionPlan;
 	private int _nextPhase;
 	private String _activityServiceName;
@@ -63,7 +63,7 @@ public class BESActivity implements Closeable
 	
 	public BESActivity(DatabaseConnectionPool connectionPool,
 		BES bes, String activityid,
-		ActivityState state, File activityCWD, 
+		ActivityState state, BESWorkingDirectory activityCWD, 
 		Vector<ExecutionPhase> executionPlan, int nextPhase, 
 		String activityServiceName, String jobName,
 		boolean suspendRequested, boolean terminateRequested)
@@ -90,7 +90,7 @@ public class BESActivity implements Closeable
 		thread.start();
 	}
 	
-	public File getActivityCWD()
+	public BESWorkingDirectory getActivityCWD()
 	{
 		return _activityCWD;
 	}
@@ -459,7 +459,8 @@ public class BESActivity implements Closeable
 			}
 
 			@Override
-			public File getCurrentWorkingDirectory() throws ExecutionException
+			public BESWorkingDirectory getCurrentWorkingDirectory()
+				throws ExecutionException
 			{
 				return _activityCWD;
 			}

@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.container.bes.execution.phases;
 
+import java.io.File;
 import java.io.Serializable;
 
 import org.ggf.bes.factory.ActivityStateEnumeration;
@@ -15,22 +16,21 @@ public class PrepareApplicationPhase extends AbstractExecutionPhase
 	
 	static private final String PREPARE_STATE = "preparing-application";
 	
-	private String _applicationName;
+	private File _executable;
 	
-	public PrepareApplicationPhase(String applicationName)
+	public PrepareApplicationPhase(File executable)
 	{
 		super(
 			new ActivityState(
 				ActivityStateEnumeration.Running,
 				PREPARE_STATE, false));
 		
-		_applicationName = applicationName;
+		_executable = executable;
 	}
 	
 	@Override
 	public void execute(ExecutionContext context) throws Throwable
 	{
-		ApplicationManager.prepareApplication(
-			context.getCurrentWorkingDirectory(), _applicationName);
+		ApplicationManager.prepareApplication(_executable);
 	}
 }

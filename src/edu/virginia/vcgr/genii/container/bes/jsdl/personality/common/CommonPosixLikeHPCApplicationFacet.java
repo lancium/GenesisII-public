@@ -1,7 +1,10 @@
 package edu.virginia.vcgr.genii.container.bes.jsdl.personality.common;
 
+import java.io.File;
+
 import javax.xml.namespace.QName;
 
+import edu.virginia.vcgr.genii.client.jsdl.FilesystemRelativePath;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.UnsupportedJSDLElement;
 import edu.virginia.vcgr.genii.client.jsdl.hpc.HPCConstants;
@@ -33,7 +36,8 @@ public class CommonPosixLikeHPCApplicationFacet extends
 				new QName(HPCConstants.HPC_NS, "WorkingDirectory"));
 		
 		((PosixLikeApplicationUnderstanding)
-			currentUnderstanding).setWorkingDirectory(workingDirectory);
+			currentUnderstanding).setWorkingDirectory(
+				new File(workingDirectory));
 	}
 	
 	@Override
@@ -41,7 +45,7 @@ public class CommonPosixLikeHPCApplicationFacet extends
 		String argument) throws JSDLException
 	{
 		((PosixLikeApplicationUnderstanding)currentUnderstanding).addArgument(
-			argument);
+			new StringOrPath(argument));
 	}
 	
 	@Override
@@ -49,7 +53,8 @@ public class CommonPosixLikeHPCApplicationFacet extends
 		String environment) throws JSDLException
 	{
 		((PosixLikeApplicationUnderstanding)
-			currentUnderstanding).addEnvironment(name, environment);
+			currentUnderstanding).addEnvironment(name, 
+				new StringOrPath(environment));
 	}
 	
 	@Override
@@ -57,7 +62,8 @@ public class CommonPosixLikeHPCApplicationFacet extends
 		String input) throws JSDLException
 	{
 		((PosixLikeApplicationUnderstanding)
-			currentUnderstanding).setStdinRedirect(input);
+			currentUnderstanding).setStdinRedirect(
+				new FilesystemRelativePath(null, input));
 	}
 
 	@Override
@@ -65,7 +71,8 @@ public class CommonPosixLikeHPCApplicationFacet extends
 		String output) throws JSDLException
 	{
 		((PosixLikeApplicationUnderstanding)
-			currentUnderstanding).setStdoutRedirect(output);
+			currentUnderstanding).setStdoutRedirect(
+				new FilesystemRelativePath(null, output));
 	}
 
 	@Override
@@ -73,7 +80,8 @@ public class CommonPosixLikeHPCApplicationFacet extends
 		String error) throws JSDLException
 	{
 		((PosixLikeApplicationUnderstanding)
-			currentUnderstanding).setStderrRedirect(error);
+			currentUnderstanding).setStderrRedirect(
+				new FilesystemRelativePath(null, error));
 	}
 
 	@Override
@@ -81,6 +89,7 @@ public class CommonPosixLikeHPCApplicationFacet extends
 		String executable) throws JSDLException
 	{
 		((PosixLikeApplicationUnderstanding)
-			currentUnderstanding).setExecutable(executable);
+			currentUnderstanding).setExecutable(
+				new FilesystemRelativePath(null, executable));
 	}
 }

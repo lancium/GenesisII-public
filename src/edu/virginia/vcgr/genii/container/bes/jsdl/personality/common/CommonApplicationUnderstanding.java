@@ -1,10 +1,13 @@
 package edu.virginia.vcgr.genii.container.bes.jsdl.personality.common;
 
+import java.io.File;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.tty.TTYConstants;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.ByteIORedirectionSink;
@@ -16,17 +19,33 @@ public abstract class CommonApplicationUnderstanding
 	static private Log _logger = LogFactory.getLog(
 		CommonApplicationUnderstanding.class);
 	
-	private String _workingDirectory = null;
+	private FilesystemManager _fsManager;
+	private BESWorkingDirectory _workingDirectory;
 	
-	public void setWorkingDirectory(String workingDirectory)
+	protected CommonApplicationUnderstanding(
+		FilesystemManager fsManager,
+		BESWorkingDirectory workingDirectory)
 	{
+		_fsManager = fsManager;
 		_workingDirectory = workingDirectory;
 	}
 	
+	public void setWorkingDirectory(File workingDirectory)
+	{
+		_workingDirectory.setWorkingDirectory(workingDirectory, false);
+		_fsManager.setWorkingDirectory(_workingDirectory.getWorkingDirectory());
+	}
+	
 	@Override
-	public String getWorkingDirectory()
+	public BESWorkingDirectory getWorkingDirectory()
 	{
 		return _workingDirectory;
+	}
+	
+	@Override
+	public FilesystemManager getFilesystemManager()
+	{
+		return _fsManager;
 	}
 	
 	protected StreamRedirectionSink discoverTTYRedirectionSink()
