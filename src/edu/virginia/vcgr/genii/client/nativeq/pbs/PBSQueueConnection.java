@@ -30,7 +30,8 @@ import edu.virginia.vcgr.genii.client.nativeq.ScriptExecutionException;
 import edu.virginia.vcgr.genii.client.nativeq.ScriptLineParser;
 import edu.virginia.vcgr.genii.client.spmd.SPMDException;
 import edu.virginia.vcgr.genii.client.spmd.SPMDTranslator;
-import edu.virginia.vcgr.genii.client.spmd.SPMDTranslators;
+import edu.virginia.vcgr.genii.client.spmd.SPMDTranslatorFactories;
+import edu.virginia.vcgr.genii.client.spmd.SPMDTranslatorFactory;
 
 public class PBSQueueConnection extends ScriptBasedQueueConnection
 {
@@ -93,10 +94,21 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 						"Native PBS Queue couldn't find SPMD Provider for type \"%s\".",
 						variation));
 				
-				SPMDTranslator translator = SPMDTranslators.getSPMDTranslator(
-					providerName);
+				SPMDTranslatorFactory factory = 
+					SPMDTranslatorFactories.getSPMDTranslatorFactory(
+						providerName);
 				
-				variations.put(URI.create(variation), translator);
+				Properties constructionProps = new Properties();
+				String value =
+					connectionProperties.getProperty(variationProperty + "." +
+						PBSQueue.QUEUE_SUPPORTED_SPMD_ADDITIONAL_CMDLINE_ARGS);
+				if (value != null)
+					constructionProps.setProperty(
+						SPMDTranslatorFactory.ADDITIONAL_CMDLINE_ARGS_PROPERTY,
+						value);
+				
+				variations.put(URI.create(variation), 
+					factory.newTranslator(constructionProps));
 			}
 		}
 		catch (SPMDException se)

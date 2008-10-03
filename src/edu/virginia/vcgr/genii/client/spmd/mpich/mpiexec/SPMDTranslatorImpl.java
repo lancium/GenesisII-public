@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.client.spmd.mpich.mpiexec;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import edu.virginia.vcgr.genii.client.spmd.AbstractSPMDTranslator;
@@ -10,11 +11,16 @@ import edu.virginia.vcgr.genii.client.spmd.SPMDTranslator;
 public class SPMDTranslatorImpl extends AbstractSPMDTranslator
 	implements SPMDTranslator
 {
-	static final public String PROVIDER_NAME = "mpich.mpiexec";
+	private List<String> _additionalArgs =
+		new LinkedList<String>();
 	
-	public SPMDTranslatorImpl()
+	public SPMDTranslatorImpl(String additionalArguments)
 	{
-		super(PROVIDER_NAME);
+		if (additionalArguments != null)
+		{
+			for (String arg : additionalArguments.split("\\s+"))
+				_additionalArgs.add(arg);
+		}
 	}
 	
 	@Override
@@ -23,6 +29,7 @@ public class SPMDTranslatorImpl extends AbstractSPMDTranslator
 	{
 		List<String> ret = new ArrayList<String>(commandLine.size() + 1);
 		ret.add("mpiexec");
+		ret.addAll(_additionalArgs);
 		ret.addAll(commandLine);
 		return ret;
 	}

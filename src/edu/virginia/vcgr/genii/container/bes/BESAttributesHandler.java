@@ -40,7 +40,7 @@ import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
-import edu.virginia.vcgr.genii.client.spmd.SPMDTranslators;
+import edu.virginia.vcgr.genii.client.spmd.SPMDTranslatorFactories;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
@@ -197,7 +197,7 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 	static public Collection<String> getSPMDProviders()
 		throws RemoteException
 	{
-		return SPMDTranslators.listSPMDTranslators();
+		return SPMDTranslatorFactories.listSPMDTranslatorFactories();
 	}
 	
 	public void setDescription(String description)
