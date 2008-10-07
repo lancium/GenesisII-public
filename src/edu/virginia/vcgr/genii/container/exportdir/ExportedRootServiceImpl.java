@@ -24,6 +24,9 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
 import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.rns.recursived.RNSRecursiveDescent;
+import edu.virginia.vcgr.genii.client.rns.recursived.RNSRecursiveDescentCallback;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
 
@@ -132,7 +135,34 @@ public class ExportedRootServiceImpl extends ExportedDirServiceImpl implements
 			ExportedDirUtils.createResolverCreationProperties(resolverCreationParams,
 				initInfo);
 		 
-		super.postCreate(rKey, myEPR, constructionParameters, resolverCreationParams);
+		super.postCreate(rKey, myEPR, constructionParameters, resolverCreationParams);	
+
+		try
+		{
+			RNSRecursiveDescent descent = RNSRecursiveDescent.createDescent();
+			descent.setAllowedRetries(5);
+			descent.setAvoidCycles(false);
+			descent.asyncDescend(new RNSPath(myEPR),
+				new RNSRecursiveDescentCallback()
+				{
+					@Override
+					public void finish() throws Throwable
+					{
+						// do nothing	
+					}
+	
+					@Override
+					public boolean handleRNSPath(RNSPath path) throws Throwable
+					{
+						// do nothing
+						return true;
+					}
+				});
+		}
+		catch (Throwable cause)
+		{
+			_logger.warn("RNS Asynchronous Sync operation failed.", cause);
+		}
 	}
 }
 	
