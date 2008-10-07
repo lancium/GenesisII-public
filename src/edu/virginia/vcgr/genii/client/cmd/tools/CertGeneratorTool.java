@@ -70,6 +70,7 @@ public class CertGeneratorTool extends BaseGridTool
 	private String _o = null;
 	private String _ou = null;
 	private String _email= null;
+	private Integer _keySize = null;
 
 	public CertGeneratorTool()
 	{
@@ -84,6 +85,10 @@ public class CertGeneratorTool extends BaseGridTool
 	public void setGen_cert()
 	{
 		_gen_cert = true;
+	}
+	
+	public void setKeysize(String keySizeStr) {
+		_keySize = Integer.parseInt(keySizeStr);
 	}
 	
 	public void setUrl()
@@ -167,7 +172,10 @@ public class CertGeneratorTool extends BaseGridTool
 		{
 			_path_for_cert_generator = getArgument(0);
 			
-			KeyPair newKeyPair = CertTool.generateKeyPair();
+			if (_keySize == null) {
+				_keySize = ClientUtils.getClientRsaKeyLength();
+			}
+			KeyPair newKeyPair = CertTool.generateKeyPair(_keySize);
 			X509Certificate [] certChain = createCert(newKeyPair, _path_for_cert_generator, _cn, _c, _st, _l, _o, _ou, _email);
 			storeCert(newKeyPair, certChain, _ks_path, _ks_password, _ks_alias, _entry_password);
 		}

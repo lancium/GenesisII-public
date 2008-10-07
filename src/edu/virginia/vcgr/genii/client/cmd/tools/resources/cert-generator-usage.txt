@@ -12,6 +12,7 @@ cert-generator --gen-cert <cert-generator-rns-path>
 	--ks-path=<local-path-for-ks>
 	--ks-pword=<password>
 	--ks-alias=<password>
+	[ --keysize=<rsa-keysize> ]
 	[ --cn={ <cn text> | LOCAL_MACHINE_NAME | LOCAL_MACHINE_IP } ]
 	[ --c=<country abbrev> ]
 	[ --st=<state> ]

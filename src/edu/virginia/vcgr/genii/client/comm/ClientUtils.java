@@ -34,7 +34,11 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.comm.attachments.AttachmentType;
 import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
+import edu.virginia.vcgr.genii.client.configuration.ConfigurationUnloadedListener;
+import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
+import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
+import edu.virginia.vcgr.genii.client.configuration.SecurityConstants;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -62,12 +66,49 @@ public class ClientUtils
 	static private Pattern _PORT_PATTERN = Pattern.compile(
 	"^get.+");
 	
+	static private Integer __clientRsaKeyLength = null;
+
+	/**
+	 * Class to wipe our loaded config stuff in the event the config manager
+	 * reloads. 
+	 */
+	static {
+		// register ourselves to renew our defaults if the configuration is 
+		// unloaded
+		ConfigurationManager.addConfigurationUnloadListener(new ConfigUnloadListener());
+	}
+	public static class ConfigUnloadListener implements ConfigurationUnloadedListener {
+		public void notifyUnloaded() {
+			synchronized(ClientUtils.class) { 
+				__clientRsaKeyLength = null;
+			}
+		}
+	}
+	
+	/**
+	 * Retrieves the client's minimum allowable level of message security
+	 */	
+	static public synchronized int getClientRsaKeyLength() throws GeneralSecurityException {
+
+		if (__clientRsaKeyLength != null) { 
+			return __clientRsaKeyLength;
+		}
+		
+		String rsaKeyLength = 
+			Installation.getDeployment(new DeploymentName()).security().getProperty(
+				SecurityConstants.Client.CLIENT_RSA_KEY_LENGTH_PROP);
+			
+		__clientRsaKeyLength =  Integer.parseInt(rsaKeyLength);
+		return __clientRsaKeyLength;
+	}
+	
+	
 	/**
 	 * Generates transient key and certificate material to be used 
 	 * for outgoing message security.
 	 */
 	private static KeyAndCertMaterial generateKeyAndCertMaterial() throws GeneralSecurityException {
-	    KeyPair keyPair = CertTool.generateKeyPair();
+	    KeyPair keyPair = CertTool.generateKeyPair(getClientRsaKeyLength());
 	    X509Certificate[] clientCertChain = {CertTool.createMasterCert(
 	    		"C=US, ST=Virginia, L=Charlottesville, O=UVA, OU=VCGR, CN=Client Cert " + (new GUID()).toString(), 
 				GenesisIIConstants.CredentialExpirationMillis,	// valid 24 hours

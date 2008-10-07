@@ -6,6 +6,8 @@ public interface SecurityConstants
 	
 	public interface Client
 	{
+		static public final String CLIENT_RSA_KEY_LENGTH_PROP =
+			"edu.virginia.vcgr.genii.client.security.message.rsa-key-length";
 		static public final String MESSAGE_MIN_CONFIG_PROP =
 			"edu.virginia.vcgr.genii.client.security.message.min-config";
 		static public final String RESOURCE_IDENTITY_TRUST_STORE_LOCATION_PROP =

@@ -48,6 +48,7 @@ public class CertTool
 	static Random serialNumRandomness = new Random(System.currentTimeMillis());
 
 	static final int SERIAL_NUM_BITS = 128;
+	static final int RSA_KEYSIZE = 2048;
 
 	static
 	{
@@ -341,11 +342,16 @@ public class CertTool
 
 		return ks;
 	}
-
+/*
 	public static KeyPair generateKeyPair() throws GeneralSecurityException
 	{
-		// generate a keypair for the new cert
+		return generateKeyPair(RSA_KEYSIZE);
+	}
+*/
+	public static KeyPair generateKeyPair(int keySize) throws GeneralSecurityException
+	{
 		KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA", "BC");
+		keyGen.initialize(keySize);
 		return keyGen.generateKeyPair();
 	}
 
@@ -377,6 +383,7 @@ public class CertTool
 						+ "  is not specified, then the certificate and keys will be displayed to the\n"
 						+ "  console.\n\n"
 
+						+ "-keysize=<rsa-keysize> \n"
 						+ "-dn=<distinguished name> \n"
 						+ "[ -validity=<days (default:12 years)> ]\n"
 						+ "[ -input-keystore=<keystore> \n"
@@ -412,6 +419,7 @@ public class CertTool
 		String base64CertFile = null;
 
 		String dn = null;
+		Integer keySize = null;
 		long validity = ((365L * 12L) + 3L) * 24L * 60L * 60L * 1000L; // default:
 																		// 12
 																		// years
@@ -482,6 +490,10 @@ public class CertTool
 				{
 					outputEntryPass = value.toCharArray();
 
+				}
+				else if (option.equals("-keysize"))
+				{
+					keySize = Integer.parseInt(value);
 				}
 				else if (option.equals("-dn"))
 				{
@@ -640,8 +652,7 @@ public class CertTool
 			// generate a keypair for the new cert
 			System.out.print("Generating keypair...");
 			System.out.flush();
-			KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA", "BC");
-			KeyPair keyPair = keyGen.generateKeyPair();
+			KeyPair keyPair = generateKeyPair(keySize);
 			System.out.println("Done.");
 
 			X509Certificate cert = null;
@@ -672,7 +683,6 @@ public class CertTool
 				// load the signing cert/private key and generate a client cert
 				PrivateKey caPrivKey =
 						(PrivateKey) ks.getKey(inputAlias, inputEntryPass);
-
 				java.security.cert.Certificate[] caCertChain =
 						(java.security.cert.Certificate[]) ks
 								.getCertificateChain(inputAlias);
