@@ -22,6 +22,7 @@ import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.io.RAFInputStream;
 import edu.virginia.vcgr.genii.client.io.RAFOutputStream;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.TransientCredentials;
 
 public class ContextFileSystem
 {
@@ -64,6 +65,11 @@ public class ContextFileSystem
 				myResponsibility = true;
 				pair = new FileContextPair(filename, transientFilename);
 				_cache[hashValue] = pair;
+				
+				if (transientFilename == null) {
+					TransientCredentials._logger.debug(
+							"This process is now unable to store current calling context credentials for the session statefile \"" + filename + "\"."); 
+				}
 			}
 		}
 
@@ -73,6 +79,9 @@ public class ContextFileSystem
 			{
 				try
 				{
+					TransientCredentials._logger.debug(
+							"Actively loading current calling context credentials to session state from files \"" + 
+							filename + "\", \"" + transientFilename + "\"");
 					pair.context = loadContext(filename);
 					loadTransient(transientFilename, pair.context);
 				}
@@ -95,6 +104,19 @@ public class ContextFileSystem
 							"Thread interrupted trying to load context.");
 					}
 				}
+				if (((pair.filename == null) && (filename != null)) ||
+					((pair.filename != null) && (filename == null)) ||
+					((pair.transientFilename != null) && (transientFilename == null)) ||
+					((pair.transientFilename == null) && (transientFilename != null)) ||
+					(!pair.filename.equals(filename)) ||
+					(!pair.transientFilename.equals(transientFilename))) {
+
+					TransientCredentials._logger.warn(
+							"Incorrectly loaded current calling context credentials from unexpected source state.  Loaded from: (" + 
+							pair.filename + ", " + pair.transientFilename + "), expected: (" + 
+							filename + ", " + transientFilename + ").  Please contact VCGR with this error message at genesisII@virginia.edu");
+				}
+
 			}
 			
 			return pair.context;
@@ -117,6 +139,12 @@ public class ContextFileSystem
 			{
 				pair = new FileContextPair(filename, transientFilename);
 				_cache[hashValue] = pair;
+				
+				if (transientFilename == null) {
+					TransientCredentials._logger.debug(
+							"This process is now unable to store current calling context credentials for the session statefile \"" + filename + "\"."); 
+				}
+				
 			}
 		}
 
@@ -126,8 +154,14 @@ public class ContextFileSystem
 			{
 				storeContext(filename, context);
 				if (transientFilename != null) { 
+					TransientCredentials._logger.debug(
+							"Storing current calling context credentials to session state in files " + 
+							pair.filename + ", " + pair.transientFilename);
+
 					storeTransient(transientFilename, context);
 				}
+
+			
 			}
 			finally
 			{
@@ -192,7 +226,7 @@ public class ContextFileSystem
 		FileLock lock = null;
 		RandomAccessFile raf = null;
 		
-		if (!filename.exists())
+		if ((filename == null) || !filename.exists())
 			return;
 		
 		try
@@ -201,6 +235,12 @@ public class ContextFileSystem
 			lock = raf.getChannel().lock();
 			ObjectInputStream in = new ObjectInputStream(new RAFInputStream(raf));
 			context.deserializeTransientProperties(in);
+			
+			if ((TransientCredentials.getTransientCredentials(context)._credentials.size() == 0)) {
+				TransientCredentials._logger.debug(
+						"Loaded empty calling context credentials from session statefile " + 
+						filename);
+			}
 		}
 		finally
 		{

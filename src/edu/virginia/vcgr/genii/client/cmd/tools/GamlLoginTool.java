@@ -415,11 +415,13 @@ public class GamlLoginTool extends BaseGridTool {
 			
 			// insert the assertion into the calling context's transient creds
 			transientCredentials._credentials.addAll(signedAssertions);
+
 		} finally {
 	
 			if (utCredential != null) {
 				// the UT credential was used only to log into the IDP, remove it
 				transientCredentials._credentials.remove(utCredential);
+				TransientCredentials._logger.debug("Removing temporary username-token credential from current calling context credentials.");
 			}
 		}
 		

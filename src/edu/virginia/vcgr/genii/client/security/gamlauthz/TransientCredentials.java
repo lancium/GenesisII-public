@@ -3,6 +3,9 @@ package edu.virginia.vcgr.genii.client.security.gamlauthz;
 import java.util.*;
 import java.io.Serializable;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 
 /**
@@ -14,6 +17,9 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
  */
 public class TransientCredentials implements Serializable
 {
+
+	static public Log _logger = 
+			LogFactory.getLog("edu.virginia.vcgr.genii.client.authn");
 
 	static final long serialVersionUID = 0L;
 
@@ -49,6 +55,8 @@ public class TransientCredentials implements Serializable
 	{
 		callingContext
 				.removeTransientProperty(TransientCredentials.TRANSIENT_CRED_PROP_NAME);
+		
+		_logger.debug("Clearing current calling context credentials.");
 	}
 
 }

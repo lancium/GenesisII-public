@@ -68,6 +68,7 @@ public class LogoutTool extends BaseGridTool
 				if (matcher.matches()) {
 					itr.remove();
 					numMatched++;
+					TransientCredentials._logger.debug("Removing credential from current calling context credentials.");
 				}
 			}
 
@@ -101,6 +102,7 @@ public class LogoutTool extends BaseGridTool
 							(credentials.size() - 1));
 					}
 					credentials.remove(which);
+					TransientCredentials._logger.debug("Removing credential from current calling context credentials.");
 					ContextManager.storeCurrentContext(callContext);
 				} catch (Throwable t)	{
 					stderr.println("Error getting login selection:  " + 

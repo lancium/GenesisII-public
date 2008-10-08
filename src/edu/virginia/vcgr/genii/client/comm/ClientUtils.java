@@ -167,9 +167,11 @@ public class ClientUtils
 					if (cred instanceof DelegatedAssertion) {
 							if (cred instanceof Renewable) {
 								_logger.warn(e.getMessage() + " : Attempting to renew credential " + cred);
+								TransientCredentials._logger.debug("Attempting to renew stale credential from current calling context credentials.");
 								((Renewable) cred).renew();
 							} else {
 								_logger.warn("Discarding non-renewable delegated credential " + cred);
+								TransientCredentials._logger.debug("Removing stale non-renewable credential from current calling context credentials.");
 								itr.remove();
 							}
 					}
