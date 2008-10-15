@@ -38,7 +38,8 @@ public class CertEntry {
 		_friendlyName = alias;
 	}
 
-	public String toString() {
-		return _friendlyName;
+	public String toString() 
+	{
+		return _certChain[0].getSubjectDN().getName();
 	}
 }

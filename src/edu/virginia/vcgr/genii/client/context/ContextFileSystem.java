@@ -68,7 +68,9 @@ public class ContextFileSystem
 				
 				if (transientFilename == null) {
 					TransientCredentials._logger.debug(
-							"This process is now unable to store current calling context credentials for the session statefile \"" + filename + "\"."); 
+						"This process is now unable to store current calling " +
+						"context credentials for the session statefile \"" +
+						filename + "\"."); 
 				}
 			}
 		}
@@ -80,8 +82,9 @@ public class ContextFileSystem
 				try
 				{
 					TransientCredentials._logger.debug(
-							"Actively loading current calling context credentials to session state from files \"" + 
-							filename + "\", \"" + transientFilename + "\"");
+						"Actively loading current calling context " +
+						"credentials to session state from files \"" + 
+						filename + "\", \"" + transientFilename + "\"");
 					pair.context = loadContext(filename);
 					loadTransient(transientFilename, pair.context);
 				}
@@ -112,9 +115,14 @@ public class ContextFileSystem
 					(!pair.transientFilename.equals(transientFilename))) {
 
 					TransientCredentials._logger.warn(
-							"Incorrectly loaded current calling context credentials from unexpected source state.  Loaded from: (" + 
-							pair.filename + ", " + pair.transientFilename + "), expected: (" + 
-							filename + ", " + transientFilename + ").  Please contact VCGR with this error message at genesisII@virginia.edu");
+						"Incorrectly loaded current calling context " +
+						"credentials from unexpected source state.  " +
+						"Loaded from: (" + 
+						pair.filename + ", " + pair.transientFilename + 
+						"), expected: (" + 
+						filename + ", " + transientFilename + 
+						").  Please contact VCGR with this error message " +
+						"at genesisII@virginia.edu");
 				}
 
 			}
@@ -142,7 +150,9 @@ public class ContextFileSystem
 				
 				if (transientFilename == null) {
 					TransientCredentials._logger.debug(
-							"This process is now unable to store current calling context credentials for the session statefile \"" + filename + "\"."); 
+						"This process is now unable to store current " +
+						"calling context credentials for the session " +
+						"statefile \"" + filename + "\"."); 
 				}
 				
 			}
@@ -155,7 +165,8 @@ public class ContextFileSystem
 				storeContext(filename, context);
 				if (transientFilename != null) { 
 					TransientCredentials._logger.debug(
-							"Storing current calling context credentials to session state in files " + 
+							"Storing current calling context credentials to " +
+							"session state in files " + 
 							pair.filename + ", " + pair.transientFilename);
 
 					storeTransient(transientFilename, context);
