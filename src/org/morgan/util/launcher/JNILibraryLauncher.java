@@ -105,20 +105,20 @@ public class JNILibraryLauncher
 	}
 	
 	
-	public static byte[] read(int fileHandle, int offset, int length){
+	public static byte[] read(int fileHandle, long offset, int length){
 		String myClass = JNI_IO_PACKAGE + ".JNIRead";
 		String myMethod = "read";
-		Class<?>[] argTypes = new Class[] {Integer.class, Integer.class, Integer.class};
+		Class<?>[] argTypes = new Class[] {Integer.class, Long.class, Integer.class};
 		Object[] args = new Object[] {new Integer(fileHandle), 
-				new Integer(Math.abs(offset)), new Integer(Math.abs(length))};
+				new Long(Math.abs(offset)), new Integer(Math.abs(length))};
 		
 		return (byte[])invoke(myClass, myMethod, argTypes, args);				
 	}
 	
-	public static int write(int fileHandle, byte[] data, int offset, int validLength){
+	public static int write(int fileHandle, byte[] data, long offset, int validLength){
 		String myClass = JNI_IO_PACKAGE + ".JNIWrite";
 		String myMethod = "write";
-		Class<?>[] argTypes = new Class[] {Integer.class, byte[].class, Integer.class};				
+		Class<?>[] argTypes = new Class[] {Integer.class, byte[].class, Long.class};				
 
 		/*	
 			Only not use default if not the same size (i.e. pool buffers may be larger than
@@ -132,14 +132,14 @@ public class JNILibraryLauncher
 			toUse = Arrays.copyOf(data, validLength);  //truncates to valid length
 		}
 		
-		Object[] args = new Object[] {new Integer(fileHandle),toUse, new Integer(offset)};		
+		Object[] args = new Object[] {new Integer(fileHandle),toUse, new Long(offset)};		
 		return (Integer)invoke(myClass, myMethod, argTypes, args);				
 	}
 	
-	public static int truncateAppend(int fileHandle, byte[] data, int offset, int validLength){
+	public static int truncateAppend(int fileHandle, byte[] data, long offset, int validLength){
 		String myClass = JNI_IO_PACKAGE + ".JNIWrite";
 		String myMethod = "truncateAppend";
-		Class<?>[] argTypes = new Class[] {Integer.class, byte[].class, Integer.class};
+		Class<?>[] argTypes = new Class[] {Integer.class, byte[].class, Long.class};
 		
 		/*	
 			Only not use default if not the same size (i.e. pool buffers may be larger than
@@ -154,7 +154,7 @@ public class JNILibraryLauncher
 		}
 		
 		Object[] args = new Object[] {new Integer(fileHandle), 
-				toUse, new Integer(offset)};
+				toUse, new Long(offset)};
 		
 		return (Integer)invoke(myClass, myMethod, argTypes, args);				
 	}

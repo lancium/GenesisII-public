@@ -10,18 +10,39 @@ public abstract class JNILibraryBase extends ApplicationBase {
 	public static boolean isInitialized = false;
 	public static final boolean DEBUG = true;
 	
+	// Members for the mirroring test harness
+	
+	/** 
+	 * If this is set to true, filesystem calls to the redirector
+	 * will be mirrored to the folder specified by testRoot.
+	 * e.g. C:\TestRoot will be the Root of the RNS space
+	 */
+	public static boolean ENABLE_LOCAL_TEST = false;
+	
+	/** 
+	 * Easy default value for testRoot
+	 */
+	public static final String DEFAULT_ROOT = "C:/TestRoot";
+	
+	/**
+	 * Folder for test harness
+	 */
+	public static String testRoot = DEFAULT_ROOT;
+	
 	synchronized public static void tryToInitialize(){
-		if(!isInitialized){
-			initialize();
+		if(!ENABLE_LOCAL_TEST) {			
+			if(!isInitialized){
+				initialize();
+			}
+			ICallingContext callingContext;
+			try {
+				callingContext = ContextManager.getCurrentContext(false);
+				ClientUtils.checkAndRenewCredentials(callingContext);
+			} catch (Exception e) {
+				
+				System.out.println("JNILibraryError:  Problem with relogin");
+			}
 		}
-		ICallingContext callingContext;
-		try {
-			callingContext = ContextManager.getCurrentContext(false);
-			ClientUtils.checkAndRenewCredentials(callingContext);
-		} catch (Exception e) {
-			
-			System.out.println("JNILibraryError:  Problem with relogin");
-		}		
 	}
 	
 	public static void initialize(){

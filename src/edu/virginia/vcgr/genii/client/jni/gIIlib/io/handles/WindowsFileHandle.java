@@ -19,7 +19,7 @@ public class WindowsFileHandle extends WindowsResourceHandle {
 	
 	CachedFile fileInCache;
 	
-	private WindowsFileHandle(){
+	public WindowsFileHandle(){
 		fileHandle = INVALID_HANDLE;
 	}
 	
@@ -207,15 +207,15 @@ public class WindowsFileHandle extends WindowsResourceHandle {
 		return fileInCache.getCachedInformation(fileHandle);
 	}
 	
-	public byte[] read(Integer offset, Integer length){
+	public byte[] read(Long offset, Integer length){
 		return fileInCache.read(offset, length);				
 	}
 	
-	public int write(byte[] data, Integer offset){
+	public int write(byte[] data, Long offset){
 		return fileInCache.write(data, offset);				
 	}
 	
-	public int truncateAppend(byte[] data, Integer offset){
+	public int truncateAppend(byte[] data, Long offset){
 		return fileInCache.truncateAppend(data, offset);				
 	}
 	

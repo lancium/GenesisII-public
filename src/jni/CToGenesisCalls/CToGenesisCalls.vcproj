@@ -120,7 +120,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(JAVA_HOME2)\include\win32&quot;;&quot;$(JAVA_HOME2)\include&quot;;C:\WINDDK\3790.1830\src\filesys\nulmrx\wxp\sys;"
+				AdditionalIncludeDirectories="&quot;$(JAVA_HOME)\include\win32&quot;;&quot;$(JAVA_HOME)\include&quot;;C:\WINDDK\3790.1830\src\filesys\nulmrx\wxp\sys"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
@@ -141,7 +141,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="jvm.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(JAVA_HOME2)\lib&quot;;&quot;$(JAVA_HOME2)\jre\bin\client&quot;"
+				AdditionalLibraryDirectories="&quot;$(JAVA_HOME)\lib&quot;;&quot;$(JAVA_HOME)\jre\bin\client&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"

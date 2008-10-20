@@ -90,8 +90,8 @@ Return Value:
 	BOOLEAN PagingIo = BooleanFlagOn(RxContext->Flags, IRP_PAGING_IO);
 
 	/* Genesis Specific Read info */
-	LONG ByteOffset;
-	LONG ByteCount;
+	LARGE_INTEGER ByteOffset;
+	ULONG ByteCount;
 	
 	PGENESIS_COMPLETION_CONTEXT pIoCompContext = GenesisGetMinirdrContext(RxContext);
 	PFILE_OBJECT FileObject = RxContext->CurrentIrpSp->FileObject;
@@ -112,11 +112,11 @@ Return Value:
 	}
 
 	/* Get offset param */	
-	ByteOffset = ((LONG)RxContext->LowIoContext.ParamsFor.ReadWrite.ByteOffset & 0x000000007FFFFFFF);
-	ByteCount = RxContext->LowIoContext.ParamsFor.ReadWrite.ByteCount;
-
-    // If the read starts beyond End of File, return EOF.
-	if (RtlLargeIntegerGreaterThan(RtlConvertLongToLargeInteger(ByteOffset + ByteCount), capFcb->Header.FileSize)
+	ByteOffset.QuadPart = RxContext->LowIoContext.ParamsFor.ReadWrite.ByteOffset;
+	ByteCount = RxContext->LowIoContext.ParamsFor.ReadWrite.ByteCount;    
+		
+	// If the read starts beyond End of File, return EOF.
+	if (RtlLargeIntegerGreaterThan(ByteOffset, capFcb->Header.FileSize)
 			|| (giiFcb->State == GENII_STATE_NOT_INITIALIZED)){
         RxDbgTrace( 0, Dbg, ("End of File\n", 0 ));
 		DbgPrint("NulMRxRead:  End of file reached\n");
@@ -124,11 +124,6 @@ Return Value:
         Status = STATUS_END_OF_FILE;
         try_return(Status);
     }    
-	if(ByteOffset < 0 || ByteCount < 0){
-		DbgPrint("NulMrxRead:  Invalid Paramater (negative)\n");
-		Status = STATUS_INVALID_PARAMETER;
-		try_return(Status);
-	}
     
     //Initialize the completion context in the RxContext
     ASSERT( sizeof(*pIoCompContext) == MRX_CONTEXT_SIZE );
@@ -185,8 +180,8 @@ Return Value:
 			Status = STATUS_SUCCESS;
 
 			if(!PagingIo){
-				FileObject->CurrentByteOffset = 
-					RtlConvertLongToLargeInteger(ByteOffset + pIoCompContext->Information);
+				FileObject->CurrentByteOffset.QuadPart = 
+					ByteOffset.QuadPart + pIoCompContext->Information;
 			}
 			else{
 				DbgPrint("NulMrxRead:  Paging IO Recv'd\n");
@@ -212,15 +207,16 @@ ULONG GenesisPrepareReadParams(PRX_CONTEXT RxContext, PVOID buffer){
 	GenesisGetFcbExtension(capFcb, giiFcb);
 	GenesisGetCcbExtension(capFobx, giiCcb);
 
-	LONG FileID, Length, Offset;		
+	ULONG FileID, Length;		
 	LARGE_INTEGER ByteOffset;
+	LARGE_INTEGER EndOffset;
 
 	char * myBuffer = (char *) buffer;	
 	BOOLEAN SynchronousIo = !BooleanFlagOn(RxContext->Flags,RX_CONTEXT_FLAG_ASYNC_OPERATION);     
 
 	/* Get parameters */
 	FileID = giiCcb->GenesisFileID;			
-	ByteOffset = RxContext->CurrentIrpSp->Parameters.Read.ByteOffset;
+	ByteOffset.QuadPart = RxContext->LowIoContext.ParamsFor.ReadWrite.ByteOffset;
 
 	//Fix byte offset
 	if(SynchronousIo && (ByteOffset.LowPart == FILE_USE_FILE_POINTER_POSITION 
@@ -228,26 +224,25 @@ ULONG GenesisPrepareReadParams(PRX_CONTEXT RxContext, PVOID buffer){
 			ByteOffset = RxContext->CurrentIrpSp->FileObject->CurrentByteOffset;
 	}
 
-	//Switch to ulong here
-	Offset = (ByteOffset.LowPart & 0x7FFFFFFF);
-	Length = (RxContext->CurrentIrpSp->Parameters.Read.Length & 0x7FFFFFF);
-    
-    //  If the read extends beyond EOF, truncate the read (fixes length
-	if (RtlLargeIntegerGreaterThan(RtlConvertLongToLargeInteger(Length + Offset), capFcb->Header.FileSize)){
-		RxContext->CurrentIrpSp->Parameters.Read.Length = (ULONG)(capFcb->Header.FileSize.LowPart - Offset);
-		RxContext->LowIoContext.ParamsFor.ReadWrite.ByteCount = (ULONG)(capFcb->Header.FileSize.LowPart - Offset);
-		Length = (ULONG)(capFcb->Header.FileSize.LowPart - Offset);
+	Length = RxContext->LowIoContext.ParamsFor.ReadWrite.ByteCount;		
+
+    //  If the read extends beyond EOF, truncate the read (fixes length	
+	EndOffset.QuadPart = ByteOffset.QuadPart + Length;	
+	if (RtlLargeIntegerGreaterThan(EndOffset, capFcb->Header.FileSize)){
+		RxContext->CurrentIrpSp->Parameters.Read.Length = (ULONG)(capFcb->Header.FileSize.QuadPart - ByteOffset.QuadPart);
+		RxContext->LowIoContext.ParamsFor.ReadWrite.ByteCount = (ULONG)(capFcb->Header.FileSize.QuadPart - ByteOffset.QuadPart);
+		Length = (ULONG)(capFcb->Header.FileSize.QuadPart - ByteOffset.QuadPart);
     }
 
-	DbgPrint("FileID is %d, ByteOffset is %d, ByteLength is %d \n", FileID, Offset, Length);       
+	DbgPrint("FileID is %d, ByteOffset is %I64d, ByteLength is %d \n", FileID, ByteOffset.QuadPart, Length);       
 
 	//Let's copy other params
 	RtlCopyMemory(myBuffer, &FileID, sizeof(LONG));
 	myBuffer += sizeof(LONG);
-	RtlCopyMemory(myBuffer, &Offset, sizeof(LONG));
-	myBuffer += sizeof(LONG);
+	RtlCopyMemory(myBuffer, &ByteOffset.QuadPart, sizeof(LONGLONG));
+	myBuffer += sizeof(LONGLONG);
 	RtlCopyMemory(myBuffer, &Length, sizeof(LONG));
 	myBuffer += sizeof(LONG);
 
-	return (sizeof(LONG) * 3);
+	return ((sizeof(LONG) * 2) + sizeof(LONGLONG));
 }

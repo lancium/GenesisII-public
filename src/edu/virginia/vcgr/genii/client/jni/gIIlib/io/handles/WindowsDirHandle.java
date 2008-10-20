@@ -15,7 +15,7 @@ public class WindowsDirHandle extends WindowsResourceHandle {
 
 	CachedDir dirInCache;
 	
-	private WindowsDirHandle(){
+	public WindowsDirHandle(){
 		fileHandle = INVALID_HANDLE;
 	}
 	

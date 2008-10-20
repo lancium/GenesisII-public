@@ -1,4 +1,5 @@
 #include <tchar.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <windows.h>
 #include <signal.h>
@@ -63,23 +64,12 @@ void printListing(char * listing, int size){
 		printf("File Type: %s ", listing);		
 		listing += strlen(listing) + 1;
 
-		memcpy(&length, listing, sizeof(ULONG));
-		printf("Size: %d ", length);
-		listing += sizeof(ULONG);
+		memcpy(&length, listing, sizeof(LONGLONG));
+		printf("Size: %I64d ", length);
+		listing += sizeof(LONGLONG);
 
 		printf("Name: %s\n", listing);
 		listing += strlen(listing) + 1;				
-	}
-}
-
-void printListing2(char * listing, int bytes){
-
-	if(bytes == JNI_ERR){
-		printf("Error occurred while processing request\n");
-	}
-	else{
-		listing[bytes] = '\0';
-		printf_s("%s\n", listing);
 	}
 }
 
@@ -90,7 +80,7 @@ int copyListing(char * buffer, char ** listing, int size){
 	
 	//Max 64 bit length
 	char lengthBuffer[9];
-	long length;
+	LONGLONG length;
 
 	int i;
 	int bytesCopied = 0;
@@ -105,8 +95,9 @@ int copyListing(char * buffer, char ** listing, int size){
 			length = atol(lengthBuffer);			
 			memcpy(pointer, &length, sizeof(long));
 			
-			if(length != -1)
-				printf("FileID: %d ",length);
+			if(length != -1){
+				//printf("FileID: %d ",length);
+			}
 			
 			bytesCopied += sizeof(long);
 			pointer += sizeof(long);
@@ -115,27 +106,25 @@ int copyListing(char * buffer, char ** listing, int size){
 			memcpy(pointer, listing[i+1], strlen(listing[i+1]));
 			pointer[strlen(listing[i+1])] = '\0';
 
-			printf("FileType: %s ", pointer);
+			//printf("FileType: %s ", pointer);
 
 			bytesCopied += (int)strlen(listing[i+1]) + 1;
 			pointer += strlen(listing[i+1]) + 1;		
 
-			//Copy file length
-			memcpy(lengthBuffer, listing[i+2], strlen(listing[i+2]));
-			lengthBuffer[strlen(listing[i+2])] = '\0';
-			length = atol(lengthBuffer);
-			memcpy(pointer, &length, sizeof(long));
+			//Copy file length			
+			length = _strtoi64(listing[i+2], NULL, 10);
+			memcpy(pointer, &length, sizeof(LONGLONG));
 
-			printf("FileSize: %d ", length); 
+			//printf("FileSize: %I64d ", length); 
 
-			bytesCopied += sizeof(long);
-			pointer += sizeof(long);
+			bytesCopied += sizeof(LONGLONG);
+			pointer += sizeof(LONGLONG);
 			
 			//Copy file name
 			memcpy(pointer, listing[i+3], strlen(listing[i+3]));
 			pointer[strlen(listing[i+3])] = '\0';
 
-			printf("FileName: %s\n", pointer);
+			//printf("FileName: %s\n", pointer);
 			
 			bytesCopied += (int)strlen(listing[i+3]) + 1;
 			pointer += strlen(listing[i+3]) + 1;
@@ -294,7 +283,7 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 				target = "";
 			}
 
-			printf("Directory: %d Target: %s for Query Directory\n", directoryId, target);			
+			//printf("Directory: %d Target: %s for Query Directory\n", directoryId, target);			
 			response->StatusCode = genesisII_directory_listing(pMyInfo, &directoryListing, directoryId, target);
 
 			//If an error, no copy is done
@@ -336,8 +325,8 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 
 				isMalformed = FALSE;
 						
-				printf("Path: %s for Create, ", path);
-				printf("Options: %d, %d, %d\n", requestedDeposition, desiredAccess, isDirectory);
+				//printf("Path: %s for Create, ", path);
+				//printf("Options: %d, %d, %d\n", requestedDeposition, desiredAccess, isDirectory);
 
 				response->StatusCode = genesisII_open(pMyInfo, path, requestedDeposition, desiredAccess, 
 					isDirectory, &listing);				
@@ -367,8 +356,8 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 			memcpy(&deleteOnCloseSpecified, bufPtr, sizeof(char));
 			response->ResponseBufferLength = sizeof(int);
 
-			printf("Closing file with fileID: %d. ", fileID);
-			printf("Delete Specified == %s\n", (deleteOnCloseSpecified ? "TRUE" : "FALSE"));
+			//printf("Closing file with fileID: %d. ", fileID);
+			//printf("Delete Specified == %s\n", (deleteOnCloseSpecified ? "TRUE" : "FALSE"));
 			returnCode = genesisII_close(pMyInfo, fileID, deleteOnCloseSpecified);
 
 			memcpy(response->ResponseBuffer, &returnCode, sizeof(int));				
@@ -395,7 +384,7 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 				target = "";
 			}						
 
-			printf("Renaming file with fileID: %d to %s. ", fileID, target);		
+			//printf("Renaming file with fileID: %d to %s. ", fileID, target);		
 			returnCode = genesisII_rename(pMyInfo, fileID, target);
 
 			memcpy(response->ResponseBuffer, &returnCode, sizeof(int));				
@@ -404,24 +393,25 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 		case GENII_READ:
 		{			
 			char *bufPtr = (char*) request->RequestBuffer;		
-			long fileID, offset, length;			
+			long fileID, length;
+			LONGLONG offset;
 
 			//Get all three parameters
-			if(request->RequestBufferLength == sizeof(long) * 3){
-				memcpy(&fileID, bufPtr, sizeof(long));
-				bufPtr += sizeof(int);
-				memcpy(&offset, bufPtr, sizeof(long));
-				bufPtr += sizeof(int);
-				memcpy(&length, bufPtr, sizeof(long));
-			}
-			printf("Read started for file with fileID: %d, offset: %d, length %d\n", fileID, offset, length);
+			memcpy(&fileID, bufPtr, sizeof(long));
+			bufPtr += sizeof(int);
+			memcpy(&offset, bufPtr, sizeof(LONGLONG));
+			bufPtr += sizeof(LONGLONG);
+			memcpy(&length, bufPtr, sizeof(long));
+
+			//printf("Read started for file with fileID: %d, offset: %I64d, length %d\n", fileID, offset, length);
 			response->ResponseBufferLength = genesisII_read(pMyInfo, fileID, response->ResponseBuffer, offset, length);			
 			break;
 		}
 		case GENII_WRITE:
 		{
 			char *bufPtr = (char*) request->RequestBuffer;		
-			long fileID, offset, length;			
+			long fileID, length;
+			LONGLONG offset;
 
 			response->ResponseBufferLength = 0;
 
@@ -429,12 +419,12 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 			__try{
 				memcpy(&fileID, bufPtr, sizeof(long));
 				bufPtr += sizeof(long);
-				memcpy(&offset, bufPtr, sizeof(long));
-				bufPtr += sizeof(long);
+				memcpy(&offset, bufPtr, sizeof(LONGLONG));
+				bufPtr += sizeof(LONGLONG);
 				memcpy(&length, bufPtr, sizeof(long));
 				bufPtr += sizeof(long);
 				
-				printf("Write started for file with fileID: %d, offset: %d, length %d\n", fileID, offset, length);
+				//printf("Write started for file with fileID: %d, offset: %I64d, length %d\n", fileID, offset, length);
 				response->ResponseBufferLength = genesisII_write(pMyInfo, fileID, bufPtr, offset, length);				
 			}			
 			__finally{			
@@ -444,7 +434,8 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 		case GENII_TRUNCATEAPPEND:
 		{
 			char *bufPtr = (char*) request->RequestBuffer;		
-			long fileID, offset, length;			
+			long fileID, length;
+			LONGLONG offset;
 
 			response->ResponseBufferLength = 0;
 
@@ -452,12 +443,12 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 			__try{
 				memcpy(&fileID, bufPtr, sizeof(long));
 				bufPtr += sizeof(long);
-				memcpy(&offset, bufPtr, sizeof(long));
-				bufPtr += sizeof(long);
+				memcpy(&offset, bufPtr, sizeof(LONGLONG));
+				bufPtr += sizeof(LONGLONG);
 				memcpy(&length, bufPtr, sizeof(long));
 				bufPtr += sizeof(long);
 				
-				printf("TruncateAppend started for file with fileID: %d, offset: %d, length %d\n", fileID, offset, length);
+				//printf("TruncateAppend started for file with fileID: %d, offset: %I64d, length %d\n", fileID, offset, length);
 				response->ResponseBufferLength = genesisII_truncate_append(pMyInfo, fileID, bufPtr, offset, length);				
 			}			
 			__finally{			
@@ -540,10 +531,12 @@ DWORD WINAPI ServerThread(LPVOID parameter){
 		//Call Genesis for appropriate response
 		prepareResponse(&myInfo, &(GeniiRequest.ControlRequest), &(GeniiResponse.ControlResponse));		
 
+		/*
 		printf("Sending Response to Kernel Driver: Id= %d, Type = %x, Length %d\n\n", 
 				 GeniiResponse.ControlResponse.RequestID,
 				 GeniiResponse.ControlResponse.ResponseType,                 
 				 GeniiResponse.ControlResponse.ResponseBufferLength);
+		*/
 		ret = SendResponse(&(GeniiResponse.ControlResponse),&GeniiRequestOverlapped);
 		if(!ret) {             
 			CloseHandle(GeniiRequestOverlapped.hEvent);
@@ -604,8 +597,8 @@ int runMultiThreaded(PGII_JNI_INFO rootInfo){
 
 	printf("Waiting for User Level Threads to Quit\n");
 
-	//Wait five seconds for other threads to catch up
-	Sleep(5000);
+	//Wait two seconds for other threads to catch up
+	Sleep(2000);
 
 	//Let's close these handles
 	next = head;

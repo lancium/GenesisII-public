@@ -20,8 +20,17 @@ public class JNIDirectoryListing extends JNILibraryBase
 			return null;
 		}
 		
+		if(target != null) {		
+			// Parenthesis are legal in file names
+			target = target.replace("(", "\\(");
+			target = target.replace(")", "\\)");
+			
+			// .'s are legal
+			target = target.replace(".", "\\.");
+		}
+		
 		//Default .* behavior or replace all * with .*
-		target = ((target=="" || target == null) ? ".*" : target.replace("*", ".*")); 
+		target = ((target=="" || target == null) ? ".*" : target.replace("*", ".*"));
 		
 		WindowsDirHandle dirHandle = (WindowsDirHandle) resourceHandle;
 		ArrayList<ResourceInformation> entries = dirHandle.getEntries(target);

@@ -11,11 +11,11 @@ public class ResourceInformation {
 	public Date createTime;
 	
 	// For directories, num entries excluding . and ..
-	public int size;
+	public long size;
 	public String name;
 	
 	public ResourceInformation(boolean isDir, String name, int handle, 
-			Date at, Date mt, Date ct, int size){
+			Date at, Date mt, Date ct, long size){
 		
 		this.name = name;
 		isDirectory = isDir;
@@ -33,7 +33,7 @@ public class ResourceInformation {
 		toReturn.add(isDirectory ? "D" : "F");
 		toReturn.add(String.valueOf(size));
 		toReturn.add(name);
-		
+
 		return toReturn;
 	}
 }

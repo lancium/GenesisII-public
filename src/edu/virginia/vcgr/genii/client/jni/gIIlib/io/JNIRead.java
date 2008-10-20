@@ -6,7 +6,7 @@ import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.WindowsFileHandle;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.WindowsResourceHandle;
 
 public class JNIRead {
-	public static byte[] read(Integer fileHandle, Integer offset, Integer length){		
+	public static byte[] read(Integer fileHandle, Long offset, Integer length){		
 		CacheManager manager = CacheManager.getInstance();		
 		WindowsResourceHandle resourceHandle = manager.getHandle(fileHandle);							
 		

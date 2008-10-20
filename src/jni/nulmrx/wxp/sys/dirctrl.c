@@ -499,7 +499,7 @@ WCHAR * GenesisGetDirectoryEntry(PGENESIS_FCB fcb, int index, LARGE_INTEGER *fil
 
 	for(i =0; i < index; i++){	
 		pointer += wcslen(pointer) + 1; //skip F | D
-		pointer += sizeof(long);		//skin length
+		pointer += sizeof(LONGLONG);		//skip length
 		pointer += wcslen(pointer) + 1; //skip name
 	}
 	__try{
@@ -517,8 +517,8 @@ WCHAR * GenesisGetDirectoryEntry(PGENESIS_FCB fcb, int index, LARGE_INTEGER *fil
 		}
 		else{
 			pointer += wcslen(pointer) + 1; //skip F | D
-			RtlCopyMemory(&(fileLength->LowPart), pointer, sizeof(long)); // copy length			
-			pointer += sizeof(long);		//skip length
+			RtlCopyMemory(&(fileLength->QuadPart), pointer, sizeof(LONGLONG)); // copy length			
+			pointer += sizeof(LONGLONG);	//skip length
 		}
 	}	
 	return pointer;

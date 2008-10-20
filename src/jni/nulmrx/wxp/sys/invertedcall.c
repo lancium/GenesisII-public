@@ -195,9 +195,9 @@ void GenesisSaveDirectoryListing(PGENESIS_FCB fcb, PVOID directoryListing, int s
 		pointer += strlen(pointer) + 1;
 
 		//Grab file length
-		RtlCopyMemory(w_pointer, pointer, sizeof(long));
-		w_pointer += sizeof(long);
-		pointer += sizeof(long);
+		RtlCopyMemory(w_pointer, pointer, sizeof(LONGLONG));
+		w_pointer += sizeof(LONGLONG);
+		pointer += sizeof(LONGLONG);
 
 		//Grab file name
 		mbstowcs(buffer, pointer, MAX_PATH_LENGTH);
@@ -232,17 +232,15 @@ void GenesisSaveInfoIntoFCB(PMRX_FCB commonFcb, PVOID info, int StatusCode){
 		if(strcmp(pointer, "D") == 0) fcb->isDirectory = TRUE;				
 		pointer += strlen(pointer) + 1;
 
-		//Grab length
-		RtlCopyMemory(&(commonFcb->Header.FileSize.LowPart), pointer, sizeof(ULONG));		
-		commonFcb->Header.FileSize.HighPart = 0;
+		//Grab length ( CHANGE FOR LONG BYTE)		
+		RtlCopyMemory(&(commonFcb->Header.FileSize.QuadPart), pointer, sizeof(LONGLONG));
 		commonFcb->Header.AllocationSize = commonFcb->Header.FileSize;
-
-		pointer += sizeof(long);		
+		pointer += sizeof(LONGLONG);		
 	}	
 	else{
 		//Skips components
 		pointer += strlen(pointer) + 1;
-		pointer += sizeof(long);		
+		pointer += sizeof(LONGLONG);		
 	}
 
 	//Skip Name

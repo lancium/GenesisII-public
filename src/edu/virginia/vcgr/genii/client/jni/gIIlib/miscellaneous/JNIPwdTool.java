@@ -9,6 +9,9 @@ public class JNIPwdTool extends JNILibraryBase{
 	
 	public static String getCurrentDirectory(){
 		tryToInitialize();
+		if(ENABLE_LOCAL_TEST){
+			return "/";
+		}
 		
 		try {
 			return RNSPath.getCurrent().getName();

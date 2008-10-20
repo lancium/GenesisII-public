@@ -30,8 +30,8 @@ public abstract class WindowsResourceHandle {
 	public int fileHandle;
 	private static int nextFileHandle=0;
 	
-	WindowsResourceHandle(){
-		fileHandle = nextHandle();
+	public WindowsResourceHandle() {
+		fileHandle = INVALID_HANDLE;
 	}
 	
 	/**
@@ -162,7 +162,7 @@ public abstract class WindowsResourceHandle {
 		
 		return cachedParent;
 	}
-	public synchronized int nextHandle(){
+	static public synchronized int nextHandle(){
 		int lastFileHandle = nextFileHandle;
 		nextFileHandle++;
 		return lastFileHandle;			

@@ -136,10 +136,10 @@ DllExport int genesisII_open(PGII_JNI_INFO info, char * target,	int requestedDep
 }
 
 DllExport int genesisII_read(PGII_JNI_INFO info, GII_FILE_HANDLE target, char* data, 
-		int offset, int length){
+		LONGLONG offset, int length){
 	jmethodID mid;
 
-	if(get_static_method(info,&(info->jni_launcher), "read", "(III)[B", &mid) != JNI_ERR)
+	if(get_static_method(info,&(info->jni_launcher), "read", "(IJI)[B", &mid) != JNI_ERR)
 	{							
 		jboolean isCopy;
 		int size = 0;
@@ -153,8 +153,6 @@ DllExport int genesisII_read(PGII_JNI_INFO info, GII_FILE_HANDLE target, char* d
 			/* Copies over data from java array */
 			buf = (*info->env)->GetByteArrayElements(info->env, myArray, &isCopy);			
 			memcpy(data ,buf, size); 
-
-
 
 			/* Release memory */
 			(*info->env)->ReleaseByteArrayElements(info->env, myArray, buf, 0);
@@ -171,11 +169,11 @@ DllExport int genesisII_read(PGII_JNI_INFO info, GII_FILE_HANDLE target, char* d
 }
 
 DllExport int genesisII_write(PGII_JNI_INFO info, GII_FILE_HANDLE target, 
-		char* data, int offset, int length){
+		char* data, LONGLONG offset, int length){
 	jmethodID mid;
 	int bytes_written;
 
-	if(get_static_method(info,&(info->jni_launcher), "write", "(I[BII)I", &mid) != JNI_ERR)
+	if(get_static_method(info,&(info->jni_launcher), "write", "(I[BJI)I", &mid) != JNI_ERR)
 	{	
 		if(length == 0){
 			bytes_written = 0;
@@ -198,11 +196,11 @@ DllExport int genesisII_write(PGII_JNI_INFO info, GII_FILE_HANDLE target,
 }
 
 DllExport int genesisII_truncate_append(PGII_JNI_INFO info, GII_FILE_HANDLE target, 
-		char* data, int offset, int length){
+		char* data, LONGLONG offset, int length){
 	jmethodID mid;
 	int bytes_written;
 
-	if(get_static_method(info,&(info->jni_launcher), "truncateAppend", "(I[BII)I", &mid) != JNI_ERR)
+	if(get_static_method(info,&(info->jni_launcher), "truncateAppend", "(I[BJI)I", &mid) != JNI_ERR)
 	{
 		if(length == 0){
 			bytes_written = 0;

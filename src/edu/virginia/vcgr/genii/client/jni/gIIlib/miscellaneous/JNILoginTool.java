@@ -13,8 +13,11 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.TransientCredentials;
 
 public class JNILoginTool extends JNILibraryBase 
 {	
-	public static Boolean login(String keystorePath, String password, String certPattern){
+	public static Boolean login(String keystorePath, String password, String certPattern){		
 		tryToInitialize();
+		if(ENABLE_LOCAL_TEST){
+			return true;
+		}
 		
 		CommandLineRunner runner = new CommandLineRunner();
 		String[] args = {"login"};						

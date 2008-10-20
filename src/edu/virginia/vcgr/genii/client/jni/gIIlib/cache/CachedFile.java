@@ -24,7 +24,7 @@ public class CachedFile extends CachedResource {
 	
 	private ReentrantReadWriteLock informationLock = new ReentrantReadWriteLock(true);
 
-	private int fileSize = 0;
+	private long fileSize = 0;
 	
 	private boolean isReadable;
 	
@@ -54,7 +54,7 @@ public class CachedFile extends CachedResource {
 		lastAccessedTime = typeInfo.getByteIOAccessTime();
 		lastModifiedTime = typeInfo.getByteIOModificationTime();
 		createTime = typeInfo.getByteIOCreateTime();
-		fileSize = (int)typeInfo.getByteIOSize();			
+		fileSize = typeInfo.getByteIOSize();			
 		isDirectory = false;
 		
 		isReadable = isRead;
@@ -137,7 +137,7 @@ public class CachedFile extends CachedResource {
 		return info;
 	}
 	
-	synchronized public byte[] read(int offset, int length){
+	synchronized public byte[] read(long offset, int length){
 		byte[] toReturn = null;		
 		try{
 			if(isReadable && length > 0){				
@@ -164,7 +164,7 @@ public class CachedFile extends CachedResource {
 		return bytesWritten;		
 	}	
 	
-	synchronized public int truncateAppend(byte[] data, Integer offset){
+	synchronized public int truncateAppend(byte[] data, long offset){
 		if(isWritable){		
 			try{
 				reconnectToEpr(true);
@@ -219,7 +219,7 @@ public class CachedFile extends CachedResource {
 			lastAccessedTime = typeInfo.getByteIOAccessTime();
 			lastModifiedTime = typeInfo.getByteIOModificationTime();
 			createTime = typeInfo.getByteIOCreateTime();
-			fileSize = (int)typeInfo.getByteIOSize();
+			fileSize = typeInfo.getByteIOSize();
 		}catch(RNSPathDoesNotExistException rpdnee){
 			System.err.println("G-ICING:  Error refresing information");
 			rpdnee.printStackTrace();

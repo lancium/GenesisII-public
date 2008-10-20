@@ -7,8 +7,11 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.TransientCredentials;
 
 public class JNILogoutTool extends JNILibraryBase {
 	
-	public static void logout(){
+	public static void logout(){		
 		tryToInitialize();
+		if(ENABLE_LOCAL_TEST){
+			return;
+		}
 		
 		try{					
 			ICallingContext callContext = ContextManager.getCurrentContext(false);

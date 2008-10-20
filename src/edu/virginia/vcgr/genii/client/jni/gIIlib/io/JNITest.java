@@ -97,9 +97,8 @@ public class JNITest {
 		WindowsFileHandle myFile2 = new WindowsFileHandle("/home/sosa/createMe.txt", WindowsResourceHandle.OPEN, 
 				WindowsResourceHandle.FILE_WRITE_DATA | WindowsResourceHandle.FILE_READ_DATA);		
 		
-		String returned = new String(myFile2.read(0, myFile2.getCachedInformation().size));
-		
-		System.out.println(returned);
+		//String returned = new String(myFile2.read(0, getCachedInformation().size)));		
+		//System.out.println(returned);
 		
 		myFile2.close(false);
 	}

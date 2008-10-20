@@ -11,6 +11,9 @@ public class JNICdTool extends JNILibraryBase {
 	
 	public static Boolean changeDirectory(String targetDirectory){
 		tryToInitialize();
+		if(ENABLE_LOCAL_TEST){
+			return true;
+		}
 		
 		try{
 			ICallingContext ctxt = ContextManager.getCurrentContext();

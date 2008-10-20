@@ -68,8 +68,8 @@ Return Value:
 	BOOLEAN PagingIo = BooleanFlagOn(RxContext->Flags, IRP_PAGING_IO);
 
 	/* Genesis Specific Read info */
-	LONG ByteOffset;
-	LONG ByteCount;
+	LARGE_INTEGER ByteOffset;
+	ULONG ByteCount;
 
 	PGENESIS_COMPLETION_CONTEXT pIoCompContext = GenesisGetMinirdrContext(RxContext);
 	PFILE_OBJECT FileObject = RxContext->CurrentIrpSp->FileObject;
@@ -90,7 +90,7 @@ Return Value:
 	}
 
 	/* Get offset param */	
-	ByteOffset = ((LONG)RxContext->LowIoContext.ParamsFor.ReadWrite.ByteOffset & 0x000000007FFFFFFF);
+	ByteOffset.QuadPart = RxContext->LowIoContext.ParamsFor.ReadWrite.ByteOffset;
 	ByteCount = RxContext->LowIoContext.ParamsFor.ReadWrite.ByteCount;  
     
     //Initialize the completion context in the RxContext
@@ -143,8 +143,7 @@ Return Value:
 			KeWaitForSingleObject(&(giiFcb->InvertedCallSemaphore), Executive, KernelMode, FALSE, NULL);			
 
 			if(!PagingIo){
-				FileObject->CurrentByteOffset = 
-					RtlConvertLongToLargeInteger(ByteOffset + pIoCompContext->Information);
+				FileObject->CurrentByteOffset.QuadPart = ByteOffset.QuadPart + pIoCompContext->Information;
 			}
 			else{
 				DbgPrint("NulMrxWrite:  Paging IO Recv'd\n");
@@ -171,8 +170,10 @@ ULONG GenesisPrepareWriteParams(PRX_CONTEXT RxContext, PVOID buffer, PBOOLEAN is
 	GenesisGetCcbExtension(capFobx, giiCcb);
 	GenesisGetSrvOpenExtension(RxContext->pRelevantSrvOpen, giiSrvOpen);
 
-	LONG FileID, Length, Offset;		
-	LARGE_INTEGER ByteOffset;
+	LONG FileID;
+	ULONG Length;
+	LARGE_INTEGER ByteOffset;	
+	LARGE_INTEGER EndOffset;
 	PVOID writeData;
 
 	char * myBuffer = (char *) buffer;	
@@ -198,19 +199,15 @@ ULONG GenesisPrepareWriteParams(PRX_CONTEXT RxContext, PVOID buffer, PBOOLEAN is
 	}
 
 	//Fix length (checks if length + offset is bigger than valid data length)
-	if((RxContext->CurrentIrpSp->Parameters.Write.Length + ByteOffset.LowPart) > capFcb->Header.ValidDataLength.LowPart){	
-		Length = capFcb->Header.ValidDataLength.LowPart - ByteOffset.LowPart;
-		Length = Length >= 0 ? Length : 0;
+	Length = RxContext->CurrentIrpSp->Parameters.Write.Length;
+	EndOffset.QuadPart = ByteOffset.QuadPart + Length;
+	if(RtlLargeIntegerGreaterThan(EndOffset, capFcb->Header.ValidDataLength)){
+		Length = (ULONG)(capFcb->Header.ValidDataLength.QuadPart - ByteOffset.QuadPart);
 	}
-	else{
-		Length = RxContext->CurrentIrpSp->Parameters.Write.Length;
-	}
-
-	Length &= 0x7FFFFFFF;	
 
 	//Do we need to truncate before writing?
 	if(RtlLargeIntegerLessThan(capFcb->Header.FileSize, giiSrvOpen->ServerFileSize)){		
-		if((capFcb->Header.FileSize.LowPart + ByteOffset.LowPart) == capFcb->Header.FileSize.LowPart){		
+		if((capFcb->Header.FileSize.QuadPart + ByteOffset.QuadPart) == capFcb->Header.FileSize.QuadPart){
 			*isTruncateAppend = TRUE;
 			DbgPrint("IsTruncateAppend!\n");
 		}
@@ -220,22 +217,18 @@ ULONG GenesisPrepareWriteParams(PRX_CONTEXT RxContext, PVOID buffer, PBOOLEAN is
 		}
 	}
 
-	//Switch to ulong here (java can't use first bit)
-	Offset = (ByteOffset.LowPart & 0x7FFFFFFF);	
-
-	DbgPrint("GenesisWrite:  FileID is %d, ByteOffset is %d, ByteLength is %d \n", FileID, Offset, Length);       
-	
+	DbgPrint("GenesisWrite:  FileID is %d, ByteOffset is %I64d, ByteLength is %d \n", FileID, ByteOffset.QuadPart, Length);
 
 	//Let's copy other params
 	RtlCopyMemory(myBuffer, &FileID, sizeof(LONG));
 	myBuffer += sizeof(LONG);
-	RtlCopyMemory(myBuffer, &Offset, sizeof(LONG));
-	myBuffer += sizeof(LONG);
+	RtlCopyMemory(myBuffer, &ByteOffset.QuadPart, sizeof(LONGLONG));
+	myBuffer += sizeof(LONGLONG);
 	RtlCopyMemory(myBuffer, &Length, sizeof(LONG));
 	myBuffer += sizeof(LONG);
 	RtlCopyMemory(myBuffer, writeData, Length);	
 
-	return ((sizeof(LONG) * 3) + Length);
+	return ((sizeof(LONG) * 2) + sizeof(LONGLONG) + Length);
 }
 
 

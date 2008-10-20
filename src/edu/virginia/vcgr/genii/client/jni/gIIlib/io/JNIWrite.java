@@ -7,7 +7,7 @@ import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.WindowsResourceHandl
 
 
 public class JNIWrite{
-	public static Integer write(Integer fileHandle, byte[] data, Integer offset){
+	public static Integer write(Integer fileHandle, byte[] data, Long offset){
 		CacheManager manager = CacheManager.getInstance();		
 		WindowsResourceHandle resourceHandle = manager.getHandle(fileHandle);							
 		
@@ -20,7 +20,7 @@ public class JNIWrite{
 		return fh.write(data, offset);						
 	}
 	
-	public static Integer truncateAppend(Integer fileHandle, byte[] data, Integer offset){
+	public static Integer truncateAppend(Integer fileHandle, byte[] data, Long offset){
 		CacheManager manager = CacheManager.getInstance();		
 		WindowsResourceHandle resourceHandle = manager.getHandle(fileHandle);							
 		
