@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.script.Bindings;
+import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -76,14 +78,10 @@ public class ScriptTool extends BaseGridTool
 			return 1;
 		}
 		
+		String []cArgs = new String[args.size() - lcv];
 		int start = lcv;
 		for (;lcv < args.size(); lcv++)
-		{
-			initialProperties.put(Integer.toString(lcv - start), 
-				args.get(lcv));
-		}
-		initialProperties.put("#",
-			Integer.toString(args.size() - start));
+			cArgs[lcv - start] = args.get(lcv);
 		
 		Reader reader = null;
 		try
@@ -94,6 +92,12 @@ public class ScriptTool extends BaseGridTool
 			engine.put("grid", new Grid(
 				initialProperties, stdin, stdout, stderr));
 			reader = new FileReader(scriptFile);
+			Bindings b = engine.getBindings(ScriptContext.GLOBAL_SCOPE);
+			b.put("ARGV", cArgs);
+			for (Object property : initialProperties.keySet())
+				b.put((String)property, 
+					initialProperties.get(property));
+			
 			engine.eval(reader);
 			return 0;
 		}
