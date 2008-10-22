@@ -328,7 +328,10 @@ public class OGRSHConnection implements Runnable
 				tool.addArgument(file);
 			}
 			
-			return tool.run(System.out, System.err, new BufferedReader(new InputStreamReader(System.in)));
+			return tool.run(
+				new PrintWriter(System.out), 
+				new PrintWriter(System.err),
+				new BufferedReader(new InputStreamReader(System.in)));
 		}
 		catch (ToolException te)
 		{

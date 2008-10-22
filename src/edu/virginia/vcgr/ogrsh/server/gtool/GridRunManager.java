@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
@@ -26,8 +26,8 @@ public class GridRunManager implements Closeable
 	static final private int STDERR = 2;
 	
 	private BufferedReader _in = null;
-	private PrintStream _out = null;
-	private PrintStream _err = null;
+	private PrintWriter _out = null;
+	private PrintWriter _err = null;
 	
 	private ITool _gridTool;
 	
@@ -162,8 +162,8 @@ public class GridRunManager implements Closeable
 		
 		_in = new BufferedReader(new InputStreamReader(
 			sockets[STDIN].getInputStream()));
-		_out = new PrintStream(sockets[STDOUT].getOutputStream());
-		_err = new PrintStream(sockets[STDERR].getOutputStream(), true);
+		_out = new PrintWriter(sockets[STDOUT].getOutputStream());
+		_err = new PrintWriter(sockets[STDERR].getOutputStream(), true);
 	}
 	
 	GridRunManager(

@@ -2,7 +2,7 @@ package edu.virginia.vcgr.genii.ftp;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import edu.virginia.vcgr.genii.client.cmd.tools.GamlLoginTool;
 import edu.virginia.vcgr.genii.client.cmd.tools.LogoutTool;
@@ -31,7 +31,7 @@ public class GeniiBackendConfiguration implements Cloneable
 	}
 	
 	public GeniiBackendConfiguration(BufferedReader stdin,
-		PrintStream stdout, PrintStream stderr, ICallingContext callingContext)
+		PrintWriter stdout, PrintWriter stderr, ICallingContext callingContext)
 		throws Throwable
 	{
 		IContextResolver oldResolver = ContextManager.getResolver();
@@ -61,7 +61,7 @@ public class GeniiBackendConfiguration implements Cloneable
 	}
 	
 	public GeniiBackendConfiguration(BufferedReader stdin,
-		PrintStream stdout, PrintStream stderr)
+		PrintWriter stdout, PrintWriter stderr)
 		throws Throwable
 	{
 		this(stdin, stdout, stderr, ContextManager.getCurrentContext());

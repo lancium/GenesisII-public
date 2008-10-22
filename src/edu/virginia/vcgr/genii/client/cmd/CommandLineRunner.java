@@ -1,7 +1,7 @@
 package edu.virginia.vcgr.genii.client.cmd;
 
-import java.io.BufferedReader;
-import java.io.PrintStream;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,8 +24,8 @@ public class CommandLineRunner
 			ConfigurationManager.getCurrentConfiguration().getClientConfiguration());
 	}
 	
-	public int runCommand(String []cLine, 
-		PrintStream out, PrintStream err, BufferedReader in) throws Throwable
+	public int runCommand(String []cLine, Writer out, Writer err, Reader in)
+		throws Throwable
 	{
 		int resultSoFar = 0;
 		

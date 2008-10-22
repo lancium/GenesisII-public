@@ -1,19 +1,26 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.Reader;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
+import org.morgan.util.io.StreamUtils;
+
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
-import edu.virginia.vcgr.genii.client.cmd.tools.xscript.DefaultScriptHandler;
-import edu.virginia.vcgr.genii.client.cmd.tools.xscript.XScriptRunner;
+import edu.virginia.vcgr.genii.client.cmd.tools.xscript.jsr.Grid;
 
 public class ScriptTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION =
-		"Executes an XScript script.";
+		"Executes a script.";
 	
 	static final private String _USAGE =
 		"script [var=val ...] <script-file>";
@@ -23,9 +30,18 @@ public class ScriptTool extends BaseGridTool
 		super(_DESCRIPTION, _USAGE, false);
 	}
 	
+	static private String getExtension(String filename)
+	{
+		int index = filename.lastIndexOf('.');
+		if (index <= 0)
+			return "xml";
+		
+		return filename.substring(index + 1);
+	}
+	
 	@Override
 	protected int runCommand() throws Throwable
-	{
+	{	
 		int lcv;
 		Properties initialProperties = new Properties();
 		
@@ -60,9 +76,39 @@ public class ScriptTool extends BaseGridTool
 			return 1;
 		}
 		
-		DefaultScriptHandler handler = new DefaultScriptHandler();
-		return XScriptRunner.runScript(
-			scriptFile, handler, stdout, stderr, stdin, initialProperties);
+		int start = lcv;
+		for (;lcv < args.size(); lcv++)
+		{
+			initialProperties.put(Integer.toString(lcv - start), 
+				args.get(lcv));
+		}
+		initialProperties.put("#",
+			Integer.toString(args.size() - start));
+		
+		Reader reader = null;
+		try
+		{
+			String extension = getExtension(scriptFile.getName());
+			ScriptEngineManager manager = new ScriptEngineManager();
+			ScriptEngine engine = manager.getEngineByExtension(extension);
+			engine.put("grid", new Grid(
+				initialProperties, stdin, stdout, stderr));
+			reader = new FileReader(scriptFile);
+			engine.eval(reader);
+			return 0;
+		}
+		catch (ScriptException se)
+		{
+			Throwable cause = se.getCause();
+			if (cause != null)
+				throw cause;
+			
+			throw se;
+		}
+		finally
+		{
+			StreamUtils.close(reader);
+		}
 	}
 
 	@Override

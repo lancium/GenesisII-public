@@ -26,13 +26,13 @@ import edu.virginia.vcgr.genii.container.sysinfo.SupportedOperatingSystems;
 public abstract class AbstractGamlLoginHandler implements CallbackHandler {
 	static private final int _PASSWORD_TRIES = 5;
 
-	protected PrintStream _out;
-	protected PrintStream _err;
+	protected PrintWriter _out;
+	protected PrintWriter _err;
 	protected BufferedReader _in;
 
 	private char[] _password = null;
 
-	protected AbstractGamlLoginHandler(PrintStream out, PrintStream err,
+	protected AbstractGamlLoginHandler(PrintWriter out, PrintWriter err,
 			BufferedReader in) {
 		_out = out;
 		_err = err;

@@ -156,9 +156,6 @@ public class BasicDBResource implements IResource
 			rs = stmt.executeQuery();
 			if (!rs.next())
 			{
-				_logger.error("Unable to load resource \"" + _resourceKey + 
-					"\".  Throwing resource unknown fault.");
-				
 				throw FaultManipulator.fillInFault(new ResourceUnknownFaultType(
 					null, null, null, null, new BaseFaultTypeDescription[] {
 						new BaseFaultTypeDescription("Resource \"" + _resourceKey + "\" is unknown.")

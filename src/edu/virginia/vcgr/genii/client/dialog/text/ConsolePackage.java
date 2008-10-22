@@ -2,19 +2,19 @@ package edu.virginia.vcgr.genii.client.dialog.text;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import edu.virginia.vcgr.genii.client.dialog.DialogException;
 import edu.virginia.vcgr.genii.client.io.GetPassword;
 
 class ConsolePackage
 {
-	private PrintStream _stdout;
-	private PrintStream _stderr;
+	private PrintWriter _stdout;
+	private PrintWriter _stderr;
 	private BufferedReader _stdin;
 	
 	public ConsolePackage(
-		PrintStream stdout, PrintStream stderr, BufferedReader stdin)
+		PrintWriter stdout, PrintWriter stderr, BufferedReader stdin)
 	{
 		_stdout = stdout;
 		_stderr = stderr;
@@ -45,12 +45,12 @@ class ConsolePackage
 		}
 	}
 	
-	public PrintStream stdout()
+	public PrintWriter stdout()
 	{
 		return _stdout;
 	}
 	
-	public PrintStream stderr()
+	public PrintWriter stderr()
 	{
 		return _stderr;
 	}

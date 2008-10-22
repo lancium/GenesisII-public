@@ -1,7 +1,7 @@
 package edu.virginia.vcgr.genii.client.cmd.tools.gamllogin;
 
 import java.io.BufferedReader;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 
@@ -10,7 +10,7 @@ import edu.virginia.vcgr.genii.client.cmd.tools.gamllogin.CertEntry;
 
 public class TextGamlLoginHandler extends AbstractGamlLoginHandler
 {
-	public TextGamlLoginHandler(PrintStream out, PrintStream err,
+	public TextGamlLoginHandler(PrintWriter out, PrintWriter err,
 		BufferedReader in)
 	{
 		super(out, err, in);

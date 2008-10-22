@@ -31,6 +31,7 @@ import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
 
 public class AlarmManager
 {
@@ -69,29 +70,23 @@ public class AlarmManager
 	
 	private boolean createTableIfNecessary(Connection conn)
 	{
-		Statement stmt = null;
-		
 		try
 		{
-			stmt = conn.createStatement();
-			stmt.executeUpdate("CREATE TABLE alarmtable (" +
-				"alarmid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY," +
-				"nextoccurance TIMESTAMP NOT NULL," +
-				"repeatinterval BIGINT," +
-				"callingcontext BLOB(128K)," +
-				"target BLOB(128K)," +
-				"methodname VARCHAR(256) NOT NULL," +
-				"userdata BLOB(128K))");
-			conn.commit();
+			DatabaseTableUtils.createTables(conn, false, 
+				"CREATE TABLE alarmtable (" +
+					"alarmid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY," +
+					"nextoccurance TIMESTAMP NOT NULL," +
+					"repeatinterval BIGINT," +
+					"callingcontext BLOB(128K)," +
+					"target BLOB(128K)," +
+					"methodname VARCHAR(256) NOT NULL," +
+					"userdata BLOB(128K))");
+				conn.commit();
 			return true;
 		}
 		catch (SQLException sqe)
 		{
-			// assume the table already exists.
-		}
-		finally
-		{
-			StreamUtils.close(stmt);
+			_logger.error("Unable to create alarm table.", sqe);
 		}
 		
 		return false;

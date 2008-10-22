@@ -2,10 +2,10 @@ package edu.virginia.vcgr.genii.container.common.notification;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -42,28 +42,18 @@ public class DBSubscriptionResourceFactory extends BasicDBResourceFactory
 	protected void createTables() throws SQLException
 	{
 		Connection conn = null;
-		Statement stmt = null;
-		
 		super.createTables();
 		
 		try
 		{
 			conn = _pool.acquire();
-			stmt = conn.createStatement();
-			
-			stmt.executeUpdate(_CREATE_SUBSCRIPTIONS_TABLE);
+			DatabaseTableUtils.createTables(conn, false, 
+				_CREATE_SUBSCRIPTIONS_TABLE);
 			conn.commit();
-		}
-		catch (SQLException sqe)
-		{
-//			 assume the table already exists.
 		}
 		finally
 		{
-			if (stmt != null)
-				try { stmt.close(); } catch (SQLException sqe) {}
-			if (conn != null)
-				_pool.release(conn);
+			_pool.release(conn);
 		}
 	}
 }

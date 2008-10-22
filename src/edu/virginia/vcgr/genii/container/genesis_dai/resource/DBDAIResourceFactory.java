@@ -2,13 +2,13 @@ package edu.virginia.vcgr.genii.container.genesis_dai.resource;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -24,7 +24,7 @@ public class DBDAIResourceFactory extends RNSDBResourceFactory{
 		"servicekey VARCHAR (128), " +
 		"servicename VARCHAR (128), " +
 		"serviceEPR BLOB (128K), " +
-		"resourcename VARCHAR (128K), " +
+		"resourcename VARCHAR (256), " +
 		"resourceEPR BLOB (128K), " +
 		"CONSTRAINT dair PRIMARY KEY (id))";
 
@@ -56,30 +56,19 @@ public class DBDAIResourceFactory extends RNSDBResourceFactory{
 	protected void createTables() throws SQLException
 	{
 		Connection conn = null;
-		Statement stmt = null;
 		super.createTables();
 		 
 		try
 		{
-			 conn = _pool.acquire();
-			 stmt = conn.createStatement();
+			conn = _pool.acquire();
+			DatabaseTableUtils.createTables(conn, false, 
+				_CREATE_DAIR_ENTRY_TABLE_STMT);
+			conn.commit();
 			 
-			 stmt.executeUpdate(_CREATE_DAIR_ENTRY_TABLE_STMT);
-			 conn.commit();
-			 
-		}
-		catch (SQLException sqe)
-		{
-			 // assume the table already exists.
 		}
 		finally
 		{
-			 if (stmt != null)
-				 try {stmt.close(); } 
-			 catch(SQLException sqe) {}
-				 
-			 if (conn != null)
-				 _pool.release(conn);
+			_pool.release(conn);
 		}		
 	}
 }

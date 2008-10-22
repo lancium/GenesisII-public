@@ -2,13 +2,13 @@ package edu.virginia.vcgr.genii.container.iterator;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.container.q2.resource.QueueDBResourceFactory;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
@@ -17,6 +17,7 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
 public class IteratorDBResourceFactory extends BasicDBResourceFactory
 {
+	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(QueueDBResourceFactory.class);
 	
 	static private final String []_CREATE_STMTS = new String[] {
@@ -51,31 +52,17 @@ public class IteratorDBResourceFactory extends BasicDBResourceFactory
 	protected void createTables() throws SQLException
 	{
 		Connection conn = null;
-		Statement stmt = null;
-		
 		super.createTables();
 		
 		try
 		{
 			conn = _pool.acquire();
-			stmt = conn.createStatement();
-			
-			for (String createStmt : _CREATE_STMTS)
-			{
-				stmt.executeUpdate(createStmt);
-			}
+			DatabaseTableUtils.createTables(conn, false, _CREATE_STMTS);
 			conn.commit();
-		}
-		catch (SQLException sqe)
-		{
-			 _logger.debug("Got an exception while creating tables (could be because they exist).", sqe);
 		}
 		finally
 		{
-			if (stmt != null)
-				try { stmt.close(); } catch (SQLException sqe) {}
-			if (conn != null)
-				_pool.release(conn);
+			_pool.release(conn);
 		}
 	}
 	

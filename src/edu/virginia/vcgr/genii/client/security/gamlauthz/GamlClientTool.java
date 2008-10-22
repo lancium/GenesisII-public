@@ -55,8 +55,8 @@ public class GamlClientTool
 		return GamlAcl.encodeAcl(new GamlAcl());
 	}
 
-	public void displayAuthZConfig(AuthZConfig config, PrintStream out,
-			PrintStream err, BufferedReader in) throws AuthZSecurityException
+	public void displayAuthZConfig(AuthZConfig config, PrintWriter out,
+		PrintWriter err, BufferedReader in) throws AuthZSecurityException
 	{
 
 		if (config == null)
@@ -244,8 +244,8 @@ public class GamlClientTool
 
 	}
 
-	public AuthZConfig modifyAuthZConfig(AuthZConfig config, PrintStream out,
-			PrintStream err, BufferedReader in) throws IOException,
+	public AuthZConfig modifyAuthZConfig(AuthZConfig config, PrintWriter out,
+		PrintWriter err, BufferedReader in) throws IOException,
 			AuthZSecurityException
 	{
 

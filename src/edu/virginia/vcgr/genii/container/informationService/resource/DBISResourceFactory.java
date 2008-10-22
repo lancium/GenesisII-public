@@ -6,13 +6,13 @@ package edu.virginia.vcgr.genii.container.informationService.resource;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -61,30 +61,19 @@ public class DBISResourceFactory extends RNSDBResourceFactory{
 	protected void createTables() throws SQLException
 	{
 		Connection conn = null;
-		Statement stmt = null;
 		super.createTables();
 		 
 		try
 		{
-			 conn = _pool.acquire();
-			 stmt = conn.createStatement();
+			conn = _pool.acquire();
+			DatabaseTableUtils.createTables(conn, false, 
+				_CREATE_BES_ENTRY_TABLE_STMT);
+			conn.commit();
 			 
-			 stmt.executeUpdate(_CREATE_BES_ENTRY_TABLE_STMT);
-			 conn.commit();
-			 
-		}
-		catch (SQLException sqe)
-		{
-			 // assume the table already exists.
 		}
 		finally
 		{
-			 if (stmt != null)
-				 try {stmt.close(); } 
-			 catch(SQLException sqe) {}
-				 
-			 if (conn != null)
-				 _pool.release(conn);
+			_pool.release(conn);
 		}		
 	}
 }

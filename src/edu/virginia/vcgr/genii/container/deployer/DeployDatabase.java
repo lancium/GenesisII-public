@@ -6,7 +6,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,6 +24,7 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
 
 public class DeployDatabase implements Closeable
 {
@@ -369,36 +369,16 @@ public class DeployDatabase implements Closeable
 	static private void createTables() throws SQLException
 	{
 		Connection connection = null;
-		Statement stmt = null;
 		
 		try
 		{
 			connection = _pool.acquire();
-			stmt = connection.createStatement();
-			
-			for (String creationText : _TABLE_CREATION_STMTS)
-			{
-				try
-				{
-					stmt.executeUpdate(creationText);
-				}
-				catch (SQLException sqe)
-				{
-					// It's probably just already in the database.
-				}
-			}
-			
+			DatabaseTableUtils.createTables(connection, false, 
+				_TABLE_CREATION_STMTS);
 			connection.commit();
-		}
-		catch (SQLException sqe)
-		{
-			if (sqe.getErrorCode() != -21)
-				throw sqe;
 		}
 		finally
 		{
-			StreamUtils.close(stmt);
-			
 			_pool.release(connection);
 		}
 	}

@@ -3,7 +3,9 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -58,18 +60,18 @@ public abstract class BaseGridTool implements ITool
 		return _useGui;
 	}
 	
-	protected PrintStream stdout;
-	protected PrintStream stderr;
+	protected PrintWriter stdout;
+	protected PrintWriter stderr;
 	protected BufferedReader stdin;
 	
-	public final int run(PrintStream out, PrintStream err, BufferedReader in)
+	public final int run(Writer out, Writer err, Reader in)
 		throws Throwable
 	{
 		try
 		{
-			stdout = out;
-			stderr = err;
-			stdin = in;
+			stdout = (out instanceof PrintWriter) ? (PrintWriter)out : new PrintWriter(out);
+			stderr = (err instanceof PrintWriter) ? (PrintWriter)err : new PrintWriter(err);
+			stdin = (in instanceof BufferedReader) ? (BufferedReader)in : new BufferedReader(in);
 			try
 			{
 				verify();
@@ -77,9 +79,9 @@ public abstract class BaseGridTool implements ITool
 			}
 			catch(InvalidToolUsageException itue)
 			{
-				err.print(itue.getLocalizedMessage());
-				err.print(usage());
-				err.println();
+				stderr.print(itue.getLocalizedMessage());
+				stderr.print(usage());
+				stderr.println();
 				return -1;
 			}
 		}

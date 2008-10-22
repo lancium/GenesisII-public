@@ -2,7 +2,6 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -201,10 +200,9 @@ public class RunTool extends BaseGridTool
 			asyncPath = _asyncName;
 			JobDefinition_Type jobDef = createJobDefinition(
 				jobName, getArguments().subList(1, getArguments().size()));
-			OutputStreamWriter writer = new OutputStreamWriter(stdout);
-			ObjectSerializer.serialize(writer, jobDef,
+			ObjectSerializer.serialize(stdout, jobDef,
 					new QName("http://example.org", "job-definition"));
-			writer.flush();
+			stdout.flush();
 			activity = submitJob(jobDef, besContainer);
 		}
 		

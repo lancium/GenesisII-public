@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.rmi.RemoteException;
 
 import org.apache.axis.message.MessageElement;
@@ -298,9 +298,9 @@ public class ApplicationDescriptionTool extends BaseGridTool
 	
 	static private class DeployPrinter implements IUploadProgressListener
 	{
-		private PrintStream _out;
+		private PrintWriter _out;
 		
-		public DeployPrinter(PrintStream out)
+		public DeployPrinter(PrintWriter out)
 		{
 			_out = out;
 		}

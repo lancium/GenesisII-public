@@ -4,7 +4,7 @@ import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.rmi.RemoteException;
 
 import org.morgan.util.io.StreamUtils;
@@ -18,7 +18,7 @@ public class TTYWatcher
 	
 	static private WatcherThread _watcherThread = null;
 	
-	synchronized static public void watch(PrintStream stdout, PrintStream stderr,
+	synchronized static public void watch(PrintWriter stdout, PrintWriter stderr,
 		EndpointReferenceType tty) throws TTYException, RemoteException, 
 			FileNotFoundException, IOException
 	{
@@ -41,12 +41,12 @@ public class TTYWatcher
 	
 	static private class WatcherThread extends Thread implements Closeable
 	{
-		private PrintStream _out;
-		private PrintStream _err;
+		private PrintWriter _out;
+		private PrintWriter _err;
 		private InputStream _in;
 		private boolean _quit;
 		
-		public WatcherThread(PrintStream out, PrintStream err,
+		public WatcherThread(PrintWriter out, PrintWriter err,
 			EndpointReferenceType epr)
 				throws RemoteException, IOException,
 					FileNotFoundException
@@ -88,7 +88,7 @@ public class TTYWatcher
 					int read = _in.read(data);
 					if (read < 0)
 						return;
-					_out.write(data, 0, read);
+					_out.write(new String(data, 0, read));
 					_out.flush();
 				}
 				catch (Throwable cause)

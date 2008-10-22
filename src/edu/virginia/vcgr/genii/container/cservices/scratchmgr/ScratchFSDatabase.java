@@ -13,46 +13,34 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
+
 public class ScratchFSDatabase
 {
+	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(ScratchFSDatabase.class);
 	
-	public ScratchFSDatabase(Connection conn)
+	public ScratchFSDatabase(Connection conn) throws SQLException
 	{
-		Statement stmt = null;
-		
-		try
-		{
-			stmt = conn.createStatement();
-			
-			stmt.executeUpdate("CREATE TABLE swapmgrdirectories (" +
+		DatabaseTableUtils.createTables(conn, false,
+			"CREATE TABLE swapmgrdirectories (" +
 				"dirid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
 				"directory VARCHAR(512) UNIQUE NOT NULL, " +
-				"lastidlestart TIMESTAMP)");
-			stmt.executeUpdate("CREATE TABLE swapmgrdirectoryreservations (" +
+				"lastidlestart TIMESTAMP)",
+			"CREATE TABLE swapmgrdirectoryreservations (" +
 				"reservationid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
 				"dirid BIGINT NOT NULL, timeacquired TIMESTAMP NOT NULL, " +
 				"CONSTRAINT swapmgrdirresdiridfk " +
 					"FOREIGN KEY (dirid) " +
-					"REFERENCES swapmgrdirectories (dirid))");
-			stmt.executeUpdate("CREATE INDEX swapmgrdirdirectoryidx " +
-				"ON swapmgrdirectories (directory)");
-			stmt.executeUpdate("CREATE INDEX swapmgrdirlastidlestartidx " +
-				"ON swapmgrdirectories (lastidlestart)");
-			stmt.executeUpdate("CREATE INDEX swapmgrdirresdirididx " +
-				"ON swapmgrdirectoryreservations (dirid)");
-			stmt.executeUpdate("CREATE INDEX swapmgrdirrestimeacquiredidx " +
+					"REFERENCES swapmgrdirectories (dirid))",
+			"CREATE INDEX swapmgrdirdirectoryidx " +
+				"ON swapmgrdirectories (directory)",
+			"CREATE INDEX swapmgrdirlastidlestartidx " +
+				"ON swapmgrdirectories (lastidlestart)",
+			"CREATE INDEX swapmgrdirresdirididx " +
+				"ON swapmgrdirectoryreservations (dirid)",
+			"CREATE INDEX swapmgrdirrestimeacquiredidx " +
 				"ON swapmgrdirectoryreservations (timeacquired)");
-		}
-		catch (SQLException sqe)
-		{
-			_logger.warn("Unable to create tables -- probably they exist.", 
-				sqe);
-		}
-		finally
-		{
-			StreamUtils.close(stmt);
-		}
 	}
 	
 	public void cleanupExpiredReservations(

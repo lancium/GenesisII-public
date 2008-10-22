@@ -1,7 +1,7 @@
 package edu.virginia.vcgr.genii.client.cmd;
 
-import java.io.BufferedReader;
-import java.io.PrintStream;
+import java.io.Reader;
+import java.io.Writer;
 
 public interface ITool
 {
@@ -11,6 +11,6 @@ public interface ITool
 	
 	public void addArgument(String argument) throws ToolException;
 	
-	public int run(PrintStream out, PrintStream err, BufferedReader in)
+	public int run(Writer out, Writer err, Reader in)
 		throws Throwable;
 }

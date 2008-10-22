@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.client.cmd;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -127,7 +128,8 @@ public class Driver extends ApplicationBase
 				String []passArgs = new String[args.length - firstArg];
 				System.arraycopy(args, firstArg, passArgs, 0, passArgs.length);
 
-				runner.runCommand(passArgs, System.out, System.err, in);
+				runner.runCommand(passArgs, new OutputStreamWriter(System.out),
+					new OutputStreamWriter(System.err), in);
 				
 				long elapsed = System.currentTimeMillis() - startTime;
 				
@@ -164,7 +166,8 @@ public class Driver extends ApplicationBase
 		try
 		{	
 			System.exit(
-				runner.runCommand(args, System.out, System.err, in));
+				runner.runCommand(args, new OutputStreamWriter(System.out),
+					new OutputStreamWriter(System.err), in));
 		}
 		catch (ReloadShellException re)
 		{

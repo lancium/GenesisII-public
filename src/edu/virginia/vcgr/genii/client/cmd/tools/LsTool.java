@@ -1,6 +1,6 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -152,7 +152,7 @@ public class LsTool extends BaseGridTool
 	}
 	
 
-	static private void printEntry(PrintStream out, RNSPath path,
+	static private void printEntry(PrintWriter out, RNSPath path,
 		boolean isLong, boolean isAll, boolean isEPR)
 		throws RNSException, ResourceException
 	{
@@ -160,7 +160,7 @@ public class LsTool extends BaseGridTool
 			path, isLong, isAll, isEPR);
 	}
 	
-	static private void printEntry(PrintStream out, TypeInformation type,
+	static private void printEntry(PrintWriter out, TypeInformation type,
 		RNSPath path, boolean isLong, boolean isAll, boolean isEPR)
 		throws RNSException, ResourceException
 	{

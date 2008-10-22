@@ -65,7 +65,7 @@ public class CatTool extends BaseGridTool
 		{
 			in = ByteIOStreamFactory.createInputStream(file);
 			while ( (read = in.read(data)) >= 0)
-				stdout.write(data, 0, read);
+				stdout.write(new String(data, 0, read));
 		}
 		finally
 		{

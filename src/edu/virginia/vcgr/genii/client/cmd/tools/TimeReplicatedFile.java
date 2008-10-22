@@ -1,8 +1,5 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cmd.CommandLineRunner;
@@ -61,7 +58,7 @@ public class TimeReplicatedFile extends BaseGridTool
 		CommandLineRunner runner = new CommandLineRunner();
 		runner.runCommand(new String[] {
 			"rm", getArgument(1) + "-Replicas/Copy_1_on_" + getArgument(2)
-		}, System.out, System.err, new BufferedReader(new InputStreamReader(System.in)));
+		}, stdout, stderr, stdin);
 		
 		startTime = System.currentTimeMillis();
 		for (int lcv = 0; lcv < 100; lcv++)

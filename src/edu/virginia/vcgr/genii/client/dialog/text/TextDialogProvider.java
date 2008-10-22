@@ -1,7 +1,7 @@
 package edu.virginia.vcgr.genii.client.dialog.text;
 
 import java.io.BufferedReader;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import edu.virginia.vcgr.genii.client.dialog.CheckBoxDialog;
 import edu.virginia.vcgr.genii.client.dialog.CheckBoxItem;
@@ -20,7 +20,7 @@ public class TextDialogProvider implements DialogProvider
 {
 	private ConsolePackage _package;
 	
-	public TextDialogProvider(PrintStream stdout, PrintStream stderr, 
+	public TextDialogProvider(PrintWriter stdout, PrintWriter stderr, 
 		BufferedReader stdin)
 	{
 		_package = new ConsolePackage(stdout, stderr, stdin);

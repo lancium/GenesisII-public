@@ -1,7 +1,7 @@
 package edu.virginia.vcgr.genii.client.cmd.tools.gamllogin;
 
 import java.io.BufferedReader;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Collection;
 
 import edu.virginia.vcgr.genii.client.gui.MenuDialog;
@@ -11,7 +11,7 @@ import edu.virginia.vcgr.genii.client.cmd.tools.gamllogin.CertEntry;
 public class GuiGamlLoginHandler extends AbstractGamlLoginHandler
 {
 	public GuiGamlLoginHandler(
-		PrintStream out, PrintStream err, BufferedReader in)
+		PrintWriter out, PrintWriter err, BufferedReader in)
 	{
 		super(out, err, in);
 	}

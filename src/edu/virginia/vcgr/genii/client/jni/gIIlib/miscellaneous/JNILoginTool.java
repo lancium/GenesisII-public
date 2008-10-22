@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.client.jni.gIIlib.miscellaneous;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
 import edu.virginia.vcgr.genii.client.cmd.CommandLineRunner;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
@@ -23,7 +24,10 @@ public class JNILoginTool extends JNILibraryBase
 		String[] args = {"login"};						
 		
 		try{
-			runner.runCommand(args, System.out, System.err, new BufferedReader(new InputStreamReader(System.in)));
+			runner.runCommand(args, 
+				new OutputStreamWriter(System.out),
+				new OutputStreamWriter(System.err),
+				new BufferedReader(new InputStreamReader(System.in)));
 			
 			// Checks to make sure login worked
 			ICallingContext callContext = ContextManager.getCurrentContext(false);

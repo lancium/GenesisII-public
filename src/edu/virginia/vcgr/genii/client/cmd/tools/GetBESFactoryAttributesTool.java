@@ -1,7 +1,5 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
-import java.io.OutputStreamWriter;
-
 import javax.xml.namespace.QName;
 
 import org.ggf.bes.factory.GetFactoryAttributesDocumentResponseType;
@@ -39,10 +37,9 @@ public class GetBESFactoryAttributesTool extends BaseGridTool
 		GetFactoryAttributesDocumentResponseType resp =
 			bes.getFactoryAttributesDocument(new GetFactoryAttributesDocumentType());
 		
-		OutputStreamWriter writer = new OutputStreamWriter(stdout);
-		ObjectSerializer.serialize(writer, resp, 
+		ObjectSerializer.serialize(stdout, resp, 
 			new QName("http://tempuri.org", "bes-factory-attributes"));
-		writer.flush();
+		stdout.flush();
 		
 		return 0;
 	}

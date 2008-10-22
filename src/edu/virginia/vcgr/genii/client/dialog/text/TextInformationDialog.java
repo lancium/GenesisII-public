@@ -1,6 +1,6 @@
 package edu.virginia.vcgr.genii.client.dialog.text;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import edu.virginia.vcgr.genii.client.dialog.InformationDialog;
 import edu.virginia.vcgr.genii.client.dialog.InputValidator;
@@ -28,7 +28,7 @@ public class TextInformationDialog extends TextInputDialog
 	@Override
 	protected void showContent()
 	{
-		PrintStream stream = 
+		PrintWriter stream = 
 			(_isError ? _package.stderr() : _package.stdout());
 		
 		stream.println();
