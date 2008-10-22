@@ -69,8 +69,8 @@ public abstract class BaseGridTool implements ITool
 	{
 		try
 		{
-			stdout = (out instanceof PrintWriter) ? (PrintWriter)out : new PrintWriter(out);
-			stderr = (err instanceof PrintWriter) ? (PrintWriter)err : new PrintWriter(err);
+			stdout = (out instanceof PrintWriter) ? (PrintWriter)out : new PrintWriter(out, true);
+			stderr = (err instanceof PrintWriter) ? (PrintWriter)err : new PrintWriter(err, true);
 			stdin = (in instanceof BufferedReader) ? (BufferedReader)in : new BufferedReader(in);
 			try
 			{
