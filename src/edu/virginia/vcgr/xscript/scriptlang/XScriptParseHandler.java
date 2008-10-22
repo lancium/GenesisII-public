@@ -439,7 +439,8 @@ public class XScriptParseHandler implements ParseHandler
 		Element element) throws ScriptException
 	{
 		CallStatement ret = new CallStatement(
-			XScriptParser.getRequiredAttribute(element, "function"));
+			XScriptParser.getRequiredAttribute(element, "function"),
+			XScriptParser.getAttribute(element, "property", null));
 		
 		NodeList children = element.getChildNodes();
 		int length = children.getLength();
@@ -456,6 +457,22 @@ public class XScriptParseHandler implements ParseHandler
 		}
 		
 		return ret;
+	}
+	
+	static private ParseStatement parseReturn(ParseContext context,
+		Element element) throws ScriptException
+	{
+		String property = XScriptParser.getAttribute(
+			element, "property", null);
+		String value = XScriptParser.getAttribute(element, "value", null);
+		
+		if (property != null)
+			return new ReturnStatement(property, null, null);
+		else if (value != null)
+			return new ReturnStatement(null, value, null);
+		
+		return new ReturnStatement(null, null,
+			parseBlock(context, element.getChildNodes()));
 	}
 	
 	@Override
@@ -512,6 +529,8 @@ public class XScriptParseHandler implements ParseHandler
 			return parseFunction(context, element);
 		else if (name.equals("call"))
 			return parseCall(context, element);
+		else if (name.equals("return"))
+			return parseReturn(context, element);
 		else
 			throw new ScriptException(String.format(
 				"Unrecognized node name <{%s}:%s>.",

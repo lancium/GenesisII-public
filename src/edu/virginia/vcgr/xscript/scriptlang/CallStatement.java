@@ -15,11 +15,13 @@ import edu.virginia.vcgr.xscript.macros.MacroReplacer;
 public class CallStatement implements ParseStatement
 {
 	private String _functionName;
+	private String _property;
 	private Collection<ParseStatement> _parameters;
 	
-	public CallStatement(String functionName)
+	public CallStatement(String functionName, String property)
 	{
 		_functionName = functionName;
+		_property = property;
 		_parameters = new ArrayList<ParseStatement>();
 	}
 	
@@ -45,20 +47,28 @@ public class CallStatement implements ParseStatement
 		for (ParseStatement stmt : _parameters)
 			parameters[lcv++] = stmt.evaluate(context);
 		
+		Object ret;
+		
 		try
 		{
 			context.push();		
 			context.setAttribute("ARGV", parameters);
 			
-			return ((ParseStatement)functionObj).evaluate(context);
+			ret = ((ParseStatement)functionObj).evaluate(context);
 		}
 		catch (ReturnFromFunctionException rffe)
 		{
-			return rffe.getResult();
+			ret = rffe.getResult();
 		}
 		finally
 		{
 			context.pop();
 		}
+		
+		if (_property != null)
+			context.setAttribute(MacroReplacer.replaceMacros(
+				context, _property), ret);
+		
+		return ret;
 	}
 }
