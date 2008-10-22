@@ -12,6 +12,25 @@ public class XScriptContext
 {
 	private Stack<Bindings> _bindings = new Stack<Bindings>();
 	
+	private Throwable _lastException = null;
+	
+	public void setException(Throwable e)
+	{
+		_lastException = e;
+	}
+	
+	public Throwable getLastException()
+	{
+		try
+		{
+			return _lastException;
+		}
+		finally
+		{
+			_lastException = null;
+		}
+	}
+	
 	@Override
 	public Object getAttribute(String name, int scope)
 	{
