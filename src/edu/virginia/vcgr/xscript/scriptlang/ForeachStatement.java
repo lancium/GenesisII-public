@@ -8,6 +8,11 @@ import java.util.regex.Pattern;
 
 import javax.script.ScriptException;
 
+import edu.virginia.vcgr.genii.client.rns.RNSException;
+import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
+import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
+import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.xscript.EarlyExitException;
 import edu.virginia.vcgr.xscript.ParseStatement;
 import edu.virginia.vcgr.xscript.ReturnFromFunctionException;
@@ -42,19 +47,17 @@ public class ForeachStatement implements ParseStatement
 	{
 		File dir = new File(sourceDir);
 		if (!dir.exists())
-			throw new ScriptException(String.format(
-				"Source directory \"%s\" does not exist.", sourceDir));
+			return null;
 		if (!dir.isDirectory())
-			throw new ScriptException(String.format(
-				"Source directory \"%s\" is not a directory.", sourceDir));
+			return null;
 		
 		Object ret = null;
 		
-		for (String path : dir.list())
+		for (File entry : dir.listFiles())
 		{
-			if (filter == null || filter.matcher(path).matches())
+			if (filter == null || filter.matcher(entry.getName()).matches())
 			{
-				context.setAttribute(paramName, path);
+				context.setAttribute(paramName, entry.getName());
 				ret = _innerStatement.evaluate(context);
 			}
 		}
@@ -87,7 +90,7 @@ public class ForeachStatement implements ParseStatement
 		}
 		catch (IOException ioe)
 		{
-			throw new ScriptException(ioe);
+			return null;
 		}
 		finally
 		{
@@ -101,7 +104,37 @@ public class ForeachStatement implements ParseStatement
 			throws ScriptException,	EarlyExitException, 
 				ReturnFromFunctionException
 	{
-		throw new ScriptException("Foreach of RNS space not implemented yet.");
+		Object ret = null;
+		
+		RNSPath targetPath;
+		try
+		{
+			targetPath = RNSPath.getCurrent().lookup(
+				sourceRNS, RNSPathQueryFlags.MUST_EXIST);
+		
+			for (RNSPath entry : targetPath.listContents())
+			{
+				if ( (filter == null) || (filter.matcher(entry.getName()).matches()) )
+				{
+					context.setAttribute(paramName, entry.getName());
+					ret = _innerStatement.evaluate(context);
+				}
+			}
+		} 
+		catch (RNSPathDoesNotExistException e)
+		{
+			return null;
+		}
+		catch (RNSPathAlreadyExistsException e)
+		{
+			throw new ScriptException(e);
+		}
+		catch (RNSException rne)
+		{
+			return null;
+		}
+		
+		return ret;
 	}
 
 	@Override

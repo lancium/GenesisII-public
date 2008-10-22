@@ -268,11 +268,12 @@ public class XScriptParseHandler implements ParseHandler
 				"required inside of a <{%s}:%s> node.", 
 				element.getNamespaceURI(), element.getLocalName()));
 		
-		ParseStatement innerStatement = parse(context, element);
+		ParseStatement innerStatement = parseBlock(
+			context, element.getChildNodes());
 		
-		return new ForStatement(
+		return new ScopeStatement(new ForStatement(
 			paramName, initialValue, inclusiveLimit, exclusiveLimit,
-			incrementValue, innerStatement);
+			incrementValue, innerStatement));
 	}
 	
 	private ParseStatement parseForeach(ParseContext context,
@@ -304,19 +305,52 @@ public class XScriptParseHandler implements ParseHandler
 				"<{%s}:%s> node.", element.getNamespaceURI(), 
 				element.getLocalName()));
 		
-		ParseStatement innerStatement = parse(context, element);
+		ParseStatement innerStatement = parseBlock(
+			context, element.getChildNodes());
 		
-		return new ForeachStatement(
+		return new ScopeStatement(new ForeachStatement(
 			paramName, filter, sourceDir, sourceFile, sourceRNS, 
-			innerStatement);
+			innerStatement));
 	}
 	
-	private ParseStatement parseXScriptNode(
-		ParseContext context, Element element) throws ScriptException
+	static private ParseStatement parseBlock(ParseContext context,
+		NodeList nodes) throws ScriptException
+	{
+		BlockStatement ret = new BlockStatement();
+		
+		int length = nodes.getLength();
+		for (int lcv = 0; lcv < length; lcv++)
+		{
+			Node n = nodes.item(lcv);
+			if (n.getNodeType() == Node.ELEMENT_NODE)
+			{
+				Element child = (Element)n;
+				ret.addStatement(
+					context.findHandler(
+						child.getNamespaceURI()).parse(context, child));
+			}
+		}
+		
+		return ret;
+	}
+	
+	static private ParseStatement parseScript(ParseContext context,
+		Element element) throws ScriptException
+	{
+		return new ScopeStatement(parseBlock(context, element.getChildNodes()));
+	}
+	
+	@Override
+	public ParseStatement parse(ParseContext context, Element element)
+		throws ScriptException
 	{
 		String name = element.getLocalName();
 		
-		if (name.equals("echo"))
+		if (name.equals("script"))
+			return parseScript(context, element);
+		else if (name.equals("param"))
+			return parseParam(context, element);
+		else if (name.equals("echo"))
 			return parseEcho(context, element);
 		else if (name.equals("define"))
 			return parseDefine(context, element);
@@ -332,19 +366,7 @@ public class XScriptParseHandler implements ParseHandler
 			return parseFor(context, element);
 		else if (name.equals("foreach"))
 			return parseForeach(context, element);
-		else
-			throw new ScriptException(
-				String.format("Don't know how to parse element <{%s}:%s>.",
-					XScriptConstants.XSCRIPT_NS, name));
-	}
-	
-	@Override
-	public ParseStatement parse(ParseContext context, Element element)
-		throws ScriptException
-	{
-		String name = element.getLocalName();
-		
-		if (name.equals("equals"))
+		else if (name.equals("equals"))
 			return parseEquals(context, element);
 		else if (name.equals("istrue"))
 			return parseIsTrueFalse(context, element, true);
@@ -364,33 +386,9 @@ public class XScriptParseHandler implements ParseHandler
 			return parseAndOrXor(context, element, "xor");
 		else if (name.equals("not"))
 			return parseNot(context, element);
-		else if (name.equals("param"))
-			return parseParam(context, element);
 		else
-		{
-			ScopeStatement ret = new ScopeStatement();
-			NodeList children = element.getChildNodes();
-			int length = children.getLength();
-			for (int lcv = 0; lcv < length; lcv++)
-			{
-				Node child = children.item(lcv);
-				if (child.getNodeType() == Node.ELEMENT_NODE)
-				{
-					String ns = child.getNamespaceURI();
-					if (ns.equals(XScriptConstants.XSCRIPT_NS))
-					{
-						ret.addStatement(parseXScriptNode(
-							context, (Element)child));	
-					} else
-					{
-						ret.addStatement(
-							context.findHandler(ns).parse(
-								context, (Element)child));
-					}
-				}
-			}
-			
-			return ret;
-		}
+			throw new ScriptException(String.format(
+				"Unrecognized node name <{%s}:%s>.",
+				element.getNamespaceURI(), name));
 	}
 }

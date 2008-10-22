@@ -35,7 +35,7 @@ public class GridCommandStatement implements ParseStatement
 		cLine[0] = _commandName;
 		int lcv = 1;
 		for (ParseStatement stmt : _arguments)
-			cLine[lcv] = stmt.evaluate(context).toString();
+			cLine[lcv++] = stmt.evaluate(context).toString();
 		
 		try
 		{

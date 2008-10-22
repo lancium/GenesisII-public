@@ -1,5 +1,8 @@
 package edu.virginia.vcgr.xscript.scriptlang;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
 import javax.script.ScriptException;
 
 import edu.virginia.vcgr.xscript.EarlyExitException;
@@ -7,27 +10,27 @@ import edu.virginia.vcgr.xscript.ParseStatement;
 import edu.virginia.vcgr.xscript.ReturnFromFunctionException;
 import edu.virginia.vcgr.xscript.XScriptContext;
 
-public class ScopeStatement implements ParseStatement
+public class BlockStatement implements ParseStatement
 {
-	private ParseStatement _stmt;
+	private Collection<ParseStatement> _statements = 
+		new LinkedList<ParseStatement>();
 	
-	public ScopeStatement(ParseStatement stmt)
+	public void addStatement(ParseStatement stmt)
 	{
-		_stmt = stmt;
+		_statements.add(stmt);
 	}
 	
 	@Override
 	public Object evaluate(XScriptContext context) throws ScriptException,
 			EarlyExitException, ReturnFromFunctionException
 	{
-		context.push();
-		try
+		Object result = null;
+		
+		for (ParseStatement stmt : _statements)
 		{
-			return _stmt.evaluate(context);
+			result = stmt.evaluate(context);
 		}
-		finally
-		{
-			context.pop();
-		}
+		
+		return result;
 	}
 }
