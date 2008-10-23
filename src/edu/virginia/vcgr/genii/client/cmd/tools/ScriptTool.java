@@ -1,7 +1,9 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
-import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
 import java.util.Map;
@@ -15,9 +17,13 @@ import javax.script.ScriptException;
 
 import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.xscript.jsr.Grid;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
+import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 
 public class ScriptTool extends BaseGridTool
 {
@@ -39,6 +45,32 @@ public class ScriptTool extends BaseGridTool
 			return "xml";
 		
 		return filename.substring(index + 1);
+	}
+	
+	static private Reader openReader(String path) throws IOException
+	{
+		try
+		{
+			if (path.startsWith("rns:"))
+			{
+				return new InputStreamReader(
+					ByteIOStreamFactory.createInputStream(
+						RNSPath.getCurrent().lookup(path.substring(4)), true));
+			} else
+			{
+				return new FileReader(path);
+			}
+		}
+		catch (RNSPathDoesNotExistException rpdnee)
+		{
+			throw new FileNotFoundException(String.format(
+				"The path %s does not exist.", path));
+		}
+		catch (RNSException rne)
+		{
+			throw new IOException(String.format(
+				"Unable to open file %s.", path), rne);
+		}
 	}
 	
 	@Override
@@ -70,34 +102,27 @@ public class ScriptTool extends BaseGridTool
 		}
 		
 		String scriptFileStr = getArgument(lcv);
-		File scriptFile = new File(scriptFileStr);
-		if (!scriptFile.exists())
-		{
-			stderr.println("Couldn't locate script file \""
-				+ scriptFile.getAbsolutePath() + "\".");
-			return 1;
-		}
 		
 		String []cArgs = new String[args.size() - lcv];
 		int start = lcv;
 		for (;lcv < args.size(); lcv++)
 			cArgs[lcv - start] = args.get(lcv);
 		
+		String extension = getExtension(scriptFileStr);
+		ScriptEngineManager manager = new ScriptEngineManager();
+		ScriptEngine engine = manager.getEngineByExtension(extension);
+		engine.put("grid", new Grid(
+			initialProperties, stdin, stdout, stderr));
+		Bindings b = engine.getBindings(ScriptContext.GLOBAL_SCOPE);
+		b.put("ARGV", cArgs);
+		for (Object property : initialProperties.keySet())
+			b.put((String)property, 
+				initialProperties.get(property));
+			
 		Reader reader = null;
 		try
-		{
-			String extension = getExtension(scriptFile.getName());
-			ScriptEngineManager manager = new ScriptEngineManager();
-			ScriptEngine engine = manager.getEngineByExtension(extension);
-			engine.put("grid", new Grid(
-				initialProperties, stdin, stdout, stderr));
-			reader = new FileReader(scriptFile);
-			Bindings b = engine.getBindings(ScriptContext.GLOBAL_SCOPE);
-			b.put("ARGV", cArgs);
-			for (Object property : initialProperties.keySet())
-				b.put((String)property, 
-					initialProperties.get(property));
-			
+		{	
+			reader = openReader(scriptFileStr);
 			engine.eval(reader);
 			return 0;
 		}
