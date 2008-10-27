@@ -1,7 +1,8 @@
 package edu.virginia.vcgr.genii.client.cmd;
 
 import java.io.FileNotFoundException;
-import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.Writer;
 
 import org.apache.axis.AxisFault;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
@@ -10,8 +11,15 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.PermissionDeniedExcepti
 
 public class SimpleExceptionHandler implements IExceptionHandler
 {
-	public int handleException(Throwable cause, PrintStream errorStream)
+	public int handleException(Throwable cause, Writer eStream)
 	{
+		PrintWriter errorStream;
+		
+		if (eStream instanceof PrintWriter)
+			errorStream = (PrintWriter)eStream;
+		else
+			errorStream = new PrintWriter(eStream);
+		
 		String tab = "";
 		StringBuilder builder = new StringBuilder();
 
@@ -49,6 +57,8 @@ public class SimpleExceptionHandler implements IExceptionHandler
 		}
 
 		errorStream.print(builder);
+		errorStream.flush();
+		
 		return 1;
 	}
 }

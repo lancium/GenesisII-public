@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.client.cmd;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Properties;
 
@@ -98,7 +99,7 @@ public class Driver extends ApplicationBase
 				catch (IOException ioe)
 				{
 					ExceptionHandlerManager.getExceptionHandler().
-						handleException(ioe, System.err);
+						handleException(ioe, new OutputStreamWriter(System.err));
 					break;
 				}
 	
@@ -151,7 +152,7 @@ public class Driver extends ApplicationBase
 				throw e;
 			} catch (Throwable cause) {
 				ExceptionHandlerManager.getExceptionHandler().
-					handleException(cause, System.err);
+					handleException(cause, new OutputStreamWriter(System.err));
 			}
 		}
 		
@@ -176,7 +177,7 @@ public class Driver extends ApplicationBase
 		catch (Throwable cause)
 		{
 			ExceptionHandlerManager.getExceptionHandler().
-				handleException(cause, System.err);
+				handleException(cause, new OutputStreamWriter(System.err));
 			System.exit(1);
 		}
 	}
