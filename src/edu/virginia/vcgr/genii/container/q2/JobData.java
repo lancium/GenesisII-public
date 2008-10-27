@@ -12,6 +12,7 @@ import edu.virginia.vcgr.genii.client.queue.QueueStates;
  */
 public class JobData
 {
+	static private final long BACKOFF = 60 * 1000L;
 	/**
 	 * This variable is used internally by the queue to maintain the current
 	 * "active" state of a job.  Is it in the process of being created or
@@ -70,6 +71,14 @@ public class JobData
 	 * that we are running on (or starting on).
 	 */
 	private Long _besID;
+	
+	/**
+	 * This date is used for exponential backoff.  If a job fails for a reason
+	 * that increases the attempt number, then we exponentially back off the
+	 * next time at which we can try running it.  This helps with resource
+	 * contention.
+	 */
+	private Date _nextValidRunTime = null;
 	
 	public JobData(long jobID, String jobTicket, short priority,
 		QueueStates jobState, Date submitTime, short runAttempts, Long besID)
@@ -179,5 +188,27 @@ public class JobData
 	public void clearJobAction()
 	{
 		_jobAction = null;
+	}
+	
+	public boolean canRun(Date now)
+	{
+		if (_nextValidRunTime == null)
+			return true;
+		
+		if (now.after(_nextValidRunTime))
+			return true;
+		
+		return false;
+	}
+	
+	public void setNextValidRunTime(Date now)
+	{
+		_nextValidRunTime = new Date(
+			now.getTime() + (BACKOFF << _runAttempts));
+	}
+	
+	public Date getNextCanRun()
+	{
+		return _nextValidRunTime;
 	}
 }

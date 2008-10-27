@@ -42,7 +42,7 @@ class QSubApplicationUnderstanding
 		
 		FilesystemManager fsManager = getFilesystemManager();
 		executionPlan.add(new PrepareApplicationPhase(
-			fsManager.lookup(getExecutable())));
+			fsManager, getExecutable()));
 		
 		Map<String, StringOrPath> env = getEnvironment();
 		env.put("GENII_DEPLOYMENT_NAME", 

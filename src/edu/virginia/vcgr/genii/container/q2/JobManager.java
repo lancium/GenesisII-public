@@ -240,7 +240,10 @@ public class JobManager implements Closeable
 		
 		/* Increment his attempt count if this counts against him. */
 		if (countAsAnAttempt)
+		{
 			job.incrementRunAttempts();
+			job.setNextValidRunTime(new Date());
+		}
 		
 		short attempts = job.getRunAttempts();
 		QueueStates newState;
@@ -1146,6 +1149,7 @@ public class JobManager implements Closeable
 			Connection connection = null;
 			EntryType entryType;
 			HashMap<Long, EntryType> entries = new HashMap<Long, EntryType>();
+			JobData data = null;
 			
 			try
 			{
@@ -1163,7 +1167,6 @@ public class JobManager implements Closeable
 				 */
 				entries.put(new Long(_besID), entryType = new EntryType());
 				_database.fillInBESEPRs(connection, entries);
-				JobData data;
 				
 				synchronized(_manager)
 				{
@@ -1271,6 +1274,9 @@ public class JobManager implements Closeable
 				
 				if (countAgainstBES)
 					_besManager.markBESAsUnavailable(_besID);
+				
+				if (data != null && countAgainstJob)
+					data.setNextValidRunTime(new Date());
 				
 				try 
 				{

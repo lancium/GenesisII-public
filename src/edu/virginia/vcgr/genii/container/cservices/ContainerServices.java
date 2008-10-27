@@ -59,6 +59,8 @@ public class ContainerServices
 			throw new ConfigurationException("Container Services already loaded.");
 	
 		DatabaseConnectionPool connectionPool = findConnectionPool();
+		ContainerServicesProperties properties = new ContainerServicesProperties(
+			connectionPool);
 		
 		_services = new HashMap<String, ContainerService>();
 	
@@ -80,7 +82,7 @@ public class ContainerServices
 						_services.put(service.serviceName(), service);
 						try
 						{
-							service.load(connectionPool);
+							service.load(connectionPool, properties);
 						}
 						catch (Throwable cause)
 						{

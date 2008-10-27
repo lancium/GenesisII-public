@@ -1246,19 +1246,22 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	private void setResourceProperties(DeleteType del)
 		throws RemoteException
 	{
-		QName rp = del.getResourceProperty();
-		
-		IAttributeManipulator manipulator =
-			_attributePackage.getManipulator(rp);
+		if (del != null)
+		{
+			QName rp = del.getResourceProperty();
 			
-		if (manipulator == null)
-			FaultManipulator.fillInFault(
-				new InvalidResourcePropertyQNameFaultType(
-					null, null, null, null, new BaseFaultTypeDescription[] {
-						new BaseFaultTypeDescription("The resource property " + rp + " is unknown.")
-					}, null));
-			
-		manipulator.setAttributeValues(new ArrayList<MessageElement>());
+			IAttributeManipulator manipulator =
+				_attributePackage.getManipulator(rp);
+				
+			if (manipulator == null)
+				FaultManipulator.fillInFault(
+					new InvalidResourcePropertyQNameFaultType(
+						null, null, null, null, new BaseFaultTypeDescription[] {
+							new BaseFaultTypeDescription("The resource property " + rp + " is unknown.")
+						}, null));
+				
+			manipulator.setAttributeValues(new ArrayList<MessageElement>());
+		}
 	}
 	
 	private void setResourceProperties(InsertType ins) throws RemoteException
@@ -1266,34 +1269,37 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		HashMap<QName, Collection<MessageElement>> map =
 			new HashMap<QName, Collection<MessageElement>>();
 		
-		MessageElement []any = ins.get_any();
-		for (MessageElement elem : any)
+		if (ins != null)
 		{
-			QName name = elem.getQName();
-			Collection<MessageElement> list = map.get(name);
-			if (list == null)
-				map.put(name, list = new ArrayList<MessageElement>());
-			list.add(elem);
-		}
-		
-		for (QName attrName : map.keySet())
-		{
-			Collection<MessageElement> newAttrs = map.get(attrName);
-			
-			IAttributeManipulator manip = getAttributePackage().getManipulator(attrName);
-			if (manip == null)
+			MessageElement []any = ins.get_any();
+			for (MessageElement elem : any)
 			{
-				FaultManipulator.fillInFault(
-					new InvalidResourcePropertyQNameFaultType(
-						null, null, null, null, new BaseFaultTypeDescription[] {
-							new BaseFaultTypeDescription("The resource property " + attrName + " is unknown.")
-						}, null));
+				QName name = elem.getQName();
+				Collection<MessageElement> list = map.get(name);
+				if (list == null)
+					map.put(name, list = new ArrayList<MessageElement>());
+				list.add(elem);
 			}
 			
-			Collection<MessageElement> oldValues = new ArrayList<MessageElement>(
-				manip.getAttributeValues());
-			oldValues.addAll(newAttrs);
-			manip.setAttributeValues(oldValues);
+			for (QName attrName : map.keySet())
+			{
+				Collection<MessageElement> newAttrs = map.get(attrName);
+				
+				IAttributeManipulator manip = getAttributePackage().getManipulator(attrName);
+				if (manip == null)
+				{
+					FaultManipulator.fillInFault(
+						new InvalidResourcePropertyQNameFaultType(
+							null, null, null, null, new BaseFaultTypeDescription[] {
+								new BaseFaultTypeDescription("The resource property " + attrName + " is unknown.")
+							}, null));
+				}
+				
+				Collection<MessageElement> oldValues = new ArrayList<MessageElement>(
+					manip.getAttributeValues());
+				oldValues.addAll(newAttrs);
+				manip.setAttributeValues(oldValues);
+			}
 		}
 	}
 	
@@ -1303,31 +1309,34 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		HashMap<QName, Collection<MessageElement>> map =
 			new HashMap<QName, Collection<MessageElement>>();
 		
-		MessageElement []any = update.get_any();
-		for (MessageElement elem : any)
+		if (update != null)
 		{
-			QName name = elem.getQName();
-			Collection<MessageElement> list = map.get(name);
-			if (list == null)
-				map.put(name, list = new ArrayList<MessageElement>());
-			list.add(elem);
-		}
-		
-		for (QName attrName : map.keySet())
-		{
-			Collection<MessageElement> newAttrs = map.get(attrName);
-			
-			IAttributeManipulator manip = getAttributePackage().getManipulator(attrName);
-			if (manip == null)
+			MessageElement []any = update.get_any();
+			for (MessageElement elem : any)
 			{
-				throw FaultManipulator.fillInFault(
-					new InvalidResourcePropertyQNameFaultType(
-						null, null, null, null, new BaseFaultTypeDescription[] {
-							new BaseFaultTypeDescription("The resource property " + attrName + " is unknown.")
-						}, null));
+				QName name = elem.getQName();
+				Collection<MessageElement> list = map.get(name);
+				if (list == null)
+					map.put(name, list = new ArrayList<MessageElement>());
+				list.add(elem);
 			}
 			
-			manip.setAttributeValues(newAttrs);
+			for (QName attrName : map.keySet())
+			{
+				Collection<MessageElement> newAttrs = map.get(attrName);
+				
+				IAttributeManipulator manip = getAttributePackage().getManipulator(attrName);
+				if (manip == null)
+				{
+					throw FaultManipulator.fillInFault(
+						new InvalidResourcePropertyQNameFaultType(
+							null, null, null, null, new BaseFaultTypeDescription[] {
+								new BaseFaultTypeDescription("The resource property " + attrName + " is unknown.")
+							}, null));
+				}
+				
+				manip.setAttributeValues(newAttrs);
+			}
 		}
 	}
 	

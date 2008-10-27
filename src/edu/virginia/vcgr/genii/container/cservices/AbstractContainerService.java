@@ -9,6 +9,7 @@ public abstract class AbstractContainerService implements ContainerService
 	private boolean _started = false;
 	private String _serviceName;
 	private DatabaseConnectionPool _connectionPool = null;
+	private ContainerServicesProperties _cservicesProperties = null;
 	
 	protected AbstractContainerService(String serviceName)
 	{
@@ -24,10 +25,12 @@ public abstract class AbstractContainerService implements ContainerService
 	protected abstract void loadService() throws Throwable;
 	
 	@Override
-	final synchronized public void load(DatabaseConnectionPool connectionPool)
-		throws Throwable
+	final synchronized public void load(DatabaseConnectionPool connectionPool,
+		ContainerServicesProperties cservicesProperties) throws Throwable
 	{
 		_connectionPool = connectionPool;
+		_cservicesProperties = cservicesProperties;
+		
 		loadService();
 	}
 
@@ -54,5 +57,11 @@ public abstract class AbstractContainerService implements ContainerService
 	public boolean started()
 	{
 		return _started;
+	}
+	
+	@Override
+	public ContainerServicesProperties getContainerServicesProperties()
+	{
+		return _cservicesProperties;
 	}
 }

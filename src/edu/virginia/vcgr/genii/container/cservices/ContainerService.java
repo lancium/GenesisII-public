@@ -7,7 +7,10 @@ public interface ContainerService
 	public boolean started();
 	public String serviceName();
 	
-	public void load(DatabaseConnectionPool connectionPool)
-		throws Throwable;
+	public void load(DatabaseConnectionPool connectionPool,
+		ContainerServicesProperties cservicesProperties)
+			throws Throwable;
 	public void start() throws Throwable;
+	
+	public ContainerServicesProperties getContainerServicesProperties();
 }

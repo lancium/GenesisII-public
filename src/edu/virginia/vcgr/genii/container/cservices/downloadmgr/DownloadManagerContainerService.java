@@ -2,10 +2,12 @@ package edu.virginia.vcgr.genii.container.cservices.downloadmgr;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,6 +18,7 @@ import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.io.URIManager;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.container.cservices.AbstractContainerService;
+import edu.virginia.vcgr.genii.container.cservices.ContainerServicePropertyListener;
 
 public class DownloadManagerContainerService extends AbstractContainerService
 {
@@ -25,33 +28,63 @@ public class DownloadManagerContainerService extends AbstractContainerService
 	static public final String SERVICE_NAME = "Download Manager";
 	
 	static public final String DOWNLOAD_TMP_DIR_PROPERTY = "download-tmpdir";
+	static public final String DOWNLOAD_TMP_DIR_CSERVICE_PROPERTY =
+		"edu.virginia.vcgr.genii.container.cservices.downloadmgr.download-tmpdir";
 	
 	private Map<File, InProgressLock> _inProgressLocks = 
 		new HashMap<File, InProgressLock>();
 	
+	private Object _lockObject = new Object();
+	private String _configuredDownloadTmpDir = null;
 	private File _downloadDirectory;
+	
+	private void selectDownloadDirectory(String propertyValue)
+	{
+		String dirPath;
+		
+		if (propertyValue == null)
+		{
+			if (_configuredDownloadTmpDir == null)
+			{
+				dirPath = String.format("%s/download-tmp",
+					ConfigurationManager.getCurrentConfiguration(
+						).getUserDirectory().getAbsolutePath());
+			} else
+				dirPath = _configuredDownloadTmpDir;
+		} else
+			dirPath = propertyValue;
+		
+		try
+		{
+			synchronized(_lockObject)
+			{
+				_downloadDirectory = new GuaranteedDirectory(
+					dirPath);
+			}
+		}
+		catch (IOException ioe)
+		{
+			throw new ConfigurationException(
+				"Unable to find download manager service directory.",
+				ioe);
+		}
+		
+		for (File f : _downloadDirectory.listFiles())
+			f.delete();	
+	}
+	
+	private void selectDownloadDirectory()
+	{
+		String prop = (String)getContainerServicesProperties().getProperty(
+			DOWNLOAD_TMP_DIR_CSERVICE_PROPERTY);
+		selectDownloadDirectory(prop);	
+	}
 	
 	private DownloadManagerContainerService(String downloadTmpDir)
 	{
 		super(SERVICE_NAME);
 		
-		if (downloadTmpDir == null)
-		{
-			downloadTmpDir = String.format("%s/download-tmp",
-				ConfigurationManager.getCurrentConfiguration(
-					).getUserDirectory().getAbsolutePath());
-		}
-		
-		try
-		{
-			_downloadDirectory = new GuaranteedDirectory(
-				downloadTmpDir);
-		}
-		catch (IOException ioe)
-		{
-			throw new ConfigurationException(
-				"Unable to create download manager service.", ioe);
-		}
+		_configuredDownloadTmpDir = downloadTmpDir;
 	}
 	
 	public DownloadManagerContainerService(Properties constructionProperties)
@@ -68,15 +101,19 @@ public class DownloadManagerContainerService extends AbstractContainerService
 	protected void loadService() throws Throwable
 	{
 		_logger.info("Loading DownloadManager Constainer Service.");
+		
+		getContainerServicesProperties().addPropertyChangeListener(
+			Pattern.compile("^" + 
+				Pattern.quote(DOWNLOAD_TMP_DIR_CSERVICE_PROPERTY) + "$"),
+			new PropertyChangeListener());
+
+		selectDownloadDirectory();
 	}
 
 	@Override
 	protected void startService() throws Throwable
 	{
 		_logger.info("Starting DownloadManager Constainer Service.");
-		
-		for (File f : _downloadDirectory.listFiles())
-			f.delete();
 	}
 	
 	public void download(URI source, File target,
@@ -137,10 +174,25 @@ public class DownloadManagerContainerService extends AbstractContainerService
 	private void doDownload(URI source, File realTarget,
 		UsernamePasswordIdentity credential) throws IOException
 	{
-		File tmpTarget = File.createTempFile(
-			"dload", ".tmp", _downloadDirectory);
+		File tmpTarget;
+		
+		synchronized(_lockObject)
+		{
+			tmpTarget = File.createTempFile(
+				"dload", ".tmp", _downloadDirectory);
+		}
 		
 		URIManager.get(source, tmpTarget, credential);
 		tmpTarget.renameTo(realTarget);
+	}
+	
+	private class PropertyChangeListener 
+		implements ContainerServicePropertyListener
+	{
+		@Override
+		public void propertyChanged(String propertyName, Serializable newValue)
+		{
+			selectDownloadDirectory((String)newValue);
+		}
 	}
 }

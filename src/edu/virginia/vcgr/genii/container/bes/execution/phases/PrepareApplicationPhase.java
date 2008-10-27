@@ -6,6 +6,8 @@ import java.io.Serializable;
 import org.ggf.bes.factory.ActivityStateEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
+import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
+import edu.virginia.vcgr.genii.client.jsdl.FilesystemRelativePath;
 import edu.virginia.vcgr.genii.container.appmgr.ApplicationManager;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
 
@@ -16,9 +18,11 @@ public class PrepareApplicationPhase extends AbstractExecutionPhase
 	
 	static private final String PREPARE_STATE = "preparing-application";
 	
-	private File _executable;
+	private FilesystemManager _fsManager;
+	private FilesystemRelativePath _executable;
 	
-	public PrepareApplicationPhase(File executable)
+	public PrepareApplicationPhase(FilesystemManager fsManager, 
+		FilesystemRelativePath executable)
 	{
 		super(
 			new ActivityState(
@@ -31,6 +35,20 @@ public class PrepareApplicationPhase extends AbstractExecutionPhase
 	@Override
 	public void execute(ExecutionContext context) throws Throwable
 	{
-		ApplicationManager.prepareApplication(_executable);
+		File executable = null;
+		
+		if (_executable.getFileSystemName() != null)
+		{
+			executable = _fsManager.lookup(_executable);
+		} else
+		{
+			executable = new File(
+				context.getCurrentWorkingDirectory().getWorkingDirectory(), 
+				_executable.getString());
+			if (!executable.exists())
+				executable = new File(_executable.getString());
+		}
+		
+		ApplicationManager.prepareApplication(executable);
 	}
 }

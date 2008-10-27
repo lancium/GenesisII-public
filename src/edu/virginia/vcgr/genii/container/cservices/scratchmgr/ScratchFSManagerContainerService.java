@@ -2,10 +2,12 @@ package edu.virginia.vcgr.genii.container.cservices.scratchmgr;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -15,6 +17,7 @@ import org.morgan.util.io.GuaranteedDirectory;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.io.FileUtils;
 import edu.virginia.vcgr.genii.container.cservices.AbstractContainerService;
+import edu.virginia.vcgr.genii.container.cservices.ContainerServicePropertyListener;
 
 public class ScratchFSManagerContainerService extends AbstractContainerService
 {
@@ -23,6 +26,8 @@ public class ScratchFSManagerContainerService extends AbstractContainerService
 	static final public String SERVICE_NAME = "Swap File Manager";
 	
 	static final public String SCRATCH_DIRECTORY_PROPERTY = "scratch-directory";
+	static final public String SCRATCH_SPACE_CSERVICES_PROPERTY =
+		"edu.virginia.vcgr.genii.container.cservices.scratchmgr.scratch-directory";
 	
 	/* Amount of time a swap file can remain idle before it is 
 	   reclaimed -- 1 day */
@@ -35,12 +40,16 @@ public class ScratchFSManagerContainerService extends AbstractContainerService
 	static final public long DEFAULT_DIR_USE_TIMEOUT_MILLIS = 
 		1000L * 60 * 60 * 24 * 7;
 	
+	private String _configuredScratchSpaceName = null;
 	private ScratchFSDatabase _db;
 	private File _uberDirectory;
 	
 	private File getSwapFilesystemDirectory(String directoryName)
 	{
-		return new File(_uberDirectory, directoryName).getAbsoluteFile();
+		synchronized(_db)
+		{
+			return new File(_uberDirectory, directoryName).getAbsoluteFile();
+		}
 	}
 	
 	@Override
@@ -55,6 +64,13 @@ public class ScratchFSManagerContainerService extends AbstractContainerService
 			conn = getConnectionPool().acquire();
 			_db = new ScratchFSDatabase(conn);
 			conn.commit();
+			
+			getContainerServicesProperties().addPropertyChangeListener(
+				Pattern.compile("^" + 
+					Pattern.quote(SCRATCH_SPACE_CSERVICES_PROPERTY) + "$"), 
+				new PropertyChangeListener());
+
+			selectUberDirectory();
 		}
 		finally
 		{
@@ -92,26 +108,48 @@ public class ScratchFSManagerContainerService extends AbstractContainerService
 		}
 	}
 	
-	private ScratchFSManagerContainerService(String scratchDirectory)
+	private void selectUberDirectory(String propertyValue)
 	{
-		super(SERVICE_NAME);
+		String path;
 		
-		if (scratchDirectory == null)
+		if (propertyValue == null)
 		{
-			scratchDirectory = String.format("%s/scratch-space", 
-				ConfigurationManager.getCurrentConfiguration(
-					).getUserDirectory().getAbsolutePath());
-		}
+			if (_configuredScratchSpaceName == null)
+			{
+				path = String.format("%s/scratch-space", 
+					ConfigurationManager.getCurrentConfiguration(
+						).getUserDirectory().getAbsolutePath());
+			} else
+				path = _configuredScratchSpaceName;
+		} else
+			path = propertyValue;
 		
 		try
 		{
-			_uberDirectory = new GuaranteedDirectory(scratchDirectory);
+			synchronized(_db)
+			{
+				_uberDirectory = new GuaranteedDirectory(path);
+			}
 		}
 		catch (IOException ioe)
 		{
 			throw new ConfigurationException("Unable to create swap space.",
 				ioe);
-		}
+		}	
+	}
+	
+	private void selectUberDirectory()
+	{
+		selectUberDirectory(
+			(String)getContainerServicesProperties().getProperty(
+				SCRATCH_SPACE_CSERVICES_PROPERTY));
+	}
+	
+	private ScratchFSManagerContainerService(String scratchDirectory)
+	{
+		super(SERVICE_NAME);
+		
+		_configuredScratchSpaceName = scratchDirectory;
 	}
 	
 	public ScratchFSManagerContainerService(Properties constructionProperties)
@@ -190,6 +228,16 @@ public class ScratchFSManagerContainerService extends AbstractContainerService
 			{
 				getConnectionPool().release(conn);
 			}
+		}
+	}
+	
+	private class PropertyChangeListener
+		implements ContainerServicePropertyListener
+	{
+		@Override
+		public void propertyChanged(String propertyName, Serializable newValue)
+		{
+			selectUberDirectory((String)newValue);
 		}
 	}
 }

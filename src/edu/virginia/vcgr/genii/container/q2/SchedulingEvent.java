@@ -1,5 +1,7 @@
 package edu.virginia.vcgr.genii.container.q2;
 
+import java.util.Date;
+
 /**
  * This class is used to wait on, and notify threads about scheduling 
  * opportunities.  An opportunity is not a guarantee that a job can
@@ -24,6 +26,12 @@ public class SchedulingEvent
 	private Object _lock = new Object();
 	
 	/**
+	 * This variable is used when we want to schedule an event to take place
+	 * sometime in the future.
+	 */
+	private Date _nextScheduledEvent = null;
+	
+	/**
 	 * Notify any potential waiters that there is a new scheduling opportunity
 	 * available.
 	 */
@@ -33,45 +41,6 @@ public class SchedulingEvent
 		{
 			_schedulingEvent = true;
 			_lock.notifyAll();
-		}
-	}
-	
-	/**
-	 * Wait for the next scheduling opportunity, or until a timeout occurs.
-	 * 
-	 * @param timeout The number of milliseconds to wait before giving up.
-	 * 
-	 * @return True if there is a scheduling opportunity, false otherwise.
-	 * 
-	 * @throws InterruptedException
-	 */
-	public boolean waitSchedulingEvent(long timeout)
-		throws InterruptedException
-	{
-		synchronized(_lock)
-		{
-			/* If there is already a scheduling opportunity, just
-			 * clear it and return true.
-			 */
-			if (_schedulingEvent)
-			{
-				_schedulingEvent = false;
-				return true;
-			}
-			
-			/* Otherwise, wait for a notification (or timeout) */
-			_lock.wait(timeout);
-			
-			/* Now, see if we got a scheduling event, or if we just
-			 * timed out.
-			 */
-			if (_schedulingEvent)
-			{
-				_schedulingEvent = false;
-				return true;
-			}
-			
-			return false;
 		}
 	}
 	
@@ -88,14 +57,38 @@ public class SchedulingEvent
 		{
 			while (true)
 			{
+				long timeout = -1L;
+				if (_nextScheduledEvent != null)
+					timeout = (_nextScheduledEvent.getTime() - 
+						System.currentTimeMillis()) + 1000L;
+				
 				if (_schedulingEvent)
 				{
 					_schedulingEvent = false;
 					return;
 				}
 				
-				_lock.wait();
+				if (timeout >= 0L)
+					_lock.wait(timeout);
+				else
+					_lock.wait();
+				
+				if (_nextScheduledEvent != null && 
+					_nextScheduledEvent.before(new Date()))
+				{
+					_nextScheduledEvent = null;
+					_schedulingEvent = true;
+				}
 			}
+		}
+	}
+	
+	public void setScheduledEvent(Date nextScheduledEvent)
+	{
+		synchronized(_lock)
+		{
+			_nextScheduledEvent = nextScheduledEvent;
+			_lock.notifyAll();
 		}
 	}
 }

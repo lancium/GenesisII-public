@@ -253,6 +253,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.dair.DAIRQueryTool</mconf:class>
 		<mconf:class name="matching-params"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.MatchingParamsTool</mconf:class>
+		<mconf:class name="set-container-service-properties"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.SetContainerServicePropertiesTool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

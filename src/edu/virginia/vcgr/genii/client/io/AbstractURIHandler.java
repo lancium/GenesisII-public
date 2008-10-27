@@ -14,16 +14,74 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.UsernamePasswo
 
 public abstract class AbstractURIHandler implements IURIHandler
 {
+	static public final int NUM_RETRIES = 5;
+	static public final long BACKOFF = 8000L;
+	
 	public abstract InputStream openInputStream(
 		URI source, UsernamePasswordIdentity credential)
 		throws IOException;
 	public abstract OutputStream openOutputStream(
 		URI target, UsernamePasswordIdentity credential)
 		throws IOException;
+
+	@Override
+	final public void get(URI source, File target, 
+		UsernamePasswordIdentity credential) throws IOException
+	{
+		IOException lastException = null;
+		
+		int attempt = 0;
+		
+		for (attempt = 0; attempt < NUM_RETRIES; attempt++)
+		{
+			try
+			{
+				getInternal(source, target, credential);
+				
+				return;
+			}
+			catch (IOException ioe)
+			{
+				lastException = ioe;
+			}
+			
+			try { Thread.sleep(BACKOFF << attempt); } 
+				catch (Throwable cause) {}
+		}
+		
+		throw lastException;
+	}
 	
 	@Override
-	public void get(URI source, File target, UsernamePasswordIdentity credential)
-			throws IOException
+	final public void put(File source, URI target, 
+		UsernamePasswordIdentity credential) throws IOException
+	{
+		IOException lastException = null;
+		
+		int attempt = 0;
+		
+		for (attempt = 0; attempt < NUM_RETRIES; attempt++)
+		{
+			try
+			{
+				putInternal(source, target, credential);
+				
+				return;
+			}
+			catch (IOException ioe)
+			{
+				lastException = ioe;
+			}
+			
+			try { Thread.sleep(BACKOFF << attempt); } 
+				catch (Throwable cause) {}
+		}
+		
+		throw lastException;
+	}
+	
+	protected void getInternal(URI source, File target, 
+		UsernamePasswordIdentity credential) throws IOException
 	{
 		FileOutputStream fos = null;
 		InputStream in = null;
@@ -41,9 +99,8 @@ public abstract class AbstractURIHandler implements IURIHandler
 		}
 	}
 
-	@Override
-	public void put(File source, URI target, UsernamePasswordIdentity credential)
-			throws IOException
+	protected void putInternal(File source, URI target,
+		UsernamePasswordIdentity credential) throws IOException
 	{
 		FileInputStream fin = null;
 		OutputStream out = null;

@@ -135,7 +135,7 @@ public class ContainerServicesParser
 		{
 			throw new IOException(String.format(
 				"Unable to construct container service class \"%s\".", 
-				serviceClass.getName()));
+				serviceClass.getName()), cause);
 		}
 	}
 	

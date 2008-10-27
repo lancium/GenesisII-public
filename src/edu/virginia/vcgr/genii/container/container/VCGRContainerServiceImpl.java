@@ -71,6 +71,14 @@ public class VCGRContainerServiceImpl extends GenesisIIBase
 	static public final String _WELLKNOWN_SERVICEDIR_KEY = 
 		"edu.virginia.vcgr.htc.container.container.service-dir-key";
 	
+	@Override
+	protected void setAttributeHandlers() throws NoSuchMethodException
+	{
+		super.setAttributeHandlers();
+		
+		new VCGRContainerAttributeHandlers(getAttributePackage());
+	}
+	
 	public VCGRContainerServiceImpl() throws RemoteException
 	{
 		super("VCGRContainerPortType");

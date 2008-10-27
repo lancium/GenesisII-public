@@ -4,6 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.sql.Connection;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -137,11 +138,32 @@ public class Scheduler implements Closeable
 			 * possible. To make this as efficient as possible, we keep track
 			 * of the iterator and continually re-iterate until we go through
 			 * all the jobs waiting for a slot, or we run out of resources to
-			 * scheduling against.
+			 * scheduling against.  We are also going to keep track of the next
+			 * job that should be scheduled, but can't be scheduled now (for
+			 * exponential backoff purposes).
 			 */
+			Date now = new Date();
+			Date nextScheduledEvent = null;
 			for (JobData queuedJob : _jobManager.getQueuedJobs())
 			{
 				match = null;
+				
+				if (!queuedJob.canRun(now))
+				{
+					Date nextRun = queuedJob.getNextCanRun();
+					if (nextRun != null)
+					{
+						if (nextScheduledEvent == null)
+							nextScheduledEvent = nextRun;
+						else
+						{
+							if (nextScheduledEvent.after(nextRun))
+								nextScheduledEvent = nextRun;
+						}
+					}
+					
+					continue;
+				}
 				
 				/* If we haven't created an iterator yet, do so now. */
 				if (slotIter == null)
@@ -183,6 +205,8 @@ public class Scheduler implements Closeable
 				if (match != null)
 					matches.add(match);
 			}
+			
+			_schedulingEvent.setScheduledEvent(nextScheduledEvent);
 			
 			/* OK, now that we have a list of matches, go ahead and try to
 			 * start the jobs.

@@ -1,0 +1,3 @@
+set-container-services-properties <container>...<container>				\
+	[--download-mgr-tmpdir=<download-manager-temporary-directory-path>]	\
+	[--scratch-space-dir=<scratch-space-directory-path>]

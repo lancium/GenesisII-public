@@ -45,7 +45,7 @@ class ForkExecApplicationUnderstanding extends PosixLikeApplicationUnderstanding
 		FilesystemManager fsManager = getFilesystemManager();
 		
 		executionPlan.add(new PrepareApplicationPhase(
-			fsManager.lookup(getExecutable())));
+			fsManager, getExecutable()));
 		Map<String, StringOrPath> env = getEnvironment();
 		env.put("GENII_DEPLOYMENT_NAME", new StringOrPath(depName.toString()));
 		env.put("GENII_USER_DIR", new StringOrPath(".genesisII-bes-state"));
