@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.dialog.gui;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -47,7 +48,15 @@ public class GuiInputDialog extends AbstractGuiDialog implements InputDialog
 	
 	protected JTextField createTextField()
 	{
-		return new JTextField();
+		JTextField field = new JTextField();
+		Dimension dim = field.getMinimumSize();
+		dim.width = 100;
+		field.setMinimumSize(dim);
+		dim = field.getPreferredSize();
+		dim.width = 100;
+		field.setPreferredSize(dim);
+		
+		return field;
 	}
 	
 	@Override

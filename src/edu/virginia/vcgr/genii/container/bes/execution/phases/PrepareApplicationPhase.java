@@ -29,6 +29,7 @@ public class PrepareApplicationPhase extends AbstractExecutionPhase
 				ActivityStateEnumeration.Running,
 				PREPARE_STATE, false));
 		
+		_fsManager = fsManager;
 		_executable = executable;
 	}
 	
