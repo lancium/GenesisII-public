@@ -102,10 +102,11 @@ public class XScriptParseHandler implements ParseHandler
 				"A <{%s}:%s> element must have a <{%s}:then> sub-element.",
 				XScriptConstants.XSCRIPT_NS, element.getLocalName()));
 		
-		ParseStatement thenStmt = parse(context, thenBlock);
+		ParseStatement thenStmt = parseBlock(context, 
+			thenBlock.getChildNodes());
 		ParseStatement elseStmt = null;
 		if (elseBlock != null)
-			elseStmt = parse(context, elseBlock);
+			elseStmt = parseBlock(context, elseBlock.getChildNodes());
 		
 		return new IfStatement(testProperty, thenStmt, elseStmt);
 	}

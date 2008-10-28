@@ -124,6 +124,7 @@ public class ScriptTool extends BaseGridTool
 		{	
 			reader = openReader(scriptFileStr);
 			engine.eval(reader);
+			
 			return 0;
 		}
 		catch (ScriptException se)

@@ -5,6 +5,8 @@
 
 	<gsh:define name="TARGET_DIR"
 		source="/uninitialized-containers"/>
+
+	<gsh:default name="GENII_INSTALL_DIR" value="INC_GENII_INSTALL_DIR"/>
 	
 	<gsh:echo
 		message="GENII_INSTALL_DIR is ${GENII_INSTALL_DIR}"/>
