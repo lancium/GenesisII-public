@@ -287,9 +287,9 @@
 			<fileset dir="../../../doc" targetdir="$INSTALL_PATH/doc"/>
 		</pack>
 
-		<pack name="StartGeniiNetFullContainer" required="no" preselected="no">
+		<pack name="Prepare GeniiNet Full Container" required="no" preselected="no">
 		    <depends packname="Core"/>
-			<description>Start New Genesis II Container from deployment GeniiNetFullContainer</description>
+			<description>Prepare New Genesis II Container from deployment GeniiNetFullContainer</description>
 			<file
 				src="../../../secrun.scratch/ContainerPostBootSecRun.jar"
 				targetdir="$INSTALL_PATH/deployments/GeniiNetFullContainer/secure-runnable"/>
@@ -314,6 +314,33 @@
 					<arg value="GeniiNetFullContainer"/>
 					<arg value="GeniiNetContainer"/>
 					<arg value="http:\/\/www.cs.virginia.edu\/~vcgr\/GeniiNet\/root.xml"/>
+				</args>
+			</executable>
+		</pack>
+
+		<pack name="Start GeniiNet Full Container" required="no"
+			preselected="no">
+			<depends packname="Prepare GeniiNet Full Container"/>
+			<description>Actually starts up the container process</description>
+			<file src="../../../scripts/GenesisII-manage-script.bat"
+				targetdir="$INSTALL_PATH" os="windows"/>
+			<parsable type="plain"
+				targetfile="$INSTALL_PATH/GenesisII-manage-script.bat"
+				os="windows"/>
+			<executable targetfile="$INSTALL_PATH/windows-start-wrapper.bat"
+				os="windows" stage="postinstall" keep="true">
+				<args>
+					<arg value="Start new container."/>
+					<arg value="$INSTALL_PATH/GenesisII-manage-script.bat"/>
+					<arg value="start"/>
+				</args>
+			</executable>
+			<executable targetfile="$INSTALL_PATH/linux-cmd-wrapper"
+				os="unix" stage="postinstall" keep="true">
+				<args>
+					<arg value="Start new container."/>
+					<arg value="$INSTALL_PATH/GenesisII-manage-script"/>
+					<arg value="start"/>
 				</args>
 			</executable>
 		</pack>
@@ -367,7 +394,7 @@
 		  </executable>		  		  
 		</pack>
 
-		<pack name="OGRSH Core" required="no" os="linux" preselected="yes">
+		<pack name="OGRSH Core" required="no" os="linux" preselected="no">
 			<description>OGRSH Core System</description>
 
 			<singlefile src="../../../OGRSH/config/config.template"
