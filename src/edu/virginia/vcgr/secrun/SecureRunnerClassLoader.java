@@ -64,7 +64,7 @@ public class SecureRunnerClassLoader extends URLClassLoader
 	public SecureRunnerClassLoader(Certificate []allowedCertificates,
 		URL[] urls)
 	{
-		super(urls);
+		super(urls, Thread.currentThread().getContextClassLoader());
 		
 		_allowedCertificates = allowedCertificates;
 	}

@@ -111,6 +111,7 @@
 				<include name="edu/virginia/vcgr/xscript/**/*"/>
 				<include name="edu/virginia/vcgr/genii/ftp/**/*"/>
 				<include name="edu/virginia/vcgr/genii/testing/**/*"/>
+				<exclude name="edu/virginia/vcgr/secrun/runnables/**/*"/>
 			</fileset>
 		</jar>
 	</target>
@@ -293,4 +294,83 @@
 	<target name="wipestate">
 		<delete dir="${user.home}/.genesisII"/>
 	</target>	
+
+	<target name="init.secrun">
+		<property file="${basedir}/build.secrun.properties"/>
+		<mkdir dir="${secrun.scratch.dir}"/>
+		<input
+			message="Input password for certificate store ${secrun.certstore}?"
+			addproperty="secrun.storepass"/>
+	</target>
+
+	<target name="secrun.test" depends="init.secrun,genii.compile">
+		<mkdir dir="${secrun.scratch.dir}/test"/>
+		<copy todir="${secrun.scratch.dir}/test">
+			<fileset dir="${obj.dir}">
+				<include name="${runnables.class.path}/test/**/*"/>
+				<exclude name="**/runnable-description.properties"/>
+			</fileset>
+		</copy>
+		<mkdir dir="${secrun.scratch.dir}/test/META-INF/secure-runnable"/>
+		<copy file="${runnables.obj.dir}/test/runnable-description.properties"
+			tofile="${secrun.scratch.dir}/test/META-INF/secure-runnable/runnable-description.properties"/>
+		<jar destfile="${secrun.scratch.dir}/TestSecRun.jar">
+			<fileset dir="${secrun.scratch.dir}/test">
+				<include name="**/*"/>
+			</fileset>
+		</jar>
+		<signjar jar="${secrun.scratch.dir}/TestSecRun.jar"
+			storetype="${secrun.storetype}"
+			alias="${secrun.storealias}"
+			keystore="${secrun.certstore}"
+			storepass="${secrun.storepass}"/>
+	</target>
+
+	<target name="secrun.contpreboot" depends="init.secrun,genii.compile">
+		<mkdir dir="${secrun.scratch.dir}/contpreboot"/>
+		<copy todir="${secrun.scratch.dir}/contpreboot">
+			<fileset dir="${obj.dir}">
+				<include name="${runnables.class.path}/contpreboot/**/*"/>
+				<exclude name="**/runnable-description.properties"/>
+			</fileset>
+		</copy>
+		<mkdir dir="${secrun.scratch.dir}/contpreboot/META-INF/secure-runnable"/>
+		<copy file="${runnables.obj.dir}/contpreboot/runnable-description.properties"
+			tofile="${secrun.scratch.dir}/contpreboot/META-INF/secure-runnable/runnable-description.properties"/>
+		<jar destfile="${secrun.scratch.dir}/ContainerPreBootSecRun.jar">
+			<fileset dir="${secrun.scratch.dir}/contpreboot">
+				<include name="**/*"/>
+			</fileset>
+		</jar>
+		<signjar jar="${secrun.scratch.dir}/ContainerPreBootSecRun.jar"
+			storetype="${secrun.storetype}"
+			alias="${secrun.storealias}"
+			keystore="${secrun.certstore}"
+			storepass="${secrun.storepass}"/>
+	</target>
+
+	<target name="secrun.contpostboot" depends="init.secrun,genii.compile">
+		<mkdir dir="${secrun.scratch.dir}/contpostboot"/>
+		<copy todir="${secrun.scratch.dir}/contpostboot">
+			<fileset dir="${obj.dir}">
+				<include name="${runnables.class.path}/contpostboot/**/*"/>
+				<exclude name="**/runnable-description.properties"/>
+			</fileset>
+		</copy>
+		<mkdir dir="${secrun.scratch.dir}/contpostboot/META-INF/secure-runnable"/>
+		<copy file="${runnables.obj.dir}/contpostboot/runnable-description.properties"
+			tofile="${secrun.scratch.dir}/contpostboot/META-INF/secure-runnable/runnable-description.properties"/>
+		<jar destfile="${secrun.scratch.dir}/ContainerPostBootSecRun.jar">
+			<fileset dir="${secrun.scratch.dir}/contpostboot">
+				<include name="**/*"/>
+			</fileset>
+		</jar>
+		<signjar jar="${secrun.scratch.dir}/ContainerPostBootSecRun.jar"
+			storetype="${secrun.storetype}"
+			alias="${secrun.storealias}"
+			keystore="${secrun.certstore}"
+			storepass="${secrun.storepass}"/>
+	</target>
+
+	<target name="secrun" depends="secrun.test, secrun.contpreboot, secrun.contpostboot"/>
 </project>

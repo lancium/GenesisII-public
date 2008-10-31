@@ -32,7 +32,7 @@
 		</authors>
 		<appsubpath>GenesisII</appsubpath>
 		<url>http://vcgr.cs.virginia.edu</url>
-		<javaversion>1.5</javaversion>
+		<javaversion>1.6</javaversion>
 	</info>
 
 	<guiprefs height="600" resizable="yes" width="900">
@@ -77,6 +77,8 @@
 			<file src="../../../scripts/jar-desc.xml"
 				targetdir="$INSTALL_PATH"/>
 			<file src="../../../RELEASE" targetdir="$INSTALL_PATH"/>
+			<singlefile src="../../../container.properties.example"
+				target="$INSTALL_PATH/container.properties"/>
 			<file src="../../../scripts/current-version.dat"
 				targetdir="$INSTALL_PATH/updates"/>
 			<fileset dir="../../../deployments" targetdir="$INSTALL_PATH/deployments"/>
@@ -203,6 +205,8 @@
 				targetfile="$INSTALL_PATH/ApplicationWatcher/genii-simple-application.properties"/>
 			<parsable type="javaprop"
 				targetfile="$INSTALL_PATH/lib/production.log4j.properties"/>
+			<parsable type="javaprop"
+				targetfile="$INSTALL_PATH/container.properties"/>
 			<parsable type="plain"
 				targetfile="$INSTALL_PATH/RELEASE"/>
 			<parsable type="plain"
@@ -286,6 +290,12 @@
 		<pack name="StartGeniiNetFullContainer" required="no" preselected="no">
 		    <depends packname="Core"/>
 			<description>Start New Genesis II Container from deployment GeniiNetFullContainer</description>
+			<file
+				src="../../../secrun.scratch/ContainerPostBootSecRun.jar"
+				targetdir="$INSTALL_PATH/deployments/GeniiNetFullContainer/secure-runnable"/>
+			<file
+				src="../../../secrun.scratch/ContainerPreBootSecRun.jar"
+				targetdir="$INSTALL_PATH/deployments/GeniiNetFullContainer/secure-runnable"/>
 			<executable targetfile="$INSTALL_PATH/windows-start-wrapper.bat"
 				os="windows" stage="postinstall" keep="true">
 				<args>

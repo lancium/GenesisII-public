@@ -3,7 +3,7 @@ package edu.virginia.vcgr.genii.client.configuration;
 import java.io.File;
 import java.io.IOException;
 
-import edu.virginia.vcgr.genii.client.cmd.GetUserDir;
+import edu.virginia.vcgr.genii.client.cmd.tools.GetUserDir;
 
 public class UserConfigUtils
 {

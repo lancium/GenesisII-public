@@ -42,16 +42,15 @@ wrapper.java.maxmemory=512
 # Application parameters.  Add parameters as needed starting from 1
 wrapper.app.parameter.1=edu.virginia.vcgr.appwatcher.ApplicationLauncher
 wrapper.app.parameter.2=%GENII_INSTALL_DIR%/ApplicationWatcher/genii-container-application.properties
-wrapper.app.parameter.3=%DEPLOYMENT_NAME% 
 
 #********************************************************************
 # Wrapper Logging Properties
 #********************************************************************
 wrapper.logfile=%GENII_USER_DIR%/wrapper.log
-wrapper.console.title=Genesis II Container %CONTAINER_NAME%
-wrapper.ntservice.name=Genesis II Container %CONTAINER_NAME%
-wrapper.ntservice.displayname=Genesis II Container %CONTAINER_NAME%
-wrapper.ntservice.description=Genesis II Container %CONTAINER_NAME%
+wrapper.console.title=Genesis II Container
+wrapper.ntservice.name=Genesis II Container
+wrapper.ntservice.displayname=Genesis II Container
+wrapper.ntservice.description=Genesis II Container
 wrapper.ntservice.process_priority=LOW
 
 # Format of output for the console.  (See docs for formats)

@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.cmd;
 
+import edu.virginia.vcgr.genii.client.cmd.tools.GetUserDir;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.container.configuration.ContainerConfiguration;

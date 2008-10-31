@@ -266,6 +266,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.MatchingParamsTool</mconf:class>
 		<mconf:class name="set-container-service-properties"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.SetContainerServicePropertiesTool</mconf:class>
+		<mconf:class name="GetUserDir"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.GetUserDir</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

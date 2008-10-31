@@ -42,6 +42,7 @@ public class Driver extends ApplicationBase
 		
 		prepareClientApplication();
 		_secRunManager = SecureRunnerManager.createSecureRunnerManager(
+			Driver.class.getClassLoader(),
 			Installation.getDeployment(new DeploymentName()));
 		Properties secRunProperties = new Properties();
 		_secRunManager.run(SecureRunnableHooks.CLIENT_PRE_STARTUP, 

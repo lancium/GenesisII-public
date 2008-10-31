@@ -50,9 +50,8 @@
 	<target name="compile-code">
 		<ant antfile="build.xml" dir="${basedir}/.." inheritAll="false">
 			<target name="build"/>
-<!--			<target name="jdoc"/> -->
 			<target name="deployments"/>
-<!--			<target name="scripts"/> -->
+			<target name="secrun"/>
 		</ant>
 		<ant antfile="${basedir}/../OGRSH/build-installer.xml"
 			dir="${basedir}/../OGRSH" inheritAll="true">

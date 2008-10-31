@@ -3,36 +3,14 @@
 # Script to generate a script suitable for installing container as a daemon in init.d
 #
 
-usageExit()
-{
-	echo "Usage: InstallContainerWrapper <deployment name> <container service name>"
-	exit -1
-}
-
 _ICW_GENII_INSTALL_DIR="%{INSTALL_PATH}"
 _ICW_LOCAL_JAVA_DIR="$_ICW_GENII_INSTALL_DIR/Java/linux-i586/jre"
 
 # get user's data directory...
-_GENII_USER_DIR=`"$_ICW_LOCAL_JAVA_DIR/bin/java" -classpath "$_ICW_GENII_INSTALL_DIR/lib/GenesisII-client.jar:$_ICW_GENII_INSTALL_DIR/lib/morgan-utilities.jar" edu.virginia.vcgr.genii.client.cmd.GetUserDir`
+_GENII_USER_DIR=`"$_ICW_GENII_INSTALL_DIR/grid" GetUserDir`
 echo "_GENII_USER_DIR is now set to ....     $_GENII_USER_DIR"
 
-# check if deployment name arg was passed in
-_DEPLOYMENT_NAME="$1"
-if [ "x$_DEPLOYMENT_NAME" = "x" ] 
-then
-	echo Missing deployment name argument
-	usageExit
-fi
-
-# check if container name arg was passed in
-_CONTAINER_NAME="$2"
-if [ "x$_CONTAINER_NAME" = "x" ] 
-then
-	echo Missing container name argument
-	usageExit
-fi
-
-_CONTAINER_DIR="$_GENII_USER_DIR/$_CONTAINER_NAME"
+_CONTAINER_DIR="$_GENII_USER_DIR"
 
 # create directory to store container data...
 echo "Creating directory for container: $_CONTAINER_DIR."
@@ -41,15 +19,16 @@ mkdir -p "$_CONTAINER_DIR"
 #
 # create script for init.d to manage this container
 #
-_MANAGE_CONTAINER_SCRIPT_PATH="$_ICW_GENII_INSTALL_DIR/$_CONTAINER_NAME-manage-script"
+_MANAGE_CONTAINER_SCRIPT_PATH="$_ICW_GENII_INSTALL_DIR/GenesisII-manage-script"
 echo "#!/bin/sh" > "$_MANAGE_CONTAINER_SCRIPT_PATH"
-echo "# auto generated script to manage VCGR Container $_CONTAINER_NAME using deployment $_DEPLOYMENT_NAME as a daemon process" >> "$_MANAGE_CONTAINER_SCRIPT_PATH"
 echo "# To enable auto start of container daemon, add this script to /etc/init.d and the proper /etc/rcX.d directories" >> "$_MANAGE_CONTAINER_SCRIPT_PATH"
 echo "#" >> "$_MANAGE_CONTAINER_SCRIPT_PATH"
 echo "" >> "$_MANAGE_CONTAINER_SCRIPT_PATH"
-echo "DEPLOYMENT_NAME=\"$_DEPLOYMENT_NAME\" CONTAINER_NAME=\"$_CONTAINER_NAME\" GENII_INSTALL_DIR=\"$_ICW_GENII_INSTALL_DIR\" LOCAL_JAVA_DIR=\"$_ICW_LOCAL_JAVA_DIR\" GENII_USER_DIR=\"$_CONTAINER_DIR\" \"$_ICW_GENII_INSTALL_DIR/VCGRContainerDaemon\" \"\$1\"" >> "$_MANAGE_CONTAINER_SCRIPT_PATH"
+echo "GENII_INSTALL_DIR=\"$_ICW_GENII_INSTALL_DIR\" LOCAL_JAVA_DIR=\"$_ICW_LOCAL_JAVA_DIR\" GENII_USER_DIR=\"$_CONTAINER_DIR\" \"$_ICW_GENII_INSTALL_DIR/VCGRContainerDaemon\" \"\$1\"" >> "$_MANAGE_CONTAINER_SCRIPT_PATH"
 chmod 744 "$_MANAGE_CONTAINER_SCRIPT_PATH"
 
+echo "You should start the container process by running $_MANAGE_CONTAINER_SCRIPT_PATH" start
+exit 0
 
 #
 # Start container on console...

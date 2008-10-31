@@ -107,14 +107,15 @@ public class SecureRunnableDescriptor implements Closeable
 		_jarFile = jarFile;
 	}
 	
-	public SecureRunnableDescriptor(Certificate []allowedCerts, File jarFile)
-		throws IOException, SecurityException, IllegalArgumentException, 
-			ClassNotFoundException, InstantiationException, 
-			NoSuchMethodException, IllegalAccessException, 
-			InvocationTargetException
+	public SecureRunnableDescriptor(ClassLoader parentLoader,
+		Certificate []allowedCerts, File jarFile)
+			throws IOException, SecurityException, IllegalArgumentException, 
+				ClassNotFoundException, InstantiationException, 
+				NoSuchMethodException, IllegalAccessException, 
+				InvocationTargetException
 	{
 		this(new SecureRunnerClassLoader(allowedCerts,
-			new URL[] { jarFile.toURI().toURL() } ));
+			new URL[] { jarFile.toURI().toURL() }, parentLoader));
 		_jarFile = jarFile;
 	}
 	
@@ -146,8 +147,7 @@ public class SecureRunnableDescriptor implements Closeable
 		
 		try
 		{
-			_runnable.run(_hook, runProperties);
-			remove = true;
+			remove = _runnable.run(runProperties);
 		}
 		catch (SecureRunSecurityException srse)
 		{
@@ -167,6 +167,8 @@ public class SecureRunnableDescriptor implements Closeable
 		
 		try
 		{
+			_runnable = null;
+			System.gc();
 			if (remove && !_jarFile.delete())
 			{
 				_logger.warn("Unable to remove successfully completed " +

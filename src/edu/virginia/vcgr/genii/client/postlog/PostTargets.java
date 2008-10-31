@@ -11,6 +11,7 @@ import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
+import edu.virginia.vcgr.genii.client.postlog.empty.EmptyPostTarget;
 
 public class PostTargets
 {
@@ -105,13 +106,5 @@ public class PostTargets
 		}
 		
 		return _target;
-	}
-	
-	static private class EmptyPostTarget implements PostTarget
-	{
-		@Override
-		public void post(PostEvent event)
-		{
-		}
 	}
 }

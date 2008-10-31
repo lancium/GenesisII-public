@@ -37,15 +37,15 @@ public class SecureRunnerManager implements Closeable
 		new HashMap<String, Collection<SecureRunnableDescriptor>>(
 			DEFAULT_DESCRIPTORS_SIZE);
 	
-	public SecureRunnerManager(Certificate[] allowedCertificates, 
-		File directory)
+	public SecureRunnerManager(ClassLoader loader,
+		Certificate[] allowedCertificates, File directory)
 	{
 		if (!directory.exists() || !directory.isDirectory())
 			return;
 		
 		for (File entry : directory.listFiles(_filter))
 		{
-			addEntry(allowedCertificates, entry);
+			addEntry(loader, allowedCertificates, entry);
 		}
 	}
 	
@@ -93,12 +93,14 @@ public class SecureRunnerManager implements Closeable
 		}
 	}
 	
-	private void addEntry(Certificate []allowedCerts, File entry)
+	private void addEntry(ClassLoader parentLoader,
+		Certificate []allowedCerts, File entry)
 	{
 		try
 		{
 			SecureRunnableDescriptor descriptor = 
-				new SecureRunnableDescriptor(allowedCerts, entry);
+				new SecureRunnableDescriptor(
+					parentLoader, allowedCerts, entry);
 			String hook = descriptor.getHook();
 			Collection<SecureRunnableDescriptor> descList =
 				_descriptors.get(hook);
@@ -178,7 +180,7 @@ public class SecureRunnerManager implements Closeable
 	}
 	
 	static public SecureRunnerManager createSecureRunnerManager(
-		Deployment deployment)
+		ClassLoader loader, Deployment deployment)
 	{
 		Security sec = deployment.security();
 		Collection<Certificate> certs = new LinkedList<Certificate>();
@@ -215,7 +217,8 @@ public class SecureRunnerManager implements Closeable
 			_logger.error("Unable to load secure runner manager.", cause2);
 		}
 		
-		return new SecureRunnerManager(certs.toArray(new Certificate[0]),
+		return new SecureRunnerManager(loader, 
+			certs.toArray(new Certificate[0]),
 			deployment.secureRunnableDirectory());
 	}
 }

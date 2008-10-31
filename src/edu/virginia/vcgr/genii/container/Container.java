@@ -107,6 +107,7 @@ public class Container extends ApplicationBase
 		
 		prepareServerApplication();
 		_secRunManager = SecureRunnerManager.createSecureRunnerManager(
+			Container.class.getClassLoader(),
 			Installation.getDeployment(new DeploymentName()));
 		Properties secRunProperties = new Properties();
 		_secRunManager.run(SecureRunnableHooks.CONTAINER_PRE_STARTUP, 

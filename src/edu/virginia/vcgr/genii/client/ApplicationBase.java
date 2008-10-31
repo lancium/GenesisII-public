@@ -5,6 +5,7 @@ import java.io.File;
 import org.morgan.util.io.GuaranteedDirectory;
 
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
+import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 
 public class ApplicationBase
 {
@@ -18,20 +19,6 @@ public class ApplicationBase
 			return null;
 		
 		return value;
-	}
-	
-	static private void prepareApplication(boolean isClient)
-	{
-		String userDir = getUserDir();
-		ConfigurationManager configurationManager = 
-			ConfigurationManager.initializeConfiguration(userDir);
-
-		setupUserDir(configurationManager.getUserDirectory());
-		
-		if (isClient)
-			configurationManager.setRoleClient();
-		else
-			configurationManager.setRoleServer();
 	}
 	
 	static private void setupUserDir(File userdir)
@@ -53,7 +40,20 @@ public class ApplicationBase
 	 */
 	static protected void prepareServerApplication()
 	{
-		prepareApplication(false);
+		ContainerProperties cProperties = 
+			ContainerProperties.containerProperties;
+		String depName = cProperties.getDeploymentName();
+		if (depName != null)
+			System.setProperty(
+				DeploymentName.DEPLOYMENT_NAME_PROPERTY, depName);
+		
+		String userDir = getUserDir(cProperties);
+		ConfigurationManager configurationManager = 
+			ConfigurationManager.initializeConfiguration(userDir);
+
+		setupUserDir(configurationManager.getUserDirectory());
+		
+		configurationManager.setRoleServer();
 	}
 	
 	/**
@@ -67,12 +67,25 @@ public class ApplicationBase
 	 */
 	static protected void prepareClientApplication()
 	{
-		prepareApplication(true);
+		String userDir = getUserDir(null);
+		ConfigurationManager configurationManager = 
+			ConfigurationManager.initializeConfiguration(userDir);
+
+		setupUserDir(configurationManager.getUserDirectory());
+		
+		configurationManager.setRoleClient();
 	}
 	
-	static public String getUserDir()
+	static public String getUserDir(ContainerProperties cProperties)
 	{
-		String userDir = getUserDirFromEnvironment();
+		String userDir = null;
+		
+		if (cProperties != null)
+			userDir = cProperties.getUserDirectory();
+		
+		if (userDir == null)
+			userDir = getUserDirFromEnvironment();
+		
 		if (userDir == null) 
 			userDir = System.getProperty("user.home") + "/.genesisII";
 

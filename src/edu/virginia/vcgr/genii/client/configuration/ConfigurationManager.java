@@ -150,8 +150,10 @@ public class ConfigurationManager
 	
 	synchronized private void setRole(Boolean isClient)
 	{
+		/*
 		if (_isClient != null)
 			throw new RuntimeException("Role already set -- can't reset.");
+		*/
 		
 		_isClient = isClient;
 	}
