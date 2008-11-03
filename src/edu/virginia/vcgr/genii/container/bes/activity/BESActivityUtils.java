@@ -26,9 +26,11 @@ import org.apache.axis.message.MessageElement;
 import org.ggf.jsdl.JobDefinition_Type;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.utils.creation.CreationProperties;
+import edu.virginia.vcgr.genii.common.notification.Subscribe;
 
 public class BESActivityUtils
 {
@@ -41,11 +43,14 @@ public class BESActivityUtils
 	{
 		private String _containerID = null;
 		private JobDefinition_Type _jobDef = null;
+		private Subscribe _subscribe = null;
 	
-		public BESActivityInitInfo(JobDefinition_Type jobDef, String containerID)
+		public BESActivityInitInfo(JobDefinition_Type jobDef, String containerID,
+			Subscribe subscribe)
 		{
 			_containerID = containerID;
 			_jobDef = jobDef;
+			_subscribe = subscribe;
 		}
 		
 		public JobDefinition_Type getJobDefinition()
@@ -57,11 +62,16 @@ public class BESActivityUtils
 		{
 			return _containerID;
 		}
+		
+		public Subscribe getSubscribeRequest()
+		{
+			return _subscribe;
+		}
 	}
 	
 	static public MessageElement[] createCreationProperties(
 		JobDefinition_Type jobDefinition, String containerID, 
-		Properties nativeqProperties)
+		Properties nativeqProperties, MessageElement subscribe)
 	{
 		Collection<MessageElement> ret = new LinkedList<MessageElement>();
 		
@@ -70,6 +80,8 @@ public class BESActivityUtils
 		
 		if (nativeqProperties != null)
 			ret.add(CreationProperties.translate(nativeqProperties));
+		if (subscribe != null)
+			ret.add(subscribe);
 		
 		return ret.toArray(new MessageElement[0]);
 	}
@@ -79,6 +91,7 @@ public class BESActivityUtils
 	{
 		JobDefinition_Type jobDef = null;
 		String containerID = null;
+		Subscribe subscribe = null;
 		
 		if (properties == null)
 			throw new IllegalArgumentException(
@@ -98,6 +111,12 @@ public class BESActivityUtils
 				any, JobDefinition_Type.class);
 			containerID = ((MessageElement)properties.get(
 				CONTAINER_ID_QNAME)).getValue();
+			
+			any = (MessageElement)properties.get(
+				BESConstants.GENII_BES_NOTIFICATION_SUBSCRIBE_ELEMENT_QNAME);
+			if (any != null)
+				subscribe = (Subscribe)ObjectDeserializer.toObject(
+					any, Subscribe.class);
 		}
 		catch (Exception e)
 		{
@@ -107,6 +126,6 @@ public class BESActivityUtils
 			throw new ResourceException(e.getMessage(), e);
 		}
 		
-		return new BESActivityInitInfo(jobDef, containerID);
+		return new BESActivityInitInfo(jobDef, containerID, subscribe);
 	}
 }

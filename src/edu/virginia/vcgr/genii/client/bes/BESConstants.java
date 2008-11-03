@@ -12,6 +12,8 @@ public interface BESConstants
 		"http://schemas.ggf.org/bes/2006/08/bes-management";
 	static public final String GENII_BES_NS =
 		"http://vcgr.cs.virginia.edu/genii/2008/3/bes";
+	static public final String GENII_BES_NOTIFICATION_NS =
+		"http://vcgr.cs.virginia.edu/genii/2008/03/bes/notification";
 	
 	static public final String BES_FACTORY_PORT_TYPE_NAME =
 		"BESFactoryPortType";
@@ -19,6 +21,11 @@ public interface BESConstants
 		"BESManagementPortType";
 	static public final String GENII_BES_PORT_TYPE_NAME =
 		"GeniiBESPortType";
+	
+	static public final String GENII_BES_NOTIFICATION_SUBSCRIBE_ELEMENT =
+		"Subscribe";
+	static public final String GENII_BES_NOTIFICATION_ACTIVITY_STATE_ELEMENT =
+		"activity-state";
 	
 	static public final PortType BES_FACTORY_PORT_TYPE =
 		PortType.get(new QName(BES_FACTORY_NS, BES_FACTORY_PORT_TYPE_NAME));
@@ -29,6 +36,12 @@ public interface BESConstants
 	
 	static public final QName DEPLOYER_EPR_ATTR =
 		new QName(GENII_BES_NS, "deployer");
+	static public final QName GENII_BES_NOTIFICATION_SUBSCRIBE_ELEMENT_QNAME =
+		new QName(GENII_BES_NOTIFICATION_NS,
+			GENII_BES_NOTIFICATION_SUBSCRIBE_ELEMENT);
+	static public final QName GENII_BES_NOTIFICATION_STATE_ELEMENT_QNAME =
+		new QName(GENII_BES_NOTIFICATION_NS,
+			GENII_BES_NOTIFICATION_ACTIVITY_STATE_ELEMENT);
 	
 	static public final String NAMING_PROFILE_WS_ADDRESSING = 
 		"http://schemas.ggf.org/bes/2006/08/bes/naming/BasicWSAddressing";

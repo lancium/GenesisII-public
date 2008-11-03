@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -84,8 +85,11 @@ public class DBSubscriptionResource
 			stmt.setString(2, sourcekey);
 			stmt.setString(3, topic);
 			stmt.setBlob(4, EPRUtils.toBlob(targetendpoint));
-			stmt.setObject(5, ObjectSerializer.toBytes(userData,
-				ISubscriptionResource.USER_DATA_CONSTRUCTION_PARAMETER));
+			if (userData == null)
+				stmt.setNull(5, Types.VARBINARY);
+			else
+				stmt.setObject(5, ObjectSerializer.toBytes(userData,
+					ISubscriptionResource.USER_DATA_CONSTRUCTION_PARAMETER));
 
 			if (stmt.executeUpdate() != 1)
 				throw new ResourceException("Couldn't create resource.");

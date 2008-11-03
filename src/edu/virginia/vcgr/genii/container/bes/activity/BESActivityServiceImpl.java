@@ -49,6 +49,8 @@ import edu.virginia.vcgr.genii.client.context.*;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLInterpreter;
+import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
+import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
@@ -58,6 +60,8 @@ import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.utils.creation.CreationProperties;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+
+import edu.virginia.vcgr.genii.common.notification.Subscribe;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.container.bes.BES;
 import edu.virginia.vcgr.genii.container.bes.BESUtilities;
@@ -69,6 +73,7 @@ import edu.virginia.vcgr.genii.container.bes.jsdl.personality.forkexec.ForkExecP
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.qsub.QSubPersonalityProvider;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.common.SByteIOFactory;
+import edu.virginia.vcgr.genii.container.common.notification.TopicSpace;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
@@ -96,6 +101,15 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 		return GENII_BES_ACTIVITY_PORT_TYPE;
 	}
 	
+	@Override
+	protected void registerTopics(TopicSpace topicSpace)
+			throws InvalidTopicException
+	{
+		super.registerTopics(topicSpace);
+		
+		topicSpace.registerTopic(WellknownTopics.BES_ACTIVITY_STATUS_CHANGE);
+	}
+
 	protected void setAttributeHandlers() throws NoSuchMethodException
 	{
 		super.setAttributeHandlers();
@@ -115,6 +129,10 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 		IBESActivityResource resource = (IBESActivityResource)rKey.dereference();
 		BESActivityInitInfo initInfo = BESActivityUtils.extractCreationProperties(
 			creationParameters);
+		
+		Subscribe subscribe = initInfo.getSubscribeRequest();
+		if (subscribe != null)
+			subscribe((String)resource.getKey(), subscribe);
 		
 		Properties creationProperties = (Properties)creationParameters.get(
 			CreationProperties.CREATION_PROPERTIES_QNAME);

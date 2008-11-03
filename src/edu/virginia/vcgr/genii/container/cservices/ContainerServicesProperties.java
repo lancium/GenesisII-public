@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.regex.Pattern;
@@ -16,6 +15,7 @@ import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
 
 public class ContainerServicesProperties
 {
@@ -69,26 +69,23 @@ public class ContainerServicesProperties
 	static private void prepareDatabase(DatabaseConnectionPool connectionPool)
 	{
 		Connection connection = null;
-		Statement stmt = null;
 		
 		try
 		{
 			connection = connectionPool.acquire();
-			stmt = connection.createStatement();
-			stmt.executeUpdate("CREATE TABLE containerservicesproperties (" +
-				"name VARCHAR(256) PRIMARY KEY, " +
-				"value BLOB(128K) NOT NULL)");
+			DatabaseTableUtils.createTables(connection, false, 
+				"CREATE TABLE containerservicesproperties (" +
+					"name VARCHAR(256) PRIMARY KEY, " +
+					"value BLOB(128K) NOT NULL)");
 			connection.commit();
 		}
 		catch (SQLException sqe)
 		{
-			_logger.warn(
-				"Cannot create container services properties table -- " +
-				"It probably already exists which is OK.", sqe);
+			_logger.error(
+				"Cannot create container services properties table.", sqe);
 		}
 		finally
 		{
-			StreamUtils.close(stmt);
 			connectionPool.release(connection);
 		}
 	}

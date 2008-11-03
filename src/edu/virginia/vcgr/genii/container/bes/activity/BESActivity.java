@@ -12,16 +12,22 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Vector;
 
+import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStateEnumeration;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.morgan.util.io.StreamUtils;
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
+import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
+import edu.virginia.vcgr.genii.client.notification.UnknownTopicException;
+import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.postlog.JobEvent;
 import edu.virginia.vcgr.genii.client.postlog.PostTarget;
 import edu.virginia.vcgr.genii.client.postlog.PostTargets;
@@ -38,6 +44,9 @@ import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.SuspendableExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
+import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
+import edu.virginia.vcgr.genii.container.common.notification.Topic;
+import edu.virginia.vcgr.genii.container.common.notification.TopicSpace;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
@@ -333,7 +342,7 @@ public class BESActivity implements Closeable
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException("Unable to update database.");
 			connection.commit();
-			
+						
 			PostTarget pt = PostTargets.poster();
 			
 			if (state.isCancelledState())
@@ -349,6 +358,24 @@ public class BESActivity implements Closeable
 			
 			_nextPhase = nextPhase;
 			_state = state;
+			
+			notifyStateChange();
+		}
+		catch (ResourceException e)
+		{
+			_logger.warn("Unable to send notification for status change.", e);
+		}
+		catch (ResourceUnknownFaultType e)
+		{
+			_logger.warn("Unable to send notification for status change.", e);
+		} 
+		catch (InvalidTopicException e)
+		{
+			_logger.warn("Unable to send notification for status change.", e);
+		}
+		catch (UnknownTopicException e)
+		{
+			_logger.warn("Unable to send notification for status change.", e);
 		}
 		finally
 		{
@@ -407,6 +434,30 @@ public class BESActivity implements Closeable
 		{
 			WorkingContext.setCurrentWorkingContext(ctxt);
 			phase.execute(getExecutionContext());
+		}
+		finally
+		{
+			WorkingContext.setCurrentWorkingContext(null);
+		}
+	}
+	
+	private void notifyStateChange()
+		throws InvalidTopicException, UnknownTopicException, 
+			ResourceException, ResourceUnknownFaultType, SQLException
+	{
+		WorkingContext ctxt = createWorkingContext();
+		
+		try
+		{
+			WorkingContext.setCurrentWorkingContext(ctxt);
+			TopicSpace space = GenesisIIBase.getTopicSpace(
+				BESActivityServiceImpl.class);
+			Topic topic = space.getTopic(WellknownTopics.BES_ACTIVITY_STATUS_CHANGE);
+			topic.notifyAll(new MessageElement[] {
+				new MessageElement(
+					BESConstants.GENII_BES_NOTIFICATION_STATE_ELEMENT_QNAME,
+					getState().toActivityStatusType())
+			});
 		}
 		finally
 		{

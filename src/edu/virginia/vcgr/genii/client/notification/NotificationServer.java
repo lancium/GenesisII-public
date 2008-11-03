@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.client.notification;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
@@ -24,6 +25,7 @@ import org.mortbay.http.SslListener;
 import org.mortbay.http.handler.AbstractHttpHandler;
 import org.mortbay.jetty.Server;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
+import org.w3c.dom.Element;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
@@ -152,6 +154,14 @@ public class NotificationServer
 	protected HttpHandler createHandler()
 	{
 		return new NotificationHandler();
+	}
+	
+	public EndpointReferenceType addNotificationHandler(
+		Pattern topicPattern, INotificationHandler handler)
+			throws IOException
+	{
+		_listeners.addEntry(topicPattern, handler);
+		return createEndpoint();
 	}
 	
 	/**
@@ -298,7 +308,7 @@ public class NotificationServer
 				in = request.getInputStream();
 				SOAPMessage msg = MessageFactory.newInstance().createMessage(null, in);
 				SOAPBody body = msg.getSOAPBody();
-				MessageElement notifyElement = (MessageElement)body.getFirstChild();
+				Element notifyElement = (Element)body.getFirstChild();
 				Notify notify = (Notify)ObjectDeserializer.toObject(
 					notifyElement, Notify.class);
 				UserDataType userData = notify.getUserData();
@@ -323,6 +333,8 @@ public class NotificationServer
 						}
 					}
 				}
+				
+				_listeners.notify(notify);
 			}
 			catch (SOAPException se)
 			{

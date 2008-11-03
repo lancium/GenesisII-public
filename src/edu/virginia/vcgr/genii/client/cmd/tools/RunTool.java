@@ -14,8 +14,10 @@ import java.util.regex.Pattern;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.axis.types.Token;
 import org.apache.axis.types.URI;
 import org.ggf.bes.factory.ActivityDocumentType;
+import org.ggf.bes.factory.ActivityStatusType;
 import org.ggf.bes.factory.CreateActivityResponseType;
 import org.ggf.bes.factory.CreateActivityType;
 import org.ggf.bes.factory.GetActivityStatusesResponseType;
@@ -39,12 +41,16 @@ import edu.virginia.vcgr.genii.client.appdesc.Matching;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.BESActivityConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
+import edu.virginia.vcgr.genii.client.bes.BESUtils;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.deployer.AppDeployerConstants;
 import edu.virginia.vcgr.genii.client.io.FileResource;
+import edu.virginia.vcgr.genii.client.notification.INotificationHandler;
+import edu.virginia.vcgr.genii.client.notification.NotificationServer;
+import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
@@ -57,6 +63,8 @@ import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
+import edu.virginia.vcgr.genii.common.notification.Notify;
+import edu.virginia.vcgr.genii.common.notification.Subscribe;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
@@ -77,6 +85,45 @@ public class RunTool extends BaseGridTool
 		"Runs the indicated JSDL file at the target BES container.";
 	static private final String _USAGE_RESOURCE =
 		"edu/virginia/vcgr/genii/client/cmd/tools/resources/run-usage.txt";
+	
+	private Object _stateLock = new Object();
+	private ActivityState _state = null;
+	
+	private class NotificationHandler implements INotificationHandler
+	{
+		@Override
+		public void notify(Notify notify)
+		{
+			try
+			{
+				MessageElement []any = notify.get_any();
+				if (any != null)
+				{
+					for (MessageElement a : any)
+					{
+						QName name = a.getQName();
+						if (name.equals(
+							BESConstants.GENII_BES_NOTIFICATION_STATE_ELEMENT_QNAME))
+						{
+							ActivityStatusType ast = 
+								(ActivityStatusType)ObjectDeserializer.toObject(
+									a, ActivityStatusType.class);
+							ActivityState aState = new ActivityState(ast);
+							synchronized(_stateLock)
+							{
+								_state = aState;
+								_stateLock.notify();
+							}
+						}
+					}
+				}
+			}
+			catch (ResourceException re)
+			{
+				re.printStackTrace(System.err);
+			}
+		}
+	}
 	
 	private String _name = null;
 	private String _asyncName = null;
@@ -159,10 +206,29 @@ public class RunTool extends BaseGridTool
 		}
 	}
 	
+	static private boolean equals(ActivityState one, ActivityState two)
+	{
+		if (one == null)
+		{
+			if (two == null)
+				return true;
+			else
+				return false;
+		} else
+		{
+			if (two == null)
+				return false;
+		}
+		
+		return one.equals(two);
+	}
+	
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		String asyncPath = null;
+		NotificationServer server = null;
+		
+		String asyncPath = _asyncName;
 		EndpointReferenceType activity = null;
 		
 		RNSPath besOrSchedPath;
@@ -178,32 +244,49 @@ public class RunTool extends BaseGridTool
 			if (state.isFailedState())
 				throw getError(path.getEndpoint());
 			return 0;
-		} else if (_jsdl != null)
+		} else 
 		{
-			String jobName = _name;
-			asyncPath = _asyncName;
-			RNSPath path = ContextManager.getCurrentContext(
-				).getCurrentPath();
-			besOrSchedPath = path.lookup(getArgument(0), 
-				RNSPathQueryFlags.MUST_EXIST);
-			besContainer = getBESContainer(besOrSchedPath);
-			activity = submitJob(
-				_jsdl, besContainer, jobName);
-		} else
-		{
-			RNSPath path = ContextManager.getCurrentContext(
-				).getCurrentPath();
-			besOrSchedPath = path.lookup(getArgument(0), 
-				RNSPathQueryFlags.MUST_EXIST);
-			besContainer = getBESContainer(besOrSchedPath);
-			String jobName = _name;
-			asyncPath = _asyncName;
-			JobDefinition_Type jobDef = createJobDefinition(
-				jobName, getArguments().subList(1, getArguments().size()));
-			ObjectSerializer.serialize(stdout, jobDef,
-					new QName("http://example.org", "job-definition"));
-			stdout.flush();
-			activity = submitJob(jobDef, besContainer);
+			Subscribe subscribeRequest = null;
+			
+			if (asyncPath == null)
+			{
+				server = NotificationServer.createStandardServer();
+				server.start();
+				EndpointReferenceType target = server.addNotificationHandler(
+					Pattern.compile(
+						String.format("^%s$", Pattern.quote(
+							WellknownTopics.BES_ACTIVITY_STATUS_CHANGE))),
+					new NotificationHandler());
+				subscribeRequest = new Subscribe(
+					new Token(WellknownTopics.BES_ACTIVITY_STATUS_CHANGE),
+					null, target, null);	
+			}
+			
+			if (_jsdl != null)
+			{
+				String jobName = _name;
+				RNSPath path = ContextManager.getCurrentContext(
+					).getCurrentPath();
+				besOrSchedPath = path.lookup(getArgument(0), 
+					RNSPathQueryFlags.MUST_EXIST);
+				besContainer = getBESContainer(besOrSchedPath);
+				activity = submitJob(
+					_jsdl, besContainer, jobName, subscribeRequest);
+			} else
+			{
+				RNSPath path = ContextManager.getCurrentContext(
+					).getCurrentPath();
+				besOrSchedPath = path.lookup(getArgument(0), 
+					RNSPathQueryFlags.MUST_EXIST);
+				besContainer = getBESContainer(besOrSchedPath);
+				String jobName = _name;
+				JobDefinition_Type jobDef = createJobDefinition(
+					jobName, getArguments().subList(1, getArguments().size()));
+				ObjectSerializer.serialize(stdout, jobDef,
+						new QName("http://example.org", "job-definition"));
+				stdout.flush();
+				activity = submitJob(jobDef, besContainer, subscribeRequest);
+			}
 		}
 		
 		if (asyncPath != null)
@@ -215,24 +298,52 @@ public class RunTool extends BaseGridTool
 			return 0;
 		}
 		
-		while (true)
+		try
 		{
-			ActivityState state = checkStatus(besContainer, activity);
-			stdout.println("Status:  " + state);
-			if (state.isFinalState())
+			ActivityState lastState = null;
+			long startTime = System.currentTimeMillis();
+			
+			while (true)
 			{
-				Throwable error = null;
-				if (state.isFailedState())
-					error = getError(activity);
-				GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, activity);
-				common.destroy(new Destroy());
-
-				if (error != null)
-					throw error;
-				return 0;
+				synchronized(_stateLock)
+				{
+					if (!equals(_state, lastState))
+					{
+						lastState = _state;
+						stdout.println("Status:  " + lastState);
+						if (lastState.isFinalState())
+						{
+							Throwable error = null;
+							if (lastState.isFailedState())
+								error = getError(activity);
+							GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, activity);
+							common.destroy(new Destroy());
+			
+							if (error != null)
+								throw error;
+							
+							return 0;
+						}
+					}
+					
+					long diffTime = System.currentTimeMillis() - startTime;
+					long waitTime = 10000 - diffTime;
+					if (waitTime < 1)
+						waitTime = 1;
+					_stateLock.wait(waitTime);
+					diffTime = System.currentTimeMillis() - startTime;
+					if (diffTime >= 10000)
+					{
+						_state = checkStatus(besContainer, activity);
+						startTime = System.currentTimeMillis();
+					}
+				}
 			}
-
-			try { Thread.sleep(1000); } catch (InterruptedException ie) {}
+		}
+		finally
+		{
+			if (server != null)
+				server.stop();
 		}
 	}
 
@@ -339,7 +450,8 @@ public class RunTool extends BaseGridTool
 	}
 	
 	static public EndpointReferenceType submitJob(String jsdlFileName,
-		EndpointReferenceType besContainer, String optJobName)
+		EndpointReferenceType besContainer, String optJobName,
+		Subscribe subscribeRequest)
 			throws IOException, ResourceException,
 				RNSException
 	{
@@ -366,7 +478,7 @@ public class RunTool extends BaseGridTool
 				}
 			}
 			
-			return submitJob(jobDef, besContainer);
+			return submitJob(jobDef, besContainer, subscribeRequest);
 		}
 		finally
 		{
@@ -375,7 +487,7 @@ public class RunTool extends BaseGridTool
 	}
 	
 	static public EndpointReferenceType submitJob(JobDefinition_Type jobDef,
-		EndpointReferenceType besContainer) 
+		EndpointReferenceType besContainer, Subscribe subscribeRequest) 
 		throws ResourceException,
 			RNSException, RemoteException
 	{
@@ -387,8 +499,12 @@ public class RunTool extends BaseGridTool
 				throw new ResourceException(
 					"Unable to find a suitable deployment.");
 		
-		CreateActivityType createActivityRequest =
-			new CreateActivityType(new ActivityDocumentType(jobDef, null), null);
+		ActivityDocumentType adt = new ActivityDocumentType(jobDef, null);
+		if (subscribeRequest != null)
+			BESUtils.addSubscription(adt, subscribeRequest);
+		
+		CreateActivityType createActivityRequest = new CreateActivityType(
+			adt, null);
 		CreateActivityResponseType response = 
 			bes.createActivity(createActivityRequest);
 		return response.getActivityIdentifier();

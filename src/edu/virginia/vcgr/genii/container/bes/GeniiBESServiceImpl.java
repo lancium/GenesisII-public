@@ -221,6 +221,21 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 		ActivityDocumentType adt = parameters.getActivityDocument();
 		JobDefinition_Type jdt = adt.getJobDefinition();
 		ResourceKey key = ResourceManager.getCurrentResource();
+		MessageElement subscribe = null;
+		
+		MessageElement []any = adt.get_any();
+		if (any != null)
+		{
+			for (MessageElement a : any)
+			{
+				QName name = a.getQName();
+				if (name.equals(
+					BESConstants.GENII_BES_NOTIFICATION_SUBSCRIBE_ELEMENT_QNAME))
+				{
+					subscribe = a;
+				}
+			}
+		}
 		
 		IBESResource resource = (IBESResource)key.dereference();
 		 
@@ -245,7 +260,8 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 			new BESActivityServiceImpl().CreateEPR(BESActivityUtils.createCreationProperties(
 							jdt, (String)resource.getKey(), 
 							(Properties)resource.getProperty(
-								GeniiBESConstants.NATIVEQ_PROVIDER_PROPERTY)),
+								GeniiBESConstants.NATIVEQ_PROVIDER_PROPERTY),
+							subscribe),
 					Container.getServiceURL("BESActivityPortType"));
 
 /*		

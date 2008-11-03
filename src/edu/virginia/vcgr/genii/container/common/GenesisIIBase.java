@@ -304,6 +304,26 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		setScheduledTerminationTime(termTime, rKey);
 	}
 	
+	static public TopicSpace getTopicSpace(
+		Class<? extends GenesisIIBase> topicClass)
+			throws InvalidTopicException
+	{
+		TopicSpace ret;
+		
+		synchronized(_topicSpaces)
+		{
+			ret = _topicSpaces.get(topicClass);
+			if (ret == null)
+			{
+				ret = new TopicSpace();
+				registerTopics(topicClass, ret);
+				_topicSpaces.put(topicClass, ret);
+			}
+		}
+		
+		return ret;
+	}
+	
 	protected TopicSpace getTopicSpace() throws InvalidTopicException
 	{
 		TopicSpace ret;
@@ -321,6 +341,26 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		}
 		
 		return ret;
+	}
+	
+	static private void registerTopics(Class<? extends GenesisIIBase> topicClass,
+		TopicSpace topicSpace) throws InvalidTopicException
+	{
+		GenesisIIBase base;
+		
+		try
+		{
+			base = topicClass.newInstance();
+			base.registerTopics(topicSpace);
+		} 
+		catch (InstantiationException e)
+		{
+			_logger.error("Unable to register topics for class.", e);
+		}
+		catch (IllegalAccessException e)
+		{
+			_logger.error("Unable to register topics for class.", e);
+		}
 	}
 	
 	protected void registerTopics(TopicSpace topicSpace) throws InvalidTopicException
@@ -546,6 +586,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 				targetServiceURL, getImplementedPortTypes(rKey));
 		
 		EndpointReferenceType oldEPR = null;
+		
 		oldEPR =
 			(EndpointReferenceType)WorkingContext.getCurrentWorkingContext().getProperty(
 				WorkingContext.EPR_PROPERTY_NAME);
@@ -970,9 +1011,10 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		}
 	}
 	
-	@RWXMapping(RWXCategory.EXECUTE)
-	public SubscribeResponse subscribe(Subscribe subscribeRequest) 
-		throws RemoteException, ResourceUnknownFaultType
+	protected SubscribeResponse subscribe(String subscribee, 
+		Subscribe subscribeRequest) 
+			throws ResourceUnknownFaultType, ResourceCreationFaultType, 
+				RemoteException
 	{
 		EndpointReferenceType target = subscribeRequest.getTarget();
 		UnsignedLong ttl = subscribeRequest.getTimeToLive();
@@ -987,7 +1029,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 			new HashMap<QName, MessageElement>();
 		SubscriptionConstructionParameters.insertSubscriptionParameters(
 			constructionParameters, 
-			(String)ResourceManager.getCurrentResource().dereference().getKey(),
+			subscribee,
 			target, topic.toString(), 
 			(ttl == null) ? null : new Long(ttl.longValue()),
 			userData);
@@ -996,6 +1038,15 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		return new SubscribeResponse(
 			subscription.vcgrCreate(
 				new VcgrCreate(params)).getEndpoint());
+	}
+	
+	@RWXMapping(RWXCategory.EXECUTE)
+	public SubscribeResponse subscribe(Subscribe subscribeRequest) 
+		throws RemoteException, ResourceUnknownFaultType
+	{
+		return subscribe(
+			(String)ResourceManager.getCurrentResource().dereference().getKey(),
+			subscribeRequest);
 	}
 	
 	@SuppressWarnings("unchecked")

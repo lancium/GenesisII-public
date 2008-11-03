@@ -96,6 +96,37 @@ public class ActivityState implements Serializable, Cloneable
 		this(ObjectDeserializer.toObject(element, ActivityStatusType.class));
 	}
 	
+	static private boolean equals(String one, String two)
+	{
+		if (one == null)
+		{
+			if (two == null)
+				return true;
+			else
+				return false;
+		} else
+		{
+			if (two == null)
+				return false;
+		}
+		
+		return one.equals(two);
+	}
+	
+	public boolean equals(ActivityState other)
+	{
+		return equals(_besState, other._besState) &&
+			equals(_geniiState, other._geniiState) &&
+			(_isSuspended == other._isSuspended);
+	}
+	
+	public boolean equals(Object other)
+	{
+		if (other instanceof ActivityState)
+			return equals((ActivityState)other);
+		return false;
+	}
+	
 	public boolean isSuspended()
 	{
 		return _isSuspended;

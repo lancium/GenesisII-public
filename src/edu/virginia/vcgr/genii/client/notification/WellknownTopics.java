@@ -26,4 +26,7 @@ public class WellknownTopics
 	/** This topic is raised when rbyteio operation occurs */
 	static public final String RANDOM_BYTEIO_OP = 
 		"edu.virginia.vcgr.genii.byteio.rbyteio.op";
+	
+	static public final String BES_ACTIVITY_STATUS_CHANGE =
+		"edu.virginia.vcgr.genii.bes.activity.status-change";
 }
