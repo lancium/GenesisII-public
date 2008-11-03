@@ -784,4 +784,28 @@ public class QueueDatabase
 			StreamUtils.close(stmt);
 		}
 	}
+	
+	public EndpointReferenceType getQueueEPR(Connection connection) 
+		throws SQLException, ResourceException
+	{
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try
+		{
+			stmt = connection.prepareStatement(
+				"SELECT queueepr FROM q2eprs WHERE queueid = ?");
+			stmt.setString(1, _queueID);
+			rs = stmt.executeQuery();
+			if (rs.next())
+				return EPRUtils.fromBlob(rs.getBlob(1));
+			
+			return null;
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+	}
 }

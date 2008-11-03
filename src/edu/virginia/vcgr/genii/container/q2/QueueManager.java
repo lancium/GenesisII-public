@@ -348,6 +348,22 @@ public class QueueManager implements Closeable
 		}
 	}
 	
+	public void checkJobStatus(String jobID) 
+		throws SQLException
+	{
+		Connection connection = null;
+		
+		try
+		{
+			connection = _connectionPool.acquire();
+			_jobManager.checkJobStatus(connection, Long.parseLong(jobID));
+		}
+		finally
+		{
+			_connectionPool.release(connection);
+		}
+	}
+	
 	public Collection<JobInformationType> getJobStatus(String []jobs)
 		throws SQLException, ResourceException, GenesisIISecurityException
 	{

@@ -7,6 +7,7 @@ import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import javax.xml.namespace.QName;
@@ -16,6 +17,7 @@ import org.apache.axis.types.Token;
 import org.apache.axis.types.UnsignedLong;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.ggf.bes.factory.ActivityStatusType;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.jsdl.JobMultiDefinition_Type;
 import org.ggf.rns.Add;
@@ -40,6 +42,8 @@ import org.ws.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.bes.ActivityState;
+import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.comm.ClientConstructionParameters;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
@@ -57,12 +61,15 @@ import edu.virginia.vcgr.genii.common.notification.Subscribe;
 import edu.virginia.vcgr.genii.common.notification.UserDataType;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+import org.oasis_open.wsrf.basefaults.BaseFaultType;
+
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.byteio.RByteIOResource;
 import edu.virginia.vcgr.genii.container.byteio.StreamableByteIOServiceImpl;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.q2.resource.IQueueResource;
 import edu.virginia.vcgr.genii.container.q2.resource.QueueDBResourceFactory;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
@@ -85,6 +92,8 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 	static private Log _logger = LogFactory.getLog(QueueServiceImpl.class);
 	
 	static private final long _DEFAULT_TIME_TO_LIVE = 1000L * 60 * 60;
+	static public QName _JOBID_QNAME =
+		new QName(GenesisIIConstants.GENESISII_NS, "job-id");
 	static private QName _FILENAME_QNAME =
 		new QName(GenesisIIConstants.GENESISII_NS, "create-file-filename");
 	static private QName _FILEPATH_QNAME =
@@ -112,6 +121,19 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		addImplementedPortType(RNSConstants.RNS_PORT_TYPE);
 	}
 	
+	@Override
+	protected void postCreate(ResourceKey key, EndpointReferenceType newEPR,
+			HashMap<QName, Object> constructionParameters,
+			Collection<MessageElement> resolverCreationParameters)
+			throws ResourceException, BaseFaultType, RemoteException
+	{
+		super.postCreate(key, newEPR, constructionParameters,
+			resolverCreationParameters);
+		
+		IQueueResource resource = (IQueueResource)key.dereference();
+		resource.setEPR(newEPR);
+	}
+
 	public PortType getFinalWSResourceInterface()
 	{
 		return QueueConstants.QUEUE_PORT_TYPE;
@@ -530,8 +552,56 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 					name += ".txt";
 				
 				submitJob(filepath);
+			} else if (topic.equals(WellknownTopics.BES_ACTIVITY_STATUS_CHANGE))
+			{
+				UserDataType userData = notify.getUserData();
+				if (userData == null || (userData.get_any() == null) )
+					throw new RemoteException(
+						"Missing required user data for notification");
+				MessageElement []data = userData.get_any();
+				if (data.length != 1)
+					throw new RemoteException(
+						"Missing required user data for notification");
+				
+				String jobid = null;
+				MessageElement elem = data[0];
+				QName elemName = elem.getQName();
+				if (elemName.equals(_JOBID_QNAME))
+				{
+					ActivityStatusType ast = null;
+					jobid = elem.getValue();
+					MessageElement []any = notify.get_any();
+					if (any == null || any.length == 0)
+						throw new RemoteException(
+							"Missing required notification body.");
+					
+					for (MessageElement a : any)
+					{
+						if (a.getQName().equals(
+							BESConstants.GENII_BES_NOTIFICATION_STATE_ELEMENT_QNAME))
+							ast = ObjectDeserializer.toObject(a, 
+								ActivityStatusType.class);
+					}
+					
+					if (ast == null)
+						throw new RemoteException(
+							"Missing required notification body element.");
+					
+					ActivityState state = new ActivityState(ast);
+					if (state.isFinalState())
+					{
+						QueueManager mgr = QueueManager.getManager(
+							(String)ResourceManager.getCurrentResource().getKey());
+						mgr.checkJobStatus(jobid);
+					}
+					
+				} else
+				{
+					throw new RemoteException(
+						"Unknown user data found in notification.");
+				}
 			}
-		}
+		} 
 		catch (Throwable t)
 		{
 			_logger.warn(t.getLocalizedMessage(), t);

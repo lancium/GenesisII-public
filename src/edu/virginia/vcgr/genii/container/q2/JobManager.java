@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.TreeMap;
 
+import org.apache.axis.message.MessageElement;
+import org.apache.axis.types.Token;
 import org.apache.axis.types.UnsignedShort;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,9 +29,11 @@ import org.morgan.util.GUID;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
+import edu.virginia.vcgr.genii.client.bes.BESUtils;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.postlog.JobEvent;
 import edu.virginia.vcgr.genii.client.postlog.PostEvent;
 import edu.virginia.vcgr.genii.client.postlog.PostTarget;
@@ -39,6 +43,8 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.Identity;
+import edu.virginia.vcgr.genii.common.notification.Subscribe;
+import edu.virginia.vcgr.genii.common.notification.UserDataType;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.queue.JobInformationType;
 import edu.virginia.vcgr.genii.queue.JobStateEnumerationType;
@@ -62,7 +68,7 @@ public class JobManager implements Closeable
 	 * or not.  It would be great if we could avoid polling, but BES doesn't
 	 * require notification in the spec. so we can't count on it.
 	 */
-	static final private long _STATUS_CHECK_FREQUENCY = 1000L * 30;
+	static final private long _STATUS_CHECK_FREQUENCY = 1000L * 60 * 5;
 	
 	/** 
 	 * The maximum number of times that we will allow a job to be started and 
@@ -792,6 +798,45 @@ public class JobManager implements Closeable
 		completeJobs(connection, jobsToComplete);
 	}
 	
+	synchronized public void checkJobStatus(Connection connection, 
+		long jobID)
+	{
+		int originalCount = _outcallThreadPool.size();
+		
+		JobData job = _jobsByID.get(jobID);
+		if (job == null || job.getBESID() == null)
+			return;
+		
+		/* For convenience, we bundle together the id's of the
+		 * job to check, and the bes container on which it is
+		 * running.
+		 */
+		JobCommunicationInfo info = new JobCommunicationInfo(
+			job.getJobID(), job.getBESID().longValue());
+		
+		/* As in other places, we use a callback mechanism to
+		 * allow outcall threads to late bind "large" information
+		 * at the last minute.  This keeps us from putting too
+		 * much into memory.  In this particular case its something
+		 * of a hack as we already had a type for getting the bes
+		 * information so we just bundled that with a second interface
+		 * for getting the job's endpoint.  This could have been done
+		 * cleaner, but it works fine.
+		 */
+		Resolver resolver = new Resolver();
+		
+		/* Enqueue the worker into the outcall thread pool */
+		_outcallThreadPool.enqueue(new JobUpdateWorker(
+			this, resolver, resolver, _connectionPool, info, job));
+	
+	int newCount = _outcallThreadPool.size();
+	
+	_logger.debug(String.format(
+		"Just finished enqueing a bunch of jobs into the thread pool " +
+		"and the thread pool size grew from %d jobs to %d jobs.", 
+		originalCount, newCount));
+	}
+	
 	/**
 	 * This method is called periodically by a watcher thread to check on the
 	 * current statuses of all jobs running in the queue (the poll'ing method
@@ -1208,9 +1253,21 @@ public class JobManager implements Closeable
 						entryType.getEntry_reference(), 
 						startCtxt);
 					ClientUtils.setTimeout(bes, 8 * 1000);
+					ActivityDocumentType adt = new ActivityDocumentType(
+						startInfo.getJSDL(), null);
+					EndpointReferenceType queueEPR = 
+						_database.getQueueEPR(connection);
+					if (queueEPR != null)
+						BESUtils.addSubscription(adt, new Subscribe(
+							new Token(WellknownTopics.BES_ACTIVITY_STATUS_CHANGE),
+							null,
+							queueEPR,
+							new UserDataType(new MessageElement[] {
+								new MessageElement(
+									QueueServiceImpl._JOBID_QNAME, 
+									Long.toString(_jobID)) })));
 					resp = bes.createActivity(
-						new CreateActivityType(
-							new ActivityDocumentType(startInfo.getJSDL(), null), null));
+						new CreateActivityType(adt, null));
 					
 					EndpointReferenceType epr = resp.getActivityIdentifier();
 					PostTargets.poster().post(JobEvent.jobLaunched(startCtxt, epr, 
