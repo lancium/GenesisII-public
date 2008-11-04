@@ -108,6 +108,7 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 		super.registerTopics(topicSpace);
 		
 		topicSpace.registerTopic(WellknownTopics.BES_ACTIVITY_STATUS_CHANGE);
+		topicSpace.registerTopic(WellknownTopics.BES_ACTIVITY_STATUS_CHANGE_FINAL);
 	}
 
 	protected void setAttributeHandlers() throws NoSuchMethodException

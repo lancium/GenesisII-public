@@ -552,7 +552,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 					name += ".txt";
 				
 				submitJob(filepath);
-			} else if (topic.equals(WellknownTopics.BES_ACTIVITY_STATUS_CHANGE))
+			} else if (topic.equals(WellknownTopics.BES_ACTIVITY_STATUS_CHANGE_FINAL))
 			{
 				UserDataType userData = notify.getUserData();
 				if (userData == null || (userData.get_any() == null) )

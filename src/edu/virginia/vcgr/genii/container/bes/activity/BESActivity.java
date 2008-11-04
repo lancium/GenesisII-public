@@ -446,6 +446,7 @@ public class BESActivity implements Closeable
 			ResourceException, ResourceUnknownFaultType, SQLException
 	{
 		WorkingContext ctxt = createWorkingContext();
+		ActivityState state = getState();
 		
 		try
 		{
@@ -456,8 +457,17 @@ public class BESActivity implements Closeable
 			topic.notifyAll(new MessageElement[] {
 				new MessageElement(
 					BESConstants.GENII_BES_NOTIFICATION_STATE_ELEMENT_QNAME,
-					getState().toActivityStatusType())
+					state.toActivityStatusType())
 			});
+			if (state.isFinalState())
+			{
+				topic = space.getTopic(WellknownTopics.BES_ACTIVITY_STATUS_CHANGE_FINAL);
+				topic.notifyAll(new MessageElement[] {
+					new MessageElement(
+						BESConstants.GENII_BES_NOTIFICATION_STATE_ELEMENT_QNAME,
+						state.toActivityStatusType())
+				});
+			}
 		}
 		finally
 		{

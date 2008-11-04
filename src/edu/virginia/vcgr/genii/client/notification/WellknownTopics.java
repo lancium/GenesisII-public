@@ -29,4 +29,6 @@ public class WellknownTopics
 	
 	static public final String BES_ACTIVITY_STATUS_CHANGE =
 		"edu.virginia.vcgr.genii.bes.activity.status-change";
+	static public final String BES_ACTIVITY_STATUS_CHANGE_FINAL =
+		"edu.virginia.vcgr.genii.bes.activity.status-change.final-state";
 }

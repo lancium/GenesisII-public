@@ -1259,7 +1259,8 @@ public class JobManager implements Closeable
 						_database.getQueueEPR(connection);
 					if (queueEPR != null)
 						BESUtils.addSubscription(adt, new Subscribe(
-							new Token(WellknownTopics.BES_ACTIVITY_STATUS_CHANGE),
+							new Token(
+								WellknownTopics.BES_ACTIVITY_STATUS_CHANGE_FINAL),
 							null,
 							queueEPR,
 							new UserDataType(new MessageElement[] {

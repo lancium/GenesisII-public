@@ -293,6 +293,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		if (termTime != null)
 			alarmID = AlarmManager.getManager().addAlarm(
 				termTime.getTime(), 15 * 1000L, null, null, "terminationAlarm", null);
+		resource.setProperty(IResource.TERM_TIME_ALARM, alarmID);
 		
 		resource.commit();
 	}
@@ -541,6 +542,11 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	
 	protected void preDestroy() throws RemoteException, ResourceException
 	{
+		IResource resource = ResourceManager.getCurrentResource().dereference();
+		
+		AlarmIdentifier alarmID = (AlarmIdentifier)resource.getProperty(IResource.TERM_TIME_ALARM);
+		if (alarmID != null)
+			alarmID.cancel();
 	}
 	
 	/**
