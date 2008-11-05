@@ -111,6 +111,50 @@ public class XScriptParseHandler implements ParseHandler
 		return new IfStatement(testProperty, thenStmt, elseStmt);
 	}
 	
+	static private ParseStatement parseSwitch(ParseContext context,
+		Element element) throws ScriptException
+	{
+		SwitchStatement statement = new SwitchStatement(
+			XScriptParser.getRequiredAttribute(element, "value"));
+		
+		NodeList children = element.getChildNodes();
+		int length = children.getLength();
+		for (int lcv = 0; lcv < length; lcv++)
+		{
+			Node n = children.item(lcv);
+			if (n.getNodeType() == Node.ELEMENT_NODE)
+			{
+				Element child = (Element)n;
+				String ns = child.getNamespaceURI();
+				String name = child.getLocalName();
+				
+				if (!ns.equals(XScriptConstants.XSCRIPT_NS) ||
+					!(name.equals("case") || name.equals("default")))
+					throw new ScriptException(String.format(
+						"Only <{%s}:%s> and <{%s}:%s> elements are " +
+						"allowed as children of a <{%s}:%s> node.", 
+						XScriptConstants.XSCRIPT_NS, "case", 
+						XScriptConstants.XSCRIPT_NS, "default",
+						XScriptConstants.XSCRIPT_NS, element.getLocalName()));
+				
+				if (name.equals("case"))
+				{
+					String casePattern = XScriptParser.getRequiredAttribute(
+						child, "pattern");
+					statement.addCase(casePattern, 
+						new ScopeStatement(parseBlock(context, 
+							child.getChildNodes())));
+				} else
+				{
+					statement.setDefault(new ScopeStatement(
+						parseBlock(context, child.getChildNodes())));
+				}
+			}
+		}
+		
+		return statement;
+	}
+	
 	static private ParseStatement parseTry(ParseContext context, 
 		Element element) throws ScriptException
 	{
@@ -336,6 +380,26 @@ public class XScriptParseHandler implements ParseHandler
 		return new ParamStatement(element.getTextContent());
 	}
 	
+	static private ParseStatement parseParallel(ParseContext context,
+		Element element) throws ScriptException
+	{
+		String threadPoolSizeString = XScriptParser.getAttribute(element, 
+			"thread-pool-size", "8");
+		ParseStatement innerStatement = parseBlock(context, 
+			element.getChildNodes());
+		return new ScopeStatement(new ParallelStatement(
+			threadPoolSizeString, innerStatement));
+	}
+	
+	static private ParseStatement parseParallelJob(ParseContext context,
+		Element element) throws ScriptException
+	{
+		ParseStatement innerStatement = parseBlock(context, 
+			element.getChildNodes());
+		return new ScopeStatement(new ParallelJobStatement(
+			innerStatement));
+	}
+	
 	private ParseStatement parseFor(ParseContext context,
 		Element element) throws ScriptException
 	{
@@ -532,6 +596,12 @@ public class XScriptParseHandler implements ParseHandler
 			return parseCall(context, element);
 		else if (name.equals("return"))
 			return parseReturn(context, element);
+		else if (name.equals("parallel"))
+			return parseParallel(context, element);
+		else if (name.equals("parallel-job"))
+			return parseParallelJob(context, element);
+		else if (name.equals("switch"))
+			return parseSwitch(context, element);
 		else
 			throw new ScriptException(String.format(
 				"Unrecognized node name <{%s}:%s>.",

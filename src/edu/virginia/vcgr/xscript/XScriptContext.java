@@ -8,11 +8,40 @@ import javax.script.SimpleBindings;
 import javax.script.SimpleScriptContext;
 
 public class XScriptContext 
-	extends SimpleScriptContext implements XScriptConstants
+	extends SimpleScriptContext implements XScriptConstants, Cloneable
 {
 	private Stack<Bindings> _bindings = new Stack<Bindings>();
 	
 	private Throwable _lastException = null;
+	
+	static private Bindings cloneBindings(Bindings original)
+	{
+		if (original == null)
+			return null;
+		
+		SimpleBindings ret = new SimpleBindings();
+		ret.putAll(original);
+		
+		return ret;
+	}
+	
+	@Override
+	public Object clone() throws CloneNotSupportedException
+	{
+		XScriptContext ret = (XScriptContext)super.clone();
+		
+		ret._lastException = _lastException;
+		ret._bindings = new Stack<Bindings>();
+		for (Bindings b : _bindings)
+			ret._bindings.add(cloneBindings(b));
+		
+		ret.setBindings(cloneBindings(getBindings(GLOBAL_SCOPE)), 
+			GLOBAL_SCOPE);
+		ret.setBindings(cloneBindings(getBindings(ENGINE_SCOPE)), 
+			ENGINE_SCOPE);
+		
+		return ret;
+	}
 	
 	public void setException(Throwable e)
 	{

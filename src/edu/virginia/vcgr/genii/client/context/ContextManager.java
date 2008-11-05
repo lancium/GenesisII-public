@@ -82,7 +82,7 @@ public class ContextManager
 		return bootContext;
 	}
 	
-	static public IContextResolver getResolver()
+	synchronized static public IContextResolver getResolver()
 	{
 		IContextResolver resolver = _resolver.get();
 		if (resolver == null)

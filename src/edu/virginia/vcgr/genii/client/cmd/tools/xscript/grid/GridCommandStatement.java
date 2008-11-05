@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.cmd.tools.xscript.grid;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -60,9 +61,13 @@ public class GridCommandStatement implements ParseStatement
 		{
 			throw re;
 		}
+		catch (Exception cause)
+		{
+			throw new ScriptException(cause);
+		}
 		catch (Throwable cause)
 		{
-			throw new ScriptException((Exception)cause);
+			throw new ScriptException(new InvocationTargetException(cause));
 		}
 	}
 }
