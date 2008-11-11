@@ -13,6 +13,10 @@
 
 
 	<!-- Static Class paths -->
+	<path id="appwatcher.classpath">
+		<fileset dir="${appwatcher.home}" includes="**/app-watcher.jar"/>
+	</path>
+
 	<path id="log4j.classpath">
 		<fileset dir="${axis.home}" includes="**/log4j*.jar"/>
 	</path>
@@ -64,6 +68,7 @@
 		<path refid="ant.classpath"/>
 		<path refid="axis.classpath"/>
 		<path refid="jetty.classpath"/>
+		<path refid="appwatcher.classpath"/>
 		<path refid="junit.classpath"/>
 		<path refid="hypersonic.classpath"/>
 		<path refid="bouncycastle.classpath"/>
