@@ -10,4 +10,4 @@ else
 	export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:%{INSTALL_PATH}/jni-lib"
 fi
 
-"$_GRID_LOCAL_JAVA_DIR/bin/java" -Xms32M -Xmx512M -classpath "%{INSTALL_PATH}/lib:%{INSTALL_PATH}/ApplicationWatcher/app-watcher.jar" "-Dlog4j.configuration=%{LOG4JCONFIG}" "-Djava.library.path=%{INSTALL_PATH}/jni-lib" "-Dedu.virginia.vcgr.genii.install-base-dir=%{INSTALL_PATH}" edu.virginia.vcgr.appwatcher.ApplicationLauncher "%{INSTALL_PATH}/ApplicationWatcher/genii-client-application.properties" "$@"
+"$_GRID_LOCAL_JAVA_DIR/bin/java" -Xms32M -Xmx512M -classpath "%{INSTALL_PATH}/lib:%{INSTALL_PATH}/ApplicationWatcher/app-watcher.jar" -Dedu.virginia.vcgr.appwatcher.update-frequency=604800000 "-Dlog4j.configuration=%{LOG4JCONFIG}" "-Djava.library.path=%{INSTALL_PATH}/jni-lib" "-Dedu.virginia.vcgr.genii.install-base-dir=%{INSTALL_PATH}" edu.virginia.vcgr.appwatcher.ApplicationLauncher "%{INSTALL_PATH}/ApplicationWatcher/genii-client-application.properties" "$@"
