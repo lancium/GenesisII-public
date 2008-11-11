@@ -39,11 +39,16 @@ public class StreamUtils
 		
 		while ( (read = in.read(data)) >= 0)
 		{
-			out.write(data, 0, read);
-			if (autoflush)
-				out.flush();
+			if (out != null)
+			{
+				out.write(data, 0, read);
+				if (autoflush)
+					out.flush();
+			}
 		}
-		out.flush();
+		
+		if (out != null)
+			out.flush();
 	}
 	
 	static public void copyStream(InputStream in, OutputStream out)

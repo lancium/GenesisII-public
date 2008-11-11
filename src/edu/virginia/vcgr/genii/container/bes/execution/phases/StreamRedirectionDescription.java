@@ -66,22 +66,20 @@ public class StreamRedirectionDescription
 	static private void redirect(ExecutionContext context,
 		StreamRedirectionSink sink, InputStream source)
 	{
-		if (sink != null)
+		try
 		{
-			try
-			{
-				Thread thread = new Thread(
-					new StreamRedirector(source, sink.openSink(context)),
-					"BES Stream Redirector Thread");
-				thread.setDaemon(false);
-				thread.start();
+			Thread thread = new Thread(
+				new StreamRedirector(source, 
+					sink == null ? null : sink.openSink(context)),
+				"BES Stream Redirector Thread");
+			thread.setDaemon(false);
+			thread.start();
 				
-				return;
-			}
-			catch (Throwable cause)
-			{
-				_logger.error("Unable to redirect stream.", cause);
-			}
+			return;
+		}
+		catch (Throwable cause)
+		{
+			_logger.error("Unable to redirect stream.", cause);
 		}
 		
 		StreamUtils.close(source);
