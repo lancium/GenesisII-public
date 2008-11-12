@@ -1,8 +1,5 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
-import edu.virginia.vcgr.appwatcher.ApplicationLauncher;
-import edu.virginia.vcgr.appwatcher.ApplicationLauncherConsole;
-import edu.virginia.vcgr.appwatcher.Version;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 
 public class UpdateTool extends BaseGridTool
@@ -20,6 +17,7 @@ public class UpdateTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
+/*
 		ApplicationLauncherConsole console = ApplicationLauncher.getConsole();
 		Version oldVersion = console.currentVersion();
 		if (!Version.EMPTY_VERSION.equals(oldVersion))
@@ -31,6 +29,10 @@ public class UpdateTool extends BaseGridTool
 		}
 		
 		return 0;
+*/
+		stderr.println("This functionallity is not supported yet.  " +
+			"It will be supported in version 2.0.");
+		return 1;
 	}
 
 	@Override
