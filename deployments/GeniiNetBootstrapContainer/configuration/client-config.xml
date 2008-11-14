@@ -259,6 +259,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.GetUserDir</mconf:class>
 		<mconf:class name="update"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.UpdateTool</mconf:class>
+		<mconf:class name="shell-login"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ShellLoginTool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>
