@@ -22,7 +22,7 @@ public class GeniiFuseFileSystem implements FuseFileSystem
 	static private final int DEFAULT_FILENAME_SIZE = 1024;
 
 	private TimedOutLRUCache<String, FuseFileSystemEntry> _lookupCache =
-		new TimedOutLRUCache<String, FuseFileSystemEntry>(4, 1000L * 4);
+		new TimedOutLRUCache<String, FuseFileSystemEntry>(128, 1000L * 48);
 	
 	private Calendar _mountTime;
 	
@@ -82,10 +82,16 @@ public class GeniiFuseFileSystem implements FuseFileSystem
 			_lastPath = target;
 			entry = new GeniiFuseEntryFacade(target, 
 				new GeniiFileSystemContextImpl());
-			_lookupCache.put(path, entry);
+			addToCache(entry);
 		}
 		
 		return entry;
+	}
+	
+	public void addToCache(FuseFileSystemEntry entry)
+	{
+		if (entry != null)
+			_lookupCache.put(entry.pwd(), entry);
 	}
 
 	@Override

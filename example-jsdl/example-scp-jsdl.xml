@@ -22,9 +22,6 @@
 				<jsdl-posix:Executable>
 					adder.sh
 				</jsdl-posix:Executable>
-<!--
-				<jsdl-posix:WorkingDirectory>/home/mmm2a/WorkingDirectory</jsdl-posix:WorkingDirectory>
--->
 				<jsdl-posix:Output>stdout</jsdl-posix:Output>
 				<jsdl-posix:Argument>seven.dat</jsdl-posix:Argument>
 				<jsdl-posix:Argument>fourty-two.dat</jsdl-posix:Argument>

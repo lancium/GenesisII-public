@@ -522,7 +522,7 @@ public class RNSPath implements Serializable
 				entries = new WSIterable<EntryType>(
 					EntryType.class, rpt.iterateList(
 						new IterateListRequestType()).getResult(),
-						50, true);
+						100, true);
 				LinkedList<RNSPath> ret = new LinkedList<RNSPath>();
 				for (EntryType entry : entries)
 				{

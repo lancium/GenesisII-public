@@ -29,8 +29,11 @@ import edu.virginia.vcgr.genii.client.exportdir.ExportedFileUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.MessageElementUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.AuthZSecurityException;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+
+import edu.virginia.vcgr.genii.common.security.AuthZConfig;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.byteio.IRByteIOResource;
 import edu.virginia.vcgr.genii.container.byteio.RandomByteIOAttributeHandlers;
@@ -42,6 +45,8 @@ import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverUtils;
+import edu.virginia.vcgr.genii.container.security.authz.providers.AuthZProviders;
+import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 
 public class ExportedDirDBResource extends BasicDBResource implements
@@ -1083,6 +1088,21 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		}
 	}
 	
+	private MessageElement getAuthZConfig(IResource resource)
+		throws ResourceUnknownFaultType, ResourceException, AuthZSecurityException
+	{
+		IAuthZProvider authZHandler = AuthZProviders.getProvider(
+			resource.getParentResourceKey().getServiceName());
+		
+		AuthZConfig config = null;
+		if (authZHandler != null)
+			config = authZHandler.getAuthZConfig(resource);
+		
+		return new MessageElement(
+			AuthZConfig.getTypeDesc().getXmlType(), 
+			config);
+	}
+	
 	private void fillInAttributes(ExportedDirEntry entry)
 		throws ResourceException
 	{
@@ -1125,10 +1145,22 @@ public class ExportedDirDBResource extends BasicDBResource implements
 			attrs.add(new MessageElement(new QName(
 				ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME),
 				resource.getCreateTime()));
+
+			_logger.trace("Getting authz config attribute.");
+			attrs.add(getAuthZConfig(resource));
 		}
 		catch (ResourceUnknownFaultType ruft)
 		{
 			// We couldn't find the resource, so we just skip it for now.
+			_logger.warn("Unable to find resource for export dir attr cache.", 
+				ruft);
+		}
+		catch (AuthZSecurityException e)
+		{
+			// Something went wrong, but no reason to fail here.
+			_logger.warn(
+				"Unable to get authorization information for export dir cache.",
+				e);
 		}
 		
 		entry.setAttributes(attrs.toArray(new MessageElement[0]));

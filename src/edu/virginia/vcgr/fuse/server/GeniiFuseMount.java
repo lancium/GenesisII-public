@@ -17,6 +17,7 @@ import edu.virginia.vcgr.fuse.exceptions.FuseFunctionNotImplementedException;
 import edu.virginia.vcgr.fuse.fs.FuseFile;
 import edu.virginia.vcgr.fuse.fs.FuseFileSystem;
 import edu.virginia.vcgr.fuse.fs.FuseFileSystemEntry;
+import edu.virginia.vcgr.fuse.fs.genii.GeniiFuseFileSystem;
 import fuse.Filesystem;
 import fuse.FilesystemConstants;
 import fuse.FuseDirEnt;
@@ -141,6 +142,8 @@ public class GeniiFuseMount implements Filesystem
 		Collection<FuseDirEnt> entries = new LinkedList<FuseDirEnt>();
 		for (FuseFileSystemEntry subEntry : entry.listContents())
 		{
+			((GeniiFuseFileSystem)_fs).addToCache(subEntry);
+			
 			FuseDirEnt directoryEntry = new FuseDirEnt();
 			
 			directoryEntry.inode = (int)subEntry.inode();

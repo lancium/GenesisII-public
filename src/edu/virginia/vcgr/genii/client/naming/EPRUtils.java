@@ -512,4 +512,10 @@ public class EPRUtils
 			return fromBytes(data);
 		}
 	}
+	
+	static public EndpointReferenceType packEPR(EndpointReferenceType epr) 
+		throws ResourceException
+	{
+		return fromBytes(toBytes(epr));
+	}
 }

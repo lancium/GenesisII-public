@@ -33,6 +33,7 @@ import edu.virginia.vcgr.genii.client.invoke.PipelineProcessor;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
+import edu.virginia.vcgr.genii.common.security.AuthZConfig;
 import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
 import edu.virginia.vcgr.genii.enhancedrns.IterateListRequestType;
 import edu.virginia.vcgr.genii.enhancedrns.IterateListResponseType;
@@ -57,6 +58,7 @@ public class AttributeCacheHandler
 	static private QName accessTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.ACCESSTIME_ATTR_NAME);
 	static private QName modTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME);
 	static private QName creatTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME);
+	static private QName authz = AuthZConfig.getTypeDesc().getXmlType();
 	
 	public AttributeCacheHandler()
 	{
@@ -240,6 +242,7 @@ public class AttributeCacheHandler
 			ret = findAttributes(getMultipleResourcePropertiesRequest, data);
 		if (ret == null)
 		{
+			_logger.debug("Couldn't find attribute data...making outcall.");
 			GetMultipleResourcePropertiesResponse resp = 
 				(GetMultipleResourcePropertiesResponse)ctxt.proceed();
 			data = new CachedAttributeData(resp.get_any());
@@ -323,8 +326,9 @@ public class AttributeCacheHandler
 						QName elemName = elem.getQName();
 						if (elemName.equals(xferMechs) || elemName.equals(size) ||
 							elemName.equals(accessTime) || elemName.equals(modTime) ||
-							elemName.equals(creatTime))
+							elemName.equals(creatTime) || elemName.equals(authz))
 						{
+							_logger.debug("Adding " + elemName + " to cache.");
 							cachedAttrs.add(elem);
 						}
 					}
@@ -375,8 +379,9 @@ public class AttributeCacheHandler
 									QName elemName = elem.getQName();
 									if (elemName.equals(xferMechs) || elemName.equals(size) ||
 										elemName.equals(accessTime) || elemName.equals(modTime) ||
-										elemName.equals(creatTime))
+										elemName.equals(creatTime) || elemName.equals(authz))
 									{
+										_logger.debug("Adding " + elemName + " to cache.");
 										cachedAttrs.add(elem);
 									}
 								}
@@ -427,8 +432,9 @@ public class AttributeCacheHandler
 								QName elemName = elem.getQName();
 								if (elemName.equals(xferMechs) || elemName.equals(size) ||
 									elemName.equals(accessTime) || elemName.equals(modTime) ||
-									elemName.equals(creatTime))
+									elemName.equals(creatTime) || elemName.equals(authz))
 								{
+									_logger.debug("Adding " + elemName + " to cache.");
 									cachedAttrs.add(elem);
 								}
 							}

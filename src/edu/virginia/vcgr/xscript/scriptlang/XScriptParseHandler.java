@@ -2,6 +2,7 @@ package edu.virginia.vcgr.xscript.scriptlang;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import javax.script.ScriptException;
@@ -366,6 +367,16 @@ public class XScriptParseHandler implements ParseHandler
 		return new ExitStatement(exitCode);
 	}
 	
+	static private ParseStatement parseSleep(ParseContext context,
+		Element element) throws ScriptException
+	{
+		return new SleepStatement(
+			TimeUnit.valueOf(XScriptParser.getAttribute(
+				element, "units", "MILLISECONDS")),
+			Long.parseLong(XScriptParser.getRequiredAttribute(
+				element, "value")));
+	}
+	
 	static private ParseStatement parseDefault(ParseContext context,
 		Element element) throws ScriptException
 	{
@@ -602,6 +613,8 @@ public class XScriptParseHandler implements ParseHandler
 			return parseParallelJob(context, element);
 		else if (name.equals("switch"))
 			return parseSwitch(context, element);
+		else if (name.equals("sleep"))
+			return parseSleep(context, element);
 		else
 			throw new ScriptException(String.format(
 				"Unrecognized node name <{%s}:%s>.",
