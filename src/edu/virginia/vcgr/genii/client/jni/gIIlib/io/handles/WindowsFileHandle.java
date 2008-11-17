@@ -82,7 +82,7 @@ public class WindowsFileHandle extends WindowsResourceHandle {
 					filePath.delete();						
 				}							
 				filePath.createNewFile();												
-				fileInCache = new CachedFile(filePath, desiredAccess, false);
+				fileInCache = new CachedFile(filePath, desiredAccess, false, true);
 				fileInCache.attach(this, desiredAccess, false);
 				
 				//Add back to parent
@@ -97,14 +97,50 @@ public class WindowsFileHandle extends WindowsResourceHandle {
 					fileInCache = cachedFile;
 				}else{
 					fileInCache = new CachedFile(filePath, desiredAccess, 
-							(requestedDeposition == OVERWRITE));
+							(requestedDeposition == OVERWRITE), true);
 					fileInCache.attach(this, desiredAccess, false);
 					manager.putResource(fileName, fileInCache);					
 				}												
 				break;			
 		}																
 	}
+	
+	/** 
+	 * Opens a file for a Non-ByteIO 
+	 * **/
+	private WindowsFileHandle(RNSPath filePath) 
+		throws RNSException, IOException {
 		
+		super();
+		
+		String fileName = filePath.pwd();
+		CacheManager manager = CacheManager.getInstance();
+		CachedResource resource = manager.getResource(fileName, true);
+		if(resource != null && resource.isDirectory()){
+			throw new RNSException("Directory exists where file is desired to be opened");
+		}
+		
+		//Cast to the correct type
+		CachedFile cachedFile = null;
+		if(resource != null){
+			cachedFile = (CachedFile)resource;
+		}										
+		if(cachedFile != null){
+			cachedFile.attach(this, WindowsResourceHandle.INFORMATION_ONLY, false);
+			fileInCache = cachedFile;
+		}else{
+			fileInCache = new CachedFile(filePath, WindowsResourceHandle.INFORMATION_ONLY, 
+					false, false);
+			fileInCache.attach(this, WindowsResourceHandle.INFORMATION_ONLY, false);
+			manager.putResource(fileName, fileInCache);					
+		}																													
+	}
+	
+	public static WindowsFileHandle createNonByteIOFileHandle(RNSPath filePath) 
+			throws RNSException, IOException {
+		return new WindowsFileHandle(filePath);
+	}
+				
 	void finishOpen(String resourceName, Integer requestedDeposition, Integer desiredAccess, CachedResource cachedResource,  
 				CachedDir cachedParent, RNSPath searchRoot, String pathToLookup) throws Exception{
 		
@@ -147,7 +183,7 @@ public class WindowsFileHandle extends WindowsResourceHandle {
 				}
 				
 				filePath.createNewFile();												
-				fileInCache = new CachedFile(filePath, desiredAccess, truncate);
+				fileInCache = new CachedFile(filePath, desiredAccess, truncate, true);
 				fileInCache.attach(this, desiredAccess, false);
 				if(cachedParent != null) cachedParent.addEntry(filePath.getName(), makeCopy());
 				
@@ -162,7 +198,7 @@ public class WindowsFileHandle extends WindowsResourceHandle {
 				}else{
 					filePath = searchRoot.lookup(pathToLookup, RNSPathQueryFlags.MUST_EXIST);
 					if(!(new TypeInformation(filePath.getEndpoint()).isRNS())){
-						fileInCache = new CachedFile(filePath, desiredAccess, truncate);
+						fileInCache = new CachedFile(filePath, desiredAccess, truncate, true);
 						fileInCache.attach(this, desiredAccess, false);
 						manager.putResource(resourceName, fileInCache);
 					}else{
@@ -184,7 +220,7 @@ public class WindowsFileHandle extends WindowsResourceHandle {
 						created = true;
 					}
 										
-					fileInCache = new CachedFile(filePath, desiredAccess, truncate);
+					fileInCache = new CachedFile(filePath, desiredAccess, truncate, true);
 					fileInCache.attach(this, desiredAccess, false);
 					
 					if(created && cachedParent != null) 

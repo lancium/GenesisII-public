@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.client.jni.gIIlib.cache;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.ws.addressing.EndpointReferenceType;
@@ -32,6 +33,8 @@ public class CachedFile extends CachedResource {
 	
 	private boolean isAppendable;
 	
+	private boolean isByteIO;
+	
 	//A reference to the ByteIO handler for this resource
 	private IFSFile byteIOHandler;
 
@@ -39,7 +42,7 @@ public class CachedFile extends CachedResource {
 	private ArrayList <WindowsFileHandle> myHandles = new ArrayList<WindowsFileHandle>();	
 	
 	public CachedFile(RNSPath filePath, int desiredAccess,
-			boolean truncate) throws RNSException, IOException{
+			boolean truncate, boolean isByteIO) throws RNSException, IOException{
 		super();
 		
 		boolean isAppend = (desiredAccess & WindowsResourceHandle.FILE_APPEND_DATA) > 0;
@@ -48,21 +51,30 @@ public class CachedFile extends CachedResource {
 		
 		rnsPath = filePath;
 		
-		EndpointReferenceType epr = rnsPath.getEndpoint();						
-		TypeInformation typeInfo = new TypeInformation(epr);
+		EndpointReferenceType epr = rnsPath.getEndpoint();	
+		if(isByteIO) {
+			TypeInformation typeInfo = new TypeInformation(epr);
+			lastAccessedTime = typeInfo.getByteIOAccessTime();
+			lastModifiedTime = typeInfo.getByteIOModificationTime();
+			createTime = typeInfo.getByteIOCreateTime();
+			fileSize = typeInfo.getByteIOSize();					
+		} else // for Non ByteIO
+		{
+			lastAccessedTime = new Date();
+			lastModifiedTime = lastAccessedTime;
+			createTime = lastAccessedTime;
+			fileSize = 0;			
+		}
 		
-		lastAccessedTime = typeInfo.getByteIOAccessTime();
-		lastModifiedTime = typeInfo.getByteIOModificationTime();
-		createTime = typeInfo.getByteIOCreateTime();
-		fileSize = typeInfo.getByteIOSize();			
-		isDirectory = false;
-		
+		this.isByteIO = isByteIO;
+					
+		isDirectory = false;		
 		isReadable = isRead;
 		isWritable = isWrite;
 		isAppendable = isAppend;
 		
 		//If ONLY information, then don't connect to ByteIO
-		if(desiredAccess != WindowsResourceHandle.INFORMATION_ONLY){
+		if(isByteIO && desiredAccess != WindowsResourceHandle.INFORMATION_ONLY){
 			reconnectToEpr(truncate);
 		}
 	}
@@ -140,7 +152,7 @@ public class CachedFile extends CachedResource {
 	synchronized public byte[] read(long offset, int length){
 		byte[] toReturn = null;		
 		try{
-			if(isReadable && length > 0){				
+			if(isByteIO && isReadable && length > 0){				
 				byteIOHandler.lseek64(offset);							
 				toReturn = byteIOHandler.read(length);
 			}			
@@ -153,7 +165,7 @@ public class CachedFile extends CachedResource {
 	synchronized public int write(byte []data, long offset){
 		int bytesWritten = 0;
 		try{
-			if(isWritable && data.length > 0){				
+			if(isByteIO && isWritable && data.length > 0){				
 				byteIOHandler.lseek64(offset);			
 				bytesWritten = byteIOHandler.write(data);
 				setDirty(true);
@@ -165,7 +177,7 @@ public class CachedFile extends CachedResource {
 	}	
 	
 	synchronized public int truncateAppend(byte[] data, long offset){
-		if(isWritable){		
+		if(isByteIO && isWritable){		
 			try{
 				reconnectToEpr(true);
 				return write(data, offset);
@@ -185,47 +197,51 @@ public class CachedFile extends CachedResource {
 			byteIOHandler.close();
 		}
 		
-		EndpointReferenceType epr = rnsPath.getEndpoint();				
-		TypeInformation typeInfo = new TypeInformation(epr);				
-		
-		if(byteIOHandler != null){
-			byteIOHandler.close();
+		if(isByteIO) {		
+			EndpointReferenceType epr = rnsPath.getEndpoint();				
+			TypeInformation typeInfo = new TypeInformation(epr);				
+			
+			if(byteIOHandler != null){
+				byteIOHandler.close();
+			}
+			
+			//Check the type of ByteIO and create it according to the options specified				
+			if (typeInfo.isRByteIO()){	
+				byteIOHandler = new RandomByteIOFileDescriptor(
+						rnsPath, epr, isReadable, isWritable, isAppendable, truncate);
+																											
+			} else if (typeInfo.isSByteIO()){
+				byteIOHandler = new StreamableByteIOFileDescriptor(rnsPath,
+						epr, isReadable, isWritable, isAppendable);
+			} else if (typeInfo.isSByteIOFactory())	{
+				throw new RNSException("SByteIOFactory is unimplemented.");
+			} else
+			{
+				//TODO: Implement this (SEE Mark's code)
+				throw new RNSException("The path refers to an " +
+						"object that isn't a file.");
+			}					
 		}
-		
-		//Check the type of ByteIO and create it according to the options specified				
-		if (typeInfo.isRByteIO()){	
-			byteIOHandler = new RandomByteIOFileDescriptor(
-					rnsPath, epr, isReadable, isWritable, isAppendable, truncate);
-																										
-		} else if (typeInfo.isSByteIO()){
-			byteIOHandler = new StreamableByteIOFileDescriptor(rnsPath,
-					epr, isReadable, isWritable, isAppendable);
-		} else if (typeInfo.isSByteIOFactory())	{
-			throw new RNSException("SByteIOFactory is unimplemented.");
-		} else
-		{
-			//TODO: Implement this (SEE Mark's code)
-			throw new RNSException("The path refers to an " +
-					"object that isn't a file.");
-		}					
 	}
 	
 	/* Refreshes RNS Meta information */
 	private void refreshInformation(){
-		try{
-			informationLock.writeLock().lock();
-			EndpointReferenceType epr = rnsPath.getEndpoint();				
-			TypeInformation typeInfo = new TypeInformation(epr);		
-			lastAccessedTime = typeInfo.getByteIOAccessTime();
-			lastModifiedTime = typeInfo.getByteIOModificationTime();
-			createTime = typeInfo.getByteIOCreateTime();
-			fileSize = typeInfo.getByteIOSize();
-		}catch(RNSPathDoesNotExistException rpdnee){
-			System.err.println("G-ICING:  Error refresing information");
-			rpdnee.printStackTrace();
-		}finally{
-			setDirty(false);
-			informationLock.writeLock().unlock();			
+		if(isByteIO){
+			try{
+				informationLock.writeLock().lock();
+				EndpointReferenceType epr = rnsPath.getEndpoint();				
+				TypeInformation typeInfo = new TypeInformation(epr);		
+				lastAccessedTime = typeInfo.getByteIOAccessTime();
+				lastModifiedTime = typeInfo.getByteIOModificationTime();
+				createTime = typeInfo.getByteIOCreateTime();
+				fileSize = typeInfo.getByteIOSize();
+			}catch(RNSPathDoesNotExistException rpdnee){
+				System.err.println("G-ICING:  Error refresing information");
+				rpdnee.printStackTrace();
+			}finally{
+				setDirty(false);
+				informationLock.writeLock().unlock();			
+			}
 		}
 	}	
 }

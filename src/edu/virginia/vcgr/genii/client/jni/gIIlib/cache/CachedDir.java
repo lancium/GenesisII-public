@@ -155,9 +155,16 @@ public class CachedDir extends CachedResource {
 						(WindowsFileHandle)directoryEntries.put(entry.getName(), fileEntry);					
 					
 					if(oldHandle != null)	oldHandle.close(false);
-				}	
-				setDirty(false);
-			}
+				} else {
+					// For non-Byte IO we treat like a file
+					WindowsFileHandle fileEntry = 
+						WindowsFileHandle.createNonByteIOFileHandle(entry);
+					WindowsFileHandle oldHandle = 
+						(WindowsFileHandle)directoryEntries.put(entry.getName(), fileEntry);
+					if(oldHandle != null)	oldHandle.close(false);
+				}
+			}			
+			setDirty(false);
 		}catch(RNSPathDoesNotExistException rnse){
 			//No entries
 		}catch(Exception e){
