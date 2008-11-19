@@ -70,6 +70,7 @@ public class CatTool extends BaseGridTool
 		finally
 		{
 			StreamUtils.close(in);
+			stdout.flush();
 		}
 	}
 }
