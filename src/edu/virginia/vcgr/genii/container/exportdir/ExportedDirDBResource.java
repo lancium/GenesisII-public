@@ -1098,9 +1098,10 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		if (authZHandler != null)
 			config = authZHandler.getAuthZConfig(resource);
 		
-		return new MessageElement(
+		MessageElement me = new MessageElement(
 			AuthZConfig.getTypeDesc().getXmlType(), 
 			config);
+		return me;
 	}
 	
 	private void fillInAttributes(ExportedDirEntry entry)

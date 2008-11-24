@@ -4,8 +4,8 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 
-import edu.virginia.vcgr.fuse.FuseUtils;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
+import edu.virginia.vcgr.genii.client.fuse.FuseUtils;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLMatchException;
 import edu.virginia.vcgr.genii.client.jsdl.personality.def.DefaultResourcesFacet;

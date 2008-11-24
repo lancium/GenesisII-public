@@ -5,9 +5,9 @@ import java.io.File;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.virginia.vcgr.fuse.server.GeniiFuse;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.fuse.GeniiFuse;
 import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.utils.exec.ExecutionEngine;
 

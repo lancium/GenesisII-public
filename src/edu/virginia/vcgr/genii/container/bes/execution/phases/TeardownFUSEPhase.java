@@ -7,8 +7,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStateEnumeration;
 
-import edu.virginia.vcgr.fuse.server.GeniiFuse;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
+import edu.virginia.vcgr.genii.client.fuse.GeniiFuse;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
 import fuse.FuseException;
 

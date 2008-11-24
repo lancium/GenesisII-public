@@ -33,7 +33,6 @@ import edu.virginia.vcgr.genii.client.invoke.PipelineProcessor;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
-import edu.virginia.vcgr.genii.common.security.AuthZConfig;
 import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
 import edu.virginia.vcgr.genii.enhancedrns.IterateListRequestType;
 import edu.virginia.vcgr.genii.enhancedrns.IterateListResponseType;
@@ -58,7 +57,8 @@ public class AttributeCacheHandler
 	static private QName accessTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.ACCESSTIME_ATTR_NAME);
 	static private QName modTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME);
 	static private QName creatTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME);
-	static private QName authz = AuthZConfig.getTypeDesc().getXmlType();
+	// static private QName authz = AuthZConfig.getTypeDesc().getXmlType();
+	static private QName authz = new QName("http://tempuri.org", "Mark");
 	
 	public AttributeCacheHandler()
 	{
