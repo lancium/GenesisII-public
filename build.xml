@@ -377,5 +377,21 @@
 			storepass="${secrun.storepass}"/>
 	</target>
 
+	<target name="register-ifs">
+		<copy todir="${env.SystemRoot}/system32">
+			<fileset dir="${basedir}/IFS"
+				includes="nulmrx.sys,nulmrxnp.dll"/>
+		</copy>
+
+		<copy file="${basedir}/jni-lib/IFS/GenesisIFSServer.exe"
+			tofile="${basedir}/GenesisIFSServer.exe"/>
+
+		<exec executable="cmd">
+			<arg value="/c"/>
+			<arg value="${basedir}/jni-lib/IFS/editRegistry.bat"/>
+			<arg value="${basedir}"/>
+  		</exec>
+	</target>
+
 	<target name="secrun" depends="secrun.test, secrun.contpreboot, secrun.contpostboot"/>
 </project>

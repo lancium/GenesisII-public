@@ -40,6 +40,7 @@
 				<include name="jserver-debug.*"/>
 				<include name="runContainer.*"/>
 				<include name="grid*"/>
+				<include name="ifs.bat"/>
 				<include name="simple-command*"/>
 				<include name="cert-tool*"/>
 				<include name="initialize-new-net-security*"/>
@@ -138,6 +139,10 @@
 		<antcall target="build-script">
 			<param name="script-src-dir" value="${scripts.dir}"/>
 			<param name="script-base-name" value="grid"/>
+		</antcall>
+		<antcall target="build-script-win">
+			<param name="win-script-src-dir" value="${scripts.dir}"/>
+			<param name="win-script-base-name" value="ifs"/>
 		</antcall>
 		<antcall target="build-script">
 			<param name="script-src-dir" value="${scripts.dir}"/>
