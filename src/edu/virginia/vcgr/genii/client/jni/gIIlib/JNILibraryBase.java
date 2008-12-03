@@ -1,99 +1,129 @@
 package edu.virginia.vcgr.genii.client.jni.gIIlib;
 
+import java.util.regex.Pattern;
+
+import edu.virginia.vcgr.fsii.FileHandleTable;
+import edu.virginia.vcgr.fsii.path.FilesystemPathRepresentation;
+import edu.virginia.vcgr.fsii.path.UnixFilesystemPathRepresentation;
 import edu.virginia.vcgr.genii.client.ApplicationBase;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.gfs.GenesisIIFilesystem;
+import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.FilesystemHandle;
 
-public abstract class JNILibraryBase extends ApplicationBase {
-
+public abstract class JNILibraryBase extends ApplicationBase
+{
 	public static boolean isInitialized = false;
 	public static final boolean DEBUG = true;
 	
+	static private FilesystemPathRepresentation PATHREP =
+		UnixFilesystemPathRepresentation.INSTANCE;
+	static private GenesisIIFilesystem _fs = null;
+	static private FileHandleTable<FilesystemHandle> _openHandles =
+		new FileHandleTable<FilesystemHandle>(1024);
+	
 	// Members for the mirroring test harness
 	
-	/** 
-	 * If this is set to true, filesystem calls to the redirector
-	 * will be mirrored to the folder specified by testRoot.
-	 * e.g. C:\TestRoot will be the Root of the RNS space
-	 */
-	public static boolean ENABLE_LOCAL_TEST = false;
-	
-	/** 
-	 * Easy default value for testRoot
-	 */
-	public static final String DEFAULT_ROOT = "C:/TestRoot";
-	
-	/**
-	 * Folder for test harness
-	 */
-	public static String testRoot = DEFAULT_ROOT;
-	
-	synchronized public static void tryToInitialize(){
-		if(!ENABLE_LOCAL_TEST) {			
-			if(!isInitialized){
-				initialize();
-			}
-			ICallingContext callingContext;
-			try {
-				callingContext = ContextManager.getCurrentContext(false);
-				ClientUtils.checkAndRenewCredentials(callingContext);
-			} catch (Exception e) {
-				
-				System.out.println("JNILibraryError:  Problem with relogin");
-			}
+	synchronized static public void tryToInitialize()
+	{
+		if(!isInitialized)
+			initialize();
+
+		ICallingContext callingContext;
+		try 
+		{
+			callingContext = ContextManager.getCurrentContext(false);
+			ClientUtils.checkAndRenewCredentials(callingContext);
+			
+			_fs = new GenesisIIFilesystem(
+				callingContext.getCurrentPath().getRoot(), 
+				null);
+		}
+		catch (Exception e) 
+		{
+			System.err.println("JNILibraryError:  Problem with relogin");
+			e.printStackTrace(System.err);
 		}
 	}
 	
-	public static void initialize(){
-		try{
+	static private void initialize()
+	{
+		try
+		{
 			prepareClientApplication();
 			isInitialized = true;
-		}catch(RuntimeException e){
-			System.out.println("Application already started");
+		}
+		catch(RuntimeException e)
+		{
+			System.err.println("Application already started");
+			e.printStackTrace(System.err);
 		}
 	}
 	
 	/** 
 	 * Cleans up paths so that they are all  consistent (important for Caching)
 	 */
-	public static String cleanupPath(String path){
+	static private String cleanupPath(String path)
+	{
 		String newPath = path;
 		
 		//All root directory pointers are '/'
-		if(path == null || path.equals("") || path.equals("/")){
+		if(path == null || path.equals("") || path.equals("/"))
 			newPath = "/";
-		}
 		
 		//All paths are absolute
-		if(!newPath.startsWith("/")){
+		if(!newPath.startsWith("/"))
 			newPath = "/" + newPath;
-		}
 		
 		//No paths end with '/'
-		if(newPath.length() > 1 && newPath.endsWith("/")){
+		if(newPath.length() > 1 && newPath.endsWith("/"))
 			newPath = newPath.substring(0, newPath.lastIndexOf('/'));
-		}
 		
 		return newPath;				
 	}
+	
+	static public String[] convertPath(String path)
+	{
+		if (!isValidPath(path))
+			return null;
+		path = cleanupPath(path);
+		tryToInitialize();
+		
+		return PATHREP.parse(null, path);
+	}
+	
+	static private Pattern DESKTOP_INI_PAT = Pattern.compile(
+		"^.*desktop\\.ini$", Pattern.CASE_INSENSITIVE);
 	
 	/**
 	 * Checks for valid paths (filters out commonly unused names)
 	 * @param path
 	 * @return
 	 */
-	public static boolean isValidPath(String path){
-		if(path != null){
-			if(path.contains(":") || 
-					path.matches(".*[Dd][Ee][Ss][Kk][Tt][Oo][Pp].[Ii][Nn][Ii]")){
+	static public boolean isValidPath(String path)
+	{
+		if(path != null)
+		{
+			if(path.contains(":") || DESKTOP_INI_PAT.matcher(path).matches())
+			{
 				if(JNILibraryBase.DEBUG)
 					System.out.println("GENESIS:  Path filtered out: " + path);
 				return false;
-			}else if (path.endsWith("Thumbs.db")){
+			} else if (path.endsWith("Thumbs.db"))
 				return false;
-			}
 		}
+		
 		return true;
+	}
+	
+	static protected GenesisIIFilesystem getFilesystem()
+	{
+		return _fs;
+	}
+	
+	static protected FileHandleTable<FilesystemHandle> openHandles()
+	{
+		return _openHandles;
 	}
 }

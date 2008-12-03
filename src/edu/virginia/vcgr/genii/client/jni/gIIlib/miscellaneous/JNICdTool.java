@@ -7,26 +7,28 @@ import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 
-public class JNICdTool extends JNILibraryBase {
-	
-	public static Boolean changeDirectory(String targetDirectory){
+public class JNICdTool extends JNILibraryBase 
+{	
+	public static Boolean changeDirectory(String targetDirectory)
+	{
 		tryToInitialize();
-		if(ENABLE_LOCAL_TEST){
-			return true;
-		}
-		
-		try{
+
+		try
+		{
 			ICallingContext ctxt = ContextManager.getCurrentContext();
 			RNSPath path = ctxt.getCurrentPath().lookup(targetDirectory, RNSPathQueryFlags.MUST_EXIST);			
-			if (!(new TypeInformation(path.getEndpoint()).isRNS())){
+			if (!(new TypeInformation(path.getEndpoint()).isRNS()))
 				return false;
-			}			
+			
 			ctxt.setCurrentPath(path);
 			ContextManager.storeCurrentContext(ctxt);
-		}catch(Exception e){
-			e.printStackTrace();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace(System.err);
 			return false;
 		}
+		
 		return true;
 	}
 }

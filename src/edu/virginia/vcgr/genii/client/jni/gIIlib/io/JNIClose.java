@@ -1,23 +1,39 @@
 package edu.virginia.vcgr.genii.client.jni.gIIlib.io;
 
-import edu.virginia.vcgr.genii.client.jni.gIIlib.cache.CacheManager;
-import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.WindowsResourceHandle;
+import edu.virginia.vcgr.fsii.FileHandleTable;
+import edu.virginia.vcgr.fsii.exceptions.FSException;
+import edu.virginia.vcgr.genii.client.jni.gIIlib.JNILibraryBase;
+import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.FilesystemHandle;
 
-
-public class JNIClose {
-	public static Boolean close(Integer handle, Boolean deleteOnClose){		
-									
-		CacheManager manager = CacheManager.getInstance();
+public class JNIClose extends JNILibraryBase 
+{
+	public static Boolean close(Integer handle, Boolean deleteOnClose)
+	{		
+		FileHandleTable<FilesystemHandle> openHandles = openHandles();
 		
-		WindowsResourceHandle resourceHandle = manager.getHandle(handle);							
+		FilesystemHandle fsHandle = openHandles.get(handle);
 		
-		if(resourceHandle == null){
-			System.out.println("G-ICING:  Invalid handle received on file close");			
+		if(fsHandle == null)
+		{
+			System.err.println("G-ICING:  Invalid handle received on file close");			
 			return false;
-		}else{
-			resourceHandle.close(deleteOnClose);			
-			manager.removeHandle(handle);
-			return true;
+		} else
+		{
+			try
+			{
+				if (deleteOnClose)
+					fsHandle.delete();
+				openHandles.release(handle);
+			
+				return true;
+			}
+			catch (FSException fse)
+			{
+				System.err.println("Unable to delete file handle.");
+				fse.printStackTrace(System.err);
+				
+				return false;
+			}
 		}
 	}
 }

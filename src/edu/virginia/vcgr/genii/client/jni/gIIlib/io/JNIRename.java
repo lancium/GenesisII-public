@@ -1,23 +1,22 @@
 package edu.virginia.vcgr.genii.client.jni.gIIlib.io;
 
-import edu.virginia.vcgr.genii.client.jni.gIIlib.cache.CacheManager;
-import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.WindowsDirHandle;
-import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.WindowsFileHandle;
-import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.WindowsResourceHandle;
+import edu.virginia.vcgr.fsii.FileHandleTable;
+import edu.virginia.vcgr.genii.client.jni.gIIlib.JNILibraryBase;
+import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.FilesystemHandle;
 
-public class JNIRename {
-
-	public static boolean rename(Integer fileHandle, String destination){					
-		CacheManager manager = CacheManager.getInstance();		
-		WindowsResourceHandle resourceHandle = manager.getHandle(fileHandle);			
+public class JNIRename extends JNILibraryBase 
+{
+	public static boolean rename(Integer fileHandle, String destination)
+	{
+		FileHandleTable<FilesystemHandle> openHandles = openHandles();
 		
-		if(resourceHandle instanceof WindowsDirHandle){
-			WindowsDirHandle dirHandle = (WindowsDirHandle)resourceHandle;
-			return dirHandle.rename(destination);			
-		}else{
-			WindowsFileHandle winFileHandle = (WindowsFileHandle)resourceHandle;
-			return winFileHandle.rename(destination);			
+		FilesystemHandle fsHandle = openHandles.get(fileHandle);
+		if(fsHandle == null)
+		{
+			System.err.println("G-ICING:  Invalid handle received for rename.");			
+			return false;
 		}
-	}
-	
+		
+		return fsHandle.renameTo(convertPath(destination));
+	}	
 }

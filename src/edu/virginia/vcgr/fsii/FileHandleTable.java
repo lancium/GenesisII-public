@@ -16,7 +16,7 @@ public class FileHandleTable<FileObjectType>
 		_nextFree = 0;
 	}
 	
-	public int allocate(FileObjectType file)
+	synchronized public int allocate(FileObjectType file)
 	{
 		if (_nextFree >= _table.length)
 			return -1;
@@ -34,7 +34,7 @@ public class FileHandleTable<FileObjectType>
 	}
 	
 	@SuppressWarnings("unchecked")
-	public FileObjectType get(int handle)
+	synchronized public FileObjectType get(int handle)
 	{
 		Object entry = _table[handle];
 		if (entry instanceof Integer)
@@ -43,7 +43,7 @@ public class FileHandleTable<FileObjectType>
 		return (FileObjectType)entry;
 	}
 	
-	public void release(int handle)
+	synchronized public void release(int handle)
 	{
 		Object entry = _table[handle];
 		if (entry instanceof Integer)

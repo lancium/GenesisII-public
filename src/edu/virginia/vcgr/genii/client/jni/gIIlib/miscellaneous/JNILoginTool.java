@@ -14,16 +14,16 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.TransientCredentials;
 
 public class JNILoginTool extends JNILibraryBase 
 {	
-	public static Boolean login(String keystorePath, String password, String certPattern){		
+	public static Boolean login(String keystorePath, 
+		String password, String certPattern)
+	{		
 		tryToInitialize();
-		if(ENABLE_LOCAL_TEST){
-			return true;
-		}
 		
 		CommandLineRunner runner = new CommandLineRunner();
 		String[] args = {"login"};						
 		
-		try{
+		try
+		{
 			runner.runCommand(args, 
 				new OutputStreamWriter(System.out),
 				new OutputStreamWriter(System.err),
@@ -34,15 +34,16 @@ public class JNILoginTool extends JNILibraryBase
 			TransientCredentials transientCredentials = TransientCredentials
 			.getTransientCredentials(callContext);
 			
-			if(transientCredentials != null && transientCredentials._credentials != null &&
-					transientCredentials._credentials.size() > 0){
+			if(transientCredentials != null && 
+				transientCredentials._credentials != null &&
+				transientCredentials._credentials.size() > 0)
 				return true;
-			}
-			else{
+			else
 				return false;
-			}		
-		}catch(Throwable e){
-			e.printStackTrace();
+		}
+		catch(Throwable e)
+		{
+			e.printStackTrace(System.err);
 			return false;			
 		}
 	}		
