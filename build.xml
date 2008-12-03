@@ -110,6 +110,7 @@
 	<target name="genii.client.jar" depends="genii.compile">
 		<jar destfile="${lib.dir}/GenesisII-client.jar">
 			<fileset dir="${obj.dir}">
+				<include name="edu/virginia/vcgr/fsii/**/*"/>
 				<include name="edu/virginia/vcgr/genii/client/**/*"/>
 				<include name="edu/virginia/vcgr/fuse/**/*"/>
 				<include name="edu/virginia/vcgr/secrun/**/*"/>
