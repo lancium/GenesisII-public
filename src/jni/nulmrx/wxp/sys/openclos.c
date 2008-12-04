@@ -859,7 +859,7 @@ Return Value:
 	DbgPrint("NulMrxCloseSrvOpen for %wZ\n", pSrvOpen->pAlreadyPrefixedName);		
 
 	//Only makes sense for files that were opened correctly
-	if(giiFCB->State == GENII_STATE_HAVE_INFO){
+	if(giiFCB->State == GENII_STATE_HAVE_INFO || giiFCB->State == GENII_STATE_HAVE_LISTING){
 
 		//Close this file handle on the Genesis Side
 		Status = GenesisSendInvertedCall(RxContext, GENII_CLOSE, FALSE);
