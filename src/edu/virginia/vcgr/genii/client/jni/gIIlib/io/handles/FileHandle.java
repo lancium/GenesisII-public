@@ -21,6 +21,9 @@ public class FileHandle extends AbstractFilesystemHandle
 	{
 		super(fs, path);
 		
+		_logger.trace(String.format(
+			"Created a FileHandle with internal handle %d.", fileHandle));
+		
 		_fileHandle = fileHandle;
 	}
 	
