@@ -3,8 +3,13 @@ package edu.virginia.vcgr.fsii;
 import java.io.Closeable;
 import java.util.Arrays;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class FileHandleTable<FileObjectType>
 {
+	static private Log _logger = LogFactory.getLog(FileHandleTable.class);
+	
 	private Object []_table;
 	private int _nextFree;
 	
@@ -26,7 +31,10 @@ public class FileHandleTable<FileObjectType>
 				"table entry for a file object of type Integer");
 		
 		if (_nextFree >= _table.length)
+		{
+			_logger.error("FileHandleTable is full -- error.");
 			return -1;
+		}
 		
 		int ret = _nextFree;
 		
@@ -35,6 +43,10 @@ public class FileHandleTable<FileObjectType>
 			_nextFree++;
 		else
 			_nextFree = Integer.class.cast(entry);
+		
+		_logger.debug(String.format(
+			"FileHandleTable[%x] -- Allocating slot %d, next free is %d.",
+			this.hashCode(), ret, _nextFree));
 		
 		_table[ret] = file;
 		return ret;
@@ -61,6 +73,10 @@ public class FileHandleTable<FileObjectType>
 			try { ((Closeable)entry).close(); } catch (Throwable cause) {}
 		}
 		
+
+		_logger.debug(String.format(
+			"FileHandleTable[%x] -- Released handle %d and pointing that slot to %d.",
+			this.hashCode(), handle, _nextFree));
 		_table[handle] = new Integer(_nextFree);
 		_nextFree = handle;
 	}

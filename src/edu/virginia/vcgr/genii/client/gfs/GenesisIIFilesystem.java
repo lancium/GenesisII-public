@@ -436,7 +436,6 @@ public class GenesisIIFilesystem implements FSFilesystem
 		{
 			throw FSExceptions.translate("Unable to open file.", cause);
 		}
-		
 	}
 
 	@Override
