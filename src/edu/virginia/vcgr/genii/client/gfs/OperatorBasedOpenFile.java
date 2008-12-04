@@ -23,7 +23,10 @@ class OperatorBasedOpenFile extends GeniiOpenFile
 	{
 		try
 		{
-			_operator.append(source);
+			synchronized(_operator)
+			{
+				_operator.append(source);
+			}
 		}
 		catch (Throwable cause)
 		{
@@ -36,7 +39,10 @@ class OperatorBasedOpenFile extends GeniiOpenFile
 	{
 		try
 		{
-			_operator.flush();
+			synchronized(_operator)
+			{
+				_operator.flush();
+			}
 		}
 		catch (Throwable cause)
 		{
@@ -47,8 +53,11 @@ class OperatorBasedOpenFile extends GeniiOpenFile
 	@Override
 	protected void closeImpl() throws IOException
 	{
-		_operator.flush();
-		_operator.close();
+		synchronized(_operator)
+		{
+			_operator.flush();
+			_operator.close();
+		}
 	}
 
 	@Override
@@ -59,7 +68,10 @@ class OperatorBasedOpenFile extends GeniiOpenFile
 			while (target.hasRemaining())
 			{
 				int start = target.position();
-				_operator.read(offset, target);
+				synchronized(_operator)
+				{
+					_operator.read(offset, target);
+				}
 				int read = target.position() - start;
 				if (read <= 0)
 					return;
@@ -77,7 +89,10 @@ class OperatorBasedOpenFile extends GeniiOpenFile
 	{
 		try
 		{
-			_operator.write(offset, source);
+			synchronized(_operator)
+			{
+				_operator.write(offset, source);
+			}
 		}
 		catch (Throwable cause)
 		{

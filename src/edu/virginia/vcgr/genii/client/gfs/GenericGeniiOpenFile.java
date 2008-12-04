@@ -31,7 +31,8 @@ class GenericGeniiOpenFile extends GeniiOpenFile
 	}
 
 	@Override
-	protected void readImpl(long offset, ByteBuffer target) throws FSException
+	synchronized protected void readImpl(long offset, ByteBuffer target) 
+		throws FSException
 	{
 		long bytesLeft = _content.remaining() - offset;
 		if (bytesLeft <= 0)

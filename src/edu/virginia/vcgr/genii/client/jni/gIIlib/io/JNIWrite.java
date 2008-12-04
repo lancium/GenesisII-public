@@ -16,7 +16,8 @@ public class JNIWrite extends JNILibraryBase
 	public static Integer write(Integer fileHandle, byte[] data, Long offset)
 	{
 		_logger.trace(String.format(
-			"JNIWrite::write(%d, ..., %d)", fileHandle, offset));
+			"JNIWrite::write(%d, byte[%d], %d)", fileHandle, data.length, 
+			offset));
 		
 		FileHandleTable<FilesystemHandle> openHandles = openHandles();
 		
@@ -41,7 +42,8 @@ public class JNIWrite extends JNILibraryBase
 	public static Integer truncateAppend(Integer fileHandle, byte[] data, Long offset)
 	{
 		_logger.trace(String.format(
-			"JNIWrite::truncateAppend(%d, ..., %d)", fileHandle, offset));
+			"JNIWrite::truncateAppend(%d, byte[%d], %d)", fileHandle, data,
+			offset));
 		
 		FileHandleTable<FilesystemHandle> openHandles = openHandles();
 		

@@ -213,12 +213,25 @@ public class GenesisIIFilesystem implements FSFilesystem
 		String fullPath = UnixFilesystemPathRepresentation.INSTANCE.toString(
 			pathComponents);	
 		
-		RNSPath entry = _lookupCache.get(fullPath);
+		RNSPath entry;
+		
+		synchronized(_lookupCache)
+		{
+			entry = _lookupCache.get(fullPath);
+		}
+		
 		if (entry == null)
 		{
-			entry = _lastPath.lookup(fullPath);
-			_lastPath = entry;
-			addToCache(entry);
+			synchronized(_lastPath)
+			{
+				entry = _lastPath.lookup(fullPath);
+				_lastPath = entry;
+			}
+			
+			synchronized(_lookupCache)
+			{
+				addToCache(entry);
+			}
 		}
 		
 		return entry;
@@ -226,8 +239,11 @@ public class GenesisIIFilesystem implements FSFilesystem
 	
 	protected void addToCache(RNSPath entry)
 	{
-		if (entry != null)
-			_lookupCache.put(entry.pwd(), entry);
+		synchronized(_lookupCache)
+		{
+			if (entry != null)
+				_lookupCache.put(entry.pwd(), entry);
+		}
 	}
 	
 	@Override
@@ -506,7 +522,11 @@ public class GenesisIIFilesystem implements FSFilesystem
 			
 			String fullPath = UnixFilesystemPathRepresentation.INSTANCE.toString(
 				path);	
-			_lookupCache.remove(fullPath);
+			
+			synchronized(_lookupCache)
+			{
+				_lookupCache.remove(fullPath);
+			}
 		}
 		catch (Throwable cause)
 		{
@@ -566,6 +586,13 @@ public class GenesisIIFilesystem implements FSFilesystem
 		{
 			to.link(from.getEndpoint());
 			from.unlink();
+			
+			String fullPath = UnixFilesystemPathRepresentation.INSTANCE.toString(
+				fromPath);	
+			synchronized(_lookupCache)
+			{
+				_lookupCache.remove(fullPath);
+			}
 		}
 		catch (Throwable cause)
 		{
