@@ -1,5 +1,8 @@
 package edu.virginia.vcgr.genii.client.jni.gIIlib.io;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.fsii.FileHandleTable;
 import edu.virginia.vcgr.fsii.exceptions.FSException;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.JNILibraryBase;
@@ -7,15 +10,20 @@ import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.FilesystemHandle;
 
 public class JNIClose extends JNILibraryBase 
 {
+	static private Log _logger = LogFactory.getLog(JNIClose.class);
+	
 	public static Boolean close(Integer handle, Boolean deleteOnClose)
-	{		
+	{
+		_logger.trace(String.format(
+			"JNIClose::close(%d, deleteOnClose = %s)", handle, deleteOnClose));
+		
 		FileHandleTable<FilesystemHandle> openHandles = openHandles();
 		
 		FilesystemHandle fsHandle = openHandles.get(handle);
 		
 		if(fsHandle == null)
 		{
-			System.err.println("G-ICING:  Invalid handle received on file close");			
+			_logger.error("G-ICING:  Invalid handle received on file close");			
 			return false;
 		} else
 		{
@@ -29,9 +37,7 @@ public class JNIClose extends JNILibraryBase
 			}
 			catch (FSException fse)
 			{
-				System.err.println("Unable to delete file handle.");
-				fse.printStackTrace(System.err);
-				
+				_logger.error("Unable to delete file handle.", fse);				
 				return false;
 			}
 		}

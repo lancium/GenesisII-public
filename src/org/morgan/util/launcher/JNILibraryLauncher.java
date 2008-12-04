@@ -69,7 +69,8 @@ public class JNILibraryLauncher
 		return (String)invoke(myClass, myMethod, argTypes, args);				
 	}
 	
-	public static boolean login(String keystorePath, String password, String certPath){
+	public static boolean login(String keystorePath, String password, String certPath)
+	{
 		String myClass = JNI_MISCELLANEOUS_PACKAGE + ".JNILoginTool";
 		String myMethod = "login";
 		Class<?>[] argTypes = new Class[] {String.class, String.class , String.class };
@@ -192,24 +193,25 @@ public class JNILibraryLauncher
 	/* ************************* END IO Functions**************************** */
 	
 	private static Object invoke(String cls, String mtd, Class<?>[] argTypes, Object[] args){
-		if(!isLoaded){
+		if(!isLoaded)
 			initialize();
-		}		
+
 		Thread.currentThread().setContextClassLoader(loader);			
 		
 		try
 		{				
-			Class<?> cl = loader.loadClass(cls);		
+			Class<?> cl = loader.loadClass(cls);
 			Method method = ((argTypes != null)? cl.getMethod(mtd, argTypes) :
 				cl.getMethod(mtd));	
 			return ((args != null) ? method.invoke(null, args) :
 				method.invoke(null));			
 		}
-		catch (Exception e)
+		catch (Throwable t)
 		{
-			e.printStackTrace();
+			System.err.println("Unable to invoke method.");
+			t.printStackTrace(System.err);
 			return null;
-		}			
+		}
 	}
 	
 	/*  NO LONGER SUPPORTED */

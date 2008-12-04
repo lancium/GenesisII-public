@@ -4,6 +4,8 @@ import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.file.FilePattern;
 import org.morgan.util.io.StreamUtils;
 
@@ -17,9 +19,15 @@ import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.FilesystemHandle;
 
 public class JNIDirectoryListing extends JNILibraryBase
 {
+	static private Log _logger = LogFactory.getLog(JNIDirectoryListing.class);
+	
 	public static ArrayList<String> getDirectoryListing(Integer handle, 
 		String target) 
 	{
+		_logger.trace(String.format(
+			"JNIDirectoryListing::getDirectoryListing(%d, %s)",
+			handle, target));
+		
 		FileHandleTable<FilesystemHandle> openHandles = openHandles();
 		FilesystemHandle fsHandle;
 		DirectoryHandle dirHandle;
@@ -27,7 +35,7 @@ public class JNIDirectoryListing extends JNILibraryBase
 		fsHandle = openHandles.get(handle);
 		if(fsHandle == null || !fsHandle.isDirectoryHandle())
 		{
-			System.err.println(
+			_logger.error(
 				"G-ICING:  Invalid handle received for directory listing");			
 			return null;
 		}
@@ -62,9 +70,7 @@ public class JNIDirectoryListing extends JNILibraryBase
 		}
 		catch (FSException fse)
 		{
-			System.err.println("Unable to get directory listing.");
-			fse.printStackTrace(System.err);
-			
+			_logger.error("Unable to get directory listing.", fse);
 			return null;
 		}
 		finally

@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.jni.gIIlib;
 
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import edu.virginia.vcgr.fsii.FileHandleTable;
@@ -125,5 +126,35 @@ public abstract class JNILibraryBase extends ApplicationBase
 	static protected FileHandleTable<FilesystemHandle> openHandles()
 	{
 		return _openHandles;
+	}
+	
+	static public String toString(ArrayList<String> array, int start, int length)
+	{
+		if (array == null)
+			return "null";
+		
+		StringBuilder builder = null;
+		for (int lcv = start; lcv < start + length; lcv++)
+		{
+			String entry = array.get(lcv);
+			
+			if (builder == null)
+				builder = new StringBuilder("{ ");
+			else
+				builder.append(", ");
+			
+			builder.append(entry);
+		}
+		
+		builder.append(" }");
+		return builder.toString();
+	}
+	
+	static public String toString(ArrayList<String> array)
+	{
+		if (array == null)
+			return "null";
+		
+		return toString(array, 0, array.size());
 	}
 }
