@@ -28,8 +28,12 @@ public abstract class JNILibraryBase extends ApplicationBase
 	
 	synchronized static public void tryToInitialize()
 	{
+		boolean didInit = false;
 		if(!isInitialized)
+		{
 			initialize();
+			didInit = true;
+		}
 
 		ICallingContext callingContext;
 		try 
@@ -37,9 +41,12 @@ public abstract class JNILibraryBase extends ApplicationBase
 			callingContext = ContextManager.getCurrentContext(false);
 			ClientUtils.checkAndRenewCredentials(callingContext);
 			
-			_fs = new GenesisIIFilesystem(
-				callingContext.getCurrentPath().getRoot(), 
-				null);
+			if (didInit)
+			{
+				_fs = new GenesisIIFilesystem(
+					callingContext.getCurrentPath().getRoot(), 
+					null);
+			}
 		}
 		catch (Exception e) 
 		{
