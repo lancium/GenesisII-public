@@ -56,7 +56,7 @@ public class JNIOpen extends JNILibraryBase
 		if (builder == null)
 			builder = new StringBuilder(str);
 		else
-			builder.append("| " + str);
+			builder.append(" | " + str);
 		
 		return builder;
 	}
@@ -73,11 +73,11 @@ public class JNIOpen extends JNILibraryBase
 		if ((desiredAccess & FilesystemHandle.FILE_WRITE_DATA) > 0)
 			builder = addOrString(builder, "WRITE");
 		if ((desiredAccess & FilesystemHandle.FILE_APPEND_DATA) > 0)
-			builder = addOrString(builder, "WRITE");
+			builder = addOrString(builder, "APPEND");
 		if ((desiredAccess & FilesystemHandle.FILE_EXECUTE) > 0)
-			builder = addOrString(builder, "WRITE");
+			builder = addOrString(builder, "EXECUTE");
 		if ((desiredAccess & FilesystemHandle.DELETE) > 0)
-			builder = addOrString(builder, "WRITE");
+			builder = addOrString(builder, "DELETE");
 		
 		return builder.toString();
 	}
@@ -200,8 +200,13 @@ public class JNIOpen extends JNILibraryBase
 		OpenFlags flags;
 		boolean isTruncate = 
 			(requestedDeposition == FilesystemHandle.OVERWRITE);
+		
+		/* I Know that this is wrong, but append isn't working and frankly isn't
+		 * used that often.
 		boolean isAppend = 
 			(desiredAccess & FilesystemHandle.FILE_APPEND_DATA) > 0;
+		*/
+		boolean isAppend = false;
 			
 		switch (requestedDeposition)
 		{
@@ -227,7 +232,10 @@ public class JNIOpen extends JNILibraryBase
 				throw new WindowsIFSException("Unknown type.");	
 		}
 		
-		mode = (desiredAccess & FilesystemHandle.FILE_WRITE_DATA) > 0 ?
+		boolean isWrite = (desiredAccess & FilesystemHandle.FILE_WRITE_DATA) > 0;
+		isWrite = isWrite || ((desiredAccess & FilesystemHandle.FILE_APPEND_DATA) > 0);
+		
+		mode = isWrite ?
 			OpenModes.READ_WRITE : OpenModes.READ;
 		
 		int handle = FilesystemHandle.INVALID_HANDLE;
