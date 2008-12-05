@@ -70,7 +70,23 @@ public class FileHandleTable<FileObjectType>
 		
 		if (entry != null && (entry instanceof Closeable))
 		{
-			try { ((Closeable)entry).close(); } catch (Throwable cause) {}
+			try
+			{
+				_logger.debug(String.format("Closing instance of %s.",
+					entry.getClass().getName()));
+				((Closeable)entry).close(); 
+				_logger.debug(String.format("Instance of %s closed.",
+					entry.getClass().getName()));
+			}
+			catch (Throwable cause) 
+			{
+				_logger.warn(String.format("Unable to close instance of %s.",
+					entry.getClass().getName()), cause);
+			}
+		} else
+		{
+			_logger.debug(String.format("Releasing instance of %s without closing.",
+				entry == null ? "<null>" : entry.getClass().getName()));
 		}
 		
 
