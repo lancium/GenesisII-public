@@ -219,6 +219,11 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 
 			if (trustList.contains(identity))
 			{
+				/*
+				System.err.println("The ID principal is" + 
+						((X509Identity) identity).getAssertingIdentityCertChain()[0].getSubjectX500Principal() + " the ID DN is " +
+						((X509Identity) identity).getAssertingIdentityCertChain()[0].getSubjectDN());
+						*/
 
 				// all's good if we straight-up contain this specific identity
 				return true;
@@ -230,7 +235,11 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 				X509Certificate[] identityCertChain =
 						((X509Identity) identity)
 								.getAssertingIdentityCertChain();
-
+				
+/*				System.err.println("The ID principal is" + 
+						((X509Identity) identity).getAssertingIdentityCertChain()[0].getSubjectX500Principal() + " the ID DN is " +
+						((X509Identity) identity).getAssertingIdentityCertChain()[0].getSubjectDN());
+*/
 				// use the acl's x509 identities as a trust store
 				try
 				{

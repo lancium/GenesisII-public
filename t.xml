@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<gsh:script
+	xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
+	xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
+	<gsh:for  param-name="FILE" initial-value="0" inclusive-limit="100" >
+		<gsh:echo message="Iteration ${FILE}"/>
+		<geniix:cp>
+		<gsh:param>--local-src</gsh:param>
+		<gsh:param>k.txt</gsh:param>
+		<gsh:param>k.txt</gsh:param>
+		</geniix:cp>
+		<geniix:rm>
+		<gsh:param>k.txt</gsh:param>
+		</geniix:rm>
+	</gsh:for>
+</gsh:script>

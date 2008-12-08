@@ -47,8 +47,15 @@ public class InternalEntry
 		return _entryReference;
 	}
 	
-	public MessageElement[] getAttributes()
+	public void setAttributes(MessageElement[] attr)
+	{
+		_attributes=attr;
+	}
+	
+	public MessageElement[]  getAttributes()
 	{
 		return _attributes;
 	}
+	
+	
 }

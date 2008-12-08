@@ -15,10 +15,12 @@
  */
 package edu.virginia.vcgr.genii.container.rns;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -47,6 +49,10 @@ import org.ggf.rns.Remove;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+
+import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
+import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
@@ -66,10 +72,13 @@ import edu.virginia.vcgr.genii.enhancedrns.*;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.container.Container;
+import edu.virginia.vcgr.genii.container.byteio.IRByteIOResource;
+import edu.virginia.vcgr.genii.container.byteio.RandomByteIOAttributeHandlers;
 import edu.virginia.vcgr.genii.container.byteio.RandomByteIOServiceImpl;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.common.notification.TopicSpace;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
+
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
@@ -221,6 +230,58 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
     	return new ListResponse(ret);
     }
 	
+	private void fillInAttributes(InternalEntry entry)
+	throws ResourceException
+	{
+
+		EndpointReferenceType epr =entry.getEntryReference();
+		//System.err.println("RNS list directory " + entry.getName() + " " + epr.getAddress());
+
+		if (!Container.getServiceURL("RandomByteIOPortType").equalsIgnoreCase(epr.getAddress().toString())) {
+			return;
+		}
+		IRByteIOResource file;
+		try {
+		 file = (IRByteIOResource)ResourceManager.getTargetResource(epr).dereference();
+		}
+		catch (ResourceUnknownFaultType fred) {return;}
+		//System.err.println("Packing in attributes for " + entry.getName());
+		String path = file.getFilePath();
+		File entryFile = new File(path);
+		ArrayList<MessageElement> attrs = new ArrayList<MessageElement>();
+		MessageElement []attrsA = entry.getAttributes();
+		if (attrsA != null)
+		{
+			for (MessageElement attr : attrsA)
+				attrs.add(attr);
+		}
+
+		QName transMechName = new QName(RandomByteIOAttributeHandlers.RANDOM_BYTEIO_NS,
+		"TransferMechanism");
+		attrs.add(new MessageElement(
+				new QName(ByteIOConstants.RANDOM_BYTEIO_NS, 
+						ByteIOConstants.SIZE_ATTR_NAME), entryFile.length()));
+		attrs.add(new MessageElement(transMechName,
+				ByteIOConstants.TRANSFER_TYPE_SIMPLE_URI));
+		attrs.add(new MessageElement(transMechName,
+				ByteIOConstants.TRANSFER_TYPE_DIME_URI));
+		attrs.add(new MessageElement(transMechName,
+				ByteIOConstants.TRANSFER_TYPE_MTOM_URI));
+
+			attrs.add(new MessageElement(new QName(
+					ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.ACCESSTIME_ATTR_NAME),
+					file.getAccessTime()));
+			attrs.add(new MessageElement(new QName(
+					ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME),
+					file.getModTime()));
+			attrs.add(new MessageElement(new QName(
+					ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME),
+					file.getCreateTime()));
+		
+		entry.setAttributes(attrs.toArray(new MessageElement[0]));
+
+}
+	
 	@RWXMapping(RWXCategory.READ)
     public IterateListResponseType iterateList(IterateListRequestType list) 
     	throws RemoteException, ResourceUnknownFaultType, 
@@ -241,6 +302,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		Collection<MessageElement> col = new LinkedList<MessageElement>();
     	for (InternalEntry internalEntry : entries)
     	{
+    		fillInAttributes(internalEntry);
     		EntryType entry = new EntryType(
     				internalEntry.getName(), 
     				internalEntry.getAttributes(), 
