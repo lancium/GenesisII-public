@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import javax.xml.namespace.QName;
 
+import edu.virginia.vcgr.fsii.security.Permissions;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.rp.ResourceProperty;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
@@ -26,6 +27,12 @@ public interface GenesisIIBaseRP
 	static public final QName AUTHZ_CONFIG_QNAME =
 		new QName(AUTHZ_CONFIG_NAMESPACE, AUTHZ_CONFIG_NAME);
 	
+	static public final String PERMISSIONS_STRING_NAME =
+		"Permissions";
+	static public final QName PERMISSIONS_STRING_QNAME =
+		new QName(GenesisIIConstants.GENESISII_NS,
+			PERMISSIONS_STRING_NAME);
+	
 	@ResourceProperty(
 		namespace = GENII_COMMON_NS,
 		localname = MATCHING_PARAMETER_ATTR_NAME)
@@ -40,6 +47,12 @@ public interface GenesisIIBaseRP
 		namespace = AUTHZ_CONFIG_NAMESPACE,
 		localname = AUTHZ_CONFIG_NAME)
 	public void setAuthZConfig(AuthZConfig config);
+	
+	@ResourceProperty(
+		namespace = GenesisIIConstants.GENESISII_NS,
+		localname = PERMISSIONS_STRING_NAME,
+		translator = PermissionsStringTranslator.class)
+	public Permissions getPermissions();
 	
 	@ResourceProperty(
 		namespace = GenesisIIConstants.GENESISII_NS,

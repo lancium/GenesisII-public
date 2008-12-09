@@ -30,7 +30,7 @@ public class GenesisIIACLManager
 			(GenesisIIBaseRP)ResourcePropertyManager.createRPInterface(
 				target, GenesisIIBaseRP.class);
 	}
-	
+		
 	private GamlAcl getRemoteACL() throws AuthZSecurityException
 	{
 		if (_remoteACL == null)
@@ -42,7 +42,7 @@ public class GenesisIIACLManager
 		return _remoteACL;
 	}
 	
-	private boolean hasPermission(Collection<Identity> acls,
+	static private boolean hasPermission(Collection<Identity> acls,
 		Collection<Identity> callerIds)
 	{
 		for (Identity id : acls)
@@ -80,15 +80,20 @@ public class GenesisIIACLManager
 	
 	public Permissions getPermissions() throws AuthZSecurityException
 	{
-		GamlAcl acl = getRemoteACL();
+		return _rpStub.getPermissions();
+	}
+	
+	static public Permissions getPermissions(
+		GamlAcl acl, Collection<Identity> callerIdentities)
+	{
 		Permissions p = new Permissions();
 		
 		p.set(PermissionBits.OWNER_READ, hasPermission(
-			acl.readAcl, _callerIdentities));
+			acl.readAcl, callerIdentities));
 		p.set(PermissionBits.OWNER_WRITE, hasPermission(
-			acl.writeAcl, _callerIdentities));
+			acl.writeAcl, callerIdentities));
 		p.set(PermissionBits.OWNER_EXECUTE, hasPermission(
-			acl.executeAcl, _callerIdentities));
+			acl.executeAcl, callerIdentities));
 		p.set(PermissionBits.EVERYONE_READ, hasPermission(
 			acl.readAcl, null));
 		p.set(PermissionBits.EVERYONE_WRITE, hasPermission(

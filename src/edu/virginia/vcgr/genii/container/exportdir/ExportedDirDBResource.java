@@ -23,20 +23,17 @@ import org.morgan.util.GUID;
 import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.ReferenceParametersType;
 
-import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedFileUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.MessageElementUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.AuthZSecurityException;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
-import edu.virginia.vcgr.genii.common.security.AuthZConfig;
 import edu.virginia.vcgr.genii.container.Container;
-import edu.virginia.vcgr.genii.container.byteio.IRByteIOResource;
-import edu.virginia.vcgr.genii.container.byteio.RandomByteIOAttributeHandlers;
+import edu.virginia.vcgr.genii.container.attrs.AttributePreFetcher;
+import edu.virginia.vcgr.genii.container.byteio.DefaultRandomByteIOAttributePreFetcher;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
@@ -45,8 +42,7 @@ import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverUtils;
-import edu.virginia.vcgr.genii.container.security.authz.providers.AuthZProviders;
-import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider;
+import edu.virginia.vcgr.genii.container.common.DefaultGenesisIIAttributesPreFetcher;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 
 public class ExportedDirDBResource extends BasicDBResource implements
@@ -1088,130 +1084,42 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		}
 	}
 	
-	private MessageElement getAuthZConfig(IResource resource)
-		throws ResourceUnknownFaultType, ResourceException, AuthZSecurityException
-	{
-		IAuthZProvider authZHandler = AuthZProviders.getProvider(
-			resource.getParentResourceKey().getServiceName());
-		
-		AuthZConfig config = null;
-		if (authZHandler != null)
-			config = authZHandler.getAuthZConfig(resource);
-		
-		MessageElement me = new MessageElement(
-			AuthZConfig.getTypeDesc().getXmlType(), 
-			config);
-		return me;
-	}
-	
 	private void fillInAttributes(ExportedDirEntry entry)
-		throws ResourceException
 	{
-		File entryFile = new File(getLocalPath(), entry.getName());
-		if (!entryFile.exists())
-			return;
-		if (!entryFile.isFile())
-			return;
-		
-		ArrayList<MessageElement> attrs = new ArrayList<MessageElement>();
-		MessageElement []attrsA = entry.getAttributes();
-		if (attrsA != null)
-		{
-			for (MessageElement attr : attrsA)
-				attrs.add(attr);
-		}
-		
-		QName transMechName = new QName(RandomByteIOAttributeHandlers.RANDOM_BYTEIO_NS,
-			"TransferMechanism");
-		attrs.add(new MessageElement(
-			new QName(ByteIOConstants.RANDOM_BYTEIO_NS, 
-				ByteIOConstants.SIZE_ATTR_NAME), entryFile.length()));
-		attrs.add(new MessageElement(transMechName,
-			ByteIOConstants.TRANSFER_TYPE_SIMPLE_URI));
-		attrs.add(new MessageElement(transMechName,
-			ByteIOConstants.TRANSFER_TYPE_DIME_URI));
-		attrs.add(new MessageElement(transMechName,
-			ByteIOConstants.TRANSFER_TYPE_MTOM_URI));
+		AttributePreFetcher preFetcher = null;
 		
 		try
 		{
-			IRByteIOResource resource = (IRByteIOResource)(ResourceManager.getTargetResource(
-				entry.getEntryReference()).dereference());
-			attrs.add(new MessageElement(new QName(
-				ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.ACCESSTIME_ATTR_NAME),
-				resource.getAccessTime()));
-			attrs.add(new MessageElement(new QName(
-				ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME),
-				resource.getModTime()));
-			attrs.add(new MessageElement(new QName(
-				ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME),
-				resource.getCreateTime()));
-
-			_logger.trace("Getting authz config attribute.");
-			attrs.add(getAuthZConfig(resource));
-		}
-		catch (ResourceUnknownFaultType ruft)
-		{
-			// We couldn't find the resource, so we just skip it for now.
-			_logger.warn("Unable to find resource for export dir attr cache.", 
-				ruft);
-		}
-		catch (AuthZSecurityException e)
-		{
-			// Something went wrong, but no reason to fail here.
-			_logger.warn(
-				"Unable to get authorization information for export dir cache.",
-				e);
-		}
-		
-		entry.setAttributes(attrs.toArray(new MessageElement[0]));
-		
-		/* This would get the entire attributes document which is TOO BIG for now.
-		EndpointReferenceType entryTarget = entry.getEntryReference();
-		
-		try
-		{
-			WorkingContext.temporarilyAssumeNewIdentity(entryTarget);
-			ExportedFileServiceImpl fileService = new ExportedFileServiceImpl();
-			GetAttributesDocumentResponse resp = fileService.getAttributesDocument(null);
-			MessageElement []newAttrs = resp.get_any();
-			if (newAttrs == null || newAttrs.length == 0)
+			File entryFile = new File(getLocalPath(), entry.getName());
+			if (!entryFile.exists())
 				return;
-			
-			MessageElement metaData = new MessageElement(GenesisIIConstants.RNS_CACHED_METADATA_DOCUMENT_QNAME);
-			for (MessageElement child : newAttrs)
-			{
-				metaData.addChild(child);
-			}
-			
-			MessageElement []attrs = entry.getAttributes();
-			if (attrs == null || attrs.length == 0)
-				entry.setAttributes(new MessageElement[] { metaData } );
+			if (entryFile.isFile())
+				preFetcher = new DefaultRandomByteIOAttributePreFetcher(
+					entry.getEntryReference());
 			else
+				preFetcher = 
+					new DefaultGenesisIIAttributesPreFetcher<IResource>(
+						entry.getEntryReference());
+		}
+		catch (Throwable cause)
+		{
+			_logger.warn("Unable to pre-fetch attributes for entry.", cause);
+		}
+		
+		if (preFetcher == null)
+			return;
+		
+		Collection<MessageElement> attrs = preFetcher.preFetch();
+		MessageElement []oldAttrs = entry.getAttributes();
+		if (oldAttrs != null)
+		{
+			for (MessageElement oldAttr : oldAttrs)
 			{
-				MessageElement []ret = new MessageElement[attrs.length + 1];
-				ret[0] = metaData;
-				System.arraycopy(attrs, 0, ret, 1, attrs.length);
-				entry.setAttributes(ret);
+				attrs.add(oldAttr);
 			}
 		}
-		catch (SOAPException se)
-		{
-			// Something is seriously wrong, but we'll continue on because 
-			// this is just for caching right now anyways.
-			_logger.warn("Unknown exception occurred while trying to " +
-				"insert ExportedFile metadata into cache return.", se);
-		}
-		catch (RemoteException re)
-		{
-			// Something is seriously wrong, but we'll continue on because 
-			// this is just for caching right now anyways.
-			_logger.warn("Exception occurred while trying to get ExportedFile metadata for caching purposes.", re);
-		}
-		finally
-		{
-			WorkingContext.releaseAssumedIdentity();
-		}
-		*/
+		
+		if (attrs.size() > 0)
+			entry.setAttributes(attrs.toArray(new MessageElement[0]));
 	}
 }

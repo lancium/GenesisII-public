@@ -28,6 +28,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.cache.TimedOutLRUCache;
+import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.invoke.InvocationContext;
 import edu.virginia.vcgr.genii.client.invoke.PipelineProcessor;
 import edu.virginia.vcgr.genii.client.naming.WSName;
@@ -326,7 +327,8 @@ public class AttributeCacheHandler
 						QName elemName = elem.getQName();
 						if (elemName.equals(xferMechs) || elemName.equals(size) ||
 							elemName.equals(accessTime) || elemName.equals(modTime) ||
-							elemName.equals(creatTime) || elemName.equals(authz))
+							elemName.equals(creatTime) || elemName.equals(authz) ||
+							elemName.equals(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME))
 						{
 							_logger.debug("Adding " + elemName + " to cache.");
 							cachedAttrs.add(elem);
@@ -379,7 +381,8 @@ public class AttributeCacheHandler
 									QName elemName = elem.getQName();
 									if (elemName.equals(xferMechs) || elemName.equals(size) ||
 										elemName.equals(accessTime) || elemName.equals(modTime) ||
-										elemName.equals(creatTime) || elemName.equals(authz))
+										elemName.equals(creatTime) || elemName.equals(authz) ||
+										elemName.equals(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME))
 									{
 										_logger.debug("Adding " + elemName + " to cache.");
 										cachedAttrs.add(elem);

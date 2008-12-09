@@ -442,6 +442,17 @@ public class Container extends ApplicationBase
 		return _containerURL + "/axis/services/" + serviceName;
 	}
 	
+	static public boolean onThisServer(EndpointReferenceType target)
+	{
+		String urlString = target.getAddress().toString();
+		String containerURL = _containerURL + "/axis/services/";
+		
+		if (urlString.startsWith(containerURL))
+			return true;
+		
+		return false;
+	}
+	
 	static public String getCurrentServiceURL(MessageContext ctxt)
 	{
 		try

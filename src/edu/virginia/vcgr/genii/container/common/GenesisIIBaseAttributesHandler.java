@@ -12,14 +12,17 @@ import javax.xml.soap.SOAPException;
 import org.apache.axis.message.MessageElement;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.fsii.security.Permissions;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
+import edu.virginia.vcgr.genii.client.gfs.GenesisIIACLManager;
 import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
 import edu.virginia.vcgr.genii.client.ogsa.OGSAQNameList;
 import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.AuthZSecurityException;
+import edu.virginia.vcgr.genii.client.security.gamlauthz.GamlAcl;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
@@ -31,6 +34,7 @@ import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
 import edu.virginia.vcgr.genii.container.attrs.IAttributeManipulator;
 import edu.virginia.vcgr.genii.container.common.notification.Topic;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
+import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
@@ -188,6 +192,23 @@ public class GenesisIIBaseAttributesHandler
 		_baseService.setCacheCoherenceWindow(gDur);
 	}
 	
+	public MessageElement getPermissionsString() 
+		throws ResourceUnknownFaultType, ResourceException, AuthZSecurityException
+	{
+		IResource resource = ResourceManager.getCurrentResource().dereference();
+		IAuthZProvider authZHandler = AuthZProviders.getProvider(
+				resource.getParentResourceKey().getServiceName());
+		AuthZConfig config = null;
+		if (authZHandler != null)
+			config = authZHandler.getAuthZConfig(resource);
+		GamlAcl acl = GamlAcl.decodeAcl(config);
+		Permissions perms = GenesisIIACLManager.getPermissions(acl, 
+			QueueSecurity.getCallerIdentities());
+		return new MessageElement(
+			GenesisIIBaseRP.PERMISSIONS_STRING_QNAME,
+			perms.toString());
+	}
+	
 	public MessageElement getAuthZConfig()
 			throws ResourceUnknownFaultType, ResourceException, AuthZSecurityException
 	{
@@ -293,6 +314,10 @@ public class GenesisIIBaseAttributesHandler
 			GenesisIIConstants.AUTHZ_CONFIG_ATTR_QNAME,
 			"getAuthZConfig",
 			"setAuthZConfig");
+		
+		addHandler(
+			GenesisIIBaseRP.PERMISSIONS_STRING_QNAME,
+			"getPermissionsString");
 		
 		addHandler(
 			OGSAWSRFBPConstants.RESOURCE_PROPERTY_NAMES_ATTR_QNAME,
