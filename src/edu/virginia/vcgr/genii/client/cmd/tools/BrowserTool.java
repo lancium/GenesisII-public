@@ -1,17 +1,11 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
-import java.nio.ByteBuffer;
-
-import edu.virginia.vcgr.fsii.file.OpenFlags;
-import edu.virginia.vcgr.fsii.file.OpenModes;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
-import edu.virginia.vcgr.genii.client.gfs.GenesisIIFilesystem;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.client.gui.browser.BrowserDialog;
 import edu.virginia.vcgr.genii.client.gui.browser.plugins.PluginManager;
 import edu.virginia.vcgr.genii.client.io.FileResource;
-import edu.virginia.vcgr.genii.client.rns.RNSPath;
 
 public class BrowserTool extends BaseGridTool
 {

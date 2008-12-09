@@ -139,29 +139,57 @@ public class GenesisIIFilesystem implements FSFilesystem
 		{
 			if (typeInfo.isRByteIO())
 			{
-				RandomByteIORP rp = 
-					(RandomByteIORP)ResourcePropertyManager.createRPInterface(
-						target, RandomByteIORP.class);
-				size = toNonNull(rp.getSize());
-				created = toMillis(rp.getCreateTime());
-				modified = toMillis(rp.getModificationTime());
-				accessed = toMillis(rp.getAccessTime());
+				try
+				{
+					RandomByteIORP rp = 
+						(RandomByteIORP)ResourcePropertyManager.createRPInterface(
+							target, RandomByteIORP.class);
+					size = toNonNull(rp.getSize());
+					created = toMillis(rp.getCreateTime());
+					modified = toMillis(rp.getModificationTime());
+					accessed = toMillis(rp.getAccessTime());
+				}
+				catch (Throwable cause)
+				{
+					size = 0L;
+					created = 0;
+					modified = accessed = System.currentTimeMillis();
+				}
 			} else if (typeInfo.isSByteIO())
 			{
-				StreamableByteIORP rp = 
-					(StreamableByteIORP )ResourcePropertyManager.createRPInterface(
-						target, StreamableByteIORP .class);
-				size = toNonNull(rp.getSize());
-				created = toMillis(rp.getCreateTime());
-				modified = toMillis(rp.getModificationTime());
-				accessed = toMillis(rp.getAccessTime());
+				try
+				{
+					StreamableByteIORP rp = 
+						(StreamableByteIORP )ResourcePropertyManager.createRPInterface(
+							target, StreamableByteIORP .class);
+					size = toNonNull(rp.getSize());
+					created = toMillis(rp.getCreateTime());
+					modified = toMillis(rp.getModificationTime());
+					accessed = toMillis(rp.getAccessTime());
+				}
+				catch (Throwable cause)
+				{
+					size = 0L;
+					created = 0;
+					modified = accessed = System.currentTimeMillis();
+				}
 			} else
 			{
-				created = modified = accessed = System.currentTimeMillis();
+				created = 0;
+				modified = accessed = System.currentTimeMillis();
 			}
 			
-			Permissions permissions = (new GenesisIIACLManager(
-				target, _callerIdentities)).getPermissions();
+			Permissions permissions;
+			
+			try
+			{
+				permissions = (new GenesisIIACLManager(
+					target, _callerIdentities)).getPermissions();
+			}
+			catch (Throwable cause)
+			{
+				permissions = new Permissions();
+			}
 			
 			int inode = (int)generateInodeNumber(target);
 			return new FilesystemStatStructure(inode, name,
