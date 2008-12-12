@@ -97,8 +97,12 @@ public class FileSystemUtils extends JNIClientBaseClass
 			return makeWindowsExecutable(filepath);
 		else
 		{
-			chmod(filepath.getAbsolutePath(),
-				MODE_USER_READ | MODE_USER_WRITE | MODE_USER_EXECUTE);
+			if (!filepath.canExecute())
+			{
+				chmod(filepath.getAbsolutePath(),
+					MODE_USER_READ | MODE_USER_WRITE | MODE_USER_EXECUTE);
+			}
+			
 			return filepath;
 		}
 	}

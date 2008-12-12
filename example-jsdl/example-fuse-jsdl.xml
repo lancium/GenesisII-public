@@ -2,7 +2,6 @@
 <jsdl:JobDefinition xmlns="http://www.example.org/"
 	xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
 	xmlns:jsdl-posix="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"
-	xmlns:ogrsh="http://vcgr.cs.virginia.edu/ogrsh"
 	xmlns:gfuse="http://vcgr.cs.virginia.edu/gfuse"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	
@@ -33,7 +32,7 @@
 			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
 			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
 			<jsdl:Target>
-				<jsdl:URI>rns:ogrsh-out.txt</jsdl:URI>
+				<jsdl:URI>rns:fuse-out.txt</jsdl:URI>
 			</jsdl:Target>
 		</jsdl:DataStaging>
 
@@ -42,7 +41,7 @@
 			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
 			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
 			<jsdl:Target>
-				<jsdl:URI>rns:ogrsh-err.txt</jsdl:URI>
+				<jsdl:URI>rns:fuse-err.txt</jsdl:URI>
 			</jsdl:Target>
 		</jsdl:DataStaging>
 

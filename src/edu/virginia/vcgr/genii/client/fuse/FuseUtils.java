@@ -40,4 +40,9 @@ public class FuseUtils
 		
 		return null;
 	}
+	
+	static public void main(String []args)
+	{
+		System.err.println(supportsFuse());
+	}
 }
