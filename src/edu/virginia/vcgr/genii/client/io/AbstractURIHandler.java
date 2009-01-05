@@ -2,11 +2,13 @@ package edu.virginia.vcgr.genii.client.io;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.util.Random;
 
 import org.morgan.util.io.StreamUtils;
 
@@ -16,6 +18,8 @@ public abstract class AbstractURIHandler implements IURIHandler
 {
 	static public final int NUM_RETRIES = 5;
 	static public final long BACKOFF = 8000L;
+
+	static private Random GENERATOR = new Random();
 	
 	public abstract InputStream openInputStream(
 		URI source, UsernamePasswordIdentity credential)
@@ -24,6 +28,13 @@ public abstract class AbstractURIHandler implements IURIHandler
 		URI target, UsernamePasswordIdentity credential)
 		throws IOException;
 
+	static private long generateBackoff(int attempt)
+	{
+		long twitter = (long)(
+			(GENERATOR.nextFloat() - 0.5) * (BACKOFF << attempt));
+		return (BACKOFF << attempt) + twitter;
+	}
+	
 	@Override
 	final public void get(URI source, File target, 
 		UsernamePasswordIdentity credential) throws IOException
@@ -40,12 +51,17 @@ public abstract class AbstractURIHandler implements IURIHandler
 				
 				return;
 			}
+			catch (FileNotFoundException fnfe)
+			{
+				lastException = fnfe;
+				break;
+			}
 			catch (IOException ioe)
 			{
 				lastException = ioe;
 			}
 			
-			try { Thread.sleep(BACKOFF << attempt); } 
+			try { Thread.sleep(generateBackoff(attempt)); }
 				catch (Throwable cause) {}
 		}
 		
@@ -73,7 +89,7 @@ public abstract class AbstractURIHandler implements IURIHandler
 				lastException = ioe;
 			}
 			
-			try { Thread.sleep(BACKOFF << attempt); } 
+			try { Thread.sleep(generateBackoff(attempt)); }
 				catch (Throwable cause) {}
 		}
 		
