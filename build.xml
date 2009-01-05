@@ -181,6 +181,7 @@
 		<ant antfile="${wsdl.dir}/authn/jndi-authn.build.xml"/>
 		<ant antfile="${wsdl.dir}/resolver/simple-resolver.build.xml"/>
 		<ant antfile="${wsdl.dir}/resolver/simple-resolver-factory.build.xml"/>
+		<ant antfile="${wsdl.dir}/rfork/rfork.build.xml"/>
 		<ant antfile="${wsdl.dir}/queue/queue.build.xml"/>
 		<ant antfile="${wsdl.dir}/informationService/informationService.build.xml"/>
 		<ant antfile="${wsdl.dir}/certGenerator/certGenerator.build.xml"/>

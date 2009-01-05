@@ -24,14 +24,12 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
-import org.ws.addressing.ReferenceParametersType;
 
 import edu.virginia.vcgr.genii.common.MatchingParameter;
 import edu.virginia.vcgr.genii.container.common.notification.DBSubscriptionResource;
 import edu.virginia.vcgr.genii.container.common.notification.SubscriptionInformation;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
-import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
@@ -63,18 +61,15 @@ public class BasicDBResource implements IResource
 	protected Connection _connection;
 	protected String _resourceKey;
 	protected ResourceKey _parentKey;
-	protected IResourceKeyTranslater _translater;
 
 	public BasicDBResource(
 			ResourceKey parentKey, 
-			DatabaseConnectionPool connectionPool,
-			IResourceKeyTranslater translater)
+			DatabaseConnectionPool connectionPool)
 		throws SQLException
 	{
 		_parentKey = parentKey;
 		_connectionPool = connectionPool;
 		_connection = _connectionPool.acquire();
-		_translater = translater;
 	}
 	
 	public Connection getConnection()
@@ -94,7 +89,7 @@ public class BasicDBResource implements IResource
 		}
 	}
 	
-	public Object getKey()
+	public String getKey()
 	{
 		if (_resourceKey.startsWith(_SPECIAL_SERVICE_KEY_TEMPLATE))
 			return null;
@@ -139,9 +134,10 @@ public class BasicDBResource implements IResource
 		}
 	}
 	
-	public void load(ReferenceParametersType refParams) throws ResourceUnknownFaultType, ResourceException
+	public void load(String resourceKey) 
+		throws ResourceUnknownFaultType, ResourceException
 	{
-		_resourceKey = (String) _translater.unwrap(refParams);
+		_resourceKey = resourceKey;
 
 		if (_resourceKey == null)
 			_resourceKey = _SPECIAL_SERVICE_KEY_TEMPLATE + _parentKey.getServiceName();
@@ -413,18 +409,6 @@ public class BasicDBResource implements IResource
 		return false;
 	}
 	
-	/**
-	 * Retrieve the WS-Addressing ReferenceParameters that match this resource.
-	 * 
-	 * @return The Addressing information for WS-Addressing.
-	 * @throws ResourceException If anything goes wrong.
-	 */
-	public ReferenceParametersType getResourceParameters()
-		throws ResourceException {
-
-		return _translater.wrap(getKey());
-	}
-
 	@Override
 	public Collection<MatchingParameter> getMatchingParameters() throws ResourceException
 	{

@@ -72,7 +72,9 @@ public class VCGRContainerServiceImpl extends GenesisIIBase
 		"edu.virginia.vcgr.htc.container.container.service-dir-key";
 	
 	@Override
-	protected void setAttributeHandlers() throws NoSuchMethodException
+	protected void setAttributeHandlers()
+		throws NoSuchMethodException, ResourceException, 
+			ResourceUnknownFaultType
 	{
 		super.setAttributeHandlers();
 		

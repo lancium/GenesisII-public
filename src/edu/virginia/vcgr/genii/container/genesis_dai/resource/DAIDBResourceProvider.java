@@ -23,7 +23,7 @@ public class DAIDBResourceProvider extends RNSDBResourceProvider {
 	protected IResourceFactory instantiateResourceFactory(DatabaseConnectionPool pool)
 	throws SQLException
 	{
-		return new DBDAIResourceFactory(pool, getTranslater());
+		return new DBDAIResourceFactory(pool);
 	}
 
 }

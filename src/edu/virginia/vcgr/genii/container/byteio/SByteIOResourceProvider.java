@@ -19,6 +19,6 @@ public class SByteIOResourceProvider extends BasicDBResourceProvider
 	protected IResourceFactory instantiateResourceFactory(DatabaseConnectionPool pool)
 		throws SQLException, ResourceException
 	{
-		return new SByteIOResourceFactory(pool, getTranslater());
+		return new SByteIOResourceFactory(pool);
 	}
 }

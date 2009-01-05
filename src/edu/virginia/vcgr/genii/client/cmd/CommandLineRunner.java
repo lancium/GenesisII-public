@@ -1,5 +1,8 @@
 package edu.virginia.vcgr.genii.client.cmd;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -11,8 +14,11 @@ import javax.xml.namespace.QName;
 import org.morgan.util.configuration.XMLConfiguration;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.cmd.tools.HelpTool;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
+import edu.virginia.vcgr.genii.client.rns.RNSPath;
 
 public class CommandLineRunner
 {	
@@ -24,9 +30,25 @@ public class CommandLineRunner
 			ConfigurationManager.getCurrentConfiguration().getClientConfiguration());
 	}
 	
+	static private Writer openRedirect(String redirectTarget) 
+		throws IOException, RNSException
+	{
+		if (redirectTarget.startsWith("file:"))
+			return new FileWriter(redirectTarget.substring(5));
+		else if (redirectTarget.startsWith("rns:"))
+		{
+			return new OutputStreamWriter(
+				ByteIOStreamFactory.createOutputStream(
+					RNSPath.getCurrent().lookup(redirectTarget.substring(4))));
+		}
+		
+		return new FileWriter(redirectTarget);
+	}
+	
 	public int runCommand(String []cLine, Writer out, Writer err, Reader in)
 		throws Throwable
 	{
+		Writer target = out;
 		int resultSoFar = 0;
 		
 		if (cLine == null || cLine.length == 0)
@@ -41,9 +63,34 @@ public class CommandLineRunner
 			throw new ToolException("Couldn't find tool \"" + cLine[0] + "\".");
 		
 		ITool instance = desc.getToolInstance();
-		for (int lcv = 1; lcv < cLine.length; lcv++)
-			instance.addArgument(cLine[lcv]);
-		return Math.max(resultSoFar, instance.run(out, err, in));
+		try
+		{
+			for (int lcv = 1; lcv < cLine.length; lcv++)
+			{
+				String argument = cLine[lcv];
+				if (argument.equals(">"))
+				{
+					if (++lcv >= cLine.length)
+						throw new ToolException(
+							"Unexpected end of command line.");
+					String redirectTarget = cLine[lcv++];
+					if (lcv < cLine.length)
+						throw new ToolException(
+							"Additional arguments found after file redirect.");
+					target = openRedirect(redirectTarget);
+					break;
+				}
+				
+				instance.addArgument(argument);
+			}
+			
+			return Math.max(resultSoFar, instance.run(target, err, in));
+		}
+		finally
+		{
+			if (target != out)
+				target.close();
+		}
 	}
 	
 	@SuppressWarnings("unchecked")

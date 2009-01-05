@@ -46,6 +46,10 @@ public class WellKnownPortTypes
 		PortType.get(new QName("http://vcgr.cs.virginia.edu/counter/2006/06/counter",
 			"CounterPortType"));
 	
+	static public PortType RESOURCE_FORK_PORT_TYPE =
+		PortType.get(new QName("http://vcgr.cs.virginia.edu/genii/rfork",
+			"ResourceForkPortType"));
+	
 	static public PortType APPDESC_PORT_TYPE =
 		PortType.get(new QName("http://vcgr.cs.virginia.edu/genii/application-description",
 			"ApplicationDescriptionPortType"));

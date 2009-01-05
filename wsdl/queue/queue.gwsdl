@@ -4,6 +4,7 @@
 	name="Queue"
 	xmlns="http://vcgr.cs.virginia.edu/genii/queue"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:rfork="http://vcgr.cs.virginia.edu/genii/resource-fork"
 	xmlns:wsa="http://www.w3.org/2005/08/addressing"
 	xmlns:queue="http://vcgr.cs.virginia.edu/genii/queue"
 	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
@@ -19,6 +20,10 @@
 	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
 	xmlns:rns="http://schemas.ggf.org/rns/2006/05/rns"
 	xmlns:enhanced-rns="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
+	xmlns:rbyteio="http://schemas.ggf.org/byteio/2005/10/random-access"
+	xmlns:byteio="http://schemas.ggf.org/byteio/2005/10/byte-io"
+    xmlns:sbyteio="http://schemas.ggf.org/byteio/2005/10/streamable-access"
+	xmlns:sfact="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory"
 	targetNamespace="http://vcgr.cs.virginia.edu/genii/queue">
 
 	<wsdl:import
@@ -36,6 +41,22 @@
     <wsdl:import
         namespace="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
         location="./enhanced-rns-generated.wsdl"/>
+
+	<wsdl:import
+		namespace="http://schemas.ggf.org/byteio/2005/10/random-access"
+		location="./rbyteio-generated.wsdl"/>
+
+	<wsdl:import
+		namespace="http://schemas.ggf.org/byteio/2005/10/streamable-access"
+		location="./sbyteio-generated.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory"
+		location="./sbyteio-factory.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/resource-fork"
+		location="./rfork-generated.wsdl"/>
 
 	<wsdl:import
 		namespace="http://docs.oasis-open.org/wsrf/rw-2"
@@ -140,11 +161,7 @@
 	</wsdl:message>
 	
 	<wsdl:portType name="QueuePortType">
-		<genii-ext:extend portType="genii-common:GeniiCommon"/>
-		<genii-ext:extend portType="rpw-2:GetResourceProperty"/>
-		<genii-ext:extend portType="rpw-2:GetMultipleResourceProperties"/>
-		<genii-ext:extend portType="rns:RNSPortType"/>
-		<genii-ext:extend portType="genii-not:GeniiNotificationConsumerPortType"/>
+		<genii-ext:extend portType="rfork:ResourceForkPortType"/>
 
 		<wsdl:operation name="submitJob">
 			<wsdl:input message="queue:SubmitJobRequest"/>

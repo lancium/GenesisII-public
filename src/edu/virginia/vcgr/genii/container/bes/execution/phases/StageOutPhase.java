@@ -44,6 +44,11 @@ public class StageOutPhase extends AbstractExecutionPhase
 	@Override
 	public void execute(ExecutionContext context) throws Throwable
 	{
+		if (!_source.exists())
+			throw new ContinuableExecutionException(
+				"Unable to locate source file \"" +
+				_source.getName() + "\" for staging-out -- skipping it.");
+		
 		try
 		{
 			URIManager.put(_source,

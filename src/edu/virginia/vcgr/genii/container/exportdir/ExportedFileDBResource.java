@@ -11,7 +11,6 @@ import java.util.HashMap;
 
 import javax.xml.namespace.QName;
 import org.ws.addressing.EndpointReferenceType;
-import org.ws.addressing.ReferenceParametersType;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,7 +25,6 @@ import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverUtils;
 import edu.virginia.vcgr.genii.container.resource.IResource;
-import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
@@ -141,11 +139,10 @@ public class ExportedFileDBResource extends RByteIOResource
 	
 	public ExportedFileDBResource(
 			ResourceKey parentKey, 
-			DatabaseConnectionPool connectionPool,
-			IResourceKeyTranslater translater)
+			DatabaseConnectionPool connectionPool)
 		throws SQLException
 	{
-		super(parentKey, connectionPool, translater);
+		super(parentKey, connectionPool);
 	}
 	
 	public void initialize(HashMap<QName, Object> constructionParams)
@@ -183,9 +180,11 @@ public class ExportedFileDBResource extends RByteIOResource
 		}
 	}
 	
-	public void load(ReferenceParametersType refParams) throws ResourceUnknownFaultType, ResourceException
+	@Override
+	public void load(String resourceKey)
+		throws ResourceUnknownFaultType, ResourceException
 	{
-		super.load(refParams);
+		super.load(resourceKey);
 		
 		if (isServiceResource()) {
 			return;

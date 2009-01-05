@@ -152,7 +152,9 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 		return ret;
 	}
 	
-	protected void setAttributeHandlers() throws NoSuchMethodException
+	protected void setAttributeHandlers()
+		throws NoSuchMethodException, ResourceException, 
+			ResourceUnknownFaultType
 	{
 		super.setAttributeHandlers();
 
@@ -253,7 +255,7 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 		
 		_logger.debug(String.format(
 			"BES with resource key \"%s\" is creating an activity.",
-			key.getKey()));
+			key.getResourceKey()));
 		
 		/* ASG August 28,2008, replaced RPC with direct call to CreateEPR */
 		EndpointReferenceType entryReference = 

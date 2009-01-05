@@ -285,6 +285,11 @@ public class QueueManager implements Closeable
 		}
 	}
 	
+	public int getBESConfiguration(String name) throws ResourceException
+	{
+		return _besManager.getConfiguration(name);
+	}
+	
 	public Collection<EntryType> listBESs(String entryName)
 		throws SQLException, ResourceException
 	{

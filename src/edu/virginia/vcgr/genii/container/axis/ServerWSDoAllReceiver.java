@@ -20,6 +20,8 @@ import org.apache.ws.axis.security.WSDoAllReceiver;
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
+import org.apache.axis.description.JavaServiceDesc;
+import org.apache.axis.description.ServiceDesc;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.SOAPConstants;
@@ -358,6 +360,13 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 				// it can't figure out how to dispatch to a non-existant method
 				return true;
 			}
+			
+			JavaServiceDesc jDesc = null;
+			ServiceDesc serviceDescription = desc.getParent();
+			if (serviceDescription != null && 
+				(serviceDescription instanceof JavaServiceDesc))
+					jDesc = (JavaServiceDesc)serviceDescription;
+			
 			Method operation = desc.getMethod();
 
 			// get the resource's authz handler
@@ -369,7 +378,9 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 
 			// Let the authZ handler make the decision
 			return authZHandler.checkAccess(callContext, cert, resource,
-					operation);
+				(jDesc == null) ?
+					operation.getDeclaringClass() : jDesc.getImplClass(),
+				operation);
 
 		}
 		catch (IOException e)

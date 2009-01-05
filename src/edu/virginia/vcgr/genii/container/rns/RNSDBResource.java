@@ -14,7 +14,6 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
-import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
@@ -34,11 +33,10 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 	
 	public RNSDBResource(
 			ResourceKey parentKey, 
-			DatabaseConnectionPool connectionPool,
-			IResourceKeyTranslater translater)
+			DatabaseConnectionPool connectionPool)
 		throws SQLException
 	{
-		super(parentKey, connectionPool, translater);
+		super(parentKey, connectionPool);
 	}
 	
 	public void addEntry(InternalEntry entry) throws ResourceException,

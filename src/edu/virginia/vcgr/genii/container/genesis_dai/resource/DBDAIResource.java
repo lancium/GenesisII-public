@@ -21,7 +21,6 @@ import com.sun.org.apache.xalan.internal.xsltc.compiler.Pattern;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
-import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.rns.RNSDBResource;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
@@ -31,10 +30,9 @@ public class DBDAIResource extends RNSDBResource implements IDAIResource{
 	
 	public DBDAIResource(
 			ResourceKey parentKey,
-			DatabaseConnectionPool connectionPool,
-			IResourceKeyTranslater translater)
-		throws SQLException {
-		super(parentKey, connectionPool, translater);
+			DatabaseConnectionPool connectionPool) throws SQLException 
+	{
+		super(parentKey, connectionPool);
 	}
 	
 	static private Log _logger = LogFactory.getLog(DBDAIResource.class);

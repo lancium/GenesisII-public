@@ -8,8 +8,8 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 
-public class DefaultRandomByteIOAttributePreFetcher 
-	extends RandomByteIOAttributePreFetcher
+public class DefaultRandomByteIOAttributePreFetcher
+	extends RandomByteIOAttributePreFetcher<IRByteIOResource>
 {
 	public DefaultRandomByteIOAttributePreFetcher(IRByteIOResource resource)
 	{

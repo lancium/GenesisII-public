@@ -9,9 +9,7 @@ import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResourceFactory;
-import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.IResourceProvider;
-import edu.virginia.vcgr.genii.container.resource.StringResourceKeyTranslater;
 
 public class BasicDBResourceProvider implements IResourceProvider
 {
@@ -20,12 +18,10 @@ public class BasicDBResourceProvider implements IResourceProvider
 	
 	private String _connectionPoolName = null;
 	private IResourceFactory _factory = null;
-	private IResourceKeyTranslater _translater;
 	
 	public BasicDBResourceProvider(Properties properties)
 		throws SQLException
 	{	
-		_translater = instantiateTranslater();
 		_connectionPoolName = properties.getProperty(
 			_CONNECTION_POOL_NAME);
 		if (_connectionPoolName == null)
@@ -67,19 +63,9 @@ public class BasicDBResourceProvider implements IResourceProvider
 		return _factory;
 	}
 
-	public IResourceKeyTranslater getTranslater()
-	{
-		return _translater;
-	}
-	
-	protected IResourceKeyTranslater instantiateTranslater()
-	{
-		return new StringResourceKeyTranslater();
-	}
-	
 	protected IResourceFactory instantiateResourceFactory(DatabaseConnectionPool pool)
 		throws SQLException, ResourceException
 	{
-		return new BasicDBResourceFactory(pool, _translater);
+		return new BasicDBResourceFactory(pool);
 	}
 }

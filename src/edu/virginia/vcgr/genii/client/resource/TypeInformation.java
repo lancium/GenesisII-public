@@ -22,11 +22,9 @@ import java.util.Date;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
-import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyResponse;
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.byteio.streamable.factory.StreamableByteIOFactory;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.bes.BESActivityConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
@@ -179,50 +177,38 @@ public class TypeInformation
 	
 	public String getTypeDescription()
 	{
-		if (isBESActivity())
-			return "BES Activity";
-		else if (isBES())
-			return "BES";
-		else if (isTTY())
-			return "TTY";
-		else if (isContainer())
-			return "Container";
-		else if (isCounter())
-			return "Counter";
-		else if (isRNS())
-			return "RNS";
+		if (isByteIO())
+			return describeByteIO();
 		else if (isPureURL())
 			return "pure-url";
-		else if (isByteIO())
-			return describeByteIO();
 		else
-			return null;
+		{
+			PortType highestRank = PortType.getHighestRankedPortType(
+				_implementedPortTypes);
+			return (highestRank == null) ? "" : highestRank.getDescription();
+		}
 	}
 
 	public long getByteIOSize()
 	{
-		EndpointReferenceType epr = _epr;
-		
 		try
 		{
-			if (isSByteIOFactory())
-			{
-				StreamableByteIOFactory factory =
-					ClientUtils.createProxy(StreamableByteIOFactory.class, _epr);
-				epr = factory.openStream(null).getEndpoint();
-			}
-			
 			Long value = null;
 			
 			if (isRByteIO())
 			{
 				RandomByteIORP rp = (RandomByteIORP)ResourcePropertyManager.createRPInterface(
-					epr, OGSARP.class, RandomByteIORP.class);
+					_epr, OGSARP.class, RandomByteIORP.class);
 				value = rp.getSize();
-			} else
+			} else if (isSByteIO())
 			{
 				StreamableByteIORP rp = (StreamableByteIORP)ResourcePropertyManager.createRPInterface(
-					epr, OGSARP.class, StreamableByteIORP.class);
+					_epr, OGSARP.class, StreamableByteIORP.class);
+				value = rp.getSize();
+			} else if (isSByteIOFactory())
+			{
+				StreamableByteIORP rp = (StreamableByteIORP)ResourcePropertyManager.createRPInterface(
+					_epr, OGSARP.class, StreamableByteIORP.class);
 				value = rp.getSize();
 			}
 			
@@ -234,21 +220,6 @@ public class TypeInformation
 		{
 			t.printStackTrace(System.err);
 			return -1L;
-		}
-		finally
-		{
-			if (epr != _epr)
-			{
-				try
-				{
-					GeniiCommon common = ClientUtils.createProxy(
-						GeniiCommon.class, epr);
-					common.destroy(new Destroy());
-				}
-				catch (Throwable t)
-				{
-				}
-			}
 		}
 	}
 	
@@ -274,34 +245,6 @@ public class TypeInformation
 	{
 		try
 		{
-			if (isSByteIOFactory())
-			{
-				EndpointReferenceType epr = null;
-				StreamableByteIOFactory factory =
-					ClientUtils.createProxy(StreamableByteIOFactory.class, _epr);
-				try
-				{
-					epr = factory.openStream(null).getEndpoint();
-					TypeInformation proxy = new TypeInformation(epr);
-					return proxy.getByteIOCreateTime();
-				}
-				finally
-				{
-					if (epr != null)
-					{
-						try
-						{
-							GeniiCommon common = ClientUtils.createProxy(
-								GeniiCommon.class, epr);
-							common.destroy(new Destroy());
-						}
-						catch (Throwable t)
-						{
-						}
-					}
-				}
-			}
-			
 			return getTimeAttribute(ByteIOConstants.CREATTIME_ATTR_NAME);
 		}
 		catch (Throwable t)
@@ -314,34 +257,6 @@ public class TypeInformation
 	{
 		try
 		{
-			if (isSByteIOFactory())
-			{
-				EndpointReferenceType epr = null;
-				StreamableByteIOFactory factory =
-					ClientUtils.createProxy(StreamableByteIOFactory.class, _epr);
-				try
-				{
-					epr = factory.openStream(null).getEndpoint();
-					TypeInformation proxy = new TypeInformation(epr);
-					return proxy.getByteIOCreateTime();
-				}
-				finally
-				{
-					if (epr != null)
-					{
-						try
-						{
-							GeniiCommon common = ClientUtils.createProxy(
-								GeniiCommon.class, epr);
-							common.destroy(new Destroy());
-						}
-						catch (Throwable t)
-						{
-						}
-					}
-				}
-			}
-			
 			return getTimeAttribute(ByteIOConstants.ACCESSTIME_ATTR_NAME);
 		}
 		catch (Throwable t)
@@ -354,34 +269,6 @@ public class TypeInformation
 	{
 		try
 		{
-			if (isSByteIOFactory())
-			{
-				EndpointReferenceType epr = null;
-				StreamableByteIOFactory factory =
-					ClientUtils.createProxy(StreamableByteIOFactory.class, _epr);
-				try
-				{
-					epr = factory.openStream(null).getEndpoint();
-					TypeInformation proxy = new TypeInformation(epr);
-					return proxy.getByteIOCreateTime();
-				}
-				finally
-				{
-					if (epr != null)
-					{
-						try
-						{
-							GeniiCommon common = ClientUtils.createProxy(
-								GeniiCommon.class, epr);
-							common.destroy(new Destroy());
-						}
-						catch (Throwable t)
-						{
-						}
-					}
-				}
-			}
-			
 			return getTimeAttribute(ByteIOConstants.MODTIME_ATTR_NAME);
 		}
 		catch (Throwable t)

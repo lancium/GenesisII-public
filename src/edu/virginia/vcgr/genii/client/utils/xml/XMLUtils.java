@@ -10,7 +10,7 @@ public class XMLUtils
 			throws SAXException
 	{
 		String value = element.getAttribute(attrName);
-		if (value == null)
+		if (value == null || value.length() == 0)
 		{
 			if (defaultValue == null)
 				throw new SAXException("Unable to find required attribute \""

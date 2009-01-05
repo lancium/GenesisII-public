@@ -50,7 +50,9 @@ public class TTYServiceImpl extends GenesisIIBase implements TTYPortType
 		addImplementedPortType(WellKnownPortTypes.SBYTEIO_SERVICE_PORT_TYPE);
 	}
 	
-	protected void setAttributeHandlers() throws NoSuchMethodException
+	protected void setAttributeHandlers() 
+		throws NoSuchMethodException, ResourceException, 
+			ResourceUnknownFaultType
 	{
 		super.setAttributeHandlers();
 		
@@ -96,7 +98,7 @@ public class TTYServiceImpl extends GenesisIIBase implements TTYPortType
 		synchronized(_buffers)
 		{
 			buffer = _buffers.get(
-				ResourceManager.getCurrentResource().getKey());
+				ResourceManager.getCurrentResource().getResourceKey());
 		}
 		
 		if (buffer == null)
@@ -128,11 +130,12 @@ public class TTYServiceImpl extends GenesisIIBase implements TTYPortType
 		
 		synchronized(_buffers)
 		{
-			buffer =
-				_buffers.get(ResourceManager.getCurrentResource().getKey());
+			String key =
+				ResourceManager.getCurrentResource().getResourceKey();
+			
+			buffer = _buffers.get(key);
 			if (buffer == null)
-				_buffers.put(ResourceManager.getCurrentResource().getKey(),
-					buffer = new TTYBuffer(1024 * 1024));
+				_buffers.put(key, buffer = new TTYBuffer(1024 * 1024));
 		}
 		
 		buffer.write(data, 0, data.length);
@@ -157,7 +160,7 @@ public class TTYServiceImpl extends GenesisIIBase implements TTYPortType
 		synchronized(_buffers)
 		{
 			_buffers.remove(
-				ResourceManager.getCurrentResource().getKey().toString());
+				ResourceManager.getCurrentResource().getResourceKey());
 		}
 	}
 }

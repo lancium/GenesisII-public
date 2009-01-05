@@ -26,7 +26,6 @@ import edu.virginia.vcgr.genii.container.common.notification.SubscriptionInforma
 import edu.virginia.vcgr.genii.container.configuration.ServiceDescription;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
-import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
@@ -50,11 +49,10 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource
 			new HashMap<String, Object>();
 
 	public JNDIResource(ResourceKey parentKey,
-			DatabaseConnectionPool connectionPool,
-			IResourceKeyTranslater translater) throws SQLException
+		DatabaseConnectionPool connectionPool) throws SQLException
 	{
 
-		super(parentKey, connectionPool, translater);
+		super(parentKey, connectionPool);
 	}
 
 	public boolean isIdpResource()
@@ -156,18 +154,19 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource
 		}
 	}
 
-	public void load(ReferenceParametersType refParams)
-			throws ResourceUnknownFaultType, ResourceException
+	@Override
+	public void load(String resourceKey)
+		throws ResourceUnknownFaultType, ResourceException
 	{
-
-		_resourceKey = (String) _translater.unwrap(refParams);
+		_resourceKey = resourceKey;
 
 		if (!isIdpResource())
 		{
-			super.load(refParams);
+			super.load(resourceKey);
 			return;
 		}
 
+		/* TODO -- We can't do this any more.  Will have to revisit soon.
 		for (MessageElement element : refParams.get_any())
 		{
 			if (element.getQName().equals(_RESOURCE_CERT_QNAME))
@@ -206,6 +205,7 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource
 						.getLocalPart(), element.getFirstChild().getNodeValue());
 			}
 		}
+		*/
 	}
 
 	public void initialize(HashMap<QName, Object> constructionParams)
@@ -341,13 +341,8 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource
 				"Cannot match subscriptions on transparent resources");
 	}
 
-	/**
-	 * Retrieve the WS-Addressing ReferenceParameters that match this resource.
-	 * 
-	 * @return The Addressing information for WS-Addressing.
-	 * @throws ResourceException
-	 *             If anything goes wrong.
-	 */
+	/* TODO -- This functionis no longer contained here.  We'll have to
+	 * revisit this issue again.
 	public ReferenceParametersType getResourceParameters()
 			throws ResourceException
 	{
@@ -420,6 +415,7 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource
 
 		return refParams;
 	}
+	*/
 
 	public void addEntry(InternalEntry entry) throws ResourceException,
 			RNSEntryExistsFaultType

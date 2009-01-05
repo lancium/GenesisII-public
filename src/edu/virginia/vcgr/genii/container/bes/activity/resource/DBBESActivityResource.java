@@ -31,7 +31,6 @@ import edu.virginia.vcgr.genii.container.bes.BESUtilities;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
-import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
@@ -99,11 +98,10 @@ public class DBBESActivityResource extends BasicDBResource implements
 
 	public DBBESActivityResource(
 			ResourceKey parentKey, 
-			DatabaseConnectionPool connectionPool,
-			IResourceKeyTranslater translater)
+			DatabaseConnectionPool connectionPool)
 		throws SQLException
 	{
-		super(parentKey, connectionPool, translater);
+		super(parentKey, connectionPool);
 	}
 	
 	public BESActivity findActivity()

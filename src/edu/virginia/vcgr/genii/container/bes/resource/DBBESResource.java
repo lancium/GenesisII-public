@@ -30,15 +30,14 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.bes.BES;
 import edu.virginia.vcgr.genii.container.bes.BESPolicy;
 import edu.virginia.vcgr.genii.container.bes.BESPolicyActions;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
-import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
-import edu.virginia.vcgr.genii.container.resource.StringResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
@@ -87,11 +86,10 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 
 	public DBBESResource(
 			ResourceKey parentKey, 
-			DatabaseConnectionPool connectionPool,
-			IResourceKeyTranslater translater)
+			DatabaseConnectionPool connectionPool)
 		throws SQLException
 	{
-		super(parentKey, connectionPool, translater);
+		super(parentKey, connectionPool);
 	}
 
 	@Override
@@ -193,8 +191,9 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 	public BESActivity getActivity(EndpointReferenceType activity)
 		throws RemoteException, UnknownActivityIdentifierFaultType
 	{
-		StringResourceKeyTranslater trans = new StringResourceKeyTranslater();
-		String id = (String)trans.unwrap(activity.getReferenceParameters());
+		AddressingParameters ap = new AddressingParameters(
+			activity.getReferenceParameters());
+		String id = ap.getResourceKey();
 		return getActivity(id);
 	}
 	

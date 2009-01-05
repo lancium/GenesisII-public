@@ -87,7 +87,8 @@ public class JNDIAuthZProvider implements IAuthZProvider
 
 	@SuppressWarnings("unchecked")
 	public boolean checkAccess(ICallingContext callingContext,
-			X509Certificate callerCert, IResource resource, Method operation)
+		X509Certificate callerCert, IResource resource, 
+		Class<?> serviceClass, Method operation)
 			throws AuthZSecurityException, ResourceException
 	{
 
@@ -96,7 +97,7 @@ public class JNDIAuthZProvider implements IAuthZProvider
 		if (!jndiResource.isIdpResource())
 		{
 			return _gamlAclProvider.checkAccess(callingContext, callerCert,
-					resource, operation);
+				resource, serviceClass, operation);
 		}
 
 		// try each identity in the caller's credentials

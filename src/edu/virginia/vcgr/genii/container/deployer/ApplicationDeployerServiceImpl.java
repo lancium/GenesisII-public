@@ -11,6 +11,7 @@ import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
@@ -60,7 +61,9 @@ public class ApplicationDeployerServiceImpl extends GenesisIIBase implements
 	static private final String _DEPLOYMENT_PROPERTY =
 		"edu.virginia.vcgr.genii.container.deployer.deployment-property";
 	
-	protected void setAttributeHandlers() throws NoSuchMethodException
+	protected void setAttributeHandlers()
+		throws NoSuchMethodException, ResourceException, 
+			ResourceUnknownFaultType
 	{
 		super.setAttributeHandlers();
 		

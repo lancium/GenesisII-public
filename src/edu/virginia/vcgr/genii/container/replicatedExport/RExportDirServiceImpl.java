@@ -53,7 +53,9 @@ public class RExportDirServiceImpl extends GenesisIIBase
 {
 	static private Log _logger = LogFactory.getLog(RExportDirServiceImpl.class);
 	
-	protected void setAttributeHandlers() throws NoSuchMethodException
+	protected void setAttributeHandlers()
+		throws NoSuchMethodException, ResourceException, 
+			ResourceUnknownFaultType
 	{
 		super.setAttributeHandlers();
 		

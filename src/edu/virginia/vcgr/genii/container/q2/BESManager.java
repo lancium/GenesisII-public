@@ -363,6 +363,17 @@ public class BESManager implements Closeable
 		
 	}
 	
+	synchronized public int getConfiguration(String name)
+		throws ResourceException
+	{
+		BESData data = _containersByName.get(name);
+		if (data == null)
+			throw new ResourceException("BES container \"" + name +
+				"\" is unknown.");
+		
+		return data.getTotalSlots();
+	}
+	
 	/**
 	 * Make out-calls to the indicated resources to get their latest 
 	 * update information.

@@ -5,7 +5,6 @@ import java.sql.SQLException;
 
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
-import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
 public class SharedExportDirBaseFactory extends BasicDBResourceFactory
@@ -27,11 +26,10 @@ public class SharedExportDirBaseFactory extends BasicDBResourceFactory
 		"(entryid VARCHAR(40) PRIMARY KEY, attr VARCHAR (8192) FOR BIT DATA)";
 	
 	protected SharedExportDirBaseFactory(
-			DatabaseConnectionPool pool, 
-			IResourceKeyTranslater translator)
+			DatabaseConnectionPool pool)
 		throws SQLException
 	{
-		super(pool, translator);
+		super(pool);
 	}
 
 	protected void createTables() throws SQLException

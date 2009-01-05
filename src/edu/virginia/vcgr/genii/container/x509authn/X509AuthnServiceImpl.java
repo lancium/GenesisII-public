@@ -272,7 +272,9 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 				resolverCreationParams);
 	}
 
-	protected void setAttributeHandlers() throws NoSuchMethodException
+	protected void setAttributeHandlers()
+		throws NoSuchMethodException, ResourceException, 
+			ResourceUnknownFaultType
 	{
 		super.setAttributeHandlers();
 		new X509AuthnAttributeHandlers(getAttributePackage());

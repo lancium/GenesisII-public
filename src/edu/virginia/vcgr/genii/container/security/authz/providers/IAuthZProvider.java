@@ -46,7 +46,8 @@ public interface IAuthZProvider
 	 * target resource is allowable with the given working context
 	 */
 	public boolean checkAccess(ICallingContext callingContext,
-			X509Certificate callerCert, IResource resource, Method operation)
+		X509Certificate callerCert, IResource resource, 
+		Class<?> serviceClass, Method operation)
 			throws AuthZSecurityException, ResourceException;
 
 	/**

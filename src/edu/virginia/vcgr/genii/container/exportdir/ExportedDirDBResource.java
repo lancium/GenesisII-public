@@ -21,7 +21,6 @@ import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.RNSEntryExistsFaultType;
 import org.morgan.util.GUID;
 import org.ws.addressing.EndpointReferenceType;
-import org.ws.addressing.ReferenceParametersType;
 
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedFileUtils;
@@ -36,7 +35,6 @@ import edu.virginia.vcgr.genii.container.attrs.AttributePreFetcher;
 import edu.virginia.vcgr.genii.container.byteio.DefaultRandomByteIOAttributePreFetcher;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
-import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
@@ -112,11 +110,10 @@ public class ExportedDirDBResource extends BasicDBResource implements
 	
 	public ExportedDirDBResource(
 			ResourceKey parentKey, 
-			DatabaseConnectionPool connectionPool,
-			IResourceKeyTranslater translater)
+			DatabaseConnectionPool connectionPool)
 		throws SQLException
 	{
-		super(parentKey, connectionPool, translater);
+		super(parentKey, connectionPool);
 
 	}
 	
@@ -142,9 +139,11 @@ public class ExportedDirDBResource extends BasicDBResource implements
 			insertDirInfo();
 	}
 	
-	public void load(ReferenceParametersType refParams) throws ResourceUnknownFaultType, ResourceException
+	@Override
+	public void load(String resourceKey)
+		throws ResourceUnknownFaultType, ResourceException
 	{
-		super.load(refParams);
+		super.load(resourceKey);
 		
 		if (isServiceResource())
 			return;

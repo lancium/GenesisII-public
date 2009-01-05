@@ -8,7 +8,6 @@ import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.IResourceFactory;
-import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 
 public class BasicDBResourceFactory implements IResourceFactory
@@ -28,13 +27,11 @@ public class BasicDBResourceFactory implements IResourceFactory
 				"(resourceid, paramname, paramvalue))";
 	
 	protected DatabaseConnectionPool _pool;
-	protected IResourceKeyTranslater _translater;
 	
-	public BasicDBResourceFactory(DatabaseConnectionPool pool, IResourceKeyTranslater translater)
+	public BasicDBResourceFactory(DatabaseConnectionPool pool)
 		throws SQLException
 	{
 		_pool = pool;
-		_translater = translater;
 		createTables();
 	}
 	
@@ -42,7 +39,7 @@ public class BasicDBResourceFactory implements IResourceFactory
 	{
 		try
 		{
-			return new BasicDBResource(parentKey, _pool, _translater);
+			return new BasicDBResource(parentKey, _pool);
 		}
 		catch (SQLException sqe)
 		{

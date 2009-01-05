@@ -26,6 +26,7 @@ import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
+import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -54,7 +55,8 @@ public class ResourceManager
 			WorkingContext ctxt = WorkingContext.getCurrentWorkingContext();
 			String serviceName = EPRUtils.extractServiceName(epr);
 			ResourceKey rKey =
-					new ResourceKey(serviceName, epr.getReferenceParameters());
+					new ResourceKey(serviceName, new AddressingParameters(
+						epr.getReferenceParameters()));
 			ctxt.setProperty(new GUID().toString(), rKey);
 			return rKey;
 		}
@@ -68,9 +70,11 @@ public class ResourceManager
 			throws ResourceUnknownFaultType, ResourceException
 	{
 		WorkingContext ctxt = WorkingContext.getCurrentWorkingContext();
-		ResourceKey key =
-				(ResourceKey) ctxt
-						.getProperty(WorkingContext.CURRENT_RESOURCE_KEY);
+		ResourceKey key = null;
+		
+		if (ctxt != null)
+			key = (ResourceKey)ctxt
+				.getProperty(WorkingContext.CURRENT_RESOURCE_KEY);
 		if (key == null)
 		{
 			EndpointReferenceType epr =
@@ -87,7 +91,8 @@ public class ResourceManager
 				throw new ResourceException(
 						"Couldn't locate target service name in current working context.");
 
-			key = new ResourceKey(serviceName, epr.getReferenceParameters());
+			key = new ResourceKey(serviceName, 
+				new AddressingParameters(epr.getReferenceParameters()));
 			ctxt.setProperty(WorkingContext.CURRENT_RESOURCE_KEY, key);
 		}
 
@@ -99,7 +104,7 @@ public class ResourceManager
 	{
 		WorkingContext ctxt = WorkingContext.getCurrentWorkingContext();
 		ResourceKey rKey =
-				new ResourceKey(serviceName, (ReferenceParametersType) null);
+				new ResourceKey(serviceName, new AddressingParameters(null));
 		ctxt.setProperty(new GUID().toString(), rKey);
 		return rKey;
 	}
@@ -131,17 +136,22 @@ public class ResourceManager
 	}
 
 	static public EndpointReferenceType createEPR(ResourceKey resource,
-			String targetServiceURL, PortType[] implementedPortTypes)
+		String targetServiceURL, PortType[] implementedPortTypes)
 			throws ResourceException
 	{
 		ReferenceParametersType refParams = null;
 		AttributedURIType address =
 				new AttributedURITypeSmart(targetServiceURL);
 		if (resource != null)
-			refParams = resource.getResourceParameters();
+		{
+			AddressingParameters addrParams = 
+				resource.getAddressingParameters();
+			if (addrParams != null)
+				refParams = addrParams.toReferenceParameters();
+		}
 
-		return new EndpointReferenceType(address, refParams, createMetadata(
-				implementedPortTypes, resource), null);
+		return new EndpointReferenceType(address, refParams, 
+			createMetadata(implementedPortTypes, resource), null);
 	}
 
 	static private void addSecureAddressingElements(
@@ -401,7 +411,7 @@ public class ResourceManager
 
 	}
 
-	static private MetadataType createMetadata(PortType[] portTypes,
+	static public MetadataType createMetadata(PortType[] portTypes,
 			ResourceKey resourceKey) throws ResourceException
 	{
 		if (portTypes == null)

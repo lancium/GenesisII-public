@@ -16,23 +16,4 @@ public interface IResourceProvider
 	 * @return The providers resource factory.
 	 */
 	public IResourceFactory getFactory();
-	
-	/**
-	 * Retrieve the key translater for this bundle.
-	 * 
-	 * @return The key translater.
-	 */
-	public IResourceKeyTranslater getTranslater();
-	
-	/**
-	 * Register (on restart) with a vulture all of the
-	 * resources which have scheduled termintation times.
-	 * 
-	 * @param serviceName The name of the service to register terminations for.
-	 * @param vulture The vulture with which to register.
-	 */
-/*
-	public void registerScheduledTermintations(String serviceName,
-		LifetimeVulture vulture);
-*/
 }

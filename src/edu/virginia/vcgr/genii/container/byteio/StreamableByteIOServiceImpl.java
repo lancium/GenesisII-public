@@ -72,7 +72,9 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements
 			return super.translateConstructionParameter(property);
 	}
 	
-	protected void setAttributeHandlers() throws NoSuchMethodException
+	protected void setAttributeHandlers() 
+		throws NoSuchMethodException, ResourceException, 
+			ResourceUnknownFaultType
 	{
 		super.setAttributeHandlers();
 		

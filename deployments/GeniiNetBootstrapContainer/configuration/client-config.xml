@@ -263,6 +263,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ShellLoginTool</mconf:class>
 		<mconf:class name="monitor-queue"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.MonitorQueue</mconf:class>
+		<mconf:class name="echo"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.EchoCommand</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

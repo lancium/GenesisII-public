@@ -39,6 +39,7 @@ import edu.virginia.vcgr.genii.client.comm.CommConstants;
 import edu.virginia.vcgr.genii.client.comm.axis.security.MessageSecurityData;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.axis.GamlMessageSendHandler;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
@@ -145,9 +146,9 @@ public class AxisClientHeaderHandler extends BasicHandler
 					if (any.length > 0) {
 						// specify that we need to sign the reference params
 						signParts.add(new WSEncryptionPart(
-				    			"simple-string", 
-				    			"http://vcgr.cs.virginia.edu/Genesis-II", 
-				    			"Element"));
+							AddressingParameters.GENII_RESOURCE_KEY_REF_PARAM,
+							AddressingParameters.GENII_REF_PARAMS_NS, 
+			    			"Element"));
 					}
 				}
 			}

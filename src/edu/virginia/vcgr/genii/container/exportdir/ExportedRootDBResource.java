@@ -3,7 +3,6 @@ package edu.virginia.vcgr.genii.container.exportdir;
 import java.sql.SQLException;
 
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
-import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 
 public class ExportedRootDBResource extends ExportedDirDBResource implements
@@ -11,10 +10,9 @@ public class ExportedRootDBResource extends ExportedDirDBResource implements
 {
 	public ExportedRootDBResource(
 			ResourceKey parentKey, 
-			DatabaseConnectionPool connectionPool,
-			IResourceKeyTranslater translater)
+			DatabaseConnectionPool connectionPool)
 		throws SQLException
 	{
-		super(parentKey, connectionPool, translater);
+		super(parentKey, connectionPool);
 	}
 }

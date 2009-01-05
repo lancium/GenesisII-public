@@ -30,6 +30,7 @@ import org.ggf.rns.Remove;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
 import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
+import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
 import edu.virginia.vcgr.genii.common.notification.Notify;
@@ -47,7 +48,9 @@ public class RExportFileServiceImpl extends RandomByteIOServiceImpl
 {
 	static private Log _logger = LogFactory.getLog(RExportFileServiceImpl.class);
 	
-	protected void setAttributeHandlers() throws NoSuchMethodException
+	protected void setAttributeHandlers()
+		throws NoSuchMethodException, ResourceException, 
+			ResourceUnknownFaultType
 	{
 		super.setAttributeHandlers();
 		

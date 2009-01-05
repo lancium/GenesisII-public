@@ -70,6 +70,7 @@ import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.attrs.AttributePreFetcher;
 import edu.virginia.vcgr.genii.container.byteio.DefaultRandomByteIOAttributePreFetcher;
 import edu.virginia.vcgr.genii.container.byteio.RandomByteIOServiceImpl;
+import edu.virginia.vcgr.genii.container.common.AttributesPreFetcherFactory;
 import edu.virginia.vcgr.genii.container.common.DefaultGenesisIIAttributesPreFetcher;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.common.notification.TopicSpace;
@@ -227,44 +228,24 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
     	return new ListResponse(ret);
     }
 	
-	private void fillInAttributes(InternalEntry entry)
+	static private class AttributesPreFetcherFactoryImpl 
+		implements AttributesPreFetcherFactory
 	{
-		EndpointReferenceType epr = entry.getEntryReference();
-		AttributePreFetcher preFetcher = null;
-		
-		try
+		@Override
+		public AttributePreFetcher getPreFetcher(EndpointReferenceType target)
+				throws Throwable
 		{
-			if (Container.getServiceURL("RandomByteIOPortType").equalsIgnoreCase(
-				epr.getAddress().toString()))
-			{
-				preFetcher =
-					new DefaultRandomByteIOAttributePreFetcher(epr);
-			} else if (Container.onThisServer(epr))
-			{
-				preFetcher =
-					new DefaultGenesisIIAttributesPreFetcher<IResource>(epr);
-			}
+			if (Container.getServiceURL(
+				"RandomByteIOPortType").equalsIgnoreCase(
+					target.getAddress().toString()))
+						return new DefaultRandomByteIOAttributePreFetcher(
+							target);
+			else if (Container.onThisServer(target))
+				return new DefaultGenesisIIAttributesPreFetcher<IResource>(
+					target);
+			
+			return null;
 		}
-		catch (Throwable cause)
-		{
-			_logger.warn("Unable to pre-fetch attributes.", cause);
-		}
-		
-		if (preFetcher == null)
-			return;
-		
-		Collection<MessageElement> attrs = preFetcher.preFetch();
-		MessageElement []oldAttrs = entry.getAttributes();
-		if (oldAttrs != null)
-		{
-			for (MessageElement oldAttr : oldAttrs)
-			{
-				attrs.add(oldAttr);
-			}
-		}
-		
-		if (attrs.size() > 0)
-			entry.setAttributes(attrs.toArray(new MessageElement[0]));
 	}
 	
 	@RWXMapping(RWXCategory.READ)
@@ -284,14 +265,18 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
     		entries = resource.retrieveEntries(null);
     	}
 
+    	AttributesPreFetcherFactory factory = 
+    		new AttributesPreFetcherFactoryImpl();
+    	
 		Collection<MessageElement> col = new LinkedList<MessageElement>();
     	for (InternalEntry internalEntry : entries)
     	{
-    		fillInAttributes(internalEntry);
+    		EndpointReferenceType epr = internalEntry.getEntryReference();
+    		
     		EntryType entry = new EntryType(
-    				internalEntry.getName(), 
-    				internalEntry.getAttributes(), 
-    				internalEntry.getEntryReference());
+				internalEntry.getName(), 
+				preFetch(epr, internalEntry.getAttributes(), factory),
+				epr);
 
     		col.add(AnyHelper.toAny(entry));
     	}

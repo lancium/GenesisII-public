@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.container.common;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.InvocationTargetException;
@@ -114,6 +115,7 @@ import edu.virginia.vcgr.genii.container.IContainerManaged;
 import edu.virginia.vcgr.genii.container.alarms.AlarmIdentifier;
 import edu.virginia.vcgr.genii.container.alarms.AlarmManager;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
+import edu.virginia.vcgr.genii.container.attrs.AttributePreFetcher;
 import edu.virginia.vcgr.genii.container.attrs.IAttributeManipulator;
 import edu.virginia.vcgr.genii.container.common.notification.SubscriptionConstructionParameters;
 import edu.virginia.vcgr.genii.container.common.notification.TopicSpace;
@@ -182,7 +184,9 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		}
 	}
 	
-	protected void setAttributeHandlers() throws NoSuchMethodException
+	protected void setAttributeHandlers()
+		throws NoSuchMethodException, ResourceException,
+			ResourceUnknownFaultType
 	{
 		new GenesisIIBaseAttributesHandler(this, getAttributePackage());
 	}
@@ -684,7 +688,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 
 		ResourceKey rKey = createResource(constructionParameters);
 		EndpointReferenceType epr = ResourceManager.createEPR(rKey, 
-			myEPR.getAddress().get_value().toString(), getImplementedPortTypes(rKey));
+			myEPR.getAddress().get_value().toString(), 
+			getImplementedPortTypes(rKey));
 		if (!(this instanceof GeniiNoOutCalls)){
 			try
 			{
@@ -709,8 +714,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		postCreate(rKey, epr, constructionParameters, resolverCreationParams);
 	
 		rKey.dereference().commit();
-		_logger.debug("Created resource \"" + rKey.getKey() + "\" for service \"" +
-			rKey.getServiceName() + "\".");
+		_logger.debug("Created resource \"" + rKey.getResourceKey() + 
+			"\" for service \"" + rKey.getServiceName() + "\".");
 		EndpointReferenceType resolveEPR = addResolvers(rKey, epr, resolverCreationParams);
 		return new VcgrCreateResponse(resolveEPR);
 	}
@@ -1014,6 +1019,30 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		{
 			StreamUtils.close(stmt);
 			pool.release(connection);
+		}
+	}
+	
+	private Object _myEPRLock = new Object();
+	private EndpointReferenceType _myEPR = null;
+	
+	protected EndpointReferenceType getMyEPR(boolean withPortTypes) 
+		throws ResourceUnknownFaultType, ResourceException
+	{
+		synchronized(_myEPRLock)
+		{
+			if (_myEPR == null)
+			{
+				String myAddress = Container.getServiceURL(_serviceName);
+				ResourceKey rKey = ResourceManager.getCurrentResource();
+				PortType []implementedPortTypes = null;
+				if (withPortTypes)
+					implementedPortTypes = getImplementedPortTypes(rKey);
+				
+				_myEPR = ResourceManager.createEPR(
+					rKey, myAddress, implementedPortTypes);
+			}
+			
+			return _myEPR;
 		}
 	}
 	
@@ -1445,5 +1474,41 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 			ResourceManager.getCurrentResource().dereference();
 		resource.removeMatchingParameter(removeMatchingParameterRequest);
 		return new RemoveMatchingParameterResponseType();
+	}
+	
+	protected MessageElement[] preFetch(EndpointReferenceType target,
+		MessageElement []existingAttributes, 
+		AttributesPreFetcherFactory factory)
+	{
+		AttributePreFetcher preFetcher = null;
+		
+		try
+		{
+			preFetcher = factory.getPreFetcher(target);
+			if (preFetcher == null)
+				return existingAttributes;
+			Collection<MessageElement> attrs = preFetcher.preFetch();
+			if (attrs == null)
+				return existingAttributes;
+			
+			if (existingAttributes != null)
+			{
+				for (MessageElement element : existingAttributes)
+					attrs.add(element);
+			}
+			
+			return attrs.toArray(new MessageElement[attrs.size()]);
+		}
+		catch (Throwable cause)
+		{
+			_logger.warn("Unable to pre-fetch attributes.", cause);
+		}
+		finally
+		{
+			if (preFetcher != null && (preFetcher instanceof Closeable))
+				StreamUtils.close((Closeable)preFetcher);
+		}
+		
+		return existingAttributes;
 	}
 }

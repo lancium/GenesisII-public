@@ -52,14 +52,23 @@ public class AttributeCacheHandler
 	private TimedOutLRUCache<WSName, CachedAttributeData> _attrCache =
 		new TimedOutLRUCache<WSName, CachedAttributeData>(_MAX_CACHE_ELEMENTS, _DEFAULT_TIMEOUT_MS);
 	
-	static private QName xferMechs = new QName(ByteIOConstants.RANDOM_BYTEIO_NS,
+	static private QName rxferMechs = new QName(ByteIOConstants.RANDOM_BYTEIO_NS,
 			ByteIOConstants.XFER_MECHS_ATTR_NAME);
-	static private QName size = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.SIZE_ATTR_NAME);
-	static private QName accessTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.ACCESSTIME_ATTR_NAME);
-	static private QName modTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME);
-	static private QName creatTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME);
+	static private QName rsize = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.SIZE_ATTR_NAME);
+	static private QName raccessTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.ACCESSTIME_ATTR_NAME);
+	static private QName rmodTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME);
+	static private QName rcreatTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME);
+	static private QName sxferMechs = new QName(ByteIOConstants.STREAMABLE_BYTEIO_NS,
+			ByteIOConstants.XFER_MECHS_ATTR_NAME);
+	static private QName ssize = new QName(ByteIOConstants.STREAMABLE_BYTEIO_NS, ByteIOConstants.SIZE_ATTR_NAME);
+	static private QName saccessTime = new QName(ByteIOConstants.STREAMABLE_BYTEIO_NS, ByteIOConstants.ACCESSTIME_ATTR_NAME);
+	static private QName smodTime = new QName(ByteIOConstants.STREAMABLE_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME);
+	static private QName screatTime = new QName(ByteIOConstants.STREAMABLE_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME);
 	// static private QName authz = AuthZConfig.getTypeDesc().getXmlType();
+	
+	/*
 	static private QName authz = new QName("http://tempuri.org", "Mark");
+	*/
 	
 	public AttributeCacheHandler()
 	{
@@ -99,7 +108,7 @@ public class AttributeCacheHandler
 			return (GetResourcePropertyDocumentResponse)ctxt.proceed();
 		}
 		
-		_logger.debug("Looking for cached attribute data.");
+		_logger.debug("Looking for cached attribute data for " + name);
 		
 		CachedAttributeData data;
 		synchronized(_attrCache)
@@ -230,7 +239,7 @@ public class AttributeCacheHandler
 			return (GetMultipleResourcePropertiesResponse)ctxt.proceed();
 		}
 		
-		_logger.debug("Looking for cached attribute data.");
+		_logger.debug("Looking for cached attribute data for " + name);
 		
 		CachedAttributeData data;
 		synchronized(_attrCache)
@@ -274,7 +283,7 @@ public class AttributeCacheHandler
 			return (GetResourcePropertyResponse)ctxt.proceed();
 		}
 		
-		_logger.debug("Looking for cached attribute data.");
+		_logger.debug("Looking for cached attribute data for " + name);
 		
 		CachedAttributeData data;
 		synchronized(_attrCache)
@@ -325,13 +334,19 @@ public class AttributeCacheHandler
 					for (MessageElement elem : any)
 					{
 						QName elemName = elem.getQName();
-						if (elemName.equals(xferMechs) || elemName.equals(size) ||
-							elemName.equals(accessTime) || elemName.equals(modTime) ||
-							elemName.equals(creatTime) || elemName.equals(authz) ||
-							elemName.equals(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME))
+						if (elemName.equals(rxferMechs) || elemName.equals(rsize) ||
+							elemName.equals(raccessTime) || elemName.equals(rmodTime) ||
+							elemName.equals(rcreatTime) ||
+							elemName.equals(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME) ||
+							elemName.equals(sxferMechs) || elemName.equals(ssize) ||
+							elemName.equals(saccessTime) || elemName.equals(smodTime) ||
+							elemName.equals(screatTime))
 						{
-							_logger.debug("Adding " + elemName + " to cache.");
+							_logger.debug("Adding " + elemName + " to " + name);
 							cachedAttrs.add(elem);
+						} else
+						{
+							_logger.debug("NOT Adding " + elemName + " to " + name);
 						}
 					}
 					
@@ -379,13 +394,19 @@ public class AttributeCacheHandler
 								for (MessageElement elem : any)
 								{
 									QName elemName = elem.getQName();
-									if (elemName.equals(xferMechs) || elemName.equals(size) ||
-										elemName.equals(accessTime) || elemName.equals(modTime) ||
-										elemName.equals(creatTime) || elemName.equals(authz) ||
-										elemName.equals(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME))
+									if (elemName.equals(rxferMechs) || elemName.equals(rsize) ||
+										elemName.equals(raccessTime) || elemName.equals(rmodTime) ||
+										elemName.equals(rcreatTime) ||
+										elemName.equals(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME) ||
+										elemName.equals(sxferMechs) || elemName.equals(ssize) ||
+										elemName.equals(saccessTime) || elemName.equals(smodTime) ||
+										elemName.equals(screatTime))
 									{
-										_logger.debug("Adding " + elemName + " to cache.");
+										_logger.debug("Adding " + elemName + " to " + name);
 										cachedAttrs.add(elem);
+									} else
+									{
+										_logger.debug("NOT Adding " + elemName + " to " + name);
 									}
 								}
 								
@@ -433,12 +454,19 @@ public class AttributeCacheHandler
 							for (MessageElement elem : any)
 							{
 								QName elemName = elem.getQName();
-								if (elemName.equals(xferMechs) || elemName.equals(size) ||
-									elemName.equals(accessTime) || elemName.equals(modTime) ||
-									elemName.equals(creatTime) || elemName.equals(authz))
+								if (elemName.equals(rxferMechs) || elemName.equals(rsize) ||
+									elemName.equals(raccessTime) || elemName.equals(rmodTime) ||
+									elemName.equals(rcreatTime) ||
+									elemName.equals(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME) ||
+									elemName.equals(sxferMechs) || elemName.equals(ssize) ||
+									elemName.equals(saccessTime) || elemName.equals(smodTime) ||
+									elemName.equals(screatTime))
 								{
-									_logger.debug("Adding " + elemName + " to cache.");
+									_logger.debug("Adding " + elemName + " to " + name);
 									cachedAttrs.add(elem);
+								} else
+								{
+									_logger.debug("NOT Adding " + elemName + " to " + name);
 								}
 							}
 							

@@ -19,6 +19,6 @@ public class ExportedRootDBResourceProvider extends BasicDBResourceProvider
 	protected IResourceFactory instantiateResourceFactory(DatabaseConnectionPool pool)
 		throws SQLException, ResourceException
 	{
-		return new ExportedRootDBResourceFactory(pool, getTranslater());
+		return new ExportedRootDBResourceFactory(pool);
 	}
 }

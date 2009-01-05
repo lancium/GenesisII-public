@@ -3,9 +3,9 @@ package edu.virginia.vcgr.genii.container.q2;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -13,30 +13,11 @@ import java.util.LinkedList;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
-import org.apache.axis.types.Token;
-import org.apache.axis.types.UnsignedLong;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStatusType;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.jsdl.JobMultiDefinition_Type;
-import org.ggf.rns.Add;
-import org.ggf.rns.AddResponse;
-import org.ggf.rns.CreateFile;
-import org.ggf.rns.CreateFileResponse;
-import org.ggf.rns.EntryType;
-import org.ggf.rns.List;
-import org.ggf.rns.ListResponse;
-import org.ggf.rns.Move;
-import org.ggf.rns.MoveResponse;
-import org.ggf.rns.Query;
-import org.ggf.rns.QueryResponse;
-import org.ggf.rns.RNSDirectoryNotEmptyFaultType;
-import org.ggf.rns.RNSEntryExistsFaultType;
-import org.ggf.rns.RNSEntryNotDirectoryFaultType;
-import org.ggf.rns.RNSFaultType;
-import org.ggf.rns.Remove;
-import org.morgan.util.io.GuaranteedDirectory;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
@@ -44,35 +25,29 @@ import org.xml.sax.InputSource;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
-import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
-import edu.virginia.vcgr.genii.client.comm.ClientConstructionParameters;
-import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.queue.QueueConstants;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
 import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.common.notification.Notify;
-import edu.virginia.vcgr.genii.common.notification.Subscribe;
 import edu.virginia.vcgr.genii.common.notification.UserDataType;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 
-import edu.virginia.vcgr.genii.container.Container;
-import edu.virginia.vcgr.genii.container.byteio.RByteIOResource;
-import edu.virginia.vcgr.genii.container.byteio.StreamableByteIOServiceImpl;
-import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.q2.forks.RootRNSFork;
 import edu.virginia.vcgr.genii.container.q2.resource.IQueueResource;
 import edu.virginia.vcgr.genii.container.q2.resource.QueueDBResourceFactory;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
+import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
+import edu.virginia.vcgr.genii.container.rfork.ResourceForkBaseService;
 import edu.virginia.vcgr.genii.queue.ConfigureRequestType;
 import edu.virginia.vcgr.genii.queue.IterateListResponseType;
 import edu.virginia.vcgr.genii.queue.IterateStatusResponseType;
@@ -87,11 +62,13 @@ import edu.virginia.vcgr.genii.queue.SubmitJobResponseType;
  * 
  * @author mmm2a
  */
-public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
+@ForkRoot(RootRNSFork.class)
+public class QueueServiceImpl extends ResourceForkBaseService
+	implements QueuePortType
 {
 	static private Log _logger = LogFactory.getLog(QueueServiceImpl.class);
 	
-	static private final long _DEFAULT_TIME_TO_LIVE = 1000L * 60 * 60;
+	//static private final long _DEFAULT_TIME_TO_LIVE = 1000L * 60 * 60;
 	static public QName _JOBID_QNAME =
 		new QName(GenesisIIConstants.GENESISII_NS, "job-id");
 	static private QName _FILENAME_QNAME =
@@ -99,6 +76,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 	static private QName _FILEPATH_QNAME =
 		new QName(GenesisIIConstants.GENESISII_NS, "data-filepath");
 	
+	/*
 	static private UserDataType createUserData(String filename, String filepath)
 	{
 		return new UserDataType(new MessageElement[] { 
@@ -108,6 +86,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 				_FILEPATH_QNAME, filepath)
 		});
 	}
+	*/
 	
 	public QueueServiceImpl() throws RemoteException
 	{
@@ -118,7 +97,6 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		 * implemented by this service.
 		 */
 		addImplementedPortType(QueueConstants.QUEUE_PORT_TYPE);
-		addImplementedPortType(RNSConstants.RNS_PORT_TYPE);
 	}
 	
 	@Override
@@ -139,6 +117,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		return QueueConstants.QUEUE_PORT_TYPE;
 	}
 	
+	/*
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
 	public AddResponse add(Add addRequest) throws RemoteException,
@@ -153,7 +132,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		
 		try
 		{
-			QueueManager mgr = QueueManager.getManager((String)rKey.getKey());
+			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
 			mgr.addNewBES(addRequest.getEntry_name(), addRequest.getEntry_reference());
 			return new AddResponse(addRequest.getEntry_reference());
 		}
@@ -162,6 +141,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 			throw new RemoteException("Unable to add bes container.", sqe);
 		}
 	}
+	*/
 
 	@Override
 	@RWXMapping(RWXCategory.OPEN)
@@ -171,7 +151,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		
 		try
 		{
-			QueueManager mgr = QueueManager.getManager((String)rKey.getKey());
+			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
 			mgr.completeJobs(completeRequest);
 			return null;
 		}
@@ -190,7 +170,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		
 		try
 		{
-			QueueManager mgr = QueueManager.getManager((String)rKey.getKey());
+			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
 			mgr.configureBES(configureRequest.getQueueResource(), 
 				configureRequest.getNumSlots().intValue());
 			return null;
@@ -201,6 +181,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		}
 	}
 
+	/*
 	@Override
 	@RWXMapping(RWXCategory.EXECUTE)
 	public CreateFileResponse createFile(CreateFile createFileRequest)
@@ -247,21 +228,13 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 				_DEFAULT_TIME_TO_LIVE)
 		};
 
-		/* ASG August 28,2008, replaced RPC with direct call to CreateEPR */
+		// ASG August 28,2008, replaced RPC with direct call to CreateEPR
 		EndpointReferenceType entryReference = 
 			new StreamableByteIOServiceImpl().CreateEPR(parameters,
 					Container.getServiceURL("StreamableByteIOPortType"));
 		return new CreateFileResponse(entryReference);
-
-		/*
-		StreamableByteIOPortType sbyteio = ClientUtils.createProxy(
-			StreamableByteIOPortType.class, EPRUtils.makeEPR(
-				Container.getServiceURL("StreamableByteIOPortType")));
-		VcgrCreateResponse resp = sbyteio.vcgrCreate(new VcgrCreate(parameters));
-		
-		return new CreateFileResponse(resp.getEndpoint());
-		*/
 	}
+*/
 
 	private JobInformationType[] getStatus(String[] getStatusRequest)
 			throws RemoteException
@@ -271,7 +244,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		
 		try
 		{
-			QueueManager mgr = QueueManager.getManager((String)rKey.getKey());
+			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
 			jobs = mgr.getJobStatus(getStatusRequest);
 			return jobs.toArray(new JobInformationType[0]);
 		}
@@ -312,7 +285,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		
 		try
 		{
-			QueueManager mgr = QueueManager.getManager((String)rKey.getKey());
+			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
 			mgr.killJobs(killRequest);
 			return null;
 		}
@@ -322,6 +295,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		}
 	}
 
+	/*
 	@Override
 	@RWXMapping(RWXCategory.READ)
 	public ListResponse list(List listRequest) throws RemoteException,
@@ -333,7 +307,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		
 		try
 		{
-			QueueManager mgr = QueueManager.getManager((String)rKey.getKey());
+			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
 			entries = mgr.listBESs(listRequest.getEntryName());
 			return new ListResponse(entries.toArray(new EntryType[0]));
 		}
@@ -342,6 +316,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 			throw new RemoteException("Unable to add bes container.", sqe);
 		}
 	}
+	*/
 
 	private ReducedJobInformationType[] listJobs(Object listRequest)
 			throws RemoteException
@@ -351,7 +326,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		
 		try
 		{
-			QueueManager mgr = QueueManager.getManager((String)rKey.getKey());
+			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
 			jobs = mgr.listJobs();
 			return jobs.toArray(new ReducedJobInformationType[0]);
 		}
@@ -384,6 +359,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		}
 	}
 
+	/*
 	@Override
 	@RWXMapping(RWXCategory.WRITE)
 	public MoveResponse move(Move moveRequest) throws RemoteException,
@@ -413,7 +389,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		
 		try
 		{
-			QueueManager mgr = QueueManager.getManager((String)rKey.getKey());
+			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
 			entries = mgr.removeBESs(removeRequest.getEntryName());
 			
 			return entries.toArray(new String[0]);
@@ -423,6 +399,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 			throw new RemoteException("Unable to add bes container.", sqe);
 		}
 	}
+	*/
 
 	@Override
 	@RWXMapping(RWXCategory.EXECUTE)
@@ -433,7 +410,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		
 		try
 		{
-			QueueManager mgr = QueueManager.getManager((String)rKey.getKey());
+			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
 			String ticket = mgr.submitJob(submitJobRequest.getPriority(), 
 				submitJobRequest.getJobDefinition());
 			
@@ -491,7 +468,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		
 		try
 		{
-			QueueManager mgr = QueueManager.getManager((String)rKey.getKey());
+			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
 			mgr.close();
 		}
 		catch (SQLException sqe)
@@ -507,6 +484,8 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 	@RWXMapping(RWXCategory.OPEN)
 	public void notify(Notify notify) throws RemoteException, ResourceUnknownFaultType
 	{
+		super.notify(notify);
+		
 		try
 		{
 			String topic = notify.getTopic().toString();
@@ -591,7 +570,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 					if (state.isFinalState())
 					{
 						QueueManager mgr = QueueManager.getManager(
-							(String)ResourceManager.getCurrentResource().getKey());
+							ResourceManager.getCurrentResource().getResourceKey());
 						mgr.checkJobStatus(jobid);
 					}
 					
@@ -605,6 +584,22 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		catch (Throwable t)
 		{
 			_logger.warn(t.getLocalizedMessage(), t);
+		}
+	}
+	
+	public void submitJob(InputStream in)
+		throws IOException
+	{
+		if (!in.markSupported())
+			throw new IOException(
+				"Can only submit jobs from streams that support marking.");
+		
+		in.mark(Integer.MAX_VALUE);
+		
+		if (!submitJobTrySingle(in))
+		{
+			in.reset();
+			submitJobTryMulti(in);
 		}
 	}
 	
@@ -632,21 +627,27 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		try
 		{
 			fin = new FileInputStream(file);
-			JobDefinition_Type []jobDefs = 
-				((JobMultiDefinition_Type)ObjectDeserializer.deserialize(
-					new InputSource(fin), JobMultiDefinition_Type.class)).getJobDefinition();
-			if (jobDefs == null)
-				return false;
-			
-			for (JobDefinition_Type jobDef : jobDefs)
-				submitJob(new SubmitJobRequestType(jobDef, (byte)0x0));
-			
-			return true;
+			return submitJobTryMulti(fin);
 		}
 		finally
 		{
 			StreamUtils.close(fin);
 		}
+	}
+	
+	private boolean submitJobTryMulti(InputStream in)
+		throws IOException
+	{
+		JobDefinition_Type []jobDefs = 
+			((JobMultiDefinition_Type)ObjectDeserializer.deserialize(
+				new InputSource(in), JobMultiDefinition_Type.class)).getJobDefinition();
+		if (jobDefs == null)
+			return false;
+		
+		for (JobDefinition_Type jobDef : jobDefs)
+			submitJob(new SubmitJobRequestType(jobDef, (byte)0x0));
+		
+		return true;
 	}
 	
 	private boolean submitJobTrySingle(File file)
@@ -657,14 +658,7 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		try
 		{
 			fin = new FileInputStream(file);
-			JobDefinition_Type jobDef = 
-				(JobDefinition_Type)ObjectDeserializer.deserialize(
-					new InputSource(fin), JobDefinition_Type.class);
-			if (jobDef == null || jobDef.getJobDescription() == null)
-				return false;
-			
-			submitJob(new SubmitJobRequestType(jobDef, (byte)0x0));
-			return true;
+			return submitJobTrySingle(fin);
 		}
 		catch (IOException ioe)
 		{
@@ -678,5 +672,18 @@ public class QueueServiceImpl extends GenesisIIBase implements QueuePortType
 		{
 			StreamUtils.close(fin);
 		}
+	}
+	
+	private boolean submitJobTrySingle(InputStream in)
+		throws IOException
+	{
+		JobDefinition_Type jobDef = 
+			(JobDefinition_Type)ObjectDeserializer.deserialize(
+				new InputSource(in), JobDefinition_Type.class);
+		if (jobDef == null || jobDef.getJobDescription() == null)
+			return false;
+		
+		submitJob(new SubmitJobRequestType(jobDef, (byte)0x0));
+		return true;
 	}
 }

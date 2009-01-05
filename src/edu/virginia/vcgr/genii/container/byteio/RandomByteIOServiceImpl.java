@@ -72,7 +72,9 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 {
 	static private Log _logger = LogFactory.getLog(RandomByteIOServiceImpl.class);
 	
-	protected void setAttributeHandlers() throws NoSuchMethodException
+	protected void setAttributeHandlers() 
+		throws NoSuchMethodException, ResourceException, 
+			ResourceUnknownFaultType
 	{
 		super.setAttributeHandlers();
 		

@@ -66,7 +66,9 @@ public class ApplicationDescriptionServiceImpl
 	static final public String APPLICATION_VERSION_PROPERTY_NAME =
 		"edu.virginia.vcgr.genii.container.appdesc.app_vers_property";
 	
-	protected void setAttributeHandlers() throws NoSuchMethodException
+	protected void setAttributeHandlers()
+		throws NoSuchMethodException, ResourceException, 
+			ResourceUnknownFaultType
 	{
 		super.setAttributeHandlers();
 		

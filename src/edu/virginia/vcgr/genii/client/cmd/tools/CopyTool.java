@@ -120,6 +120,7 @@ public class CopyTool extends BaseGridTool
 			}
 			
 			copy(in, out);
+			out.flush();
 		}
 		catch (RNSPathDoesNotExistException e)
 		{

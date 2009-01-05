@@ -33,10 +33,8 @@ import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
 import edu.virginia.vcgr.genii.container.attrs.IAttributeManipulator;
 import edu.virginia.vcgr.genii.container.common.notification.Topic;
-import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
 import edu.virginia.vcgr.genii.container.resource.IResource;
-import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.security.authz.providers.*;
 
@@ -88,19 +86,19 @@ public class GenesisIIBaseAttributesHandler
 		return ret;
 	}
 	
-	public MessageElement getImplementedPortTypes() throws SOAPException
+	public MessageElement getImplementedPortTypes() 
+		throws SOAPException, ResourceException, ResourceUnknownFaultType
 	{
-		synchronized(_baseService._implementedPortTypes)
-		{
-			Collection<QName> names = new ArrayList<QName>(
-				_baseService._implementedPortTypes.size());
-			for (PortType pt : _baseService._implementedPortTypes)
-				names.add(pt.getQName());
-			
-			OGSAQNameList list = new OGSAQNameList(names);
-			return list.toMessageElement(
-				OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME);
-		}
+		PortType []implementedPortTypes = _baseService.getImplementedPortTypes(
+			ResourceManager.getCurrentResource());
+		Collection<QName> names = new ArrayList<QName>(
+			implementedPortTypes.length);
+		for (PortType pt : implementedPortTypes)
+			names.add(pt.getQName());
+		
+		OGSAQNameList list = new OGSAQNameList(names);
+		return list.toMessageElement(
+			OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME);
 	}
 	
 	public MessageElement getFinalResourceInterface() throws SOAPException
@@ -144,13 +142,7 @@ public class GenesisIIBaseAttributesHandler
 	public MessageElement getResourceEndpoint()
 		throws ResourceUnknownFaultType, ResourceException
 	{
-		EndpointReferenceType myEPR = (EndpointReferenceType)WorkingContext.getCurrentWorkingContext(
-			).getProperty(WorkingContext.EPR_PROPERTY_NAME);
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		PortType []implementedPortTypes = new PortType[_baseService._implementedPortTypes.size()];
-		_baseService._implementedPortTypes.toArray(implementedPortTypes);
-		EndpointReferenceType epr = ResourceManager.createEPR(
-			rKey, myEPR.getAddress().get_value().toString(), implementedPortTypes);
+		EndpointReferenceType epr = _baseService.getMyEPR(true);
 		
 		return new MessageElement(
 			OGSAWSRFBPConstants.RESOURCE_ENDPOINT_REFERENCE_ATTR_QNAME, epr);

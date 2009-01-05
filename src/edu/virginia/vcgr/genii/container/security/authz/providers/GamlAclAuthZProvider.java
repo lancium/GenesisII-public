@@ -183,11 +183,11 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 		resource.setProperty(GAML_ACL_PROPERTY_NAME, acl);
 	}
 
-	protected boolean checkAclAccess(Identity identity, Method operation,
-			GamlAcl acl) throws AuthZSecurityException
+	protected boolean checkAclAccess(Identity identity, Class<?> serviceClass,
+		Method operation, GamlAcl acl) throws AuthZSecurityException
 	{
 
-		RWXCategory category = RWXManager.lookup(operation);
+		RWXCategory category = RWXManager.lookup(serviceClass, operation);
 		ArrayList<Identity> trustList = null;
 		switch (category)
 		{
@@ -303,7 +303,8 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 
 	@SuppressWarnings("unchecked")
 	public boolean checkAccess(ICallingContext callingContext,
-			X509Certificate callerCert, IResource resource, Method operation)
+		X509Certificate callerCert, IResource resource, 
+		Class<?> serviceClass, Method operation)
 			throws AuthZSecurityException, ResourceException
 	{
 
@@ -315,7 +316,7 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 					(GamlAcl) resource.getProperty(GAML_ACL_PROPERTY_NAME);
 
 			// check the wildcard access
-			if ((acl == null) || checkAclAccess(null, operation, acl))
+			if ((acl == null) || checkAclAccess(null, serviceClass, operation, acl))
 			{
 				return true;
 			}
@@ -348,7 +349,7 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 				{
 
 					// a simple identity
-					if (checkAclAccess((Identity) cred, operation, acl))
+					if (checkAclAccess((Identity) cred, serviceClass, operation, acl))
 					{
 						allowed = true;
 					}
@@ -399,7 +400,7 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 										.getAttribute();
 
 						if (checkAclAccess(identityAttr.getIdentity(),
-								operation, acl))
+							serviceClass, operation, acl))
 						{
 							allowed = true;
 						}

@@ -8,7 +8,6 @@ import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.IResourceFactory;
-import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
@@ -22,18 +21,17 @@ public class RNSDBResourceFactory extends BasicDBResourceFactory implements
 		"CONSTRAINT contextsconstraint1 PRIMARY KEY (resourceid, name))";
 	
 	public RNSDBResourceFactory(
-			DatabaseConnectionPool pool, 
-			IResourceKeyTranslater translator)
+			DatabaseConnectionPool pool)
 		throws SQLException
 	{
-		super(pool, translator);
+		super(pool);
 	}
 	
 	public IResource instantiate(ResourceKey parentKey) throws ResourceException
 	{
 		try
 		{
-			return new RNSDBResource(parentKey, _pool, _translater);
+			return new RNSDBResource(parentKey, _pool);
 		}
 		catch (SQLException sqe)
 		{

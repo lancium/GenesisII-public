@@ -173,6 +173,24 @@ public class GenesisIIFilesystem implements FSFilesystem
 					created = 0;
 					modified = accessed = System.currentTimeMillis();
 				}
+			} else if (typeInfo.isSByteIOFactory())
+			{
+				try
+				{
+					StreamableByteIORP rp = 
+						(StreamableByteIORP )ResourcePropertyManager.createRPInterface(
+							target, StreamableByteIORP .class);
+					size = toNonNull(rp.getSize());
+					created = toMillis(rp.getCreateTime());
+					modified = toMillis(rp.getModificationTime());
+					accessed = toMillis(rp.getAccessTime());
+				}
+				catch (Throwable cause)
+				{
+					size = 0L;
+					created = 0;
+					modified = accessed = System.currentTimeMillis();
+				}
 			} else
 			{
 				created = 0;
@@ -519,6 +537,9 @@ public class GenesisIIFilesystem implements FSFilesystem
 							RandomByteIOPortType.class, target.getEndpoint()));
 				transferer.truncAppend(newSize, new byte[0]);
 			} else if (info.isSByteIO())
+			{
+				// Can't do this.
+			} else if (info.isSByteIOFactory())
 			{
 				// Can't do this.
 			} else if (info.isRNS())

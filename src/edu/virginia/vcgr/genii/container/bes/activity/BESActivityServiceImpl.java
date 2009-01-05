@@ -111,11 +111,6 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 		topicSpace.registerTopic(WellknownTopics.BES_ACTIVITY_STATUS_CHANGE_FINAL);
 	}
 
-	protected void setAttributeHandlers() throws NoSuchMethodException
-	{
-		super.setAttributeHandlers();
-	}
-	
 	protected void postCreate(ResourceKey rKey,
 		EndpointReferenceType activityEPR, HashMap<QName, Object> creationParameters,
 		Collection<MessageElement> resolverCreationParams)
@@ -125,7 +120,7 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 		
 		_logger.debug(String.format(
 			"Post creating a BES Activity with resource key \"%s\".", 
-			rKey.getKey()));
+			rKey.getResourceKey()));
 		
 		IBESActivityResource resource = (IBESActivityResource)rKey.dereference();
 		BESActivityInitInfo initInfo = BESActivityUtils.extractCreationProperties(
@@ -198,7 +193,7 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 				BES_ACTIVITY_LIFETIME);
 			_logger.debug(String.format(
 				"Setting term. time for BES Activity with resource key \"%s\".", 
-				rKey.getKey()));
+				rKey.getResourceKey()));
 			setScheduledTerminationTime(future, rKey);
 		}
 		catch (IOException fnfe)

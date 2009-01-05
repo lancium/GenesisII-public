@@ -128,7 +128,9 @@ public class SQLAccessCombinedServiceImpl extends EnhancedRNSServiceImpl
 	 * setting up the Attributes for an SQLAccess DataResource
 	 */
 	
-	protected void setAttributeHandlers() throws NoSuchMethodException
+	protected void setAttributeHandlers()
+		throws NoSuchMethodException, ResourceException, 
+			ResourceUnknownFaultType
 	{
 		super.setAttributeHandlers();
 		new SQLPropertyAttributesHandler(this, getAttributePackage());

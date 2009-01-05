@@ -20,6 +20,6 @@ public class JNDIResourceProvider extends BasicDBResourceProvider
 	protected IResourceFactory instantiateResourceFactory(
 			DatabaseConnectionPool pool) throws SQLException
 	{
-		return new JNDIResourceFactory(pool, getTranslater());
+		return new JNDIResourceFactory(pool);
 	}
 }

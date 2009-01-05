@@ -18,6 +18,6 @@ public class DBSubscriptionResourceProvider extends BasicDBResourceProvider
 	protected IResourceFactory instantiateResourceFactory(DatabaseConnectionPool pool)
 		throws SQLException
 	{
-		return new DBSubscriptionResourceFactory(pool, getTranslater());
+		return new DBSubscriptionResourceFactory(pool);
 	}
 }

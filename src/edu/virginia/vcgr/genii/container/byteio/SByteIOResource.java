@@ -11,7 +11,6 @@ import org.apache.axis.message.MessageElement;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
-import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 
 public class SByteIOResource extends RByteIOResource implements
@@ -24,11 +23,10 @@ public class SByteIOResource extends RByteIOResource implements
 	
 	public SByteIOResource(
 			ResourceKey parentKey, 
-			DatabaseConnectionPool connectionPool,
-			IResourceKeyTranslater translater)
+			DatabaseConnectionPool connectionPool)
 		throws SQLException
 	{
-		super(parentKey, connectionPool, translater);
+		super(parentKey, connectionPool);
 	}
 	
 	public File chooseFile(HashMap<QName, Object> creationProperties)

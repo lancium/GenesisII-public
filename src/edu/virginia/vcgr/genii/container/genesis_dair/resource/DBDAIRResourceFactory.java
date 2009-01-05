@@ -10,7 +10,6 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.container.resource.IResource;
-import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.rns.RNSDBResourceFactory;
 
@@ -28,17 +27,17 @@ public class DBDAIRResourceFactory extends RNSDBResourceFactory {
 		"query VARCHAR (512), " +
 		"CONSTRAINT dataresourcesC1 UNIQUE (resourcename))";
 		
-	public DBDAIRResourceFactory(DatabaseConnectionPool connectionPool,
-			IResourceKeyTranslater translator)
-			throws SQLException {
-		super(connectionPool, translator);
+	public DBDAIRResourceFactory(DatabaseConnectionPool connectionPool)
+		throws SQLException 
+	{
+		super(connectionPool);
 	}
 	
 	public IResource instantiate(ResourceKey parentKey) throws ResourceException
 	{
 		try
 		{
-			return new DBDAIRResource(parentKey, _pool, _translater);
+			return new DBDAIRResource(parentKey, _pool);
 		}
 		catch (SQLException sqe)
 		{

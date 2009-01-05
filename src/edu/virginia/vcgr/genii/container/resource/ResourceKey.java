@@ -11,8 +11,8 @@ import javax.xml.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
-import org.ws.addressing.ReferenceParametersType;
 
+import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.x509.CertCreationSpec;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
@@ -39,6 +39,7 @@ public class ResourceKey implements Closeable
 	private IResourceProvider _provider = null;
 	private String _serviceName;
 	private boolean _incrementedCounter = false;
+	private AddressingParameters _addressingParameters;
 	
 	static private void incrementCounter(IResource resource)
 	{
@@ -114,6 +115,8 @@ public class ResourceKey implements Closeable
 			RequiredConstructionParamWorker.setRequiredConstructionParameters(
 				_cachedResource, constructionParameters);
 			noExceptions = true;
+			_addressingParameters = new AddressingParameters(
+				_cachedResource.getKey(), null, null);
 		}
 		finally
 		{
@@ -135,18 +138,19 @@ public class ResourceKey implements Closeable
 	 * a resource which can't be found.
 	 * @throws ResourceException If anything else goes wrong.
 	 */
-	ResourceKey(String serviceName, ReferenceParametersType refParams)
+	ResourceKey(String serviceName, AddressingParameters addrParams)
 		throws ResourceUnknownFaultType, ResourceException
 	{
 		boolean noExceptions = false;
 		_serviceName = serviceName;
+		_addressingParameters = addrParams;
 		
 		try
 		{
 			_provider = ResourceProviders.getProvider(serviceName);
 			_factory = _provider.getFactory();
 			_cachedResource = _factory.instantiate(this);
-			_cachedResource.load(refParams);
+			_cachedResource.load(addrParams.getResourceKey());
 			incrementCounter(_cachedResource);
 			_incrementedCounter = true;
 			noExceptions = true;
@@ -176,10 +180,10 @@ public class ResourceKey implements Closeable
 	 * @return The Addressing information for WS-Addressing.
 	 * @throws ResourceException If anything goes wrong.
 	 */
-	public ReferenceParametersType getResourceParameters()
+	public String getResourceKey()
 		throws ResourceException
 	{
-		return dereference().getResourceParameters(); 
+		return dereference().getKey(); 
 	}
 	
 	/**
@@ -302,11 +306,8 @@ public class ResourceKey implements Closeable
 		return _serviceName;
 	}
 	
-	public Object getKey()
+	public AddressingParameters getAddressingParameters()
 	{
-		if (_cachedResource == null) {
-			return null;
-		}
-		return _cachedResource.getKey();
+		return _addressingParameters;
 	}
 }

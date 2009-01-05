@@ -10,7 +10,6 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
-import org.ws.addressing.ReferenceParametersType;
 
 import edu.virginia.vcgr.genii.common.MatchingParameter;
 import edu.virginia.vcgr.genii.container.common.notification.SubscriptionInformation;
@@ -71,7 +70,8 @@ public interface IResource extends Closeable
 	 * type as long as it matches the IResourceKeyTranslater being used.
 	 * @throws ResourceException If anything goes wrong.
 	 */
-	public void load(ReferenceParametersType refParams) throws ResourceUnknownFaultType, ResourceException;
+	public void load(String resourceKey) 
+		throws ResourceUnknownFaultType, ResourceException;
 	
 	/**
 	 * Retrieve the internal key that represents this resource.  This method is
@@ -80,7 +80,7 @@ public interface IResource extends Closeable
 	 * 
 	 * @return The internal key representation for this resource.
 	 */
-	public Object getKey();
+	public String getKey();
 	
 	/**
 	 * This method returns a key that can be used for locking the resource.  It can be,
@@ -142,15 +142,6 @@ public interface IResource extends Closeable
 	 * Return whether or not the resource is a service resource
 	 */
 	public boolean isServiceResource();
-	
-	/**
-	 * Retrieve the WS-Addressing ReferenceParameters that match this resource.
-	 * 
-	 * @return The Addressing information for WS-Addressing.
-	 * @throws ResourceException If anything goes wrong.
-	 */
-	public ReferenceParametersType getResourceParameters()
-		throws ResourceException;
 	
 	public Collection<MatchingParameter> getMatchingParameters()
 		throws ResourceException;

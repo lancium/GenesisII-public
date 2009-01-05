@@ -3,9 +3,10 @@ package edu.virginia.vcgr.genii.container.byteio;
 import javax.xml.namespace.QName;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
+import edu.virginia.vcgr.genii.container.resource.IResource;
 
-public abstract class RandomByteIOAttributePreFetcher
-	extends DefaultByteIOAttributePreFetcher<IRByteIOResource>
+public abstract class RandomByteIOAttributePreFetcher<Type extends IResource>
+	extends DefaultByteIOAttributePreFetcher<Type>
 {
 	static final private QName XFER_MECHS_ATTR_NAME = new QName(
 		ByteIOConstants.RANDOM_BYTEIO_NS, "TransferMechanism");
@@ -18,7 +19,7 @@ public abstract class RandomByteIOAttributePreFetcher
 	static final private QName CREATE_TIME_ATTR_NAME = new QName(	
 		ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME);
 	
-	protected RandomByteIOAttributePreFetcher(IRByteIOResource resource)
+	protected RandomByteIOAttributePreFetcher(Type resource)
 	{
 		super(resource);
 	}

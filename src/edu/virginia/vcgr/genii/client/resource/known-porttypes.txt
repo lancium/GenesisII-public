@@ -39,6 +39,7 @@
 {http://vcgr.cs.virginia.edu/genii/informationService}InformationServicePortType
 {http://vcgr.cs.virginia.edu/genii/iterator}IteratorPortType
 {http://vcgr.cs.virginia.edu/genii/queue}QueuePortType
+{http://vcgr.cs.virginia.edu/genii/rfork}ResourceForkPortType
 {http://vcgr.cs.virginia.edu/rns/2006/08/exported-dir}ExportedDirPortType
 {http://vcgr.cs.virginia.edu/rns/2006/08/exported-root}ExportedRootPortType
 {http://vcgr.cs.virginia.edu/rns/2007/08/replicatedExport/resolver-factory}RExportResolverFactoryPortType

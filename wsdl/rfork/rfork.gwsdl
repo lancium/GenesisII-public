@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<wsdl:definitions
+	name="ResourceFork"
+	xmlns="http://vcgr.cs.virginia.edu/genii/resource-fork"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:rfork="http://vcgr.cs.virginia.edu/genii/resource-fork"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+	xmlns:rpw-2="http://docs.oasis-open.org/wsrf/rpw-2"
+    xmlns:rw-2="http://docs.oasis-open.org/wsrf/rw-2"
+	xmlns:wsrf-r="http://docs.oasis-open.org/wsrf/r-2"
+	xmlns:wsrf-rw="http://docs.oasis-open.org/wsrf/rw-2" 
+	xmlns:genii-not="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
+    xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:rns="http://schemas.ggf.org/rns/2006/05/rns"
+	xmlns:enhanced-rns="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
+	xmlns:rbyteio="http://schemas.ggf.org/byteio/2005/10/random-access"
+	xmlns:byteio="http://schemas.ggf.org/byteio/2005/10/byte-io"
+    xmlns:sbyteio="http://schemas.ggf.org/byteio/2005/10/streamable-access"
+	xmlns:sfact="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory"
+	targetNamespace="http://vcgr.cs.virginia.edu/genii/resource-fork">
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rw-2"
+		location="./wsrf/wsResourceFaults.wsdl"/>
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rpw-2"
+		location="./wsrf/wsResourceProperties.wsdl"/>
+
+    <wsdl:import
+        namespace="http://schemas.ggf.org/rns/2006/05/rns"
+        location="./rns.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
+        location="./enhanced-rns-generated.wsdl"/>
+
+	<wsdl:import
+		namespace="http://schemas.ggf.org/byteio/2005/10/random-access"
+		location="./rbyteio-generated.wsdl"/>
+
+	<wsdl:import
+		namespace="http://schemas.ggf.org/byteio/2005/10/streamable-access"
+		location="./sbyteio-generated.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory"
+		location="./sbyteio-factory.wsdl"/>
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rw-2"
+		location="wsrf/wsResourceFaults.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple"
+		location="./resource-simple.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
+		location="./resource-factory.wsdl"/>
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rlw-2"
+		location="wsrf/wsResourceLifetime.wsdl"/>
+
+	<wsdl:import
+		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-authz"
+		location="./resource-authz.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+        location="./common-generated.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
+        location="./notification.wsdl"/>
+
+	<wsdl:portType name="ResourceForkPortType">
+		<genii-ext:extend portType="genii-common:GeniiCommon"/>
+		<genii-ext:extend portType="rpw-2:GetResourceProperty"/>
+		<genii-ext:extend portType="rpw-2:GetMultipleResourceProperties"/>
+		<genii-ext:extend portType="rns:RNSPortType"/>
+		<genii-ext:extend portType="genii-not:GeniiNotificationConsumerPortType"/>
+		<genii-ext:extend portType="enhanced-rns:EnhancedRNSPortType"/>
+		<genii-ext:extend portType="rbyteio:RandomByteIOPortType"/>
+		<genii-ext:extend portType="sbyteio:StreamableByteIOPortType"/>
+		<genii-ext:extend portType="sfact:StreamableByteIOFactory"/>
+	</wsdl:portType>
+</wsdl:definitions>

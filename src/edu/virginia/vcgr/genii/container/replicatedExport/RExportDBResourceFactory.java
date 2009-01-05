@@ -6,23 +6,21 @@ import java.sql.SQLException;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
-import edu.virginia.vcgr.genii.container.resource.IResourceKeyTranslater;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 
 public class RExportDBResourceFactory extends SharedRExportBaseFactory
 {
 	public RExportDBResourceFactory(
-			DatabaseConnectionPool pool, 
-			IResourceKeyTranslater translator)
+			DatabaseConnectionPool pool)
 		throws SQLException
 	{
-		super(pool, translator);
+		super(pool);
 	}
 	
 	public IResource instantiate(ResourceKey parentKey) throws ResourceException
 	{
 		try{
-			return new RExportDBResource(parentKey, _pool, _translater);
+			return new RExportDBResource(parentKey, _pool);
 		}
 		catch (SQLException sqe){
 			throw new ResourceException(

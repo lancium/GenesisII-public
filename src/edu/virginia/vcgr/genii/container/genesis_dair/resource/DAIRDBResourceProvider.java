@@ -19,6 +19,6 @@ public class DAIRDBResourceProvider extends RNSDBResourceProvider {
 	protected IResourceFactory instantiateResourceFactory(DatabaseConnectionPool pool)
 	throws SQLException
 	{
-		return new DBDAIRResourceFactory(pool, getTranslater());
+		return new DBDAIRResourceFactory(pool);
 	}
 }
