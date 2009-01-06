@@ -99,4 +99,9 @@ public class BasicConstraints implements AttributeConstraints, Renewable
 				+ this._maxDelegationDepth + ")";
 	}
 
+	@Override
+	public Date getExpiration()
+	{
+		return new Date(_notValidBeforeMillis + _durationValidMillis);
+	}
 }

@@ -13,4 +13,5 @@ public interface AttributeConstraints extends Externalizable
 	public void checkValidity(int delegationDepth, Date date)
 			throws AttributeInvalidException;
 
+	public Date getExpiration();
 }

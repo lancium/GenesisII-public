@@ -11,6 +11,7 @@ import java.security.PublicKey;
 import java.security.cert.*;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import edu.virginia.vcgr.genii.common.security.CertificateChainType;
@@ -292,7 +293,7 @@ public class SecurityUtils
 					"Error processing GAML credential: No calling context");
 			
 			// remove/renew stale creds/attributes
-			ClientUtils.checkAndRenewCredentials(callingContext);
+			ClientUtils.checkAndRenewCredentials(callingContext, new Date());
 
 			TransientCredentials transientCredentials = 
 				TransientCredentials.getTransientCredentials(callingContext);

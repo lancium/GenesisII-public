@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.client.jni.gIIlib;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 import edu.virginia.vcgr.fsii.FileHandleTable;
@@ -39,7 +40,7 @@ public abstract class JNILibraryBase extends ApplicationBase
 		try 
 		{
 			callingContext = ContextManager.getCurrentContext(false);
-			ClientUtils.checkAndRenewCredentials(callingContext);
+			ClientUtils.checkAndRenewCredentials(callingContext, new Date());
 			
 			if (didInit)
 			{

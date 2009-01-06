@@ -1,5 +1,7 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.util.Date;
+
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
@@ -30,7 +32,7 @@ public class WhoamiTool extends BaseGridTool
 			stdout.println("Not logged in");
 		} else {
 			// remove/renew stale creds/attributes
-			ClientUtils.checkAndRenewCredentials(callingContext);
+			ClientUtils.checkAndRenewCredentials(callingContext, new Date());
 
 			TransientCredentials transientCredentials = 
 				TransientCredentials.getTransientCredentials(callingContext);

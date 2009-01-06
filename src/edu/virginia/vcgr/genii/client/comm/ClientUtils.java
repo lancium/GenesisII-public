@@ -23,6 +23,7 @@ import java.security.KeyPair;
 import java.security.cert.X509Certificate;
 import java.security.cert.CertificateExpiredException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -107,11 +108,12 @@ public class ClientUtils
 	 * Generates transient key and certificate material to be used 
 	 * for outgoing message security.
 	 */
-	private static KeyAndCertMaterial generateKeyAndCertMaterial() throws GeneralSecurityException {
+	private static KeyAndCertMaterial generateKeyAndCertMaterial(
+		long timeout, TimeUnit units) throws GeneralSecurityException {
 	    KeyPair keyPair = CertTool.generateKeyPair(getClientRsaKeyLength());
 	    X509Certificate[] clientCertChain = {CertTool.createMasterCert(
 	    		"C=US, ST=Virginia, L=Charlottesville, O=UVA, OU=VCGR, CN=Client Cert " + (new GUID()).toString(), 
-				GenesisIIConstants.CredentialExpirationMillis,	// valid 24 hours
+				TimeUnit.MILLISECONDS.convert(timeout, units),
 	    		keyPair.getPublic(), 
 	    		keyPair.getPrivate()) };
 	    
@@ -124,8 +126,10 @@ public class ClientUtils
 	 *   all previous attributes will be renewed if possible, discarded otherwise)  
 	 * @throws GeneralSecurityException
 	 */
-	public static KeyAndCertMaterial checkAndRenewCredentials(ICallingContext callContext) throws GeneralSecurityException {
-
+	public static KeyAndCertMaterial checkAndRenewCredentials(
+		ICallingContext callContext, Date validUntil)
+			throws GeneralSecurityException 
+	{
 		boolean updated = false;
 		KeyAndCertMaterial retval = callContext.getActiveKeyAndCertMaterial();
 		ArrayList <GamlCredential> credentials = 
@@ -142,7 +146,7 @@ public class ClientUtils
 			for (X509Certificate cert : retval._clientCertChain) {
 				// (Check 10 seconds into the future so as to avoid the credential
 				// expiring in-flight)
-				cert.checkValidity(new Date(System.currentTimeMillis() + (10 * 1000)));
+				cert.checkValidity(new Date(validUntil.getTime() + 10000));
 			}
 		} catch (CertificateExpiredException e) {
 
@@ -156,7 +160,14 @@ public class ClientUtils
 				// new client identity.
 
 				_logger.warn("Renewing client tool identity.");
-				retval = generateKeyAndCertMaterial();
+				// We create an identity for either 24 hours, or until the valid
+				// duration expires (which ever is longer) + 10 seconds of slop for
+				// in transit time outs.
+				retval = generateKeyAndCertMaterial(
+					Math.max(
+						GenesisIIConstants.CredentialExpirationMillis, // valid 24 hours
+						validUntil.getTime() - System.currentTimeMillis() + 10000),
+					TimeUnit.MILLISECONDS);
 				callContext.setActiveKeyAndCertMaterial(retval);
 				updated = true;
 				

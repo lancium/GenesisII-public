@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.client.security.gamlauthz.assertions;
 
 import java.io.ObjectStreamException;
 import java.security.GeneralSecurityException;
+import java.util.Date;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
@@ -30,8 +31,12 @@ public class RenewableClientAttribute extends DelegatedAttribute implements
 
 		// grab the delegatee identity from the calling context (renewing it
 		// if necesssary -- dont want to sign to stale creds
+		// Don't want to sign it over to client code key material that will
+		// expire before contraints.
 		KeyAndCertMaterial clientKeyMaterial =
-				ClientUtils.checkAndRenewCredentials(_callingContext);
+			ClientUtils.checkAndRenewCredentials(
+				_callingContext, 
+				constraints == null ? new Date() : constraints.getExpiration());
 
 		if ((assertion == null) || (clientKeyMaterial._clientCertChain == null))
 		{

@@ -331,7 +331,8 @@ public class GamlLoginTool extends BaseGridTool {
 				// we're going to use the WS-TRUST token-issue operation
 				// to log in to a security tokens service
 				KeyAndCertMaterial clientKeyMaterial = 
-					ClientUtils.checkAndRenewCredentials(callingContext);
+					ClientUtils.checkAndRenewCredentials(callingContext, 
+					new Date());
 				return doIdpLogin(
 						epr, 
 						_validMillis, 

@@ -20,6 +20,7 @@ import java.security.GeneralSecurityException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
@@ -183,7 +184,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 		} else {
 			// update any stale creds
 			try { 
-				ClientUtils.checkAndRenewCredentials(callContext); 
+				ClientUtils.checkAndRenewCredentials(callContext, new Date()); 
 			} catch (GeneralSecurityException e) {
 				throw new GenesisIISecurityException("Could not prepare outgoing calling context: " + e.getMessage(), e);
 			}	
