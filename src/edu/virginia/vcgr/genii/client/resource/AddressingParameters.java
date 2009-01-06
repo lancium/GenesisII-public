@@ -28,6 +28,9 @@ public class AddressingParameters
 	static public final String GENII_ADDITIONAL_USER_INFO_REF_PARAM =
 		"additiona-user-information";
 	
+	static public final QName OLD_REFERENCE_PARAMTER_QNAME =
+		new QName("http://vcgr.cs.virginia.edu/Genesis-II", "simple-string");
+	
 	static public final QName GENII_RESOURCE_KEY_REF_PARAM_QNAME =
 		new QName(GENII_REF_PARAMS_NS, GENII_RESOURCE_KEY_REF_PARAM);
 	static public final QName GENII_RESOURCE_FORK_REF_PARAM_QNAME =
@@ -105,7 +108,10 @@ public class AddressingParameters
 				for (MessageElement element : elements)
 				{
 					QName elementName = element.getQName();
-					if (elementName.equals(GENII_RESOURCE_KEY_REF_PARAM_QNAME))
+					if (
+						elementName.equals(GENII_RESOURCE_KEY_REF_PARAM_QNAME)
+						|| 
+						elementName.equals(OLD_REFERENCE_PARAMTER_QNAME))
 					{
 						_resourceKey = element.getValue();
 					} else if (elementName.equals(GENII_RESOURCE_FORK_REF_PARAM_QNAME))
