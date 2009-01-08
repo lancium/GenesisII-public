@@ -1,6 +1,8 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.io.PrintWriter;
+import java.security.GeneralSecurityException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -11,10 +13,12 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 
 public class LsTool extends BaseGridTool
@@ -22,13 +26,14 @@ public class LsTool extends BaseGridTool
 	static final private String _DESCRIPTION =
 		"Lists elements in context space.";
 	static final private String _USAGE =
-		"ls [-ldae] [--long] [--all] [--directory] [--epr] [<target> *]\n" +
+		"ls [-ldae] [--long] [--all] [--directory] [--epr] [--cert-chain] [<target> *]\n" +
 		"\tWHERE -e means to show the EPR.";
 	
 	private boolean _long = false;
 	private boolean _all = false;
 	private boolean _directory = false;
 	private boolean _epr = false;
+	private boolean _certChain = false;
 	
 	public LsTool()
 	{
@@ -38,6 +43,11 @@ public class LsTool extends BaseGridTool
 	public void setLong()
 	{
 		_long = true;
+	}
+	
+	public void setCert_chain()
+	{
+		_certChain = true;
 	}
 	
 	public void setL()
@@ -103,7 +113,7 @@ public class LsTool extends BaseGridTool
 		if (isDirectory)
 		{
 			for (RNSPath path : targets)
-				printEntry(stdout, path, isLong, isAll, isEPR);
+				printEntry(stdout, path, isLong, isAll, isEPR, _certChain);
 		} else
 		{
 			ArrayList<RNSPath> dirs = new ArrayList<RNSPath>();
@@ -113,7 +123,7 @@ public class LsTool extends BaseGridTool
 				TypeInformation type = new TypeInformation(
 					path.getEndpoint());
 				if (!type.isRNS())
-					printEntry(stdout, type, path, isLong, isAll, isEPR);
+					printEntry(stdout, type, path, isLong, isAll, isEPR, _certChain);
 				else
 				{
 					dirs.add(path);
@@ -135,7 +145,8 @@ public class LsTool extends BaseGridTool
 				{
 					for (RNSPath entry : entries)
 					{
-						printEntry(stdout, entry, isLong, isAll, isEPR);
+						printEntry(stdout, entry, isLong, isAll, isEPR,
+							_certChain);
 					}
 				}
 				
@@ -153,15 +164,15 @@ public class LsTool extends BaseGridTool
 	
 
 	static private void printEntry(PrintWriter out, RNSPath path,
-		boolean isLong, boolean isAll, boolean isEPR)
+		boolean isLong, boolean isAll, boolean isEPR, boolean isCertChain)
 		throws RNSException, ResourceException
 	{
 		printEntry(out, new TypeInformation(path.getEndpoint()),
-			path, isLong, isAll, isEPR);
+			path, isLong, isAll, isEPR, isCertChain);
 	}
 	
 	static private void printEntry(PrintWriter out, TypeInformation type,
-		RNSPath path, boolean isLong, boolean isAll, boolean isEPR)
+		RNSPath path, boolean isLong, boolean isAll, boolean isEPR, boolean certChain)
 		throws RNSException, ResourceException
 	{
 		String name = path.getName();
@@ -185,5 +196,23 @@ public class LsTool extends BaseGridTool
 			out.println("\t" + ObjectSerializer.toString(
 				path.getEndpoint(),
 				new QName(GenesisIIConstants.GENESISII_NS, "endpoint"), false));
+		if (certChain)
+		{
+			try
+			{
+				X509Certificate[] certs = EPRUtils.extractCertChain(path.getEndpoint());
+				if (certs == null || certs.length == 0)
+					out.println("No asscoiated certificates!");
+				else
+					for (X509Certificate cert : certs)
+					{
+						out.format("Certificate:  %s\n", cert);
+					}
+			}
+			catch (GeneralSecurityException gse)
+			{
+				out.println("Unable to acquire cert chain:  " + gse);
+			}
+		}
 	}
 }

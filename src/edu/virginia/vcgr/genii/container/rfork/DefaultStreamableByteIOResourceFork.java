@@ -64,6 +64,10 @@ public class DefaultStreamableByteIOResourceFork
 						{
 							targetMethod = dependentForkClass.getMethod(
 								"modifyState", InputStream.class);
+						} else if (operation.getName().equals("destroy"))
+						{
+							targetMethod = dependentForkClass.getMethod(
+								"modifyState", InputStream.class);
 						} else
 							throw new RWXMappingException("Target method \"" +
 								operation.getName() + 
@@ -150,6 +154,7 @@ public class DefaultStreamableByteIOResourceFork
 	}
 	
 	@Override
+	@RWXMappingResolver(DependentStreamableMappingResolver.class)
 	public void destroy() throws ResourceException
 	{
 		try

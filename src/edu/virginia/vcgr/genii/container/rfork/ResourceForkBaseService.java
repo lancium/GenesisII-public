@@ -116,6 +116,48 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 	private ResourceForkInformation _forkInfo = null;
 	private ResourceFork _fork = null;
 	
+	static public class DestroyForkMappingResolver implements MappingResolver
+	{
+		@Override
+		public RWXCategory resolve(Class<?> serviceClass, Method operation)
+		{
+			try
+			{
+				ResourceKey rKey = ResourceManager.getCurrentResource();
+				AddressingParameters ap = rKey.getAddressingParameters();
+				Class<?> forkClass = null;
+				if (ap != null)
+				{
+					ResourceForkInformation info = 
+						(ResourceForkInformation)ap.getResourceForkInformation();
+					if (info != null)
+					{
+						ResourceFork fork = info.instantiateFork(null);
+						if (fork.getForkPath().equals("/"))
+							return RWXCategory.INHERITED;
+						
+						forkClass = fork.getClass();
+					}
+				}
+				
+				if (forkClass == null)
+					return RWXCategory.INHERITED;
+				
+				return RWXManager.lookup(forkClass, "destroy");
+			} 
+			catch (ResourceUnknownFaultType e)
+			{
+				throw new RWXMappingException("Unable to find RWXCategory.", 
+					e);
+			}
+			catch (ResourceException e)
+			{
+				throw new RWXMappingException("Unable to find RWXCategory.", 
+					e);
+			}
+		}	
+	}
+	
 	static public class ForkMappingResolver implements MappingResolver
 	{
 		@Override
@@ -499,7 +541,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 	}
 	
 	@Override
-	@RWXMapping(RWXCategory.INHERITED)
+	@RWXMappingResolver(DestroyForkMappingResolver.class)
 	public DestroyResponse destroy(Destroy destroyRequest)
 			throws RemoteException, ResourceUnknownFaultType,
 			ResourceNotDestroyedFaultType, ResourceUnavailableFaultType

@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 
@@ -93,8 +94,9 @@ public class AddressingParameters
 	
 	private String _resourceKey;
 	private Object _resourceForkInfo;
-	private Serializable _additionalUserInfo;
+	private Map<String, Serializable> _additionalUserInfo;
 	
+	@SuppressWarnings("unchecked")
 	public AddressingParameters(ReferenceParametersType refParams) 
 		throws ResourceException
 	{
@@ -126,7 +128,9 @@ public class AddressingParameters
 						String stringValue = element.getValue();
 						if (stringValue != null)
 						{
-							_additionalUserInfo = toObject(stringValue);
+							_additionalUserInfo = 
+								(Map<String, Serializable>)toObject(
+									stringValue);
 						}
 					} else
 					{
@@ -140,7 +144,7 @@ public class AddressingParameters
 	
 	public AddressingParameters(String resourceKey,
 		Object resourceForkInfo,
-		Serializable additionalUserInfo)
+		Map<String, Serializable> additionalUserInfo)
 	{
 		_resourceKey = resourceKey;
 		_resourceForkInfo = resourceForkInfo;
@@ -168,13 +172,13 @@ public class AddressingParameters
 		_resourceForkInfo = resourceForkInfo;
 	}
 	
-	public Serializable getAdditionalUserInformation()
+	public Map<String, Serializable> getAdditionalUserInformation()
 	{
 		return _additionalUserInfo;
 	}
 	
 	public void setAdditionalUserInformation(
-		Serializable additionalUserInformation)
+		Map<String, Serializable> additionalUserInformation)
 	{
 		_additionalUserInfo = additionalUserInformation;
 	}

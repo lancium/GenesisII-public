@@ -32,7 +32,7 @@
 		</authors>
 		<appsubpath>GenesisII</appsubpath>
 		<url>http://vcgr.cs.virginia.edu</url>
-		<javaversion>1.6</javaversion>
+		<javaversion>1.5</javaversion>
 	</info>
 
 	<guiprefs height="600" resizable="yes" width="900">

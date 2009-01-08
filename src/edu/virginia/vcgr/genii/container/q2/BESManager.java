@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.EntryType;
@@ -17,9 +18,11 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.container.attrs.AttributePreFetcher;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 
 /**
@@ -219,6 +222,20 @@ public class BESManager implements Closeable
 			"\" into queue as resource " + id);
 	}
 	
+	private class BESAttributePrefetcher implements AttributePreFetcher
+	{
+		@Override
+		public Collection<MessageElement> preFetch()
+		{
+			Collection<MessageElement> ret = new ArrayList<MessageElement>(1);
+			
+			ret.add(new MessageElement(
+				GenesisIIBaseRP.PERMISSIONS_STRING_QNAME,
+				"r--r--"));
+			return ret;
+		}
+	}
+	
 	/**
 	 * List all BES's contained in the queue which match a given 
 	 * regular expression.
@@ -247,7 +264,9 @@ public class BESManager implements Closeable
 				/* If so, add it's entry information (but leave the EPR 
 				 * blank, we'll back-fill that in a second. */
 				ret.put(new Long(data.getID()),
-					new EntryType(data.getName(), null, null));
+					new EntryType(data.getName(), 
+						new BESAttributePrefetcher().preFetch().toArray(
+							new MessageElement[0]), null));
 			}
 		}
 		
