@@ -182,7 +182,7 @@ public class GamlLoginTool extends BaseGridTool {
 					"Lifetime"), 
 				new LifetimeType(
 					new AttributedDateTime(
-						zulu.format(new Date())), 
+						zulu.format(new Date(System.currentTimeMillis() - 1000 * 60 * 15))), 
 					new AttributedDateTime(
 						zulu.format(new Date(System.currentTimeMillis() + validMillis)))));
 		element.setType(LifetimeType.getTypeDesc().getXmlType());
