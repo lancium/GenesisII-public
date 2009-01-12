@@ -96,16 +96,13 @@ public class Container extends ApplicationBase
 		
 		ContainerStatistics.instance();
 		
-		if (args.length == 1) {
+		if (args.length == 1)
 			System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, args[0]);
-			_logger.info("Container deployment is " + args[0]);
-		} 
-		else {
-			System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, "default");
-			_logger.info("Container deployment is default");
-		}
 		
 		prepareServerApplication();
+		
+		_logger.info(String.format(
+			"Deployment name is %s.\n", new DeploymentName()));
 		_secRunManager = SecureRunnerManager.createSecureRunnerManager(
 			Container.class.getClassLoader(),
 			Installation.getDeployment(new DeploymentName()));

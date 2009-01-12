@@ -1,5 +1,7 @@
 package edu.virginia.vcgr.genii.client.configuration;
 
+import edu.virginia.vcgr.genii.client.ContainerProperties;
+
 public class DeploymentName
 {
 	static public final String DEPLOYMENT_NAME_PROPERTY =
@@ -55,7 +57,10 @@ public class DeploymentName
 		catch(Throwable t)
 		{
 		}
-				
+			
+		deploymentName = 
+			ContainerProperties.containerProperties.getDeploymentName();
+		
 		// if all else fails, try "default"
 		if (deploymentName == null)
 			deploymentName = DEFAULT_DEPLOYMENT_NAME;
