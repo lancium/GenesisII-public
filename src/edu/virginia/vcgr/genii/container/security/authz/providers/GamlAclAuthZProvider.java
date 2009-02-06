@@ -219,16 +219,19 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 
 			if (trustList.contains(identity))
 			{
-				/*
-				System.err.println("The ID principal is" + 
-						((X509Identity) identity).getAssertingIdentityCertChain()[0].getSubjectX500Principal() + " the ID DN is " +
-						((X509Identity) identity).getAssertingIdentityCertChain()[0].getSubjectDN());
-						*/
-
 				// all's good if we straight-up contain this specific identity
+				// (We assume that if identity is a crypto token, it has 
+				// been validated and verified)
 				return true;
 
 			}
+/*
+ * We no longer use the trust-chain mechanism for authorization: it was
+ * causing some issue when new users' cert chains included host-container
+ * certs as intermediate authorities, allowing them access when it was 
+ * only intended for those authenticated as the host-container itself.
+ * 
+ * 
 			else if (identity instanceof X509Identity)
 			{
 
@@ -236,10 +239,6 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 						((X509Identity) identity)
 								.getAssertingIdentityCertChain();
 				
-/*				System.err.println("The ID principal is" + 
-						((X509Identity) identity).getAssertingIdentityCertChain()[0].getSubjectX500Principal() + " the ID DN is " +
-						((X509Identity) identity).getAssertingIdentityCertChain()[0].getSubjectDN());
-*/
 				// use the acl's x509 identities as a trust store
 				try
 				{
@@ -296,6 +295,8 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 					throw new AuthZSecurityException("Unable to check ACLs.", e);
 				}
 			}
+*/
+
 		}
 
 		return false;
@@ -345,17 +346,7 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 			for (GamlCredential cred : callerCredentials)
 			{
 
-				if (cred instanceof Identity)
-				{
-
-					// a simple identity
-					if (checkAclAccess((Identity) cred, serviceClass, operation, acl))
-					{
-						allowed = true;
-					}
-
-				}
-				else if (cred instanceof SignedAssertion)
+				if (cred instanceof SignedAssertion)
 				{
 
 					// a signed assertion: need to check validity and
@@ -405,6 +396,16 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 							allowed = true;
 						}
 					}
+				}
+				else if (cred instanceof Identity)
+				{
+
+					// a simple identity
+					if (checkAclAccess((Identity) cred, serviceClass, operation, acl))
+					{
+						allowed = true;
+					}
+
 				}
 			}
 
