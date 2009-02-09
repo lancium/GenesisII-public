@@ -42,6 +42,7 @@ import edu.virginia.vcgr.genii.client.ApplicationBase;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
+import edu.virginia.vcgr.genii.client.configuration.GridEnvironment;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.Security;
@@ -93,6 +94,8 @@ public class Container extends ApplicationBase
 			usage();
 			System.exit(1);
 		}
+		
+		GridEnvironment.loadGridEnvironment();
 		
 		ContainerStatistics.instance();
 		

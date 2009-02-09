@@ -1,5 +1,8 @@
 package edu.virginia.vcgr.genii.container.rfork;
 
+import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
+import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 
 public abstract class AbstractStreamableByteIOResourceFork 
@@ -65,20 +68,32 @@ public abstract class AbstractStreamableByteIOResourceFork
 		}
 	}
 	
+	@Override
+	@RWXMapping(RWXCategory.OPEN)
+	public void destroy() throws ResourceException
+	{
+		super.destroy();
+	}
+	
 	protected boolean isDirty()
 	{
+		boolean ret = false;
+		
 		try
 		{
 			ResourceKey rKey = getService().getResourceKey();
 			Boolean dirty = (Boolean)rKey.dereference().getProperty(String.format(
 				DIRTY_PROPERTY_FORMAT_STRING, getForkPath()));
 			if (dirty == null)
-				return false;
-			return dirty.booleanValue();
+				ret = false;
+			else
+				ret = dirty.booleanValue();
 		}
 		catch (Exception re)
 		{
 			throw new RuntimeException("Unable to get resource property.", re);
 		}
+		
+		return ret;
 	}
 }

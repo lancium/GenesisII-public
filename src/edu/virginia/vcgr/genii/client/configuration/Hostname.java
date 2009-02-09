@@ -186,6 +186,17 @@ public class Hostname
 		return _externalName;
 	}
 	
+	public String toShortString()
+	{
+		String ret = toString();
+		
+		int index = ret.indexOf('.');
+		if (index > 0)
+			ret = ret.substring(0, index);
+		
+		return ret;
+	}
+	
 	synchronized public InetAddress getAddress()
 		throws UnknownHostException
 	{

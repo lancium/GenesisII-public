@@ -1,17 +1,12 @@
 package edu.virginia.vcgr.genii.container.jndiauthn;
 
 import org.apache.axis.types.URI;
-import java.security.cert.X509Certificate;
 import java.sql.SQLException;
 import java.util.*;
-import java.security.GeneralSecurityException;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPException;
 
-import org.apache.axis.message.MessageElement;
 import org.ggf.rns.RNSEntryExistsFaultType;
-import org.ws.addressing.ReferenceParametersType;
 
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
@@ -21,13 +16,11 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.SecurityConstants;
-import edu.virginia.vcgr.genii.client.security.WSSecurityUtils;
 import edu.virginia.vcgr.genii.container.common.notification.SubscriptionInformation;
 import edu.virginia.vcgr.genii.container.configuration.ServiceDescription;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
-import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 import edu.virginia.vcgr.genii.container.rns.RNSDBResource;
 
@@ -38,11 +31,6 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource
 	static private final QName _SERVICES_QNAME =
 			new QName(GenesisIIConstants.GENESISII_NS, "services");
 	static protected Long _resourceCertificateLifetime = null;
-
-	// used for encoding the end certificate into the resource properties
-	static private final String _RESOURCE_CERT_NAME = "resource-cert";
-	static private QName _RESOURCE_CERT_QNAME =
-			new QName(GenesisIIConstants.GENESISII_NS, _RESOURCE_CERT_NAME);
 
 	// transient properties for the resource
 	transient protected HashMap<String, Object> _properties =

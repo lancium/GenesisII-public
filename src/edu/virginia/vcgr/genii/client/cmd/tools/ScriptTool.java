@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -21,6 +22,8 @@ import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.xscript.jsr.Grid;
+import edu.virginia.vcgr.genii.client.configuration.GridEnvironment;
+import edu.virginia.vcgr.genii.client.configuration.PathVariable;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
@@ -101,14 +104,24 @@ public class ScriptTool extends BaseGridTool
 			initialProperties.put(arg.substring(0, index), arg.substring(index + 1));
 		}
 		
-		String scriptFileStr = getArgument(lcv);
+		String scriptFileString = getArgument(lcv);
+		if (!scriptFileString.startsWith("rns:"))
+		{
+			File scriptFile = PathVariable.lookupVariable(System.getProperties(), 
+				GridEnvironment.GRID_PATH_ENV_VARIABLE).find(scriptFileString,
+					PathVariable.FindTypes.FILE);
+			if (scriptFile == null)
+				throw new FileNotFoundException(String.format(
+					"Unable to locate script file %s.", scriptFileString));
+			scriptFileString = scriptFile.getAbsolutePath();
+		}
 		
 		String []cArgs = new String[args.size() - lcv];
 		int start = lcv;
 		for (;lcv < args.size(); lcv++)
 			cArgs[lcv - start] = args.get(lcv);
 		
-		String extension = getExtension(scriptFileStr);
+		String extension = getExtension(scriptFileString);
 		ScriptEngineManager manager = new ScriptEngineManager();
 		ScriptEngine engine = manager.getEngineByExtension(extension);
 		engine.put("grid", new Grid(
@@ -122,7 +135,7 @@ public class ScriptTool extends BaseGridTool
 		Reader reader = null;
 		try
 		{	
-			reader = openReader(scriptFileStr);
+			reader = openReader(scriptFileString);
 			engine.eval(reader);
 			
 			return 0;

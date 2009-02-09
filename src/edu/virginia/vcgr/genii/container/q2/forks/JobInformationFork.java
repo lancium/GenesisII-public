@@ -13,6 +13,7 @@ import edu.virginia.vcgr.genii.client.queue.JobTicket;
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.queue.QueueUtils;
 import edu.virginia.vcgr.genii.client.queue.ReducedJobInformation;
+import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.Identity;
@@ -84,6 +85,14 @@ public class JobInformationFork
 	}
 	
 	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public void destroy() throws ResourceException
+	{
+		super.destroy();
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.WRITE)
 	public void modifyState(InputStream source) throws IOException
 	{
 		throw new IOException("Not allowed to modify the state of a job.");

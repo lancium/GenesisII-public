@@ -12,6 +12,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.ApplicationBase;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
+import edu.virginia.vcgr.genii.client.configuration.GridEnvironment;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.secrun.SecureRunnableHooks;
 import edu.virginia.vcgr.secrun.SecureRunnerManager;
@@ -29,6 +30,7 @@ public class Driver extends ApplicationBase
 	
 	static public void main(String []args)
 	{
+		GridEnvironment.loadGridEnvironment();
 		String deploymentName = System.getenv("GENII_DEPLOYMENT_NAME");
 		if (deploymentName != null)
 		{

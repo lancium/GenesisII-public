@@ -66,8 +66,7 @@ public class DefaultStreamableByteIOResourceFork
 								"modifyState", InputStream.class);
 						} else if (operation.getName().equals("destroy"))
 						{
-							targetMethod = dependentForkClass.getMethod(
-								"modifyState", InputStream.class);
+							return RWXCategory.OPEN;
 						} else
 							throw new RWXMappingException("Target method \"" +
 								operation.getName() + 

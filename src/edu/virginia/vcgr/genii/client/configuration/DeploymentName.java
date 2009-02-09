@@ -44,6 +44,9 @@ public class DeploymentName
 		// jfk3w - added user config information - including user's deployment path
 		if (deploymentName == null)
 			deploymentName = System.getenv(DEPLOYMENT_NAME_ENVIRONMENT_VARIABLE);
+
+		if (deploymentName != null)
+			return deploymentName;
 		
 		// try reading user's config file from USER_DIR
 		try

@@ -43,7 +43,12 @@ public class SecureRunnerManager implements Closeable
 		if (!directory.exists() || !directory.isDirectory())
 			return;
 		
-		for (File entry : directory.listFiles(_filter))
+		for (File entry : directory.listFiles(_deleteMeFilter))
+		{
+			entry.delete();
+		}
+		
+		for (File entry : directory.listFiles(_jarFilter))
 		{
 			addEntry(loader, allowedCertificates, entry);
 		}
@@ -134,13 +139,23 @@ public class SecureRunnerManager implements Closeable
 		}
 	}
 	
-	static private final FilenameFilter _filter = new FilenameFilterImpl();
+	static private final FilenameFilter _deleteMeFilter = 
+		new FilenameFilterImpl(".deleteme");
+	static private final FilenameFilter _jarFilter = 
+		new FilenameFilterImpl(".jar");
 	static private class FilenameFilterImpl implements FilenameFilter
 	{
+		private String _endsWithString;
+		
+		public FilenameFilterImpl(String endsWithString)
+		{
+			_endsWithString = endsWithString;
+		}
+		
 		@Override
 		public boolean accept(File dir, String name)
 		{
-			return (name.endsWith(".jar"));
+			return (name.endsWith(_endsWithString));
 		}	
 	}
 	

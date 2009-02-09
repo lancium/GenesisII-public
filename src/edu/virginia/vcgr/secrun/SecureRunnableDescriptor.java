@@ -2,8 +2,11 @@ package edu.virginia.vcgr.secrun;
 
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
@@ -30,6 +33,35 @@ public class SecureRunnableDescriptor implements Closeable
 	private String _hook;
 	private File _jarFile;
 	private SecureRunnable _runnable;
+	
+	static private File createTmpFile(File jarFile)
+		throws IOException
+	{
+		File tmp = new File(
+			jarFile.getParentFile(), String.format("%s.deleteme",
+				jarFile.getName()));
+		
+		InputStream in = null;
+		OutputStream out = null;
+		byte []data = new byte[1024 * 4];
+		int read;
+		
+		try
+		{
+			in = new FileInputStream(jarFile);
+			out = new FileOutputStream(tmp);
+			
+			while ( (read = in.read(data)) > 0)
+				out.write(data, 0, read);
+			
+			return tmp;
+		}
+		finally
+		{
+			StreamUtils.close(in);
+			StreamUtils.close(out);
+		}
+	}
 	
 	static private Properties loadProperties(ClassLoader loader,
 		String resource) throws IOException
@@ -103,7 +135,7 @@ public class SecureRunnableDescriptor implements Closeable
 			InvocationTargetException
 	{
 		this(new SecureRunnerClassLoader(allowedCerts,
-			new URL[] { jarFile.toURI().toURL() }, parent));
+			new URL[] { createTmpFile(jarFile).toURI().toURL() }, parent));
 		_jarFile = jarFile;
 	}
 	
@@ -115,7 +147,7 @@ public class SecureRunnableDescriptor implements Closeable
 				InvocationTargetException
 	{
 		this(new SecureRunnerClassLoader(allowedCerts,
-			new URL[] { jarFile.toURI().toURL() }, parentLoader));
+			new URL[] { createTmpFile(jarFile).toURI().toURL() }, parentLoader));
 		_jarFile = jarFile;
 	}
 	

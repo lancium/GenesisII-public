@@ -276,6 +276,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.MonitorQueue</mconf:class>
 		<mconf:class name="echo"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.EchoCommand</mconf:class>
+		<mconf:class name="manage-windows-container-service"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ManageWindowsContainerServiceTool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

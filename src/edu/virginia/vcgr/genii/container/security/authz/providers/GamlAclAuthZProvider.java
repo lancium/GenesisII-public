@@ -16,23 +16,14 @@
 
 package edu.virginia.vcgr.genii.container.security.authz.providers;
 
-import java.security.cert.PKIXBuilderParameters;
-import java.security.cert.X509CertSelector;
 import java.security.cert.X509Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.GeneralSecurityException;
-import java.security.KeyStore;
-import java.security.cert.CertificateException;
 
 import java.util.*;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.util.HashSet;
-
-import javax.net.ssl.CertPathTrustManagerParameters;
-import javax.net.ssl.ManagerFactoryParameters;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
