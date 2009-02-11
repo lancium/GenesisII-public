@@ -36,6 +36,18 @@ public class PathVariable
 	public File find(String filename, FindTypes findType)
 	{
 		File f = new File(filename);
+		
+		if (f.exists())
+		{
+			if (findType == FindTypes.FILE)
+			{
+				if (f.isFile())
+					return f;
+			} else
+				if (f.isDirectory())
+					return f;
+		}
+		
 		if (f.isAbsolute())
 		{
 			if (findType == FindTypes.ANY)

@@ -72,6 +72,13 @@ public class RNSPath implements Serializable
 	
 	static private Log _logger = LogFactory.getLog(RNSPath.class);
 	
+	/**
+	 * Returns the current grid namespace path.  This is similar to getcwd
+	 * in posix systems but refers only to grid paths here.
+	 * 
+	 * @return The grid client's current working directory in the grid
+	 * namespace.
+	 */
 	static public RNSPath getCurrent()
 	{
 		try
@@ -149,6 +156,20 @@ public class RNSPath implements Serializable
 		return _cachedEPR;
 	}
 	
+	/**
+	 * Construct a new RNS path based off of component information.  While it
+	 * is permitted for users to call this constructor directly, in general it
+	 * is recommended that RNSPath instances be obtained through other
+	 * mechanisms such as calls to RNSPath.getCurrent() and by looking
+	 * up entries within other directories.
+	 * 
+	 * @param parent The RNSPath for the parent under which this entry exists.
+	 * @param nameFromParent The name that this entry has inside of the parent
+	 * directory.
+	 * @param cachedEPR The EPR of this entry (if it has one).
+	 * @param attemptedResolve Should we attempt to resolve the EPR of this
+	 * entry if we don't have any EPR yet.
+	 */
 	public RNSPath(RNSPath parent, String nameFromParent, 
 		EndpointReferenceType cachedEPR, boolean attemptedResolve)
 	{
@@ -172,11 +193,26 @@ public class RNSPath implements Serializable
 			_attemptedResolve = true;
 	}
 	
+	/**
+	 * Create a new RNSPath which represents a new rooted RNS namespace
+	 * at the given EPR.
+	 * 
+	 * @param root The EPR which represents the root of this new namespace.
+	 */
 	public RNSPath(EndpointReferenceType root)
 	{
 		this(null, null, root, true);
 	}
 	
+	/**
+	 * Turn the current RNSPath into a sandbox.  This essentially makes
+	 * the current grid directory the root of a new namespace.
+	 * 
+	 * @return The RNSPath of a new sandbox namespace rooted at the represented
+	 * grid directory.
+	 * 
+	 * @throws RNSPathDoesNotExistException
+	 */
 	public RNSPath createSandbox()
 		throws RNSPathDoesNotExistException
 	{
@@ -190,6 +226,12 @@ public class RNSPath implements Serializable
 		return new RNSPath(newRoot);
 	}
 	
+	/**
+	 * Retrieve the name of this entry as represented by the parent
+	 * directory.
+	 * 
+	 * @return The name of this RNS entry.
+	 */
 	public String getName()
 	{
 		if (_nameFromParent == null)
@@ -198,12 +240,27 @@ public class RNSPath implements Serializable
 		return _nameFromParent;
 	}
 	
+	/**
+	 * Get the EPR of the current entry if it exists.  If the entry doesn't
+	 * exist, this method throws an exception.
+	 * 
+	 * @return The EPR of this entry if it exists.
+	 * 
+	 * @throws RNSPathDoesNotExistException
+	 */
 	public EndpointReferenceType getEndpoint()
 		throws RNSPathDoesNotExistException
 	{
 		return resolveRequired();
 	}
 	
+	/**
+	 * Return the full path to this entry starting at the root of the
+	 * namespace.
+	 * 
+	 * @return A slash separated string representing the full grid path
+	 * to this entry.
+	 */
 	public String pwd()
 	{
 		if (_parent == null)
@@ -216,6 +273,11 @@ public class RNSPath implements Serializable
 		return parent + "/" + _nameFromParent;
 	}
 	
+	/**
+	 * Retrieve the root RNSPath entry for this namespace.
+	 * 
+	 * @return The root RNSPath entry for this namespace.
+	 */
 	public RNSPath getRoot()
 	{
 		if (_parent == null)
@@ -224,6 +286,11 @@ public class RNSPath implements Serializable
 		return _parent.getRoot();
 	}
 	
+	/**
+	 * Retrieve the parent RNSPath entry for this entry.
+	 * 
+	 * @return The parent RNSPath entry for this entry.
+	 */
 	public RNSPath getParent()
 	{
 		if (_parent == null)
@@ -232,16 +299,35 @@ public class RNSPath implements Serializable
 		return _parent;
 	}
 	
+	/**
+	 * Determines if this RNSPath entry represents the root of a namespace.
+	 * 
+	 * @return True if this entry is the root of a namespace, false otherwise.
+	 */
 	public boolean isRoot()
 	{
 		return _parent == null;
 	}
 	
+	/**
+	 * Determine if this entry represents a grid resource that exists (has
+	 * an EPR) or doesn't.
+	 * 
+	 * @return True if this entry has an EPR, false otherwise.
+	 */
 	public boolean exists()
 	{
 		return resolveOptional() != null;
 	}
 	
+	/**
+	 * Assuming that this entry doesn't exist, this method creates a new
+	 * directory at the indicated path.
+	 * 
+	 * @throws RNSException
+	 * @throws RNSPathAlreadyExistsException
+	 * @throws RNSPathDoesNotExistException
+	 */
 	public void mkdir()
 		throws RNSException, RNSPathAlreadyExistsException, 
 			RNSPathDoesNotExistException
@@ -269,6 +355,14 @@ public class RNSPath implements Serializable
 		}
 	}
 	
+	/**
+	 * Similar to mkdir(), but this operation creates all directories that
+	 * don't exist in the indicated path, including this one.
+	 * 
+	 * @throws RNSException
+	 * @throws RNSPathAlreadyExistsException
+	 * @throws RNSPathDoesNotExistException
+	 */
 	public void mkdirs()
 		throws RNSException, RNSPathAlreadyExistsException, 
 			RNSPathDoesNotExistException
@@ -287,6 +381,18 @@ public class RNSPath implements Serializable
 		mkdir();
 	}
 	
+	/**
+	 * Creates a new ByteIO file at this path.  This operation assumes that
+	 * the current path doesn't yet exist.  The type of ByteIO created can
+	 * be any valid ByteIO implementation that the parent directory decides
+	 * to create.
+	 * 
+	 * @return The EPR of a newly created ByteIO file.
+	 * 
+	 * @throws RNSPathAlreadyExistsException
+	 * @throws RNSPathDoesNotExistException
+	 * @throws RNSException
+	 */
 	public EndpointReferenceType createNewFile()
 		throws RNSPathAlreadyExistsException, RNSPathDoesNotExistException,
 			RNSException
@@ -322,6 +428,16 @@ public class RNSPath implements Serializable
 		rep.add(this);
 	}
 	
+	/**
+	 * Lookup an RNSPath based off of this path.  This path can be relative
+	 * or absolute compared to this path.  The path does not have to exist
+	 * either.  If the indicated path does not exist, an RNSPath entry with
+	 * no EPR will be returned.
+	 * 
+	 * @param path The relative or absolute path to lookup.
+	 * 
+	 * @return An RNSPath entry representing the path looked up.
+	 */
 	public RNSPath lookup(String path)
 	{
 		try
@@ -340,6 +456,20 @@ public class RNSPath implements Serializable
 		return null;
 	}
 	
+	/**
+	 * Similar to lookup above, this operation looks up a new RNSPath entry at
+	 * a given query path.  This operation however takes a flag which can
+	 * specify whether or not to return directories that don't actually
+	 * exist.
+	 * 
+	 * @param path The RNS path to lookup.
+	 * @param queryFlag A flag indicating whether or not to fault if the
+	 * entry exists/does not exist.
+	 * 
+	 * @return The RNSPath entry that was found/indicated.
+	 * @throws RNSPathDoesNotExistException
+	 * @throws RNSPathAlreadyExistsException
+	 */
 	public RNSPath lookup(String path, RNSPathQueryFlags queryFlag)
 			throws RNSPathDoesNotExistException, RNSPathAlreadyExistsException
 	{
@@ -434,12 +564,38 @@ public class RNSPath implements Serializable
 		return ret;
 	}
 
+	/**
+	 * A utility operation that looks up a path expression and returns exactly
+	 * one matching path entry.  If more then one path entry matching the 
+	 * pathExpression, an exception is thrown.
+	 * 
+	 * @param pathExpression A path expression which is to be looked up.  This
+	 * path expression can contain standard file system globbing patterns such
+	 * as *.
+	 * 
+	 * @return The resultant RNSPath entry (if any).
+	 * @throws RNSMultiLookupResultException
+	 */
 	public RNSPath expandSingleton(String pathExpression)
 		throws RNSMultiLookupResultException
 	{
 		return expandSingleton(pathExpression, null);
 	}
 	
+	/**
+	 * This operation looks up pathExpressions and returns the exact matching
+	 * entry that is found if any.
+	 * 
+	 * @param pathExpression The path expression to lookup.  This expression
+	 * will be matched against the filterType indicated.
+	 * @param filterType A filter which figures out how to expand the
+	 * pathExpression language given.  Two pathExpressio filterTypes are
+	 * available by default -- one parses file globbing patterns, the other
+	 * parses Regular Expressions.
+	 * 
+	 * @return The matched RNSPath entry.
+	 * @throws RNSMultiLookupResultException
+	 */
 	public RNSPath expandSingleton(String pathExpression, 
 		FilterFactory filterType) throws RNSMultiLookupResultException
 	{
@@ -453,11 +609,31 @@ public class RNSPath implements Serializable
 		return ret.iterator().next();
 	}
 	
+	/**
+	 * Similar to expandSingleton above, but this version of the operation
+	 * matches 0 or more entries.
+	 * 
+	 * @param pathExpression The file pattern globbing path expression to
+	 * lookup.
+	 * 
+	 * @return A collection of zero or more RNSPath entries that matched
+	 * the query.
+	 */
 	public Collection<RNSPath> expand(String pathExpression)
 	{
 		return expand(pathExpression, new FilePatternFilterFactory());
 	}
 	
+	/**
+	 * Similar to the expandSingleton operation above except that this
+	 * version of the operation can return 0 or more entries that match
+	 * the path query.
+	 * 
+	 * @param pathExpression The path expression to lookup.
+	 * @param filterType The file pattern matcher to use.
+	 * 
+	 * @return The RNSPath entries that matched the query.
+	 */
 	public Collection<RNSPath> expand(String pathExpression,
 		FilterFactory filterType)
 	{
@@ -491,6 +667,19 @@ public class RNSPath implements Serializable
 		}
 	}
 	
+	/**
+	 * List the contents of the current RNS directory that match the given
+	 * filter.
+	 * 
+	 * @param filter A filter that is used to select entries in the current
+	 * RNS directory.
+	 * 
+	 * @return The set of all RNS entries in the current directory that matched
+	 * the given pattern.
+	 * 
+	 * @throws RNSPathDoesNotExistException
+	 * @throws RNSException
+	 */
 	public Collection<RNSPath> listContents(RNSFilter filter)
 		throws RNSPathDoesNotExistException, RNSException
 	{
@@ -505,6 +694,14 @@ public class RNSPath implements Serializable
 		return ret;
 	}
 	
+	/**
+	 * List all of the entries in the given RNS directory.
+	 * 
+	 * @return The set of all RNSPath entries contained in this directory.
+	 * 
+	 * @throws RNSPathDoesNotExistException
+	 * @throws RNSException
+	 */
 	public Collection<RNSPath> listContents()
 		throws RNSPathDoesNotExistException, RNSException
 	{
@@ -569,6 +766,16 @@ public class RNSPath implements Serializable
 		}
 	}
 	
+	/**
+	 * Assuming that the indicated RNSPath entry does not yet exist (but that
+	 * it's parent does), links the given EPR into this named entry.
+	 * 
+	 * @param epr The EPR to link to this indicated name.
+	 * 
+	 * @throws RNSPathAlreadyExistsException
+	 * @throws RNSPathDoesNotExistException
+	 * @throws RNSException
+	 */
 	public void link(EndpointReferenceType epr)
 		throws RNSPathAlreadyExistsException, RNSPathDoesNotExistException,
 			RNSException
@@ -596,6 +803,14 @@ public class RNSPath implements Serializable
 		}
 	}
 	
+	/**
+	 * Unlink this RNSPath entry from the namespace (this will never
+	 * destroy the target resource -- it merely unlinks it from the
+	 * filesystem).
+	 * 
+	 * @throws RNSPathDoesNotExistException
+	 * @throws RNSException
+	 */
 	public void unlink()
 		throws RNSPathDoesNotExistException, RNSException
 	{
@@ -620,6 +835,13 @@ public class RNSPath implements Serializable
 		}
 	}
 	
+	/**
+	 * Similar to unlink above, but this operation also destroy the target
+	 * resource if at all possible.
+	 * 
+	 * @throws RNSPathDoesNotExistException
+	 * @throws RNSException
+	 */
 	public void delete()
 		throws RNSPathDoesNotExistException, RNSException
 	{
@@ -649,6 +871,9 @@ public class RNSPath implements Serializable
 		}
 	}
 	
+	/**
+	 * Returns the pwd() for this RNSPath entry.
+	 */
 	public String toString()
 	{
 		return pwd();
