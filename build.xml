@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="build" name="GenesisII">
 
+
+
 	<!-- Properties -->
 	<property environment="env"/>
 	<property file="${basedir}/build.properties"/>
@@ -395,4 +397,12 @@
 	</target>
 
 	<target name="secrun" depends="secrun.test, secrun.contpreboot, secrun.contpostboot"/>
+
+	<target name="api-doc" depends="build">
+		<javadoc destdir="${basedir}/api-doc">
+			<fileset dir="${basedir}/src">
+				<include name="edu/virginia/vcgr/genii/client/**/*.java"/>
+			</fileset>
+		</javadoc>
+	</target>
 </project>
