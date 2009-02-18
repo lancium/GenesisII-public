@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStateEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
@@ -14,6 +16,8 @@ import edu.virginia.vcgr.genii.container.bes.execution.ContinuableExecutionExcep
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionException;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
+import edu.virginia.vcgr.genii.container.sysinfo.SupportedOperatingSystems;
+import edu.virginia.vcgr.genii.procmgmt.ProcessManager;
 
 public class RunProcessPhase extends AbstractRunProcessPhase 
 	implements TerminateableExecutionPhase, Serializable
@@ -21,6 +25,8 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 	static final long serialVersionUID = 0L;
 	
 	static final private String EXECUTING_STAGE = "executing";
+	
+	static private Log _logger = LogFactory.getLog(RunProcessPhase.class);
 	
 	private File _executable;
 	private String []_arguments;
@@ -30,6 +36,22 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 	transient private Boolean _hardTerminate = null;
 	
 	private StreamRedirectionDescription _redirects;
+	
+	static private void destroyProcess(Process process)
+	{
+		try
+		{
+			if (SupportedOperatingSystems.current() == 
+				SupportedOperatingSystems.WINDOWS)
+				ProcessManager.kill(process);
+		}
+		catch (Throwable cause)
+		{
+			_logger.error("Problem killing process.", cause);
+		}
+		
+		process.destroy();
+	}
 	
 	public RunProcessPhase(File executable, String []arguments, 
 		Map<String, String> environment,
@@ -59,7 +81,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 		synchronized(_processLock)
 		{
 			if (_process != null)
-				_process.destroy();
+				destroyProcess(_process);
 		}
 	}
 	
@@ -127,7 +149,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 		{
 			synchronized(_processLock)
 			{
-				_process.destroy();
+				destroyProcess(_process);
 				_process = null;
 			}
 		}
@@ -146,7 +168,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 		synchronized(_processLock)
 		{
 			_hardTerminate = Boolean.TRUE;
-			_process.destroy();
+			destroyProcess(_process);
 		}
 	}
 }
