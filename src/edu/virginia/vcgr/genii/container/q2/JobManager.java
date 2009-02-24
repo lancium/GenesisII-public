@@ -369,7 +369,11 @@ public class JobManager implements Closeable
 			 * others killing, getting the status of, or completing someone 
 			 * elses jobs.
 			 */
-			Collection<Identity> identities = QueueSecurity.getCallerIdentities();
+			Collection<Identity> identities = QueueSecurity.getCallerIdentities(true);
+			
+			if (identities.size() <= 0)
+				throw new ResourceException(
+					"Cannot submit a job with no non-group credentials.");
 			
 			/* The job starts out in the queued state and with the current 
 			 * time as it's submit time. */
@@ -500,7 +504,11 @@ public class JobManager implements Closeable
 		for (Long jobID : ownerMap.keySet())
 		{
 			/* Get the in-memory information for this job */
+			String scheduledOn = null;
 			JobData jobData = _jobsByID.get(jobID);
+			BESData besData = _besManager.findBES(jobData.getBESID());
+			if (besData != null)
+				scheduledOn = besData.getName();
 			
 			try
 			{
@@ -520,7 +528,8 @@ public class JobManager implements Closeable
 						QueueUtils.convert(jobData.getSubmitTime()),
 						QueueUtils.convert(pji.getStartTime()),
 						QueueUtils.convert(pji.getFinishTime()),
-						new UnsignedShort(jobData.getRunAttempts())));
+						new UnsignedShort(jobData.getRunAttempts()),
+						scheduledOn));
 				}
 			}
 			catch (IOException ioe)
@@ -595,6 +604,11 @@ public class JobManager implements Closeable
 			for (Long jobID : ownerMap.keySet())
 			{
 				JobData jobData = _jobsByID.get(jobID.longValue());
+				BESData besData = _besManager.findBES(jobData.getBESID());
+				String scheduledOn = null;
+				if (besData != null)
+					scheduledOn = besData.getName();
+				
 				PartialJobInfo pji = ownerMap.get(jobID);
 				
 				/* If the job is owned by the caller, add the job's
@@ -611,7 +625,8 @@ public class JobManager implements Closeable
 						QueueUtils.convert(jobData.getSubmitTime()),
 						QueueUtils.convert(pji.getStartTime()),
 						QueueUtils.convert(pji.getFinishTime()),
-						new UnsignedShort(jobData.getRunAttempts())));
+						new UnsignedShort(jobData.getRunAttempts()),
+						scheduledOn));
 				} else
 				{
 					/* If the caller did not own a job, then we throw a

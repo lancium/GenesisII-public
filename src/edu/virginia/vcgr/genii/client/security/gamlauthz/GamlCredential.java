@@ -5,6 +5,7 @@ import java.util.Date;
 
 import org.apache.axis.message.MessageElement;
 
+import edu.virginia.vcgr.genii.client.security.Describable;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.AttributeInvalidException;
 
 /**
@@ -13,9 +14,8 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.AttributeInv
  * @author dmerrill
  * 
  */
-public interface GamlCredential
+public interface GamlCredential extends Describable
 {
-
 	public static final String ENCODED_GAML_CREDENTIALS_PROPERTY =
 			"genii.client.security.authz.encoded-gaml-credentials";
 	public static final String CALLER_CREDENTIALS_PROPERTY =
@@ -39,5 +39,4 @@ public interface GamlCredential
 	 * @throws GeneralSecurityException
 	 */
 	public MessageElement toMessageElement() throws GeneralSecurityException;
-
 }

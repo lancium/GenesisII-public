@@ -26,6 +26,9 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
+import edu.virginia.vcgr.genii.client.security.VerbosityLevel;
+import edu.virginia.vcgr.genii.client.security.X500PrincipalUtilities;
+
 /**
  * A delegated attribute. The pairing of an existing signed assertion with the
  * identity of a delegatee
@@ -145,14 +148,47 @@ public class DelegatedAttribute implements Attribute
 
 	public String toString()
 	{
-		return "(DelegatedAttribute) delegateeIdentity("
-				+ _delegateeIdentity.length + "): \""
-				+ _delegateeIdentity[0].getSubjectX500Principal().getName()
-				+ "\" "
-				+ ((_constraints == null) ? "" : _constraints.toString() + " ")
-				+ " subAssertion: [" + _assertion + "]";
+		return describe(VerbosityLevel.HIGH);
 	}
-
+	
+	@Override
+	public String describe(VerbosityLevel verbosity)
+	{
+		if (verbosity.compareTo(VerbosityLevel.HIGH) >= 0)
+			return String.format(
+				"(DelegatedAttribute) delegateeIdentity(%d): \"%s\" " +
+				"%s subAssertion: [%s]", _delegateeIdentity.length,
+				X500PrincipalUtilities.describe(
+					_delegateeIdentity[0].getSubjectX500Principal(), verbosity),
+				((_constraints == null) ? "" : _constraints),
+				_assertion.describe(verbosity));
+		else
+		{
+			if (_constraints == null)
+				return String.format("%s -> %s",
+					_assertion.describe(verbosity),
+					X500PrincipalUtilities.describe(
+						_delegateeIdentity[0].getSubjectX500Principal(),
+						verbosity));
+			else
+			{
+				if (verbosity.compareTo(VerbosityLevel.LOW) >= 0)
+					return String.format("%s (%s->) %s",
+							_assertion.describe(verbosity),
+							_constraints.describe(verbosity),
+						X500PrincipalUtilities.describe(
+								_delegateeIdentity[0].getSubjectX500Principal(),
+								verbosity));
+				else
+					return String.format("%s -> %s",
+						_assertion.describe(verbosity),
+					X500PrincipalUtilities.describe(
+						_delegateeIdentity[0].getSubjectX500Principal(),
+						verbosity));
+			}
+		}
+	}
+	
 	public void writeExternal(ObjectOutput out) throws IOException
 	{
 		out.writeObject(_assertion);

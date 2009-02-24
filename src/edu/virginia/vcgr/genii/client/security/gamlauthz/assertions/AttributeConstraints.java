@@ -3,7 +3,9 @@ package edu.virginia.vcgr.genii.client.security.gamlauthz.assertions;
 import java.io.Externalizable;
 import java.util.Date;
 
-public interface AttributeConstraints extends Externalizable
+import edu.virginia.vcgr.genii.client.security.Describable;
+
+public interface AttributeConstraints extends Externalizable, Describable
 {
 	/**
 	 * Checks that the attribute is time-valid with respect to the supplied date

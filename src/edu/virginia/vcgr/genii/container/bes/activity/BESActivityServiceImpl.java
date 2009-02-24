@@ -134,7 +134,7 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 			CreationProperties.CREATION_PROPERTIES_QNAME);
 		
 		String activityServiceName = "BESActivityPortType";
-		Collection<Identity> owners = QueueSecurity.getCallerIdentities();
+		Collection<Identity> owners = QueueSecurity.getCallerIdentities(true);
 		
 		BESWorkingDirectory workingDirectory = new BESWorkingDirectory(
 			chooseDirectory(creationParameters, 5), true);

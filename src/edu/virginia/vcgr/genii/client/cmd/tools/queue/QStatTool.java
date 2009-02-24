@@ -58,17 +58,23 @@ public class QStatTool extends BaseGridTool
 	private void printHeader()
 	{
 		stdout.println(String.format(
-			"%1$-36s   %2$-17s   %3$-8s   %4$-8s", 
-			"Ticket", "Submit Time", "State", "Attempts"));
+			"%1$-36s   %2$-17s   %3$-4s   %4$-8s", 
+			"Ticket", "Submit Time", "Trys", "State"));
 	}
 	
 	static private final String _FORMAT =
-		"%1$-36s   %2$tH:%2$tM %2$td %2$tb %2$tY   %3$-8s   %4$-8d";
+		"%1$-36s   %2$tH:%2$tM %2$td %2$tb %2$tY   %3$-4d   %4$s";
 	
 	private void printJobInformation(JobInformation jobInfo)
 	{
+		String stateString = jobInfo.getScheduledOn();
+		if (stateString != null)
+			stateString = String.format("On %s", stateString);
+		else
+			stateString = String.format("%s", jobInfo.getJobState());
+		
 		stdout.println(String.format(
 			_FORMAT, jobInfo.getTicket(), jobInfo.getSubmitTime(),
-			jobInfo.getJobState(), jobInfo.getFailedAttempts()));
+			jobInfo.getFailedAttempts(), stateString));
 	}
 }

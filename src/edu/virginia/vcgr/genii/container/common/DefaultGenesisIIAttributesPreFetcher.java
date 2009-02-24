@@ -57,7 +57,7 @@ public class DefaultGenesisIIAttributesPreFetcher<Type extends IResource>
 			config = authZHandler.getAuthZConfig(resource);
 		GamlAcl acl = GamlAcl.decodeAcl(config);
 		return GenesisIIACLManager.getPermissions(acl, 
-			QueueSecurity.getCallerIdentities());
+			QueueSecurity.getCallerIdentities(false));
 	}
 		
 	protected void fillInAttributes(

@@ -277,6 +277,14 @@ public class BESManager implements Closeable
 		return ret.values();
 	}
 	
+	synchronized public BESData findBES(Long besID)
+	{
+		if (besID == null)
+			return null;
+		
+		return _containersByID.get(besID);
+	}
+	
 	/**
 	 * Remove BES containers from a queue based off of regular expression.
 	 * 

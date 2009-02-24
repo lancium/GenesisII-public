@@ -29,6 +29,7 @@ import javax.xml.soap.SOAPException;
 import org.apache.axis.message.MessageElement;
 import org.apache.ws.security.message.token.BinarySecurity;
 
+import edu.virginia.vcgr.genii.client.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.client.security.WSSecurityUtils;
 
 /**
@@ -182,7 +183,17 @@ public class SignedAttributeAssertion extends SignedAssertionBaseImpl
 
 	public String toString()
 	{
-		return "(SignedAttributeAssertion)\n attribute : [" + _attribute + "]";
+		return describe(VerbosityLevel.HIGH);
+	}
+	
+	@Override
+	public String describe(VerbosityLevel verbosity)
+	{
+		if (verbosity.compareTo(VerbosityLevel.HIGH) >= 0)
+			return String.format("(SignedAttributeAssertion)\n attribute : [%s]", 
+				_attribute);
+		else
+			return _attribute.describe(verbosity);
 	}
 
 	/**

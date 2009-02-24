@@ -195,7 +195,7 @@ public class GenesisIIBaseAttributesHandler
 			config = authZHandler.getAuthZConfig(resource);
 		GamlAcl acl = GamlAcl.decodeAcl(config);
 		Permissions perms = GenesisIIACLManager.getPermissions(acl, 
-			QueueSecurity.getCallerIdentities());
+			QueueSecurity.getCallerIdentities(false));
 		return new MessageElement(
 			GenesisIIBaseRP.PERMISSIONS_STRING_QNAME,
 			perms.toString());

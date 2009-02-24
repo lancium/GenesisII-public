@@ -248,7 +248,8 @@ public class QueueManipulator
 					QueueStates.fromQueueStateType(jobInfo.getJobStatus()),
 					(int)jobInfo.getPriority(), jobInfo.getSubmitTime(),
 					jobInfo.getStartTime(), jobInfo.getFinishTime(),
-					jobInfo.getAttempts().intValue());	
+					jobInfo.getAttempts().intValue(),
+					jobInfo.getScheduledOn());	
 		}
 
 		@Override

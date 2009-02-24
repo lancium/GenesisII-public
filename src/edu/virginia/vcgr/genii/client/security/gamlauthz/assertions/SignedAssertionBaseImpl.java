@@ -22,6 +22,8 @@ import java.io.*;
 import java.util.*;
 
 import edu.virginia.vcgr.genii.client.cache.LRUCache;
+import edu.virginia.vcgr.genii.client.security.VerbosityLevel;
+import edu.virginia.vcgr.genii.client.security.X500PrincipalUtilities;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.GamlCredential;
 
 import edu.virginia.vcgr.genii.client.ser.Base64;
@@ -123,9 +125,21 @@ public abstract class SignedAssertionBaseImpl implements SignedAssertion,
 	 */
 	public String toString()
 	{
-		return "GAML: "
-				+ getAttribute().getAssertingIdentityCertChain()[0]
-						.getSubjectDN().getName();
+		return describe(VerbosityLevel.HIGH);
+	}
+	
+	@Override
+	public String describe(VerbosityLevel verbosity)
+	{
+		X509Certificate []certChain = 
+			getAttribute().getAssertingIdentityCertChain();
+		
+		if (certChain == null || certChain.length == 0)
+			return "GAML:  Empty Cert Chain";
+		
+		return String.format("GAML: (%s)%s",
+			X500PrincipalUtilities.describe(
+				certChain[0].getSubjectX500Principal(), verbosity));
 	}
 
 	public static String base64encodeAssertion(SignedAssertion signedAssertion)

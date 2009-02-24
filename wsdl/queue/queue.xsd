@@ -60,7 +60,9 @@
 					<xsd:element name="finish-time" type="xsd:dateTime"
 						minOccurs="0" maxOccurs="1" nillable="true"/>
 					<xsd:element name="attempts" type="xsd:unsignedShort"
-						minOccurs="1" maxOccurs="1" nlllable="false"/>
+						minOccurs="1" maxOccurs="1" nillable="false"/>
+					<xsd:element name="scheduled-on" type="xsd:string"
+						minOccurs="0" maxOccurs="1" nillable="true"/>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>

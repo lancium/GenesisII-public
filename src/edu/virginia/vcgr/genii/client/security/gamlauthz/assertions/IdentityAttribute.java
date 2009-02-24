@@ -5,6 +5,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.security.cert.X509Certificate;
 
+import edu.virginia.vcgr.genii.client.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
 
 /**
@@ -47,9 +48,27 @@ public class IdentityAttribute extends BasicAttribute
 
 	public String toString()
 	{
-		return "IdentityAttribute ("
-				+ ((_constraints == null) ? "" : _constraints.toString() + " ")
-				+ ((_identity == null) ? "" : _identity.toString() + " ") + ")";
+		return describe(VerbosityLevel.HIGH);
+	}
+	
+	@Override
+	public String describe(VerbosityLevel verbosity)
+	{
+		if (verbosity.compareTo(VerbosityLevel.HIGH) >= 0)
+		{
+			return String.format("IdentityAttribute (%s %s)",
+				((_constraints == null) ? "" : _constraints.toString()),
+				((_identity == null) ? "" : _identity.describe(verbosity)));
+		} else
+		{
+			if (_constraints != null && 
+				(verbosity.compareTo(VerbosityLevel.LOW) >= 0))
+				return String.format("%s %s",
+					_constraints.describe(verbosity), 
+					_identity.describe(verbosity));
+			else
+				return _identity.describe(verbosity);
+		}
 	}
 
 	public void writeExternal(ObjectOutput out) throws IOException
@@ -64,5 +83,4 @@ public class IdentityAttribute extends BasicAttribute
 		super.readExternal(in);
 		_identity = (AssertableIdentity) in.readObject();
 	}
-
 }

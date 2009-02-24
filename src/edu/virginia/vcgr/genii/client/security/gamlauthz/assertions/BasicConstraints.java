@@ -6,6 +6,8 @@ import java.io.ObjectOutput;
 import java.security.GeneralSecurityException;
 import java.util.Date;
 
+import edu.virginia.vcgr.genii.client.security.VerbosityLevel;
+
 public class BasicConstraints implements AttributeConstraints, Renewable
 {
 
@@ -83,6 +85,7 @@ public class BasicConstraints implements AttributeConstraints, Renewable
 
 	public String toString()
 	{
+		/*
 		long days = _durationValidMillis / (1000 * 60 * 60 * 24);
 		long remainder = _durationValidMillis % (1000 * 60 * 60 * 24);
 		long hours = remainder / (1000 * 60 * 60);
@@ -97,6 +100,18 @@ public class BasicConstraints implements AttributeConstraints, Renewable
 				+ " days, " + hours + " hours, " + minutes + " minutes, "
 				+ seconds + " seconds" + "\" maxDelegationDepth: "
 				+ this._maxDelegationDepth + ")";
+		*/
+		return describe(VerbosityLevel.HIGH);
+	}
+	
+	@Override
+	public String describe(VerbosityLevel verbosity)
+	{
+		Date before = new Date(_notValidBeforeMillis);
+		Date after = new Date(_notValidBeforeMillis + _durationValidMillis);
+		
+		return String.format("[%1$tD %1$tT, %2$tD %2$tT]",
+			before, after);
 	}
 
 	@Override

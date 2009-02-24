@@ -13,7 +13,9 @@ import org.apache.axis.message.MessageElement;
 
 import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
 import edu.virginia.vcgr.genii.client.security.SecurityUtils;
+import edu.virginia.vcgr.genii.client.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.client.security.WSSecurityUtils;
+import edu.virginia.vcgr.genii.client.security.X500PrincipalUtilities;
 
 public class X509Identity implements AssertableIdentity, SignedAssertion
 {
@@ -111,8 +113,19 @@ public class X509Identity implements AssertableIdentity, SignedAssertion
 
 	public String toString()
 	{
-		return "[X509Identity] \"" + _identity[0].getSubjectX500Principal()
-				+ "\"";
+		return describe(VerbosityLevel.HIGH);
+	}
+	
+	@Override
+	public String describe(VerbosityLevel verbosity)
+	{
+		if (verbosity.compareTo(VerbosityLevel.HIGH) >= 0)
+			return String.format("[X509Identity] \"%s\"", 
+				X500PrincipalUtilities.describe(
+					_identity[0].getSubjectX500Principal(), verbosity));
+		else
+			return X500PrincipalUtilities.describe(
+				_identity[0].getSubjectX500Principal(), verbosity);
 	}
 
 	public boolean equals(Object other)

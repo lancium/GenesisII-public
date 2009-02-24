@@ -9,6 +9,7 @@ import java.security.GeneralSecurityException;
 
 import org.apache.axis.message.MessageElement;
 
+import edu.virginia.vcgr.genii.client.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.client.security.WSSecurityUtils;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.GamlCredential;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.AttributeInvalidException;
@@ -50,8 +51,13 @@ public class UsernamePasswordIdentity implements Identity, GamlCredential
 
 	public String toString()
 	{
-		return "[Username-Token] Username: " + _userName; // + ", Token: " +
-															// _token;
+		return describe(VerbosityLevel.HIGH);
+	}
+	
+	@Override
+	public String describe(VerbosityLevel verbosity)
+	{
+		return String.format("[Username-Token] %s", _userName);
 	}
 
 	public MessageElement toMessageElement() throws GeneralSecurityException

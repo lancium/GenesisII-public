@@ -20,12 +20,14 @@ import java.io.Externalizable;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
+import edu.virginia.vcgr.genii.client.security.Describable;
+
 /**
  * A serializable statement
  * 
  * @author dmerrill
  */
-public interface Attribute extends Externalizable
+public interface Attribute extends Externalizable, Describable
 {
 
 	/**

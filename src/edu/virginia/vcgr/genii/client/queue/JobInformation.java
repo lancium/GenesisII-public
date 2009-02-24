@@ -12,12 +12,13 @@ public class JobInformation extends ReducedJobInformation
 	private Calendar _startTime;
 	private Calendar _finishTime;
 	private int _failedAttempts;
+	private String _scheduledOn;
 	
 	public JobInformation(JobTicket ticket,
 		Collection<Identity> owners, QueueStates state,
 		int prioity, Calendar submitTime,
 		Calendar startTime, Calendar finishTime,
-		int failedAttempts)
+		int failedAttempts, String scheduledOn)
 	{
 		super(ticket, owners, state);
 		
@@ -26,6 +27,7 @@ public class JobInformation extends ReducedJobInformation
 		_startTime = startTime;
 		_finishTime = finishTime;
 		_failedAttempts = failedAttempts;
+		_scheduledOn = scheduledOn;
 	}
 	
 	public int getPriority()
@@ -51,5 +53,10 @@ public class JobInformation extends ReducedJobInformation
 	public int getFailedAttempts()
 	{
 		return _failedAttempts;
+	}
+	
+	public String getScheduledOn()
+	{
+		return _scheduledOn;
 	}
 }

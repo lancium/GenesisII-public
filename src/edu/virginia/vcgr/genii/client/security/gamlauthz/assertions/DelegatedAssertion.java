@@ -33,6 +33,7 @@ import javax.xml.soap.SOAPException;
 import org.apache.axis.message.MessageElement;
 import org.apache.ws.security.message.token.BinarySecurity;
 
+import edu.virginia.vcgr.genii.client.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.client.security.WSSecurityUtils;
 
 /**
@@ -229,8 +230,17 @@ public class DelegatedAssertion extends SignedAssertionBaseImpl
 
 	public String toString()
 	{
-		return "(DelegatedAttribute)\n attribute : [" + _delegatedAttribute
-				+ "]";
+		return describe(VerbosityLevel.HIGH);
+	}
+	
+	@Override
+	public String describe(VerbosityLevel verbosity)
+	{
+		if (verbosity.compareTo(VerbosityLevel.HIGH) >= 0)
+			return String.format("(DelegatedAttribute)\n attribute : [%s]",
+				_delegatedAttribute.describe(verbosity));
+		else
+			return _delegatedAttribute.describe(verbosity);
 	}
 
 	public void writeExternal(ObjectOutput out) throws IOException

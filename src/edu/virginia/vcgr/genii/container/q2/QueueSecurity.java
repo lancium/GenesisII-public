@@ -2,7 +2,10 @@ package edu.virginia.vcgr.genii.container.q2;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
@@ -14,12 +17,35 @@ import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 /**
  * This class is a collection of utilities that the queue uses to manipulate
  * certain aspects of security implemented by the queue.  Mostly having to do
- * with the association of identieis with jobs (ownership relationship).
+ * with the association of identities with jobs (ownership relationship).
  * 
  * @author mmm2a
  */
 public class QueueSecurity
 {
+	static final private Pattern HAS_GROUP_TOKEN_PATTERN =
+		Pattern.compile("^.*(?<![a-z])cn=[^,]*group.*$", Pattern.CASE_INSENSITIVE);
+	
+	static public boolean isGroupIdentity(Identity identity)
+	{
+		Matcher matcher = HAS_GROUP_TOKEN_PATTERN.matcher(identity.toString());
+		return matcher.matches();
+	}
+	
+	static private Collection<Identity> filterOutGroups(
+		Collection<Identity> in)
+	{
+		Collection<Identity> ret = new ArrayList<Identity>(in.size());
+		
+		for (Identity test : in)
+		{
+			if (!isGroupIdentity(test))
+				ret.add(test);
+		}
+		
+		return ret;
+	}
+	
 	/**
 	 * Retrieve the list of identities associated with the current calling
 	 * context.  The queue will associate these identities with being the
@@ -29,8 +55,8 @@ public class QueueSecurity
 	 * 
 	 * @throws AuthZSecurityException
 	 */
-	static public Collection<Identity> getCallerIdentities() 
-		throws AuthZSecurityException
+	static public Collection<Identity> getCallerIdentities(
+		boolean filterOutGroups) throws AuthZSecurityException
 	{
 		try
 		{
@@ -38,7 +64,11 @@ public class QueueSecurity
 			ICallingContext callingContext = 
 				ContextManager.getCurrentContext(false);
 			
-			return SecurityUtils.getCallerIdentities(callingContext);
+			if (filterOutGroups)
+				return filterOutGroups(
+					SecurityUtils.getCallerIdentities(callingContext));
+			else
+				return SecurityUtils.getCallerIdentities(callingContext);
 		}
 		catch (GeneralSecurityException gse)
 		{
@@ -73,7 +103,7 @@ public class QueueSecurity
 			return true;
 		
 		/* Now, get the caller's identities. */
-		Collection<Identity> callers = QueueSecurity.getCallerIdentities();
+		Collection<Identity> callers = QueueSecurity.getCallerIdentities(true);
 		
 		/* For each identity that owns the job...*/
 		for (Identity jobOwner : jobOwners)
