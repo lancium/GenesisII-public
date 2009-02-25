@@ -40,8 +40,9 @@ public class FilesystemManager implements Serializable
 		String fsName = path.getFileSystemName();
 		String relativePath = path.getString();
 		
-		if (relativePath.startsWith("/") || relativePath.startsWith("\\"))
-			return new File(relativePath);
+		File tmp = new File(relativePath);
+		if (tmp.isAbsolute())
+			return tmp;
 		
 		if (fsName == null)
 		{
