@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.container.q2;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * Just a collection (size 1 now) of useful utilities used by the queue.
@@ -24,6 +25,7 @@ public class QueueUtils
 		
 		Calendar c = Calendar.getInstance();
 		c.setTime(d);
+		c.setTimeZone(TimeZone.getTimeZone("GMT"));
 		return c;
 	}
 }

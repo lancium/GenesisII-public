@@ -6,7 +6,9 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.rmi.RemoteException;
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.TimeZone;
 
 import edu.virginia.vcgr.genii.client.queue.JobInformation;
 import edu.virginia.vcgr.genii.client.queue.JobTicket;
@@ -31,13 +33,13 @@ public class JobInformationFork
 	extends AbstractStreamableByteIOFactoryResourceFork
 {
 	static private final String _FORMAT =
-		"%1$-36s   %2$tH:%2$tM %2$td %2$tb %2$tY   %3$-4d   %4$s";
+		"%1$-36s   %2$tH:%2$tM %2$tZ %2$td %2$tb %2$tY   %3$-4d   %4$s";
 	
 	static private void printJobInfo(PrintStream out,
 		JobInformation jobInfo)
 	{
 		out.println(String.format(
-			"%1$-36s   %2$-17s   %3$-4s   %4$-8s", 
+			"%1$-36s   %2$-21s   %3$-4s   %4$-8s", 
 			"Ticket", "Submit Time", "Trys", "State"));
 		
 		String stateString = jobInfo.getScheduledOn();
@@ -46,8 +48,12 @@ public class JobInformationFork
 		else
 			stateString = String.format("%s", jobInfo.getJobState());
 		
+		TimeZone tz = TimeZone.getDefault();
+		Calendar submitTime = jobInfo.getSubmitTime();
+		submitTime.setTimeZone(tz);
+		
 		out.println(String.format(
-			_FORMAT, jobInfo.getTicket(), jobInfo.getSubmitTime(),
+			_FORMAT, jobInfo.getTicket(), submitTime,
 			jobInfo.getFailedAttempts(), stateString));
 	}
 	

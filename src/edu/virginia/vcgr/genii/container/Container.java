@@ -208,6 +208,7 @@ public class Container extends ApplicationBase
 			_containerURL = Hostname.normalizeURL(
 				"http://127.0.0.1:" + _containerConfiguration.getListenPort());
 		}
+		System.err.format("Acceptor threads is %d\n", listener.getMaxThreads());
 		server.addListener(listener);
 		
 		HttpContext context = new HttpContext();
