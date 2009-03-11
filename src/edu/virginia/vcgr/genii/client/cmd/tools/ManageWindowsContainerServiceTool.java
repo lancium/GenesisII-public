@@ -70,6 +70,8 @@ public class ManageWindowsContainerServiceTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
+		int result = 0;
+		
 		Properties webContainerProperties = Installation.getDeployment(
 			new DeploymentName()).webContainerProperties();
 		int port = Integer.parseInt(webContainerProperties.getProperty(
@@ -116,14 +118,23 @@ public class ManageWindowsContainerServiceTool extends BaseGridTool
 			
 			if (!success)
 			{
-				_logger.error(String.format(
-					"Failed to execute task(%s) with all retries -- " +
-					"giving up.", eTask));
-				return 1;
+				if (_install)
+				{
+					_logger.error(String.format(
+						"Failed to execute task(%s) with all retries -- " +
+						"giving up.", eTask));
+					return 1;
+				} else
+				{
+					_logger.error(String.format(
+						"Failed to execute task(%s) with all retries -- " +
+						"we'll keep going just in case.", eTask));
+					result = 1;
+				}
 			}
 		}
 		
-		return 0;
+		return result;
 	}
 
 	@Override

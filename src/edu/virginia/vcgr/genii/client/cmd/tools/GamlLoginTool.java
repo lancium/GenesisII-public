@@ -387,9 +387,11 @@ public class GamlLoginTool extends BaseGridTool {
 				} else {
 					handler = new GuiGamlLoginHandler(stdout, stderr, stdin);
 				}
-				_password = new String(handler.getPassword(
-						"Username/Password Login", 
-						"Password for " + _username + ": "));
+				char []pword = handler.getPassword("Username/Password Login",
+					String.format("Password for %s:  ", _username));
+				if (pword == null)
+					return 0;
+				_password = new String(pword);
 			}
 			utCredential = new UsernamePasswordIdentity(_username, _password);
 			

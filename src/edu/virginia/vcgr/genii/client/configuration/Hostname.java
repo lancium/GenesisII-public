@@ -15,6 +15,7 @@
  */
 package edu.virginia.vcgr.genii.client.configuration;
 
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -116,8 +117,12 @@ public class Hostname
 			mode = _EPR_ADDRESSING_MODE_DEFAULT_VALUE;
 		
 		if (mode.equals("ip"))
-			return addr.getHostAddress();
-		else if (mode.equals("dns"))
+		{
+			if (addr instanceof Inet6Address)
+				return String.format("[%s]", addr.getHostAddress());
+			else
+				return addr.getHostAddress();
+		} else if (mode.equals("dns"))
 			return addr.getCanonicalHostName();
 		
 		String dns = addr.getCanonicalHostName();

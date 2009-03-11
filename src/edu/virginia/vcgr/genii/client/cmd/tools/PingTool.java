@@ -11,10 +11,12 @@ import edu.virginia.vcgr.genii.common.GeniiCommon;
 
 public class PingTool extends BaseGridTool
 {
+	static final private String _DEFAULT_MESSAGE = "Hello, World!";
+	
 	static final private String _DESCRIPTION =
 		"Pings a target.";
 	static final private String _USAGE =
-		"ping [--attempts=<number>] <target> <query>";
+		"ping [--attempts=<number>] <target> [<query>]";
 	
 	public PingTool() {
 		super(_DESCRIPTION, _USAGE, false);
@@ -40,18 +42,24 @@ public class PingTool extends BaseGridTool
 		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class,
 			target);
 
-		for (int i = 0; i < _attempts; i++) {
-			String response = common.ping(getArgument(1));
-			stdout.println("Response " + i + ": " + response);
+		String msg = _DEFAULT_MESSAGE;
+		if (numArguments() == 2)
+			msg = getArgument(1);
+		
+		for (int i = 0; i < _attempts; i++) 
+		{
+			String response = common.ping(msg);
+			stdout.format("Response %d:  %s\n", i, response);
 		}
 		
 		return 0;
 	}
 
 	@Override
-	protected void verify() throws ToolException {
-		if (numArguments() != 2) {
+	protected void verify() throws ToolException
+	{
+		int numArgs = numArguments();
+		if ( (numArgs < 1) || (numArgs > 2) )
 			throw new InvalidToolUsageException();
-		}
 	}
 }
