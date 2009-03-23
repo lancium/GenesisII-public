@@ -3,8 +3,13 @@ package edu.virginia.vcgr.genii.client.nativeq;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.mortbay.log.LogFactory;
+
 public class JobStateCache
 {
+	static private Log _logger = LogFactory.getLog(JobStateCache.class);
+	
 	private Map<JobToken, NativeQueueState> _cache =
 		new HashMap<JobToken, NativeQueueState>();
 	private long _lastUpdated = -1L;
@@ -13,6 +18,8 @@ public class JobStateCache
 		BulkStatusFetcher fetcher, long cacheWindow) 
 			throws NativeQueueException
 	{
+		NativeQueueState state;
+		
 		synchronized(_cache)
 		{
 			if ( (_lastUpdated < 0) ||
@@ -24,7 +31,11 @@ public class JobStateCache
 				_lastUpdated = System.currentTimeMillis();
 			}
 			
-			return _cache.get(token);
+			state = _cache.get(token);
 		}
+		
+		_logger.debug(String.format("Status of \"%s\" is %s.\n",
+			token, state));
+		return state;
 	}
 }

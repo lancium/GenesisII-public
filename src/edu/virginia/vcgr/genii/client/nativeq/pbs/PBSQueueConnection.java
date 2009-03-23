@@ -37,7 +37,6 @@ import edu.virginia.vcgr.genii.client.spmd.SPMDTranslatorFactory;
 
 public class PBSQueueConnection extends ScriptBasedQueueConnection
 {
-	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(PBSQueueConnection.class);
 	
 	static final public long DEFAULT_CACHE_WINDOW = 1000L * 30;
@@ -148,7 +147,7 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 	static private class JobStatusParser implements ScriptLineParser
 	{
 		static private Pattern JOB_TOKEN_PATTERN =
-			Pattern.compile("^\\s*Job Id:\\s*([^\\s]+)\\s*$");
+			Pattern.compile("^\\s*Job Id:\\s*(\\S+)\\s*$");
 		static private Pattern JOB_STATE_PATTERN =
 			Pattern.compile("^\\s*job_state\\s*=\\s*(\\S+)\\s*$");
 		
@@ -208,8 +207,11 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 			Map<String, String> stateMap = parser.getStateMap();
 			for (String tokenString : stateMap.keySet())
 			{
-				ret.put(new PBSJobToken(tokenString),
-					PBSQueueState.fromStateSymbol(stateMap.get(tokenString)));
+				PBSJobToken token = new PBSJobToken(tokenString);
+				PBSQueueState state = PBSQueueState.fromStateSymbol(
+					stateMap.get(tokenString));
+				_logger.debug(String.format("Putting %s[%s]\n", token, state));
+				ret.put(token, state);
 			}
 			
 			return ret;
