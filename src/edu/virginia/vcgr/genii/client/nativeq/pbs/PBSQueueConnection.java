@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -21,12 +22,13 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
 import edu.virginia.vcgr.genii.client.nativeq.ApplicationDescription;
 import edu.virginia.vcgr.genii.client.nativeq.BasicResourceAttributes;
+import edu.virginia.vcgr.genii.client.nativeq.BulkStatusFetcher;
 import edu.virginia.vcgr.genii.client.nativeq.FactoryResourceAttributes;
+import edu.virginia.vcgr.genii.client.nativeq.JobStateCache;
 import edu.virginia.vcgr.genii.client.nativeq.JobToken;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueException;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueState;
 import edu.virginia.vcgr.genii.client.nativeq.ScriptBasedQueueConnection;
-import edu.virginia.vcgr.genii.client.nativeq.ScriptExecutionException;
 import edu.virginia.vcgr.genii.client.nativeq.ScriptLineParser;
 import edu.virginia.vcgr.genii.client.spmd.SPMDException;
 import edu.virginia.vcgr.genii.client.spmd.SPMDTranslator;
@@ -38,8 +40,11 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(PBSQueueConnection.class);
 	
+	static final public long DEFAULT_CACHE_WINDOW = 1000L * 30;
 	static final public URI PBS_MANAGER_TYPE = URI.create(
 		"http://vcgr.cs.virginia.edu/genesisII/nativeq/pbs");
+	
+	private JobStateCache _statusCache;
 	
 	private String _qName;
 	
@@ -48,10 +53,13 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 	private File _qdelBinary;
 	
 	PBSQueueConnection(File workingDirectory, Properties connectionProperties,
-		String queueName, File qsubBinary, File qstatBinary, File qdelBinary)
+		String queueName, File qsubBinary, File qstatBinary, File qdelBinary,
+		JobStateCache statusCache)
 			throws NativeQueueException
 	{
 		super(workingDirectory, connectionProperties);
+		
+		_statusCache = statusCache;
 		
 		_qName = queueName;
 		
@@ -139,30 +147,72 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 
 	static private class JobStatusParser implements ScriptLineParser
 	{
-		static private Pattern PATTERN =
+		static private Pattern JOB_TOKEN_PATTERN =
+			Pattern.compile("^\\s*Job Id:\\s*([^\\s]+)\\s*$");
+		static private Pattern JOB_STATE_PATTERN =
 			Pattern.compile("^\\s*job_state\\s*=\\s*(\\S+)\\s*$");
 		
-		private String _stateToken = null;
+		private Map<String, String> _matchedPairs =
+			new HashMap<String, String>();
+		
+		private String _lastToken = null;
+		private String _lastState = null;
 		
 		@Override
 		public Pattern[] getHandledPatterns()
 		{
-			return new Pattern[] { PATTERN };
+			return new Pattern[] { JOB_TOKEN_PATTERN, JOB_STATE_PATTERN };
 		}
 
 		@Override
 		public void parseLine(Matcher matcher) throws NativeQueueException
 		{
-			_stateToken = matcher.group(1);
+			if (matcher.pattern() == JOB_TOKEN_PATTERN)
+				_lastToken = matcher.group(1);
+			else if (matcher.pattern() == JOB_STATE_PATTERN)
+			{
+				_lastState = matcher.group(1);
+				if (_lastToken == null)
+					throw new NativeQueueException(
+						"Unable to parse status output.");
+				
+				_matchedPairs.put(_lastToken, _lastState);
+				_lastToken = null;
+				_lastState = null;
+			} else
+				throw new NativeQueueException(
+					"Unable to parse status output.");
 		}
 		
-		public String getStateToken()
+		public Map<String, String> getStateMap()
 			throws NativeQueueException
 		{
-			if (_stateToken == null)
-				throw new NativeQueueException("Unable to parse qstat output.");
+			return _matchedPairs;
+		}
+	}
+	
+	private class BulkPBSStatusFetcher implements BulkStatusFetcher
+	{
+		@Override
+		public Map<JobToken, NativeQueueState> getStateMap()
+				throws NativeQueueException
+		{
+			Map<JobToken, NativeQueueState> ret = 
+				new HashMap<JobToken, NativeQueueState>();
 			
-			return _stateToken;
+			ProcessBuilder builder = new ProcessBuilder(
+				_qstatBinary.getAbsolutePath(), "-f");
+			String result = execute(builder);
+			JobStatusParser parser = new JobStatusParser();
+			parseResult(result, parser);
+			Map<String, String> stateMap = parser.getStateMap();
+			for (String tokenString : stateMap.keySet())
+			{
+				ret.put(new PBSJobToken(tokenString),
+					PBSQueueState.fromStateSymbol(stateMap.get(tokenString)));
+			}
+			
+			return ret;
 		}
 	}
 	
@@ -170,25 +220,12 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 	public NativeQueueState getStatus(JobToken token)
 			throws NativeQueueException
 	{
-		try
-		{
-			ProcessBuilder builder = new ProcessBuilder(
-				_qstatBinary.getAbsolutePath(), "-f", token.toString());
-			String result = execute(builder);
-			JobStatusParser parser = new JobStatusParser();
-			parseResult(result, parser);
-			return PBSQueueState.fromStateSymbol(parser.getStateToken());
-		}
-		catch (ScriptExecutionException see)
-		{
-			if (see.getExitCode() == 153)
-			{
-				// This just means the job isn't in there -- probably exited
-				return PBSQueueState.fromStateSymbol("E");
-			}
-			
-			throw see;
-		}
+		NativeQueueState state = _statusCache.get(
+			token, new BulkPBSStatusFetcher(), DEFAULT_CACHE_WINDOW);
+		if (state == null)
+			state = PBSQueueState.fromStateSymbol("E");
+		
+		return state;
 	}
 
 	@Override

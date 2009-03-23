@@ -7,6 +7,7 @@ import java.util.Properties;
 
 import edu.virginia.vcgr.genii.client.nativeq.AbstractNativeQueue;
 import edu.virginia.vcgr.genii.client.nativeq.BinariesDescription;
+import edu.virginia.vcgr.genii.client.nativeq.JobStateCache;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConnection;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueException;
 
@@ -49,6 +50,8 @@ public class PBSQueue extends AbstractNativeQueue
 		_defaultsMap.put(QUEUE_QDEL_PATH_PROPERTY, DEFAULT_QDEL_COMMAND);
 	}
 	
+	private JobStateCache _statusCache = new JobStateCache();
+	
 	public PBSQueue()
 	{
 		super(PROVIDER_NAME);
@@ -71,6 +74,7 @@ public class PBSQueue extends AbstractNativeQueue
 			connectionProperties, qname, 
 			binDesc.get(QUEUE_QSUB_PATH_PROPERTY),
 			binDesc.get(QUEUE_QSTAT_PATH_PROPERTY),
-			binDesc.get(QUEUE_QDEL_PATH_PROPERTY));
+			binDesc.get(QUEUE_QDEL_PATH_PROPERTY),
+			_statusCache);
 	}
 }
