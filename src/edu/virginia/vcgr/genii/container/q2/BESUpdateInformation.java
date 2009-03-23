@@ -91,6 +91,13 @@ public class BESUpdateInformation
 		return responsive && _available;
 	}
 	
+	private Date nextUpdate(Date now)
+	{
+		long timeToWait = (_updateCycle << _misses);
+		
+		return new Date(now.getTime() + timeToWait);
+	}
+	
 	/**
 	 * Check to see if it's time for another update check.
 	 * 
@@ -117,5 +124,23 @@ public class BESUpdateInformation
 		
 		/* We need to update if the timeToWait interval has already passed. */
 		return (now.getTime() - _lastUpdated.getTime() >= timeToWait);
+	}
+	
+	@Override
+	public String toString()
+	{
+		Date now = new Date();
+		Date nextUpdate = nextUpdate(now);
+		
+		String responsiveString = "available";
+		if (!_available)
+			responsiveString = "not available";
+		else if (!isAvailable())
+			responsiveString = "not responsive";
+		
+		return String.format("%s (misses = %d, last-updated = %3$tT %3$tD, \n" +
+			"\tlast-responsive = %4$tT %4$tD, next-update = %5$tT %5$tD)",
+			responsiveString, _misses, _lastUpdated, _lastResponsive,
+			nextUpdate);
 	}
 }

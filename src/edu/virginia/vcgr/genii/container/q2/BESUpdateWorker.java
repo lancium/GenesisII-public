@@ -22,18 +22,20 @@ public class BESUpdateWorker implements OutcallHandler
 {
 	static private Log _logger = LogFactory.getLog(BESUpdateWorker.class);
 	
+	private String _besName;
 	private DatabaseConnectionPool _connectionPool;
 	private BESManager _manager;
 	private long _besID;
 	private IBESPortTypeResolver _portTypeResolver;
 	
 	public BESUpdateWorker(DatabaseConnectionPool connectionPool,
-		BESManager manager, long besID, 
+		BESManager manager, long besID, String besName, 
 		IBESPortTypeResolver clientStubResolver)
 	{
 		_connectionPool = connectionPool;
 		_manager = manager;
 		_besID = besID;
+		_besName = besName;
 		_portTypeResolver = clientStubResolver;
 	}
 	
@@ -77,12 +79,12 @@ public class BESUpdateWorker implements OutcallHandler
 			 */
 			GeniiBESPortType clientStub = _portTypeResolver.createClientStub(
 				connection, _besID);
-			ClientUtils.setTimeout(clientStub, 8 * 1000);
+			ClientUtils.setTimeout(clientStub, 120 * 1000);
 			
 			/* Go ahead and Mark the BES as missed until we have actually
 			 * communicated with it.
 			 */
-			_manager.markBESAsMissed(_besID);
+			_manager.markBESAsMissed(_besID, "Startup procedure");
 			
 			/* Make the out call to the BES object to get it's factory 
 			 * attributes */
@@ -95,11 +97,14 @@ public class BESUpdateWorker implements OutcallHandler
 			if (resp.getFactoryResourceAttributesDocument(
 				).isIsAcceptingNewActivities())
 			{
+				_logger.info(String.format(
+					"Marking container %s as available.", _besName));
 				_manager.markBESAsAvailable(_besID);
 			} else
 			{
 				/* Otherwise, we mark it as unavailable */
-				_manager.markBESAsUnavailable(_besID);
+				_manager.markBESAsUnavailable(_besID, 
+					"Not currently accepting activities");
 			}
 		}
 		catch (Throwable cause)
@@ -107,8 +112,12 @@ public class BESUpdateWorker implements OutcallHandler
 			/* If we couldn't talk to the container at all, then we mark it
 			 * as missed.
 			 */
-			_logger.warn("Unable to update BES container " + _besID, cause);
-			_manager.markBESAsMissed(_besID);
+			_logger.warn(String.format(
+				"Unable to update BES container %s(%d).", 
+				_besName, _besID), cause);
+			_manager.markBESAsMissed(_besID, String.format(
+				"Exception during communication %s(%s)", 
+				cause.getClass().getName(), cause.getLocalizedMessage()));
 		}
 		finally
 		{

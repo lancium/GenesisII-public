@@ -102,7 +102,8 @@ public class DBISResource extends RNSDBResource implements IISResource{
 			stmt.setString(2, resourceName);
 			stmt.setBlob(3, EPRUtils.toBlob(resourceEndpoint));
 			stmt.setBlob(4, EPRUtils.toBlob(serviceEndpoint));
-			stmt.setBlob(5, DBSerializer.toBlob(callingContext));
+			stmt.setBlob(5, DBSerializer.toBlob(callingContext,
+				_connection, "isbescontainers", "callingcontext"));
 			if (stmt.executeUpdate() != 1)
 				throw new ResourceException("Unable to update database.");
 			stmt.close();

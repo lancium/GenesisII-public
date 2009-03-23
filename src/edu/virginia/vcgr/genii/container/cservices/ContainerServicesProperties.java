@@ -195,7 +195,8 @@ public class ContainerServicesProperties
 				stmt = connection.prepareStatement(
 					"UPDATE containerservicesproperties " +
 					"SET value = ? WHERE name = ?");
-				stmt.setBlob(1, DBSerializer.toBlob(newValue));
+				stmt.setBlob(1, DBSerializer.toBlob(newValue,
+					connection, "containerservicesproperties", "value"));
 				stmt.setString(2, propertyName);
 				if (stmt.executeUpdate() != 1)
 					throw new SQLException(
@@ -209,7 +210,8 @@ public class ContainerServicesProperties
 					"INSERT INTO containerservicesproperties (name, value) " +
 					"VALUES (?, ?)");
 				stmt.setString(1, propertyName);
-				stmt.setBlob(2, DBSerializer.toBlob(newValue));
+				stmt.setBlob(2, DBSerializer.toBlob(newValue,
+					connection, "containerservicesproperties", "value"));
 				if (stmt.executeUpdate() != 1)
 					throw new SQLException(
 						"Unable to insert property into database.");

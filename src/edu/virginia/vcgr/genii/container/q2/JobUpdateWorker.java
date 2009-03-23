@@ -86,7 +86,7 @@ public class JobUpdateWorker implements OutcallHandler
 				connection, _jobInfo.getJobID());
 			GeniiBESPortType clientStub = _clientStubResolver.createClientStub(
 				connection, _jobInfo.getBESID());
-			ClientUtils.setTimeout(clientStub, 8 * 1000);
+			ClientUtils.setTimeout(clientStub, 120 * 1000);
 			
 			if (jobEndpoint == null)
 			{
@@ -135,14 +135,15 @@ public class JobUpdateWorker implements OutcallHandler
 				if (state.isFailedState())
 				{
 					/* If the job failed in the BES, fail it in the queue */
-					if (!_jobManager.failJob(connection, _jobInfo.getJobID(), true))
+					if (!_jobManager.failJob(connection, _jobInfo.getJobID(), 
+						true, false))
 						PostTargets.poster().post(
 							JobEvent.jobFailed(null, 
 								Long.toString(_jobInfo.getJobID())));
 				} else if (state.isCancelledState())
 				{
 					/* If the job was cancelled, then finish it here */
-					_jobManager.failJob(connection, _jobInfo.getJobID(), false);
+					_jobManager.failJob(connection, _jobInfo.getJobID(), false, false);
 					PostTargets.poster().post(JobEvent.jobKilled(null,
 						Long.toString(_jobInfo.getJobID())));
 				} else if (state.isFinishedState())

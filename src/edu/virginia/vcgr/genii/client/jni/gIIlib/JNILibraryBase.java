@@ -9,6 +9,7 @@ import edu.virginia.vcgr.fsii.path.FilesystemPathRepresentation;
 import edu.virginia.vcgr.fsii.path.UnixFilesystemPathRepresentation;
 import edu.virginia.vcgr.genii.client.ApplicationBase;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.gfs.GenesisIIFilesystem;
@@ -40,7 +41,8 @@ public abstract class JNILibraryBase extends ApplicationBase
 		try 
 		{
 			callingContext = ContextManager.getCurrentContext(false);
-			ClientUtils.checkAndRenewCredentials(callingContext, new Date());
+			ClientUtils.checkAndRenewCredentials(callingContext, new Date(),
+				new SecurityUpdateResults());
 			
 			if (didInit)
 			{

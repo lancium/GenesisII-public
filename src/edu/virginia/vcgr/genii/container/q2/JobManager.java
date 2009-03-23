@@ -2,6 +2,8 @@ package edu.virginia.vcgr.genii.container.q2;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.security.GeneralSecurityException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -31,6 +33,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.bes.BESUtils;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
@@ -216,7 +219,7 @@ public class JobManager implements Closeable
 			"container went down.");
 		for (JobData job : starting)
 		{
-			failJob(connection, job.getJobID(), false);
+			failJob(connection, job.getJobID(), false, false);
 		}
 	}
 	
@@ -232,7 +235,7 @@ public class JobManager implements Closeable
 	 * @throws ResourceException
 	 */
 	synchronized public boolean failJob(Connection connection, 
-		long jobID, boolean countAsAnAttempt)
+		long jobID, boolean countAsAnAttempt, boolean isPermanent)
 		throws SQLException, ResourceException
 	{
 		boolean ret = false;
@@ -247,7 +250,14 @@ public class JobManager implements Closeable
 		/* Increment his attempt count if this counts against him. */
 		if (countAsAnAttempt)
 		{
-			job.incrementRunAttempts();
+			if (isPermanent)
+			{
+				job.incrementRunAttempts(
+					_MAX_RUN_ATTEMPTS - job.getRunAttempts());
+			} else
+			{
+				job.incrementRunAttempts();
+			}
 			job.setNextValidRunTime(new Date());
 		}
 		
@@ -852,6 +862,40 @@ public class JobManager implements Closeable
 		originalCount, newCount));
 	}
 	
+	synchronized public void summarize(PrintStream out)
+	{
+		long queued = 0;
+		long running = 0;
+		long starting = 0;
+		long finished = 0;
+		long error = 0;
+		long requeued = 0;
+		
+		out.println("Queue Job Summary\n-----------------------------\n");
+		for (JobData jobData : _jobsByID.values())
+		{
+			QueueStates state = jobData.getJobState();
+			if (state == QueueStates.QUEUED)
+				queued++;
+			else if (state == QueueStates.REQUEUED)
+				requeued++;
+			else if (state == QueueStates.STARTING)
+				starting++;
+			else if (state == QueueStates.RUNNING)
+				running++;
+			else if (state == QueueStates.ERROR)
+				error++;
+			else if (state == QueueStates.FINISHED)
+				finished++;
+		}
+		out.format("\tQueued:     %d\n", queued);
+		out.format("\tRe-queued:  %d\n", requeued);
+		out.format("\tStarting:   %d\n", starting);
+		out.format("\tRunning:    %d\n", running);
+		out.format("\tError:      %d\n", error);
+		out.format("\tFinished:   %d\n", finished);
+	}
+	
 	/**
 	 * This method is called periodically by a watcher thread to check on the
 	 * current statuses of all jobs running in the queue (the poll'ing method
@@ -1205,6 +1249,7 @@ public class JobManager implements Closeable
 		
 		public void run()
 		{
+			boolean isPermanent = false;
 			ICallingContext startCtxt = null;
 			Connection connection = null;
 			EntryType entryType;
@@ -1221,6 +1266,18 @@ public class JobManager implements Closeable
 				 */
 				JobStartInformation startInfo = _database.getStartInformation(
 					connection, _jobID);
+				
+				SecurityUpdateResults checkResults = new SecurityUpdateResults();
+				ClientUtils.checkAndRenewCredentials(startInfo.getCallingContext(),
+					new Date(System.currentTimeMillis() + 1000l * 60 * 10),
+					checkResults);
+				if (checkResults.removedCredentials().size() > 0)
+				{
+					isPermanent = true;
+					throw new GeneralSecurityException(
+						"A job's credentials expired so we can't make " +
+						"any further progress on it.  Failing it.");
+				}
 				
 				/* Use the database's fillInBESEPRs function to get the EPR of
 				 * the BES container that we are going to launch on.
@@ -1267,7 +1324,7 @@ public class JobManager implements Closeable
 					GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, 
 						entryType.getEntry_reference(), 
 						startCtxt);
-					ClientUtils.setTimeout(bes, 8 * 1000);
+					ClientUtils.setTimeout(bes, 120 * 1000);
 					ActivityDocumentType adt = new ActivityDocumentType(
 						startInfo.getJSDL(), null);
 					EndpointReferenceType queueEPR = 
@@ -1319,7 +1376,10 @@ public class JobManager implements Closeable
 			}
 			catch (Throwable cause)
 			{
-				_logger.warn("Unable to start job " + _jobID, cause);
+				_logger.warn(String.format(
+					"Unable to start job %d.  Exception class is %s.", 
+					_jobID, cause.getClass().getName()), cause);
+				
 				boolean countAgainstJob;
 				boolean countAgainstBES;
 				
@@ -1339,6 +1399,14 @@ public class JobManager implements Closeable
 				{
 					countAgainstJob = true;
 					countAgainstBES = false;
+				} else if (cause instanceof GenesisIISecurityException)
+				{
+					countAgainstJob = true;
+					countAgainstBES = false;
+				} else if (cause instanceof GeneralSecurityException)
+				{
+					countAgainstJob = true;
+					countAgainstBES = false;
 				} else
 				{
 					countAgainstJob = true;
@@ -1346,7 +1414,12 @@ public class JobManager implements Closeable
 				}
 				
 				if (countAgainstBES)
-					_besManager.markBESAsUnavailable(_besID);
+				{
+					_besManager.markBESAsUnavailable(_besID, 
+						String.format("Exception during job start %s(%s)",
+							cause.getClass().getName(), 
+							cause.getLocalizedMessage()));
+				}
 				
 				if (data != null && countAgainstJob)
 					data.setNextValidRunTime(new Date());
@@ -1354,7 +1427,8 @@ public class JobManager implements Closeable
 				try 
 				{
 					/* We got an exception, so fail the job. */
-					failJob(connection, _jobID, countAgainstJob);
+					failJob(connection, _jobID, countAgainstJob,
+						isPermanent);
 					PostTargets.poster().post(JobEvent.jobFailed(
 						startCtxt, Long.toString(_jobID)));
 					_schedulingEvent.notifySchedulingEvent();
@@ -1446,7 +1520,7 @@ public class JobManager implements Closeable
 				GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, 
 					killInfo.getBESEndpoint(), 
 					killInfo.getCallingContext());
-				ClientUtils.setTimeout(bes, 8 * 1000);
+				ClientUtils.setTimeout(bes, 120 * 1000);
 				bes.terminateActivities(new TerminateActivitiesType(
 					new EndpointReferenceType[] {
 						killInfo.getJobEndpoint()

@@ -20,5 +20,6 @@ public class RootRNSFork extends StaticRNSResourceFork
 		addDefaultEntry("resource-slots", ResourceSlotsRNSFork.class);
 		addDefaultEntry("jobs", JobsRNSFork.class);
 		addDefaultEntry("submission-point", JobSubmissionFork.class);
+		addDefaultEntry("summary", QueueSummaryResourceFork.class);
 	}
 }

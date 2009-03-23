@@ -5,6 +5,7 @@ import java.security.GeneralSecurityException;
 import java.util.Date;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 
@@ -36,7 +37,8 @@ public class RenewableClientAttribute extends DelegatedAttribute implements
 		KeyAndCertMaterial clientKeyMaterial =
 			ClientUtils.checkAndRenewCredentials(
 				_callingContext, 
-				constraints == null ? new Date() : constraints.getExpiration());
+				constraints == null ? new Date() : constraints.getExpiration(),
+				new SecurityUpdateResults());
 
 		if ((assertion == null) || (clientKeyMaterial._clientCertChain == null))
 		{

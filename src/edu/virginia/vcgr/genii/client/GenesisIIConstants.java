@@ -10,7 +10,7 @@ public class GenesisIIConstants
 	static public final String OGSA_BP_NS =
 		"http://schemas.ggc.org/ogsa/2006/05/wsrf-bp";
 	
-	static public final long CredentialExpirationMillis = 1000 * 60 * 60 * 24; // valid 24 hours
+	static public final long CredentialExpirationMillis = 1000 * 60 * 60 * 24 * 7; // valid 7 days
  
 	static public final String NAMING_CLIENT_CONFORMANCE_PROPERTY = "IsWSNamingClient";
 	

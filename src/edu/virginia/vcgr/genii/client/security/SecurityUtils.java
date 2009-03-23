@@ -16,6 +16,7 @@ import java.util.List;
 
 import edu.virginia.vcgr.genii.common.security.CertificateChainType;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.comm.axis.AxisClientInvocationHandler;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationUnloadedListener;
@@ -293,7 +294,8 @@ public class SecurityUtils
 					"Error processing GAML credential: No calling context");
 			
 			// remove/renew stale creds/attributes
-			ClientUtils.checkAndRenewCredentials(callingContext, new Date());
+			ClientUtils.checkAndRenewCredentials(callingContext, new Date(),
+				new SecurityUpdateResults());
 
 			TransientCredentials transientCredentials = 
 				TransientCredentials.getTransientCredentials(callingContext);

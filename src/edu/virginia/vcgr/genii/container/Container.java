@@ -68,11 +68,6 @@ public class Container extends ApplicationBase
 	static private AxisServer _axisServer = null;
 	static private ContainerConfiguration _containerConfiguration;
 	
-	/* MOOCH
-	static private EventManager _eventManager;
-	static private AlarmManager _alarmManager;
-	static private LifetimeVulture _vulture;
-	*/
 	static private String _containerURL;
 	
 	static private X509Certificate[] _containerCertChain;
@@ -115,10 +110,6 @@ public class Container extends ApplicationBase
 		
 		try
 		{
-// MOOCH			_eventManager = new EventManager();
-// MOOCH			_alarmManager = new AlarmManager(_eventManager);
-// MOOCH			_vulture = new LifetimeVulture(_eventManager, _alarmManager);
-			
 			WSDDProvider.registerProvider(
 				GAroundInvokerFactory.PROVIDER_QNAME,
 				new GAroundInvokerFactory());
@@ -150,13 +141,6 @@ public class Container extends ApplicationBase
 	{
 		return _containerConfiguration;
 	}
-	
-	/* MOOCH
-	static public LifetimeVulture getLifetimeVulture()
-	{
-		return _vulture;
-	}
-	*/
 	
 	static private org.apache.axis.Handler getHandler(
 			SimpleChain handlerChain, 
@@ -208,7 +192,10 @@ public class Container extends ApplicationBase
 			_containerURL = Hostname.normalizeURL(
 				"http://127.0.0.1:" + _containerConfiguration.getListenPort());
 		}
-		System.err.format("Acceptor threads is %d\n", listener.getMaxThreads());
+		
+		_logger.info(String.format("Setting max acceptor threads to %d\n",
+			_containerConfiguration.getMaxAcceptorThreads()));
+		listener.setMaxThreads(_containerConfiguration.getMaxAcceptorThreads());
 		server.addListener(listener);
 		
 		HttpContext context = new HttpContext();

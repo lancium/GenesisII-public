@@ -38,6 +38,7 @@ import org.apache.ws.security.WSEncryptionPart;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.comm.CommConstants;
+import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.comm.axis.security.MessageSecurityData;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
@@ -184,7 +185,8 @@ public class AxisClientHeaderHandler extends BasicHandler
 		} else {
 			// update any stale creds
 			try { 
-				ClientUtils.checkAndRenewCredentials(callContext, new Date()); 
+				ClientUtils.checkAndRenewCredentials(callContext, new Date(),
+					new SecurityUpdateResults()); 
 			} catch (GeneralSecurityException e) {
 				throw new GenesisIISecurityException("Could not prepare outgoing calling context: " + e.getMessage(), e);
 			}	

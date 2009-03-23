@@ -419,9 +419,11 @@ public class QueueDatabase
 				"VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?)");
 			stmt.setString(1, ticket);
 			stmt.setString(2, _queueID);
-			stmt.setBlob(3, DBSerializer.toBlob(callingContext));
+			stmt.setBlob(3, DBSerializer.toBlob(callingContext,
+				connection, "q2jobs", "callingcontext"));
 			stmt.setBlob(4, DBSerializer.xmlToBlob(jsdl));
-			stmt.setBlob(5, DBSerializer.toBlob(identities));
+			stmt.setBlob(5, DBSerializer.toBlob(identities,
+				connection, "q2jobs", "owners"));
 			stmt.setShort(6, priority);
 			stmt.setString(7, state.name());
 			stmt.setTimestamp(8, new Timestamp(submitTime.getTime()));

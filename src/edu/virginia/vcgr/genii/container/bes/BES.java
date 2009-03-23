@@ -299,16 +299,20 @@ public class BES implements Closeable
 			stmt.setString(1, activityid);
 			stmt.setString(2, _besid);
 			stmt.setBlob(3, DBSerializer.xmlToBlob(jsdl));
-			stmt.setBlob(4, DBSerializer.toBlob(owners));
-			stmt.setBlob(5, DBSerializer.toBlob(callingContext));
-			stmt.setBlob(6, DBSerializer.toBlob(state));
+			stmt.setBlob(4, DBSerializer.toBlob(owners,
+				connection, "besactivitiestable", "owners"));
+			stmt.setBlob(5, DBSerializer.toBlob(callingContext,
+				connection, "besactivitiestable", "callingcontext"));
+			stmt.setBlob(6, DBSerializer.toBlob(state,
+				connection, "besactivitiestable", "state"));
 			stmt.setTimestamp(7, new Timestamp(System.currentTimeMillis()));
 			stmt.setShort(8, (short)0);
 			stmt.setShort(9, (short)0);
 			stmt.setString(10, String.format("%s%s", 
 				activityCWD.mustDelete() ? "d" : "k",
 				activityCWD.getWorkingDirectory().getAbsolutePath()));
-			stmt.setBlob(11, DBSerializer.toBlob(executionPlan));
+			stmt.setBlob(11, DBSerializer.toBlob(executionPlan,
+				connection, "besactivitiestable", "executionplan"));
 			stmt.setInt(12, 0);
 			stmt.setBlob(13, EPRUtils.toBlob(activityEPR));
 			stmt.setString(14, activityServiceName);

@@ -5,6 +5,7 @@ import java.util.Date;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.VerbosityLevel;
@@ -44,7 +45,8 @@ public class WhoamiTool extends BaseGridTool
 		else
 		{
 			// remove/renew stale creds/attributes
-			ClientUtils.checkAndRenewCredentials(callingContext, new Date());
+			ClientUtils.checkAndRenewCredentials(callingContext, new Date(),
+				new SecurityUpdateResults());
 
 			TransientCredentials transientCredentials = 
 				TransientCredentials.getTransientCredentials(callingContext);

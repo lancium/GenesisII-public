@@ -127,8 +127,8 @@ public class ClientUtils
 	 * @throws GeneralSecurityException
 	 */
 	public static KeyAndCertMaterial checkAndRenewCredentials(
-		ICallingContext callContext, Date validUntil)
-			throws GeneralSecurityException 
+		ICallingContext callContext, Date validUntil, 
+		SecurityUpdateResults results) throws GeneralSecurityException 
 	{
 		boolean updated = false;
 		KeyAndCertMaterial retval = callContext.getActiveKeyAndCertMaterial();
@@ -136,26 +136,31 @@ public class ClientUtils
 			TransientCredentials.getTransientCredentials(callContext)._credentials;
 
 		// Ensure client identity is valid
-		try {
-			if (retval == null) {
+		try
+		{
+			if (retval == null) 
+			{
 				// we never had any client identity
 				throw new CertificateExpiredException("Could not find caller's identity and key material.");
 			}
 				
 			// check the time validity of our client identity
-			for (X509Certificate cert : retval._clientCertChain) {
+			for (X509Certificate cert : retval._clientCertChain) 
+			{
 				// (Check 10 seconds into the future so as to avoid the credential
 				// expiring in-flight)
 				cert.checkValidity(new Date(validUntil.getTime() + 10000));
 			}
-		} catch (CertificateExpiredException e) {
-
-			if (!ConfigurationManager.getCurrentConfiguration().isClientRole()) {
+		}
+		catch (CertificateExpiredException e) 
+		{
+			if (!ConfigurationManager.getCurrentConfiguration().isClientRole())
+			{
 				// We're a resource operating inside this container with 
 				// a specific identity that has now expired.
 				throw e;
-			
-			} else {	
+			} else
+			{	
 				// We're in the client role, meaning we can generate our own 
 				// new client identity.
 
@@ -173,18 +178,24 @@ public class ClientUtils
 				
 				// Any delegated credentials must be discarded or renewed
 				Iterator<GamlCredential> itr = credentials.iterator();
-				while (itr.hasNext()) {
+				while (itr.hasNext())
+				{
 					GamlCredential cred = itr.next();
-					if (cred instanceof DelegatedAssertion) {
-							if (cred instanceof Renewable) {
-								_logger.warn(e.getMessage() + " : Attempting to renew credential " + cred);
-								TransientCredentials._logger.debug("Attempting to renew stale credential from current calling context credentials.");
-								((Renewable) cred).renew();
-							} else {
-								_logger.warn("Discarding non-renewable delegated credential " + cred);
-								TransientCredentials._logger.debug("Removing stale non-renewable credential from current calling context credentials.");
-								itr.remove();
-							}
+					if (cred instanceof DelegatedAssertion) 
+					{
+						if (cred instanceof Renewable) 
+						{
+							_logger.warn(e.getMessage() + " : Attempting to renew credential " + cred);
+							TransientCredentials._logger.debug("Attempting to renew stale credential from current calling context credentials.");
+							((Renewable) cred).renew();
+							results.noteRenewedCredential(cred);
+						} else 
+						{
+							_logger.warn("Discarding non-renewable delegated credential " + cred);
+							TransientCredentials._logger.debug("Removing stale non-renewable credential from current calling context credentials.");
+							itr.remove();
+							results.noteRemovedCredential(cred);
+						}
 					}
 				}
 			}
@@ -192,30 +203,42 @@ public class ClientUtils
 		
 		// remove stale credentials
 		Iterator<GamlCredential> itr = credentials.iterator();
-		while (itr.hasNext()) {
+		while (itr.hasNext()) 
+		{
 			GamlCredential cred = itr.next();
-			try {
+			try 
+			{
 				// (Check 10 seconds into the future so as to avoid the credential
 				// expiring in-flight)
 				cred.checkValidity(new Date(System.currentTimeMillis() + (10 * 1000)));
-			} catch (AttributeExpiredException e) {
+			}
+			catch (AttributeExpiredException e) 
+			{
 				updated = true;
-				if (cred instanceof Renewable) {
+				if (cred instanceof Renewable)
+				{
 					_logger.warn(e.getMessage() + " : Attempting to renew credential " + cred);
 					((Renewable) cred).renew();
-				} else {
+					results.noteRenewedCredential(cred);
+				} else 
+				{
 					_logger.warn(e.getMessage() + " : Discarding credential " + cred);
 					itr.remove();
+					results.noteRemovedCredential(cred);
 				}
 			}
 		}
 
 		// persist any updates
-		try {
-			if (updated) {
+		try 
+		{
+			if (updated) 
+			{
 				ContextManager.storeCurrentContext(callContext);
 			}
-		} catch (Exception ex) {
+		} 
+		catch (Exception ex) 
+		{
 			_logger.warn(ex, ex);
 		}
 		

@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.container.q2;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -401,6 +402,15 @@ public class BESManager implements Closeable
 		return data.getTotalSlots();
 	}
 	
+	synchronized public String getBESName(long id)
+	{
+		BESData data = _containersByID.get(new Long(id));
+		if (data == null)
+			return "<unknown>";
+		
+		return data.getName();
+	}
+	
 	/**
 	 * Make out-calls to the indicated resources to get their latest 
 	 * update information.
@@ -439,8 +449,12 @@ public class BESManager implements Closeable
 			
 			/* Go ahead and enqueue a new "update" worker into the outcall 
 			 * thread pool. */
+			String besName = "<unknown>";
+			BESData data = _containersByID.get(new Long(info.getBESID()));
+			if (data != null)
+				besName = data.getName();
 			_outcallThreadPool.enqueue(new BESUpdateWorker(_connectionPool,
-				this, info.getBESID(), resolver));
+				this, info.getBESID(), besName, resolver));
 		}
 	}
 	
@@ -527,7 +541,7 @@ public class BESManager implements Closeable
 	 * @param besID The key of the resource that we need to mark as
 	 * unavailable.
 	 */
-	synchronized public void markBESAsUnavailable(long besID)
+	synchronized public void markBESAsUnavailable(long besID, String reason)
 	{
 		/* Find it's update information structure and mark it as down */
 		BESUpdateInformation updateInfo = _updateInformation.get(
@@ -542,8 +556,9 @@ public class BESManager implements Closeable
 		 * it's name. This costs us a little time, but not enough to worry 
 		 * about. */
 		BESData data = _containersByID.get(new Long(besID));
-		_logger.info("Marking BES container \"" + data.getName() 
-			+ "\" as un-available.");
+		_logger.info(String.format(
+			"Marking BES container \"%s\" as un-available:  %s.", 
+			data.getName(), reason));
 	}
 	
 	/**
@@ -554,7 +569,7 @@ public class BESManager implements Closeable
 	 * @param besID The key of the resource that we need to mark as
 	 * missed.
 	 */
-	synchronized public void markBESAsMissed(long besID)
+	synchronized public void markBESAsMissed(long besID, String reason)
 	{
 		BESUpdateInformation updateInfo = _updateInformation.get(
 			new Long(besID));
@@ -568,8 +583,9 @@ public class BESManager implements Closeable
 		 * it's name. This costs us a little time, but not enough to worry 
 		 * about. */
 		BESData data = _containersByID.get(new Long(besID));
-		_logger.info("Marking BES container \"" + data.getName() 
-			+ "\" as un-responsive.");
+		_logger.info(String.format(
+			"Marking BES container \"%s\" as un-responsive.  %s.", 
+			data.getName(), reason));
 	}
 	
 	/**
@@ -624,6 +640,23 @@ public class BESManager implements Closeable
 			 */
 			return ClientUtils.createProxy(GeniiBESPortType.class, 
 				entry.getEntry_reference(), _callingContext);
+		}
+	}
+	
+	synchronized public void summarize(PrintStream out) 
+		throws IOException, SQLException
+	{
+		out.println("BES Resource Summary\n-----------------------------\n");
+		for (BESData data : _containersByID.values())
+		{
+			String responsiveness = "<unknown>";
+			
+			BESUpdateInformation info = _updateInformation.get(data.getID());
+			if (info != null)
+				responsiveness = info.toString();
+			
+			out.format("%s(%d) -- %s.\n", data.getName(), data.getTotalSlots(),
+				responsiveness);
 		}
 	}
 }

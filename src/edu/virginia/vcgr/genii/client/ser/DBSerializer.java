@@ -8,26 +8,109 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.sql.Blob;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import javax.sql.rowset.serial.SerialBlob;
 import javax.xml.namespace.QName;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 import org.xml.sax.InputSource;
 
 
 public class DBSerializer
 {
-	static public Blob toBlob(Object obj)
-		throws SQLException
+	static private Log _logger = LogFactory.getLog(DBSerializer.class);
+	
+	static private Map<String, Long> _blobSizes = new HashMap<String, Long>();
+	
+	static private long getBlobLength(Connection connection,
+			String tableName, String columnName)
 	{
+		Long value;
+		tableName = tableName.toUpperCase();
+		columnName = columnName.toUpperCase();
+		String key = String.format("%s.%s", tableName, columnName);
+		
+		ResultSet rs = null;
+	
+		synchronized(_blobSizes)
+		{
+			value = _blobSizes.get(key);
+		}
+		
+		if (value != null)
+			return value.longValue();
+		
+		try
+		{
+			DatabaseMetaData dmd = connection.getMetaData();
+			rs = dmd.getColumns(null, null, tableName.toUpperCase(), columnName.toUpperCase());
+			if (!rs.next())
+			{
+				_logger.warn(String.format(
+					"Unable to find table %s or column %s in database.",
+					tableName, columnName));
+				value = new Long(Long.MAX_VALUE);
+			} else
+			{
+				value = rs.getLong(7);
+				if (value == null)
+					value = Long.MAX_VALUE;
+			}
+			
+			synchronized(_blobSizes)
+			{
+				_blobSizes.put(key, value);
+			}
+			
+			return value;
+		}
+		catch (Throwable cause)
+		{
+			_logger.error("Unable to get column size.", cause);
+			return Long.MAX_VALUE;
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+		}
+	}
+	
+	static public Blob toBlob(Object obj, Connection connection,
+		String tableName, String columnName)
+			throws SQLException
+	{
+		long maxLength = getBlobLength(connection, tableName, columnName);
+		SerialBlob blob;
+		
 		if (obj == null)
 			return null;
 		
 		try
 		{
-			return new SerialBlob(serialize(obj));
+			blob = new SerialBlob(serialize(obj, maxLength));
+			_logger.debug(String.format(
+				"Created a blob of length %d bytes for %s.%s which has a " +
+				"max length of %d bytes.",
+				blob.length(), tableName, columnName, maxLength));
+			if (blob.length() > maxLength)
+			{
+				_logger.error(String.format(
+					"Error:  Blob was created with %d bytes for %s.%s, " +
+					"but the maximum length for that column is %d bytes.", 
+					tableName, columnName, maxLength));
+			}
+			
+			return blob;
 		}
 		catch (IOException ioe)
 		{
@@ -46,8 +129,19 @@ public class DBSerializer
 		
 		try
 		{
-			oin = new ObjectInputStream(in = b.getBinaryStream());
-			return oin.readObject();
+			try
+			{
+				oin = new ObjectInputStream(in = b.getBinaryStream());
+				return oin.readObject();
+			}
+			catch (Throwable cause)
+			{
+				// try to decompress first
+				in.close();
+				oin = new ObjectInputStream(new GZIPInputStream(
+					in = b.getBinaryStream()));
+				return oin.readObject();
+			}
 		}
 		catch (IOException ioe)
 		{
@@ -63,7 +157,7 @@ public class DBSerializer
 		}
 	}
 	
-	static public byte[] serialize(Object obj)
+	static public byte[] serialize(Object obj, long maxLength)
 		throws IOException
 	{
 		ObjectOutputStream oos = null;
@@ -83,7 +177,18 @@ public class DBSerializer
 			StreamUtils.close(oos);
 		}
 		
-		return baos.toByteArray();
+		byte []data = baos.toByteArray();
+		if (data.length > maxLength)
+		{
+			_logger.debug(String.format(
+				"The blob was too large (%d), so compressing it.", 
+				data.length));
+			data = compress(data);
+			_logger.debug(String.format(
+				"Compressed size is %d.", data.length));
+		}
+		
+		return data;
 	}
 	
 	static public Object deserialize(byte []data)
@@ -97,6 +202,14 @@ public class DBSerializer
 		try
 		{
 			ois = new ObjectInputStream(new ByteArrayInputStream(data));
+			return ois.readObject();
+		}
+		catch (Throwable cause)
+		{
+			// try to decompress it first
+			ois.close();
+			ois = new ObjectInputStream(new ByteArrayInputStream(
+				decompress(data)));
 			return ois.readObject();
 		}
 		finally
@@ -189,6 +302,50 @@ public class DBSerializer
 		finally
 		{
 			StreamUtils.close(in);
+		}
+	}
+	
+	static private byte[] compress(byte []data)
+	{
+		try
+		{
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			GZIPOutputStream out = new GZIPOutputStream(baos);
+			out.write(data);
+			out.close();
+			baos.close();
+			return baos.toByteArray();
+		}
+		catch (Throwable cause)
+		{
+			_logger.warn("Unable to compress stream.", cause);
+			return data;
+		}
+	}
+	
+	static private byte[] decompress(byte []data)
+	{
+		byte []ret = new byte[4096];
+		int read;
+		
+		try
+		{
+			ByteArrayInputStream bais = new ByteArrayInputStream(data);
+			GZIPInputStream in = new GZIPInputStream(bais);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			while ( (read = in.read(ret)) > 0)
+			{
+				baos.write(ret, 0, read);
+			}
+			
+			in.close();
+			baos.close();
+			return baos.toByteArray();
+		}
+		catch (Throwable cause)
+		{
+			_logger.warn("Unable to decompress stream.", cause);
+			return data;
 		}
 	}
 }

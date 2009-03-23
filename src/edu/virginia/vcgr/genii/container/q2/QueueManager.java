@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.container.q2;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -416,5 +417,11 @@ public class QueueManager implements Closeable
 		{
 			_connectionPool.release(connection);
 		}
+	}
+	
+	public void summarize(PrintStream out) throws IOException, SQLException
+	{
+		_besManager.summarize(out);
+		_jobManager.summarize(out);
 	}
 }

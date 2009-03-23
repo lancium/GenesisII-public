@@ -40,13 +40,13 @@ public class CertGeneratorUtils
 		parameters.put(CERT_GENERATOR_ISSUER_CHAIN_CONSTRUCTION_PARAMETER,
 				new MessageElement(
 						CERT_GENERATOR_ISSUER_CHAIN_CONSTRUCTION_PARAMETER,
-						DBSerializer.serialize(issuerChain)));
+						DBSerializer.serialize(issuerChain, Long.MAX_VALUE)));
 		parameters
 				.put(
 						CERT_GENERATOR_ISSUER_PRIVATE_KEY_CONSTRUCTION_PARAMETER,
 						new MessageElement(
 								CERT_GENERATOR_ISSUER_PRIVATE_KEY_CONSTRUCTION_PARAMETER,
-								DBSerializer.serialize(issuerPrivateKey)));
+								DBSerializer.serialize(issuerPrivateKey, Long.MAX_VALUE)));
 	}
 
 	static public MessageElement[] createCreationProperties(
@@ -57,11 +57,11 @@ public class CertGeneratorUtils
 		any[0] =
 				new MessageElement(
 						CERT_GENERATOR_ISSUER_CHAIN_CONSTRUCTION_PARAMETER,
-						DBSerializer.serialize(issuerChain));
+						DBSerializer.serialize(issuerChain, Long.MAX_VALUE));
 		any[1] =
 				new MessageElement(
 						CERT_GENERATOR_ISSUER_PRIVATE_KEY_CONSTRUCTION_PARAMETER,
-						DBSerializer.serialize(issuerPrivateKey));
+						DBSerializer.serialize(issuerPrivateKey, Long.MAX_VALUE));
 		if (defaultValidity == null)
 			defaultValidity = new Long(_DEFAULT_VALIDITY);
 		any[2] =

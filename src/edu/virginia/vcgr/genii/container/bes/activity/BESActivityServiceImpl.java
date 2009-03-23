@@ -85,7 +85,7 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 	static private Log _logger = LogFactory.getLog(BESActivityServiceImpl.class);
 
 	// One week of life
-	static private final long BES_ACTIVITY_LIFETIME = 1000L * 60 * 60 * 24 * 7;
+	static private final long BES_ACTIVITY_LIFETIME = 1000L * 60 * 60 * 24 * 7 * 4;
 	
 	public BESActivityServiceImpl() throws RemoteException
 	{
@@ -309,7 +309,7 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 			{
 				Throwable cause = faults.iterator().next();
 				if (cause != null)
-					serializedFault = DBSerializer.serialize(cause);
+					serializedFault = DBSerializer.serialize(cause, Long.MAX_VALUE);
 			}
 			
 			return new BESActivityGetErrorResponseType(serializedFault);

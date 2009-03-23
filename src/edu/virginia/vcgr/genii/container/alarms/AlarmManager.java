@@ -247,10 +247,10 @@ public class AlarmManager
 				"VALUES (?, ?, ?, ?, ?, ?)");
 			addStmt.setTimestamp(1, new Timestamp(nextOccurance.getTime()));
 			addStmt.setLong(2, repeatIntervalMS);
-			addStmt.setBlob(3, DBSerializer.toBlob(callingContext));
+			addStmt.setBlob(3, DBSerializer.toBlob(callingContext, conn, "alarmtable", "callingcontext"));
 			addStmt.setBlob(4, EPRUtils.toBlob(targetEPR));
 			addStmt.setString(5, methodName);
-			addStmt.setBlob(6, DBSerializer.toBlob(userData));
+			addStmt.setBlob(6, DBSerializer.toBlob(userData, conn, "alarmtable", "userdata"));
 			if (addStmt.executeUpdate() != 1)
 				throw new RuntimeException("Unable to add alarm to database.");
 			

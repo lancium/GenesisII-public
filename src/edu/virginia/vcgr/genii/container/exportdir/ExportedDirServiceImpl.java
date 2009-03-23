@@ -1,5 +1,7 @@
 package edu.virginia.vcgr.genii.container.exportdir;
 
+import java.io.File;
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Calendar;
 import java.util.Collection;
@@ -35,6 +37,7 @@ import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
+import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedFileUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
@@ -46,6 +49,9 @@ import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
 import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+import org.oasis_open.docs.wsrf.rl_2.Destroy;
+
+import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.container.Container;
@@ -130,15 +136,16 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 		resource.setModTime(c);
 		resource.setAccessTime(c);
 	}
-	
+
 	@RWXMapping(RWXCategory.EXECUTE)
 	public CreateFileResponse createFile(CreateFile createFileRequest)
 			throws RemoteException, RNSEntryExistsFaultType,
 			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType,
 			RNSFaultType
 	{
-		EndpointReferenceType entryReference;
-		String filename = createFileRequest.getFilename();
+		String filename = null;
+		EndpointReferenceType entryReference = null;
+		filename = createFileRequest.getFilename();
 		IExportedDirResource resource;
 		
 		ResourceKey rKey = ResourceManager.getCurrentResource();
@@ -146,48 +153,80 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 		{
 			resource = (IExportedDirResource)rKey.dereference();
 			
-			Collection<ExportedDirEntry> entries = resource.retrieveEntries(null);
-			for (ExportedDirEntry entry : entries)
-			{
-				if (filename.equals(entry.getName()))
-					throw FaultManipulator.fillInFault(new RNSEntryExistsFaultType(
-						null, null, null, null, null, null, filename));
-			}
-			
 			String fullPath = ExportedFileUtils.createFullPath(
 				resource.getLocalPath(), filename);
 			String parentIds = ExportedDirUtils.createParentIdsString(
 				resource.getParentIds(), resource.getId());
+			
 			try
 			{
-				long start = System.currentTimeMillis();
+				if (!(new File(fullPath).createNewFile()))
+				{
+					throw FaultManipulator.fillInFault(new RNSEntryExistsFaultType(
+						null, null, null, null, null, null, filename));
+				}
+			}
+			catch (IOException ioe)
+			{
+				throw new RemoteException(String.format(
+					"Unable to create new file on disk (%s).",
+					fullPath), ioe);
+			}
+			
+			try
+			{
 				WorkingContext.temporarilyAssumeNewIdentity(
 					EPRUtils.makeEPR(Container.getServiceURL("ExportedFilePortType"), false));
-				System.err.println("ExportDir: makeEPR elapsed is " + (System.currentTimeMillis()- start));
 				
-				start = System.currentTimeMillis();
-
 				entryReference = new ExportedFileServiceImpl().vcgrCreate(new VcgrCreate(
 					ExportedFileUtils.createCreationProperties(
 							fullPath, parentIds, resource.getReplicationState()))).getEndpoint();
-				System.err.println("ExportDir: create file elapsed is " + (System.currentTimeMillis()- start));
+			
+				String newEntryId = (new GUID()).toString();
+				ExportedDirEntry newEntry = new ExportedDirEntry(
+					resource.getId(), filename, entryReference,
+					newEntryId, ExportedDirEntry._FILE_TYPE, null);
+				resource.addEntry(newEntry, false);
+				resource.commit();
+			}
+			catch (Throwable t)
+			{
+				_logger.warn(
+					"Cleaning up state from a failed export file create.", t);
+				
+				if (entryReference != null)
+				{
+					try
+					{
+						GeniiCommon common = ClientUtils.createProxy(
+							GeniiCommon.class, entryReference);
+						common.destroy(new Destroy());
+					}
+					catch (Throwable tt)
+					{
+						_logger.error("Unable to clean up bogus file object.", tt);
+					}
+				}
+				
+				new File(fullPath).delete();
+				
+				if (t instanceof RemoteException)
+					throw ((RemoteException)t);
+				else if (t instanceof RuntimeException)
+					throw (RuntimeException)t;
+				else	
+					throw new RemoteException("" +
+						"Exception occurred while creating exported file.", t);
 			}
 			finally
 			{
 				WorkingContext.releaseAssumedIdentity();
 			}
-			
-			String newEntryId = (new GUID()).toString();
-			ExportedDirEntry newEntry = new ExportedDirEntry(
-				resource.getId(), filename, entryReference,
-				newEntryId, ExportedDirEntry._FILE_TYPE, null);
-			resource.addEntry(newEntry, true);
-			resource.commit();
 		}
 		
 		return new CreateFileResponse(entryReference);
 	}
-
+	
 	@RWXMapping(RWXCategory.WRITE)
 	public AddResponse add(Add addRequest) throws RemoteException,
 		RNSEntryExistsFaultType, ResourceUnknownFaultType,

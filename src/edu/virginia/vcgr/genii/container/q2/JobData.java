@@ -163,9 +163,14 @@ public class JobData
 		return _runAttempts;
 	}
 	
+	synchronized public void incrementRunAttempts(int incr)
+	{
+		_runAttempts += incr;
+	}
+	
 	synchronized public void incrementRunAttempts()
 	{
-		_runAttempts++;
+		incrementRunAttempts(1);
 	}
 	
 	public String currentJobAction()

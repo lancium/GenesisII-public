@@ -15,6 +15,7 @@ import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.configuration.UserPreferences;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
@@ -332,7 +333,7 @@ public class GamlLoginTool extends BaseGridTool {
 				// to log in to a security tokens service
 				KeyAndCertMaterial clientKeyMaterial = 
 					ClientUtils.checkAndRenewCredentials(callingContext, 
-					new Date());
+					new Date(), new SecurityUpdateResults());
 				return doIdpLogin(
 						epr, 
 						_validMillis, 

@@ -310,8 +310,10 @@ public class VCGRContainerServiceImpl extends GenesisIIBase
 		try
 		{
 			return new ContainerStatisticsResultType(stats.getStartTime(),
-				DBSerializer.serialize(stats.getDatabaseStatistics().report()),
-				DBSerializer.serialize(stats.getMethodStatistics().report()));
+				DBSerializer.serialize(stats.getDatabaseStatistics().report(),
+					Long.MAX_VALUE),
+				DBSerializer.serialize(stats.getMethodStatistics().report(),
+					Long.MAX_VALUE));
 		}
 		catch (IOException ioe)
 		{

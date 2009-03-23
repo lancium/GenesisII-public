@@ -159,7 +159,7 @@ public class QueueSecurity
 		int lcv = 0;
 		for (Identity id : identities)
 		{
-			ret[lcv++] = DBSerializer.serialize(id);
+			ret[lcv++] = DBSerializer.serialize(id, Long.MAX_VALUE);
 		}
 		
 		return ret;

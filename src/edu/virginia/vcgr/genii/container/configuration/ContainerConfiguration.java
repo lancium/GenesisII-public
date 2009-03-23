@@ -16,9 +16,11 @@ public class ContainerConfiguration
 		"edu.virginia.vcgr.genii.container.notification.work-pool-size";
 	static private final String _NOTIFICATION_POOL_SIZE_DEFAULT = "5";
 	
+	static private final String _DEFAULT_MAX_ACCEPT_THREADS = "16";
 	static private final String _DEFAULT_LISTEN_PORT_VALUE = "18080";	
 	
 	private XMLConfiguration _configuration;
+	private int _maxThreads;
 	private int _listenPort;
 	private SslInformation _sslInformation = null;
 	private int _notificationPoolSize;
@@ -59,6 +61,11 @@ public class ContainerConfiguration
 		return _listenPort;
 	}
 	
+	public int getMaxAcceptorThreads()
+	{
+		return _maxThreads;
+	}
+	
 	public boolean isSSL()
 	{
 		return _sslInformation != null;
@@ -76,6 +83,12 @@ public class ContainerConfiguration
 					WebContainerConstants.LISTEN_PORT_PROP, 
 					_DEFAULT_LISTEN_PORT_VALUE);
 		_listenPort = Integer.parseInt(sListenPort);
+		
+		String sMaxThreads =
+			Installation.getDeployment(new DeploymentName()).webContainerProperties().getProperty(
+				WebContainerConstants.MAX_ACCEPT_THREADS_PROP,
+				_DEFAULT_MAX_ACCEPT_THREADS);
+		_maxThreads = Integer.parseInt(sMaxThreads);
 		
 		String notSize = props.getProperty(
 			_NOTIFICATION_POOL_SIZE, _NOTIFICATION_POOL_SIZE_DEFAULT);
