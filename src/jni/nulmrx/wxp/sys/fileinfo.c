@@ -20,9 +20,6 @@ Abstract:
 #pragma hdrstop
 #pragma warning(error:4101)   // Unreferenced local variable
 
-//  The local debug trace level
-#define Dbg                              (DEBUG_TRACE_FILEINFO)
-
 NTSTATUS NulMRxQueryVolumeInformation(IN OUT PRX_CONTEXT RxContext)
 /*++
 
@@ -55,16 +52,13 @@ Return Value:
     UNICODE_STRING ustrVolume;
     ULONG BytesToCopy;
 
-	RxCaptureFcb;
-
-    RxTraceEnter("NulMRxQueryVolumeInformation");
+	RxCaptureFcb;    
 
     switch( FsInformationClass ) {
         case FileFsVolumeInformation:
 		{
     		PFILE_FS_VOLUME_INFORMATION pVolInfo = (PFILE_FS_VOLUME_INFORMATION) OriginalBuffer;
-            RtlZeroMemory( pVolInfo, sizeof(FILE_FS_VOLUME_INFORMATION) );
-			DbgPrint("QueryVolumeInformation:  FileFsVolumeInformation\n");	
+            RtlZeroMemory( pVolInfo, sizeof(FILE_FS_VOLUME_INFORMATION));			
             pVolInfo->VolumeCreationTime.QuadPart = 0;
             pVolInfo->VolumeSerialNumber = 0x00000001;
             pVolInfo->VolumeLabelLength = wcslen(GENESIS_VOLUME_NAME) * sizeof(WCHAR);
@@ -90,8 +84,7 @@ Return Value:
 		{
 			WCHAR *label = L"Genesis";
 			PFILE_FS_LABEL_INFORMATION pLabelInfo = (PFILE_FS_LABEL_INFORMATION) OriginalBuffer;
-			RtlZeroMemory(pLabelInfo, sizeof(FILE_FS_LABEL_INFORMATION) );	
-			DbgPrint("QueryVolumeInformation:  FileFsLabelInformation\n");  
+			RtlZeroMemory(pLabelInfo, sizeof(FILE_FS_LABEL_INFORMATION) );				
 
 			//No label
 			RtlCopyMemory(pLabelInfo->VolumeLabel, label, wcslen(label) * sizeof(WCHAR));
@@ -104,8 +97,7 @@ Return Value:
         case FileFsSizeInformation:
 		{
 			PFILE_FS_SIZE_INFORMATION pSizeInfo = (PFILE_FS_SIZE_INFORMATION) OriginalBuffer;
-			RtlZeroMemory(pSizeInfo, sizeof(FILE_FS_SIZE_INFORMATION) );	
-			DbgPrint("QueryVolumeInformation:  FileFsSizeInformation\n");            
+			RtlZeroMemory(pSizeInfo, sizeof(FILE_FS_SIZE_INFORMATION));				
 
 			//Faked info!
 			//4KB block size.  64KB Allocation Size.  1GB used of 8GB for user.
@@ -123,8 +115,7 @@ Return Value:
 			PFILE_FS_DEVICE_INFORMATION pDevInfo = (PFILE_FS_DEVICE_INFORMATION) OriginalBuffer;
 			RtlZeroMemory(pDevInfo, sizeof(FILE_FS_DEVICE_INFORMATION) );			
 			pDevInfo->DeviceType = FILE_DEVICE_NETWORK_FILE_SYSTEM;
-			pDevInfo->Characteristics = FILE_REMOTE_DEVICE;			
-			DbgPrint("QueryVolumeInformation:  FileFsDeviceInformation\n");			
+			pDevInfo->Characteristics = FILE_REMOTE_DEVICE;						
 			
 			RxContext->Info.LengthRemaining -= sizeof(FILE_FS_DEVICE_INFORMATION);
 			Status = STATUS_SUCCESS;            
@@ -151,21 +142,18 @@ Return Value:
 			pAttribInfo->FileSystemNameLength = BytesToCopy;
            
             Status = STATUS_SUCCESS;            
-			RxSetIoStatusInfo(RxContext, sizeof(FILE_FS_ATTRIBUTE_INFORMATION));       
-            DbgPrint("QueryVolumeInformation:  FileFsAttributeInformation\n");
+			RxSetIoStatusInfo(RxContext, sizeof(FILE_FS_ATTRIBUTE_INFORMATION));                   
 		}
         break;
     
-        case FileFsControlInformation:
-            DbgPrint("QueryVolumeInformation:  FileFsControlInformation\n");
+        case FileFsControlInformation:            
 			Status = STATUS_NOT_IMPLEMENTED;
 			RxSetIoStatusInfo(RxContext, 0);   
             break;
     
 		case FileFsFullSizeInformation:{
 			PFILE_FS_FULL_SIZE_INFORMATION pFsInfo = (PFILE_FS_FULL_SIZE_INFORMATION) OriginalBuffer;
-			RtlZeroMemory(pFsInfo, sizeof(FILE_FS_FULL_SIZE_INFORMATION));
-            DbgPrint("QueryVolumeInformation:  FileFsFullSizeInformation\n");
+			RtlZeroMemory(pFsInfo, sizeof(FILE_FS_FULL_SIZE_INFORMATION));            
 			
 			//Faked info!
 			//4KB block size.  64KB Allocation Size.  1GB used of 8GB for user.  Total space is 10GB
@@ -179,26 +167,22 @@ Return Value:
 			RxSetIoStatusInfo(RxContext, sizeof(FILE_FS_FULL_SIZE_INFORMATION));   
 		}
         break;
-        case FileFsObjectIdInformation:
-            DbgPrint("QueryVolumeInformation:  FileFsObjectIdInformation\n");
+        case FileFsObjectIdInformation:            
 			RxSetIoStatusInfo(RxContext, 0);   
 			Status = STATUS_NOT_IMPLEMENTED;
             break;
     
-        case FileFsMaximumInformation:
-            DbgPrint("QueryVolumeInformation:  FileFsMaximumInformation\n");
+        case FileFsMaximumInformation:            
 			RxSetIoStatusInfo(RxContext, 0);   
 			Status = STATUS_NOT_IMPLEMENTED;			
             break;
     
-        default:
-			DbgPrint("QueryVolumeInformation:  Unknown!!!\n");
+        default:			
 			RxSetIoStatusInfo(RxContext, 0);   
 			Status = STATUS_NOT_IMPLEMENTED;
             break;
     }
-
-    RxTraceLeave(Status);
+    
     return(Status);
 }
 
@@ -225,9 +209,7 @@ Return Value:
 
 --*/
 {
-    NTSTATUS Status = STATUS_NOT_IMPLEMENTED;
-
-    DbgPrint("NulMRxSetVolumeInformation \n");
+    NTSTATUS Status = STATUS_NOT_IMPLEMENTED;    
     return(Status);
 }
 
@@ -254,29 +236,23 @@ Return Value:
 	NTSTATUS Status = STATUS_SUCCESS;    	
 	
 	RxCaptureFcb;	
-	GenesisGetFcbExtension(capFcb, giiFCB);
-
-    RxTraceEnter("NulMRxQueryFileInformation");	
+	GenesisGetFcbExtension(capFcb, giiFCB);    
 
 	PAGED_CODE();		
 
-	ExAcquireFastMutex(&(giiFCB->ExclusiveLock));	
- 
-	DbgPrint("NulMRxQueryFileInformation: Started for file %wZ\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName);
+	ExAcquireFastMutex(&(giiFCB->ExclusiveLock));	 	
 
 	//Something went wrong
 	if(giiFCB == NULL){		
 		ExReleaseFastMutex(&(giiFCB->ExclusiveLock));
-		DbgPrint("NulMRxQueryFileInformation: Failed!  GIIFCB == NULL\n");
+		GIIPrint(("GenesisDrive:  Unable to obtain lock to read information for file"));
 		RxContext->Info.LengthRemaining = 0;
 		Status = STATUS_FILE_CLOSED;
 	}
 	else{				
 		Status = GenesisCompleteQueryFileInformation(RxContext);	
 		ExReleaseFastMutex(&(giiFCB->ExclusiveLock));
-	}
-    
-    RxTraceLeave(Status);
+	}        
     return(Status);
 }
 
@@ -301,11 +277,8 @@ Return Value:
 {
     NTSTATUS Status = STATUS_SUCCESS;    
     FILE_INFORMATION_CLASS FunctionalityRequested = 
-            RxContext->Info.FileInformationClass;
-
-	//Doesn't matter if alloc or eof (same byte alignment)
-    PFILE_END_OF_FILE_INFORMATION pEndOfFileInfo = 
-            (PFILE_END_OF_FILE_INFORMATION) RxContext->Info.Buffer;
+            RxContext->Info.FileInformationClass;	
+    
     LARGE_INTEGER NewAllocationSize;
 
 	RxCaptureFcb;
@@ -315,46 +288,70 @@ Return Value:
 
 	PAGED_CODE();
 
-	DbgPrint("NulMRX:  SetFileInfo received\n");
-
     switch( FunctionalityRequested ) {
 		case FileBasicInformation:{
-			PFILE_BASIC_INFORMATION pBasic = (PFILE_BASIC_INFORMATION) RxContext->Info.Buffer;
-            DbgPrint("FileBasicInformation\n");	
-			
+			PFILE_BASIC_INFORMATION pBasic = (PFILE_BASIC_INFORMATION) RxContext->Info.Buffer;            			
 			fcb->AccessedTime = pBasic->LastAccessTime;
 			fcb->CreateTime = pBasic->CreationTime;
 			fcb->ModifiedTime = pBasic->ChangeTime;						
+			
 			RxSetIoStatusInfo(RxContext, sizeof(FILE_BASIC_INFORMATION));
+			RxContext->Info.LengthRemaining -= sizeof(FILE_BASIC_INFORMATION);									
 		}
         break;    
 		case FileDispositionInformation:{
 			PFILE_DISPOSITION_INFORMATION pDispo = (PFILE_DISPOSITION_INFORMATION) RxContext->Info.Buffer;
-            DbgPrint("FileDispositionInformation\n");
+			fcb->DeleteOnCloseSpecified = pDispo->DeleteFile;	
+
 			RxSetIoStatusInfo(RxContext, sizeof(FILE_DISPOSITION_INFORMATION));
-			fcb->DeleteOnCloseSpecified = pDispo->DeleteFile;
-			if(pDispo->DeleteFile == TRUE)
-			{
-				DbgPrint("Delete file requested ... \n");
-			}
+			RxContext->Info.LengthRemaining -= sizeof(FILE_DISPOSITION_INFORMATION);									
 		}
         break;
     
-        case FilePositionInformation:
-            DbgPrint("FilePositionInformation\n");
-            break;
-    
-        case FileAllocationInformation:            
-    
-		case FileEndOfFileInformation:{
-			if(FunctionalityRequested == FileAllocationInformation){
-				DbgPrint("NulMrx:  FileAllocationInfo Recv'd\n");
-			}else{
-				DbgPrint("NulMrx:  FileEndOfFile Recv'd\n");
-			}
-			DbgPrint("FileSize is %d FileSizeHigh is %d\n",pEndOfFileInfo->EndOfFile.LowPart,pEndOfFileInfo->EndOfFile.HighPart);
-			DbgPrint("Old FileSize is %d FileSizeHigh is %d\n",capFcb->Header.FileSize.LowPart,capFcb->Header.FileSize.HighPart);
+		case FilePositionInformation:{
+			PFILE_POSITION_INFORMATION position_info = (PFILE_POSITION_INFORMATION) RxContext->Info.Buffer;
+			GIIPrint(("GenesisDrive: File position changing to %x %x\n", position_info->CurrentByteOffset.HighPart, 
+				position_info->CurrentByteOffset.LowPart));
+			ccb->CurrentByteOffset = position_info->CurrentByteOffset;
 
+			RxContext->Info.LengthRemaining -= sizeof(FILE_POSITION_INFORMATION);
+			RxSetIoStatusInfo(RxContext, sizeof(FILE_POSITION_INFORMATION));
+			}
+        break;
+    
+		case FileAllocationInformation:{
+			PFILE_ALLOCATION_INFORMATION pAllocationInfo = 
+				(PFILE_ALLOCATION_INFORMATION) RxContext->Info.Buffer;
+
+			// Case falls through to FileEndOfFileInfo since we don't have knowledge of allocation versus
+			// FileSize information as we are dealing with an obscure backend
+						
+			// Are we extending or truncating the file
+			if(RtlLargeIntegerGreaterThan(pAllocationInfo->AllocationSize, capFcb->Header.FileSize)) {
+            
+                Status = NulMRxExtendFile(
+                                RxContext,
+                                &pAllocationInfo->AllocationSize,
+                                &NewAllocationSize
+                                );                    
+            } else {
+                Status = NulMRxTruncateFile(
+                                RxContext,
+                                &pAllocationInfo->AllocationSize,
+                                &NewAllocationSize
+                                );				
+            }									
+
+			RxContext->Info.LengthRemaining -= sizeof(FILE_ALLOCATION_INFORMATION);
+			RxSetIoStatusInfo(RxContext, sizeof(FILE_ALLOCATION_INFORMATION));
+		}
+		break;
+
+		case FileEndOfFileInformation:{
+			PFILE_END_OF_FILE_INFORMATION pEndOfFileInfo = 
+				(PFILE_END_OF_FILE_INFORMATION) RxContext->Info.Buffer;
+			
+			// Are we extending or truncating the file
 			if(RtlLargeIntegerGreaterThan(pEndOfFileInfo->EndOfFile, capFcb->Header.FileSize)) {
             
                 Status = NulMRxExtendFile(
@@ -377,30 +374,30 @@ Return Value:
     
 		case FileRenameInformation:{
 			PFILE_RENAME_INFORMATION pRenameInfo = (PFILE_RENAME_INFORMATION) RxContext->Info.Buffer;
-            DbgPrint("FileRenameInformation\n");
+			GIIPrint(("GenesisDrive:  File rename received\n"));
 			
 			//Close this file handle on the Genesis Side
 			Status = GenesisSendInvertedCall(RxContext, GENII_RENAME, FALSE);
 
-			//Something could go wrong (only wait if something will actually come back to free you)
+			// Something could go wrong (only wait if something will actually come back to free you)
 			if(NT_SUCCESS(Status)){
 				//Waits for caller
 				KeWaitForSingleObject(&(fcb->InvertedCallSemaphore), Executive, KernelMode, FALSE, NULL);
 			}
-
+			// Error for rename = access denied - don't have better information
 			if(ccb->lastStatus == -1){
 				Status =  STATUS_ACCESS_DENIED;
 			}
 
+			RxContext->Info.LengthRemaining -= sizeof(FILE_RENAME_INFORMATION);
+			RxSetIoStatusInfo(RxContext, sizeof(FILE_RENAME_INFORMATION));
             break;
 		}
         default:
-
-			DbgPrint("Unknown set information requested\n");
+			GIIPrint(("GenesisDrive: Unknown set information requested\n"));
+			Status = STATUS_NOT_SUPPORTED;
             break;									  
-    }
-    
-    RxTraceLeave(Status);
+    }        
 	return Status;
 }
 
@@ -423,7 +420,6 @@ Return Value:
 --*/
 {
     NTSTATUS Status = STATUS_NOT_IMPLEMENTED;
-
     return(Status);
 }
 
@@ -454,8 +450,7 @@ NTSTATUS GenesisCompleteQueryFileInformation(PRX_CONTEXT RxContext){
 		Buffer = (PCHAR)PtrIrp->UserBuffer;
 	}
 
-	if(giiFCB->State == GENII_STATE_NOT_FOUND){
-		DbgPrint("QueryFileInformation:  File not found in Genesis but still created\n");
+	if(giiFCB->State == GENII_STATE_NOT_FOUND){		
 		Status = STATUS_FILE_INVALID;
 	}
 
@@ -473,14 +468,10 @@ NTSTATUS GenesisCompleteQueryFileInformation(PRX_CONTEXT RxContext){
 			pFileStdInfo->LastAccessTime = giiFCB->OpenTime;
 			pFileStdInfo->LastWriteTime = giiFCB->OpenTime;						
 
-			RxContext->Info.LengthRemaining -= sizeof(FILE_BASIC_INFORMATION);
-
-			DbgPrint("NulMRxQueryFileInformation: Ended for file %wZ of type FBI\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName);
+			RxContext->Info.LengthRemaining -= sizeof(FILE_BASIC_INFORMATION);			
 		}
 		break;
-
-
-		/* NOT SUPPORTED */
+		
 		case FileInternalInformation:{
 			PFILE_INTERNAL_INFORMATION pFileStdInfo = 
 				(PFILE_INTERNAL_INFORMATION) RxContext->Info.Buffer;	
@@ -488,8 +479,7 @@ NTSTATUS GenesisCompleteQueryFileInformation(PRX_CONTEXT RxContext){
 			
 			pFileStdInfo->IndexNumber.QuadPart = giiCCB->GenesisFileID;			
 
-			RxContext->Info.LengthRemaining -= sizeof(FILE_INTERNAL_INFORMATION);
-			DbgPrint("NulMRxQueryFileInformation: Ended for file %wZ of type FII\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName);
+			RxContext->Info.LengthRemaining -= sizeof(FILE_INTERNAL_INFORMATION);			
 		}
 		break;			
 
@@ -502,8 +492,7 @@ NTSTATUS GenesisCompleteQueryFileInformation(PRX_CONTEXT RxContext){
 				RxContext->pRelevantSrvOpen->pAlreadyPrefixedName->Length);
 			pFileStdInfo->FileNameLength = RxContext->pRelevantSrvOpen->pAlreadyPrefixedName->Length;			
 
-			RxContext->Info.LengthRemaining -= sizeof(FILE_NAME_INFORMATION);
-			DbgPrint("NulMRxQueryFileInformation: Ended for file %wZ of type FNI\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName);
+			RxContext->Info.LengthRemaining -= sizeof(FILE_NAME_INFORMATION);			
 		}
 		break;
 
@@ -522,8 +511,7 @@ NTSTATUS GenesisCompleteQueryFileInformation(PRX_CONTEXT RxContext){
 			pFileStdInfo->LastAccessTime = giiFCB->OpenTime;
 			pFileStdInfo->LastWriteTime = giiFCB->OpenTime;
 
-			RxContext->Info.LengthRemaining -= sizeof(FILE_NETWORK_OPEN_INFORMATION);
-			DbgPrint("NulMRxQueryFileInformation: Ended for file %wZ of type FNOI\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName);
+			RxContext->Info.LengthRemaining -= sizeof(FILE_NETWORK_OPEN_INFORMATION);			
 		}
 		break;
 
@@ -534,8 +522,7 @@ NTSTATUS GenesisCompleteQueryFileInformation(PRX_CONTEXT RxContext){
 
 			pFileStdInfo->CurrentByteOffset = giiCCB->CurrentByteOffset; 				
 
-			RxContext->Info.LengthRemaining -= sizeof(FILE_POSITION_INFORMATION);
-			DbgPrint("NulMRxQueryFileInformation: Ended for file %wZ of type FPI\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName);
+			RxContext->Info.LengthRemaining -= sizeof(FILE_POSITION_INFORMATION);			
 		}
 		break;
 
@@ -544,8 +531,7 @@ NTSTATUS GenesisCompleteQueryFileInformation(PRX_CONTEXT RxContext){
 				(PFILE_ALL_INFORMATION) RxContext->Info.Buffer;	
 			RtlZeroMemory(pFileStdInfo, sizeof(FILE_ALL_INFORMATION));
 			
-			RxContext->Info.LengthRemaining -= sizeof(FILE_ALL_INFORMATION);
-			DbgPrint("NulMRxQueryFileInformation: Ended for file %wZ of type FAI\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName);
+			RxContext->Info.LengthRemaining -= sizeof(FILE_ALL_INFORMATION);			
 		}
 		break;
 
@@ -555,19 +541,17 @@ NTSTATUS GenesisCompleteQueryFileInformation(PRX_CONTEXT RxContext){
 				(PFILE_STREAM_INFORMATION) RxContext->Info.Buffer;	
 			RtlZeroMemory(pFileStdInfo, sizeof(FILE_STREAM_INFORMATION));				
 			
-			RxContext->Info.LengthRemaining -= sizeof(FILE_STREAM_INFORMATION);
-			DbgPrint("NulMRxQueryFileInformation: Ended for file %wZ of type FSI\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName);
+			RxContext->Info.LengthRemaining -= sizeof(FILE_STREAM_INFORMATION);			
  	    }
  	    break;
 
-        /* NOT SUPPORTED (returns 0 EAs)*/
+        /* Extended Attributes are not supported in this driver */
 		case FileEaInformation:{
 			PFILE_EA_INFORMATION pFileStdInfo = 
 				(PFILE_EA_INFORMATION) RxContext->Info.Buffer;	
 			RtlZeroMemory(pFileStdInfo, sizeof(FILE_EA_INFORMATION));			
 			
-			RxContext->Info.LengthRemaining -= sizeof(FILE_EA_INFORMATION);											   
-			DbgPrint("NulMRxQueryFileInformation: Ended for file %wZ of type FEI\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName);			
+			RxContext->Info.LengthRemaining -= sizeof(FILE_EA_INFORMATION);											   			
 		}
 		break;
             
@@ -582,8 +566,7 @@ NTSTATUS GenesisCompleteQueryFileInformation(PRX_CONTEXT RxContext){
 			pFileStdInfo->NumberOfLinks = 0; //hard-coded	
 			pFileStdInfo->DeletePending = FALSE;
             
-			RxContext->Info.LengthRemaining -= sizeof(FILE_STANDARD_INFORMATION);				
-			DbgPrint("NulMRxQueryFileInformation: Ended for file %wZ of type FStdI %d\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName, giiFCB->isDirectory);
+			RxContext->Info.LengthRemaining -= sizeof(FILE_STANDARD_INFORMATION);							
 		}	
 		break;	        
 
@@ -597,8 +580,8 @@ NTSTATUS GenesisCompleteQueryFileInformation(PRX_CONTEXT RxContext){
 		 }
 		 break;
 		default:
-			DbgPrint("NulMRxQueryFileInformation: Ended for file %wZ not supported: %d!\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName,
-				FunctionalityRequested);
+			GIIPrint(("GenesisDrive:  Unsupported type for Query Information received for file %wZ with type: %d!\n",
+				RxContext->pRelevantSrvOpen->pAlreadyPrefixedName, FunctionalityRequested));
 			Status = STATUS_NOT_SUPPORTED;
 			break;
 	}    

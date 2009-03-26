@@ -200,7 +200,7 @@ Notes:
 		}
 
     } else {
-        DbgPrint("Creating V_NET_ROOT on existing NET_ROOT\n");
+        GIIPrint(("Creating V_NET_ROOT on existing NET_ROOT\n"));
     }
 
     if( (Status == STATUS_SUCCESS) && fInitializeNetRoot )

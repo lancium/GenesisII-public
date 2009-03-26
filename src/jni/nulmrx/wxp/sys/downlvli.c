@@ -8,19 +8,12 @@ Module Name:
 
 Abstract:
 
-    This module implements downlevel fileinfo, volinfo, and dirctrl.
+    This module implements truncate and extend
 
 --*/
 
 #include "precomp.h"
 #pragma hdrstop
-
-//
-//  The local debug trace level
-//
-
-RXDT_DefineCategory(DOWNLVLI);
-#define Dbg                 (DEBUG_TRACE_DOWNLVLI)
 
 NTSTATUS
 NulMRxTruncateFile(
@@ -46,15 +39,11 @@ Return Value:
 {
     NTSTATUS Status = STATUS_SUCCESS;
     RxCaptureFcb;	
-	GenesisGetFcbExtension(capFcb,giiFCB);    	
+	GenesisGetFcbExtension(capFcb,giiFCB);    	    
 
-    RxTraceEnter("NulMRxTruncateFile");
+	PAGED_CODE();    
 
-	PAGED_CODE();
-
-    RxDbgTrace(0,  Dbg, ("NewFileSize is %d\n", pNewFileSize->LowPart));
-
-	DbgPrint("NulMRxTruncate:  Truncating file size to %d\n", pNewFileSize->LowPart);
+	GIIPrint(("GenesisDrive:  Truncating file size to %I64d\n", pNewFileSize->QuadPart));
 
 	capFcb->Header.FileSize = *pNewFileSize;	
 	capFcb->Header.AllocationSize = capFcb->Header.FileSize;
@@ -65,8 +54,6 @@ Return Value:
 	}	
 
 	pNewAllocationSize = &capFcb->Header.FileSize;
-
-    RxTraceLeave(Status);
     return Status;
 }
 
@@ -94,27 +81,23 @@ Return Value:
 {
     NTSTATUS Status = STATUS_SUCCESS;
     RxCaptureFcb;
-    GenesisGetFcbExtension(capFcb,giiFCB);      
+    GenesisGetFcbExtension(capFcb,giiFCB);          
 
-    RxTraceEnter("NulMRxExtendFile");
-
-	PAGED_CODE();
-
-    RxDbgTrace(0,  Dbg, ("NewFileSize is %d\n", pNewFileSize->LowPart));
+	PAGED_CODE();    
 	    
-	DbgPrint("NulMRxExtend:  Extending file size to %d\n", pNewFileSize->LowPart);
+	GIIPrint(("GenesisDrive:  Extending file size to %I64d\n", pNewFileSize->QuadPart));
 
 	capFcb->Header.FileSize = *pNewFileSize;	
 	capFcb->Header.AllocationSize = *pNewFileSize;
 
-	if (RtlLargeIntegerGreaterThan(capFcb->Header.ValidDataLength, *pNewFileSize)) {
+	//Not valid
+	/*if (RtlLargeIntegerGreaterThan(capFcb->Header.ValidDataLength, *pNewFileSize)) {
 		// Decrease the valid data length value.
 		capFcb->Header.ValidDataLength = *pNewFileSize;
-	}	
+	}*/	
 
 	pNewAllocationSize = &capFcb->Header.FileSize;
-
-    RxTraceLeave(Status);
+    
     return Status;
 }
 

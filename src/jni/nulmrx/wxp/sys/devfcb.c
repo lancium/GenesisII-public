@@ -58,7 +58,7 @@ Notes:
     PLOWIO_CONTEXT LowIoContext  = &RxContext->LowIoContext;
     ULONG ControlCode = 0;
 
-    //DbgPrint("NulMRxDevFcb\n");
+    //GIIPrint((NulMRxDevFcb\n"));
 
     switch (MajorFunctionCode)
     {
@@ -224,8 +224,8 @@ Notes:
         Status = STATUS_INVALID_DEVICE_REQUEST;
     }
 
-    //DbgPrint("NulMRxDevFcb st,info=%08lx,%08lx\n",
-                            //Status,RxContext->InformationToReturn);
+    //GIIPrint(("NulMRxDevFcb st,info=%08lx,%08lx\n",
+                            //Status,RxContext->InformationToReturn));
     return(Status);
 }
 
@@ -265,10 +265,10 @@ GetConnectionHandle(
         NULL,           // Ptr to EA Buffer
         0);         // Length of EA buffer
 
-    DbgPrint("ZwCreateFile returned %lx\n",Status);
+    GIIPrint(("ZwCreateFile returned %lx\n",Status));
 
     if ( (STATUS_SUCCESS == Status) && (INVALID_HANDLE_VALUE != Handle) ) {
-        DbgPrint("ZwCreateFile returned success\n");
+        GIIPrint(("ZwCreateFile returned success\n"));
     }
     else
         Handle = INVALID_HANDLE_VALUE;
@@ -309,7 +309,7 @@ DoCreateConnection(
         PWCHAR pwcLC;
         ULONG i;
 
-        DbgPrint("GetConnectionHandle returned success\n");
+        GIIPrint(("GetConnectionHandle returned success\n"));
         ZwClose(Handle);
         for ( i = 0, pwcLC = (PWCHAR) ConnectName; i < ConnectNameLen, *pwcLC!= L':';
               i+=sizeof(WCHAR), pwcLC++ );
@@ -326,7 +326,7 @@ DoCreateConnection(
     }
     else
     {
-        DbgPrint("GetConnectionHandle returned failure\n");
+        GIIPrint(("GetConnectionHandle returned failure\n"));
         Status = STATUS_BAD_NETWORK_NAME;
     }
 
@@ -361,8 +361,7 @@ RXSTATUS
 
     PAGED_CODE();
 
-    DbgPrint("NulMrxCreateConnection called\n");
-    RxDbgTrace(+1, Dbg, ("NulMRxCreateConnection \n"));
+    GIIPrint(("NulMrxCreateConnection called\n"));    
 
     if (!Wait) {
         //just post right now!
@@ -391,7 +390,7 @@ DoDeleteConnection(
     Handle = GetConnectionHandle(FileName);
 
     if ( INVALID_HANDLE_VALUE != Handle ) {
-        DbgPrint("GetConnectionHandle returned success\n");
+        GIIPrint(("GetConnectionHandle returned success\n"));
 
         Status = ObReferenceObjectByHandle(
                 Handle,
@@ -401,7 +400,7 @@ DoDeleteConnection(
                 (PVOID *)&pFileObject,
                 NULL);
 
-        DbgPrint("ObReferenceObjectByHandle worked ok\n");
+        GIIPrint(("ObReferenceObjectByHandle worked ok\n"));
         if ( NT_SUCCESS(Status) ) {
 
             // Got the FileObject. Now get an Fobx
@@ -409,7 +408,7 @@ DoDeleteConnection(
             if (NodeType(Fobx)==RDBSS_NTC_V_NETROOT) {
                 VNetRoot = (PV_NET_ROOT)(Fobx);
                 NetRoot = (PNET_ROOT)VNetRoot->NetRoot;
-                DbgPrint("Calling RxFinalizeConnection\n");
+                GIIPrint(("Calling RxFinalizeConnection\n"));
                 Status = RxFinalizeConnection(NetRoot,VNetRoot,TRUE);
             } else {
                 ASSERT(FALSE);

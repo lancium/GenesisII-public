@@ -34,9 +34,6 @@ NTSTATUS GenesisWriteCompletionRoutine(PRX_CONTEXT RxContext){
 	return pIoCompContext->Status;
 }
 
-//  The local debug trace level
-#define Dbg                              (DEBUG_TRACE_WRITE)
-
 NTSTATUS
 NulMRxWrite (
       IN PRX_CONTEXT RxContext)
@@ -75,17 +72,12 @@ Return Value:
 	PFILE_OBJECT FileObject = RxContext->CurrentIrpSp->FileObject;
 
 	BOOLEAN CompleteIrp = FALSE;
-	BOOLEAN PostRequest = FALSE;
+	BOOLEAN PostRequest = FALSE;    
 
-    RxTraceEnter("NulMRxWrite");
-
-	PAGED_CODE();
-
-	DbgPrint("NulMRxWrite:  Started for file: %wZ\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName);	
+	PAGED_CODE();	
 
 	if(giiFcb->isDirectory){
-		Status = STATUS_INVALID_DEVICE_REQUEST;
-		DbgPrint("NulMRxWrite:  Write attempted on directory!\n");
+		Status = STATUS_FILE_IS_A_DIRECTORY;		
 		try_return(Status);
 	}
 
@@ -98,10 +90,9 @@ Return Value:
     RtlZeroMemory( pIoCompContext, sizeof(*pIoCompContext) );
     
     if( SynchronousIo ) {
-        DbgPrint("This I/O is sync\n");
+		GIIPrint(("GenesisDrive:  Write is is synchronous\n"));
         pIoCompContext->IoType = IO_TYPE_SYNCHRONOUS;
-    } else {
-        DbgPrint("This I/O is async\n");
+    } else {        
         pIoCompContext->IoType = IO_TYPE_ASYNC;
     }
 
@@ -113,7 +104,7 @@ Return Value:
 	//	GenesisMdlComplete(RxContext);
 	//	// The IRP has been completed.
 	//	CompleteIrp = FALSE;
-		DbgPrint("NulMrxWrite:  IRP_MN_COMPLETE Received");
+		// GIIPrint(("NulMrxWrite:  IRP_MN_COMPLETE Received"));
 	//	try_return(Status = STATUS_SUCCESS);
 	}
 
@@ -124,7 +115,7 @@ Return Value:
 	if (RxContext->CurrentIrpSp->MinorFunction & IRP_MN_DPC) {
 	//	CompleteIrp = FALSE;
 	//	PostRequest = TRUE;
-		DbgPrint("NulMrxWrite:  IRP_MN_DPC Received");
+		// GIIPrint(("NulMrxWrite:  IRP_MN_DPC Received"));
 	//	try_return(Status = STATUS_PENDING);
 	}
 
@@ -146,20 +137,17 @@ Return Value:
 				FileObject->CurrentByteOffset.QuadPart = ByteOffset.QuadPart + pIoCompContext->Information;
 			}
 			else{
-				DbgPrint("NulMrxWrite:  Paging IO Recv'd\n");
+				// Paging IO received
 			}
 		}
-	}
-
-    RxDbgTrace(0, Dbg, ("Status = %x Info = %x\n",RxContext->IoStatusBlock.Status,RxContext->IoStatusBlock.Information));
+	}    
 
 try_exit:	NOTHING;					
 
 	if(Status != STATUS_PENDING){
-		DbgPrint("NulMRxWrite:  Completed for file: %wZ\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName);
+		// Write has finished
 	}
-
-    RxTraceLeave(Status);
+    
     return(Status);
 } 
 
@@ -194,30 +182,39 @@ ULONG GenesisPrepareWriteParams(PRX_CONTEXT RxContext, PVOID buffer, PBOOLEAN is
 			ByteOffset = RxContext->CurrentIrpSp->FileObject->CurrentByteOffset;
 	}
 	else if(ByteOffset.LowPart == FILE_WRITE_TO_END_OF_FILE && ByteOffset.HighPart == -1){
-		//If append  
+		//If append
+		GIIPrint(("GenesisDrive:  Received an append at the write level\n"));
 		ByteOffset = capFcb->Header.FileSize;
 	}
 
-	//Fix length (checks if length + offset is bigger than valid data length)
+	// Calculate write range
 	Length = RxContext->CurrentIrpSp->Parameters.Write.Length;
+
+	// Cap the size
+	if (Length > USER_KERNEL_MAX_TRANSFER_SIZE) {
+		Length = USER_KERNEL_MAX_TRANSFER_SIZE;
+	}	
+
 	EndOffset.QuadPart = ByteOffset.QuadPart + Length;
-	if(RtlLargeIntegerGreaterThan(EndOffset, capFcb->Header.ValidDataLength)){
-		Length = (ULONG)(capFcb->Header.ValidDataLength.QuadPart - ByteOffset.QuadPart);
+
+	// If write range is outside of valid range, truncate write range
+	if(RtlLargeIntegerGreaterThan(EndOffset, capFcb->Header.FileSize)){
+		GIIPrint(("GenesisDrive:  Write range is outside of valid range, fixing\n"));
+		Length = (ULONG)(capFcb->Header.FileSize.QuadPart - ByteOffset.QuadPart);
 	}
 
-	//Do we need to truncate before writing?
+	// Do we need to truncate before writing?
 	if(RtlLargeIntegerLessThan(capFcb->Header.FileSize, giiSrvOpen->ServerFileSize)){		
 		if((capFcb->Header.FileSize.QuadPart + ByteOffset.QuadPart) == capFcb->Header.FileSize.QuadPart){
-			*isTruncateAppend = TRUE;
-			DbgPrint("IsTruncateAppend!\n");
+			*isTruncateAppend = TRUE;			
 		}
 		else{
-			*isTruncateWrite = TRUE;
-			DbgPrint("IsTruncateWrite!\n");
+			*isTruncateWrite = TRUE;			
 		}
 	}
 
-	DbgPrint("GenesisWrite:  FileID is %d, ByteOffset is %I64d, ByteLength is %d \n", FileID, ByteOffset.QuadPart, Length);
+	GIIPrint(("GenesisDrive:  Write for fileID %d, ByteOffset is %I64d, ByteLength is %llu, current size is %I64d\n", 
+		FileID, ByteOffset.QuadPart, Length, capFcb->Header.FileSize.QuadPart));
 
 	//Let's copy other params
 	RtlCopyMemory(myBuffer, &FileID, sizeof(LONG));

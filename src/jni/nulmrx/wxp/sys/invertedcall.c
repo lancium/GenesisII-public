@@ -40,12 +40,12 @@ ULONG GenesisPrepareDirectoryAndTarget(PRX_CONTEXT RxContext, PVOID buffer, BOOL
 		RtlCopyMemory(myBuffer,giiCCB->Target.Buffer, giiCCB->Target.Length);
 		myBuffer[giiCCB->Target.Length] = '\0';
 		
-		DbgPrint("GenesisIFS:  Sending to Genesis for Directory %s and Target %s\n", (char*)buffer, myBuffer);
+		GIIPrint(("GenesisDrive:  Sending to Genesis for Directory %s and Target %s\n", (char*)buffer, myBuffer));
 
 		//Return lengths + 2 null characters
 		return sizeof(long) + giiCCB->Target.Length + 2;	
 	}else{
-		DbgPrint("GenesisIFS:  Sending get info to Genesis for File %s\n", (char*)buffer);
+		GIIPrint(("GenesisDrive:  Sending get info to Genesis for File %s\n", (char*)buffer));
 		myBuffer[0] = '\0';
 		return sizeof(long) + 1;
 	}
@@ -70,7 +70,7 @@ ULONG GenesisPrepareCreate(PRX_CONTEXT RxContext, PVOID buffer){
 	//Get unaltered deposition
 	RequestedDisposition = ((PtrIoStackLocation->Parameters.Create.Options >> 24) & 0xFF);	
 
-	DbgPrint("RequestedDispostion %d\n", RequestedDisposition);
+	GIIPrint(("RequestedDispostion %d\n", RequestedDisposition));
 
 	//Set up the desired access new appropriately
 	DesiredAccess = PtrIoStackLocation->Parameters.Create.SecurityContext->DesiredAccess;
@@ -103,7 +103,7 @@ ULONG GenesisPrepareCreate(PRX_CONTEXT RxContext, PVOID buffer){
 	RtlCopyMemory(myBuffer, &isDirectory, sizeof(UINT));
 	myBuffer += sizeof(UINT);
 
-	DbgPrint("GenesisIFS:  Sending create to Genesis for File %s\n", (char*)buffer);
+	GIIPrint(("GenesisDrive:  Sending create to Genesis for File %s\n", (char*)buffer));
 	myBuffer[0] = '\0';
 	return temp.Length + 2 + (sizeof(UINT) * 3);	
 }
@@ -260,194 +260,219 @@ NTSTATUS GenesisSendInvertedCall(PRX_CONTEXT RxContext, ULONG callType, BOOLEAN 
 			((PBYTE)(NulMRxDeviceObject) + sizeof(RDBSS_DEVICE_OBJECT));	
 	PGENESIS_CONTROL_EXTENSION controlExt =
 		(PGENESIS_CONTROL_EXTENSION)GeniiControlDeviceObject->DeviceExtension;
-	PLIST_ENTRY listEntry;
+	PLIST_ENTRY listEntry = NULL;
 	PIRP controlIrp;
 	PGENII_CONTROL_REQUEST controlRequest;	
 	PFAST_MUTEX dataQueueLock;
-	PLIST_ENTRY dataQueue;	
-	
+	PLIST_ENTRY dataQueue;		
 	PMDL mdl;
 	PVOID controlBuffer;
+	BOOLEAN isActive = TRUE;
     
 	dataQueue = &dataExt->GeniiRequestQueue;
     dataQueueLock = &dataExt->GeniiRequestQueueLock;
+	
+	// Data device read must be satisfied by queuing request off to the service.
+	dataRequest = (PGENII_REQUEST) ExAllocatePoolWithTag(PagedPool, sizeof(GENII_REQUEST), 'rdCO');
+	if (!dataRequest) {
+		// Complete the request, indicating that the operation failed						
+		return STATUS_INSUFFICIENT_RESOURCES;				
+	}
+	RtlZeroMemory(dataRequest, sizeof(GENII_REQUEST));
+	dataRequest->RequestID = (ULONG) InterlockedIncrement(&GeniiRequestID);
+	dataRequest->RequestType = callType;
 
-	// Insert the request into the appropriate queue here
-	ExAcquireFastMutex(dataQueueLock);
+	GIIPrint(("Preparing InvCall For reqId %d with type %d\n", dataRequest->RequestID, dataRequest->RequestType));
+	dataRequest->Irp = Irp;
 
-	if(controlExt->DeviceState == GENII_CONTROL_ACTIVE){
-		// Data device read must be satisfied by queuing request off to the service.
-		dataRequest = (PGENII_REQUEST) ExAllocatePoolWithTag(PagedPool, sizeof(GENII_REQUEST), 'rdCO');
-		if (!dataRequest) {
-			// Complete the request, indicating that the operation failed						
-			status = STATUS_INSUFFICIENT_RESOURCES;
+	// Also want originating RxContext!
+	dataRequest->RxContext = RxContext;
+				
+	// Acqiure lock here ***************************
+	ExAcquireFastMutex(&controlExt->ServiceQueueLock);	
 
-			//Cleanup (not good coding practice but easiest way without a HUGE if statement
-			ExReleaseFastMutex(dataQueueLock);	
-			return status;
+	// Fine grained lock control requires this
+	if(controlExt->DeviceState != GENII_CONTROL_ACTIVE) {
+		ExFreePoolWithTag(dataRequest, 'rdC0');
+		ExReleaseFastMutex(&controlExt->ServiceQueueLock);
+		return STATUS_DEVICE_NOT_CONNECTED;
+	}
+	// Remove head of the queue if not empty
+	if (!IsListEmpty(&controlExt->ServiceQueue)) {
+		//UFS has a thread ready to handle the request		
+		listEntry = RemoveHeadList(&controlExt->ServiceQueue);
+	}
+
+	// Release lock here *****************************
+	ExReleaseFastMutex(&controlExt->ServiceQueueLock);
+
+	//If no waiting threads.  We need to insert this into the request queue
+	if(listEntry == NULL) {				
+		ExAcquireFastMutex(dataQueueLock);		
+		ExAcquireFastMutex(&controlExt->RequestQueueLock);		
+
+		// Fine grained lock control requires this
+		if(controlExt->DeviceState != GENII_CONTROL_ACTIVE) {
+			ExFreePoolWithTag(dataRequest, 'rdC0');
+			ExReleaseFastMutex(&controlExt->RequestQueueLock);
+			ExReleaseFastMutex(dataQueueLock);
+			return STATUS_DEVICE_NOT_CONNECTED;
 		}
-		RtlZeroMemory(dataRequest, sizeof(GENII_REQUEST));
-		dataRequest->RequestID = (ULONG) InterlockedIncrement(&GeniiRequestID);
-		dataRequest->RequestType = callType;
-		dataRequest->Irp = Irp;				
 
-		//Also want originating RxContext!
-		dataRequest->RxContext = RxContext;
+		//We are enqueuing the IRP, mark it as pending if allowed
+		if(MarkAsPending){
+			RxMarkContextPending(RxContext);					
+			status = STATUS_PENDING;
+		}
+		
+		//Put the user's actual request in the queue for safekeeping
+		InsertTailList(dataQueue, &dataRequest->ListEntry);						
+
+		//Second since we don't have a thread to deal with this, put in rq		
+		InsertTailList(&controlExt->RequestQueue, &dataRequest->ServiceListEntry);
+
+		ExReleaseFastMutex(&controlExt->RequestQueueLock);
+		ExReleaseFastMutex(dataQueueLock);
+	}
+	else{		
+		controlIrp = CONTAINING_RECORD(listEntry, IRP, Tail.Overlay.ListEntry);
+
+		//This stuff locks control buffer (to write input commands into)
+		controlRequest = (PGENII_CONTROL_REQUEST) controlIrp->AssociatedIrp.SystemBuffer;
+		controlRequest->RequestID = dataRequest->RequestID;
+		controlRequest->RequestType = callType;
+
+		// Our problem here is that the control buffer is in a different address space.
+		mdl = IoAllocateMdl(controlRequest->RequestBuffer,
+						  controlRequest->RequestBufferLength,
+						  FALSE, // should not be any other MDLs associated with control IRP
+						  FALSE, // no quota charged
+						  controlIrp); // track the MDL in the control IRP...
+		
+		if (NULL == mdl) {               
+			// Complete the data request - this falls through and completes below.
+			status = STATUS_INSUFFICIENT_RESOURCES;				                    									
+		}				
+		else{
+			__try {
+				// Probe and lock the pages
+				MmProbeAndLockProcessPages(
+					mdl, 
+					IoGetRequestorProcess(controlIrp),
+					UserMode,
+					IoModifyAccess
+					);
+			} __except(EXCEPTION_EXECUTE_HANDLER) {
+				// Access probe failed				
+				status = GetExceptionCode();
+				GIIPrint(("GenesisDrive: MDL probe and lock page exception in invCall: %d\n", status));
+				IoFreeMdl(mdl);																		
+			}			
+		}
+		//We are still succesful
+		if(NT_SUCCESS(status)){			
 			
-		//Check if the UFS has a thread ready to handle this request
-		ExAcquireFastMutex(&controlExt->ServiceQueueLock);
+			//Actually get pointer (same as ControlRequest->RequestBuffer)
+			controlBuffer = MmGetSystemAddressForMdlSafe(mdl, NormalPagePriority);				
 
-		//If no waiting threads.  We need to insert this into the request queue
-		if (IsListEmpty(&controlExt->ServiceQueue)) {
+			switch(callType){
+				case GENII_QUERYDIRECTORY:
+					//Copies Directory and Target info into buffer with length
+					controlRequest->RequestBufferLength = 
+						GenesisPrepareDirectoryAndTarget(RxContext, controlBuffer, TRUE);
+					break;
+				case GENII_CREATE:
+					//Copies Target info into buffer
+					controlRequest->RequestBufferLength = 
+						GenesisPrepareCreate(RxContext, controlBuffer);
+					break;
+				case GENII_CLOSE:
+					//Copies Target info into buffer
+					controlRequest->RequestBufferLength = 
+						GenesisPrepareClose(RxContext, controlBuffer);
+					break;						
+				case GENII_READ:
 
-			//First put it into Data Queue
+					//NO IDEA WHY HERE
+					//Let's now lock the user buffer (back to user space) (lock for write)
+					//status = GenesisLockCallersBuffer(RxContext->CurrentIrp, FALSE, 
+					//	RxContext->CurrentIrpSp->Parameters.Read.Length);
+					//Copies target, offset and length info into buffer
+					controlRequest->RequestBufferLength = 
+						GenesisPrepareReadParams(RxContext, controlBuffer);					
+					break;
+				case GENII_WRITE:
+				{
+					BOOLEAN isTruncateAppend = FALSE;
+					BOOLEAN isTruncateWrite = FALSE;
+
+					//Copies target, offset and length info into buffer
+					controlRequest->RequestBufferLength = 
+						GenesisPrepareWriteParams(RxContext, controlBuffer, &isTruncateAppend, 
+							&isTruncateWrite);
+
+					if(isTruncateAppend || isTruncateWrite){
+						controlRequest->RequestType = GENII_TRUNCATEAPPEND;
+					}
+					break;
+				}
+				case GENII_RENAME:				
+					//Copies Target info into buffer
+					controlRequest->RequestBufferLength = 
+						GenesisPrepareRename(RxContext, controlBuffer);
+					break;						
+				default:
+					GIIPrint(("GenesisDrive: Unsupported function trying to be sent to UFS"));
+					status = STATUS_NOT_SUPPORTED;
+			}
+		}
+		//Were we successful with getting the control request and moving the data request into it
+		if(NT_SUCCESS(status)){
+
+			//Insert into Data Q (ready to be responded to)
+			ExAcquireFastMutex(dataQueueLock);
+
+			// Fine grained lock control requires this
+			if(controlExt->DeviceState != GENII_CONTROL_ACTIVE) {
+				ExFreePoolWithTag(dataRequest, 'rdC0');
+				IoFreeMdl(mdl);
+				ExReleaseFastMutex(dataQueueLock);
+				return STATUS_DEVICE_NOT_CONNECTED;
+			}
 
 			//We are enqueuing the IRP, mark it as pending if allowed
 			if(MarkAsPending){
 				RxMarkContextPending(RxContext);					
 				status = STATUS_PENDING;
-			}
+			}			
+			
+			InsertTailList(dataQueue, &dataRequest->ListEntry);
+			ExReleaseFastMutex(dataQueueLock);
 
-			//Insert into Data Q (ready to be responded to)
-			InsertTailList(dataQueue, &dataRequest->ListEntry);	
-
-			//Second put it into Request Queue
-			ExAcquireFastMutex(&controlExt->RequestQueueLock);
-			InsertTailList(&controlExt->RequestQueue, &dataRequest->ServiceListEntry);
-			ExReleaseFastMutex(&controlExt->RequestQueueLock);			
+			//Second, sends back inverted call
+			controlIrp->IoStatus.Status = STATUS_SUCCESS;
+			controlIrp->IoStatus.Information = sizeof(GENII_CONTROL_REQUEST);          
+			IoCompleteRequest(controlIrp, IO_NO_INCREMENT);
 		}
 		else{
-			//UFS has a thread ready to handle the request		
-			listEntry = RemoveHeadList(&controlExt->ServiceQueue);			
+			GIIPrint(("GenesisDrive: InvCall returned bad status %d !!!\n", status));
 
-			controlIrp = CONTAINING_RECORD(listEntry, IRP, Tail.Overlay.ListEntry);
+			//Free memory
+			ExFreePoolWithTag(dataRequest,'rdCO');
 
-			//This stuff locks control buffer (to write input commands into)
-			controlRequest = (PGENII_CONTROL_REQUEST) controlIrp->AssociatedIrp.SystemBuffer;							
-			controlRequest->RequestID = dataRequest->RequestID;			
-			controlRequest->RequestType = callType;				
-
-			// Our problem here is that the control buffer is in a different address space.
-			mdl = IoAllocateMdl(controlRequest->RequestBuffer,
-							  controlRequest->RequestBufferLength,
-							  FALSE, // should not be any other MDLs associated with control IRP
-							  FALSE, // no quota charged
-							  controlIrp); // track the MDL in the control IRP...
+			//Return entry to ServiceQueue (so we don't lose threads :-))
+			ExAcquireFastMutex(&controlExt->ServiceQueueLock);
 			
-			if (NULL == mdl) {               
-				// Complete the data request - this falls through and completes below.
-				status = STATUS_INSUFFICIENT_RESOURCES;				                    									
-			}				
-			else{
-				__try {
-					// Probe and lock the pages
-					MmProbeAndLockProcessPages(mdl, IoGetRequestorProcess(controlIrp),UserMode,IoModifyAccess);
-				} __except(EXCEPTION_EXECUTE_HANDLER) {
-					// Access probe failed	                
-					status = GetExceptionCode();
-
-					// Cleanup what we were doing....
-					IoFreeMdl(mdl);					
-				
-					//I'm not sure about the right status to return here
-					status = STATUS_INSUFFICIENT_RESOURCES;					
-				}			
+			// Fine grained lock control requires this
+			if(controlExt->DeviceState != GENII_CONTROL_ACTIVE) {								
+				ExReleaseFastMutex(&controlExt->ServiceQueueLock);
+				return STATUS_DEVICE_NOT_CONNECTED;
 			}
-			//We are still succesful
-			if(NT_SUCCESS(status)){
-				
-				//Actually get pointer (same as ControlRequest->RequestBuffer)
-				controlBuffer = MmGetSystemAddressForMdlSafe(mdl, NormalPagePriority);				
 
-				switch(callType){
-					case GENII_QUERYDIRECTORY:
-						//Copies Directory and Target info into buffer with length
-						controlRequest->RequestBufferLength = 
-							GenesisPrepareDirectoryAndTarget(RxContext, controlBuffer, TRUE);
-						break;
-					case GENII_CREATE:
-						//Copies Target info into buffer
-						controlRequest->RequestBufferLength = 
-							GenesisPrepareCreate(RxContext, controlBuffer);
-						break;
-					case GENII_CLOSE:
-						//Copies Target info into buffer
-						controlRequest->RequestBufferLength = 
-							GenesisPrepareClose(RxContext, controlBuffer);
-						break;						
-					case GENII_READ:
-						//Let's now lock the user buffer (back to user space) (lock for write)
-						status = GenesisLockCallersBuffer(RxContext->CurrentIrp, FALSE, 
-							RxContext->CurrentIrpSp->Parameters.Read.Length);
-
-						//Copies target, offset and length info into buffer
-						controlRequest->RequestBufferLength = 
-							GenesisPrepareReadParams(RxContext, controlBuffer);
-						break;
-					case GENII_WRITE:
-					{
-						BOOLEAN isTruncateAppend = FALSE;
-						BOOLEAN isTruncateWrite = FALSE;
-
-						//Copies target, offset and length info into buffer
-						controlRequest->RequestBufferLength = 
-							GenesisPrepareWriteParams(RxContext, controlBuffer, &isTruncateAppend, 
-								&isTruncateWrite);
-
-						if(isTruncateAppend || isTruncateWrite){
-							controlRequest->RequestType = GENII_TRUNCATEAPPEND;
-						}
-						break;
-					}
-					case GENII_RENAME:
-					{
-						//Copies Target info into buffer
-						controlRequest->RequestBufferLength = 
-							GenesisPrepareRename(RxContext, controlBuffer);
-						break;		
-					}
-					default:
-						DbgPrint("G-ICING:  Unsupported function trying to be sent to UFS");
-						status = STATUS_NOT_SUPPORTED;						
-				}
-			}
-			//Were we successful with getting the control request and moving the data request into it
-			if(NT_SUCCESS(status)){
-
-				//First place in Data Queue
-
-				//We are enqueuing the IRP, mark it as pending if allowed
-				if(MarkAsPending){
-					RxMarkContextPending(RxContext);					
-					status = STATUS_PENDING;
-				}
-
-				//Insert into Data Q (ready to be responded to)
-				InsertTailList(dataQueue, &dataRequest->ListEntry);					
-
-				//Second, sends back inverted call
-				controlIrp->IoStatus.Status = STATUS_SUCCESS;
-				controlIrp->IoStatus.Information = sizeof(GENII_CONTROL_REQUEST);          
-				IoCompleteRequest(controlIrp, IO_NO_INCREMENT);
-			}
-			else{
-				DbgPrint("G-ICING returned bad status %d\n", status);
-
-				//Free memory
-				ExFreePoolWithTag(dataRequest,'rdCO');
-
-				//Return entry to ServiceQueue (so we don't lose threads :-))
-				InsertTailList(&controlExt->ServiceQueue, listEntry);
-			}
-			//Release the service queue lock
-			ExReleaseFastMutex(&controlExt->ServiceQueueLock);					
-		}
-	}else{		
-		//Device is inactive	
-		status = STATUS_DEVICE_NOT_CONNECTED;		
-	}	  	
-	ExReleaseFastMutex(dataQueueLock);	
-
+			InsertTailList(&controlExt->ServiceQueue, listEntry);
+			ExReleaseFastMutex(&controlExt->ServiceQueueLock);
+		}			
+	}
 	return status;	
 }
 
@@ -467,7 +492,7 @@ NTSTATUS GenesisSendInvertedCall(PRX_CONTEXT RxContext, ULONG callType, BOOLEAN 
 *
 *************************************************************************
 --*/
-NTSTATUS GenesisLockCallersBuffer(PIRP PtrIrp,BOOLEAN IsReadOperation,ULONG Length)
+NTSTATUS GenesisLockCallersBuffer(PIRP PtrIrp, BOOLEAN IsReadOperation, ULONG Length)
 {
 	NTSTATUS			RC = STATUS_SUCCESS;
 	PMDL				PtrMdl = NULL;

@@ -19,6 +19,7 @@ the null mini rdr.
 //  The local debug trace level
 
 #define Dbg                              (DEBUG_TRACE_INIT)
+#define DEBUG							 0
 
 #include "ntverp.h"
 #include "nulmrx.h"
@@ -133,10 +134,10 @@ DriverEntry(
 
 	ULONG i;
 
-	DbgPrint("+++ NULMRX Driver %08lx Loaded +++\n", DriverObject);
+	DbgPrint("+++ GenesisDrive Driver %08lx Loaded +++\n", DriverObject);
 	Status =  RxDriverEntry(DriverObject, RegistryPath);
 	if (Status != STATUS_SUCCESS) {
-		DbgPrint("Wrapper failed to initialize. Status = %08lx\n",Status);
+		DbgPrint("GenesisDrive: Wrapper failed to initialize. Status = %08lx\n",Status);
 		return(Status);
 	}
 
@@ -202,7 +203,7 @@ DriverEntry(
 
 		/* ------------------ Genii Control Device code start ------------------------ */
 
-		DbgPrint("Initializing the Genii Controller Device ... ");		
+		GIIPrint(("Initializing the Genii Controller Device ... "));
 		RtlInitUnicodeString(&GeniiControlName, DD_GENII_CONTROL_DEVICE_NAME_U);						
 		Status = IoCreateDevice(DriverObject,
 			sizeof(GENESIS_CONTROL_EXTENSION),
@@ -239,7 +240,7 @@ DriverEntry(
 			try_return(Status);
 		}
 
-		DbgPrint("initialization complete!\n");
+		GIIPrint(("initialization complete!\n"));
 
 		NulMRxInitState = NULMRXINIT_GENII_CONTROLLER_CREATED;
 
@@ -261,7 +262,7 @@ try_exit: NOTHING;
 
 	if (Status != STATUS_SUCCESS) {
 		NulMRxInitUnwind(DriverObject,NulMRxInitState);
-		DbgPrint("NulMRx failed to start with %08lx %08lx\n",Status,NulMRxInitState);
+		DbgPrint("GenesisDrive: failed to start with %08lx %08lx\n",Status,NulMRxInitState);
 		return(Status);
 	}
 
@@ -295,8 +296,7 @@ try_exit: NOTHING;
 				NULMRX_STARTABLE);
 
 			if (State != NULMRX_STARTABLE) {
-				Status = STATUS_REDIRECTOR_STARTED;
-				DbgPrint("Status is STATUS_REDIR_STARTED\n");
+				Status = STATUS_REDIRECTOR_STARTED;				
 			}
 
 			//
@@ -425,18 +425,18 @@ NulMRxUnload(
 	RtlInitUnicodeString(&UserModeDeviceName, DD_NULMRX_USERMODE_SHADOW_DEV_NAME_U);
 	Status = IoDeleteSymbolicLink( &UserModeDeviceName);
 	if (Status!=STATUS_SUCCESS) {
-		DbgPrint("NulMRx - main: Could not delete Symbolic Link\n");
+		// Could not delete symbolic link
 	}
 
 	/* Extra code for Genii Contorller unload */
 	RtlInitUnicodeString(&UserModeDeviceName, DD_GENII_CONTROL_DEVICE_USER_NAME);
 	Status = IoDeleteSymbolicLink( &UserModeDeviceName);
 	if (Status!=STATUS_SUCCESS) {
-		DbgPrint("NulMRx - Genii: Could not delete Symbolic Link\n");
+		// Could not delete Symbolic Link
 	}		
 
 	RxUnload(DriverObject);
-	DbgPrint("+++ NULMRX Driver %08lx Unoaded +++\n", DriverObject);
+	DbgPrint("+++ GenesisDrive Driver %08lx Unoaded +++\n", DriverObject);
 }
 
 
@@ -569,10 +569,7 @@ NulMRxStart(
 
 			--*/
 {
-	NTSTATUS Status = STATUS_SUCCESS;
-
-	DbgPrint("Entering NulMRxStart \n");
-
+	NTSTATUS Status = STATUS_SUCCESS;	
 	return Status;
 }
 
@@ -603,11 +600,7 @@ NulMRxStop(
 
 		   --*/
 {
-	NTSTATUS Status;
-
-	DbgPrint("Entering NulMRxStop \n");
-
-
+	NTSTATUS Status;	
 	return(STATUS_SUCCESS);
 }
 
@@ -724,15 +717,14 @@ NulMRxFsdDispatch (
 				Status = VCGRGeniiControlClose(DeviceObject, Irp);
 				break;		
 			case IRP_MJ_FLUSH_BUFFERS:
-			case IRP_MJ_CLEANUP:
-				DbgPrint("G-ICING: Cleanup received\n");
+			case IRP_MJ_CLEANUP:				
 				Irp->IoStatus.Status = STATUS_SUCCESS;
 				Irp->IoStatus.Information = 0;
 				IoCompleteRequest(Irp, IO_NO_INCREMENT);
 				Status = STATUS_SUCCESS;
 				break;
 			default:		
-				DbgPrint("NulMRxFsdDispatch:  Unknown control code for GC received %d.\n", irpSp->MajorFunction);
+				GIIPrint(("GenesisDrive:  Dispatch received unknown control code: %d.\n", irpSp->MajorFunction));
 				Irp->IoStatus.Status = STATUS_INVALID_DEVICE_REQUEST;
 				Irp->IoStatus.Information = 0;
 				IoCompleteRequest(Irp, IO_NO_INCREMENT);
@@ -794,7 +786,7 @@ NulMRxGetUlongRegistryParameter(
 		if (Value->Type == REG_DWORD) {
 			PULONG ConfigValue = (PULONG)&Value->Data[0];
 			*ParamUlong = *((PULONG)ConfigValue);
-			DbgPrint("readRegistryvalue %wZ = %08lx\n",&UnicodeString,*ParamUlong);
+			GIIPrint(("readRegistryvalue %wZ = %08lx\n",&UnicodeString,*ParamUlong));
 			return(STATUS_SUCCESS);
 		} else {
 			Status = STATUS_INVALID_PARAMETER;
@@ -853,9 +845,7 @@ NulMRxReadRegistryParameters()
 //  complete the control request - that is the job of the caller!  It DOES
 //  complete the data request (if it finds a matching entry).
 static NTSTATUS ProcessUFSClose()
-{	
-	PLIST_ENTRY dataQueue;
-	PFAST_MUTEX dataQueueLock;
+{		
 	PLIST_ENTRY listEntry;	
 	PGENII_REQUEST dataRequest = NULL; 
 	PIRP controlIrp;	
@@ -864,33 +854,23 @@ static NTSTATUS ProcessUFSClose()
 	PNULMRX_DEVICE_EXTENSION dataExt = (PNULMRX_DEVICE_EXTENSION)
 		((PBYTE)(NulMRxDeviceObject) + sizeof(RDBSS_DEVICE_OBJECT));
 	PGENESIS_CONTROL_EXTENSION controlExt =
-		(PGENESIS_CONTROL_EXTENSION) GeniiControlDeviceObject->DeviceExtension;
+		(PGENESIS_CONTROL_EXTENSION) GeniiControlDeviceObject->DeviceExtension;	
 
-	DbgPrint("ProcessUFSClose: Entered. \n");	
-
-	//Get Data Queue locks and queue
-	dataQueue = &dataExt->GeniiRequestQueue;
-    dataQueueLock = &dataExt->GeniiRequestQueueLock;
-
-	ExAcquireFastMutex(dataQueueLock);
-
+	ExAcquireFastMutex(&dataExt->GeniiRequestQueueLock);	
+	ExAcquireFastMutex(&controlExt->ServiceQueueLock);
+	ExAcquireFastMutex(&controlExt->RequestQueueLock);		
+	
 	//Mark inactive
 	controlExt->DeviceState = GENII_CONTROL_INACTIVE;
 
-	//Get all other locks - time for clean up
-	ExAcquireFastMutex(&controlExt->ServiceQueueLock);
-	ExAcquireFastMutex(&controlExt->RequestQueueLock);		
-
 	//Empty service Queue
-	while(!IsListEmpty(dataQueue)){
-		listEntry = RemoveHeadList(dataQueue);	
+	while(!IsListEmpty(&dataExt->GeniiRequestQueue)){
+		listEntry = RemoveHeadList(&dataExt->GeniiRequestQueue);	
 		dataRequest = CONTAINING_RECORD(listEntry, GENII_REQUEST, ListEntry);
 		if (dataRequest != NULL) {
 
 			BOOLEAN isSynchronous = IoIsOperationSynchronous(dataRequest->Irp);													
-			GenesisGetFcbExtension(dataRequest->RxContext->pFcb, giiFcb);
-
-			RemoveEntryList(listEntry);	
+			GenesisGetFcbExtension(dataRequest->RxContext->pFcb, giiFcb);			
 
 			switch(dataRequest->RequestType){
 				case GENII_QUERYDIRECTORY:	
@@ -905,7 +885,6 @@ static NTSTATUS ProcessUFSClose()
 						ExReleaseFastMutex(&giiFcb->ExclusiveLock);
 						RxCompleteAsynchronousRequest(dataRequest->RxContext, status);						
 					}					
-
 					break;
 				}
 
@@ -922,7 +901,6 @@ static NTSTATUS ProcessUFSClose()
 				case GENII_WRITE:
 				{				
 					PGENESIS_COMPLETION_CONTEXT pIoCompContext = GenesisGetMinirdrContext(dataRequest->RxContext);
-
 					if(pIoCompContext->IoType == IO_TYPE_SYNCHRONOUS){
 						//Release semaphore.  This should make the synch read finish
 						KeReleaseSemaphore(&(giiFcb->InvertedCallSemaphore),0, 1, FALSE);								
@@ -942,16 +920,12 @@ static NTSTATUS ProcessUFSClose()
 					break;
 			}					
 		}				
-	}
-
-	DbgPrint("ProcessUFSClose: Entries in DataQueue removed. \n");	
+	}	
 
 	//Empty request Queue
 	while(!IsListEmpty(&controlExt->RequestQueue)){
 		RemoveHeadList(&controlExt->RequestQueue);
-	}	
-
-	DbgPrint("ProcessUFSClose: Entries in RequestQueue removed. \n");
+	}		
 
 	//Empty service Queue
 	while(!IsListEmpty(&controlExt->ServiceQueue)){
@@ -962,13 +936,11 @@ static NTSTATUS ProcessUFSClose()
 			controlIrp->IoStatus.Information = sizeof(GENII_CONTROL_REQUEST);      
 			IoCompleteRequest(controlIrp, IO_NO_INCREMENT);
 		}
-	}	
-
-	DbgPrint("ProcessUFSClose: Entries in ServiceQueue removed. \n");	
+	}		
 	
 	ExReleaseFastMutex(&controlExt->RequestQueueLock);
 	ExReleaseFastMutex(&controlExt->ServiceQueueLock);	
-	ExReleaseFastMutex(dataQueueLock);
+	ExReleaseFastMutex(&dataExt->GeniiRequestQueueLock);
 
 	// Return the results of the operation.
 	return STATUS_SUCCESS;
@@ -997,226 +969,201 @@ static NTSTATUS ProcessResponse(PIRP Irp)
 	PLIST_ENTRY nextEntry;
 	PGENII_REQUEST dataRequest = NULL; 
 	NTSTATUS status = STATUS_SUCCESS;
-	PVOID buffer = NULL;
-	PIO_STACK_LOCATION irpSp;
+	PVOID buffer = NULL;	
 	ULONG bytesToCopy;
 	PMDL mdl;	
-	BOOLEAN isActive;
+	BOOLEAN hasMatched=FALSE;
 
 	PNULMRX_DEVICE_EXTENSION dataExt = (PNULMRX_DEVICE_EXTENSION)
 		((PBYTE)(NulMRxDeviceObject) + sizeof(RDBSS_DEVICE_OBJECT));
 	PGENESIS_CONTROL_EXTENSION controlExt =
-		(PGENESIS_CONTROL_EXTENSION) GeniiControlDeviceObject->DeviceExtension;
-
-	DbgPrint("ProcessResponse: Entered. \n");
+		(PGENESIS_CONTROL_EXTENSION) GeniiControlDeviceObject->DeviceExtension;	
 
 	// Get the response packet
 	response = (PGENII_CONTROL_RESPONSE) Irp->AssociatedIrp.SystemBuffer;
 
-	//Always assuming correct response type
 	dataQueue = &dataExt->GeniiRequestQueue;
 	dataQueueLock = &dataExt->GeniiRequestQueueLock;
 
 	//Check to make sure if active first
-	ExAcquireFastMutex(dataQueueLock);
-	isActive = (controlExt->DeviceState == GENII_CONTROL_ACTIVE);	
+	ExAcquireFastMutex(dataQueueLock);		
 	
 	//Early abort if device is inactive
-	if(!isActive){
+	if(controlExt->DeviceState != GENII_CONTROL_ACTIVE){
 		ExReleaseFastMutex(dataQueueLock);
 		return status;
 	}
 
 	for (listEntry = dataQueue->Flink;
-		listEntry != dataQueue;
-		listEntry = listEntry->Flink) {
+			listEntry != dataQueue && hasMatched == FALSE;
+			listEntry = listEntry->Flink) {
 
-			// Check to see if this response matches up    
-			dataRequest = CONTAINING_RECORD(listEntry, GENII_REQUEST, ListEntry);
+		// Check to see if this response matches up    
+		dataRequest = CONTAINING_RECORD(listEntry, GENII_REQUEST, ListEntry);
 
-			if (dataRequest != NULL && dataRequest->RequestID == response->RequestID) {
-
-				//  This is our request, process it:
-				//  - Remove it from the list
-				//  - Transfer the data
-				//  - Indicate the results
-				//  - Complete the IRP
-				BOOLEAN isSynchronous = IoIsOperationSynchronous(dataRequest->Irp);
-				BOOLEAN hasReleasedRequest = FALSE;
-
-				RemoveEntryList(listEntry);
-
-				irpSp = IoGetCurrentIrpStackLocation(dataRequest->Irp);
-
-				try{				
-					PMRX_FCB commonFcb = dataRequest->RxContext->pFcb;
-					GenesisGetFcbExtension(commonFcb, giiFcb);
-					GenesisGetCcbExtension(commonFcb, giiCcb);
-
-					switch(response->ResponseType){
-						case GENII_QUERYDIRECTORY:	
-							{
-								//Stores result into File Control Block (should have exclusive access)
-								GenesisSaveDirectoryListing(giiFcb, response->ResponseBuffer, response->StatusCode);								
-
-								if(!isSynchronous){
-									status = GenesisCompleteQueryDirectory(dataRequest->RxContext);
-									//Release exclusive lock to FCB (information saved already)
-									ExReleaseFastMutex(&giiFcb->ExclusiveLock);
-
-									DbgPrint("NulMRxQueryDirectory: Ended for file %wZ\n", 
-										dataRequest->RxContext->pRelevantSrvOpen->pAlreadyPrefixedName);
-									
-									RxCompleteAsynchronousRequest(dataRequest->RxContext, status);						
-								}
-								else{
-									//Release semaphore
-									KeReleaseSemaphore(&(giiFcb->InvertedCallSemaphore),0, 1, FALSE);					
-								}								
-
-								//If it got here it is successful regardless
-								status = STATUS_SUCCESS;
-								break;
-							}
-
-						//Always synchronous
-						case GENII_CREATE:
-						{				
-							//SAVE INTO FCB here
-							GenesisSaveInfoIntoFCB(commonFcb, response->ResponseBuffer, response->StatusCode);										
-
-							//Release semaphore.  This should make the create finish
-							KeReleaseSemaphore(&(giiFcb->InvertedCallSemaphore),0, 1, FALSE);
-
-							//If it got here it is successful regardless
-							status = STATUS_SUCCESS;					
-							break;
-						}
-						case GENII_RENAME:
-						{
-							memcpy(&giiCcb->lastStatus, response->ResponseBuffer, sizeof(int));
-
-							//Release semaphore.  This should make the create finish
-							KeReleaseSemaphore(&(giiFcb->InvertedCallSemaphore),0, 1, FALSE);
-
-							//If it got here it is successful regardless
-							status = STATUS_SUCCESS;					
-							break;
-						}
-						case GENII_READ:			
-						{				
-							PGENESIS_COMPLETION_CONTEXT pIoCompContext = GenesisGetMinirdrContext(dataRequest->RxContext);
-							ULONG Information = 0;
-
-							if (response->ResponseBufferLength < irpSp->Parameters.Read.Length) {
-								bytesToCopy = response->ResponseBufferLength;
-							} else {
-								bytesToCopy = irpSp->Parameters.Read.Length;
-							}
-
-							DbgPrint("GeniiReadReturn:  Starting copy\n");
-
-							//Check to see if some error happened
-							if(response->ResponseBufferLength == -1){
-								status = STATUS_FILE_INVALID;
-								DbgPrint("GeniiReadReturn: Response buffer -1\n");
-							}
-
-							else{
-								buffer = pIoCompContext->Context;						
-
-								__try { 
-									RtlCopyMemory(buffer, response->ResponseBuffer, bytesToCopy);							
-									DbgPrint("GeniiReadReturn:  Copy successful to temp buffer %d\n", bytesToCopy);
-									status = STATUS_SUCCESS;
-									Information = bytesToCopy;
-								} __except (EXCEPTION_EXECUTE_HANDLER) {
-									status = GetExceptionCode();							
-								}							
-							}
-
-							//Complete Request
-							pIoCompContext->Status = status;
-							pIoCompContext->Information = Information;
-
-							if(pIoCompContext->IoType == IO_TYPE_SYNCHRONOUS){
-								//Release semaphore.  This should make the synch read finish
-								KeReleaseSemaphore(&(giiFcb->InvertedCallSemaphore),0, 1, FALSE);
-							}
-							else{
-								RxSetIoStatusInfo(dataRequest->RxContext, Information);
-								RxSetIoStatusStatus(dataRequest->RxContext, status);
-								status = RxLowIoCompletion(dataRequest->RxContext);
-							}
-
-							// The control operation was successful in any case
-							status = STATUS_SUCCESS;
-
-							// And break from the loop, no sense looking any farther
-							break;
-						}
-						case GENII_TRUNCATEAPPEND:
-						case GENII_WRITE:
-						{
-							PGENESIS_COMPLETION_CONTEXT pIoCompContext = GenesisGetMinirdrContext(dataRequest->RxContext);
-							ULONG Information = 0;
-
-							if(response->ResponseType == GENII_TRUNCATEAPPEND){
-								DbgPrint("GeniiTruncateAppend returned!\n");
-							}else{
-								DbgPrint("GeniiWriteReturned\n");
-							}
-
-							//Check to see if some error happened
-							if(response->ResponseBufferLength == -1){
-								status = STATUS_ACCESS_DENIED;						
-							}
-							else{
-								Information = response->ResponseBufferLength;
-								status = STATUS_SUCCESS;
-							}
-
-							pIoCompContext->Information = Information;
-							pIoCompContext->Status = status;
-
-							if(pIoCompContext->IoType == IO_TYPE_SYNCHRONOUS){
-								//Release semaphore.  This should make the synch read finish
-								KeReleaseSemaphore(&(giiFcb->InvertedCallSemaphore),0, 1, FALSE);								
-							}
-							else{
-								RxSetIoStatusInfo(dataRequest->RxContext, Information);
-								RxSetIoStatusStatus(dataRequest->RxContext, status);
-								status = RxLowIoCompletion(dataRequest->RxContext);
-							}
-
-							status = STATUS_SUCCESS;
-							break;
-
-						}
-						case GENII_CLOSE:
-							//Release semaphore.  This should make the close finish
-							KeReleaseSemaphore(&(giiFcb->InvertedCallSemaphore),0, 1, FALSE);		
-							break;
-						default:
-							DbgPrint("ProcessResponse:  Invalid Response Type!\n");
-							dataRequest->Irp->IoStatus.Status = STATUS_INVALID_PARAMETER;
-							dataRequest->Irp->IoStatus.Information = 0;
-							IoCompleteRequest(dataRequest->Irp, IO_NO_INCREMENT);				
-							break;
-					}
-					hasReleasedRequest = TRUE;
-				}
-				finally{
-					if(!hasReleasedRequest){
-						DbgPrint("Response type was unknown %d  \n", response->ResponseType);	
-						dataRequest->Irp->IoStatus.Status = STATUS_INVALID_PARAMETER;
-						dataRequest->Irp->IoStatus.Information = 0;
-						IoCompleteRequest(dataRequest->Irp, IO_NO_INCREMENT);	
-					}
-				}			
-			}
+		// This one matches the control request
+		if (dataRequest != NULL && dataRequest->RequestID == response->RequestID) {												
+			RemoveEntryList(listEntry);
+			hasMatched = TRUE;
+		}
 	}
+	// We no longer need the data queue
 	ExReleaseFastMutex(dataQueueLock);
+
+	if(dataRequest != NULL) {
+		BOOLEAN isSynchronous = IoIsOperationSynchronous(dataRequest->Irp);
+		PMRX_FCB commonFcb;
+		PIO_STACK_LOCATION irpSp;
+
+		// Get CCB and FCB for the original data request
+		GenesisGetFcbExtension(dataRequest->RxContext->pFcb, giiFcb);
+		GenesisGetCcbExtension(dataRequest->RxContext->pFcb, giiCcb);			
+
+		// Get some misc info
+		commonFcb = dataRequest->RxContext->pFcb;
+		irpSp = IoGetCurrentIrpStackLocation(dataRequest->Irp);
+
+		switch(response->ResponseType){
+			case GENII_QUERYDIRECTORY:					
+				//Stores result into File Control Block (should have exclusive access)
+				GenesisSaveDirectoryListing(giiFcb, response->ResponseBuffer, response->StatusCode);								
+
+				if(!isSynchronous){
+					status = GenesisCompleteQueryDirectory(dataRequest->RxContext);
+					//Release exclusive lock to FCB (information saved already)
+					ExReleaseFastMutex(&giiFcb->ExclusiveLock);																
+					GIIPrint(("GenesisDrive:  QueryDirectory Ended for file %wZ\n", 
+						dataRequest->RxContext->pRelevantSrvOpen->pAlreadyPrefixedName));
+					RxCompleteAsynchronousRequest(dataRequest->RxContext, status);						
+				}
+				else{
+					//Release semaphore
+					KeReleaseSemaphore(&(giiFcb->InvertedCallSemaphore),0, 1, FALSE);					
+				}								
+
+				//If it got here it is successful regardless
+				status = STATUS_SUCCESS;
+				break;				
+
+			//Always synchronous
+			case GENII_CREATE:								
+				GenesisSaveInfoIntoFCB(commonFcb, response->ResponseBuffer, response->StatusCode);										
+
+				//Release semaphore.  This should make the create finish
+				KeReleaseSemaphore(&(giiFcb->InvertedCallSemaphore),0, 1, FALSE);
+
+				//If it got here it is successful regardless
+				status = STATUS_SUCCESS;					
+				break;			
+			case GENII_RENAME:			
+				memcpy(&giiCcb->lastStatus, response->ResponseBuffer, sizeof(int));
+
+				//Release semaphore.  This should make the create finish
+				KeReleaseSemaphore(&(giiFcb->InvertedCallSemaphore),0, 1, FALSE);
+
+				//If it got here it is successful regardless
+				status = STATUS_SUCCESS;					
+				break;			
+			case GENII_READ:			
+			{				
+				PGENESIS_COMPLETION_CONTEXT pIoCompContext = GenesisGetMinirdrContext(dataRequest->RxContext);
+				ULONG Information = 0;
+
+				if (response->ResponseBufferLength < irpSp->Parameters.Read.Length) {
+					bytesToCopy = response->ResponseBufferLength;
+				} else {
+					bytesToCopy = irpSp->Parameters.Read.Length;
+				}							
+
+				//Check to see if some error happened
+				if(response->ResponseBufferLength == -1){
+					status = STATUS_FILE_INVALID;							
+				}
+
+				else{
+					buffer = pIoCompContext->Context;						
+
+					__try { 
+						RtlCopyMemory(buffer, response->ResponseBuffer, bytesToCopy);																
+						status = STATUS_SUCCESS;
+						Information = bytesToCopy;
+					} __except (EXCEPTION_EXECUTE_HANDLER) {
+						status = GetExceptionCode();							
+					}							
+				}
+
+				//Complete Request
+				pIoCompContext->Status = status;
+				pIoCompContext->Information = Information;
+
+				if(pIoCompContext->IoType == IO_TYPE_SYNCHRONOUS){
+					//Release semaphore.  This should make the synch read finish
+					KeReleaseSemaphore(&(giiFcb->InvertedCallSemaphore),0, 1, FALSE);
+				}
+				else{
+					RxSetIoStatusInfo(dataRequest->RxContext, Information);
+					RxSetIoStatusStatus(dataRequest->RxContext, status);
+					status = RxLowIoCompletion(dataRequest->RxContext);
+				}
+
+				// The control operation was successful in any case
+				status = STATUS_SUCCESS;
+
+				// And break from the loop, no sense looking any farther
+				break;
+			}
+			case GENII_TRUNCATEAPPEND:
+			case GENII_WRITE:
+			{
+				PGENESIS_COMPLETION_CONTEXT pIoCompContext = GenesisGetMinirdrContext(dataRequest->RxContext);
+				ULONG Information = 0;							
+
+				//Check to see if some error happened
+				if(response->ResponseBufferLength == -1){
+					status = STATUS_ACCESS_DENIED;						
+				}
+				else{
+					Information = response->ResponseBufferLength;
+					status = STATUS_SUCCESS;
+				}
+
+				pIoCompContext->Information = Information;
+				pIoCompContext->Status = status;
+
+				if(pIoCompContext->IoType == IO_TYPE_SYNCHRONOUS){
+					//Release semaphore.  This should make the synch write finish
+					KeReleaseSemaphore(&(giiFcb->InvertedCallSemaphore),0, 1, FALSE);								
+				}
+				else{
+					RxSetIoStatusInfo(dataRequest->RxContext, Information);
+					RxSetIoStatusStatus(dataRequest->RxContext, status);
+					status = RxLowIoCompletion(dataRequest->RxContext);
+				}
+
+				status = STATUS_SUCCESS;
+				break;
+
+			}
+			case GENII_CLOSE:
+				//Release semaphore.  This should make the close finish
+				KeReleaseSemaphore(&(giiFcb->InvertedCallSemaphore),0, 1, FALSE);		
+				break;
+			default:
+				GIIPrint(("GenesisDrive:  ProcessResponse received invalid response type: %d!\n"
+					, response->ResponseType));
+				//Free associated data buffer
+				status = STATUS_INVALID_PARAMETER;	
+				dataRequest->Irp->IoStatus.Status = STATUS_INTERNAL_ERROR;
+				dataRequest->Irp->IoStatus.Information = 0;
+				IoCompleteRequest(dataRequest->Irp, IO_NO_INCREMENT);
+				break;
+		} // End switch statement
+		//Free memory allocated in Inverted Call
+		ExFreePoolWithTag(dataRequest,'rdCO');
+	} else {	// We have no matching IRP
+		GIIPrint(("GenesisDrive:  ProcessResponse did not find matching IRP\n"));
+		status = STATUS_INVALID_PARAMETER;		
+	}
 
 	// Return the results of the operation.
 	return status;
@@ -1248,37 +1195,38 @@ static NTSTATUS ProcessControlRequest(PIRP Irp)
 	PNULMRX_DEVICE_EXTENSION dataExt = (PNULMRX_DEVICE_EXTENSION)
 		((PBYTE)(NulMRxDeviceObject) + sizeof(RDBSS_DEVICE_OBJECT));
 	PGENESIS_CONTROL_EXTENSION controlExt =
-		(PGENESIS_CONTROL_EXTENSION) GeniiControlDeviceObject->DeviceExtension;
+		(PGENESIS_CONTROL_EXTENSION) GeniiControlDeviceObject->DeviceExtension;	
 
-	DbgPrint("ProcessControlRequest: Entered. \n");
+	// Device is active, lock the queues before we do anything
+	ExAcquireFastMutex(&controlExt->ServiceQueueLock);	
+	ExAcquireFastMutex(&controlExt->RequestQueueLock);
 
-	//Data Queue Lock
-	ExAcquireFastMutex(&dataExt->GeniiRequestQueueLock);
-	isActive = (controlExt->DeviceState == GENII_CONTROL_ACTIVE);
-	ExReleaseFastMutex(&dataExt->GeniiRequestQueueLock);
-	
-	//Early abort if device is inactive
-	if(!isActive){
+	if((controlExt->DeviceState != GENII_CONTROL_ACTIVE)) {
+		ExReleaseFastMutex(&controlExt->RequestQueueLock);
+		ExReleaseFastMutex(&controlExt->ServiceQueueLock);
 		return status;
 	}
 
-	//First, we need to lock the control queue before we do anything else
-	ExAcquireFastMutex(&controlExt->ServiceQueueLock);
-	ExAcquireFastMutex(&controlExt->RequestQueueLock);
-
-	// Check request queue
-	if (!IsListEmpty(&controlExt->RequestQueue)) {
-		listEntry = RemoveHeadList(&controlExt->RequestQueue);
-		status = STATUS_SUCCESS;
+	/* 
+	   Check request queue.  These are pending IRP's for items that 
+	   were stalled while sending an inverted call
+    */
+	if (!IsListEmpty(&controlExt->RequestQueue)) {		
+		listEntry = RemoveHeadList(&controlExt->RequestQueue);		
 	} else {
-		controlRequest = (PGENII_CONTROL_REQUEST) Irp->AssociatedIrp.SystemBuffer;
+		// There is nothing in the request queue.  Leave this GetRequest for InvCall	    
+		controlRequest = (PGENII_CONTROL_REQUEST) 
+			Irp->AssociatedIrp.SystemBuffer;
 		irpSp = IoGetCurrentIrpStackLocation(Irp);
 
-		if(!controlRequest || irpSp->Parameters.DeviceIoControl.OutputBufferLength < sizeof(GENII_CONTROL_REQUEST)) {
+		// This isn't from the user mode service or is malformed
+		if(!controlRequest ||
+				irpSp->Parameters.DeviceIoControl.OutputBufferLength
+					< sizeof(GENII_CONTROL_REQUEST)) {
 			status = STATUS_INVALID_PARAMETER;
-		} else {
-			// We have to insert the control IRP into the queue
-			IoMarkIrpPending(Irp);			
+		} else {			
+			GIIPrint(("GenesisDrive: GetRequest pending for next inverted call\n"));
+			IoMarkIrpPending(Irp);
 			InsertTailList(&controlExt->ServiceQueue, &Irp->Tail.Overlay.ListEntry);
 			status = STATUS_PENDING;
 		}
@@ -1287,67 +1235,46 @@ static NTSTATUS ProcessControlRequest(PIRP Irp)
 	ExReleaseFastMutex(&controlExt->RequestQueueLock);
 	ExReleaseFastMutex(&controlExt->ServiceQueueLock);
 
-	// If we found an entry to process, we need to return the information to
-	// the caller here.
-	if (listEntry) {
-
-		// This is the request we removed from the queue.
+	// We found a pending entry from the request queue
+	if(NULL != listEntry) {
+		// This is the control request from usermode (we will manipulate this)
 		controlRequest = (PGENII_CONTROL_REQUEST) Irp->AssociatedIrp.SystemBuffer;
 
+		// The datarequest is the original IRP that needs to be serviced
 		dataRequest = CONTAINING_RECORD(listEntry, GENII_REQUEST, ServiceListEntry);
 		irpSp = IoGetCurrentIrpStackLocation(dataRequest->Irp);
 
-		// We are going to use the request ID to match the response
+		// Manipulate the control request to match the data request
 		controlRequest->RequestID = dataRequest->RequestID;	
 		controlRequest->RequestType = dataRequest->RequestType;
 
+		GIIPrint(("GenesisDrive: Control request from async queue id: %d type %d\n", 
+			controlRequest->RequestID, controlRequest->RequestType));
+
 		//Use buffer given			
 		switch(controlRequest->RequestType){
-			case GENII_QUERYDIRECTORY:
-			{
-				DbgPrint("QueryDirectory being serviced\n");				
-
+			case GENII_QUERYDIRECTORY:					
 				//Copies Directory and Target info into buffer with length
 				controlRequest->RequestBufferLength = 
 					GenesisPrepareDirectoryAndTarget(dataRequest->RxContext, 
-					controlRequest->RequestBuffer, TRUE);
-
-				// We've finished processing the request to this point.  Dispatch to the control application
-				// for further processing.
-				status = STATUS_SUCCESS;					
-				break;
-			}
-			case GENII_CLOSE:
-			{
-				DbgPrint("Close being serviced in queue\n");				
-
+					controlRequest->RequestBuffer, TRUE);				
+				break;			
+			case GENII_CLOSE:							
 				//Copies Directory and Target info into buffer with length
 				controlRequest->RequestBufferLength = 
 					GenesisPrepareClose(dataRequest->RxContext, 
-					controlRequest->RequestBuffer);
-				status = STATUS_SUCCESS;
-				break;
-			}
-			case GENII_CREATE:
-			{				
-				DbgPrint("Create being serviced\n");	
-
+					controlRequest->RequestBuffer);				
+				break;		
+			case GENII_CREATE:						
 				//Copies Directory and Target info into buffer with length
 				controlRequest->RequestBufferLength = 
 					GenesisPrepareCreate(dataRequest->RxContext, 
-					controlRequest->RequestBuffer);						
-
-				// We've finished processing the request to this point.  Dispatch to the control application
-				// for further processing.
-				status = STATUS_SUCCESS;
-				break;
-			}
+					controlRequest->RequestBuffer);										
+				break;			
 			case GENII_WRITE:
 			{	
 				BOOLEAN isTruncateAppend=FALSE;
 				BOOLEAN isTruncateWrite=FALSE;				
-
-				DbgPrint("Write being serviced\n");
 
 				//Copies Target info with other info
 				controlRequest->RequestBufferLength = 
@@ -1357,42 +1284,26 @@ static NTSTATUS ProcessControlRequest(PIRP Irp)
 				if(isTruncateAppend || isTruncateWrite){
 					controlRequest->RequestType = GENII_TRUNCATEAPPEND;
 				}
-				status = STATUS_SUCCESS;
 				break;
 			}
-			case GENII_READ:
-			{		
-				DbgPrint("Read being serviced\n");
-
+			case GENII_READ:				
 				//Copies Target info with other info
 				controlRequest->RequestBufferLength = 
 					GenesisPrepareReadParams(dataRequest->RxContext, 
-					controlRequest->RequestBuffer);										
-
-				status = STATUS_SUCCESS;
-				break;
-			}
-			case GENII_RENAME:
-			{
-				DbgPrint("Rename being serviced\n");
-
+					controlRequest->RequestBuffer);														
+				break;		
+			case GENII_RENAME:							
 				//Copies Target info with other info
 				controlRequest->RequestBufferLength = 
 					GenesisPrepareRename(dataRequest->RxContext, 
-					controlRequest->RequestBuffer);										
-
-				status = STATUS_SUCCESS;
-				break;
-
-			}
+					controlRequest->RequestBuffer);														
+				break;			
 			default:
-				DbgPrint("Unsupported function placed in async queue %x\n",irpSp->MajorFunction);
+				GIIPrint(("GenesisDrive:  async queue received unsupported function %x\n",irpSp->MajorFunction));
 				break;
-		}						
-	}
-	if(status == STATUS_SUCCESS) {
+		}
 		Irp->IoStatus.Information = sizeof(GENII_CONTROL_REQUEST);
-	}
+	}		
 	return status;
 }
 
@@ -1413,7 +1324,7 @@ NTSTATUS VCGRGeniiControl(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 	BOOLEAN sendResponse = FALSE;
 	BOOLEAN getRequest = FALSE;
 	BOOLEAN ufsStop = FALSE;
-	NTSTATUS status;  
+	NTSTATUS status;  	
 
 	//Double-check to make sure the IRP is meant for G-ICING
 	if (GENII_CONTROL_TYPE != DeviceObject->DeviceType) {
@@ -1421,13 +1332,15 @@ NTSTATUS VCGRGeniiControl(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 		Irp->IoStatus.Information = 0;
 		IoCompleteRequest(Irp, IO_NO_INCREMENT);
 
+		GIIPrint(("GenesisDrive:  Invalid control request sent from IFS\n"));
+
 		// Note that we don't do this...
 		return STATUS_INVALID_DEVICE_REQUEST;
 	}
 
 	// Check the control code  
 	switch (irpSp->Parameters.DeviceIoControl.IoControlCode) {	  
-		case GENII_CONTROL_GET_REQUEST:			
+		case GENII_CONTROL_GET_REQUEST:								
 			getRequest = TRUE;
 			break;
 
@@ -1441,7 +1354,7 @@ NTSTATUS VCGRGeniiControl(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 
 		//Incorrect IO control sent
 		default:    	
-			DbgPrint("G-ICING:  Error! Unknown control code received.\n");
+			GIIPrint(("GenesisDrive:  Unknown control code received.\n"));
 			Irp->IoStatus.Status = STATUS_INVALID_DEVICE_REQUEST;
 			Irp->IoStatus.Information = 0;
 			IoCompleteRequest(Irp, IO_NO_INCREMENT);
@@ -1451,12 +1364,13 @@ NTSTATUS VCGRGeniiControl(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 	//Process the request from UFS (queue up request etc)
 	if (getRequest) {
 		if (irpSp->Parameters.DeviceIoControl.OutputBufferLength < sizeof(GENII_CONTROL_REQUEST)) {        			
-			status = STATUS_BUFFER_OVERFLOW; 
+			status = STATUS_BUFFER_TOO_SMALL; 
+			Irp->IoStatus.Information = sizeof(GENII_CONTROL_REQUEST);
 		}
 		else{
 			// Now process the request.  This IRP may be queued as part of the processing here.
 			status = ProcessControlRequest(Irp);
-		}
+		}		
 	}
 
 	//Process the response from UFS 
@@ -1464,6 +1378,7 @@ NTSTATUS VCGRGeniiControl(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 		// Validate response parameters
 		if (irpSp->Parameters.DeviceIoControl.InputBufferLength < sizeof(GENII_CONTROL_RESPONSE)) {
 			status = STATUS_BUFFER_TOO_SMALL;			
+			Irp->IoStatus.Information = sizeof(GENII_CONTROL_RESPONSE);
 		}
 		else{
 			// Have to handle response first.
@@ -1479,14 +1394,11 @@ NTSTATUS VCGRGeniiControl(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 	// If the request was not pending, we complete it here. 
 	if (STATUS_PENDING != status) {
 		Irp->IoStatus.Status = status;
-		if(status == STATUS_BUFFER_TOO_SMALL)
-			Irp->IoStatus.Information = getRequest? sizeof(GENII_CONTROL_REQUEST) : sizeof(GENII_CONTROL_RESPONSE);
-		else
-			Irp->IoStatus.Information = 0;
-		IoCompleteRequest(Irp, IO_NO_INCREMENT);
-	}
-	else{
-		IoMarkIrpPending(Irp);
+		// Necessary?  Changed
+		if(status == STATUS_BUFFER_TOO_SMALL) {
+			GIIPrint(("GenesisDrive:  Buffer too small in ControlRequest send\n"));			
+		}
+		IoCompleteRequest(Irp, IO_NO_INCREMENT);		
 	}
 
 	// Regardless, at this point we return the status back to the caller.
@@ -1535,8 +1447,7 @@ NTSTATUS VCGRGeniiControlCreate(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 // Notes:
 //  None.
 NTSTATUS VCGRGeniiControlClose(PDEVICE_OBJECT DeviceObject, PIRP Irp)
-{  
-	DbgPrint("G-ICING:  Close received on control object\n");
+{  	
 	Irp->IoStatus.Status = STATUS_SUCCESS;
 	Irp->IoStatus.Information = 0;
 	IoCompleteRequest(Irp, IO_NO_INCREMENT);

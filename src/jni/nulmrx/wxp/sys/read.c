@@ -16,28 +16,19 @@ Abstract:
 #include "precomp.h"
 #pragma hdrstop
 
-//
-//  The local debug trace level
-//
-
-#define Dbg                              (DEBUG_TRACE_READ)
-
 NTSTATUS GenesisReadCompletionRoutine(PRX_CONTEXT RxContext){
 	RxCaptureFcb;
 	GenesisGetFcbExtension(capFcb, giiFCB);
 	NTSTATUS Status = STATUS_SUCCESS;
 	PGENESIS_COMPLETION_CONTEXT pIoCompContext = GenesisGetMinirdrContext(RxContext);
-	PVOID buffer;
-
-	DbgPrint("Completing Call\n");
+	PVOID buffer;	
 
 	buffer = RxLowIoGetBufferAddress(RxContext);
 	Status = pIoCompContext->Status;
 
 	if(NT_SUCCESS(Status) && buffer != NULL){
 		__try { 
-			RtlCopyMemory(buffer, pIoCompContext->Context, pIoCompContext->Information);							
-			DbgPrint("NulMRxRead:  Copied successful: %d bytes\n", pIoCompContext->Information);
+			RtlCopyMemory(buffer, pIoCompContext->Context, pIoCompContext->Information);										
 			Status = STATUS_SUCCESS;		
 		} __except (EXCEPTION_EXECUTE_HANDLER) {
 			Status = GetExceptionCode();							
@@ -97,17 +88,12 @@ Return Value:
 	PFILE_OBJECT FileObject = RxContext->CurrentIrpSp->FileObject;
 
 	BOOLEAN CompleteIrp = FALSE;
-	BOOLEAN PostRequest = FALSE;
+	BOOLEAN PostRequest = FALSE;    
 
-    RxTraceEnter("NulMRxRead");    
-
-	PAGED_CODE();
-
-	DbgPrint("NulMRxRead:  Started for file: %wZ\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName);
+	PAGED_CODE();	
 
 	if(giiFcb->isDirectory){
-		Status = STATUS_INVALID_DEVICE_REQUEST;
-		DbgPrint("NulMRxRead:  Read attempted on directory!\n");
+		Status = STATUS_FILE_IS_A_DIRECTORY;		
 		try_return(Status);
 	}
 
@@ -117,10 +103,7 @@ Return Value:
 		
 	// If the read starts beyond End of File, return EOF.
 	if (RtlLargeIntegerGreaterThan(ByteOffset, capFcb->Header.FileSize)
-			|| (giiFcb->State == GENII_STATE_NOT_INITIALIZED)){
-        RxDbgTrace( 0, Dbg, ("End of File\n", 0 ));
-		DbgPrint("NulMRxRead:  End of file reached\n");
-
+			|| (giiFcb->State == GENII_STATE_NOT_INITIALIZED)){        
         Status = STATUS_END_OF_FILE;
         try_return(Status);
     }    
@@ -130,10 +113,9 @@ Return Value:
     RtlZeroMemory( pIoCompContext, sizeof(*pIoCompContext) );
     
     if( SynchronousIo ) {
-        DbgPrint("This I/O is sync\n");
+		GIIPrint(("GenesisDrive:  Read is sync\n"));
         pIoCompContext->IoType = IO_TYPE_SYNCHRONOUS;
-    } else {
-        DbgPrint("This I/O is async\n");
+    } else {        
         pIoCompContext->IoType = IO_TYPE_ASYNC;
     }
 
@@ -145,7 +127,7 @@ Return Value:
 	//	GenesisMdlComplete(RxContext);
 	//	// The IRP has been completed.
 	//	CompleteIrp = FALSE;
-		DbgPrint("NulMrxRead:  IRP_MN_COMPLETE Received");
+		//GIIPrint(("NulMrxRead:  IRP_MN_COMPLETE Received"));
 	//	try_return(Status = STATUS_SUCCESS);
 	}
 
@@ -156,7 +138,7 @@ Return Value:
 	if (RxContext->CurrentIrpSp->MinorFunction & IRP_MN_DPC) {
 	//	CompleteIrp = FALSE;
 	//	PostRequest = TRUE;
-		DbgPrint("NulMrxRead:  IRP_MN_DPC Received");
+		//GIIPrint(("NulMrxRead:  IRP_MN_DPC Received"));
 	//	try_return(Status = STATUS_PENDING);
 	}
 
@@ -184,20 +166,17 @@ Return Value:
 					ByteOffset.QuadPart + pIoCompContext->Information;
 			}
 			else{
-				DbgPrint("NulMrxRead:  Paging IO Recv'd\n");
+				// Paging IO Recv
 			}
 		}
 	}
 
-    RxDbgTrace(0, Dbg, ("Status = %x Info = %x\n",RxContext->IoStatusBlock.Status,RxContext->IoStatusBlock.Information));
-
 try_exit:	NOTHING;					
 
 	if(Status != STATUS_PENDING){
-		DbgPrint("NulMRxRead:  Completed for file: %wZ\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName);
+		// Read completed
 	}
-
-    RxTraceLeave(Status);
+    
     return(Status);
 } 
 
@@ -224,7 +203,12 @@ ULONG GenesisPrepareReadParams(PRX_CONTEXT RxContext, PVOID buffer){
 			ByteOffset = RxContext->CurrentIrpSp->FileObject->CurrentByteOffset;
 	}
 
-	Length = RxContext->LowIoContext.ParamsFor.ReadWrite.ByteCount;		
+	Length = RxContext->LowIoContext.ParamsFor.ReadWrite.ByteCount;	
+
+	// Cap the size
+	if (Length > USER_KERNEL_MAX_TRANSFER_SIZE) {
+		Length = USER_KERNEL_MAX_TRANSFER_SIZE;
+	}
 
     //  If the read extends beyond EOF, truncate the read (fixes length	
 	EndOffset.QuadPart = ByteOffset.QuadPart + Length;	
@@ -234,7 +218,7 @@ ULONG GenesisPrepareReadParams(PRX_CONTEXT RxContext, PVOID buffer){
 		Length = (ULONG)(capFcb->Header.FileSize.QuadPart - ByteOffset.QuadPart);
     }
 
-	DbgPrint("FileID is %d, ByteOffset is %I64d, ByteLength is %d \n", FileID, ByteOffset.QuadPart, Length);       
+	GIIPrint(("GenesisDrive:  Read for fileID %d, ByteOffset is %I64d, ByteLength is %llu \n", FileID, ByteOffset.QuadPart, Length));
 
 	//Let's copy other params
 	RtlCopyMemory(myBuffer, &FileID, sizeof(LONG));
@@ -242,7 +226,7 @@ ULONG GenesisPrepareReadParams(PRX_CONTEXT RxContext, PVOID buffer){
 	RtlCopyMemory(myBuffer, &ByteOffset.QuadPart, sizeof(LONGLONG));
 	myBuffer += sizeof(LONGLONG);
 	RtlCopyMemory(myBuffer, &Length, sizeof(LONG));
-	myBuffer += sizeof(LONG);
+	myBuffer += sizeof(ULONG);
 
 	return ((sizeof(LONG) * 2) + sizeof(LONGLONG));
 }

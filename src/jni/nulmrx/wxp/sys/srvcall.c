@@ -59,7 +59,7 @@ Return Value:
     ASSERT( NodeType(pSrvCall) == RDBSS_NTC_SRVCALL );
 
 	// validate the server name with the test name of 'nulsvr'
-	DbgPrint("NulMRx - SrvCall: Connection Name Length: %d\n",  pSrvCall->pSrvCallName->Length );
+	GIIPrint(("NulMRx - SrvCall: Connection Name Length: %d\n",  pSrvCall->pSrvCallName->Length));
 
 	if ( pSrvCall->pSrvCallName->Length >= 26 )
 	{

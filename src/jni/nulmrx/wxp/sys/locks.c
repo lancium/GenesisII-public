@@ -49,7 +49,7 @@ Return Value:
 {
     NTSTATUS Status = STATUS_NOT_IMPLEMENTED;
 
-    //DbgPrint("NulMRxLocks \n");
+    //GIIPrint(("NulMRxLocks \n"));
     return(Status);
 }
 
@@ -80,7 +80,7 @@ Return Value:
 {
     NTSTATUS Status = STATUS_NOT_IMPLEMENTED;
 
-    DbgPrint("NulMRxCompleteBufferingStateChangeRequest \n");
+    GIIPrint(("NulMRxCompleteBufferingStateChangeRequest \n"));
     return(Status);
 }
 
@@ -103,9 +103,9 @@ Return Value:
 
 --*/
 {
-    NTSTATUS Status = STATUS_NOT_IMPLEMENTED;
+	NTSTATUS Status = STATUS_SUCCESS;
 
-    DbgPrint("NulMRxFlush \n");
+	GIIPrint(("GenesisDrive:  Network flush received\n"));
     return(Status);
 }
 

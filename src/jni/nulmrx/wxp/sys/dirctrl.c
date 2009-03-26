@@ -59,7 +59,7 @@ Return Value:
 	ExAcquireFastMutex(&(fcb->ExclusiveLock));
 
 	if(IoIsOperationSynchronous(RxContext->CurrentIrp)){
-		DbgPrint("QueryDirectory: Io Is Synchronous\n");
+		GIIPrint(("QueryDirectory: Io Is Synchronous\n"));
 	}
 
 	//GenesisII-Specific File Index Information	
@@ -75,7 +75,7 @@ Return Value:
 	}	
 	if(!(fcb->isDirectory)){
 		ExReleaseFastMutex(&(fcb->ExclusiveLock));
-		DbgPrint("QueryDirectory:  File is not a directory %wZ\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName);
+		GIIPrint(("QueryDirectory:  File is not a directory %wZ\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName));
 		RxContext->Info.LengthRemaining = 0;
 		RxContext->IoStatusBlock.Information = FILE_NON_DIRECTORY_FILE;
 		Status = STATUS_NOT_A_DIRECTORY;
@@ -93,12 +93,12 @@ Return Value:
 			RtlUnicodeStringToAnsiString(&tempString, target, TRUE);
 			tempString.Buffer[tempString.Length] = '\0';
 		
-			DbgPrint("QueryDirectory: Started for file %wZ with target %s\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName,
-				tempString.Buffer);								
-			DbgPrint("QueryDirectory: Target before conversion %wZ\n", target);		
+			GIIPrint(("QueryDirectory: Started for file %wZ with target %s\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName,
+				tempString.Buffer));
+			GIIPrint(("QueryDirectory: Target before conversion %wZ\n", target));
 
 			if(RtlCompareString(&tempString, &ccb->Target, FALSE) != 0){
-				DbgPrint("QueryDirectory:  Targets do not match.  Copying new Target and calling Genesis\n");
+				GIIPrint(("QueryDirectory:  Targets do not match.  Copying new Target and calling Genesis\n"));
 				fcb->State = GENII_STATE_HAVE_INFO; //revert state 								
 				RtlCopyString(&(ccb->Target), &tempString);				
 			}		
@@ -108,8 +108,8 @@ Return Value:
 			if(fcb->State != GENII_STATE_HAVE_LISTING){
 				RtlInitAnsiString(&tempString, "*\0");
 				RtlCopyString(&(ccb->Target), &tempString);
-				DbgPrint("QueryDirectory:  Started for file %wZ with target * \n",
-					RxContext->pRelevantSrvOpen->pAlreadyPrefixedName);			
+				GIIPrint(("QueryDirectory:  Started for file %wZ with target * \n",
+					RxContext->pRelevantSrvOpen->pAlreadyPrefixedName));
 			}
 		}
 		ccb->Target.Buffer[ccb->Target.Length] = '\0';
@@ -139,7 +139,7 @@ Return Value:
 			}
 		}
 		else{
-			DbgPrint("NulMRxQueryDirectory: Failed due to failure status %d\n", Status);
+			GIIPrint(("NulMRxQueryDirectory: Failed due to failure status %d\n", Status));
 
 			//If failed to send inverted call, release mutex
 			ExReleaseFastMutex(&(fcb->ExclusiveLock));
@@ -160,7 +160,7 @@ Return Value:
 try_exit:	NOTHING;
 
 	if(Status != STATUS_PENDING){
-		DbgPrint("QueryDirectory: Ended for file %wZ\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName);
+		GIIPrint(("QueryDirectory: Ended for file %wZ\n", RxContext->pRelevantSrvOpen->pAlreadyPrefixedName));
 	}
 	return Status;
 }
@@ -212,7 +212,7 @@ NTSTATUS GenesisCompleteQueryDirectory(PRX_CONTEXT RxContext){
 	FileIndex = &(ccb->FileIndex);	
 	DirectorySize = &(fcb->DirectorySize);
 
-	DbgPrint("QueryDirectory:  FileIndex %d, DirectorySize: %d\n", *FileIndex, *DirectorySize);
+	GIIPrint(("QueryDirectory:  FileIndex %d, DirectorySize: %d\n", *FileIndex, *DirectorySize));
 
 	if(*FileIndex >= *DirectorySize){						
 		if(RxContext->QueryDirectory.ReturnSingleEntry != 0){			
@@ -224,7 +224,7 @@ NTSTATUS GenesisCompleteQueryDirectory(PRX_CONTEXT RxContext){
 	}
 
 	if(fcb->State == GENII_STATE_NOT_FOUND){
-		DbgPrint("QueryDirectory:  File not found in Genesis but still created\n");
+		GIIPrint(("QueryDirectory:  File not found in Genesis but still created\n"));
 		PtrIrp->IoStatus.Information = TotalCopySize;
 		return STATUS_FILE_INVALID;
 	}
@@ -239,7 +239,7 @@ NTSTATUS GenesisCompleteQueryDirectory(PRX_CONTEXT RxContext){
 			int nLen, entryType;	
 			LARGE_INTEGER entryLength;
 			
-			DbgPrint("QueryDirectory:  File Directory Information Requested \n");	
+			GIIPrint(("QueryDirectory:  File Directory Information Requested \n"));
 
 			currentName = GenesisGetDirectoryEntry(fcb, *FileIndex, &entryLength, &entryType);
 			nLen = wcslen(currentName);			
@@ -301,7 +301,7 @@ NTSTATUS GenesisCompleteQueryDirectory(PRX_CONTEXT RxContext){
 			int nLen, entryType;				
 			LARGE_INTEGER entryLength;
 
-			DbgPrint("QueryDirectory:  File Full Dir Information Requested \n");																	
+			GIIPrint(("QueryDirectory:  File Full Dir Information Requested \n"));
 
 			currentName = GenesisGetDirectoryEntry(fcb, *FileIndex, &entryLength, &entryType);
 			nLen = wcslen(currentName);
@@ -363,7 +363,7 @@ NTSTATUS GenesisCompleteQueryDirectory(PRX_CONTEXT RxContext){
 			int nLen,	entryType;	
 			LARGE_INTEGER entryLength;
 			
-			DbgPrint("QueryDirectory:  File Both Dir Information Requested \n");		
+			GIIPrint(("QueryDirectory:  File Both Dir Information Requested \n"));
 
 			currentName = GenesisGetDirectoryEntry(fcb, *FileIndex, &entryLength, &entryType);
 			nLen = wcslen(currentName);			
@@ -431,7 +431,7 @@ NTSTATUS GenesisCompleteQueryDirectory(PRX_CONTEXT RxContext){
 			int nLen, entryType;				
 			LARGE_INTEGER entryLength;
 
-			DbgPrint("QueryDirectory:  File Names Information Requested \n");
+			GIIPrint(("QueryDirectory:  File Names Information Requested \n"));
 
 			currentName = GenesisGetDirectoryEntry(fcb, *FileIndex, &entryLength, &entryType);
 			nLen = wcslen(currentName);			

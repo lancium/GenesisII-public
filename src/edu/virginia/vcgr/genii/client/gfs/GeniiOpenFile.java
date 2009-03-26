@@ -32,12 +32,6 @@ abstract class GeniiOpenFile implements Closeable
 	}
 	
 	@Override
-	final protected void finalize() throws Throwable
-	{
-		close();
-	}
-	
-	@Override
 	synchronized final public void close() throws IOException
 	{
 		try

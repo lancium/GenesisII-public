@@ -17,12 +17,6 @@ Abstract:
 #pragma hdrstop
 
 //
-//  The debug trace level
-//
-
-#define Dbg                              (DEBUG_TRACE_CREATE)
-
-//
 //  forwards & pragmas
 //
 
@@ -188,22 +182,18 @@ Return Value:
     RX_FILE_TYPE StorageType = FileTypeFile;
     ULONG CreateAction = FILE_OPENED;    //Look INTO this more
     
-    NulMRxGetNetRootExtension(NetRoot,pNetRootExtension);	
-
-    RxTraceEnter("NulMRxCreate");       
-    RxDbgTrace(0, Dbg, ("     Attempt to open %wZ Len is %d\n", RemainingName, RemainingName->Length ));
+    NulMRxGetNetRootExtension(NetRoot,pNetRootExtension);	    
 	
 	PAGED_CODE();		
 
     if( NetRoot->Type == NET_ROOT_DISK) {
 
-		DbgPrint("NulMrxCreate:  Attempt to open %wZ\n", RemainingName);			
+		GIIPrint(("NulMrxCreate:  Attempt to open %wZ\n", RemainingName));
 
 		//Lock VCB?  might as well (stop concurrent opens)
 		ExAcquireResourceExclusiveLite(&(dataExt->VCBResource), TRUE);
 		AcquiredVCB = TRUE;		
-
-        RxDbgTrace(0, Dbg, ("NulMRxCreate: Type supported \n"));            
+        
         //  Squirrel away the scatter list in the FCB extension.
         //  This is done only for data files.
 
@@ -239,7 +229,7 @@ Return Value:
 		
 		//If two :'s in Name this is an EA file
 		if(firstCol != NULL && (wcschr(firstCol, L':') != NULL)){
-			DbgPrint("NulMrxCreate:  Failed! EA not in Genesis\n");
+			GIIPrint(("NulMrxCreate:  Failed! EA not in Genesis\n"));
 			Status = STATUS_NO_SUCH_FILE;		
 			try_return(Status);
 		}
@@ -250,7 +240,7 @@ Return Value:
 		{
 			//ABORT!!!			
 			Status = STATUS_EAS_NOT_SUPPORTED;
-			DbgPrint("NulMrxCreate:  Failed! EA not supported\n");
+			GIIPrint(("NulMrxCreate:  Failed! EA not supported\n"));
 			try_return(Status);
 		}
 
@@ -271,28 +261,28 @@ Return Value:
 		
 				if(OpenTargetDirectory){
 					Status = STATUS_INVALID_PARAMETER;
-					DbgPrint("NulMrxCreate:  Failed! Volume root is not a directory\n");
+					GIIPrint(("NulMrxCreate:  Failed! Volume root is not a directory\n"));
 					try_return(Status);
 				}
 				if(DirectoryOnlyRequested){
 					Status = STATUS_NOT_A_DIRECTORY;
-					DbgPrint("NulMrxCreate:  Failed! Volume root is not a directory\n");
+					GIIPrint(("NulMrxCreate:  Failed! Volume root is not a directory\n"));
 					try_return(Status);
 				}
 				if(RequestedDisposition != FILE_OPEN && RequestedDisposition != FILE_OPEN_IF){
 					Status = STATUS_ACCESS_DENIED;
-					DbgPrint("NulMrxCreate:  Failed! Wrong type of Disposition\n");
+					GIIPrint(("NulMrxCreate:  Failed! Wrong type of Disposition\n"));
 					try_return(Status);
 				}
 
-				DbgPrint("NulMrxCreate:  Volume open completed successfully\n");
+				GIIPrint(("NulMrxCreate:  Volume open completed successfully\n"));
 
 				//Do something special for open volume (or not)				
 				try_return(Status);
 		}
 
 		if(OpenByFileId){
-			DbgPrint("NulMrxCreate: Failed!  Open By file id not supported\n");
+			GIIPrint(("NulMrxCreate: Failed!  Open By file id not supported\n"));
 			Status = STATUS_NOT_SUPPORTED;
 			try_return(Status);
 		}		
@@ -305,11 +295,11 @@ Return Value:
 		if(RemainingName != NULL && RemainingName->Length > 0 && 
 			RemainingName->Buffer != NULL){			
 
-			DbgPrint("NulMrxCreate:  Processing filename %wZ\n", &(NewFileObject->FileName));
+			GIIPrint(("NulMrxCreate:  Processing filename %wZ\n", &(NewFileObject->FileName)));
 
 			if(wcsstr(NewFileObject->FileName.Buffer, L"Desktop.ini") != NULL 
 				|| wcsstr(NewFileObject->FileName.Buffer, L"desktop.ini") != NULL){
-				DbgPrint("NulMrxCreate:  Desktop.ini not supported\n");
+				GIIPrint(("NulMrxCreate:  Desktop.ini not supported\n"));
 				Status = STATUS_NO_SUCH_FILE;				
 				RxReleaseFcbResourceInMRx(capFcb);
 				try_return(Status);
@@ -323,7 +313,7 @@ Return Value:
 					RequestedDisposition == FILE_OVERWRITE_IF){
 	
 				Status = STATUS_FILE_IS_A_DIRECTORY;
-				DbgPrint("NulMrxCreate: Failed!  Wrong options specified for root dir\n");
+				GIIPrint(("NulMrxCreate: Failed!  Wrong options specified for root dir\n"));
 				try_return(Status);
 			}
 
@@ -348,12 +338,12 @@ Return Value:
 		ExAcquireFastMutex(&giiFCB->ExclusiveLock);
 
 		/* You would enter code here to do path traversal (but we just open up directly :-D) */
-		DbgPrint("NulMrxCreate:  Checking in with Genesis\n");		
+		GIIPrint(("NulMrxCreate:  Checking in with Genesis\n"));
 		Status = GenesisSendInvertedCall(RxContext, GENII_CREATE, FALSE);
 
 		//Something could go wrong (only wait if something will actually come back to free you)
 		if(!NT_SUCCESS(Status)){
-			DbgPrint("GenesisSendInvertedCall failed with Status %d\n", Status);
+			GIIPrint(("GenesisSendInvertedCall failed with Status %d\n", Status));
 			ExReleaseFastMutex(&giiFCB->ExclusiveLock);
 			RxReleaseFcbResourceInMRx(capFcb);
 			try_return(Status);
@@ -383,7 +373,7 @@ Return Value:
 				//No file to open
 				Status = STATUS_NO_SUCH_FILE;
 			}
-			DbgPrint("NulMrxCreate: Genesis did not find the file\n");
+			GIIPrint(("NulMrxCreate: Genesis did not find the file\n"));
 			try_return(Status);
 		}	
 		else{
@@ -401,14 +391,14 @@ Return Value:
 		//Check to see if file - dir mismatch
 		if(FileOnlyRequested && giiFCB->isDirectory){
 			Status = STATUS_FILE_IS_A_DIRECTORY;
-			DbgPrint("NulMrxCreate: Failed!  Path is a directory\n");
+			GIIPrint(("NulMrxCreate: Failed!  Path is a directory\n"));
 			try_return(Status);
 		}
 		
 		//Check to see if dir - file mismatch
 		if(DirectoryOnlyRequested && !giiFCB->isDirectory){
 			Status = STATUS_NOT_A_DIRECTORY;
-			DbgPrint("NulMrxCreate: Failed!  Path is not a directory\n");
+			GIIPrint(("NulMrxCreate: Failed!  Path is not a directory\n"));
 			try_return(Status);
 		}
 
@@ -419,8 +409,7 @@ Return Value:
 		//Yay
 		*ReturnedInformation = FILE_OPENED;
 
-		//Complete CreateFile contract        
-		RxDbgTrace(0,Dbg,("EOF is %d AllocSize is %d\n",(ULONG)EndOfFile,(ULONG)AllocationSize));
+		//Complete CreateFile contract        		
 		
 		//Let's get these attributes
 		FileBasicInfo.FileAttributes = ((giiFCB->isDirectory) ? FILE_ATTRIBUTE_DIRECTORY : 
@@ -449,18 +438,16 @@ Return Value:
 									);
 
 		if( Status != STATUS_SUCCESS ) {            
-			//  alloc error..            
-			RxDbgTrace(0, Dbg, ("Failed to allocate Fobx \n"));
-			DbgPrint("NulMrxCreate: Failed!  Failed to allocate Fobx\n");
+			//  alloc error..            			
+			GIIPrint(("NulMrxCreate: Failed!  Failed to allocate Fobx\n"));
 			try_return(Status);
 		}     
 		else{
 			GenesisInitializeCCB((PGENESIS_CCB)RxContext->pFobx->Context2, tempFileID);
 		}
 	}
-	else {
-        RxDbgTrace(0, Dbg, ("NulMRxCreate: Type not supported or invalid open\n"));
-		DbgPrint("NulMRxCreate: Type not supported or invalid open\n");
+	else {        
+		GIIPrint(("NulMRxCreate: Type not supported or invalid open\n"));
         Status = STATUS_NOT_IMPLEMENTED;
 		try_return(Status);
     }
@@ -499,9 +486,8 @@ try_exit:  NOTHING;
 		ExReleaseResource(&(dataExt->VCBResource));				
 		AcquiredVCB = FALSE;
 	}
-
-	RxTraceLeave(Status);
-	DbgPrint("NulMrxCreate:  Attempt to open %wZ finished\n", RemainingName);
+	
+	// Open finished
 	return Status;
 }
 
@@ -555,8 +541,7 @@ Return Value:
     RxCaptureFcb;
     PMRX_SRV_OPEN SrvOpen = RxContext->pRelevantSrvOpen;	
     FCB_INIT_PACKET InitPacket;
-
-    RxDbgTrace(0, Dbg, ("MRxExCreateFileSuccessTail\n"));
+    
     PAGED_CODE();
 
     ASSERT( NodeType(SrvOpen) == RDBSS_NTC_SRVOPEN );
@@ -573,9 +558,7 @@ Return Value:
         return STATUS_INSUFFICIENT_RESOURCES;
     }
     
-    ASSERT  ( RxIsFcbAcquiredExclusive ( capFcb )  );
-    RxDbgTrace(0, Dbg, ("Storagetype %08lx/Action %08lx\n", StorageType, CreateAction ));
-
+    ASSERT  ( RxIsFcbAcquiredExclusive ( capFcb )  );    
     RxContext->Create.ReturnedCreateInformation = CreateAction;
 
     RxFormInitPacket(
@@ -629,16 +612,11 @@ Return Value:
 
 --*/
 {
-    NTSTATUS Status;        
-
-    RxTraceEnter("NulMRxCollapseOpen");
-	DbgPrint("NulMrxCollapseOpen is being called\n");    
+    NTSTATUS Status;            
 
 	//Create handles this (baby)
 	Status = NulMRxCreate(RxContext);
-    
-	DbgPrint("NulMrxCollapseOpen is finished\n");
-    RxTraceLeave(Status);
+    	    
     return Status;
 }
 
@@ -671,7 +649,7 @@ Notes:
 {
     NTSTATUS Status = STATUS_NOT_IMPLEMENTED;
 
-    DbgPrint("NulMRxComputeNewBufferingState \n");
+    GIIPrint(("NulMRxComputeNewBufferingState \n"));
     return(Status);
 }
 
@@ -683,12 +661,8 @@ NulMRxDeallocateForFcb (
     NTSTATUS Status = STATUS_SUCCESS;
     NulMRxGetFcbExtension(pFcb,pFcbExtension);
     PMRX_NET_ROOT         pNetRoot = pFcb->pNetRoot;
-    NulMRxGetNetRootExtension(pNetRoot,pNetRootExtension);
-
-    RxTraceEnter("NulMRxDeallocateForFcb\n");	
-	DbgPrint("NulMrxDeallocateForFcb\n");
-
-    RxTraceLeave(Status);
+    NulMRxGetNetRootExtension(pNetRoot,pNetRootExtension);    	
+    
     return(Status);
 }
 
@@ -710,9 +684,9 @@ Return Value:
     RXSTATUS - The return status for the operation
 
 --*/
-{
-   ASSERT(!"Found a truncate");
-   return STATUS_NOT_IMPLEMENTED;
+{   
+	GIIPrint(("GenesisDrive:  Received unsupported truncate through MRx\n"));
+	return STATUS_NOT_IMPLEMENTED;
 }
 
 NTSTATUS
@@ -750,23 +724,15 @@ Return Value:
     PAGED_CODE();
 
     ASSERT( NodeType(SrvOpen) == RDBSS_NTC_SRVOPEN );
-    ASSERT ( NodeTypeIsFcb(capFcb) );
+    ASSERT ( NodeTypeIsFcb(capFcb) );    	
 
-    RxDbgTrace( 0, Dbg, ("NulMRxCleanupFobx\n"));
-	DbgPrint("NulMRxCleanupFobx for %d\n", geniiCCB->GenesisFileID);	
-
-    if (FlagOn(capFcb->FcbState,FCB_STATE_ORPHANED)) {
-       RxDbgTrace( 0, Dbg, ("File orphaned\n"));
+    if (FlagOn(capFcb->FcbState,FCB_STATE_ORPHANED)) {       
        return (STATUS_SUCCESS);
     }
 
-    if ((capFcb->pNetRoot->Type != NET_ROOT_PIPE) && !SearchHandleOpen) {
-       RxDbgTrace( 0, Dbg, ("File not for closing at cleanup\n"));
+    if ((capFcb->pNetRoot->Type != NET_ROOT_PIPE) && !SearchHandleOpen) {       
        return (STATUS_SUCCESS);
-    }
-
-	DbgPrint("NulMRxCleanupFobx for %d finished\n", geniiCCB->GenesisFileID);	
-    RxDbgTrace( 0, Dbg, ("NulMRxCleanup  exit with status=%08lx\n", Status ));	
+    }	    
 
     return(Status);
 }
@@ -794,12 +760,10 @@ Notes:
 
 --*/
 {
-	PGENESIS_FCB giiFCB;
-
-    RxDbgTrace( 0, Dbg, ("NulMRxForcedClose\n"));
+	PGENESIS_FCB giiFCB;    
 
 	giiFCB = (PGENESIS_FCB)pSrvOpen->pFcb->Context2;
-	DbgPrint("NulMRxForcedClose for %wZ\n", pSrvOpen->pAlreadyPrefixedName);
+	GIIPrint(("GenesisDrive: ForcedClose for %wZ\n", pSrvOpen->pAlreadyPrefixedName));
 
 	if(giiFCB != NULL){
 
@@ -810,13 +774,6 @@ Notes:
 
     return STATUS_SUCCESS;
 }
-
-//
-//  The local debug trace level
-//
-
-#undef  Dbg
-#define Dbg                              (DEBUG_TRACE_CLOSE)
 
 NTSTATUS
 NulMRxCloseSrvOpen(
@@ -854,9 +811,8 @@ Return Value:
     NulMRxGetNetRootExtension(pNetRoot,pNetRootExtension);
 
 	giiFCB = (PGENESIS_FCB)capFcb->Context2;
-
-    RxDbgTrace( 0, Dbg, ("NulMRxCloseSrvOpen \n"));
-	DbgPrint("NulMrxCloseSrvOpen for %wZ\n", pSrvOpen->pAlreadyPrefixedName);		
+    
+	GIIPrint(("GenesisDrive:  CloseSrvOpen for %wZ\n", pSrvOpen->pAlreadyPrefixedName));
 
 	//Only makes sense for files that were opened correctly
 	if(giiFCB->State == GENII_STATE_HAVE_INFO || giiFCB->State == GENII_STATE_HAVE_LISTING){
@@ -879,11 +835,6 @@ NulMRxDeallocateForFobx (
     IN OUT PMRX_FOBX pFobx
     )
 {
-	GenesisGetCcbExtension(pFobx,geniiCCB);	
-
-    RxDbgTrace( 0, Dbg, ("NulMRxDeallocateForFobx\n"));		
-
-	DbgPrint("NulMRxDeallocateForFobx for fileid %d\n", geniiCCB->GenesisFileID);
-
+	GenesisGetCcbExtension(pFobx,geniiCCB);		
     return(STATUS_SUCCESS);
 }
