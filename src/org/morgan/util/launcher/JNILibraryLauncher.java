@@ -23,16 +23,19 @@ public class JNILibraryLauncher
 {
 	private static boolean isLoaded = false;
 	private static ClassLoader loader;
-	/*
-	private final static String JNI_PACKAGE = 
-		"edu.virginia.vcgr.genii.client.jni.gIIlib";
-	private final static String JNI_DEPRECATED_PACKAGE = 
-		"edu.virginia.vcgr.genii.client.jni.gIIlib.deprecated";
-	*/
 	private final static String JNI_IO_PACKAGE = 
 		"edu.virginia.vcgr.genii.client.jni.gIIlib.io";
 	private final static String JNI_MISCELLANEOUS_PACKAGE = 
 		"edu.virginia.vcgr.genii.client.jni.gIIlib.miscellaneous";
+	
+	/*
+	 * Note:
+	 * 
+	 * You can change packages to point to edu...jni.giilibmirror.io(.miscellaneous) 
+	 * To get interaction with old library.  Especially useful for testing out the
+	 * driver without Internet connectivity
+	 */
+	
 	private static final String BASE_DIR_SYSTEM_PROPERTY = 
 		"edu.virginia.vcgr.genii.install-base-dir";
 	
@@ -213,82 +216,4 @@ public class JNILibraryLauncher
 			return null;
 		}
 	}
-	
-	/*  NO LONGER SUPPORTED */
-	
-	/*
-	@SuppressWarnings("unchecked")
-	public static Object[] getInformation(String path){
-		String myClass = JNI_PACKAGE + ".JNIGetInformationTool";										 
-		String myMethod = "getInformation";
-		Class[] argTypes = new Class[] {String.class};
-		Object[] args = new Object[] {path};
-				
-		ArrayList<String> toReturn = (ArrayList<String>)
-			invoke(myClass, myMethod, argTypes, args);
-		return ((toReturn != null) ? toReturn.toArray() : null);
-	}
-	*/
-	
-	/*
-	@SuppressWarnings("unchecked")
-	public static Object[] getDirectoryListing(String directory, String target){		
-		String myClass = JNI_IO_PACKAGE + ".JNIDirectoryListing";
-		String myMethod = "getDirectoryListingOld";
-		Class[] argTypes = new Class[] {String.class, String.class};
-		Object[] args = new Object[] { directory, target };
-						
-		ArrayList<String> toReturn = (ArrayList<String>)
-			invoke(myClass, myMethod, argTypes, args);
-		return ((toReturn != null) ? toReturn.toArray() : null);
-	}
-	*/
-	
-	/*
-	public static boolean makeDirectory(String newDirectory){
-		String myClass = JNI_PACKAGE + ".JNIMkDirTool";
-		String myMethod = "makeDirectory";
-		Class<?>[] argTypes = new Class[] {String.class };
-		Object[] args = new Object[] { newDirectory};
-		
-		return (Boolean)invoke(myClass, myMethod, argTypes, args);					
-	}
-	*/
-	
-	/*
-	public static boolean remove(String target, boolean recursive, boolean force){
-		String myClass = JNI_PACKAGE + ".JNIRmTool";
-		String myMethod = "remove";
-		Class<?>[] argTypes = new Class[] {String.class, 
-				Boolean.class, Boolean.class};
-		Object[] args = new Object[] {target, 
-				new Boolean(recursive), new Boolean(force)};
-		
-		return (Boolean)invoke(myClass, myMethod, argTypes, args);				
-	}
-	*/
-	
-	/*
-	public static boolean copy(String source, String destination,boolean srcLocal, boolean dstLocal){
-		String myClass = JNI_PACKAGE + ".JNICpTool";
-		String myMethod = "copy";
-		Class<?>[] argTypes = new Class[] {String.class, String.class, 
-					Boolean.class, Boolean.class};
-		Object[] args = new Object[] {source, destination, 
-				new Boolean(srcLocal), new Boolean(dstLocal)};
-		
-		return (Boolean)invoke(myClass, myMethod, argTypes, args);				
-	}
-	*/
-	
-	/*
-	public static boolean move(String source, String destination){
-		String myClass = JNI_PACKAGE + ".JNIMvTool";
-		String myMethod = "move";
-		Class<?>[] argTypes = new Class[] {String.class, String.class};
-		Object[] args = new Object[] {source, destination};
-		
-		return (Boolean)invoke(myClass, myMethod, argTypes, args);				
-	}
-	*/
 }
