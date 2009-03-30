@@ -9,19 +9,21 @@
 #include <winioctl.h>
 #include "server.h"
 
-//-----------------------------------------------------------------------------
-// Local structures
+#define DEBUG						 1
+#if DEBUG
+#define GenesisPrint(Args) printf(Args)
+#else
+#define GenesisPrint(Args) NOP_FUNCTION
+#endif
 
-#define DEBUG						 0
-#define NUMBER_OF_THREADS			 5
-#define THREAD_DELAY				200
+#define NUMBER_OF_THREADS			 1
+#define THREAD_DELAY				100
                                                 
 //Global variables
 HANDLE sem_handle;					//Semaphore to control access to device (necessary?)
 HANDLE close_handle;				//Semaphore to control when to close
 HANDLE GenesisControlHandle;		//Device handle	
 BOOL isRunning = TRUE;				//Communication between threads (for closing)
-int loggedin = 0;					//Whether logged in or not
 
 //Defined in Test.c
 void TestThread(GII_JNI_INFO rootInfo);
@@ -53,22 +55,22 @@ void printListing(char * listing, int size){
 	ULONG fileid;
 
 	if(size == JNI_ERR){
-		printf("Error occurred while processing request\n");
+		GenesisPrint(("GenesisDrive: Error occurred while processing request\n"));
 	}
 
 	for(i =0; i< size; i++){		
 		memcpy(&fileid, listing, sizeof(ULONG));		
-		printf("File ID: %d ", fileid);
+		GenesisPrint(("GenesisDrive: File ID: %d ", fileid));
 		listing += sizeof(ULONG);
 
-		printf("File Type: %s ", listing);		
+		GenesisPrint(("GenesisDrive: File Type: %s ", listing));
 		listing += strlen(listing) + 1;
 
 		memcpy(&length, listing, sizeof(LONGLONG));
-		printf("Size: %I64d ", length);
+		GenesisPrint(("GenesisDrive: Size: %I64d ", length));
 		listing += sizeof(LONGLONG);
 
-		printf("Name: %s\n", listing);
+		GenesisPrint(("GenesisDrive: Name: %s\n", listing));
 		listing += strlen(listing) + 1;				
 	}
 }
@@ -96,7 +98,7 @@ int copyListing(char * buffer, char ** listing, int size){
 			memcpy(pointer, &length, sizeof(long));
 			
 			if(length != -1){
-				//printf("FileID: %d ",length);
+				//GenesisPrint(("GenesisDrive: FileID: %d ",length);
 			}
 			
 			bytesCopied += sizeof(long);
@@ -106,7 +108,7 @@ int copyListing(char * buffer, char ** listing, int size){
 			memcpy(pointer, listing[i+1], strlen(listing[i+1]));
 			pointer[strlen(listing[i+1])] = '\0';
 
-			//printf("FileType: %s ", pointer);
+			//GenesisPrint(("GenesisDrive: FileType: %s ", pointer));;
 
 			bytesCopied += (int)strlen(listing[i+1]) + 1;
 			pointer += strlen(listing[i+1]) + 1;		
@@ -115,7 +117,7 @@ int copyListing(char * buffer, char ** listing, int size){
 			length = _strtoi64(listing[i+2], NULL, 10);
 			memcpy(pointer, &length, sizeof(LONGLONG));
 
-			//printf("FileSize: %I64d ", length); 
+			//GenesisPrint(("GenesisDrive: FileSize: %I64d ", length));; 
 
 			bytesCopied += sizeof(LONGLONG);
 			pointer += sizeof(LONGLONG);
@@ -124,7 +126,7 @@ int copyListing(char * buffer, char ** listing, int size){
 			memcpy(pointer, listing[i+3], strlen(listing[i+3]));
 			pointer[strlen(listing[i+3])] = '\0';
 
-			//printf("FileName: %s\n", pointer);
+			//GenesisPrint(("GenesisDrive: FileName: %s\n", pointer));;
 			
 			bytesCopied += (int)strlen(listing[i+3]) + 1;
 			pointer += strlen(listing[i+3]) + 1;
@@ -132,7 +134,7 @@ int copyListing(char * buffer, char ** listing, int size){
 	}
 	__finally{
 		if((bytesCopied == 0) && (size > 0)){
-			printf("Some error occurred on copy (no bytes copied)\n");
+			printf("GenesisDrive: Some error occurred on copy (no bytes copied)\n");
 		}
 	}
 	return bytesCopied;
@@ -153,7 +155,7 @@ BOOL GetRequest(PGENII_CONTROL_REQUEST PRequest,LPOVERLAPPED POverlapped)
     if(!status) {
         DWORD error = GetLastError();
         if(error != ERROR_IO_PENDING) {
-			printf("Something went wrong:  GetRequest - Status %x",GetLastError());
+			printf("GenesisDrive: Something went wrong:  GetRequest - Status %x",GetLastError());
             return FALSE;
         }
     }    
@@ -178,7 +180,7 @@ BOOL SendResponse(PGENII_CONTROL_RESPONSE PResponse,LPOVERLAPPED POverlapped)
     if(!status) {
         DWORD error = GetLastError();
         if(error != ERROR_IO_PENDING) {
-            printf("Something went wrong:  SendResponse - Status %x",GetLastError());
+            printf("GenesisDrive: Something went wrong:  SendResponse - Status %x",GetLastError());
             return FALSE;
         }
     }        
@@ -202,18 +204,16 @@ BOOL SendUFSClose(LPOVERLAPPED POverlapped)
     if(!status) {
         DWORD error = GetLastError();
         if(error != ERROR_IO_PENDING) {
-            printf("Something went wrong:  SendUFSClose - Status %x",GetLastError());
+            printf("GenesisDrive: Something went wrong:  SendUFSClose - Status %x",GetLastError());
             return FALSE;
         }
     }        
-
     return TRUE;                             
 }
 
 void RepeatControlCSignalHandler(int signalNumber){
 	signal(SIGINT, RepeatControlCSignalHandler);
-
-	printf("G-ICING:  CTRL+C received, UFS is already shutting down\n");
+	printf("GenesisDrive:  CTRL+C received, UFS is already shutting down\n");
 }
 
 void ControlCSignalHandler(int signalNumber){
@@ -223,7 +223,7 @@ void ControlCSignalHandler(int signalNumber){
 	//Setup other signal handler if many calls are made
 	signal(SIGINT, RepeatControlCSignalHandler);
 
-	printf("G-ICING:  CTRL+C received, UFS is shutting down\n");
+	printf("GenesisDrive: CTRL+C received, UFS is shutting down\n");
 
 	//This will step all threads from waiting again
 	isRunning = FALSE;
@@ -237,7 +237,7 @@ void ControlCSignalHandler(int signalNumber){
 
     ret = SendUFSClose(&OverlappedForCloser);
     if(!ret) {
-		printf("UFSClose not able to be sent!!!  Unable to abort, please restart\n");
+		printf("GenesisDrive: UFSClose not able to be sent!!!  Unable to abort, please restart\n");
         CloseHandle(OverlappedForCloser.hEvent);
         return;
     } 			
@@ -247,7 +247,7 @@ void ControlCSignalHandler(int signalNumber){
         Sleep(100);
     }
 
-	printf("Signal handler has returned. Kernel is now consistent with a close\n");
+	GenesisPrint(("GenesisDrive: Signal handler has returned. Kernel is now consistent with a close\n"));
 
 	//Signal main thread to finish clean up
 	ReleaseSemaphore(close_handle, 1, NULL);
@@ -283,7 +283,7 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 				target = "";
 			}
 
-			//printf("Directory: %d Target: %s for Query Directory\n", directoryId, target);			
+			//GenesisPrint(("GenesisDrive: Directory: %d Target: %s for Query Directory\n", directoryId, target));			
 			response->StatusCode = genesisII_directory_listing(pMyInfo, &directoryListing, directoryId, target);
 
 			//If an error, no copy is done
@@ -325,8 +325,8 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 
 				isMalformed = FALSE;
 						
-				//printf("Path: %s for Create, ", path);
-				//printf("Options: %d, %d, %d\n", requestedDeposition, desiredAccess, isDirectory);
+				//GenesisPrint(("GenesisDrive: Path: %s for Create, ", path);
+				//GenesisPrint(("GenesisDrive: Options: %d, %d, %d\n", requestedDeposition, desiredAccess, isDirectory));
 
 				response->StatusCode = genesisII_open(pMyInfo, path, requestedDeposition, desiredAccess, 
 					isDirectory, &listing);				
@@ -356,8 +356,8 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 			memcpy(&deleteOnCloseSpecified, bufPtr, sizeof(char));
 			response->ResponseBufferLength = sizeof(int);
 
-			//printf("Closing file with fileID: %d. ", fileID);
-			//printf("Delete Specified == %s\n", (deleteOnCloseSpecified ? "TRUE" : "FALSE"));
+			//GenesisPrint(("GenesisDrive: Closing file with fileID: %d. ", fileID));
+			//GenesisPrint(("GenesisDrive: Delete Specified == %s\n", (deleteOnCloseSpecified ? "TRUE" : "FALSE")));
 			returnCode = genesisII_close(pMyInfo, fileID, deleteOnCloseSpecified);
 
 			memcpy(response->ResponseBuffer, &returnCode, sizeof(int));				
@@ -384,7 +384,7 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 				target = "";
 			}						
 
-			//printf("Renaming file with fileID: %d to %s. ", fileID, target);		
+			//GenesisPrint(("GenesisDrive: Renaming file with fileID: %d to %s. ", fileID, target));		
 			returnCode = genesisII_rename(pMyInfo, fileID, target);
 
 			memcpy(response->ResponseBuffer, &returnCode, sizeof(int));				
@@ -403,7 +403,7 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 			bufPtr += sizeof(LONGLONG);
 			memcpy(&length, bufPtr, sizeof(long));
 
-			//printf("Read started for file with fileID: %d, offset: %I64d, length %d\n", fileID, offset, length);
+			//GenesisPrint(("GenesisDrive: Read started for file with fileID: %d, offset: %I64d, length %d\n", fileID, offset, length));
 			response->ResponseBufferLength = genesisII_read(pMyInfo, fileID, response->ResponseBuffer, offset, length);			
 			break;
 		}
@@ -424,7 +424,7 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 				memcpy(&length, bufPtr, sizeof(long));
 				bufPtr += sizeof(long);
 				
-				//printf("Write started for file with fileID: %d, offset: %I64d, length %d\n", fileID, offset, length);
+				//GenesisPrint(("GenesisDrive: Write started for file with fileID: %d, offset: %I64d, length %d\n", fileID, offset, length);
 				response->ResponseBufferLength = genesisII_write(pMyInfo, fileID, bufPtr, offset, length);				
 			}			
 			__finally{			
@@ -448,7 +448,7 @@ void prepareResponse(PGII_JNI_INFO pMyInfo, PGENII_CONTROL_REQUEST request,
 				memcpy(&length, bufPtr, sizeof(long));
 				bufPtr += sizeof(long);
 				
-				//printf("TruncateAppend started for file with fileID: %d, offset: %I64d, length %d\n", fileID, offset, length);
+				//GenesisPrint(("GenesisDrive: TruncateAppend started for file with fileID: %d, offset: %I64d, length %d\n", fileID, offset, length);
 				response->ResponseBufferLength = genesisII_truncate_append(pMyInfo, fileID, bufPtr, offset, length);				
 			}			
 			__finally{			
@@ -478,7 +478,7 @@ DWORD WINAPI ServerThread(LPVOID parameter){
 	GII_JNI_INFO myInfo;	
 
 	if(initializeJavaVMForThread(&myInfo) == -1){
-		printf("Thread initialization failed\n");
+		printf("GenesisDrive: Thread initialization failed\n");
 		return -1;
 	}
 	
@@ -515,9 +515,7 @@ DWORD WINAPI ServerThread(LPVOID parameter){
 		ret = GetOverlappedResult(GenesisControlHandle,&GeniiRequestOverlapped,&bytesTransferred,FALSE);		        
 
 		if(!isRunning){
-			if(DEBUG){
-				printf("Closing event signal after return from Kernel\n");
-			}
+			printf("GenesisDrive: Closing event signal after return from Kernel\n");
 			CloseHandle(GeniiRequestOverlapped.hEvent);
 			continue;
 		}
@@ -532,10 +530,10 @@ DWORD WINAPI ServerThread(LPVOID parameter){
 		prepareResponse(&myInfo, &(GeniiRequest.ControlRequest), &(GeniiResponse.ControlResponse));		
 
 		/*
-		printf("Sending Response to Kernel Driver: Id= %d, Type = %x, Length %d\n\n", 
+		GenesisPrint(("GenesisDrive: Sending Response to Kernel Driver: Id= %d, Type = %x, Length %d\n\n", 
 				 GeniiResponse.ControlResponse.RequestID,
 				 GeniiResponse.ControlResponse.ResponseType,                 
-				 GeniiResponse.ControlResponse.ResponseBufferLength);
+				 GeniiResponse.ControlResponse.ResponseBufferLength));
 		*/
 		ret = SendResponse(&(GeniiResponse.ControlResponse),&GeniiRequestOverlapped);
 		if(!ret) {             
@@ -575,7 +573,8 @@ int runMultiThreaded(PGII_JNI_INFO rootInfo){
 	// We cannot continue if we cannot find the device
 	if(GenesisControlHandle == INVALID_HANDLE_VALUE) {
 		DWORD error = GetLastError();		
-		printf("Kernel Driver not opened correctly.  Error code %d\n", error);
+		printf("GenesisDrive:  Kernel Driver not opened correctly.  Most likely the system could not \
+			find the driver.  Please reinstall and restart your system.  Error code %d\n", error);
 		return 0; 
 	}	
 
@@ -592,10 +591,12 @@ int runMultiThreaded(PGII_JNI_INFO rootInfo){
 		}	
 	}
 
+	printf("GenesisDrive: Now accepting requests\n");
+
 	//Wait for close semaphore to be released
 	WaitForSingleObject(close_handle, INFINITE);
 
-	printf("Waiting for User Level Threads to Quit\n");
+	GenesisPrint(("GenesisDrive: Waiting for User Level Threads to Quit\n"));
 
 	//Wait two seconds for other threads to catch up
 	Sleep(2000);
@@ -608,7 +609,7 @@ int runMultiThreaded(PGII_JNI_INFO rootInfo){
 			next = next->nextWorker;		
 			CloseHandle(current->thread);
 		}__except(EXCEPTION_EXECUTE_HANDLER){
-			printf("Error on thread close\n");
+			printf("GenesisDrive: Error on thread close\n");
 		}
 	}		
 
@@ -628,33 +629,25 @@ int runMultiThreaded(PGII_JNI_INFO rootInfo){
 int main(int argc, char* argv[])
 {
 	int status = 0;
+	int isSuccessful;
 
-	GII_JNI_INFO rootInfo;		
+	GII_JNI_INFO rootInfo;
+
+	printf("GenesisDrive: Initializing with %d threads with %d delay\n", NUMBER_OF_THREADS, THREAD_DELAY);
 
 	//Initialize in root thread
 	if(initializeJavaVM(NULL, &rootInfo) == -1){
-		printf("Initialization Failed!\n ");
-		return 0;
-	}
-
-	if(!loggedin){
-		int isSuccessful;
-		printf("Logging In to Genesis\n");
+		printf("GenesisDrive: Initialization Failed.  Shutting down\n");		
+	} else {
+		printf("GenesisDrive: Logging In to Genesis\n");
 		isSuccessful = genesisII_login(&rootInfo, NULL, "keys", "sky");
 		if(isSuccessful == JNI_ERR){
-			printf("Login unsuccessful\n");
-			return 0;
-		}
-		else{
-			printf("Login successful\n");
-			loggedin = 1;
-		}
+			printf("GenesisDrive: Login unsuccessful.  GenesisDrive requires login.  Shutting down\n");		
+		} else {			
+			status = runMultiThreaded(&rootInfo);
+			//TestThread(rootInfo);		//For testing
+		}	
 	}
-	
-	status = runMultiThreaded(&rootInfo);		
-
-	//TestThread(rootInfo);		
-	printf("Shutdown Complete\n");	
-	
+	printf("GenesisDrive: Shutdown Complete\n");		
 	return status;
 }
