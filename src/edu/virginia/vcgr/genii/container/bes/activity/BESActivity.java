@@ -271,7 +271,7 @@ public class BESActivity implements Closeable
 			return;
 		
 		updateState(false, true);
-		_runner.requestTerminate();
+		_runner.requestTerminate(false);
 	}
 	
 	synchronized public void resume() throws ExecutionException,
@@ -713,7 +713,8 @@ public class BESActivity implements Closeable
 			return true;
 		}
 		
-		public void requestTerminate() throws ExecutionException
+		public void requestTerminate(boolean countAsFailedAttempt)
+			throws ExecutionException
 		{
 			synchronized(_phaseLock)
 			{
@@ -726,7 +727,8 @@ public class BESActivity implements Closeable
 				if (_currentPhase != null)
 				{
 					if (_currentPhase instanceof TerminateableExecutionPhase)
-						((TerminateableExecutionPhase)_currentPhase).terminate();
+						((TerminateableExecutionPhase)_currentPhase).terminate(
+							countAsFailedAttempt);
 				} else
 				{
 					_phaseLock.notify();
@@ -857,7 +859,7 @@ public class BESActivity implements Closeable
 		@Override
 		public void kill() throws ExecutionException
 		{
-			_runner.requestTerminate();
+			_runner.requestTerminate(true);
 		}
 
 		@Override

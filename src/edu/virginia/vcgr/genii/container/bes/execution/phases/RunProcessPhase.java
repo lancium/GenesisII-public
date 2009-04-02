@@ -34,6 +34,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 	transient private Process _process = null;
 	private String _processLock = new String();
 	transient private Boolean _hardTerminate = null;
+	transient private boolean _countAsFailedAttempt = true;
 	
 	private StreamRedirectionDescription _redirects;
 	
@@ -139,11 +140,17 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 			int eValue = _process.waitFor();
 			
 			if (_hardTerminate != null && _hardTerminate.booleanValue())
+			{
+				if (_countAsFailedAttempt)
+					throw new ContinuableExecutionException(
+						"The process was forcably killed.");
+				
 				return;
+			}
 			
 			if (eValue != 0)
-				throw new ContinuableExecutionException(
-					"Process exited with non-zero value:  " + eValue); 
+				_logger.info(String.format(
+					"Process exited with non-zero value:  %d", eValue)); 
 		}
 		catch (InterruptedException ie)
 		{
@@ -163,11 +170,13 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 	}
 	
 	@Override
-	public void terminate() throws ExecutionException
+	public void terminate(boolean countAsFailedAttempt) 
+		throws ExecutionException
 	{
 		synchronized(_processLock)
 		{
 			_hardTerminate = Boolean.TRUE;
+			_countAsFailedAttempt = countAsFailedAttempt;
 			destroyProcess(_process);
 		}
 	}

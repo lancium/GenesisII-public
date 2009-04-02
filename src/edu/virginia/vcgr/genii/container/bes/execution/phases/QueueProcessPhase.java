@@ -68,7 +68,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 	}
 	
 	@Override
-	public void terminate() throws ExecutionException
+	public void terminate(boolean countAsFailedAttempt)
+		throws ExecutionException
 	{
 		try
 		{

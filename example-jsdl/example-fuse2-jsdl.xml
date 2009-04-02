@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsdl:JobDefinition xmlns="http://www.example.org/"
+	xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
+	xmlns:jsdl-posix="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	
+	<jsdl:JobDescription>
+		<jsdl:Resources>
+			<jsdl:FileSystem name="GRID">
+<!-- Required.  Identifies it as a grid mount -->
+				<jsdl:MountSource>rns:/</jsdl:MountSource>
+<!-- Optional.  MUST be normal
+				<jsdl:FileSystemType>normal</jsdl:FileSystemType>
+-->
+			</jsdl:FileSystem>
+		</jsdl:Resources>
+		
+		<jsdl:Application>
+			<jsdl:ApplicationName>ls</jsdl:ApplicationName>
+			<jsdl-posix:POSIXApplication>
+				<jsdl-posix:Executable filesystemName="GRID">
+					ls.sh
+				</jsdl-posix:Executable>
+				<jsdl-posix:Output>stdout</jsdl-posix:Output>
+				<jsdl-posix:Argument>-la</jsdl-posix:Argument>
+				<jsdl-posix:Argument
+					filesystemName="GRID">.</jsdl-posix:Argument>
+			</jsdl-posix:POSIXApplication>
+		</jsdl:Application>
+<!--
+		<jsdl:DataStaging>
+			<jsdl:FileName>ls.sh</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Source>
+				<jsdl:URI>http://www.cs.virginia.edu/~mmm2a/test/ls.sh</jsdl:URI>
+			</jsdl:Source>
+		</jsdl:DataStaging>
+-->
+		
+		<jsdl:DataStaging>
+			<jsdl:FileName>stdout</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Target>
+				<jsdl:URI>rns:stdout.txt</jsdl:URI>
+			</jsdl:Target>
+		</jsdl:DataStaging>
+	</jsdl:JobDescription>
+	
+</jsdl:JobDefinition>
