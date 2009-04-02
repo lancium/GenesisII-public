@@ -92,8 +92,17 @@ public class CommonExecutionUnderstanding
 	public void addFilesystem(FilesystemUnderstanding understanding)
 		throws JSDLException
 	{
-		_fsManager.addFilesystem("SCRATCH", 
-			understanding.createScratchFilesystem(_jobAnnotation));
+		if (understanding.isScratchFileSystem())
+		{
+			_fsManager.addFilesystem("SCRATCH", 
+				understanding.createScratchFilesystem(_jobAnnotation));
+		} else if (understanding.isGridFileSystem())
+		{
+			_fsManager.addFilesystem(understanding.getFileSystemName(),
+				understanding.createGridFilesystem(
+					new File(getWorkingDirectory().getWorkingDirectory(), 
+						"grid-mnt")));
+		}
 	}
 	
 	public void setApplication(ApplicationUnderstanding application)

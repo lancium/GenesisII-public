@@ -38,6 +38,14 @@ public class CommonFilesystemFacet extends DefaultFileSystemFacet
 	}
 
 	@Override
+	public void consumeMountSource(Object currentUnderstanding,
+			String mountSource) throws JSDLException
+	{
+		((FilesystemUnderstanding)currentUnderstanding).setFileSystemSource(
+			mountSource);
+	}
+
+	@Override
 	public void completeFacet(Object parentUnderstanding,
 			Object currentUnderstanding) throws JSDLException
 	{

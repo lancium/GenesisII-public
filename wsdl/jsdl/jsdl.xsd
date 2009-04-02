@@ -241,6 +241,7 @@ This document and the information contained herein is provided on an "AS IS" bas
 			<xsd:element ref="jsdl:FileSystemType" minOccurs="0"/>
 			<xsd:element ref="jsdl:Description" minOccurs="0"/>
 			<xsd:element ref="jsdl:MountPoint" minOccurs="0"/>
+			<xsd:element ref="jsdl:MountSource" minOccurs="0"/>
 			<xsd:element ref="jsdl:DiskSpace" minOccurs="0"/>
 			<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
@@ -311,6 +312,7 @@ This document and the information contained herein is provided on an "AS IS" bas
 	<xsd:element name="FileSystem" type="jsdl:FileSystem_Type"/>
 	<xsd:element name="FileSystemType" type="jsdl:FileSystemTypeEnumeration"/>
 	<xsd:element name="MountPoint" type="xsd:string"/>
+	<xsd:element name="MountSource" type="xsd:string"/>
 	<xsd:element name="DiskSpace" type="jsdl:RangeValue_Type"/>
 	<xsd:element name="IndividualCPUTime" type="jsdl:RangeValue_Type"/>
 	<xsd:element name="IndividualCPUSpeed" type="jsdl:RangeValue_Type"/>

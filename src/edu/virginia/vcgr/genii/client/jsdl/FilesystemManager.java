@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.client.jsdl;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +30,11 @@ public class FilesystemManager implements Serializable
 			throw new IllegalArgumentException("Filesystem cannot be null.");
 		
 		_filesystems.put(filesystemName, filesystem);
+	}
+	
+	public Collection<JSDLFileSystem> getFileSystems()
+	{
+		return _filesystems.values();
 	}
 	
 	public File lookup(FilesystemRelativePath path)

@@ -13,10 +13,19 @@ public class SetupFUSEPhase extends AbstractFUSEPhases
 {
 	static final long serialVersionUID = 0L;
 	
-	public SetupFUSEPhase(String mountPoint)
+	private String _sandbox = null;
+	
+	public SetupFUSEPhase(String mountPoint, String sandbox)
 	{
 		super(mountPoint, new ActivityState(
 			ActivityStateEnumeration.Running, "fuse-setup", false));
+		
+		_sandbox = sandbox;
+	}
+	
+	public SetupFUSEPhase(String mountPoint)
+	{
+		this(mountPoint, null);
 	}
 	
 	@Override
@@ -35,9 +44,12 @@ public class SetupFUSEPhase extends AbstractFUSEPhases
 					+ mountPoint.getAbsolutePath() + "\" is not a directory.");
 		}
 		
+		String sandbox = (_sandbox == null) ? "/" : _sandbox;
+			
 		ProcessBuilder builder = new ProcessBuilder(
 			Installation.getGridCommand().getAbsolutePath(),
-			"fuse", "--mount", getMountPoint(context).getAbsolutePath());
+			"fuse", "--mount", String.format("--sandbox=%s", sandbox),
+			getMountPoint(context).getAbsolutePath());
 		builder.redirectErrorStream(true);
 		
 		StreamRedirectionSink sink = new FileRedirectionSink(

@@ -12,11 +12,15 @@ import edu.virginia.vcgr.genii.client.configuration.Deployment;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
+import edu.virginia.vcgr.genii.client.jsdl.GridFileSystem;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
+import edu.virginia.vcgr.genii.client.jsdl.JSDLFileSystem;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.PrepareApplicationPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.RunProcessPhase;
+import edu.virginia.vcgr.genii.container.bes.execution.phases.SetupFUSEPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.StreamRedirectionDescription;
+import edu.virginia.vcgr.genii.container.bes.execution.phases.TeardownFUSEPhase;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.PosixLikeApplicationUnderstanding;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.StringOrPath;
@@ -43,6 +47,19 @@ class ForkExecApplicationUnderstanding extends PosixLikeApplicationUnderstanding
 		DeploymentName depName = deployment.getName();
 		
 		FilesystemManager fsManager = getFilesystemManager();
+		
+		for (JSDLFileSystem fs : fsManager.getFileSystems())
+		{
+			if (fs instanceof GridFileSystem)
+			{
+				GridFileSystem gfs = (GridFileSystem)fs;
+				executionPlan.add(new SetupFUSEPhase(
+					gfs.getMountPoint().getAbsolutePath(),
+					gfs.getSandbox()));
+				cleanupPhases.add(new TeardownFUSEPhase(
+					gfs.getMountPoint().getAbsolutePath()));
+			}
+		}
 		
 		executionPlan.add(new PrepareApplicationPhase(
 			fsManager, getExecutable()));

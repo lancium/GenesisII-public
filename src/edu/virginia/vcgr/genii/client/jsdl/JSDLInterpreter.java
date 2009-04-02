@@ -755,9 +755,9 @@ public class JSDLInterpreter
 		if (str != null)
 			facet.consumeMountPoint(understanding, str);
 		
-		/* MountSource doesn't actually exist.
-			facet.consumeMountSource(understanding, fst.getMountSource());
-		*/
+		str = fst.getMountSource();
+		if (str != null)
+			facet.consumeMountSource(understanding, str);
 		
 		RangeExpression range = RangeFactory.parse(fst.getDiskSpace());
 		if (range != null)

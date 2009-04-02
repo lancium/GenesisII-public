@@ -24,6 +24,7 @@ public class FuseTool extends BaseGridTool
 	private boolean _isUnmount = false;
 	private int _uid = -1;
 	private boolean _daemon = false;
+	private String _sandbox = null;
 	
 	public FuseTool()
 	{
@@ -33,6 +34,11 @@ public class FuseTool extends BaseGridTool
 	public void setDaemon()
 	{
 		_daemon = true;
+	}
+	
+	public void setSandbox(String sandbox)
+	{
+		_sandbox = sandbox;
 	}
 
 	public void setMount()
@@ -70,7 +76,7 @@ public class FuseTool extends BaseGridTool
 		if (_isMount)
 		{
 			GeniiFuse.mountGenesisII(new File(getArgument(0)), 
-				new String[] { "-f", "-s" }, _uid, _daemon);
+				new String[] { "-f", "-s" }, null, _sandbox, _uid, _daemon);
 		} else
 		{
 			GeniiFuse.unmountGenesisII(new File(getArgument(0)));
