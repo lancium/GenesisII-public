@@ -5,10 +5,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Properties;
+import java.util.Random;
 
 import javax.xml.namespace.QName;
 
@@ -422,11 +424,35 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 			response.toArray(new GetActivityStatusResponseType[0]), null);
 	}
 
+	static private void addAndrewsClassAttributes(String resourceName, 
+			Collection<MessageElement> any)
+	{
+		final String classNamespace = "http://cs.virginia.edu/classes/andrews-class";
+		
+		final QName reliability = new QName(classNamespace, "reliability");
+		final QName cost = new QName(classNamespace, "cost");
+		final QName downtime = new QName(classNamespace, "downtime");
+		
+		Random generator = new Random(resourceName.hashCode());
+		
+		int n = generator.nextInt(3);
+		float r = 0.80f;
+		r += 0.05f * n;
+		
+		int c = 5 + 5 * n;
+		String dt = "15-20 4 * * *";
+		
+		any.add(new MessageElement(reliability, r));
+		any.add(new MessageElement(cost, c));
+		any.add(new MessageElement(downtime, dt));
+	}
+	
 	@Override
 	@RWXMapping(RWXCategory.READ)
 	public GetFactoryAttributesDocumentResponseType getFactoryAttributesDocument(
 			GetFactoryAttributesDocumentType parameters) throws RemoteException
 	{
+		Collection<MessageElement> any = new ArrayList<MessageElement>(4);
 		String resourceName = Hostname.getLocalHostname().toString();
 		
 		URI []namingProfiles = null;
@@ -449,6 +475,8 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 			_logger.fatal("Unexpected exception in BES.", cause);
 		}
 		
+		addAndrewsClassAttributes(resourceName, any);
+		
 		try
 		{
 			return new GetFactoryAttributesDocumentResponseType(
@@ -469,7 +497,8 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 					BESAttributesHandler.getTotalNumberOfActivities(),
 					BESAttributesHandler.getActivityReferences(),
 					0, null, namingProfiles, besExtensions, 
-					localResourceManagerType, null), null);
+					localResourceManagerType, 
+					any.toArray(new MessageElement[any.size()])), null);
 		}
 		catch (SQLException sqe)
 		{
