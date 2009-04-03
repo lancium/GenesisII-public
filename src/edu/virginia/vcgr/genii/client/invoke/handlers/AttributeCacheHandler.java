@@ -27,6 +27,8 @@ import org.oasis_open.docs.wsrf.rp_2.UpdateResourcePropertiesResponse;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
+import edu.virginia.vcgr.genii.client.cache.AttributeCache;
+import edu.virginia.vcgr.genii.client.cache.AttributeCacheFlushListener;
 import edu.virginia.vcgr.genii.client.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.invoke.InvocationContext;
@@ -70,8 +72,44 @@ public class AttributeCacheHandler
 	static private QName authz = new QName("http://tempuri.org", "Mark");
 	*/
 	
+	private class FlushListener implements AttributeCacheFlushListener
+	{
+		@Override
+		public void flush(WSName endpoint, QName... attributes)
+		{
+			synchronized(_attrCache)
+			{
+				if (endpoint == null)
+				{
+					if ((attributes == null) || (attributes.length == 0))
+					{
+						_attrCache.clear();
+						return;
+					}
+					
+					for (WSName e : _attrCache.keySet())
+						flush(e, attributes);
+				} else
+				{
+					if ((attributes == null) || (attributes.length == 0))
+					{
+						_attrCache.remove(endpoint);
+					} else
+					{
+						CachedAttributeData data = _attrCache.get(endpoint);
+						if (data != null)
+						{
+							data.flush(attributes);
+						}
+					}
+				}
+			}
+		}
+	}
+	
 	public AttributeCacheHandler()
 	{
+		AttributeCache.addFlushListener(new FlushListener());
 		_attrCache.activelyTimeoutElements(true);
 	}
 	

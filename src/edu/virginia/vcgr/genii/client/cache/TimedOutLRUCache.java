@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.client.cache;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  * This cache attempt to efficiently handle cached items that may time out after a certain
@@ -156,6 +157,14 @@ public class TimedOutLRUCache<KeyType, DataType>
 				_lruList.remove(node);
 				_timeoutList.remove(node);
 			}
+		}
+	}
+	
+	public Set<KeyType> keySet()
+	{
+		synchronized(_map)
+		{
+			return _map.keySet();
 		}
 	}
 	

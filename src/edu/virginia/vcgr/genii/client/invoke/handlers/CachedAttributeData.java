@@ -46,6 +46,16 @@ public class CachedAttributeData
 	{
 		this(resp.get_any(), true);
 	}
+	
+	public void flush(QName []attributes)
+	{
+		for (QName name : attributes)
+		{
+			_attrs.remove(name);
+		}
+		
+		_isFull = false;
+	}
 		
 	@SuppressWarnings("unchecked")
 	public CachedAttributeData(MessageElement uberDoc)
