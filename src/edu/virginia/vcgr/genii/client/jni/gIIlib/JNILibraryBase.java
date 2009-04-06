@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.regex.Pattern;
 
+import edu.virginia.vcgr.fsii.FSFilesystem;
 import edu.virginia.vcgr.fsii.FileHandleTable;
 import edu.virginia.vcgr.fsii.path.FilesystemPathRepresentation;
 import edu.virginia.vcgr.fsii.path.UnixFilesystemPathRepresentation;
@@ -13,16 +14,18 @@ import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.gfs.GenesisIIFilesystem;
+import edu.virginia.vcgr.genii.client.gfs.cache.GenesisIICachedFilesystem;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.FilesystemHandle;
 
 public abstract class JNILibraryBase extends ApplicationBase
 {
+	public static boolean USE_CACHE_FS = true;
 	public static boolean isInitialized = false;
 	public static final boolean DEBUG = true;
 	
 	static private FilesystemPathRepresentation PATHREP =
 		UnixFilesystemPathRepresentation.INSTANCE;
-	static private GenesisIIFilesystem _fs = null;
+	static private FSFilesystem _fs = null;
 	static private FileHandleTable<FilesystemHandle> _openHandles =
 		new FileHandleTable<FilesystemHandle>(1024);
 	
@@ -46,9 +49,15 @@ public abstract class JNILibraryBase extends ApplicationBase
 			
 			if (didInit)
 			{
-				_fs = new GenesisIIFilesystem(
-					callingContext.getCurrentPath().getRoot(), 
-					null);
+				if(USE_CACHE_FS){
+					_fs = new GenesisIICachedFilesystem(new GenesisIIFilesystem(
+							callingContext.getCurrentPath().getRoot(), 
+							null));
+				} else {
+					_fs = new GenesisIIFilesystem(
+						callingContext.getCurrentPath().getRoot(), 
+						null);
+				}
 			}
 		}
 		catch (Exception e) 
@@ -128,7 +137,7 @@ public abstract class JNILibraryBase extends ApplicationBase
 		return true;
 	}
 	
-	static protected GenesisIIFilesystem getFilesystem()
+	static protected FSFilesystem getFilesystem()
 	{
 		return _fs;
 	}

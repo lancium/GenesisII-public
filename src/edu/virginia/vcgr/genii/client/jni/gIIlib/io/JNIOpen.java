@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.fsii.FSFilesystem;
 import edu.virginia.vcgr.fsii.FileHandleTable;
 import edu.virginia.vcgr.fsii.FilesystemEntryType;
 import edu.virginia.vcgr.fsii.FilesystemStatStructure;
@@ -12,7 +13,6 @@ import edu.virginia.vcgr.fsii.exceptions.FSEntryNotFoundException;
 import edu.virginia.vcgr.fsii.file.OpenFlags;
 import edu.virginia.vcgr.fsii.file.OpenModes;
 import edu.virginia.vcgr.fsii.path.UnixFilesystemPathRepresentation;
-import edu.virginia.vcgr.genii.client.gfs.GenesisIIFilesystem;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.JNILibraryBase;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.io.exception.WindowsIFSException;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.DirectoryHandle;
@@ -97,7 +97,7 @@ public class JNIOpen extends JNILibraryBase
 		if (path == null)
 			return null;
 		
-		GenesisIIFilesystem fs = getFilesystem();
+		FSFilesystem fs = getFilesystem();
 		FileHandleTable<FilesystemHandle> openHandles = openHandles();
 		ArrayList<String> ret;
 		
@@ -132,7 +132,7 @@ public class JNIOpen extends JNILibraryBase
 	
 	static private ArrayList<String> openDirectory(String []path,
 		int requestedDeposition, int desiredAccess,
-		GenesisIIFilesystem fs, FileHandleTable<FilesystemHandle> openHandles)
+		FSFilesystem fs, FileHandleTable<FilesystemHandle> openHandles)
 			throws Exception
 	{
 		FilesystemStatStructure stat;
@@ -191,7 +191,7 @@ public class JNIOpen extends JNILibraryBase
 	
 	static private ArrayList<String> openFile(String []path,
 		int requestedDeposition, int desiredAccess,
-		GenesisIIFilesystem fs, FileHandleTable<FilesystemHandle> openHandles)
+		FSFilesystem fs, FileHandleTable<FilesystemHandle> openHandles)
 			throws Exception
 	{
 		FilesystemStatStructure stat;
@@ -266,7 +266,7 @@ public class JNIOpen extends JNILibraryBase
 	
 	static private ArrayList<String> openUnknown(String []path,
 		int requestedDeposition, int desiredAccess,
-		GenesisIIFilesystem fs, FileHandleTable<FilesystemHandle> openHandles)
+		FSFilesystem fs, FileHandleTable<FilesystemHandle> openHandles)
 			throws Exception
 	{
 		FilesystemStatStructure stat = fs.stat(path);

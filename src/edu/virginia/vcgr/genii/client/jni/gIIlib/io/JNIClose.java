@@ -6,6 +6,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.fsii.FileHandleTable;
 import edu.virginia.vcgr.fsii.exceptions.FSException;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.JNILibraryBase;
+import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.FileHandle;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.FilesystemHandle;
 
 public class JNIClose extends JNILibraryBase 
@@ -31,6 +32,9 @@ public class JNIClose extends JNILibraryBase
 			{
 				if (deleteOnClose)
 					fsHandle.delete();
+				if(fsHandle instanceof FileHandle){
+					((FileHandle)fsHandle).flush();
+				}
 				openHandles.release(handle);
 			
 				return true;

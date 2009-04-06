@@ -36,6 +36,7 @@ import edu.virginia.vcgr.genii.client.byteio.RandomByteIORP;
 import edu.virginia.vcgr.genii.client.byteio.StreamableByteIORP;
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransfererFactory;
+import edu.virginia.vcgr.genii.client.cache.AttributeCache;
 import edu.virginia.vcgr.genii.client.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
@@ -254,7 +255,7 @@ public class GenesisIIFilesystem implements FSFilesystem
 		return gof;
 	}
 	
-	protected RNSPath lookup(String []pathComponents) throws FSException
+	public RNSPath lookup(String []pathComponents) throws FSException
 	{
 		String fullPath = UnixFilesystemPathRepresentation.INSTANCE.toString(
 			pathComponents);	
@@ -325,6 +326,7 @@ public class GenesisIIFilesystem implements FSFilesystem
 	{
 		GeniiOpenFile gof = lookup(fileHandle);
 		gof.flush();
+		flushAttributeCache(gof.getPath());
 	}
 
 	@Override
@@ -413,7 +415,7 @@ public class GenesisIIFilesystem implements FSFilesystem
 		}
 	}
 
-	private long open(boolean wasCreated, RNSPath target, 
+	private long open(String[] path, boolean wasCreated, RNSPath target, 
 		EndpointReferenceType epr, OpenFlags flags, OpenModes mode) 
 			throws FSException, ResourceException, GenesisIISecurityException, 
 				RemoteException, IOException
@@ -422,20 +424,20 @@ public class GenesisIIFilesystem implements FSFilesystem
 				
 		TypeInformation tInfo = new TypeInformation(epr);
 		if (tInfo.isRByteIO())
-			gof = new RandomByteIOOpenFile(epr, true, 
+			gof = new RandomByteIOOpenFile(path, epr, true, 
 				mode == OpenModes.READ_WRITE, flags.isAppend());
 		else if (tInfo.isSByteIO())
-			gof = new StreamableByteIOOpenFile(wasCreated, epr, true,
+			gof = new StreamableByteIOOpenFile(path, wasCreated, epr, true,
 				mode == OpenModes.READ_WRITE, flags.isAppend());
 		else if (tInfo.isSByteIOFactory())
-			gof = new StreamableByteIOFactoryOpenFile(epr, true,
+			gof = new StreamableByteIOFactoryOpenFile(path, epr, true,
 				mode == OpenModes.READ_WRITE, flags.isAppend());
 		else
 		{
 			String eprString = ObjectSerializer.toString(
 				epr, new QName(GenesisIIConstants.GENESISII_NS, "endpoint"),
 				false);
-			gof = new GenericGeniiOpenFile(ByteBuffer.wrap(eprString.getBytes()),
+			gof = new GenericGeniiOpenFile(path, ByteBuffer.wrap(eprString.getBytes()),
 				true, mode == OpenModes.READ_WRITE, flags.isAppend());
 		}
 		
@@ -462,7 +464,7 @@ public class GenesisIIFilesystem implements FSFilesystem
 					throw new FSEntryAlreadyExistsException(String.format(
 						"Path %s already exists.", target.pwd()));
 				
-				return open(false, target, epr, flags, mode);
+				return open(path, false, target, epr, flags, mode);
 			} else
 			{
 				if (!flags.isCreate())
@@ -475,7 +477,7 @@ public class GenesisIIFilesystem implements FSFilesystem
 						epr, _callerIdentities)).setPermissions(
 							initialPermissions);
 				
-				return open(true, target, epr, flags, mode);
+				return open(path, true, target, epr, flags, mode);
 			}
 		}
 		catch (Throwable cause)
@@ -536,6 +538,9 @@ public class GenesisIIFilesystem implements FSFilesystem
 						ClientUtils.createProxy(
 							RandomByteIOPortType.class, target.getEndpoint()));
 				transferer.truncAppend(newSize, new byte[0]);
+				
+				//New size is 0, flush attribute cache
+				flushAttributeCache(path);				
 			} else if (info.isSByteIO())
 			{
 				// Can't do this.
@@ -567,6 +572,9 @@ public class GenesisIIFilesystem implements FSFilesystem
 		try
 		{
 			target.delete();
+			
+			//Take it out of the attribute cache
+			flushAttributeCache(path);
 			
 			String fullPath = UnixFilesystemPathRepresentation.INSTANCE.toString(
 				path);	
@@ -635,6 +643,9 @@ public class GenesisIIFilesystem implements FSFilesystem
 			to.link(from.getEndpoint());
 			from.unlink();
 			
+			//Take the from out of the attribute cache
+			flushAttributeCache(fromPath);
+			
 			String fullPath = UnixFilesystemPathRepresentation.INSTANCE.toString(
 				fromPath);	
 			synchronized(_lookupCache)
@@ -646,6 +657,24 @@ public class GenesisIIFilesystem implements FSFilesystem
 		{
 			throw FSExceptions.translate(String.format(
 				"Unable to rename %s to %s.", from.pwd(), to.pwd()), cause);
+		}
+	}
+	/*
+	 * flushAttributeCache takes in a path and if it exists in the
+	 * attribute cache will remove the entry corresponding to the that
+	 * path
+	 */
+	private void flushAttributeCache(String [] path) throws FSException {
+		RNSPath rnsPath = lookup(path);
+		try {
+			WSName wsName = new WSName(rnsPath.getEndpoint());
+			if(wsName.isValidWSName()) {				
+				AttributeCache.flush(wsName);
+			}
+		} catch(RNSPathDoesNotExistException rpe){
+			_logger.debug(String.format("Path does not exist unexpected for "
+					+"%s", UnixFilesystemPathRepresentation.INSTANCE.toString(
+							path)));
 		}
 	}
 }

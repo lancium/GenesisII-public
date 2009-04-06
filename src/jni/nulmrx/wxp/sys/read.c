@@ -157,10 +157,8 @@ Return Value:
 
 		if(SynchronousIo){
 			PVOID requestBuffer = NULL;
-
-			KeWaitForSingleObject(&(giiFcb->InvertedCallSemaphore), Executive, KernelMode, FALSE, NULL);			
-			Status = STATUS_SUCCESS;
-
+			
+			KeWaitForSingleObject(&(giiFcb->InvertedCallSemaphore), Executive, KernelMode, FALSE, NULL);
 			if(!PagingIo){
 				FileObject->CurrentByteOffset.QuadPart = 
 					ByteOffset.QuadPart + pIoCompContext->Information;
@@ -168,6 +166,7 @@ Return Value:
 			else{
 				// Paging IO Recv
 			}
+			Status = STATUS_SUCCESS;			
 		}
 	}
 

@@ -6,9 +6,9 @@ import java.nio.ByteBuffer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.fsii.FSFilesystem;
 import edu.virginia.vcgr.fsii.exceptions.FSException;
 import edu.virginia.vcgr.fsii.path.UnixFilesystemPathRepresentation;
-import edu.virginia.vcgr.genii.client.gfs.GenesisIIFilesystem;
 
 
 public class FileHandle extends AbstractFilesystemHandle
@@ -17,7 +17,7 @@ public class FileHandle extends AbstractFilesystemHandle
 	
 	private long _fileHandle;
 	
-	public FileHandle(GenesisIIFilesystem fs, String []path, long fileHandle)
+	public FileHandle(FSFilesystem fs, String []path, long fileHandle)
 	{
 		super(fs, path);
 		
@@ -88,5 +88,11 @@ public class FileHandle extends AbstractFilesystemHandle
 		_fs.truncate(_path, offset);
 		_fs.write(_fileHandle, offset, source);
 		return source.position();
+	}
+	
+	public void flush() throws FSException {
+		_logger.trace(String.format("FileHandle::flush(%s)",
+				UnixFilesystemPathRepresentation.INSTANCE.toString(_path)));
+		_fs.flush(_fileHandle);
 	}
 }

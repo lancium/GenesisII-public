@@ -35,12 +35,12 @@ class RandomByteIOOpenFile extends OperatorBasedOpenFile
 			new AppendResolverImpl(transferer), false);
 	}
 	
-	RandomByteIOOpenFile(EndpointReferenceType target,
+	RandomByteIOOpenFile(String[] path, EndpointReferenceType target,
 		boolean canRead, boolean canWrite, boolean isAppend)
 			throws ResourceException, GenesisIISecurityException, 
 				RemoteException, IOException
 	{
-		super(createOperator(target),
+		super(path, createOperator(target),
 			canRead, canWrite, isAppend);
 	}
 	

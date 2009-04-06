@@ -3,9 +3,9 @@ package edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.fsii.FSFilesystem;
 import edu.virginia.vcgr.fsii.exceptions.FSException;
 import edu.virginia.vcgr.fsii.path.UnixFilesystemPathRepresentation;
-import edu.virginia.vcgr.genii.client.gfs.GenesisIIFilesystem;
 
 abstract class AbstractFilesystemHandle implements FilesystemHandle
 {
@@ -13,15 +13,9 @@ abstract class AbstractFilesystemHandle implements FilesystemHandle
 		AbstractFilesystemHandle.class);
 	
 	protected String []_path;
-	protected GenesisIIFilesystem _fs;
+	protected FSFilesystem _fs;
 	
-	@Override 
-	protected void finalize() throws Throwable
-	{
-		close();
-	}
-	
-	protected AbstractFilesystemHandle(GenesisIIFilesystem fs, String []path)
+	protected AbstractFilesystemHandle(FSFilesystem fs, String []path)
 	{
 		_path = path;
 		_fs = fs;

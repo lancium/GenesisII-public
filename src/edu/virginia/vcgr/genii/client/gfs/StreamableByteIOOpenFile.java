@@ -39,24 +39,24 @@ class StreamableByteIOOpenFile extends OperatorBasedOpenFile
 
 	private StreamableByteIOPortType _destroyer = null;
 	
-	StreamableByteIOOpenFile(boolean wasCreated, 
+	StreamableByteIOOpenFile(String[] path, boolean wasCreated, 
 		StreamableByteIOPortType portType,
 		boolean canRead, boolean canWrite, boolean isAppend)
 			throws ResourceException, GenesisIISecurityException, 
 				RemoteException, IOException
 	{
-		super(createOperator(portType), canRead, canWrite, isAppend);
+		super(path, createOperator(portType), canRead, canWrite, isAppend);
 		
 		if (wasCreated)
 			_destroyer = portType;
 	}
 	
-	StreamableByteIOOpenFile(boolean wasCreated, EndpointReferenceType target,
+	StreamableByteIOOpenFile(String[] path, boolean wasCreated, EndpointReferenceType target,
 		boolean canRead, boolean canWrite, boolean isAppend)
 			throws ResourceException, GenesisIISecurityException, 
 				RemoteException, IOException
 	{
-		this(wasCreated, ClientUtils.createProxy(
+		this(path, wasCreated, ClientUtils.createProxy(
 			StreamableByteIOPortType.class, target),
 			canRead, canWrite, isAppend);
 	}

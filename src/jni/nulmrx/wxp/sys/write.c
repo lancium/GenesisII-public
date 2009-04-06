@@ -130,15 +130,15 @@ Return Value:
 	if(NT_SUCCESS(Status)){
 		if(SynchronousIo){
 			PVOID requestBuffer = NULL;
-
+			
 			KeWaitForSingleObject(&(giiFcb->InvertedCallSemaphore), Executive, KernelMode, FALSE, NULL);			
-
 			if(!PagingIo){
-				FileObject->CurrentByteOffset.QuadPart = ByteOffset.QuadPart + pIoCompContext->Information;
+				FileObject->CurrentByteOffset.QuadPart = ByteOffset.QuadPart + pIoCompContext->Information;					
 			}
-			else{
-				// Paging IO received
-			}
+			else{					
+				//Paging IO received
+			}				
+			Status = STATUS_SUCCESS;			
 		}
 	}    
 
@@ -146,8 +146,7 @@ try_exit:	NOTHING;
 
 	if(Status != STATUS_PENDING){
 		// Write has finished
-	}
-    
+	}    
     return(Status);
 } 
 

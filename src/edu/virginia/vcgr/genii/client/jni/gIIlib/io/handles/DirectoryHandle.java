@@ -5,17 +5,17 @@ import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.fsii.FSFilesystem;
 import edu.virginia.vcgr.fsii.FilesystemStatStructure;
 import edu.virginia.vcgr.fsii.exceptions.FSException;
 import edu.virginia.vcgr.fsii.path.UnixFilesystemPathRepresentation;
-import edu.virginia.vcgr.genii.client.gfs.GenesisIIFilesystem;
 
 
 public class DirectoryHandle extends AbstractFilesystemHandle
 {
 	static private Log _logger = LogFactory.getLog(DirectoryHandle.class);
 	
-	public DirectoryHandle(GenesisIIFilesystem fs, String []path)
+	public DirectoryHandle(FSFilesystem fs, String []path)
 	{
 		super(fs, path);
 	}

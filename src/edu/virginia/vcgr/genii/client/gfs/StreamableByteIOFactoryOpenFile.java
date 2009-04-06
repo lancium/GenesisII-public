@@ -19,19 +19,19 @@ class StreamableByteIOFactoryOpenFile extends GeniiOpenFile
 	private StreamableByteIOPortType _target;
 	private StreamableByteIOOpenFile _file;
 	
-	StreamableByteIOFactoryOpenFile(EndpointReferenceType target,
+	StreamableByteIOFactoryOpenFile(String[] path, EndpointReferenceType target,
 		boolean canRead, boolean canWrite, boolean isAppend)
 			throws ResourceException, GenesisIISecurityException, 
 				RemoteException, IOException
 	{
-		super(canRead, canWrite, isAppend);
+		super(path, canRead, canWrite, isAppend);
 		
 		StreamableByteIOFactory factory = ClientUtils.createProxy(
 			StreamableByteIOFactory.class, target);
 		target = factory.openStream(null).getEndpoint();
 		_target = ClientUtils.createProxy(
 			StreamableByteIOPortType.class, target);
-		_file = new StreamableByteIOOpenFile(false, _target, 
+		_file = new StreamableByteIOOpenFile(path, false, _target, 
 			canRead, canWrite, isAppend);
 	}
 

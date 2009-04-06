@@ -14,6 +14,7 @@ abstract class GeniiOpenFile implements Closeable
 	private boolean _write;
 	private boolean _append;
 	private boolean _closed = false;
+	private String[] _path;
 	
 	protected abstract void closeImpl() throws IOException;
 	protected abstract void readImpl(long offset, ByteBuffer target)
@@ -23,12 +24,13 @@ abstract class GeniiOpenFile implements Closeable
 	protected abstract void appendImpl(ByteBuffer source)
 		throws FSException;
 	
-	protected GeniiOpenFile(boolean canRead, boolean canWrite, 
+	protected GeniiOpenFile(String[] path, boolean canRead, boolean canWrite, 
 		boolean isAppend)
 	{
 		_read = canRead;
 		_write = canWrite;
 		_append = isAppend;
+		_path = path;
 	}
 	
 	@Override
@@ -72,5 +74,9 @@ abstract class GeniiOpenFile implements Closeable
 			writeImpl(offset, source);
 		else
 			throw new FSFileHandleBadStateException("Cannot write to file.");
+	}
+	
+	public String[] getPath(){
+		return _path;
 	}
 }

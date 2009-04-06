@@ -104,8 +104,7 @@ Return Value:
 --*/
 {
 	NTSTATUS Status = STATUS_SUCCESS;
-
-	GIIPrint(("GenesisDrive:  Network flush received\n"));
+	GIIPrint(("GenesisDrive:  Network flush received\n"));	
     return(Status);
 }
 

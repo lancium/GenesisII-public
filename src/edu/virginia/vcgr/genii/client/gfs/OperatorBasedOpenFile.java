@@ -10,10 +10,10 @@ class OperatorBasedOpenFile extends GeniiOpenFile
 {
 	private BasicFileOperator _operator;
 	
-	protected OperatorBasedOpenFile(BasicFileOperator operator,
+	protected OperatorBasedOpenFile(String[] path, BasicFileOperator operator,
 		boolean canRead, boolean canWrite, boolean isAppend)
 	{
-		super(canRead, canWrite, isAppend);
+		super(path, canRead, canWrite, isAppend);
 		
 		_operator = operator;
 	}

@@ -10,10 +10,10 @@ class GenericGeniiOpenFile extends GeniiOpenFile
 {
 	private ByteBuffer _content;
 	
-	GenericGeniiOpenFile(ByteBuffer content,
+	GenericGeniiOpenFile(String[] path, ByteBuffer content,
 		boolean canRead, boolean canWrite, boolean isAppend)
 	{
-		super(canRead, canWrite, isAppend);
+		super(path, canRead, canWrite, isAppend);
 		_content = content;
 	}
 	
