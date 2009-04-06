@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.SecurityUtils;
@@ -98,6 +99,9 @@ public class QueueSecurity
 	static public boolean isOwner(Collection<Identity> jobOwners) 
 		throws AuthZSecurityException
 	{
+		if (Security.isAdministrator())
+			return true;
+		
 		/* If the job has no owners, then we automatically match */
 		if (jobOwners == null || jobOwners.size() == 0)
 			return true;

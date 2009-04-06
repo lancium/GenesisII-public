@@ -52,6 +52,7 @@ import edu.virginia.vcgr.genii.client.security.MessageLevelSecurity;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.resource.IResource;
+import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.context.*;
 
 import org.morgan.util.configuration.*;
@@ -344,11 +345,16 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			try
 			{
 				callContext = ContextManager.getCurrentContext();
+				if (Security.isAdministrator(callContext))
+				{
+					_logger.info("Method call made as admin.");
+					return true;
+				}
 			}
 			catch (ConfigurationException e)
 			{
 				throw new IOException(e.getMessage());
-			}
+			} 
 
 			// Grab the operation method from the message context
 			org.apache.axis.description.OperationDesc desc =

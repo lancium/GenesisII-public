@@ -183,7 +183,7 @@ public class GamlClientTool
 		return retval;
 	}
 
-	public Identity downloadIdentity(String sourcePath, boolean isLocalSource)
+	static public Identity downloadIdentity(String sourcePath, boolean isLocalSource)
 			throws ConfigurationException, FileNotFoundException, IOException,
 			RNSException, GeneralSecurityException
 	{
