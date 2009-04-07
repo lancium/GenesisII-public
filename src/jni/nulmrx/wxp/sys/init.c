@@ -467,16 +467,16 @@ NulMRxInitializeTables(
 
 	// null mini redirector extension sizes and allocation policies.
 	NulMRxDispatch.MRxFlags = (RDBSS_MANAGE_NET_ROOT_EXTENSION |
-		RDBSS_MANAGE_FCB_EXTENSION);
+		RDBSS_MANAGE_FCB_EXTENSION | RDBSS_MANAGE_SRV_OPEN_EXTENSION | RDBSS_MANAGE_FOBX_EXTENSION);
 
 	NulMRxDispatch.MRxSrvCallSize  = 0; // srvcall extension is not handled in rdbss
 	NulMRxDispatch.MRxNetRootSize  = sizeof(NULMRX_NETROOT_EXTENSION);
 	NulMRxDispatch.MRxVNetRootSize = 0;
-	NulMRxDispatch.MRxFcbSize      = sizeof(NULMRX_FCB_EXTENSION);
-	NulMRxDispatch.MRxSrvOpenSize  = 0;
-	NulMRxDispatch.MRxFobxSize     = 0;
+	NulMRxDispatch.MRxFcbSize      = sizeof(GenesisFCB);
+	NulMRxDispatch.MRxSrvOpenSize  = sizeof(GenesisSrvOpen);
+	NulMRxDispatch.MRxFobxSize     = sizeof(GenesisCCB);
 
-	// Mini redirector cancel routine ..    
+	// Mini redirector cancel routine ... never called
 	NulMRxDispatch.MRxCancel = NULL;
 
 	// Mini redirector Start/Stop. Each mini-rdr can be started or stopped

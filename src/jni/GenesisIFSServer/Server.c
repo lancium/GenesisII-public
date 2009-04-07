@@ -9,7 +9,7 @@
 #include <winioctl.h>
 #include "server.h"
 
-#define DEBUG						 1
+#define DEBUG						 0
 #if DEBUG
 #define GenesisPrint(Args) printf(Args)
 #else

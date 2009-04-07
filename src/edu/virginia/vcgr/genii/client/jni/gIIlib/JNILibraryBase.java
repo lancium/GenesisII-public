@@ -19,7 +19,7 @@ import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.FilesystemHandle;
 
 public abstract class JNILibraryBase extends ApplicationBase
 {
-	public static boolean USE_CACHE_FS = true;
+	public static boolean USE_CACHE_FS = false;
 	public static boolean isInitialized = false;
 	public static final boolean DEBUG = true;
 	

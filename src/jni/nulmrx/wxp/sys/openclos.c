@@ -115,7 +115,7 @@ Return Value:
 
 --*/
 {
-    NTSTATUS Status = STATUS_SUCCESS;
+	NTSTATUS Status = STATUS_MORE_PROCESSING_REQUIRED;
     RxCaptureFcb;
 
     PAGED_CODE();

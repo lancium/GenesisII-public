@@ -99,17 +99,22 @@ public class GeniiCachedDir extends GeniiCachedResource {
 				directoryEntries.put(fsStat.getName(), goh);
 			} 
 		}
+		ArrayList<String>namesToRemove = new ArrayList<String>();
 		for(String name : directoryEntries.keySet()) {
 			//No longer valid
 			if(!names.contains(name)){
 				_logger.debug(String.format("--Merge removing %s", 
 						name));
-				GeniiOpenHandle goh = removeEntry(name);
-				if(!goh.isDirectory()){
-					((GeniiOpenFileHandle)goh).close();
-				}
+				namesToRemove.add(name);
 			}
 		}
+		for(String name : namesToRemove) {
+			GeniiOpenHandle goh = removeEntry(name);
+			if(!goh.isDirectory()){
+				((GeniiOpenFileHandle)goh).close();
+			}
+		}
+		
 	}
 	
 	public synchronized void addEntry(String name, GeniiOpenHandle handle)
