@@ -29,7 +29,7 @@ import edu.virginia.vcgr.genii.client.gfs.cache.handles.GeniiOpenHandle;
  */
 public class GeniiCachedDir extends GeniiCachedResource {			
 	//Handles to entries for this directory (all items are cached!!!)
-	private Hashtable<String, GeniiOpenHandle> directoryEntries;	
+	private Hashtable<String, GeniiOpenHandle<?>> directoryEntries;	
 	
 	static private Log _logger = LogFactory.getLog(GeniiCachedDir.class);
 	
@@ -49,7 +49,7 @@ public class GeniiCachedDir extends GeniiCachedResource {
 		}
 		ArrayList<FilesystemStatStructure> fsStats = 
 			new ArrayList<FilesystemStatStructure>();
-		for(GeniiOpenHandle goh : directoryEntries.values()) {
+		for(GeniiOpenHandle<?> goh : directoryEntries.values()) {
 			fsStats.add(goh.stat());
 		}		
 		return new GeniiCachedDirectoryHandle(fsStats);
@@ -61,12 +61,12 @@ public class GeniiCachedDir extends GeniiCachedResource {
 		if(directoryEntries != null) {
 			merge();
 		} else {
-			directoryEntries = new Hashtable<String, GeniiOpenHandle>();		
+			directoryEntries = new Hashtable<String, GeniiOpenHandle<?>>();		
 			DirectoryHandle dh = _fs.listDirectory(_path);
 			for(FilesystemStatStructure fsStat : dh) {
 				_logger.debug(String.format("--Refresh found %s", 
 						fsStat.getName()));
-				GeniiOpenHandle goh;
+				GeniiOpenHandle<?> goh;
 				String[] childPath = Arrays.copyOf(_path, _path.length+1);			
 				childPath[_path.length] = fsStat.getName();
 				if(fsStat.getEntryType().equals(FilesystemEntryType.DIRECTORY)) {							
@@ -88,7 +88,7 @@ public class GeniiCachedDir extends GeniiCachedResource {
 			if(!directoryEntries.containsKey(name)){
 				_logger.debug(String.format("--Merge adding %s", 
 						name));
-				GeniiOpenHandle goh;
+				GeniiOpenHandle<?> goh;
 				String[] childPath = Arrays.copyOf(_path, _path.length+1);			
 				childPath[_path.length] = fsStat.getName();
 				if(fsStat.getEntryType().equals(FilesystemEntryType.DIRECTORY)) {							
@@ -109,7 +109,7 @@ public class GeniiCachedDir extends GeniiCachedResource {
 			}
 		}
 		for(String name : namesToRemove) {
-			GeniiOpenHandle goh = removeEntry(name);
+			GeniiOpenHandle<?> goh = removeEntry(name);
 			if(!goh.isDirectory()){
 				((GeniiOpenFileHandle)goh).close();
 			}
@@ -117,7 +117,7 @@ public class GeniiCachedDir extends GeniiCachedResource {
 		
 	}
 	
-	public synchronized void addEntry(String name, GeniiOpenHandle handle)
+	public synchronized void addEntry(String name, GeniiOpenHandle<?> handle)
 			throws FSEntryAlreadyExistsException{
 		if(directoryEntries.containsKey(name)){
 			throw new FSEntryAlreadyExistsException(String.format(
@@ -128,7 +128,7 @@ public class GeniiCachedDir extends GeniiCachedResource {
 		directoryEntries.put(name, handle);
 	}
 	
-	public synchronized GeniiOpenHandle removeEntry(String name)
+	public synchronized GeniiOpenHandle<?> removeEntry(String name)
 			throws FSEntryNotFoundException {
 		if(!directoryEntries.containsKey(name)){
 			throw new FSEntryNotFoundException(String.format(
