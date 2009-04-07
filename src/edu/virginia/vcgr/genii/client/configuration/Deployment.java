@@ -19,6 +19,8 @@ public class Deployment
 	static private final String SERVICES_DIRECTORY_NAME = "services";
 	static private final String WEB_CONTAINER_PROPERTIES_FILENAME = 
 		"web-container.properties";
+	static private final String REJUVENATION_PROPERTYIES_FILENAME =
+		"rejuvenation.properties";
 	static private final String SECURE_RUNNABLE_DIRECTORY_NAME = 
 		"secure-runnable";
 	
@@ -31,6 +33,7 @@ public class Deployment
 	private Security _security;
 	private File _servicesDirectory;
 	private Properties _webContainerProperties;
+	private Properties _rejuvenationProperties;
 	
 	private Deployment(File deploymentDirectory)
 	{
@@ -53,6 +56,8 @@ public class Deployment
 				SERVICES_DIRECTORY_NAME + " directory.");
 		
 		_webContainerProperties = loadWebContainerProperties(
+			_deploymentDirectory.getName(), _configurationDirectory);
+		_rejuvenationProperties = loadRejuvenationProperties(
 			_deploymentDirectory.getName(), _configurationDirectory);
 		
 		_secureRunnableDirectory = new File(_deploymentDirectory, 
@@ -84,6 +89,32 @@ public class Deployment
 		}
 	}
 	
+	static private Properties loadRejuvenationProperties(
+		String deploymentName, File configurationDirectory)
+	{
+		FileInputStream fin = null;
+		Properties ret = new Properties();
+		
+		try
+		{
+			fin = new FileInputStream(new File(configurationDirectory, 
+				REJUVENATION_PROPERTYIES_FILENAME));
+			ret.load(fin);
+			return ret;
+		}
+		catch (IOException ioe)
+		{
+			_logger.warn(
+				"Unable to load software rejuvenation information.  " +
+				"Assuming there isn't any.");
+			return new Properties();
+		}
+		finally
+		{
+			StreamUtils.close(fin);
+		}
+	}
+	
 	public File secureRunnableDirectory()
 	{
 		return _secureRunnableDirectory;
@@ -107,6 +138,11 @@ public class Deployment
 	public Properties webContainerProperties()
 	{
 		return _webContainerProperties;
+	}
+	
+	public Properties softwareRejuvenationProperties()
+	{
+		return _rejuvenationProperties;
 	}
 	
 	public DeploymentName getName()
