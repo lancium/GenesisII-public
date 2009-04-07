@@ -104,9 +104,9 @@ public class Deployment
 		}
 		catch (IOException ioe)
 		{
-			_logger.warn(
+			_logger.debug(
 				"Unable to load software rejuvenation information.  " +
-				"Assuming there isn't any.");
+				"Assuming there isn't any.", ioe);
 			return new Properties();
 		}
 		finally
