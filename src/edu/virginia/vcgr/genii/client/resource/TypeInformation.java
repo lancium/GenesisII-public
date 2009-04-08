@@ -34,6 +34,7 @@ import edu.virginia.vcgr.genii.client.byteio.StreamableByteIORP;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.ogsa.OGSARP;
+import edu.virginia.vcgr.genii.client.queue.QueueConstants;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
@@ -104,6 +105,11 @@ public class TypeInformation
 	public boolean isBES()
 	{
 		return hasPortType(BESConstants.GENII_BES_PORT_TYPE);
+	}
+	
+	public boolean isQueue()
+	{
+		return hasPortType(QueueConstants.QUEUE_PORT_TYPE);
 	}
 	
 	public boolean isContainer()

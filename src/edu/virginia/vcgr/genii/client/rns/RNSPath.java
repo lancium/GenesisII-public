@@ -40,6 +40,7 @@ import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.iterator.WSIterable;
@@ -66,11 +67,14 @@ import edu.virginia.vcgr.genii.enhancedrns.IterateListRequestType;
  * 
  * @author Mark Morgan
  */
-public class RNSPath implements Serializable
+public class RNSPath implements Serializable, Cloneable
 {
 	static final long serialVersionUID = -5879165350773440573L;
 	
 	static private Log _logger = LogFactory.getLog(RNSPath.class);
+	
+	static private TimedOutLRUCache<String, RNSPath> _lookupCache =
+		new TimedOutLRUCache<String, RNSPath>(8, 1000L * 16);
 	
 	/**
 	 * Returns the current grid namespace path.  This is similar to getcwd
@@ -150,7 +154,7 @@ public class RNSPath implements Serializable
 		}
 		catch (RemoteException re)
 		{
-			_logger.debug("Error lookinup path component.", re);
+			_logger.debug("Error looking up path component.", re);
 		}
 		
 		return _cachedEPR;
@@ -456,6 +460,18 @@ public class RNSPath implements Serializable
 		return null;
 	}
 	
+	static private String formPath(String []pathElements)
+	{
+		StringBuilder builder = new StringBuilder();
+		for (String element : pathElements)
+			builder.append(String.format("/%s", element));
+		
+		if (builder.length() == 0)
+			builder.append("/");
+		
+		return builder.toString();
+	}
+	
 	/**
 	 * Similar to lookup above, this operation looks up a new RNSPath entry at
 	 * a given query path.  This operation however takes a flag which can
@@ -478,6 +494,14 @@ public class RNSPath implements Serializable
 				"Cannot lookup a path which is null.");
 		
 		String[] pathElements = PathUtils.normalizePath(pwd(), path);
+		String fullPath = formPath(pathElements);
+		RNSPath ret = _lookupCache.get(fullPath);
+		if (ret != null)
+		{
+			_logger.trace("Using cached RNS Path.");
+			return ret;
+		}
+		
 		ArrayList<RNSPath> arrayRep = new ArrayList<RNSPath>();
 		arrayify(arrayRep);
 		
@@ -496,7 +520,9 @@ public class RNSPath implements Serializable
 		if (lcv >= pathElements.length)
 		{
 			// We completely matched a portion of the original path
-			return arrayRep.get(lcv);
+			ret = arrayRep.get(lcv);
+			_lookupCache.put(fullPath, ret);
+			return ret;
 		}
 		
 		RNSPath next = arrayRep.get(lcv);
@@ -515,6 +541,7 @@ public class RNSPath implements Serializable
 				throw new RNSPathAlreadyExistsException(next.pwd());
 		}
 		
+		_lookupCache.put(fullPath, next);
 		return next;
 	}
 	
@@ -883,7 +910,7 @@ public class RNSPath implements Serializable
 	{
 		return new RNSPathSerializedRepresentation(this);
 	}
-	
+
 	static private class RNSPathSerializedRepresentation implements Serializable
 	{
 		static final long serialVersionUID = 2134908123740L;

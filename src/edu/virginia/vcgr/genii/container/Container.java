@@ -130,8 +130,9 @@ public class Container extends ApplicationBase
 			t.printStackTrace(System.err);
 			System.exit(1);
 		}
-		
+		/* We have decided not to do this.
 		SoftwareRejuvenator.startRejuvenator();
+		*/
 	}
 	
 	static public ConfigurationManager getConfigurationManager()
