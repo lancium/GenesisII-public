@@ -52,7 +52,6 @@ import edu.virginia.vcgr.genii.client.notification.INotificationHandler;
 import edu.virginia.vcgr.genii.client.notification.NotificationServer;
 import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
@@ -73,8 +72,6 @@ import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyResponse;
 import edu.virginia.vcgr.genii.deployer.ApplicationDeployerPortType;
 import edu.virginia.vcgr.genii.deployer.CreateDeploymentRequestType;
 import edu.virginia.vcgr.genii.deployer.ReifyJSDLRequestType;
-import edu.virginia.vcgr.genii.scheduler.ScheduleCriteriaType;
-import edu.virginia.vcgr.genii.scheduler.basic.BasicSchedulerPortType;
 
 public class RunTool extends BaseGridTool
 {
@@ -515,20 +512,6 @@ public class RunTool extends BaseGridTool
 			ResourceException, RemoteException
 	{
 		EndpointReferenceType target = besOrSchedPath.getEndpoint();
-		TypeInformation tInfo = new TypeInformation(target);
-		if (tInfo.isScheduler())
-		{
-			BasicSchedulerPortType scheduler = ClientUtils.createProxy(
-				BasicSchedulerPortType.class, target);
-			EndpointReferenceType []result = scheduler.scheduleActivities(
-				new ScheduleCriteriaType[] {
-					new ScheduleCriteriaType()
-				});
-			if (result == null || result.length != 1)
-				throw new ResourceException(
-					"Scheduler didn't return a reasonable schedule.");
-			target = result[0];
-		}
 		
 		return target;
 	}

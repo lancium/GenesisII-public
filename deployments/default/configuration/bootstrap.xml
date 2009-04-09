@@ -69,7 +69,6 @@
 	<gsh:echo message="Forming general directory structure."/>
 	<geniix:mkdir>
 		<gsh:param>/bes-containers</gsh:param>
-		<gsh:param>/schedulers</gsh:param>
 		<gsh:param>/users</gsh:param>
 		<gsh:param>/groups</gsh:param>
 		<gsh:param>/home</gsh:param>
@@ -83,12 +82,6 @@
 	</geniix:chmod>
 
 	<geniix:chmod>
-		<gsh:param>/schedulers</gsh:param>
-		<gsh:param>+r</gsh:param>
-		<gsh:param>--everyone</gsh:param>
-	</geniix:chmod>
-
-	<geniix:chmod>
 		<gsh:param>/users</gsh:param>
 		<gsh:param>+r</gsh:param>
 		<gsh:param>--everyone</gsh:param>
@@ -112,17 +105,6 @@
 		<gsh:param>--everyone</gsh:param>
 	</geniix:chmod>
 
-	<geniix:create-resource>
-		<gsh:param>${BOOT_SRVS}/BasicSchedulerPortType</gsh:param>
-		<gsh:param>/schedulers/BootstrapScheduler</gsh:param>
-	</geniix:create-resource>
-
-	<geniix:chmod>
-		<gsh:param>/schedulers/BootstrapScheduler</gsh:param>
-		<gsh:param>+r</gsh:param>
-		<gsh:param>--everyone</gsh:param>
-	</geniix:chmod>
-	
 	<gsh:echo message="Adding groups"/>
 	<gsh:foreach param-name="FILE" source-dir="${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/certs/groups"
 		filter="^.*\.cer$">
@@ -264,12 +246,6 @@
 			<gsh:param>--everyone</gsh:param>
 		</geniix:chmod>
 
-		<gsh:echo message="Linking bes ${CONTAINER} into scheduler"/>
-		<geniix:ln>
-			<gsh:param>/bes-containers/${CONTAINER}</gsh:param>
-			<gsh:param>/schedulers/BootstrapScheduler/${CONTAINER}</gsh:param>
-		</geniix:ln>
-		
 		<gsh:echo message="Setting deployer for bes ${CONTAINER}."/>
 		<geniix:set-deployers>
 			<gsh:param>/bes-containers/${CONTAINER}</gsh:param>
@@ -285,15 +261,6 @@
 		</gsh:foreach>
 	</gsh:foreach>
 
-	<gsh:foreach param-name="GROUP" source-rns="/groups">
-		<gsh:echo message="Adding group ${GROUP} to +x for scheduler"/>
-		<geniix:chmod>
-			<gsh:param>/schedulers/BootstrapScheduler</gsh:param>
-			<gsh:param>+r+x</gsh:param>
-			<gsh:param>/groups/${GROUP}</gsh:param>
-		</geniix:chmod>
-	</gsh:foreach>
-	
 	<gsh:echo message="Creating Certificate Generator for containers using keys.pfx."/>
 	<geniix:cert-generator>
 		<gsh:param>--create-generator</gsh:param>

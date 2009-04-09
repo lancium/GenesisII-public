@@ -4,8 +4,6 @@
 	xmlns:genii="http://vcgr.cs.virginia.edu/Genesis-II">
 
 	<mconf:config-sections>
-		<mconf:config-section name="genii:gaml-keystore"
-			class="org.morgan.util.configuration.PropertiesConfigurationSectionHandler"/>
 		<mconf:config-section name="genii:locator-registry"
 			class="edu.virginia.vcgr.genii.client.configuration.LocatorRegistrySectionHandler"/>
 		<mconf:config-section name="genii:uri-handlers"
@@ -16,18 +14,10 @@
 			class="org.morgan.util.configuration.InstanceConfigurationSectionHandler"/>
 		<mconf:config-section name="genii:tools"
 			class="org.morgan.util.configuration.ClassConfigurationSectionHandler"/>
-		<mconf:config-section name="genii:global-properties"
-			class="org.morgan.util.configuration.PropertiesConfigurationSectionHandler"/>
 		<mconf:config-section name="genii:client-pipeline"
 			class="edu.virginia.vcgr.genii.client.invoke.ClientPipelineSectionHandler"/>
 	</mconf:config-sections>
 	
-	<genii:global-properties>
-		<mconf:property 
-			name="edu.virginia.vcgr.genii.container.epr-addressing-mode"
-			value="ip"/>
-	</genii:global-properties>
-
 	
 	<genii:smtp-properties>
 		<mconf:property name="mail.smtp.auth" value="false"/>
@@ -50,14 +40,10 @@
 		<locator
 			interface="edu.virginia.vcgr.genii.container.VCGRContainerPortType"
 			locator-type="edu.virginia.vcgr.genii.container.VCGRContainerServiceLocator"/>
-		<locator interface="edu.virginia.vcgr.genii.counter.CounterPortType"
-			locator-type="edu.virginia.vcgr.genii.counter.CounterServiceLocator"/>
 		<locator interface="org.ggf.rns.RNSPortType"
 			locator-type="org.ggf.rns.RNSServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType"
 			locator-type="edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSServiceLocator"/>
-		<locator interface="edu.virginia.vcgr.genii.scheduler.basic.BasicSchedulerPortType"
-			locator-type="edu.virginia.vcgr.genii.scheduler.basic.BasicSchedulerServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.bes.GeniiBESPortType"
 			locator-type="edu.virginia.vcgr.genii.bes.GeniiBESServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.bes.activity.BESActivityPortType"
@@ -68,10 +54,6 @@
 			locator-type="org.ggf.sbyteio.StreamableByteIOServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.byteio.streamable.factory.StreamableByteIOFactory"
 			locator-type="edu.virginia.vcgr.genii.byteio.streamable.factory.StreamableByteIOFactoryServiceLocator"/>
-		<locator interface="org.ggf.rbyteio.RandomByteIOInteropPortType"
-			locator-type="org.ggf.rbyteio.RandomByteIOInteropServiceLocator"/>
-		<locator interface="org.ggf.sbyteio.StreamableByteIOInteropPortType"
-			locator-type="org.ggf.sbyteio.StreamableByteIOInteropServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.common.GeniiCommon"
 			locator-type="edu.virginia.vcgr.genii.common.GeniiCommonServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.exportdir.ExportedRootPortType"
@@ -80,6 +62,10 @@
 			locator-type="edu.virginia.vcgr.genii.exportdir.ExportedDirServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.exportdir.ExportedFilePortType"
 			locator-type="edu.virginia.vcgr.genii.exportdir.ExportedFileServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.replicatedExport.RExportFilePortType"
+			locator-type="edu.virginia.vcgr.genii.replicatedExport.RExportFileServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.replicatedExport.RExportDirPortType"
+			locator-type="edu.virginia.vcgr.genii.replicatedExport.RExportDirServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.common.notification.GeniiNotificationConsumerPortType"
 			locator-type="edu.virginia.vcgr.genii.common.notification.GeniiNotificationConsumerServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.common.notification.GeniiSubscriptionPortType"
@@ -92,6 +78,10 @@
 			locator-type="edu.virginia.vcgr.genii.resolver.simple.SimpleResolverServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.resolver.simple.SimpleResolverFactoryPortType"
 			locator-type="edu.virginia.vcgr.genii.resolver.simple.SimpleResolverFactoryServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.replicatedExport.resolver.RExportResolverPortType"
+			locator-type="edu.virginia.vcgr.genii.replicatedExport.resolver.RExportResolverServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.replicatedExport.resolver.RExportResolverFactoryPortType"
+			locator-type="edu.virginia.vcgr.genii.replicatedExport.resolver.RExportResolverFactoryServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.appdesc.ApplicationDescriptionPortType"
 			locator-type="edu.virginia.vcgr.genii.appdesc.ApplicationDescriptionServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.deployer.ApplicationDeployerPortType"
@@ -100,28 +90,12 @@
 			locator-type="edu.virginia.vcgr.genii.queue.QueueServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.iterator.IteratorPortType"
 			locator-type="edu.virginia.vcgr.genii.iterator.IteratorServiceLocator"/>
-		<locator interface="edu.virginia.vcgr.genii.certGenerator.CertGeneratorPortType"
-			locator-type="edu.virginia.vcgr.genii.certGenerator.CertGeneratorServiceLocator"/>
-		<locator interface="edu.virginia.vcgr.genii.informationService.InformationServicePortType"
-			locator-type="edu.virginia.vcgr.genii.informationService.InformationServiceServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.x509authn.X509AuthnPortType"
 			locator-type="edu.virginia.vcgr.genii.x509authn.X509AuthnServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.jndiauthn.JNDIAuthnPortType"
 			locator-type="edu.virginia.vcgr.genii.jndiauthn.JNDIAuthnServiceLocator"/>
-		<locator interface="org.ogf.ogsa.ticker.TickerFactory"
-			locator-type="org.ogf.ogsa.ticker.TickerFactoryServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.tty.TTYPortType"
 			locator-type="edu.virginia.vcgr.genii.tty.TTYServiceLocator"/>
-		<locator interface="edu.virginia.vcgr.genii.genesis_dai.CoreDataAccessCombinedPortType"
-			locator-type="edu.virginia.vcgr.genii.genesis_dai.CoreDataAccessCombinedServiceLocator"/>
-		<locator interface="edu.virginia.vcgr.genii.genesis_dai.WSRFDataResourcePortType"
-			locator-type="edu.virginia.vcgr.genii.genesis_dai.WSRFDataResourceServiceLocator"/>
-		<locator interface="edu.virginia.vcgr.genii.genesis_dair.SQLAccessCombinedPortType"
-			locator-type="edu.virginia.vcgr.genii.genesis_dair.SQLAccessCombinedServiceLocator"/>
-		<locator interface="edu.virginia.vcgr.genii.genesis_dair.SQLResponseCombinedPortType"
-			locator-type="edu.virginia.vcgr.genii.genesis_dair.SQLResponseCombinedServiceLocator"/>
-		<locator interface="edu.virginia.vcgr.genii.genesis_dair.SQLRowsetAccessPortType"
-			locator-type="edu.virginia.vcgr.genii.genesis_dair.SQLRowsetAccessServiceLocator"/>
 	</genii:locator-registry>
 	
 	<genii:configured-instances>
@@ -130,7 +104,7 @@
 			base="edu.virginia.vcgr.genii.client.comm.IProxyFactory"/>
 		<mconf:instance name="context-resolver" 
 			type="edu.virginia.vcgr.genii.client.context.ClientContextResolver"
-			base="edu.virginia.vcgr.genii.client.context.IContextResolver"/>
+			base="edu.virginia.vcgr.genii.client.context.IContextResolver"/>		
 		<mconf:instance name="debug-list-handler"
 			type="edu.virginia.vcgr.genii.client.invoke.handlers.DebugListHandler"
 			base="java.lang.Object"/>
@@ -140,6 +114,8 @@
 	</genii:configured-instances>
 
 	<genii:tools>
+		<mconf:class name="touch"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.TouchTool</mconf:class>
 		<mconf:class name="idp"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.IdpTool</mconf:class>
 		<mconf:class name="authz"
@@ -160,10 +136,6 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.WhoamiTool</mconf:class>
 		<mconf:class name="chmod"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.GamlChmodTool</mconf:class>
-<!--			
-		<mconf:class name="ut-login"
-			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.UTLoginTool</mconf:class>
--->
 		<mconf:class name="logout"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.LogoutTool</mconf:class>
 		<mconf:class name="cd"
@@ -172,8 +144,6 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.MkdirTool</mconf:class>
 		<mconf:class name="ping"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.PingTool</mconf:class>
-		<mconf:class name="byteio"
-			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ByteIOInteropTool</mconf:class>
 		<mconf:class name="ln"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.LnTool</mconf:class>
 		<mconf:class name="unlink"
@@ -198,6 +168,10 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CreateResourceTool</mconf:class>
 		<mconf:class name="export"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ExportTool</mconf:class>
+		<mconf:class name="rexport"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ReplicatedExportTool</mconf:class>
+		<mconf:class name="rexport-test"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ExportPerformanceTest</mconf:class>
 		<mconf:class name="script"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ScriptTool</mconf:class>
 		<mconf:class name="app-description-tool"
@@ -228,12 +202,12 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.queue.QSubTool</mconf:class>
 		<mconf:class name="get-bes-attributes"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.GetBESFactoryAttributesTool</mconf:class>
+		<mconf:class name="get-resourceProps"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.GetResourcePropertiesTool</mconf:class>
 		<mconf:class name="cert-generator"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CertGeneratorTool</mconf:class>
 		<mconf:class name="set-user-config"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.SetUserConfigTool</mconf:class>
-		<mconf:class name="xmldb-query"
-			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.InfoSQueryTool</mconf:class>
 		<mconf:class name="create-user"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CreateUserTool</mconf:class>
 		<mconf:class name="create-jndi-sts"
@@ -244,16 +218,16 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.BesPolicyTool</mconf:class>
 		<mconf:class name="tty"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.TTYTool</mconf:class>
-		<mconf:class name="dair-query"
-			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.dair.TestQuery</mconf:class>
 		<mconf:class name="container-stats"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ContainerStatsTool</mconf:class>
 		<mconf:class name="user-preferences"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.UserPreferencesTool</mconf:class>
 		<mconf:class name="fuse"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.FuseTool</mconf:class>
-		<mconf:class name="dairquery"
-			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.dair.DAIRQueryTool</mconf:class>
+		<mconf:class name="rns"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.RNSInteropTool</mconf:class>
+		<mconf:class name="byteioperf"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ByteIOPerformanceTool</mconf:class>
 		<mconf:class name="matching-params"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.MatchingParamsTool</mconf:class>
 		<mconf:class name="set-container-service-properties"

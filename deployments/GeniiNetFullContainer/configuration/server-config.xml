@@ -137,12 +137,6 @@
 				value="connection-pool"/>
 		</mconf:instance>
 		
-		<mconf:instance name="basic-scheduler-db-resource-provider"
-			type="edu.virginia.vcgr.genii.container.scheduler.basic.BasicSchedulerDBResourceProvider">
-			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
-				value="connection-pool"/>
-		</mconf:instance>
-		
 		<mconf:instance name="rbyteio-db-resource-provider"
 			type="edu.virginia.vcgr.genii.container.byteio.RByteIOResourceProvider">
 			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
@@ -238,56 +232,9 @@
 			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
 				value="connection-pool"/>
 		</mconf:instance>
-		
-		<mconf:instance name="is-db-resource-provider"
-			type="edu.virginia.vcgr.genii.container.informationService.resource.ISDBResourceProvider">
-			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
-				value="connection-pool"/>
-		</mconf:instance>
-		
-		<mconf:instance name="ticker-resource-provider"
-			type="edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceProvider">
-			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
-				value="connection-pool"/>
-		</mconf:instance>
-
-		<mconf:instance name="dai-db-resource-provider"
-			type="edu.virginia.vcgr.genii.container.genesis_dai.resource.DAIDBResourceProvider">
-			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
-				value="connection-pool"/>
-		</mconf:instance>
-		
-		<mconf:instance name="dair-db-resource-provider"
-			type="edu.virginia.vcgr.genii.container.genesis_dair.resource.DAIRDBResourceProvider">
-			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
-				value="connection-pool"/>
-		</mconf:instance>
 	</genii:configured-instances>
 	
 <genii:services>
-		<genii:service name="CounterPortType">
-			<genii:resource-provider name="basic-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-			<genii:security-settings>
-				<mconf:property 
-					name="edu.virginia.vcgr.genii.container.security.service-certificate-lifetime"
-					value="6000000"/>	<!-- 100 minutes -->
-				<mconf:property
-					name="edu.virginia.vcgr.genii.container.security.resource-certificate-lifetime"
-					value="600000"/>	<!-- 10 minutes -->
-			</genii:security-settings>
-<!--  turns on making resolver for new instances of this type
-			<genii:default-resolver-factory-settings>
-				<mconf:property 
-					name="edu.virginia.vcgr.genii.container.resolver.default-resolver-factory-proxy-class"
-					value="edu.virginia.vcgr.genii.container.resolver.SimpleResolverFactoryProxy"/>
-				<mconf:property
-					name="edu.virginia.vcgr.genii.container.resolver.simple.test-property"
-					value="TESTING"/>
-			</genii:default-resolver-factory-settings>
--->
-		</genii:service>
-		
 		<genii:service name="EnhancedRNSPortType">
 			<genii:resource-provider name="rns-db-resource-provider"/>
 			<genii:authz-provider name="gamlacl-authz-provider"/>
@@ -301,11 +248,6 @@
 					value="TESTING"/>
 			</genii:default-resolver-factory-settings>
 -->
-		</genii:service>
-		
-		<genii:service name="BasicSchedulerPortType">
-			<genii:resource-provider name="basic-scheduler-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
 		</genii:service>
 		
 		<genii:service name="RandomByteIOPortType">
@@ -336,18 +278,6 @@
 					value="TESTING"/>
 			</genii:default-resolver-factory-settings>
 -->
-		</genii:service>
-
-		<!-- WSRF interop fest port types, feel free to remove later -->		
-		<genii:service name="RandomByteIOInteropPortType">
-			<genii:resource-provider name="rbyteio-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-		</genii:service>
-
-		<!-- WSRF interop fest port types, feel free to remove later -->		
-		<genii:service name="StreamableByteIOInteropPortType">
-			<genii:resource-provider name="sbyteio-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
 		</genii:service>
 
 		<genii:service name="GeniiBESPortType">
@@ -488,43 +418,8 @@
 			<genii:authz-provider name="gamlacl-authz-provider"/>
 		</genii:service>
 		
-		<genii:service name="InformationServicePortType">
-			<genii:resource-provider name="is-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-		</genii:service>
-		
-		<genii:service name="TickerFactory">
-			<genii:resource-provider name="basic-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-		</genii:service>
-
 		<genii:service name="TTYPortType">
 			<genii:resource-provider name="basic-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-		</genii:service>
-		
-		<genii:service name="CoreDataAccessCombinedPortType">
-			<genii:resource-provider name="dai-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-		</genii:service>
-		
-		<genii:service name="WSRFDataResourcePortType">
-			<genii:resource-provider name="dai-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-		</genii:service>
-
-		<genii:service name="SQLAccessCombinedPortType">
-			<genii:resource-provider name="dair-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-		</genii:service>
-		
-		<genii:service name="SQLResponseCombinedPortType">
-			<genii:resource-provider name="dair-db-resource-provider"/>
-			<genii:authz-provider name="gamlacl-authz-provider"/>
-		</genii:service>
-		
-		<genii:service name="SQLRowsetAccessPortType">
-			<genii:resource-provider name="dair-db-resource-provider"/>
 			<genii:authz-provider name="gamlacl-authz-provider"/>
 		</genii:service>
 	</genii:services>

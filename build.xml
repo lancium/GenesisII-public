@@ -172,14 +172,11 @@
 		<ant antfile="${wsdl.dir}/deployment/gapp-description.build.xml"/>
 		<ant antfile="${wsdl.dir}/deployment/deployer.build.xml"/>
 		<ant antfile="${wsdl.dir}/byteio/rbyteio.build.xml"/>
-		<ant antfile="${wsdl.dir}/byteio/interop/rbyteiointerop.build.xml"/>
 		<ant antfile="${wsdl.dir}/byteio/sbyteio.build.xml"/>
-		<ant antfile="${wsdl.dir}/byteio/interop/sbyteiointerop.build.xml"/>
 		<ant antfile="${wsdl.dir}/byteio/sbyteio-factory.build.xml"/>
 		<ant antfile="${wsdl.dir}/container/container.build.xml"/>
 		<ant antfile="${wsdl.dir}/bes/bes-activity.build.xml"/>
 		<ant antfile="${wsdl.dir}/bes/bes.build.xml"/>
-		<ant antfile="${wsdl.dir}/scheduler/basic-scheduler.build.xml"/>
 		<ant antfile="${wsdl.dir}/exported/exported-file.build.xml"/>
 		<ant antfile="${wsdl.dir}/exported/exported-dir.build.xml"/>
 		<ant antfile="${wsdl.dir}/exported/exported-root.build.xml"/>
@@ -190,21 +187,13 @@
 		<ant antfile="${wsdl.dir}/resolver/simple-resolver-factory.build.xml"/>
 		<ant antfile="${wsdl.dir}/rfork/rfork.build.xml"/>
 		<ant antfile="${wsdl.dir}/queue/queue.build.xml"/>
-		<ant antfile="${wsdl.dir}/informationService/informationService.build.xml"/>
 		<ant antfile="${wsdl.dir}/certGenerator/certGenerator.build.xml"/>
-		<ant antfile="${wsdl.dir}/ticker/ticker.build.xml"/>
 		<ant antfile="${wsdl.dir}/tty/tty.build.xml"/>
-		<ant antfile="${wsdl.dir}/counter/counter.build.xml"/>
 		<ant antfile="${wsdl.dir}/iterator/iterator.build.xml"/>
 		<ant antfile="${wsdl.dir}/replicatedExport/rexport-file.build.xml"/>
 		<ant antfile="${wsdl.dir}/replicatedExport/rexport-dir.build.xml"/>
 		<ant antfile="${wsdl.dir}/replicatedExport/rexport-resolver.build.xml"/>
 		<ant antfile="${wsdl.dir}/replicatedExport/rexport-resolver-factory.build.xml"/>
-		<ant antfile="${wsdl.dir}/genesis_dai/CoreDataAccessCombined.build.xml"/>
-		<ant antfile="${wsdl.dir}/genesis_dai/WSRFDataResource.build.xml"/>
-		<ant antfile="${wsdl.dir}/genesis_dair/SQLAccessCombined.build.xml"/>
-		<ant antfile="${wsdl.dir}/genesis_dair/SQLRowsetAccess.build.xml"/>
-		<ant antfile="${wsdl.dir}/genesis_dair/SQLResponseCombined.build.xml"/>
 	</target>
 
 	<target name="genii.wsdl.tools"

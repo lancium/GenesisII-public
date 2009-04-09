@@ -40,14 +40,10 @@
 		<locator
 			interface="edu.virginia.vcgr.genii.container.VCGRContainerPortType"
 			locator-type="edu.virginia.vcgr.genii.container.VCGRContainerServiceLocator"/>
-		<locator interface="edu.virginia.vcgr.genii.counter.CounterPortType"
-			locator-type="edu.virginia.vcgr.genii.counter.CounterServiceLocator"/>
 		<locator interface="org.ggf.rns.RNSPortType"
 			locator-type="org.ggf.rns.RNSServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType"
 			locator-type="edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSServiceLocator"/>
-		<locator interface="edu.virginia.vcgr.genii.scheduler.basic.BasicSchedulerPortType"
-			locator-type="edu.virginia.vcgr.genii.scheduler.basic.BasicSchedulerServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.bes.GeniiBESPortType"
 			locator-type="edu.virginia.vcgr.genii.bes.GeniiBESServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.bes.activity.BESActivityPortType"
@@ -58,10 +54,6 @@
 			locator-type="org.ggf.sbyteio.StreamableByteIOServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.byteio.streamable.factory.StreamableByteIOFactory"
 			locator-type="edu.virginia.vcgr.genii.byteio.streamable.factory.StreamableByteIOFactoryServiceLocator"/>
-		<locator interface="org.ggf.rbyteio.RandomByteIOInteropPortType"
-			locator-type="org.ggf.rbyteio.RandomByteIOInteropServiceLocator"/>
-		<locator interface="org.ggf.sbyteio.StreamableByteIOInteropPortType"
-			locator-type="org.ggf.sbyteio.StreamableByteIOInteropServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.common.GeniiCommon"
 			locator-type="edu.virginia.vcgr.genii.common.GeniiCommonServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.exportdir.ExportedRootPortType"
@@ -98,26 +90,12 @@
 			locator-type="edu.virginia.vcgr.genii.queue.QueueServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.iterator.IteratorPortType"
 			locator-type="edu.virginia.vcgr.genii.iterator.IteratorServiceLocator"/>
-		<locator interface="edu.virginia.vcgr.genii.informationService.InformationServicePortType"
-			locator-type="edu.virginia.vcgr.genii.informationService.InformationServiceServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.x509authn.X509AuthnPortType"
 			locator-type="edu.virginia.vcgr.genii.x509authn.X509AuthnServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.jndiauthn.JNDIAuthnPortType"
 			locator-type="edu.virginia.vcgr.genii.jndiauthn.JNDIAuthnServiceLocator"/>
-		<locator interface="org.ogf.ogsa.ticker.TickerFactory"
-			locator-type="org.ogf.ogsa.ticker.TickerFactoryServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.tty.TTYPortType"
 			locator-type="edu.virginia.vcgr.genii.tty.TTYServiceLocator"/>
-		<locator interface="edu.virginia.vcgr.genii.genesis_dai.CoreDataAccessCombinedPortType"
-			locator-type="edu.virginia.vcgr.genii.genesis_dai.CoreDataAccessCombinedServiceLocator"/>
-		<locator interface="edu.virginia.vcgr.genii.genesis_dai.WSRFDataResourcePortType"
-			locator-type="edu.virginia.vcgr.genii.genesis_dai.WSRFDataResourceServiceLocator"/>
-		<locator interface="edu.virginia.vcgr.genii.genesis_dair.SQLAccessCombinedPortType"
-			locator-type="edu.virginia.vcgr.genii.genesis_dair.SQLAccessCombinedServiceLocator"/>
-		<locator interface="edu.virginia.vcgr.genii.genesis_dair.SQLResponseCombinedPortType"
-			locator-type="edu.virginia.vcgr.genii.genesis_dair.SQLResponseCombinedServiceLocator"/>
-		<locator interface="edu.virginia.vcgr.genii.genesis_dair.SQLRowsetAccessPortType"
-			locator-type="edu.virginia.vcgr.genii.genesis_dair.SQLRowsetAccessServiceLocator"/>
 	</genii:locator-registry>
 	
 	<genii:configured-instances>
@@ -138,8 +116,6 @@
 	<genii:tools>
 		<mconf:class name="touch"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.TouchTool</mconf:class>
-		<mconf:class name="ogsa-bp-interop"
-			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.OGSAWSRFBPInteropTool</mconf:class>
 		<mconf:class name="idp"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.IdpTool</mconf:class>
 		<mconf:class name="authz"
@@ -160,10 +136,6 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.WhoamiTool</mconf:class>
 		<mconf:class name="chmod"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.GamlChmodTool</mconf:class>
-<!--			
-		<mconf:class name="ut-login"
-			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.UTLoginTool</mconf:class>
--->
 		<mconf:class name="logout"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.LogoutTool</mconf:class>
 		<mconf:class name="cd"
@@ -172,8 +144,6 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.MkdirTool</mconf:class>
 		<mconf:class name="ping"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.PingTool</mconf:class>
-		<mconf:class name="byteio"
-			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ByteIOInteropTool</mconf:class>
 		<mconf:class name="ln"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.LnTool</mconf:class>
 		<mconf:class name="unlink"
@@ -238,8 +208,6 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CertGeneratorTool</mconf:class>
 		<mconf:class name="set-user-config"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.SetUserConfigTool</mconf:class>
-		<mconf:class name="xmldb-query"
-			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.InfoSQueryTool</mconf:class>
 		<mconf:class name="create-user"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CreateUserTool</mconf:class>
 		<mconf:class name="create-jndi-sts"
@@ -254,10 +222,6 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ContainerStatsTool</mconf:class>
 		<mconf:class name="user-preferences"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.UserPreferencesTool</mconf:class>
-		<mconf:class name="dair-query"
-			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.dair.TestQuery</mconf:class>
-		<mconf:class name="dairquery"
-			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.dair.DAIRQueryTool</mconf:class>	
 		<mconf:class name="fuse"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.FuseTool</mconf:class>
 		<mconf:class name="rns"
