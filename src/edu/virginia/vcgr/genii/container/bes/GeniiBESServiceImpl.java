@@ -75,6 +75,7 @@ import org.xml.sax.InputSource;
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
+import edu.virginia.vcgr.genii.client.bes.BESFaultManager;
 import edu.virginia.vcgr.genii.client.bes.GeniiBESConstants;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.comm.ClientConstructionParameters;
@@ -381,7 +382,7 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 			catch (Throwable cause)
 			{
 				response.add(new GetActivityDocumentResponseType(
-					target, null, FaultConstructor.constructFault(cause), 
+					target, null, BESFaultManager.constructFault(cause), 
 					null));
 			}
 		}
@@ -410,12 +411,14 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 				activity.verifyOwner();
 				response.add(new GetActivityStatusResponseType(
 					target, activity.getState().toActivityStatusType(),
-					null, null));
+					BESFaultManager.constructFault(
+						activity.getFaults().toArray(new Throwable[0])),
+					null));
 			}
 			catch (Throwable cause)
 			{
 				response.add(new GetActivityStatusResponseType(
-					target, null, FaultConstructor.constructFault(cause), 
+					target, null, BESFaultManager.constructFault(cause), 
 					null));
 			}
 		}
@@ -837,7 +840,7 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 			catch (Throwable cause)
 			{
 				responses.add(new TerminateActivityResponseType(aepr, false, 
-					FaultConstructor.constructFault(cause), null));
+					BESFaultManager.constructFault(cause), null));
 			}
 		}
 		
