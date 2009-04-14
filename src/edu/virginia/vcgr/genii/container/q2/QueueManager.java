@@ -20,6 +20,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.queue.JobErrorPacket;
 import edu.virginia.vcgr.genii.queue.JobInformationType;
 import edu.virginia.vcgr.genii.queue.ReducedJobInformationType;
 
@@ -379,6 +380,22 @@ public class QueueManager implements Closeable
 		{
 			connection = _connectionPool.acquire();
 			return _jobManager.getJobStatus(connection, jobs);
+		}
+		finally
+		{
+			_connectionPool.release(connection);
+		}
+	}
+	
+	public JobErrorPacket[] queryErrorInformation(String job)
+		throws SQLException, ResourceException, GenesisIISecurityException
+	{
+		Connection connection = null;
+		
+		try
+		{
+			connection = _connectionPool.acquire();
+			return _jobManager.queryErrorInformation(connection, job);
 		}
 		finally
 		{

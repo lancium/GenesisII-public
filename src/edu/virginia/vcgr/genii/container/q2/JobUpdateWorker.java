@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.container.q2;
 
 import java.sql.Connection;
+import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -10,6 +11,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
+import edu.virginia.vcgr.genii.client.bes.BESFaultManager;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.postlog.JobEvent;
 import edu.virginia.vcgr.genii.client.postlog.PostTargets;
@@ -126,6 +128,17 @@ public class JobUpdateWorker implements OutcallHandler
 					+ _jobInfo.getJobID());
 			} else
 			{
+				Collection<String> faults = 
+					BESFaultManager.getFaultDetail(
+						activityStatuses[0].getFault());
+				
+				if (faults != null && faults.size() > 0)
+				{
+					_jobManager.addJobErrorInformation(
+						connection, _jobInfo.getJobID(), 
+						_data.getRunAttempts(), faults);
+				}
+				
 				/* We have it's status, convert it to a more reasonable data
 				 * type (not the auto generated from WSDL one which is
 				 * worthless).

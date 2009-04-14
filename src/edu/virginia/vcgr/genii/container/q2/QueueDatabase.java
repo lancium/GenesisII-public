@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.container.q2;
 
 import java.io.IOException;
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,6 +12,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -716,24 +719,32 @@ public class QueueDatabase
 	public void completeJobs(Connection connection, Collection<Long> jobIDs)
 		throws SQLException, ResourceException
 	{
-		PreparedStatement stmt = null;
+		PreparedStatement stmt1 = null;
+		PreparedStatement stmt2 = null;
 		
 		try
 		{
-			stmt = connection.prepareStatement(
+			stmt1 = connection.prepareStatement(
 				"DELETE FROM q2jobs WHERE jobid = ?");
+			stmt2 = connection.prepareStatement(
+				"DELETE FROM q2errors WHERE jobid = ?");
 			
 			for (Long jobID : jobIDs)
 			{
-				stmt.setLong(1, jobID.longValue());
-				stmt.addBatch();
+				stmt1.setLong(1, jobID.longValue());
+				stmt1.addBatch();
+				
+				stmt2.setLong(1, jobID.longValue());
+				stmt2.addBatch();
 			}
 			
-			stmt.executeBatch();
+			stmt1.executeBatch();
+			stmt2.executeBatch();
 		}
 		finally
 		{
-			StreamUtils.close(stmt);
+			StreamUtils.close(stmt1);
+			StreamUtils.close(stmt2);
 		}
 	}
 	
@@ -803,6 +814,72 @@ public class QueueDatabase
 				return EPRUtils.fromBlob(rs.getBlob(1));
 			
 			return null;
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+	}
+	
+	public void addError(Connection connection,
+		long jobid, short attempt, Collection<String> errors) 
+			throws SQLException
+	{
+		PreparedStatement stmt = null;
+		
+		try
+		{
+			stmt = connection.prepareStatement(
+				"INSERT INTO q2errors (queueid, jobid, attempt, errors) " +
+				"VALUES (?, ?, ?, ?)");
+			stmt.setString(1, _queueID);
+			stmt.setLong(2, jobid);
+			stmt.setShort(3, attempt);
+			stmt.setBlob(4, DBSerializer.toBlob(errors, connection, 
+				"q2errors", "errors"));
+			stmt.executeUpdate();
+		}
+		finally
+		{
+			StreamUtils.close(stmt);
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Collection<String>> getAttemptErrors(Connection connection,
+		long jobid) throws SQLException
+	{
+		Vector<Collection<String>> ret = new Vector<Collection<String>>(10);
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try
+		{
+			stmt = connection.prepareStatement(
+				"SELECT attempt, errors FROM q2errors WHERE jobid = ?");
+			stmt.setLong(1, jobid);
+			rs = stmt.executeQuery();
+			while (rs.next())
+			{
+				short attempt = rs.getShort(1);
+				Blob blob = rs.getBlob(2);
+				Collection<String> errors = 
+					(Collection<String>)DBSerializer.fromBlob(blob);
+				if (errors != null && errors.size() > 0)
+				{
+					if (attempt >= ret.size())
+						ret.setSize(attempt + 1);
+					
+					Collection<String> tmp = ret.get(attempt);
+					if (tmp == null)
+						ret.set(attempt, errors);
+					else
+						tmp.addAll(errors);
+				}
+			}
+			
+			return ret;
 		}
 		finally
 		{

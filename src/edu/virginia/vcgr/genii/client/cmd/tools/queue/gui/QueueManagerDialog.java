@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.rmi.RemoteException;
 import java.util.Collection;
@@ -26,6 +27,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.client.queue.JobTicket;
 import edu.virginia.vcgr.genii.client.queue.QueueManipulator;
 
@@ -97,7 +99,8 @@ public class QueueManagerDialog extends JFrame
 			{
 				if (!_isComplete)
 					manipulator.kill(_tickets);
-				manipulator.complete(_tickets);
+				else
+					manipulator.complete(_tickets);
 			}
 			catch (Throwable cause)
 			{
@@ -139,23 +142,27 @@ public class QueueManagerDialog extends JFrame
 		JScrollPane scroller = new JScrollPane(_table);
 		scroller.setPreferredSize(new Dimension(1000, 500));
 		content.add(scroller,
-			new GridBagConstraints(0, 0, 3, 1, 1.0, 1.0,
+			new GridBagConstraints(0, 0, 4, 1, 1.0, 1.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(5, 5, 5, 5), 5, 5));
-		content.add(new JButton(new CompleteAction(_table)),
+		content.add(new JButton(new ShowErrorsAction(_table)),
 			new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.NONE,
 				new Insets(5, 5, 5, 5), 5, 5));
-		content.add(new JButton(new DeleteAction(_table)),
+		content.add(new JButton(new CompleteAction(_table)),
 			new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.NONE,
 				new Insets(5, 5, 5, 5), 5, 5));
-		content.add(new JButton(new RefreshAction()),
+		content.add(new JButton(new DeleteAction(_table)),
 			new GridBagConstraints(2, 1, 1, 1, 1.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.NONE,
 				new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new JButton(new RefreshAction()),
+			new GridBagConstraints(3, 1, 1, 1, 1.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.NONE,
+				new Insets(5, 5, 5, 5), 5, 5));
 		
-		content.add(status, new GridBagConstraints(0, 2, 3, 1, 1.0, 0.0,
+		content.add(status, new GridBagConstraints(0, 2, 4, 1, 1.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(5, 5, 5, 5), 5, 5));
 	}
@@ -182,7 +189,7 @@ public class QueueManagerDialog extends JFrame
 			for (int index : indices)
 			{
 				jobs.add(new JobTicket(
-					_table.getModel().getValueAt(index, 0).toString()));
+					_table.getValueAt(index, 0).toString()));
 			}
 			
 			Thread th = new Thread(new QueueManipulatorWorker(jobs, true));
@@ -227,10 +234,10 @@ public class QueueManagerDialog extends JFrame
 			for (int index : indices)
 			{
 				jobs.add(new JobTicket(
-					_table.getModel().getValueAt(index, 0).toString()));
+					_table.getValueAt(index, 0).toString()));
 			}
 			
-			Thread th = new Thread(new QueueManipulatorWorker(jobs, true));
+			Thread th = new Thread(new QueueManipulatorWorker(jobs, false));
 			th.setName("Queue Actioner Thread");
 			th.setDaemon(true);
 			th.start();
@@ -257,6 +264,39 @@ public class QueueManagerDialog extends JFrame
 		public void actionPerformed(ActionEvent event)
 		{
 			((QueueTableModel)_table.getModel()).refresh();
+		}
+	}
+	
+	private class ShowErrorsAction extends AbstractAction
+		implements ListSelectionListener
+	{
+		static final long serialVersionUID = 0L;
+		
+		private ShowErrorsAction(JTable table)
+		{
+			super("Show Errors");
+			
+			setEnabled(false);
+			table.getSelectionModel().addListSelectionListener(this);
+		}
+
+		@Override
+		public void valueChanged(ListSelectionEvent e)
+		{
+			setEnabled(_table.getSelectedRowCount() == 1);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			int index = _table.getSelectedRow();
+			
+			ErrorDisplay display = new ErrorDisplay(QueueManagerDialog.this,
+				_queueEPR, new JobTicket(_table.getValueAt(index, 0).toString()));
+			display.pack();
+			GuiUtils.centerComponent(display);
+			display.setModalityType(ModalityType.DOCUMENT_MODAL);
+			display.setVisible(true);
 		}
 	}
 }

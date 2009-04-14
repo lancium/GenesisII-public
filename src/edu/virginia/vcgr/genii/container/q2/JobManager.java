@@ -6,10 +6,12 @@ import java.io.PrintStream;
 import java.security.GeneralSecurityException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.axis.message.MessageElement;
@@ -49,6 +51,7 @@ import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.Identity;
 import edu.virginia.vcgr.genii.common.notification.Subscribe;
 import edu.virginia.vcgr.genii.common.notification.UserDataType;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.queue.JobErrorPacket;
 import edu.virginia.vcgr.genii.queue.JobInformationType;
 import edu.virginia.vcgr.genii.queue.JobStateEnumerationType;
 import edu.virginia.vcgr.genii.queue.ReducedJobInformationType;
@@ -77,7 +80,7 @@ public class JobManager implements Closeable
 	 * The maximum number of times that we will allow a job to be started and 
 	 * failed before giving up.
 	 */
-	static final private short _MAX_RUN_ATTEMPTS = 10;
+	static final public short MAX_RUN_ATTEMPTS = 10;
 	
 	volatile private boolean _closed = false;
 	
@@ -253,7 +256,7 @@ public class JobManager implements Closeable
 			if (isPermanent)
 			{
 				job.incrementRunAttempts(
-					_MAX_RUN_ATTEMPTS - job.getRunAttempts());
+					MAX_RUN_ATTEMPTS - job.getRunAttempts());
 			} else
 			{
 				job.incrementRunAttempts();
@@ -265,7 +268,7 @@ public class JobManager implements Closeable
 		QueueStates newState;
 		
 		/* If' he's already been started too many times, we fail him permanently */
-		if (attempts >= _MAX_RUN_ATTEMPTS)
+		if (attempts >= MAX_RUN_ATTEMPTS)
 		{
 			// We can't run this job any more.
 			newState = QueueStates.ERROR;
@@ -661,6 +664,57 @@ public class JobManager implements Closeable
 		}
 	}
 	
+	synchronized public JobErrorPacket[] queryErrorInformation(
+		Connection connection, String job)
+			throws SQLException, ResourceException, GenesisIISecurityException
+	{
+		JobData jobData = _jobsByTicket.get(job);
+		if (jobData == null)
+			throw new ResourceException(String.format(
+				"Unable to find job %s in queue.", job));
+		
+		/* Now ask the database to fill in information about these
+		 * jobs that we don't have in memory (like owner).
+		 */
+		Collection<Long> jobList = new ArrayList<Long>(1);
+		jobList.add(jobData.getJobID());
+		HashMap<Long, PartialJobInfo> ownerMap =
+			_database.getPartialJobInfos(connection, jobList);
+		
+		PartialJobInfo pji = ownerMap.get(jobData.getJobID());
+		
+		/* If the job is owned by the caller, add the job's
+		 * status information to the result list.
+		 */
+		if (!QueueSecurity.isOwner(pji.getOwners()))
+		{
+			/* If the caller did not own a job, then we throw a
+			 * security exception.
+			 */
+			throw new GenesisIISecurityException(
+				"Not permitted to get status of job \"" 
+				+ jobData.getJobTicket() + "\".");
+		}
+		
+		List<Collection<String>> errors = _database.getAttemptErrors(
+			connection, jobData.getJobID());
+		
+		Collection<JobErrorPacket> packets =
+			new LinkedList<JobErrorPacket>();
+		
+		for (int lcv = 0; lcv < errors.size(); lcv++)
+		{
+			Collection<String> strings = errors.get(lcv);
+			if (strings != null)
+			{
+				packets.add(new JobErrorPacket(new UnsignedShort(lcv),
+					strings.toArray(new String[0])));
+			}
+		}
+		
+		return packets.toArray(new JobErrorPacket[0]);
+	}
+	
 	/**
 	 * This method completes (or removes from the queue) all jobs which are
 	 * owned by the caller and which are in a final state.  Only jobs in a
@@ -1007,6 +1061,22 @@ public class JobManager implements Closeable
 				if (rs.slotsAvailable() <= 0)
 					slots.remove(besID);
 			}
+		}
+	}
+	
+	synchronized public void addJobErrorInformation(Connection connection,
+		long jobid, short attempt, Collection<String> errors)
+	{
+		try
+		{
+			_database.addError(connection, jobid, attempt, errors);
+			connection.commit();
+		}
+		catch (Throwable cause)
+		{
+			_logger.warn(
+				"An error occurred while trying to save error information.", 
+				cause);
 		}
 	}
 	

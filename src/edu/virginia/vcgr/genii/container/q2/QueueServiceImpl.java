@@ -51,7 +51,9 @@ import edu.virginia.vcgr.genii.container.rfork.ResourceForkBaseService;
 import edu.virginia.vcgr.genii.queue.ConfigureRequestType;
 import edu.virginia.vcgr.genii.queue.IterateListResponseType;
 import edu.virginia.vcgr.genii.queue.IterateStatusResponseType;
+import edu.virginia.vcgr.genii.queue.JobErrorPacket;
 import edu.virginia.vcgr.genii.queue.JobInformationType;
+import edu.virginia.vcgr.genii.queue.QueryErrorRequest;
 import edu.virginia.vcgr.genii.queue.QueuePortType;
 import edu.virginia.vcgr.genii.queue.ReducedJobInformationType;
 import edu.virginia.vcgr.genii.queue.SubmitJobRequestType;
@@ -274,6 +276,24 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		catch (SQLException sqe)
 		{
 			throw new RemoteException("Unable to create iterator.", sqe);
+		}
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.OPEN)
+	public JobErrorPacket[] queryErrorInformation(QueryErrorRequest arg0)
+			throws RemoteException
+	{
+		ResourceKey rKey = ResourceManager.getCurrentResource();
+		
+		try
+		{
+			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
+			return mgr.queryErrorInformation(arg0.getJobTicket());
+		}
+		catch (SQLException sqe)
+		{
+			throw new RemoteException("Unable to complete jobs in queue.", sqe);
 		}
 	}
 

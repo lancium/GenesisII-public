@@ -186,6 +186,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ReplicatedFileTool</mconf:class>
 		<mconf:class name="time-file"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.TimeReplicatedFile</mconf:class>
+		<mconf:class name="qquery"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.queue.QQueryTool</mconf:class>
 		<mconf:class name="qcomplete"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.queue.QCompleteTool</mconf:class>
 		<mconf:class name="qconfigure"

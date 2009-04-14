@@ -44,7 +44,13 @@ public class QueueDBResourceFactory extends BasicDBResourceFactory
 			"CONSTRAINT q2jobsticket UNIQUE (jobticket, queueid))",
 		"CREATE TABLE q2eprs (" +
 			"queueid VARCHAR(256) PRIMARY KEY, " +
-			"queueepr BLOB (128K) NOT NULL)"
+			"queueepr BLOB (128K) NOT NULL)",
+		"CREATE TABLE q2errors (" +
+			"errorid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
+			"queueid VARCHAR(256) NOT NULL, " +
+			"jobid BIGINT NOT NULL, " +
+			"attempt SMALLINT NOT NULL, " +
+			"errors BLOB(1M))"
 	};
 	
 	public QueueDBResourceFactory(

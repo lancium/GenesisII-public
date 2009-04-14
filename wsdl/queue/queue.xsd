@@ -151,4 +151,30 @@
 		type="queue:ConfigureRequestType"/>
 		
 	<xsd:element name="ConfigureResponse"/>
+
+	<xsd:complexType name="JobErrorPacket">
+		<xsd:sequence>
+			<xsd:element name="attempt" type="xsd:unsignedShort"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+			<xsd:element name="fault-text" type="xsd:string"
+				minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="QueryErrorRequest">
+		<xsd:sequence>
+			<xsd:element name="job-ticket" type="xsd:string"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="QueryErrorRequest" type="queue:QueryErrorRequest"/>
+
+	<xsd:complexType name="QueryErrorResponse">
+		<xsd:sequence>
+			<xsd:element name="fault-packet" type="queue:JobErrorPacket"
+				minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="QueryErrorResponse" type="queue:QueryErrorResponse"/>
+
 </xsd:schema>

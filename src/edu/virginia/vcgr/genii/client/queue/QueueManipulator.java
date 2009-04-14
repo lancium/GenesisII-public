@@ -7,6 +7,9 @@ import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Vector;
 
 import org.apache.axis.types.UnsignedInt;
 import org.ggf.jsdl.JobDefinition_Type;
@@ -23,8 +26,10 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.Identity;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.queue.ConfigureRequestType;
+import edu.virginia.vcgr.genii.queue.JobErrorPacket;
 import edu.virginia.vcgr.genii.queue.JobInformationType;
 import edu.virginia.vcgr.genii.queue.JobStateEnumerationType;
+import edu.virginia.vcgr.genii.queue.QueryErrorRequest;
 import edu.virginia.vcgr.genii.queue.QueuePortType;
 import edu.virginia.vcgr.genii.queue.ReducedJobInformationType;
 import edu.virginia.vcgr.genii.queue.SubmitJobRequestType;
@@ -165,6 +170,44 @@ public class QueueManipulator
 		QueuePortType queue = ClientUtils.createProxy(QueuePortType.class, _queue);
 		queue.configureResource(new ConfigureRequestType(resourceName,
 			new UnsignedInt((long)numSlots)));
+	}
+	
+	public List<Collection<String>> queryErrorInformation(
+		JobTicket ticket) throws RemoteException
+	{
+		Vector<Collection<String>> errors = new Vector<Collection<String>>();
+		
+		QueuePortType queue = ClientUtils.createProxy(
+			QueuePortType.class, _queue);
+		JobErrorPacket []packets = queue.queryErrorInformation(
+			new QueryErrorRequest(ticket.toString()));
+		
+		if (packets != null)
+		{
+			for (JobErrorPacket packet : packets)
+			{
+				if (packet != null)
+				{
+					short attempt = packet.getAttempt().shortValue();
+					if (attempt >= errors.size())
+						errors.setSize(attempt + 1);
+					Collection<String> tmp = errors.get(attempt);
+					if (tmp == null)
+						errors.set(attempt, tmp = new LinkedList<String>());
+					String []texts = packet.getFaultText();
+					if (texts != null)
+					{
+						for (String text : texts)
+						{
+							if (text != null)
+								tmp.add(text);
+						}
+					}
+				}
+			}
+		}
+		
+		return errors;
 	}
 	
 	static private class ReducedJobInformationIterator

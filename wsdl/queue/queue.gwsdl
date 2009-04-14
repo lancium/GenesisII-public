@@ -159,6 +159,16 @@
 		<wsdl:part name="ConfigureResponse"
 			element="queue:ConfigureResponse"/>
 	</wsdl:message>
+
+	<wsdl:message name="QueryErrorRequest">
+		<wsdl:part name="QueryErrorRequest"
+			element="queue:QueryErrorRequest"/>
+	</wsdl:message>
+
+	<wsdl:message name="QueryErrorResponse">
+		<wsdl:part name="QueryErrorResponse"
+			element="queue:QueryErrorResponse"/>
+	</wsdl:message>
 	
 	<wsdl:portType name="QueuePortType">
 		<genii-ext:extend portType="rfork:ResourceForkPortType"/>
@@ -191,6 +201,11 @@
 		<wsdl:operation name="configureResource">
 			<wsdl:input message="queue:ConfigureRequest"/>
 			<wsdl:output message="queue:ConfigureResponse"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="queryErrorInformation">
+			<wsdl:input message="queue:QueryErrorRequest"/>
+			<wsdl:output message="queue:QueryErrorResponse"/>
 		</wsdl:operation>
 	</wsdl:portType>
 
