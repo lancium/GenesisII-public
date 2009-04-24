@@ -113,12 +113,8 @@ public class Container extends ApplicationBase
 			WSDDProvider.registerProvider(
 				GAroundInvokerFactory.PROVIDER_QNAME,
 				new GAroundInvokerFactory());
-
-			runContainer();
 			
-			_logger.info("Starting container services.");
-			ContainerServices.loadAll();
-			ContainerServices.startAll();
+			runContainer();
 			
 			System.out.println("Container Started");
 			_secRunManager.run(SecureRunnableHooks.CONTAINER_POST_STARTUP, 
@@ -224,6 +220,11 @@ public class Container extends ApplicationBase
 		}
 		
 		server.start();
+		
+		_logger.info("Starting container services.");
+		ContainerServices.loadAll();
+		ContainerServices.startAll();
+		
 		initializeServices(webAppCtxt);
 		
 		ServiceDeployer.startServiceDeployer(_axisServer,

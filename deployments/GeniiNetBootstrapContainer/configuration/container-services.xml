@@ -33,6 +33,13 @@
 		<property name="download-tmpdir" value="${SHARED_DIR}/download-tmp"/>
 -->
 	</container-service>
+	
+	<!--
+		This service is used to execute jobs for bes containers
+	-->
+	<container-service
+		class="${CSERVICES_PKG}.executionmgr.ExecutionManagerService">
+	</container-service>
 </container-services>
 
 
