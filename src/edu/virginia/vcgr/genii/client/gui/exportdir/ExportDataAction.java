@@ -82,7 +82,8 @@ class ExportDataAction extends AbstractAction
 		String rnsPath = creationInfo.getRNSPath();
 		File localPath = new File(creationInfo.getLocalPath());
 		RNSPath rPath = ExportManipulator.createExport(
-			creationInfo.getContainerInformation().getContainerURL(), localPath, rnsPath);
+			creationInfo.getContainerInformation().getContainerURL(), localPath, rnsPath,
+			creationInfo.isLightWeight());
 		ExportDirState.addExport(creationInfo.getContainerInformation().getDeploymentName(),
 			new ExportDirInformation(rPath, localPath));
 		fireExportChanged();

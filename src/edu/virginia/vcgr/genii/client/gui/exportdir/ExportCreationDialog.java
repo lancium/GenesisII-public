@@ -9,8 +9,10 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 
 import javax.swing.AbstractAction;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JRadioButton;
 
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.client.install.ContainerInformation;
@@ -27,6 +29,8 @@ public class ExportCreationDialog extends JDialog
 	private ExportPathsWidget _paths;
 	private DeploymentsWidget _deployments;
 	private ExportCreationInformation _information = null;
+	private JRadioButton _standardExportService = null;
+	private JRadioButton _lightweightExportService = null;
 	
 	public ExportCreationDialog(JDialog owner)
 		throws FileLockException, NoContainersException
@@ -43,10 +47,24 @@ public class ExportCreationDialog extends JDialog
 			new GridBagConstraints(0, GridBagConstraints.RELATIVE, 2, 1,
 				1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 				new Insets(5, 5, 5, 5), 5, 5));
+		container.add(_standardExportService = new JRadioButton("Standard Export"),
+			new GridBagConstraints(0, GridBagConstraints.RELATIVE, 2, 1,
+				1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+				new Insets(5, 5, 5, 5), 5, 5));
+		container.add(_lightweightExportService = new JRadioButton("Light-weight Export"),
+			new GridBagConstraints(0, GridBagConstraints.RELATIVE, 2, 1,
+				1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
+				new Insets(5, 5, 5, 5), 5, 5));
 		container.add(_paths= new ExportPathsWidget(),
 			new GridBagConstraints(0, GridBagConstraints.RELATIVE, 2, 1,
 				1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 				new Insets(5, 5, 5, 5), 5, 5));
+		
+		_lightweightExportService.setSelected(true);
+		_standardExportService.setSelected(false);
+		ButtonGroup group = new ButtonGroup();
+		group.add(_lightweightExportService);
+		group.add(_standardExportService);
 		
 		CreateExportAction action = new CreateExportAction();
 		_deployments.addInformationListener(action);
@@ -97,7 +115,8 @@ public class ExportCreationDialog extends JDialog
 				RNSPath rnsPath = RNSPath.getCurrent().lookup(_paths.getRNSPath(), RNSPathQueryFlags.MUST_NOT_EXIST);
 				ExportManipulator.validate(rnsPath);
 				_information = new ExportCreationInformation(_deployments.getSelectedDeployment(),
-					_paths.getLocalPath(), _paths.getRNSPath());
+					_paths.getLocalPath(), _paths.getRNSPath(), 
+					_lightweightExportService.isSelected());
 				setVisible(false);
 			}
 			catch (Throwable cause)

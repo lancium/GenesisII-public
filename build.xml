@@ -180,12 +180,13 @@
 		<ant antfile="${wsdl.dir}/exported/exported-file.build.xml"/>
 		<ant antfile="${wsdl.dir}/exported/exported-dir.build.xml"/>
 		<ant antfile="${wsdl.dir}/exported/exported-root.build.xml"/>
+		<ant antfile="${wsdl.dir}/rfork/rfork.build.xml"/>
+		<ant antfile="${wsdl.dir}/exported/light-export.build.xml"/>
 		<ant antfile="${wsdl.dir}/naming.build.xml"/>
 		<ant antfile="${wsdl.dir}/authn/x509-authn.build.xml"/>
 		<ant antfile="${wsdl.dir}/authn/jndi-authn.build.xml"/>
 		<ant antfile="${wsdl.dir}/resolver/simple-resolver.build.xml"/>
 		<ant antfile="${wsdl.dir}/resolver/simple-resolver-factory.build.xml"/>
-		<ant antfile="${wsdl.dir}/rfork/rfork.build.xml"/>
 		<ant antfile="${wsdl.dir}/queue/queue.build.xml"/>
 		<ant antfile="${wsdl.dir}/certGenerator/certGenerator.build.xml"/>
 		<ant antfile="${wsdl.dir}/tty/tty.build.xml"/>

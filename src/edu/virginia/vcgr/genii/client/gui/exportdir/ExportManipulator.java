@@ -20,7 +20,8 @@ import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 public class ExportManipulator
 {
 	static public RNSPath createExport(
-		URL containerURL, File localPath, String rnsPath)
+		URL containerURL, File localPath, String rnsPath,
+		boolean isLightweight)
 			throws FileNotFoundException, ExportException,
 				RNSException, CreationException,
 				ResourceCreationFaultType, RemoteException, IOException
@@ -31,7 +32,8 @@ public class ExportManipulator
 		validate(target);
 		
 		ExportTool.createExportedRoot(EPRUtils.makeEPR(containerURL.toString() 
-			+ "/axis/services/ExportedRootPortType"),
+			+ "/axis/services/" + 
+				(isLightweight ? "LightWeightExportPortType" : "ExportedRootPortType")),
 			localPath.getAbsolutePath(), rnsPath, false);
 		return RNSPath.getCurrent().lookup(rnsPath, RNSPathQueryFlags.MUST_EXIST);
 	}

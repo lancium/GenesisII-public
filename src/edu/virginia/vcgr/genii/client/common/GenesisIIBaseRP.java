@@ -14,7 +14,7 @@ import edu.virginia.vcgr.genii.common.security.AuthZConfig;
 public interface GenesisIIBaseRP
 {
 	static public final String GENII_COMMON_NS =
-		"";
+		"http://vcgr.cs.virginia.edu/genii/common";
 	static public final String MATCHING_PARAMETER_ATTR_NAME =
 		"matching-parameter";
 	static public final QName MATCHING_PARAMTER_ATTR_QNAME =

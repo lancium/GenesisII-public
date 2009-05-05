@@ -332,6 +332,12 @@
 
 		</genii:service>
 		
+
+		<genii:service name="LightWeightExportPortType">
+			<genii:resource-provider name="basic-db-resource-provider"/>
+			<genii:authz-provider name="gamlacl-authz-provider"/>
+		</genii:service>
+		
 		<genii:service name="RExportFilePortType">
 			<genii:resource-provider name="rbyteio-db-resource-provider"/>
 			<genii:authz-provider name="gamlacl-authz-provider"/>
