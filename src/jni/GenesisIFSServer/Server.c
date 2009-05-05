@@ -16,7 +16,7 @@
 #define GenesisPrint(Args) NOP_FUNCTION
 #endif
 
-#define NUMBER_OF_THREADS			 1
+#define NUMBER_OF_THREADS			 3
 #define THREAD_DELAY				100
                                                 
 //Global variables

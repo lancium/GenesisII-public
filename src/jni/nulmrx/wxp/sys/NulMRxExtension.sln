@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NulMRxExtension", "NulMRxExtension.vcproj", "{F9DF32FD-339D-4CA0-99E7-5F24808D314C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NulMrxExtensionDll", "..\dll\NulMrxExtensionDll.vcproj", "{367E040D-38BA-4D8D-8BA9-E6851D3E0C2B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F9DF32FD-339D-4CA0-99E7-5F24808D314C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F9DF32FD-339D-4CA0-99E7-5F24808D314C}.Debug|Win32.Build.0 = Debug|Win32
+		{F9DF32FD-339D-4CA0-99E7-5F24808D314C}.Release|Win32.ActiveCfg = Release|Win32
+		{F9DF32FD-339D-4CA0-99E7-5F24808D314C}.Release|Win32.Build.0 = Release|Win32
+		{367E040D-38BA-4D8D-8BA9-E6851D3E0C2B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{367E040D-38BA-4D8D-8BA9-E6851D3E0C2B}.Debug|Win32.Build.0 = Debug|Win32
+		{367E040D-38BA-4D8D-8BA9-E6851D3E0C2B}.Release|Win32.ActiveCfg = Release|Win32
+		{367E040D-38BA-4D8D-8BA9-E6851D3E0C2B}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
