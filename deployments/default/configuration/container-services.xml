@@ -5,7 +5,10 @@
 	<variable name="SHARED_DIR" value="/home/mmm2a/shared-directory"/>
 
 	<container-service
-		class="${CSERVICES_PKG}.besstatus.BESStatusContainerService"/>
+		class="${CSERVICES_PKG}.infomgr.InformationContainerService">
+		<property name="edu.virginia.vcgr.genii.cservices.infomgr.num-threads"
+			value="8"/>
+	</container-service>
 
 	<!--
 		This service is responsible for handing out and reclaiming scratch

@@ -9,15 +9,24 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * An Information Portal is a portal through which "information" can be 
+ * acquired about endpoints.  This portal can cache values and gets updated
+ * values on separate threads from a thread pool.
+ * 
+ * @author mmm2a
+ *
+ * @param <InformationType>
+ */
 public class InformationPortal<InformationType> implements Closeable
 {
 	private long _timeout;
 	private long _cacheWindow;
 	
-	private ExecutorService _executor;
+	private Executor _executor;
 	private boolean _closed = false;
 	
 	private InformationPersister<InformationType> _persister;
@@ -57,7 +66,7 @@ public class InformationPortal<InformationType> implements Closeable
 		close();
 	}
 	
-	InformationPortal(ExecutorService executor,
+	InformationPortal(Executor executor,
 		InformationPersister<InformationType> persister,
 		InformationResolver<InformationType> resolver,
 		long timeout, TimeUnit timeoutUnits,
@@ -120,7 +129,7 @@ public class InformationPortal<InformationType> implements Closeable
 			_currentlyResolving.add(endpoint);
 		}
 		
-		_executor.submit(new ResolverWorker(endpoint));
+		_executor.execute(new ResolverWorker(endpoint));
 	}
 	
 	public InformationResult<InformationType> getInformation(InformationEndpoint endpoint) 
