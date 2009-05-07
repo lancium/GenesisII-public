@@ -1,0 +1,38 @@
+CC		=		gcc
+JNI_HEADERS=/System/Library/Frameworks/JavaVM.framework/Headers
+INSTALL_PATH=/Users/morgan/Documents/workspace/Genii-2.0
+CFLAGS	=		-Wall -I$(JNI_HEADERS) -fPIC -m64
+LFLAGS	=
+
+OBJDIR	=		Release
+LIBDIR	=		$(INSTALL_PATH)/jni-lib
+
+OBJECTS	=		$(OBJDIR)/ExceptionUtils.o									\
+				$(OBJDIR)/FileSystemUtils.o								\
+				$(OBJDIR)/GetPassword.o
+
+LIBRARIES	=	$(LIBDIR)/libVcgrClientLib.so
+
+##########################################################################
+
+all:	$(LIBRARIES)
+
+clean:
+	/bin/rm -f -r $(OBJECTS) $(LIBRARIES)
+
+##########################################################################
+
+$(OBJDIR)/ExceptionUtils.o:	ExceptionUtils.h ExceptionUtils.c
+	$(CC) $(CFLAGS) ExceptionUtils.c -c -o $(OBJDIR)/ExceptionUtils.o
+
+$(OBJDIR)/GetPassword.o:	GetPassword.jh GetPassword.c
+	$(CC) $(CFLAGS) GetPassword.c -c -o $(OBJDIR)/GetPassword.o
+
+$(OBJDIR)/FileSystemUtils.o:	FileSystemUtils.jh FileSystemUtils.c		\
+		ExceptionUtils.h
+	$(CC) $(CFLAGS) FileSystemUtils.c -c -o $(OBJDIR)/FileSystemUtils.o
+
+##########################################################################
+
+$(LIBDIR)/libVcgrClientLib.so:	$(OBJECTS)
+	$(CC) $(CFLAGS) -dynamiclib $(OBJECTS) -o $(LIBDIR)/libVcgrClientLib.so -framework JavaVM

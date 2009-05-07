@@ -198,6 +198,8 @@
 			<parsable type="javaprop"
 				targetfile="$INSTALL_PATH/ApplicationWatcher/genii-client-application.properties"/>
 			<parsable type="javaprop"
+				targetfile="$INSTALL_PATH/ApplicationWatcher/genii-update-application.properties"/>
+			<parsable type="javaprop"
 				targetfile="$INSTALL_PATH/ApplicationWatcher/genii-container-application.properties"/>
 			<parsable type="javaprop"
 				targetfile="$INSTALL_PATH/ApplicationWatcher/genii-ogrshserv-application.properties"/>
@@ -217,6 +219,8 @@
 				targetfile="$INSTALL_PATH/runContainer.sh" os="unix"/>
 			<parsable type="shell"
 				targetfile="$INSTALL_PATH/grid" os="unix"/>
+			<parsable type="shell"
+				targetfile="$INSTALL_PATH/grid-update" os="unix"/>
 			<parsable type="shell"
 				targetfile="$INSTALL_PATH/simple-command" os="unix"/>
 			<parsable type="shell"
@@ -241,6 +245,8 @@
 				targetfile="$INSTALL_PATH/runContainer.bat" os="windows"/>
 			<parsable type="plain"
 				targetfile="$INSTALL_PATH/grid.bat" os="windows"/>
+			<parsable type="plain"
+				targetfile="$INSTALL_PATH/grid-update.bat" os="windows"/>
 			<parsable type="plain"
 				targetfile="$INSTALL_PATH/ifs.bat" os="windows"/>
 			<parsable type="plain"

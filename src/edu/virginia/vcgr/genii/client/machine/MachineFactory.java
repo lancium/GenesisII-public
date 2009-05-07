@@ -29,6 +29,9 @@ public class MachineFactory
 		} else if (os.equals(SupportedOperatingSystems.LINUX))
 		{
 			return new LinuxMachineInterrogator();
+		} else if (os.equals(SupportedOperatingSystems.MACOSX))
+		{
+			return new MacOSXMachineInterrogator();
 		} else
 			throw new RuntimeException("Operating system " +
 				os + " is unsupported.");

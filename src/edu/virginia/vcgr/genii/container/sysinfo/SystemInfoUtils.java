@@ -26,6 +26,8 @@ public class SystemInfoUtils
 			_provider = new ProcFilesystemProvider();
 		else if (os.equals(SupportedOperatingSystems.WINDOWS))
 			_provider = new WindowsProvider();
+		else if (os.equals(SupportedOperatingSystems.MACOSX))
+			_provider = new MacOSXProvider();
 		else
 			throw new RuntimeException(
 				"Don't know an ISystemInfoProvider for OS type \"" +

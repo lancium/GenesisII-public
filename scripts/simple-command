@@ -4,4 +4,4 @@ _SC_LOCAL_JAVA_DIR="$_SC_GENII_INSTALL_DIR/Java/linux-i586/jre"
 APPLICATION_CLASS="$1"
 shift
 
-exec "$_SC_LOCAL_JAVA_DIR/bin/java" -Xms32M -Xmx128M -classpath "%{INSTALL_PATH}/lib:%{INSTALL_PATH}/ApplicationWatcher/app-watcher.jar" "-Dlog4j.configuration=%{LOG4JCONFIG}" "-Djava.library.path=%{INSTALL_PATH}/jni-lib" "-Dedu.virginia.vcgr.genii.install-base-dir=%{INSTALL_PATH}" edu.virginia.vcgr.appwatcher.ApplicationLauncher --application-class="$APPLICATION_CLASS" "%{INSTALL_PATH}/ApplicationWatcher/genii-simple-application.properties" "$@"
+exec "$_SC_LOCAL_JAVA_DIR/bin/java" -Xms32M -Xmx128M -classpath "%{INSTALL_PATH}/lib:%{INSTALL_PATH}/ApplicationWatcher/app-manager.jar" "-Dlog4j.configuration=%{LOG4JCONFIG}" "-Djava.library.path=%{INSTALL_PATH}/jni-lib" "-Dedu.virginia.vcgr.genii.install-base-dir=%{INSTALL_PATH}" edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher --application-class="$APPLICATION_CLASS" "%{INSTALL_PATH}/ApplicationWatcher/genii-simple-application.properties" "$@"

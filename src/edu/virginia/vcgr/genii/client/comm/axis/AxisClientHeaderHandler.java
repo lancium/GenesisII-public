@@ -36,8 +36,12 @@ import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.ReferenceParametersType;
 import org.apache.ws.security.WSEncryptionPart;
 
+import edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher;
+import edu.virginia.vcgr.appmgr.launcher.ApplicationLauncherConsole;
+import edu.virginia.vcgr.appmgr.version.Version;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.comm.CommConstants;
+import edu.virginia.vcgr.genii.client.comm.GeniiSOAPHeaderConstants;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.comm.axis.security.MessageSecurityData;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
@@ -51,6 +55,45 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 public class AxisClientHeaderHandler extends BasicHandler
 {
 	static final long serialVersionUID = 0L;
+	
+	private void setGenesisIIHeaders(MessageContext msgContext)
+		throws AxisFault
+	{
+		SOAPHeader header;
+		
+		try
+		{
+			header = msgContext.getMessage().getSOAPHeader();
+		
+			Version currentVersion;
+			ApplicationLauncherConsole console = ApplicationLauncher.getConsole();
+			if (console != null)
+			{
+				currentVersion = console.currentVersion();
+				if (currentVersion != null && 
+					!currentVersion.equals(Version.EMPTY_VERSION))
+				{
+					SOAPHeaderElement geniiVersion = new SOAPHeaderElement(
+							GeniiSOAPHeaderConstants.GENII_ENDPOINT_VERSION,
+							currentVersion.toString());
+					geniiVersion.setActor(null);
+					geniiVersion.setMustUnderstand(false);
+					header.addChildElement(geniiVersion);
+				}
+			}
+	
+			SOAPHeaderElement isGenesisII = new SOAPHeaderElement(
+				GeniiSOAPHeaderConstants.GENII_ENDPOINT_QNAME,
+				Boolean.TRUE);
+			isGenesisII.setActor(null);
+			isGenesisII.setMustUnderstand(false);
+			header.addChildElement(isGenesisII);
+		}
+		catch (SOAPException se)
+		{
+			throw new AxisFault(se.getLocalizedMessage());
+		}
+	}
 	
 	private void setMessageID(MessageContext msgContext) throws AxisFault
 	{
@@ -241,5 +284,6 @@ public class AxisClientHeaderHandler extends BasicHandler
 		setSOAPAction(msgContext);
 		setWSAddressingHeaders(msgContext);
 		setCallingContextHeaders(msgContext);
+		setGenesisIIHeaders(msgContext);
 	}
 }

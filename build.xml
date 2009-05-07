@@ -15,8 +15,8 @@
 
 
 	<!-- Static Class paths -->
-	<path id="appwatcher.classpath">
-		<fileset dir="${appwatcher.home}" includes="**/app-watcher.jar"/>
+	<path id="appmanager.classpath">
+		<fileset dir="${appmanager.home}" includes="**/app-manager.jar"/>
 	</path>
 
 	<path id="gpm.classpath">
@@ -74,7 +74,7 @@
 		<path refid="ant.classpath"/>
 		<path refid="axis.classpath"/>
 		<path refid="jetty.classpath"/>
-		<path refid="appwatcher.classpath"/>
+		<path refid="appmanager.classpath"/>
 		<path refid="gpm.classpath"/>
 		<path refid="junit.classpath"/>
 		<path refid="hypersonic.classpath"/>

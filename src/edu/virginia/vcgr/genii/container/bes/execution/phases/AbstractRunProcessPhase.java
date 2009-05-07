@@ -28,6 +28,8 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 			overloadWindowsEnvironment(processEnvironment, overload);
 		else if (os.equals(SupportedOperatingSystems.LINUX))
 			overloadLinuxEnvironment(processEnvironment, overload);
+		else if (os.equals(SupportedOperatingSystems.MACOSX))
+			overloadLinuxEnvironment(processEnvironment, overload);
 		else
 			throw new RuntimeException("Don't know how to handle \"" +
 				os + "\" platform.");

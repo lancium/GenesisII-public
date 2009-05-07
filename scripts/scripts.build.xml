@@ -84,6 +84,13 @@
 		<replace file="${basedir}/ApplicationWatcher/genii-container-application.properties"
 			token="\" value="\\" summary="no"/>
 
+		<copy file="${scripts.dir}/genii-update-application.properties"
+			tofile="${basedir}/ApplicationWatcher/genii-update-application.properties"/>
+		<replace file="${basedir}/ApplicationWatcher/genii-update-application.properties"
+			token="$INSTALL_PATH" value="${basedir}" summary="no"/>
+		<replace file="${basedir}/ApplicationWatcher/genii-update-application.properties"
+			token="\" value="\\" summary="no"/>
+
 		<copy file="${scripts.dir}/genii-client-application.properties"
 			tofile="${basedir}/ApplicationWatcher/genii-client-application.properties"/>
 		<replace file="${basedir}/ApplicationWatcher/genii-client-application.properties"
@@ -135,6 +142,10 @@
 		<antcall target="build-script-unix">
 			<param name="unix-script-src-dir" value="${scripts.dir}"/>
 			<param name="unix-script-base-name" value="jserver-debug.sh"/>
+		</antcall>
+		<antcall target="build-script">
+			<param name="script-src-dir" value="${scripts.dir}"/>
+			<param name="script-base-name" value="grid-update"/>
 		</antcall>
 		<antcall target="build-script">
 			<param name="script-src-dir" value="${scripts.dir}"/>

@@ -1,0 +1,13 @@
+#!/bin/sh
+
+_GRID_GENII_INSTALL_DIR="/home/mmm2a/Work/eclipse-workspace/Genii-2.0-prep"
+_GRID_LOCAL_JAVA_DIR="$_GRID_GENII_INSTALL_DIR/Java/linux-i586/jre"
+
+if [ -z "$LD_LIBRARY_PATH" ]
+then
+	export LD_LIBRARY_PATH="/home/mmm2a/Work/eclipse-workspace/Genii-2.0-prep/jni-lib"
+else
+	export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/home/mmm2a/Work/eclipse-workspace/Genii-2.0-prep/jni-lib"
+fi
+
+"$_GRID_LOCAL_JAVA_DIR/bin/java" -Xms32M -Xmx512M -classpath "/home/mmm2a/Work/eclipse-workspace/Genii-2.0-prep/lib:/home/mmm2a/Work/eclipse-workspace/Genii-2.0-prep/ApplicationWatcher/app-manager.jar" -Dedu.virginia.vcgr.appwatcher.update-frequency=604800000 "-Dlog4j.configuration=genesisII.log4j.properties" "-Djava.library.path=/home/mmm2a/Work/eclipse-workspace/Genii-2.0-prep/jni-lib" "-Dedu.virginia.vcgr.genii.install-base-dir=/home/mmm2a/Work/eclipse-workspace/Genii-2.0-prep" edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher "/home/mmm2a/Work/eclipse-workspace/Genii-2.0-prep/ApplicationWatcher/genii-update-application.properties" "$@"

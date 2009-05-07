@@ -50,4 +50,7 @@ public interface IProxyFactory
 	
 	public void setTimeout(Object clientProxy, int timeoutMillis) 
 		throws ResourceException;
+	
+	public GenesisIIEndpointInformation getLastEndpointInformation(
+		Object clientProxy) throws ResourceException;
 }

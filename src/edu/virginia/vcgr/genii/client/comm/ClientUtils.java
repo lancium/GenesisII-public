@@ -449,6 +449,12 @@ public class ClientUtils
 		return getProxyFactory().getAttachments(clientProxy);
 	}
 	
+	static public GenesisIIEndpointInformation getLastEndpointInformation(
+		Object clientProxy) throws ResourceException
+	{
+		return getProxyFactory().getLastEndpointInformation(clientProxy);
+	}
+	
 	static public void setTimeout(Object clientProxy, int timeoutMillis)
 		throws ResourceException
 	{

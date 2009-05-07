@@ -30,6 +30,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.comm.GenesisIIEndpointInformation;
 import edu.virginia.vcgr.genii.client.comm.IProxyFactory;
 import edu.virginia.vcgr.genii.client.comm.attachments.AttachmentType;
 import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
@@ -109,6 +110,13 @@ public class AxisBasedProxyFactory implements IProxyFactory
 	{
 		AxisClientInvocationHandler handler = getInvocationHandler(clientProxy);
 		return handler.getInAttachments();
+	}
+	
+	public GenesisIIEndpointInformation getLastEndpointInformation(
+		Object clientProxy) throws ResourceException
+	{
+		AxisClientInvocationHandler handler = getInvocationHandler(clientProxy);
+		return handler.getLastEndpointInformation();
 	}
 
 	public void setAttachments(Object clientProxy, 

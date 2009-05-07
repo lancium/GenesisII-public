@@ -50,6 +50,8 @@ public class PingTool extends BaseGridTool
 		{
 			String response = common.ping(msg);
 			stdout.format("Response %d:  %s\n", i, response);
+			stdout.format("Endpoint Information:  %s\n", 
+				ClientUtils.getLastEndpointInformation(common));
 		}
 		
 		return 0;

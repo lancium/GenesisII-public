@@ -37,6 +37,8 @@ import org.apache.axis.configuration.FileProvider;
 import org.ogf.schemas.naming._2006._08.naming.ResolveFailedWithReferralFaultType;
 
 import java.io.IOException;
+
+import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.axis.types.URI;
 import java.security.GeneralSecurityException;
 
@@ -47,10 +49,13 @@ import javax.xml.soap.SOAPException;
 
 import org.apache.axis.SimpleChain;
 
+import edu.virginia.vcgr.appmgr.version.Version;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cache.LRUCache;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.CommConstants;
+import edu.virginia.vcgr.genii.client.comm.GenesisIIEndpointInformation;
+import edu.virginia.vcgr.genii.client.comm.GeniiSOAPHeaderConstants;
 import edu.virginia.vcgr.genii.client.comm.MethodDescription;
 import edu.virginia.vcgr.genii.client.comm.ResolutionContext;
 import edu.virginia.vcgr.genii.client.configuration.*;
@@ -174,6 +179,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		AttachmentType.DIME;
 	private Collection<GeniiAttachment> _outAttachments = null;
 	private Collection<GeniiAttachment> _inAttachments = null;
+	private GenesisIIEndpointInformation _lastEndpointInfo = null;
 	
 	private HashMap<MethodDescription, Object> _portMethods =
 		new HashMap<MethodDescription, Object>();
@@ -482,8 +488,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 					try
 					{
 						startCommunicate = System.currentTimeMillis();
-						Object ret = handler.doInvoke(calledMethod, arguments, timeout);
-						return ret;
+						return handler.doInvoke(
+							calledMethod, arguments, timeout);
 					}
 					catch(Throwable t)
 					{
@@ -565,6 +571,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	protected Object doInvoke(Method calledMethod, Object[] arguments, 
 		int timeout) throws Throwable
 	{
+		_lastEndpointInfo = null;
 		MethodDescription methodDesc = new MethodDescription(calledMethod);
 		Stub stubInstance = (Stub) _portMethods.get(methodDesc);
 
@@ -597,10 +604,49 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 		Object [] inAttachments = stubInstance.getAttachments();
 		if (inAttachments != null)
-		{
 			setInAttachments(inAttachments);
+		
+		boolean isGeniiEndpoint = false;
+		Version endpointVersion = null;
+		
+		for (SOAPHeaderElement elem : stubInstance.getResponseHeaders())
+		{
+			QName name = elem.getQName();
+			if (name.equals(GeniiSOAPHeaderConstants.GENII_ENDPOINT_QNAME))
+			{
+				org.w3c.dom.Node n = elem.getFirstChild();
+				if (n != null)
+				{
+					String text = n.getNodeValue();
+					if (text != null && text.equalsIgnoreCase("true"))
+						isGeniiEndpoint = true;
+				}
+			} else if (name.equals(
+				GeniiSOAPHeaderConstants.GENII_ENDPOINT_VERSION))
+			{
+				org.w3c.dom.Node n = elem.getFirstChild();
+				if (n != null)
+				{
+					String text = n.getNodeValue();
+					if (text != null)
+					{
+						try
+						{
+							endpointVersion = new Version(text);
+						}
+						catch (Throwable cause)
+						{
+							_logger.warn(
+								"Unable to parse version from soap header.", 
+								cause);
+						}
+					}
+				}
+			}
 		}
 		
+		_lastEndpointInfo = new GenesisIIEndpointInformation(
+			isGeniiEndpoint, endpointVersion);
 		return ret;
 	}
 	
@@ -780,5 +826,10 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		_inAttachments = null;
 		
 		return res;
+	}
+	
+	public GenesisIIEndpointInformation getLastEndpointInformation()
+	{
+		return _lastEndpointInfo;
 	}
 }

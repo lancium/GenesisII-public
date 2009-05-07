@@ -74,6 +74,9 @@ public class JSDLUtils extends JNIContainerBaseClass
 		else if (os.equals(SupportedOperatingSystems.LINUX))
 			return new OperatingSystemType_Type(
 				OperatingSystemTypeEnumeration.LINUX, null);
+		else if (os.equals(SupportedOperatingSystems.MACOSX))
+			return new OperatingSystemType_Type(
+				OperatingSystemTypeEnumeration.MACOS, null);
 		else
 			throw new RuntimeException(
 				"Unsupported operating system type found (" + os + ").");

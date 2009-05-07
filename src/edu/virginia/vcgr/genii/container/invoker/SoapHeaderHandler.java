@@ -13,12 +13,17 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher;
+import edu.virginia.vcgr.appmgr.launcher.ApplicationLauncherConsole;
+import edu.virginia.vcgr.appmgr.version.Version;
+import edu.virginia.vcgr.genii.client.comm.GeniiSOAPHeaderConstants;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.container.axis.WSAddressingExtractor;
+import edu.virginia.vcgr.genii.container.context.WorkingContext;
 
-public class WSAddressingHandler implements IAroundInvoker
+public class SoapHeaderHandler implements IAroundInvoker
 {
-	static private Log _logger = LogFactory.getLog(WSAddressingHandler.class);
+	static private Log _logger = LogFactory.getLog(SoapHeaderHandler.class);
 	
 	static private final String _WS_ADDR_NS = 
 		"http://www.w3.org/2005/08/addressing";
@@ -33,6 +38,11 @@ public class WSAddressingHandler implements IAroundInvoker
 		new QName(_WS_ADDR_NS, _WS_ADDR_REPLY_TO);
 	static private QName _WS_ADDR_ACTION_QNAME = 
 		new QName(_WS_ADDR_NS, _WS_ADDR_ACTION);
+	
+	static private QName IS_GENII_ELEMENT_NAME =
+		GeniiSOAPHeaderConstants.GENII_ENDPOINT_QNAME;
+	static private QName GENII_VERSION_ELEMENT_NAME =
+		GeniiSOAPHeaderConstants.GENII_ENDPOINT_VERSION;
 	
 	public Object invoke(InvocationContext invocationContext) throws Exception
 	{
@@ -51,6 +61,8 @@ public class WSAddressingHandler implements IAroundInvoker
 		EndpointReferenceType replyTo = EPRUtils.makeEPR(
 			"http://www.w3.org/2005/08/addressing/anonymous", false);
 		String action = null;
+		Version clientVersion = null;
+		boolean isGeniiClient = false;
 		
 		Message msg = msgCtxt.getRequestMessage();
 		SOAPHeader header = msg.getSOAPHeader();
@@ -91,6 +103,36 @@ public class WSAddressingHandler implements IAroundInvoker
 				} else if (nodeName.equals(_WS_ADDR_ACTION_QNAME))
 				{
 					action = node.getFirstChild().getNodeValue();
+				} else if (nodeName.equals(IS_GENII_ELEMENT_NAME))
+				{
+					Node child = node.getFirstChild();
+					if (child != null)
+					{
+						String value = child.getNodeValue();
+						if (value != null && value.equalsIgnoreCase("true"))
+							isGeniiClient = true;
+					}
+				} else if (nodeName.equals(GENII_VERSION_ELEMENT_NAME))
+				{
+					Node child = node.getFirstChild();
+					if (child != null)
+					{
+						String value = child.getNodeValue();
+						if (value != null)
+						{
+							try
+							{
+								clientVersion = new Version(value);
+							}
+							catch (Throwable cause)
+							{
+								_logger.warn(
+									"Can't parse Genii Version soap header.", 
+									cause);
+								
+							}
+						}
+					}
 				}
 			}
 		}
@@ -98,6 +140,13 @@ public class WSAddressingHandler implements IAroundInvoker
 		_logger.debug("Calling Operation with MessageID = " + messageID +
 			", ReplyTo = " + replyTo.getAddress().get_value() +
 			", Action = " + action);
+		
+		WorkingContext ctxt = WorkingContext.getCurrentWorkingContext();
+		ctxt.setProperty(
+			GeniiSOAPHeaderConstants.GENII_ENDPOINT_NAME, isGeniiClient);
+		if (clientVersion != null)
+			ctxt.setProperty(GeniiSOAPHeaderConstants.GENII_ENDPOINT_VERSION_NAME,
+				clientVersion);
 		
 		Object obj = invocationContext.proceed();
 		msg = msgCtxt.getResponseMessage();
@@ -109,6 +158,31 @@ public class WSAddressingHandler implements IAroundInvoker
 
 		header = msg.getSOAPHeader();
 		
+		// Add the genii-endpoint element
+		SOAPHeaderElement geniiEndpoint = new SOAPHeaderElement(
+			GeniiSOAPHeaderConstants.GENII_ENDPOINT_QNAME, Boolean.TRUE);
+		geniiEndpoint.setActor(null);
+		geniiEndpoint.setMustUnderstand(false);
+		header.addChildElement(geniiEndpoint);
+		
+		// Add the genii version if appropriate
+		ApplicationLauncherConsole console =
+			ApplicationLauncher.getConsole();
+		if (console != null)
+		{
+			Version serverVersion = console.currentVersion();
+			if (serverVersion != null && 
+				!(serverVersion.equals(Version.EMPTY_VERSION)))
+			{
+				SOAPHeaderElement versionElement = new SOAPHeaderElement(
+					GeniiSOAPHeaderConstants.GENII_ENDPOINT_VERSION,
+					serverVersion.toString());
+				versionElement.setActor(null);
+				versionElement.setMustUnderstand(false);
+				header.addChildElement(versionElement);
+			}
+		}
+			
 		// Add the relates to
 		if (messageID != null)
 		{
