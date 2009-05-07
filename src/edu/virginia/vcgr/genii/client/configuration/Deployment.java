@@ -17,6 +17,8 @@ public class Deployment
 	
 	static private final String CONFIGURATION_DIRECTORY_NAME = "configuration";
 	static private final String SERVICES_DIRECTORY_NAME = "services";
+	static private final String URI_PROPERTIES_FILENAME =
+		"uri-manager.properties";
 	static private final String WEB_CONTAINER_PROPERTIES_FILENAME = 
 		"web-container.properties";
 	static private final String REJUVENATION_PROPERTYIES_FILENAME =
@@ -33,6 +35,7 @@ public class Deployment
 	private Security _security;
 	private File _servicesDirectory;
 	private Properties _webContainerProperties;
+	private Properties _uriManagerProperties;
 	private Properties _rejuvenationProperties;
 	
 	private Deployment(File deploymentDirectory)
@@ -57,11 +60,37 @@ public class Deployment
 		
 		_webContainerProperties = loadWebContainerProperties(
 			_deploymentDirectory.getName(), _configurationDirectory);
+		_uriManagerProperties = loadURIManagerProperties(
+			_deploymentDirectory.getName(), _configurationDirectory);
 		_rejuvenationProperties = loadRejuvenationProperties(
 			_deploymentDirectory.getName(), _configurationDirectory);
 		
 		_secureRunnableDirectory = new File(_deploymentDirectory, 
 			SECURE_RUNNABLE_DIRECTORY_NAME);
+	}
+	
+	static private Properties loadURIManagerProperties(
+		String deploymentName, File configurationDirectory)
+	{
+		FileInputStream fin = null;
+		Properties ret = new Properties();
+		
+		try
+		{
+			fin = new FileInputStream(new File(configurationDirectory, 
+				URI_PROPERTIES_FILENAME));
+			ret.load(fin);
+			return ret;
+		}
+		catch (IOException ioe)
+		{
+			_logger.debug("Unable to load uri manager properties from deployment.", ioe);
+			return new Properties();
+		}
+		finally
+		{
+			StreamUtils.close(fin);
+		}
 	}
 	
 	static private Properties loadWebContainerProperties(
@@ -133,6 +162,11 @@ public class Deployment
 	public File getServicesDirectory()
 	{
 		return _servicesDirectory;
+	}
+	
+	public Properties uriManagerProperties()
+	{
+		return _uriManagerProperties;
 	}
 	
 	public Properties webContainerProperties()

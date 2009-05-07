@@ -21,6 +21,7 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.concurrent.Semaphore;
 
 import javax.xml.namespace.QName;
 
@@ -28,14 +29,22 @@ import org.morgan.util.configuration.XMLConfiguration;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
+import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
+import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.UsernamePasswordIdentity;
 
 @SuppressWarnings("unchecked")
 public class URIManager
 {
-	static private QName _URI_HANDLER_QNAME =
+	static private final String 
+		DEFAULT_MAXIMUM_SIMULTANEOUS_CONNECTIONS = "128";
+	static private final String MAXIMUM_SIMULTANEOUS_CONNECTIONS_PROPERTY =
+		"edu.virginia.vcgr.genii.client.io.uri-manager.max-simultaneous-connections";
+	
+	static private final QName _URI_HANDLER_QNAME =
 		new QName(GenesisIIConstants.GENESISII_NS, "uri-handlers");
 	
+	static private Semaphore _connectionSemaphore;
 	static private HashMap<String, IURIHandler> _handlers =
 		new HashMap<String, IURIHandler>();
 	
@@ -55,6 +64,12 @@ public class URIManager
 				_handlers.put(scheme, handler);
 			}
 		}
+		
+		_connectionSemaphore = new Semaphore(Integer.parseInt(
+			Installation.getDeployment(
+				new DeploymentName()).uriManagerProperties().getProperty(
+					MAXIMUM_SIMULTANEOUS_CONNECTIONS_PROPERTY,
+					DEFAULT_MAXIMUM_SIMULTANEOUS_CONNECTIONS)), true);
 	}
 	
 	static public String[] getHandledProtocols()
@@ -90,7 +105,16 @@ public class URIManager
 		if (handler == null)
 			throw new IOException("Don't know how to handle \"" + source + "\".");
 		
-		handler.get(source, target, credential);
+		try
+		{
+			_connectionSemaphore.acquireUninterruptibly();
+			Thread.interrupted();
+			handler.get(source, target, credential);
+		}
+		finally
+		{
+			_connectionSemaphore.release();
+		}
 	}
 	
 	static public void put(File source, URI target,
@@ -104,6 +128,15 @@ public class URIManager
 		if (handler == null)
 			throw new IOException("Don't know how to handle \"" + target + "\".");
 		
-		handler.put(source, target, credential);
+		try
+		{
+			_connectionSemaphore.acquireUninterruptibly();
+			Thread.interrupted();
+			handler.put(source, target, credential);
+		}
+		finally
+		{
+			_connectionSemaphore.release();
+		}
 	}
 }
