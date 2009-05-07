@@ -41,6 +41,7 @@
 	<classpathentry kind="lib" path="ext/ant/ant-jsch.jar"/>
 	<classpathentry kind="lib" path="ext/fuse/fuse-j.jar"/>
 	<classpathentry kind="lib" path="ext/GeniiProcessMgmt/GeniiProcMgmt.jar"/>
+	<classpathentry kind="lib" path="ApplicationWatcher/app-manager.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="ext/derby/derby.jar"/>
 	<classpathentry kind="lib" path="ext/xmldb/db.jar"/>
@@ -48,6 +49,5 @@
 	<classpathentry kind="lib" path="ext/jndi/nis.jar"/>
 	<classpathentry kind="lib" path="ext/bouncycastle/bcprov-jdk16-139.jar" sourcepath="D:/Dev/bcprov-jdk16-139/src.zip"/>
 	<classpathentry kind="lib" path="lib/GenesisII-ws.jar" sourcepath="genned-src"/>
-	<classpathentry kind="lib" path="ApplicationWatcher/app-manager.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
