@@ -14,6 +14,8 @@ public class JobRequest implements Serializable
 	private String _jobAnnotation = null;
 	private String _jobName = null;
 	
+	private Restrictions _restrictions = new Restrictions();
+	
 	private SPMDInformation _spmdInformation = null;
 	
 	private Map<String, Filesystem> _filesystems =
@@ -42,6 +44,11 @@ public class JobRequest implements Serializable
 	final public String getJobName()
 	{
 		return _jobName;
+	}
+	
+	final public Restrictions getRestrictions()
+	{
+		return _restrictions;
 	}
 	
 	final public void setJobAnnotation(String annotation)

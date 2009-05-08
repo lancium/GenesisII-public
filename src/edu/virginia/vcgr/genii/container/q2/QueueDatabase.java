@@ -50,6 +50,11 @@ public class QueueDatabase
 		_queueID = queueID;
 	}
 	
+	public String getQueueID()
+	{
+		return _queueID;
+	}
+	
 	/**
 	 * Get a list of all BES containers registered with this queue.
 	 * 
@@ -616,6 +621,42 @@ public class QueueDatabase
 		{
 			StreamUtils.close(rs);
 			StreamUtils.close(query);
+			StreamUtils.close(stmt);
+		}
+	}
+	
+	public JobDefinition_Type getJSDL(Connection connection,
+		long jobID) throws SQLException, ResourceException
+	{
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try
+		{
+			stmt = connection.prepareStatement(
+				"SELECT jsdl FROM q2jobs WHERE jobid = ?");
+			stmt.setLong(1, jobID);
+			
+			rs = stmt.executeQuery();
+			if (!rs.next())
+				throw new ResourceException("Unable to find entry for job " + jobID);
+			
+			return DBSerializer.xmlFromBlob(
+				JobDefinition_Type.class, rs.getBlob(1));
+		}
+		catch (ClassNotFoundException cnfe)
+		{
+			throw new ResourceException("Unable to deserialize calling " +
+				"context and jsdl for job " + jobID, cnfe);
+		}
+		catch (IOException ioe)
+		{
+			throw new ResourceException("Unable to deserialize calling " +
+				"context and jsdl for job " + jobID, ioe);
+		}
+		finally
+		{
+			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
 		}
 	}

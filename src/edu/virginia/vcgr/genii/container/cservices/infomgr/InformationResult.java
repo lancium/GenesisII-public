@@ -1,6 +1,10 @@
 package edu.virginia.vcgr.genii.container.cservices.infomgr;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Calendar;
+
+import org.morgan.util.io.StreamUtils;
 
 /**
  * A bundle class that wraps together information about an endpoint,
@@ -31,6 +35,25 @@ public class InformationResult<InfoType>
 		_exception = exception;
 		_lastUpdated = lastUpdated;
 		_information = information;
+	}
+	
+	@Override
+	public String toString()
+	{
+		StringWriter writer = new StringWriter();
+		PrintWriter pw = new PrintWriter(writer);
+		
+		pw.format("%sLast Updated:  %tc\n",
+			(_exception == null) ? "" : 
+				String.format("[(%s) %s] ",
+					_exception.getClass().getName(), 
+					_exception.getLocalizedMessage()),
+			_lastUpdated);
+		pw.format("Information?  %s\n", _information);
+		
+		StreamUtils.close(pw);
+		StreamUtils.close(writer);
+		return writer.toString();
 	}
 	
 	/**

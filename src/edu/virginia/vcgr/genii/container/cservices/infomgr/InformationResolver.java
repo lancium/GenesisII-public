@@ -1,7 +1,6 @@
 package edu.virginia.vcgr.genii.container.cservices.infomgr;
 
-import java.rmi.RemoteException;
-import java.util.concurrent.TimeUnit;
+import edu.virginia.vcgr.genii.client.utils.Duration;
 
 /**
  * An interface that represents the ability to acquire information
@@ -25,9 +24,9 @@ public interface InformationResolver<ResultType>
 	 * @return Any information acquired.  This result CAN be null
 	 * at the callers discretion.
 	 * 
-	 * @throws RemoteException
+	 * @throws Throwable
 	 */
 	public ResultType acquire(
-		InformationEndpoint endpoint, long timeout, TimeUnit timeoutUnits) 
-		throws RemoteException;
+		InformationEndpoint endpoint, Duration timeout)
+		throws Throwable;
 }

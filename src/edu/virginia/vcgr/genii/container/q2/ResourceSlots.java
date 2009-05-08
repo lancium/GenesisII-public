@@ -9,15 +9,22 @@ package edu.virginia.vcgr.genii.container.q2;
  */
 public class ResourceSlots
 {
+	private BESData _besData;
 	private long _besID;
 	private int _slotsAvailable;
 	
 	public ResourceSlots(BESData besData)
 	{
+		_besData = besData;
 		_besID = besData.getID();
 		_slotsAvailable = besData.getTotalSlots();
 	}
 	
+	public BESData getBESData()
+	{
+		return _besData;
+		
+	}
 	public long getBESID()
 	{
 		return _besID;

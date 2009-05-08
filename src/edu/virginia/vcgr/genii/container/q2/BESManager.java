@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
@@ -24,7 +25,13 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.container.attrs.AttributePreFetcher;
+import edu.virginia.vcgr.genii.container.cservices.infomgr.InformationEndpoint;
+import edu.virginia.vcgr.genii.container.cservices.infomgr.InformationListener;
+import edu.virginia.vcgr.genii.container.cservices.infomgr.InformationPortal;
+import edu.virginia.vcgr.genii.container.cservices.infomgr.InformationResult;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.q2.besinfo.BESEndpoint;
+import edu.virginia.vcgr.genii.container.q2.besinfo.BESInformation;
 
 /**
  * The BESManager is the main class for keeping track of and manipulating 
@@ -52,7 +59,10 @@ public class BESManager implements Closeable
 	 * should close. */
 	volatile private boolean _closed = false;
 	
+	private InformationPortal<BESInformation> _informationPortal;
 	private QueueDatabase _database;
+	
+	private Map<Long, BESInformation> _besInformation;
 	
 	/**
 	 * The scheduling event is an object which allows code to raise and wait
@@ -67,9 +77,7 @@ public class BESManager implements Closeable
 	 * </UL>
 	 */
 	private SchedulingEvent _schedulingEvent;
-	
-	private DatabaseConnectionPool _connectionPool;
-	
+		
 	/** A map of container IDs to their in-memory data. */
 	private HashMap<Long, BESData> _containersByID = 
 		new HashMap<Long, BESData>();
@@ -95,26 +103,23 @@ public class BESManager implements Closeable
 		new HashMap<Long, BESData>();
 	
 	/**
-	 * Thread pool used to make out-calls from the queue.
-	 */
-	private ThreadPool _outcallThreadPool;
-	
-	/**
 	 * This is the worker object (java.lang.Runnable) used to request updates
 	 * from BES containers.
 	 */
 	private BESResourceUpdater _updater;
 	
-	public BESManager(ThreadPool outcallThreadPool, QueueDatabase database, 
-		SchedulingEvent schedulingEvent, Connection connection, 
+	public BESManager(QueueDatabase database, 
+		SchedulingEvent schedulingEvent, Connection connection,
+		InformationPortal<BESInformation> informationPortal,
 		DatabaseConnectionPool connectionPool) 
 			throws SQLException, ResourceException, 
 				GenesisIISecurityException
 	{
-		_connectionPool = connectionPool;
+		_besInformation = new HashMap<Long, BESInformation>();
+		
+		_informationPortal = informationPortal;
 		_database = database;
 		_schedulingEvent = schedulingEvent;
-		_outcallThreadPool = outcallThreadPool;
 		
 		loadFromDatabase(connection);
 		
@@ -125,6 +130,14 @@ public class BESManager implements Closeable
 		 * being lazy but its a lot easier to have the guy wake up frequently
 		 * and check to see if anyone needs an update. */
 		_updater = new BESResourceUpdater(connectionPool, this, _BES_UPDATE_CYCLE / 10);
+	}
+	
+	BESInformation getBESInformation(long besID)
+	{
+		synchronized(_besInformation)
+		{
+			return _besInformation.get(besID);
+		}
 	}
 	
 	protected void finalize() throws Throwable
@@ -453,8 +466,48 @@ public class BESManager implements Closeable
 			BESData data = _containersByID.get(new Long(info.getBESID()));
 			if (data != null)
 				besName = data.getName();
-			_outcallThreadPool.enqueue(new BESUpdateWorker(_connectionPool,
-				this, info.getBESID(), besName, resolver));
+			
+			markBESAsMissed(data.getID(), "Startup Procedure.");
+			_informationPortal.getInformation(
+				new BESEndpoint(_database.getQueueID(),
+					info.getBESID(), besName, resolver),
+				new InformationUpdateListener());
+		}
+	}
+	
+	private class InformationUpdateListener 
+		implements InformationListener<BESInformation>
+	{
+		@Override
+		public void informationUpdated(InformationEndpoint endpoint,
+			InformationResult<BESInformation> information)
+		{
+			BESEndpoint besEndpoint = (BESEndpoint)endpoint;
+			
+			_logger.trace(String.format(
+				"Received update information about %s -- %s.",
+				endpoint, information));
+			
+			synchronized(_besInformation)
+			{
+				_besInformation.put(besEndpoint.getBESID(), 
+					information.information());
+			}
+			
+			if (information.wasResponsive())
+			{
+				if (information.information().isAcceptingNewActivities())
+					markBESAsAvailable(besEndpoint.getBESID());
+				else
+					markBESAsUnavailable(besEndpoint.getBESID(),
+						"Not currently accepting activities.");
+			} else
+			{
+				markBESAsMissed(besEndpoint.getBESID(), String.format(
+					"Exception during communication %s(%s)",
+					information.exception().getClass().getName(),
+					information.exception().getLocalizedMessage()));
+			}
 		}
 	}
 	

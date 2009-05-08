@@ -248,17 +248,27 @@ public class Scheduler implements Closeable
 		{
 			ResourceSlots rSlots = slots.next();
 			
-			if (matcher.matches(queuedJob.getJobID(), rSlots.getBESID()))
+			try
 			{
-				/* If there was a match, reserve the slot */
-				rSlots.reserveSlot();
-				
-				/* If we just reserved the last available slot, take it out
-				 * of the list.
-				 */
-				if (rSlots.slotsAvailable() <= 0)
-					slots.remove();
-				return new ResourceMatch(queuedJob.getJobID(), rSlots.getBESID());
+				if (matcher.matches(
+					_jobManager.getJSDL(queuedJob.getJobID()), 
+					_besManager.getBESInformation(rSlots.getBESID())))
+				{
+					/* If there was a match, reserve the slot */
+					rSlots.reserveSlot();
+					
+					/* If we just reserved the last available slot, take it out
+					 * of the list.
+					 */
+					if (rSlots.slotsAvailable() <= 0)
+						slots.remove();
+					return new ResourceMatch(queuedJob.getJobID(), 
+						rSlots.getBESID());
+				}
+			}
+			catch (Throwable cause)
+			{
+				_logger.warn("Error trying to match job to resource.", cause);
 			}
 		}
 		

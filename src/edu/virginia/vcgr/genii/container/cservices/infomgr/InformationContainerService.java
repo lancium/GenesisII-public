@@ -3,11 +3,11 @@ package edu.virginia.vcgr.genii.container.cservices.infomgr;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.client.utils.Duration;
 import edu.virginia.vcgr.genii.container.cservices.AbstractContainerService;
 
 /**
@@ -94,8 +94,7 @@ public class InformationContainerService extends AbstractContainerService
 	public <InfoType> InformationPortal<InfoType> createNewPortal(
 		InformationPersister<InfoType> persister,
 		InformationResolver<InfoType> resolver,
-		long timeout, TimeUnit timeoutUnits,
-		long cacheWindow, TimeUnit cacheWindowUnits)
+		Duration defaultTimeout, Duration defaultCacheWindow)
 	{
 		if (persister == null)
 			throw new IllegalArgumentException(
@@ -105,13 +104,13 @@ public class InformationContainerService extends AbstractContainerService
 			throw new IllegalArgumentException(
 				"The \"resolver\" parameter cannot be null.");
 		
-		if (timeoutUnits == null)
-			timeoutUnits = TimeUnit.MILLISECONDS;
+		if (defaultTimeout == null)
+			defaultTimeout = Duration.InfiniteDuration;
 		
-		if (cacheWindowUnits == null)
-			cacheWindowUnits = TimeUnit.MILLISECONDS;
+		if (defaultCacheWindow == null)
+			defaultCacheWindow = Duration.InfiniteDuration;
 		
 		return new InformationPortal<InfoType>(_executor, persister, resolver, 
-			timeout, timeoutUnits, cacheWindow, cacheWindowUnits);
+			defaultTimeout, defaultCacheWindow);
 	}
 }

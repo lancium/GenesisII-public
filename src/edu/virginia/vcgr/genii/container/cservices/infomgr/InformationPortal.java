@@ -10,7 +10,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executor;
-import java.util.concurrent.TimeUnit;
+
+import edu.virginia.vcgr.genii.client.utils.Duration;
 
 /**
  * An Information Portal is a portal through which "information" can be 
@@ -23,8 +24,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class InformationPortal<InformationType> implements Closeable
 {
-	private long _timeout;
-	private long _cacheWindow;
+	private Duration _defaultTimeout;
+	private Duration _defaultCacheWindow;
 	
 	private Executor _executor;
 	private boolean _closed = false;
@@ -69,17 +70,14 @@ public class InformationPortal<InformationType> implements Closeable
 	InformationPortal(Executor executor,
 		InformationPersister<InformationType> persister,
 		InformationResolver<InformationType> resolver,
-		long timeout, TimeUnit timeoutUnits,
-		long cacheWindow, TimeUnit cacheWindowUnits)
+		Duration defaultTimeout, Duration defaultCacheWindow)
 	{
 		_executor = executor;
 		_persister = persister;
 		_resolver = resolver;
 		
-		_timeout = TimeUnit.MILLISECONDS.convert(
-			timeout, timeoutUnits);
-		_cacheWindow = TimeUnit.MILLISECONDS.convert(
-			cacheWindow, cacheWindowUnits);
+		_defaultTimeout = defaultTimeout;
+		_defaultCacheWindow = defaultCacheWindow;
 		
 		Thread th = new Thread(new TimeoutWorker(), 
 			"Information Portal Timeout Worker");
@@ -88,13 +86,18 @@ public class InformationPortal<InformationType> implements Closeable
 	}
 	
 	public void getInformation(InformationEndpoint endpoint,
-		InformationListener<InformationType> listener)
+		InformationListener<InformationType> listener,
+		Duration timeout, Duration cacheWindow)
 	{
-		Calendar timeout = Calendar.getInstance();
-		timeout.setTimeInMillis(timeout.getTimeInMillis() + _timeout);
+		if (timeout == null)
+			timeout = _defaultTimeout;
+		if (cacheWindow == null)
+			cacheWindow = _defaultCacheWindow;
+		
+		Calendar timeoutExpiration = timeout.getExpiration();
 		
 		WaitingListener<InformationType> waiter =
-			new WaitingListener<InformationType>(listener, timeout);
+			new WaitingListener<InformationType>(listener, timeoutExpiration);
 		
 		synchronized(_waitingListeners)
 		{
@@ -103,8 +106,8 @@ public class InformationPortal<InformationType> implements Closeable
 				InformationResult<InformationType> result =
 					_persister.get(endpoint);
 				if (result != null &&
-					result.lastUpdated().getTimeInMillis() + _cacheWindow >
-						System.currentTimeMillis())
+					cacheWindow.getExpiration(
+						result.lastUpdated()).after(Calendar.getInstance()))
 				{
 					listener.informationUpdated(endpoint, result);
 					return;
@@ -132,13 +135,28 @@ public class InformationPortal<InformationType> implements Closeable
 		_executor.execute(new ResolverWorker(endpoint));
 	}
 	
-	public InformationResult<InformationType> getInformation(InformationEndpoint endpoint) 
-		throws InterruptedException
+	public void getInformation(InformationEndpoint endpoint,
+		InformationListener<InformationType> listener)
+	{
+		getInformation(endpoint, listener, _defaultTimeout,
+			_defaultCacheWindow);
+	}
+	
+	public InformationResult<InformationType> getInformation(
+		InformationEndpoint endpoint,
+		Duration timeout, Duration cacheWindow) throws InterruptedException
 	{
 		BlockingInformationListener<InformationType> listener =
 			new BlockingInformationListener<InformationType>();
-		getInformation(endpoint, listener);
+		getInformation(endpoint, listener, timeout, cacheWindow);
 		return listener.get();
+	}
+	
+	public InformationResult<InformationType> getInformation(
+		InformationEndpoint endpoint) throws InterruptedException
+	{
+		return getInformation(endpoint,
+			_defaultTimeout, _defaultCacheWindow);
 	}
 	
 	@Override
@@ -242,7 +260,7 @@ public class InformationPortal<InformationType> implements Closeable
 			
 			try
 			{
-				info = _resolver.acquire(_endpoint, _timeout, TimeUnit.MILLISECONDS);
+				info = _resolver.acquire(_endpoint, _defaultTimeout);
 				result = new InformationResult<InformationType>(
 					info, Calendar.getInstance(), null);
 			}

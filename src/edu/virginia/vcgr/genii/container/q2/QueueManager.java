@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,7 +20,14 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.client.utils.Duration;
+import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
+import edu.virginia.vcgr.genii.container.cservices.infomgr.InMemoryPersister;
+import edu.virginia.vcgr.genii.container.cservices.infomgr.InformationContainerService;
+import edu.virginia.vcgr.genii.container.cservices.infomgr.InformationPortal;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.q2.besinfo.BESInformation;
+import edu.virginia.vcgr.genii.container.q2.besinfo.BESInformationResolver;
 import edu.virginia.vcgr.genii.queue.JobErrorPacket;
 import edu.virginia.vcgr.genii.queue.JobInformationType;
 import edu.virginia.vcgr.genii.queue.ReducedJobInformationType;
@@ -67,6 +75,26 @@ public class QueueManager implements Closeable
 	 */
 	static private HashMap<String, QueueManager> _queueManager =
 		new HashMap<String, QueueManager>(_DEFAULT_MANAGER_COUNT);
+	
+	static private InformationPortal<BESInformation> _informationPortal = null;
+	
+	synchronized static InformationPortal<BESInformation> 
+		informationPortal()
+	{
+		if (_informationPortal == null)
+		{
+			InformationContainerService service = 
+				(InformationContainerService)ContainerServices.findService(
+						InformationContainerService.SERVICE_NAME);
+			_informationPortal = service.createNewPortal(
+				new InMemoryPersister<BESInformation>(),
+				new BESInformationResolver(_connectionPool),
+				new Duration(30, TimeUnit.SECONDS),
+				new Duration(10, TimeUnit.MINUTES));
+		}
+		
+		return _informationPortal;
+	}
 	
 	/**
 	 * Create and start (active threads) all queue managers registered
@@ -211,9 +239,9 @@ public class QueueManager implements Closeable
 		try
 		{
 			connection = _connectionPool.acquire();
-			_besManager = new BESManager(_outcallThreadPool,
+			_besManager = new BESManager(
 				_database, _schedulingEvent, 
-				connection, _connectionPool);
+				connection, informationPortal(), _connectionPool);
 			_jobManager = new JobManager(_outcallThreadPool,
 				_database, _schedulingEvent, _besManager, connection, _connectionPool);
 			_scheduler = new Scheduler(_schedulingEvent, _connectionPool,

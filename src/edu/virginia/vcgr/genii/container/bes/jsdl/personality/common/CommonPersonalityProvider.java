@@ -2,9 +2,12 @@ package edu.virginia.vcgr.genii.container.bes.jsdl.personality.common;
 
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
+import edu.virginia.vcgr.genii.client.jsdl.personality.CPUArchitectureFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.DataStagingFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.FileSystemFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.JobIdentificationFacet;
+import edu.virginia.vcgr.genii.client.jsdl.personality.OperatingSystemFacet;
+import edu.virginia.vcgr.genii.client.jsdl.personality.OperatingSystemTypeFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.ResourcesFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.SourceURIFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.TargetURIFacet;
@@ -65,5 +68,26 @@ public class CommonPersonalityProvider extends DefaultPersonalityProvider
 		throws JSDLException
 	{
 		return new CommonTargetURIFacet();
+	}
+
+	@Override
+	public CPUArchitectureFacet getCPUArchitectureFacet(
+			Object currentUnderstanding) throws JSDLException
+	{
+		return new CommonCPUArchitectureFacet();
+	}
+
+	@Override
+	public OperatingSystemFacet getOperatingSystemFacet(
+			Object currentUnderstanding) throws JSDLException
+	{
+		return new CommonOperatingSystemFacet();
+	}
+
+	@Override
+	public OperatingSystemTypeFacet getOperatingSystemTypeFacet(
+			Object currentUnderstanding) throws JSDLException
+	{
+		return new CommonOperatingSystemTypeFacet();
 	}
 }

@@ -1,9 +1,13 @@
 package edu.virginia.vcgr.genii.container.jsdl.parser;
 
+import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
+import edu.virginia.vcgr.genii.client.jsdl.personality.CPUArchitectureFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.DataStagingFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.FileSystemFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.HPCApplicationFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.JobIdentificationFacet;
+import edu.virginia.vcgr.genii.client.jsdl.personality.OperatingSystemFacet;
+import edu.virginia.vcgr.genii.client.jsdl.personality.OperatingSystemTypeFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.POSIXApplicationFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.ResourcesFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.SPMDApplicationFacet;
@@ -76,5 +80,26 @@ public class ExecutionProvider extends DefaultPersonalityProvider
 		Object currentUnderstanding)
 	{
 		return new ExecutionSPMDApplicationFacet();
+	}
+
+	@Override
+	public CPUArchitectureFacet getCPUArchitectureFacet(
+			Object currentUnderstanding) throws JSDLException
+	{
+		return new ExecutionCPUArchitectureFacet();
+	}
+
+	@Override
+	public OperatingSystemFacet getOperatingSystemFacet(
+			Object currentUnderstanding) throws JSDLException
+	{
+		return new ExecutionOperatingSystemFacet();
+	}
+
+	@Override
+	public OperatingSystemTypeFacet getOperatingSystemTypeFacet(
+			Object currentUnderstanding) throws JSDLException
+	{
+		return new ExecutionOperatingSystemTypeFacet();
 	}
 }

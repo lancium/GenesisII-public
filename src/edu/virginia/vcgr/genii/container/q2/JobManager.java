@@ -485,6 +485,22 @@ public class JobManager implements Closeable
 		}
 	}
 	
+	synchronized public JobDefinition_Type getJSDL(long jobID) 
+		throws SQLException, ResourceException
+	{
+		Connection connection = null;
+		
+		try
+		{
+			connection = _connectionPool.acquire();
+			return _database.getJSDL(connection, jobID);
+		}
+		finally
+		{
+			_connectionPool.release(connection);
+		}
+	}
+	
 	/**
 	 * Get the job status for jobs in the queue.  This operation IS subject to
 	 * owner verification.  This means that only the owner of a job is allowed

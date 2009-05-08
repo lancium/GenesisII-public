@@ -80,6 +80,7 @@ import edu.virginia.vcgr.genii.client.bes.GeniiBESConstants;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.comm.ClientConstructionParameters;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
@@ -92,6 +93,7 @@ import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.utils.creation.CreationProperties;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
+import edu.virginia.vcgr.genii.common.MatchingParameter;
 import edu.virginia.vcgr.genii.common.notification.Notify;
 import edu.virginia.vcgr.genii.common.notification.Subscribe;
 import edu.virginia.vcgr.genii.common.notification.UserDataType;
@@ -450,6 +452,21 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 		any.add(new MessageElement(downtime, dt));
 	}
 	
+	private void addMatchingParameters(Collection<MessageElement> any) 
+		throws ResourceUnknownFaultType, ResourceException
+	{
+		IResource resource = ResourceManager.getCurrentResource().dereference();
+		Collection<MatchingParameter> matchingParams = 
+			resource.getMatchingParameters();
+		for (MatchingParameter param : matchingParams)
+		{
+			MessageElement me = new MessageElement(
+				GenesisIIBaseRP.MATCHING_PARAMTER_ATTR_QNAME,
+				param);
+			any.add(me);
+		}
+	}
+	
 	@Override
 	@RWXMapping(RWXCategory.READ)
 	public GetFactoryAttributesDocumentResponseType getFactoryAttributesDocument(
@@ -479,6 +496,7 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 		}
 		
 		addAndrewsClassAttributes(resourceName, any);
+		addMatchingParameters(any);
 		
 		try
 		{

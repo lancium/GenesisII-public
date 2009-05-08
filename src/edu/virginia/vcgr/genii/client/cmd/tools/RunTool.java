@@ -460,6 +460,7 @@ public class RunTool extends BaseGridTool
 			JobDefinition_Type jobDef = 
 				(JobDefinition_Type)ObjectDeserializer.deserialize(
 					new InputSource(fin), JobDefinition_Type.class);
+			
 			if (optJobName != null)
 			{
 				JobIdentification_Type ident =
