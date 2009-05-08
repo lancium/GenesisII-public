@@ -57,10 +57,11 @@ import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
-import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
-import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
+import edu.virginia.vcgr.genii.client.security.authz.rwx.*;
+import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
+import edu.virginia.vcgr.genii.client.security.credentials.TransientCredentials;
+import edu.virginia.vcgr.genii.client.security.credentials.assertions.*;
+import edu.virginia.vcgr.genii.client.security.credentials.identity.X509Identity;
 import edu.virginia.vcgr.genii.client.security.WSSecurityUtils;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
@@ -75,11 +76,10 @@ import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.client.security.*;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
-import edu.virginia.vcgr.genii.client.comm.axis.security.FlexibleBouncyCrypto;
+import edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
 import edu.virginia.vcgr.genii.container.Container;
 
 import edu.virginia.vcgr.genii.x509authn.*;
@@ -188,7 +188,7 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 				.getLocalPart(), newIdpName);
 
 		// determine the credential the idp will front
-		GamlCredential credential = null;
+		GIICredential credential = null;
 		MessageElement encodedCredential =
 				(MessageElement) constructionParameters
 						.get(SecurityConstants.IDP_DELEGATED_CREDENTIAL_QNAME);
@@ -288,8 +288,8 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 
 		ResourceKey rKey = ResourceManager.getCurrentResource();
 		IRNSResource resource = (IRNSResource) rKey.dereference();
-		GamlCredential credential =
-				(GamlCredential) resource
+		GIICredential credential =
+				(GIICredential) resource
 						.getProperty(SecurityConstants.IDP_DELEGATED_CREDENTIAL_QNAME
 								.getLocalPart());
 
@@ -490,7 +490,7 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 													new X509Security(subElement);
 											X509Certificate delegateTo =
 													bstToken
-															.getX509Certificate(new FlexibleBouncyCrypto());
+															.getX509Certificate(new GIIBouncyCrypto());
 											delegateToChain =
 													new X509Certificate[] { delegateTo };
 										}
@@ -504,7 +504,7 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 													bstToken
 															.getX509Certificates(
 																	false,
-																	new edu.virginia.vcgr.genii.client.comm.axis.security.FlexibleBouncyCrypto());
+																	new edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto());
 										}
 										else
 										{

@@ -147,4 +147,9 @@ public interface ICommandLine
 	 * @return An array of all of the option values stored in this command line.
 	 */
 	public String[] getOptionValues(String optionName);
+	
+	/**
+	 * Returns true if the command line has no arguments, options, or flags
+	 */
+	public boolean isEmpty();
 }

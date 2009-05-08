@@ -35,14 +35,14 @@ public interface ICallingContext
 	 * Gets a multi-value property.  Null if does not exist, otherwise 
 	 * a non-empty ArrayList
 	 */
-	public ArrayList<Serializable> getProperty(String name);
+	public Collection<Serializable> getProperty(String name);
 
 	/**
 	 * Sets a multi-value property.  Overwrites any prevous properties
 	 * at this level (Overloads, but does not overwrite a same-named 
 	 * parent property.) 
 	 */
-	public void setProperty(String name, ArrayList<Serializable> values);
+	public void setProperty(String name, Collection<Serializable> values);
 	
 	/**
 	 * Removes a multi-value property from all levels (including parent). 

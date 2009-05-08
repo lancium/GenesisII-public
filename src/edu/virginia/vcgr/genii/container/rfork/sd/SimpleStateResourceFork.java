@@ -6,9 +6,9 @@ import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 
 import org.apache.commons.logging.Log;
-import org.mortbay.log.LogFactory;
+import org.apache.commons.logging.LogFactory;
 
-import edu.virginia.vcgr.genii.client.security.authz.RWXMappingResolver;
+import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMappingResolver;
 import edu.virginia.vcgr.genii.container.rfork.AbstractStreamableByteIOFactoryResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 

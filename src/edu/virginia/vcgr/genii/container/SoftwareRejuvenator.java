@@ -3,7 +3,7 @@ package edu.virginia.vcgr.genii.container;
 import java.text.ParseException;
 
 import org.apache.commons.logging.Log;
-import org.mortbay.log.LogFactory;
+import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;

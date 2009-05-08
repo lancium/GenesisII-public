@@ -31,20 +31,26 @@ import org.morgan.util.configuration.ConfigurationException;
 
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
+import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.context.*;
-import edu.virginia.vcgr.genii.client.security.MessageLevelSecurity;
+import edu.virginia.vcgr.genii.client.security.MessageLevelSecurityRequirements;
 import edu.virginia.vcgr.genii.common.security.*;
-import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
-import edu.virginia.vcgr.genii.client.security.authz.RWXManager;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
+import edu.virginia.vcgr.genii.client.security.authz.acl.Acl;
+import edu.virginia.vcgr.genii.client.security.authz.acl.AclEntry;
+import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
+import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXManager;
+import edu.virginia.vcgr.genii.client.security.authz.*;
+import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
+import edu.virginia.vcgr.genii.client.security.credentials.TransientCredentials;
+import edu.virginia.vcgr.genii.client.security.credentials.assertions.*;
+import edu.virginia.vcgr.genii.client.security.credentials.identity.*;
 import edu.virginia.vcgr.genii.container.resource.*;
 import edu.virginia.vcgr.genii.client.resource.*;
-import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.container.Container;
 
 /**
+ * AuthZ provider implementation of GII Acls: an access-control mechanism 
+ * comprised of read/write/execute policy-sets.
  * 
  * NOTES: - The presence of a NULL certificate in the ACL indicates open access. -
  * A NULL ACL indicates no access
@@ -61,13 +67,16 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 	static public final String GAML_DEFAULT_OWNER_CERT_PATH =
 			"genii.security.authz.bootstrapOwnerCertPath";
 
-	static protected final MessageLevelSecurity _defaultMinMsgSec =
-			new MessageLevelSecurity(MessageLevelSecurity.SIGN);
+	
+	static protected final MessageLevelSecurityRequirements _defaultMinMsgSec =
+// dgm4d: no longer need SIGN now that we do ssl holder-of-key 
+//        authn of msg-level creds
+//			new MessageLevelSecurity(MessageLevelSecurity.SIGN);	
+			new MessageLevelSecurityRequirements(MessageLevelSecurityRequirements.NONE);
 
 	static protected HashMap<String, X509Certificate> _defaultCertCache =
 			new HashMap<String, X509Certificate>();
 
-	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(GamlAclAuthZProvider.class);
 
 	X509Certificate _defaultInitialResourceOwner = null;
@@ -125,7 +134,7 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 					TransientCredentials
 							.getTransientCredentials(callingContext);
 
-			for (GamlCredential cred : transientCredentials._credentials)
+			for (GIICredential cred : transientCredentials._credentials)
 			{
 
 				if (cred instanceof Identity)
@@ -166,7 +175,7 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 		defaultOwners.add(new X509Identity((X509Certificate[]) resource
 				.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME)));
 
-		GamlAcl acl = new GamlAcl();
+		Acl acl = new Acl();
 		acl.readAcl.addAll(defaultOwners);
 		acl.writeAcl.addAll(defaultOwners);
 		acl.executeAcl.addAll(defaultOwners);
@@ -175,11 +184,11 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 	}
 
 	protected boolean checkAclAccess(Identity identity, Class<?> serviceClass,
-		Method operation, GamlAcl acl) throws AuthZSecurityException
+		Method operation, Acl acl) throws AuthZSecurityException
 	{
 
 		RWXCategory category = RWXManager.lookup(serviceClass, operation);
-		ArrayList<Identity> trustList = null;
+		Collection<AclEntry> trustList = null;
 		switch (category)
 		{
 		case READ:
@@ -207,209 +216,86 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 		}
 		else
 		{
-
-			if (trustList.contains(identity))
+			// go through the AclEntries
+			for (AclEntry entry : trustList) 
 			{
-				// all's good if we straight-up contain this specific identity
-				// (We assume that if identity is a crypto token, it has 
-				// been validated and verified)
-				return true;
-
-			}
-/*
- * We no longer use the trust-chain mechanism for authorization: it was
- * causing some issue when new users' cert chains included host-container
- * certs as intermediate authorities, allowing them access when it was 
- * only intended for those authenticated as the host-container itself.
- * 
- * 
-			else if (identity instanceof X509Identity)
-			{
-
-				X509Certificate[] identityCertChain =
-						((X509Identity) identity)
-								.getAssertingIdentityCertChain();
-				
-				// use the acl's x509 identities as a trust store
-				try
-				{
-					// create an in-memory cert keystore for the trusted certs
-					KeyStore ks = KeyStore.getInstance("JKS");
-					ks.load(null, null);
-
-					// add the trusted certs into the memory-keystore
-					for (Identity trustedIdentity : trustList)
-					{
-						if (trustedIdentity instanceof X509Identity)
-						{
-							X509Certificate trustedCert =
-									((X509Identity) trustedIdentity)
-											.getAssertingIdentityCertChain()[0];
-							ks.setCertificateEntry(trustedCert
-									.getSubjectX500Principal().getName(),
-									trustedCert);
-						}
+				try {
+					if (entry.isPermitted(identity)) {
+						return true;
 					}
-
-					// create a trust manager from the key store
-					PKIXBuilderParameters pkixParams =
-							new PKIXBuilderParameters(ks,
-									new X509CertSelector());
-					pkixParams.setRevocationEnabled(false);
-					ManagerFactoryParameters trustParams =
-							new CertPathTrustManagerParameters(pkixParams);
-					TrustManagerFactory tmf =
-							TrustManagerFactory.getInstance("PKIX");
-					tmf.init(trustParams);
-					X509TrustManager trustManager =
-							(X509TrustManager) tmf.getTrustManagers()[0];
-					try
-					{
-						trustManager.checkClientTrusted(identityCertChain,
-								identityCertChain[0].getPublicKey()
-										.getAlgorithm());
-					}
-					catch (CertificateException e)
-					{
-						return false;
-					}
-
-					return true;
-
-				}
-				catch (IOException e)
-				{
-					throw new AuthZSecurityException("Unable to check ACLs.", e);
-				}
-				catch (java.security.GeneralSecurityException e)
-				{
-					throw new AuthZSecurityException("Unable to check ACLs.", e);
+				} catch (Exception e) {
 				}
 			}
-*/
-
 		}
 
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
-	public boolean checkAccess(ICallingContext callingContext,
-		X509Certificate callerCert, IResource resource, 
-		Class<?> serviceClass, Method operation)
-			throws AuthZSecurityException, ResourceException
+	
+
+	
+	
+	public void checkAccess(
+		Collection<GIICredential> authenticatedCallerCredentials,
+		IResource resource, 
+		Class<?> serviceClass, 
+		Method operation)
+			throws PermissionDeniedException, AuthZSecurityException, ResourceException
 	{
 
 		try
 		{
+			ICallingContext callContext = ContextManager.getCurrentContext(false);
 
 			// get ACL
-			GamlAcl acl =
-					(GamlAcl) resource.getProperty(GAML_ACL_PROPERTY_NAME);
+			Acl acl = (Acl) resource.getProperty(GAML_ACL_PROPERTY_NAME);
 
-			// check the wildcard access
+			// pre-emptive check of the wildcard access
 			if ((acl == null) || checkAclAccess(null, serviceClass, operation, acl))
 			{
-				return true;
-			}
-
-			if (callingContext == null)
-			{
-				throw new AuthZSecurityException(
-						"Error processing GAML credential: No calling context");
-			}
-
-			// get the destination certificate from the calling context
-			KeyAndCertMaterial targetKeyMaterial =
-					ContextManager.getCurrentContext(false)
-							.getActiveKeyAndCertMaterial();
-			X509Certificate[] targetCertChain = null;
-			if (targetKeyMaterial != null)
-			{
-				targetCertChain = targetKeyMaterial._clientCertChain;
+				return;
 			}
 
 			// try each identity in the caller's credentials
-			boolean allowed = false;
-			ArrayList<GamlCredential> callerCredentials =
-					(ArrayList<GamlCredential>) callingContext
-							.getTransientProperty(GamlCredential.CALLER_CREDENTIALS_PROPERTY);
-			for (GamlCredential cred : callerCredentials)
+			for (GIICredential cred : authenticatedCallerCredentials)
 			{
-
-				if (cred instanceof SignedAssertion)
+				if (cred instanceof Identity)
 				{
-
-					// a signed assertion: need to check validity and
-					// verify authenticity
-					SignedAssertion signedAssertion = (SignedAssertion) cred;
-					signedAssertion.checkValidity(new Date());
-					signedAssertion.validateAssertion();
-
-					// if the assertion is pre-authorized for us, unwrap one
-					// layer
-					if ((targetCertChain != null)
-							&& (signedAssertion.getAuthorizedIdentity()[0]
-									.equals(targetCertChain[0])))
-					{
-						if (!(signedAssertion instanceof DelegatedAssertion))
-						{
-							throw new AuthZSecurityException(
-									"GAML credential \""
-											+ signedAssertion
-											+ "\" does not match the incoming message sender");
-						}
-						signedAssertion =
-								((DelegatedAssertion) signedAssertion).unwrap();
-					}
-
-					// verify that the request message signer is the same as the
-					// authorized user of the assertion
-					if (!signedAssertion.getAuthorizedIdentity()[0]
-							.equals(callerCert))
-					{
-						throw new AuthZSecurityException(
-								"GAML credential \""
-										+ signedAssertion
-										+ "\" does not match the incoming message sender");
-					}
-
-					// if its an identity assertion, check it against our ACLs
-					if (signedAssertion.getAttribute() instanceof IdentityAttribute)
-					{
-						IdentityAttribute identityAttr =
-								(IdentityAttribute) signedAssertion
-										.getAttribute();
-
-						if (checkAclAccess(identityAttr.getIdentity(),
-							serviceClass, operation, acl))
-						{
-							allowed = true;
-						}
-					}
-				}
-				else if (cred instanceof Identity)
-				{
-
-					// a simple identity
+					// straight-up identity
 					if (checkAclAccess((Identity) cred, serviceClass, operation, acl))
 					{
-						allowed = true;
+						return;
 					}
-
+				}
+				else if (cred instanceof SignedAssertion) 
+				{
+					// possibly unwrap an identity from an IdentityAttribute
+					SignedAssertion sa = (SignedAssertion) cred;
+					if (sa.getAttribute() instanceof IdentityAttribute) 
+					{
+						IdentityAttribute ia = (IdentityAttribute) sa.getAttribute();
+						if (checkAclAccess(ia.getIdentity(), serviceClass, operation, acl))
+						{
+							return;
+						}
+					}
 				}
 			}
 
-			if (!allowed)
+			// Check Administrator Access
+			if (Security.isAdministrator(callContext))
 			{
-				throw new PermissionDeniedException(operation.getName());
-			}
+				_logger.info("Method call made as admin.");
+				return;
+			}			
 
-			return true;
-
+			// Nobody appreciates us
+			throw new PermissionDeniedException(operation.getName());
 		}
 		catch (AuthZSecurityException ase)
 		{
+			// Re-throw (it's a subclass of IOException, which we do want
+			// to trap)
 			throw ase;
 		}
 		catch (IOException e)
@@ -422,14 +308,9 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 			throw new AuthZSecurityException(
 					"Error processing GAML credential.", e);
 		}
-		catch (GeneralSecurityException e)
-		{
-			throw new AuthZSecurityException(
-					"Error processing GAML credential.", e);
-		}
 	}
 
-	public MessageLevelSecurity getMinIncomingMsgLevelSecurity(
+	public MessageLevelSecurityRequirements getMinIncomingMsgLevelSecurity(
 			IResource resource) throws AuthZSecurityException,
 			ResourceException
 	{
@@ -437,22 +318,22 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 		try
 		{
 			// get ACL
-			GamlAcl acl =
-					(GamlAcl) resource.getProperty(GAML_ACL_PROPERTY_NAME);
+			Acl acl =
+					(Acl) resource.getProperty(GAML_ACL_PROPERTY_NAME);
 
 			if (acl == null)
 			{
 
 				// return no security requirements if null ACL
-				return new MessageLevelSecurity(MessageLevelSecurity.NONE);
+				return new MessageLevelSecurityRequirements(MessageLevelSecurityRequirements.NONE);
 
 			}
 			else if (acl.requireEncryption)
 			{
 
 				// add in encryption
-				return _defaultMinMsgSec.computeUnion(new MessageLevelSecurity(
-						MessageLevelSecurity.ENCRYPT));
+				return _defaultMinMsgSec.computeUnion(new MessageLevelSecurityRequirements(
+						MessageLevelSecurityRequirements.ENCRYPT));
 			}
 
 			return _defaultMinMsgSec;
@@ -471,12 +352,12 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 		try
 		{
 			// get ACL
-			GamlAcl acl =
-					(GamlAcl) resource.getProperty(GAML_ACL_PROPERTY_NAME);
+			Acl acl =
+					(Acl) resource.getProperty(GAML_ACL_PROPERTY_NAME);
 
 			if (acl != null)
 			{
-				return GamlAcl.encodeAcl(acl);
+				return Acl.encodeAcl(acl);
 			}
 
 			return new AuthZConfig(null);
@@ -493,7 +374,7 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 			throws AuthZSecurityException, ResourceException
 	{
 
-		GamlAcl acl = GamlAcl.decodeAcl(config);
+		Acl acl = Acl.decodeAcl(config);
 		resource.setProperty(GAML_ACL_PROPERTY_NAME, acl);
 		resource.commit();
 	}

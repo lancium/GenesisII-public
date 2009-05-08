@@ -18,6 +18,7 @@ package org.morgan.util.cmdline;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.StringTokenizer;
 
 /**
@@ -125,6 +126,10 @@ public class CommandLine implements ICommandLine
 				addArgument(arg);
 		}
 	}
+	
+	public CommandLine(List<String> args) {
+		this(args.toArray(new String[args.size()]));
+	}
 
 	public CommandLine(String []args) {
 		this(args, true);
@@ -143,6 +148,14 @@ public class CommandLine implements ICommandLine
 		}
 	}
 	
+	/**
+	 * Returns true if the command line has no arguments, options, or flags
+	 */
+	public boolean isEmpty() 
+	{
+		return _flags.isEmpty() && _options.isEmpty() && _arguments.isEmpty();
+	}
+
 	public int numArguments()
 	{
 		return _arguments.size();

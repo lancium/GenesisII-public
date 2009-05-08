@@ -21,12 +21,11 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 
 import org.morgan.util.io.StreamUtils;
-import org.mortbay.http.HttpException;
-import org.mortbay.http.HttpRequest;
-import org.mortbay.http.HttpResponse;
-import org.mortbay.http.handler.AbstractHttpHandler;
+import org.mortbay.jetty.*;
+import org.mortbay.jetty.handler.*;
+import javax.servlet.http.*;
 
-public class ResourceFileHandler extends AbstractHttpHandler
+public class ResourceFileHandler extends AbstractHandler
 {
 	static final long serialVersionUID = 0;
 		
@@ -41,8 +40,8 @@ public class ResourceFileHandler extends AbstractHttpHandler
 		}
 	}
 	
-	public void handle(String pathInContext, String pathParams,
-		HttpRequest arg2, HttpResponse arg3) 
+	public void handle(String target, HttpServletRequest arg2, 
+			HttpServletResponse arg3, int dispatch) 
 			throws HttpException, IOException
 	{
 		InputStream in = null;
@@ -53,28 +52,28 @@ public class ResourceFileHandler extends AbstractHttpHandler
 		{
 			out = arg3.getOutputStream();
 			
-			if (!pathInContext.endsWith("/"))
+			if (!target.endsWith("/"))
 			{
-				in = loader.getResourceAsStream(_resourceBase + pathInContext);
+				in = loader.getResourceAsStream(_resourceBase + target);
 				if (in == null)
 				{
 					in = loader.getResourceAsStream(
-							_resourceBase + pathInContext + "/index.html");
+							_resourceBase + target + "/index.html");
 				}
 			} else
 			{
-				in = loader.getResourceAsStream(_resourceBase + pathInContext +
+				in = loader.getResourceAsStream(_resourceBase + target +
 					"index.html");
 			}
 			
 			if (in == null)
 			{
 				throw new IOException(
-					"Couldn't find resource \"" + pathInContext + "\".");
+					"Couldn't find resource \"" + target + "\".");
 			}
 			
 			StreamUtils.copyStream(in, out);
-			arg3.commit();
+//			arg3.commit();
 		}
 		catch (IOException ioe)
 		{

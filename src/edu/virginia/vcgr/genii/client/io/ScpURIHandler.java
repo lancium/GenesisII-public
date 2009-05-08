@@ -7,7 +7,7 @@ import java.io.OutputStream;
 import java.net.URI;
 
 import edu.virginia.vcgr.genii.client.io.scp.ScpUtility;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.UsernamePasswordIdentity;
+import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
 
 public class ScpURIHandler extends AbstractURIHandler
 {

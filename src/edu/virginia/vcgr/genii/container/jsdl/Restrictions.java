@@ -1,9 +1,9 @@
 package edu.virginia.vcgr.genii.container.jsdl;
 
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.OperatingSystemTypeEnumeration;
 import org.ggf.jsdl.ProcessorArchitectureEnumeration;
-import org.mortbay.log.LogFactory;
 
 public class Restrictions
 {

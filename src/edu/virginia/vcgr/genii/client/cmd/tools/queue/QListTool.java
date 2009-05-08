@@ -8,7 +8,7 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
 import edu.virginia.vcgr.genii.client.queue.QueueManipulator;
 import edu.virginia.vcgr.genii.client.queue.ReducedJobInformation;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.Identity;
+import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
 
 public class QListTool extends BaseGridTool
 {

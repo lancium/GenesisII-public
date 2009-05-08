@@ -13,13 +13,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 
 import org.apache.commons.logging.Log;
-import org.mortbay.log.LogFactory;
+import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.queue.JobInformation;
 import edu.virginia.vcgr.genii.client.queue.QueueManipulator;
 import edu.virginia.vcgr.genii.client.security.VerbosityLevel;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.Identity;
+import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
 
 public class QueueTableModel extends AbstractTableModel
 {

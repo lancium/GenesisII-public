@@ -7,10 +7,10 @@ import java.security.cert.*;
 import javax.xml.soap.SOAPException;
 import javax.xml.namespace.QName;
 
-import edu.virginia.vcgr.genii.client.comm.axis.security.FlexibleBouncyCrypto;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
+import edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto;
+import edu.virginia.vcgr.genii.client.security.credentials.*;
+import edu.virginia.vcgr.genii.client.security.credentials.assertions.*;
+import edu.virginia.vcgr.genii.client.security.credentials.identity.*;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.ws.security.WSConstants;
@@ -121,7 +121,7 @@ public class WSSecurityUtils
 				{
 					PKIPathSecurity bstToken = new PKIPathSecurity(element);
 					return bstToken.getX509Certificates(false,
-							new FlexibleBouncyCrypto());
+							new GIIBouncyCrypto());
 				}
 				catch (GenesisIISecurityException e)
 				{
@@ -170,7 +170,7 @@ public class WSSecurityUtils
 			binaryToken.addTextNode("");
 			BinarySecurity bstToken = new PKIPathSecurity(binaryToken);
 			((PKIPathSecurity) bstToken).setX509Certificates(certChain, false,
-					new FlexibleBouncyCrypto());
+					new GIIBouncyCrypto());
 
 			MessageElement embedded =
 					new MessageElement(new QName(
@@ -226,7 +226,7 @@ public class WSSecurityUtils
 				{
 					X509Security bstToken = new X509Security(element);
 					return bstToken
-							.getX509Certificate(new FlexibleBouncyCrypto());
+							.getX509Certificate(new GIIBouncyCrypto());
 				}
 				catch (GenesisIISecurityException e)
 				{
@@ -290,7 +290,7 @@ public class WSSecurityUtils
 		}
 	}
 
-	public static GamlCredential decodeTokenElement(MessageElement tokenElement)
+	public static GIICredential decodeTokenElement(MessageElement tokenElement)
 			throws GeneralSecurityException
 	{
 

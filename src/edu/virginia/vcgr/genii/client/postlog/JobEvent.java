@@ -11,7 +11,7 @@ import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.security.SecurityUtils;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.Identity;
+import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
 
 public class JobEvent implements PostEvent
 {

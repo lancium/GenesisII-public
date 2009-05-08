@@ -9,9 +9,9 @@ import org.apache.axis.message.MessageElement;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
 import edu.virginia.vcgr.genii.client.security.*;
+import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
+import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.rns.*;
 
@@ -104,7 +104,7 @@ public class IdpTool extends GamlLoginTool {
 			
 			// log in
 			URI authnSource = (_authnUri == null) ? null : new URI(_authnUri);
-			ArrayList<GamlCredential> assertions = delegateToIdentity(
+			ArrayList<GIICredential> assertions = delegateToIdentity(
 					authnSource, 
 					ContextManager.getCurrentContext(), 
 					idpCertChain);

@@ -44,9 +44,9 @@ import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.GamlCredential;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.TransientCredentials;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
+import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
+import edu.virginia.vcgr.genii.client.security.credentials.TransientCredentials;
+import edu.virginia.vcgr.genii.client.security.credentials.assertions.*;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
@@ -130,9 +130,14 @@ public class ClientUtils
 		ICallingContext callContext, Date validUntil, 
 		SecurityUpdateResults results) throws GeneralSecurityException 
 	{
+		if (callContext == null) {
+			// we never had any client identity
+			throw new CertificateExpiredException("No calling-context in which to store credentials.");
+		}
+
 		boolean updated = false;
 		KeyAndCertMaterial retval = callContext.getActiveKeyAndCertMaterial();
-		ArrayList <GamlCredential> credentials = 
+		ArrayList <GIICredential> credentials = 
 			TransientCredentials.getTransientCredentials(callContext)._credentials;
 
 		// Ensure client identity is valid
@@ -177,10 +182,10 @@ public class ClientUtils
 				updated = true;
 				
 				// Any delegated credentials must be discarded or renewed
-				Iterator<GamlCredential> itr = credentials.iterator();
+				Iterator<GIICredential> itr = credentials.iterator();
 				while (itr.hasNext())
 				{
-					GamlCredential cred = itr.next();
+					GIICredential cred = itr.next();
 					if (cred instanceof DelegatedAssertion) 
 					{
 						if (cred instanceof Renewable) 
@@ -202,10 +207,10 @@ public class ClientUtils
 		}
 		
 		// remove stale credentials
-		Iterator<GamlCredential> itr = credentials.iterator();
+		Iterator<GIICredential> itr = credentials.iterator();
 		while (itr.hasNext()) 
 		{
-			GamlCredential cred = itr.next();
+			GIICredential cred = itr.next();
 			try 
 			{
 				// (Check 10 seconds into the future so as to avoid the credential

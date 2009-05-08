@@ -8,7 +8,7 @@ import java.util.HashMap;
 import javax.xml.namespace.QName;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.CertGeneratorUtils;
+import edu.virginia.vcgr.genii.client.security.x509.CertGeneratorUtils;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;

@@ -24,20 +24,21 @@ import java.lang.reflect.Method;
 import java.security.GeneralSecurityException;
 
 import javax.naming.Context;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.InitialDirContext;
 import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.InitialDirContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.context.*;
-import edu.virginia.vcgr.genii.client.security.MessageLevelSecurity;
+import edu.virginia.vcgr.genii.client.security.MessageLevelSecurityRequirements;
 import edu.virginia.vcgr.genii.client.security.SecurityConstants;
 import edu.virginia.vcgr.genii.common.security.*;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
+import edu.virginia.vcgr.genii.client.security.authz.*;
+import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
+import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.container.resource.*;
 import edu.virginia.vcgr.genii.client.resource.*;
 
@@ -54,9 +55,9 @@ import edu.virginia.vcgr.genii.container.security.authz.providers.*;
 public class JNDIAuthZProvider implements IAuthZProvider
 {
 
-	static protected final MessageLevelSecurity _defaultMinMsgSec =
-			new MessageLevelSecurity(MessageLevelSecurity.SIGN
-					| MessageLevelSecurity.ENCRYPT);
+	static protected final MessageLevelSecurityRequirements _defaultMinMsgSec =
+			new MessageLevelSecurityRequirements(MessageLevelSecurityRequirements.SIGN
+					| MessageLevelSecurityRequirements.ENCRYPT);
 
 	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(JNDIAuthZProvider.class);
@@ -86,25 +87,39 @@ public class JNDIAuthZProvider implements IAuthZProvider
 	}
 
 	@SuppressWarnings("unchecked")
-	public boolean checkAccess(ICallingContext callingContext,
-		X509Certificate callerCert, IResource resource, 
-		Class<?> serviceClass, Method operation)
-			throws AuthZSecurityException, ResourceException
+	public void checkAccess(
+			Collection<GIICredential> authenticatedCallerCredentials,
+			IResource resource, 
+			Class<?> serviceClass, 
+			Method operation)
+		throws PermissionDeniedException, AuthZSecurityException, ResourceException
 	{
-
+		
 		JNDIResource jndiResource = (JNDIResource) resource;
 
 		if (!jndiResource.isIdpResource())
 		{
-			return _gamlAclProvider.checkAccess(callingContext, callerCert,
+			_gamlAclProvider.checkAccess(authenticatedCallerCredentials,
 				resource, serviceClass, operation);
+			return;
+		}
+
+		ICallingContext callingContext;
+		try 
+		{
+			callingContext = ContextManager.getCurrentContext(false);
+		}
+		catch (IOException e)
+		{
+			throw new AuthZSecurityException(
+				"Calling context exception in JNDIAuthZProvider.", e);
 		}
 
 		// try each identity in the caller's credentials
-		ArrayList<GamlCredential> callerCredentials =
-				(ArrayList<GamlCredential>) callingContext
-						.getTransientProperty(GamlCredential.CALLER_CREDENTIALS_PROPERTY);
-		for (GamlCredential cred : callerCredentials)
+		ArrayList<GIICredential> callerCredentials =
+				(ArrayList<GIICredential>) callingContext
+						.getTransientProperty(GIICredential.CALLER_CREDENTIALS_PROPERTY);
+		for (GIICredential cred : callerCredentials)
 		{
 
 			if (cred instanceof UsernamePasswordIdentity)
@@ -153,10 +168,10 @@ public class JNDIAuthZProvider implements IAuthZProvider
 						ypPassword = ypPassword.substring("{crypt}".length());
 						String utPassword = utIdentity.getPassword();
 
-						if (org.mortbay.util.UnixCrypt.crypt(utPassword,
+						if (org.mortbay.jetty.security.UnixCrypt.crypt(utPassword,
 								ypPassword).equals(ypPassword))
 						{
-							return true;
+							return;
 						}
 						break;
 
@@ -183,14 +198,14 @@ public class JNDIAuthZProvider implements IAuthZProvider
 					throw new AuthZSecurityException(
 						"Naming exception in JNDIAuthZProvider.", e);
 				}
-
 			}
 		}
 
+		// Nobody appreciates us
 		throw new PermissionDeniedException(operation.getName());
 	}
 
-	public MessageLevelSecurity getMinIncomingMsgLevelSecurity(
+	public MessageLevelSecurityRequirements getMinIncomingMsgLevelSecurity(
 			IResource resource) throws AuthZSecurityException,
 			ResourceException
 	{
@@ -208,23 +223,24 @@ public class JNDIAuthZProvider implements IAuthZProvider
 	public AuthZConfig getAuthZConfig(IResource resource)
 			throws AuthZSecurityException, ResourceException
 	{
-
-		if (resource.isServiceResource())
-		{
-			return _gamlAclProvider.getAuthZConfig(resource);
-		}
-
-		return new AuthZConfig(null);
+		if ((resource instanceof IJNDIResource) && ((IJNDIResource) resource).isIdpResource()) {
+			// we are a stateless IDP resource
+			return new AuthZConfig(null);
+        }
+		
+		return _gamlAclProvider.getAuthZConfig(resource);
 	}
 
 	public void setAuthZConfig(AuthZConfig config, IResource resource)
 			throws AuthZSecurityException, ResourceException
 	{
+		if ((resource instanceof IJNDIResource) && ((IJNDIResource) resource).isIdpResource()) {
+			// we are a stateless IDP resource
+			return;
+        }
 
-		if (resource.isServiceResource())
-		{
-			_gamlAclProvider.setAuthZConfig(config, resource);
-		}
+		_gamlAclProvider.setAuthZConfig(config, resource);
 	}
+
 
 }

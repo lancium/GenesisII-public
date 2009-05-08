@@ -1,13 +1,13 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import edu.virginia.vcgr.genii.common.security.*;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.GamlClientTool;
-import edu.virginia.vcgr.genii.common.security.AuthZConfig;
+import edu.virginia.vcgr.genii.client.security.authz.acl.AclAuthZClientTool;
 
 public class AuthZTool extends BaseGridTool
 {
@@ -41,7 +41,11 @@ public class AuthZTool extends BaseGridTool
 
 			// display retrieved authz config
 			stdout.println("Authorization configuration for " + getArgument(0) + ":\n");
-			GamlClientTool subTool = new GamlClientTool();
+			
+			// Select authorization provider subtool depending on the 
+			// type of authz config we got back
+			AclAuthZClientTool subTool = new AclAuthZClientTool();
+
 			if ((config == null) || (config.get_any() == null)) {
 				stdout.println("No authorization module set.");
 			} else {

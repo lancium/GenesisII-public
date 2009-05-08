@@ -3,32 +3,32 @@ package edu.virginia.vcgr.genii.client.comm;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import edu.virginia.vcgr.genii.client.security.gamlauthz.GamlCredential;
+import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
 
 public class SecurityUpdateResults
 {
-	private Collection<GamlCredential> _removedCredentials = 
-		new LinkedList<GamlCredential>();
-	private Collection<GamlCredential> _renewedCredentials =
-		new LinkedList<GamlCredential>();
+	private Collection<GIICredential> _removedCredentials = 
+		new LinkedList<GIICredential>();
+	private Collection<GIICredential> _renewedCredentials =
+		new LinkedList<GIICredential>();
 	
-	public void noteRemovedCredential(GamlCredential cred)
+	public void noteRemovedCredential(GIICredential cred)
 	{
 		_removedCredentials.add(cred);
 	}
 	
-	public void noteRenewedCredential(GamlCredential cred)
+	public void noteRenewedCredential(GIICredential cred)
 	{
 		_renewedCredentials.add(cred);
 	}
 	
-	public Collection<GamlCredential> removedCredentials()
+	public Collection<GIICredential> removedCredentials()
 	{
-		return new LinkedList<GamlCredential>(_removedCredentials);
+		return new LinkedList<GIICredential>(_removedCredentials);
 	}
 	
-	public Collection<GamlCredential> renewedCredentials()
+	public Collection<GIICredential> renewedCredentials()
 	{
-		return new LinkedList<GamlCredential>(_renewedCredentials);
+		return new LinkedList<GIICredential>(_renewedCredentials);
 	}
 }

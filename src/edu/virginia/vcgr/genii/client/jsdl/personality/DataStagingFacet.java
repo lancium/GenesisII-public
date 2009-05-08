@@ -3,7 +3,7 @@ package edu.virginia.vcgr.genii.client.jsdl.personality;
 import org.ggf.jsdl.CreationFlagEnumeration;
 
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.UsernamePasswordIdentity;
+import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
 
 public interface DataStagingFacet extends PersonalityFacet
 {

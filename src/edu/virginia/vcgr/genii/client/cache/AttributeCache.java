@@ -7,8 +7,7 @@ import java.util.LinkedList;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
-import org.mortbay.log.LogFactory;
-
+import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 
 public class AttributeCache

@@ -21,8 +21,8 @@ import edu.virginia.vcgr.genii.client.ogsa.OGSAQNameList;
 import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.AuthZSecurityException;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.GamlAcl;
+import edu.virginia.vcgr.genii.client.security.authz.AuthZSecurityException;
+import edu.virginia.vcgr.genii.client.security.authz.acl.Acl;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
@@ -193,7 +193,7 @@ public class GenesisIIBaseAttributesHandler
 		AuthZConfig config = null;
 		if (authZHandler != null)
 			config = authZHandler.getAuthZConfig(resource);
-		GamlAcl acl = GamlAcl.decodeAcl(config);
+		Acl acl = Acl.decodeAcl(config);
 		Permissions perms = GenesisIIACLManager.getPermissions(acl, 
 			QueueSecurity.getCallerIdentities(false));
 		return new MessageElement(

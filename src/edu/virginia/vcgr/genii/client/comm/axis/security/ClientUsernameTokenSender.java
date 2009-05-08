@@ -25,8 +25,8 @@ import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
+import edu.virginia.vcgr.genii.client.security.credentials.identity.*;
+import edu.virginia.vcgr.genii.client.security.credentials.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,6 +37,12 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 
 import java.security.GeneralSecurityException;
 
+/**
+ * Client-side UsernameToken message-level security handler for outgoing 
+ * (request) messages. 
+ *  
+ * @author dgm4d
+ */
 public class ClientUsernameTokenSender extends WSDoAllSender implements
 		ISecuritySendHandler
 {
@@ -67,15 +73,15 @@ public class ClientUsernameTokenSender extends WSDoAllSender implements
 	 * perform any actions
 	 */
 	public boolean configure(ICallingContext callContext,
-			MessageSecurityData msgSecData) throws GeneralSecurityException
+			MessageSecurity msgSecData) throws GeneralSecurityException
 	{
 		_utIdentity = null;
 
 		// get credentials from calling context
-		ArrayList<GamlCredential> credentials =
+		ArrayList<GIICredential> credentials =
 				TransientCredentials.getTransientCredentials(callContext)._credentials;
 
-		for (GamlCredential cred : credentials)
+		for (GIICredential cred : credentials)
 		{
 			if (cred instanceof UsernamePasswordIdentity)
 			{

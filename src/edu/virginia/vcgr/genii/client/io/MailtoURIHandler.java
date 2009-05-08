@@ -21,7 +21,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.util.Properties;
 
-import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.UsernamePasswordIdentity;
+import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
 
 public class MailtoURIHandler extends AbstractURIHandler
 	implements IURIHandler

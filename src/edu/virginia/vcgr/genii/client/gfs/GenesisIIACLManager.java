@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.gfs;
 
+import java.security.GeneralSecurityException;
 import java.util.Collection;
 
 import org.ws.addressing.EndpointReferenceType;
@@ -9,14 +10,15 @@ import edu.virginia.vcgr.fsii.security.Permissions;
 import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.AuthZSecurityException;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.GamlAcl;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.Identity;
+import edu.virginia.vcgr.genii.client.security.authz.AuthZSecurityException;
+import edu.virginia.vcgr.genii.client.security.authz.acl.Acl;
+import edu.virginia.vcgr.genii.client.security.authz.acl.AclEntry;
+import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
 import edu.virginia.vcgr.genii.common.security.AuthZConfig;
 
 public class GenesisIIACLManager
 {
-	private GamlAcl _remoteACL = null;
+	private Acl _remoteACL = null;
 	
 	private Collection<Identity> _callerIdentities;
 	private GenesisIIBaseRP _rpStub;
@@ -31,33 +33,44 @@ public class GenesisIIACLManager
 				target, GenesisIIBaseRP.class);
 	}
 		
-	private GamlAcl getRemoteACL() throws AuthZSecurityException
+	private Acl getRemoteACL() throws AuthZSecurityException
 	{
 		if (_remoteACL == null)
 		{
 			AuthZConfig config = _rpStub.getAuthZConfig();
-			_remoteACL = GamlAcl.decodeAcl(config);
+			_remoteACL = Acl.decodeAcl(config);
 		}
 		
 		return _remoteACL;
 	}
 	
-	static private boolean hasPermission(Collection<Identity> acls,
+	static private boolean hasPermission(Collection<AclEntry> acls, 
 		Collection<Identity> callerIds)
 	{
-		for (Identity id : acls)
+		for (AclEntry entry : acls)
 		{
-			if (id == null)
+			if (entry == null)
 				return true;
 			
-			if (callerIds != null && callerIds.contains(id))
-				return true;
+			if (callerIds != null) {
+
+				for (Identity id : callerIds) 
+				{
+					try {
+						if (entry.isPermitted(id)) {
+							return true;
+						}
+					} catch (GeneralSecurityException e) {
+					}
+				}
+
+			}
 		}
 		
 		return false;
 	}
 	
-	private void setPermission(Collection<Identity> acls,
+	private void setPermission(Collection<AclEntry> acls,
 		boolean isAllowed, Collection<Identity> callerIds)
 	{
 		if (callerIds == null)
@@ -84,7 +97,7 @@ public class GenesisIIACLManager
 	}
 	
 	static public Permissions getPermissions(
-		GamlAcl acl, Collection<Identity> callerIdentities)
+		Acl acl, Collection<Identity> callerIdentities)
 	{
 		Permissions p = new Permissions();
 		
@@ -106,7 +119,7 @@ public class GenesisIIACLManager
 	
 	public void setPermissions(Permissions p) throws AuthZSecurityException
 	{
-		GamlAcl acl = getRemoteACL();
+		Acl acl = getRemoteACL();
 		setPermission(acl.readAcl, p.isSet(PermissionBits.OWNER_READ), 
 			_callerIdentities);
 		setPermission(acl.writeAcl, p.isSet(PermissionBits.OWNER_WRITE), 
@@ -120,7 +133,7 @@ public class GenesisIIACLManager
 		setPermission(acl.executeAcl, p.isSet(PermissionBits.EVERYONE_EXECUTE), 
 			null);
 		
-		AuthZConfig config = GamlAcl.encodeAcl(acl);
+		AuthZConfig config = Acl.encodeAcl(acl);
 		_rpStub.setAuthZConfig(config);
 	}
 }

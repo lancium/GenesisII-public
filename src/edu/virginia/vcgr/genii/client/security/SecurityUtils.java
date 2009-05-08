@@ -12,9 +12,13 @@ import java.security.cert.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
-import edu.virginia.vcgr.genii.common.security.CertificateChainType;
+import javax.net.ssl.CertPathTrustManagerParameters;
+import javax.net.ssl.ManagerFactoryParameters;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
+
+import edu.virginia.vcgr.genii.certGenerator.CertificateChainType;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.comm.axis.AxisClientInvocationHandler;
@@ -26,12 +30,10 @@ import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.configuration.SecurityConstants;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.AuthZSecurityException;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.GamlCredential;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.TransientCredentials;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.IdentityAttribute;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.SignedAssertion;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.Identity;
+import edu.virginia.vcgr.genii.client.security.credentials.*;
+import edu.virginia.vcgr.genii.client.security.credentials.assertions.*;
+import edu.virginia.vcgr.genii.client.security.credentials.identity.*;
+import edu.virginia.vcgr.genii.client.security.authz.*;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 
 import org.morgan.util.configuration.ConfigurationException;
@@ -123,26 +125,46 @@ public class SecurityUtils
 	}
 
 	/**
-	 * Verify the certificate path as correctly chaining to a trusted root
+	 * Verify the certificate path.  If useLocalTrustStore, then also 
+	 * ensure correctly chaining to a trusted root in the local trust 
+	 * store; otherwise just validate the signature chain (no trust).
 	 */
-	static public void validateCertPath(X509Certificate[] certChain)
-			throws GeneralSecurityException
+	static public void validateCertPath(
+			X509Certificate[] certChain, 
+			boolean useLocalTrustStore)
+		throws GeneralSecurityException
 	{
-		List<X509Certificate> certchain = new ArrayList<X509Certificate>();
-		for (int i = 0; i < certChain.length - 1; i++)
+		if (!useLocalTrustStore) 
 		{
-			certchain.add(certChain[i]);
-		}
-		CertPath cp =
-				CertificateFactory.getInstance("X.509", "BC").generateCertPath(
-						certchain);
+			// simply verify each certificate with its predecessor
+			for (int i = 0; i < certChain.length - 2; i++)
+			{
+				certChain[i].verify(certChain[i + 1].getPublicKey());
+			}
 
-		CertPathValidator cpv = CertPathValidator.getInstance("PKIX", "BC");
-		PKIXParameters param =
-				new PKIXParameters(SecurityUtils.getTrustStore());
-		param.setRevocationEnabled(false);
-		cpv.validate(cp, param);
+			// we're through no problemo
+			return;
+		}
+		
+
+		// create a trust manager from the trust store
+		KeyStore ks = SecurityUtils.getTrustStore();
+		PKIXBuilderParameters pkixParams =
+				new PKIXBuilderParameters(ks,
+						new X509CertSelector());
+		pkixParams.setRevocationEnabled(false);
+		ManagerFactoryParameters trustParams =
+				new CertPathTrustManagerParameters(pkixParams);
+		TrustManagerFactory tmf =
+				TrustManagerFactory.getInstance("PKIX");
+		tmf.init(trustParams);
+		X509TrustManager trustManager = (X509TrustManager) tmf.getTrustManagers()[0];
+
+		trustManager.checkClientTrusted(
+				certChain,
+				certChain[0].getPublicKey().getAlgorithm());
 	}
+
 
 	static public final byte[] serializePublicKey(PublicKey pk)
 			throws IOException
@@ -300,7 +322,7 @@ public class SecurityUtils
 			TransientCredentials transientCredentials = 
 				TransientCredentials.getTransientCredentials(callingContext);
 			
-			for (GamlCredential cred : transientCredentials._credentials) 
+			for (GIICredential cred : transientCredentials._credentials) 
 			{
 				/* If the cred is an Identity, then we simply add that idendity
 				 * to our identity list.
@@ -310,12 +332,10 @@ public class SecurityUtils
 					ret.add((Identity)cred);
 				} else if (cred instanceof SignedAssertion) 
 				{
-					/* If the cred is a signed assertion, then we have to
+					/* If the cred is a signed identity assertion, then we have to
 					 * get the identity out of the assertion.
 					 */
 					SignedAssertion signedAssertion = (SignedAssertion)cred;
-					
-					// if its an identity assertion, check it against our ACLs
 					if (signedAssertion.getAttribute() 
 						instanceof IdentityAttribute) 
 					{

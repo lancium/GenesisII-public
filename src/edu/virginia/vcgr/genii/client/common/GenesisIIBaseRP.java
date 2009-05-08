@@ -4,12 +4,12 @@ import java.util.Collection;
 
 import javax.xml.namespace.QName;
 
+import edu.virginia.vcgr.genii.common.security.*;
 import edu.virginia.vcgr.fsii.security.Permissions;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.rp.ResourceProperty;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.common.MatchingParameter;
-import edu.virginia.vcgr.genii.common.security.AuthZConfig;
 
 public interface GenesisIIBaseRP
 {
@@ -21,7 +21,7 @@ public interface GenesisIIBaseRP
 		new QName(GENII_COMMON_NS, MATCHING_PARAMETER_ATTR_NAME);
 	
 	static public final String AUTHZ_CONFIG_NAMESPACE =
-		"http://vcgr.cs.virginia.edu/genii/2006/12/security";
+		"http://vcgr.cs.virginia.edu/genii/2008/12/security";
 	static public final String AUTHZ_CONFIG_NAME =
 		"AuthZConfig";
 	static public final QName AUTHZ_CONFIG_QNAME =

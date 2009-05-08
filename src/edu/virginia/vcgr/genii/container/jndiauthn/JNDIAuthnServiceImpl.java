@@ -53,9 +53,10 @@ import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
-import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
-import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
+import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
+import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
+import edu.virginia.vcgr.genii.client.security.credentials.assertions.*;
+import edu.virginia.vcgr.genii.client.security.credentials.identity.*;
 import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
 import edu.virginia.vcgr.genii.enhancedrns.IterateListResponseType;
 
@@ -70,14 +71,13 @@ import edu.virginia.vcgr.genii.container.rns.IRNSResource;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.client.security.*;
-import edu.virginia.vcgr.genii.client.comm.axis.security.FlexibleBouncyCrypto;
+import edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto;
 import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.x509.CertCreationSpec;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
 import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.container.Container;
@@ -482,7 +482,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 													new X509Security(subElement);
 											X509Certificate delegateTo =
 													bstToken
-															.getX509Certificate(new FlexibleBouncyCrypto());
+															.getX509Certificate(new GIIBouncyCrypto());
 											delegateToChain =
 													new X509Certificate[] { delegateTo };
 										}
@@ -496,7 +496,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 													bstToken
 															.getX509Certificates(
 																	false,
-																	new edu.virginia.vcgr.genii.client.comm.axis.security.FlexibleBouncyCrypto());
+																	new edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto());
 										}
 										else
 										{

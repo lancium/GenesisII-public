@@ -25,6 +25,7 @@ import java.security.GeneralSecurityException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 
 import javax.xml.namespace.QName;
@@ -44,7 +45,8 @@ import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.IContextResolver;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
+import edu.virginia.vcgr.genii.client.security.authz.*;
+import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.container.resource.IResource;
@@ -109,23 +111,26 @@ public class AxisBasedContextResolver implements IContextResolver
 			retval = resourceContext.deriveNewContext(ct);
 		}
 		
-		// MOOCH: add comments 
-		ArrayList<GamlCredential> callerCredentials = new ArrayList<GamlCredential>();
-		ArrayList<Serializable> signedAssertions = 
-			retval.getProperty(GamlCredential.ENCODED_GAML_CREDENTIALS_PROPERTY);
-		retval.removeProperty(GamlCredential.ENCODED_GAML_CREDENTIALS_PROPERTY);
-		TransientCredentials transientCredentials = 
-			TransientCredentials.getTransientCredentials(retval); 
+		// Remove any serialized caller-credentials from the message header 
+		Collection<Serializable> signedAssertions = 
+			retval.getProperty(GIICredential.ENCODED_GAML_CREDENTIALS_PROPERTY);
+		retval.removeProperty(GIICredential.ENCODED_GAML_CREDENTIALS_PROPERTY);
+
+		// Deserialize the encoded caller-credentials and add them 
+		// to a "caller-only" cred-set: they will be added to the transient 
+		// cred-set later (along with any other creds conveyed outside the 
+		// calling-context) during security-processing.
+		ArrayList<GIICredential> callerCredentials = new ArrayList<GIICredential>();
 		if (signedAssertions != null) {
 			Iterator<Serializable> itr = signedAssertions.iterator();
 			while (itr.hasNext()) {
-				GamlCredential signedAssertion = (GamlCredential) itr.next();
-				transientCredentials._credentials.add(signedAssertion);
+				GIICredential signedAssertion = (GIICredential) itr.next();
 				callerCredentials.add(signedAssertion);
 			}
 		}
-		retval.setTransientProperty(GamlCredential.CALLER_CREDENTIALS_PROPERTY, callerCredentials);
-		
+		retval.setTransientProperty(
+				GIICredential.CALLER_CREDENTIALS_PROPERTY, 
+				callerCredentials);
 		
 		// place the resource's key material in the transient calling context
 		// so that it may be properly used for outgoing messages

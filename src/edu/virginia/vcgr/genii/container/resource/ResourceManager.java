@@ -31,7 +31,7 @@ import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
-import edu.virginia.vcgr.genii.client.security.MessageLevelSecurity;
+import edu.virginia.vcgr.genii.client.security.MessageLevelSecurityRequirements;
 import edu.virginia.vcgr.genii.client.security.SecurityConstants;
 import edu.virginia.vcgr.genii.client.security.WSSecurityUtils;
 
@@ -180,8 +180,8 @@ public class ResourceManager
 			IAuthZProvider handler =
 					AuthZProviders.getProvider(resource.getParentResourceKey()
 							.getServiceName());
-			MessageLevelSecurity minMsgSec =
-					new MessageLevelSecurity(MessageLevelSecurity.NONE);
+			MessageLevelSecurityRequirements minMsgSec =
+					new MessageLevelSecurityRequirements(MessageLevelSecurityRequirements.NONE);
 			if ((handler != null)
 					&& (handler.getMinIncomingMsgLevelSecurity(resource) != null))
 			{
@@ -375,7 +375,7 @@ public class ResourceManager
 							.getServiceName());
 			if (handler != null)
 			{
-				MessageLevelSecurity minMsgSec =
+				MessageLevelSecurityRequirements minMsgSec =
 						handler.getMinIncomingMsgLevelSecurity(resource);
 
 				RequiredMessageSecurityTypeMin minAttr =

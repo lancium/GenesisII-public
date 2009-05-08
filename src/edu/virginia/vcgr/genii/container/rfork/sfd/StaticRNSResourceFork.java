@@ -8,8 +8,8 @@ import java.util.Map;
 
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.security.authz.RWXCategory;
-import edu.virginia.vcgr.genii.client.security.authz.RWXMapping;
+import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
+import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.container.rfork.DefaultResourceForkInformation;
 import edu.virginia.vcgr.genii.container.rfork.ReadOnlyRNSResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceFork;

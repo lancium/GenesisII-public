@@ -7,7 +7,7 @@ import java.io.Writer;
 import org.apache.axis.AxisFault;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 
-import edu.virginia.vcgr.genii.client.security.gamlauthz.PermissionDeniedException;
+import edu.virginia.vcgr.genii.client.security.authz.PermissionDeniedException;
 
 public class SimpleExceptionHandler implements IExceptionHandler
 {

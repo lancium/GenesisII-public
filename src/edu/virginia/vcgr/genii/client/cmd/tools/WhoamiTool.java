@@ -9,8 +9,9 @@ import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.VerbosityLevel;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.GamlCredential;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.TransientCredentials;
+import edu.virginia.vcgr.genii.client.security.credentials.*;
+import edu.virginia.vcgr.genii.client.security.credentials.identity.X509Identity;
+import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 
 public class WhoamiTool extends BaseGridTool
 {
@@ -41,21 +42,25 @@ public class WhoamiTool extends BaseGridTool
 		ICallingContext callingContext = ContextManager.getCurrentContext(false);
 
 		if (callingContext == null) 
-			stdout.println("Not logged in");
+			stdout.println("No credentials");
 		else
 		{
 			// remove/renew stale creds/attributes
-			ClientUtils.checkAndRenewCredentials(callingContext, new Date(),
-				new SecurityUpdateResults());
+			KeyAndCertMaterial clientKeyMaterial = 
+				ClientUtils.checkAndRenewCredentials(
+						callingContext, 
+						new Date(),
+						new SecurityUpdateResults());
 
 			TransientCredentials transientCredentials = 
 				TransientCredentials.getTransientCredentials(callingContext);
-			if (transientCredentials._credentials.isEmpty()) 
-				stdout.println("Not logged in");
-			else
+			stdout.format("Client Tool Identity: \n\t%s\n\n", 
+					(new X509Identity(clientKeyMaterial._clientCertChain)).describe(_verbosity));
+			if (!transientCredentials._credentials.isEmpty()) 
 			{
-				for (GamlCredential cred : transientCredentials._credentials)
-					stdout.format("%s\n", cred.describe(_verbosity));
+				stdout.format("Additional Credentials: \n");
+				for (GIICredential cred : transientCredentials._credentials)
+					stdout.format("\t%s\n", cred.describe(_verbosity));
 			}
 		}
 		

@@ -19,6 +19,12 @@ package edu.virginia.vcgr.genii.client.comm.axis.security;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import java.security.GeneralSecurityException;
 
+/**
+ * Interface for GII message send-handlers 
+ * 
+ * @author dgm4d
+ *
+ */
 public interface ISecuritySendHandler extends org.apache.axis.Handler
 {
 
@@ -33,6 +39,6 @@ public interface ISecuritySendHandler extends org.apache.axis.Handler
 	 * perform any actions
 	 */
 	public boolean configure(ICallingContext callContext,
-			MessageSecurityData msgSecData) throws GeneralSecurityException;
+			MessageSecurity msgSecData) throws GeneralSecurityException;
 
 }

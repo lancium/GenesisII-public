@@ -29,12 +29,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
-import org.mortbay.http.HttpContext;
-import org.mortbay.http.SocketListener;
-import org.mortbay.http.SslListener;
-import org.mortbay.jetty.Server;
+import org.mortbay.jetty.*;
+import org.mortbay.jetty.handler.*;
+import org.mortbay.jetty.webapp.*;
+import org.mortbay.jetty.security.SslSocketConnector;
+import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.servlet.ServletHolder;
-import org.mortbay.jetty.servlet.WebApplicationContext;
+
 import org.ws.addressing.AttributedURIType;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -47,6 +48,7 @@ import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.configuration.SecurityConstants;
+import edu.virginia.vcgr.genii.client.comm.jetty.TrustAllSslSocketConnector;
 import edu.virginia.vcgr.genii.client.install.InstallationState;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
@@ -166,9 +168,9 @@ public class Container extends ApplicationBase
 	static private void runContainer()
 		throws ConfigurationException, IOException, Exception
 	{
-		WebApplicationContext webAppCtxt;
+		WebAppContext webAppCtxt;
 		Server server;
-		SocketListener listener;
+		SocketConnector socketConnector;
 		
 		initializeIdentitySecurity(getConfigurationManager().getContainerConfiguration());
 
@@ -178,33 +180,34 @@ public class Container extends ApplicationBase
 		
 		if (_containerConfiguration.isSSL())
 		{
-			listener = new SslListener();
-			listener.setPort(_containerConfiguration.getListenPort());
+			socketConnector = new TrustAllSslSocketConnector();
+			socketConnector.setPort(_containerConfiguration.getListenPort());
 			_containerConfiguration.getSslInformation().configure(getConfigurationManager(),
-				(SslListener)listener);
+				(SslSocketConnector)socketConnector);
 			_containerURL = Hostname.normalizeURL(
 				"https://127.0.0.1:" + _containerConfiguration.getListenPort());
 		} else
 		{
-			listener = new SocketListener();
-			listener.setPort(_containerConfiguration.getListenPort());
+			socketConnector = new SocketConnector();
+			socketConnector.setPort(_containerConfiguration.getListenPort());
 			_containerURL = Hostname.normalizeURL(
 				"http://127.0.0.1:" + _containerConfiguration.getListenPort());
 		}
-		
+
 		_logger.info(String.format("Setting max acceptor threads to %d\n",
 			_containerConfiguration.getMaxAcceptorThreads()));
-		listener.setMaxThreads(_containerConfiguration.getMaxAcceptorThreads());
-		server.addListener(listener);
+		socketConnector.setAcceptors(_containerConfiguration.getMaxAcceptorThreads());
+		server.addConnector(socketConnector);
 		
-		HttpContext context = new HttpContext();
+		ContextHandler context = new ContextHandler();
 		context.setContextPath("/");
-		context.addHandler(new ResourceFileHandler("edu/virginia/vcgr/genii/container"));
-		server.addContext(context);
+		context.setResourceBase("edu/virginia/vcgr/genii/container");
+		server.addHandler(context);
 		
-		webAppCtxt = server.addWebApplication(
-				"/axis",
-				Installation.axisWebApplicationPath().getAbsolutePath());
+		webAppCtxt = new WebAppContext(
+				Installation.axisWebApplicationPath().getAbsolutePath(),
+				"/axis");
+		server.addHandler(webAppCtxt);
 		
 		try
 		{
@@ -232,7 +235,7 @@ public class Container extends ApplicationBase
 				new DeploymentName()).getServicesDirectory());
 	}
 	
-	static private void initializeServices(WebApplicationContext ctxt)
+	static private void initializeServices(WebAppContext ctxt)
 		throws ServletException, AxisFault
 	{
 		ServletHolder []holders = ctxt.getServletHandler().getServlets();
@@ -240,8 +243,7 @@ public class Container extends ApplicationBase
 		{
 			if (holder.getName().equals("AxisServlet"))
 			{
-				AxisServletBase s = (AxisServletBase)holder.getServlet();
-				_axisServer = s.getEngine();
+				_axisServer = ((AxisServletBase) holder.getServlet()).getEngine();
 			}
 		}
 		

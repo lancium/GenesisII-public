@@ -17,6 +17,7 @@
 package edu.virginia.vcgr.genii.container.security.authz.providers;
 
 import java.security.cert.X509Certificate;
+import java.util.Collection;
 
 import java.lang.reflect.Method;
 
@@ -24,15 +25,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.context.*;
-import edu.virginia.vcgr.genii.client.security.MessageLevelSecurity;
+import edu.virginia.vcgr.genii.client.security.MessageLevelSecurityRequirements;
+import edu.virginia.vcgr.genii.client.security.authz.AuthZSecurityException;
+import edu.virginia.vcgr.genii.client.security.authz.PermissionDeniedException;
+import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
 import edu.virginia.vcgr.genii.common.security.*;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
 import edu.virginia.vcgr.genii.container.resource.*;
 import edu.virginia.vcgr.genii.client.resource.*;
 
 /**
- * 
- * NOTES: - Returns true for all access-control decisions
+ * AuthZ provider implementation that returns true for all 
+ * access-control decisions
  * 
  * @author dmerrill
  * 
@@ -43,8 +46,8 @@ public class OpenAuthZProvider implements IAuthZProvider
 	static public final String GAML_ACL_PROPERTY_NAME =
 			"genii.container.security.authz.gaml-acl";
 
-	static protected final MessageLevelSecurity _defaultMinMsgSec =
-			new MessageLevelSecurity(MessageLevelSecurity.NONE);
+	static protected final MessageLevelSecurityRequirements _defaultMinMsgSec =
+			new MessageLevelSecurityRequirements(MessageLevelSecurityRequirements.NONE);
 
 	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(OpenAuthZProvider.class);
@@ -65,16 +68,16 @@ public class OpenAuthZProvider implements IAuthZProvider
 
 	}
 
-	public boolean checkAccess(ICallingContext callingContext,
-		X509Certificate callerCert, IResource resource, 
-		Class<?> serviceClass, Method operation)
-			throws AuthZSecurityException, ResourceException
+	public void checkAccess(
+			Collection<GIICredential> authenticatedCallerCredentials,
+			IResource resource, 
+			Class<?> serviceClass, 
+			Method operation)
+			throws PermissionDeniedException, AuthZSecurityException, ResourceException
 	{
-
-		return true;
 	}
 
-	public MessageLevelSecurity getMinIncomingMsgLevelSecurity(
+	public MessageLevelSecurityRequirements getMinIncomingMsgLevelSecurity(
 			IResource resource) throws AuthZSecurityException,
 			ResourceException
 	{

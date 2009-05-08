@@ -9,7 +9,7 @@ import edu.virginia.vcgr.genii.client.cmd.CommandLineRunner;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.jni.giilibmirror.JNILibraryBase;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.TransientCredentials;
+import edu.virginia.vcgr.genii.client.security.credentials.TransientCredentials;
 
 
 public class JNILoginTool extends JNILibraryBase 

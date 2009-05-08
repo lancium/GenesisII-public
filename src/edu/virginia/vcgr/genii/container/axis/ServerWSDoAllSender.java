@@ -40,7 +40,7 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
-import edu.virginia.vcgr.genii.client.comm.axis.security.FlexibleBouncyCrypto;
+import edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 
 public class ServerWSDoAllSender extends WSDoAllSender
@@ -144,7 +144,7 @@ public class ServerWSDoAllSender extends WSDoAllSender
 			keyStore.setKeyEntry(CRYPTO_ALIAS, _serverPrivateKey, CRYTO_PASS
 					.toCharArray(), targetCertChain);
 
-			crypto = new FlexibleBouncyCrypto();
+			crypto = new GIIBouncyCrypto();
 			crypto.setKeyStore(keyStore);
 
 			return crypto;
@@ -178,7 +178,7 @@ public class ServerWSDoAllSender extends WSDoAllSender
 			KeyStore keyStore = KeyStore.getInstance("JKS");
 			keyStore.load(null, null);
 
-			crypto = new FlexibleBouncyCrypto();
+			crypto = new GIIBouncyCrypto();
 			crypto.setKeyStore(keyStore);
 
 			return crypto;

@@ -31,6 +31,14 @@ public class ReducedCommandLine implements ICommandLine
 		_firstArgument = firstArgument;
 	}
 	
+	/**
+	 * Returns true if the command line has no arguments, options, or flags
+	 */
+	public boolean isEmpty() 
+	{
+		return _parentCommandLine.isEmpty();
+	}
+	
 	public int numArguments()
 	{
 		return _parentCommandLine.numArguments() - _firstArgument;

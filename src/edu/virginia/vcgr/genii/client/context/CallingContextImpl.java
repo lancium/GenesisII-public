@@ -93,8 +93,8 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	protected static final String CURRENT_PATH_KEY = "__$$Current Path$$";
 
 	// multi-value list of name-value properties
-	private HashMap<String, ArrayList<Serializable>> _properties = 
-		new HashMap<String, ArrayList<Serializable>>();
+	private HashMap<String, Collection<Serializable>> _properties = 
+		new HashMap<String, Collection<Serializable>>();
 
 	private CallingContextImpl _parent = null;
 
@@ -115,7 +115,7 @@ public class CallingContextImpl implements ICallingContext, Serializable
 			if (pairs != null) {
 				for (ContextNameValuePairType pair : ct.getProperty()) {
 					String name = pair.getName();
-					ArrayList<Serializable> multiValue = _properties.get(name);
+					Collection<Serializable> multiValue = _properties.get(name);
 					if (multiValue == null) {
 						multiValue = new ArrayList<Serializable>();
 						_properties.put(name, multiValue);
@@ -131,9 +131,9 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		setCurrentPath(root);
 	}
 
-	public synchronized ArrayList<Serializable> getProperty(String name) {
+	public synchronized Collection<Serializable> getProperty(String name) {
 		
-		ArrayList<Serializable> multiValue = null;
+		Collection<Serializable> multiValue = null;
 		multiValue = _properties.get(name);
 		if (multiValue == null && _parent != null)
 			return _parent.getProperty(name);
@@ -141,14 +141,14 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	}
 	
 	public synchronized Serializable getSingleValueProperty(String name) {
-		ArrayList<Serializable> multiValue = getProperty(name);
+		Collection<Serializable> multiValue = getProperty(name);
 		if (multiValue == null) {
 			return null;
 		}
-		return multiValue.get(0);
+		return multiValue.iterator().next();
 	}
 
-	public synchronized void setProperty(String name, ArrayList<Serializable> multiValue) {
+	public synchronized void setProperty(String name, Collection<Serializable> multiValue) {
 	    if ((multiValue != null) && (multiValue.isEmpty())) {
 	    	throw new IllegalArgumentException("Illegal empty multiValue, use null instead");
 	    }
@@ -204,9 +204,9 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	}
 
 	public synchronized RNSPath getCurrentPath() {
-		ArrayList<Serializable> multiValue = _properties.get(CURRENT_PATH_KEY);
+		Collection<Serializable> multiValue = _properties.get(CURRENT_PATH_KEY);
 		if (multiValue != null) {
-			return (RNSPath) multiValue.get(0);
+			return (RNSPath) multiValue.iterator().next();
 		}
 
 		if (_parent != null) {
@@ -263,7 +263,7 @@ public class CallingContextImpl implements ICallingContext, Serializable
 				for (ContextNameValuePairType pair : pairs)
 				{
 					String name = pair.getName();
-					ArrayList<Serializable> multiValue =
+					Collection<Serializable> multiValue =
 						retval._properties.get(name);
 					if (multiValue == null)
 					{
@@ -285,7 +285,7 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		}
 
 		for (String name : _properties.keySet()) {
-			ArrayList<Serializable> values = _properties.get(name);
+			Collection<Serializable> values = _properties.get(name);
 			for (Serializable val : values) {
 				String strVal = retrieveBase64Encoded(val);
 				pairs.add(0, new ContextNameValuePairType(name, strVal));

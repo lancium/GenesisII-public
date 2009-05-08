@@ -34,7 +34,7 @@ public class NotificationListenerTool extends BaseGridTool
 		server.start();
 		server.addNotificationListener(target, getArgument(1), 
 			new NotificationListener());
-		
+
 		while (true)
 		{
 			Thread.sleep(1000 * 10);

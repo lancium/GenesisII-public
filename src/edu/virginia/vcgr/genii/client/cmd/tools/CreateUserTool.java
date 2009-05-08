@@ -208,8 +208,8 @@ public class CreateUserTool extends BaseGridTool
 			GamlChmodTool chmodTool = new GamlChmodTool();
 			chmodTool.addArgument(fullPath);
 			chmodTool.addArgument("+x");
-			chmodTool.setUsername(_loginName);
-			chmodTool.setPassword(_password);
+			chmodTool.addArgument("--username=" + _loginName);
+			chmodTool.addArgument("--password=" + _password);
 			
 			chmodTool.run(stdout, stderr, stdin);
 		}

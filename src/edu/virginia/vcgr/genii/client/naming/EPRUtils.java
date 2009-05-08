@@ -31,6 +31,7 @@ import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.MetadataType;
 import org.xml.sax.InputSource;
 
+import edu.virginia.vcgr.genii.common.security.*;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.ogsa.OGSARP;
 import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
@@ -40,7 +41,6 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
-import edu.virginia.vcgr.genii.common.security.*;
 import edu.virginia.vcgr.genii.client.security.*;
 
 import org.oasis_open.docs.ws_sx.ws_securitypolicy._200702.*;
@@ -190,7 +190,7 @@ public class EPRUtils
 		return null;
 	}
 
-	static public MessageLevelSecurity extractMinMessageSecurity(
+	static public MessageLevelSecurityRequirements extractMinMessageSecurity(
 			EndpointReferenceType epr) throws GeneralSecurityException
 	{
 
@@ -204,25 +204,8 @@ public class EPRUtils
 		RequiredMessageSecurityType minSec = null;
 		for (MessageElement element : elements)
 		{
-			if (element.getQName().equals(
-					RequiredMessageSecurityType.getTypeDesc().getXmlType()))
-			{
-				// original security requirements
-				try
-				{
-					minSec =
-							(RequiredMessageSecurityType) element
-									.getObjectValue(RequiredMessageSecurityType.class);
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace(System.err);
-					return null;
-				}
-				break;
 
-			}
-			else if (element.getQName().equals(
+			if (element.getQName().equals(
 					new QName(PolicyAttachment.getTypeDesc().getXmlType()
 							.getNamespaceURI(), "PolicyAttachment")))
 			{
@@ -235,7 +218,7 @@ public class EPRUtils
 							(PolicyAttachment) element
 									.getObjectValue(PolicyAttachment.class);
 
-					MessageLevelSecurity retval = new MessageLevelSecurity();
+					MessageLevelSecurityRequirements retval = new MessageLevelSecurityRequirements();
 
 					// TODO: assume it applies to everything. We will want to
 					// get
@@ -264,8 +247,8 @@ public class EPRUtils
 							{
 								retval =
 										retval
-												.computeUnion(new MessageLevelSecurity(
-														MessageLevelSecurity.SIGN));
+												.computeUnion(new MessageLevelSecurityRequirements(
+														MessageLevelSecurityRequirements.SIGN));
 							}
 
 						}
@@ -275,8 +258,8 @@ public class EPRUtils
 										"EncryptedParts")))
 						{
 
-							retval = retval.computeUnion(new MessageLevelSecurity(
-									MessageLevelSecurity.ENCRYPT));
+							retval = retval.computeUnion(new MessageLevelSecurityRequirements(
+									MessageLevelSecurityRequirements.ENCRYPT));
 						}
 					}
 
@@ -302,7 +285,7 @@ public class EPRUtils
 			return null;
 		}
 
-		return new MessageLevelSecurity(minType.getValue());
+		return new MessageLevelSecurityRequirements(minType.getValue());
 	}
 
 	static private Pattern _SERVICE_NAME_PATTERN =

@@ -19,6 +19,12 @@ package edu.virginia.vcgr.genii.client.comm.axis.security;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import java.security.GeneralSecurityException;
 
+/**
+ * Interface for GII message receive-handlers 
+ * 
+ * @author dgm4d
+ *
+ */
 public interface ISecurityRecvHandler extends org.apache.axis.Handler
 {
 

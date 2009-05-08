@@ -63,7 +63,7 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
-import edu.virginia.vcgr.genii.client.security.MessageLevelSecurity;
+import edu.virginia.vcgr.genii.client.security.MessageLevelSecurityRequirements;
 import edu.virginia.vcgr.genii.client.security.SecurityUtils;
 import edu.virginia.vcgr.genii.client.security.x509.*;
 import edu.virginia.vcgr.genii.client.invoke.IFinalInvoker;
@@ -121,7 +121,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 // STATIC CONFIGURATION MEMBERS
 //-----------------------------------------------------------------------------
 	
-	static private MessageLevelSecurity __minClientMessageSec = null;
+	static private MessageLevelSecurityRequirements __minClientMessageSec = null;
 
 	/**
 	 * Class to wipe our loaded config stuff in the event the config manager
@@ -148,7 +148,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	/**
 	 * Retrieves the client's minimum allowable level of message security
 	 */	
-	static private synchronized MessageLevelSecurity getMinClientMessageSec() throws GeneralSecurityException {
+	static private synchronized MessageLevelSecurityRequirements getMinClientMessageSec() throws GeneralSecurityException {
 
 		if (__minClientMessageSec != null) { 
 			return __minClientMessageSec;
@@ -158,7 +158,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			Installation.getDeployment(new DeploymentName()).security().getProperty(
 				SecurityConstants.Client.MESSAGE_MIN_CONFIG_PROP);
 			
-		__minClientMessageSec =  new MessageLevelSecurity(minMessageSecurity);
+		__minClientMessageSec =  new MessageLevelSecurityRequirements(minMessageSecurity);
 		return __minClientMessageSec;
 	}
 	
@@ -215,9 +215,9 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		URI epi = EPRUtils.extractEndpointIdentifier(_epr);
 		
 		// determine the level of message security we need
-		MessageLevelSecurity minClientMessageSec = getMinClientMessageSec();
-		MessageLevelSecurity minResourceSec = EPRUtils.extractMinMessageSecurity(_epr);
-		MessageLevelSecurity neededMsgSec = minClientMessageSec.computeUnion(minResourceSec); 
+		MessageLevelSecurityRequirements minClientMessageSec = getMinClientMessageSec();
+		MessageLevelSecurityRequirements minResourceSec = EPRUtils.extractMinMessageSecurity(_epr);
+		MessageLevelSecurityRequirements neededMsgSec = minClientMessageSec.computeUnion(minResourceSec); 
 		
 		// perform resource-AuthN as specified in the client config file
 		try {
@@ -236,7 +236,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 					}
 					
 					// run it through the trust manager
-					SecurityUtils.validateCertPath(chain);
+					SecurityUtils.validateCertPath(chain, true);
 			        
 			        // insert into valid certs cache
 			        validatedCerts.put(_resourceCert, Boolean.TRUE);
@@ -254,13 +254,10 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 
 		// prepare a message security datastructure for the message context
 		// if needed
-		MessageSecurityData msgSecData = null;
-		if (!neededMsgSec.isNone()) {
-			msgSecData = new MessageSecurityData(
-					neededMsgSec,
-					chain,
-					epi);
-		}
+		MessageSecurity msgSecData = new MessageSecurity(
+				neededMsgSec,
+				chain,
+				epi);
 		if (msgSecData != null) {
 			stubInstance._setProperty(CommConstants.MESSAGE_SEC_CALL_DATA, 
 					msgSecData);

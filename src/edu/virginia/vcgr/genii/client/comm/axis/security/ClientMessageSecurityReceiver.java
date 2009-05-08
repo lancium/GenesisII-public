@@ -57,6 +57,12 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver;
 
+/**
+ * Client-side X.509 message-level security handler for incoming 
+ * (response) messages.   
+ * 
+ * @author dgm4d
+ */
 public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements
 		ISecurityRecvHandler
 {
@@ -66,7 +72,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements
 	private static final String CRYTO_PASS = "pwd";
 	public static final String RESOURCE_ALIAS = "RESOURCE_ALIAS";
 
-	private MessageSecurityData _messageSec = null;
+	private MessageSecurity _messageSec = null;
 	private ICallingContext _callContext = null;
 
 	@SuppressWarnings("unchecked")
@@ -100,7 +106,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements
 	{
 
 		_messageSec =
-				(MessageSecurityData) msgContext
+				(MessageSecurity) msgContext
 						.getProperty(CommConstants.MESSAGE_SEC_CALL_DATA);
 		_callContext =
 				(ICallingContext) msgContext
@@ -185,7 +191,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements
 						.toString(), _messageSec._resourceCertChain[0]);
 			}
 
-			crypto = new FlexibleBouncyCrypto("sigCrypto");
+			crypto = new GIIBouncyCrypto();
 			crypto.setKeyStore(keyStore);
 
 			return crypto;
@@ -226,7 +232,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements
 			keyStore.setKeyEntry(CRYPTO_ALIAS, keyMaterial._clientPrivateKey,
 					CRYTO_PASS.toCharArray(), keyMaterial._clientCertChain);
 
-			crypto = new FlexibleBouncyCrypto("enc&dec crypto");
+			crypto = new GIIBouncyCrypto();
 			crypto.setKeyStore(keyStore);
 
 			return crypto;

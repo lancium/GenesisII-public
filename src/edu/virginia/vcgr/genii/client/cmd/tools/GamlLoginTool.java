@@ -25,10 +25,9 @@ import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.security.*;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.UsernamePasswordIdentity;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.X509Identity;
+import edu.virginia.vcgr.genii.client.security.credentials.*;
+import edu.virginia.vcgr.genii.client.security.credentials.assertions.*;
+import edu.virginia.vcgr.genii.client.security.credentials.identity.*;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.client.utils.PathUtils;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
@@ -70,6 +69,7 @@ public class GamlLoginTool extends BaseGridTool {
 	protected String _durationString = null;
 	protected long _validMillis = GenesisIIConstants.CredentialExpirationMillis;
 	protected boolean _aliasPatternFlag = false;
+	protected boolean _replaceClientToolIdentityFlag = false;
 	protected String _username = null;
 	protected String _pattern = null;
 	protected String _authnUri = null;
@@ -97,6 +97,10 @@ public class GamlLoginTool extends BaseGridTool {
 	public void setAlias() {
 		_aliasPatternFlag = true;
 	}
+	
+	public void setToolIdentity() {
+		_replaceClientToolIdentityFlag = true;
+	}
 
 	public void setPattern(String pattern) {
 		_pattern = pattern;
@@ -108,7 +112,7 @@ public class GamlLoginTool extends BaseGridTool {
 		_durationString = durationString;
 	}
 	
-	public static GamlCredential extractAssertion(RequestSecurityTokenResponseType reponseMessage) 
+	public static GIICredential extractAssertion(RequestSecurityTokenResponseType reponseMessage) 
 		throws Throwable {
 			
 		for (MessageElement element : reponseMessage.get_any()) {
@@ -140,7 +144,7 @@ public class GamlLoginTool extends BaseGridTool {
 	 * Calls requestSecurityToken2() on the specified idp.  If delegateAttribute is
 	 * non-null, the returned tokens are delegated to that identity (the common-case).
 	 */
-	public static ArrayList<GamlCredential> doIdpLogin(
+	public static ArrayList<GIICredential> doIdpLogin(
 			EndpointReferenceType idpEpr,
 			long validMillis,
 			X509Certificate[] delegateeIdentity) throws Throwable {
@@ -183,7 +187,9 @@ public class GamlLoginTool extends BaseGridTool {
 					"Lifetime"), 
 				new LifetimeType(
 					new AttributedDateTime(
-						zulu.format(new Date(System.currentTimeMillis() - 1000 * 60 * 15))), 
+						zulu.format(new Date(
+								System.currentTimeMillis() - 
+								GenesisIIConstants.CredentialGoodFromOffset))), 
 					new AttributedDateTime(
 						zulu.format(new Date(System.currentTimeMillis() + validMillis)))));
 		element.setType(LifetimeType.getTypeDesc().getXmlType());
@@ -224,7 +230,7 @@ public class GamlLoginTool extends BaseGridTool {
 		RequestSecurityTokenResponseType[] responses = idp
 				.requestSecurityToken2(request);
 		
-		ArrayList<GamlCredential> retval = new ArrayList<GamlCredential>();
+		ArrayList<GIICredential> retval = new ArrayList<GIICredential>();
 		
 		if (responses != null) {
 			for (RequestSecurityTokenResponseType response : responses) {
@@ -235,12 +241,26 @@ public class GamlLoginTool extends BaseGridTool {
 		return retval;
 	}
 
-	protected ArrayList<GamlCredential> doKeystoreLogin(
+	/**
+	 * Prompts the user to select an identity from the specified
+	 * keystore, delegating the selected credential to the delegatee.
+	 * 
+	 * If delegatee is null, the credential is delegated to the calling 
+	 * context's current client key material, in which case it will
+	 * be self-renewing.
+	 * 
+	 * @param keystoreInput
+	 * @param callContext
+	 * @param delegateeIdentity
+	 * @return
+	 * @throws Throwable
+	 */
+	protected ArrayList<GIICredential> doKeystoreLogin(
 			InputStream keystoreInput, 
 			ICallingContext callContext,
 			X509Certificate[] delegateeIdentity) throws Throwable {
 
-		ArrayList<GamlCredential> retval = new ArrayList<GamlCredential>();
+		ArrayList<GIICredential> retval = new ArrayList<GIICredential>();
 
 		AbstractGamlLoginHandler handler = null;
 		if (!useGui() || !GuiUtils.supportsGraphics()) {
@@ -254,6 +274,24 @@ public class GamlLoginTool extends BaseGridTool {
 		if (certEntry == null) {
 			return null;
 		}
+		
+		// If desired, replace the primary client identity (used for
+		// SSL & message signing) with the  
+		// one specified
+		if (_replaceClientToolIdentityFlag)
+		{
+			TransientCredentials.globalLogout(callContext);
+
+			stdout.println("Replacing client tool identity with credentials for \""
+					+ certEntry._certChain[0].getSubjectDN().getName() + "\".");
+			
+			KeyAndCertMaterial clientKeyMaterial = 
+				new KeyAndCertMaterial(certEntry._certChain, certEntry._privateKey);
+			callContext.setActiveKeyAndCertMaterial(clientKeyMaterial);
+			
+			return null;
+		}
+		
 
 		stdout.println("Acquiring credentials for \""
 				+ certEntry._certChain[0].getSubjectDN().getName() + "\".");
@@ -268,9 +306,9 @@ public class GamlLoginTool extends BaseGridTool {
 			// create a renewable attribute delegated to the calling context
 			RenewableClientAttribute delegateeAttribute = new RenewableClientAttribute(
 				new BasicConstraints(
-					System.currentTimeMillis() - (1000L * 60 * 15), 	// 15 minutes ago
-					_validMillis, 										// default 24 hours valid
-					10),												// delegation depth 10 
+					System.currentTimeMillis() - GenesisIIConstants.CredentialGoodFromOffset,
+					_validMillis, 										
+					10),												 
 				identityAssertion,
 				callContext);
 			
@@ -283,9 +321,9 @@ public class GamlLoginTool extends BaseGridTool {
 			// create a static attribute delegated to the specified party 
 			DelegatedAttribute delegateeAttribute = new DelegatedAttribute(
 				new BasicConstraints(
-					System.currentTimeMillis() - (1000L * 60 * 15), 	// 15 minutes ago
-					_validMillis, 										// default 24 hours valid
-					10),												// delegation depth 10 
+					System.currentTimeMillis() - GenesisIIConstants.CredentialGoodFromOffset,
+					_validMillis, 										
+					10),												 
 				identityAssertion,
 				delegateeIdentity);
 			
@@ -295,14 +333,30 @@ public class GamlLoginTool extends BaseGridTool {
 		return retval;
 	}
 
-	protected ArrayList<GamlCredential> delegateToIdentity(
+	protected ArrayList<GIICredential> delegateToIdentity(
 			URI authnUri, ICallingContext callingContext) throws Throwable {
 		
 		return delegateToIdentity(authnUri, callingContext, null);
 	}
 
-	protected ArrayList<GamlCredential> delegateToIdentity(
-		URI authnUri, ICallingContext callingContext, X509Certificate[] delegatee) throws Throwable {
+	/**
+	 * Delegates the credential designated by authnUri to the delegatee.
+	 * 
+	 * If delegatee is null, the credential is delegated to the calling 
+	 * context's current client key material.
+	 * 
+	 * @param authnUri
+	 * @param callingContext
+	 * @param delegatee  
+	 * @return
+	 * @throws Throwable
+	 */
+	protected ArrayList<GIICredential> delegateToIdentity(
+			URI authnUri, 
+			ICallingContext callingContext, 
+			X509Certificate[] delegatee)	// if null, delegates to  
+		throws Throwable 
+	{
 
 		String protocol = (authnUri == null) ? null : authnUri.getScheme();
 
@@ -313,7 +367,8 @@ public class GamlLoginTool extends BaseGridTool {
 
 		if ((protocol == null) || protocol.equals("file")) {
 			// log into keystore from a specific file
-			BufferedInputStream fis = new BufferedInputStream(new FileInputStream(authnUri.getSchemeSpecificPart()));
+			BufferedInputStream fis = new BufferedInputStream(
+					new FileInputStream(authnUri.getSchemeSpecificPart()));
 			try {
 				return doKeystoreLogin(fis, callingContext, delegatee);
 			} finally {
@@ -410,7 +465,7 @@ public class GamlLoginTool extends BaseGridTool {
 				.getTransientCredentials(callContext);
 		try {
 			// log in
-			ArrayList<GamlCredential> signedAssertions = 
+			ArrayList<GIICredential> signedAssertions = 
 				delegateToIdentity(authnSource, callContext);
 	
 			if (signedAssertions == null) {

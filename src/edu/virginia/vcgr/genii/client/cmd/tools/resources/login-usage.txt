@@ -2,7 +2,7 @@ login
 
 login [--storetype=<PKCS12|JKS|WIN>] [--password=<keystore-password>] 
 	[--alias] [--pattern=<certificate/token pattern>] 
-	[--validDuration=<duration-string>] [<keystore URL>]
+	[--validDuration=<duration-string>] [--toolIdentity] [<keystore URL>]
 			
 login [--validDuration=<duration-string>]
 	[--username=<username> [--password=<password>]] 

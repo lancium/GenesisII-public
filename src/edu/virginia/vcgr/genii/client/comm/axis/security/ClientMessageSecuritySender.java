@@ -41,6 +41,12 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
+/**
+ * Client-side X.509 message-level security handler for outgoing 
+ * (request) messages.   
+ * 
+ * @author dgm4d
+ */
 public class ClientMessageSecuritySender extends WSDoAllSender implements
 		ISecuritySendHandler
 {
@@ -49,7 +55,7 @@ public class ClientMessageSecuritySender extends WSDoAllSender implements
 	public static final String CRYPTO_ALIAS = "CRYPTO_ALIAS";
 	private static final String CRYTO_PASS = "pwd";
 
-	private MessageSecurityData _messageSec = null;
+	private MessageSecurity _messageSec = null;
 	private ICallingContext _callContext = null;
 	private boolean _serialize = false;
 	private String _securityActions = "";
@@ -72,7 +78,7 @@ public class ClientMessageSecuritySender extends WSDoAllSender implements
 	 * perform any actions
 	 */
 	public boolean configure(ICallingContext callContext,
-			MessageSecurityData msgSecData) throws GeneralSecurityException
+			MessageSecurity msgSecData) throws GeneralSecurityException
 	{
 
 		_messageSec = msgSecData;
@@ -182,7 +188,7 @@ public class ClientMessageSecuritySender extends WSDoAllSender implements
 			keyStore.setKeyEntry(CRYPTO_ALIAS, keyMaterial._clientPrivateKey,
 					CRYTO_PASS.toCharArray(), keyMaterial._clientCertChain);
 
-			crypto = new FlexibleBouncyCrypto();
+			crypto = new GIIBouncyCrypto();
 			crypto.setKeyStore(keyStore);
 
 			return crypto;
@@ -219,7 +225,7 @@ public class ClientMessageSecuritySender extends WSDoAllSender implements
 			keyStore.setCertificateEntry(CRYPTO_ALIAS,
 					_messageSec._resourceCertChain[0]);
 
-			crypto = new FlexibleBouncyCrypto();
+			crypto = new GIIBouncyCrypto();
 			crypto.setKeyStore(keyStore);
 
 			return crypto;

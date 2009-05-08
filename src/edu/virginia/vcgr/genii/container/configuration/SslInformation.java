@@ -1,7 +1,7 @@
 package edu.virginia.vcgr.genii.container.configuration;
 
 import org.morgan.util.configuration.ConfigurationException;
-import org.mortbay.http.SslListener;
+import org.mortbay.jetty.security.SslSocketConnector;
 
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
@@ -35,13 +35,16 @@ public class SslInformation
 				SecurityConstants.Container.SSL_KEY_STORE_TYPE_PROP + "\" not found.");
 	}
 	
-	public void configure(ConfigurationManager manager, SslListener listener)
+	public void configure(ConfigurationManager manager, SslSocketConnector connector)
 	{
-		listener.setKeystore(
+		connector.setKeystore(
 			(Installation.getDeployment(new DeploymentName()).security().getSecurityFile(
 				_keystoreFilename)).getAbsolutePath());
-		listener.setKeystoreType(_keystoreType);
-		listener.setPassword(_keystorePassword);
-		listener.setKeyPassword(_keyPassword);
+		connector.setKeystoreType(_keystoreType);
+		connector.setPassword(_keystorePassword);
+		connector.setKeyPassword(_keyPassword);
+		
+		// request clients to authn with a cert
+		connector.setWantClientAuth(true);
 	}
 }

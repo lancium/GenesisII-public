@@ -9,9 +9,9 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.assertions.*;
+import edu.virginia.vcgr.genii.client.security.credentials.*;
+import edu.virginia.vcgr.genii.client.security.credentials.identity.*;
+import edu.virginia.vcgr.genii.client.security.credentials.assertions.*;
 
 public class LogoutTool extends BaseGridTool
 {
@@ -52,11 +52,11 @@ public class LogoutTool extends BaseGridTool
 					+ ".*$", flags);
 
 			int numMatched = 0;
-			ArrayList <GamlCredential> credentials = 
+			ArrayList <GIICredential> credentials = 
 				TransientCredentials.getTransientCredentials(callContext)._credentials;
-			Iterator<GamlCredential> itr = credentials.iterator();
+			Iterator<GIICredential> itr = credentials.iterator();
 			while (itr.hasNext()) {
-				GamlCredential cred = itr.next();
+				GIICredential cred = itr.next();
 				String toMatch = null;
 				if (cred instanceof Identity) {
 					toMatch = cred.toString();
@@ -79,7 +79,7 @@ public class LogoutTool extends BaseGridTool
 			ContextManager.storeCurrentContext(callContext);
 		} else {
 			while (true) {
-				ArrayList <GamlCredential> credentials = 
+				ArrayList <GIICredential> credentials = 
 					TransientCredentials.getTransientCredentials(callContext)._credentials;
 				if (credentials.size() == 0)
 					break;

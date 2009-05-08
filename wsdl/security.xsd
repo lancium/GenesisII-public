@@ -1,74 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema
-	xmlns="http://vcgr.cs.virginia.edu/genii/2006/12/security"
+	xmlns="http://vcgr.cs.virginia.edu/genii/2008/12/security"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	xmlns:security="http://vcgr.cs.virginia.edu/genii/2006/12/security"
+	xmlns:security="http://vcgr.cs.virginia.edu/genii/2008/12/security"
 	xmlns:wsa="http://www.w3.org/2005/08/addressing"
-	targetNamespace="http://vcgr.cs.virginia.edu/genii/2006/12/security"
+	targetNamespace="http://vcgr.cs.virginia.edu/genii/2008/12/security"
 	elementFormDefault="qualified"
 	attributeFormDefault="unqualified">
 
-
-	<xsd:complexType name="CertificateChainType">
+	<xsd:complexType name="AclEntryListType">
 		<xsd:sequence>
 			<xsd:element name="count" type="xsd:int"/>
 			<xsd:element
-				name="Certificate" type="xsd:base64Binary"
-				minOccurs="0" maxOccurs="unbounded" nillable="false"/>
-		</xsd:sequence>
-	</xsd:complexType>
-	
-	<xsd:complexType name="GamlIdentityListType">
-		<xsd:sequence>
-			<xsd:element name="count" type="xsd:int"/>
-			<xsd:element
-				name="identity" type="security:IdentityType"
+				name="identity" type="xsd:base64Binary"
 				minOccurs="0" maxOccurs="unbounded" nillable="false"/>
 		</xsd:sequence>
 	</xsd:complexType>
 
-	<xsd:complexType abstract="true" name="IdentityType">
-	</xsd:complexType>
-
-	<xsd:complexType name="X509IdentityType">
-		<xsd:complexContent>
-		<xsd:extension base="security:IdentityType">
-			<xsd:sequence>
-				<xsd:element name="certificateChain" type="security:CertificateChainType"/>
-			</xsd:sequence>
-		</xsd:extension>
-		</xsd:complexContent>
-	</xsd:complexType>
-	
-	<xsd:complexType name="IDPIdentityType">
-		<xsd:complexContent>
-		<xsd:extension base="security:IdentityType">
-			<xsd:sequence>
-				<xsd:element name="name" type="xsd:string"/>
-				<xsd:element name="certificateChain" type="security:CertificateChainType"/>
-			</xsd:sequence>
-		</xsd:extension>
-		</xsd:complexContent>
-	</xsd:complexType>
-
-	<xsd:complexType name="UTIdentityType">
-		<xsd:complexContent>
-		<xsd:extension base="security:IdentityType">
-			<xsd:sequence>
-				<xsd:element name="name" type="xsd:string"/>
-				<xsd:element name="token" type="xsd:string"/>
-			</xsd:sequence>
-		</xsd:extension>
-		</xsd:complexContent>
-	</xsd:complexType>
-
-
-	<xsd:complexType name="GamlAclType" >
+	<xsd:complexType name="AclType" >
 		<xsd:attribute name="requireEncryption" use="optional" type="xsd:boolean"/>
 		<xsd:sequence>
-			<xsd:element name="readAcl" type="security:GamlIdentityListType"/>
-			<xsd:element name="writeAcl" type="security:GamlIdentityListType"/>
-			<xsd:element name="executeAcl" type="security:GamlIdentityListType"/>
+			<xsd:element name="readAcl" type="security:AclEntryListType"/>
+			<xsd:element name="writeAcl" type="security:AclEntryListType"/>
+			<xsd:element name="executeAcl" type="security:AclEntryListType"/>
 		</xsd:sequence>
 	</xsd:complexType>
 
@@ -98,19 +52,5 @@
 	</xsd:complexType>
 	<xsd:element name="security:RequiredMessageSecurityType"/>
 	
-	<!-- Public Key Type -->
-	<xsd:complexType name="PublicKeyType" >
-		<xsd:sequence>
-			<xsd:element name="publicKey" type="xsd:base64Binary" minOccurs="1" maxOccurs="1" nillable="false"/>
-		</xsd:sequence>
-	</xsd:complexType>
-
-	<!-- X509 Name Type -->
-	<xsd:complexType name="X509NameType" >
-		<xsd:sequence>
-			<xsd:element name="X509Name" type="xsd:string" minOccurs="1" maxOccurs="1" nillable="false"/>
-		</xsd:sequence>
-	</xsd:complexType>
-
 
 </xsd:schema>

@@ -10,8 +10,17 @@ public class GenesisIIConstants
 	static public final String OGSA_BP_NS =
 		"http://schemas.ggc.org/ogsa/2006/05/wsrf-bp";
 	
-	static public final long CredentialExpirationMillis = 1000L * 60L * 60L * 24L * 30L; // valid 7 days
+	static public final long CredentialExpirationMillis = 
+		1000L * 60L * 60L * 24L * 30L; 	// valid 30 days
  
+	static public final long CredentialGoodFromOffset = 
+		1000L * 60L * 15L; 				// 15 minutes ago 
+	
+	static public final long CredentialCacheTimeout =
+		1000L * 60L * 60L; 				// 1 hour lifetime in cache
+
+	static public final int MaxDelegationDepth = 10; 
+
 	static public final String NAMING_CLIENT_CONFORMANCE_PROPERTY = "IsWSNamingClient";
 	
 	static public final String REGISTERED_TOPICS_ATTR =
@@ -20,7 +29,7 @@ public class GenesisIIConstants
 		new QName(GENESISII_NS, REGISTERED_TOPICS_ATTR);
 	
 	static public QName AUTHZ_CONFIG_ATTR_QNAME =
-		new QName("http://vcgr.cs.virginia.edu/genii/2006/12/security", "AuthZConfig");
+		new QName("http://vcgr.cs.virginia.edu/genii/2008/12/security", "AuthZConfig");
 	static public final String AUTHZ_CONFIG_ATTR =
 		AUTHZ_CONFIG_ATTR_QNAME.getLocalPart();
 	

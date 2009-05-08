@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import org.ggf.jsdl.CreationFlagEnumeration;
 
-import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.UsernamePasswordIdentity;
+import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
 
 public class DataStage implements Serializable
 {

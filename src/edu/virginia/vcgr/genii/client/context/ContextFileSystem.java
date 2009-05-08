@@ -22,7 +22,7 @@ import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.io.RAFInputStream;
 import edu.virginia.vcgr.genii.client.io.RAFOutputStream;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.TransientCredentials;
+import edu.virginia.vcgr.genii.client.security.credentials.TransientCredentials;
 
 public class ContextFileSystem
 {

@@ -5,6 +5,9 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPBody;
@@ -15,15 +18,13 @@ import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.Token;
 import org.morgan.util.GUID;
 import org.morgan.util.io.StreamUtils;
-import org.mortbay.http.HttpContext;
-import org.mortbay.http.HttpException;
-import org.mortbay.http.HttpHandler;
-import org.mortbay.http.HttpRequest;
-import org.mortbay.http.HttpResponse;
-import org.mortbay.http.SocketListener;
-import org.mortbay.http.SslListener;
-import org.mortbay.http.handler.AbstractHttpHandler;
+import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.bio.SocketConnector;
+import org.mortbay.jetty.handler.AbstractHandler;
+import org.mortbay.jetty.handler.ContextHandler;
+import org.mortbay.jetty.security.SslSocketConnector;
+
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.w3c.dom.Element;
 import org.ws.addressing.EndpointReferenceType;
@@ -58,55 +59,58 @@ public class NotificationServer
 	
 	private String _protocol;
 	protected Server _httpServer;
-	private NotificationTable _listeners = new NotificationTable();
+	private NotificationTable _listenerTable = new NotificationTable();
 	private HashMap<GUID, ISubscription> _subscriptions =
 		new HashMap<GUID, ISubscription>();
 	
-	private HttpContext createContext()
+	private ContextHandler createContext()
 	{
-		HttpContext context;
+		ContextHandler context;
 		
-		context = new HttpContext();
+		context = new ContextHandler();
 		context.setContextPath("/");
 		context.addHandler(createHandler());
 		
 		return context;
 	}
+
 	
 	protected NotificationServer(Integer port)
 	{
-		SocketListener listener;
+		
+		SocketConnector listener;
 		
 		_protocol = _HTTP_PROTOCOL;
 		
 		_httpServer = new Server();
-		listener = new SocketListener();
+		listener = new SocketConnector();
 		if (port != null)
 			listener.setPort(port.intValue());
-		_httpServer.addListener(listener);
+		_httpServer.addConnector(listener);
 		
-		_httpServer.addContext(createContext());
+		_httpServer.addHandler(createContext());
+
 	}
 	
 	protected NotificationServer(Integer port,
 		String keystore, String keystoreType, 
 		String password, String keyPassword)
 	{
-		SslListener listener;
+		SslSocketConnector listener;
 		
 		_protocol = _HTTPS_PROTOCOL;
 		
 		_httpServer = new Server();
-		listener = new SslListener();
+		listener = new SslSocketConnector();
 		if (port != null)
 			listener.setPort(port.intValue());
 		listener.setKeystore(keystore);
 		listener.setKeystoreType(keystoreType);
 		listener.setKeyPassword(keyPassword);
 		listener.setPassword(password);
-		_httpServer.addListener(listener);
+		_httpServer.addConnector(listener);
 		
-		_httpServer.addContext(createContext());
+		_httpServer.addHandler(createContext());
 	}
 	
 	protected void finalize() throws Throwable
@@ -138,7 +142,7 @@ public class NotificationServer
 	 * Stop the server so that it can't receive further notifications.
 	 * @throws InterruptedException
 	 */
-	public void stop() throws InterruptedException
+	public void stop() throws Exception
 	{
 		if (_httpServer.isStarted())
 		{
@@ -151,7 +155,7 @@ public class NotificationServer
 		}
 	}
 	
-	protected HttpHandler createHandler()
+	protected Handler createHandler()
 	{
 		return new NotificationHandler();
 	}
@@ -160,7 +164,7 @@ public class NotificationServer
 		Pattern topicPattern, INotificationHandler handler)
 			throws IOException
 	{
-		_listeners.addEntry(topicPattern, handler);
+		_listenerTable.addEntry(topicPattern, handler);
 		return createEndpoint();
 	}
 	
@@ -181,7 +185,7 @@ public class NotificationServer
 		String topic, INotificationListener listener) 
 		throws IOException
 	{
-		GUID userKey = _listeners.addEntry(listener);
+		GUID userKey = _listenerTable.addEntry(listener);
 		
 		MessageElement userKeyElement = new MessageElement(
 			_USER_KEY_ELEMENT_NAME, userKey.toString());
@@ -228,7 +232,7 @@ public class NotificationServer
 		
 		return new EndpointReferenceType(
 			new AttributedURITypeSmart(String.format(_URL_PATTERN,
-				_protocol, "127.0.0.1", _httpServer.getListeners()[0].getPort())),
+				_protocol, "127.0.0.1", _httpServer.getConnectors()[0].getPort())),
 			null, null, null);
 	}
 	
@@ -293,13 +297,17 @@ public class NotificationServer
 			keystorePassword, keyPassword);
 	}
 	
-	private class NotificationHandler extends AbstractHttpHandler
+	private class NotificationHandler extends AbstractHandler
 	{
 		static final long serialVersionUID = 0L;
 		
-		public void handle(String pathInContext, String pathParams,
-			HttpRequest request, HttpResponse response) 
-				throws HttpException, IOException
+		@Override
+		public void handle(
+				String target, 
+				HttpServletRequest request,
+				HttpServletResponse response, 
+				int dispatch) 
+			throws IOException, ServletException
 		{
 			InputStream in = null;
 			
@@ -328,13 +336,13 @@ public class NotificationServer
 								subscription = _subscriptions.get(gKey);
 							}
 							if (subscription != null)
-								_listeners.notify(GUID.fromString(key), subscription,
+								_listenerTable.notify(GUID.fromString(key), subscription,
 									notify);
 						}
 					}
 				}
 				
-				_listeners.notify(notify);
+				_listenerTable.notify(notify);
 			}
 			catch (SOAPException se)
 			{
@@ -345,6 +353,7 @@ public class NotificationServer
 				StreamUtils.close(in);
 			}
 		}
+
 	}
 	
 	private class SubscriptionImpl implements ISubscription
@@ -381,7 +390,7 @@ public class NotificationServer
 					}
 				}
 			}).start();
-			_listeners.remove(_subscriptionKey);
+			_listenerTable.remove(_subscriptionKey);
 			synchronized(_subscriptions)
 			{
 				_subscriptions.remove(_subscriptionKey);

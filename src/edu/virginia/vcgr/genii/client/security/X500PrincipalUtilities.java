@@ -29,7 +29,7 @@ public class X500PrincipalUtilities
 		if (verbosity.compareTo(VerbosityLevel.HIGH) >= 0)
 			return principal.toString();
 		else
-			return String.format("%s",
+			return String.format("\"%s\"",
 				getCN(principal));
 	}
 }

@@ -178,7 +178,7 @@ public class DBSerializer
 		}
 		
 		byte []data = baos.toByteArray();
-		if (data.length > maxLength)
+		if ((maxLength > 0) && (data.length > maxLength))
 		{
 			_logger.debug(String.format(
 				"The blob was too large (%d), so compressing it.", 

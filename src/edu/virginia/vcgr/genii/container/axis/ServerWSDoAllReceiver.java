@@ -20,6 +20,7 @@ import org.apache.ws.axis.security.WSDoAllReceiver;
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
+import org.apache.axis.transport.http.HTTPConstants;
 import org.apache.axis.description.JavaServiceDesc;
 import org.apache.axis.description.ServiceDesc;
 import org.apache.commons.logging.Log;
@@ -47,20 +48,27 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.*;
 
-import edu.virginia.vcgr.genii.client.comm.axis.security.FlexibleBouncyCrypto;
-import edu.virginia.vcgr.genii.client.security.MessageLevelSecurity;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLException;
+
+import edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto;
+import edu.virginia.vcgr.genii.client.security.MessageLevelSecurityRequirements;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.resource.IResource;
-import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.context.*;
 
 import org.morgan.util.configuration.*;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 
-import edu.virginia.vcgr.genii.client.security.gamlauthz.*;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.identity.*;
+import edu.virginia.vcgr.genii.client.security.authz.AuthZSecurityException;
+import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
+import edu.virginia.vcgr.genii.client.security.credentials.TransientCredentials;
+import edu.virginia.vcgr.genii.client.security.credentials.assertions.DelegatedAssertion;
+import edu.virginia.vcgr.genii.client.security.credentials.assertions.SignedAssertion;
+import edu.virginia.vcgr.genii.client.security.credentials.identity.*;
+import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.container.security.authz.providers.*;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
@@ -72,6 +80,8 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 
 	static public final String CRYPTO_ALIAS = "CRYPTO_ALIAS";
 	static private final String CRYTO_PASS = "pwd";
+	static private final String SIG_CRYPTO_PROPERTY = 
+		GIIBouncyCrypto.class.getCanonicalName();
 
 	private static PrivateKey _serverPrivateKey;
 
@@ -130,22 +140,28 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 						WSSecurityUtil.getSOAPConstants(doc
 								.getDocumentElement());
 				if (WSSecurityUtil.getSecurityHeader(doc, actor, sc) == null)
+				{
+					// perform Authz
+					performAuthz();		
 					return;
+				}
 			}
 
 		}
 		catch (Exception e)
 		{
-			_logger
-					.error(
-							"An error occurred while trying to handler server-side, receiver security.",
-							e);
+			_logger.error(
+				"An error occurred while trying to handler server-side, receiver security.",
+				e);
 			throw new AxisFault(
 					"Exception thrown while retrieving security headers.", e);
 		}
 
 		// process all incoming security headers
 		super.invoke(msgContext);
+		
+		// perform Authz
+		performAuthz();		
 	}
 
 	@SuppressWarnings("unchecked")
@@ -158,7 +174,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		try
 		{
 			// get the resource's min messsage-sec level
-			MessageLevelSecurity resourceMinMsgSec;
+			MessageLevelSecurityRequirements resourceMinMsgSec;
 			IResource resource =
 					ResourceManager.getCurrentResource().dereference();
 			IAuthZProvider authZHandler =
@@ -167,7 +183,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 
 			if (authZHandler == null)
 			{
-				resourceMinMsgSec = new MessageLevelSecurity();
+				resourceMinMsgSec = new MessageLevelSecurityRequirements();
 			}
 			else
 			{
@@ -176,7 +192,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			}
 
 			// retrieve what we required from the actions vector
-			int performed = MessageLevelSecurity.NONE;
+			int performed = MessageLevelSecurityRequirements.NONE;
 			for (int i = 0; i < wsResult.size(); i++)
 			{
 				int action =
@@ -184,10 +200,10 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 				switch (action)
 				{
 				case WSConstants.SIGN:
-					performed |= MessageLevelSecurity.SIGN;
+					performed |= MessageLevelSecurityRequirements.SIGN;
 					break;
 				case WSConstants.ENCR:
-					performed |= MessageLevelSecurity.ENCRYPT;
+					performed |= MessageLevelSecurityRequirements.ENCRYPT;
 					break;
 				case WSConstants.UT:
 					break;
@@ -195,7 +211,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			}
 
 			// check to make sure we met our min level
-			if ((new MessageLevelSecurity(performed))
+			if ((new MessageLevelSecurityRequirements(performed))
 					.superset(resourceMinMsgSec))
 			{
 				return true;
@@ -236,9 +252,14 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			KeyStore keyStore = KeyStore.getInstance("JKS");
 			keyStore.load(null, null);
 
-			crypto = new FlexibleBouncyCrypto();
+			crypto = new GIIBouncyCrypto();
 			crypto.setKeyStore(keyStore);
 
+			// store our sig crypto for use later in retrieving 
+			// message-signing creds
+			((MessageContext)reqData.getMsgContext()).
+				setProperty(SIG_CRYPTO_PROPERTY, crypto);
+			
 			return crypto;
 
 		}
@@ -255,6 +276,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			throw new WSSecurityException(e.getMessage(), e);
 		}
 	}
+	
 
 	/**
 	 * Hook to allow subclasses to load their Encryption Crypto however they see
@@ -295,7 +317,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 						.toCharArray(), targetCertChain);
 			}
 
-			crypto = new FlexibleBouncyCrypto();
+			crypto = new GIIBouncyCrypto();
 			crypto.setKeyStore(keyStore);
 
 			return crypto;
@@ -323,78 +345,237 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		}
 	}
 
+
 	/**
-	 * Access control point for AuthZ handlers that require the caller's message
-	 * signing certificate
+	 * Authenticate any holder-of-key (i.e., signed) bearer credentials
+	 * using the given authenticated certificate-chains.
+	 * 
+	 * Returns a cumulative collection identities composed from both 
+	 * the bearer- and authenticated- credentials
+	 * 
 	 */
-	protected boolean verifyTrust(X509Certificate cert, RequestData reqData)
-			throws WSSecurityException
-	{
+	public static Collection<GIICredential> authenticateBearerCredentials(
+			ArrayList<GIICredential> bearerCredentials,
+			ArrayList<X509Certificate[]> authenticatedCertChains, 
+			X509Certificate[] targetCertChain) 
+			
+			throws AuthZSecurityException, GeneralSecurityException {
+		
+		HashSet<GIICredential> retval = new HashSet<GIICredential>();
+		
+		// Add the authenticated certificate chains
+		for (X509Certificate[] certChain : authenticatedCertChains) {
+			retval.add(new X509Identity(certChain));
+		}
+		
+		// Corroborate the bearer credentials
+		for (GIICredential cred : bearerCredentials)
+		{
+			if (cred instanceof SignedAssertion)
+			{
+				// Holder-of-key token
+				SignedAssertion signedAssertion = (SignedAssertion) cred;
+
+				// Check validity and verify integrity
+				signedAssertion.checkValidity(new Date());
+				signedAssertion.validateAssertion();
+
+				// If the assertion is pre-authorized for us, unwrap one
+				// layer
+				if ((targetCertChain != null)
+						&& (signedAssertion.getAuthorizedIdentity()[0]
+								.equals(targetCertChain[0])))
+				{
+					if (!(signedAssertion instanceof DelegatedAssertion))
+					{
+						throw new AuthZSecurityException(
+								"GAML credential \""
+										+ signedAssertion
+										+ "\" does not match the incoming message sender");
+					}
+					signedAssertion =
+							((DelegatedAssertion) signedAssertion).unwrap();
+				}
+
+				// Verify that the request message signer is the same as the
+				// one of the holder-of-key certificates
+				boolean match = false;
+				for (X509Certificate[] callerCertChain : authenticatedCertChains) {
+					if (callerCertChain[0].equals(signedAssertion.getAuthorizedIdentity()[0])) {
+						match = true;
+						break;
+					}
+				}
+				
+				if (!match) {
+					throw new AuthZSecurityException(
+							"GII credential \""
+									+ signedAssertion
+									+ "\" does not match the incoming message sender");
+				}
+			}
+
+			retval.add(cred);
+		}
+		
+		return retval;
+	}
+	
+	/**
+	 * Perform authorization for the callee resource.
+	 * 
+	 * @throws WSSecurityException upon access-denial
+	 */
+	@SuppressWarnings("unchecked")
+	protected void performAuthz() throws AxisFault {
 
 		try
 		{
-			// we can now extract our calling context (if we did encryption, it
-			// would
-			// not have been readable till now)
+			// Grab working and message contexts
 			WorkingContext workingContext =
-					WorkingContext.getCurrentWorkingContext();
+				WorkingContext.getCurrentWorkingContext();
 			MessageContext messageContext =
-					(MessageContext) workingContext
-							.getProperty(WorkingContext.MESSAGE_CONTEXT_KEY);
-			ICallingContext callContext = null;
-			try
+				(MessageContext) workingContext
+						.getProperty(WorkingContext.MESSAGE_CONTEXT_KEY);
+			
+			// Extract our calling context (any decryption should be 
+			// over with).  All GII message-level assertions and UT 
+			// tokens should be within CALLER_CREDENTIALS_PROPERTY by now.
+			ICallingContext callContext = ContextManager.getCurrentContext();
+
+			// Get the destination certificate from the calling context
+			KeyAndCertMaterial targetKeyMaterial =
+					ContextManager.getCurrentContext(false)
+							.getActiveKeyAndCertMaterial();
+			X509Certificate[] targetCertChain = null;
+			if (targetKeyMaterial != null)
 			{
-				callContext = ContextManager.getCurrentContext();
-				if (Security.isAdministrator(callContext))
-				{
-					_logger.info("Method call made as admin.");
-					return true;
+				targetCertChain = targetKeyMaterial._clientCertChain;
+			}
+
+			// Create a list of public certificate chains that have been 
+			// verified as holder-of-key (e.g., though SSL or 
+			// message-level security).
+			ArrayList<X509Certificate[]> authenticatedCertChains = 
+				new ArrayList<X509Certificate[]>();
+
+			// Grab the client-hello authenticated SSL cert-chain (if there
+			// was one)
+			org.mortbay.jetty.Request req = (org.mortbay.jetty.Request) 
+				messageContext.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
+			Object transport = req.getConnection().getEndPoint().getTransport();
+			if (transport instanceof SSLSocket) 
+			{
+				SSLSocket socket = (SSLSocket) transport;
+				
+				try { 
+					X509Certificate[] clientSslCertChain = 
+						(X509Certificate[]) socket.getSession().getPeerCertificates();
+					if (clientSslCertChain != null) {
+						authenticatedCertChains.add(clientSslCertChain);
+					}
+				} catch (SSLException e) {
+					_logger.warn("Error retrieving SSL client certchain", e);
 				}
 			}
-			catch (ConfigurationException e)
+				
+			// Retrieve the message-level cert-chains that have been 
+			// recorded in the signature-Crypto instance. (Unfortunately 
+			// this method is only called with the end-certificate; without
+			// the chain, it's impossible to trust X.509 proxy certs)
+			GIIBouncyCrypto sigCrypto = (GIIBouncyCrypto) 
+				messageContext.getProperty(SIG_CRYPTO_PROPERTY);
+			if (sigCrypto != null) 
 			{
-				throw new IOException(e.getMessage());
-			} 
+				authenticatedCertChains.addAll(sigCrypto.getLoadedCerts());
+			}
 
+			// Retrieve and authenticate other accumulated 
+			// message-level credentials (e.g., GII delegated assertions, etc.)
+			ArrayList<GIICredential> bearerCredentials =
+				(ArrayList<GIICredential>) callContext
+						.getTransientProperty(GIICredential.CALLER_CREDENTIALS_PROPERTY);
+			Collection<GIICredential> authenticatedCallerCreds = 
+				authenticateBearerCredentials(
+					bearerCredentials,
+					authenticatedCertChains, 
+					targetCertChain);					
+			
+			// Finally add all of our callerIds to the calling-context's 
+			// outgoing credentials 
+			TransientCredentials transientCredentials = 
+				TransientCredentials.getTransientCredentials(callContext); 
+			transientCredentials._credentials.addAll(authenticatedCallerCreds);
+			
 			// Grab the operation method from the message context
 			org.apache.axis.description.OperationDesc desc =
 					messageContext.getOperation();
 			if (desc == null)
 			{
 				// pretend security doesn't exist -- axis will do what it does
-				// when
-				// it can't figure out how to dispatch to a non-existant method
-				return true;
+				// when it can't figure out how to dispatch to a non-existant 
+				// method
+				return;
 			}
-			
 			JavaServiceDesc jDesc = null;
 			ServiceDesc serviceDescription = desc.getParent();
 			if (serviceDescription != null && 
 				(serviceDescription instanceof JavaServiceDesc))
 					jDesc = (JavaServiceDesc)serviceDescription;
-			
-			Method operation = desc.getMethod();
+			Method operation = desc.getMethod();			
 
-			// get the resource's authz handler
+			// Get the resource's authz handler
 			IResource resource =
 					ResourceManager.getCurrentResource().dereference();
 			IAuthZProvider authZHandler =
 					AuthZProviders.getProvider(resource.getParentResourceKey()
 							.getServiceName());
-
+			
 			// Let the authZ handler make the decision
-			return authZHandler.checkAccess(callContext, cert, resource,
-				(jDesc == null) ?
-					operation.getDeclaringClass() : jDesc.getImplClass(),
-				operation);
+			authZHandler.checkAccess(
+					authenticatedCallerCreds, 
+					resource,
+					(jDesc == null) ? operation.getDeclaringClass() : jDesc.getImplClass(),
+					operation);
 
 		}
 		catch (IOException e)
 		{
-			throw new WSSecurityException(e.getMessage(), e);
+			throw new AxisFault(e.getMessage(), e);
 		}
+		catch (GeneralSecurityException e)
+		{
+			throw new AxisFault(e.getMessage(), e);
+		}
+		
 	}
+	
+    /**
+     * Evaluate whether a given certificate should be trusted.
+     * Hook to allow subclasses to implement custom validation methods however they see fit.
+     *
+     * @param cert the certificate that should be validated against the keystore
+     * @return true if the certificate is trusted, false if not (AxisFault is thrown for exceptions during CertPathValidation)
+     * @throws WSSecurityException
+     */
+    protected boolean verifyTrust(
+    		X509Certificate cert, 
+    		RequestData reqData) 
+    	throws WSSecurityException 
+    {
+    	// Return true for now.  performAuthz() will grab the creds retrieved
+    	// via message signature (and elsewhere) and make the actual trust/authz 
+    	// decision.
+    	return true;
+    }
 
+    	
+	/**
+	 * Callback class to stash any username-token credentials into the   
+	 * calling context's CALLER_CREDENTIALS_PROPERTY.
+	 * 
+	 * @author dgm4d
+	 */
 	static public class ServerPWCallback implements CallbackHandler
 	{
 
@@ -417,7 +598,9 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 					switch (pc.getUsage())
 					{
 					case WSPasswordCallback.USERNAME_TOKEN:
-						// broken
+						// broken, but WSS4J seems to call USERNAME_TOKEN_UNKNOWN
+						// case below anyway 
+						
 						/*
 						 * // return password from file to make sure of match
 						 * pc.setPassword("mooch"); return;
@@ -425,6 +608,14 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 						break;
 
 					case WSPasswordCallback.USERNAME_TOKEN_UNKNOWN:
+
+						// Grab the supplied username token
+						UsernamePasswordIdentity identity =
+							new UsernamePasswordIdentity(pc.getIdentifer(),
+									pc.getPassword());
+
+						// Extract our calling context (any decryption 
+						// should be over with) 
 						ICallingContext callContext = null;
 						try
 						{
@@ -435,22 +626,13 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 							throw new IOException(e.getMessage());
 						}
 
-						// check to make sure the username and password match
-
-						// add the identity to the current calling context
-						UsernamePasswordIdentity identity =
-								new UsernamePasswordIdentity(pc.getIdentifer(),
-										pc.getPassword());
-						TransientCredentials transientCredentials =
-								TransientCredentials
-										.getTransientCredentials(callContext);
-						transientCredentials._credentials.add(identity);
-
-						// add the identity to the caller's credential list
-						ArrayList<GamlCredential> callerCredentials =
-								(ArrayList<GamlCredential>) callContext
-										.getTransientProperty(GamlCredential.CALLER_CREDENTIALS_PROPERTY);
+						// add the UT to the caller's credential list
+						ArrayList<GIICredential> callerCredentials =
+								(ArrayList<GIICredential>) callContext
+										.getTransientProperty(GIICredential.CALLER_CREDENTIALS_PROPERTY);
 						callerCredentials.add(identity);
+						
+						break;
 
 					case WSPasswordCallback.DECRYPT:
 					case WSPasswordCallback.SIGNATURE:

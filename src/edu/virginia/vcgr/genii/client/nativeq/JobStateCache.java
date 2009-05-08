@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
-import org.mortbay.log.LogFactory;
+import org.apache.commons.logging.LogFactory;
 
 public class JobStateCache
 {

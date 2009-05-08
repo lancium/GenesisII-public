@@ -43,11 +43,10 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.comm.CommConstants;
 import edu.virginia.vcgr.genii.client.comm.GeniiSOAPHeaderConstants;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
-import edu.virginia.vcgr.genii.client.comm.axis.security.MessageSecurityData;
+import edu.virginia.vcgr.genii.client.comm.axis.security.MessageSecurity;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
-import edu.virginia.vcgr.genii.client.security.gamlauthz.axis.GamlMessageSendHandler;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
@@ -181,6 +180,17 @@ public class AxisClientHeaderHandler extends BasicHandler
 					for (MessageElement elem : any)
 					{
 						SOAPHeaderElement she = new SOAPHeaderElement(elem);
+						
+						// dgm4d: Haxx for problem where resource keys go missing:
+						// Basically we have resource keys occasionally set 
+						// as MessageElement.objectValue, which isn't deep-copied
+						// from "elem" during the SOAPHeaderElement construction.
+						if ((elem.getObjectValue() != null) && 
+							((she.getChildren() == null) || (she.getChildren().isEmpty())))
+						{
+							she.setObjectValue(elem.getObjectValue()); 
+						}
+						
 						she.removeAttributeNS(
 							EndpointReferenceType.getTypeDesc().getXmlType().getNamespaceURI(),
 							"IsReferenceParameter");
@@ -241,14 +251,16 @@ public class AxisClientHeaderHandler extends BasicHandler
 		
 		// process the transient credentials to prepare
 		// the serializable portion of the calling context for them
-		MessageSecurityData msgSecData = 
-			(MessageSecurityData) msgContext.getProperty(CommConstants.MESSAGE_SEC_CALL_DATA);
-		if ((msgSecData != null) && (!msgSecData._neededMsgSec.isNone())) {
-			GamlMessageSendHandler.messageSendPrepareHandler(
-					callContext, 
-					msgContext.getOperation().getMethod(), 
-					msgSecData._resourceCertChain);
-		}
+		MessageSecurity msgSecData = 
+			(MessageSecurity) msgContext.getProperty(CommConstants.MESSAGE_SEC_CALL_DATA);
+
+		// Prepare outgoing GIICredentials contained within the  
+		// calling-context's TransientCredentials, performing pre-delegation
+		// and serialization steps.   
+		MessageSecurity.messageSendPrepareHandler(
+				callContext, 
+				msgContext.getOperation().getMethod(), 
+				msgSecData);
 		
 		try
 		{
