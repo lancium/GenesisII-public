@@ -6,6 +6,8 @@ import edu.virginia.vcgr.genii.client.jsdl.personality.CPUArchitectureFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.CandidateHostsFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.DataStagingFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.FileSystemFacet;
+import edu.virginia.vcgr.genii.client.jsdl.personality.GeniiOrFacet;
+import edu.virginia.vcgr.genii.client.jsdl.personality.GeniiPropertyFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.HPCApplicationFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.JobDefinitionFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.JobDescriptionFacet;
@@ -137,5 +139,19 @@ public class DefaultPersonalityProvider implements PersonalityProvider
 			throws JSDLException
 	{
 		return new DefaultTargetURIFacet();
+	}
+
+	@Override
+	public GeniiOrFacet getGeniiOrFacet(Object currentUnderstanding)
+			throws JSDLException
+	{
+		return new DefaultGeniiOrFacet();
+	}
+
+	@Override
+	public GeniiPropertyFacet getGeniiPropertyFacet(Object currentUnderstanding)
+			throws JSDLException
+	{
+		return new DefaultGeniiPropertyFacet();
 	}
 }

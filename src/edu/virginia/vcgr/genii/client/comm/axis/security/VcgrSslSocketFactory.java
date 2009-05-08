@@ -31,7 +31,6 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.configuration.*;
 import edu.virginia.vcgr.genii.client.configuration.Security;
-import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.x509.*;
 
@@ -51,7 +50,9 @@ public class VcgrSslSocketFactory
 		extends SSLSocketFactory 
 		implements ConfigurationUnloadedListener
 {
-
+	static public InheritableThreadLocal<ICallingContext> threadCallingContext =
+		new InheritableThreadLocal<ICallingContext>();
+	
     protected TrustManager[] _trustManagers;
     protected SecureRandom _random = null;
 	
@@ -62,7 +63,7 @@ public class VcgrSslSocketFactory
 		// reset cached key/trust stores
 		notifyUnloaded();
 	}
-
+	
 	public synchronized void notifyUnloaded() {
 		try {
 			TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
@@ -109,7 +110,13 @@ public class VcgrSslSocketFactory
 		
 		try {
 			
-			ICallingContext callingContext = ContextManager.getCurrentContext(false);
+			ICallingContext callingContext = threadCallingContext.get();
+			if (callingContext == null)
+				throw new RuntimeException(
+					"We got a null calling context which " +
+					"means that client invocation handler " +
+					"didn't set it up correctly.");
+			
 			KeyAndCertMaterial clientKeyMaterial = 
 				ClientUtils.checkAndRenewCredentials(callingContext, 
 				new Date(), new SecurityUpdateResults());

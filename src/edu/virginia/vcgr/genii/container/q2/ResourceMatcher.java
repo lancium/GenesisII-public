@@ -1,5 +1,12 @@
 package edu.virginia.vcgr.genii.container.q2;
 
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.xml.namespace.QName;
+
+import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.CPUArchitecture_Type;
@@ -11,6 +18,8 @@ import org.ggf.jsdl.OperatingSystem_Type;
 import org.ggf.jsdl.ProcessorArchitectureEnumeration;
 import org.ggf.jsdl.Resources_Type;
 
+import edu.virginia.vcgr.genii.client.jsdl.personality.GeniiOrFacet;
+import edu.virginia.vcgr.genii.client.jsdl.personality.GeniiPropertyFacet;
 import edu.virginia.vcgr.genii.container.q2.besinfo.BESInformation;
 
 /**
@@ -22,6 +31,64 @@ import edu.virginia.vcgr.genii.container.q2.besinfo.BESInformation;
 public class ResourceMatcher
 {
 	static private Log _logger = LogFactory.getLog(ResourceMatcher.class);
+	
+	static private boolean matchProperty(
+		Map<String, Collection<String>> properties,
+		MessageElement testProperty)
+	{
+		String propertyName = testProperty.getAttribute(
+			GeniiPropertyFacet.PROPERTY_NAME_ATTRIBUTE);
+		String propertyValue = testProperty.getAttribute(
+			GeniiPropertyFacet.PROPERTY_VALUE_ATTRIBUTE);
+		
+		if (propertyName == null)
+		{
+			_logger.warn("Found a matching parameter property with no name.");
+			return true;
+		}
+		
+		if (propertyValue == null)
+			_logger.trace("Found a matching parameter property with no " +
+				"value...assuming it's a set test.");
+		
+		Collection<String> values = properties.get(propertyName);
+		if (values == null || values.size() == 0)
+			return false;
+		
+		if (propertyValue == null)
+			return true;
+		
+		for (String value : values)
+		{
+			if (value.equals(propertyValue))
+				return true;
+		}
+		
+		return false;
+	}
+	
+	static private boolean matchOr(
+		Map<String, Collection<String>> properties,
+		MessageElement orElement)
+	{
+		Iterator<?> iter = orElement.getChildElements();
+		while (iter.hasNext())
+		{
+			MessageElement element = (MessageElement)iter.next();
+			QName name = element.getQName();
+			if (name.equals(GeniiPropertyFacet.PROPERTY_ELEMENT))
+			{
+				if (matchProperty(properties, element))
+					return true;
+			} else if (name.equals(GeniiOrFacet.OR_ELEMENT))
+			{
+				if (matchOr(properties, element))
+					return true;
+			}
+		}
+		
+		return false;
+	}
 	
 	static private boolean matchArch(BESInformation info, 
 		CPUArchitecture_Type arch)
@@ -109,6 +176,26 @@ public class ResourceMatcher
 			_logger.warn(
 				"Cannot match jsdl to bes information -- OS restrictinos don't match.");
 			return false;
+		}
+		
+		MessageElement []any = resources.get_any();
+		if (any != null)
+		{
+			for (MessageElement element : any)
+			{
+				QName name = element.getQName();
+				if (name.equals(GeniiPropertyFacet.PROPERTY_ELEMENT))
+				{
+					if (!matchProperty(
+						besInfo.getMatchingParameters(), element))
+						return false;
+				} else if (name.equals(GeniiOrFacet.OR_ELEMENT))
+				{
+					if (!matchOr(
+						besInfo.getMatchingParameters(), element))
+						return false;
+				}
+			}
 		}
 		
 		return true;

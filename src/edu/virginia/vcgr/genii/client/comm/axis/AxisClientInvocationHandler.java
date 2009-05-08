@@ -597,7 +597,13 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		}
 	
 		stubInstance.setTimeout(timeout);
+		
+		/* Set calling context so that the socket factory has access to
+		 * it.
+		 */
+		VcgrSslSocketFactory.threadCallingContext.set(_callContext);
 		Object ret = calledMethod.invoke(stubInstance, arguments);
+		VcgrSslSocketFactory.threadCallingContext.set(null);
 
 		Object [] inAttachments = stubInstance.getAttachments();
 		if (inAttachments != null)

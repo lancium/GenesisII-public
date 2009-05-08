@@ -51,7 +51,7 @@ public class JobEvent implements PostEvent
 		boolean seenFirst = false;
 		try
 		{
-			Collection<Identity> ids = SecurityUtils.getCallerIdentities();
+			Collection<Identity> ids = SecurityUtils.getCallerIdentities(ctxt);
 			if (ids != null)
 			{
 				for (Identity id : ids)

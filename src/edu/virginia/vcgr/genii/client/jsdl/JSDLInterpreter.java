@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.client.jsdl;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -47,6 +48,8 @@ import edu.virginia.vcgr.genii.client.jsdl.personality.CPUArchitectureFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.CandidateHostsFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.DataStagingFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.FileSystemFacet;
+import edu.virginia.vcgr.genii.client.jsdl.personality.GeniiOrFacet;
+import edu.virginia.vcgr.genii.client.jsdl.personality.GeniiPropertyFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.HPCApplicationFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.JobDefinitionFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.JobDescriptionFacet;
@@ -81,6 +84,20 @@ public class JSDLInterpreter
 	}
 	
 	static private void understandAny(
+		PersonalityFacet facet, Object understanding, 
+		MessageElement []any) throws JSDLException
+	{
+		if (any != null)
+		{
+			for (MessageElement a : any)
+			{
+				if (a != null)
+					facet.consumeAny(understanding, a);
+			}
+		}
+	}
+	
+	static private void understandResourcesAny(PersonalityProvider provider,
 		PersonalityFacet facet, Object understanding, MessageElement []any)
 			throws JSDLException
 	{
@@ -89,7 +106,40 @@ public class JSDLInterpreter
 			for (MessageElement a : any)
 			{
 				if (a != null)
-					facet.consumeAny(understanding, a);
+				{
+					QName name = a.getQName();
+					if (name.equals(GeniiPropertyFacet.PROPERTY_ELEMENT))
+					{
+						String propertyName = a.getAttribute(
+							GeniiPropertyFacet.PROPERTY_NAME_ATTRIBUTE);
+						String propertyValue = a.getAttribute(
+							GeniiPropertyFacet.PROPERTY_VALUE_ATTRIBUTE);
+						
+						GeniiPropertyFacet f2 = provider.getGeniiPropertyFacet(
+							understanding);
+						Object newUnderstanding = f2.createFacetUnderstanding(
+							understanding);
+						f2.consumeProperty(newUnderstanding, propertyName, 
+							propertyValue);
+						f2.completeFacet(understanding, newUnderstanding);
+					} else if (name.equals(GeniiOrFacet.OR_ELEMENT))
+					{
+						GeniiOrFacet f2 = provider.getGeniiOrFacet(
+							understanding);
+						Object newUnderstanding = f2.createFacetUnderstanding(
+							understanding);
+						
+						Collection<MessageElement> children = 
+							new ArrayList<MessageElement>();
+						Iterator<?> iter = a.getChildElements();
+						while (iter.hasNext())
+							children.add((MessageElement)iter.next());
+						understandResourcesAny(provider, f2, newUnderstanding,
+							children.toArray(new MessageElement[children.size()]));
+						f2.completeFacet(understanding, newUnderstanding);
+					} else
+						facet.consumeAny(understanding, a);
+				}
 			}
 		}
 	}
@@ -283,7 +333,7 @@ public class JSDLInterpreter
 		Object understanding = facet.createFacetUnderstanding(
 			parentUnderstanding);
 				
-		understandAny(facet, understanding, resources.get_any());
+		understandResourcesAny(provider, facet, understanding, resources.get_any());
 		
 		understandCandidateHosts(provider, understanding, 
 			resources.getCandidateHosts());

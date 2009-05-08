@@ -232,7 +232,7 @@ public class NotificationServer
 		
 		return new EndpointReferenceType(
 			new AttributedURITypeSmart(String.format(_URL_PATTERN,
-				_protocol, "127.0.0.1", _httpServer.getConnectors()[0].getPort())),
+				_protocol, "127.0.0.1", _httpServer.getConnectors()[0].getLocalPort())),
 			null, null, null);
 	}
 	

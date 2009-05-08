@@ -113,6 +113,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		{
 			IResource resource =
 					ResourceManager.getCurrentResource().dereference();
+			
 			IAuthZProvider authZHandler =
 					AuthZProviders.getProvider(resource.getParentResourceKey()
 							.getServiceName());
