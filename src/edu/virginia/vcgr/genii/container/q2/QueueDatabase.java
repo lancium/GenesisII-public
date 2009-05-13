@@ -121,7 +121,8 @@ public class QueueDatabase
 				"VALUES (?, ?, ?, 1)");
 			stmt.setString(1, _queueID);
 			stmt.setString(2, name);
-			stmt.setBlob(3, EPRUtils.toBlob(epr));
+			stmt.setBlob(3, EPRUtils.toBlob(epr,
+				"q2resources", "resourceendpoint"));
 			
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException(
@@ -374,12 +375,14 @@ public class QueueDatabase
 			stmt.setShort(1, attempts);
 			stmt.setString(2, newState.name());
 			stmt.setTimestamp(3, new Timestamp(finishTime.getTime()));
-			stmt.setBlob(4, EPRUtils.toBlob(jobEndpoint));
+			stmt.setBlob(4, EPRUtils.toBlob(jobEndpoint,
+				"q2jobs", "jobendpoint"));
 			if (besID != null)
 				stmt.setLong(5, besID.longValue());
 			else
 				stmt.setNull(5, Types.BIGINT);
-			stmt.setBlob(6, EPRUtils.toBlob(besEndpoint));
+			stmt.setBlob(6, EPRUtils.toBlob(besEndpoint,
+				"q2jobs", "resourceendpoint"));
 			stmt.setLong(7, jobID);
 			
 			if (stmt.executeUpdate() != 1)
@@ -428,10 +431,11 @@ public class QueueDatabase
 			stmt.setString(1, ticket);
 			stmt.setString(2, _queueID);
 			stmt.setBlob(3, DBSerializer.toBlob(callingContext,
-				connection, "q2jobs", "callingcontext"));
-			stmt.setBlob(4, DBSerializer.xmlToBlob(jsdl));
+				"q2jobs", "callingcontext"));
+			stmt.setBlob(4, DBSerializer.xmlToBlob(jsdl,
+				"q2jobs", "jsdl"));
 			stmt.setBlob(5, DBSerializer.toBlob(identities,
-				connection, "q2jobs", "owners"));
+				"q2jobs", "owners"));
 			stmt.setShort(6, priority);
 			stmt.setString(7, state.name());
 			stmt.setTimestamp(8, new Timestamp(submitTime.getTime()));
@@ -605,7 +609,8 @@ public class QueueDatabase
 					stmt.setString(1, QueueStates.STARTING.name());
 					stmt.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
 					stmt.setLong(3, match.getBESID());
-					stmt.setBlob(4, EPRUtils.toBlob(besEPR));
+					stmt.setBlob(4, EPRUtils.toBlob(besEPR,
+						"q2jobs", "resourceendpoint"));
 					stmt.setLong(5, match.getJobID());
 					
 					stmt.addBatch();
@@ -735,7 +740,8 @@ public class QueueDatabase
 				"UPDATE q2jobs SET state = ?, jobendpoint = ? " +
 				"WHERE jobid = ?");
 			stmt.setString(1, QueueStates.RUNNING.name());
-			stmt.setBlob(2, EPRUtils.toBlob(jobEPR));
+			stmt.setBlob(2, EPRUtils.toBlob(jobEPR,
+				"q2jobs", "jobendpoint"));
 			stmt.setLong(3, jobID);
 			
 			if (stmt.executeUpdate() != 1)
@@ -877,7 +883,7 @@ public class QueueDatabase
 			stmt.setString(1, _queueID);
 			stmt.setLong(2, jobid);
 			stmt.setShort(3, attempt);
-			stmt.setBlob(4, DBSerializer.toBlob(errors, connection, 
+			stmt.setBlob(4, DBSerializer.toBlob(errors, 
 				"q2errors", "errors"));
 			stmt.executeUpdate();
 		}

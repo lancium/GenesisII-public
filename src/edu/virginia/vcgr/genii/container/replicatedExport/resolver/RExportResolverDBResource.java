@@ -193,7 +193,8 @@ implements IRExportResolverResource
 			else{
 				stmt.setString(1, resourceEPI);
 				stmt.setString(2, resolverEPI);
-				stmt.setBlob(3, EPRUtils.toBlob(resolverEPR));
+				stmt.setBlob(3, EPRUtils.toBlob(resolverEPR,
+					"resolvermapping", "resolverEPR"));
 			}
 			if (stmt.executeUpdate() != 1)
 				throw new ResourceException(

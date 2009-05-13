@@ -16,7 +16,7 @@ public class RNSDBResourceFactory extends BasicDBResourceFactory implements
 {
 	static private final String _CREATE_ENTRY_TABLE_STMT =
 		"CREATE TABLE entries (resourceid VARCHAR(128), name VARCHAR(256), " +
-		"endpoint BLOB (128K), id VARCHAR(40), " +
+		"endpoint BLOB (2G), id VARCHAR(40), " +
 		"attrs VARCHAR (8192) FOR BIT DATA, " +
 		"CONSTRAINT contextsconstraint1 PRIMARY KEY (resourceid, name))";
 	

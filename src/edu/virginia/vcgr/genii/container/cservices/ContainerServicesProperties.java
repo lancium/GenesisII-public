@@ -76,7 +76,7 @@ public class ContainerServicesProperties
 			DatabaseTableUtils.createTables(connection, false, 
 				"CREATE TABLE containerservicesproperties (" +
 					"name VARCHAR(256) PRIMARY KEY, " +
-					"value BLOB(128K) NOT NULL)");
+					"value BLOB(2G) NOT NULL)");
 			connection.commit();
 		}
 		catch (SQLException sqe)
@@ -196,7 +196,7 @@ public class ContainerServicesProperties
 					"UPDATE containerservicesproperties " +
 					"SET value = ? WHERE name = ?");
 				stmt.setBlob(1, DBSerializer.toBlob(newValue,
-					connection, "containerservicesproperties", "value"));
+					"containerservicesproperties", "value"));
 				stmt.setString(2, propertyName);
 				if (stmt.executeUpdate() != 1)
 					throw new SQLException(
@@ -211,7 +211,7 @@ public class ContainerServicesProperties
 					"VALUES (?, ?)");
 				stmt.setString(1, propertyName);
 				stmt.setBlob(2, DBSerializer.toBlob(newValue,
-					connection, "containerservicesproperties", "value"));
+					"containerservicesproperties", "value"));
 				if (stmt.executeUpdate() != 1)
 					throw new SQLException(
 						"Unable to insert property into database.");

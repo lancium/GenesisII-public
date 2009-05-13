@@ -24,7 +24,7 @@ public class IteratorDBResourceFactory extends BasicDBResourceFactory
 			"entryid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
 			"iteratorid VARCHAR(256) NOT NULL, " +
 			"elementindex BIGINT NOT NULL, " +
-			"contents BLOB(128K) NOT NULL, " +
+			"contents BLOB(2G) NOT NULL, " +
 			"CONSTRAINT iteratorsuniqueconstraint UNIQUE (iteratorid, elementindex))"
 	};
 	

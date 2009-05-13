@@ -8,12 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.sql.Blob;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -29,7 +24,8 @@ import org.xml.sax.InputSource;
 public class DBSerializer
 {
 	static private Log _logger = LogFactory.getLog(DBSerializer.class);
-	
+
+/*
 	static private Map<String, Long> _blobSizes = new HashMap<String, Long>();
 	
 	static private long getBlobLength(Connection connection,
@@ -84,12 +80,12 @@ public class DBSerializer
 			StreamUtils.close(rs);
 		}
 	}
+*/
 	
-	static public Blob toBlob(Object obj, Connection connection,
-		String tableName, String columnName)
+	static public Blob toBlob(Object obj, String tableName, String columnName)
 			throws SQLException
 	{
-		long maxLength = getBlobLength(connection, tableName, columnName);
+		long maxLength = BlobLimits.limits().getLimit(tableName, columnName);
 		SerialBlob blob;
 		
 		if (obj == null)
@@ -107,7 +103,7 @@ public class DBSerializer
 				_logger.error(String.format(
 					"Error:  Blob was created with %d bytes for %s.%s, " +
 					"but the maximum length for that column is %d bytes.", 
-					tableName, columnName, maxLength));
+					blob.length(), tableName, columnName, maxLength));
 			}
 			
 			return blob;
@@ -264,15 +260,30 @@ public class DBSerializer
 		}
 	}
 	
-	static public Blob xmlToBlob(Object obj)
-		throws SQLException
+	static public Blob xmlToBlob(Object obj, 
+		String tableName, String columnName) throws SQLException
 	{
+		long maxLength = BlobLimits.limits().getLimit(tableName, columnName);
+		
 		if (obj == null)
 			return null;
 		
 		try
 		{
 			byte []data = xmlSerialize(obj);
+		
+			_logger.debug(String.format(
+				"Created a blob of length %d bytes for %s.%s which has a " +
+				"max length of %d bytes.",
+				data.length, tableName, columnName, maxLength));
+			if (data.length > maxLength)
+			{
+				_logger.error(String.format(
+					"Error:  Blob was created with %d bytes for %s.%s, " +
+					"but the maximum length for that column is %d bytes.", 
+					data.length, tableName, columnName, maxLength));
+			}
+			
 			return new SerialBlob(data);
 		}
 		catch (IOException ioe)

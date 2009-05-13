@@ -50,7 +50,8 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 			stmt = _connection.prepareStatement(_ADD_ENTRY_STATEMENT);
 			stmt.setString(1, this._resourceKey);
 			stmt.setString(2, entry.getName());
-			stmt.setBlob(3, EPRUtils.toBlob(entry.getEntryReference()));
+			stmt.setBlob(3, EPRUtils.toBlob(entry.getEntryReference(),
+				"entries", "endpoint"));
 			stmt.setString(4, attrKey);
 			stmt.setBytes(5, ObjectSerializer.anyToBytes(entry.getAttributes()));
 			if (stmt.executeUpdate() != 1)

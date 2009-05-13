@@ -186,7 +186,7 @@ public class BasicDBResource implements IResource
 			stmt.setString(2, propertyName);
 			
 			Blob b = DBSerializer.toBlob(value,
-				_connection, "properties", "propvalue");
+				"properties", "propvalue");
 			_logger.debug("Serializing " + b.length() + 
 				" bytes into property database.");
 			if (b.length() <= 0)

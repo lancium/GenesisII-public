@@ -77,10 +77,10 @@ public class AlarmManager
 					"alarmid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY," +
 					"nextoccurance TIMESTAMP NOT NULL," +
 					"repeatinterval BIGINT," +
-					"callingcontext BLOB(128K)," +
-					"target BLOB(128K)," +
+					"callingcontext BLOB(2G)," +
+					"target BLOB(2G)," +
 					"methodname VARCHAR(256) NOT NULL," +
-					"userdata BLOB(128K))");
+					"userdata BLOB(2G))");
 				conn.commit();
 			return true;
 		}
@@ -247,10 +247,11 @@ public class AlarmManager
 				"VALUES (?, ?, ?, ?, ?, ?)");
 			addStmt.setTimestamp(1, new Timestamp(nextOccurance.getTime()));
 			addStmt.setLong(2, repeatIntervalMS);
-			addStmt.setBlob(3, DBSerializer.toBlob(callingContext, conn, "alarmtable", "callingcontext"));
-			addStmt.setBlob(4, EPRUtils.toBlob(targetEPR));
+			addStmt.setBlob(3, DBSerializer.toBlob(callingContext, "alarmtable", "callingcontext"));
+			addStmt.setBlob(4, EPRUtils.toBlob(targetEPR,
+				"alarmtable", "target"));
 			addStmt.setString(5, methodName);
-			addStmt.setBlob(6, DBSerializer.toBlob(userData, conn, "alarmtable", "userdata"));
+			addStmt.setBlob(6, DBSerializer.toBlob(userData, "alarmtable", "userdata"));
 			if (addStmt.executeUpdate() != 1)
 				throw new RuntimeException("Unable to add alarm to database.");
 			

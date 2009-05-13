@@ -970,7 +970,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 					new MessageElement[] { any }, new UnsignedInt(count));
 				stmt.setString(1, id);
 				stmt.setLong(2, count);
-				stmt.setBlob(3, DBSerializer.xmlToBlob(member));
+				stmt.setBlob(3, DBSerializer.xmlToBlob(member,
+					"iterators", "contents"));
 				
 				stmt.addBatch();
 				needsExecute = true;

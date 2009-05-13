@@ -338,7 +338,7 @@ public class BESActivity implements Closeable
 				"WHERE activityid = ?");
 			stmt.setInt(1, nextPhase);
 			stmt.setBlob(2, DBSerializer.toBlob(state, 
-				connection, "besactivitiestable", "state"));
+				"besactivitiestable", "state"));
 			stmt.setString(3, _activityid);
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException("Unable to update database.");
@@ -590,7 +590,7 @@ public class BESActivity implements Closeable
 						stmt.setString(1, _activityid);
 						stmt.setString(2, name);
 						stmt.setBlob(3, DBSerializer.toBlob(value,
-							connection, "besactivitypropertiestable", "propertyvalue"));
+							"besactivitypropertiestable", "propertyvalue"));
 						stmt.executeUpdate();
 					}
 					
@@ -625,7 +625,7 @@ public class BESActivity implements Closeable
 			
 			try
 			{
-				blob = DBSerializer.toBlob(cause, connection,
+				blob = DBSerializer.toBlob(cause,
 					"besactivityfaultstable", "fault");
 			}
 			catch (SQLException sqe)

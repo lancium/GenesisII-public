@@ -22,35 +22,35 @@ public class QueueDBResourceFactory extends BasicDBResourceFactory
 		"CREATE TABLE q2resources (" +
 			"resourceid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
 			"resourcename VARCHAR(256) NOT NULL, " +
-			"resourceendpoint BLOB(128K) NOT NULL, " +
+			"resourceendpoint BLOB(2G) NOT NULL, " +
 			"queueid VARCHAR(256) NOT NULL, totalslots INTEGER NOT NULL," +
 			"CONSTRAINT q2resourcesnamecnst UNIQUE (resourcename, queueid))",
 		"CREATE TABLE q2jobs (" +
 			"jobid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
 			"jobticket VARCHAR(256) NOT NULL, " +
 			"queueid VARCHAR(256) NOT NULL, " +
-			"callingcontext BLOB(128K) NOT NULL, " +
-			"jsdl BLOB(128K) NOT NULL, " +
-			"owners BLOB(128K) NOT NULL," +
+			"callingcontext BLOB(2G) NOT NULL, " +
+			"jsdl BLOB(2G) NOT NULL, " +
+			"owners BLOB(2G) NOT NULL," +
 			"priority SMALLINT NOT NULL," +
 			"state VARCHAR(64) NOT NULL, " +
 			"submittime TIMESTAMP NOT NULL, " +
 			"starttime TIMESTAMP, " +
 			"finishtime TIMESTAMP, " +
 			"runattempts SMALLINT NOT NULL, " +
-			"jobendpoint BLOB(128K), " +
+			"jobendpoint BLOB(2G), " +
 			"resourceid BIGINT, " +
-			"resourceendpoint BLOB(128K), " +
+			"resourceendpoint BLOB(2G), " +
 			"CONSTRAINT q2jobsticket UNIQUE (jobticket, queueid))",
 		"CREATE TABLE q2eprs (" +
 			"queueid VARCHAR(256) PRIMARY KEY, " +
-			"queueepr BLOB (128K) NOT NULL)",
+			"queueepr BLOB (2G) NOT NULL)",
 		"CREATE TABLE q2errors (" +
 			"errorid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
 			"queueid VARCHAR(256) NOT NULL, " +
 			"jobid BIGINT NOT NULL, " +
 			"attempt SMALLINT NOT NULL, " +
-			"errors BLOB(1M))"
+			"errors BLOB(2G))"
 	};
 	
 	public QueueDBResourceFactory(

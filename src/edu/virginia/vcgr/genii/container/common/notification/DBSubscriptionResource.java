@@ -82,7 +82,8 @@ public class DBSubscriptionResource
 			stmt.setString(1, _resourceKey);
 			stmt.setString(2, sourcekey);
 			stmt.setString(3, topic);
-			stmt.setBlob(4, EPRUtils.toBlob(targetendpoint));
+			stmt.setBlob(4, EPRUtils.toBlob(targetendpoint,
+				"subscriptions", "targetendpoint"));
 			if (userData == null)
 				stmt.setNull(5, Types.VARBINARY);
 			else

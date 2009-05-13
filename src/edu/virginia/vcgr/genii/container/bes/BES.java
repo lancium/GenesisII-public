@@ -298,13 +298,13 @@ public class BES implements Closeable
 				"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			stmt.setString(1, activityid);
 			stmt.setString(2, _besid);
-			stmt.setBlob(3, DBSerializer.xmlToBlob(jsdl));
+			stmt.setBlob(3, DBSerializer.xmlToBlob(jsdl, "besactivitiestable", "jsdl"));
 			stmt.setBlob(4, DBSerializer.toBlob(owners,
-				connection, "besactivitiestable", "owners"));
+				"besactivitiestable", "owners"));
 			stmt.setBlob(5, DBSerializer.toBlob(callingContext,
-				connection, "besactivitiestable", "callingcontext"));
+				"besactivitiestable", "callingcontext"));
 			stmt.setBlob(6, DBSerializer.toBlob(state,
-				connection, "besactivitiestable", "state"));
+				"besactivitiestable", "state"));
 			stmt.setTimestamp(7, new Timestamp(System.currentTimeMillis()));
 			stmt.setShort(8, (short)0);
 			stmt.setShort(9, (short)0);
@@ -312,9 +312,10 @@ public class BES implements Closeable
 				activityCWD.mustDelete() ? "d" : "k",
 				activityCWD.getWorkingDirectory().getAbsolutePath()));
 			stmt.setBlob(11, DBSerializer.toBlob(executionPlan,
-				connection, "besactivitiestable", "executionplan"));
+				"besactivitiestable", "executionplan"));
 			stmt.setInt(12, 0);
-			stmt.setBlob(13, EPRUtils.toBlob(activityEPR));
+			stmt.setBlob(13, EPRUtils.toBlob(activityEPR,
+				"besactivitiestable", "activityepr"));
 			stmt.setString(14, activityServiceName);
 			stmt.setString(15, jobName);
 			if (stmt.executeUpdate() != 1)

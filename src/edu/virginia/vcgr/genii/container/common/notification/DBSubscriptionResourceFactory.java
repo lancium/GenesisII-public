@@ -15,7 +15,7 @@ public class DBSubscriptionResourceFactory extends BasicDBResourceFactory
 	static private final String _CREATE_SUBSCRIPTIONS_TABLE =
 		"CREATE TABLE subscriptions(" +
 		"subscriptionid VARCHAR(128) PRIMARY KEY, sourcekey VARCHAR(128)," +
-		"topic VARCHAR(256), targetendpoint BLOB(128K)," +
+		"topic VARCHAR(256), targetendpoint BLOB(2G)," +
 		"userdata VARCHAR (8192) FOR BIT DATA)";
 	
 	public DBSubscriptionResourceFactory(

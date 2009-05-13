@@ -73,7 +73,8 @@ public class QueueDBResource extends BasicDBResource implements IQueueResource
 			stmt = _connection.prepareStatement(
 				"INSERT INTO q2eprs (queueid, queueepr) VALUES (?, ?)");
 			stmt.setString(1, _resourceKey);
-			stmt.setBlob(2, EPRUtils.toBlob(epr));
+			stmt.setBlob(2, EPRUtils.toBlob(epr,
+				"q2eprs", "queueepr"));
 			stmt.executeUpdate();
 			
 		}

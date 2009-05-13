@@ -525,7 +525,8 @@ public class ExportedDirDBResource extends BasicDBResource implements
 			stmt = _connection.prepareStatement(_ADD_ENTRY_STMT);
 			stmt.setString(1, getId());
 			stmt.setString(2, entryName);
-			stmt.setBlob(3, EPRUtils.toBlob(entryReference));
+			stmt.setBlob(3, EPRUtils.toBlob(entryReference,
+				"exporteddirentry", "endpoint"));
 			stmt.setString(4, entryID);
 			stmt.setString(5, entryType);
 			if (stmt.executeUpdate() != 1)

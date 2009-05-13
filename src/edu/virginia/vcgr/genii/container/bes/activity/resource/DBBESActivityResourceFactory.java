@@ -39,27 +39,27 @@ public class DBBESActivityResourceFactory extends BasicDBResourceFactory
 		"CREATE TABLE besactivityfaultstable (" +
 			"faultid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY," +
 			"besactivityid VARCHAR(256) NOT NULL," +
-			"fault BLOB(32K))",
+			"fault BLOB(2G))",
 		"CREATE TABLE besactivitiestable (" +
 			"activityid VARCHAR(256) NOT NULL PRIMARY KEY," +
 			"besid VARCHAR(256) NOT NULL," +
-			"jsdl BLOB(256K) NOT NULL," +
-			"owners BLOB(128K) NOT NULL," +
-			"callingcontext BLOB(128K) NOT NULL," +
-			"state BLOB(256K) NOT NULL," +
+			"jsdl BLOB(2G) NOT NULL," +
+			"owners BLOB(2G) NOT NULL," +
+			"callingcontext BLOB(2G) NOT NULL," +
+			"state BLOB(2G) NOT NULL," +
 			"submittime TIMESTAMP NOT NULL," +
 			"suspendrequested SMALLINT NOT NULL," +
 			"terminaterequested SMALLINT NOT NULL," +
 			"activitycwd VARCHAR(256) NOT NULL," +
-			"executionplan BLOB(256K) NOT NULL," +
+			"executionplan BLOB(2G) NOT NULL," +
 			"nextphase INTEGER NOT NULL," +
-			"activityepr BLOB(128K) NOT NULL," +
+			"activityepr BLOB(2G) NOT NULL," +
 			"activityservicename VARCHAR(128) NOT NULL," +
 			"jobname VARCHAR(256) NOT NULL)",
 		"CREATE TABLE besactivitypropertiestable (" +
 			"activityid VARCHAR(256) NOT NULL," +
 			"propertyname VARCHAR(256) NOT NULL," +
-			"propertyvalue BLOB(128K)," +
+			"propertyvalue BLOB(2G)," +
 			"CONSTRAINT besactivitypropertiesconstraint1 " +
 			"PRIMARY KEY (activityid, propertyname))",
 		"CREATE INDEX besactivityfaultsindex ON besactivityfaultstable(besactivityid)",

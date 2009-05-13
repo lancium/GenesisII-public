@@ -39,6 +39,7 @@ import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
+import edu.virginia.vcgr.genii.client.ser.BlobLimits;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.client.security.*;
@@ -355,15 +356,31 @@ public class EPRUtils
 				new InputSource(in), EndpointReferenceType.class);
 	}
 
-	static public Blob toBlob(EndpointReferenceType epr)
+	static public Blob toBlob(
+		EndpointReferenceType epr, String tableName, String columnName)
 			throws ResourceException
 	{
+		long maxLength = BlobLimits.limits().getLimit(tableName, columnName);
+		
 		if (epr == null)
 			return null;
 
 		try
 		{
-			return new SerialBlob(toBytes(epr));
+			Blob blob = new SerialBlob(toBytes(epr));
+			_logger.debug(String.format(
+				"Created a blob of length %d bytes for %s.%s which has a " +
+				"max length of %d bytes.",
+				blob.length(), tableName, columnName, maxLength));
+			if (blob.length() > maxLength)
+			{
+				_logger.error(String.format(
+					"Error:  Blob was created with %d bytes for %s.%s, " +
+					"but the maximum length for that column is %d bytes.", 
+					blob.length(), tableName, columnName, maxLength));
+			}
+			
+			return blob;
 		}
 		catch (Throwable t)
 		{
