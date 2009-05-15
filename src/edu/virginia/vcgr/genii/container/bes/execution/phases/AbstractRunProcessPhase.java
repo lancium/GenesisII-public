@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
-import edu.virginia.vcgr.genii.container.sysinfo.SupportedOperatingSystems;
 
 abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 {
@@ -23,16 +23,12 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 		if (overload == null || overload.size() == 0)
 			return;
 		
-		SupportedOperatingSystems os = SupportedOperatingSystems.current();
-		if (os.equals(SupportedOperatingSystems.WINDOWS))
+		OperatingSystemType os = OperatingSystemType.getCurrent();
+		
+		if (os.isWindows())
 			overloadWindowsEnvironment(processEnvironment, overload);
-		else if (os.equals(SupportedOperatingSystems.LINUX))
-			overloadLinuxEnvironment(processEnvironment, overload);
-		else if (os.equals(SupportedOperatingSystems.MACOSX))
-			overloadLinuxEnvironment(processEnvironment, overload);
 		else
-			throw new RuntimeException("Don't know how to handle \"" +
-				os + "\" platform.");
+			overloadLinuxEnvironment(processEnvironment, overload);
 	}
 	
 	static private void overloadLinuxEnvironment(
@@ -121,16 +117,14 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 		if (command.contains(File.separator))
 			return command;
 		
-		SupportedOperatingSystems os = SupportedOperatingSystems.current();
-		if (os.equals(SupportedOperatingSystems.WINDOWS))
+		if (OperatingSystemType.getCurrent().isWindows())
 		{
 			String key = findWindowsVariable(env, "PATH");
 			path = env.get(key);
-		} else if (os.equals(SupportedOperatingSystems.LINUX))
+		} else
 		{
 			path = env.get("PATH");
-		} else
-			throw new RuntimeException("Dont' know how to handle \"" + os + "\" platform.");
+		}
 		
 		if (path == null)
 			path = "";

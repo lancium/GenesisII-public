@@ -10,7 +10,7 @@ import org.ggf.jsdl.hpcp.DirectoryName_Type;
 import org.ggf.jsdl.hpcp.Environment_Type;
 import org.ggf.jsdl.hpcp.FileName_Type;
 
-import edu.virginia.vcgr.genii.container.sysinfo.SupportedOperatingSystems;
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 
 public class HPCApplicationReifier
 {
@@ -107,8 +107,8 @@ public class HPCApplicationReifier
 	
 	static private boolean isWindows()
 	{
-		return SupportedOperatingSystems.current().equals(
-			SupportedOperatingSystems.WINDOWS);
+		return OperatingSystemType.getCurrent() == 
+			OperatingSystemType.Windows_XP;
 	}
 	
 	static private String modifyPath(String original,

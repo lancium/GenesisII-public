@@ -15,23 +15,25 @@
  */
 package edu.virginia.vcgr.genii.container.sysinfo;
 
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
+
 public class SystemInfoUtils
 {
 	static private ISystemInfoProvider _provider;
 	static
 	{
-		SupportedOperatingSystems os = SupportedOperatingSystems.current();
+		OperatingSystemType osType = OperatingSystemType.getCurrent();
 
-		if (os.equals(SupportedOperatingSystems.LINUX))
+		if (osType == OperatingSystemType.LINUX)
 			_provider = new ProcFilesystemProvider();
-		else if (os.equals(SupportedOperatingSystems.WINDOWS))
+		else if (osType == OperatingSystemType.Windows_XP)
 			_provider = new WindowsProvider();
-		else if (os.equals(SupportedOperatingSystems.MACOSX))
+		else if (osType == OperatingSystemType.MACOS)
 			_provider = new MacOSXProvider();
 		else
 			throw new RuntimeException(
 				"Don't know an ISystemInfoProvider for OS type \"" +
-				os + "\".");
+				osType + "\".");
 	}
 	
 	static private ISystemInfoProvider getProvider()

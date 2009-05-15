@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.client.cmd.*;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.UserConfig;
@@ -13,7 +14,6 @@ import edu.virginia.vcgr.genii.client.context.ContextStreamUtils;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.utils.urls.URLUtilities;
-import edu.virginia.vcgr.genii.container.sysinfo.SupportedOperatingSystems;
 
 public class ConnectTool extends BaseGridTool
 {
@@ -57,8 +57,7 @@ public class ConnectTool extends BaseGridTool
 	static public void connect(String connectURL)
 		throws ResourceException, MalformedURLException, IOException
 	{
-		boolean isWindows = SupportedOperatingSystems.current().equals(
-			SupportedOperatingSystems.WINDOWS);
+		boolean isWindows = OperatingSystemType.getCurrent().isWindows();
 		
 		URL url = URLUtilities.formURL(connectURL, isWindows);
 		connect(ContextStreamUtils.load(url), null);
@@ -93,8 +92,7 @@ public class ConnectTool extends BaseGridTool
 	static public void connect(String connectURL, DeploymentName deploymentName)
 		throws ResourceException, MalformedURLException, IOException
 	{
-		boolean isWindows = SupportedOperatingSystems.current().equals(
-			SupportedOperatingSystems.WINDOWS);
+		boolean isWindows = OperatingSystemType.getCurrent().isWindows();
 		
 		URL url = URLUtilities.formURL(connectURL, isWindows);
 		connect(ContextStreamUtils.load(url), deploymentName);

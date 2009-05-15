@@ -4,7 +4,7 @@ import java.io.File;
 
 import org.morgan.util.configuration.ConfigurationException;
 
-import edu.virginia.vcgr.genii.container.sysinfo.SupportedOperatingSystems;
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 
 public class Installation
 {
@@ -85,12 +85,12 @@ public class Installation
 	static public File getGridCommand()
 	{
 		File ret;
-		SupportedOperatingSystems os = SupportedOperatingSystems.current();
+		boolean isWindows = OperatingSystemType.getCurrent().isWindows();
 		
-		if (os.equals(SupportedOperatingSystems.LINUX))
-			ret = new File(_installationDirectory, "grid");
-		else
+		if (isWindows)
 			ret = new File(_installationDirectory, "grid.bat");
+		else
+			ret = new File(_installationDirectory, "grid");
 		
 		if (!ret.exists())
 			throw new ConfigurationException("Unable to locate grid command.");

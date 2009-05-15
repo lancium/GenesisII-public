@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 import java.text.ParseException;
 import java.util.LinkedList;
 
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
@@ -21,7 +22,6 @@ import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
-import edu.virginia.vcgr.genii.container.sysinfo.SupportedOperatingSystems;
 
 /**
  * This is almost the same tool as the create-user tool, except that it creates
@@ -180,8 +180,7 @@ public class CreateUserDelegateTool extends CreateUserTool
 	{
 		ComboBoxDialog menu;
 		
-		boolean isWindows = SupportedOperatingSystems.current().equals(
-			SupportedOperatingSystems.WINDOWS);
+		boolean isWindows = OperatingSystemType.getCurrent().isWindows();
 		
 		MenuItem pkcs12 = new SimpleMenuItem("P", "PKCS12");
 		MenuItem jks = new SimpleMenuItem("J", "JKS");

@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.client.jni.JNIClientBaseClass;
-import edu.virginia.vcgr.genii.container.sysinfo.SupportedOperatingSystems;
 
 public class FileSystemUtils extends JNIClientBaseClass
 {
@@ -92,8 +92,7 @@ public class FileSystemUtils extends JNIClientBaseClass
 			throw new FileNotFoundException("Couldn't find file \"" +
 				filepath.getAbsolutePath() + "\".");
 
-		SupportedOperatingSystems os = SupportedOperatingSystems.current();
-		if (os.equals(SupportedOperatingSystems.WINDOWS))
+		if (OperatingSystemType.getCurrent().isWindows())
 			return makeWindowsExecutable(filepath);
 		else
 		{

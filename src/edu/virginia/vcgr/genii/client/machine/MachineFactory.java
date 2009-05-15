@@ -1,17 +1,17 @@
 package edu.virginia.vcgr.genii.client.machine;
 
-import edu.virginia.vcgr.genii.container.sysinfo.SupportedOperatingSystems;
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 
 public class MachineFactory
 {
 	static public MachineActor getActorInstance()
 	{
-		SupportedOperatingSystems os = SupportedOperatingSystems.current();
+		OperatingSystemType os = OperatingSystemType.getCurrent();
 		
-		if (os.equals(SupportedOperatingSystems.WINDOWS))
+		if (os.isWindows())
 		{
 			return new WindowsMachineActor();
-		} else if (os.equals(SupportedOperatingSystems.LINUX))
+		} else if (os == OperatingSystemType.LINUX)
 		{
 			return new LinuxMachineActor();
 		} else
@@ -21,15 +21,16 @@ public class MachineFactory
 	
 	static public MachineInterrogator getInterrogatorInstance()
 	{
-		SupportedOperatingSystems os = SupportedOperatingSystems.current();
+		OperatingSystemType os = OperatingSystemType.getCurrent();
 		
-		if (os.equals(SupportedOperatingSystems.WINDOWS))
+		
+		if (os.isWindows())
 		{
 			return new WindowsMachineInterrogator();
-		} else if (os.equals(SupportedOperatingSystems.LINUX))
+		} else if (os == OperatingSystemType.LINUX)
 		{
 			return new LinuxMachineInterrogator();
-		} else if (os.equals(SupportedOperatingSystems.MACOSX))
+		} else if (os == OperatingSystemType.MACOS)
 		{
 			return new MacOSXMachineInterrogator();
 		} else

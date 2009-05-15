@@ -11,12 +11,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStateEnumeration;
 
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.container.bes.execution.ContinuableExecutionException;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionException;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
-import edu.virginia.vcgr.genii.container.sysinfo.SupportedOperatingSystems;
 import edu.virginia.vcgr.genii.procmgmt.ProcessManager;
 
 public class RunProcessPhase extends AbstractRunProcessPhase 
@@ -42,8 +42,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 	{
 		try
 		{
-			if (SupportedOperatingSystems.current() == 
-				SupportedOperatingSystems.WINDOWS)
+			if (OperatingSystemType.getCurrent().isWindows())
 				ProcessManager.kill(process);
 		}
 		catch (Throwable cause)

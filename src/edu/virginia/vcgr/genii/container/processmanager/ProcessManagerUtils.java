@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.container.processmanager;
 
-import edu.virginia.vcgr.genii.container.sysinfo.SupportedOperatingSystems;
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
+
 
 public class ProcessManagerUtils 
 {
@@ -8,13 +9,13 @@ public class ProcessManagerUtils
 
 	static
 	{
-		SupportedOperatingSystems os = SupportedOperatingSystems.current();
+		OperatingSystemType os = OperatingSystemType.getCurrent();
 		
-		if (os.equals(SupportedOperatingSystems.LINUX))
+		if (os == OperatingSystemType.LINUX)
 		{
 			// Currently undefined Linux behavior for process management
 			_provider = new LinuxProvider();
-		} else if (os.equals(SupportedOperatingSystems.WINDOWS))
+		} else if (os.isWindows())
 		{
 			_provider = new WindowsProvider();
 		} else

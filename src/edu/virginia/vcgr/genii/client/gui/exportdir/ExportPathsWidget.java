@@ -14,7 +14,7 @@ import javax.swing.JTextField;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
-import edu.virginia.vcgr.genii.container.sysinfo.SupportedOperatingSystems;
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 
 public class ExportPathsWidget extends JComponent
 {
@@ -30,9 +30,7 @@ public class ExportPathsWidget extends JComponent
 	
 	private JButton createLocalBrowseButton()
 	{
-		SupportedOperatingSystems os = SupportedOperatingSystems.current();
-		
-		if (os.equals(SupportedOperatingSystems.WINDOWS))
+		if (OperatingSystemType.getCurrent().isWindows())
 		{
 			// A persistent bug in Microsoft Windows JFileChooser
 			// implementation can cause this widget to hang

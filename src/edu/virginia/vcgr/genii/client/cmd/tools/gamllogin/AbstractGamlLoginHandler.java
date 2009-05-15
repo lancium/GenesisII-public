@@ -13,6 +13,8 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.client.cmd.tools.GamlLoginTool;
 
 import javax.security.auth.callback.Callback;
@@ -21,7 +23,6 @@ import javax.security.auth.callback.PasswordCallback;
 
 import edu.virginia.vcgr.genii.client.security.wincrypto.WinX509KeyManager;
 import edu.virginia.vcgr.genii.client.security.x509.InputStreamBuilder;
-import edu.virginia.vcgr.genii.container.sysinfo.SupportedOperatingSystems;
 
 public abstract class AbstractGamlLoginHandler implements CallbackHandler {
 	static private final int _PASSWORD_TRIES = 5;
@@ -79,8 +80,7 @@ public abstract class AbstractGamlLoginHandler implements CallbackHandler {
 
 	private void addEntriesFromWindows(Collection<CertEntry> entries) 
 	{
-		if (SupportedOperatingSystems.current().equals(
-			SupportedOperatingSystems.WINDOWS)) 
+		if (OperatingSystemType.getCurrent().isWindows())
 		{
 			WinX509KeyManager km = new WinX509KeyManager();
 			String[] aliases = km.getClientAliases(null, null);

@@ -1,26 +1,20 @@
 package edu.virginia.vcgr.genii.client.sysinfo;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.CPUArchitecture_Type;
-import org.ggf.jsdl.OperatingSystemTypeEnumeration;
-import org.ggf.jsdl.OperatingSystemType_Type;
 import org.ggf.jsdl.OperatingSystem_Type;
-import org.ggf.jsdl.ProcessorArchitectureEnumeration;
 import org.morgan.util.io.StreamUtils;
-
-import edu.virginia.vcgr.genii.client.utils.exec.ExecutionEngine;
 
 public class SystemUtils
 {	
+	/*
 	static private Log _logger = LogFactory.getLog(SystemUtils.class);
 	
 	static final private String _OS_ARCH_PREFIX = "os.arch.";
 	static final private String _OS_NAME_PREFIX = "os.name.";
+	*/
 	static private Properties _propertyMap;
 	
 	static
@@ -47,6 +41,10 @@ public class SystemUtils
 	
 	static public CPUArchitecture_Type[] getSupportedArchitectures()
 	{
+		throw new RuntimeException(
+			"This type of cpu arch query is no longer supported.");
+		
+		/*
 		ProcessorArchitectureEnumeration primaryArchName = null;
 		ProcessorArchitectureEnumeration secondaryArchName = null;
 		
@@ -81,10 +79,15 @@ public class SystemUtils
 		return new CPUArchitecture_Type[] {
 			new CPUArchitecture_Type(primaryArchName, null)
 		};
+		*/
 	}
 	
 	static public OperatingSystem_Type[] getSupportedOperatingSystems()
 	{
+		throw new RuntimeException(
+			"This type of os query is no longer supported.");
+		
+		/*
 		OperatingSystemTypeEnumeration operatingSystemName;
 		String operatingSystemVersion;
 		String description = null;
@@ -99,11 +102,6 @@ public class SystemUtils
 				new OperatingSystemType_Type(operatingSystemName, null),
 				operatingSystemVersion, description, null)
 		};
-	}
-	
-	static public void main(String []args) throws Throwable
-	{
-		System.err.println(getSupportedArchitectures());
-		System.err.println(getSupportedOperatingSystems());
+		*/
 	}
 }

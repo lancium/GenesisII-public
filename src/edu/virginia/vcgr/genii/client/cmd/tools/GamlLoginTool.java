@@ -11,6 +11,7 @@ import java.util.*;
 
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
@@ -41,7 +42,6 @@ import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.dialog.YesNoDialog;
 import edu.virginia.vcgr.genii.client.dialog.YesNoSelection;
 import edu.virginia.vcgr.genii.client.dialog.validators.NonEmptyValidator;
-import edu.virginia.vcgr.genii.container.sysinfo.SupportedOperatingSystems;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.resource.*;
@@ -523,8 +523,7 @@ public class GamlLoginTool extends BaseGridTool {
 	private boolean queryUserForDefaultOptions() 
 		throws DialogException, IOException, UserCancelException
 	{
-		boolean isWindows = SupportedOperatingSystems.current().equals(
-			SupportedOperatingSystems.WINDOWS);
+		boolean isWindows = OperatingSystemType.getCurrent().isWindows();
 		
 		DialogProvider provider = DialogFactory.getProvider(
 			stdout, stderr, stdin, useGui());

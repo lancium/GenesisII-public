@@ -27,8 +27,8 @@ import org.ggf.jsdl.ProcessorArchitectureEnumeration;
 import org.ggf.jsdl.RangeValue_Type;
 import org.ggf.jsdl.Range_Type;
 
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.client.jni.JNIContainerBaseClass;
-import edu.virginia.vcgr.genii.container.sysinfo.SupportedOperatingSystems;
 
 public class JSDLUtils extends JNIContainerBaseClass
 {
@@ -64,22 +64,12 @@ public class JSDLUtils extends JNIContainerBaseClass
 	
 	static public OperatingSystemType_Type getLocalOperatingSystemType()
 	{
-		SupportedOperatingSystems os = SupportedOperatingSystems.current();
+		OperatingSystemType os = OperatingSystemType.getCurrent();
 		
 		_logger.debug("Determined that the local OS Type is \""
 			+ os + "\".");
-		if (os.equals(SupportedOperatingSystems.WINDOWS))		
-			return new OperatingSystemType_Type(
-				OperatingSystemTypeEnumeration.Windows_XP, null);
-		else if (os.equals(SupportedOperatingSystems.LINUX))
-			return new OperatingSystemType_Type(
-				OperatingSystemTypeEnumeration.LINUX, null);
-		else if (os.equals(SupportedOperatingSystems.MACOSX))
-			return new OperatingSystemType_Type(
-				OperatingSystemTypeEnumeration.MACOS, null);
-		else
-			throw new RuntimeException(
-				"Unsupported operating system type found (" + os + ").");
+		return new OperatingSystemType_Type(
+			OperatingSystemTypeEnumeration.fromString(os.name()), null);
 	}
 	
 	static public boolean satisfiesRange(double value,

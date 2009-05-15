@@ -10,7 +10,7 @@ import org.ggf.jsdl.posix.Environment_Type;
 import org.ggf.jsdl.posix.FileName_Type;
 import org.ggf.jsdl.posix.POSIXApplication_Type;
 
-import edu.virginia.vcgr.genii.container.sysinfo.SupportedOperatingSystems;
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 
 public class POSIXApplicationReifier
 {
@@ -111,8 +111,8 @@ public class POSIXApplicationReifier
 	
 	static private boolean isWindows()
 	{
-		return SupportedOperatingSystems.current().equals(
-			SupportedOperatingSystems.WINDOWS);
+		return OperatingSystemType.getCurrent() == 
+			OperatingSystemType.Windows_XP;
 	}
 	
 	static private String modifyPath(String original,
