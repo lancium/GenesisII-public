@@ -37,7 +37,7 @@ public class PingTool extends BaseGridTool
 		
 		EndpointReferenceType target = path.getEndpoint();
 		/*
-		target.getAddress().get_value().setFragment("resource-fork");
+		target.getAddress().get_value().setQueryString("genii-container-id=" + new GUID());
 		*/
 		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class,
 			target);

@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.container.rfork;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -441,7 +442,9 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 				Matcher matcher = EPI_PATTERN.matcher(epi);
 				if (matcher.matches())
 					epi = matcher.group(1);
-				epi += ":fork-path:" + forkPath; 
+				File forkFile = new File(forkPath);
+				java.net.URI forkFileURI = forkFile.toURI();
+				epi += ":fork-path:" + forkFileURI.getRawPath();
 				any[lcv] = new MessageElement(
 					WSName.ENDPOINT_IDENTIFIER_QNAME, epi);
 				return epr;

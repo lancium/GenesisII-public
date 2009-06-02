@@ -27,6 +27,7 @@ import org.apache.axis.transport.http.AxisServletBase;
 import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.morgan.util.GUID;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
 import org.mortbay.jetty.*;
@@ -50,6 +51,7 @@ import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.configuration.SecurityConstants;
 import edu.virginia.vcgr.genii.client.comm.jetty.TrustAllSslSocketConnector;
 import edu.virginia.vcgr.genii.client.install.InstallationState;
+import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
@@ -224,6 +226,7 @@ public class Container extends ApplicationBase
 		
 		server.start();
 		
+		_logger.info(String.format("Container ID:  %s", getContainerID()));
 		_logger.info("Starting container services.");
 		ContainerServices.loadAll();
 		ContainerServices.startAll();
@@ -430,10 +433,13 @@ public class Container extends ApplicationBase
 			String currentURL = getCurrentServiceURL(ctxt);
 			int index = currentURL.lastIndexOf('/');
 			if (index > 0)
-				return currentURL.substring(0, index + 1) + serviceName;
+				return currentURL.substring(0, index + 1) + serviceName +
+					"?" + EPRUtils.GENII_CONTAINER_ID_PARAMETER + "=" 
+					+ Container.getContainerID();
 		}
 		
-		return _containerURL + "/axis/services/" + serviceName;
+		return _containerURL + "/axis/services/" + serviceName +
+			"?" + EPRUtils.GENII_CONTAINER_ID_PARAMETER + "=" + Container.getContainerID();
 	}
 	
 	static public boolean onThisServer(EndpointReferenceType target)
@@ -479,6 +485,35 @@ public class Container extends ApplicationBase
 	static public long getDefaultCertificateLifetime()
 	{
 		return _defaultCertificateLifetime;
+	}
+	
+	static private GUID _containerID = null;
+	static private Object _containerIDLock = new Object();
+	
+	static public GUID getContainerID()
+	{
+		synchronized (_containerIDLock)
+		{
+			if (_containerID == null)
+			{
+				PersistentContainerProperties properties =
+					PersistentContainerProperties.getProperties();
+				try
+				{
+					_containerID = (GUID)properties.getProperty("container-id");
+					if (_containerID == null)
+						_containerID = new GUID();
+					properties.setProperty("container-id", _containerID);
+				}
+				catch (Throwable cause)
+				{
+					throw new ConfigurationException(
+						"Unable to get/set container id.", cause);
+				}
+			}
+			
+			return _containerID;
+		}
 	}
 	
 	static private void recordInstallationState(String deploymentName, URL containerURL)

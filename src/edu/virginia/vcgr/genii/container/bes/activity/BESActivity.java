@@ -114,7 +114,7 @@ public class BESActivity implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(true);
 			stmt = connection.prepareStatement("SELECT owners FROM besactivitiestable " +
 				"WHERE activityid = ?");
 			stmt.setString(1, _activityid);
@@ -147,7 +147,7 @@ public class BESActivity implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(true);
 			stmt = connection.prepareStatement(
 				"SELECT activityepr FROM besactivitiestable " +
 				"WHERE activityid = ?");
@@ -174,7 +174,7 @@ public class BESActivity implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(true);
 			stmt = connection.prepareStatement(
 				"SELECT jsdl FROM besactivitiestable " +
 				"WHERE activityid = ?");
@@ -204,7 +204,7 @@ public class BESActivity implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(true);
 			stmt = connection.prepareStatement(
 				"SELECT fault FROM besactivityfaultstable " +
 				"WHERE besactivityid = ?");
@@ -302,7 +302,7 @@ public class BESActivity implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(true);
 			stmt = connection.prepareStatement(
 				"UPDATE besactivitiestable " +
 					"SET suspendrequested = ?, terminaterequested = ? " +
@@ -332,7 +332,7 @@ public class BESActivity implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(true);
 			stmt = connection.prepareStatement(
 				"UPDATE besactivitiestable SET nextphase = ?, state = ? " +
 				"WHERE activityid = ?");
@@ -394,7 +394,7 @@ public class BESActivity implements Closeable
 
         try
         {
-            connection = _connectionPool.acquire();
+            connection = _connectionPool.acquire(true);
             stmt = connection.prepareStatement(
                 "SELECT callingcontext, activityepr " +
                     "FROM besactivitiestable " +
@@ -496,7 +496,7 @@ public class BESActivity implements Closeable
 				
 				try
 				{
-					connection = _connectionPool.acquire();
+					connection = _connectionPool.acquire(true);
 					stmt = connection.prepareStatement(
 						"SELECT callingcontext FROM besactivitiestable " +
 						"WHERE activityid = ?");
@@ -537,7 +537,7 @@ public class BESActivity implements Closeable
 				
 				try
 				{
-					connection = _connectionPool.acquire();
+					connection = _connectionPool.acquire(true);
 					stmt = connection.prepareStatement(
 						"SELECT propertyvalue FROM besactivitypropertiestable " +
 						"WHERE activityid = ? AND propertyname = ?");
@@ -572,7 +572,7 @@ public class BESActivity implements Closeable
 				
 				try
 				{
-					connection = _connectionPool.acquire();
+					connection = _connectionPool.acquire(false);
 					stmt = connection.prepareStatement(
 						"DELETE FROM besactivitypropertiestable " +
 						"WHERE activityid = ? AND propertyname = ?");
@@ -621,7 +621,7 @@ public class BESActivity implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(true);
 			
 			try
 			{

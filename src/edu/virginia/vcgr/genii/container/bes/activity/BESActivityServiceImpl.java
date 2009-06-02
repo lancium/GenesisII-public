@@ -17,8 +17,6 @@ package edu.virginia.vcgr.genii.container.bes.activity;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.rmi.RemoteException;
 import java.util.Calendar;
 import java.util.Collection;
@@ -33,16 +31,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.morgan.util.GUID;
-import org.morgan.util.io.StreamUtils;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.bes.activity.BESActivityGetErrorResponseType;
 import edu.virginia.vcgr.genii.bes.activity.BESActivityPortType;
-import edu.virginia.vcgr.genii.byteio.streamable.factory.OpenStreamResponse;
-import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
-import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.BESActivityConstants;
 import edu.virginia.vcgr.genii.client.bes.GeniiBESConstants;
 import edu.virginia.vcgr.genii.client.context.*;
@@ -66,20 +60,22 @@ import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.container.bes.BES;
 import edu.virginia.vcgr.genii.container.bes.BESUtilities;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivityUtils.BESActivityInitInfo;
+import edu.virginia.vcgr.genii.container.bes.activity.forks.RootRNSFork;
 import edu.virginia.vcgr.genii.container.bes.activity.resource.IBESActivityResource;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.CommonExecutionUnderstanding;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.forkexec.ForkExecPersonalityProvider;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.qsub.QSubPersonalityProvider;
-import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
-import edu.virginia.vcgr.genii.container.common.SByteIOFactory;
 import edu.virginia.vcgr.genii.container.common.notification.TopicSpace;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
+import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
+import edu.virginia.vcgr.genii.container.rfork.ResourceForkBaseService;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
-public class BESActivityServiceImpl extends GenesisIIBase implements
+@ForkRoot(RootRNSFork.class)
+public class BESActivityServiceImpl extends ResourceForkBaseService implements
 		BESActivityPortType, BESActivityConstants
 {
 	static private Log _logger = LogFactory.getLog(BESActivityServiceImpl.class);
@@ -92,8 +88,6 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 		super("BESActivityPortType");
 		
 		addImplementedPortType(GENII_BES_ACTIVITY_PORT_TYPE);
-		addImplementedPortType(
-			WellKnownPortTypes.SBYTEIO_FACTORY_PORT_TYPE);
 	}
 	
 	public PortType getFinalWSResourceInterface()
@@ -234,63 +228,6 @@ public class BESActivityServiceImpl extends GenesisIIBase implements
 			configDir = basedir;
 		
 		return new File(configDir, new GUID().toString());
-	}
-
-	@RWXMapping(RWXCategory.READ)
-	public OpenStreamResponse openStream(Object openStreamRequest) 
-		throws RemoteException, ResourceCreationFaultType, ResourceUnknownFaultType
-	{
-		SByteIOFactory factory = null;
-		
-		IBESActivityResource resource = 
-			(IBESActivityResource)ResourceManager.getCurrentResource().dereference();
-		
-		try
-		{
-			factory = createStreamableByteIOResource();
-			OutputStream out = factory.getCreationStream();
-			BESActivity activity = resource.findActivity(); 	
-			ActivityState state = activity.getState();
-			PrintStream ps = new PrintStream(out);
-			ps.println("Status:");
-			ps.println(state);
-			
-			if (state.isFailedState())
-			{
-				ps.print("\nFaults:");
-				int lcv = 0;
-				for (Throwable cause : activity.getFaults())
-				{
-					ps.println("\nFault #" + lcv);
-					cause.printStackTrace(ps);
-					ps.println();
-					lcv++;
-				}
-			}
-			
-			ps.flush();
-			return new OpenStreamResponse(factory.create());
-		}
-		catch (SQLException sqe)
-		{
-			throw FaultManipulator.fillInFault(
-				new ResourceCreationFaultType(null, null, null, null,
-					new BaseFaultTypeDescription[] {
-						new BaseFaultTypeDescription(sqe.getLocalizedMessage()) },
-					null));
-		}
-		catch (IOException ioe)
-		{
-			throw FaultManipulator.fillInFault(
-				new ResourceCreationFaultType(null, null, null, null,
-					new BaseFaultTypeDescription[] {
-						new BaseFaultTypeDescription(ioe.getLocalizedMessage()) },
-					null));
-		}
-		finally
-		{
-			StreamUtils.close(factory);
-		}
 	}
 
 	@Override

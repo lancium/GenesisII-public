@@ -40,7 +40,7 @@ public class SharedRExportBaseFactory extends BasicDBResourceFactory
 		
 		try
 		{
-			conn = _pool.acquire();
+			conn = _pool.acquire(false);
 			DatabaseTableUtils.createTables(conn, false, 
 				_CREATE_REXPORT_TABLE_STMT,
 				_CREATE_REXPORT_ENTRY_TABLE_STMT,

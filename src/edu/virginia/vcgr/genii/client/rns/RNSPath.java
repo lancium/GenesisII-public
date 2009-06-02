@@ -750,8 +750,10 @@ public class RNSPath implements Serializable, Cloneable
 				LinkedList<RNSPath> ret = new LinkedList<RNSPath>();
 				for (EntryType entry : entries)
 				{
-					ret.add(new RNSPath(this, entry.getEntry_name(), 
-						entry.getEntry_reference(), true));
+					RNSPath newEntry = new RNSPath(this, entry.getEntry_name(),
+						entry.getEntry_reference(), true);
+					_lookupCache.put(newEntry.pwd(), newEntry);
+					ret.add(newEntry);
 				}
 				
 				return ret;
@@ -780,8 +782,11 @@ public class RNSPath implements Serializable, Cloneable
 			{
 				for (EntryType entry : rpt.list(new List(null)).getEntryList())
 				{
-					ret.add(new RNSPath(this, entry.getEntry_name(),
-						entry.getEntry_reference(), true));
+					RNSPath newEntry = new RNSPath(this, entry.getEntry_name(),
+						entry.getEntry_reference(), true);
+
+					_lookupCache.put(newEntry.pwd(), newEntry);
+					ret.add(newEntry);
 				}
 				
 				return ret;

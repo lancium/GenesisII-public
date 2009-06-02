@@ -50,7 +50,10 @@ public class QueueDBResourceFactory extends BasicDBResourceFactory
 			"queueid VARCHAR(256) NOT NULL, " +
 			"jobid BIGINT NOT NULL, " +
 			"attempt SMALLINT NOT NULL, " +
-			"errors BLOB(2G))"
+			"errors BLOB(2G))",
+		"CREATE TABLE q2jobpings (" +
+			"jobid BIGINT PRIMARY KEY," +
+			"failedcommattempts INTEGER NOT NULL)"
 	};
 	
 	public QueueDBResourceFactory(
@@ -79,7 +82,7 @@ public class QueueDBResourceFactory extends BasicDBResourceFactory
 		
 		try
 		{
-			conn = _pool.acquire();
+			conn = _pool.acquire(false);
 			DatabaseTableUtils.createTables(conn, false, _CREATE_STMTS);
 			conn.commit();
 		}

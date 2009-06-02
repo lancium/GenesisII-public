@@ -132,6 +132,10 @@ public class DBSerializer
 			}
 			catch (Throwable cause)
 			{
+				_logger.warn(
+					"Error trying to deserialize a blob -- trying compressed version.",
+					cause);
+				
 				// try to decompress first
 				in.close();
 				oin = new ObjectInputStream(new GZIPInputStream(

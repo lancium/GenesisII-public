@@ -452,7 +452,20 @@ public class QueueDatabase
 			if (!rs.next())
 				throw new SQLException(
 					"Unable to determine last added job's ID.");
-			return rs.getLong(1);
+			long jobid = rs.getLong(1);
+			
+			stmt.close();
+			stmt = null;
+			
+			stmt = connection.prepareStatement(
+				"INSERT INTO q2jobpings (jobid, failedcommattempts) " +
+				"VALUES (?, 0)");
+			stmt.setLong(1, jobid);
+			if (stmt.executeUpdate() != 1)
+				throw new SQLException(
+					"Unable to set job communication attempts.");
+			
+			return jobid;
 		}
 		finally
 		{
@@ -768,6 +781,7 @@ public class QueueDatabase
 	{
 		PreparedStatement stmt1 = null;
 		PreparedStatement stmt2 = null;
+		PreparedStatement stmt3 = null;
 		
 		try
 		{
@@ -775,6 +789,8 @@ public class QueueDatabase
 				"DELETE FROM q2jobs WHERE jobid = ?");
 			stmt2 = connection.prepareStatement(
 				"DELETE FROM q2errors WHERE jobid = ?");
+			stmt3 = connection.prepareStatement(
+				"DELETE FROM q2jobpings WHERE jobid = ?");
 			
 			for (Long jobID : jobIDs)
 			{
@@ -783,15 +799,20 @@ public class QueueDatabase
 				
 				stmt2.setLong(1, jobID.longValue());
 				stmt2.addBatch();
+				
+				stmt3.setLong(1, jobID.longValue());
+				stmt3.addBatch();
 			}
 			
 			stmt1.executeBatch();
 			stmt2.executeBatch();
+			stmt3.executeBatch();
 		}
 		finally
 		{
 			StreamUtils.close(stmt1);
 			StreamUtils.close(stmt2);
+			StreamUtils.close(stmt3);
 		}
 	}
 	
@@ -927,6 +948,52 @@ public class QueueDatabase
 			}
 			
 			return ret;
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+	}
+	
+	public void setJobCommunicationAttempts(Connection connection,
+		long jobid, int number)	throws SQLException
+	{
+		PreparedStatement stmt = null;
+		
+		try
+		{
+			stmt = connection.prepareStatement(
+				"UPDATE q2jobpings SET failedcommattempts = ? " +
+				"WHERE jobid = ?");
+			stmt.setInt(1, number);
+			stmt.setLong(2, jobid);
+			if (stmt.executeUpdate() != 1)
+				throw new SQLException(
+					"Unable to set job communication attempt number.");
+		}
+		finally
+		{
+			StreamUtils.close(stmt);
+		}
+	}
+	
+	public int getJobCommunicationAttempts(Connection connection, long jobid)
+		throws SQLException
+	{
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try
+		{
+			stmt = connection.prepareStatement(
+				"SELECT failedcommattempts FROM q2jobpings WHERE jobid = ?");
+			stmt.setLong(1, jobid);
+			rs = stmt.executeQuery();
+			if (!rs.next())
+				throw new SQLException(
+					"Unable to get job attempt number from database.");
+			return rs.getInt(1);
 		}
 		finally
 		{

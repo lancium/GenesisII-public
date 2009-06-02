@@ -66,7 +66,7 @@ public class BESResourceUpdater implements Closeable
 				try
 				{
 					/* Acquire a new connection from the pool */
-					connection = _connectionPool.acquire();
+					connection = _connectionPool.acquire(false);
 					
 					/* Have the BES manager update the resources */
 					_manager.updateResources(connection);

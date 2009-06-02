@@ -32,7 +32,7 @@ public class BESInformationResolver
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(true);
 			GeniiBESPortType bes = bEndpoint.getClientStub(connection);
 			
 			long timeoutValue = timeout.getTimeoutInMilliseconds();

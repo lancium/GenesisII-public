@@ -44,7 +44,7 @@ public class DBSubscriptionResourceFactory extends BasicDBResourceFactory
 		
 		try
 		{
-			conn = _pool.acquire();
+			conn = _pool.acquire(false);
 			DatabaseTableUtils.createTables(conn, false, 
 				_CREATE_SUBSCRIPTIONS_TABLE);
 			conn.commit();

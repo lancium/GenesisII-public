@@ -123,7 +123,7 @@ public class AlarmManager
 		
 		try
 		{
-			conn = _connectionPool.acquire();
+			conn = _connectionPool.acquire(true);
 			if (!createTableIfNecessary(conn))
 				reloadFromDatabase(conn);
 		}
@@ -161,7 +161,7 @@ public class AlarmManager
 		
 		try
 		{
-			conn = _connectionPool.acquire();
+			conn = _connectionPool.acquire(true);
 			stmt = conn.prepareStatement(
 				"DELETE FROM alarmtable WHERE alarmid = ?");
 			stmt.setLong(1, alarmKey);
@@ -239,7 +239,7 @@ public class AlarmManager
 		
 		try
 		{
-			conn = _connectionPool.acquire();
+			conn = _connectionPool.acquire(true);
 			addStmt = conn.prepareStatement(
 				"INSERT INTO alarmtable(" +
 					"nextoccurance, repeatinterval, callingcontext, " +
@@ -415,7 +415,7 @@ public class AlarmManager
 		
 		try
 		{
-			conn = _connectionPool.acquire();
+			conn = _connectionPool.acquire(false);
 			getInfoStmt = conn.prepareStatement(
 				"SELECT repeatinterval, callingcontext, target, " +
 					"methodname, userdata " +

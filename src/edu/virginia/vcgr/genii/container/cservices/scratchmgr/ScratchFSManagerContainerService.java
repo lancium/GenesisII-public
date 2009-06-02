@@ -61,7 +61,7 @@ public class ScratchFSManagerContainerService extends AbstractContainerService
 		
 		try
 		{
-			conn = getConnectionPool().acquire();
+			conn = getConnectionPool().acquire(false);
 			_db = new ScratchFSDatabase(conn);
 			conn.commit();
 			
@@ -89,7 +89,7 @@ public class ScratchFSManagerContainerService extends AbstractContainerService
 		
 		try
 		{
-			conn = getConnectionPool().acquire();
+			conn = getConnectionPool().acquire(false);
 			
 			_db.cleanupExpiredReservations(conn, 
 				DEFAULT_DIR_USE_TIMEOUT_MILLIS);
@@ -184,7 +184,7 @@ public class ScratchFSManagerContainerService extends AbstractContainerService
 			
 			try
 			{
-				conn = getConnectionPool().acquire();
+				conn = getConnectionPool().acquire(false);
 				
 				reservationID = _db.reserveDirectory(conn, directory);
 				
@@ -213,7 +213,7 @@ public class ScratchFSManagerContainerService extends AbstractContainerService
 		{
 			try
 			{
-				conn = getConnectionPool().acquire();
+				conn = getConnectionPool().acquire(false);
 				
 				long dirID = _db.releaseReservation(conn, reservationID);
 				_db.patchIdle(conn, dirID);

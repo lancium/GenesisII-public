@@ -10,6 +10,8 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import org.apache.axis.types.URI;
+import org.apache.axis.types.URI.MalformedURIException;
+
 import java.net.URL;
 import java.sql.Blob;
 import javax.sql.rowset.serial.SerialBlob;
@@ -25,6 +27,7 @@ import org.apache.axis.AxisFault;
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.morgan.util.GUID;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.AttributedURIType;
 import org.ws.addressing.EndpointReferenceType;
@@ -51,6 +54,11 @@ public class EPRUtils
 {
 	static private Log _logger = LogFactory.getLog(EPRUtils.class);
 
+	static public final String GENII_CONTAINER_ID_PARAMETER =
+		"genii-container-id";
+	static private final Pattern GENII_CONTAINER_ID_PATTERN = 
+		Pattern.compile(String.format("%s=([-a-fA-F0-9]+)",
+			Pattern.quote(GENII_CONTAINER_ID_PARAMETER)));
 	/**
 	 * Generates a temporary EPR to (hopefully) obtain the full (incl.
 	 * porttypes, certs, etc.) EPR from the service's attributes. The full one
@@ -292,18 +300,27 @@ public class EPRUtils
 	static private Pattern _SERVICE_NAME_PATTERN =
 			Pattern.compile("^.*/axis/services/([^/]+)$");
 
+	static public String extractServiceName(URI uri)
+		throws AxisFault
+	{
+		Matcher matcher = _SERVICE_NAME_PATTERN.matcher(
+			uri.getPath());
+		if (!matcher.matches())
+			throw new AxisFault(String.format(
+				"Can't locate target service \"%s\".", uri));
+		return matcher.group(1);
+	}
+	
 	static public String extractServiceName(EndpointReferenceType epr)
 			throws AxisFault
 	{
-		return extractServiceName(epr.getAddress().get_value().toString());
+		return extractServiceName(epr.getAddress().get_value());
 	}
 
-	static public String extractServiceName(String url) throws AxisFault
+	static public String extractServiceName(String url)
+		throws AxisFault, MalformedURIException
 	{
-		Matcher matcher = _SERVICE_NAME_PATTERN.matcher(url);
-		if (!matcher.matches())
-			throw new AxisFault("Can't locate target service \"" + url + "\".");
-		return matcher.group(1);
+		return extractServiceName(new URI(url));
 	}
 
 	static public byte[] toBytes(EndpointReferenceType epr)
@@ -432,6 +449,28 @@ public class EPRUtils
 			}
 		}
 
+		return null;
+	}
+	
+	static public GUID getGeniiContainerID(EndpointReferenceType epr)
+	{
+		AttributedURIType uriType = epr.getAddress();
+		if (uriType != null)
+		{
+			URI uri = uriType.get_value();
+			if (uri != null)
+			{
+				String query = uri.getQueryString();
+				if (query != null)
+				{
+					Matcher matcher = GENII_CONTAINER_ID_PATTERN.matcher(
+						query);
+					if (matcher.matches())
+						return GUID.fromString(matcher.group(1));
+				}
+			}
+		}
+		
 		return null;
 	}
 

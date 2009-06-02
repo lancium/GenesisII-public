@@ -46,7 +46,7 @@ public class RNSDBResourceFactory extends BasicDBResourceFactory implements
 		
 		try
 		{
-			conn = _pool.acquire();
+			conn = _pool.acquire(false);
 			DatabaseTableUtils.createTables(conn, false, 
 				_CREATE_ENTRY_TABLE_STMT);
 			conn.commit();

@@ -39,7 +39,7 @@ public class SharedExportDirBaseFactory extends BasicDBResourceFactory
 		
 		try
 		{
-			conn = _pool.acquire();
+			conn = _pool.acquire(false);
 			DatabaseTableUtils.createTables(conn, false,
 				_CREATE_EXPORTED_FILE_TABLE_STMT,
 				_CREATE_EXPORTED_DIR_TABLE_STMT,

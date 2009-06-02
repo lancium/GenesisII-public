@@ -77,6 +77,7 @@ import org.oasis_open.docs.wsrf.rp_2.UpdateResourcePropertiesResponse;
 import org.oasis_open.docs.wsrf.rp_2.UpdateType;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
+import org.ws.addressing.AttributedURIType;
 import org.ws.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
 
@@ -86,6 +87,7 @@ import edu.virginia.vcgr.genii.client.comm.ClientConstructionParameters;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
+import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
@@ -482,7 +484,22 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	}
 	
 	@RWXMapping(RWXCategory.READ)
-	public final String ping(String request) {
+	public final String ping(String request)
+	{
+		try
+		{
+			EndpointReferenceType epr = 
+				(EndpointReferenceType)WorkingContext.getCurrentWorkingContext().getProperty(
+					WorkingContext.EPR_PROPERTY_NAME);
+			_logger.info(String.format(
+				"Container ID \"%s\".\n",
+				EPRUtils.getGeniiContainerID(epr)));
+		}
+		catch (ContextException ce)
+		{
+			_logger.warn("Unable to get current EPR.");
+		}
+		
 		return request;
 	}
 
@@ -687,8 +704,18 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		}
 
 		ResourceKey rKey = createResource(constructionParameters);
+		AttributedURIType targetAddress = myEPR.getAddress();
+		if (EPRUtils.getGeniiContainerID(myEPR) == null)
+		{
+			targetAddress = new AttributedURIType(
+				String.format("%s?%s=%s",
+					targetAddress.get_value(), 
+					EPRUtils.GENII_CONTAINER_ID_PARAMETER, 
+					Container.getContainerID()));
+		}
+		
 		EndpointReferenceType epr = ResourceManager.createEPR(rKey, 
-			myEPR.getAddress().get_value().toString(), 
+			targetAddress.toString(), 
 			getImplementedPortTypes(rKey));
 		if (!(this instanceof GeniiNoOutCalls)){
 			try
@@ -959,7 +986,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		
 		try
 		{
-			connection = pool.acquire();
+			connection = pool.acquire(false);
 			stmt = connection.prepareStatement(
 				"INSERT INTO iterators (iteratorid, elementindex, contents) " +
 				"VALUES(?, ?, ?)");

@@ -105,8 +105,8 @@ public class WorkingContextHandler extends BasicHandler
 		}
 		newContext.setProperty(WorkingContext.EPR_PROPERTY_NAME, epr);
 
-		newContext.setProperty(WorkingContext.TARGETED_SERVICE_NAME, EPRUtils
-				.extractServiceName(epr));
+		newContext.setProperty(WorkingContext.TARGETED_SERVICE_NAME,
+			EPRUtils.extractServiceName(epr));
 
 		newContext.setProperty(WorkingContext.MESSAGE_CONTEXT_KEY, ctxt);
 

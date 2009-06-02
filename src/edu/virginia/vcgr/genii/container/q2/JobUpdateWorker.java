@@ -83,11 +83,12 @@ public class JobUpdateWorker implements OutcallHandler
 			 * resolvers to get the memory "large" information from the
 			 * database.
 			 */
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(false);
 			EndpointReferenceType jobEndpoint = _jobEndpointResolver.getJobEndpoint(
 				connection, _jobInfo.getJobID());
 			GeniiBESPortType clientStub = _clientStubResolver.createClientStub(
 				connection, _jobInfo.getBESID());
+			try { connection.commit(); } catch (Throwable c) {}
 			ClientUtils.setTimeout(clientStub, 120 * 1000);
 			
 			if (jobEndpoint == null)
@@ -114,6 +115,8 @@ public class JobUpdateWorker implements OutcallHandler
 				activityStatuses 
 					= clientStub.getActivityStatuses(new GetActivityStatusesType(
 						new EndpointReferenceType[] { jobEndpoint }, null)).getResponse();
+				_jobManager.resetJobCommunicationAttempts(connection, _jobInfo.getJobID());
+				connection.commit();
 			}
 			finally
 			{
@@ -149,20 +152,21 @@ public class JobUpdateWorker implements OutcallHandler
 				{
 					/* If the job failed in the BES, fail it in the queue */
 					if (!_jobManager.failJob(connection, _jobInfo.getJobID(), 
-						true, false))
+						true, false, true))
 						PostTargets.poster().post(
 							JobEvent.jobFailed(null, 
 								Long.toString(_jobInfo.getJobID())));
 				} else if (state.isCancelledState())
 				{
 					/* If the job was cancelled, then finish it here */
-					_jobManager.failJob(connection, _jobInfo.getJobID(), false, false);
+					_jobManager.failJob(connection, _jobInfo.getJobID(), 
+							false, false, true);
 					PostTargets.poster().post(JobEvent.jobKilled(null,
 						Long.toString(_jobInfo.getJobID())));
 				} else if (state.isFinishedState())
 				{
 					/* If the job finished on the bes, finish it here */
-					_jobManager.finishJob(connection, _jobInfo.getJobID());
+					_jobManager.finishJob(_jobInfo.getJobID());
 					PostTargets.poster().post(JobEvent.jobFinished(null,
 						Long.toString(_jobInfo.getJobID())));
 				}
@@ -172,6 +176,18 @@ public class JobUpdateWorker implements OutcallHandler
 		{
 			_logger.warn("Unable to update job status for job " 
 				+ _jobInfo.getJobID(), cause);
+			try
+			{
+				_jobManager.addJobCommunicationAttempt(connection,
+					_data.getJobID(), _data.getBESID().longValue());
+				connection.commit();
+			}
+			catch (Throwable cause2)
+			{
+				_logger.warn(String.format(
+					"Unable to update database for failed job %d.", 
+					_jobInfo.getJobID()), cause2);
+			}
 		}
 		finally
 		{

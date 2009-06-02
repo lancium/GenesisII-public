@@ -215,7 +215,9 @@ public class VCGRContainerServiceImpl extends GenesisIIBase
 				ResourceKey targetKey = ResourceManager.getServiceResource(serviceName);
 				
 				EndpointReferenceType targetEPR = 
-					ResourceManager.createEPR(targetKey, shortenedURL + serviceName,
+					ResourceManager.createEPR(targetKey, shortenedURL + 
+						serviceName + "?" + EPRUtils.GENII_CONTAINER_ID_PARAMETER +
+						"=" + Container.getContainerID(),
 						findImplementedPortTypes(desc.getImplClass()));
 				
 				ret.add(new EntryType(serviceName, null, targetEPR));

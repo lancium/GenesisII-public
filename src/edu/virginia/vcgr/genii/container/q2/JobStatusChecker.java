@@ -70,7 +70,7 @@ public class JobStatusChecker
 					/* Acquire a connection from the connection pool and ask
 					 * the manager to check the job statuses.
 					 */
-					connection = _connectionPool.acquire();
+					connection = _connectionPool.acquire(true);
 					_manager.checkJobStatuses(connection);
 				}
 				catch (Throwable cause)

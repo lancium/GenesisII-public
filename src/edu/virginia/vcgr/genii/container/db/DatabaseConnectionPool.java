@@ -112,7 +112,7 @@ public class DatabaseConnectionPool
 		t.start();
 	}
 	
-	public Connection acquire() throws SQLException
+	private Connection acquire() throws SQLException
 	{
 		Connection connection = null;
 		_logger.debug("Acquiring DB connection[" + _connPool.size() + "]");
@@ -143,6 +143,13 @@ public class DatabaseConnectionPool
 			if (!succeeded)
 				_lock.readLock().unlock();
 		}
+	}
+	
+	public Connection acquire(boolean useAutoCommit) throws SQLException
+	{
+		Connection ret = acquire();
+		ret.setAutoCommit(useAutoCommit);
+		return ret;
 	}
 	
 	public void release(Connection conn)
@@ -206,7 +213,6 @@ public class DatabaseConnectionPool
 		_logger.debug("Creating a new database connection.");
 		
 		Connection conn = DriverManager.getConnection(_connectString, _user, _password);
-		conn.setAutoCommit(false);
 		conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
 		return (Connection)Proxy.newProxyInstance(
 			Thread.currentThread().getContextClassLoader(),
@@ -315,6 +321,8 @@ public class DatabaseConnectionPool
 	static protected class ConnectionInterceptor implements InvocationHandler
 	{
 		static private Method _CLOSE_METHOD;
+		static private Method _COMMIT_METHOD;
+		static private Method _ROLLBACK_METHOD;
 		
 		static
 		{
@@ -322,10 +330,15 @@ public class DatabaseConnectionPool
 			{
 				_CLOSE_METHOD = Connection.class.getDeclaredMethod(
 					"close", new Class[0]);
+				_COMMIT_METHOD = Connection.class.getDeclaredMethod(
+					"commit", new Class[0]);
+				_ROLLBACK_METHOD = Connection.class.getDeclaredMethod(
+					"rollback", new Class[0]);
 			}
 			catch (Throwable t)
 			{
-				_logger.error("Couldn't load the close method.", t);
+				_logger.error(
+					"Couldn't load the close/commit/rollback methods.", t);
 			}
 		}
 		
@@ -363,6 +376,18 @@ public class DatabaseConnectionPool
 				_logger.error("Someone tried to close a pooled connection.");
 				throw new RuntimeException(
 					"Someone tried to close a pooled connection.");
+			} else if (method.equals(_COMMIT_METHOD))
+			{
+				if (!((Connection)_instance).getAutoCommit())
+					return method.invoke(_instance, args);
+				else
+					return null;
+			} else if (method.equals(_ROLLBACK_METHOD))
+			{
+				if (!((Connection)_instance).getAutoCommit())
+					return method.invoke(_instance, args);
+				else
+					return null;
 			}
 			
 			boolean interrupted = Thread.interrupted();

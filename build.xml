@@ -175,13 +175,13 @@
 		<ant antfile="${wsdl.dir}/byteio/sbyteio.build.xml"/>
 		<ant antfile="${wsdl.dir}/byteio/sbyteio-factory.build.xml"/>
 		<ant antfile="${wsdl.dir}/container/container.build.xml"/>
-		<ant antfile="${wsdl.dir}/bes/bes-activity.build.xml"/>
-		<ant antfile="${wsdl.dir}/bes/bes.build.xml"/>
 		<ant antfile="${wsdl.dir}/exported/exported-file.build.xml"/>
 		<ant antfile="${wsdl.dir}/exported/exported-dir.build.xml"/>
 		<ant antfile="${wsdl.dir}/exported/exported-root.build.xml"/>
 		<ant antfile="${wsdl.dir}/rfork/rfork.build.xml"/>
 		<ant antfile="${wsdl.dir}/exported/light-export.build.xml"/>
+		<ant antfile="${wsdl.dir}/bes/bes-activity.build.xml"/>
+		<ant antfile="${wsdl.dir}/bes/bes.build.xml"/>
 		<ant antfile="${wsdl.dir}/naming.build.xml"/>
 		<ant antfile="${wsdl.dir}/authn/x509-authn.build.xml"/>
 		<ant antfile="${wsdl.dir}/authn/jndi-authn.build.xml"/>

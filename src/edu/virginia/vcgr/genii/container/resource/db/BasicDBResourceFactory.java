@@ -53,7 +53,7 @@ public class BasicDBResourceFactory implements IResourceFactory
 		
 		try
 		{
-			conn = _pool.acquire();
+			conn = _pool.acquire(false);
 			DatabaseTableUtils.createTables(conn, false,
 				_CREATE_KEY_TABLE_STMT,
 				_CREATE_PROPERTY_TABLE_STMT,

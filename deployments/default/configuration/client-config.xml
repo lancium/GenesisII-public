@@ -37,6 +37,8 @@
 	</genii:uri-handlers>
 	
 	<genii:locator-registry>
+		<locator interface="edu.virginia.vcgr.genii.certGenerator.CertGeneratorPortType"
+			locator-type="edu.virginia.vcgr.genii.certGenerator.CertGeneratorServiceLocator"/>
 		<locator
 			interface="edu.virginia.vcgr.genii.container.VCGRContainerPortType"
 			locator-type="edu.virginia.vcgr.genii.container.VCGRContainerServiceLocator"/>
@@ -246,6 +248,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.EchoCommand</mconf:class>
 		<mconf:class name="manage-windows-container-service"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ManageWindowsContainerServiceTool</mconf:class>
+		<mconf:class name="patch-ip"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.PatchIPTool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

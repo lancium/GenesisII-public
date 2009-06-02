@@ -54,7 +54,7 @@ public class IteratorDBResourceFactory extends BasicDBResourceFactory
 		
 		try
 		{
-			conn = _pool.acquire();
+			conn = _pool.acquire(false);
 			DatabaseTableUtils.createTables(conn, false, _CREATE_STMTS);
 			conn.commit();
 		}

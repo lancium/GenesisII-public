@@ -24,7 +24,7 @@ public class TestingDerbyTimestamps
 		
 		try
 		{
-			conn = _pool.acquire();
+			conn = _pool.acquire(false);
 			insertStmt = conn.prepareStatement(
 				"INSERT INTO test1 VALUES(?, CURRENT_TIMESTAMP)");
 			insertStmt.setInt(1, 0);
@@ -95,7 +95,7 @@ public class TestingDerbyTimestamps
 		
 		try
 		{
-			conn = _pool.acquire();
+			conn = _pool.acquire(false);
 			stmt = conn.createStatement();
 			stmt.executeUpdate("CREATE TABLE test1 (ID INTEGER PRIMARY KEY," +
 				"ts TIMESTAMP)");
@@ -115,7 +115,7 @@ public class TestingDerbyTimestamps
 		
 		try
 		{
-			conn = _pool.acquire();
+			conn = _pool.acquire(false);
 			stmt = conn.createStatement();
 			stmt.executeUpdate("DROP TABLE test1 CASCADE");
 			conn.commit();

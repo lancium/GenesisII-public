@@ -72,7 +72,7 @@ public class ContainerServicesProperties
 		
 		try
 		{
-			connection = connectionPool.acquire();
+			connection = connectionPool.acquire(false);
 			DatabaseTableUtils.createTables(connection, false, 
 				"CREATE TABLE containerservicesproperties (" +
 					"name VARCHAR(256) PRIMARY KEY, " +
@@ -181,7 +181,7 @@ public class ContainerServicesProperties
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(false);
 			stmt = connection.prepareStatement(
 				"SELECT name FROM containerservicesproperties WHERE name = ?");
 			stmt.setString(1, propertyName);
@@ -239,7 +239,7 @@ public class ContainerServicesProperties
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(true);
 			stmt = connection.prepareStatement(
 				"DELETE FROM containerservicesproperties WHERE name = ?");
 			stmt.setString(1, propertyName);
@@ -270,7 +270,7 @@ public class ContainerServicesProperties
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(true);
 			stmt = connection.prepareStatement(
 				"SELECT value FROM containerservicesproperties " +
 					"WHERE name = ?");

@@ -55,8 +55,8 @@ public class DatabaseConnectionManager
 	static private HashMap<String, DatabaseConnectionPool> _pools =
 		new HashMap<String, DatabaseConnectionPool>();
 	
-	static public Connection acquireConnection(String connectionPoolName)
-		throws SQLException
+	static public Connection acquireConnection(String connectionPoolName, 
+		boolean useAutoCommit) throws SQLException
 	{
 		DatabaseConnectionPool pool;
 		synchronized (_pools)
@@ -67,7 +67,7 @@ public class DatabaseConnectionManager
 					(pool = findConnectionPool(connectionPoolName)));
 		}
 		
-		Connection conn = pool.acquire();
+		Connection conn = pool.acquire(useAutoCommit);
 		_storage.get().add(new ConnectionDescription(pool, conn));
 		return conn;
 	}

@@ -116,7 +116,7 @@ public class DeployDatabase implements Closeable
 	
 	public DeployDatabase() throws SQLException
 	{
-		_connection = _pool.acquire();
+		_connection = _pool.acquire(false);
 		
 		prepareStatements();
 	}
@@ -372,7 +372,7 @@ public class DeployDatabase implements Closeable
 		
 		try
 		{
-			connection = _pool.acquire();
+			connection = _pool.acquire(false);
 			DatabaseTableUtils.createTables(connection, false, 
 				_TABLE_CREATION_STMTS);
 			connection.commit();

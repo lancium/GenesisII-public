@@ -90,7 +90,7 @@ public class TestingHypersonic
 		
 		try
 		{
-			conn = _pool.acquire();
+			conn = _pool.acquire(false);
 			stmt = conn.createStatement();
 			stmt.executeUpdate("CREATE TABLE test1 (ID INTEGER PRIMARY KEY," +
 				"guid VARCHAR(256), bits VARCHAR (8192) FOR BIT DATA)");
@@ -110,7 +110,7 @@ public class TestingHypersonic
 		
 		try
 		{
-			conn = _pool.acquire();
+			conn = _pool.acquire(false);
 			stmt = conn.createStatement();
 			stmt.executeUpdate("DROP TABLE test1 CASCADE");
 			conn.commit();
@@ -129,7 +129,7 @@ public class TestingHypersonic
 		
 		try
 		{
-			conn = _pool.acquire();
+			conn = _pool.acquire(false);
 			stmt = conn.prepareStatement("INSERT INTO test1 VALUES(?, ?, ?)");
 			
 			for (int lcv = 0; lcv < _NUM_ROWS; lcv++)
@@ -162,7 +162,7 @@ public class TestingHypersonic
 		
 		try
 		{
-			conn = _pool.acquire();
+			conn = _pool.acquire(false);
 			stmt = conn.prepareStatement("SELECT * FROM test1 WHERE ID > ? AND ID < ?");
 			
 			for (int lcv = 100; lcv < (_NUM_ROWS - 100); lcv += 100)
@@ -200,7 +200,7 @@ public class TestingHypersonic
 		
 		try
 		{
-			conn = _pool.acquire();
+			conn = _pool.acquire(false);
 			stmt = conn.createStatement();
 			
 			for (int lcv = 0; lcv < _NUM_ROWS; lcv += 100)
@@ -230,7 +230,7 @@ public class TestingHypersonic
 		
 		try
 		{
-			conn = _pool.acquire();
+			conn = _pool.acquire(false);
 			stmt = conn.createStatement();
 			
 			stmt.executeUpdate("DELETE FROM test1");

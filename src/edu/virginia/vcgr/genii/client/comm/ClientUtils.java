@@ -61,6 +61,9 @@ public class ClientUtils
 {
 	static private Log _logger = LogFactory.getLog(ClientUtils.class);
 
+	static private InheritableThreadLocal<Long> _TIMEOUTS =
+		new InheritableThreadLocal<Long>();
+	
 	static private final String _PROXY_FACTORY_INSTANCE_NAME =
 		"proxy-factory-instance";
 	
@@ -103,6 +106,10 @@ public class ClientUtils
 		return __clientRsaKeyLength;
 	}
 	
+	static public void setDefaultTimeoutForThread(Long newTimeout)
+	{
+		_TIMEOUTS.set(newTimeout);
+	}
 	
 	/**
 	 * Generates transient key and certificate material to be used 
@@ -419,6 +426,10 @@ public class ClientUtils
 	{
 		IProxyFactory factory = getProxyFactory();
 		IFace face = factory.createProxy(loader, iface, epr, callContext);
+		
+		Long timeout = _TIMEOUTS.get();
+		if (timeout != null)
+			factory.setTimeout(face, timeout.intValue());
 		
 		return face;
 	}

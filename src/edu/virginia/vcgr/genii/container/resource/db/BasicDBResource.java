@@ -69,7 +69,7 @@ public class BasicDBResource implements IResource
 	{
 		_parentKey = parentKey;
 		_connectionPool = connectionPool;
-		_connection = _connectionPool.acquire();
+		_connection = _connectionPool.acquire(false);
 	}
 	
 	public Connection getConnection()

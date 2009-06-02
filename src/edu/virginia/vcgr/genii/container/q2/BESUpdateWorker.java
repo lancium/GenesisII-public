@@ -68,7 +68,7 @@ public class BESUpdateWorker implements OutcallHandler
 		try
 		{
 			/* Acquire a new database connection to use */
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(false);
 			
 			/* Use the client stub resolver to finally load the EPR for
 			 * the BES container from the database.  Because we are in the
@@ -79,6 +79,7 @@ public class BESUpdateWorker implements OutcallHandler
 			 */
 			GeniiBESPortType clientStub = _portTypeResolver.createClientStub(
 				connection, _besID);
+			try { connection.commit(); } catch (Throwable c) {}
 			ClientUtils.setTimeout(clientStub, 120 * 1000);
 			
 			/* Go ahead and Mark the BES as missed until we have actually

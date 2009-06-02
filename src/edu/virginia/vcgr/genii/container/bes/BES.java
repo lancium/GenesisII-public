@@ -92,7 +92,7 @@ public class BES implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(true);
 			stmt = connection.createStatement();
 			rs = stmt.executeQuery(
 				"SELECT besid, userloggedinaction, screensaverinactiveaction " +
@@ -132,7 +132,7 @@ public class BES implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(false);
 			stmt = connection.prepareStatement(
 				"INSERT INTO bespolicytable " +
 					"(besid, userloggedinaction, screensaverinactiveaction) " +
@@ -169,7 +169,7 @@ public class BES implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(false);
 			stmt = connection.prepareStatement(
 				"DELETE FROM bespolicytable WHERE besid = ?");
 			stmt.setString(1, besid);
@@ -288,7 +288,7 @@ public class BES implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(false);
 			stmt = connection.prepareStatement(
 				"INSERT INTO besactivitiestable " +
 					"(activityid, besid, jsdl, owners, callingcontext, " +
@@ -360,7 +360,7 @@ public class BES implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(false);
 			stmt = connection.prepareStatement(
 				"DELETE FROM besactivitiestable WHERE activityid = ?");
 			stmt.setString(1, activityid);

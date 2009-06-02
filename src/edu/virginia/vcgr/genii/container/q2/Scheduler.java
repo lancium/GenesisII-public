@@ -215,7 +215,7 @@ public class Scheduler implements Closeable
 			try
 			{
 				/* Acquire a new connection from the pool */
-				connection = _connectionPool.acquire();
+				connection = _connectionPool.acquire(false);
 				
 				/* And start the jobs. */
 				_jobManager.startJobs(connection, matches);

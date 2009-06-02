@@ -5,12 +5,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Stack;
 
+import org.apache.axis.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.context.ContextException;
+import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 
 public class WorkingContext implements Closeable, Cloneable
@@ -75,17 +77,25 @@ public class WorkingContext implements Closeable, Cloneable
 			stack.push(new WorkingContext());
 		}
 		
-		String serviceName = newTarget.getAddress().get_value().toString();
-		int index = serviceName.lastIndexOf('/');
-		if (index < 0)
-			throw new ContextException("Couldn't determine service name for service at URI \"" +
-				serviceName + "\".");
-		serviceName = serviceName.substring(index + 1);
-		WorkingContext newContext = stack.peek();
-		newContext = (WorkingContext)newContext.clone();
-		newContext.setProperty(EPR_PROPERTY_NAME, newTarget);
-		newContext.setProperty(TARGETED_SERVICE_NAME, serviceName);
-		stack.push(newContext);
+		try
+		{
+			String serviceName = EPRUtils.extractServiceName(newTarget);
+			int index = serviceName.lastIndexOf('/');
+			if (index < 0)
+				throw new ContextException("Couldn't determine service name for service at URI \"" +
+					serviceName + "\".");
+			serviceName = serviceName.substring(index + 1);
+			WorkingContext newContext = stack.peek();
+			newContext = (WorkingContext)newContext.clone();
+			newContext.setProperty(EPR_PROPERTY_NAME, newTarget);
+			newContext.setProperty(TARGETED_SERVICE_NAME, serviceName);
+			stack.push(newContext);
+		}
+		catch (AxisFault af)
+		{
+			throw new ContextException(
+				"Unable to extract service name from EPR.", af);
+		}
 	}
 	
 	static public void releaseAssumedIdentity() throws ContextException

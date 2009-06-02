@@ -124,7 +124,7 @@ public class QueueManager implements Closeable
 		try
 		{
 			/* Acquire a new connection to access the database with. */
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(true);
 			
 			/* We look through the resources table to find all queueid's
 			 * indicated.  We could equally have used the jobs table, but
@@ -238,7 +238,7 @@ public class QueueManager implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(true);
 			_besManager = new BESManager(
 				_database, _schedulingEvent, 
 				connection, informationPortal(), _connectionPool);
@@ -290,7 +290,7 @@ public class QueueManager implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(false);
 			_besManager.addNewBES(connection, name, epr);
 		}
 		finally
@@ -306,7 +306,7 @@ public class QueueManager implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(false);
 			_besManager.configureBES(connection, name, newSlots);
 		}
 		finally
@@ -327,7 +327,7 @@ public class QueueManager implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(true);
 			return _besManager.listBESs(connection, entryName);
 		}
 		finally
@@ -342,7 +342,7 @@ public class QueueManager implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(false);
 			return _besManager.removeBESs(connection, entryName);
 		}
 		finally
@@ -358,7 +358,7 @@ public class QueueManager implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(false);
 			return _jobManager.submitJob(connection, jsdl, priority);
 		}
 		finally
@@ -374,7 +374,7 @@ public class QueueManager implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(true);
 			return _jobManager.listJobs(connection);
 		}
 		finally
@@ -386,17 +386,7 @@ public class QueueManager implements Closeable
 	public void checkJobStatus(String jobID) 
 		throws SQLException
 	{
-		Connection connection = null;
-		
-		try
-		{
-			connection = _connectionPool.acquire();
-			_jobManager.checkJobStatus(connection, Long.parseLong(jobID));
-		}
-		finally
-		{
-			_connectionPool.release(connection);
-		}
+		_jobManager.checkJobStatus(Long.parseLong(jobID));
 	}
 	
 	public Collection<JobInformationType> getJobStatus(String []jobs)
@@ -406,7 +396,7 @@ public class QueueManager implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(true);
 			return _jobManager.getJobStatus(connection, jobs);
 		}
 		finally
@@ -422,7 +412,7 @@ public class QueueManager implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(true);
 			return _jobManager.queryErrorInformation(connection, job);
 		}
 		finally
@@ -439,7 +429,7 @@ public class QueueManager implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(false);
 			_jobManager.completeJobs(connection, jobs);
 		}
 		finally
@@ -455,7 +445,7 @@ public class QueueManager implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(false);
 			_jobManager.killJobs(connection, jobs);
 		}
 		finally

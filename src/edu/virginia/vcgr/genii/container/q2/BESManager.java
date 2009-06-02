@@ -445,6 +445,7 @@ public class BESManager implements Closeable
 		 * (it's own).  Load that context from the database. */
 		ICallingContext queueCallingContext = _database.getQueueCallingContext(
 			connection);
+		connection.commit();
 		
 		/* Go through the list of containers to update */
 		for (BESUpdateInformation info : resourcesToUpdate)

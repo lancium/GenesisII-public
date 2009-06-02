@@ -76,6 +76,10 @@ public class JobManager implements Closeable
 	 */
 	static final private long _STATUS_CHECK_FREQUENCY = 1000L * 60 * 5;
 	
+	/** One hour of non-communication */
+	static final private long MAX_COMM_ATTEMPTS = 
+		(1000L * 60 * 60 * 1) / _STATUS_CHECK_FREQUENCY;
+	
 	/** 
 	 * The maximum number of times that we will allow a job to be started and 
 	 * failed before giving up.
@@ -222,7 +226,7 @@ public class JobManager implements Closeable
 			"container went down.");
 		for (JobData job : starting)
 		{
-			failJob(connection, job.getJobID(), false, false);
+			failJob(connection, job.getJobID(), false, false, true);
 		}
 	}
 	
@@ -238,7 +242,8 @@ public class JobManager implements Closeable
 	 * @throws ResourceException
 	 */
 	synchronized public boolean failJob(Connection connection, 
-		long jobID, boolean countAsAnAttempt, boolean isPermanent)
+		long jobID, boolean countAsAnAttempt, boolean isPermanent,
+		boolean attemptKill)
 		throws SQLException, ResourceException
 	{
 		boolean ret = false;
@@ -303,7 +308,8 @@ public class JobManager implements Closeable
 		 * (if that's where he's destined for) when the database has been 
 		 * updated and the outcall has been made).
 		 */
-		_outcallThreadPool.enqueue(new JobKiller(job, newState));
+		if (attemptKill)
+			_outcallThreadPool.enqueue(new JobKiller(job, newState, false));
 		return ret;
 	}
 	
@@ -317,7 +323,7 @@ public class JobManager implements Closeable
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
-	synchronized public void finishJob(Connection connection, long jobID)
+	synchronized public void finishJob(long jobID)
 		throws SQLException, ResourceException
 	{
 		/* Find the job in the in-memory maps */
@@ -342,7 +348,48 @@ public class JobManager implements Closeable
 		/* See failJob for a complete discussion of why we enqueue an outcall
 		 * worker at this point -- the reasons are the same.
 		 */
-		_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED));
+		_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED, false));
+	}
+	
+	synchronized public void killJob(Connection connection, long jobID)
+		throws SQLException, ResourceException
+	{
+		/* Find the job in the in-memory maps */
+		JobData job = _jobsByID.get(new Long(jobID));
+		if (job == null)
+		{
+			// don't know where it went, but it's no longer our responsibility.
+			return;
+		}
+		
+		_logger.debug("Killing a running job:" + jobID);
+		
+		// This is one of the few times we are going to break our pattern and
+		// modify the in memory state before the database.  The reason for this
+		// is that we can't afford to forget that the BES container has a job
+		// on it that it's managing.  If we do, we will eventually leak memory
+		// on that container.
+		_queuedJobs.remove(new SortableJobKey(job));
+		_runningJobs.remove(new Long(jobID));
+		job.incrementRunAttempts();
+		
+		_database.modifyJobState(connection, job.getJobID(),
+			job.getRunAttempts(), QueueStates.FINISHED, new Date(), null, null, null);
+		connection.commit();
+		
+		/* Finally, note the new state in memory and clear the 
+		 * old BES information. */
+		job.setJobState(QueueStates.FINISHED);
+		job.clearBESID();
+		
+		/* Otherwise, we assume that he's already in 
+		 * the right list */
+		_logger.debug("Moving job \"" + job.getJobTicket()
+			+ "\" to the " + QueueStates.FINISHED + " state.");
+	
+		_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED, true));
+		
+		_schedulingEvent.notifySchedulingEvent();
 	}
 	
 	/**
@@ -492,7 +539,7 @@ public class JobManager implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire();
+			connection = _connectionPool.acquire(true);
 			return _database.getJSDL(connection, jobID);
 		}
 		finally
@@ -893,8 +940,7 @@ public class JobManager implements Closeable
 		completeJobs(connection, jobsToComplete);
 	}
 	
-	synchronized public void checkJobStatus(Connection connection, 
-		long jobID)
+	synchronized public void checkJobStatus(long jobID)
 	{
 		int originalCount = _outcallThreadPool.size();
 		
@@ -1279,15 +1325,41 @@ public class JobManager implements Closeable
 			{
 				/* If the job is running, we have to finish the job (which 
 				 * will kill it for us) */
-				finishJob(connection, jobID);
+				killJob(connection, jobID);
 			} else if (!jobData.getJobState().isFinalState())
 			{
 				/* This won't kill the job (it isn't running), but it
 				 * will move it to the correct lists, thus preventing it
 				 * from ever being run.
 				 */
-				finishJob(connection, jobID);
+				finishJob(jobID);
 			}
+		}
+	}
+	
+	synchronized public void resetJobCommunicationAttempts(
+		Connection connection, long jobid) throws SQLException
+	{
+		_database.setJobCommunicationAttempts(connection, jobid, 0);
+	}
+	
+	synchronized public void addJobCommunicationAttempt(
+		Connection connection, long jobid, long besid) 
+			throws SQLException, ResourceException
+	{
+		int commAttempts = _database.getJobCommunicationAttempts(
+			connection, jobid);
+		if (commAttempts > MAX_COMM_ATTEMPTS)
+		{
+			_logger.error(String.format(
+				"Unable to communicate with job for %d attempts.  Re-starting it.",
+				commAttempts));
+			failJob(connection, jobid, false, false, false);
+			_besManager.markBESAsMissed(besid, "Couldn't get job status.");
+		} else
+		{
+			_database.setJobCommunicationAttempts(connection, jobid, 
+				commAttempts + 1);
 		}
 	}
 	
@@ -1345,13 +1417,14 @@ public class JobManager implements Closeable
 			try
 			{
 				/* Acquire a new database connection to use. */
-				connection = _connectionPool.acquire();
+				connection = _connectionPool.acquire(false);
 				
 				/* Get all of the information from the database required to
 				 * start the job.
 				 */
 				JobStartInformation startInfo = _database.getStartInformation(
 					connection, _jobID);
+				connection.commit();
 				
 				SecurityUpdateResults checkResults = new SecurityUpdateResults();
 				ClientUtils.checkAndRenewCredentials(startInfo.getCallingContext(),
@@ -1386,7 +1459,7 @@ public class JobManager implements Closeable
 					 *  start it.  Instead, we will finish it early. */
 					if (data.killed())
 					{
-						finishJob(connection, _jobID);
+						finishJob(_jobID);
 						return;
 					}
 				}
@@ -1457,7 +1530,7 @@ public class JobManager implements Closeable
 					 * will immediately kill it and finish it.
 					 */
 					if (data.killed())
-						finishJob(connection, _jobID);
+						finishJob(_jobID);
 				}
 			}
 			catch (Throwable cause)
@@ -1514,7 +1587,7 @@ public class JobManager implements Closeable
 				{
 					/* We got an exception, so fail the job. */
 					failJob(connection, _jobID, countAgainstJob,
-						isPermanent);
+						isPermanent, true);
 					PostTargets.poster().post(JobEvent.jobFailed(
 						startCtxt, Long.toString(_jobID)));
 					_schedulingEvent.notifySchedulingEvent();
@@ -1540,11 +1613,14 @@ public class JobManager implements Closeable
 	 */
 	private class JobKiller implements OutcallHandler
 	{
+		private boolean _outcallOnly;
 		private JobData _jobData;
 		private QueueStates _newState;
 		
-		public JobKiller(JobData jobData, QueueStates newState)
+		public JobKiller(JobData jobData, QueueStates newState,
+			boolean outcallOnly)
 		{
+			_outcallOnly = outcallOnly;
 			_jobData = jobData;
 			_newState = newState;
 		}
@@ -1589,6 +1665,7 @@ public class JobManager implements Closeable
 			 */
 			KillInformation killInfo = _database.getKillInfo(
 				connection, _jobData.getJobID());
+			connection.commit();
 				
 			String oldAction = _jobData.setJobAction("Terminating");
 			if (oldAction != null)
@@ -1606,7 +1683,7 @@ public class JobManager implements Closeable
 				GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, 
 					killInfo.getBESEndpoint(), 
 					killInfo.getCallingContext());
-				ClientUtils.setTimeout(bes, 120 * 1000);
+				ClientUtils.setTimeout(bes, 30 * 1000);
 				bes.terminateActivities(new TerminateActivitiesType(
 					new EndpointReferenceType[] {
 						killInfo.getJobEndpoint()
@@ -1632,7 +1709,13 @@ public class JobManager implements Closeable
 			try
 			{
 				/* Acquire a connection to talk to the database with. */
-				connection = _connectionPool.acquire();
+				connection = _connectionPool.acquire(false);
+				
+				if (_outcallOnly)
+				{
+					terminateActivity(connection);
+					return;
+				}
 				
 				/* If the job is running, then we have to terminate it */
 				if (_jobData.getJobState().equals(QueueStates.RUNNING))

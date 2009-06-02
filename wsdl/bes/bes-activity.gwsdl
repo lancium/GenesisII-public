@@ -10,8 +10,14 @@
 	xmlns:wsrf-rw="http://docs.oasis-open.org/wsrf/rw-2" 
 	xmlns:genii-rfact="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
     xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
-	xmlns:sfact="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory"
 	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:rfork="http://vcgr.cs.virginia.edu/genii/resource-fork"
+	xmlns:rns="http://schemas.ggf.org/rns/2006/05/rns"
+	xmlns:enhanced-rns="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
+	xmlns:byteio="http://schemas.ggf.org/byteio/2005/10/byte-io"
+	xmlns:rbyteio="http://schemas.ggf.org/byteio/2005/10/random-access"
+	xmlns:sbyteio="http://schemas.ggf.org/byteio/2005/10/streamable-access"
+	xmlns:sfact="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory"
 	xmlns:rpw-2="http://docs.oasis-open.org/wsrf/rpw-2"
     xmlns:rw-2="http://docs.oasis-open.org/wsrf/rw-2">
 
@@ -55,6 +61,30 @@
         namespace="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
         location="./notification.wsdl"/>
 
+	<wsdl:import
+		namespace="http://schemas.ggf.org/rns/2006/05/rns"
+		location="./rns.wsdl"/>
+
+	<wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
+        location="./enhanced-rns-generated.wsdl"/>
+
+    <wsdl:import
+        namespace="http://schemas.ggf.org/byteio/2005/10/random-access"
+        location="./rbyteio-generated.wsdl"/>
+
+    <wsdl:import
+        namespace="http://schemas.ggf.org/byteio/2005/10/streamable-access"
+        location="./sbyteio-generated.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory"
+        location="./sbyteio-factory.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/genii/resource-fork"
+        location="./rfork-generated.wsdl"/>
+
 	<wsdl:types>
 		<xsd:schema
 			attributeFormDefault="unqualified"
@@ -82,20 +112,11 @@
 	</wsdl:message>
 
 	<wsdl:portType name="BESActivityPortType">
+		<genii-ext:extend portType="rfork:ResourceForkPortType"/>
 		<genii-ext:extend portType="genii-common:GeniiCommon"/>
-		<genii-ext:extend portType="sfact:StreamableByteIOFactory"/>
 		<genii-ext:extend portType="rpw-2:GetResourceProperty"/>
 		<genii-ext:extend portType="rpw-2:GetMultipleResourceProperties"/>
-		
-		<wsdl:operation name="openStream">
-			<wsdl:input message="sfact:openStreamRequest"/>
-			<wsdl:output message="sfact:openStreamResponse"/>
-			<wsdl:fault name="ResourceUnknownFault"
-				message="wsrf-rw:ResourceUnknownFault"/>
-			<wsdl:fault name="ResourceCreationFault"
-				message="genii-rfact:ResourceCreationFault"/>
-		</wsdl:operation>
-		
+
 		<wsdl:operation name="getError">
 			<wsdl:input message="bes-activity:BESActivityGetErrorRequest"/>
 			<wsdl:output message="bes-activity:BESActivityGetErrorResponse"/>
