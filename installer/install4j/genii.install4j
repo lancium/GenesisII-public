@@ -12,8 +12,8 @@
       <envVar name="JDK_HOME" />
     </searchSequence>
     <variables>
-      <variable name="genii.patch-url" value="http://vcgr.cs.virginia.edu/GenesisII-2.0/ReleaseBranch-2.0" />
-      <variable name="genii.connection-url" value="http://vcgr.cs.virginia.edu/GeniiNet/root.xml" />
+      <variable name="genii.patch-url" value="http://vcgr.cs.virginia.edu/GenesisII/2.0/patches/ReleaseBranch-2.0" />
+      <variable name="genii.connection-url" value="http://vcgr.cs.virginia.edu/XCG/2.0/root.xml" />
       <variable name="genii.deployment" value="GeniiNetFullContainer" />
       <variable name="genii.build-number" value="2000" />
       <variable name="genii.xcg-port" value="18080" />
@@ -36,10 +36,10 @@
     <mountPoints>
       <mountPoint id="41" root="" location="ApplicationWatcher" mode="755" />
       <mountPoint id="356" root="" location="updates" mode="755" />
-      <mountPoint id="34" root="" location="" mode="755" />
       <mountPoint id="502" root="" location="deployments" mode="755" />
       <mountPoint id="503" root="" location="deployments/GeniiNetFullContainer" mode="755" />
       <mountPoint id="504" root="" location="deployments/GeniiNetFullContainer/secure-runnable" mode="755" />
+      <mountPoint id="34" root="" location="" mode="755" />
       <mountPoint id="35" root="20" location="jni-lib" mode="755" />
       <mountPoint id="36" root="20" location="jni-lib/IFS" mode="755" />
       <mountPoint id="251" root="20" location="JavaServiceWrapper" mode="755" />
@@ -54,6 +54,7 @@
       <fileEntry mountPoint="41" file="../../scripts/genii-container-application.properties" overwrite="4" shared="false" mode="644" uninstallMode="0" />
       <fileEntry mountPoint="41" file="../../scripts/genii-update-application.properties" overwrite="4" shared="false" mode="644" uninstallMode="0" />
       <fileEntry mountPoint="356" file="../../scripts/current-version.txt" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="504" file="../../secrun.scratch/ContainerPostBootSecRun.jar" overwrite="4" shared="false" mode="644" uninstallMode="0" />
       <dirEntry mountPoint="34" file="../.." overwrite="4" shared="false" mode="644" uninstallMode="0" excludeSuffixes=".svn" dirMode="755">
         <exclude>
           <entry location="build.secrun.properties" fileType="regular" />
@@ -113,7 +114,6 @@
         </exclude>
       </dirEntry>
       <fileEntry mountPoint="34" file="../../scripts/jar-desc.xml" overwrite="4" shared="false" mode="644" uninstallMode="0" />
-      <fileEntry mountPoint="504" file="../../secrun.scratch/ContainerPostBootSecRun.jar" overwrite="4" shared="false" mode="644" uninstallMode="0" />
       <fileEntry mountPoint="36" file="../../jni-lib/IFS/editRegistry.bat" overwrite="4" shared="true" mode="644" uninstallMode="0" />
       <fileEntry mountPoint="36" file="../../jni-lib/IFS/GenesisIFS Readme.txt" overwrite="4" shared="true" mode="644" uninstallMode="0" />
       <fileEntry mountPoint="36" file="../../jni-lib/IFS/GenesisIFSServer.exe" overwrite="4" shared="true" mode="644" uninstallMode="0" />
@@ -2304,7 +2304,7 @@ return true;</string>
     </applications>
   </installerGui>
   <mediaSets>
-    <unixInstaller name="Unix Installer" id="50" mediaFileName="" installDir="GenesisII" overridePrincipalLanguage="false" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="">
+    <unixInstaller name="Unix Installer" id="50" mediaFileName="" installDir="GenesisII" overridePrincipalLanguage="false" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
       <excludedLaunchers />
       <excludedComponents />
       <excludedBeans />
@@ -2318,7 +2318,7 @@ return true;</string>
         <scriptLines />
       </installerScript>
     </unixInstaller>
-    <win32 name="Windows" id="80" mediaFileName="" installDir="GenesisII" overridePrincipalLanguage="false" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="" runAsAdmin="true">
+    <win32 name="Windows" id="80" mediaFileName="" installDir="GenesisII" overridePrincipalLanguage="false" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" runAsAdmin="true">
       <excludedLaunchers />
       <excludedComponents />
       <excludedBeans />
@@ -2329,7 +2329,7 @@ return true;</string>
       </exclude>
       <variables />
     </win32>
-    <macosFolder name="Mac OS X Folder" id="240" mediaFileName="" installDir="GenesisII" overridePrincipalLanguage="false" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="">
+    <macosFolder name="Mac OS X Folder" id="240" mediaFileName="" installDir="GenesisII" overridePrincipalLanguage="false" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
       <excludedLaunchers />
       <excludedComponents />
       <excludedBeans />
