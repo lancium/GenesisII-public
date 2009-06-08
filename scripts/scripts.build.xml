@@ -68,61 +68,61 @@
 		<copy file="${scripts.dir}/jar-desc.xml"
 			tofile="${basedir}/jar-desc.xml"/>
 		<replace file="${basedir}/jar-desc.xml"
-			token="$INSTALL_PATH" value="${basedir}" summary="no"/>
+			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
 
 		<copy file="${scripts.dir}/genii-base-application.properties"
 			tofile="${basedir}/ApplicationWatcher/genii-base-application.properties"/>
 		<replace file="${basedir}/ApplicationWatcher/genii-base-application.properties"
-			token="$INSTALL_PATH" value="${basedir}" summary="no"/>
+			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
 		<replace file="${basedir}/ApplicationWatcher/genii-base-application.properties"
 			token="\" value="\\" summary="no"/>
 
 		<copy file="${scripts.dir}/genii-container-application.properties"
 			tofile="${basedir}/ApplicationWatcher/genii-container-application.properties"/>
 		<replace file="${basedir}/ApplicationWatcher/genii-container-application.properties"
-			token="$INSTALL_PATH" value="${basedir}" summary="no"/>
+			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
 		<replace file="${basedir}/ApplicationWatcher/genii-container-application.properties"
 			token="\" value="\\" summary="no"/>
 
 		<copy file="${scripts.dir}/genii-update-application.properties"
 			tofile="${basedir}/ApplicationWatcher/genii-update-application.properties"/>
 		<replace file="${basedir}/ApplicationWatcher/genii-update-application.properties"
-			token="$INSTALL_PATH" value="${basedir}" summary="no"/>
+			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
 		<replace file="${basedir}/ApplicationWatcher/genii-update-application.properties"
 			token="\" value="\\" summary="no"/>
 
 		<copy file="${scripts.dir}/genii-client-application.properties"
 			tofile="${basedir}/ApplicationWatcher/genii-client-application.properties"/>
 		<replace file="${basedir}/ApplicationWatcher/genii-client-application.properties"
-			token="$INSTALL_PATH" value="${basedir}" summary="no"/>
+			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
 		<replace file="${basedir}/ApplicationWatcher/genii-client-application.properties"
 			token="\" value="\\" summary="no"/>
 
 		<copy file="${scripts.dir}/genii-simple-application.properties"
 			tofile="${basedir}/ApplicationWatcher/genii-simple-application.properties"/>
 		<replace file="${basedir}/ApplicationWatcher/genii-simple-application.properties"
-			token="$INSTALL_PATH" value="${basedir}" summary="no"/>
+			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
 		<replace file="${basedir}/ApplicationWatcher/genii-simple-application.properties"
 			token="\" value="\\" summary="no"/>
 
 		<copy file="${scripts.dir}/genii-certtool-application.properties"
 			tofile="${basedir}/ApplicationWatcher/genii-certtool-application.properties"/>
 		<replace file="${basedir}/ApplicationWatcher/genii-certtool-application.properties"
-			token="$INSTALL_PATH" value="${basedir}" summary="no"/>
+			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
 		<replace file="${basedir}/ApplicationWatcher/genii-certtool-application.properties"
 			token="\" value="\\" summary="no"/>
 
 		<copy file="${scripts.dir}/genii-ogrshserv-application.properties"
 			tofile="${basedir}/ApplicationWatcher/genii-ogrshserv-application.properties"/>
 		<replace file="${basedir}/ApplicationWatcher/genii-ogrshserv-application.properties"
-			token="$INSTALL_PATH" value="${basedir}" summary="no"/>
+			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
 		<replace file="${basedir}/ApplicationWatcher/genii-ogrshserv-application.properties"
 			token="\" value="\\" summary="no"/>
 
 		<copy file="${scripts.dir}/jserver-jar-desc.xml"
 			tofile="${basedir}/jserver-jar-desc.xml"/>
 		<replace file="${basedir}/jserver-jar-desc.xml"
-			token="$INSTALL_PATH" value="${basedir}" summary="no"/>
+			token="${installer:sys.installationDir}" value="${basedir}" summary="no"/>
 		<replace file="${basedir}/jserver-jar-desc.xml"
 			token="$LOG4JCONFIG" value="genesisII.log4j.properties"
 			summary="no"/>
@@ -178,14 +178,6 @@
 		<antcall target="build-script">
 			<param name="script-src-dir" value="${scripts.dir}"/>
 			<param name="script-base-name" value="uninstall-container"/>
-		</antcall>
-		<antcall target="build-script">
-			<param name="script-src-dir" value="${basedir}/ext/JavaServiceWrapper/bin"/>
-			<param name="script-base-name" value="InstallContainerWrapper"/>
-		</antcall>
-		<antcall target="build-script">
-			<param name="script-src-dir" value="${basedir}/ext/JavaServiceWrapper/bin"/>
-			<param name="script-base-name" value="UninstallContainerWrapper"/>
 		</antcall>
 		<antcall target="build-script-win">
 			<param name="win-script-src-dir" value="${scripts.dir}"/>

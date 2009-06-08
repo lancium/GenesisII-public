@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <vcgr:jars
 	xmlns:vcgr="http://vcgr.cs.virginia.edu">
-	<vcgr:jar-dir recursive="true">$INSTALL_PATH/lib</vcgr:jar-dir>
-	<vcgr:jar-dir recursive="true">$INSTALL_PATH/ext</vcgr:jar-dir>
+	<vcgr:jar-dir recursive="true">${installer:sys.installationDir}/lib</vcgr:jar-dir>
+	<vcgr:jar-dir recursive="true">${installer:sys.installationDir}/ext</vcgr:jar-dir>
 </vcgr:jars>

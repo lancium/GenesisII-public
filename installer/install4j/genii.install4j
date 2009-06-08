@@ -1,0 +1,2346 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<install4j version="4.2.3" transformSequenceNumber="2">
+  <directoryPresets config="../../secrun.scratch/ContainerPostBootSecRun.jar" />
+  <application name="Genesis II" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" keepModificationTimes="false" missingFilesStrategy="warn" shortName="genii" publisher="Global Bio Grid" publisherWeb="http://vcgr.cs.virginia.edu" version="2.0.0" allPathsRelative="true" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.6">
+    <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
+      <principalLanguage id="en" customLocalizationFile="" />
+      <additionalLanguages />
+    </languages>
+    <searchSequence>
+      <registry />
+      <envVar name="JAVA_HOME" />
+      <envVar name="JDK_HOME" />
+    </searchSequence>
+    <variables>
+      <variable name="genii.patch-url" value="http://vcgr.cs.virginia.edu/GenesisII-2.0/ReleaseBranch-2.0" />
+      <variable name="genii.connection-url" value="http://vcgr.cs.virginia.edu/GeniiNet/root.xml" />
+      <variable name="genii.deployment" value="GeniiNetFullContainer" />
+      <variable name="genii.build-number" value="2000" />
+      <variable name="genii.xcg-port" value="18080" />
+    </variables>
+  </application>
+  <files>
+    <filesets>
+      <fileset name="Windows Only Files" id="19" />
+      <fileset name="Linux Only Files" id="21" />
+      <fileset name="Mac OS X Only Files" id="23" />
+      <fileset name="State Directory" id="25" />
+    </filesets>
+    <roots>
+      <root id="20" fileset="19" location="" />
+      <root id="22" fileset="21" location="" />
+      <root id="24" fileset="23" location="" />
+      <root id="26" fileset="25" location="" />
+      <root id="27" fileset="25" location="${installer:sys.userHome}/.genesisII" />
+    </roots>
+    <mountPoints>
+      <mountPoint id="41" root="" location="ApplicationWatcher" mode="755" />
+      <mountPoint id="356" root="" location="updates" mode="755" />
+      <mountPoint id="34" root="" location="" mode="755" />
+      <mountPoint id="502" root="" location="deployments" mode="755" />
+      <mountPoint id="503" root="" location="deployments/GeniiNetFullContainer" mode="755" />
+      <mountPoint id="504" root="" location="deployments/GeniiNetFullContainer/secure-runnable" mode="755" />
+      <mountPoint id="35" root="20" location="jni-lib" mode="755" />
+      <mountPoint id="36" root="20" location="jni-lib/IFS" mode="755" />
+      <mountPoint id="251" root="20" location="JavaServiceWrapper" mode="755" />
+      <mountPoint id="37" root="22" location="jni-lib" mode="755" />
+      <mountPoint id="252" root="22" location="JavaServiceWrapper" mode="755" />
+      <mountPoint id="38" root="24" location="jni-lib" mode="755" />
+      <mountPoint id="253" root="24" location="JavaServiceWrapper" mode="755" />
+    </mountPoints>
+    <entries>
+      <fileEntry mountPoint="41" file="../../scripts/genii-base-application.properties" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="41" file="../../scripts/genii-client-application.properties" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="41" file="../../scripts/genii-container-application.properties" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="41" file="../../scripts/genii-update-application.properties" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="356" file="../../scripts/current-version.txt" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <dirEntry mountPoint="34" file="../.." overwrite="4" shared="false" mode="644" uninstallMode="0" excludeSuffixes=".svn" dirMode="755">
+        <exclude>
+          <entry location="build.secrun.properties" fileType="regular" />
+          <entry location="change-port.sh" fileType="regular" />
+          <entry location="simple-command" fileType="regular" />
+          <entry location="wsdl" fileType="regular" />
+          <entry location="VCGRContainerDaemon" fileType="regular" />
+          <entry location="secrun.scratch" fileType="regular" />
+          <entry location="hess.xml" fileType="regular" />
+          <entry location="connect-new-client" fileType="regular" />
+          <entry location="jni-lib" fileType="regular" />
+          <entry location="build.xml" fileType="regular" />
+          <entry location="Java" fileType="regular" />
+          <entry location="security" fileType="regular" />
+          <entry location="jserver-jar-desc.xml" fileType="regular" />
+          <entry location="ApplicationWatcher/genii-ogrshserv-application.properties" fileType="regular" />
+          <entry location="ApplicationWatcher/genii-certtool-application.properties" fileType="regular" />
+          <entry location="ApplicationWatcher/genii-simple-application.properties" fileType="regular" />
+          <entry location="ApplicationWatcher/genii-container-application.properties" fileType="regular" />
+          <entry location="ApplicationWatcher/genii-client-application.properties" fileType="regular" />
+          <entry location="ApplicationWatcher/genii-update-application.properties" fileType="regular" />
+          <entry location="ApplicationWatcher/genii-base-application.properties" fileType="regular" />
+          <entry location="initialize-new-net-security" fileType="regular" />
+          <entry location="grid-update" fileType="regular" />
+          <entry location="runContainer.sh" fileType="regular" />
+          <entry location="container.properties.example" fileType="regular" />
+          <entry location="uninstall-container" fileType="regular" />
+          <entry location="jserver.sh" fileType="regular" />
+          <entry location="install-new-container" fileType="regular" />
+          <entry location="genned-obj" fileType="regular" />
+          <entry location="connect-default-client.bat" fileType="regular" />
+          <entry location="JavaServiceWrapper" fileType="regular" />
+          <entry location="services" fileType="regular" />
+          <entry location="jserver-debug.sh" fileType="regular" />
+          <entry location="scripts" fileType="regular" />
+          <entry location="bin" fileType="regular" />
+          <entry location=".project" fileType="regular" />
+          <entry location="linux-cmd-wrapper" fileType="regular" />
+          <entry location="build.properties" fileType="regular" />
+          <entry location="mappings.properties" fileType="regular" />
+          <entry location=".settings" fileType="regular" />
+          <entry location="wsdd" fileType="regular" />
+          <entry location="src" fileType="regular" />
+          <entry location="codegen" fileType="regular" />
+          <entry location="deployments/default" fileType="regular" />
+          <entry location="deployments/GeniiNetBootstrapContainer" fileType="regular" />
+          <entry location="grid" fileType="regular" />
+          <entry location="cert-tool" fileType="regular" />
+          <entry location="lib/genesisII.log4j.properties" fileType="regular" />
+          <entry location="lib/gen" fileType="regular" />
+          <entry location=".classpath" fileType="regular" />
+          <entry location="genned-src" fileType="regular" />
+          <entry location="jar-desc.xml" fileType="regular" />
+          <entry location="installer" fileType="regular" />
+          <entry location="example-dep" fileType="regular" />
+          <entry location="init.build.xml" fileType="regular" />
+        </exclude>
+      </dirEntry>
+      <fileEntry mountPoint="34" file="../../scripts/jar-desc.xml" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="504" file="../../secrun.scratch/ContainerPostBootSecRun.jar" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="36" file="../../jni-lib/IFS/editRegistry.bat" overwrite="4" shared="true" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="36" file="../../jni-lib/IFS/GenesisIFS Readme.txt" overwrite="4" shared="true" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="36" file="../../jni-lib/IFS/GenesisIFSServer.exe" overwrite="4" shared="true" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="36" file="../../jni-lib/IFS/nulmrx.ini" overwrite="4" shared="true" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="36" file="../../jni-lib/IFS/nulmrx.sys" overwrite="4" shared="true" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="36" file="../../jni-lib/IFS/nulmrxnp.dll" overwrite="4" shared="true" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="35" file="../../jni-lib/CToGenesisCalls.dll" overwrite="4" shared="true" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="35" file="../../jni-lib/GeniiProcessMgmt.dll" overwrite="4" shared="true" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="35" file="../../jni-lib/libdb_java45.dll" overwrite="4" shared="true" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="35" file="../../jni-lib/libdb_java45d.dll" overwrite="4" shared="true" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="35" file="../../jni-lib/libdbxml_java23.dll" overwrite="4" shared="true" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="35" file="../../jni-lib/msvcr71.dll" overwrite="4" shared="true" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="35" file="../../jni-lib/nulmrxnp.dll" overwrite="4" shared="true" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="35" file="../../jni-lib/VcgrClientLib.dll" overwrite="4" shared="true" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="35" file="../../jni-lib/VcgrContainerLib.dll" overwrite="4" shared="true" mode="644" uninstallMode="0" />
+      <dirEntry mountPoint="251" file="../../JavaServiceWrapper" overwrite="4" shared="false" mode="644" uninstallMode="0" excludeSuffixes=".svn" dirMode="755">
+        <exclude>
+          <entry location="wrapper-delta-pack-3.3.5.tar.gz" fileType="regular" />
+          <entry location="wrapper/logs" fileType="regular" />
+          <entry location="wrapper/doc" fileType="regular" />
+          <entry location="wrapper/jdoc" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-freebsd-x86-32" fileType="regular" />
+          <entry location="wrapper/bin/UninstallTestWrapper-NT.bat" fileType="regular" />
+          <entry location="wrapper/bin/StopTestWrapper-NT.bat" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-freebsd-x86-64" fileType="regular" />
+          <entry location="wrapper/bin/ResumeTestWrapper-NT.bat" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-hpux-parisc-64" fileType="regular" />
+          <entry location="wrapper/bin/PauseTestWrapper-NT.bat" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-aix-ppc-64" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-hpux-ia-32" fileType="regular" />
+          <entry location="wrapper/bin/XCGContainer" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-linux-x86-64" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-solaris-sparc-64" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-hpux-parisc-32" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-aix-ppc-32" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-hpux-ia-64" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-solaris-sparc-32" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-linux-x86-32" fileType="regular" />
+          <entry location="wrapper/bin/InstallTestWrapper-NT.bat" fileType="regular" />
+          <entry location="wrapper/bin/StartTestWrapper-NT.bat" fileType="regular" />
+          <entry location="wrapper/bin/TestWrapperNoWrapper.bat" fileType="regular" />
+          <entry location="wrapper/bin/TestWrapper.bat" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-macosx-universal-32" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-linux-ppc-32" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-solaris-x86-64" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-linux-ia-64" fileType="regular" />
+          <entry location="wrapper/bin/testwrapper" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-solaris-x86-32" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-linux-ppc-64" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-macosx-universal-64" fileType="regular" />
+          <entry location="wrapper/jdoc.tar.gz" fileType="regular" />
+          <entry location="wrapper/src" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-macosx-universal-64.jnilib" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-linux-ia-64.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-hpux-parisc-64.sl" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-linux-ppc-64.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-linux-x86-32.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-aix-ppc-32.a" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-freebsd-x86-32.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-linux-x86-64.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-solaris-x86-64.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-hpux-ia-64.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-linux-ppc-32.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-macosx-universal-32.jnilib" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-solaris-sparc-64.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-freebsd-x86-64.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-solaris-sparc-32.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-solaris-x86-32.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-aix-ppc-64.a" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-hpux-parisc-32.sl" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-hpux-ia-32.so" fileType="regular" />
+        </exclude>
+      </dirEntry>
+      <fileEntry mountPoint="37" file="../../jni-lib/libfuse.so.2" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="37" file="../../jni-lib/libjavafs.so" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="37" file="../../jni-lib/libVcgrClientLib.so" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <dirEntry mountPoint="252" file="../../JavaServiceWrapper" overwrite="4" shared="false" mode="644" uninstallMode="0" excludeSuffixes=".svn" dirMode="755">
+        <exclude>
+          <entry location="wrapper-delta-pack-3.3.5.tar.gz" fileType="regular" />
+          <entry location="wrapper/logs" fileType="regular" />
+          <entry location="wrapper/doc" fileType="regular" />
+          <entry location="wrapper/jdoc" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-freebsd-x86-32" fileType="regular" />
+          <entry location="wrapper/bin/UninstallTestWrapper-NT.bat" fileType="regular" />
+          <entry location="wrapper/bin/StopTestWrapper-NT.bat" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-freebsd-x86-64" fileType="regular" />
+          <entry location="wrapper/bin/ResumeTestWrapper-NT.bat" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-hpux-parisc-64" fileType="regular" />
+          <entry location="wrapper/bin/PauseTestWrapper-NT.bat" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-aix-ppc-64" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-hpux-ia-32" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-linux-x86-64" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-solaris-sparc-64" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-hpux-parisc-32" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-aix-ppc-32" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-hpux-ia-64" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-solaris-sparc-32" fileType="regular" />
+          <entry location="wrapper/bin/InstallTestWrapper-NT.bat" fileType="regular" />
+          <entry location="wrapper/bin/StartTestWrapper-NT.bat" fileType="regular" />
+          <entry location="wrapper/bin/TestWrapperNoWrapper.bat" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-windows-x86-32.exe" fileType="regular" />
+          <entry location="wrapper/bin/TestWrapper.bat" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-macosx-universal-32" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-linux-ppc-32" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-solaris-x86-64" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-linux-ia-64" fileType="regular" />
+          <entry location="wrapper/bin/testwrapper" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-solaris-x86-32" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-linux-ppc-64" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-macosx-universal-64" fileType="regular" />
+          <entry location="wrapper/jdoc.tar.gz" fileType="regular" />
+          <entry location="wrapper/src" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-macosx-universal-64.jnilib" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-linux-ia-64.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-hpux-parisc-64.sl" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-linux-ppc-64.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-aix-ppc-32.a" fileType="regular" />
+          <entry location="wrapper/lib/wrapper-windows-x86-32.dll" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-freebsd-x86-32.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-linux-x86-64.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-solaris-x86-64.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-hpux-ia-64.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-linux-ppc-32.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-macosx-universal-32.jnilib" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-solaris-sparc-64.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-freebsd-x86-64.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-solaris-sparc-32.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-solaris-x86-32.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-aix-ppc-64.a" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-hpux-parisc-32.sl" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-hpux-ia-32.so" fileType="regular" />
+        </exclude>
+      </dirEntry>
+      <fileEntry mountPoint="38" file="../../jni-lib/libVcgrClientLib.jnilib" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <dirEntry mountPoint="253" file="../../JavaServiceWrapper" overwrite="4" shared="false" mode="644" uninstallMode="0" excludeSuffixes=".svn" dirMode="755">
+        <exclude>
+          <entry location="wrapper-delta-pack-3.3.5.tar.gz" fileType="regular" />
+          <entry location="wrapper/logs" fileType="regular" />
+          <entry location="wrapper/doc" fileType="regular" />
+          <entry location="wrapper/jdoc" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-freebsd-x86-32" fileType="regular" />
+          <entry location="wrapper/bin/UninstallTestWrapper-NT.bat" fileType="regular" />
+          <entry location="wrapper/bin/StopTestWrapper-NT.bat" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-freebsd-x86-64" fileType="regular" />
+          <entry location="wrapper/bin/ResumeTestWrapper-NT.bat" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-hpux-parisc-64" fileType="regular" />
+          <entry location="wrapper/bin/PauseTestWrapper-NT.bat" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-aix-ppc-64" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-hpux-ia-32" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-linux-x86-64" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-solaris-sparc-64" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-hpux-parisc-32" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-aix-ppc-32" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-hpux-ia-64" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-solaris-sparc-32" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-linux-x86-32" fileType="regular" />
+          <entry location="wrapper/bin/InstallTestWrapper-NT.bat" fileType="regular" />
+          <entry location="wrapper/bin/StartTestWrapper-NT.bat" fileType="regular" />
+          <entry location="wrapper/bin/TestWrapperNoWrapper.bat" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-windows-x86-32.exe" fileType="regular" />
+          <entry location="wrapper/bin/TestWrapper.bat" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-macosx-universal-32" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-linux-ppc-32" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-solaris-x86-64" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-linux-ia-64" fileType="regular" />
+          <entry location="wrapper/bin/testwrapper" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-solaris-x86-32" fileType="regular" />
+          <entry location="wrapper/bin/wrapper-linux-ppc-64" fileType="regular" />
+          <entry location="wrapper/jdoc.tar.gz" fileType="regular" />
+          <entry location="wrapper/src" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-linux-ia-64.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-hpux-parisc-64.sl" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-linux-ppc-64.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-linux-x86-32.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-aix-ppc-32.a" fileType="regular" />
+          <entry location="wrapper/lib/wrapper-windows-x86-32.dll" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-freebsd-x86-32.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-linux-x86-64.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-solaris-x86-64.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-hpux-ia-64.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-linux-ppc-32.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-macosx-universal-32.jnilib" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-solaris-sparc-64.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-freebsd-x86-64.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-solaris-sparc-32.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-solaris-x86-32.so" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-aix-ppc-64.a" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-hpux-parisc-32.sl" fileType="regular" />
+          <entry location="wrapper/lib/libwrapper-hpux-ia-32.so" fileType="regular" />
+        </exclude>
+      </dirEntry>
+    </entries>
+    <components>
+      <component name="Genesis II Core" id="28" displayDescription="true" selected="true" mandatory="true" downloadable="true">
+        <description>The core set of libraries and files necessary to run Genesis II clients and servers.</description>
+        <include all="false">
+          <entry location="updates" fileType="regular" />
+          <entry location="RELEASE" fileType="regular" />
+          <entry location="webapps" fileType="regular" />
+          <entry location="ApplicationWatcher/genii-base-application.properties" fileType="regular" />
+          <entry location="ApplicationWatcher/genii-client-application.properties" fileType="regular" />
+          <entry location="ApplicationWatcher/genii-update-application.properties" fileType="regular" />
+          <entry location="ApplicationWatcher/app-manager.jar" fileType="regular" />
+          <entry location="License.txt" fileType="regular" />
+          <entry location="ext" fileType="regular" />
+          <entry location="lib" fileType="regular" />
+          <entry location="jar-desc.xml" fileType="regular" />
+          <entry location="deployments/GeniiNetFullContainer/security" fileType="regular" />
+          <entry location="deployments/GeniiNetFullContainer/services" fileType="regular" />
+          <entry location="deployments/GeniiNetFullContainer/configuration" fileType="regular" />
+          <entry location="grid" fileType="launcher" />
+          <entry location="grid-update" fileType="launcher" />
+          <entry location=".i4j_external_20/jni-lib/CToGenesisCalls.dll" fileType="regular" />
+          <entry location=".i4j_external_20/jni-lib/GeniiProcessMgmt.dll" fileType="regular" />
+          <entry location=".i4j_external_20/jni-lib/libdb_java45.dll" fileType="regular" />
+          <entry location=".i4j_external_20/jni-lib/libdb_java45d.dll" fileType="regular" />
+          <entry location=".i4j_external_20/jni-lib/libdbxml_java23.dll" fileType="regular" />
+          <entry location=".i4j_external_20/jni-lib/msvcr71.dll" fileType="regular" />
+          <entry location=".i4j_external_20/jni-lib/nulmrxnp.dll" fileType="regular" />
+          <entry location=".i4j_external_20/jni-lib/VcgrClientLib.dll" fileType="regular" />
+          <entry location=".i4j_external_20/jni-lib/VcgrContainerLib.dll" fileType="regular" />
+          <entry location=".i4j_fileset_21" fileType="regular" />
+          <entry location=".i4j_fileset_23" fileType="regular" />
+          <entry location=".i4j_fileset_25" fileType="regular" />
+        </include>
+        <dependencies />
+      </component>
+      <folder name="Documentation" id="30" displayDescription="false" expanded="false">
+        <description>Various types of Genesis II documentation and examples.</description>
+        <components>
+          <component name="Documentation" id="29" displayDescription="false" selected="true" mandatory="false" downloadable="true">
+            <description />
+            <include all="false">
+              <entry location="doc" fileType="regular" />
+            </include>
+            <dependencies>
+              <component id="28" />
+            </dependencies>
+          </component>
+          <component name="Example JSDL Files" id="31" displayDescription="false" selected="true" mandatory="false" downloadable="true">
+            <description />
+            <include all="false">
+              <entry location="example-jsdl" fileType="regular" />
+            </include>
+            <dependencies>
+              <component id="28" />
+            </dependencies>
+          </component>
+          <component name="Example NativeQ Files" id="32" displayDescription="false" selected="true" mandatory="false" downloadable="true">
+            <description />
+            <include all="false">
+              <entry location="example-nativeq" fileType="regular" />
+            </include>
+            <dependencies>
+              <component id="28" />
+            </dependencies>
+          </component>
+        </components>
+      </folder>
+      <component name="G-ICING" id="33" displayDescription="false" selected="false" mandatory="false" downloadable="true">
+        <description>Windows Installable File System implementation.</description>
+        <include all="false">
+          <entry location=".i4j_external_20/jni-lib/IFS" fileType="regular" />
+        </include>
+        <dependencies>
+          <component id="28" />
+        </dependencies>
+      </component>
+      <component name="Genesis II Container" id="40" displayDescription="false" selected="false" mandatory="false" downloadable="true">
+        <description>Components necessary for starting a Genesis II Container or Server.</description>
+        <include all="false">
+          <entry location="ApplicationWatcher/genii-container-application.properties" fileType="regular" />
+          <entry location="deployments/GeniiNetFullContainer/secure-runnable" fileType="regular" />
+          <entry location=".i4j_external_20/JavaServiceWrapper" fileType="regular" />
+          <entry location=".i4j_external_22/JavaServiceWrapper" fileType="regular" />
+          <entry location=".i4j_external_24/JavaServiceWrapper" fileType="regular" />
+        </include>
+        <dependencies>
+          <component id="28" />
+        </dependencies>
+      </component>
+    </components>
+  </files>
+  <launchers>
+    <launcher name="grid" id="39" external="false" excludeFromMenu="false" menuName="" icnsFile="" pngIcon16File="" pngIcon32File="" macServiceDependencies="" swtApp="false" fileset="">
+      <executable name="grid" type="1" iconSet="false" iconFile="" executableDir="" redirectStderr="false" stderrFile="error.log" redirectStdout="false" stdoutFile="output.log" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false">
+        <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" />
+      </executable>
+      <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="" java6SplashScreen="false">
+        <text>
+          <statusLine x="20" y="20" text="" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
+          <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
+        </text>
+      </splashScreen>
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.appwatcher.update-frquency=604800000&quot; &quot;-Dlog4j.configuration=production.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ApplicationWatcher/genii-client-application.properties&quot;" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+        <classPath>
+          <directory location="lib" failOnError="false" />
+          <archive location="ApplicationWatcher/app-manager.jar" failOnError="false" />
+        </classPath>
+        <nativeLibraryDirectories>
+          <directory name="jni-lib" />
+        </nativeLibraryDirectories>
+      </java>
+      <includedFiles />
+      <unextractableFiles />
+      <customScript mode="1" file="">
+        <scriptLines />
+      </customScript>
+    </launcher>
+    <launcher name="grid-update" id="76" external="false" excludeFromMenu="false" menuName="" icnsFile="" pngIcon16File="" pngIcon32File="" macServiceDependencies="" swtApp="false" fileset="">
+      <executable name="grid-update" type="1" iconSet="false" iconFile="" executableDir="" redirectStderr="false" stderrFile="error.log" redirectStdout="false" stdoutFile="output.log" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="false" workingDirectory="." singleInstance="true" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false">
+        <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" />
+      </executable>
+      <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="" java6SplashScreen="false">
+        <text>
+          <statusLine x="20" y="20" text="" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
+          <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
+        </text>
+      </splashScreen>
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.appwatcher.update-frquency=604800000&quot; &quot;-Dlog4j.configuration=production.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ApplicationWatcher/genii-update-application.properties&quot;" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+        <classPath>
+          <directory location="lib" failOnError="false" />
+          <archive location="ApplicationWatcher/app-manager.jar" failOnError="false" />
+        </classPath>
+        <nativeLibraryDirectories>
+          <directory name="jni-lib" />
+        </nativeLibraryDirectories>
+      </java>
+      <includedFiles />
+      <unextractableFiles />
+      <customScript mode="1" file="">
+        <scriptLines />
+      </customScript>
+    </launcher>
+    <launcher name="XCGContainer" id="264" external="true" excludeFromMenu="true" menuName="" externalFile="JavaServiceWrapper/wrapper/bin/XCGContainer" />
+  </launchers>
+  <installerGui installerType="1" suggestPreviousProgramGroup="false" addOnAppId="" suggestPreviousLocations="true">
+    <customCode useInstalledFiles="true" />
+    <applications>
+      <application name="" id="installer" beanClass="com.install4j.runtime.beans.applications.InstallerApplication" enabled="true" commentSet="false" comment="" customIcnsFile="" customIcoFile="">
+        <serializedBean>
+          <java class="java.beans.XMLDecoder">
+            <object class="com.install4j.runtime.beans.applications.InstallerApplication" />
+          </java>
+        </serializedBean>
+        <startup>
+          <screen name="" id="1" beanClass="com.install4j.runtime.beans.screens.StartupScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.StartupScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+        </startup>
+        <screens>
+          <screen name="" id="2" beanClass="com.install4j.runtime.beans.screens.WelcomeScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.WelcomeScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+          <screen name="" id="355" beanClass="com.install4j.runtime.beans.screens.LicenseScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.LicenseScreen">
+                  <void property="displayedTextFile">
+                    <object class="com.install4j.api.beans.ExternalFile">
+                      <string>../../License.txt</string>
+                    </object>
+                  </void>
+                </object>
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+          <screen name="" id="3" beanClass="com.install4j.runtime.beans.screens.InstallationDirectoryScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.InstallationDirectoryScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions>
+              <action name="" id="4" beanClass="com.install4j.runtime.beans.actions.misc.LoadResponseFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.misc.LoadResponseFileAction" />
+                  </java>
+                </serializedBean>
+                <condition>context.getVariable("sys.responseFile") == null</condition>
+              </action>
+            </actions>
+            <formComponents />
+          </screen>
+          <screen name="" id="142" beanClass="com.install4j.runtime.beans.screens.InstallationTypeScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.InstallationTypeScreen">
+                  <void property="installationTypeConfigs">
+                    <void method="add">
+                      <object class="com.install4j.runtime.beans.screens.installationtype.InstallationTypeConfig">
+                        <void property="id">
+                          <string>146</string>
+                        </void>
+                        <void property="name">
+                          <string>XCG Client Install</string>
+                        </void>
+                        <void property="selectedComponentIds">
+                          <void method="add">
+                            <string>28</string>
+                          </void>
+                          <void method="add">
+                            <string>30</string>
+                          </void>
+                        </void>
+                        <void property="userCanCustomize">
+                          <boolean>false</boolean>
+                        </void>
+                      </object>
+                    </void>
+                    <void method="add">
+                      <object class="com.install4j.runtime.beans.screens.installationtype.InstallationTypeConfig">
+                        <void property="id">
+                          <string>153</string>
+                        </void>
+                        <void property="name">
+                          <string>XCG Full Container Install</string>
+                        </void>
+                        <void property="selectedComponentIds">
+                          <void method="add">
+                            <string>28</string>
+                          </void>
+                          <void method="add">
+                            <string>30</string>
+                          </void>
+                          <void method="add">
+                            <string>33</string>
+                          </void>
+                          <void method="add">
+                            <string>40</string>
+                          </void>
+                        </void>
+                        <void property="userCanCustomize">
+                          <boolean>false</boolean>
+                        </void>
+                      </object>
+                    </void>
+                  </void>
+                </object>
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+          <screen name="" id="5" beanClass="com.install4j.runtime.beans.screens.ComponentsScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.ComponentsScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+          <screen name="" id="6" beanClass="com.install4j.runtime.beans.screens.StandardProgramGroupScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.StandardProgramGroupScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+          <screen name="" id="7" beanClass="com.install4j.runtime.beans.screens.InstallationScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="true" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.InstallationScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions>
+              <action name="" id="8" beanClass="com.install4j.runtime.beans.actions.InstallFilesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.InstallFilesAction" />
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Set Initialization Variables" id="309" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.control.RunScriptAction">
+                      <void property="script">
+                        <object class="com.install4j.api.beans.ScriptProperty">
+                          <void property="value">
+                            <string>context.setVariable("genii.username", System.getProperty("user.name"));
+
+FileSetSetup windowsFileset = context.getFileSetById("19");
+FileSetSetup linuxFileset = context.getFileSetById("21");
+FileSetSetup macosFileset = context.getFileSetById("23");
+
+context.setVariable("genii.isWindows", new Boolean(
+    (windowsFileset != null) &amp;&amp; windowsFileset.isSelected()));
+context.setVariable("genii.isLinux", new Boolean(
+    (linuxFileset != null) &amp;&amp; linuxFileset.isSelected()));
+context.setVariable("genii.isMacOS", new Boolean(
+    (macosFileset != null) &amp;&amp; macosFileset.isSelected()));
+
+boolean hasContainer = context.getInstallationComponentById("40").isSelected();
+context.setVariable("genii.hasContainer", new Boolean(hasContainer));
+return true;</string>
+                          </void>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <group name="Patch Core Files" id="42" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.groups.ActionGroup" />
+                  </java>
+                </serializedBean>
+                <beans>
+                  <action name="Patch jar-desc.xml" id="46" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to patch jar-desc.xml">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
+                          <void property="encoding">
+                            <string />
+                          </void>
+                          <void property="failIfNoReplacement">
+                            <boolean>true</boolean>
+                          </void>
+                          <void property="file">
+                            <object class="java.io.File">
+                              <string>jar-desc.xml</string>
+                            </object>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                  <action name="Patch RELEASE file" id="75" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to patch RELEASE file.">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
+                          <void property="failIfNoReplacement">
+                            <boolean>true</boolean>
+                          </void>
+                          <void property="file">
+                            <object class="java.io.File">
+                              <string>RELEASE</string>
+                            </object>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                  <action name="Patch genii-base-application.properties" id="222" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
+                          <void property="escapeForPropertyFile">
+                            <boolean>true</boolean>
+                          </void>
+                          <void property="failIfNoReplacement">
+                            <boolean>true</boolean>
+                          </void>
+                          <void property="file">
+                            <object class="java.io.File">
+                              <string>ApplicationWatcher/genii-base-application.properties</string>
+                            </object>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                  <action name="Patch genii-client-application.properties" id="225" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
+                          <void property="escapeForPropertyFile">
+                            <boolean>true</boolean>
+                          </void>
+                          <void property="failIfNoReplacement">
+                            <boolean>true</boolean>
+                          </void>
+                          <void property="file">
+                            <object class="java.io.File">
+                              <string>ApplicationWatcher/genii-client-application.properties</string>
+                            </object>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                  <action name="Patch genii-update-application.properties" id="227" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
+                          <void property="escapeForPropertyFile">
+                            <boolean>true</boolean>
+                          </void>
+                          <void property="failIfNoReplacement">
+                            <boolean>true</boolean>
+                          </void>
+                          <void property="file">
+                            <object class="java.io.File">
+                              <string>ApplicationWatcher/genii-update-application.properties</string>
+                            </object>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                  <action name="Patch genii-container-application.properties" id="229" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
+                          <void property="escapeForPropertyFile">
+                            <boolean>true</boolean>
+                          </void>
+                          <void property="failIfNoReplacement">
+                            <boolean>true</boolean>
+                          </void>
+                          <void property="file">
+                            <object class="java.io.File">
+                              <string>ApplicationWatcher/genii-container-application.properties</string>
+                            </object>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                  <action name="Patch production.log4j.properties" id="231" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
+                          <void property="escapeForPropertyFile">
+                            <boolean>true</boolean>
+                          </void>
+                          <void property="failIfNoReplacement">
+                            <boolean>true</boolean>
+                          </void>
+                          <void property="file">
+                            <object class="java.io.File">
+                              <string>lib/production.log4j.properties</string>
+                            </object>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                  <action name="Patch current-verison.txt" id="357" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
+                          <void property="failIfNoReplacement">
+                            <boolean>true</boolean>
+                          </void>
+                          <void property="file">
+                            <object class="java.io.File">
+                              <string>updates/current-version.txt</string>
+                            </object>
+                          </void>
+                          <void property="ignoreMissing">
+                            <boolean>false</boolean>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                </beans>
+              </group>
+              <action name="" id="9" beanClass="com.install4j.runtime.beans.actions.desktop.CreateProgramGroupAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.desktop.CreateProgramGroupAction">
+                      <void property="programGroupName">
+                        <string>${compiler:sys.fullName}</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="" id="10" beanClass="com.install4j.runtime.beans.actions.desktop.RegisterAddRemoveAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.desktop.RegisterAddRemoveAction">
+                      <void property="itemName">
+                        <string>${compiler:sys.fullName} ${compiler:sys.version}</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+            </actions>
+            <formComponents />
+          </screen>
+          <group name="Post Installation Configuration" id="66" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.groups.ScreenGroup" />
+              </java>
+            </serializedBean>
+            <beans>
+              <group name="Service Install and Start Confirmations" id="310" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.groups.ScreenGroup">
+                      <void property="conditionExpression">
+                        <object class="com.install4j.api.beans.ScriptProperty">
+                          <void property="value">
+                            <string>context.getBooleanVariable("genii.hasContainer")</string>
+                          </void>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <beans>
+                  <group name="Windows" id="315" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.groups.ScreenGroup">
+                          <void property="conditionExpression">
+                            <object class="com.install4j.api.beans.ScriptProperty">
+                              <void property="value">
+                                <string>context.getBooleanVariable("genii.isWindows")</string>
+                              </void>
+                            </object>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <beans>
+                      <screen name="Windows Service Confirmations" id="316" beanClass="com.install4j.runtime.beans.screens.AdditionalConfirmationsScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+                        <serializedBean>
+                          <java class="java.beans.XMLDecoder">
+                            <object class="com.install4j.runtime.beans.screens.AdditionalConfirmationsScreen" />
+                          </java>
+                        </serializedBean>
+                        <condition />
+                        <validation />
+                        <preActivation />
+                        <postActivation />
+                        <actions />
+                        <formComponents>
+                          <formComponent name="Install Service" id="317" beanClass="com.install4j.runtime.beans.formcomponents.CheckboxComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                            <serializedBean>
+                              <java class="java.beans.XMLDecoder">
+                                <object class="com.install4j.runtime.beans.formcomponents.CheckboxComponent">
+                                  <void property="checkboxText">
+                                    <string>Install XCG Container as a Service?</string>
+                                  </void>
+                                  <void property="coupledComponentIds">
+                                    <void method="add">
+                                      <string>318</string>
+                                    </void>
+                                  </void>
+                                  <void property="initiallySelected">
+                                    <boolean>true</boolean>
+                                  </void>
+                                  <void property="variableName">
+                                    <string>genii.installAsService</string>
+                                  </void>
+                                </object>
+                              </java>
+                            </serializedBean>
+                            <initScript />
+                            <visibiltyScript />
+                          </formComponent>
+                          <formComponent name="Start Service" id="318" beanClass="com.install4j.runtime.beans.formcomponents.CheckboxComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                            <serializedBean>
+                              <java class="java.beans.XMLDecoder">
+                                <object class="com.install4j.runtime.beans.formcomponents.CheckboxComponent">
+                                  <void property="checkboxText">
+                                    <string>Start XCG Container Service?</string>
+                                  </void>
+                                  <void property="initiallySelected">
+                                    <boolean>true</boolean>
+                                  </void>
+                                  <void property="variableName">
+                                    <string>genii.startService</string>
+                                  </void>
+                                </object>
+                              </java>
+                            </serializedBean>
+                            <initScript />
+                            <visibiltyScript />
+                          </formComponent>
+                          <formComponent name="" id="362" beanClass="com.install4j.runtime.beans.formcomponents.SpacerComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                            <serializedBean>
+                              <java class="java.beans.XMLDecoder">
+                                <object class="com.install4j.runtime.beans.formcomponents.SpacerComponent">
+                                  <void property="height">
+                                    <int>20</int>
+                                  </void>
+                                </object>
+                              </java>
+                            </serializedBean>
+                            <initScript />
+                            <visibiltyScript />
+                          </formComponent>
+                          <formComponent name="" id="364" beanClass="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                            <serializedBean>
+                              <java class="java.beans.XMLDecoder">
+                                <object class="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent">
+                                  <void property="labelText">
+                                    <string>The XCG Container receives requests on an open TCP network socket port.
+In order for this to work, that port must not be currently blocked by your
+Windows firewall.  If you would like, we can automatically unblock that
+port for you.</string>
+                                  </void>
+                                </object>
+                              </java>
+                            </serializedBean>
+                            <initScript />
+                            <visibiltyScript />
+                          </formComponent>
+                          <formComponent name="Firewall" id="363" beanClass="com.install4j.runtime.beans.formcomponents.CheckboxComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                            <serializedBean>
+                              <java class="java.beans.XMLDecoder">
+                                <object class="com.install4j.runtime.beans.formcomponents.CheckboxComponent">
+                                  <void property="checkboxText">
+                                    <string>Open Port in Firewall?</string>
+                                  </void>
+                                  <void property="initiallySelected">
+                                    <boolean>true</boolean>
+                                  </void>
+                                  <void property="variableName">
+                                    <string>genii.openFirewall</string>
+                                  </void>
+                                </object>
+                              </java>
+                            </serializedBean>
+                            <initScript />
+                            <visibiltyScript />
+                          </formComponent>
+                        </formComponents>
+                      </screen>
+                    </beans>
+                  </group>
+                  <group name="Non-Windows Service Configuration" id="320" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.groups.ScreenGroup">
+                          <void property="conditionExpression">
+                            <object class="com.install4j.api.beans.ScriptProperty">
+                              <void property="value">
+                                <string>!context.getBooleanVariable("genii.isWindows")</string>
+                              </void>
+                            </object>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <beans>
+                      <screen name="Non-Windows Service Configuration" id="321" beanClass="com.install4j.runtime.beans.screens.AdditionalConfirmationsScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+                        <serializedBean>
+                          <java class="java.beans.XMLDecoder">
+                            <object class="com.install4j.runtime.beans.screens.AdditionalConfirmationsScreen" />
+                          </java>
+                        </serializedBean>
+                        <condition />
+                        <validation />
+                        <preActivation />
+                        <postActivation />
+                        <actions />
+                        <formComponents>
+                          <formComponent name="Start Service" id="322" beanClass="com.install4j.runtime.beans.formcomponents.CheckboxComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                            <serializedBean>
+                              <java class="java.beans.XMLDecoder">
+                                <object class="com.install4j.runtime.beans.formcomponents.CheckboxComponent">
+                                  <void property="checkboxText">
+                                    <string>Start XCG Container Service</string>
+                                  </void>
+                                  <void property="initiallySelected">
+                                    <boolean>true</boolean>
+                                  </void>
+                                  <void property="variableName">
+                                    <string>genii.startService</string>
+                                  </void>
+                                </object>
+                              </java>
+                            </serializedBean>
+                            <initScript />
+                            <visibiltyScript />
+                          </formComponent>
+                        </formComponents>
+                      </screen>
+                    </beans>
+                  </group>
+                  <screen name="XCG Port Number" id="505" beanClass="com.install4j.runtime.beans.screens.FormScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.screens.FormScreen">
+                          <void property="subTitle">
+                            <string>Port Number</string>
+                          </void>
+                          <void property="title">
+                            <string>XCG Container Port Number</string>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                    <validation />
+                    <preActivation />
+                    <postActivation />
+                    <actions>
+                      <action name="Replace port number in web-container.properties" id="515" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                        <serializedBean>
+                          <java class="java.beans.XMLDecoder">
+                            <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
+                              <void property="escapeForPropertyFile">
+                                <boolean>true</boolean>
+                              </void>
+                              <void property="failIfNoReplacement">
+                                <boolean>true</boolean>
+                              </void>
+                              <void property="file">
+                                <object class="java.io.File">
+                                  <string>deployments/GeniiNetFullContainer/configuration/web-container.properties</string>
+                                </object>
+                              </void>
+                            </object>
+                          </java>
+                        </serializedBean>
+                        <condition />
+                      </action>
+                    </actions>
+                    <formComponents>
+                      <formComponent name="" id="511" beanClass="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                        <serializedBean>
+                          <java class="java.beans.XMLDecoder">
+                            <object class="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent">
+                              <void property="labelText">
+                                <string>By default the XCG container listens for incoming messages on TCP port
+${compiler:genii.xcg-port}.  You can either keep this default value or change
+the port number to suit your environment.</string>
+                              </void>
+                            </object>
+                          </java>
+                        </serializedBean>
+                        <initScript />
+                        <visibiltyScript />
+                      </formComponent>
+                      <formComponent name="" id="512" beanClass="com.install4j.runtime.beans.formcomponents.SpacerComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                        <serializedBean>
+                          <java class="java.beans.XMLDecoder">
+                            <object class="com.install4j.runtime.beans.formcomponents.SpacerComponent" />
+                          </java>
+                        </serializedBean>
+                        <initScript />
+                        <visibiltyScript />
+                      </formComponent>
+                      <formComponent name="Port Number" id="513" beanClass="com.install4j.runtime.beans.formcomponents.IntegerTextfieldComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                        <serializedBean>
+                          <java class="java.beans.XMLDecoder">
+                            <object class="com.install4j.runtime.beans.formcomponents.IntegerTextfieldComponent">
+                              <void property="columns">
+                                <int>10</int>
+                              </void>
+                              <void property="initialText">
+                                <string>${compiler:genii.xcg-port}</string>
+                              </void>
+                              <void property="inputVerifier">
+                                <object class="com.install4j.api.beans.ScriptProperty">
+                                  <void property="value">
+                                    <string>long port = Long.parseLong(text);
+if (port &lt;= 1024)
+{
+    context.getProgressInterface().showFailure("Port numbers must be greater then 1024.");
+    return false;   
+}
+
+return true;</string>
+                                  </void>
+                                </object>
+                              </void>
+                              <void property="labelText">
+                                <string>XCG Container Port Number</string>
+                              </void>
+                              <void property="variableName">
+                                <string>genii.xcg-port</string>
+                              </void>
+                            </object>
+                          </java>
+                        </serializedBean>
+                        <initScript />
+                        <visibiltyScript />
+                      </formComponent>
+                    </formComponents>
+                  </screen>
+                </beans>
+              </group>
+              <screen name="" id="147" beanClass="com.install4j.runtime.beans.screens.CustomizableProgressScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.screens.CustomizableProgressScreen">
+                      <void property="subTitle">
+                        <string>Doing post installation configuration.</string>
+                      </void>
+                      <void property="title">
+                        <string>Post Installation Configuration</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+                <validation />
+                <preActivation />
+                <postActivation />
+                <actions>
+                  <action name="" id="152" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.control.SetProgressAction">
+                          <void property="percentValue">
+                            <int>50</int>
+                          </void>
+                          <void property="progressChangeType">
+                            <object class="com.install4j.runtime.beans.actions.control.ProgressChangeType" field="SET_INDETERMINATE" />
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                  <action name="Create container.properties file" id="150" beanClass="com.install4j.runtime.beans.actions.text.AppendToFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.text.AppendToFileAction">
+                          <void property="file">
+                            <object class="java.io.File">
+                              <string>container.properties</string>
+                            </object>
+                          </void>
+                          <void property="text">
+                            <string>edu.virginia.vcgr.genii.container.deployment-name=${compiler:genii.deployment}</string>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition>!(new File(context.getInstallationDirectory(), "container.properties")).exists()</condition>
+                  </action>
+                  <action name="" id="149" beanClass="com.install4j.runtime.beans.actions.control.SetMessageAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.control.SetMessageAction">
+                          <void property="statusMessage">
+                            <string>Connect client to XCG</string>
+                          </void>
+                          <void property="useStatus">
+                            <boolean>true</boolean>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                  <action name="" id="148" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to connect to XCG grid.">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
+                          <void property="arguments">
+                            <array class="java.lang.String" length="3">
+                              <void index="0">
+                                <string>connect</string>
+                              </void>
+                              <void index="1">
+                                <string>${compiler:genii.connection-url}</string>
+                              </void>
+                              <void index="2">
+                                <string>${compiler:genii.deployment}</string>
+                              </void>
+                            </array>
+                          </void>
+                          <void property="executable">
+                            <object class="java.io.File">
+                              <string>grid</string>
+                            </object>
+                          </void>
+                          <void property="wait">
+                            <boolean>true</boolean>
+                          </void>
+                          <void property="workingDirectory">
+                            <object class="java.io.File">
+                              <string>.</string>
+                            </object>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                  <group name="Configure Container Service" id="255" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.groups.ActionGroup">
+                          <void property="conditionExpression">
+                            <object class="com.install4j.api.beans.ScriptProperty">
+                              <void property="value">
+                                <string>context.getBooleanVariable("genii.hasContainer")</string>
+                              </void>
+                            </object>
+                          </void>
+                          <void property="defaultErrorMessage">
+                            <string>Unable to configure XCG Container Service</string>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <beans>
+                      <action name="" id="256" beanClass="com.install4j.runtime.beans.actions.control.SetMessageAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                        <serializedBean>
+                          <java class="java.beans.XMLDecoder">
+                            <object class="com.install4j.runtime.beans.actions.control.SetMessageAction">
+                              <void property="statusMessage">
+                                <string>Setting up XCG Container Service</string>
+                              </void>
+                              <void property="useStatus">
+                                <boolean>true</boolean>
+                              </void>
+                            </object>
+                          </java>
+                        </serializedBean>
+                        <condition />
+                      </action>
+                      <group name="Prepare Service" id="260" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="">
+                        <serializedBean>
+                          <java class="java.beans.XMLDecoder">
+                            <object class="com.install4j.runtime.beans.groups.ActionGroup" />
+                          </java>
+                        </serializedBean>
+                        <beans>
+                          <action name="Replace Variables in wrapper.conf" id="257" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to configure service wrapper configuration.">
+                            <serializedBean>
+                              <java class="java.beans.XMLDecoder">
+                                <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
+                                  <void property="failIfNoReplacement">
+                                    <boolean>true</boolean>
+                                  </void>
+                                  <void property="file">
+                                    <object class="java.io.File">
+                                      <string>JavaServiceWrapper/wrapper/conf/wrapper.conf</string>
+                                    </object>
+                                  </void>
+                                </object>
+                              </java>
+                            </serializedBean>
+                            <condition />
+                          </action>
+                          <action name="Patch broken properties" id="258" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to configure service wrapper configuration.">
+                            <serializedBean>
+                              <java class="java.beans.XMLDecoder">
+                                <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
+                                  <void property="file">
+                                    <object class="java.io.File">
+                                      <string>JavaServiceWrapper/wrapper/conf/wrapper.conf</string>
+                                    </object>
+                                  </void>
+                                  <void property="replaceValue">
+                                    <string>\\</string>
+                                  </void>
+                                  <void property="searchValue">
+                                    <string>\</string>
+                                  </void>
+                                </object>
+                              </java>
+                            </serializedBean>
+                            <condition />
+                          </action>
+                          <action name="" id="261" beanClass="com.install4j.runtime.beans.actions.files.SetModeAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Can't set permissions on service wrapper.">
+                            <serializedBean>
+                              <java class="java.beans.XMLDecoder">
+                                <object class="com.install4j.runtime.beans.actions.files.SetModeAction">
+                                  <void property="file">
+                                    <object class="java.io.File">
+                                      <string>JavaServiceWrapper/wrapper/bin/wrapper-linux-x86-32</string>
+                                    </object>
+                                  </void>
+                                  <void property="mode">
+                                    <string>755</string>
+                                  </void>
+                                </object>
+                              </java>
+                            </serializedBean>
+                            <condition />
+                          </action>
+                          <group name="Prepare XCGContainer Script" id="271" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="">
+                            <serializedBean>
+                              <java class="java.beans.XMLDecoder">
+                                <object class="com.install4j.runtime.beans.groups.ActionGroup">
+                                  <void property="conditionExpression">
+                                    <object class="com.install4j.api.beans.ScriptProperty">
+                                      <void property="value">
+                                        <string>!context.getBooleanVariable("genii.isWindows")</string>
+                                      </void>
+                                    </object>
+                                  </void>
+                                  <void property="defaultErrorMessage">
+                                    <string>Unable to prepare XCGContainer script</string>
+                                  </void>
+                                </object>
+                              </java>
+                            </serializedBean>
+                            <beans>
+                              <action name="Replace Variables in XCGContainer" id="268" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                                <serializedBean>
+                                  <java class="java.beans.XMLDecoder">
+                                    <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
+                                      <void property="failIfNoReplacement">
+                                        <boolean>true</boolean>
+                                      </void>
+                                      <void property="file">
+                                        <object class="java.io.File">
+                                          <string>JavaServiceWrapper/wrapper/bin/XCGContainer</string>
+                                        </object>
+                                      </void>
+                                    </object>
+                                  </java>
+                                </serializedBean>
+                                <condition />
+                              </action>
+                              <action name="" id="266" beanClass="com.install4j.runtime.beans.actions.files.SetModeAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Can't set permissions on service wrapper.">
+                                <serializedBean>
+                                  <java class="java.beans.XMLDecoder">
+                                    <object class="com.install4j.runtime.beans.actions.files.SetModeAction">
+                                      <void property="file">
+                                        <object class="java.io.File">
+                                          <string>JavaServiceWrapper/wrapper/bin/XCGContainer</string>
+                                        </object>
+                                      </void>
+                                      <void property="mode">
+                                        <string>755</string>
+                                      </void>
+                                    </object>
+                                  </java>
+                                </serializedBean>
+                                <condition />
+                              </action>
+                              <action name="" id="270" beanClass="com.install4j.runtime.beans.actions.files.CreateSymlinkAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                                <serializedBean>
+                                  <java class="java.beans.XMLDecoder">
+                                    <object class="com.install4j.runtime.beans.actions.files.CreateSymlinkAction">
+                                      <void property="file">
+                                        <object class="java.io.File">
+                                          <string>JavaServiceWrapper/wrapper/bin/XCGContainer</string>
+                                        </object>
+                                      </void>
+                                      <void property="linkFile">
+                                        <object class="java.io.File">
+                                          <string>XCGContainer</string>
+                                        </object>
+                                      </void>
+                                    </object>
+                                  </java>
+                                </serializedBean>
+                                <condition />
+                              </action>
+                            </beans>
+                          </group>
+                          <group name="Open Firewall" id="365" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="">
+                            <serializedBean>
+                              <java class="java.beans.XMLDecoder">
+                                <object class="com.install4j.runtime.beans.groups.ActionGroup">
+                                  <void property="conditionExpression">
+                                    <object class="com.install4j.api.beans.ScriptProperty">
+                                      <void property="value">
+                                        <string>context.getBooleanVariable("genii.openFirewall")</string>
+                                      </void>
+                                    </object>
+                                  </void>
+                                  <void property="defaultErrorMessage">
+                                    <string>Unable to open port for firewall.</string>
+                                  </void>
+                                </object>
+                              </java>
+                            </serializedBean>
+                            <beans>
+                              <action name="" id="371" beanClass="com.install4j.runtime.beans.actions.control.SetMessageAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                                <serializedBean>
+                                  <java class="java.beans.XMLDecoder">
+                                    <object class="com.install4j.runtime.beans.actions.control.SetMessageAction">
+                                      <void property="statusMessage">
+                                        <string>Opening port in firewall for container.</string>
+                                      </void>
+                                      <void property="useStatus">
+                                        <boolean>true</boolean>
+                                      </void>
+                                    </object>
+                                  </java>
+                                </serializedBean>
+                                <condition />
+                              </action>
+                              <action name="Open Port" id="366" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                                <serializedBean>
+                                  <java class="java.beans.XMLDecoder">
+                                    <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
+                                      <void property="arguments">
+                                        <array class="java.lang.String" length="6">
+                                          <void index="0">
+                                            <string>firewall</string>
+                                          </void>
+                                          <void index="1">
+                                            <string>add</string>
+                                          </void>
+                                          <void index="2">
+                                            <string>portopening</string>
+                                          </void>
+                                          <void index="3">
+                                            <string>protocol=TCP</string>
+                                          </void>
+                                          <void index="4">
+                                            <string>name=XCG Container</string>
+                                          </void>
+                                          <void index="5">
+                                            <string>port=${installer:genii.xcg-port}</string>
+                                          </void>
+                                        </array>
+                                      </void>
+                                      <void property="executable">
+                                        <object class="java.io.File">
+                                          <string>${installer:sys.system32Dir}/netsh</string>
+                                        </object>
+                                      </void>
+                                      <void property="wait">
+                                        <boolean>true</boolean>
+                                      </void>
+                                      <void property="workingDirectory">
+                                        <object class="java.io.File">
+                                          <string>.</string>
+                                        </object>
+                                      </void>
+                                    </object>
+                                  </java>
+                                </serializedBean>
+                                <condition />
+                              </action>
+                            </beans>
+                          </group>
+                          <group name="Install Service" id="281" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="">
+                            <serializedBean>
+                              <java class="java.beans.XMLDecoder">
+                                <object class="com.install4j.runtime.beans.groups.ActionGroup">
+                                  <void property="conditionExpression">
+                                    <object class="com.install4j.api.beans.ScriptProperty">
+                                      <void property="value">
+                                        <string>context.getBooleanVariable("genii.installAsService")</string>
+                                      </void>
+                                    </object>
+                                  </void>
+                                  <void property="defaultErrorMessage">
+                                    <string>Unable to install XCG Service</string>
+                                  </void>
+                                </object>
+                              </java>
+                            </serializedBean>
+                            <beans>
+                              <action name="" id="341" beanClass="com.install4j.runtime.beans.actions.control.SetMessageAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                                <serializedBean>
+                                  <java class="java.beans.XMLDecoder">
+                                    <object class="com.install4j.runtime.beans.actions.control.SetMessageAction">
+                                      <void property="statusMessage">
+                                        <string>Installing XCG Container as Service</string>
+                                      </void>
+                                      <void property="useStatus">
+                                        <boolean>true</boolean>
+                                      </void>
+                                    </object>
+                                  </java>
+                                </serializedBean>
+                                <condition />
+                              </action>
+                              <action name="Install Container Wrapper" id="342" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to install XCG Container as a Service">
+                                <serializedBean>
+                                  <java class="java.beans.XMLDecoder">
+                                    <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
+                                      <void property="arguments">
+                                        <array class="java.lang.String" length="2">
+                                          <void index="0">
+                                            <string>-i</string>
+                                          </void>
+                                          <void index="1">
+                                            <string>../conf/wrapper.conf</string>
+                                          </void>
+                                        </array>
+                                      </void>
+                                      <void property="executable">
+                                        <object class="java.io.File">
+                                          <string>JavaServiceWrapper/wrapper/bin/wrapper-windows-x86-32.exe</string>
+                                        </object>
+                                      </void>
+                                      <void property="showWindowsConsole">
+                                        <boolean>true</boolean>
+                                      </void>
+                                      <void property="wait">
+                                        <boolean>true</boolean>
+                                      </void>
+                                      <void property="workingDirectory">
+                                        <object class="java.io.File">
+                                          <string>JavaServiceWrapper/wrapper/bin</string>
+                                        </object>
+                                      </void>
+                                    </object>
+                                  </java>
+                                </serializedBean>
+                                <condition />
+                              </action>
+                            </beans>
+                          </group>
+                          <group name="Start Service" id="323" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="">
+                            <serializedBean>
+                              <java class="java.beans.XMLDecoder">
+                                <object class="com.install4j.runtime.beans.groups.ActionGroup">
+                                  <void property="conditionExpression">
+                                    <object class="com.install4j.api.beans.ScriptProperty">
+                                      <void property="value">
+                                        <string>context.getBooleanVariable("genii.startService") &amp;&amp; context.getBooleanVariable("genii.installAsService")</string>
+                                      </void>
+                                    </object>
+                                  </void>
+                                  <void property="defaultErrorMessage">
+                                    <string>Unable to start XCG Service</string>
+                                  </void>
+                                </object>
+                              </java>
+                            </serializedBean>
+                            <beans>
+                              <action name="" id="325" beanClass="com.install4j.runtime.beans.actions.control.SetMessageAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                                <serializedBean>
+                                  <java class="java.beans.XMLDecoder">
+                                    <object class="com.install4j.runtime.beans.actions.control.SetMessageAction">
+                                      <void property="statusMessage">
+                                        <string>Starting the XCG Container Service</string>
+                                      </void>
+                                      <void property="useStatus">
+                                        <boolean>true</boolean>
+                                      </void>
+                                    </object>
+                                  </java>
+                                </serializedBean>
+                                <condition />
+                              </action>
+                              <group name="Start Windows Service" id="343" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="">
+                                <serializedBean>
+                                  <java class="java.beans.XMLDecoder">
+                                    <object class="com.install4j.runtime.beans.groups.ActionGroup">
+                                      <void property="conditionExpression">
+                                        <object class="com.install4j.api.beans.ScriptProperty">
+                                          <void property="value">
+                                            <string>context.getBooleanVariable("genii.isWindows")</string>
+                                          </void>
+                                        </object>
+                                      </void>
+                                    </object>
+                                  </java>
+                                </serializedBean>
+                                <beans>
+                                  <action name="" id="347" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to start XCG Container Service">
+                                    <serializedBean>
+                                      <java class="java.beans.XMLDecoder">
+                                        <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
+                                          <void property="arguments">
+                                            <array class="java.lang.String" length="2">
+                                              <void index="0">
+                                                <string>-t</string>
+                                              </void>
+                                              <void index="1">
+                                                <string>../conf/wrapper.conf</string>
+                                              </void>
+                                            </array>
+                                          </void>
+                                          <void property="executable">
+                                            <object class="java.io.File">
+                                              <string>JavaServiceWrapper/wrapper/bin/wrapper-windows-x86-32.exe</string>
+                                            </object>
+                                          </void>
+                                          <void property="wait">
+                                            <boolean>true</boolean>
+                                          </void>
+                                          <void property="workingDirectory">
+                                            <object class="java.io.File">
+                                              <string>JavaServiceWrapper/wrapper/bin</string>
+                                            </object>
+                                          </void>
+                                        </object>
+                                      </java>
+                                    </serializedBean>
+                                    <condition />
+                                  </action>
+                                </beans>
+                              </group>
+                              <group name="Start Non-WIndows Service" id="345" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="">
+                                <serializedBean>
+                                  <java class="java.beans.XMLDecoder">
+                                    <object class="com.install4j.runtime.beans.groups.ActionGroup">
+                                      <void property="conditionExpression">
+                                        <object class="com.install4j.api.beans.ScriptProperty">
+                                          <void property="value">
+                                            <string>!context.getBooleanVariable("genii.isWindows")</string>
+                                          </void>
+                                        </object>
+                                      </void>
+                                    </object>
+                                  </java>
+                                </serializedBean>
+                                <beans>
+                                  <action name="Start XCG Container" id="346" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to start XCG Container Service">
+                                    <serializedBean>
+                                      <java class="java.beans.XMLDecoder">
+                                        <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
+                                          <void property="arguments">
+                                            <array class="java.lang.String" length="1">
+                                              <void index="0">
+                                                <string>start</string>
+                                              </void>
+                                            </array>
+                                          </void>
+                                          <void property="executable">
+                                            <object class="java.io.File">
+                                              <string>XCGContainer</string>
+                                            </object>
+                                          </void>
+                                          <void property="wait">
+                                            <boolean>true</boolean>
+                                          </void>
+                                          <void property="workingDirectory">
+                                            <object class="java.io.File">
+                                              <string>.</string>
+                                            </object>
+                                          </void>
+                                        </object>
+                                      </java>
+                                    </serializedBean>
+                                    <condition />
+                                  </action>
+                                </beans>
+                              </group>
+                            </beans>
+                          </group>
+                        </beans>
+                      </group>
+                    </beans>
+                  </group>
+                  <action name="" id="161" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.control.SetProgressAction">
+                          <void property="percentValue">
+                            <int>100</int>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                </actions>
+                <formComponents />
+              </screen>
+              <screen name="" id="158" beanClass="com.install4j.runtime.beans.screens.ServicesScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.screens.ServicesScreen" />
+                  </java>
+                </serializedBean>
+                <condition />
+                <validation />
+                <preActivation />
+                <postActivation />
+                <actions />
+                <formComponents />
+              </screen>
+            </beans>
+          </group>
+          <screen name="" id="11" beanClass="com.install4j.runtime.beans.screens.FinishedScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="true">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.FinishedScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions>
+              <action name="" id="354" beanClass="com.install4j.runtime.beans.actions.registry.SaveInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.registry.SaveInstallerVariablesAction">
+                      <void property="installerVariables">
+                        <array class="java.lang.String" length="9">
+                          <void index="0">
+                            <string>genii.installAsService</string>
+                          </void>
+                          <void index="1">
+                            <string>genii.startService</string>
+                          </void>
+                          <void index="2">
+                            <string>genii.username</string>
+                          </void>
+                          <void index="3">
+                            <string>genii.isWindows</string>
+                          </void>
+                          <void index="4">
+                            <string>genii.isLinux</string>
+                          </void>
+                          <void index="5">
+                            <string>genii.isMacos</string>
+                          </void>
+                          <void index="6">
+                            <string>genii.hasContainer</string>
+                          </void>
+                          <void index="7">
+                            <string>genii.openFirewall</string>
+                          </void>
+                          <void index="8">
+                            <string>genii.xcg-port</string>
+                          </void>
+                        </array>
+                      </void>
+                      <void property="packageName">
+                        <string>${compiler:sys.applicationId}</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+            </actions>
+            <formComponents />
+          </screen>
+        </screens>
+      </application>
+      <application name="" id="uninstaller" beanClass="com.install4j.runtime.beans.applications.UninstallerApplication" enabled="true" commentSet="false" comment="" customIcnsFile="" customIcoFile="">
+        <serializedBean>
+          <java class="java.beans.XMLDecoder">
+            <object class="com.install4j.runtime.beans.applications.UninstallerApplication" />
+          </java>
+        </serializedBean>
+        <startup>
+          <screen name="" id="12" beanClass="com.install4j.runtime.beans.screens.StartupScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.StartupScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions>
+              <action name="" id="332" beanClass="com.install4j.runtime.beans.actions.registry.LoadInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.registry.LoadInstallerVariablesAction">
+                      <void property="packageName">
+                        <string>${compiler:sys.applicationId}</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="" id="18" beanClass="com.install4j.runtime.beans.actions.misc.LoadResponseFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.misc.LoadResponseFileAction" />
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+            </actions>
+            <formComponents />
+          </screen>
+        </startup>
+        <screens>
+          <screen name="" id="13" beanClass="com.install4j.runtime.beans.screens.UninstallWelcomeScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.UninstallWelcomeScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+          <screen name="Manage XCG Container" id="328" beanClass="com.install4j.runtime.beans.screens.CustomizableProgressScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.CustomizableProgressScreen">
+                  <void property="cancelEnabled">
+                    <boolean>false</boolean>
+                  </void>
+                  <void property="subTitle">
+                    <string>Managing XCG Container</string>
+                  </void>
+                  <void property="title">
+                    <string>Managing XCG Container</string>
+                  </void>
+                </object>
+              </java>
+            </serializedBean>
+            <condition>context.getBooleanVariable("genii.hasContainer")</condition>
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions>
+              <action name="" id="338" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.control.SetProgressAction">
+                      <void property="progressChangeType">
+                        <object class="com.install4j.runtime.beans.actions.control.ProgressChangeType" field="SET_INDETERMINATE" />
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <group name="Close Firewall Port" id="368" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.groups.ActionGroup">
+                      <void property="conditionExpression">
+                        <object class="com.install4j.api.beans.ScriptProperty">
+                          <void property="value">
+                            <string>context.getBooleanVariable("genii.isWindows")</string>
+                          </void>
+                        </object>
+                      </void>
+                      <void property="defaultErrorMessage">
+                        <string>Unable to close firewall port opening.</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <beans>
+                  <action name="" id="369" beanClass="com.install4j.runtime.beans.actions.control.SetMessageAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.control.SetMessageAction">
+                          <void property="statusMessage">
+                            <string>Closing firewall port opening</string>
+                          </void>
+                          <void property="useStatus">
+                            <boolean>true</boolean>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                  <action name="" id="370" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
+                          <void property="arguments">
+                            <array class="java.lang.String" length="5">
+                              <void index="0">
+                                <string>firewall</string>
+                              </void>
+                              <void index="1">
+                                <string>delete</string>
+                              </void>
+                              <void index="2">
+                                <string>portopening</string>
+                              </void>
+                              <void index="3">
+                                <string>protocol=TCP</string>
+                              </void>
+                              <void index="4">
+                                <string>port=${installer:genii.xcg-port}</string>
+                              </void>
+                            </array>
+                          </void>
+                          <void property="executable">
+                            <object class="java.io.File">
+                              <string>${installer:sys.system32Dir}/netsh.exe</string>
+                            </object>
+                          </void>
+                          <void property="wait">
+                            <boolean>true</boolean>
+                          </void>
+                          <void property="workingDirectory">
+                            <object class="java.io.File">
+                              <string>.</string>
+                            </object>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                </beans>
+              </group>
+              <group name="Non-Windows Container Management" id="337" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.groups.ActionGroup">
+                      <void property="conditionExpression">
+                        <object class="com.install4j.api.beans.ScriptProperty">
+                          <void property="value">
+                            <string>!context.getBooleanVariable("genii.isWindows")</string>
+                          </void>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <beans>
+                  <action name="" id="353" beanClass="com.install4j.runtime.beans.actions.control.SetMessageAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.control.SetMessageAction">
+                          <void property="statusMessage">
+                            <string>Stopping XCG Container Service</string>
+                          </void>
+                          <void property="useStatus">
+                            <boolean>true</boolean>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                  <action name="Stop XCGContainer" id="340" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
+                          <void property="arguments">
+                            <array class="java.lang.String" length="1">
+                              <void index="0">
+                                <string>stop</string>
+                              </void>
+                            </array>
+                          </void>
+                          <void property="executable">
+                            <object class="java.io.File">
+                              <string>XCGContainer</string>
+                            </object>
+                          </void>
+                          <void property="wait">
+                            <boolean>true</boolean>
+                          </void>
+                          <void property="workingDirectory">
+                            <object class="java.io.File">
+                              <string>.</string>
+                            </object>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                </beans>
+              </group>
+              <group name="Windows Container Management" id="335" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.groups.ActionGroup">
+                      <void property="conditionExpression">
+                        <object class="com.install4j.api.beans.ScriptProperty">
+                          <void property="value">
+                            <string>context.getBooleanVariable("genii.isWindows") &amp;&amp; context.getBooleanVariable("genii.installAsService")</string>
+                          </void>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <beans>
+                  <action name="" id="352" beanClass="com.install4j.runtime.beans.actions.control.SetMessageAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.control.SetMessageAction">
+                          <void property="statusMessage">
+                            <string>Uninstalling XCG Container Service</string>
+                          </void>
+                          <void property="useStatus">
+                            <boolean>true</boolean>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                  <action name="Uninstall Service" id="349" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="3" errorMessage="Unable to uninstall container service">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
+                          <void property="arguments">
+                            <array class="java.lang.String" length="2">
+                              <void index="0">
+                                <string>-r</string>
+                              </void>
+                              <void index="1">
+                                <string>../conf/wrapper.conf</string>
+                              </void>
+                            </array>
+                          </void>
+                          <void property="executable">
+                            <object class="java.io.File">
+                              <string>JavaServiceWrapper/wrapper/bin/wrapper-windows-x86-32.exe</string>
+                            </object>
+                          </void>
+                          <void property="wait">
+                            <boolean>true</boolean>
+                          </void>
+                          <void property="workingDirectory">
+                            <object class="java.io.File">
+                              <string>JavaServiceWrapper/wrapper/bin</string>
+                            </object>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                </beans>
+              </group>
+            </actions>
+            <formComponents />
+          </screen>
+          <screen name="Cleanup State Directory" id="62" beanClass="com.install4j.runtime.beans.screens.AdditionalConfirmationsScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.AdditionalConfirmationsScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents>
+              <formComponent name="" id="64" beanClass="com.install4j.runtime.beans.formcomponents.LabelComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.formcomponents.LabelComponent">
+                      <void property="labelText">
+                        <string>Would you like to clean up your state directory?</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <initScript />
+                <visibiltyScript />
+              </formComponent>
+              <formComponent name="" id="63" beanClass="com.install4j.runtime.beans.formcomponents.CheckboxComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.formcomponents.CheckboxComponent">
+                      <void property="checkboxText">
+                        <string>Cleanup state directory?</string>
+                      </void>
+                      <void property="initiallySelected">
+                        <boolean>true</boolean>
+                      </void>
+                      <void property="variableName">
+                        <string>genii.cleanupStateDir</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <initScript />
+                <visibiltyScript />
+              </formComponent>
+            </formComponents>
+          </screen>
+          <screen name="" id="14" beanClass="com.install4j.runtime.beans.screens.UninstallationScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.UninstallationScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions>
+              <action name="Delete Deployments" id="514" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>deployments</string>
+                        </object>
+                      </void>
+                      <void property="recurse">
+                        <boolean>true</boolean>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Cleanup State Directory" id="65" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to clean up state directory.">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>${installer:sys.userHome}/.genesisII</string>
+                        </object>
+                      </void>
+                      <void property="recurse">
+                        <boolean>true</boolean>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition>context.getBooleanVariable("genii.cleanupStateDir")</condition>
+              </action>
+              <action name="Delete container.log" id="56" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>container.log</string>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Delete Update Directory" id="53" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>updates</string>
+                        </object>
+                      </void>
+                      <void property="recurse">
+                        <boolean>true</boolean>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Delete container.properties" id="51" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>container.properties</string>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Delete JavaServiceWrapper" id="262" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>JavaServiceWrapper</string>
+                        </object>
+                      </void>
+                      <void property="recurse">
+                        <boolean>true</boolean>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="Delete webapps" id="263" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="file">
+                        <object class="java.io.File">
+                          <string>webapps</string>
+                        </object>
+                      </void>
+                      <void property="recurse">
+                        <boolean>true</boolean>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+              <action name="" id="15" beanClass="com.install4j.runtime.beans.actions.UninstallFilesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.UninstallFilesAction" />
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+            </actions>
+            <formComponents />
+          </screen>
+          <screen name="" id="17" beanClass="com.install4j.runtime.beans.screens.UninstallFailureScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="true">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.UninstallFailureScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+          <screen name="" id="16" beanClass="com.install4j.runtime.beans.screens.UninstallSuccessScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="true">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.UninstallSuccessScreen" />
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions />
+            <formComponents />
+          </screen>
+        </screens>
+      </application>
+    </applications>
+  </installerGui>
+  <mediaSets>
+    <unixInstaller name="Unix Installer" id="50" mediaFileName="" installDir="GenesisII" overridePrincipalLanguage="false" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="">
+      <excludedLaunchers />
+      <excludedComponents />
+      <excludedBeans />
+      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
+      <exclude>
+        <entry location=".i4j_fileset_19" fileType="regular" />
+        <entry location=".i4j_fileset_23" fileType="regular" />
+      </exclude>
+      <variables />
+      <installerScript mode="1" file="">
+        <scriptLines />
+      </installerScript>
+    </unixInstaller>
+    <win32 name="Windows" id="80" mediaFileName="" installDir="GenesisII" overridePrincipalLanguage="false" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="" runAsAdmin="true">
+      <excludedLaunchers />
+      <excludedComponents />
+      <excludedBeans />
+      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
+      <exclude>
+        <entry location=".i4j_fileset_21" fileType="regular" />
+        <entry location=".i4j_fileset_23" fileType="regular" />
+      </exclude>
+      <variables />
+    </win32>
+    <macosFolder name="Mac OS X Folder" id="240" mediaFileName="" installDir="GenesisII" overridePrincipalLanguage="false" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="">
+      <excludedLaunchers />
+      <excludedComponents />
+      <excludedBeans />
+      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
+      <exclude>
+        <entry location=".i4j_fileset_19" fileType="regular" />
+        <entry location=".i4j_fileset_21" fileType="regular" />
+      </exclude>
+      <variables />
+    </macosFolder>
+  </mediaSets>
+  <buildIds buildAll="true" />
+</install4j>
+

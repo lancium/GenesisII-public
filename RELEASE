@@ -1,1 +1,1 @@
-Genesis II $APP_VER
+Genesis II ${installer:sys.version}
