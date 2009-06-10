@@ -25,7 +25,6 @@
 		message="Logging in as ${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/admin.pfx."/>
 	<geniix:login>
 		<gsh:param>--no-gui</gsh:param>
-		<gsh:param>--password=admin</gsh:param>
 		<gsh:param>--pattern=Admin</gsh:param>
 		<gsh:param>${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/admin.pfx</gsh:param>
 	</geniix:login>
@@ -35,7 +34,7 @@
 	<geniix:create-rns-root>
 		<gsh:param>--protocol=https</gsh:param>
 		<gsh:param>--host=localhost</gsh:param>
-		<gsh:param>--port=18080</gsh:param>
+		<gsh:param>--port=18443</gsh:param>
 		<gsh:param>context.xml</gsh:param>
 	</geniix:create-rns-root>
 

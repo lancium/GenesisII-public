@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="4.2.3" transformSequenceNumber="2">
-  <directoryPresets config="../../secrun.scratch/ContainerPostBootSecRun.jar" />
+  <directoryPresets config="../../deployments" />
   <application name="Genesis II" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" keepModificationTimes="false" missingFilesStrategy="warn" shortName="genii" publisher="Global Bio Grid" publisherWeb="http://vcgr.cs.virginia.edu" version="2.0.0" allPathsRelative="true" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.6">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
@@ -25,6 +25,7 @@
       <fileset name="Linux Only Files" id="21" />
       <fileset name="Mac OS X Only Files" id="23" />
       <fileset name="State Directory" id="25" />
+      <fileset name="Bootstrap Files" id="645" />
     </filesets>
     <roots>
       <root id="20" fileset="19" location="" />
@@ -32,6 +33,7 @@
       <root id="24" fileset="23" location="" />
       <root id="26" fileset="25" location="" />
       <root id="27" fileset="25" location="${installer:sys.userHome}/.genesisII" />
+      <root id="646" fileset="645" location="" />
     </roots>
     <mountPoints>
       <mountPoint id="41" root="" location="ApplicationWatcher" mode="755" />
@@ -47,6 +49,8 @@
       <mountPoint id="252" root="22" location="JavaServiceWrapper" mode="755" />
       <mountPoint id="38" root="24" location="jni-lib" mode="755" />
       <mountPoint id="253" root="24" location="JavaServiceWrapper" mode="755" />
+      <mountPoint id="647" root="646" location="deployments" mode="755" />
+      <mountPoint id="656" root="646" location="deployments/GeniiNetBootstrapContainer" mode="755" />
     </mountPoints>
     <entries>
       <fileEntry mountPoint="41" file="../../scripts/genii-base-application.properties" overwrite="4" shared="false" mode="644" uninstallMode="0" />
@@ -305,6 +309,9 @@
           <entry location="wrapper/lib/libwrapper-hpux-ia-32.so" fileType="regular" />
         </exclude>
       </dirEntry>
+      <dirEntry mountPoint="656" file="../../deployments/GeniiNetBootstrapContainer" overwrite="4" shared="false" mode="644" uninstallMode="0" excludeSuffixes=".svn" dirMode="755">
+        <exclude />
+      </dirEntry>
     </entries>
     <components>
       <component name="Genesis II Core" id="28" displayDescription="true" selected="true" mandatory="true" downloadable="true">
@@ -390,6 +397,7 @@
           <entry location=".i4j_external_20/JavaServiceWrapper" fileType="regular" />
           <entry location=".i4j_external_22/JavaServiceWrapper" fileType="regular" />
           <entry location=".i4j_external_24/JavaServiceWrapper" fileType="regular" />
+          <entry location=".i4j_fileset_645" fileType="regular" />
         </include>
         <dependencies>
           <component id="28" />
@@ -2312,6 +2320,7 @@ return true;</string>
       <exclude>
         <entry location=".i4j_fileset_19" fileType="regular" />
         <entry location=".i4j_fileset_23" fileType="regular" />
+        <entry location=".i4j_fileset_645" fileType="regular" />
       </exclude>
       <variables />
       <installerScript mode="1" file="">
@@ -2326,6 +2335,7 @@ return true;</string>
       <exclude>
         <entry location=".i4j_fileset_21" fileType="regular" />
         <entry location=".i4j_fileset_23" fileType="regular" />
+        <entry location=".i4j_fileset_645" fileType="regular" />
       </exclude>
       <variables />
     </win32>
@@ -2337,9 +2347,26 @@ return true;</string>
       <exclude>
         <entry location=".i4j_fileset_19" fileType="regular" />
         <entry location=".i4j_fileset_21" fileType="regular" />
+        <entry location=".i4j_fileset_645" fileType="regular" />
       </exclude>
       <variables />
     </macosFolder>
+    <unixInstaller name="Bootstrap Installer" id="649" mediaFileName="Bootstrap-2.0" installDir="GenesisII" overridePrincipalLanguage="false" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
+      <excludedLaunchers />
+      <excludedComponents />
+      <excludedBeans />
+      <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
+      <exclude>
+        <entry location=".i4j_fileset_19" fileType="regular" />
+        <entry location=".i4j_fileset_23" fileType="regular" />
+      </exclude>
+      <variables>
+        <variable name="genii.deployment" value="GeniiNetBootstrapContainer" />
+      </variables>
+      <installerScript mode="1" file="">
+        <scriptLines />
+      </installerScript>
+    </unixInstaller>
   </mediaSets>
   <buildIds buildAll="true" />
 </install4j>

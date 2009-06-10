@@ -30,7 +30,9 @@ public class CertGeneratorDBResource extends BasicDBResource implements ICertGen
 	public void setCertificateIssuerInfo(HashMap<QName, Object> creationParameters) 
 		throws ResourceException
 	{
-		setProperty(_DEFAULT_VALIDITY_PROPERTY_NAME, (creationParameters.get(CertGeneratorUtils.CERT_GENERATOR_DEFAULT_VALIDITY_CONSTRUCTION_PARAMETER).toString()));
+		setProperty(_DEFAULT_VALIDITY_PROPERTY_NAME,
+			creationParameters.get(
+				CertGeneratorUtils.CERT_GENERATOR_DEFAULT_VALIDITY_CONSTRUCTION_PARAMETER).toString());
 		X509Certificate [] issuerCertChain = (X509Certificate []) creationParameters.get(CertGeneratorUtils.CERT_GENERATOR_ISSUER_CHAIN_CONSTRUCTION_PARAMETER);
 		setProperty(_ISSUER_CERT_CHAIN_PROPERTY_NAME, issuerCertChain);
 		PrivateKey issuerPrivateKey = (PrivateKey) creationParameters.get(CertGeneratorUtils.CERT_GENERATOR_ISSUER_PRIVATE_KEY_CONSTRUCTION_PARAMETER);
