@@ -8,7 +8,7 @@
 		source="/containers/BootstrapContainer/Services"/>
 	
 	<gsh:default name="GENII_INSTALL_DIR" value="."/>
-	<gsh:default name="DEPLOYMENT_NAME" value="default"/>
+	<gsh:default name="DEPLOYMENT_NAME" value="GeniiNetBootstrapContainer"/>
 	
 	<gsh:echo
 		message="GENII_INSTALL_DIR is ${GENII_INSTALL_DIR}"/>
@@ -47,7 +47,7 @@
 	</geniix:mkdir>
 	
 	<geniix:ln>
-		<gsh:param>--service-url=https://localhost:18080/axis/services/VCGRContainerPortType</gsh:param>
+		<gsh:param>--service-url=https://localhost:18443/axis/services/VCGRContainerPortType</gsh:param>
 		<gsh:param>/containers/BootstrapContainer</gsh:param>
 	</geniix:ln>
 
@@ -252,7 +252,8 @@
 		<gsh:param>--create-generator</gsh:param>
 		<gsh:param>${BOOT_SRVS}/CertGeneratorPortType</gsh:param>
 		<gsh:param>--ks-path=${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/containergrp.pfx</gsh:param>
-		<gsh:param>--ks-pword=containergrp</gsh:param>
+		<gsh:param>--ks-pword=Crwsalapcwiowwlploa</gsh:param>
+		<gsh:param>--entry-pword=Crwsalapcwiowwlploa</gsh:param>
 		<gsh:param>--ks-alias=GenesisII Container Group CA Cert</gsh:param>
 		<gsh:param>/etc/ContainerGroupCertGenerator</gsh:param>
 	</geniix:cert-generator>

@@ -2,7 +2,8 @@ cert-generator --create-generator
         { --url <cert-generator-service-url> | <cert-generator-service-rns-path> } 
         --ks-path=<local-path-issuer-key-store> 
         --ks-pword=<issuer-key-store-password> 
-        --ks-alias=<issuer-key-store-alias> 
+        --ks-alias=<issuer-key-store-alias>
+        --entry-pword=<issuer-key-password>
         [ --default-validity=<validity seconds> ]
         [new-rns-path-for-cert-generator]
 	

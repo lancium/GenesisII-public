@@ -87,7 +87,9 @@ public class ApplicationBase
 			userDir = getUserDirFromEnvironment();
 		
 		if (userDir == null) 
-			userDir = System.getProperty("user.home") + "/.genesisII";
+			userDir = String.format("%s/%s",
+				System.getProperty("user.home"), 
+				GenesisIIConstants.GENESISII_STATE_DIR_NAME);
 
 		try
 		{

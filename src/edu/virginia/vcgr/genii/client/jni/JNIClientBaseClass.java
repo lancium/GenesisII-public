@@ -23,7 +23,6 @@ public class JNIClientBaseClass
 	{
 		try 
 		{
-			System.err.format("java.library.path=%s\n", System.getProperty("java.library.path"));
 			System.loadLibrary(VCGR_CLIENT_LIB_NAME);
 		}
 		catch (UnsatisfiedLinkError e)

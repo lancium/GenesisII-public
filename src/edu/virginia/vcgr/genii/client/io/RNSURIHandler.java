@@ -20,6 +20,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
@@ -29,6 +32,8 @@ import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePass
 public class RNSURIHandler extends AbstractURIHandler
 	implements IURIHandler
 {
+	static private Log _logger = LogFactory.getLog(RNSURIHandler.class);
+	
 	static private final String []_HANDLED_PROTOCOLS =
 		new String[] { "rns" };
 	
@@ -59,6 +64,10 @@ public class RNSURIHandler extends AbstractURIHandler
 			RNSPath path = RNSPath.getCurrent();
 			path = path.lookup(uri.getSchemeSpecificPart(), 
 				RNSPathQueryFlags.MUST_EXIST);
+			
+			_logger.debug(String.format("Staging a file in from \"%s\".",
+				path.pwd()));
+			
 			return ByteIOStreamFactory.createInputStream(path);
 		}
 		catch (RNSException re)
@@ -79,6 +88,10 @@ public class RNSURIHandler extends AbstractURIHandler
 			RNSPath path = RNSPath.getCurrent();
 			path = path.lookup(uri.getSchemeSpecificPart(), 
 				RNSPathQueryFlags.DONT_CARE);
+			
+			_logger.debug(String.format("Staging a file out to \"%s\".",
+				path.pwd()));
+			
 			return ByteIOStreamFactory.createOutputStream(path);
 		}
 		catch (RNSException re)

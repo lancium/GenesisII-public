@@ -4,6 +4,9 @@ import javax.xml.namespace.QName;
 
 public class GenesisIIConstants
 {
+	static public final String GENESISII_STATE_DIR_NAME =
+		".genesisII-2.0";
+	
 	static public final String GENESISII_NS =
 		"http://vcgr.cs.virginia.edu/Genesis-II";
 	

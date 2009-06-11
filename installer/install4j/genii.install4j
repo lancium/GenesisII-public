@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="4.2.3" transformSequenceNumber="2">
-  <directoryPresets config="../../deployments" />
+  <directoryPresets config="../../secrun.scratch/ContainerPreBootSecRun.jar" />
   <application name="Genesis II" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" keepModificationTimes="false" missingFilesStrategy="warn" shortName="genii" publisher="Global Bio Grid" publisherWeb="http://vcgr.cs.virginia.edu" version="2.0.0" allPathsRelative="true" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.6">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
@@ -16,7 +16,10 @@
       <variable name="genii.connection-url" value="http://vcgr.cs.virginia.edu/XCG/2.0/root.xml" />
       <variable name="genii.deployment" value="GeniiNetFullContainer" />
       <variable name="genii.build-number" value="2000" />
-      <variable name="genii.xcg-port" value="18080" />
+      <variable name="genii.xcg-port" value="18443" />
+      <variable name="genii.container-memory.fraction" value="0.25" />
+      <variable name="genii.container-memory.upper-limit" value="2048" />
+      <variable name="genii.container-memory.lower-limit" value="512" />
     </variables>
   </application>
   <files>
@@ -32,7 +35,7 @@
       <root id="22" fileset="21" location="" />
       <root id="24" fileset="23" location="" />
       <root id="26" fileset="25" location="" />
-      <root id="27" fileset="25" location="${installer:sys.userHome}/.genesisII" />
+      <root id="27" fileset="25" location="${installer:sys.userHome}/.genesisII-2.0" />
       <root id="646" fileset="645" location="" />
     </roots>
     <mountPoints>
@@ -59,6 +62,7 @@
       <fileEntry mountPoint="41" file="../../scripts/genii-update-application.properties" overwrite="4" shared="false" mode="644" uninstallMode="0" />
       <fileEntry mountPoint="356" file="../../scripts/current-version.txt" overwrite="4" shared="false" mode="644" uninstallMode="0" />
       <fileEntry mountPoint="504" file="../../secrun.scratch/ContainerPostBootSecRun.jar" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <fileEntry mountPoint="504" file="../../secrun.scratch/ContainerPreBootSecRun.jar" overwrite="4" shared="false" mode="644" uninstallMode="0" />
       <dirEntry mountPoint="34" file="../.." overwrite="4" shared="false" mode="644" uninstallMode="0" excludeSuffixes=".svn" dirMode="755">
         <exclude>
           <entry location="build.secrun.properties" fileType="regular" />
@@ -1308,6 +1312,38 @@ return true;</string>
                           </java>
                         </serializedBean>
                         <beans>
+                          <action name="Set genii.container-memory" id="801" beanClass="com.install4j.runtime.beans.actions.control.SetVariableAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                            <serializedBean>
+                              <java class="java.beans.XMLDecoder">
+                                <object class="com.install4j.runtime.beans.actions.control.SetVariableAction">
+                                  <void property="script">
+                                    <object class="com.install4j.api.beans.ScriptProperty">
+                                      <void property="value">
+                                        <string>double fraction = Double.parseDouble(
+    context.getCompilerVariable("genii.container-memory.fraction"));
+long upperLimit = Long.parseLong(
+    context.getCompilerVariable("genii.container-memory.upper-limit"));
+long lowerLimit = Long.parseLong(
+    context.getCompilerVariable("genii.container-memory.lower-limit"));
+    
+long memory = Math.round(SystemInfo.getPhysicalMemory() * fraction / 1024 / 1024);
+if (memory &lt; lowerLimit)
+    memory = lowerLimit;
+if (memory &gt; upperLimit)
+    memory = upperLimit;
+
+return memory;</string>
+                                      </void>
+                                    </object>
+                                  </void>
+                                  <void property="variableName">
+                                    <string>genii.container-memory</string>
+                                  </void>
+                                </object>
+                              </java>
+                            </serializedBean>
+                            <condition />
+                          </action>
                           <action name="Replace Variables in wrapper.conf" id="257" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to configure service wrapper configuration.">
                             <serializedBean>
                               <java class="java.beans.XMLDecoder">
@@ -2180,7 +2216,7 @@ return true;</string>
                     <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
                       <void property="file">
                         <object class="java.io.File">
-                          <string>${installer:sys.userHome}/.genesisII</string>
+                          <string>${installer:sys.userHome}/.genesisII-2.0</string>
                         </object>
                       </void>
                       <void property="recurse">

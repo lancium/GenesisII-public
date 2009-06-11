@@ -39,6 +39,8 @@ public class BootstrapProperties extends Properties
 	
 	static final public String CERT_GENERATOR_RNS_PATH_PROPERTY_NAME =
 		"edu.virginia.vcgr.genii.container.cert-generator.rns";
+	static final public String CERT_GENERATOR_KEYSIZE_PROPERTY_NAME =
+		"edu.virginia.vcgr.genii.container.cert-generator.keysize";
 	static final public String CERT_GENERATOR_OUTPUT_STORE_PROPERTY_NAME =
 		"edu.virginia.vcgr.genii.container.cert-generator.output-store";
 	static final public String CONTAINER_PUBLIC_CERT_FILENAME_PROPERTY_NAME =
@@ -57,7 +59,6 @@ public class BootstrapProperties extends Properties
 		"edu.virginia.vcgr.genii.container.cert-generator.c";
 	static final public String CERT_GENERATOR_ST_PROPERTY_NAME =
 		"edu.virginia.vcgr.genii.container.cert-generator.st";
-
 	
 	private PostTarget _exceptionLogger = null;
 	
@@ -143,6 +144,16 @@ public class BootstrapProperties extends Properties
 			throw new ConfigurationException(String.format(
 				"Missing required bootstrap property \"%s\".",
 				CERT_GENERATOR_RNS_PATH_PROPERTY_NAME));
+		return ret;
+	}
+	
+	public String getCertGeneratorKeysize()
+	{
+		String ret = getProperty(CERT_GENERATOR_KEYSIZE_PROPERTY_NAME);
+		if (ret == null)
+			throw new ConfigurationException(String.format(
+				"Missing required bootstrap property \"%s\".",
+				CERT_GENERATOR_KEYSIZE_PROPERTY_NAME));
 		return ret;
 	}
 	

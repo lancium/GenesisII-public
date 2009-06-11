@@ -5,7 +5,6 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
-
 public interface ResourceFork
 {
 	public String getForkPath();

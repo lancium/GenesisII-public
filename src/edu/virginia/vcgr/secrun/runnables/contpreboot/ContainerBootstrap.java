@@ -65,7 +65,10 @@ public class ContainerBootstrap implements SecureRunnable
 			
 			String hostname = getHostName(false, true);
 			
-			ICallingContext callingContext = connect(connectURL);
+			ICallingContext callingContext = ContextManager.getCurrentContext(false);
+			if (callingContext == null)
+				callingContext = connect(connectURL);
+			
 			try
 			{
 				ContextManager.setResolver(new MemoryBasedContextResolver(
@@ -175,6 +178,7 @@ public class ContainerBootstrap implements SecureRunnable
 		CertGeneratorTool tool = new CertGeneratorTool();
 		tool.setGen_cert();
 		tool.addArgument(bProperties.getCertGeneratorRNSPath());
+		tool.setKeysize(bProperties.getCertGeneratorKeysize());
 		tool.setKs_path(
 			Installation.getDeployment(
 				new DeploymentName()).security().getSecurityFile(

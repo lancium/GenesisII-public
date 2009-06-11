@@ -202,6 +202,7 @@ public class CreateUserTool extends BaseGridTool
 		idpTool.run(stdout, stderr, stdin);
 		
 		String fullPath = idpServicePath + "/" + idpName;
+		RNSPath.clearCacheEntry(fullPath);
 		
 		try
 		{

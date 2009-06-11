@@ -7,7 +7,6 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 
-
 public abstract class AbstractResourceFork implements ResourceFork
 {
 	private ResourceForkService _service;

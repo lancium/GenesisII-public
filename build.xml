@@ -296,7 +296,7 @@
 	</target>
 	
 	<target name="wipestate">
-		<delete dir="${user.home}/.genesisII"/>
+		<delete dir="${user.home}/.genesisII-2.0"/>
 	</target>	
 
 	<target name="init.secrun">

@@ -126,18 +126,23 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 				{
 					ResourceForkInformation info = 
 						(ResourceForkInformation)ap.getResourceForkInformation();
+					ResourceFork fork = null;
+					
 					if (info != null)
+						fork = info.instantiateFork(null);
+					
+					if (fork != null)
 					{
-						ResourceFork fork = info.instantiateFork(null);
 						if (fork.getForkPath().equals("/"))
-							return RWXCategory.INHERITED;
+							return RWXCategory.EXECUTE;
 						
 						forkClass = fork.getClass();
-					}
+					} else
+						return RWXCategory.EXECUTE;
 				}
 				
 				if (forkClass == null)
-					return RWXCategory.INHERITED;
+					return RWXCategory.EXECUTE;
 				
 				return RWXManager.lookup(forkClass, "destroy");
 			} 

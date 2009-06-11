@@ -125,8 +125,7 @@ public class RNSPath implements Serializable, Cloneable
 	{
 		EndpointReferenceType epr = resolveOptional();
 		if (epr == null)
-			throw new RNSPathDoesNotExistException(
-				"Unable to resolve path \"" + pwd() + "\".");
+			throw new RNSPathDoesNotExistException(pwd());
 		
 		return epr;
 	}
@@ -470,6 +469,11 @@ public class RNSPath implements Serializable, Cloneable
 			builder.append("/");
 		
 		return builder.toString();
+	}
+	
+	static public void clearCacheEntry(String fullPath)
+	{
+		_lookupCache.remove(fullPath);
 	}
 	
 	/**
