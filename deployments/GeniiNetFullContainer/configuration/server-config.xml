@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+?xml version="1.0" encoding="utf-8" ?>
 <mconf:configuration
 	xmlns:mconf="http://www.mark-morgan.net/org/morgan/util/configuration"
 	xmlns:genii="http://vcgr.cs.virginia.edu/Genesis-II">
@@ -81,7 +81,7 @@
 		    	 the identity of the container will be used in these circumstances. 
 			-->
 			<mconf:property name="genii.security.authz.bootstrapOwnerCertPath"
-				value="container.cer"/>
+				value="admin.cer"/>
 						
 		</mconf:instance>
 
@@ -100,7 +100,7 @@
 		    	 the identity of the container will be used in these circumstances. 
 			-->
 			<mconf:property name="genii.security.authz.bootstrapOwnerCertPath"
-				value="container.cer"/>
+				value="admin.cer"/>
 						
 		</mconf:instance>
 

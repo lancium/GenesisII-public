@@ -23,7 +23,7 @@ public class Security
 	static private final String SECURITY_PROPERTIES_FILE_NAME = 
 		"security.properties";
 	static private final String ADMIN_CERTIFICATE_FILE =
-		"administrator.cer";
+		"admin.cer";
 	
 	static private boolean _loadedAdministrator = false;
 	static private Identity _administrator = null;
