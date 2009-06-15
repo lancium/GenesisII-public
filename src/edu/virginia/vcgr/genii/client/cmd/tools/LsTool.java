@@ -93,6 +93,15 @@ public class LsTool extends BaseGridTool
 		boolean isEPR = _epr;
 		List<String> arguments = getArguments();
 		ICallingContext ctxt = ContextManager.getCurrentContext();
+		
+		/* MOOCH */
+		RNSPath rootPath = RNSPath.getCurrent().getRoot();
+		System.err.format("Container ID:  \"%s\".\n", 
+			EPRUtils.getGeniiContainerID(rootPath.getEndpoint()));
+		System.err.format("Resource Key:  \"%s\".\n",
+			rootPath.getEndpoint().getReferenceParameters().get_any()[0].getFirstChild());
+		/* MOOCH */
+		
 		if (arguments.size() == 0)
 			arguments.add(".");
 		ArrayList<RNSPath> targets = new ArrayList<RNSPath>();

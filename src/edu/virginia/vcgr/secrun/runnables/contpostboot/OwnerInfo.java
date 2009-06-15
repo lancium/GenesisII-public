@@ -61,4 +61,9 @@ public class OwnerInfo
 	{
 		_ownerInfoFile.delete();
 	}
+	
+	public boolean exists()
+	{
+		return _ownerInfoFile.exists();
+	}
 }

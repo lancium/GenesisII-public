@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.secrun.runnables.contpreboot;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -133,13 +134,19 @@ public class ContainerBootstrap implements SecureRunnable
 	private void generateOwnerFile(OwnerInfo info) 
 		throws Throwable
 	{
-		DownloadCertificateTool dTool = new DownloadCertificateTool();
-		dTool.addArgument(info.getUserPath());
-		dTool.addArgument(
-			Installation.getDeployment(
-				new DeploymentName()).security().getSecurityFile(
-					"owner.cer").getAbsolutePath());
-		dTool.run(out, err, in);
+		File ownerCer = Installation.getDeployment(
+			new DeploymentName()).security().getSecurityFile("owner.cer");
+		
+		if (!ownerCer.exists())
+		{
+			DownloadCertificateTool dTool = new DownloadCertificateTool();
+			dTool.addArgument(info.getUserPath());
+			dTool.addArgument(
+				Installation.getDeployment(
+					new DeploymentName()).security().getSecurityFile(
+						"owner.cer").getAbsolutePath());
+			dTool.run(out, err, in);
+		}
 	}
 	
 	private void loginAsInstaller(

@@ -1171,120 +1171,209 @@ return true;</string>
                       </formComponent>
                     </formComponents>
                   </screen>
-                  <screen name="Owner Screen" id="894" beanClass="com.install4j.runtime.beans.screens.FormScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+                  <group name="Owner Group" id="901" beanClass="com.install4j.runtime.beans.groups.ScreenGroup" enabled="true" commentSet="false" comment="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
-                        <object class="com.install4j.runtime.beans.screens.FormScreen">
-                          <void property="subTitle">
-                            <string>Owner Information</string>
+                        <object class="com.install4j.runtime.beans.groups.ScreenGroup">
+                          <void property="conditionExpression">
+                            <object class="com.install4j.api.beans.ScriptProperty">
+                              <void property="value">
+                                <string>return !context.getCompilerVariable("genii.deployment").equals("GeniiNetBootstrapContainer");</string>
+                              </void>
+                            </object>
                           </void>
-                          <void property="title">
-                            <string>Owner Information</string>
+                          <void property="loopExpression">
+                            <object class="com.install4j.api.beans.ScriptProperty">
+                              <void property="value">
+                                <string>File ownerCer = new File(String.format("deployments/%s/security/owner.cer",
+    context.getCompilerVariable("genii.deployment")));
+return !ownerCer.exists();</string>
+                              </void>
+                            </object>
                           </void>
                         </object>
                       </java>
                     </serializedBean>
-                    <condition />
-                    <validation />
-                    <preActivation />
-                    <postActivation />
-                    <actions>
-                      <action name="" id="900" beanClass="com.install4j.runtime.beans.actions.text.AppendToFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <beans>
+                      <screen name="Owner Screen" id="902" beanClass="com.install4j.runtime.beans.screens.FormScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
                         <serializedBean>
                           <java class="java.beans.XMLDecoder">
-                            <object class="com.install4j.runtime.beans.actions.text.AppendToFileAction">
-                              <void property="file">
-                                <object class="java.io.File">
-                                  <string>deployments/GeniiNetFullContainer/security/owner.info</string>
-                                </object>
+                            <object class="com.install4j.runtime.beans.screens.FormScreen">
+                              <void property="subTitle">
+                                <string>Owner Information</string>
                               </void>
-                              <void property="text">
-                                <string>${installer:genii.user-path}
-${installer:genii.user-name}
-${installer:genii.user-password}</string>
+                              <void property="title">
+                                <string>Owner Information</string>
                               </void>
                             </object>
                           </java>
                         </serializedBean>
                         <condition />
-                      </action>
-                    </actions>
-                    <formComponents>
-                      <formComponent name="" id="895" beanClass="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
-                        <serializedBean>
-                          <java class="java.beans.XMLDecoder">
-                            <object class="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent">
-                              <void property="labelText">
-                                <string>In order to start the container, a user must be identified to 
+                        <validation />
+                        <preActivation />
+                        <postActivation />
+                        <actions>
+                          <action name="Download Certificate" id="909" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="Unable to download owner certificate.">
+                            <serializedBean>
+                              <java class="java.beans.XMLDecoder">
+                                <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
+                                  <void property="arguments">
+                                    <array class="java.lang.String" length="3">
+                                      <void index="0">
+                                        <string>download-certificate</string>
+                                      </void>
+                                      <void index="1">
+                                        <string>${installer:genii.user-path}</string>
+                                      </void>
+                                      <void index="2">
+                                        <string>owner.cer</string>
+                                      </void>
+                                    </array>
+                                  </void>
+                                  <void property="executable">
+                                    <object class="java.io.File">
+                                      <string>grid</string>
+                                    </object>
+                                  </void>
+                                  <void property="wait">
+                                    <boolean>true</boolean>
+                                  </void>
+                                  <void property="workingDirectory">
+                                    <object class="java.io.File">
+                                      <string>deployments/GeniiNetFullContainer/security</string>
+                                    </object>
+                                  </void>
+                                </object>
+                              </java>
+                            </serializedBean>
+                            <condition />
+                          </action>
+                          <action name="" id="903" beanClass="com.install4j.runtime.beans.actions.text.AppendToFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="">
+                            <serializedBean>
+                              <java class="java.beans.XMLDecoder">
+                                <object class="com.install4j.runtime.beans.actions.text.AppendToFileAction">
+                                  <void property="file">
+                                    <object class="java.io.File">
+                                      <string>deployments/GeniiNetFullContainer/security/owner.info</string>
+                                    </object>
+                                  </void>
+                                  <void property="text">
+                                    <string>${installer:genii.user-path}
+${installer:genii.user-name}
+${installer:genii.user-password}</string>
+                                  </void>
+                                </object>
+                              </java>
+                            </serializedBean>
+                            <condition>File ownerCer = new File(String.format("deployments/%s/security/owner.cer",
+    context.getCompilerVariable("genii.deployment")));
+return ownerCer.exists();</condition>
+                          </action>
+                        </actions>
+                        <formComponents>
+                          <formComponent name="" id="904" beanClass="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                            <serializedBean>
+                              <java class="java.beans.XMLDecoder">
+                                <object class="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent">
+                                  <void property="labelText">
+                                    <string>In order to start the container, a user must be identified to 
 manage that container.  Please provide the RNS path to your
 user object as well as the login name and password for that
 account.</string>
-                              </void>
-                            </object>
-                          </java>
-                        </serializedBean>
-                        <initScript />
-                        <visibiltyScript />
-                      </formComponent>
-                      <formComponent name="" id="896" beanClass="com.install4j.runtime.beans.formcomponents.SpacerComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
-                        <serializedBean>
-                          <java class="java.beans.XMLDecoder">
-                            <object class="com.install4j.runtime.beans.formcomponents.SpacerComponent" />
-                          </java>
-                        </serializedBean>
-                        <initScript />
-                        <visibiltyScript />
-                      </formComponent>
-                      <formComponent name="User RNS Path" id="897" beanClass="com.install4j.runtime.beans.formcomponents.TextfieldComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
-                        <serializedBean>
-                          <java class="java.beans.XMLDecoder">
-                            <object class="com.install4j.runtime.beans.formcomponents.TextfieldComponent">
-                              <void property="labelText">
-                                <string>User RNS Path</string>
-                              </void>
-                              <void property="variableName">
-                                <string>genii.user-path</string>
-                              </void>
-                            </object>
-                          </java>
-                        </serializedBean>
-                        <initScript />
-                        <visibiltyScript />
-                      </formComponent>
-                      <formComponent name="Login Username" id="898" beanClass="com.install4j.runtime.beans.formcomponents.TextfieldComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
-                        <serializedBean>
-                          <java class="java.beans.XMLDecoder">
-                            <object class="com.install4j.runtime.beans.formcomponents.TextfieldComponent">
-                              <void property="labelText">
-                                <string>Login Username</string>
-                              </void>
-                              <void property="variableName">
-                                <string>genii.user-name</string>
-                              </void>
-                            </object>
-                          </java>
-                        </serializedBean>
-                        <initScript />
-                        <visibiltyScript />
-                      </formComponent>
-                      <formComponent name="" id="899" beanClass="com.install4j.runtime.beans.formcomponents.PasswordComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
-                        <serializedBean>
-                          <java class="java.beans.XMLDecoder">
-                            <object class="com.install4j.runtime.beans.formcomponents.PasswordComponent">
-                              <void property="labelText">
-                                <string>Login Password</string>
-                              </void>
-                              <void property="variableName">
-                                <string>genii.user-password</string>
-                              </void>
-                            </object>
-                          </java>
-                        </serializedBean>
-                        <initScript />
-                        <visibiltyScript />
-                      </formComponent>
-                    </formComponents>
-                  </screen>
+                                  </void>
+                                </object>
+                              </java>
+                            </serializedBean>
+                            <initScript />
+                            <visibiltyScript />
+                          </formComponent>
+                          <formComponent name="" id="905" beanClass="com.install4j.runtime.beans.formcomponents.SpacerComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                            <serializedBean>
+                              <java class="java.beans.XMLDecoder">
+                                <object class="com.install4j.runtime.beans.formcomponents.SpacerComponent" />
+                              </java>
+                            </serializedBean>
+                            <initScript />
+                            <visibiltyScript />
+                          </formComponent>
+                          <formComponent name="User RNS Path" id="906" beanClass="com.install4j.runtime.beans.formcomponents.TextfieldComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                            <serializedBean>
+                              <java class="java.beans.XMLDecoder">
+                                <object class="com.install4j.runtime.beans.formcomponents.TextfieldComponent">
+                                  <void property="inputVerifier">
+                                    <object class="com.install4j.api.beans.ScriptProperty">
+                                      <void property="value">
+                                        <string>if (text == null || text.length() &lt;= 0)
+{
+    context.getProgressInterface().showFailure("User path field cannot be left blank.");
+    return false;
+}
+
+return true;</string>
+                                      </void>
+                                    </object>
+                                  </void>
+                                  <void property="labelText">
+                                    <string>User RNS Path</string>
+                                  </void>
+                                  <void property="variableName">
+                                    <string>genii.user-path</string>
+                                  </void>
+                                </object>
+                              </java>
+                            </serializedBean>
+                            <initScript />
+                            <visibiltyScript />
+                          </formComponent>
+                          <formComponent name="Login Username" id="907" beanClass="com.install4j.runtime.beans.formcomponents.TextfieldComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                            <serializedBean>
+                              <java class="java.beans.XMLDecoder">
+                                <object class="com.install4j.runtime.beans.formcomponents.TextfieldComponent">
+                                  <void property="keyValidator">
+                                    <object class="com.install4j.api.beans.ScriptProperty">
+                                      <void property="value">
+                                        <string>if (text == null || text.length() &lt;= 0)
+{
+    context.getProgressInterface().showFailure("User name field cannot be left blank.");
+    return false;
+}
+
+return true;</string>
+                                      </void>
+                                    </object>
+                                  </void>
+                                  <void property="labelText">
+                                    <string>Login Username</string>
+                                  </void>
+                                  <void property="variableName">
+                                    <string>genii.user-name</string>
+                                  </void>
+                                </object>
+                              </java>
+                            </serializedBean>
+                            <initScript />
+                            <visibiltyScript />
+                          </formComponent>
+                          <formComponent name="" id="908" beanClass="com.install4j.runtime.beans.formcomponents.PasswordComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                            <serializedBean>
+                              <java class="java.beans.XMLDecoder">
+                                <object class="com.install4j.runtime.beans.formcomponents.PasswordComponent">
+                                  <void property="labelText">
+                                    <string>Login Password</string>
+                                  </void>
+                                  <void property="variableName">
+                                    <string>genii.user-password</string>
+                                  </void>
+                                </object>
+                              </java>
+                            </serializedBean>
+                            <initScript />
+                            <visibiltyScript />
+                          </formComponent>
+                        </formComponents>
+                      </screen>
+                    </beans>
+                  </group>
                 </beans>
               </group>
               <screen name="" id="147" beanClass="com.install4j.runtime.beans.screens.CustomizableProgressScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
