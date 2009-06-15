@@ -86,6 +86,7 @@ public class ContextFileSystem
 						"credentials to session state from files \"" + 
 						filename + "\", \"" + transientFilename + "\"");
 					pair.context = loadContext(filename);
+					loadTransient(transientFilename, pair.context);
 				}
 				finally
 				{
