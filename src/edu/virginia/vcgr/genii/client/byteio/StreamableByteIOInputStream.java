@@ -48,7 +48,7 @@ public class StreamableByteIOInputStream extends InputStream
 	 * @param desiredTransferProtocol The desired transfer protocol to use when
 	 * reading bytes.
 	 * 
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws RemoteException
 	 */
 	public StreamableByteIOInputStream(EndpointReferenceType epr,
@@ -92,7 +92,7 @@ public class StreamableByteIOInputStream extends InputStream
 	 * 
 	 * @param epr The source ByteIO to read bytes from.
 	 * 
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws RemoteException
 	 */
 	public StreamableByteIOInputStream(EndpointReferenceType epr)

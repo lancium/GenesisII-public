@@ -38,7 +38,7 @@ public class RNSUtilities
 	 * name of service, name of container, or empty string).
 	 * @return The path to the service we are looking for.
 	 * 
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws RNSException
 	 */
 	static public RNSPath findService(

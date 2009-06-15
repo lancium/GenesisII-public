@@ -35,7 +35,7 @@ public class RandomByteIOInputStream extends InputStream
 	 * @param desiredTransferProtocol The desired transfer protocol to use when
 	 * reading bytes.
 	 * 
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws RemoteException
 	 */
 	public RandomByteIOInputStream(EndpointReferenceType source,
@@ -54,7 +54,7 @@ public class RandomByteIOInputStream extends InputStream
 	 * 
 	 * @param source The source ByteIO to read bytes from.
 	 * 
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws RemoteException
 	 */
 	public RandomByteIOInputStream(EndpointReferenceType source)

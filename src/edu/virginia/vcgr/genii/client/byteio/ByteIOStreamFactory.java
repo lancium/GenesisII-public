@@ -37,7 +37,7 @@ public class ByteIOStreamFactory
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 */
 	static public InputStream createInputStream(EndpointReferenceType target, 
 		URI desiredTransferType, boolean createBuffered)
@@ -77,7 +77,7 @@ public class ByteIOStreamFactory
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 */
 	static public InputStream createInputStream(EndpointReferenceType target,
 		boolean createBuffered) throws FileNotFoundException, RemoteException,
@@ -97,7 +97,7 @@ public class ByteIOStreamFactory
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 */
 	static public InputStream createInputStream(EndpointReferenceType target)
 		throws FileNotFoundException, RemoteException, IOException
@@ -130,7 +130,7 @@ public class ByteIOStreamFactory
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws RNSException
 	 */
 	static public InputStream createInputStream(RNSPath target,
@@ -151,7 +151,7 @@ public class ByteIOStreamFactory
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws RNSException
 	 */
 	static public InputStream createInputStream(RNSPath target)
@@ -175,7 +175,7 @@ public class ByteIOStreamFactory
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 */
 	static public OutputStream createOutputStream(EndpointReferenceType target, 
 		URI desiredTransferType, boolean createBuffered)
@@ -215,7 +215,7 @@ public class ByteIOStreamFactory
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 */
 	static public OutputStream createOutputStream(EndpointReferenceType target,
 		boolean createBuffered) throws FileNotFoundException, RemoteException,
@@ -235,7 +235,7 @@ public class ByteIOStreamFactory
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 */
 	static public OutputStream createOutputStream(EndpointReferenceType target)
 		throws FileNotFoundException, RemoteException, IOException
@@ -257,7 +257,7 @@ public class ByteIOStreamFactory
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws RNSException
 	 */
 	static public OutputStream createOutputStream(RNSPath target, 
@@ -284,7 +284,7 @@ public class ByteIOStreamFactory
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws RNSException
 	 */
 	static public OutputStream createOutputStream(RNSPath target,
@@ -304,7 +304,7 @@ public class ByteIOStreamFactory
 	 * 
 	 * @throws FileNotFoundException
 	 * @throws RemoteException
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws RNSException
 	 */
 	static public OutputStream createOutputStream(RNSPath target)

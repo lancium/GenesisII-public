@@ -1270,7 +1270,8 @@ return true;</string>
                           <void property="loopExpression">
                             <object class="com.install4j.api.beans.ScriptProperty">
                               <void property="value">
-                                <string>File ownerCer = new File(String.format("deployments/%s/security/owner.cer",
+                                <string>File ownerCer = new File(String.format("%s/deployments/%s/security/owner.cer",
+    context.getVariable("sys.installationDir"),
     context.getCompilerVariable("genii.deployment")));
 return !ownerCer.exists();</string>
                               </void>
@@ -1333,7 +1334,7 @@ return !ownerCer.exists();</string>
                             </serializedBean>
                             <condition />
                           </action>
-                          <action name="Create owner.info file" id="1037" beanClass="com.install4j.runtime.beans.actions.text.AppendToFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="">
+                          <action name="Create owner.info file" id="1037" beanClass="com.install4j.runtime.beans.actions.text.AppendToFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="Unable to create owner.info file.">
                             <serializedBean>
                               <java class="java.beans.XMLDecoder">
                                 <object class="com.install4j.runtime.beans.actions.text.AppendToFileAction">
@@ -1908,7 +1909,7 @@ return memory;</string>
                           <void property="conditionExpression">
                             <object class="com.install4j.api.beans.ScriptProperty">
                               <void property="value">
-                                <string>context.getBooleanVariable("genii.startService") &amp;&amp; context.getBooleanVariable("genii.installAsService")</string>
+                                <string>context.getBooleanVariable("genii.startService")</string>
                               </void>
                             </object>
                           </void>

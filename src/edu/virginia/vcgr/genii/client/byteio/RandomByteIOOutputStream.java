@@ -50,7 +50,7 @@ public class RandomByteIOOutputStream extends OutputStream
 	 * @param desiredTransferProtocol The desired transfer protocol to use when
 	 * writing bytes.
 	 * 
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws RemoteException
 	 */
 	public RandomByteIOOutputStream(EndpointReferenceType target, 
@@ -70,7 +70,7 @@ public class RandomByteIOOutputStream extends OutputStream
 	 * 
 	 * @param target The target ByteIO to write bytes to.
 	 * 
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws RemoteException
 	 */
 	public RandomByteIOOutputStream(EndpointReferenceType target)

@@ -687,7 +687,7 @@ public class RPInvoker implements InvocationHandler
 	 * @param target The target resource to get/set RPs for.
 	 * 
 	 * @throws GenesisIISecurityException
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws ResourceException
 	 */
 	public RPInvoker(Collection<QName> likelyRPs, EndpointReferenceType target)

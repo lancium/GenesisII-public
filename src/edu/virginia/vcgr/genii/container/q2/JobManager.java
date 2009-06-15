@@ -402,7 +402,7 @@ public class JobManager implements Closeable
 	 * @return The job ticket assigned to this job.
 	 * 
 	 * @throws SQLException
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws ResourceException
 	 */
 	synchronized public String submitJob(Connection connection,
@@ -1022,7 +1022,7 @@ public class JobManager implements Closeable
 	 * 
 	 * @throws SQLException
 	 * @throws ResourceException
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws GenesisIISecurityException
 	 */
 	synchronized public void checkJobStatuses(Connection connection)

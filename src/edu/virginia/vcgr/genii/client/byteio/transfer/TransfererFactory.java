@@ -61,7 +61,7 @@ abstract class TransfererFactory
 	 * and don't have any thing in common with each other (code-wise) so
 	 * a parameterized type here wouldn't help.
 	 * 
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws RemoteException
 	 */
 	protected TransfererFactory(Object clientStub)
@@ -95,7 +95,7 @@ abstract class TransfererFactory
 	 * Given a target ByteIO, ask for it's attributes and figure out
 	 * which transfer protocols it supports.
 	 * 
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws RemoteException
 	 */
 	private void fillInPreferences()
@@ -183,7 +183,7 @@ abstract class TransfererFactory
 	 * 
 	 * @return A newly create transferer.
 	 * 
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 */
 	protected Object createTransferer(String requestedTransferType)
 		throws IOException
@@ -213,7 +213,7 @@ abstract class TransfererFactory
 	 * 
 	 * @return The newly created transferer.
 	 * 
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 */
 	protected Object createTransferer()
 		throws IOException

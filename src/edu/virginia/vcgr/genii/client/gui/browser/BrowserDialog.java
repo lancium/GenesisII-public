@@ -87,7 +87,7 @@ public class BrowserDialog extends JFrame
 	 * to use for this browser.
 	 * 
 	 * @throws RNSException
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 */
 	public BrowserDialog(PluginManager pluginManager)
 		throws RNSException

@@ -24,7 +24,7 @@ public class StreamableByteIOTransfererFactory extends TransfererFactory
 	 * 
 	 * @param clientStub The remote client stub to use for outcoing calls.
 	 * 
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws RemoteException
 	 */
 	public StreamableByteIOTransfererFactory(
@@ -73,7 +73,7 @@ public class StreamableByteIOTransfererFactory extends TransfererFactory
 	 * 
 	 * @return A newly created streamable byteio transferer.
 	 * 
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 */
 	
 	public StreamableByteIOTransferer createStreamableByteIOTransferer(
@@ -91,7 +91,7 @@ public class StreamableByteIOTransfererFactory extends TransfererFactory
 	 * 
 	 * @return A newly created streamable byteio transferer.
 	 * 
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 */
 	public StreamableByteIOTransferer createStreamableByteIOTransferer()
 		throws IOException
@@ -108,7 +108,7 @@ public class StreamableByteIOTransfererFactory extends TransfererFactory
 	 * 
 	 * @return A newly create streamable byteio transferer.
 	 * 
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws RemoteException
 	 */
 	
@@ -131,7 +131,7 @@ public class StreamableByteIOTransfererFactory extends TransfererFactory
 	 * 
 	 * @return A newly create transferer.
 	 * 
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws RemoteException
 	 */
 	static public StreamableByteIOTransferer createStreamableByteIOTransferer(

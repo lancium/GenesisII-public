@@ -178,7 +178,7 @@ public class NotificationServer
 	 * @param listener A notification listener to call when a notification comes in.
 	 * @return A subscription instance which can be used later to cancel the subscription.
 	 * 
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws IOException
 	 */
 	public ISubscription addNotificationListener(EndpointReferenceType target,
@@ -214,7 +214,7 @@ public class NotificationServer
 	 * @return A subscription instance which can be used later to cancel the subscription.
 	 * 
 	 * @throws RNSPathDoesNotExistException
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws IOException
 	 */
 	public ISubscription addNotificationListener(RNSPath target,

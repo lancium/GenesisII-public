@@ -162,7 +162,7 @@ public class BESManager implements Closeable
 	 * 
 	 * @throws SQLException
 	 * @throws ResourceException
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws GenesisIISecurityException
 	 */
 	synchronized private void loadFromDatabase(Connection connection)
@@ -197,7 +197,7 @@ public class BESManager implements Closeable
 	 * 
 	 * @throws SQLException
 	 * @throws ResourceException
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws GenesisIISecurityException
 	 */
 	synchronized public void addNewBES(Connection connection, String name,
@@ -433,7 +433,7 @@ public class BESManager implements Closeable
 	 * 
 	 * @throws SQLException
 	 * @throws ResourceException
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws GenesisIISecurityException
 	 */
 	synchronized private void updateResources(Connection connection,
@@ -520,7 +520,7 @@ public class BESManager implements Closeable
 	 * 
 	 * @throws SQLException
 	 * @throws ResourceException
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws GenesisIISecurityException
 	 */
 	synchronized public void updateResources(Connection connection)

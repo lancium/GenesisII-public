@@ -25,7 +25,7 @@ public class RandomByteIOTransfererFactory extends TransfererFactory
 	 * @param clientStub The RandomByteIO client stub to use for outcalls
 	 * from created transferers.
 	 * 
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws RemoteException
 	 */
 	public RandomByteIOTransfererFactory(RandomByteIOPortType clientStub)
@@ -72,7 +72,7 @@ public class RandomByteIOTransfererFactory extends TransfererFactory
 	 * 
 	 * @return A newly created random byteio transferer.
 	 * 
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 */
 	public RandomByteIOTransferer createRandomByteIOTransferer(
 		URI desiredTransferType) throws IOException
@@ -89,7 +89,7 @@ public class RandomByteIOTransfererFactory extends TransfererFactory
 	 * 
 	 * @return A newly created random byteio transferer.
 	 * 
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 */
 	public RandomByteIOTransferer createRandomByteIOTransferer()
 		throws IOException
@@ -106,7 +106,7 @@ public class RandomByteIOTransfererFactory extends TransfererFactory
 	 * 
 	 * @return A newly create random byteio transferer.
 	 * 
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws RemoteException
 	 */
 	static public RandomByteIOTransferer createRandomByteIOTransferer(
@@ -128,7 +128,7 @@ public class RandomByteIOTransfererFactory extends TransfererFactory
 	 * 
 	 * @return A newly create transferer.
 	 * 
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws RemoteException
 	 */
 	static public RandomByteIOTransferer createRandomByteIOTransferer(

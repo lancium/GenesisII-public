@@ -86,7 +86,6 @@ public class ContextFileSystem
 						"credentials to session state from files \"" + 
 						filename + "\", \"" + transientFilename + "\"");
 					pair.context = loadContext(filename);
-					loadTransient(transientFilename, pair.context);
 				}
 				finally
 				{
@@ -216,6 +215,7 @@ public class ContextFileSystem
 			raf = new RandomAccessFile(filename, "rw");
 			lock = raf.getChannel().lock();
 			raf.setLength(0);
+			raf.seek(0);
 			OutputStream out = new RAFOutputStream(raf);
 			Writer writer = new OutputStreamWriter(out);
 			ContextStreamUtils.store(writer, context);

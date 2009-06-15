@@ -260,7 +260,7 @@ public class ExportTool extends BaseGridTool
 	 * @param optTargetName
 	 * @param createProperties
 	 * @return
-	 * @throws ConfigurationExceptionMOOCH
+	 * @throws ConfigurationException
 	 * @throws ResourceException
 	 * @throws ResourceCreationFaultType
 	 * @throws RemoteException
