@@ -42,6 +42,7 @@ public class ContainerBootstrap implements SecureRunnable
 	@Override
 	public boolean run(Properties runProperties) throws Throwable
 	{
+		OwnerInfo info = new OwnerInfo();
 		BootstrapProperties bProperties = new BootstrapProperties();
 		ContainerConfiguration cc = new ContainerConfiguration(
 			ConfigurationManager.getCurrentConfiguration());
@@ -60,7 +61,7 @@ public class ContainerBootstrap implements SecureRunnable
 			{
 				ContextManager.setResolver(new MemoryBasedContextResolver(
 					callingContext));
-				login(bProperties);
+				login(bProperties, info);
 				
 				AttachHostTool tool = new AttachHostTool();
 				tool.addArgument(String.format(
@@ -70,6 +71,7 @@ public class ContainerBootstrap implements SecureRunnable
 					bProperties.getAttachPath(), hostname));
 				if (tool.run(out, err, in) != 0)
 					throw new ToolException("Unable to attach host to net.");
+				info.deleteFile();
 			}
 			finally
 			{
@@ -120,7 +122,8 @@ public class ContainerBootstrap implements SecureRunnable
 	}
 	
 	private void login(
-		BootstrapProperties cProperties) throws Throwable
+		BootstrapProperties cProperties, OwnerInfo ownerInfo)
+			throws Throwable
 	{
 		String certStore = cProperties.getInstallerCertStorePath();
 		if (certStore == null)
@@ -171,6 +174,15 @@ public class ContainerBootstrap implements SecureRunnable
 			tool.setPassword(cProperties.getCertGeneratorPassword());
 			if (tool.run(out, err, in) != 0)
 				throw new ToolException("Unable to log in as container.");
+			
+			tool = new GamlLoginTool();
+			tool.setNo_gui();
+			tool.addArgument(String.format(
+				"rns:%s", ownerInfo.getUserPath()));
+			tool.setUsername(ownerInfo.getUserName());
+			tool.setPassword(ownerInfo.getUserPassword());
+			if (tool.run(out, err, in) != 0)
+				throw new ToolException("Unable to log in as owner.");
 		}
 		finally
 		{

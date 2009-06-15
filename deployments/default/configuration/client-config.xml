@@ -250,6 +250,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ManageWindowsContainerServiceTool</mconf:class>
 		<mconf:class name="patch-ip"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.PatchIPTool</mconf:class>
+		<mconf:class name="download-certificate"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.DownloadCertificateTool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

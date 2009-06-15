@@ -25,6 +25,7 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.genii.client.cmd.GetHostName;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.CertGeneratorTool;
+import edu.virginia.vcgr.genii.client.cmd.tools.DownloadCertificateTool;
 import edu.virginia.vcgr.genii.client.cmd.tools.GamlLoginTool;
 import edu.virginia.vcgr.genii.client.cmd.tools.LogoutTool;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
@@ -65,7 +66,10 @@ public class ContainerBootstrap implements SecureRunnable
 			
 			String hostname = getHostName(false, true);
 			
+			/*
 			ICallingContext callingContext = ContextManager.getCurrentContext(false);
+			*/
+			ICallingContext callingContext = null;
 			if (callingContext == null)
 				callingContext = connect(connectURL);
 			
@@ -76,6 +80,7 @@ public class ContainerBootstrap implements SecureRunnable
 				loginAsInstaller(bProperties);
 				generateContainerCertificate(bProperties, hostname);
 				generateContainerPublicCertificate(bProperties);
+				generateOwnerFile(new OwnerInfo());
 			}
 			finally
 			{
@@ -123,6 +128,18 @@ public class ContainerBootstrap implements SecureRunnable
 		throws ResourceException, MalformedURLException, IOException
 	{
 		return ContextStreamUtils.load(new URL(connectURL));
+	}
+	
+	private void generateOwnerFile(OwnerInfo info) 
+		throws Throwable
+	{
+		DownloadCertificateTool dTool = new DownloadCertificateTool();
+		dTool.addArgument(info.getUserPath());
+		dTool.addArgument(
+			Installation.getDeployment(
+				new DeploymentName()).security().getSecurityFile(
+					"owner.cer").getAbsolutePath());
+		dTool.run(out, err, in);
 	}
 	
 	private void loginAsInstaller(

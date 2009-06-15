@@ -63,7 +63,7 @@
       <fileEntry mountPoint="356" file="../../scripts/current-version.txt" overwrite="4" shared="false" mode="644" uninstallMode="0" />
       <fileEntry mountPoint="504" file="../../secrun.scratch/ContainerPostBootSecRun.jar" overwrite="4" shared="false" mode="644" uninstallMode="0" />
       <fileEntry mountPoint="504" file="../../secrun.scratch/ContainerPreBootSecRun.jar" overwrite="4" shared="false" mode="644" uninstallMode="0" />
-      <dirEntry mountPoint="34" file="../.." overwrite="4" shared="false" mode="644" uninstallMode="0" excludeSuffixes=".svn" dirMode="755">
+      <dirEntry mountPoint="34" file="../.." overwrite="4" shared="false" mode="644" uninstallMode="0" excludeSuffixes=".svn, derby.log, context.xml" dirMode="755">
         <exclude>
           <entry location="build.secrun.properties" fileType="regular" />
           <entry location="change-port.sh" fileType="regular" />
@@ -1113,9 +1113,10 @@ port for you.</string>
                           <java class="java.beans.XMLDecoder">
                             <object class="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent">
                               <void property="labelText">
-                                <string>By default the XCG container listens for incoming messages on TCP port
-${compiler:genii.xcg-port}.  You can either keep this default value or change
-the port number to suit your environment.</string>
+                                <string>By default the XCG container listens for incoming messages on
+TCP port ${compiler:genii.xcg-port}.  You can either keep this
+default value or change the port number to suit your 
+environment.</string>
                               </void>
                             </object>
                           </java>
@@ -1161,6 +1162,120 @@ return true;</string>
                               </void>
                               <void property="variableName">
                                 <string>genii.xcg-port</string>
+                              </void>
+                            </object>
+                          </java>
+                        </serializedBean>
+                        <initScript />
+                        <visibiltyScript />
+                      </formComponent>
+                    </formComponents>
+                  </screen>
+                  <screen name="Owner Screen" id="894" beanClass="com.install4j.runtime.beans.screens.FormScreen" enabled="true" commentSet="false" comment="" rollbackBarrier="false" backButton="2" finishScreen="false">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.screens.FormScreen">
+                          <void property="subTitle">
+                            <string>Owner Information</string>
+                          </void>
+                          <void property="title">
+                            <string>Owner Information</string>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                    <validation />
+                    <preActivation />
+                    <postActivation />
+                    <actions>
+                      <action name="" id="900" beanClass="com.install4j.runtime.beans.actions.text.AppendToFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                        <serializedBean>
+                          <java class="java.beans.XMLDecoder">
+                            <object class="com.install4j.runtime.beans.actions.text.AppendToFileAction">
+                              <void property="file">
+                                <object class="java.io.File">
+                                  <string>deployments/GeniiNetFullContainer/security/owner.info</string>
+                                </object>
+                              </void>
+                              <void property="text">
+                                <string>${installer:genii.user-path}
+${installer:genii.user-name}
+${installer:genii.user-password}</string>
+                              </void>
+                            </object>
+                          </java>
+                        </serializedBean>
+                        <condition />
+                      </action>
+                    </actions>
+                    <formComponents>
+                      <formComponent name="" id="895" beanClass="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                        <serializedBean>
+                          <java class="java.beans.XMLDecoder">
+                            <object class="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent">
+                              <void property="labelText">
+                                <string>In order to start the container, a user must be identified to 
+manage that container.  Please provide the RNS path to your
+user object as well as the login name and password for that
+account.</string>
+                              </void>
+                            </object>
+                          </java>
+                        </serializedBean>
+                        <initScript />
+                        <visibiltyScript />
+                      </formComponent>
+                      <formComponent name="" id="896" beanClass="com.install4j.runtime.beans.formcomponents.SpacerComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                        <serializedBean>
+                          <java class="java.beans.XMLDecoder">
+                            <object class="com.install4j.runtime.beans.formcomponents.SpacerComponent" />
+                          </java>
+                        </serializedBean>
+                        <initScript />
+                        <visibiltyScript />
+                      </formComponent>
+                      <formComponent name="User RNS Path" id="897" beanClass="com.install4j.runtime.beans.formcomponents.TextfieldComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                        <serializedBean>
+                          <java class="java.beans.XMLDecoder">
+                            <object class="com.install4j.runtime.beans.formcomponents.TextfieldComponent">
+                              <void property="labelText">
+                                <string>User RNS Path</string>
+                              </void>
+                              <void property="variableName">
+                                <string>genii.user-path</string>
+                              </void>
+                            </object>
+                          </java>
+                        </serializedBean>
+                        <initScript />
+                        <visibiltyScript />
+                      </formComponent>
+                      <formComponent name="Login Username" id="898" beanClass="com.install4j.runtime.beans.formcomponents.TextfieldComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                        <serializedBean>
+                          <java class="java.beans.XMLDecoder">
+                            <object class="com.install4j.runtime.beans.formcomponents.TextfieldComponent">
+                              <void property="labelText">
+                                <string>Login Username</string>
+                              </void>
+                              <void property="variableName">
+                                <string>genii.user-name</string>
+                              </void>
+                            </object>
+                          </java>
+                        </serializedBean>
+                        <initScript />
+                        <visibiltyScript />
+                      </formComponent>
+                      <formComponent name="" id="899" beanClass="com.install4j.runtime.beans.formcomponents.PasswordComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                        <serializedBean>
+                          <java class="java.beans.XMLDecoder">
+                            <object class="com.install4j.runtime.beans.formcomponents.PasswordComponent">
+                              <void property="labelText">
+                                <string>Login Password</string>
+                              </void>
+                              <void property="variableName">
+                                <string>genii.user-password</string>
                               </void>
                             </object>
                           </java>
@@ -2348,7 +2463,7 @@ return memory;</string>
     </applications>
   </installerGui>
   <mediaSets>
-    <unixInstaller name="Unix Installer" id="50" mediaFileName="" installDir="GenesisII" overridePrincipalLanguage="false" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
+    <unixInstaller name="Unix Installer" id="50" mediaFileName="" installDir="GenesisII" overridePrincipalLanguage="false" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="linux-x86-1.6.0_14" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
       <excludedLaunchers />
       <excludedComponents />
       <excludedBeans />
@@ -2363,7 +2478,7 @@ return memory;</string>
         <scriptLines />
       </installerScript>
     </unixInstaller>
-    <win32 name="Windows" id="80" mediaFileName="" installDir="GenesisII" overridePrincipalLanguage="false" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" runAsAdmin="true">
+    <win32 name="Windows" id="80" mediaFileName="" installDir="GenesisII" overridePrincipalLanguage="false" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="windows-x86-1.6.0_14_us_only" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" runAsAdmin="true">
       <excludedLaunchers />
       <excludedComponents />
       <excludedBeans />
@@ -2387,7 +2502,7 @@ return memory;</string>
       </exclude>
       <variables />
     </macosFolder>
-    <unixInstaller name="Bootstrap Installer" id="649" mediaFileName="Bootstrap-2.0" installDir="GenesisII" overridePrincipalLanguage="false" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
+    <unixInstaller name="Bootstrap Installer" id="649" mediaFileName="Bootstrap-2.0" installDir="GenesisII" overridePrincipalLanguage="false" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" includedJRE="linux-x86-1.6.0_14" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">
       <excludedLaunchers />
       <excludedComponents />
       <excludedBeans />
