@@ -1351,7 +1351,8 @@ ${installer:genii.user-password}</string>
                                 </object>
                               </java>
                             </serializedBean>
-                            <condition>File ownerCer = new File(String.format("deployments/%s/security/owner.cer",
+                            <condition>File ownerCer = new File(String.format("%s/deployments/%s/security/owner.cer",
+    context.getVariable("sys.installationDir"),
     context.getCompilerVariable("genii.deployment")));
 return ownerCer.exists();</condition>
                           </action>
