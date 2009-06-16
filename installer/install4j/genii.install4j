@@ -1910,7 +1910,14 @@ return memory;</string>
                           <void property="conditionExpression">
                             <object class="com.install4j.api.beans.ScriptProperty">
                               <void property="value">
-                                <string>context.getBooleanVariable("genii.startService")</string>
+                                <string>boolean isWindows = context.getCompilerVariable("genii.isWindows").equals("true");
+boolean startService = context.getBooleanVariable("genii.startService");
+boolean installService = context.getBooleanVariable("genii.installAsService");
+
+if (isWindows)
+    return startService &amp;&amp; installService;
+else
+return startService;</string>
                               </void>
                             </object>
                           </void>
@@ -2205,7 +2212,7 @@ return memory;</string>
                       <void property="conditionExpression">
                         <object class="com.install4j.api.beans.ScriptProperty">
                           <void property="value">
-                            <string>context.getBooleanVariable("genii.isWindows")</string>
+                            <string>context.getCompilerVariable("genii.isWindows").equals("true")</string>
                           </void>
                         </object>
                       </void>
@@ -2281,7 +2288,7 @@ return memory;</string>
                       <void property="conditionExpression">
                         <object class="com.install4j.api.beans.ScriptProperty">
                           <void property="value">
-                            <string>!context.getBooleanVariable("genii.isWindows")</string>
+                            <string>!(context.getCompilerVariable("genii.isWindows").equals("true"))</string>
                           </void>
                         </object>
                       </void>
@@ -2342,7 +2349,7 @@ return memory;</string>
                       <void property="conditionExpression">
                         <object class="com.install4j.api.beans.ScriptProperty">
                           <void property="value">
-                            <string>context.getBooleanVariable("genii.isWindows") &amp;&amp; context.getBooleanVariable("genii.installAsService")</string>
+                            <string>context.getCompilerVariable("genii.isWindows").equals("true") &amp;&amp; context.getBooleanVariable("genii.installAsService")</string>
                           </void>
                         </object>
                       </void>
