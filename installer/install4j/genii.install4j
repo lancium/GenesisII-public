@@ -325,20 +325,20 @@
       <component name="Genesis II Core" id="28" displayDescription="true" selected="true" mandatory="true" downloadable="true">
         <description>The core set of libraries and files necessary to run Genesis II clients and servers.</description>
         <include all="false">
-          <entry location="updates" fileType="regular" />
           <entry location="RELEASE" fileType="regular" />
           <entry location="webapps" fileType="regular" />
           <entry location="ApplicationWatcher/genii-base-application.properties" fileType="regular" />
           <entry location="ApplicationWatcher/genii-client-application.properties" fileType="regular" />
           <entry location="ApplicationWatcher/genii-update-application.properties" fileType="regular" />
           <entry location="ApplicationWatcher/app-manager.jar" fileType="regular" />
+          <entry location="updates" fileType="regular" />
           <entry location="License.txt" fileType="regular" />
-          <entry location="ext" fileType="regular" />
-          <entry location="lib" fileType="regular" />
-          <entry location="jar-desc.xml" fileType="regular" />
           <entry location="deployments/GeniiNetFullContainer/security" fileType="regular" />
           <entry location="deployments/GeniiNetFullContainer/services" fileType="regular" />
           <entry location="deployments/GeniiNetFullContainer/configuration" fileType="regular" />
+          <entry location="ext" fileType="regular" />
+          <entry location="lib" fileType="regular" />
+          <entry location="jar-desc.xml" fileType="regular" />
           <entry location="grid" fileType="launcher" />
           <entry location="grid-update" fileType="launcher" />
           <entry location=".i4j_external_20/jni-lib/CToGenesisCalls.dll" fileType="regular" />
@@ -350,8 +350,8 @@
           <entry location=".i4j_external_20/jni-lib/nulmrxnp.dll" fileType="regular" />
           <entry location=".i4j_external_20/jni-lib/VcgrClientLib.dll" fileType="regular" />
           <entry location=".i4j_external_20/jni-lib/VcgrContainerLib.dll" fileType="regular" />
-          <entry location=".i4j_fileset_21" fileType="regular" />
-          <entry location=".i4j_fileset_23" fileType="regular" />
+          <entry location=".i4j_external_22/jni-lib" fileType="regular" />
+          <entry location=".i4j_external_24/jni-lib" fileType="regular" />
           <entry location=".i4j_fileset_25" fileType="regular" />
         </include>
         <dependencies />
@@ -424,7 +424,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.appwatcher.update-frquency=604800000&quot; &quot;-Dlog4j.configuration=production.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ApplicationWatcher/genii-client-application.properties&quot;" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.appwatcher.update-frequency=604800000&quot; &quot;-Dlog4j.configuration=production.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ApplicationWatcher/genii-client-application.properties&quot;" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
         <classPath>
           <directory location="lib" failOnError="false" />
           <archive location="ApplicationWatcher/app-manager.jar" failOnError="false" />
@@ -1583,6 +1583,26 @@ return memory;</string>
                           </void>
                           <void property="searchValue">
                             <string>\</string>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                  <action name="Re-patch wrapper.conf" id="1149" beanClass="com.install4j.runtime.beans.actions.text.ModifyTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.text.ModifyTextFileAction">
+                          <void property="file">
+                            <object class="java.io.File">
+                              <string>JavaServiceWrapper/wrapper/conf/wrapper.conf</string>
+                            </object>
+                          </void>
+                          <void property="replaceValue">
+                            <string>.\</string>
+                          </void>
+                          <void property="searchValue">
+                            <string>MOOCH</string>
                           </void>
                         </object>
                       </java>
