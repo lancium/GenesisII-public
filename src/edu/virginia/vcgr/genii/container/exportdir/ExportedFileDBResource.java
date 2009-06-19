@@ -19,6 +19,7 @@ import edu.virginia.vcgr.genii.client.exportdir.ExportedFileUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
+import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.byteio.RByteIOResource;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
@@ -132,8 +133,8 @@ public class ExportedFileDBResource extends RByteIOResource
 		}
 		finally
 		{
-			close(rs);
-			close(stmt);
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
 		}
 	}
 	
@@ -251,7 +252,7 @@ public class ExportedFileDBResource extends RByteIOResource
 		}
 		finally
 		{
-			close(stmt);
+			StreamUtils.close(stmt);
 		}
 		
 		//if replicated, notify resolver
@@ -327,7 +328,7 @@ public class ExportedFileDBResource extends RByteIOResource
 		}
 		finally
 		{
-			close(stmt);
+			StreamUtils.close(stmt);
 		}
 	}
 	
@@ -360,8 +361,8 @@ public class ExportedFileDBResource extends RByteIOResource
 		}
 		finally
 		{
-			close(rs);
-			close(stmt);
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
 		}
 	}
 	

@@ -206,7 +206,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		String newStsName =
 				(String) constructionParameters
 						.get(SecurityConstants.NEW_JNDI_STS_NAME_QNAME);
-		Collection<String> entries = myResource.listEntries();
+		Collection<String> entries = myResource.listEntries(null);
 		if (entries.contains(newStsName))
 		{
 			throw FaultManipulator.fillInFault(new RNSEntryExistsFaultType(

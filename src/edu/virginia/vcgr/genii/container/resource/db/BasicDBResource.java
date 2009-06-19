@@ -130,7 +130,7 @@ public class BasicDBResource implements IResource
 		}
 		finally
 		{
-			close(stmt);
+			StreamUtils.close(stmt);
 		}
 	}
 	
@@ -164,8 +164,8 @@ public class BasicDBResource implements IResource
 		}
 		finally
 		{
-			close(rs);
-			close(stmt);
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
 		}
 	}
 
@@ -181,6 +181,7 @@ public class BasicDBResource implements IResource
 			stmt.setString(2, propertyName);
 			stmt.executeUpdate();
 			stmt.close();
+			stmt = null;
 			stmt = _connection.prepareStatement(_INSERT_PROPERTY_STMT);
 			stmt.setString(1, _resourceKey);
 			stmt.setString(2, propertyName);
@@ -216,7 +217,7 @@ public class BasicDBResource implements IResource
 		}
 		finally
 		{
-			close(stmt);
+			StreamUtils.close(stmt);
 		}
 	}
 	
@@ -225,47 +226,30 @@ public class BasicDBResource implements IResource
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		
-		for (int lcv = 0; lcv < 5; lcv++)
+		try
 		{
-			try
-			{
-				stmt = _connection.prepareStatement(_GET_PROPERTY_STMT);
-				stmt.setString(1, _resourceKey);
-				stmt.setString(2, propertyName);
-				rs = stmt.executeQuery();
-				if (!rs.next()) {
-					return null;
-				}
-				
-				Blob blob = rs.getBlob(1);
-				if (blob == null)
-					return null;
-				
-				return DBSerializer.fromBlob(rs.getBlob(1));
-			}
-			catch (SQLException sqe)
-			{
-				throw new ResourceException(sqe.getLocalizedMessage(), sqe);
-			}
-			catch (NullPointerException npe)
-			{
-				if (lcv < 4)
-				{
-					// Make another attempt
-					System.err.println("Making another attempt to read property.");
-				} else
-				{
-					throw npe;
-				}
-			}
-			finally
-			{
-				close(rs);
-				close(stmt);
-			}
+			stmt = _connection.prepareStatement(_GET_PROPERTY_STMT);
+			stmt.setString(1, _resourceKey);
+			stmt.setString(2, propertyName);
+			rs = stmt.executeQuery();
+			if (!rs.next())
+				return null;
+			
+			Blob blob = rs.getBlob(1);
+			if (blob == null)
+				return null;
+			
+			return DBSerializer.fromBlob(blob);
 		}
-		
-		throw new ResourceException("Unexpected code hit.");
+		catch (SQLException sqe)
+		{
+			throw new ResourceException("Unable to get property.", sqe);
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
 	}
 
 	public void destroy() throws ResourceException
@@ -295,7 +279,7 @@ public class BasicDBResource implements IResource
 		}
 		finally
 		{
-			close(stmt);
+			StreamUtils.close(stmt);
 		}
 	}
 
@@ -350,18 +334,6 @@ public class BasicDBResource implements IResource
 		return _parentKey;
 	}
 	
-	static protected void close(ResultSet rs)
-	{
-		if (rs != null)
-			try { rs.close(); } catch (Throwable t) {}
-	}
-	
-	static protected void close(PreparedStatement stmt)
-	{
-		if (stmt != null)
-			try { stmt.close(); } catch (Throwable t) {}
-	}
-	
 	static protected void destroyAll(Connection connection, Collection<String> keys)
 		throws ResourceException
 	{
@@ -388,8 +360,8 @@ public class BasicDBResource implements IResource
 		}
 		finally
 		{
-			close(destroyKeyStmt);
-			close(destroyPropertiesStmt);
+			StreamUtils.close(destroyKeyStmt);
+			StreamUtils.close(destroyPropertiesStmt);
 		}
 	}
 
@@ -474,7 +446,7 @@ public class BasicDBResource implements IResource
 		}
 		finally
 		{
-			close(stmt);
+			StreamUtils.close(stmt);
 		}
 	}
 
@@ -508,7 +480,7 @@ public class BasicDBResource implements IResource
 		}
 		finally
 		{
-			close(stmt);
+			StreamUtils.close(stmt);
 		}
 	}
 }

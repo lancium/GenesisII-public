@@ -8,6 +8,7 @@ import java.util.Collection;
 
 import org.ggf.rns.RNSEntryExistsFaultType;
 import org.morgan.util.GUID;
+import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -24,6 +25,8 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 		"INSERT INTO entries VALUES(?, ?, ?, ?, ?)";
 	static private final String _SELECT_ENTRIES_STMT =
 		"SELECT name FROM entries WHERE resourceid = ?";
+	static private final String _SELECT_SINGLETON_ENTRY_STMT =
+		"SELECT name FROM entries WHERE resourceid = ? AND name = ?";
 	static private final String _RETRIEVE_ONE_STMT =
 		"SELECT name, endpoint, id, attrs FROM entries WHERE resourceid = ? AND name = ?";
 	static private final String _RETRIEVE_ALL_STMT =
@@ -71,11 +74,11 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 		}
 		finally
 		{
-			close(stmt);
+			StreamUtils.close(stmt);
 		}
 	}
 
-	public Collection<String> listEntries() throws ResourceException
+	public Collection<String> listEntries(String name) throws ResourceException
 	{
 		ArrayList<String> ret = new ArrayList<String>();
 		
@@ -84,7 +87,13 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 		
 		try
 		{
-			stmt = _connection.prepareStatement(_SELECT_ENTRIES_STMT);
+			if (name == null)
+				stmt = _connection.prepareStatement(_SELECT_ENTRIES_STMT);
+			else
+			{
+				stmt = _connection.prepareStatement(_SELECT_SINGLETON_ENTRY_STMT);
+				stmt.setString(2, name);
+			}
 			stmt.setString(1, _resourceKey);
 			rs = stmt.executeQuery();
 			
@@ -101,8 +110,8 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 		}
 		finally
 		{
-			close(rs);
-			close(stmt);
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
 		}
 	}
 
@@ -129,7 +138,7 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 		}
 		finally
 		{
-			close(stmt);
+			StreamUtils.close(stmt);
 		}
 	}
 
@@ -170,8 +179,8 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 		}
 		finally
 		{
-			close(rs);
-			close(stmt);
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
 		}
 	}
 }

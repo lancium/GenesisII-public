@@ -166,7 +166,7 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 						.get(SecurityConstants.NEW_IDP_NAME_QNAME);
 		ResourceKey serviceKey = ResourceManager.getCurrentResource();
 		IRNSResource serviceResource = (IRNSResource) serviceKey.dereference();
-		Collection<String> entries = serviceResource.listEntries();
+		Collection<String> entries = serviceResource.listEntries(null);
 		if (entries.contains(newIdpName))
 		{
 			throw FaultManipulator.fillInFault(new RNSEntryExistsFaultType(

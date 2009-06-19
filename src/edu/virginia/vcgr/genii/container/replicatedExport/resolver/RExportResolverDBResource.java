@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
@@ -148,7 +149,7 @@ implements IRExportResolverResource
 			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
 		}
 		finally{
-			close(stmt);
+			StreamUtils.close(stmt);
 		}
 		
 		//assuming first resolver is the correct one
@@ -205,7 +206,7 @@ implements IRExportResolverResource
 					"Could not update resolver-resource mapping in table", sqe);
 		}
 		finally{
-			close(stmt);
+			StreamUtils.close(stmt);
 		}
 	}
 }

@@ -11,6 +11,7 @@ import java.util.HashMap;
 
 import javax.xml.namespace.QName;
 
+import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
@@ -99,7 +100,7 @@ public class DBSubscriptionResource
 		}
 		finally
 		{
-			close(stmt);
+			StreamUtils.close(stmt);
 		}
 	}
 	
@@ -121,7 +122,7 @@ public class DBSubscriptionResource
 		}
 		finally
 		{
-			close(stmt);
+			StreamUtils.close(stmt);
 		}
 	}
 	
@@ -192,8 +193,8 @@ public class DBSubscriptionResource
 		}
 		finally
 		{
-			close(result);
-			close(stmt);
+			StreamUtils.close(result);
+			StreamUtils.close(stmt);
 		}
 	}
 	
@@ -221,7 +222,7 @@ public class DBSubscriptionResource
 		}
 		finally
 		{
-			close(stmt);
+			StreamUtils.close(stmt);
 		}
 	}
 }

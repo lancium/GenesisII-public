@@ -15,11 +15,11 @@
       <variable name="genii.patch-url" value="http://vcgr.cs.virginia.edu/GenesisII/2.0/patches/ReleaseBranch-2.0" />
       <variable name="genii.connection-url" value="http://vcgr.cs.virginia.edu/XCG/2.0/root.xml" />
       <variable name="genii.deployment" value="GeniiNetFullContainer" />
-      <variable name="genii.build-number" value="2000" />
+      <variable name="genii.build-number" value="2001" />
       <variable name="genii.xcg-port" value="18443" />
       <variable name="genii.container-memory.fraction" value="0.25" />
       <variable name="genii.container-memory.upper-limit" value="2048" />
-      <variable name="genii.container-memory.lower-limit" value="512" />
+      <variable name="genii.container-memory.lower-limit" value="1024" />
       <variable name="genii.isWindows" value="false" />
       <variable name="genii.isLInux" value="false" />
       <variable name="genii.isMacOSX" value="false" />
@@ -402,6 +402,7 @@
         <include all="false">
           <entry location="ApplicationWatcher/genii-container-application.properties" fileType="regular" />
           <entry location="deployments/GeniiNetFullContainer/secure-runnable" fileType="regular" />
+          <entry location="export" fileType="launcher" />
           <entry location=".i4j_external_20/JavaServiceWrapper" fileType="regular" />
           <entry location=".i4j_external_22/JavaServiceWrapper" fileType="regular" />
           <entry location=".i4j_external_24/JavaServiceWrapper" fileType="regular" />
@@ -424,7 +425,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.appwatcher.update-frequency=604800000&quot; &quot;-Dlog4j.configuration=production.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ApplicationWatcher/genii-client-application.properties&quot;" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.appwatcher.update-frequency=604800000&quot; &quot;-Dlog4j.configuration=production.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ApplicationWatcher/genii-client-application.properties&quot; -Xmx512m" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
         <classPath>
           <directory location="lib" failOnError="false" />
           <archive location="ApplicationWatcher/app-manager.jar" failOnError="false" />
@@ -465,6 +466,31 @@
       </customScript>
     </launcher>
     <launcher name="XCGContainer" id="264" external="true" excludeFromMenu="true" menuName="" externalFile="JavaServiceWrapper/wrapper/bin/XCGContainer" />
+    <launcher name="Export" id="1229" external="false" excludeFromMenu="false" menuName="" icnsFile="" pngIcon16File="" pngIcon32File="" macServiceDependencies="" swtApp="false" fileset="">
+      <executable name="export" type="1" iconSet="false" iconFile="" executableDir="" redirectStderr="true" stderrFile="error.log" redirectStdout="false" stdoutFile="output.log" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false">
+        <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" />
+      </executable>
+      <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="" java6SplashScreen="false">
+        <text>
+          <statusLine x="20" y="20" text="" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
+          <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
+        </text>
+      </splashScreen>
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.appwatcher.update-frequency=604800000&quot; &quot;-Dlog4j.configuration=production.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ApplicationWatcher/genii-client-application.properties&quot; -Xmx512m" arguments="export" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+        <classPath>
+          <directory location="lib" failOnError="false" />
+          <archive location="ApplicationWatcher/app-manager.jar" failOnError="false" />
+        </classPath>
+        <nativeLibraryDirectories>
+          <directory name="jni-lib" />
+        </nativeLibraryDirectories>
+      </java>
+      <includedFiles />
+      <unextractableFiles />
+      <customScript mode="1" file="">
+        <scriptLines />
+      </customScript>
+    </launcher>
   </launchers>
   <installerGui installerType="1" suggestPreviousProgramGroup="false" addOnAppId="" suggestPreviousLocations="true">
     <customCode useInstalledFiles="true" />
@@ -899,13 +925,13 @@ return true;</string>
                 <preActivation />
                 <postActivation />
                 <actions>
-                  <action name="Create container.properties file" id="1015" beanClass="com.install4j.runtime.beans.actions.text.AppendToFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Create container.properties file" id="1015" beanClass="com.install4j.runtime.beans.actions.text.AppendToFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to create container.properties file">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.text.AppendToFileAction">
                           <void property="file">
                             <object class="java.io.File">
-                              <string>container.properties</string>
+                              <string>${installer:sys.installationDir}/container.properties</string>
                             </object>
                           </void>
                           <void property="text">
@@ -914,7 +940,8 @@ return true;</string>
                         </object>
                       </java>
                     </serializedBean>
-                    <condition>!(new File(context.getInstallationDirectory(), "container.properties")).exists()</condition>
+                    <condition>File propFile = new File(context.getInstallationDirectory(), "container.properties");
+return !propFile.exists();</condition>
                   </action>
                   <action name="" id="1016" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Unable to connect to XCG grid.">
                     <serializedBean>
@@ -949,7 +976,8 @@ return true;</string>
                         </object>
                       </java>
                     </serializedBean>
-                    <condition />
+                    <condition>File propFile = new File(context.getInstallationDirectory(), "container.properties");
+return propFile.exists();</condition>
                   </action>
                   <action name="" id="1017" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
@@ -2670,6 +2698,7 @@ return startService;</string>
       </exclude>
       <variables>
         <variable name="genii.isWindows" value="true" />
+        <variable name="genii.container-memory.upper-limit" value="1536" />
       </variables>
     </win32>
     <macosFolder name="Mac OS X Folder" id="240" mediaFileName="" installDir="GenesisII" overridePrincipalLanguage="false" requires64bit="false" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads">

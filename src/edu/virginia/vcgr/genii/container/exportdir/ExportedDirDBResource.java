@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.RNSEntryExistsFaultType;
 import org.morgan.util.GUID;
+import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
@@ -235,7 +236,7 @@ public class ExportedDirDBResource extends BasicDBResource implements
 				"Could not update modify time for exportDir resource entry", sqe);
 		}
 		finally{
-			close(stmt);
+			StreamUtils.close(stmt);
 		}
 	}
 	
@@ -325,14 +326,14 @@ public class ExportedDirDBResource extends BasicDBResource implements
 			stmt.setString(1, getId());
 			stmt.executeUpdate();
 			
-			close(stmt);
+			StreamUtils.close(stmt);
 			stmt = null;
 			
 			stmt = connection.prepareStatement(_DELETE_EXPORTED_DIR_ENTRIES_STMT);
 			stmt.setString(1, getId());
 			stmt.executeUpdate();
 			
-			close(stmt);
+			StreamUtils.close(stmt);
 			stmt = null;
 			
 			stmt = connection.prepareStatement(_DELETE_EXPORTED_DIR_STMT);
@@ -351,7 +352,7 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		}
 		finally
 		{
-			close(stmt);
+			StreamUtils.close(stmt);
 		}
 		
 		//if replicated, delete resolver mapping and notify resolver of termination
@@ -447,8 +448,8 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		}
 		finally
 		{
-			close(rs);
-			close(stmt);
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
 		}
 	}
 	
@@ -478,7 +479,7 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		}
 		finally
 		{
-			close(stmt);
+			StreamUtils.close(stmt);
 		}
 	}
 	
@@ -546,7 +547,7 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		}
 		finally
 		{
-			close(stmt);
+			StreamUtils.close(stmt);
 		}
 	}
 	
@@ -577,7 +578,7 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		}
 		finally
 		{
-			close(stmt);
+			StreamUtils.close(stmt);
 		}
 	}
 	
@@ -888,8 +889,8 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		}
 		finally
 		{
-			close(rs);
-			close(stmt);
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
 		}
 	}
 	
@@ -924,8 +925,8 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		}
 		finally
 		{
-			close(rs);
-			close(stmt);
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
 		}
 	}
 	
@@ -972,7 +973,7 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		}
 		finally
 		{
-			close(stmt);
+			StreamUtils.close(stmt);
 		}
 	}
 	
@@ -1079,8 +1080,8 @@ public class ExportedDirDBResource extends BasicDBResource implements
 		}
 		finally
 		{
-			close(rs);
-			close(stmt);
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
 		}
 	}
 	

@@ -9,8 +9,6 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.sql.Blob;
 import java.sql.SQLException;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 import javax.sql.rowset.serial.SerialBlob;
 import javax.xml.namespace.QName;
@@ -19,7 +17,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 import org.xml.sax.InputSource;
-
 
 public class DBSerializer
 {
@@ -125,31 +122,16 @@ public class DBSerializer
 		
 		try
 		{
-			try
-			{
-				oin = new ObjectInputStream(in = b.getBinaryStream());
-				return oin.readObject();
-			}
-			catch (Throwable cause)
-			{
-				_logger.warn(
-					"Error trying to deserialize a blob -- trying compressed version.",
-					cause);
-				
-				// try to decompress first
-				in.close();
-				oin = new ObjectInputStream(new GZIPInputStream(
-					in = b.getBinaryStream()));
-				return oin.readObject();
-			}
-		}
-		catch (IOException ioe)
+			oin = new ObjectInputStream(in = b.getBinaryStream());
+			return oin.readObject();
+		} 
+		catch (IOException e)
 		{
-			throw new SQLException("Unable to deserialize from blob.", ioe);
+			throw new SQLException("Unable to deserialize from blob.", e);
 		}
-		catch (ClassNotFoundException cnfe)
+		catch (ClassNotFoundException e)
 		{
-			throw new SQLException("Unable to deserialize from blob.", cnfe);
+			throw new SQLException("Unable to deserialize from blob.", e);
 		}
 		finally
 		{
@@ -181,11 +163,11 @@ public class DBSerializer
 		if ((maxLength > 0) && (data.length > maxLength))
 		{
 			_logger.debug(String.format(
-				"The blob was too large (%d), so compressing it.", 
+				"The blob was too large (%d), we no longer attempt to compress it.", 
 				data.length));
-			data = compress(data);
-			_logger.debug(String.format(
-				"Compressed size is %d.", data.length));
+			throw new IOException(String.format(
+				"The serialized blob is too large(%d > %d).",
+				data.length, maxLength));
 		}
 		
 		return data;
@@ -202,14 +184,6 @@ public class DBSerializer
 		try
 		{
 			ois = new ObjectInputStream(new ByteArrayInputStream(data));
-			return ois.readObject();
-		}
-		catch (Throwable cause)
-		{
-			// try to decompress it first
-			ois.close();
-			ois = new ObjectInputStream(new ByteArrayInputStream(
-				decompress(data)));
 			return ois.readObject();
 		}
 		finally
@@ -317,50 +291,6 @@ public class DBSerializer
 		finally
 		{
 			StreamUtils.close(in);
-		}
-	}
-	
-	static private byte[] compress(byte []data)
-	{
-		try
-		{
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			GZIPOutputStream out = new GZIPOutputStream(baos);
-			out.write(data);
-			out.close();
-			baos.close();
-			return baos.toByteArray();
-		}
-		catch (Throwable cause)
-		{
-			_logger.warn("Unable to compress stream.", cause);
-			return data;
-		}
-	}
-	
-	static private byte[] decompress(byte []data)
-	{
-		byte []ret = new byte[4096];
-		int read;
-		
-		try
-		{
-			ByteArrayInputStream bais = new ByteArrayInputStream(data);
-			GZIPInputStream in = new GZIPInputStream(bais);
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			while ( (read = in.read(ret)) > 0)
-			{
-				baos.write(ret, 0, read);
-			}
-			
-			in.close();
-			baos.close();
-			return baos.toByteArray();
-		}
-		catch (Throwable cause)
-		{
-			_logger.warn("Unable to decompress stream.", cause);
-			return data;
 		}
 	}
 }

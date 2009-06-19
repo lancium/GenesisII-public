@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.RNSEntryExistsFaultType;
 import org.morgan.util.GUID;
+import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
@@ -188,8 +189,8 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 		}
 		finally
 		{
-			close(rs);
-			close(stmt);
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
 		}
 	}
 	
@@ -234,7 +235,7 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 					"Could not add rexport resource entry", sqe);
 		}
 		finally{
-			close(stmt);
+			StreamUtils.close(stmt);
 		}
 	}
 	
@@ -254,7 +255,7 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 					"Could not update path for rexport resource entry", sqe);
 		}
 		finally{
-			close(stmt);
+			StreamUtils.close(stmt);
 		}
 	}
 	
@@ -352,7 +353,7 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 						"Could not add new rexport entry to table.", sqe);
 		}
 		finally{
-			close(stmt);
+			StreamUtils.close(stmt);
 		}
 	}
 	
@@ -385,7 +386,7 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 					"Problem with storing attrs in rexport table", sqe);
 		}
 		finally{
-			close(stmt);
+			StreamUtils.close(stmt);
 		}
 	}
 
@@ -464,7 +465,7 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 					"Could not remove entry from rexport table", sqe);
 		}
 		finally{
-			close(stmt);
+			StreamUtils.close(stmt);
 		}
 	}
 	
@@ -497,14 +498,14 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 			stmt.setString(1, getId());
 			stmt.executeUpdate();
 			
-			close(stmt);
+			StreamUtils.close(stmt);
 			stmt = null;
 			
 			stmt = connection.prepareStatement(_DELETE_EXPORT_ENTRIES_STMT);
 			stmt.setString(1, getId());
 			stmt.executeUpdate();
 			
-			close(stmt);
+			StreamUtils.close(stmt);
 			stmt = null;
 			
 			stmt = connection.prepareStatement(_DELETE_REXPORT_STMT);
@@ -525,7 +526,7 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 		}
 		finally
 		{
-			close(stmt);
+			StreamUtils.close(stmt);
 		}
 	}
 	
@@ -580,8 +581,8 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 		}
 		finally
 		{
-			close(rs);
-			close(stmt);
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
 		}
 	}
 			
@@ -703,8 +704,8 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 			return ret;
 		}
 		finally{
-			close(rs);
-			close(stmt);
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
 		}
 	}
 	

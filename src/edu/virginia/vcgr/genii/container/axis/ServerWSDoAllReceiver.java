@@ -122,6 +122,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 					|| (authZHandler.getMinIncomingMsgLevelSecurity(resource)
 							.isNone()))
 			{
+				resource.commit();
 				// We have no requirements for incoming message security. If
 				// there
 				// are no incoming headers, don't do any crypto processing
@@ -147,6 +148,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 					return;
 				}
 			}
+			resource.commit();
 
 		}
 		catch (Exception e)
@@ -539,6 +541,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 					(jDesc == null) ? operation.getDeclaringClass() : jDesc.getImplClass(),
 					operation);
 
+			resource.commit();
 		}
 		catch (IOException e)
 		{

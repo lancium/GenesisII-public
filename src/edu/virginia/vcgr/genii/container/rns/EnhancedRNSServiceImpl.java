@@ -136,8 +136,9 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		synchronized(rKey.getLockObject())
 		{
 			resource = (IRNSResource)rKey.dereference();
-			Collection<String> entries = resource.listEntries();
-				
+			Collection<String> entries = resource.listEntries(filename);
+			resource.commit();
+			
 			if (entries.contains(filename))
 				throw FaultManipulator.fillInFault(
 					new RNSEntryExistsFaultType(null, null, null, null,
@@ -215,6 +216,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
     	{
 	    	resource = (IRNSResource)rKey.dereference();
 		    entries = resource.retrieveEntries(list.getEntryName());
+		    resource.commit();
     	}
     	
     	EntryType []ret = new EntryType[entries.size()];
@@ -263,6 +265,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
     	{
     		resource = (IRNSResource)rKey.dereference();
     		entries = resource.retrieveEntries(null);
+    		resource.commit();
     	}
 
     	AttributesPreFetcherFactory factory = 
@@ -335,11 +338,11 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
     	{
 	    	resource = (IRNSResource)rKey.dereference();
 		    removed = resource.removeEntries(remove.getEntryName());
+		    resource.commit();
     	}
     	
 	    ret = new String[removed.size()];
 	    removed.toArray(ret);
-	    resource.commit();
     
 	    return ret;
     }

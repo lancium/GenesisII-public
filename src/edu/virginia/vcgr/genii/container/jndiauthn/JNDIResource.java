@@ -419,12 +419,12 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource
 				"Resource is not a JNDIAuthnPortType resource");
 	}
 
-	public Collection<String> listEntries() throws ResourceException
+	public Collection<String> listEntries(String name) throws ResourceException
 	{
 
 		if (isServiceResource())
 		{
-			return super.listEntries();
+			return super.listEntries(name);
 		}
 
 		throw new ResourceException(
