@@ -69,6 +69,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 			if (console != null)
 			{
 				currentVersion = console.currentVersion();
+				
 				if (currentVersion != null && 
 					!currentVersion.equals(Version.EMPTY_VERSION))
 				{
@@ -80,7 +81,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 					header.addChildElement(geniiVersion);
 				}
 			}
-	
+			
 			SOAPHeaderElement isGenesisII = new SOAPHeaderElement(
 				GeniiSOAPHeaderConstants.GENII_ENDPOINT_QNAME,
 				Boolean.TRUE);

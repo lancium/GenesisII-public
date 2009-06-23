@@ -8,6 +8,7 @@ import org.apache.axis.AxisFault;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 
 import edu.virginia.vcgr.genii.client.security.authz.PermissionDeniedException;
+import edu.virginia.vcgr.genii.client.version.MinimumVersionException;
 
 public class SimpleExceptionHandler implements IExceptionHandler
 {
@@ -25,6 +26,19 @@ public class SimpleExceptionHandler implements IExceptionHandler
 
 		while (cause != null)
 		{
+			if (cause instanceof MinimumVersionException)
+			{
+				MinimumVersionException me = (MinimumVersionException)cause;
+				builder.append(tab + String.format(
+					"Your client at version \"%s\" doesn't appear to meet\n" +
+					"the minimum version requirements for the target\n" +
+					"operation (%s).  Please exit the grid shell and\n" +
+					"run the grid-update tool to upgrade your client.", 
+					me.getClientVersion(), me.getMinimumVersion()));
+				errorStream.print(builder);
+				errorStream.flush();
+				return 1;
+			}
 			if (cause instanceof NullPointerException)
 				builder.append(tab + 
 					"Internal Genesis II Error -- Null Pointer Exception\n");
@@ -47,7 +61,16 @@ public class SimpleExceptionHandler implements IExceptionHandler
 						operation + "\".\n");
 				} else
 				{
-					builder.append(tab + message + "\n");
+					MinimumVersionException mve =
+						MinimumVersionException.reformException(message);
+					if (mve != null)
+					{
+						handleException(mve, eStream);
+						return 1;
+					} else
+					{
+						builder.append(tab + message + "\n");
+					}
 				}
 			} else
 				builder.append(tab + cause.getLocalizedMessage() + "\n");
