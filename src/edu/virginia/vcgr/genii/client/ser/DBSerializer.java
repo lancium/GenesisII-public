@@ -165,9 +165,6 @@ public class DBSerializer
 			_logger.debug(String.format(
 				"The blob was too large (%d), we no longer attempt to compress it.", 
 				data.length));
-			throw new IOException(String.format(
-				"The serialized blob is too large(%d > %d).",
-				data.length, maxLength));
 		}
 		
 		return data;
