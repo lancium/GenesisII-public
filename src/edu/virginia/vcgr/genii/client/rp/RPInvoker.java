@@ -1,5 +1,7 @@
 package edu.virginia.vcgr.genii.client.rp;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -18,9 +20,8 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnavailableFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
@@ -686,16 +687,18 @@ public class RPInvoker implements InvocationHandler
 	 * @param likelyRPs The list of resource properties that we are "likely" 
 	 * going to have to handle.
 	 * @param target The target resource to get/set RPs for.
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
 	 * 
-	 * @throws GenesisIISecurityException
 	 * @throws ConfigurationException
-	 * @throws ResourceException
 	 */
 	public RPInvoker(Collection<QName> likelyRPs, EndpointReferenceType target,
-		ICallingContext callingContext) throws GenesisIISecurityException, 
-			ResourceException
+		ICallingContext callingContext) throws FileNotFoundException, IOException
 	{
 		_likelyRPs = likelyRPs;
+		if (callingContext == null)
+			callingContext = ContextManager.getCurrentContext(false);
+		
 		_stub = ClientUtils.createProxy(GeniiCommon.class, target,
 			callingContext);
 	}

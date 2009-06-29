@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.rp;
 
+import java.io.IOException;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -247,6 +248,11 @@ public class ResourcePropertyManager
 		{
 			throw new ResourcePropertyException(
 				"Unknown resource exception in Genesis II.", re);
+		}
+		catch (IOException ioe)
+		{
+			throw new ResourcePropertyException(
+				"Unable to load calling context.", ioe);
 		}
 	}
 	

@@ -34,9 +34,9 @@
 	<classpathentry kind="lib" path="ext/xmldb/dbxml.jar"/>
 	<classpathentry kind="lib" path="ext/jndi/nis.jar"/>
 	<classpathentry kind="lib" path="ext/bouncycastle/bcprov-jdk16-139.jar" sourcepath="D:/Dev/bcprov-jdk16-139/src.zip"/>
-	<classpathentry kind="lib" path="lib/GenesisII-ws.jar" sourcepath="genned-src"/>
 	<classpathentry kind="lib" path="ext/jetty/lib/servlet-api-2.5-20081211.jar"/>
 	<classpathentry kind="lib" path="ext/jetty/lib/jetty-6.1.17.jar"/>
 	<classpathentry kind="lib" path="ext/jetty/lib/jetty-util-6.1.17.jar"/>
+	<classpathentry kind="lib" path="/GenesisII/lib/GenesisII-ws.jar" sourcepath="/GenesisII/genned-src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
