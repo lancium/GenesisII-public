@@ -18,6 +18,7 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnavailableFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
@@ -690,12 +691,13 @@ public class RPInvoker implements InvocationHandler
 	 * @throws ConfigurationException
 	 * @throws ResourceException
 	 */
-	public RPInvoker(Collection<QName> likelyRPs, EndpointReferenceType target)
-		throws GenesisIISecurityException, 
+	public RPInvoker(Collection<QName> likelyRPs, EndpointReferenceType target,
+		ICallingContext callingContext) throws GenesisIISecurityException, 
 			ResourceException
 	{
 		_likelyRPs = likelyRPs;
-		_stub = ClientUtils.createProxy(GeniiCommon.class, target);
+		_stub = ClientUtils.createProxy(GeniiCommon.class, target,
+			callingContext);
 	}
 	
 	/**

@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.client.bes;
 
 import javax.xml.namespace.QName;
 
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 
 public interface BESConstants
@@ -55,4 +56,48 @@ public interface BESConstants
 		"edu.virginia.vcgr.genii.container.bes.worker-dir";
 	static public final String CONFIG_PROPERTY_WORKER_DIR_ALLOW_OVERRIDE =
 		"edu.virginia.vcgr.genii.container.bes.worker-dir.allow-override";
+	
+	static public final String POLICY_RESOURCE_PROPERTY_NAME = "Policy";
+	static public final String THRESHOLD_RESOURCE_PROPERTY_NAME = "Threshold";
+	
+	static public final QName POLICY_RP = new QName(GENII_BES_NS, 
+		POLICY_RESOURCE_PROPERTY_NAME);
+	static public final QName THRESHOLD_RP = new QName(GENII_BES_NS, 
+		THRESHOLD_RESOURCE_PROPERTY_NAME);
+	
+	static public final QName NAME_ATTR = new QName(
+		GENII_BES_NS, "Name");
+	static public final QName TOTAL_NUMBER_OF_ACTIVITIES_ATTR = new QName(
+		GENII_BES_NS, "TotalNumberOfActivities");
+	static public final QName ACTIVITY_REFERENCE_ATTR = new QName(
+		GENII_BES_NS, "ActivityReference");
+	static public final QName DESCRIPTION_ATTR = new QName(
+		GENII_BES_NS, "Description");
+	static public final QName OPERATING_SYSTEM_ATTR = new QName(
+		GENII_BES_NS, "OperatingSystem");
+	static public final QName CPU_ARCHITECTURE_ATTR = new QName(
+		GENII_BES_NS, "CPUArchitecture");
+	static public final QName CPU_COUNT_ATTR = new QName(
+		GENII_BES_NS, "CPUCount");
+	static public final QName BES_POLICY_ATTR = new QName(
+		GENII_BES_NS, POLICY_RESOURCE_PROPERTY_NAME);
+	static public final QName BES_THRESHOLD_ATTR = new QName(
+		GENII_BES_NS, THRESHOLD_RESOURCE_PROPERTY_NAME);
+	static public final QName OGRSH_VERSIONS_ATTR = new QName(
+		GENII_BES_NS, "OGRSHVersion");
+	
+	static public final QName SPMD_PROVIDER_ATTR = new QName(
+		GENII_BES_NS, "SPMDProvider");
+	
+	static public final QName CPU_SPEED_ATTR = new QName(
+		GenesisIIConstants.JSDL_NS, "IndividualCPUSpeed");
+	static public final QName PHYSICAL_MEMORY_ATTR = new QName(
+		GenesisIIConstants.JSDL_NS, "PhysicalMemory");
+	static public final QName VIRTUAL_MEMORY_ATTR = new QName(
+		GenesisIIConstants.JSDL_NS, "VirtualMemory");
+	
+	static public final String IS_ACCEPTING_NEW_ACTIVITIES_NAME =
+		"IsAcceptingNewActivities";
+	static public final QName IS_ACCEPTING_NEW_ACTIVITIES_ATTR = new QName(
+		GENII_BES_NS, IS_ACCEPTING_NEW_ACTIVITIES_NAME);
 }

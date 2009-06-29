@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,7 +30,6 @@ import org.ggf.jsdl.OperatingSystem_Type;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
@@ -43,6 +40,7 @@ import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.spmd.SPMDTranslatorFactories;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+
 import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
@@ -59,38 +57,6 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 	
 	static private final String _DESCRIPTION_PROPERTY = "attribute:description";
 	static private final String _DEPLOYER_PROPERTY = "attribute:deployer";
-	
-	static public QName NAME_ATTR = new QName(
-		GENII_BES_NS, "Name");
-	static public QName TOTAL_NUMBER_OF_ACTIVITIES_ATTR = new QName(
-		GENII_BES_NS, "TotalNumberOfActivities");
-	static public QName ACTIVITY_REFERENCE_ATTR = new QName(
-		GENII_BES_NS, "ActivityReference");
-	static public QName DESCRIPTION_ATTR = new QName(
-		GENII_BES_NS, "Description");
-	static public QName OPERATING_SYSTEM_ATTR = new QName(
-		GENII_BES_NS, "OperatingSystem");
-	static public QName CPU_ARCHITECTURE_ATTR = new QName(
-		GENII_BES_NS, "CPUArchitecture");
-	static public QName CPU_COUNT_ATTR = new QName(
-		GENII_BES_NS, "CPUCount");
-	static public QName BES_POLICY_ATTR = new QName(
-		GENII_BES_NS, "Policy");
-	static public QName OGRSH_VERSIONS_ATTR = new QName(
-		GENII_BES_NS, "OGRSHVersion");
-	
-	static public QName SPMD_PROVIDER_ATTR = new QName(
-		GENII_BES_NS, "SPMDProvider");
-	
-	static public QName CPU_SPEED_ATTR = new QName(
-		GenesisIIConstants.JSDL_NS, "IndividualCPUSpeed");
-	static public QName PHYSICAL_MEMORY_ATTR = new QName(
-		GenesisIIConstants.JSDL_NS, "PhysicalMemory");
-	static public QName VIRTUAL_MEMORY_ATTR = new QName(
-		GenesisIIConstants.JSDL_NS, "VirtualMemory");
-	
-	static public QName IS_ACCEPTING_NEW_ACTIVITIES_ATTR = new QName(
-		GENII_BES_NS, "IsAcceptingNewActivities");
 	
 	public BESAttributesHandler(AttributePackage pkg) throws NoSuchMethodException
 	{
@@ -111,6 +77,7 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		addHandler(IS_ACCEPTING_NEW_ACTIVITIES_ATTR, "getIsAcceptingNewActivitiesAttr");
 		addHandler(SPMD_PROVIDER_ATTR, "getSPMDProvidersAttr");
 		addHandler(BES_POLICY_ATTR, "getBESPolicyAttr", "setBESPolicyAttr");
+		addHandler(BES_THRESHOLD_ATTR, "getBESThresholdAttr", "setBESThresholdAttr");
 		addHandler(CPU_SPEED_ATTR, "getCPUSpeedAttr");
 		addHandler(PHYSICAL_MEMORY_ATTR, "getPhysicalMemoryAttr");
 		addHandler(VIRTUAL_MEMORY_ATTR, "getVirtualMemoryAttr");
@@ -273,6 +240,31 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		IBESResource resource;
 		resource = (IBESResource)ResourceManager.getCurrentResource().dereference();
 		resource.setPolicy(p);
+		resource.commit();
+	}
+	
+	public MessageElement getBESThresholdAttr()
+		throws ResourceUnknownFaultType, ResourceException, 
+			RemoteException
+	{
+		IBESResource resource;
+		resource = (IBESResource)ResourceManager.getCurrentResource().dereference();
+		Integer threshold = (Integer)resource.getProperty(
+			IBESResource.THRESHOLD_DB_PROPERTY_NAME);
+		return new MessageElement(BES_THRESHOLD_ATTR, threshold);
+	}
+	
+	public void setBESThresholdAttr(MessageElement policy)
+		throws ResourceUnknownFaultType, ResourceException, 
+			RemoteException
+	{
+		Integer threshold = Integer.class.cast(
+			ObjectDeserializer.toObject(policy, Integer.class));
+		
+		IBESResource resource;
+		resource = (IBESResource)ResourceManager.getCurrentResource().dereference();
+		resource.setProperty(
+			IBESResource.THRESHOLD_DB_PROPERTY_NAME, threshold);
 		resource.commit();
 	}
 	
