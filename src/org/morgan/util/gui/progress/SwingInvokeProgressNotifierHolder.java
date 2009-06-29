@@ -4,14 +4,8 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.SwingUtilities;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 class SwingInvokeProgressNotifierHolder implements ProgressNotifier
 {
-	static private Log _logger = LogFactory.getLog(
-		SwingInvokeProgressNotifierHolder.class);
-	
 	private ProgressNotifier _notifier;
 
 	public SwingInvokeProgressNotifierHolder(ProgressNotifier notifier)
@@ -36,11 +30,11 @@ class SwingInvokeProgressNotifierHolder implements ProgressNotifier
 		}
 		catch (InvocationTargetException ite)
 		{
-			_logger.warn("Unable to initialize notifier.", ite);
+			System.err.println("Unable to initialize notifier.");
 		} 
 		catch (InterruptedException e)
 		{
-			_logger.warn("Unable to initialize notifier.", e);
+			System.err.println("Unable to initialize notifier.");
 		}
 	}
 	

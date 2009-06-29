@@ -1,12 +1,12 @@
 package org.morgan.util.gui.progress;
 
+import org.morgan.util.GraphicsUtils;
+
 import java.awt.Component;
 import java.awt.Window;
 import java.awt.Dialog.ModalityType;
 
 import javax.swing.SwingUtilities;
-
-import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 
 public class DefaultProgressNotifier implements ProgressNotifier
 {
@@ -115,7 +115,7 @@ public class DefaultProgressNotifier implements ProgressNotifier
 						_progress, _controller);
 					
 					dialog.pack();
-					GuiUtils.centerComponent(dialog);
+					GraphicsUtils.centerWindow(dialog);
 					dialog.setModalityType(ModalityType.MODELESS);
 					dialog.setVisible(true);
 					
