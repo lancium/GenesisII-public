@@ -21,6 +21,13 @@
 			tab-priority="0"/>
 	</plugin>
 	
+	<plugin name="BES Management"
+		implementing-class="edu.virginia.vcgr.genii.client.gui.browser.plugins.bes.BESManagementPlugin">
+		<tab
+			tab-name="BES Management"
+			tab-priority="50"/>
+	</plugin>
+	
 	<plugin name="Default Selection Display Plugin"
 		implementing-class="edu.virginia.vcgr.genii.client.gui.browser.plugins.sys.DefaultSelectionDisplayPlugin">
 		

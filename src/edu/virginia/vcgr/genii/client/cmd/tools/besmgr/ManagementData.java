@@ -4,22 +4,21 @@ import edu.virginia.vcgr.genii.container.bes.BESPolicy;
 
 public class ManagementData
 {
-	private boolean _storedAcceptingNewActivities;
 	private BESPolicy _storedPolicy;
 	private Integer _storedThreshold = null;
+	private boolean _isAcceptingActivities;
 	
 	public ManagementData(BESPolicy policy,
-		boolean isAcceptingNewActivities,
-		Integer threshold)
+		Integer threshold, boolean isAcceptingActivities)
 	{
-		_storedAcceptingNewActivities = isAcceptingNewActivities;
+		_isAcceptingActivities = isAcceptingActivities;
 		_storedPolicy = policy;
 		_storedThreshold = threshold;
 	}
 	
-	final public boolean isAcceptingNewActivities()
+	final public boolean isAcceptingActivities()
 	{
-		return _storedAcceptingNewActivities;
+		return _isAcceptingActivities;
 	}
 	
 	final public BESPolicy policy()

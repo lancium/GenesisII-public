@@ -205,6 +205,9 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 		if (storedAccepting != null && !storedAccepting.booleanValue())
 			return false;
 		
-		return getBES().isAcceptingActivites();
+		Integer threshold = (Integer)getProperty(
+			IBESResource.THRESHOLD_DB_PROPERTY_NAME);
+		
+		return getBES().isAcceptingActivites(threshold);
 	}
 }

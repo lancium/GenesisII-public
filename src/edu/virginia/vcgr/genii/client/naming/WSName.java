@@ -16,6 +16,13 @@
 package edu.virginia.vcgr.genii.client.naming;
 
 import org.apache.axis.types.URI;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
+import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,8 +39,10 @@ import org.ws.addressing.MetadataType;
 
 import edu.virginia.vcgr.genii.client.naming.ResolverDescription.ResolverType;
 
-public class WSName implements Comparable<WSName>
+public class WSName implements Comparable<WSName>, Serializable
 {
+	static final long serialVersionUID = 0L;
+	
 	static private Log _logger = LogFactory.getLog(WSName.class);
 	
 	static public final String NAMING_NS =
@@ -345,5 +354,29 @@ public class WSName implements Comparable<WSName>
 		EndpointReferenceType newEPR = new EndpointReferenceType(origAddress, origRefParams, newMetadata, origMessageElements);
 		
 		return newEPR;
+	}
+	
+	private void writeObject(ObjectOutputStream out)
+    	throws IOException
+	{
+		EPRUtils.serializeEPR(out, _epr);
+	}
+
+	private void readObject(ObjectInputStream in)
+    	throws IOException, ClassNotFoundException
+	{
+		_epr = EPRUtils.deserializeEPR(in);
+		
+
+		_triedExtraction = false;
+		_endpointIdentifier = null;
+		_resolvers = new ArrayList<ResolverDescription>();
+	}
+
+	@SuppressWarnings("unused")
+	private void readObjectNoData() 
+    	throws ObjectStreamException
+	{
+		throw new StreamCorruptedException("The input stream is corrupt.");
 	}
 }

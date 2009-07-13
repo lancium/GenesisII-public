@@ -276,6 +276,26 @@ public class RNSPath implements Serializable, Cloneable
 		return parent + "/" + _nameFromParent;
 	}
 	
+	public boolean equals(RNSPath other)
+	{
+		return pwd().equals(other.pwd());
+	}
+	
+	@Override
+	public boolean equals(Object other)
+	{
+		if (other instanceof RNSPath)
+			return equals((RNSPath)other);
+		
+		return false;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return pwd().hashCode();
+	}
+	
 	/**
 	 * Retrieve the root RNSPath entry for this namespace.
 	 * 

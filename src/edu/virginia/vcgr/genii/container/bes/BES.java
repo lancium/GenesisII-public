@@ -205,8 +205,13 @@ public class BES implements Closeable
 		close();
 	}
 	
-	synchronized public boolean isAcceptingActivites()
+	synchronized public boolean isAcceptingActivites(
+		Integer threshold)
 	{
+		if (threshold != null)
+			if (_containedActivities.size() >= threshold.intValue())
+				return false;
+		
 		return !_enactor.getCurrentAction().equals(BESPolicyActions.KILL);
 	}
 	

@@ -6,6 +6,7 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.besmgr.BESManagerDialog;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
+import edu.virginia.vcgr.genii.client.gui.bes.BESSelectorDialog;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 
@@ -18,7 +19,7 @@ public class BESManager extends BaseGridTool
 	
 	private EndpointReferenceType getLocalBESContainer()
 	{
-		return null;
+		return BESSelectorDialog.selectBESContainer(null);
 	}
 	
 	public BESManager()
@@ -41,10 +42,7 @@ public class BESManager extends BaseGridTool
 		{
 			target = getLocalBESContainer();
 			if (target == null)
-			{
-				stderr.println("No local BES container created.");
-				return 1;
-			}
+				return 0;
 		}
 		
 		BESManagerDialog dialog = new BESManagerDialog(null, target);

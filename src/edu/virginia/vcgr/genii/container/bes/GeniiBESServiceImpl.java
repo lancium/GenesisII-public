@@ -249,7 +249,6 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 		if (!resource.isAcceptingNewActivities())
 			throw new NotAcceptingNewActivitiesFaultType(null);
 	
-
 		if (_localActivityServiceEPR == null) 
 		{
 			// only need to make this epr from scratch once (which involves
