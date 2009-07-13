@@ -174,6 +174,7 @@ public class GeniiFuse
 			System.err.println("Exiting fuse mount.");
 		}
 		
+		@SuppressWarnings("unused")
 		public Exception getError()
 		{
 			return _error;

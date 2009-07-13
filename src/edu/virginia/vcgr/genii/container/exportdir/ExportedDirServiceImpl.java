@@ -46,7 +46,6 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
-import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
@@ -58,6 +57,8 @@ import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.common.GeniiNoOutCalls;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
+import edu.virginia.vcgr.genii.container.invoker.timing.Timer;
+import edu.virginia.vcgr.genii.container.invoker.timing.TimingSink;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
@@ -299,8 +300,10 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
     	throws RemoteException, ResourceUnknownFaultType, 
     		RNSEntryNotDirectoryFaultType, RNSFaultType
     {
+		TimingSink tSink = TimingSink.sink();
+		Timer timer = null;
 		ResourceKey rKey = ResourceManager.getCurrentResource();
-		Collection<MessageElement> entryCollection;
+		Collection<Object> entryCollection;
 		Collection<ExportedDirEntry> entries = null;
 		
 		synchronized(rKey.getLockObject())
@@ -308,26 +311,36 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 			IExportedDirResource resource = 
 				(IExportedDirResource)rKey.dereference();
 			
+			timer = tSink.getTimer("Retrieve Entries");
 			entries = resource.retrieveEntries(null);
+			timer.noteTime();
 		}
 		//create collection of MessageElement entries
-		entryCollection = new LinkedList<MessageElement>();
+		entryCollection = new LinkedList<Object>();
+		timer = tSink.getTimer("Prepare Entries");
     	for (ExportedDirEntry exportDirEntry : entries){
     		EntryType entry = new EntryType(
     				exportDirEntry.getName(), 
     				exportDirEntry.getAttributes(), 
     				exportDirEntry.getEntryReference());
 
-    		entryCollection.add(AnyHelper.toAny(entry));
+    		entryCollection.add(entry);
     	}
+    	timer.noteTime();
 		
 		try{
+			timer = tSink.getTimer("Create Iterator");
 			return new IterateListResponseType(super.createWSIterator(
 					entryCollection.iterator(), 100));
 		}
 		catch (SQLException sqe){
 			throw new RemoteException("Unable to create iterator for exportDir lookup.", sqe);
 		} 
+		finally
+		{
+			if (timer != null)
+				timer.noteTime();
+		}
     }	
 	
 	@RWXMapping(RWXCategory.READ)

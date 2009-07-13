@@ -1,6 +1,5 @@
 package edu.virginia.vcgr.genii.container.iterator;
 
-import java.io.IOException;
 import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,9 +7,12 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import org.apache.axis.message.MessageElement;
+import org.apache.axis.types.UnsignedInt;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -64,20 +66,12 @@ public class IteratorDBResource extends BasicDBResource implements
 			{
 				Blob blob = rs.getBlob(1);
 				
-				ret.add(DBSerializer.xmlFromBlob(IteratorMemberType.class, blob));
+				ret.add(new IteratorMemberType(new MessageElement[] {
+					AnyHelper.toAny(DBSerializer.fromBlob(blob)) },
+					new UnsignedInt(startElement++)));
 			}
 			
 			return ret.toArray(new IteratorMemberType[0]);
-		}
-		catch (IOException ioe)
-		{
-			throw new ResourceException(
-				"Unable to deserialize iterator member content.", ioe);
-		}
-		catch (ClassNotFoundException cnfe)
-		{
-			throw new ResourceException(
-				"Unable to deserialize iterator member content.", cnfe);
 		}
 		catch (SQLException sqe)
 		{

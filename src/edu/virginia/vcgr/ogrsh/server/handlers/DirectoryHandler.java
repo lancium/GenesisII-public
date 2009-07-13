@@ -94,11 +94,6 @@ public class DirectoryHandler
 			_entryType = entryType;
 		}
 		
-		public DirectoryEntry(IOGRSHReadBuffer buffer) throws IOException
-		{
-			unpack(buffer);
-		}
-
 		public void pack(IOGRSHWriteBuffer buffer) throws IOException
 		{
 			buffer.writeObject(_inode);

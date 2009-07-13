@@ -8,8 +8,6 @@ import java.awt.Dialog.ModalityType;
 
 import javax.swing.SwingUtilities;
 
-import org.morgan.util.GraphicsUtils;
-
 public class DefaultProgressNotifier implements ProgressNotifier
 {
 	private Component _parent;

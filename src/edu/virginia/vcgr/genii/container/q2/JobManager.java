@@ -10,8 +10,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.axis.message.MessageElement;
@@ -492,7 +494,7 @@ public class JobManager implements Closeable
 	 * @throws ResourceException
 	 */
 	synchronized public Collection<ReducedJobInformationType> listJobs(
-		Connection connection) throws SQLException, ResourceException
+		Connection connection, String ticket) throws SQLException, ResourceException
 	{
 		Collection<ReducedJobInformationType> ret = 
 			new LinkedList<ReducedJobInformationType>();
@@ -501,8 +503,18 @@ public class JobManager implements Closeable
 		 * jobs that isn't kept in memory (the owner identities for
 		 * example).
 		 */
+		Set<Long> keySet = null;
+		if (ticket != null)
+		{
+			keySet = new HashSet<Long>();
+			JobData data = _jobsByTicket.get(ticket);
+			if (data != null)
+				keySet.add(new Long(data.getJobID()));
+		} else
+			keySet = _jobsByID.keySet();
+		
 		HashMap<Long, PartialJobInfo> ownerMap =
-			_database.getPartialJobInfos(connection, _jobsByID.keySet());
+			_database.getPartialJobInfos(connection, keySet);
 		
 		try
 		{

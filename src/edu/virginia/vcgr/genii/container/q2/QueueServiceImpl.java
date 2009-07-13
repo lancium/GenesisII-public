@@ -31,7 +31,6 @@ import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
-import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.common.notification.Notify;
 import edu.virginia.vcgr.genii.common.notification.UserDataType;
@@ -261,12 +260,10 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	public IterateStatusResponseType iterateStatus(String[] iterateStatusRequest)
 			throws RemoteException
 	{
-		Collection<MessageElement> col = new LinkedList<MessageElement>();
+		Collection<Object> col = new LinkedList<Object>();
 		
 		for (JobInformationType jit : getStatus(iterateStatusRequest))
-		{
-			col.add(AnyHelper.toAny(jit));
-		}
+			col.add(jit);
 		
 		try
 		{
@@ -347,7 +344,7 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		try
 		{
 			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
-			jobs = mgr.listJobs();
+			jobs = mgr.listJobs(null);
 			return jobs.toArray(new ReducedJobInformationType[0]);
 		}
 		catch (SQLException sqe)
@@ -361,11 +358,11 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	public IterateListResponseType iterateListJobs(Object iterateListRequest)
 			throws RemoteException
 	{
-		Collection<MessageElement> col = new LinkedList<MessageElement>();
+		Collection<Object> col = new LinkedList<Object>();
 		
 		for (ReducedJobInformationType rjit : listJobs(iterateListRequest))
 		{
-			col.add(AnyHelper.toAny(rjit));
+			col.add(rjit);
 		}
 		
 		try

@@ -89,7 +89,7 @@ public class JobListingRNSFork extends AbstractRNSResourceFork
 		{
 			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
 			if (!mineOnly)
-				jobs = mgr.listJobs();
+				jobs = mgr.listJobs(null);
 			else
 				jobs = mgr.getJobStatus(null);
 			

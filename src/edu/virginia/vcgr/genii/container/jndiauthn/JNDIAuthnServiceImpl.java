@@ -78,8 +78,6 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.x509.CertCreationSpec;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
-import edu.virginia.vcgr.genii.client.ser.AnyHelper;
-import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.enhancedrns.*;
 
@@ -666,10 +664,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		ArrayList<EntryType> accumulator = new ArrayList<EntryType>();
 		while (iterator.hasNext())
 		{
-			MessageElement wrappedEntryType = iterator.next();
-			EntryType entry =
-					ObjectDeserializer.toObject(wrappedEntryType,
-							EntryType.class);
+			EntryType entry = (EntryType)iterator.next();
 			accumulator.add(entry);
 		}
 
@@ -698,7 +693,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 			Collection<InternalEntry> entries;
 			entries = myResource.retrieveEntries(null);
 
-			Collection<MessageElement> col = new LinkedList<MessageElement>();
+			Collection<Object> col = new LinkedList<Object>();
 			for (InternalEntry internalEntry : entries)
 			{
 				EntryType entry =
@@ -706,7 +701,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 								.getAttributes(), internalEntry
 								.getEntryReference());
 
-				col.add(AnyHelper.toAny(entry));
+				col.add(entry);
 			}
 
 			try
@@ -970,7 +965,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		throw new RemoteException("\"query\" not applicable.");
 	}
 
-	public class EntryIterator implements Iterator<MessageElement>
+	public class EntryIterator implements Iterator<Object>
 	{
 
 		protected NamingEnumeration<NameClassPair> _namingEnumerator = null;
@@ -1051,7 +1046,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 			}
 		}
 
-		public MessageElement next()
+		public Object next()
 		{
 
 			if (!hasNext())
@@ -1087,7 +1082,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 						new EntryType(_next.getName(), null, wsName
 								.getEndpoint());
 
-				return AnyHelper.toAny(newEntry);
+				return newEntry;
 
 			}
 			catch (ResourceException e)

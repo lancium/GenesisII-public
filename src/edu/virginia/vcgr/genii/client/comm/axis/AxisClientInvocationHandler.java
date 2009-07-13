@@ -68,7 +68,6 @@ import edu.virginia.vcgr.genii.client.security.SecurityUtils;
 import edu.virginia.vcgr.genii.client.security.x509.*;
 import edu.virginia.vcgr.genii.client.invoke.IFinalInvoker;
 import edu.virginia.vcgr.genii.client.invoke.InvocationInterceptorManager;
-import edu.virginia.vcgr.genii.client.naming.EPIResolutionCache;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.NameResolutionFailedException;
 import edu.virginia.vcgr.genii.client.naming.ResolverDescription;
@@ -710,6 +709,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		/* check cache first */
 		// took out cache because of issues with multiple resources with same EPI
 		//		if (!context.triedCache())
+		/*
 		if(false)
 		{
 			URI epi = context.getEPI();
@@ -722,6 +722,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 					return newHandler;
 			}
 		}
+		*/
 		
 		/* cache failed - need to try resolvers */
 		ListIterator<ResolverDescription> resolversIter = context.getResolversIter();

@@ -18,21 +18,14 @@ public class InvocationMatcher
 	
 	static private class HandlerInformation
 	{
-		private String _invocationName;
 		private Object _invocationObject;
 		private Method _invocationMethod;
 		
 		public HandlerInformation(String invocationName, Object invocationObject,
 			Method invocationMethod)
 		{
-			_invocationName = invocationName;
 			_invocationObject = invocationObject;
 			_invocationMethod = invocationMethod;
-		}
-		
-		public String getInvocationName()
-		{
-			return _invocationName;
 		}
 		
 		public Object getInvocationObject()

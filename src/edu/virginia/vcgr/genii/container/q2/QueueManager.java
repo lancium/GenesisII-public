@@ -367,7 +367,7 @@ public class QueueManager implements Closeable
 		}
 	}
 	
-	public Collection<ReducedJobInformationType> listJobs()
+	public Collection<ReducedJobInformationType> listJobs(String ticket)
 		throws SQLException, ResourceException
 	{
 		Connection connection = null;
@@ -375,7 +375,7 @@ public class QueueManager implements Closeable
 		try
 		{
 			connection = _connectionPool.acquire(true);
-			return _jobManager.listJobs(connection);
+			return _jobManager.listJobs(connection, ticket);
 		}
 		finally
 		{

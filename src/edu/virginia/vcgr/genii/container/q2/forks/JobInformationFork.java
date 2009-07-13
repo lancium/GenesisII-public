@@ -150,7 +150,7 @@ public class JobInformationFork
 			} else
 			{
 				for (ReducedJobInformationType rjit :
-					mgr.listJobs())
+					mgr.listJobs(jobTicket))
 				{
 					if (rjit.getJobTicket().equals(jobTicket))
 					{

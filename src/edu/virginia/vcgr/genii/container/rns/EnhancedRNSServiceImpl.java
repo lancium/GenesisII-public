@@ -60,7 +60,6 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
-import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 
 import edu.virginia.vcgr.genii.enhancedrns.*;
 
@@ -75,6 +74,8 @@ import edu.virginia.vcgr.genii.container.common.DefaultGenesisIIAttributesPreFet
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.common.notification.TopicSpace;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
+import edu.virginia.vcgr.genii.container.invoker.timing.Timer;
+import edu.virginia.vcgr.genii.container.invoker.timing.TimingSink;
 
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -256,7 +257,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
     		RNSEntryNotDirectoryFaultType, RNSFaultType
     {
     	_logger.debug("Entered iterate list method.");
-    	
+    	TimingSink tSink = TimingSink.sink();
     	IRNSResource resource = null;
     	Collection<InternalEntry> entries;
     	
@@ -264,14 +265,17 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
     	synchronized (rKey.getLockObject())
     	{
     		resource = (IRNSResource)rKey.dereference();
+    		Timer rTimer = tSink.getTimer("Retrieve Entries");
     		entries = resource.retrieveEntries(null);
+    		rTimer.noteTime();
     		resource.commit();
     	}
 
     	AttributesPreFetcherFactory factory = 
     		new AttributesPreFetcherFactoryImpl();
     	
-		Collection<MessageElement> col = new LinkedList<MessageElement>();
+    	Timer prepTimer = tSink.getTimer("Prepare Entries");
+		Collection<Object> col = new LinkedList<Object>();
     	for (InternalEntry internalEntry : entries)
     	{
     		EndpointReferenceType epr = internalEntry.getEntryReference();
@@ -281,9 +285,11 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 				preFetch(epr, internalEntry.getAttributes(), factory),
 				epr);
 
-    		col.add(AnyHelper.toAny(entry));
+    		col.add(entry);
     	}
+    	prepTimer.noteTime();
 		
+    	Timer createTimer = tSink.getTimer("Create Iterator");
 		try
 		{
 			return new IterateListResponseType(
@@ -292,8 +298,11 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 		catch (SQLException sqe)
 		{
 			throw new RemoteException("Unable to create iterator.", sqe);
-		} 
-	    
+		}
+		finally
+		{
+			createTimer.noteTime();
+		}
     }	
     
 	@RWXMapping(RWXCategory.WRITE)

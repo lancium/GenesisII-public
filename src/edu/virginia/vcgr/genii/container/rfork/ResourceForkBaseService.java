@@ -77,7 +77,6 @@ import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.*;
-import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 import edu.virginia.vcgr.genii.common.notification.Notify;
 import edu.virginia.vcgr.genii.common.notification.UserDataType;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
@@ -89,6 +88,8 @@ import edu.virginia.vcgr.genii.container.common.AttributesPreFetcherFactory;
 import edu.virginia.vcgr.genii.container.common.DefaultGenesisIIAttributesPreFetcher;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
+import edu.virginia.vcgr.genii.container.invoker.timing.Timer;
+import edu.virginia.vcgr.genii.container.invoker.timing.TimingSink;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
@@ -596,6 +597,9 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 	public IterateListResponseType iterateList(IterateListRequestType arg0)
 			throws RemoteException
 	{
+		TimingSink tSink = TimingSink.sink();
+		Timer timer = null;
+		
 		ResourceFork tFork = getResourceFork();
 		if (!(tFork instanceof RNSResourceFork))
 			throw new RemoteException(
@@ -607,10 +611,13 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 		
 		try
 		{
+			timer = tSink.getTimer("Retrieve Entries");
 			Iterable<InternalEntry> entries =
 				fork.list(getExemplarEPR(), null);
+			timer.noteTime();
 			
-			Collection<MessageElement> col = new LinkedList<MessageElement>();
+			Collection<Object> col = new LinkedList<Object>();
+			timer = tSink.getTimer("Prepare Entries");
 	    	for (InternalEntry internalEntry : entries)
 	    	{
 	    		EndpointReferenceType epr = internalEntry.getEntryReference();
@@ -620,9 +627,11 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
     				preFetch(epr, internalEntry.getAttributes(), factory),
     				epr);
 
-	    		col.add(AnyHelper.toAny(entry));
+	    		col.add(entry);
 	    	}
+	    	timer.noteTime();
 			
+	    	timer = tSink.getTimer("Create Iterator");
 			return new IterateListResponseType(
 				super.createWSIterator(col.iterator(), 100));
 		}
@@ -633,6 +642,11 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 		catch (IOException ioe)
 		{
 			throw new RemoteException("Unable to list contents.", ioe);
+		}
+		finally
+		{
+			if (timer != null)
+				timer.noteTime();
 		}
 	}
 
@@ -976,6 +990,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 	}	
 	
 /* Streamable ByteIO Factory Operations */
+	@SuppressWarnings("unchecked")
 	@Override
 	@RWXMapping(RWXCategory.OPEN)
 	public OpenStreamResponse openStream(Object arg0) throws RemoteException,
