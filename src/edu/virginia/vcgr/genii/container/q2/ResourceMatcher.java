@@ -165,7 +165,7 @@ public class ResourceMatcher
 		CPUArchitecture_Type arch = resources.getCPUArchitecture();
 		if (arch != null && !matchArch(besInfo, arch))
 		{
-			_logger.warn(
+			_logger.debug(
 				"Cannot match jsdl to bes information -- Processor architectures don't match.");
 			return false;
 		}
@@ -173,7 +173,7 @@ public class ResourceMatcher
 		OperatingSystem_Type osType = resources.getOperatingSystem();
 		if (osType != null && !matchOS(besInfo, osType))
 		{
-			_logger.warn(
+			_logger.debug(
 				"Cannot match jsdl to bes information -- OS restrictinos don't match.");
 			return false;
 		}
