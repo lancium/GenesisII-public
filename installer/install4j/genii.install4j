@@ -21,7 +21,7 @@
       <variable name="genii.container-memory.upper-limit" value="2048" />
       <variable name="genii.container-memory.lower-limit" value="1024" />
       <variable name="genii.isWindows" value="false" />
-      <variable name="genii.isLInux" value="false" />
+      <variable name="genii.isLinux" value="false" />
       <variable name="genii.isMacOSX" value="false" />
       <variable name="genii.isBootstrap" value="false" />
     </variables>
@@ -1664,7 +1664,24 @@ return memory;</string>
                         </object>
                       </java>
                     </serializedBean>
-                    <condition>!(context.getCompilerVariable("genii.isWindows").equals("true"))</condition>
+                    <condition>context.getCompilerVariable("genii.isLinux").equals("true")</condition>
+                  </action>
+                  <action name="Set the MacOS access permissions" id="1372" beanClass="com.install4j.runtime.beans.actions.files.SetModeAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Can't set permissions on service wrapper.">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.files.SetModeAction">
+                          <void property="file">
+                            <object class="java.io.File">
+                              <string>JavaServiceWrapper/wrapper/bin/wrapper-macosx-universal-64</string>
+                            </object>
+                          </void>
+                          <void property="mode">
+                            <string>755</string>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition>context.getCompilerVariable("genii.isMacOSX").equals("true")</condition>
                   </action>
                   <action name="Set Progress to 50%" id="1068" beanClass="com.install4j.runtime.beans.actions.control.SetProgressAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
@@ -2681,6 +2698,7 @@ return startService;</string>
       </exclude>
       <variables>
         <variable name="genii.isLInux" value="true" />
+        <variable name="genii.isLinux" value="true" />
       </variables>
       <installerScript mode="1" file="">
         <scriptLines />
@@ -2728,12 +2746,15 @@ return startService;</string>
         <variable name="genii.deployment" value="GeniiNetBootstrapContainer" />
         <variable name="genii.isLInux" value="true" />
         <variable name="genii.isBootstrap" value="true" />
+        <variable name="genii.isLinux" value="true" />
       </variables>
       <installerScript mode="1" file="">
         <scriptLines />
       </installerScript>
     </unixInstaller>
   </mediaSets>
-  <buildIds buildAll="true" />
+  <buildIds buildAll="true">
+    <mediaSet refId="240" />
+  </buildIds>
 </install4j>
 
