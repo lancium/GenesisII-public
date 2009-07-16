@@ -45,7 +45,7 @@ public class JNILibraryLauncher
 			if(!isLoaded)
 			{			
 				String basedir = System.getProperty(BASE_DIR_SYSTEM_PROPERTY);
-				JarDescription description = new JarDescription(basedir + "/jar-desc.xml");			
+				JarDescription description = new JarDescription(basedir + "/ifs-jar-desc.xml");			
 				loader = description.createClassLoader();				
 				isLoaded = true;
 			}
