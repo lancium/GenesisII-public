@@ -77,6 +77,7 @@ import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.*;
+import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 import edu.virginia.vcgr.genii.common.notification.Notify;
 import edu.virginia.vcgr.genii.common.notification.UserDataType;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
@@ -616,7 +617,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 				fork.list(getExemplarEPR(), null);
 			timer.noteTime();
 			
-			Collection<Object> col = new LinkedList<Object>();
+			Collection<MessageElement> col = new LinkedList<MessageElement>();
 			timer = tSink.getTimer("Prepare Entries");
 	    	for (InternalEntry internalEntry : entries)
 	    	{
@@ -627,7 +628,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
     				preFetch(epr, internalEntry.getAttributes(), factory),
     				epr);
 
-	    		col.add(entry);
+	    		col.add(AnyHelper.toAny(entry));
 	    	}
 	    	timer.noteTime();
 			

@@ -26,7 +26,10 @@ import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.CPUArchitecture_Type;
+import org.ggf.jsdl.OperatingSystemTypeEnumeration;
+import org.ggf.jsdl.OperatingSystemType_Type;
 import org.ggf.jsdl.OperatingSystem_Type;
+import org.ggf.jsdl.ProcessorArchitectureEnumeration;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -35,6 +38,7 @@ import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.nativeq.NativeQProperties;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.spmd.SPMDTranslatorFactories;
@@ -134,18 +138,45 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		return (String)resource.getProperty(_DESCRIPTION_PROPERTY);
 	}
 	
-	static public OperatingSystem_Type getOperatingSystem()
+	static public OperatingSystem_Type getOperatingSystem() throws RemoteException
 	{
-		return JSDLUtils.getLocalOperatingSystem();
+		IBESResource resource = null;
+		resource = (IBESResource)ResourceManager.getCurrentResource().dereference();
+		NativeQProperties qProps = new NativeQProperties(resource.nativeQProperties());
+		OperatingSystemTypeEnumeration osType = qProps.operatingSystemName();
+		String osVersion = qProps.operatingSystemVersion();
+		
+		OperatingSystem_Type ret = JSDLUtils.getLocalOperatingSystem();
+		if (osType != null)
+			ret.setOperatingSystemType(new OperatingSystemType_Type(osType, null));
+		if (osVersion != null)
+			ret.setOperatingSystemVersion(osVersion);
+		
+		return ret;
 	}
 	
-	static public CPUArchitecture_Type getCPUArchitecture()
+	static public CPUArchitecture_Type getCPUArchitecture() throws RemoteException
 	{
+		IBESResource resource = null;
+		resource = (IBESResource)ResourceManager.getCurrentResource().dereference();
+		NativeQProperties qProps = new NativeQProperties(resource.nativeQProperties());
+		ProcessorArchitectureEnumeration override = qProps.cpuArchitecture();
+		
+		if (override != null)
+			return new CPUArchitecture_Type(override, null);
+		
 		return JSDLUtils.getLocalCPUArchitecture();
 	}
 	
-	static public int getCPUCount()
+	static public int getCPUCount() throws RemoteException
 	{
+		IBESResource resource = null;
+		resource = (IBESResource)ResourceManager.getCurrentResource().dereference();
+		NativeQProperties qProps = new NativeQProperties(resource.nativeQProperties());
+		Integer cpuCount = qProps.cpuCount();
+		if (cpuCount != null)
+			return cpuCount.intValue();
+		
 		return ManagementFactory.getOperatingSystemMXBean(
 			).getAvailableProcessors();
 	}
@@ -165,6 +196,42 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		throws RemoteException
 	{
 		return SPMDTranslatorFactories.listSPMDTranslatorFactories();
+	}
+	
+	static public long getCPUSpeed() throws RemoteException
+	{
+		IBESResource resource = null;
+		resource = (IBESResource)ResourceManager.getCurrentResource().dereference();
+		NativeQProperties qProps = new NativeQProperties(resource.nativeQProperties());
+		Long override = qProps.cpuSpeed();
+		if (override != null)
+			return override.longValue();
+		
+		return SystemInfoUtils.getIndividualCPUSpeed();
+	}
+	
+	static public long getPhysicalMemory() throws RemoteException
+	{
+		IBESResource resource = null;
+		resource = (IBESResource)ResourceManager.getCurrentResource().dereference();
+		NativeQProperties qProps = new NativeQProperties(resource.nativeQProperties());
+		Long override = qProps.physicalMemory();
+		if (override != null)
+			return override.longValue();
+		
+		return SystemInfoUtils.getPhysicalMemory();
+	}
+	
+	static public long getVirtualMemory() throws RemoteException
+	{
+		IBESResource resource = null;
+		resource = (IBESResource)ResourceManager.getCurrentResource().dereference();
+		NativeQProperties qProps = new NativeQProperties(resource.nativeQProperties());
+		Long override = qProps.virtualMemory();
+		if (override != null)
+			return override.longValue();
+		
+		return SystemInfoUtils.getVirtualMemory();
 	}
 	
 	public void setDescription(String description)
@@ -338,37 +405,37 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		setDescription(element.getValue());
 	}
 	
-	public MessageElement getOperatingSystemAttr()
+	public MessageElement getOperatingSystemAttr() throws RemoteException
 	{
 		return new MessageElement(OPERATING_SYSTEM_ATTR, getOperatingSystem());
 	}
 	
-	public MessageElement getCPUArchitectureAttr()
+	public MessageElement getCPUArchitectureAttr() throws RemoteException
 	{
 		return new MessageElement(CPU_ARCHITECTURE_ATTR, getCPUArchitecture());
 	}
 	
-	public MessageElement getCPUCountAttr()
+	public MessageElement getCPUCountAttr() throws RemoteException
 	{
 		return new MessageElement(CPU_COUNT_ATTR, getCPUCount());
 	}
 	
-	public MessageElement getCPUSpeedAttr()
+	public MessageElement getCPUSpeedAttr() throws RemoteException
 	{
 		return new MessageElement(CPU_SPEED_ATTR,
-			SystemInfoUtils.getIndividualCPUSpeed());
+			getCPUSpeed());
 	}
 	
-	public MessageElement getPhysicalMemoryAttr()
+	public MessageElement getPhysicalMemoryAttr() throws RemoteException
 	{
 		return new MessageElement(PHYSICAL_MEMORY_ATTR, 
-			SystemInfoUtils.getPhysicalMemory());
+			getPhysicalMemory());
 	}
 	
-	public MessageElement getVirtualMemoryAttr()
+	public MessageElement getVirtualMemoryAttr() throws RemoteException
 	{
 		return new MessageElement(VIRTUAL_MEMORY_ATTR,
-			SystemInfoUtils.getVirtualMemory());
+			getVirtualMemory());
 	}
 	
 	public ArrayList<MessageElement> getDeployersAttr()

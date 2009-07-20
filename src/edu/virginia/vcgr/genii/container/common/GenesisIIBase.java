@@ -142,7 +142,6 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
-import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.client.utils.creation.CreationProperties;
@@ -957,7 +956,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	}
 	
 	protected IteratorInitializationType createWSIterator(
-		Iterator<Object> contents, int defaultBatchSize) 
+		Iterator<MessageElement> contents, int defaultBatchSize) 
 			throws ResourceException, ResourceUnknownFaultType,
 				SQLException, GenesisIISecurityException, RemoteException
 	{
@@ -969,7 +968,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 			if (!contents.hasNext())
 				break;
 			initMembers.add(new IteratorMemberType(
-				new MessageElement[] { AnyHelper.toAny(contents.next()) }, 
+				new MessageElement[] { contents.next() }, 
 				new UnsignedInt((long)lcv)));
 		}
 
@@ -994,10 +993,12 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 				"VALUES(?, ?, ?)");
 			while (contents.hasNext())
 			{
-				Object any = contents.next();
+				MessageElement any = contents.next();
+				IteratorMemberType member = new IteratorMemberType(
+					new MessageElement[] { any }, new UnsignedInt(count));
 				stmt.setString(1, id);
 				stmt.setLong(2, count);
-				stmt.setBlob(3, DBSerializer.toBlob(any,
+				stmt.setBlob(3, DBSerializer.xmlToBlob(member,
 					"iterators", "contents"));
 				
 				stmt.addBatch();

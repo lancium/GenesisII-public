@@ -183,10 +183,8 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 				GeniiBESConstants.NATIVEQ_PROVIDER_PROPERTY);
 			if (queueProvider != null)
 			{
-				IResource resource = key.dereference();
-				resource.setProperty(
-					GeniiBESConstants.NATIVEQ_PROVIDER_PROPERTY, 
-					props);
+				IBESResource resource = (IBESResource)key.dereference();
+				resource.nativeQProperties(props);
 			}
 		}
 	}
@@ -264,9 +262,8 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 		/* ASG August 28,2008, replaced RPC with direct call to CreateEPR */
 		EndpointReferenceType entryReference = 
 			new BESActivityServiceImpl().CreateEPR(BESActivityUtils.createCreationProperties(
-							jdt, (String)resource.getKey(), 
-							(Properties)resource.getProperty(
-								GeniiBESConstants.NATIVEQ_PROVIDER_PROPERTY),
+							jdt, (String)resource.getKey(),
+							resource.nativeQProperties(),
 							subscribe),
 					Container.getServiceURL("BESActivityPortType"));
 

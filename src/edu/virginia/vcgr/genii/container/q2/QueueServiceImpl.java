@@ -31,6 +31,7 @@ import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
+import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.common.notification.Notify;
 import edu.virginia.vcgr.genii.common.notification.UserDataType;
@@ -260,10 +261,10 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	public IterateStatusResponseType iterateStatus(String[] iterateStatusRequest)
 			throws RemoteException
 	{
-		Collection<Object> col = new LinkedList<Object>();
+		Collection<MessageElement> col = new LinkedList<MessageElement>();
 		
 		for (JobInformationType jit : getStatus(iterateStatusRequest))
-			col.add(jit);
+			col.add(AnyHelper.toAny(jit));
 		
 		try
 		{
@@ -358,11 +359,11 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	public IterateListResponseType iterateListJobs(Object iterateListRequest)
 			throws RemoteException
 	{
-		Collection<Object> col = new LinkedList<Object>();
+		Collection<MessageElement> col = new LinkedList<MessageElement>();
 		
 		for (ReducedJobInformationType rjit : listJobs(iterateListRequest))
 		{
-			col.add(rjit);
+			col.add(AnyHelper.toAny(rjit));
 		}
 		
 		try

@@ -60,6 +60,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
+import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 
 import edu.virginia.vcgr.genii.enhancedrns.*;
 
@@ -275,7 +276,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
     		new AttributesPreFetcherFactoryImpl();
     	
     	Timer prepTimer = tSink.getTimer("Prepare Entries");
-		Collection<Object> col = new LinkedList<Object>();
+		Collection<MessageElement> col = new LinkedList<MessageElement>();
     	for (InternalEntry internalEntry : entries)
     	{
     		EndpointReferenceType epr = internalEntry.getEntryReference();
@@ -285,7 +286,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 				preFetch(epr, internalEntry.getAttributes(), factory),
 				epr);
 
-    		col.add(entry);
+    		col.add(AnyHelper.toAny(entry));
     	}
     	prepTimer.noteTime();
 		

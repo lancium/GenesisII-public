@@ -46,6 +46,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
+import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
@@ -303,7 +304,7 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 		TimingSink tSink = TimingSink.sink();
 		Timer timer = null;
 		ResourceKey rKey = ResourceManager.getCurrentResource();
-		Collection<Object> entryCollection;
+		Collection<MessageElement> entryCollection;
 		Collection<ExportedDirEntry> entries = null;
 		
 		synchronized(rKey.getLockObject())
@@ -316,7 +317,7 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 			timer.noteTime();
 		}
 		//create collection of MessageElement entries
-		entryCollection = new LinkedList<Object>();
+		entryCollection = new LinkedList<MessageElement>();
 		timer = tSink.getTimer("Prepare Entries");
     	for (ExportedDirEntry exportDirEntry : entries){
     		EntryType entry = new EntryType(
@@ -324,7 +325,7 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
     				exportDirEntry.getAttributes(), 
     				exportDirEntry.getEntryReference());
 
-    		entryCollection.add(entry);
+    		entryCollection.add(AnyHelper.toAny(entry));
     	}
     	timer.noteTime();
 		
