@@ -10,6 +10,7 @@ public class ApplicationDescription
 {
 	private URI _spmdVariation;
 	private Integer _numProcesses;
+	private Integer _numProcessesPerHost;
 	private String _executableName;
 	private Collection<String> _arguments;
 	private Map<String, String> _environment;
@@ -18,13 +19,14 @@ public class ApplicationDescription
 	private String _stderrRedirect;
 	
 	public ApplicationDescription(
-		URI spmdVariation, Integer numProcesses,
+		URI spmdVariation, Integer numProcesses, Integer numProcessesPerHost,
 		String executableName, Collection<String> arguments,
 		Map<String, String> environment,
 		String stdinRedirect, String stdoutRedirect, String stderrRedirect)
 	{
 		_spmdVariation = spmdVariation;
 		_numProcesses = numProcesses;
+		_numProcessesPerHost = numProcessesPerHost;
 		
 		if (executableName == null)
 			throw new IllegalArgumentException(
@@ -51,6 +53,11 @@ public class ApplicationDescription
 	public Integer getNumProcesses()
 	{
 		return _numProcesses;
+	}
+	
+	public Integer getNumProcessesPerHost()
+	{
+		return _numProcessesPerHost;
 	}
 	
 	public String getExecutableName()

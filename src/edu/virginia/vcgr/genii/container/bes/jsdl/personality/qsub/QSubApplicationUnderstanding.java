@@ -66,7 +66,8 @@ class QSubApplicationUnderstanding
 		if (ogrshVersion == null)
 		{
 			executionPlan.add(new QueueProcessPhase(
-				getSPMDVariation(), getNumProcesses(),
+				getSPMDVariation(), getNumProcesses(), 
+				getNumProcessesPerHost(),
 				fsManager.lookup(getExecutable()),
 				stringArgs, stringEnv,
 				fsManager.lookup(getStdinRedirect()),
@@ -89,6 +90,7 @@ class QSubApplicationUnderstanding
 			
 			executionPlan.add(new QueueProcessPhase(
 				getSPMDVariation(), getNumProcesses(),
+				getNumProcessesPerHost(),
 				shim, args, stringEnv,
 				fsManager.lookup(getStdinRedirect()),
 				fsManager.lookup(getStdoutRedirect()),

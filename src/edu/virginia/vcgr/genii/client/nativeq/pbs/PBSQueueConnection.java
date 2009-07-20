@@ -240,9 +240,18 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 		if (application.getSPMDVariation() != null)
 		{
 			Integer numProcs = application.getNumProcesses();
-			if (numProcs != null)
+			Integer numProcsPerHost = application.getNumProcessesPerHost();
+			
+			if (numProcs != null) 
 			{
-				script.format("#PBS -l nodes=%d\n", numProcs.intValue());
+				if (numProcsPerHost != null)
+				{
+					script.format("#PBS -l nodes=%d:ppn=%d\n", numProcs.intValue(), numProcsPerHost.intValue());
+				}
+				else 
+				{
+					script.format("#PBS -l nodes=%d:ppn=1\n", numProcs.intValue());	
+				}
 			}
 		}
 	}

@@ -21,6 +21,7 @@ public abstract class PosixLikeApplicationUnderstanding extends
 		CommonApplicationUnderstanding
 {
 	private Integer _numProcesses = null;
+	private Integer _numProcessesPerHost = null;
 	private URI _spmdVariation = null;
 	
 	private FilesystemRelativePath _executable = null;
@@ -58,6 +59,17 @@ public abstract class PosixLikeApplicationUnderstanding extends
 	{
 		return _numProcesses;
 	}
+	
+	public void setNumProcessesPerHost(int numProcessesPerHost)
+	{
+		_numProcessesPerHost = new Integer(numProcessesPerHost);
+	}
+	
+	public Integer getNumProcessesPerHost()
+	{
+		return _numProcessesPerHost;
+	}
+	
 	
 	public void setExecutable(FilesystemRelativePath executable)
 	{

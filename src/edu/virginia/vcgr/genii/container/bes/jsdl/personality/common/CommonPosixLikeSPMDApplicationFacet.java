@@ -28,6 +28,16 @@ public class CommonPosixLikeSPMDApplicationFacet
 		((PosixLikeApplicationUnderstanding)currentUnderstanding).setNumProcesses(
 			numberOfProcesses.intValue());
 	}
+	
+	@Override
+	public void consumeProcessesPerHost(Object currentUnderstanding,
+			Integer processesPerHost)
+			throws JSDLException
+	{
+				
+		((PosixLikeApplicationUnderstanding)currentUnderstanding).setNumProcessesPerHost(
+				processesPerHost.intValue());
+	}
 
 	@Override
 	public void consumeSPMDVariation(Object currentUnderstanding,

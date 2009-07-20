@@ -93,7 +93,7 @@ public class DefaultSPMDApplicationFacet extends DefaultPersonalityFacet
 
 	@Override
 	public void consumeProcessesPerHost(Object currentUnderstanding,
-			int processesPerHost) throws JSDLException
+			Integer processesPerHost) throws JSDLException
 	{
 		throw new UnsupportedJSDLElement(
 			new QName(SPMDConstants.JSDL_SPMD_NS, "ProcessesPerHost"));

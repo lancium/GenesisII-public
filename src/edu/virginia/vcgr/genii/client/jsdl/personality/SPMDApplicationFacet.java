@@ -32,7 +32,7 @@ public interface SPMDApplicationFacet extends PersonalityFacet
 		Object currentUnderstanding, Integer numberOfProcesses,
 		boolean useActualCPUCount) throws JSDLException;
 	public void consumeProcessesPerHost(
-		Object currentUnderstanding, int processesPerHost)
+		Object currentUnderstanding, Integer processesPerHost)
 			throws JSDLException;
 	public void consumeThreadsPerProcess(
 		Object currentUnderstanding, Integer threadsPerProcess,

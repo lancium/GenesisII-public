@@ -38,6 +38,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 	
 	private URI _spmdVariation;
 	private Integer _numProcesses;
+	private Integer _numProcessesPerHost;
 	private File _executable;
 	private Collection<String> _arguments;
 	private File _stdin;
@@ -49,7 +50,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 	transient private JobToken _jobToken = null;
 	transient private Boolean _terminate = null;
 	
-	public QueueProcessPhase(URI spmdVariation, Integer numProcesses,
+	public QueueProcessPhase(URI spmdVariation, Integer numProcesses, Integer numProcessesPerHost,
 		File executable, Collection<String> arguments, Map<String, String> environment,
 		File stdin, File stdout, File stderr, Properties queueProperties)
 	{
@@ -58,6 +59,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 	
 		_spmdVariation = spmdVariation;
 		_numProcesses = numProcesses;
+		_numProcessesPerHost = numProcessesPerHost;
 		_executable = executable;
 		_arguments = arguments;
 		_environment = environment;
@@ -124,7 +126,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 				}
 				
 				_jobToken = queue.submit(new ApplicationDescription(
-					_spmdVariation, _numProcesses, _executable.getAbsolutePath(),
+					_spmdVariation, _numProcesses, _numProcessesPerHost, _executable.getAbsolutePath(),
 					_arguments,
 					_environment, fileToPath(_stdin),
 					fileToPath(_stdout), fileToPath(_stderr)));

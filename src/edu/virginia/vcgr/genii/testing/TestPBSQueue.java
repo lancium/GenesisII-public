@@ -23,7 +23,7 @@ public class TestPBSQueue
 		arggs.add("mmm2a@virginia.edu");
 		File workingDir = new GuaranteedDirectory("/home/mmm2a/queue");
 		ApplicationDescription application = new ApplicationDescription(
-			SPMDConstants.ANY_MPI, new Integer(5),
+			SPMDConstants.ANY_MPI, new Integer(5), new Integer(1),
 			"mail", arggs, null, "/etc/passwd", "/dev/null", "/dev/null");
 		NativeQueue queue = NativeQueues.getNativeQueue("pbs");
 		
