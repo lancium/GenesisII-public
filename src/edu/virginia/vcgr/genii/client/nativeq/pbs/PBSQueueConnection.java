@@ -246,7 +246,8 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 			{
 				if (numProcsPerHost != null)
 				{
-					script.format("#PBS -l nodes=%d:ppn=%d\n", numProcs.intValue(), numProcsPerHost.intValue());
+					Integer hosts = numProcs / numProcsPerHost;
+					script.format("#PBS -l nodes=%d:ppn=%d\n", hosts.intValue(), numProcsPerHost.intValue());
 				}
 				else 
 				{
