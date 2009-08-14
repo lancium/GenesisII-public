@@ -695,6 +695,16 @@ FileSetSetup macosFileset = context.getFileSetById("23");
 
 boolean hasContainer = context.getInstallationComponentById("40").isSelected();
 context.setVariable("genii.hasContainer", new Boolean(hasContainer));
+
+if (context.getCompilerVariable("genii.isWindows").equals("true"))
+{
+    String domain = System.getenv("USERDOMAIN");
+    String machine = System.getenv("COMPUTERNAME");
+    if (machine.toUpperCase().contains(domain.toUpperCase()))
+        domain = ".";
+    context.setVariable("genii.wrapperdomain", domain);
+}
+
 return true;</string>
                           </void>
                         </object>
@@ -1627,7 +1637,7 @@ return memory;</string>
                             </object>
                           </void>
                           <void property="replaceValue">
-                            <string>.\</string>
+                            <string>\</string>
                           </void>
                           <void property="searchValue">
                             <string>MOOCH</string>
