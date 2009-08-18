@@ -17,7 +17,8 @@ import org.ggf.jsdl.OperatingSystemType_Type;
 import org.ggf.jsdl.OperatingSystem_Type;
 import org.ggf.jsdl.ProcessorArchitectureEnumeration;
 import org.ggf.jsdl.Resources_Type;
-
+import org.ggf.jsdl.RangeValue_Type;
+import org.ggf.jsdl.Boundary_Type;
 import edu.virginia.vcgr.genii.client.jsdl.personality.GeniiOrFacet;
 import edu.virginia.vcgr.genii.client.jsdl.personality.GeniiPropertyFacet;
 import edu.virginia.vcgr.genii.container.q2.besinfo.BESInformation;
@@ -100,6 +101,16 @@ public class ResourceMatcher
 		return info.getProcessorArchitecture().equals(pArch);
 	}
 	
+	static private boolean matchMem(BESInformation info, 
+			RangeValue_Type memRange)
+	{
+		Boundary_Type memUpperBound = memRange.getUpperBoundedRange();
+		if (memUpperBound == null)
+			return true;
+		
+		return (memUpperBound.get_value() <= info.getPhysicalMemory().doubleValue());
+	}
+	
 	static private boolean matchOS(BESInformation info, 
 		OperatingSystem_Type os)
 	{
@@ -175,6 +186,14 @@ public class ResourceMatcher
 		{
 			_logger.debug(
 				"Cannot match jsdl to bes information -- OS restrictinos don't match.");
+			return false;
+		}
+		
+		RangeValue_Type memoryRange = resources.getTotalPhysicalMemory();
+		if (memoryRange != null && !matchMem(besInfo, memoryRange))
+		{
+			_logger.debug(
+				"Cannot match jsdl to bes information -- Memory requirements don't match.");
 			return false;
 		}
 		

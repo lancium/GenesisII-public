@@ -35,6 +35,7 @@ public class BESInformation
 	private ProcessorArchitectureEnumeration _processorArchitecture;
 	private OperatingSystemTypeEnumeration _operatingSystemType;
 	private String _operatingSystemVerison;
+	private Double _physicalMemory;
 	
 	private boolean _isAcceptingNewActivites;
 	private long _numContainedActivities;
@@ -71,6 +72,12 @@ public class BESInformation
 					
 					_operatingSystemVerison = d4.getOperatingSystemVersion();
 				}	
+				
+				Double d6 = d2.getPhysicalMemory();
+				if (d6 != null)
+				{
+					_physicalMemory = d6;
+				}
 			}
 			
 			MessageElement []any = d1.get_any();
@@ -114,6 +121,8 @@ public class BESInformation
 		pw.format("%s Version %s on %s\n", 
 			_operatingSystemType, _operatingSystemVerison,
 			_processorArchitecture);
+		pw.format("%s bytes on physical memory available\n",
+				_physicalMemory);
 		pw.format(
 			"%d activites contained; accepting new ones?  %s\n",
 			_numContainedActivities, _isAcceptingNewActivites);
@@ -145,6 +154,11 @@ public class BESInformation
 	final public String getOperatingSystemVersion()
 	{
 		return _operatingSystemVerison;
+	}
+	
+	final public Double getPhysicalMemory()
+	{
+		return _physicalMemory;
 	}
 	
 	final public boolean isAcceptingNewActivities()
