@@ -37,6 +37,8 @@ public class CommonExecutionUnderstanding
 	private String _requiredOGRSHVersion = null;
 	private String _fuseDirectory = null;
 	
+	private Double _totalPhysicalMemory = null;
+	
 	private ApplicationUnderstanding _application = null;
 	
 	public CommonExecutionUnderstanding(FilesystemManager fsManager)
@@ -128,6 +130,16 @@ public class CommonExecutionUnderstanding
 		return _application.getWorkingDirectory();
 	}
 	
+	public Double getTotalPhysicalMemory()
+	{
+		return _totalPhysicalMemory;
+	}
+	
+	public void setTotalPhysicalMemory(Double totalPhysicalMemory)
+	{
+		_totalPhysicalMemory = totalPhysicalMemory;
+	}
+	
 	public Vector<ExecutionPhase> createExecutionPlan(
 		Properties creationProperties) throws JSDLException
 	{
@@ -173,9 +185,11 @@ public class CommonExecutionUnderstanding
 				new File(OGRSHConfigFilename)));
 		}
 		
+		JobUnderstandingContext jobContext = new JobUnderstandingContext(_requiredOGRSHVersion, getTotalPhysicalMemory());
+		
 		if (_application != null)
 			_application.addExecutionPhases(
-				creationProperties, ret, cleanups, _requiredOGRSHVersion);
+				creationProperties, ret, cleanups, jobContext);
 		
 		for (DataStagingUnderstanding stage : _stageOuts)
 		{

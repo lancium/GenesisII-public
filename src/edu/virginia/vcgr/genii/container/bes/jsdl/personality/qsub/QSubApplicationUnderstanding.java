@@ -18,8 +18,10 @@ import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.PrepareApplicationPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.QueueProcessPhase;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
+import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.JobUnderstandingContext;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.PosixLikeApplicationUnderstanding;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.StringOrPath;
+
 
 class QSubApplicationUnderstanding 
 	extends PosixLikeApplicationUnderstanding
@@ -33,9 +35,11 @@ class QSubApplicationUnderstanding
 	@Override
 	public void addExecutionPhases(Properties creationProperties,
 		Vector<ExecutionPhase> executionPlan,
-		Vector<ExecutionPhase> cleanupPhases, String ogrshVersion)
+		Vector<ExecutionPhase> cleanupPhases, JobUnderstandingContext jobContext)
 		throws JSDLException
 	{
+		String ogrshVersion = jobContext.getRequiredOGRSHVersion();
+		
 		Deployment deployment = Installation.getDeployment(
 			new DeploymentName());
 		DeploymentName depName = deployment.getName();
@@ -73,7 +77,8 @@ class QSubApplicationUnderstanding
 				fsManager.lookup(getStdinRedirect()),
 				fsManager.lookup(getStdoutRedirect()),
 				fsManager.lookup(getStderrRedirect()),
-				creationProperties));
+				creationProperties,
+				jobContext.getTotalPhysicalMemory()));
 		} else
 		{
 			stringEnv.put("BES_HOME", "/home/bes-job");
@@ -95,7 +100,8 @@ class QSubApplicationUnderstanding
 				fsManager.lookup(getStdinRedirect()),
 				fsManager.lookup(getStdoutRedirect()),
 				fsManager.lookup(getStderrRedirect()),
-				creationProperties));
+				creationProperties,
+				jobContext.getTotalPhysicalMemory()));
 		}
 	}
 }

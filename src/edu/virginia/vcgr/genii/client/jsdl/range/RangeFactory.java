@@ -8,6 +8,8 @@ import org.ggf.jsdl.Exact_Type;
 import org.ggf.jsdl.RangeValue_Type;
 import org.ggf.jsdl.Range_Type;
 
+import edu.virginia.vcgr.genii.client.jsdl.range.RangeDescription;
+
 abstract class CompositeRangeExpression implements RangeExpression
 {
 	protected Collection<RangeExpression> _expressions =
@@ -16,6 +18,18 @@ abstract class CompositeRangeExpression implements RangeExpression
 	public void addExpression(RangeExpression expr)
 	{
 		_expressions.add(expr);
+	}
+	
+	public RangeDescription describe()
+	{
+		RangeDescription description = new RangeDescription();
+		
+		for (RangeExpression expr : _expressions)
+		{
+			description.addDescription(expr.describe());
+		}
+		
+		return description;
 	}
 }
 
@@ -31,6 +45,7 @@ class CompositeAndRangeExpression extends CompositeRangeExpression
 		
 		return true;
 	}
+	
 }
 
 class CompositeOrRangeExpression extends CompositeRangeExpression
@@ -45,6 +60,7 @@ class CompositeOrRangeExpression extends CompositeRangeExpression
 		
 		return false;
 	}
+		
 }
 
 class ExactValueRangeExpression implements RangeExpression
@@ -65,6 +81,11 @@ class ExactValueRangeExpression implements RangeExpression
 		
 		return testValue == _value;
 	}
+	
+	public RangeDescription describe()
+	{		
+		return new RangeDescription((_value-_epsilon), (_value+_epsilon));
+	}
 }
 
 abstract class BoundRangeExpression implements RangeExpression
@@ -78,6 +99,7 @@ abstract class BoundRangeExpression implements RangeExpression
 		Boolean exclusive = boundary.getExclusiveBound();
 		_exclusive = (exclusive == null) ? false : true;
 	}
+	
 }
 
 class LowerBoundRangeExpression extends BoundRangeExpression
@@ -94,6 +116,11 @@ class LowerBoundRangeExpression extends BoundRangeExpression
 			
 		return testValue >= _bound;
 	}
+	
+	public RangeDescription describe()
+	{
+		return new RangeDescription(_bound, Double.NaN); 
+	}
 }
 
 class UpperBoundRangeExpression extends BoundRangeExpression
@@ -109,6 +136,11 @@ class UpperBoundRangeExpression extends BoundRangeExpression
 			return testValue < _bound;
 			
 		return testValue <= _bound;
+	}
+	
+	public RangeDescription describe()
+	{
+		return new RangeDescription(Double.NaN, _bound); 
 	}
 }
 

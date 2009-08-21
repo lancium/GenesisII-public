@@ -9,6 +9,7 @@ import edu.virginia.vcgr.genii.client.fuse.FuseUtils;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLMatchException;
 import edu.virginia.vcgr.genii.client.jsdl.personality.def.DefaultResourcesFacet;
+import edu.virginia.vcgr.genii.client.jsdl.range.RangeExpression;
 import edu.virginia.vcgr.genii.container.bes.OGRSHConstants;
 
 public class CommonResourcesFacet extends DefaultResourcesFacet
@@ -49,5 +50,14 @@ public class CommonResourcesFacet extends DefaultResourcesFacet
 				currentUnderstanding).setFuseMountDirectory(fuseDirectory);
 		} else
 			super.consumeAny(currentUnderstanding, any);
+	}
+	
+	@Override
+	public void consumeTotalPhysicalMemory(
+			Object currentUnderstanding,
+			RangeExpression totalPhysicalMemory) throws JSDLException
+	{
+		((CommonExecutionUnderstanding)currentUnderstanding).setTotalPhysicalMemory(
+				totalPhysicalMemory.describe().getUpperBound());
 	}
 }

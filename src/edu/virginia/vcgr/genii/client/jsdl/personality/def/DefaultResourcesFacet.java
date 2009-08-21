@@ -106,8 +106,8 @@ public class DefaultResourcesFacet extends DefaultPersonalityFacet implements
 	public void consumeTotalPhysicalMemory(Object currentUnderstanding,
 			RangeExpression totalPhysicalMemory) throws JSDLException
 	{
-		//throw new UnsupportedJSDLElement(
-			//new QName(JSDLConstants.JSDL_NS, "TotalPhysicalMemory"));
+		throw new UnsupportedJSDLElement(
+			new QName(JSDLConstants.JSDL_NS, "TotalPhysicalMemory"));
 	}
 
 	@Override

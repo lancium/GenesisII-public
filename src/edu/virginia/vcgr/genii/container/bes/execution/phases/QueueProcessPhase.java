@@ -47,12 +47,14 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 	private Map<String, String> _environment;
 	private Properties _queueProperties;
 	
+	private Double _totalPhysicalMemory;
+	
 	transient private JobToken _jobToken = null;
 	transient private Boolean _terminate = null;
 	
 	public QueueProcessPhase(URI spmdVariation, Integer numProcesses, Integer numProcessesPerHost,
 		File executable, Collection<String> arguments, Map<String, String> environment,
-		File stdin, File stdout, File stderr, Properties queueProperties)
+		File stdin, File stdout, File stderr, Properties queueProperties, Double totalPhysicalMemory)
 	{
 		super(new ActivityState(
 			ActivityStateEnumeration.Running, "Enqueing", false));
@@ -67,6 +69,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 		_stdin = stdin;
 		_stdout = stdout;
 		_stderr = stderr;
+		_totalPhysicalMemory = totalPhysicalMemory;
 	}
 	
 	@Override
@@ -129,7 +132,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 					_spmdVariation, _numProcesses, _numProcessesPerHost, _executable.getAbsolutePath(),
 					_arguments,
 					_environment, fileToPath(_stdin),
-					fileToPath(_stdout), fileToPath(_stderr)));
+					fileToPath(_stdout), fileToPath(_stderr), _totalPhysicalMemory));
 				context.setProperty(JOB_TOKEN_PROPERTY, _jobToken);
 			}
 			

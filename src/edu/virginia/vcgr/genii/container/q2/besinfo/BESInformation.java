@@ -121,7 +121,7 @@ public class BESInformation
 		pw.format("%s Version %s on %s\n", 
 			_operatingSystemType, _operatingSystemVerison,
 			_processorArchitecture);
-		pw.format("%s bytes on physical memory available\n",
+		pw.format("%s bytes of physical memory available\n",
 				_physicalMemory);
 		pw.format(
 			"%d activites contained; accepting new ones?  %s\n",

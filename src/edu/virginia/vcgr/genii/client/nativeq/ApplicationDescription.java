@@ -17,12 +17,14 @@ public class ApplicationDescription
 	private String _stdinRedirect;
 	private String _stdoutRedirect;
 	private String _stderrRedirect;
+	private Double _totalPhysicalMemory;
 	
 	public ApplicationDescription(
 		URI spmdVariation, Integer numProcesses, Integer numProcessesPerHost,
 		String executableName, Collection<String> arguments,
 		Map<String, String> environment,
-		String stdinRedirect, String stdoutRedirect, String stderrRedirect)
+		String stdinRedirect, String stdoutRedirect, String stderrRedirect,
+		Double totalPhysicalMemory)
 	{
 		_spmdVariation = spmdVariation;
 		_numProcesses = numProcesses;
@@ -43,6 +45,8 @@ public class ApplicationDescription
 		_stdinRedirect = stdinRedirect;
 		_stdoutRedirect = stdoutRedirect;
 		_stderrRedirect = stderrRedirect;
+		
+		_totalPhysicalMemory = totalPhysicalMemory;
 	}
 
 	public URI getSPMDVariation()
@@ -88,5 +92,10 @@ public class ApplicationDescription
 	public String getStderrRedirect()
 	{
 		return _stderrRedirect;
+	}
+	
+	public Double getTotalPhysicalMemory()
+	{
+		return _totalPhysicalMemory;
 	}
 }

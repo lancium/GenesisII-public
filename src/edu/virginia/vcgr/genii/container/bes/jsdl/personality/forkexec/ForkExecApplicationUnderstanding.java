@@ -22,6 +22,7 @@ import edu.virginia.vcgr.genii.container.bes.execution.phases.SetupFUSEPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.StreamRedirectionDescription;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.TeardownFUSEPhase;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
+import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.JobUnderstandingContext;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.PosixLikeApplicationUnderstanding;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.StringOrPath;
 
@@ -36,9 +37,11 @@ class ForkExecApplicationUnderstanding extends PosixLikeApplicationUnderstanding
 	@Override
 	public void addExecutionPhases(Properties creationProperties,
 			Vector<ExecutionPhase> executionPlan,
-			Vector<ExecutionPhase> cleanupPhases, String ogrshVersion)
+			Vector<ExecutionPhase> cleanupPhases, JobUnderstandingContext jobContext)
 			throws JSDLException
 	{
+		String ogrshVersion = jobContext.getRequiredOGRSHVersion();
+		
 		StreamRedirectionDescription redirection = 
 			getStreamRedirectionDescription();
 		

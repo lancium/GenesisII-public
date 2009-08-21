@@ -241,7 +241,7 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 		{
 			Integer numProcs = application.getNumProcesses();
 			Integer numProcsPerHost = application.getNumProcessesPerHost();
-			
+						
 			if (numProcs != null) 
 			{
 				if (numProcsPerHost != null)
@@ -254,6 +254,13 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 					script.format("#PBS -l nodes=%d:ppn=1\n", numProcs.intValue());	
 				}
 			}
+			
+		}
+		
+		Double totalPhyscialMemory = application.getTotalPhysicalMemory();
+		if ( (totalPhyscialMemory != null) && (!totalPhyscialMemory.equals(Double.NaN)) )
+		{
+			script.format("#PBS -l mem=%d\n", totalPhyscialMemory.intValue());
 		}
 	}
 

@@ -16,6 +16,6 @@ public interface ApplicationUnderstanding
 		Properties creationProperties,
 		Vector<ExecutionPhase> executionPlan, 
 		Vector<ExecutionPhase> cleanupPhases,
-		String ogrshVersion)
+		JobUnderstandingContext jobContext)
 			throws JSDLException;
 }
