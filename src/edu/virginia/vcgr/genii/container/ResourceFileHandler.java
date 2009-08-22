@@ -82,7 +82,9 @@ public class ResourceFileHandler extends AbstractHandler
 				PrintStream ps = new PrintStream(out);
 				ps.println("<html><head><title>Error Page</title></head><body>");
 				ps.println("Error trying to generate static web page:");
+				ps.println("<pre>");
 				ioe.printStackTrace(ps);
+				ps.println("</pre>");
 			} else
 				throw ioe;
 		}

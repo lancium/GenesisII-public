@@ -201,15 +201,17 @@ public class Container extends ApplicationBase
 		socketConnector.setAcceptors(_containerConfiguration.getMaxAcceptorThreads());
 		server.addConnector(socketConnector);
 		
-		ContextHandler context = new ContextHandler();
-		context.setContextPath("/");
-		context.setResourceBase("edu/virginia/vcgr/genii/container");
+		ContextHandler context = new ContextHandler("/axis");
 		server.addHandler(context);
-		
 		webAppCtxt = new WebAppContext(
 				Installation.axisWebApplicationPath().getAbsolutePath(),
-				"/axis");
-		server.addHandler(webAppCtxt);
+				"/");
+		context.addHandler(webAppCtxt);
+		
+		context = new ContextHandler("/");
+		server.addHandler(context);
+		context.addHandler(new ResourceFileHandler(
+			"edu/virginia/vcgr/genii/container"));
 		
 		try
 		{
