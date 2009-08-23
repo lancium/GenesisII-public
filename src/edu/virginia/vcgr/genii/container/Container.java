@@ -58,6 +58,7 @@ import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 import edu.virginia.vcgr.genii.container.configuration.ContainerConfiguration;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.deployment.ServiceDeployer;
+import edu.virginia.vcgr.genii.container.dynpages.DynamicPageHandler;
 import edu.virginia.vcgr.genii.container.invoker.GAroundInvokerFactory;
 import edu.virginia.vcgr.genii.container.alarms.AlarmManager;
 import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver;
@@ -207,6 +208,10 @@ public class Container extends ApplicationBase
 				Installation.axisWebApplicationPath().getAbsolutePath(),
 				"/");
 		context.addHandler(webAppCtxt);
+		
+		context = new ContextHandler("/pages");
+		server.addHandler(context);
+		context.addHandler(new DynamicPageHandler("edu/virginia/vcgr/genii/container/pages"));
 		
 		context = new ContextHandler("/");
 		server.addHandler(context);

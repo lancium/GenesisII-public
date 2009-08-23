@@ -28,4 +28,10 @@ public class BESWorkingDirectory
 	{
 		return _mustDelete;
 	}
+	
+	@Override
+	public String toString()
+	{
+		return _workingDirectory.toString();
+	}
 }

@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
@@ -94,6 +95,11 @@ public class QueueManager implements Closeable
 		}
 		
 		return _informationPortal;
+	}
+	
+	synchronized static public Collection<String> listAllQueues()
+	{
+		return new Vector<String>(_queueManager.keySet());
 	}
 	
 	/**

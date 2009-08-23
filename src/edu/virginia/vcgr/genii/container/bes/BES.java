@@ -67,6 +67,14 @@ public class BES implements Closeable
 		}
 	}
 	
+	static public Collection<String> listBESs()
+	{
+		synchronized(_knownInstances)
+		{
+			return new Vector<String>(_knownInstances.keySet());
+		}
+	}
+	
 	static public BES findBESForActivity(String activityid)
 	{
 		synchronized(_activityToBESMap)
