@@ -3,3 +3,5 @@ class-method-stats.html=[class]ClassMethodStatistics
 
 bes-info.html=[class]BESInformation
 queue-info.html=[class]QueueInformation
+
+graph.png=[class]GraphGenerator

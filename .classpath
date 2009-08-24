@@ -28,6 +28,8 @@
 	<classpathentry kind="lib" path="ext/fuse/fuse-j.jar"/>
 	<classpathentry kind="lib" path="ApplicationWatcher/app-manager.jar"/>
 	<classpathentry kind="lib" path="ext/GeniiProcessMgmt/GeniiProcMgmt.jar"/>
+	<classpathentry kind="lib" path="ext/jfreechart/jfreechart-1.0.13.jar"/>
+	<classpathentry kind="lib" path="ext/jfreechart/jcommon-1.0.16.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="ext/derby/derby.jar"/>
 	<classpathentry kind="lib" path="ext/xmldb/db.jar"/>

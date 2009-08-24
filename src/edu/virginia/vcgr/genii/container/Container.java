@@ -209,9 +209,12 @@ public class Container extends ApplicationBase
 				"/");
 		context.addHandler(webAppCtxt);
 		
+		/*
 		context = new ContextHandler("/pages");
 		server.addHandler(context);
 		context.addHandler(new DynamicPageHandler("edu/virginia/vcgr/genii/container/pages"));
+		*/
+		DynamicPageHandler.addDynamicPages(server);
 		
 		context = new ContextHandler("/");
 		server.addHandler(context);
