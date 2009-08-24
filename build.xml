@@ -35,6 +35,10 @@
 		<fileset dir="${ant.home}" includes="**/*.jar"/>
 	</path>
 
+	<path id="jfreechart.classpath">
+		<fileset dir="${jfreechart.home}" includes="**/*.jar"/>
+	</path>
+
 	<path id="axis.classpath">
 		<fileset dir="${axis.home}" includes="**/*.jar"/>
 	</path>
@@ -72,6 +76,7 @@
 		<pathelement location="${gennedobj-dir}"/>
 		<path refid="jsch.classpath"/>
 		<path refid="ant.classpath"/>
+		<path refid="jfreechart.classpath"/>
 		<path refid="axis.classpath"/>
 		<path refid="jetty.classpath"/>
 		<path refid="appmanager.classpath"/>
