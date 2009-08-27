@@ -112,7 +112,6 @@ import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
-import edu.virginia.vcgr.genii.container.sysinfo.SystemInfoUtils;
 
 public class GeniiBESServiceImpl extends GenesisIIBase implements
 	GeniiBESPortType, BESConstants
@@ -504,9 +503,9 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 						BESAttributesHandler.getCPUArchitecture(),
 						new Double((double)BESAttributesHandler.getCPUCount()),
 						new Double(
-							(double)SystemInfoUtils.getIndividualCPUSpeed()),
-						new Double((double)SystemInfoUtils.getPhysicalMemory()),
-						new Double((double)SystemInfoUtils.getVirtualMemory()),
+							(double)BESAttributesHandler.getCPUSpeed()),
+						new Double((double)BESAttributesHandler.getPhysicalMemory()),
+						new Double((double)BESAttributesHandler.getVirtualMemory()),
 						null),
 					BESAttributesHandler.getIsAcceptingNewActivities(),
 					BESAttributesHandler.getName(),
