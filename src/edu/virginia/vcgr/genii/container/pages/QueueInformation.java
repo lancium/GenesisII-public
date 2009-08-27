@@ -1,18 +1,16 @@
 package edu.virginia.vcgr.genii.container.pages;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.sql.SQLException;
+import java.util.Map;
 
-import org.ggf.rns.EntryType;
-
-import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.container.dynpages.InjectParameter;
-import edu.virginia.vcgr.genii.container.dynpages.SimpleTitledHtmlPage;
+import edu.virginia.vcgr.genii.container.dynpages.templates.GenesisIIStyledPage;
 import edu.virginia.vcgr.genii.container.q2.QueueManager;
-import edu.virginia.vcgr.genii.queue.ReducedJobInformationType;
 
-public class QueueInformation extends SimpleTitledHtmlPage
+public class QueueInformation extends GenesisIIStyledPage
 {
 	static final private String PAGE_TITLE = "Grid Queue Information";
 	
@@ -31,45 +29,39 @@ public class QueueInformation extends SimpleTitledHtmlPage
 		ps.println("</UL>");
 	}
 	
+	private void generateResourcesAvailable(PrintStream ps, QueueManager queue)
+		throws IOException
+	{
+		ps.format("<H2>Total Resources Available:  %d</H2><BR/>", queue.totalSlots());
+		ps.println("<TABLE border=\"0\" cellpadding=\"50\">");
+		ps.println("<TR>");
+		ps.println("<TD>");
+		ps.println("<UL>");
+		Map<String, Long> jobMap = queue.summarizeJobs();
+		for (String category : jobMap.keySet())
+			ps.format("<LI>%d Jobs %s</LI>", jobMap.get(category), category);
+		ps.println("</UL>");
+		ps.println("</TD>");
+		ps.println("<TD>");
+		ps.format("<IMG SRC=\"queue-resources.png?queueID=%s\" " +
+			"ALT=\"*\" width\"%d\" height=\"%d\"/>",
+			_queueID, QueueResources.WIDTH, QueueResources.HEIGHT);
+		ps.println("</TD>");
+		ps.println("</TR>");
+		ps.println("</TABLE>");
+	}
+	
 	private void generateQueuePage(PrintStream ps, String queueID)
 		throws IOException
 	{
-		ps.format("<H2>Information for Grid Queue %s</H2>", queueID);
-		
 		try
 		{
 			QueueManager queue = QueueManager.getManager(queueID);
 			if (queue == null)
+				throw new FileNotFoundException("Couldn't find target Queue.");
+			else
 			{
-				ps.println("<BOLD>None Available</BOLD>");
-				return;
-			} else
-			{
-				ps.println("<TABLE border=\"1\">");
-				ps.println("<CAPTION>Container BES Resources</CAPTION>");
-				ps.println("<TR bgcolor=\"#7FFD4\"><TH>BES Name</TH><TH>Slots Configured</TH></TR>");
-				for (EntryType entry : queue.listBESs(null))
-				{
-					ps.format("<TR><TD>%s</TD><TD>%d</TD></TR>",
-						entry.getEntry_name(), 
-						queue.getBESConfiguration(entry.getEntry_name()));
-				}
-				ps.println("</TABLE>");
-				
-				ps.println("<BR>");
-				
-				ps.println("<TABLE border=\"1\">");
-				ps.println("<CAPTION>Contained Jobs</CAPTION>");
-				ps.println("<TR bgcolor=\"#7FFD4\"><TH>Job Ticket</TH><TH>Job State</TH></TR>");
-				for (ReducedJobInformationType rji : queue.listJobs(null))
-				{
-					String ticket = rji.getJobTicket();
-					QueueStates state = QueueStates.fromQueueStateType(rji.getJobStatus());
-					
-					ps.format("<TR><TD>%s</TD><TD>%s</TD></TR>",
-						ticket, state);
-				}
-				ps.println("</TABLE>");
+				generateResourcesAvailable(ps, queue);
 			}
 		}
 		catch (SQLException sqe)
@@ -80,7 +72,7 @@ public class QueueInformation extends SimpleTitledHtmlPage
 	}
 	
 	@Override
-	protected void generateBody(PrintStream ps) throws IOException
+	protected void generateContent(PrintStream ps) throws IOException
 	{
 		if (_queueID == null)
 			generateAllQueuesPage(ps);
@@ -90,6 +82,6 @@ public class QueueInformation extends SimpleTitledHtmlPage
 	
 	public QueueInformation()
 	{
-		super(PAGE_TITLE);
+		super("images/grid_logo_medium.jpg", PAGE_TITLE);
 	}
 }

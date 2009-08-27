@@ -11,10 +11,11 @@ import edu.virginia.vcgr.genii.client.stats.MethodStatistics;
 import edu.virginia.vcgr.genii.client.stats.MethodStatisticsReport;
 import edu.virginia.vcgr.genii.client.stats.MethodStatisticsReportPoint;
 import edu.virginia.vcgr.genii.client.stats.TimeInterval;
-import edu.virginia.vcgr.genii.container.dynpages.SimpleTitledHtmlPage;
+import edu.virginia.vcgr.genii.container.dynpages.templates.GenesisIIStyledPage;
 
-public class ContainerStatistics extends SimpleTitledHtmlPage
+public class ContainerStatistics extends GenesisIIStyledPage
 {
+	static final private String LOGO_LOCATION = "images/grid_logo_medium.jpg";
 	static final private String PAGE_TITLE = "Genesis II Container Statistics";
 	
 	static private void printClassTable(PrintStream ps,
@@ -42,11 +43,11 @@ public class ContainerStatistics extends SimpleTitledHtmlPage
 	
 	public ContainerStatistics()
 	{
-		super(PAGE_TITLE);
+		super(LOGO_LOCATION, PAGE_TITLE);
 	}
 
 	@Override
-	protected void generateBody(PrintStream ps) throws IOException
+	protected void generateContent(PrintStream ps) throws IOException
 	{
 		edu.virginia.vcgr.genii.client.stats.ContainerStatistics stats = 
 			edu.virginia.vcgr.genii.client.stats.ContainerStatistics.instance();

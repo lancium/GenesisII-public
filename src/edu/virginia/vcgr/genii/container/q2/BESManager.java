@@ -653,6 +653,11 @@ public class BESManager implements Closeable
 		return _scheduleableContainers.values();
 	}
 	
+	synchronized public Collection<BESData> getAllBESs()
+	{
+		return _containersByID.values();
+	}
+	
 	/**
 	 * An internal class that we use to "late-bind" BES keys to
 	 * the BES container's EPR.  This allows us to avoid ever

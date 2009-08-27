@@ -5,3 +5,4 @@ bes-info.html=[class]BESInformation
 queue-info.html=[class]QueueInformation
 
 graph.png=[class]GraphGenerator
+queue-resources.png=[class]QueueResources

@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
@@ -29,6 +30,9 @@ import edu.virginia.vcgr.genii.container.cservices.infomgr.InformationPortal;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.besinfo.BESInformation;
 import edu.virginia.vcgr.genii.container.q2.besinfo.BESInformationResolver;
+import edu.virginia.vcgr.genii.container.q2.summary.HostDescription;
+import edu.virginia.vcgr.genii.container.q2.summary.ResourceSummary;
+import edu.virginia.vcgr.genii.container.q2.summary.SlotSummary;
 import edu.virginia.vcgr.genii.queue.JobErrorPacket;
 import edu.virginia.vcgr.genii.queue.JobInformationType;
 import edu.virginia.vcgr.genii.queue.ReducedJobInformationType;
@@ -460,9 +464,93 @@ public class QueueManager implements Closeable
 		}
 	}
 	
+	public Map<String, Long> summarizeJobs()
+	{
+		return _jobManager.summarizeToMap();
+	}
+	
 	public void summarize(PrintStream out) throws IOException, SQLException
 	{
 		_besManager.summarize(out);
-		_jobManager.summarize(out);
+		Map<String, Long> jobMap = _jobManager.summarizeToMap();
+		
+		out.println("Queue Job Summary\n-----------------------------\n");
+		for (String category : jobMap.keySet())
+		{
+			out.format("\t%s:  %d\n", jobMap.get(category));
+		}
+	}
+	
+	public long totalSlots()
+	{
+		long total = 0L;
+		
+		synchronized(_besManager)
+		{
+			/* Get all available resources */
+			Collection<BESData> allResources = _besManager.getAllBESs();
+
+			/* If we didn't get any resources back, then there's no reason
+			 * to continue.
+			 */
+			if (allResources.size() == 0)
+				return total;
+			
+			/* Now we go through the list and get rid of all resources that
+			 * had no slots allocated.
+			 */
+			for (BESData data : allResources)
+				total += data.getTotalSlots();
+		}
+		
+		return total;
+	}
+	
+	public ResourceSummary summarize()
+	{
+		ResourceSummary summary = new ResourceSummary();
+		Map<Long, SlotSummary> hostSlotSummary = 
+			new HashMap<Long, SlotSummary>();
+		
+		synchronized(_besManager)
+		{
+			/* Get all available resources */
+			Collection<BESData> allResources = _besManager.getAllBESs();
+
+			/* If we didn't get any resources back, then there's no reason
+			 * to continue.
+			 */
+			if (allResources.size() == 0)
+				return summary;
+			
+			/* Now we go through the list and get rid of all resources that
+			 * had no slots allocated.
+			 */
+			for (BESData data : allResources)
+				hostSlotSummary.put(data.getID(), 
+					new SlotSummary(data.getTotalSlots(), 0L));
+		}
+		
+		synchronized(_jobManager)
+		{
+			_jobManager.recordUsedSlots(hostSlotSummary);
+		}
+		
+		synchronized(_besManager)
+		{
+			for (Long besID : hostSlotSummary.keySet())
+			{
+				BESInformation info = _besManager.getBESInformation(besID);
+				if (info != null)
+				{
+					summary.add(new HostDescription(
+						info.getProcessorArchitecture(), 
+						info.getOperatingSystemType()),
+						hostSlotSummary.get(besID));
+				}
+			}
+		}
+		
+		return summary;
 	}
 }

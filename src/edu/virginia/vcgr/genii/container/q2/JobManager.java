@@ -2,7 +2,6 @@ package edu.virginia.vcgr.genii.container.q2;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.security.GeneralSecurityException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -11,8 +10,10 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -53,6 +54,7 @@ import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
 import edu.virginia.vcgr.genii.common.notification.Subscribe;
 import edu.virginia.vcgr.genii.common.notification.UserDataType;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.q2.summary.SlotSummary;
 import edu.virginia.vcgr.genii.queue.JobErrorPacket;
 import edu.virginia.vcgr.genii.queue.JobInformationType;
 import edu.virginia.vcgr.genii.queue.JobStateEnumerationType;
@@ -990,8 +992,10 @@ public class JobManager implements Closeable
 		originalCount, newCount));
 	}
 	
-	synchronized public void summarize(PrintStream out)
+	synchronized public Map<String, Long> summarizeToMap()
 	{
+		Map<String, Long> ret = new LinkedHashMap<String, Long>();
+		
 		long queued = 0;
 		long running = 0;
 		long starting = 0;
@@ -999,7 +1003,6 @@ public class JobManager implements Closeable
 		long error = 0;
 		long requeued = 0;
 		
-		out.println("Queue Job Summary\n-----------------------------\n");
 		for (JobData jobData : _jobsByID.values())
 		{
 			QueueStates state = jobData.getJobState();
@@ -1016,12 +1019,15 @@ public class JobManager implements Closeable
 			else if (state == QueueStates.FINISHED)
 				finished++;
 		}
-		out.format("\tQueued:     %d\n", queued);
-		out.format("\tRe-queued:  %d\n", requeued);
-		out.format("\tStarting:   %d\n", starting);
-		out.format("\tRunning:    %d\n", running);
-		out.format("\tError:      %d\n", error);
-		out.format("\tFinished:   %d\n", finished);
+		
+		ret.put("Queued", queued);
+		ret.put("Re-queued", requeued);
+		ret.put("Starting", starting);
+		ret.put("Running", running);
+		ret.put("Error", error);
+		ret.put("Finished", finished);
+		
+		return ret;
 	}
 	
 	/**
@@ -1135,6 +1141,24 @@ public class JobManager implements Closeable
 				if (rs.slotsAvailable() <= 0)
 					slots.remove(besID);
 			}
+		}
+	}
+	
+	synchronized public void recordUsedSlots(Map<Long, SlotSummary> slots)
+	{
+		/* Iterate through all running jobs and reduce the slot count from
+		 * resources that they are using.
+		 */
+		for (JobData job : _runningJobs.values())
+		{
+			/* Get the bes id that the job is running on */
+			Long besID = job.getBESID();
+			if (besID == null)
+				continue;
+			
+			SlotSummary summary = slots.get(besID);
+			if (summary != null)
+				summary.add(-1, 1);
 		}
 	}
 	
