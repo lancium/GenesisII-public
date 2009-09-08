@@ -105,7 +105,7 @@ public class ExportTool extends BaseGridTool
 			/* get local directory path to be exported */
 			String localPath = getArgument(1);
 			
-			EndpointReferenceType epr = createExportedRoot(
+			EndpointReferenceType epr = createExportedRoot(targetRNSName,
 				exportServiceEPR, localPath, targetRNSName, _replicate);
 
 			if (targetRNSName == null)
@@ -223,8 +223,8 @@ public class ExportTool extends BaseGridTool
 	}
 	
 	static public EndpointReferenceType createExportedRoot(
-			EndpointReferenceType exportServiceEPR, String localPath, 
-			String RNSPath, boolean isReplicated) 
+		String humanName, EndpointReferenceType exportServiceEPR, 
+		String localPath, String RNSPath, boolean isReplicated) 
 		throws ResourceException,
 			ResourceCreationFaultType, RemoteException, RNSException,
 			CreationException, IOException
@@ -236,7 +236,7 @@ public class ExportTool extends BaseGridTool
 			replicationIndicator = "true";
 		
 		MessageElement[] createProps = ExportedDirUtils.createCreationProperties(
-			localPath, "", replicationIndicator);
+			humanName, localPath, "", replicationIndicator);
 		
 		ICallingContext origContext = ContextManager.getCurrentContext();
 		ICallingContext createContext = origContext.deriveNewContext();

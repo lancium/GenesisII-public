@@ -23,6 +23,7 @@ import org.ws.addressing.ReferenceParametersType;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
+import edu.virginia.vcgr.genii.client.container.ContainerConstants;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
@@ -455,6 +456,10 @@ public class ResourceManager
 			}
 
 		}
+		
+		any.add(new MessageElement(
+			ContainerConstants.CONTAINER_ID_METADATA_ELEMENT,
+			Container.getContainerID().toString()));
 
 		// Add container key
 

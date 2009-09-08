@@ -25,6 +25,16 @@ public class BasicDBResourceFactory implements IResourceFactory
 			"paramvalue VARCHAR(256), " +
 			"CONSTRAINT matchingparamsconstraint1 PRIMARY KEY " +
 				"(resourceid, paramname, paramvalue))";
+	static private final String _CREATE_RESOURCES_TABLE_STMT =
+		"CREATE TABLE resources2(resourceid VARCHAR(128) PRIMARY KEY," +
+			"implementingclass VARCHAR(512) NOT NULL, " +
+			"epi VARCHAR(512) NOT NULL, " +
+			"humanname VARCHAR(512), " +
+			"epr BLOB(2G))";
+	static private final String _CREATE_RESOURCES_IMPL_CLASS_INDEX =
+		"CREATE INDEX resources2implclassindex ON resources2(implementingclass)";
+	static private final String _CREATE_RESOURCES_EPI_INDEX =
+		"CREATE INDEX resources2epiindex ON resources2(epi)";
 	
 	protected DatabaseConnectionPool _pool;
 	
@@ -57,7 +67,10 @@ public class BasicDBResourceFactory implements IResourceFactory
 			DatabaseTableUtils.createTables(conn, false,
 				_CREATE_KEY_TABLE_STMT,
 				_CREATE_PROPERTY_TABLE_STMT,
-				_CREATE_MATCHING_PARAMS_STMT);
+				_CREATE_MATCHING_PARAMS_STMT,
+				_CREATE_RESOURCES_TABLE_STMT,
+				_CREATE_RESOURCES_IMPL_CLASS_INDEX,
+				_CREATE_RESOURCES_EPI_INDEX);
 			conn.commit();
 		}
 		finally

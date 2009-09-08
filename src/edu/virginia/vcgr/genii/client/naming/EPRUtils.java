@@ -36,6 +36,7 @@ import org.xml.sax.InputSource;
 
 import edu.virginia.vcgr.genii.common.security.*;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.container.ContainerConstants;
 import edu.virginia.vcgr.genii.client.ogsa.OGSARP;
 import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
 import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
@@ -556,5 +557,30 @@ public class EPRUtils
 		throws ResourceException
 	{
 		return fromBytes(toBytes(epr));
+	}
+	
+	static public GUID extractContainerID(EndpointReferenceType epr)
+	{
+		if (epr == null)
+			return null;
+		
+		MetadataType md = epr.getMetadata();
+		if (md == null)
+			return null;
+		
+		MessageElement []any = md.get_any();
+		if (any == null)
+			return null;
+		
+		for (MessageElement element : any)
+		{
+			QName name = element.getQName();
+			if (name.equals(ContainerConstants.CONTAINER_ID_METADATA_ELEMENT))
+			{
+				return GUID.fromString(element.getValue());
+			}
+		}
+		
+		return null;
 	}
 }

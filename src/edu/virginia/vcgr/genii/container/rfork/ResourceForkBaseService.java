@@ -351,6 +351,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 			_forkLock = new Object();
 		
 		addImplementedPortType(WellKnownPortTypes.RESOURCE_FORK_PORT_TYPE);
+		addImplementedPortType(RNSConstants.ENHANCED_RNS_PORT_TYPE);
 	}
 	
 	@Override

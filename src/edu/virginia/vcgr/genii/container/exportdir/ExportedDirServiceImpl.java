@@ -276,7 +276,7 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 				resource.getParentIds(), resource.getId());
 			String isReplicated = resource.getReplicationState();
 			newRef =
-				vcgrCreate(new VcgrCreate(ExportedDirUtils.createCreationProperties(
+				vcgrCreate(new VcgrCreate(ExportedDirUtils.createCreationProperties(null,
 					fullPath, 
 					parentIds, 
 					isReplicated))).getEndpoint();

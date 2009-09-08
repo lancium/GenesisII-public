@@ -107,6 +107,16 @@ public class TypeInformation
 		return hasPortType(BESConstants.GENII_BES_PORT_TYPE);
 	}
 	
+	public boolean isLightweightExport()
+	{
+		return hasPortType(WellKnownPortTypes.EXPORTED_LIGHTWEIGHT_ROOT_SERVICE_PORT_TYPE);
+	}
+	
+	public boolean isExport()
+	{
+		return hasPortType(WellKnownPortTypes.EXPORTED_ROOT_SERVICE_PORT_TYPE);
+	}
+	
 	public boolean isQueue()
 	{
 		return hasPortType(QueueConstants.QUEUE_PORT_TYPE);

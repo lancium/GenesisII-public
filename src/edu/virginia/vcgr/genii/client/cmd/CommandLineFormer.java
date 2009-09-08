@@ -5,7 +5,7 @@ import java.util.Collection;
 
 public class CommandLineFormer
 {
-	static public String[] formCommandLine(String line) throws ToolException
+	static public String[] formCommandLine(String line)
 	{
 		boolean insideQuotes = false;
 		StringBuilder builder = null;

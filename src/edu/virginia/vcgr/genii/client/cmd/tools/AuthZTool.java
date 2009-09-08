@@ -62,6 +62,9 @@ public class AuthZTool extends BaseGridTool
 				stdout.flush();
 				
 				String input = stdin.readLine();
+				if (input == null)
+					return 0;
+				
 				stdout.println();
 				int choice = 0;					
 				try {
@@ -78,6 +81,8 @@ public class AuthZTool extends BaseGridTool
 						stdout.println("Invalid choice.");
 					} else {
 						config = subTool.modifyAuthZConfig(config, stdout, stderr, stdin);
+						if (config == null)
+							return 0;
 						chosen = true;
 					}
 					break;

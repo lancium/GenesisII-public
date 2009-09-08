@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Vector;
 
 import javax.xml.namespace.QName;
 
@@ -28,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.comm.ClientConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
 public class ExportedDirUtils
@@ -93,24 +95,26 @@ public class ExportedDirUtils
 		}
 	}
 	
-	static public MessageElement[] createCreationProperties(
+	static public MessageElement[] createCreationProperties(String humanName,
 		String path, String parentIds, String isReplicated)
 	{
-		MessageElement []any = new MessageElement[5];
-		any[0] = new MessageElement(new QName(
-			GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME), path);
-		any[1] = new MessageElement(new QName(
-			GenesisIIConstants.GENESISII_NS, _PARENT_IDS_ELEM_NAME), parentIds);
-		any[2] = new MessageElement(new QName(
-			GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR), isReplicated);
-		any[3] = new MessageElement(new QName(
+		Collection<MessageElement> any = new Vector<MessageElement>(6);
+		any.add(new MessageElement(new QName(
+			GenesisIIConstants.GENESISII_NS, _PATH_ELEM_NAME), path));
+		any.add(new MessageElement(new QName(
+			GenesisIIConstants.GENESISII_NS, _PARENT_IDS_ELEM_NAME), parentIds));
+		any.add(new MessageElement(new QName(
+			GenesisIIConstants.GENESISII_NS, _REPLICATION_INDICATOR), isReplicated));
+		any.add(new MessageElement(new QName(
 			GenesisIIConstants.GENESISII_NS, _LAST_MODIFIED_TIME), 
-			getLastModifiedTime(path));
-		any[4] = new MessageElement(new QName(
+			getLastModifiedTime(path)));
+		any.add(new MessageElement(new QName(
 			GenesisIIConstants.GENESISII_NS, _REXPORT_RESOLVER_EPR),
-			null);
+			null));
+		if (humanName != null)
+			any.add(ClientConstructionParameters.createHumanNameProperty(humanName));
 		
-		return any;
+		return any.toArray(new MessageElement[any.size()]);
 	}
 	
 	static public MessageElement[] createReplicationCreationProperties(

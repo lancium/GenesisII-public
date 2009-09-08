@@ -254,6 +254,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.DownloadCertificateTool</mconf:class>
 		<mconf:class name="bes-manager"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.BESManager</mconf:class>
+		<mconf:class name="client-ui"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ClientApplicationUITool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

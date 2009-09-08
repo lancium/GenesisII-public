@@ -12,6 +12,9 @@ public class ClientConstructionParameters
 	static public QName TIME_TO_LIVE_PROPERTY_ELEMENT =
 		new QName(GenesisIIConstants.GENESISII_NS, "time-to-live");
 	
+	static public QName HUMAN_NAME_PROPERTY_ELEMENT =
+		new QName(GenesisIIConstants.GENESISII_NS, "human-name");
+	
 	static public MessageElement createTimeToLiveProperty(long timeToLiveMS)
 	{
 		MessageElement ret = new MessageElement(TIME_TO_LIVE_PROPERTY_ELEMENT);
@@ -39,4 +42,13 @@ public class ClientConstructionParameters
 		return new org.apache.axis.types.URI((m.getValue()));
 	}
 
+	static public MessageElement createHumanNameProperty(String humanName)
+	{
+		return new MessageElement(HUMAN_NAME_PROPERTY_ELEMENT, humanName);
+	}
+	
+	static public String getHumanNameProperty(MessageElement me)
+	{
+		return me.getValue();
+	}
 }

@@ -13,6 +13,8 @@ import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 
@@ -53,6 +55,7 @@ import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.configuration.SecurityConstants;
+import edu.virginia.vcgr.genii.client.container.ContainerIDFile;
 import edu.virginia.vcgr.genii.client.comm.jetty.TrustAllSslSocketConnector;
 import edu.virginia.vcgr.genii.client.install.InstallationState;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
@@ -123,6 +126,8 @@ public class Container extends ApplicationBase
 				new GAroundInvokerFactory());
 			
 			runContainer();
+			
+			ContainerIDFile.containerID(getContainerID());
 			
 			System.out.println("Container Started");
 			_secRunManager.run(SecureRunnableHooks.CONTAINER_POST_STARTUP, 
@@ -431,6 +436,39 @@ public class Container extends ApplicationBase
 		}
 		
 		return installedServices;
+	}
+	
+	static final private Pattern SERVICE_NAME_FROM_URL = Pattern.compile(
+		"^https?://[^/]*/axis/services/(\\w+).*$", Pattern.CASE_INSENSITIVE);
+	
+	static public Class<?> getClassForServiceURL(String serviceURL)
+	{
+		Class<?> ret = null;
+		
+		_logger.debug(String.format(
+			"Asked to get class for service URL \"%s\".", serviceURL));
+	
+		Matcher matcher = SERVICE_NAME_FROM_URL.matcher(serviceURL);
+		if (!matcher.matches())
+		{
+			_logger.warn(String.format(
+				"Unable to get service name from URL \"%s\".", serviceURL));
+			return null;
+		}
+		
+		String serviceName = matcher.group(1);
+		for (JavaServiceDesc desc : getInstalledServices())
+		{
+			if (serviceName.equalsIgnoreCase(desc.getName()))
+			{
+				ret = desc.getImplClass();
+				break;
+			}
+		}
+		
+		_logger.debug(String.format("Class for %s is %s.",
+			serviceURL, ret.getName()));
+		return ret;
 	}
 	
 	static public String getServiceURL(String serviceName)

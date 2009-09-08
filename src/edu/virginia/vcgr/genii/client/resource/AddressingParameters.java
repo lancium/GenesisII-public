@@ -27,7 +27,7 @@ public class AddressingParameters
 	static public final String GENII_RESOURCE_FORK_REF_PARAM =
 		"resource-fork";
 	static public final String GENII_ADDITIONAL_USER_INFO_REF_PARAM =
-		"additiona-user-information";
+		"additional-user-information";
 	
 	static public final QName OLD_REFERENCE_PARAMTER_QNAME =
 		new QName("http://vcgr.cs.virginia.edu/Genesis-II", "simple-string");
@@ -203,5 +203,10 @@ public class AddressingParameters
 		
 		return new ReferenceParametersType(
 			tmp.toArray(new MessageElement[tmp.size()]));
+	}
+	
+	public AddressingParameters stripResourceForkInformation()
+	{
+		return new AddressingParameters(_resourceKey, null, _additionalUserInfo);
 	}
 }

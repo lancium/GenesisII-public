@@ -300,6 +300,9 @@ public class AclAuthZClientTool implements AuthZSubTool
 
 			String input = in.readLine();
 			out.println();
+			if (input == null)
+				return null;
+			
 			int choice = 0;
 			try
 			{

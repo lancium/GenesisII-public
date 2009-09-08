@@ -6,6 +6,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -91,6 +92,11 @@ public class CommandLineRunner
 			if (target != out)
 				target.close();
 		}
+	}
+	
+	final public Map<String, ToolDescription> getToolList()
+	{
+		return Collections.unmodifiableMap(_tools);
 	}
 	
 	@SuppressWarnings("unchecked")

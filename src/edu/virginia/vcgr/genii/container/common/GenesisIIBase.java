@@ -138,7 +138,9 @@ import edu.virginia.vcgr.genii.container.resolver.Resolution;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
+import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
+import edu.virginia.vcgr.genii.container.resource.db.query.ResourceSummary;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
@@ -392,6 +394,9 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		} else if (name.equals(CreationProperties.CREATION_PROPERTIES_QNAME))
 		{
 			return CreationProperties.translate(property);
+		} else if (name.equals(ClientConstructionParameters.HUMAN_NAME_PROPERTY_ELEMENT))
+		{
+			return ClientConstructionParameters.getHumanNameProperty(property);
 		} else
 			return property;
 	}
@@ -646,6 +651,24 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		
 			// allow subclasses to do creation work
 			postCreate(rKey, epr, constructionParameters, resolverCreationParams);
+			IResource resource = rKey.dereference();
+			if (resource instanceof BasicDBResource)
+			{
+				try
+				{
+					Object obj = constructionParameters.get(ClientConstructionParameters.HUMAN_NAME_PROPERTY_ELEMENT);
+					ResourceSummary.addResource(
+						((BasicDBResource)resource).getConnection(),
+						rKey.getResourceKey(),
+						obj == null ? null : obj.toString(),
+						Container.getClassForServiceURL(targetServiceURL), epr);
+				}
+				catch (Throwable cause)
+				{
+					_logger.warn("Unable to note creation of resource.", cause);
+				}
+			}
+			
 			return epr;
 		}
 		finally
@@ -741,10 +764,30 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		// allow subclasses to do creation work
 		postCreate(rKey, epr, constructionParameters, resolverCreationParams);
 	
-		rKey.dereference().commit();
+		IResource resource = rKey.dereference();
+		resource.commit();
 		_logger.debug("Created resource \"" + rKey.getResourceKey() + 
 			"\" for service \"" + rKey.getServiceName() + "\".");
 		EndpointReferenceType resolveEPR = addResolvers(rKey, epr, resolverCreationParams);
+		if (resource instanceof BasicDBResource)
+		{
+			try
+			{
+				Object obj = constructionParameters.get(ClientConstructionParameters.HUMAN_NAME_PROPERTY_ELEMENT);
+				ResourceSummary.addResource(
+					((BasicDBResource)resource).getConnection(),
+					rKey.getResourceKey(),
+					obj == null ? null : obj.toString(),
+					getClass(),
+					resolveEPR);
+			}
+			catch (Throwable cause)
+			{
+				_logger.warn("Unable to note creation of resource.", cause);
+			}
+		}
+				
+		resource.commit();
 		return new VcgrCreateResponse(resolveEPR);
 	}
 	
@@ -1051,28 +1094,17 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		}
 	}
 	
-	private Object _myEPRLock = new Object();
-	private EndpointReferenceType _myEPR = null;
-	
 	protected EndpointReferenceType getMyEPR(boolean withPortTypes) 
 		throws ResourceUnknownFaultType, ResourceException
 	{
-		synchronized(_myEPRLock)
-		{
-			if (_myEPR == null)
-			{
-				String myAddress = Container.getServiceURL(_serviceName);
-				ResourceKey rKey = ResourceManager.getCurrentResource();
-				PortType []implementedPortTypes = null;
-				if (withPortTypes)
-					implementedPortTypes = getImplementedPortTypes(rKey);
-				
-				_myEPR = ResourceManager.createEPR(
-					rKey, myAddress, implementedPortTypes);
-			}
-			
-			return _myEPR;
-		}
+		String myAddress = Container.getServiceURL(_serviceName);
+		ResourceKey rKey = ResourceManager.getCurrentResource();
+		PortType []implementedPortTypes = null;
+		if (withPortTypes)
+			implementedPortTypes = getImplementedPortTypes(rKey);
+		
+		return ResourceManager.createEPR(
+			rKey, myAddress, implementedPortTypes);
 	}
 	
 	protected SubscribeResponse subscribe(String subscribee, 

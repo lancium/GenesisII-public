@@ -724,7 +724,7 @@ public class ExportedDirDBResource extends BasicDBResource implements
 					/* moved code to check if _dirServiceEPR set to constructor */
 					serviceEPR = _dirServiceEPR;
 					entryType = ExportedDirEntry._DIR_TYPE;
-					creationProperties = ExportedDirUtils.createCreationProperties(
+					creationProperties = ExportedDirUtils.createCreationProperties(null,
 						newPath, childrenParentIds, getReplicationState());
 					
 				} else

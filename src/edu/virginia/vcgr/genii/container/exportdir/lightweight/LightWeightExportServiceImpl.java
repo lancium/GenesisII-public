@@ -78,6 +78,7 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService
 		super("LightWeightExportPortType");
 
 		addImplementedPortType(WellKnownPortTypes.EXPORTED_ROOT_SERVICE_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.EXPORTED_LIGHTWEIGHT_ROOT_SERVICE_PORT_TYPE);
 	}
 	
 	@Override

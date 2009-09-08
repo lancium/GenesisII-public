@@ -218,7 +218,7 @@
 		<display-rank>100</display-rank>
 		<description>ERoot</description>
 	</portType>
-
+	
 	<portType name="{http://vcgr.cs.virginia.edu/rns/2007/08/replicatedExport/resolver-factory}RExportResolverFactoryPortType">
 		<display-rank>100</display-rank>
 		<description>RExpResFact</description>
@@ -267,5 +267,10 @@
 	<portType name="{http://vcgr.cs.virginia.edu/genii/genesis_dair}SQLRowsetAccessPortType">
 		<display-rank>100</display-rank>
 		<description>SQLRowset</description>
+	</portType>
+	
+	<portType name="{http://vcgr.cs.virginia.edu/export/2009/05/light-export}LightWeightExportPortType">
+		<display-rank>100</display-rank>
+		<description>LWExport</description>
 	</portType>
 </known-porttypes>

@@ -15,6 +15,7 @@
  */
 package edu.virginia.vcgr.genii.client.context;
 
+import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -105,5 +106,28 @@ public class ContextManager
 	static public void setResolver(IContextResolver resolver)
 	{
 		_resolver.set(resolver);
+	}
+	
+	static public Closeable temporarilyAssumeContext(ICallingContext context)
+	{
+		IContextResolver oldResolver = ContextManager.getResolver();
+		ContextManager.setResolver(new MemoryBasedContextResolver(context));
+		return new AssumedContextState(oldResolver);
+	}
+	
+	static private class AssumedContextState implements Closeable
+	{
+		private IContextResolver _oldResolver;
+		
+		private AssumedContextState(IContextResolver oldResolver){
+			
+			_oldResolver = oldResolver;
+		}
+		
+		@Override
+		public void close()
+		{
+			ContextManager.setResolver(_oldResolver);
+		}
 	}
 }

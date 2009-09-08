@@ -1,0 +1,51 @@
+<plugins>
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.MakeDirectoryPlugin">
+		<top-menu menu-name="File" group="Basic File" item-name="Make Directory"/>
+		
+		<popup-menu group="Basic File" item-name="Make Directory"/>
+	</plugin>
+	
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.MakeFilePlugin">
+		<top-menu menu-name="File" group="Basic File" item-name="Create New File"/>
+		
+		<popup-menu group="Basic File" item-name="Create New File"/>
+	</plugin>
+	
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.epr.EPRDisplayPlugin">
+		<tab name="EPR Display"/>
+	</plugin>
+	
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.attrs.AttributesDisplayPlugin">
+		<tab name="Resource Properties"/>
+	</plugin>
+	
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.acls.ACLPlugin">
+		<tab name="Security"/>
+	</plugin>
+	
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.debug.DebugPlugin">
+		<top-menu menu-name="Debug" group="Debug"
+			item-name="Debug"/>
+
+		<popup-menu group="Debug" item-name="Debug"/>
+
+		<tab name="Debug Tab">
+			<property name="tab-property" value="tab-value"/>
+		</tab>
+
+		<plugin-properties>
+			<property name="plugin-property" value="plugin-value"/>
+		</plugin-properties>
+	</plugin>
+	
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.jsdltool.JSDLToolPlugin">
+		<top-menu menu-name="Jobs" group="JSDL" item-name="Create Job"/>
+		
+		<popup-menu group="JSDL" item-name="Create Job"/>
+	</plugin>
+	
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.shell.GridShellPlugin">
+		<top-menu menu-name="Tools" group="Shell" item-name="Launch Grid Shell"/>
+	</plugin>
+	
+</plugins>

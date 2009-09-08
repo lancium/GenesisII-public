@@ -208,7 +208,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
     	throws RemoteException, ResourceUnknownFaultType, 
     		RNSEntryNotDirectoryFaultType, RNSFaultType
     {
-    	_logger.debug("Entered list method.");
+		_logger.debug("Entered list method.");
     	
     	IRNSResource resource = null;
     	Collection<InternalEntry> entries;
@@ -257,7 +257,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
     	throws RemoteException, ResourceUnknownFaultType, 
     		RNSEntryNotDirectoryFaultType, RNSFaultType
     {
-    	_logger.debug("Entered iterate list method.");
+		_logger.debug("Entered iterate list method.");
     	TimingSink tSink = TimingSink.sink();
     	IRNSResource resource = null;
     	Collection<InternalEntry> entries;

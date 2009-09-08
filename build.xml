@@ -39,6 +39,10 @@
 		<fileset dir="${jfreechart.home}" includes="**/*.jar"/>
 	</path>
 
+	<path id="jsdltool.classpath">
+		<fileset dir="${jsdltool.home}" includes="**/*.jar"/>
+	</path>
+
 	<path id="dpage.classpath">
 		<fileset dir="${dpage.home}" includes="**/*.jar"/>
 	</path>
@@ -49,6 +53,10 @@
 
 	<path id="jetty.classpath">
 		<fileset dir="${jetty.home}" includes="**/*.jar"/>
+	</path>
+
+	<path id="MorganU.classpath">
+		<fileset dir="${MorganU.home}" includes="**/*.jar"/>
 	</path>
 
 	<path id="junit.classpath">
@@ -81,9 +89,11 @@
 		<path refid="jsch.classpath"/>
 		<path refid="ant.classpath"/>
 		<path refid="jfreechart.classpath"/>
+		<path refid="jsdltool.classpath"/>
 		<path refid="dpage.classpath"/>
 		<path refid="axis.classpath"/>
 		<path refid="jetty.classpath"/>
+		<path refid="MorganU.classpath"/>
 		<path refid="appmanager.classpath"/>
 		<path refid="gpm.classpath"/>
 		<path refid="junit.classpath"/>
@@ -198,11 +208,11 @@
 		<ant antfile="${wsdl.dir}/byteio/rbyteio.build.xml"/>
 		<ant antfile="${wsdl.dir}/byteio/sbyteio.build.xml"/>
 		<ant antfile="${wsdl.dir}/byteio/sbyteio-factory.build.xml"/>
-		<ant antfile="${wsdl.dir}/container/container.build.xml"/>
 		<ant antfile="${wsdl.dir}/exported/exported-file.build.xml"/>
 		<ant antfile="${wsdl.dir}/exported/exported-dir.build.xml"/>
 		<ant antfile="${wsdl.dir}/exported/exported-root.build.xml"/>
 		<ant antfile="${wsdl.dir}/rfork/rfork.build.xml"/>
+		<ant antfile="${wsdl.dir}/container/container.build.xml"/>
 		<ant antfile="${wsdl.dir}/exported/light-export.build.xml"/>
 		<ant antfile="${wsdl.dir}/bes/bes-activity.build.xml"/>
 		<ant antfile="${wsdl.dir}/bes/bes.build.xml"/>

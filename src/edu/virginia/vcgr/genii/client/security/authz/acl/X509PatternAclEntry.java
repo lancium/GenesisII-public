@@ -50,9 +50,8 @@ public class X509PatternAclEntry implements AclEntry, Serializable {
 	// cache an X509 pattern upon first use
 	transient protected X509Principal _bcPattern;
 	
-	public X509PatternAclEntry(X509Identity trustRoot, X500Principal userPattern) 
-			throws GeneralSecurityException {
-		
+	public X509PatternAclEntry(X509Identity trustRoot, X500Principal userPattern)
+	{	
 		_userPattern = userPattern;
 		_trustRoot = trustRoot;
 	}

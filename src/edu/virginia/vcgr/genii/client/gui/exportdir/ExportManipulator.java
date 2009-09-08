@@ -31,7 +31,7 @@ public class ExportManipulator
 		RNSPath target = RNSPath.getCurrent().lookup(rnsPath, RNSPathQueryFlags.MUST_NOT_EXIST);
 		validate(target);
 		
-		ExportTool.createExportedRoot(EPRUtils.makeEPR(containerURL.toString() 
+		ExportTool.createExportedRoot(rnsPath, EPRUtils.makeEPR(containerURL.toString() 
 			+ "/axis/services/" + 
 				(isLightweight ? "LightWeightExportPortType" : "ExportedRootPortType")),
 			localPath.getAbsolutePath(), rnsPath, false);
