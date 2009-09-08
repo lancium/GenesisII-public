@@ -22,6 +22,7 @@ public class ContainerConfiguration
 	private XMLConfiguration _configuration;
 	private int _maxThreads;
 	private int _listenPort;
+	private Integer _dpagesPort = null;
 	private SslInformation _sslInformation = null;
 	private int _notificationPoolSize;
 	private Properties _globalProperties;
@@ -61,6 +62,11 @@ public class ContainerConfiguration
 		return _listenPort;
 	}
 	
+	public Integer getDPagesPort()
+	{
+		return _dpagesPort;
+	}
+	
 	public int getMaxAcceptorThreads()
 	{
 		return _maxThreads;
@@ -83,6 +89,12 @@ public class ContainerConfiguration
 					WebContainerConstants.LISTEN_PORT_PROP, 
 					_DEFAULT_LISTEN_PORT_VALUE);
 		_listenPort = Integer.parseInt(sListenPort);
+		
+		String dListenPort =
+			Installation.getDeployment(new DeploymentName()).webContainerProperties().getProperty(
+				WebContainerConstants.DPAGES_PORT_PROP);
+		if (dListenPort != null)
+			_dpagesPort = Integer.valueOf(dListenPort);
 		
 		String sMaxThreads =
 			Installation.getDeployment(new DeploymentName()).webContainerProperties().getProperty(

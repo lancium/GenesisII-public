@@ -217,7 +217,7 @@ public class Container extends ApplicationBase
 				"/");
 		context.addHandler(webAppCtxt);
 		
-		loadDynamicPages(server);
+		Server dServer = loadDynamicPages(_containerConfiguration.getDPagesPort());
 		
 		context = new ContextHandler("/");
 		server.addHandler(context);
@@ -238,6 +238,8 @@ public class Container extends ApplicationBase
 		}
 		
 		server.start();
+		if (dServer != null)
+			dServer.start();
 		
 		_logger.info(String.format("Container ID:  %s", getContainerID()));
 		_logger.info("Starting container services.");
@@ -595,6 +597,23 @@ public class Container extends ApplicationBase
 		}
 	}
 	
+	static private Server loadDynamicPages(Integer dPagesPort)
+	{
+		Server server = null;
+		
+		if (dPagesPort != null)
+		{
+			server = new Server();
+			
+			SocketConnector socketConnector = new SocketConnector();
+			socketConnector.setPort(dPagesPort.intValue());
+			server.addConnector(socketConnector);
+		}
+		
+		loadDynamicPages(server);
+		return server;
+	}
+	
 	static private void loadDynamicPages(Server server)
 	{
 		File dynPagesDir = Installation.getDeployment(
@@ -616,6 +635,13 @@ public class Container extends ApplicationBase
 				{
 					if (entry.getName().endsWith(".dar"))
 					{
+						if (server == null)
+						{
+							_logger.warn(
+								"Attempt to load dynamic page without the dpage-port specified.");
+							return;
+						}
+						
 						DynamicPageLoader.addDynamicPages(
 							server, scratchManager, entry);
 					}
