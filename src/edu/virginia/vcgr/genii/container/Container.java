@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.container;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -27,9 +28,12 @@ import org.apache.axis.transport.http.AxisServletBase;
 import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.morgan.dpage.DynamicPageLoader;
+import org.morgan.dpage.ScratchSpaceManager;
 import org.morgan.util.GUID;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
+import org.morgan.util.io.GuaranteedDirectory;
 import org.mortbay.jetty.*;
 import org.mortbay.jetty.handler.*;
 import org.mortbay.jetty.webapp.*;
@@ -58,7 +62,6 @@ import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 import edu.virginia.vcgr.genii.container.configuration.ContainerConfiguration;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.deployment.ServiceDeployer;
-import edu.virginia.vcgr.genii.container.dynpages.DynamicPageHandler;
 import edu.virginia.vcgr.genii.container.invoker.GAroundInvokerFactory;
 import edu.virginia.vcgr.genii.container.alarms.AlarmManager;
 import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver;
@@ -209,12 +212,7 @@ public class Container extends ApplicationBase
 				"/");
 		context.addHandler(webAppCtxt);
 		
-		/*
-		context = new ContextHandler("/pages");
-		server.addHandler(context);
-		context.addHandler(new DynamicPageHandler("edu/virginia/vcgr/genii/container/pages"));
-		*/
-		DynamicPageHandler.addDynamicPages(server);
+		loadDynamicPages(server);
 		
 		context = new ContextHandler("/");
 		server.addHandler(context);
@@ -556,6 +554,45 @@ public class Container extends ApplicationBase
 			{
 				_logger.fatal("Unable to remove container state.", cause);
 			}
+		}
+	}
+	
+	static private void loadDynamicPages(Server server)
+	{
+		File dynPagesDir = Installation.getDeployment(
+			new DeploymentName()).getDynamicPagesDirectory();
+		if (!dynPagesDir.exists() || !dynPagesDir.isDirectory())
+			return;
+		
+		try
+		{
+			File scratchSpaceDirectory = new GuaranteedDirectory(
+				ConfigurationManager.getCurrentConfiguration().getUserDirectory(),
+				"dynamic-pages-scratch");
+			
+			ScratchSpaceManager scratchManager = new ScratchSpaceManager(
+				scratchSpaceDirectory);
+			for (File entry : dynPagesDir.listFiles())
+			{
+				try
+				{
+					if (entry.getName().endsWith(".dar"))
+					{
+						DynamicPageLoader.addDynamicPages(
+							server, scratchManager, entry);
+					}
+				}
+				catch (Throwable cause)
+				{
+					_logger.warn(String.format(
+						"Unable to load dynamic page package \"%s\".", 
+						entry.getName()), cause);
+				}
+			}
+		}
+		catch (Throwable cause)
+		{
+			_logger.warn("Unable to load dynamic pages.", cause);
 		}
 	}
 }

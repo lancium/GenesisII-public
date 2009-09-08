@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,10 +27,12 @@ import edu.virginia.vcgr.genii.client.nativeq.BulkStatusFetcher;
 import edu.virginia.vcgr.genii.client.nativeq.FactoryResourceAttributes;
 import edu.virginia.vcgr.genii.client.nativeq.JobStateCache;
 import edu.virginia.vcgr.genii.client.nativeq.JobToken;
+import edu.virginia.vcgr.genii.client.nativeq.NativeQueue;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueException;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueState;
 import edu.virginia.vcgr.genii.client.nativeq.ScriptBasedQueueConnection;
 import edu.virginia.vcgr.genii.client.nativeq.ScriptLineParser;
+import edu.virginia.vcgr.genii.client.nativeq.UnixSignals;
 import edu.virginia.vcgr.genii.client.spmd.SPMDException;
 import edu.virginia.vcgr.genii.client.spmd.SPMDTranslator;
 import edu.virginia.vcgr.genii.client.spmd.SPMDTranslatorFactories;
@@ -269,6 +272,10 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 			File workingDirectory, ApplicationDescription application)
 			throws NativeQueueException, IOException
 	{
+		EnumSet<UnixSignals> signals = UnixSignals.parseTrapAndKillSet(
+			connectionProperties().getProperty(
+				NativeQueue.SIGNALS_TO_TRAP_AND_KILL));
+		
 		URI variation = application.getSPMDVariation();
 		if (variation != null)
 		{
@@ -310,6 +317,11 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 			
 			if (application.getStdinRedirect() != null)
 				script.format(" < \"%s\"", application.getStdinRedirect());
+			
+			if (signals.size() > 0)
+				script.print(" &");
+			
+			script.println();
 		} else
 			super.generateApplicationBody(script, workingDirectory, application);
 	}
@@ -373,7 +385,8 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 		{
 			throw new NativeQueueException(
 				"Application doesn't appear to have exited.", ioe);
-		}catch (IOException ioe)
+		}
+		catch (IOException ioe)
 		{
 			throw new NativeQueueException(
 				"Unable to determine application exit status.", ioe);

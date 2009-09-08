@@ -10,6 +10,9 @@ public interface NativeQueue
 	static public final String BASH_BINARY_PATH_PROPERTY =
 		"edu.virginia.vcgr.genii.client.nativeq.bash-binary";
 	
+	static public final String SIGNALS_TO_TRAP_AND_KILL =
+		"edu.virginia.vcgr.genii.client.nativeq.signals-to-trap-for-kill";
+	
 	public String getProviderName();
 	
 	public NativeQueueConnection connect(

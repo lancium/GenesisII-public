@@ -1,0 +1,7 @@
+container-stats.html=[class]ContainerStatistics
+class-method-stats.html=[class]ClassMethodStatistics
+
+bes-info.html=[class]BESInformation
+queue-info.html=[class]QueueInformation
+
+queue-resources.png=[class]QueueResources

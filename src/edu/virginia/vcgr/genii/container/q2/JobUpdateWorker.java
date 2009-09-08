@@ -152,7 +152,7 @@ public class JobUpdateWorker implements OutcallHandler
 				{
 					/* If the job failed in the BES, fail it in the queue */
 					if (!_jobManager.failJob(connection, _jobInfo.getJobID(), 
-						true, false, true))
+						!state.isIgnoreable(), false, true))
 						PostTargets.poster().post(
 							JobEvent.jobFailed(null, 
 								Long.toString(_jobInfo.getJobID())));

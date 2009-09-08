@@ -19,6 +19,7 @@ import edu.virginia.vcgr.genii.client.nativeq.NativeQueueState;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueues;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionException;
+import edu.virginia.vcgr.genii.container.bes.execution.IgnoreableFault;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
 
@@ -148,6 +149,10 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 				_phaseShiftLock.wait(DEFAULT_LOOP_CYCLE);
 			}
 			context.setProperty(JOB_TOKEN_PROPERTY, null);
+			
+			if (queue.getExitCode(_jobToken) == 257)
+				throw new IgnoreableFault(
+					"Queue process exited with signal.");
 		}
 	}
 	

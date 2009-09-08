@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import edu.virginia.vcgr.genii.container.dynpages.DynamicPage;
+import org.morgan.dpage.DynamicPage;
 
 public abstract class GenesisIIStyledPage implements DynamicPage
 {
@@ -40,7 +40,7 @@ public abstract class GenesisIIStyledPage implements DynamicPage
 	}
 	
 	@Override
-	public void generate(PrintStream ps) throws IOException
+	public void generatePage(PrintStream ps) throws IOException
 	{
 		ps.format("<HTML><TITLE>%s</TITLE><BODY>\n", _title);
 		generateHeader(ps);

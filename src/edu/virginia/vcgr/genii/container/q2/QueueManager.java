@@ -477,7 +477,7 @@ public class QueueManager implements Closeable
 		out.println("Queue Job Summary\n-----------------------------\n");
 		for (String category : jobMap.keySet())
 		{
-			out.format("\t%s:  %d\n", jobMap.get(category));
+			out.format("\t%s:  %d\n", category, jobMap.get(category));
 		}
 	}
 	

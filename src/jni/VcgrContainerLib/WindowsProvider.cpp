@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <Ntsecapi.h>
+#include <tlhelp32.h>
 
 // This define may be in Ntstatus.h, not relying on that
 #define STATUS_SUCCESS ((NTSTATUS)0x00000000L)
@@ -248,8 +249,13 @@ bool GetSessionData(PLUID session)
  * Method:    getUserLoggedIn
  * Signature: ()Z
  */
+
+/* We used to do it this way, but Microsoft escalated the security requirements for these OS
+calls to an eggregious level.
+
 JNIEXPORT jboolean JNICALL Java_edu_virginia_vcgr_genii_container_sysinfo_WindowsProvider_getUserLoggedIn
-(JNIEnv *env, jobject obj) {
+(JNIEnv *env, jobject obj)
+{
   PLUID sessions;
   ULONG count;
   NTSTATUS retval;
@@ -277,4 +283,40 @@ JNIEXPORT jboolean JNICALL Java_edu_virginia_vcgr_genii_container_sysinfo_Window
   }
 
   return false;
+}
+*/
+
+JNIEXPORT jboolean JNICALL Java_edu_virginia_vcgr_genii_container_sysinfo_WindowsProvider_getUserLoggedIn
+(JNIEnv *env, jobject obj)
+{
+	HANDLE snapshot;
+	PROCESSENTRY32 pe32;
+	bool ret;
+
+	ret = false;
+	pe32.dwSize = sizeof(PROCESSENTRY32);
+
+	snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if (snapshot == INVALID_HANDLE_VALUE)
+	{
+		// We should throw a java exception here, but we don't have
+		// time to implement that right now.
+		fprintf(stderr, "Unable to create process snapshot.");
+		return false;
+	}
+
+	if (Process32First(snapshot, &pe32))
+	{
+		do
+		{
+			if (wcscmp(pe32.szExeFile, L"explorer.exe") == 0)
+			{
+				ret = true;
+				break;
+			}
+		} while (Process32Next(snapshot, &pe32));
+	}
+
+	CloseHandle(snapshot);
+	return ret;
 }

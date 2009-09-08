@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -125,6 +126,28 @@ public abstract class ScriptBasedQueueConnection
 		File workingDirectory, ApplicationDescription application)
 			throws NativeQueueException, IOException
 	{
+		EnumSet<UnixSignals> signals = UnixSignals.parseTrapAndKillSet(
+			connectionProperties().getProperty(
+				NativeQueue.SIGNALS_TO_TRAP_AND_KILL));
+		
+		if (signals.size() > 0)
+		{
+			script.println("function signalTrap()");
+			script.println("{");
+			script.println(
+				"\techo \"Caught a signal -- killing process group.\" >&2");
+			script.println(
+				"\tQUEUE_SCRIPT_RESULT=257");
+			script.format("echo $QUEUE_SCRIPT_RESULT > %s.tmp\n", 
+				QUEUE_SCRIPT_RESULT_FILENAME);
+			script.format("mv %1$s.tmp %1$s\n", QUEUE_SCRIPT_RESULT_FILENAME);
+			script.println("\tkill -9 0");
+			script.println("}");
+			script.println();
+			for (UnixSignals signal : signals)
+				script.format("trap signalTrap %s\n", signal);
+		}
+			
 		script.format("export QUEUE_SCRIPT_RESULT=0\n");
 	}
 
@@ -132,13 +155,27 @@ public abstract class ScriptBasedQueueConnection
 		File workingDirectory, ApplicationDescription application)
 			throws NativeQueueException, IOException
 	{
-		script.format("\nexport QUEUE_SCRIPT_RESULT=$?\n");
+		EnumSet<UnixSignals> signals = UnixSignals.parseTrapAndKillSet(
+			connectionProperties().getProperty(
+				NativeQueue.SIGNALS_TO_TRAP_AND_KILL));
+		
+		if (signals.size() > 0)
+		{
+			script.println("QUEUE_JOB_ID=%%");
+			script.println("wait %$QUEUE_JOB_ID");
+			script.println("export QUEUE_SCRIPT_RESULT=$?");
+		} else
+			script.format("\nexport QUEUE_SCRIPT_RESULT=$?\n");
 	}
 	
 	protected void generateApplicationBody(PrintStream script,
 		File workingDirectory, ApplicationDescription application)
 			throws NativeQueueException, IOException
 	{
+		EnumSet<UnixSignals> signals = UnixSignals.parseTrapAndKillSet(
+			connectionProperties().getProperty(
+				NativeQueue.SIGNALS_TO_TRAP_AND_KILL));
+		
 		script.format("cd \"%s\"\n", workingDirectory.getAbsolutePath());
 		
 		String execName = application.getExecutableName();
@@ -151,6 +188,11 @@ public abstract class ScriptBasedQueueConnection
 		
 		if (application.getStdinRedirect() != null)
 			script.format(" < \"%s\"", application.getStdinRedirect());
+		
+		if (signals.size() > 0)
+			script.print(" &");
+		
+		script.println();
 	}
 	
 	protected void generateScriptFooter(PrintStream script,

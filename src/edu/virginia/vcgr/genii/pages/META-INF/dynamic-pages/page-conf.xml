@@ -1,0 +1,4 @@
+<pages>
+	<page context="/pages" resource-base="edu/virginia/vcgr/genii/pages"
+		injection-handler-factory="edu.virginia.vcgr.genii.container.dynpages.GenesisIIInjectionHandlerFactory"/>
+</pages>

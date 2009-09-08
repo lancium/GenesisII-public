@@ -17,6 +17,7 @@ public class Deployment
 	
 	static private final String CONFIGURATION_DIRECTORY_NAME = "configuration";
 	static private final String SERVICES_DIRECTORY_NAME = "services";
+	static private final String DYNAMIC_PAGES_DIRECTORY_NAME = "dynamic-pages";
 	static private final String URI_PROPERTIES_FILENAME =
 		"uri-manager.properties";
 	static private final String WEB_CONTAINER_PROPERTIES_FILENAME = 
@@ -34,6 +35,7 @@ public class Deployment
 	private File _secureRunnableDirectory;
 	private Security _security;
 	private File _servicesDirectory;
+	private File _dynamicPagesDirectory;
 	private Properties _webContainerProperties;
 	private Properties _uriManagerProperties;
 	private Properties _rejuvenationProperties;
@@ -57,6 +59,9 @@ public class Deployment
 			throw new InvalidDeploymentException(_deploymentDirectory.getName(),
 				"Does not contain a " +
 				SERVICES_DIRECTORY_NAME + " directory.");
+		
+		_dynamicPagesDirectory = new File(_deploymentDirectory,
+			DYNAMIC_PAGES_DIRECTORY_NAME);
 		
 		_webContainerProperties = loadWebContainerProperties(
 			_deploymentDirectory.getName(), _configurationDirectory);
@@ -162,6 +167,11 @@ public class Deployment
 	public File getServicesDirectory()
 	{
 		return _servicesDirectory;
+	}
+	
+	public File getDynamicPagesDirectory()
+	{
+		return _dynamicPagesDirectory;
 	}
 	
 	public Properties uriManagerProperties()

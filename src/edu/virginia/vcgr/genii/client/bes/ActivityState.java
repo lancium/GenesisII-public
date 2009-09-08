@@ -164,6 +164,11 @@ public class ActivityState implements Serializable, Cloneable
 		return _besState.equals(ActivityStateEnumeration._Finished);	
 	}
 	
+	public boolean isIgnoreable()
+	{
+		return _geniiState != null && _geniiState.equals("Ignoreable");
+	}
+	
 	public ActivityStatusType toActivityStatusType()
 	{
 		Collection<MessageElement> anyC = new Vector<MessageElement>(2);

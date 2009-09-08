@@ -16,6 +16,7 @@ public abstract class AbstractNativeQueueConnection
 	private File _workingDirectory = null;
 	private Map<URI, SPMDTranslator> _supportedSPMDVariations = 
 		new HashMap<URI, SPMDTranslator>(4);
+	private Properties _connectionProperties;
 	
 	protected AbstractNativeQueueConnection(
 		File workingDirectory, Properties connectionProperties) 
@@ -25,6 +26,13 @@ public abstract class AbstractNativeQueueConnection
 		initialize(connectionProperties);
 		addSupportedSPMDVariations(_supportedSPMDVariations, 
 			connectionProperties);
+		
+		_connectionProperties = connectionProperties;
+	}
+	
+	protected Properties connectionProperties()
+	{
+		return _connectionProperties;
 	}
 	
 	protected void initialize(Properties connectionProperties)

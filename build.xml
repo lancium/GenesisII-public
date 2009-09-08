@@ -39,6 +39,10 @@
 		<fileset dir="${jfreechart.home}" includes="**/*.jar"/>
 	</path>
 
+	<path id="dpage.classpath">
+		<fileset dir="${dpage.home}" includes="**/*.jar"/>
+	</path>
+
 	<path id="axis.classpath">
 		<fileset dir="${axis.home}" includes="**/*.jar"/>
 	</path>
@@ -77,6 +81,7 @@
 		<path refid="jsch.classpath"/>
 		<path refid="ant.classpath"/>
 		<path refid="jfreechart.classpath"/>
+		<path refid="dpage.classpath"/>
 		<path refid="axis.classpath"/>
 		<path refid="jetty.classpath"/>
 		<path refid="appmanager.classpath"/>
@@ -97,7 +102,7 @@
 	<!-- Build Targets -->
 	<target name="build" depends="jars,scripts,deployments"/>
 
-	<target name="jars" depends="genii.container.jar,genii.client.jar,ogrsh.jar,genii.ws.jar,genii.wsdl.jar,morgan.utilities.jar"/>
+	<target name="jars" depends="genii.container.jar,genii.client.jar,ogrsh.jar,genii.ws.jar,genii.wsdl.jar,morgan.utilities.jar,genii.dpages.jars"/>
 
 	<target name="deployments" depends="generate.ws.source">
 		<copy todir="${deployments.dir}/default/services">
@@ -115,6 +120,20 @@
 		<jar destfile="${lib.dir}/GenesisII-container.jar">
 			<fileset dir="${obj.dir}">
 				<include name="edu/virginia/vcgr/genii/container/**/*"/>
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="genii.dpages.jars" depends="pages.dar"/>
+
+	<target name="pages.dar" depends="genii.compile">
+		<jar destfile="${dpages.dir}/pages.dar">
+			<metainf dir="${obj.dir}/edu/virginia/vcgr/genii/pages/META-INF">
+				<include name="**/*"/>
+			</metainf>
+			<fileset dir="${obj.dir}">
+				<include name="edu/virginia/vcgr/genii/pages/**/*"/>
+				<exclude name="edu/virginia/vcgr/genii/pages/META-INF"/>
 			</fileset>
 		</jar>
 	</target>
@@ -275,6 +294,7 @@
 	<target name="clean">
 		<delete dir="${temporary.codegen.dir}"/>
 		<delete dir="${wsdd.dir}"/>
+		<delete dir="${dpages.dir}"/>
 		<delete dir="${generated.source.dir}"/>
 		<delete dir="${generated.obj.dir}"/>
 		<delete dir="${obj.dir}"/>

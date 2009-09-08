@@ -8,6 +8,7 @@
 		<mkdir dir="${generated.source.dir}"/>
 		<mkdir dir="${generated.obj.dir}"/>
 		<mkdir dir="${obj.dir}"/>
+		<mkdir dir="${dpages.dir}"/>
 		<mkdir dir="${deployments.dir}/default"/>
 	</target>
 	

@@ -41,6 +41,7 @@ import edu.virginia.vcgr.genii.container.bes.execution.ContinuableExecutionExcep
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionException;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
+import edu.virginia.vcgr.genii.container.bes.execution.IgnoreableFault;
 import edu.virginia.vcgr.genii.container.bes.execution.SuspendableExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
@@ -755,6 +756,17 @@ public class BESActivity implements Closeable
 			}
 		}
 		
+		private boolean containsIgnoreableFault(Collection<Throwable> faults)
+		{
+			for (Throwable fault : faults)
+			{
+				if (fault instanceof IgnoreableFault)
+					return true;
+			}
+			
+			return false;
+		}
+		
 		public void run()
 		{
 			while (true)
@@ -765,12 +777,23 @@ public class BESActivity implements Closeable
 					{
 						if (finishedExecution())
 						{
+							Collection<Throwable> faults = getFaults();
 							if (getFaults().size() > 0)
-								updateState(_executionPlan.size(),
-									new ActivityState(
-										ActivityStateEnumeration.Failed, 
-										null, false));
-							else
+							{
+								if (!containsIgnoreableFault(faults))
+								{
+									updateState(_executionPlan.size(),
+										new ActivityState(
+											ActivityStateEnumeration.Failed, 
+											null, false));
+								} else
+								{
+									updateState(_executionPlan.size(),
+										new ActivityState(
+											ActivityStateEnumeration.Failed,
+											"Ignoreable", false));
+								}
+							} else
 								updateState(_executionPlan.size(),
 									new ActivityState(
 										ActivityStateEnumeration.Finished, 
