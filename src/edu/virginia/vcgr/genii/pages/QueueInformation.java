@@ -34,13 +34,22 @@ public class QueueInformation extends GenesisIIStyledPage
 		throws IOException
 	{
 		ps.format("<H2>Total Resources Available:  %d</H2><BR/>", queue.totalSlots());
+		ps.format("<H3>Total Jobs Finished for All Time:  %d</H3><BR/>",
+			queue.totalFinishedAllTime());
 		ps.println("<TABLE border=\"0\" cellpadding=\"50\">");
 		ps.println("<TR>");
 		ps.println("<TD>");
 		ps.println("<UL>");
 		Map<String, Long> jobMap = queue.summarizeJobs();
 		for (String category : jobMap.keySet())
-			ps.format("<LI>%d Jobs %s</LI>", jobMap.get(category), category);
+		{
+			if (category.equals("Error"))
+				ps.format("<LI>%d Jobs Currently in Error</LI>", jobMap.get(category));
+			else if (category.equals("Finished"))
+				ps.format("<LI>%d Jobs Finished but Not Reaped</LI>", jobMap.get(category));
+			else
+				ps.format("<LI>%d Jobs Currently %s</LI>", jobMap.get(category), category);
+		}
 		ps.println("</UL>");
 		ps.println("</TD>");
 		ps.println("<TD>");

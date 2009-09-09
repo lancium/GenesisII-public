@@ -65,7 +65,6 @@ public class QueueManager implements Closeable
 	 */
 	static private final int _MAX_SIMULTANEOUS_OUTCALLS = 8;
 	
-	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(QueueManager.class);
 	
 	/**
@@ -504,6 +503,27 @@ public class QueueManager implements Closeable
 		}
 		
 		return total;
+	}
+	
+	public long totalFinishedAllTime()
+	{
+		Connection connection = null;
+		
+		try
+		{
+			connection = _connectionPool.acquire(true);
+			return _database.getTotalFinished(connection);
+		}
+		catch (SQLException sqe)
+		{
+			_logger.warn("Unable to acqurie total job finished count.", sqe);
+			return 0L;
+		}
+		finally
+		{
+			if (connection != null)
+				_connectionPool.release(connection);
+		}
 	}
 	
 	public ResourceSummary summarize()

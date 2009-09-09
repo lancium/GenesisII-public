@@ -29,6 +29,7 @@ import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
+import edu.virginia.vcgr.genii.container.q2.resource.IQueueResource;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 
 /**
@@ -994,6 +995,86 @@ public class QueueDatabase
 				throw new SQLException(
 					"Unable to get job attempt number from database.");
 			return rs.getInt(1);
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+	}
+	
+	public void incrementFinishCount(Connection connection) 
+		throws SQLException
+	{
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		Long value = null;
+		
+		try
+		{
+			stmt = connection.prepareStatement(
+				"SELECT propvalue FROM properties " +
+				"WHERE resourceid = ? and propname = ?");
+			stmt.setString(1, _queueID);
+			stmt.setString(2, IQueueResource.TOTAL_COUNT_PROPERTY_NAME);
+			rs = stmt.executeQuery();
+			if (rs.next())
+				value = (Long)DBSerializer.fromBlob(rs.getBlob(1));
+			stmt.close();
+			stmt = null;
+			if (value == null)
+			{
+				stmt = connection.prepareStatement(
+					"INSERT INTO properties " +
+						"(resourceid, propname, propvalue) " +
+					"VALUES (?, ?, ?)");
+				stmt.setString(1, _queueID);
+				stmt.setString(2, IQueueResource.TOTAL_COUNT_PROPERTY_NAME);
+				stmt.setBlob(3, DBSerializer.toBlob(
+					new Long(1), "properties", "propvalue"));
+			} else
+			{
+				stmt = connection.prepareStatement(
+					"UPDATE properties SET propvalue = ? " +
+					"WHERE resourceid = ? AND propname = ?");
+				stmt.setBlob(1, DBSerializer.toBlob(
+					new Long(value.longValue() + 1),
+					"properties", "propvalue"));
+				stmt.setString(2, _queueID);
+				stmt.setString(3, IQueueResource.TOTAL_COUNT_PROPERTY_NAME);
+			}
+			
+			if (stmt.executeUpdate() != 1)
+				throw new SQLException("Unable to update total job count.");
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+	}
+	
+	public long getTotalFinished(Connection connection) 
+		throws SQLException
+	{
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		Long value = null;
+		
+		try
+		{
+			stmt = connection.prepareStatement(
+				"SELECT propvalue FROM properties " +
+				"WHERE resourceid = ? and propname = ?");
+			stmt.setString(1, _queueID);
+			stmt.setString(2, IQueueResource.TOTAL_COUNT_PROPERTY_NAME);
+			rs = stmt.executeQuery();
+			if (rs.next())
+				value = (Long)DBSerializer.fromBlob(rs.getBlob(1));
+			else
+				value = new Long(0);
+			
+			return value.longValue();
 		}
 		finally
 		{

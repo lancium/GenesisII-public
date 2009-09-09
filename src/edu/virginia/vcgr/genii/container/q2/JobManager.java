@@ -340,6 +340,23 @@ public class JobManager implements Closeable
 		
 		_logger.debug("Finished job " + jobID);
 		
+		Connection connection = null;
+		
+		try
+		{
+			connection = _connectionPool.acquire(false);
+			_database.incrementFinishCount(connection);
+			connection.commit();
+		}
+		catch (SQLException sqe)
+		{
+			_logger.warn("Unable to update total jobs finished count.", sqe);
+		}
+		finally
+		{
+			_connectionPool.release(connection);
+		}
+		
 		// This is one of the few times we are going to break our pattern and
 		// modify the in memory state before the database.  The reason for this
 		// is that we can't afford to forget that the BES container has a job
