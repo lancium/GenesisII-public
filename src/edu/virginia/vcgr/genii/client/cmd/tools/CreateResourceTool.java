@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Properties;
 
 import javax.xml.namespace.QName;
@@ -15,6 +17,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.comm.ClientConstructionParameters;
 import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.rcreate.CreationException;
@@ -36,6 +39,7 @@ public class CreateResourceTool extends BaseGridTool
 
 	private boolean _url = false;
 	private File _creationProperties = null;
+	private String _shortDescription = null;
 	
 	public CreateResourceTool()
 	{
@@ -56,6 +60,11 @@ public class CreateResourceTool extends BaseGridTool
 		_creationProperties = new File(propertiesFile);
 	}
 	
+	public void setDescription(String shortDescription)
+	{
+		_shortDescription = shortDescription;
+	}
+	
 	@Override
 	protected int runCommand() throws Throwable
 	{
@@ -66,10 +75,10 @@ public class CreateResourceTool extends BaseGridTool
 		
 		if (_url)
 			epr = createFromURLService(serviceLocation, targetName,
-				creationProperties);
+				creationProperties, _shortDescription);
 		else
 			epr = createFromRNSService(serviceLocation, targetName,
-				creationProperties);
+				creationProperties, _shortDescription);
 		
 		if (targetName == null)
 			stdout.println(ObjectSerializer.toString(epr,
@@ -109,23 +118,25 @@ public class CreateResourceTool extends BaseGridTool
 	}
 	
 	static public EndpointReferenceType createFromRNSService(String rnsPath, 
-		String optTargetName, Properties creationProperties)
+		String optTargetName, Properties creationProperties,
+		String shortDescription)
 		throws IOException, RNSException, CreationException
 	{
 		RNSPath path = RNSPath.getCurrent();
 		path = path.lookup(rnsPath, RNSPathQueryFlags.MUST_EXIST);
 		return createInstance(path.getEndpoint(), optTargetName, 
-			creationProperties);
+			creationProperties, shortDescription);
 	}
 	
 	static public EndpointReferenceType createFromURLService(
-		String url, String optTargetName, Properties creationProperties)
+		String url, String optTargetName, Properties creationProperties,
+		String shortDescription)
 			throws ResourceException,
 				ResourceCreationFaultType, RemoteException, RNSException,
 				CreationException
 	{
 		return createInstance(EPRUtils.makeEPR(url), optTargetName,
-				creationProperties);
+				creationProperties, shortDescription);
 	}
 	
 	static public EndpointReferenceType createInstance(
@@ -157,14 +168,23 @@ public class CreateResourceTool extends BaseGridTool
 	
 	static public EndpointReferenceType createInstance(
 		EndpointReferenceType service, String optTargetName,
-		Properties creationProperties)
+		Properties creationProperties, String shortDescription)
 		throws ResourceException,
 			ResourceCreationFaultType, RemoteException, RNSException, 
 			CreationException
 	{
+		Collection<MessageElement> constructionProperties = 
+			new ArrayList<MessageElement>();
+		
+		constructionProperties.add(CreationProperties.translate(
+			creationProperties));
+		if (shortDescription != null)
+			constructionProperties.add(
+				ClientConstructionParameters.createHumanNameProperty(
+					shortDescription));
+		
 		return createInstance(service, optTargetName, 
-			new MessageElement [] { 
-				CreationProperties.translate(creationProperties)
-		});
+			constructionProperties.toArray(
+				new MessageElement[constructionProperties.size()]));
 	}
 }
