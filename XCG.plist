@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UserName</key>
+	<string>guser</string>
+
+	<key>GroupName</key>
+	<string>staff</string>
+
+	<key>KeepAlive</key>
+	<true/>
+
+	<key>Label</key>
+	<string>edu.virginia.vcgr.xcg</string>
+
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Users/guser/XCG/GenesisII/runContainer.sh</string>
+	</array>
+
+	<key>RunAtLoad</key>
+	<true/>
+
+	<key>StandardErrorPath</key>
+	<string>/Users/guser/XCG.err</string>
+
+	<key>StandardOutPath</key>
+	<string>/Users/guser/XCG.out</string>
+
+	<key>WorkingDirectory</key>
+	<string>/Users/guser/XCG/GenesisII</string>
+</dict>
+</plist>
