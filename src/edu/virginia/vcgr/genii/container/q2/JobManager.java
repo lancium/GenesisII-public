@@ -1142,9 +1142,11 @@ public class JobManager implements Closeable
 			/* Get the bes id that the job is running on */
 			Long besID = job.getBESID();
 			if (besID == null)
-				throw new ResourceException(
-					"A job is marked as running which isn't " +
-					"assigned to a BES container.");
+			{
+				_logger.warn("A job is marked as running which isn't " +
+				"assigned to a BES container.");
+				continue;
+			}
 			
 			ResourceSlots rs = slots.get(besID);
 			if (rs != null)

@@ -286,7 +286,7 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 				resourceConstraints.getTotalPhysicalMemory();
 			if ( (totalPhyscialMemory != null) &&
 				(!totalPhyscialMemory.equals(Double.NaN)) )
-				script.format("#PBS -l mem=%d\n", totalPhyscialMemory.intValue());
+				script.format("#PBS -l mem=%d\n", totalPhyscialMemory.longValue());
 			
 			Double wallclockTime = resourceConstraints.getWallclockTimeLimit();
 			if (wallclockTime != null && !wallclockTime.equals(Double.NaN))
