@@ -3,22 +3,24 @@ package edu.virginia.vcgr.genii.container.bes.jsdl.personality.common;
 public class JobUnderstandingContext
 {
 	private String _requiredOGRSHVersion;
-	private Double _totalPhyscialMemory;
 	
-	public JobUnderstandingContext(String requiredOGRSHVersion, Double totalPhyscialMemory)
+	private ResourceConstraints _resourceConstraints;
+	
+	public JobUnderstandingContext(String requiredOGRSHVersion,
+		ResourceConstraints resourceConstraints)
 	{
 		_requiredOGRSHVersion = requiredOGRSHVersion; 
-		_totalPhyscialMemory = totalPhyscialMemory;
+
+		_resourceConstraints = resourceConstraints;
 	}
 	
-	public Double getTotalPhysicalMemory()
-	{
-		return _totalPhyscialMemory;
-	}
-	
-	public String getRequiredOGRSHVersion()
+	final public String getRequiredOGRSHVersion()
 	{
 		return _requiredOGRSHVersion;
 	}
 	
+	final public ResourceConstraints getResourceConstraints()
+	{
+		return _resourceConstraints;
+	}
 }

@@ -47,4 +47,7 @@ public interface ResourcesFacet extends PersonalityFacet
 	public void consumeTotalResourceCount(
 		Object currentUnderstanding,
 		RangeExpression totalResourceCount) throws JSDLException;
+	public void consumeWallclockTimeLimit(
+		Object currentUnderstanding,
+		RangeExpression wallclockTimeLimit) throws JSDLException;
 }

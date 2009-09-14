@@ -2,11 +2,11 @@ package edu.virginia.vcgr.genii.client.jsdl.personality.def;
 
 import javax.xml.namespace.QName;
 
-import edu.virginia.vcgr.genii.client.jsdl.JSDLConstants;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.UnsupportedJSDLElement;
 import edu.virginia.vcgr.genii.client.jsdl.personality.ResourcesFacet;
 import edu.virginia.vcgr.genii.client.jsdl.range.RangeExpression;
+import edu.virginia.vcgr.genii.jsdltool.doc.JSDLConstants;
 
 public class DefaultResourcesFacet extends DefaultPersonalityFacet implements
 		ResourcesFacet
@@ -124,5 +124,13 @@ public class DefaultResourcesFacet extends DefaultPersonalityFacet implements
 	{
 		throw new UnsupportedJSDLElement(
 			new QName(JSDLConstants.JSDL_NS, "TotalVirtualMemory"));
+	}
+
+	@Override
+	public void consumeWallclockTimeLimit(Object currentUnderstanding,
+			RangeExpression wallclockTimeLimit) throws JSDLException
+	{
+		throw new UnsupportedJSDLElement(
+			new QName(JSDLConstants.GENII_NS, "WallclockTime"));
 	}
 }

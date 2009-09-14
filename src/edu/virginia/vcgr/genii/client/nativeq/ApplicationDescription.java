@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.ResourceConstraints;
+
 public class ApplicationDescription
 {
 	private URI _spmdVariation;
@@ -17,14 +19,14 @@ public class ApplicationDescription
 	private String _stdinRedirect;
 	private String _stdoutRedirect;
 	private String _stderrRedirect;
-	private Double _totalPhysicalMemory;
+	private ResourceConstraints _resourceConstraints;
 	
 	public ApplicationDescription(
 		URI spmdVariation, Integer numProcesses, Integer numProcessesPerHost,
 		String executableName, Collection<String> arguments,
 		Map<String, String> environment,
 		String stdinRedirect, String stdoutRedirect, String stderrRedirect,
-		Double totalPhysicalMemory)
+		ResourceConstraints resourceConstraints)
 	{
 		_spmdVariation = spmdVariation;
 		_numProcesses = numProcesses;
@@ -46,7 +48,7 @@ public class ApplicationDescription
 		_stdoutRedirect = stdoutRedirect;
 		_stderrRedirect = stderrRedirect;
 		
-		_totalPhysicalMemory = totalPhysicalMemory;
+		_resourceConstraints = resourceConstraints;
 	}
 
 	public URI getSPMDVariation()
@@ -94,8 +96,8 @@ public class ApplicationDescription
 		return _stderrRedirect;
 	}
 	
-	public Double getTotalPhysicalMemory()
+	public ResourceConstraints getResourceConstraints()
 	{
-		return _totalPhysicalMemory;
+		return _resourceConstraints;
 	}
 }

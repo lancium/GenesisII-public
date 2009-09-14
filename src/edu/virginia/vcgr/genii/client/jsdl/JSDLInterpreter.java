@@ -26,6 +26,7 @@ import org.ggf.jsdl.OperatingSystemTypeEnumeration;
 import org.ggf.jsdl.OperatingSystemType_Type;
 import org.ggf.jsdl.OperatingSystem_Type;
 import org.ggf.jsdl.ProcessorArchitectureEnumeration;
+import org.ggf.jsdl.RangeValue_Type;
 import org.ggf.jsdl.Resources_Type;
 import org.ggf.jsdl.SourceTarget_Type;
 import org.ggf.jsdl.hpcp.HPCProfileApplication_Type;
@@ -70,6 +71,7 @@ import edu.virginia.vcgr.genii.client.jsdl.spmd.SPMDConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
+import edu.virginia.vcgr.genii.jsdltool.doc.JSDLConstants;
 
 public class JSDLInterpreter
 {
@@ -137,6 +139,20 @@ public class JSDLInterpreter
 						understandResourcesAny(provider, f2, newUnderstanding,
 							children.toArray(new MessageElement[children.size()]));
 						f2.completeFacet(understanding, newUnderstanding);
+					} else if (name.equals(new QName(JSDLConstants.GENII_NS, "WallclockTime")))
+					{
+						try
+						{
+							RangeValue_Type rType = ObjectDeserializer.toObject(a, RangeValue_Type.class);
+							RangeExpression range = RangeFactory.parse(rType);
+							if (range != null)
+								((ResourcesFacet)facet).consumeWallclockTimeLimit(
+									understanding, range);
+						}
+						catch (Throwable cause)
+						{
+							throw new JSDLException("Unable to parse wallclock time.", cause);
+						}
 					} else
 						facet.consumeAny(understanding, a);
 				}

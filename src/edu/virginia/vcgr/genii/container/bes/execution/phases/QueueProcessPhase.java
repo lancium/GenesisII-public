@@ -22,6 +22,7 @@ import edu.virginia.vcgr.genii.container.bes.execution.ExecutionException;
 import edu.virginia.vcgr.genii.container.bes.execution.IgnoreableFault;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
+import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.ResourceConstraints;
 
 public class QueueProcessPhase extends AbstractRunProcessPhase 
 	implements TerminateableExecutionPhase
@@ -48,14 +49,15 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 	private Map<String, String> _environment;
 	private Properties _queueProperties;
 	
-	private Double _totalPhysicalMemory;
+	private ResourceConstraints _resourceConstraints;
 	
 	transient private JobToken _jobToken = null;
 	transient private Boolean _terminate = null;
 	
 	public QueueProcessPhase(URI spmdVariation, Integer numProcesses, Integer numProcessesPerHost,
 		File executable, Collection<String> arguments, Map<String, String> environment,
-		File stdin, File stdout, File stderr, Properties queueProperties, Double totalPhysicalMemory)
+		File stdin, File stdout, File stderr, Properties queueProperties, 
+		ResourceConstraints resourceConstraints)
 	{
 		super(new ActivityState(
 			ActivityStateEnumeration.Running, "Enqueing", false));
@@ -70,7 +72,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 		_stdin = stdin;
 		_stdout = stdout;
 		_stderr = stderr;
-		_totalPhysicalMemory = totalPhysicalMemory;
+		_resourceConstraints = resourceConstraints;
 	}
 	
 	@Override
@@ -133,7 +135,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 					_spmdVariation, _numProcesses, _numProcessesPerHost, _executable.getAbsolutePath(),
 					_arguments,
 					_environment, fileToPath(_stdin),
-					fileToPath(_stdout), fileToPath(_stderr), _totalPhysicalMemory));
+					fileToPath(_stdout), fileToPath(_stderr), _resourceConstraints));
 				context.setProperty(JOB_TOKEN_PROPERTY, _jobToken);
 			}
 			

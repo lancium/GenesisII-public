@@ -38,6 +38,7 @@ public class CommonExecutionUnderstanding
 	private String _fuseDirectory = null;
 	
 	private Double _totalPhysicalMemory = null;
+	private Double _wallclockTimeLimit = null;
 	
 	private ApplicationUnderstanding _application = null;
 	
@@ -140,6 +141,16 @@ public class CommonExecutionUnderstanding
 		_totalPhysicalMemory = totalPhysicalMemory;
 	}
 	
+	public Double getWallclockTimeLimit()
+	{
+		return _wallclockTimeLimit;
+	}
+	
+	public void setWallclockTimeLimit(Double wallclockTimeLimit)
+	{
+		_wallclockTimeLimit = wallclockTimeLimit;
+	}
+	
 	public Vector<ExecutionPhase> createExecutionPlan(
 		Properties creationProperties) throws JSDLException
 	{
@@ -185,7 +196,12 @@ public class CommonExecutionUnderstanding
 				new File(OGRSHConfigFilename)));
 		}
 		
-		JobUnderstandingContext jobContext = new JobUnderstandingContext(_requiredOGRSHVersion, getTotalPhysicalMemory());
+		
+		ResourceConstraints resourceConstraints = new ResourceConstraints();
+		resourceConstraints.setTotalPhysicalMemory(getTotalPhysicalMemory());
+		resourceConstraints.setWallclockTimeLimit(getWallclockTimeLimit());
+		JobUnderstandingContext jobContext = new JobUnderstandingContext(
+			_requiredOGRSHVersion, resourceConstraints);
 		
 		if (_application != null)
 			_application.addExecutionPhases(

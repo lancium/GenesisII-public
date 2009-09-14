@@ -60,4 +60,12 @@ public class CommonResourcesFacet extends DefaultResourcesFacet
 		((CommonExecutionUnderstanding)currentUnderstanding).setTotalPhysicalMemory(
 				totalPhysicalMemory.describe().getUpperBound());
 	}
+
+	@Override
+	public void consumeWallclockTimeLimit(Object currentUnderstanding,
+		RangeExpression wallclockTimeLimit) throws JSDLException
+	{
+		((CommonExecutionUnderstanding)currentUnderstanding).setWallclockTimeLimit(
+			wallclockTimeLimit.describe().getUpperBound());
+	}
 }

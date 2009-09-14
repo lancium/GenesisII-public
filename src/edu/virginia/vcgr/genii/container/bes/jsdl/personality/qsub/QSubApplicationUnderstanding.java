@@ -78,7 +78,7 @@ class QSubApplicationUnderstanding
 				fsManager.lookup(getStdoutRedirect()),
 				fsManager.lookup(getStderrRedirect()),
 				creationProperties,
-				jobContext.getTotalPhysicalMemory()));
+				jobContext.getResourceConstraints()));
 		} else
 		{
 			stringEnv.put("BES_HOME", "/home/bes-job");
@@ -101,7 +101,7 @@ class QSubApplicationUnderstanding
 				fsManager.lookup(getStdoutRedirect()),
 				fsManager.lookup(getStderrRedirect()),
 				creationProperties,
-				jobContext.getTotalPhysicalMemory()));
+				jobContext.getResourceConstraints()));
 		}
 	}
 }

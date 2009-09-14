@@ -37,6 +37,7 @@ import edu.virginia.vcgr.genii.client.spmd.SPMDException;
 import edu.virginia.vcgr.genii.client.spmd.SPMDTranslator;
 import edu.virginia.vcgr.genii.client.spmd.SPMDTranslatorFactories;
 import edu.virginia.vcgr.genii.client.spmd.SPMDTranslatorFactory;
+import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.ResourceConstraints;
 
 public class PBSQueueConnection extends ScriptBasedQueueConnection
 {
@@ -45,6 +46,23 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 	static final public long DEFAULT_CACHE_WINDOW = 1000L * 30;
 	static final public URI PBS_MANAGER_TYPE = URI.create(
 		"http://vcgr.cs.virginia.edu/genesisII/nativeq/pbs");
+	
+	static private String toWallTimeFormat(double value)
+	{
+		long total = (long)value;
+		long seconds = total % 60;
+		total /= 60;
+		long minutes = total % 60;
+		total /= 60;
+		long hours = total;
+		
+		if (hours > 0)
+			return String.format("%d:%d:%d", hours, minutes, seconds);
+		else if (minutes > 0)
+			return String.format("%d:%d", minutes, seconds);
+		else
+			return String.format("%d", seconds);
+	}
 	
 	private JobStateCache _statusCache;
 	
@@ -260,10 +278,19 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 			
 		}
 		
-		Double totalPhyscialMemory = application.getTotalPhysicalMemory();
-		if ( (totalPhyscialMemory != null) && (!totalPhyscialMemory.equals(Double.NaN)) )
+		ResourceConstraints resourceConstraints = 
+			application.getResourceConstraints();
+		if (resourceConstraints != null)
 		{
-			script.format("#PBS -l mem=%d\n", totalPhyscialMemory.intValue());
+			Double totalPhyscialMemory = 
+				resourceConstraints.getTotalPhysicalMemory();
+			if ( (totalPhyscialMemory != null) &&
+				(!totalPhyscialMemory.equals(Double.NaN)) )
+				script.format("#PBS -l mem=%d\n", totalPhyscialMemory.intValue());
+			
+			Double wallclockTime = resourceConstraints.getWallclockTimeLimit();
+			if (wallclockTime != null && !wallclockTime.equals(Double.NaN))
+				script.format("#PBS -l walltime=%s\n", toWallTimeFormat(wallclockTime));
 		}
 	}
 

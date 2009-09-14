@@ -12,6 +12,7 @@ import edu.virginia.vcgr.genii.client.nativeq.JobToken;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueue;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConnection;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueues;
+import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.ResourceConstraints;
 
 public class TestPBSQueue
 {
@@ -25,7 +26,7 @@ public class TestPBSQueue
 		ApplicationDescription application =  new ApplicationDescription(
 				SPMDConstants.ANY_MPI, new Integer(5), new Integer(1),
 				"mail", arggs, null, "/etc/passwd", "/dev/null", "/dev/null", 
-				new Double(5000000));
+				new ResourceConstraints());
 		NativeQueue queue = NativeQueues.getNativeQueue("pbs");
 		
 		NativeQueueConnection connection = queue.connect(workingDir, null);
