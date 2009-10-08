@@ -1,8 +1,13 @@
 package edu.virginia.vcgr.genii.container.q2;
 
+import java.sql.SQLException;
 import java.util.Date;
 
+import org.ggf.jsdl.JobDefinition_Type;
+
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
+import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.container.q2.matching.JobResourceRequirements;
 
 /**
  * This is the main data structure for keeping all information about a job
@@ -79,6 +84,8 @@ public class JobData
 	 * contention.
 	 */
 	private Date _nextValidRunTime = null;
+	
+	private JobResourceRequirements _resourceRequirements = null;
 	
 	public JobData(long jobID, String jobTicket, short priority,
 		QueueStates jobState, Date submitTime, short runAttempts, Long besID)
@@ -171,6 +178,18 @@ public class JobData
 	synchronized public void incrementRunAttempts()
 	{
 		incrementRunAttempts(1);
+	}
+	
+	synchronized public JobResourceRequirements getResourceRequirements(
+		JobManager _jobManager) throws ResourceException, SQLException
+	{
+		if (_resourceRequirements == null)
+		{
+			JobDefinition_Type jsdl = _jobManager.getJSDL(_jobID);
+			_resourceRequirements = new JobResourceRequirements(jsdl);
+		}
+		
+		return _resourceRequirements;
 	}
 	
 	public String currentJobAction()

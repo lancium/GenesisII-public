@@ -29,4 +29,6 @@ public interface IBESPortTypeResolver
 	public GeniiBESPortType createClientStub(
 		Connection connection, long besID)
 			throws Throwable;
+	
+	public String getBESName(long besID);
 }

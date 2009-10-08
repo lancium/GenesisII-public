@@ -1,7 +1,8 @@
 package edu.virginia.vcgr.genii.container.q2;
 
 import java.sql.Connection;
-import java.util.Collection;
+import java.util.List;
+import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -74,6 +75,7 @@ public class JobUpdateWorker implements OutcallHandler
 	public void run()
 	{
 		Connection connection = null;
+		long besID = -1L;
 		
 		try
 		{
@@ -86,8 +88,10 @@ public class JobUpdateWorker implements OutcallHandler
 			connection = _connectionPool.acquire(false);
 			EndpointReferenceType jobEndpoint = _jobEndpointResolver.getJobEndpoint(
 				connection, _jobInfo.getJobID());
+			besID = _jobInfo.getBESID();
+			String besName = _clientStubResolver.getBESName(besID);
 			GeniiBESPortType clientStub = _clientStubResolver.createClientStub(
-				connection, _jobInfo.getBESID());
+				connection, besID);
 			try { connection.commit(); } catch (Throwable c) {}
 			ClientUtils.setTimeout(clientStub, 120 * 1000);
 			
@@ -131,9 +135,14 @@ public class JobUpdateWorker implements OutcallHandler
 					+ _jobInfo.getJobID());
 			} else
 			{
-				Collection<String> faults = 
+				List<String> faults = 
 					BESFaultManager.getFaultDetail(
 						activityStatuses[0].getFault());
+				
+				if (faults == null)
+					faults = new Vector<String>(1);
+				faults.add(0, String.format("Job ran on BES resource %s.",
+					besName == null ? "<unknown>" : besName));
 				
 				if (faults != null && faults.size() > 0)
 				{

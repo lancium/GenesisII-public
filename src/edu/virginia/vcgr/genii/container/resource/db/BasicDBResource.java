@@ -31,6 +31,7 @@ import edu.virginia.vcgr.genii.container.common.notification.SubscriptionInforma
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
+import edu.virginia.vcgr.genii.container.resource.db.query.ResourceSummary;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
 public class BasicDBResource implements IResource
@@ -272,6 +273,7 @@ public class BasicDBResource implements IResource
 			stmt = _connection.prepareStatement(_DESTROY_MATCHING_PARAMS_STMT);
 			stmt.setString(1, _resourceKey);
 			stmt.executeUpdate();
+			ResourceSummary.removeResources(_connection, _resourceKey);
 			
 			DBSubscriptionResource.destroySubscriptions(this);
 		}

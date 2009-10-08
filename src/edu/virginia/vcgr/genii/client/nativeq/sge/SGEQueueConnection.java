@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.genii.client.nativeq.pbs;
+package edu.virginia.vcgr.genii.client.nativeq.sge;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -7,8 +7,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,25 +26,22 @@ import edu.virginia.vcgr.genii.client.nativeq.BulkStatusFetcher;
 import edu.virginia.vcgr.genii.client.nativeq.FactoryResourceAttributes;
 import edu.virginia.vcgr.genii.client.nativeq.JobStateCache;
 import edu.virginia.vcgr.genii.client.nativeq.JobToken;
-import edu.virginia.vcgr.genii.client.nativeq.NativeQueue;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueException;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueState;
 import edu.virginia.vcgr.genii.client.nativeq.ScriptBasedQueueConnection;
-import edu.virginia.vcgr.genii.client.nativeq.ScriptLineParser;
-import edu.virginia.vcgr.genii.client.nativeq.UnixSignals;
 import edu.virginia.vcgr.genii.client.spmd.SPMDException;
 import edu.virginia.vcgr.genii.client.spmd.SPMDTranslator;
 import edu.virginia.vcgr.genii.client.spmd.SPMDTranslatorFactories;
 import edu.virginia.vcgr.genii.client.spmd.SPMDTranslatorFactory;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.ResourceConstraints;
 
-public class PBSQueueConnection extends ScriptBasedQueueConnection
+public class SGEQueueConnection extends ScriptBasedQueueConnection
 {
-	static private Log _logger = LogFactory.getLog(PBSQueueConnection.class);
+	static private Log _logger = LogFactory.getLog(SGEQueueConnection.class);
 	
 	static final public long DEFAULT_CACHE_WINDOW = 1000L * 30;
-	static final public URI PBS_MANAGER_TYPE = URI.create(
-		"http://vcgr.cs.virginia.edu/genesisII/nativeq/pbs");
+	static final public URI SGE_MANAGER_TYPE = URI.create(
+		"http://vcgr.cs.virginia.edu/genesisII/nativeq/sge");
 	
 	static private String toWallTimeFormat(double value)
 	{
@@ -76,7 +71,7 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 	
 	private AdditionalArguments _additionalArguments;
 	
-	PBSQueueConnection(File workingDirectory, Properties connectionProperties,
+	SGEQueueConnection(File workingDirectory, Properties connectionProperties,
 		String queueName, File qsubBinary, File qstatBinary, File qdelBinary,
 		AdditionalArguments additionalArguments, JobStateCache statusCache)
 			throws NativeQueueException
@@ -119,7 +114,7 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 			for (int lcv = 0; true; lcv++)
 			{
 				String variationProperty =
-					PBSQueue.QUEUE_SUPPORTED_SPMD_VARIATIONS_PROPERTY_BASE +
+					SGEQueue.QUEUE_SUPPORTED_SPMD_VARIATIONS_PROPERTY_BASE +
 					"." + lcv;
 				
 				String variation = connectionProperties.getProperty(
@@ -130,11 +125,11 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 				
 				String providerName = connectionProperties.getProperty(
 					variationProperty + "." + 
-					PBSQueue.QUEUE_SUPPORTED_SPMD_VARIATION_PROVIDER_FOOTER);
+					SGEQueue.QUEUE_SUPPORTED_SPMD_VARIATION_PROVIDER_FOOTER);
 				
 				if (providerName == null)
 					throw new NativeQueueException(String.format(
-						"Native PBS Queue couldn't find SPMD Provider for type \"%s\".",
+						"Native SGE Queue couldn't find SPMD Provider for type \"%s\".",
 						variation));
 				
 				SPMDTranslatorFactory factory = 
@@ -144,7 +139,7 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 				Properties constructionProps = new Properties();
 				String value =
 					connectionProperties.getProperty(variationProperty + "." +
-						PBSQueue.QUEUE_SUPPORTED_SPMD_ADDITIONAL_CMDLINE_ARGS);
+						SGEQueue.QUEUE_SUPPORTED_SPMD_ADDITIONAL_CMDLINE_ARGS);
 				if (value != null)
 					constructionProps.setProperty(
 						SPMDTranslatorFactory.ADDITIONAL_CMDLINE_ARGS_PROPERTY,
@@ -169,7 +164,7 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 				JSDLUtils.getLocalOperatingSystem(),
 				JSDLUtils.getLocalCPUArchitecture(),
 				null, null, null, null),
-			null, PBS_MANAGER_TYPE);
+			null, SGE_MANAGER_TYPE);
 	}
 
 	@Override
@@ -188,54 +183,8 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 		ProcessBuilder builder = new ProcessBuilder(commandLine);
 		execute(builder);
 	}
-
-	static private class JobStatusParser implements ScriptLineParser
-	{
-		static private Pattern JOB_TOKEN_PATTERN =
-			Pattern.compile("^\\s*Job Id:\\s*(\\S+)\\s*$");
-		static private Pattern JOB_STATE_PATTERN =
-			Pattern.compile("^\\s*job_state\\s*=\\s*(\\S+)\\s*$");
-		
-		private Map<String, String> _matchedPairs =
-			new HashMap<String, String>();
-		
-		private String _lastToken = null;
-		private String _lastState = null;
-		
-		@Override
-		public Pattern[] getHandledPatterns()
-		{
-			return new Pattern[] { JOB_TOKEN_PATTERN, JOB_STATE_PATTERN };
-		}
-
-		@Override
-		public void parseLine(Matcher matcher) throws NativeQueueException
-		{
-			if (matcher.pattern() == JOB_TOKEN_PATTERN)
-				_lastToken = matcher.group(1);
-			else if (matcher.pattern() == JOB_STATE_PATTERN)
-			{
-				_lastState = matcher.group(1);
-				if (_lastToken == null)
-					throw new NativeQueueException(
-						"Unable to parse status output.");
-				
-				_matchedPairs.put(_lastToken, _lastState);
-				_lastToken = null;
-				_lastState = null;
-			} else
-				throw new NativeQueueException(
-					"Unable to parse status output.");
-		}
-		
-		public Map<String, String> getStateMap()
-			throws NativeQueueException
-		{
-			return _matchedPairs;
-		}
-	}
 	
-	private class BulkPBSStatusFetcher implements BulkStatusFetcher
+	private class BulkSGEStatusFetcher implements BulkStatusFetcher
 	{
 		@Override
 		public Map<JobToken, NativeQueueState> getStateMap()
@@ -246,22 +195,21 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 			
 			List<String> commandLine = new LinkedList<String>();
 			commandLine.add(_qstatBinary.getAbsolutePath());
-			commandLine.add("-f");
 			for (String additionalArgString : _additionalArguments.qstatArguments())
 				commandLine.add(additionalArgString);
+			commandLine.add("-xml");
 			
 			if (_destination != null)
 				commandLine.add(String.format("@%s", _destination));
 			
 			ProcessBuilder builder = new ProcessBuilder(commandLine);
 			String result = execute(builder);
-			JobStatusParser parser = new JobStatusParser();
-			parseResult(result, parser);
-			Map<String, String> stateMap = parser.getStateMap();
+			Map<String, String> stateMap = SGEJobStatusParser.parseStatus(
+				result);
 			for (String tokenString : stateMap.keySet())
 			{
-				PBSJobToken token = new PBSJobToken(tokenString);
-				PBSQueueState state = PBSQueueState.fromStateSymbol(
+				SGEJobToken token = new SGEJobToken(tokenString);
+				SGEQueueState state = SGEQueueState.fromStateString(
 					stateMap.get(tokenString));
 				_logger.debug(String.format("Putting %s[%s]\n", token, state));
 				ret.put(token, state);
@@ -276,10 +224,9 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 			throws NativeQueueException
 	{
 		NativeQueueState state = _statusCache.get(
-			token, new BulkPBSStatusFetcher(), DEFAULT_CACHE_WINDOW);
+			token, new BulkSGEStatusFetcher(), DEFAULT_CACHE_WINDOW);
 		if (state == null)
-			state = PBSQueueState.fromStateSymbol("E");
-		
+			state = SGEQueueState.fromStateString("finished");
 		return state;
 	}
 
@@ -294,28 +241,14 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 		String stderr = application.getStderrRedirect();
 		
 		if (stdout != null)
-			script.format("#PBS -o %s\n", stdout);
+			script.format("#$ -o %s\n", stdout);
 		if (stderr != null)
-			script.format("#PBS -e %s\n", stderr);
+			script.format("#$ -e %s\n", stderr);
 		
 		if (application.getSPMDVariation() != null)
 		{
-			Integer numProcs = application.getNumProcesses();
-			Integer numProcsPerHost = application.getNumProcessesPerHost();
-						
-			if (numProcs != null) 
-			{
-				if (numProcsPerHost != null)
-				{
-					Integer hosts = numProcs / numProcsPerHost;
-					script.format("#PBS -l nodes=%d:ppn=%d\n", hosts.intValue(), numProcsPerHost.intValue());
-				}
-				else 
-				{
-					script.format("#PBS -l nodes=%d:ppn=1\n", numProcs.intValue());	
-				}
-			}
-			
+			throw new NativeQueueException(
+				"SPMD not supported on SGE at the moment.");
 		}
 		
 		ResourceConstraints resourceConstraints = 
@@ -326,11 +259,11 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 				resourceConstraints.getTotalPhysicalMemory();
 			if ( (totalPhyscialMemory != null) &&
 				(!totalPhyscialMemory.equals(Double.NaN)) )
-				script.format("#PBS -l mem=%d\n", totalPhyscialMemory.longValue());
+				script.format("#$ -l mf=%d\n", totalPhyscialMemory.longValue());
 			
 			Double wallclockTime = resourceConstraints.getWallclockTimeLimit();
 			if (wallclockTime != null && !wallclockTime.equals(Double.NaN))
-				script.format("#PBS -l walltime=%s\n", toWallTimeFormat(wallclockTime));
+				script.format("#$ -l h_rt=%s\n", toWallTimeFormat(wallclockTime));
 		}
 	}
 
@@ -339,60 +272,28 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 			File workingDirectory, ApplicationDescription application)
 			throws NativeQueueException, IOException
 	{
-		EnumSet<UnixSignals> signals = UnixSignals.parseTrapAndKillSet(
-			connectionProperties().getProperty(
-				NativeQueue.SIGNALS_TO_TRAP_AND_KILL));
-		
 		URI variation = application.getSPMDVariation();
 		if (variation != null)
 		{
-			SPMDTranslator translator = supportedSPMDVariations().get(
-				variation);
-			if (translator == null)
-				throw new NativeQueueException(String.format(
-					"Unable to find SPMD translator for variation \"%s\".",
-					variation));
-			
-			script.format("cd \"%s\"\n", workingDirectory.getAbsolutePath());
-			
-			List<String> commandLine = new ArrayList<String>(16);
-			
-			String execName = application.getExecutableName();
-			if (!execName.contains("/"))
-				execName = String.format("./%s", execName);
-			
-			commandLine.add(execName);
-			
-			for (String arg : application.getArguments())
-				commandLine.add(arg);
-			
-			try
-			{
-				commandLine = translator.translateCommandLine(commandLine);
-				boolean first = true;
-				for (String val : commandLine)
-				{
-					script.format("%s\"%s\"", (first ? "" : " "), val);
-					first = false;
-				}
-			}
-			catch (SPMDException se)
-			{
-				throw new NativeQueueException(
-					"Unable to translate SPMD command.", se);
-			}
-			
-			if (application.getStdinRedirect() != null)
-				script.format(" < \"%s\"", application.getStdinRedirect());
-			
-			if (signals.size() > 0)
-				script.print(" &");
-			
-			script.println();
+			throw new NativeQueueException("SPMD not supported in SGE at the moment.");
 		} else
 			super.generateApplicationBody(script, workingDirectory, application);
 	}
 
+	static final private Pattern JOB_TOKEN_PATTERN = Pattern.compile(
+		"^.*Your job ([a-zA-Z0-9.]+)\\s+.*$");
+	
+	static private String extractJobToken(String text)
+		throws NativeQueueException
+	{
+		Matcher matcher = JOB_TOKEN_PATTERN.matcher(text);
+		if (matcher.matches())
+			return matcher.group(1);
+		
+		throw new NativeQueueException(String.format(
+			"Unable to parse job token from result string \"%s\".", text));
+	}
+	
 	@Override
 	public JobToken submit(ApplicationDescription application) 
 		throws NativeQueueException
@@ -414,6 +315,9 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 
 			command.add(builder.toString());
 		}
+		
+		command.add("-wd");
+		command.add(getWorkingDirectory().getAbsolutePath());
 		
 		Map<String, String> environment = application.getEnvironment();
 		if (environment.size() > 0)
@@ -439,8 +343,8 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 		
 		ProcessBuilder builder = new ProcessBuilder(command);
 		builder.directory(getWorkingDirectory());
-		return new PBSJobToken(
-			execute(builder).trim());
+		return new SGEJobToken(extractJobToken(
+			execute(builder).trim()));
 	}
 
 	@Override

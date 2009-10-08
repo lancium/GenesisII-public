@@ -3,6 +3,8 @@ package edu.virginia.vcgr.genii.container.rfork;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class AbstractStreamableByteIOFactoryResourceFork 
 	extends AbstractResourceFork implements StreamableByteIOFactoryResourceFork
@@ -33,6 +35,50 @@ public abstract class AbstractStreamableByteIOFactoryResourceFork
 		{
 			_count++;
 		}	
+	}
+	
+	static private AdvertisedSize discoverAdvertisedSize(Class<?> cl)
+	{
+		if (cl == null || cl.equals(Object.class))
+			return null;
+		
+		AdvertisedSize aSize = cl.getAnnotation(AdvertisedSize.class);
+		if (aSize == null)
+		{
+			if (!cl.isInterface())
+			{
+				for (Class<?> cl2 : cl.getInterfaces())
+				{
+					aSize = discoverAdvertisedSize(cl2);
+					if (aSize != null)
+						return aSize;
+				}
+				
+				aSize = discoverAdvertisedSize(cl.getSuperclass());
+			}
+		}
+		
+		return aSize;
+	}
+	
+	static private Map<Class<?>, AdvertisedSize> _sizeMap =
+		new HashMap<Class<?>, AdvertisedSize>();
+	
+	static private AdvertisedSize getAdvertisedSize(Class<?> cl)
+	{
+		AdvertisedSize aSize = null;
+		
+		synchronized(_sizeMap)
+		{
+			aSize = _sizeMap.get(cl);
+			if (aSize == null && !_sizeMap.containsKey(cl))
+			{
+				aSize = discoverAdvertisedSize(cl);
+				_sizeMap.put(cl, aSize);
+			}
+		}
+		
+		return aSize;
 	}
 	
 	protected AbstractStreamableByteIOFactoryResourceFork(
@@ -86,6 +132,11 @@ public abstract class AbstractStreamableByteIOFactoryResourceFork
 	@Override
 	public long size()
 	{
+		AdvertisedSize aSize = getAdvertisedSize(getClass());
+		
+		if (aSize != null && aSize.value() >= 0L)
+			return aSize.value();
+		
 		try
 		{
 			SimpleCountingStream stream = new SimpleCountingStream();

@@ -29,6 +29,7 @@ import javax.net.ssl.*;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
+import edu.virginia.vcgr.genii.client.comm.socket.SocketConfigurer;
 import edu.virginia.vcgr.genii.client.configuration.*;
 import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
@@ -55,11 +56,12 @@ public class VcgrSslSocketFactory
 	
     protected TrustManager[] _trustManagers;
     protected SecureRandom _random = null;
-	
+	protected SocketConfigurer _clientSocketConfigurer;
 	
 	public VcgrSslSocketFactory() {
 		ConfigurationManager.addConfigurationUnloadListener(this);
-
+		_clientSocketConfigurer = Installation.getDeployment(
+			new DeploymentName()).clientSocketConfigurer();
 		// reset cached key/trust stores
 		notifyUnloaded();
 	}
@@ -133,33 +135,38 @@ public class VcgrSslSocketFactory
 		}
 	}
 	
+	final private Socket configureSocket(Socket socket)
+	{
+		_clientSocketConfigurer.configureSocket(socket);
+		return socket;
+	}
+	
 	public Socket createSocket(Socket socket, String s, int i, boolean flag)
 		throws IOException 
 	{
-
-		return getSSLSocketFactory().createSocket(socket, s, i, flag);
+		return configureSocket(getSSLSocketFactory().createSocket(socket, s, i, flag));
 	}
 
 	public Socket createSocket(InetAddress inaddr, int i, InetAddress inaddr1,
 		int j) throws IOException
 	{
-		return getSSLSocketFactory().createSocket(inaddr, i, inaddr1, j);
+		return configureSocket(getSSLSocketFactory().createSocket(inaddr, i, inaddr1, j));
 	}
 
 	public Socket createSocket(InetAddress inaddr, int i) throws IOException 
 	{
-		return getSSLSocketFactory().createSocket(inaddr, i);
+		return configureSocket(getSSLSocketFactory().createSocket(inaddr, i));
 	}
 
 	public Socket createSocket(String s, int i, InetAddress inaddr, int j)
 		throws IOException 
 	{
-		return getSSLSocketFactory().createSocket(s, i, inaddr, j);
+		return configureSocket(getSSLSocketFactory().createSocket(s, i, inaddr, j));
 	}
 
 	public Socket createSocket(String s, int i) throws IOException 
 	{
-		return getSSLSocketFactory().createSocket(s, i);
+		return configureSocket(getSSLSocketFactory().createSocket(s, i));
 	}
 
 	public String[] getDefaultCipherSuites() 

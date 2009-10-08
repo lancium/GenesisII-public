@@ -11,6 +11,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.genii.client.comm.socket.SocketConfigurer;
+
 public class Deployment
 {
 	static private Log _logger = LogFactory.getLog(Deployment.class);
@@ -24,6 +26,8 @@ public class Deployment
 		"web-container.properties";
 	static private final String REJUVENATION_PROPERTYIES_FILENAME =
 		"rejuvenation.properties";
+	static private final String CLIENT_SOCKET_PROPERTIES_FILENAME =
+		"client-socket.properties";
 	static private final String SECURE_RUNNABLE_DIRECTORY_NAME = 
 		"secure-runnable";
 	
@@ -39,6 +43,7 @@ public class Deployment
 	private Properties _webContainerProperties;
 	private Properties _uriManagerProperties;
 	private Properties _rejuvenationProperties;
+	private SocketConfigurer _clientSocketConfigurer;
 	
 	private Deployment(File deploymentDirectory)
 	{
@@ -67,11 +72,40 @@ public class Deployment
 			_deploymentDirectory.getName(), _configurationDirectory);
 		_uriManagerProperties = loadURIManagerProperties(
 			_deploymentDirectory.getName(), _configurationDirectory);
+		_clientSocketConfigurer = loadClientSocketConfigurer();
 		_rejuvenationProperties = loadRejuvenationProperties(
 			_deploymentDirectory.getName(), _configurationDirectory);
 		
 		_secureRunnableDirectory = new File(_deploymentDirectory, 
 			SECURE_RUNNABLE_DIRECTORY_NAME);
+	}
+	
+	private SocketConfigurer loadClientSocketConfigurer()
+	{
+		Properties properties = new Properties();
+		
+		File confFile = getConfigurationFile(
+			CLIENT_SOCKET_PROPERTIES_FILENAME);
+		if (confFile.exists())
+		{
+			FileInputStream fin = null;
+			
+			try
+			{
+				fin = new FileInputStream(confFile);
+				properties.load(fin);
+			}
+			catch (IOException ioe)
+			{
+				_logger.debug("Unable to load client-socket properties.", ioe);
+			}
+			finally
+			{
+				StreamUtils.close(fin);
+			}
+		}
+		
+		return new SocketConfigurer(properties);
 	}
 	
 	static private Properties loadURIManagerProperties(
@@ -182,6 +216,11 @@ public class Deployment
 	public Properties webContainerProperties()
 	{
 		return _webContainerProperties;
+	}
+	
+	public SocketConfigurer clientSocketConfigurer()
+	{
+		return _clientSocketConfigurer;
 	}
 	
 	public Properties softwareRejuvenationProperties()

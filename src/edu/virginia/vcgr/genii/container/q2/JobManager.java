@@ -579,6 +579,12 @@ public class JobManager implements Closeable
 		}
 	}
 	
+	synchronized public JobDefinition_Type getJSDL(String ticket)
+		throws ResourceException, SQLException
+	{
+		return getJSDL(_jobsByTicket.get(ticket).getJobID());
+	}
+	
 	/**
 	 * Get the job status for jobs in the queue.  This operation IS subject to
 	 * owner verification.  This means that only the owner of a job is allowed
@@ -1310,7 +1316,16 @@ public class JobManager implements Closeable
 		{
 			resolve(connection, jobID);
 			return _endpoint;
-		}	
+		}
+		
+		public String getBESName(long besID)
+		{
+			BESData data = _besManager.findBES(besID);
+			if (data != null)
+				return data.getName();
+			
+			return null;
+		}
 	}
 	
 	/**

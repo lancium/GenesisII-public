@@ -81,8 +81,11 @@ public abstract class AbstractByteIOTransferer<Type> implements ByteIOTransferer
 	{
 		Collection<GeniiAttachment> attachments =
 			ClientUtils.getAttachments(clientProxy);
-		if (attachments == null || attachments.size() != 1)
-			throw new RemoteException("Invalid attachment data received.");
+		if (attachments == null)
+			throw new RemoteException("No attachments were received!");
+		if (attachments.size() != 1)
+			throw new RemoteException(String.format(
+				"%d attachments were received.", attachments.size()));
 			
 		return attachments.iterator().next().getData();
 	}

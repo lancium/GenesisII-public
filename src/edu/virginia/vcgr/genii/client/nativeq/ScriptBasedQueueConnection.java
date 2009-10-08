@@ -106,20 +106,13 @@ public abstract class ScriptBasedQueueConnection
 		File workingDirectory, ApplicationDescription application)
 			throws NativeQueueException, IOException
 	{
-		script.format("#%s\n\n", getBashBinary().getAbsolutePath());
+		script.format("#!%s\n\n", getBashBinary().getAbsolutePath());
 	}
 	
 	protected void generateQueueHeaders(PrintStream script,
 		File workingDirectory, ApplicationDescription application)
 			throws NativeQueueException, IOException
 	{
-		String stdout = application.getStdoutRedirect();
-		String stderr = application.getStderrRedirect();
-		
-		if (stdout != null)
-			script.format("#PBS -o %s\n", stdout);
-		if (stderr != null)
-			script.format("#PBS -e %s\n", stderr);
 	}
 	
 	protected void generateQueueApplicationHeader(PrintStream script,

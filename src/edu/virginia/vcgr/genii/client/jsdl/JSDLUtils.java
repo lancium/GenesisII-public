@@ -47,6 +47,9 @@ public class JSDLUtils extends JNIContainerBaseClass
 			else if (arch.equals("i386"))
 				return new CPUArchitecture_Type(
 					ProcessorArchitectureEnumeration.x86, null);
+			else if (arch.equals(ProcessorArchitectureEnumeration._x86_64))
+				return new CPUArchitecture_Type(
+					ProcessorArchitectureEnumeration.x86_64, null);
 		}
 		
 		return new CPUArchitecture_Type(

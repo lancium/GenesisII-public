@@ -1,14 +1,21 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
-import java.util.Collection;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.rmi.RemoteException;
+import java.util.LinkedList;
 
+import org.ggf.rbyteio.RandomByteIOPortType;
+
+import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransferer;
+import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransfererFactory;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.io.FileResource;
-import edu.virginia.vcgr.genii.client.rns.RNSException;
+import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
-import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
-import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 
 public class ByteIOPerformanceTool extends BaseGridTool
 {
@@ -17,44 +24,121 @@ public class ByteIOPerformanceTool extends BaseGridTool
 	static final private FileResource _USAGE =
 		new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/resources/byteioperf-usage.txt");
 	
-	static private void makeCorrectFileCount(RNSPath target, int fileCount)
-		throws RNSPathDoesNotExistException, RNSException
+	static private class WorkRequest
 	{
-		RNSPath newFile;
-		Collection<RNSPath> files = target.listContents();
-		if (files.size() < fileCount)
+		private long _startByte;
+		private boolean _completed = false;
+		
+		public void waitForCompletion() throws InterruptedException
 		{
-			System.err.format("Growing directory from %d files to %d.\n",
-				files.size(), fileCount);
-			for (int lcv = files.size(); lcv < fileCount; lcv++)
+			synchronized(this)
 			{
-				newFile = target.lookup(String.format("%s/placeholder.%d",
-					target.pwd(), lcv), RNSPathQueryFlags.MUST_NOT_EXIST);
-				newFile.createNewFile();
+				while (!_completed)
+					wait();
 			}
-		} else
+		}
+		
+		public void completed()
 		{
-			System.err.format("Shrinking directory from %d files to %d.\n",
-				files.size(), fileCount);
-			for (int lcv = files.size() - 1; lcv >= fileCount; lcv--)
+			synchronized(this)
 			{
-				newFile = target.lookup(String.format("placeholder.%d",lcv), 
-					RNSPathQueryFlags.MUST_EXIST);
-				newFile.delete();
+				_completed = true;
+				notifyAll();
 			}
 		}
 	}
 	
-	static private void doFile(RNSPath dir) 
-		throws RNSException
+	private Long _lastByte = null;
+	private LinkedList<WorkRequest> _queue = new LinkedList<WorkRequest>();
+	
+	private class Worker implements Runnable
 	{
-		RNSPath newFile;
+		private ByteBuffer _block;
+		private RandomByteIOTransferer _source;
 		
-		System.err.format("Testing.\n");
-		newFile = dir.lookup("test-file.dat",
-			RNSPathQueryFlags.MUST_NOT_EXIST);
-		newFile.createNewFile();
-		newFile.delete();
+		private Worker(RandomByteIOTransferer source, int blockSize) 
+			throws ResourceException, GenesisIISecurityException, RemoteException, IOException
+		{
+			_block = ByteBuffer.allocate(blockSize);
+			_source = source;
+		}
+		
+		@Override
+		public void run()
+		{
+			try
+			{
+				WorkRequest wr = null;
+				while (_lastByte == null)
+				{
+					wr = null;
+					
+					synchronized(_queue)
+					{
+						if (_queue.isEmpty())
+						{
+							_queue.wait();
+							continue;
+						} else
+							wr = _queue.removeFirst();
+					}
+					
+					if (_lastByte != null)
+						break;
+					
+					_block.rewind();
+					_source.read(wr._startByte, _block);
+					if (_block.remaining() > 0)
+					{
+						_block.flip();
+						_lastByte = new Long(wr._startByte + _block.remaining());
+					}
+					
+					wr.completed();
+				}
+				
+				synchronized(_queue)
+				{
+					for (WorkRequest request : _queue)
+					{
+						request.completed();
+					}
+					
+					_queue.clear();
+				}
+			}
+			catch (Throwable cause)
+			{
+				cause.printStackTrace(System.err);
+			}
+		}
+	}
+	
+	private long readFile(int numThreads, int blockSize) throws InterruptedException
+	{
+		LinkedList<WorkRequest> requestList = new LinkedList<WorkRequest>();
+		long nextRequest = 0;
+		
+		while (_lastByte == null)
+		{
+			while (requestList.size() < numThreads)
+			{
+				WorkRequest request = new WorkRequest();
+				request._startByte = nextRequest;
+				nextRequest += blockSize;
+				requestList.addLast(request);
+				synchronized(_queue)
+				{
+					_queue.addLast(request);
+					_queue.notify();
+				}
+			}
+			
+			WorkRequest request = requestList.removeFirst();
+			request.waitForCompletion();
+		}
+		
+		return _lastByte;
 	}
 	
 	public ByteIOPerformanceTool()
@@ -65,24 +149,38 @@ public class ByteIOPerformanceTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		RNSPath targetDir = RNSPath.getCurrent().lookup(getArgument(0),
-			RNSPathQueryFlags.MUST_EXIST);
-		int iterations = Integer.parseInt(getArgument(1));
-		
-		for (int lcv = 2; lcv < numArguments(); lcv++)
+		RNSPath source = RNSPath.getCurrent().lookup(getArgument(0));
+		int blockSize = Integer.parseInt(getArgument(1));
+		int numThreads = Integer.parseInt(getArgument(2));
+		long startTime;
+		long stopTime;
+		long bytesTransferred;
+
+		for (int lcv = 0; lcv < numThreads; lcv++)
 		{
-			int fileCount = Integer.parseInt(getArgument(lcv));
-			makeCorrectFileCount(targetDir, fileCount);
-			for (int iter = 0; iter < iterations; iter++)
-				doFile(targetDir);
+			RandomByteIOTransferer sourceT =
+				RandomByteIOTransfererFactory.createRandomByteIOTransferer(
+					ClientUtils.createProxy(RandomByteIOPortType.class,
+					source.getEndpoint()));
+			Thread th = new Thread(new Worker(sourceT, blockSize));
+			th.setDaemon(true);
+			th.start();
 		}
+		
+		startTime = System.currentTimeMillis();
+		bytesTransferred = readFile(numThreads, blockSize);
+		stopTime = System.currentTimeMillis();
+		
+		stderr.format("Transfered %d bytes in %d milliseconds\n",
+			bytesTransferred, (stopTime - startTime));
+		
 		return 0;
 	}
 
 	@Override
 	protected void verify() throws ToolException
 	{
-		if (numArguments() < 3)
+		if (numArguments() != 3)
 			throw new InvalidToolUsageException();
 	}
 }

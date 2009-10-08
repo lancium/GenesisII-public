@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.genii.client.nativeq.pbs;
+package edu.virginia.vcgr.genii.client.nativeq.sge;
 
 import java.io.File;
 import java.util.HashMap;
@@ -12,32 +12,32 @@ import edu.virginia.vcgr.genii.client.nativeq.JobStateCache;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConnection;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueException;
 
-public class PBSQueue extends AbstractNativeQueue
+public class SGEQueue extends AbstractNativeQueue
 {
-	static final public String PROVIDER_NAME = "pbs";
+	static final public String PROVIDER_NAME = "sge";
 	
 	static final public String QUEUE_NAME_PROPERTY =
-		"edu.virginia.vcgr.genii.client.nativeq.pbs.queue-name";
+		"edu.virginia.vcgr.genii.client.nativeq.sge.queue-name";
 	
 	static final public String QUEUE_BIN_DIRECTORY_PROPERTY =
-		"edu.virginia.vcgr.genii.client.nativeq.pbs.bin-directory";
+		"edu.virginia.vcgr.genii.client.nativeq.sge.bin-directory";
 	
 	static final public String QUEUE_QSUB_PATH_PROPERTY =
-		"edu.virginia.vcgr.genii.client.nativeq.pbs.qsub-path";
+		"edu.virginia.vcgr.genii.client.nativeq.sge.qsub-path";
 	static final public String QUEUE_QDEL_PATH_PROPERTY =
-		"edu.virginia.vcgr.genii.client.nativeq.pbs.qdel-path";
+		"edu.virginia.vcgr.genii.client.nativeq.sge.qdel-path";
 	static final public String QUEUE_QSTAT_PATH_PROPERTY =
-		"edu.virginia.vcgr.genii.client.nativeq.pbs.qstat-path";
+		"edu.virginia.vcgr.genii.client.nativeq.sge.qstat-path";
 	
 	static final public String QUEUE_QSUB_ADDITIONAL_ARG_PROPERTY_PATTERN =
-		"edu.virginia.vcgr.genii.client.nativeq.pbs.qsub.additional-argument.%d";
+		"edu.virginia.vcgr.genii.client.nativeq.sge.qsub.additional-argument.%d";
 	static final public String QUEUE_QSTAT_ADDITIONAL_ARG_PROPERTY_PATTERN =
-		"edu.virginia.vcgr.genii.client.nativeq.pbs.qstat.additional-argument.%d";
+		"edu.virginia.vcgr.genii.client.nativeq.sge.qstat.additional-argument.%d";
 	static final public String QUEUE_QDEL_ADDITIONAL_ARG_PROPERTY_PATTERN =
-		"edu.virginia.vcgr.genii.client.nativeq.pbs.qdel.additional-argument.%d";
+		"edu.virginia.vcgr.genii.client.nativeq.sge.qdel.additional-argument.%d";
 	
 	static final public String QUEUE_SUPPORTED_SPMD_VARIATIONS_PROPERTY_BASE =
-		"edu.virginia.vcgr.genii.client.nativeq.pbs.spmd.variation";
+		"edu.virginia.vcgr.genii.client.nativeq.sge.spmd.variation";
 	static final public String QUEUE_SUPPORTED_SPMD_VARIATION_PROVIDER_FOOTER =
 		"spmd-provider";
 	static final public String QUEUE_SUPPORTED_SPMD_ADDITIONAL_CMDLINE_ARGS =
@@ -60,7 +60,7 @@ public class PBSQueue extends AbstractNativeQueue
 	
 	private JobStateCache _statusCache = new JobStateCache();
 	
-	public PBSQueue()
+	public SGEQueue()
 	{
 		super(PROVIDER_NAME);
 	}
@@ -78,7 +78,7 @@ public class PBSQueue extends AbstractNativeQueue
 			connectionProperties, QUEUE_BIN_DIRECTORY_PROPERTY,
 			_defaultsMap);
 		
-		return new PBSQueueConnection(workingDirectory,
+		return new SGEQueueConnection(workingDirectory,
 			connectionProperties, qname, 
 			binDesc.get(QUEUE_QSUB_PATH_PROPERTY),
 			binDesc.get(QUEUE_QSTAT_PATH_PROPERTY),

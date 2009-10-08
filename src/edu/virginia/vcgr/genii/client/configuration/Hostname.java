@@ -87,6 +87,14 @@ public class Hostname
 		{
 			int score = 4;
 			
+			if (addr instanceof Inet6Address)
+			{
+				_logger.debug(String.format(
+					"Skipping address \"%s\" because it's an IPv6 address.",
+					addr));
+				continue;
+			}
+			
 			if (addr.isAnyLocalAddress())
 				continue;
 			else if (addr.isSiteLocalAddress())

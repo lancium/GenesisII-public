@@ -600,9 +600,17 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		/* Set calling context so that the socket factory has access to
 		 * it.
 		 */
+		_logger.debug(String.format(
+			"Starting an outcall for %s on thread [%x]%s.",
+			calledMethod.getName(), Thread.currentThread().getId(), Thread.currentThread()));
+		long start = System.currentTimeMillis();
 		VcgrSslSocketFactory.threadCallingContext.set(_callContext);
 		Object ret = calledMethod.invoke(stubInstance, arguments);
 		VcgrSslSocketFactory.threadCallingContext.set(null);
+		start = System.currentTimeMillis() - start;
+		_logger.debug(String.format(
+			"Finished an outcall for %s on thread [%x]%s (duration was %d ms).",
+			calledMethod.getName(), Thread.currentThread().getId(), Thread.currentThread(), start));
 
 		Object [] inAttachments = stubInstance.getAttachments();
 		if (inAttachments != null)

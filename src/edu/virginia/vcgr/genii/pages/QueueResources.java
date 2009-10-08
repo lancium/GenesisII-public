@@ -4,6 +4,9 @@ import java.awt.image.RenderedImage;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Vector;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -40,7 +43,10 @@ public class QueueResources extends ImageSourceDynamicPage
 			ResourceSummary summary = queue.summarize();
 			DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 			
-			for (HostDescription description : summary.hostDescriptions())
+			List<HostDescription> descriptions = new Vector<HostDescription>(
+				summary.hostDescriptions());
+			Collections.sort(descriptions);
+			for (HostDescription description : descriptions)
 			{
 				SlotSummary slotSummary = summary.get(description);
 				

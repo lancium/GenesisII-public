@@ -56,6 +56,11 @@ public class LocalContainer
 		}
 	}
 	
+	public boolean isContainerRunning()
+	{
+		return _localContainer != null;
+	}
+	
 	public EndpointReferenceType getEndpoint(String serviceName)
 		throws ContainerNotRunningException
 	{

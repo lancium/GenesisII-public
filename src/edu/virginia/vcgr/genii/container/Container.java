@@ -3,7 +3,6 @@ package edu.virginia.vcgr.genii.container;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
@@ -19,6 +18,7 @@ import java.util.regex.Pattern;
 import javax.servlet.ServletException;
 
 import org.apache.axis.AxisFault;
+import org.apache.axis.ConfigurationException;
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.MessageContext;
 import org.apache.axis.SimpleChain;
@@ -33,7 +33,6 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.dpage.DynamicPageLoader;
 import org.morgan.dpage.ScratchSpaceManager;
 import org.morgan.util.GUID;
-import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
 import org.morgan.util.io.GuaranteedDirectory;
 import org.mortbay.jetty.*;
@@ -246,16 +245,38 @@ public class Container extends ApplicationBase
 		ContainerServices.loadAll();
 		ContainerServices.startAll();
 		
-		initializeServices(webAppCtxt);
+		Collection<Class<? extends IContainerManaged>> containerServices =
+			initializeServices(webAppCtxt);
 		
 		ServiceDeployer.startServiceDeployer(_axisServer,
 			Installation.getDeployment(
 				new DeploymentName()).getServicesDirectory());
+		
+		for (Class<? extends IContainerManaged> service : containerServices)
+		{
+			try
+			{
+				Constructor<?> cons = service.getConstructor(new Class[0]);
+				IContainerManaged base =
+					(IContainerManaged)cons.newInstance(new Object[0]);
+				base.startup();
+			}
+			catch (Throwable cause)
+			{
+				_logger.warn(String.format(
+					"Unable to configure service:  %s.", service), cause);
+			}
+		}
 	}
 	
-	static private void initializeServices(WebAppContext ctxt)
-		throws ServletException, AxisFault
+	@SuppressWarnings("unchecked")
+	static private Collection<Class<? extends IContainerManaged>> 
+		initializeServices(WebAppContext ctxt)
+			throws ServletException, AxisFault
 	{
+		Collection<Class<? extends IContainerManaged>> managedServiceClasses =
+			new LinkedList<Class<? extends IContainerManaged>>();
+		
 		ServletHolder []holders = ctxt.getServletHandler().getServlets();
 		for (ServletHolder holder : holders)
 		{
@@ -293,37 +314,15 @@ public class Container extends ApplicationBase
 				{
 					Class<?> implClass = ((JavaServiceDesc)obj).getImplClass();
 					if (IContainerManaged.class.isAssignableFrom(implClass))
-					{
-						Constructor<?> cons = implClass.getConstructor(new Class[0]);
-						IContainerManaged base =
-							(IContainerManaged)cons.newInstance(new Object[0]);
-						base.startup();
-					}
+						managedServiceClasses.add((Class<? extends IContainerManaged>)implClass);
 				}
 			}
+			
+			return managedServiceClasses;
 		}
-		catch (InstantiationException ie)
+		catch (ConfigurationException e)
 		{
-			throw new AxisFault(ie.getLocalizedMessage(), ie);
-		}
-		catch (InvocationTargetException ite)
-		{
-			Throwable t = ite.getCause();
-			if (t == null)
-				t = ite;
-			throw new AxisFault(t.getLocalizedMessage(), t);
-		}
-		catch (IllegalAccessException iae)
-		{
-			throw new AxisFault(iae.getLocalizedMessage(), iae);
-		}
-		catch (NoSuchMethodException nsme)
-		{
-			throw new AxisFault(nsme.getLocalizedMessage(), nsme);
-		}
-		catch (org.apache.axis.ConfigurationException ce)
-		{
-			throw new AxisFault(ce.getLocalizedMessage(), ce);
+			throw new AxisFault("Unable to configure deployment services.", e);
 		}
 	}
 	
@@ -555,7 +554,7 @@ public class Container extends ApplicationBase
 				}
 				catch (Throwable cause)
 				{
-					throw new ConfigurationException(
+					throw new org.morgan.util.configuration.ConfigurationException(
 						"Unable to get/set container id.", cause);
 				}
 			}
@@ -608,9 +607,10 @@ public class Container extends ApplicationBase
 			SocketConnector socketConnector = new SocketConnector();
 			socketConnector.setPort(dPagesPort.intValue());
 			server.addConnector(socketConnector);
+			
+			loadDynamicPages(server);
 		}
-		
-		loadDynamicPages(server);
+
 		return server;
 	}
 	

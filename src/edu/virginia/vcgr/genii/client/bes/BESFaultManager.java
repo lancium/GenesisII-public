@@ -5,6 +5,7 @@ import java.io.StringWriter;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -57,9 +58,9 @@ public class BESFaultManager
 		}
 	}
 	
-	static public Collection<String> getFaultDetail(Fault fault)
+	static public List<String> getFaultDetail(Fault fault)
 	{
-		Collection<String> ret = null;
+		List<String> ret = null;
 		
 		Detail d = fault.getDetail();
 		if (d != null)

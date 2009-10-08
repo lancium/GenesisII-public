@@ -59,6 +59,8 @@ public class BESResourceUpdater implements Closeable
 	{
 		public void run()
 		{
+			try { Thread.sleep(1000L * 45); } catch (Throwable cause) {}
+			
 			while (!_closed)
 			{
 				Connection connection = null;

@@ -3,15 +3,21 @@ package edu.virginia.vcgr.genii.container.resource.db;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.IResourceFactory;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
+import edu.virginia.vcgr.genii.container.resource.db.query.ResourceSummary;
 
 public class BasicDBResourceFactory implements IResourceFactory
 {
+	static private Log _logger = LogFactory.getLog(BasicDBResourceFactory.class);
+	
 	static private final String _CREATE_KEY_TABLE_STMT =
 		"CREATE TABLE resources (resourceid VARCHAR(128) PRIMARY KEY," +
 			"createtime TIMESTAMP)";
@@ -71,6 +77,16 @@ public class BasicDBResourceFactory implements IResourceFactory
 				_CREATE_RESOURCES_TABLE_STMT,
 				_CREATE_RESOURCES_IMPL_CLASS_INDEX,
 				_CREATE_RESOURCES_EPI_INDEX);
+			
+			try
+			{
+				ResourceSummary.cleanupLeakedResources(conn);
+			}
+			catch (Throwable cause)
+			{
+				_logger.warn("Unable to clean up leaked resources.", cause);
+			}
+			
 			conn.commit();
 		}
 		finally

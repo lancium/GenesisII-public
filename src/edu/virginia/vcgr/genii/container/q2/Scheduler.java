@@ -14,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.q2.matching.JobResourceRequirements;
 
 /**
  * The scheduler class is another manager used by the queue that actively
@@ -147,7 +148,6 @@ public class Scheduler implements Closeable
 			for (JobData queuedJob : _jobManager.getQueuedJobs())
 			{
 				match = null;
-				
 				if (!queuedJob.canRun(now))
 				{
 					Date nextRun = queuedJob.getNextCanRun();
@@ -165,6 +165,20 @@ public class Scheduler implements Closeable
 					continue;
 				}
 				
+				JobResourceRequirements requirements = null;
+				
+				try
+				{
+					requirements = queuedJob.getResourceRequirements(_jobManager);
+				}
+				catch (Throwable cause)
+				{
+					_logger.warn(
+						"Error trying to get job resource requirements for matching.", 
+						cause);
+					requirements = new JobResourceRequirements();
+				}
+				
 				/* If we haven't created an iterator yet, do so now. */
 				if (slotIter == null)
 				{
@@ -175,12 +189,12 @@ public class Scheduler implements Closeable
 					slotIter = slots.values().iterator();
 					
 					/* Try to find a match */
-					match = findSlot(matcher, queuedJob, slotIter);
+					match = findSlot(matcher, queuedJob, requirements, slotIter);
 				} else
 				{
 					/* If we got here, then we already had an iterator 
 					 * from before.  Try to find a match with it. */
-					match = findSlot(matcher, queuedJob, slotIter);
+					match = findSlot(matcher, queuedJob, requirements, slotIter);
 					
 					/* If we couldn't find a match, it may have been the case
 					 * that we simply had already passed a potential match with
@@ -196,7 +210,7 @@ public class Scheduler implements Closeable
 						/* Create a new iterator and try to find 
 						 * a match again. */
 						slotIter = slots.values().iterator();
-						match = findSlot(matcher, queuedJob, slotIter);
+						match = findSlot(matcher, queuedJob, requirements, slotIter);
 					}
 				}
 				
@@ -204,6 +218,11 @@ public class Scheduler implements Closeable
 				 * to our list. */
 				if (match != null)
 					matches.add(match);
+				else
+					_logger.debug(String.format(
+						"Unable to find resource match for job %s[%s].",
+						queuedJob.getJobTicket(), requirements));
+						
 			}
 			
 			_schedulingEvent.setScheduledEvent(nextScheduledEvent);
@@ -241,34 +260,36 @@ public class Scheduler implements Closeable
 	 * 
 	 * @return The match (if one was found), otherwise null.
 	 */
-	private ResourceMatch findSlot(ResourceMatcher matcher, JobData queuedJob, 
-		Iterator<ResourceSlots> slots)
+	private ResourceMatch findSlot(ResourceMatcher matcher, JobData queuedJob,
+		JobResourceRequirements requirements, Iterator<ResourceSlots> slots)
 	{
-		while (slots.hasNext())
+		if (requirements != null)
 		{
-			ResourceSlots rSlots = slots.next();
-			
-			try
+			while (slots.hasNext())
 			{
-				if (matcher.matches(
-					_jobManager.getJSDL(queuedJob.getJobID()), 
-					_besManager.getBESInformation(rSlots.getBESID())))
+				ResourceSlots rSlots = slots.next();
+				
+				try
 				{
-					/* If there was a match, reserve the slot */
-					rSlots.reserveSlot();
-					
-					/* If we just reserved the last available slot, take it out
-					 * of the list.
-					 */
-					if (rSlots.slotsAvailable() <= 0)
-						slots.remove();
-					return new ResourceMatch(queuedJob.getJobID(), 
-						rSlots.getBESID());
+					if (matcher.matches(requirements, 
+						_besManager.getBESInformation(rSlots.getBESID())))
+					{
+						/* If there was a match, reserve the slot */
+						rSlots.reserveSlot();
+						
+						/* If we just reserved the last available slot, take it out
+						 * of the list.
+						 */
+						if (rSlots.slotsAvailable() <= 0)
+							slots.remove();
+						return new ResourceMatch(queuedJob.getJobID(), 
+							rSlots.getBESID());
+					}
 				}
-			}
-			catch (Throwable cause)
-			{
-				_logger.warn("Error trying to match job to resource.", cause);
+				catch (Throwable cause)
+				{
+					_logger.warn("Error trying to match job to resource.", cause);
+				}
 			}
 		}
 		
@@ -285,6 +306,8 @@ public class Scheduler implements Closeable
 	{
 		public void run()
 		{
+			long startTime = 0L;
+			
 			/* A small hack, but go ahead and pre-notify ourselves that
 			 * there might be a scheduling opportunity.  This bootstraps
 			 * the scheduler for when it is first loaded.  If we just loaded
@@ -303,6 +326,7 @@ public class Scheduler implements Closeable
 						/* Now that we have an opportunity, go ahead and
 						 * schedule some jobs if we can.
 						 */
+						startTime = System.currentTimeMillis();
 						scheduleJobs();
 					}
 					catch (Throwable cause)
@@ -310,6 +334,12 @@ public class Scheduler implements Closeable
 						_logger.warn(
 							"An exception occurred while scheduling new " +
 							"jobs to run on the queue.", cause);
+					}
+					finally
+					{
+						_logger.debug(String.format(
+							"It took %d milliseconds to run the scheduling loop.",
+							(System.currentTimeMillis() - startTime)));
 					}
 				}
 				catch (InterruptedException ie)

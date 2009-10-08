@@ -329,6 +329,12 @@ public class QueueManager implements Closeable
 		return _besManager.getConfiguration(name);
 	}
 	
+	public JobDefinition_Type getJSDL(String jobTicket)
+		throws ResourceException, SQLException
+	{
+		return _jobManager.getJSDL(jobTicket);
+	}
+	
 	public Collection<EntryType> listBESs(String entryName)
 		throws SQLException, ResourceException
 	{

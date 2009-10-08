@@ -184,4 +184,22 @@ public class ResourceSummary
 			StreamUtils.close(stmt);
 		}
 	}
+	
+	static public void cleanupLeakedResources(Connection connection)
+		throws SQLException
+	{
+		PreparedStatement stmt = null;
+		try
+		{
+			stmt = connection.prepareStatement(
+				"DELETE FROM resources2 " +
+				"WHERE resourceid NOT IN " +
+					"(SELECT resourceid FROM resources)");
+			stmt.executeUpdate();
+		}
+		finally
+		{
+			StreamUtils.close(stmt);
+		}
+	}
 }

@@ -1,1 +1,1 @@
-byteioperf <target-dir> <iterations> <file-count1>...<file-countn>
+byteioperf <source-byteio> <block-size> <num-threads>

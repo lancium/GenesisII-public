@@ -627,7 +627,8 @@ public class BESManager implements Closeable
 	{
 		BESUpdateInformation updateInfo = _updateInformation.get(
 			new Long(besID));
-		updateInfo.miss();
+		if (updateInfo != null)
+			updateInfo.miss();
 		
 		/* Remove the structure from the available list (if it isn't there, 
 		 * this operation is a no-op. */
@@ -637,9 +638,10 @@ public class BESManager implements Closeable
 		 * it's name. This costs us a little time, but not enough to worry 
 		 * about. */
 		BESData data = _containersByID.get(new Long(besID));
-		_logger.info(String.format(
-			"Marking BES container \"%s\" as un-responsive.  %s.", 
-			data.getName(), reason));
+		if (data != null)
+			_logger.info(String.format(
+				"Marking BES container \"%s\" as un-responsive.  %s.", 
+				data.getName(), reason));
 	}
 	
 	/**
@@ -699,6 +701,15 @@ public class BESManager implements Closeable
 			 */
 			return ClientUtils.createProxy(GeniiBESPortType.class, 
 				entry.getEntry_reference(), _callingContext);
+		}
+		
+		public String getBESName(long besID)
+		{
+			BESData data = findBES(besID);
+			if (data != null)
+				return data.getName();
+			
+			return null;
 		}
 	}
 	
