@@ -128,6 +128,8 @@ public class ClientUtils
 	}
 
 	/**
+	 * Note that it is possible for a calling context not to have ANY key and cert material,
+	 * in which case this method does nothing.
 	 * @param callContext The calling context containing the 
 	 * @return The client's key and cert material, re-generated if necessary.  (Upon refresh, 
 	 *   all previous attributes will be renewed if possible, discarded otherwise)  
@@ -150,18 +152,18 @@ public class ClientUtils
 		// Ensure client identity is valid
 		try
 		{
-			if (retval == null) 
+			if (retval != null) 
 			{
-				// we never had any client identity
-				throw new CertificateExpiredException("Could not find caller's identity and key material.");
-			}
-				
-			// check the time validity of our client identity
-			for (X509Certificate cert : retval._clientCertChain) 
+				// check the time validity of our client identity
+				for (X509Certificate cert : retval._clientCertChain) 
+				{
+					// (Check 10 seconds into the future so as to avoid the credential
+					// expiring in-flight)
+					cert.checkValidity(new Date(validUntil.getTime() + 10000));
+				}
+			} else if (ConfigurationManager.getCurrentConfiguration().isClientRole())
 			{
-				// (Check 10 seconds into the future so as to avoid the credential
-				// expiring in-flight)
-				cert.checkValidity(new Date(validUntil.getTime() + 10000));
+				throw new CertificateExpiredException("Client role with no certificate.");
 			}
 		}
 		catch (CertificateExpiredException e) 

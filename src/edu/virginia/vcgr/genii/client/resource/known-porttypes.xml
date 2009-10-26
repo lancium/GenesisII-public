@@ -273,4 +273,9 @@
 		<display-rank>100</display-rank>
 		<description>LWExport</description>
 	</portType>
+	
+	<portType name="{http://vcgr.cs.virginia.edu/genii/gridlog}GridLogPortType">
+		<display-rank>100</display-rank>
+		<description>Grid Logger</description>
+	</portType>
 </known-porttypes>

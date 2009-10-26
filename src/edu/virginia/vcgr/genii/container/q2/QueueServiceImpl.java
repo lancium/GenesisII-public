@@ -49,6 +49,8 @@ import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkBaseService;
 import edu.virginia.vcgr.genii.queue.ConfigureRequestType;
+import edu.virginia.vcgr.genii.queue.GetJobLogRequest;
+import edu.virginia.vcgr.genii.queue.GetJobLogResponse;
 import edu.virginia.vcgr.genii.queue.IterateListResponseType;
 import edu.virginia.vcgr.genii.queue.IterateStatusResponseType;
 import edu.virginia.vcgr.genii.queue.JobErrorPacket;
@@ -292,6 +294,24 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		catch (SQLException sqe)
 		{
 			throw new RemoteException("Unable to complete jobs in queue.", sqe);
+		}
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.READ)
+	public GetJobLogResponse getJobLog(GetJobLogRequest arg0)
+			throws RemoteException
+	{
+		ResourceKey rKey = ResourceManager.getCurrentResource();
+		
+		try
+		{
+			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
+			return mgr.getJobLog(arg0.getJobTicket());
+		}
+		catch (SQLException sqe)
+		{
+			throw new RemoteException("Unable to get job log endpoint.", sqe);
 		}
 	}
 

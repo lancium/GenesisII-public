@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -58,6 +60,7 @@ public class ContainerServices
 		if (_services != null)
 			throw new ConfigurationException("Container Services already loaded.");
 	
+		ExecutorService executor = Executors.newFixedThreadPool(8);
 		DatabaseConnectionPool connectionPool = findConnectionPool();
 		ContainerServicesProperties properties = new ContainerServicesProperties(
 			connectionPool);
@@ -82,7 +85,7 @@ public class ContainerServices
 						_services.put(service.serviceName(), service);
 						try
 						{
-							service.load(connectionPool, properties);
+							service.load(executor, connectionPool, properties);
 						}
 						catch (Throwable cause)
 						{

@@ -254,7 +254,7 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 				EPRUtils.makeEPR(Container.getServiceURL("BESActivityPortType"));
 		}
 		
-		_logger.debug(String.format(
+		_logger.info(String.format(
 			"BES with resource key \"%s\" is creating an activity.",
 			key.getResourceKey()));
 		

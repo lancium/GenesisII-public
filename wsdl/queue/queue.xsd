@@ -177,4 +177,20 @@
 	</xsd:complexType>
 	<xsd:element name="QueryErrorResponse" type="queue:QueryErrorResponse"/>
 
+	<xsd:complexType name="GetJobLogRequest">
+		<xsd:sequence>
+			<xsd:element name="job-ticket" type="xsd:string"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="GetJobLogRequest" type="queue:GetJobLogRequest"/>
+
+	<xsd:complexType name="GetJobLogResponse">
+		<xsd:sequence>
+			<xsd:element name="log-endpoint" type="wsa:EndpointReferenceType"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="GetJobLogResponse" type="queue:GetJobLogResponse"/>
+
 </xsd:schema>

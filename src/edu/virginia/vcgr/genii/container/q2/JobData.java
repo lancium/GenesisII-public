@@ -1,10 +1,12 @@
 package edu.virginia.vcgr.genii.container.q2;
 
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Date;
 
 import org.ggf.jsdl.JobDefinition_Type;
 
+import edu.virginia.vcgr.genii.client.gridlog.GridLogTarget;
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.q2.matching.JobResourceRequirements;
@@ -87,8 +89,11 @@ public class JobData
 	
 	private JobResourceRequirements _resourceRequirements = null;
 	
+	private Collection<GridLogTarget> _gridLogTargets;
+	
 	public JobData(long jobID, String jobTicket, short priority,
-		QueueStates jobState, Date submitTime, short runAttempts, Long besID)
+		QueueStates jobState, Date submitTime, short runAttempts, Long besID,
+		Collection<GridLogTarget> gridLogTargets)
 	{
 		_killed = false;
 		_jobID = jobID;
@@ -98,13 +103,15 @@ public class JobData
 		_submitTime = submitTime;
 		_besID = besID;
 		_runAttempts = runAttempts;
+		_gridLogTargets = gridLogTargets;
 	}
 	
 	public JobData(long jobID, String jobTicket, short priority,
-		QueueStates jobState, Date submitTime, short runAttempts)
+		QueueStates jobState, Date submitTime, short runAttempts,
+		Collection<GridLogTarget> gridLogTargets)
 	{
 		this(jobID, jobTicket, priority, jobState, submitTime, 
-			runAttempts, null);
+			runAttempts, null, gridLogTargets);
 	}
 	
 	public boolean killed()
@@ -234,5 +241,10 @@ public class JobData
 	public Date getNextCanRun()
 	{
 		return _nextValidRunTime;
+	}
+	
+	public Collection<GridLogTarget> gridLogTargets()
+	{
+		return _gridLogTargets;
 	}
 }

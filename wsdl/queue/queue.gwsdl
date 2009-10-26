@@ -169,6 +169,16 @@
 		<wsdl:part name="QueryErrorResponse"
 			element="queue:QueryErrorResponse"/>
 	</wsdl:message>
+
+	<wsdl:message name="GetJobLogRequest">
+		<wsdl:part name="GetJobLogRequest"
+			element="queue:GetJobLogRequest"/>
+	</wsdl:message>
+
+	<wsdl:message name="GetJobLogResponse">
+		<wsdl:part name="GetJobLogResponse"
+			element="queue:GetJobLogResponse"/>
+	</wsdl:message>
 	
 	<wsdl:portType name="QueuePortType">
 		<genii-ext:extend portType="rfork:ResourceForkPortType"/>
@@ -206,6 +216,11 @@
 		<wsdl:operation name="queryErrorInformation">
 			<wsdl:input message="queue:QueryErrorRequest"/>
 			<wsdl:output message="queue:QueryErrorResponse"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="getJobLog">
+			<wsdl:input message="queue:GetJobLogRequest"/>
+			<wsdl:output message="queue:GetJobLogResponse"/>
 		</wsdl:operation>
 	</wsdl:portType>
 

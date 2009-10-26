@@ -2,6 +2,8 @@ package edu.virginia.vcgr.genii.container.q2;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.security.GeneralSecurityException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -33,14 +35,19 @@ import org.ggf.bes.factory.UnsupportedFeatureFaultType;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.rns.EntryType;
 import org.morgan.util.GUID;
+import org.morgan.util.io.StreamUtils;
+import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.bes.BESUtils;
+import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.gridlog.GridLogTarget;
+import edu.virginia.vcgr.genii.client.gridlog.GridLogUtils;
 import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.postlog.JobEvent;
 import edu.virginia.vcgr.genii.client.postlog.PostEvent;
@@ -51,9 +58,13 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.authz.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
+import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.notification.Subscribe;
 import edu.virginia.vcgr.genii.common.notification.UserDataType;
+import edu.virginia.vcgr.genii.container.cservices.gridlogger.GridLogDevice;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.gridlog.GridLogServiceUtils;
+import edu.virginia.vcgr.genii.container.gridlog.GridLogTargetBundle;
 import edu.virginia.vcgr.genii.container.q2.summary.SlotSummary;
 import edu.virginia.vcgr.genii.queue.JobErrorPacket;
 import edu.virginia.vcgr.genii.queue.JobInformationType;
@@ -72,6 +83,7 @@ import edu.virginia.vcgr.genii.queue.ReducedJobInformationType;
 public class JobManager implements Closeable
 {
 	static private Log _logger = LogFactory.getLog(BESManager.class);
+	static private GridLogDevice _jobLogger = new GridLogDevice(JobManager.class);
 	
 	/**
 	 * How often we poll a running job (ms) to see if it is completed/failed
@@ -430,6 +442,8 @@ public class JobManager implements Closeable
 		JobDefinition_Type jsdl, short priority) 
 		throws SQLException, ResourceException
 	{
+		GridLogTargetBundle bundle = null;
+		
 		try
 		{
 			/* First, generate a new ticket for the job.  If we were being 
@@ -443,6 +457,10 @@ public class JobManager implements Closeable
 			 * so that we can make outcalls in the future on his/her behalf.
 			 */
 			ICallingContext callingContext = ContextManager.getCurrentContext(false);
+			
+			bundle = GridLogServiceUtils.createLog();
+			GridLogUtils.addTarget(callingContext, bundle.target());
+			Collection<GridLogTarget> gridLogTargets = GridLogUtils.getTargets(callingContext);
 			
 			/* Similarly, get the current caller's security identity so that 
 			 * we can store that.  This is used to protect different users 
@@ -465,8 +483,10 @@ public class JobManager implements Closeable
 			 * jobID from the database for it). */
 			long jobID = _database.submitJob(
 				connection, ticket, priority, jsdl, callingContext, identities, 
-				state, submitTime);
+				state, submitTime, bundle, gridLogTargets);
 			connection.commit();
+			
+			bundle = null;
 			
 			PostTargets.poster().post(
 				JobEvent.jobSubmitted(callingContext, Long.toString(jobID)));
@@ -481,7 +501,7 @@ public class JobManager implements Closeable
 			 * put it into the in-memory lists.
 			 */
 			JobData job = new JobData(
-				jobID, ticket, priority, state, submitTime, (short)0);
+				jobID, ticket, priority, state, submitTime, (short)0, gridLogTargets);
 			_jobsByID.put(new Long(jobID), job);
 			_jobsByTicket.put(ticket, job);
 			_queuedJobs.put(new SortableJobKey(jobID, priority, submitTime),
@@ -496,6 +516,19 @@ public class JobManager implements Closeable
 		}
 		catch (IOException ioe)
 		{
+			if (bundle != null)
+			{
+				try
+				{
+					ClientUtils.createProxy(GeniiCommon.class, bundle.epr()).destroy(new Destroy());
+				}
+				catch (Throwable cause)
+				{
+					_logger.error(
+						"Error trying to destroy useless grid log info.", cause);
+				}
+			}
+			
 			throw new ResourceException("Unable to submit job.", ioe);
 		}
 	}
@@ -579,10 +612,59 @@ public class JobManager implements Closeable
 		}
 	}
 	
+	synchronized public EndpointReferenceType getLogEPR(String jobTicket)
+		throws ResourceException, SQLException
+	{
+		return getLogEPR(_jobsByTicket.get(jobTicket).getJobID());
+	}
+	
+	synchronized public EndpointReferenceType getLogEPR(long jobID) 
+		throws ResourceException, SQLException
+	{
+		Connection connection = null;
+		
+		try
+		{
+			connection = _connectionPool.acquire(true);
+			return _database.getLogEPR(connection, jobID);
+		}
+		finally
+		{
+			_connectionPool.release(connection);
+		}
+	}
+	
+	synchronized public void printLog(long jobID, PrintStream out)
+		throws IOException
+	{
+		InputStream in = null;
+		
+		try
+		{
+			EndpointReferenceType epr = getLogEPR(jobID);
+			in = ByteIOStreamFactory.createInputStream(epr);
+			StreamUtils.copyStream(in, out);
+		}
+		catch (SQLException e)
+		{
+			throw new IOException("Unable to print log for job.", e);
+		}
+		finally
+		{
+			StreamUtils.close(in);
+		}
+	}
+	
 	synchronized public JobDefinition_Type getJSDL(String ticket)
 		throws ResourceException, SQLException
 	{
 		return getJSDL(_jobsByTicket.get(ticket).getJobID());
+	}
+	
+	synchronized public void printLog(String ticket, PrintStream out)
+		throws IOException
+	{
+		printLog(_jobsByTicket.get(ticket).getJobID(), out);
 	}
 	
 	/**
@@ -1477,6 +1559,7 @@ public class JobManager implements Closeable
 		
 		public void run()
 		{
+			Collection<GridLogTarget> logTargets = null;
 			boolean isPermanent = false;
 			ICallingContext startCtxt = null;
 			Connection connection = null;
@@ -1496,12 +1579,18 @@ public class JobManager implements Closeable
 					connection, _jobID);
 				connection.commit();
 				
+				logTargets = GridLogUtils.getTargets(
+					startInfo.getCallingContext());
+				
 				SecurityUpdateResults checkResults = new SecurityUpdateResults();
 				ClientUtils.checkAndRenewCredentials(startInfo.getCallingContext(),
 					new Date(System.currentTimeMillis() + 1000l * 60 * 10),
 					checkResults);
 				if (checkResults.removedCredentials().size() > 0)
 				{
+					_jobLogger.log(logTargets, 
+						"The security information for this job has expired!" +
+						"  Failing the job permanently.");
 					isPermanent = true;
 					throw new GeneralSecurityException(
 						"A job's credentials expired so we can't make " +
@@ -1529,6 +1618,8 @@ public class JobManager implements Closeable
 					 *  start it.  Instead, we will finish it early. */
 					if (data.killed())
 					{
+						_jobLogger.log(logTargets,
+							"The job was manually killed before it could be started.");
 						finishJob(_jobID);
 						return;
 					}
@@ -1537,6 +1628,9 @@ public class JobManager implements Closeable
 				String oldAction = data.setJobAction("Creating");
 				if (oldAction != null)
 				{
+					_jobLogger.log(logTargets,
+						"The job is currently being processed by the queue in" +
+						" some other way and so we will not start it after all.");
 					_logger.error(
 						"We're trying to create an activity for a job that " +
 						"is already under going some action:  " + oldAction);
@@ -1568,6 +1662,9 @@ public class JobManager implements Closeable
 								new MessageElement(
 									QueueServiceImpl._JOBID_QNAME, 
 									Long.toString(_jobID)) })));
+					
+					_jobLogger.log(logTargets,
+						"Making grid outcall to start the job on the target BES container.");
 					resp = bes.createActivity(
 						new CreateActivityType(adt, null));
 					
@@ -1605,6 +1702,8 @@ public class JobManager implements Closeable
 			}
 			catch (Throwable cause)
 			{
+				_jobLogger.log(logTargets,
+					"Unable to start the job on the remove BES.", cause);
 				_logger.warn(String.format(
 					"Unable to start job %d.  Exception class is %s.", 
 					_jobID, cause.getClass().getName()), cause);

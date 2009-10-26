@@ -51,6 +51,18 @@ public class QueueDBResource extends BasicDBResource implements IQueueResource
 			stmt = _connection.prepareStatement("DELETE FROM q2errors WHERE queueid = ?");
 			stmt.setString(1, _resourceKey);
 			stmt.executeUpdate();
+			
+			stmt.close();
+			stmt = null;
+			stmt = _connection.prepareStatement("DELETE FROM q2logs WHERE queueid = ?");
+			stmt.setString(1, _resourceKey);
+			stmt.executeUpdate();
+			
+			stmt.close();
+			stmt = null;
+			stmt = _connection.prepareStatement("DELETE FROM q2joblogtargets WHERE queueid = ?");
+			stmt.setString(1, _resourceKey);
+			stmt.executeUpdate();
 		}
 		catch (SQLException sqe)
 		{

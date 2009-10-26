@@ -26,6 +26,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.queue.ConfigureRequestType;
+import edu.virginia.vcgr.genii.queue.GetJobLogRequest;
 import edu.virginia.vcgr.genii.queue.JobErrorPacket;
 import edu.virginia.vcgr.genii.queue.JobInformationType;
 import edu.virginia.vcgr.genii.queue.JobStateEnumerationType;
@@ -208,6 +209,13 @@ public class QueueManipulator
 		}
 		
 		return errors;
+	}
+	
+	public EndpointReferenceType getJobLog(JobTicket ticket) throws RemoteException
+	{
+		QueuePortType queue = ClientUtils.createProxy(
+			QueuePortType.class, _queue);
+		return queue.getJobLog(new GetJobLogRequest(ticket.toString())).getLogEndpoint();
 	}
 	
 	static private class ReducedJobInformationIterator

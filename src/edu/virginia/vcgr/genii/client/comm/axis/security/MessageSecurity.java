@@ -97,7 +97,7 @@ public class MessageSecurity
 		ArrayList<GIICredential> credentials = 
 			new ArrayList<GIICredential>(
 				TransientCredentials.getTransientCredentials(callingContext)._credentials);
-		if (clientKeyMaterial._clientCertChain != null) 
+		if (clientKeyMaterial != null && clientKeyMaterial._clientCertChain != null) 
 			credentials.add(new X509Identity(clientKeyMaterial._clientCertChain));
 
 		try

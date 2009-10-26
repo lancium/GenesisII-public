@@ -13,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.container.cservices.gridlogger.GridLogDevice;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.matching.JobResourceRequirements;
 
@@ -25,6 +26,7 @@ import edu.virginia.vcgr.genii.container.q2.matching.JobResourceRequirements;
 public class Scheduler implements Closeable
 {
 	static private Log _logger = LogFactory.getLog(Scheduler.class);
+	static private GridLogDevice _jobLogger = new GridLogDevice(Scheduler.class);
 	
 	volatile private boolean _closed = false;
 	
@@ -217,12 +219,20 @@ public class Scheduler implements Closeable
 				/* If we found a match, then go ahead and add it 
 				 * to our list. */
 				if (match != null)
+				{
+					_jobLogger.log(queuedJob.gridLogTargets(),
+						String.format("Matched job against resource \"%s\".",
+							_besManager.getBESName(match.getBESID())));
 					matches.add(match);
-				else
+				} else
+				{
+					_jobLogger.log(queuedJob.gridLogTargets(),
+						"Unable to find any suitable matches at the moment." +
+						"  Will try again later.");
 					_logger.debug(String.format(
 						"Unable to find resource match for job %s[%s].",
 						queuedJob.getJobTicket(), requirements));
-						
+				}		
 			}
 			
 			_schedulingEvent.setScheduledEvent(nextScheduledEvent);

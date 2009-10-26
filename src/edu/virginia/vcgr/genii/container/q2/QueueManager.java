@@ -33,6 +33,7 @@ import edu.virginia.vcgr.genii.container.q2.besinfo.BESInformationResolver;
 import edu.virginia.vcgr.genii.container.q2.summary.HostDescription;
 import edu.virginia.vcgr.genii.container.q2.summary.ResourceSummary;
 import edu.virginia.vcgr.genii.container.q2.summary.SlotSummary;
+import edu.virginia.vcgr.genii.queue.GetJobLogResponse;
 import edu.virginia.vcgr.genii.queue.JobErrorPacket;
 import edu.virginia.vcgr.genii.queue.JobInformationType;
 import edu.virginia.vcgr.genii.queue.ReducedJobInformationType;
@@ -335,6 +336,11 @@ public class QueueManager implements Closeable
 		return _jobManager.getJSDL(jobTicket);
 	}
 	
+	public void printLog(String jobTicket, PrintStream out) throws IOException
+	{
+		_jobManager.printLog(jobTicket, out);
+	}
+	
 	public Collection<EntryType> listBESs(String entryName)
 		throws SQLException, ResourceException
 	{
@@ -434,6 +440,12 @@ public class QueueManager implements Closeable
 		{
 			_connectionPool.release(connection);
 		}
+	}
+	
+	public GetJobLogResponse getJobLog(String job) throws ResourceException, SQLException
+	{
+		return new GetJobLogResponse(
+			_jobManager.getLogEPR(job));
 	}
 	
 	public void completeJobs(String []jobs)

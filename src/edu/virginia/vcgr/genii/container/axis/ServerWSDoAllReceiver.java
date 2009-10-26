@@ -48,8 +48,8 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.*;
 
+import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLException;
 
 import edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto;
 import edu.virginia.vcgr.genii.client.security.MessageLevelSecurityRequirements;
@@ -477,8 +477,10 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 					if (clientSslCertChain != null) {
 						authenticatedCertChains.add(clientSslCertChain);
 					}
-				} catch (SSLException e) {
-					_logger.warn("Error retrieving SSL client certchain", e);
+				}
+				catch (SSLPeerUnverifiedException unverified)
+				{
+					
 				}
 			}
 				

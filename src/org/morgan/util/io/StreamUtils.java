@@ -19,6 +19,8 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
+import java.io.Writer;
 import java.net.Socket;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -30,6 +32,20 @@ import java.sql.Statement;
 public class StreamUtils
 {
 	static private final int _DEFAULT_BUFFER_SIZE = 1024 * 8;
+	
+	static public void copyStream(Reader reader, Writer writer) throws IOException
+	{
+		char []data = new char[_DEFAULT_BUFFER_SIZE];
+		int read;
+		
+		while ( (read = reader.read(data)) > 0)
+		{
+			if (writer != null)
+				writer.write(data, 0, read);
+		}
+		
+		writer.flush();
+	}
 	
 	static public void copyStream(InputStream in, OutputStream out, boolean autoflush)
 		throws IOException

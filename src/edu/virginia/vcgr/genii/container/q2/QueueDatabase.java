@@ -24,11 +24,13 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.gridlog.GridLogTarget;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
+import edu.virginia.vcgr.genii.container.gridlog.GridLogTargetBundle;
 import edu.virginia.vcgr.genii.container.q2.resource.IQueueResource;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 
@@ -295,6 +297,32 @@ public class QueueDatabase
 		}
 	}
 	
+	public Collection<GridLogTarget> getGridLogTargets(Connection connection,
+		long jobid) throws SQLException
+	{
+		Collection<GridLogTarget> ret = new LinkedList<GridLogTarget>();
+		
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try
+		{
+			stmt = connection.prepareStatement("SELECT target FROM q2joblogtargets WHERE jobid = ?");
+			stmt.setLong(1, jobid);
+			rs = stmt.executeQuery();
+			
+			while (rs.next())
+				ret.add((GridLogTarget)DBSerializer.fromBlob(rs.getBlob(1)));
+			
+			return ret;
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+	}
+	
 	/**
 	 * Load all jobs from the database for the given queue.
 	 * 
@@ -322,11 +350,13 @@ public class QueueDatabase
 			
 			while (rs.next())
 			{
+				long jobid = rs.getLong(1);
 				allJobs.add(new JobData(
-					rs.getLong(1), rs.getString(2), rs.getShort(3),
+					jobid, rs.getString(2), rs.getShort(3),
 					QueueStates.valueOf(rs.getString(4)),
 					new Date(rs.getTimestamp(5).getTime()),
-					rs.getShort(6), (Long)rs.getObject(7)));
+					rs.getShort(6), (Long)rs.getObject(7),
+					getGridLogTargets(connection, jobid)));
 			}
 			
 			return allJobs;
@@ -417,7 +447,8 @@ public class QueueDatabase
 		Connection connection, String ticket, short priority, 
 		JobDefinition_Type jsdl, ICallingContext callingContext, 
 		Collection<Identity> identities, 
-		QueueStates state, Date submitTime) 
+		QueueStates state, Date submitTime, GridLogTargetBundle bundle,
+		Collection<GridLogTarget> gridLogTargets) 
 		throws SQLException, IOException
 	{
 		PreparedStatement stmt = null;
@@ -465,6 +496,34 @@ public class QueueDatabase
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException(
 					"Unable to set job communication attempts.");
+		
+			stmt.close();
+			stmt = null;
+			
+			stmt = connection.prepareStatement(
+				"INSERT INTO q2logs (jobid, queueid, logtarget, logepr) " +
+				"VALUES (?, ?, ?, ?)");
+			stmt.setLong(1, jobid);
+			stmt.setString(2, _queueID);
+			stmt.setBlob(3, DBSerializer.toBlob(
+				bundle.target(), "q2logs", "logtarget"));
+			stmt.setBlob(4, EPRUtils.toBlob(bundle.epr(), "q2logs", "logepr"));
+			if (stmt.executeUpdate() != 1)
+				throw new SQLException(
+					"Unable to set job log information.");
+			
+			stmt.close();
+			stmt = null;
+			stmt = connection.prepareStatement(
+				"INSERT INTO q2joblogtargets (jobid, queueid, target) VALUES (?, ?, ?)");
+			for (GridLogTarget target : gridLogTargets)
+			{
+				stmt.setLong(1, jobid);
+				stmt.setString(2, _queueID);
+				stmt.setBlob(3, DBSerializer.toBlob(target, "q2joblogtargets", "target"));
+				stmt.addBatch();
+			}
+			stmt.executeBatch();
 			
 			return jobid;
 		}
@@ -680,6 +739,31 @@ public class QueueDatabase
 		}
 	}
 	
+	public EndpointReferenceType getLogEPR(Connection connection,
+		long jobID) throws ResourceException, SQLException
+	{
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try
+		{
+			stmt = connection.prepareStatement(
+				"SELECT logepr FROM q2logs WHERE jobid = ?");
+			stmt.setLong(1, jobID);
+			
+			rs = stmt.executeQuery();
+			if (!rs.next())
+				throw new ResourceException("Unable to find log entry for job " + jobID);
+			
+			return EPRUtils.fromBlob(rs.getBlob(1));
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+	}
+	
 	/**
 	 * Get the large memory information from the database necessary to start
 	 * a new job on a bes container.
@@ -783,6 +867,8 @@ public class QueueDatabase
 		PreparedStatement stmt1 = null;
 		PreparedStatement stmt2 = null;
 		PreparedStatement stmt3 = null;
+		PreparedStatement stmt4 = null;
+		PreparedStatement stmt5 = null;
 		
 		try
 		{
@@ -792,6 +878,10 @@ public class QueueDatabase
 				"DELETE FROM q2errors WHERE jobid = ?");
 			stmt3 = connection.prepareStatement(
 				"DELETE FROM q2jobpings WHERE jobid = ?");
+			stmt4 = connection.prepareStatement(
+				"DELETE FROM q2logs WHERE jobid = ?");
+			stmt5 = connection.prepareStatement(
+				"DELETE FROM q2joblogtargets WHERE jobid = ?");
 			
 			for (Long jobID : jobIDs)
 			{
@@ -803,17 +893,27 @@ public class QueueDatabase
 				
 				stmt3.setLong(1, jobID.longValue());
 				stmt3.addBatch();
+				
+				stmt4.setLong(1, jobID.longValue());
+				stmt4.addBatch();
+				
+				stmt5.setLong(1, jobID.longValue());
+				stmt5.addBatch();
 			}
 			
 			stmt1.executeBatch();
 			stmt2.executeBatch();
 			stmt3.executeBatch();
+			stmt4.executeBatch();
+			stmt5.executeBatch();
 		}
 		finally
 		{
 			StreamUtils.close(stmt1);
 			StreamUtils.close(stmt2);
 			StreamUtils.close(stmt3);
+			StreamUtils.close(stmt4);
+			StreamUtils.close(stmt5);
 		}
 	}
 	

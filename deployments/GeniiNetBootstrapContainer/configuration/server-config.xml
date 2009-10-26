@@ -136,6 +136,12 @@
 			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
 				value="connection-pool"/>
 		</mconf:instance>
+
+		<mconf:instance name="gridlog-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.gridlog.GridLogDBResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
 		
 		<mconf:instance name="rbyteio-db-resource-provider"
 			type="edu.virginia.vcgr.genii.container.byteio.RByteIOResourceProvider">
@@ -406,6 +412,11 @@
 
 		<genii:service name="IteratorPortType">
 			<genii:resource-provider name="iterator-db-resource-provider"/>
+			<genii:authz-provider name="gamlacl-authz-provider"/>
+		</genii:service>
+
+		<genii:service name="GridLogPortType">
+			<genii:resource-provider name="gridlog-db-resource-provider"/>
 			<genii:authz-provider name="gamlacl-authz-provider"/>
 		</genii:service>
 

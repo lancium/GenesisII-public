@@ -71,6 +71,9 @@ public class SingleSSLX509KeyManager implements X509KeyManager
 	 */
 	public X509Certificate[] getCertificateChain(String alias)
 	{
+		if (_keyAndCertMaterial == null)
+			return null;
+		
 		return _keyAndCertMaterial._clientCertChain;
 	}
 
@@ -102,6 +105,9 @@ public class SingleSSLX509KeyManager implements X509KeyManager
 	 */
 	public PrivateKey getPrivateKey(String alias)
 	{
+		if (_keyAndCertMaterial == null)
+			return null;
+		
 		return _keyAndCertMaterial._clientPrivateKey;
 	}
 
