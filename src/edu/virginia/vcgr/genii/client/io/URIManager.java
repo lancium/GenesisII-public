@@ -25,6 +25,8 @@ import java.util.concurrent.Semaphore;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.configuration.XMLConfiguration;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
@@ -36,6 +38,8 @@ import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePass
 @SuppressWarnings("unchecked")
 public class URIManager
 {
+	static private Log _logger = LogFactory.getLog(URIManager.class);
+	
 	static private final String 
 		DEFAULT_MAXIMUM_SIMULTANEOUS_CONNECTIONS = "128";
 	static private final String MAXIMUM_SIMULTANEOUS_CONNECTIONS_PROPERTY =
@@ -97,6 +101,9 @@ public class URIManager
 	static public void get(URI source, File target, 
 		UsernamePasswordIdentity credential) throws IOException
 	{
+		_logger.info(String.format(
+			"Attempting to copy file from %s to %s.",
+			source, target));
 		String scheme = source.getScheme();
 		if (scheme == null)
 			throw new IOException("Don't know how to handle \"" + source + "\".");
@@ -120,6 +127,10 @@ public class URIManager
 	static public void put(File source, URI target,
 		UsernamePasswordIdentity credential) throws IOException
 	{
+		_logger.info(String.format(
+			"Attempting to copy file from %s to %s.",
+			source, target));
+		
 		String scheme = target.getScheme();
 		if (scheme == null)
 			throw new IOException("Don't know how to handle \"" + target + "\".");

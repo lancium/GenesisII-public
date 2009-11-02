@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.container.q2;
 
 import java.sql.Connection;
+import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 
@@ -14,8 +15,10 @@ import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.BESFaultManager;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.gridlog.GridLogTarget;
 import edu.virginia.vcgr.genii.client.postlog.JobEvent;
 import edu.virginia.vcgr.genii.client.postlog.PostTargets;
+import edu.virginia.vcgr.genii.container.cservices.gridlogger.GridLogDevice;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 
 /**
@@ -27,6 +30,7 @@ import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 public class JobUpdateWorker implements OutcallHandler
 {
 	static private Log _logger = LogFactory.getLog(JobUpdateWorker.class);
+	static private GridLogDevice _jobLogger = new GridLogDevice(JobUpdateWorker.class);
 	
 	private IBESPortTypeResolver _clientStubResolver;
 	private JobCommunicationInfo _jobInfo;
@@ -74,11 +78,14 @@ public class JobUpdateWorker implements OutcallHandler
 	
 	public void run()
 	{
+		Collection<GridLogTarget> logTargets = _data.gridLogTargets();
+		
 		Connection connection = null;
 		long besID = -1L;
 		
 		try
 		{
+			_jobLogger.log(logTargets, "Checking status of the job.");
 			_logger.debug("Checking status of job " + _jobInfo.getJobID());
 	
 			/* Get a connection from the connection pool and then ask the 
@@ -115,6 +122,7 @@ public class JobUpdateWorker implements OutcallHandler
 			GetActivityStatusResponseType []activityStatuses;
 			try
 			{
+				_jobLogger.log(logTargets, "Making grid outcall to get activity status.");
 				/* call the BES container to get the activity's status. */
 				activityStatuses 
 					= clientStub.getActivityStatuses(new GetActivityStatusesType(
@@ -131,6 +139,7 @@ public class JobUpdateWorker implements OutcallHandler
 			 * a weird internal error. */
 			if (activityStatuses == null || activityStatuses.length != 1)
 			{
+				_jobLogger.log(logTargets, "Unable to get activity status for the job.");
 				_logger.error("Unable to get activity status for job " 
 					+ _jobInfo.getJobID());
 			} else
@@ -157,6 +166,8 @@ public class JobUpdateWorker implements OutcallHandler
 				 */
 				ActivityState state = new ActivityState(
 					activityStatuses[0].getActivityStatus());
+				_jobLogger.log(logTargets, String.format(
+					"The activity's status is \"%s\".", state));
 				if (state.isFailedState())
 				{
 					/* If the job failed in the BES, fail it in the queue */
@@ -183,12 +194,14 @@ public class JobUpdateWorker implements OutcallHandler
 		}
 		catch (Throwable cause)
 		{
+			_jobLogger.log(logTargets, "Unable to update job status for job.", cause);
 			_logger.warn("Unable to update job status for job " 
 				+ _jobInfo.getJobID(), cause);
 			try
 			{
 				_jobManager.addJobCommunicationAttempt(connection,
-					_data.getJobID(), _data.getBESID().longValue());
+					_data.getJobID(), _data.getBESID().longValue(),
+					logTargets);
 				connection.commit();
 			}
 			catch (Throwable cause2)

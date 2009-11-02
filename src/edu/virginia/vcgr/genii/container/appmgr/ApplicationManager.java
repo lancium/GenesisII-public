@@ -18,15 +18,23 @@ package edu.virginia.vcgr.genii.container.appmgr;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.genii.client.io.FileSystemUtils;
 
 public class ApplicationManager
 {
+	static private Log _logger = LogFactory.getLog(ApplicationManager.class);
+	
 	static public File prepareApplication(File executable) throws IOException
 	{
 		if (executable.exists())
 			return FileSystemUtils.makeExecutable(executable);
 		
+		_logger.warn(String.format(
+			"Executable file \"%s\" does not seem to exist.",
+			executable.getAbsolutePath()));
 		return null;
 	}
 }

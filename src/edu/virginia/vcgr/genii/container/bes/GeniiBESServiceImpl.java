@@ -244,7 +244,10 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 		IBESResource resource = (IBESResource)key.dereference();
 		 
 		if (!resource.isAcceptingNewActivities())
+		{
+			_logger.info("BES container not currently accepting new activities.");
 			throw new NotAcceptingNewActivitiesFaultType(null);
+		}
 	
 		if (_localActivityServiceEPR == null) 
 		{

@@ -6,10 +6,16 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStateEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
+import edu.virginia.vcgr.genii.client.bes.ExitCondition;
 import edu.virginia.vcgr.genii.client.bes.GeniiBESConstants;
+import edu.virginia.vcgr.genii.client.bes.NormalExit;
+import edu.virginia.vcgr.genii.client.bes.SignaledExit;
+import edu.virginia.vcgr.genii.client.bes.Signals;
 import edu.virginia.vcgr.genii.client.nativeq.ApplicationDescription;
 import edu.virginia.vcgr.genii.client.nativeq.JobToken;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueue;
@@ -28,6 +34,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 	implements TerminateableExecutionPhase
 {
 	static final long serialVersionUID = 0L;
+	
+	static private Log _logger = LogFactory.getLog(QueueProcessPhase.class);
 	
 	static private final String JOB_TOKEN_PROPERTY = 
 		"edu.virginia.vcgr.genii.container.bes.phases.queue.job-token";
@@ -91,6 +99,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 				
 				NativeQueueConnection queue = connectQueue(
 					_workingDirectory.getWorkingDirectory());
+				_logger.info(String.format(
+					"Asking batch system (%s) to cancel the job.", queue));
 				queue.cancel(_jobToken);
 				
 				_phaseShiftLock.notifyAll();
@@ -131,6 +141,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 					}
 				}
 				
+				_logger.info(String.format(
+					"Asking batch system (%s) to submit the job.", queue));
 				_jobToken = queue.submit(new ApplicationDescription(
 					_spmdVariation, _numProcesses, _numProcessesPerHost, _executable.getAbsolutePath(),
 					_arguments,
@@ -152,10 +164,23 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 			}
 			context.setProperty(JOB_TOKEN_PROPERTY, null);
 			
-			if (queue.getExitCode(_jobToken) == 257)
+			int exitCode = queue.getExitCode(_jobToken);
+			ExitCondition exitCondition = interpretExitCode(exitCode);
+			_logger.info(String.format("Process exited with %s.",
+				(exitCondition instanceof SignaledExit) ?
+					("Signal " + exitCondition) :
+					("Exit code " + exitCondition)));
+			if (exitCode == 257)
 				throw new IgnoreableFault(
 					"Queue process exited with signal.");
 		}
+	}
+	
+	static private ExitCondition interpretExitCode(int exitCode)
+	{
+		if (exitCode > 128)
+			return new SignaledExit(Signals.values()[exitCode - 128 - 1]);
+		return new NormalExit(exitCode);
 	}
 	
 	@Override

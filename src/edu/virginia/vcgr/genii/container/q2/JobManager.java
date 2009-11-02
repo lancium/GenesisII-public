@@ -262,6 +262,8 @@ public class JobManager implements Closeable
 		boolean attemptKill)
 		throws SQLException, ResourceException
 	{
+		Collection<GridLogTarget> logTargets = null;
+	
 		boolean ret = false;
 		/* Find the job's in-memory information */
 		JobData job = _jobsByID.get(new Long(jobID));
@@ -270,6 +272,15 @@ public class JobManager implements Closeable
 			// don't know where it went, but it's no longer our responsibility.
 			return ret;
 		}
+		
+		logTargets = job.gridLogTargets();
+		_jobLogger.log(logTargets, String.format(
+			"Failing job(%s, %s, %s)",
+			countAsAnAttempt ? "This failure counts against the job" :
+				"This failure does NOT count against the job",
+			isPermanent ? "Failure is permanent" : "Failure is NOT permanent",
+			attemptKill ? "Attempting to kill the job" :
+				"NOT attempting to kill the job"));
 		
 		/* Increment his attempt count if this counts against him. */
 		if (countAsAnAttempt)
@@ -342,6 +353,8 @@ public class JobManager implements Closeable
 	synchronized public void finishJob(long jobID)
 		throws SQLException, ResourceException
 	{
+		Collection<GridLogTarget> logTargets;
+		
 		/* Find the job in the in-memory maps */
 		JobData job = _jobsByID.get(new Long(jobID));
 		if (job == null)
@@ -349,6 +362,9 @@ public class JobManager implements Closeable
 			// don't know where it went, but it's no longer our responsibility.
 			return;
 		}
+		
+		logTargets = job.gridLogTargets();
+		_jobLogger.log(logTargets, "Finishing job.");
 		
 		_logger.debug("Finished job " + jobID);
 		
@@ -395,6 +411,7 @@ public class JobManager implements Closeable
 			return;
 		}
 		
+		_jobLogger.log(job.gridLogTargets(), "Killing running job.");
 		_logger.debug("Killing a running job:" + jobID);
 		
 		// This is one of the few times we are going to break our pattern and
@@ -933,6 +950,8 @@ public class JobManager implements Closeable
 			JobData data = _jobsByID.remove(jobID);
 			if (data != null)
 			{
+				_jobLogger.log(data.gridLogTargets(),
+					"Completing job.");
 				/* Remove the job from all lists */
 				_jobsByTicket.remove(data.getJobTicket());
 				_queuedJobs.remove(new SortableJobKey(
@@ -1496,13 +1515,17 @@ public class JobManager implements Closeable
 	}
 	
 	synchronized public void addJobCommunicationAttempt(
-		Connection connection, long jobid, long besid) 
+		Connection connection, long jobid, long besid,
+		Collection<GridLogTarget> logTargets) 
 			throws SQLException, ResourceException
 	{
 		int commAttempts = _database.getJobCommunicationAttempts(
 			connection, jobid);
 		if (commAttempts > MAX_COMM_ATTEMPTS)
 		{
+			_jobLogger.log(logTargets,
+				"Failed job communication attempts exceeds limit." +
+				"  Re-starting job.");
 			_logger.error(String.format(
 				"Unable to communicate with job for %d attempts.  Re-starting it.",
 				commAttempts));
@@ -1703,7 +1726,7 @@ public class JobManager implements Closeable
 			catch (Throwable cause)
 			{
 				_jobLogger.log(logTargets,
-					"Unable to start the job on the remove BES.", cause);
+					"Unable to start the job on the remote BES.", cause);
 				_logger.warn(String.format(
 					"Unable to start job %d.  Exception class is %s.", 
 					_jobID, cause.getClass().getName()), cause);
@@ -1826,7 +1849,8 @@ public class JobManager implements Closeable
 		 * @throws SQLException
 		 * @throws ResourceException
 		 */
-		private ICallingContext terminateActivity(Connection connection)
+		private ICallingContext terminateActivity(Connection connection,
+			Collection<GridLogTarget> logTargets)
 			throws SQLException, ResourceException
 		{
 			/* Ask the database for all information needed to
@@ -1853,6 +1877,7 @@ public class JobManager implements Closeable
 					killInfo.getBESEndpoint(), 
 					killInfo.getCallingContext());
 				ClientUtils.setTimeout(bes, 30 * 1000);
+				_jobLogger.log(logTargets, "Making grid outcall to kill the activity.");
 				bes.terminateActivities(new TerminateActivitiesType(
 					new EndpointReferenceType[] {
 						killInfo.getJobEndpoint()
@@ -1861,6 +1886,8 @@ public class JobManager implements Closeable
 			}
 			catch (Throwable cause)
 			{
+				_jobLogger.log(logTargets,
+					"Unable to make outcall to kill the activity.", cause);
 				_logger.warn("Exception occurred while killing an activity.");
 				return null;
 			}
@@ -1872,6 +1899,9 @@ public class JobManager implements Closeable
 		
 		public void run()
 		{
+			Collection<GridLogTarget> logTargets =
+				_jobData.gridLogTargets();
+			
 			ICallingContext ctxt = null;
 			Connection connection = null;
 			
@@ -1882,13 +1912,13 @@ public class JobManager implements Closeable
 				
 				if (_outcallOnly)
 				{
-					terminateActivity(connection);
+					terminateActivity(connection, logTargets);
 					return;
 				}
 				
 				/* If the job is running, then we have to terminate it */
 				if (_jobData.getJobState().equals(QueueStates.RUNNING))
-					ctxt = terminateActivity(connection);
+					ctxt = terminateActivity(connection, logTargets);
 				
 				/* Ask the database to update the job state */
 				_database.modifyJobState(connection, _jobData.getJobID(),

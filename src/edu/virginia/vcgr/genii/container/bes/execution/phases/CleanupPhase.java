@@ -3,6 +3,8 @@ package edu.virginia.vcgr.genii.container.bes.execution.phases;
 import java.io.File;
 import java.io.Serializable;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStateEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
@@ -13,6 +15,8 @@ public class CleanupPhase extends AbstractExecutionPhase
 	implements Serializable
 {
 	static final long serialVersionUID = 0L;
+
+	static private Log _logger = LogFactory.getLog(CleanupPhase.class);
 	
 	static final private String CLEANUP_STAGE = "cleanup";
 	
@@ -46,10 +50,13 @@ public class CleanupPhase extends AbstractExecutionPhase
 	{
 		try
 		{
+			_logger.info(String.format(
+				"Attempting to clean-up activity by removing file \"%s\".", _fileToCleanup.getName()));
 			removeFile(_fileToCleanup);
 		}
 		catch (Throwable cause)
 		{
+			_logger.error("Unable to clean up file.", cause);
 			throw new ContinuableExecutionException(
 				"A continuable exception has occurred while " +
 					"running a BES activity.", cause);

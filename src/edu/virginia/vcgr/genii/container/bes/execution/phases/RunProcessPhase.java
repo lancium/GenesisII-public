@@ -42,6 +42,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 	{
 		try
 		{
+			_logger.info("Attempting to kill running process.");
 			if (OperatingSystemType.getCurrent().isWindows())
 				ProcessManager.kill(process);
 		}
@@ -127,6 +128,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 			}
 			resetCommand(builder);
 			
+			_logger.info("Trying to start a new process on machine using fork/exec or spawn.");
 			_process = builder.start();
 			_redirects.enact(context,
 				_process.getOutputStream(),
@@ -149,7 +151,9 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 			
 			if (eValue != 0)
 				_logger.info(String.format(
-					"Process exited with non-zero value:  %d", eValue)); 
+					"Process exited with non-zero value:  %d", eValue));
+			else
+				_logger.info("Process exited with an exit code of 0.");
 		}
 		catch (InterruptedException ie)
 		{
