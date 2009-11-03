@@ -1,19 +1,18 @@
 package edu.virginia.vcgr.genii.client.jsdl.sweep;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import edu.virginia.vcgr.genii.client.jsdl.sweep.eval.EvaluationPlan;
+import edu.virginia.vcgr.genii.client.jsdl.sweep.eval.Evaluable;
+import edu.virginia.vcgr.genii.client.jsdl.sweep.eval.EvaluationContext;
 
 @XmlRootElement(namespace = SweepConstants.SWEEP_NS, name = "Sweep")
-public class Sweep implements Serializable, Countable
+public class Sweep implements Serializable, Countable, Evaluable
 {
 	static final long serialVersionUID = 0L;
 	
@@ -58,148 +57,41 @@ public class Sweep implements Serializable, Countable
 		
 		return _assignments.get(0).size();
 	}
-	
-	final public Iterator<EvaluationPlan> planIterator()
-	{
-		if (_subSweeps == null || _subSweeps.size() == 0)
-			return new SimplePlanIterator();
-		else
-			return new ComplexPlanIterator();
-	}
-	
-	// This iterator is used ONLY if there are no sub-sweeps to deal with.
-	private class SimplePlanIterator implements Iterator<EvaluationPlan>
-	{
-		private List<Iterator<EvaluationPlan>> _assignmentPlans;
-		
-		private SimplePlanIterator()
-		{
-			_assignmentPlans = new Vector<Iterator<EvaluationPlan>>(
-				_assignments.size());
-			for (SweepAssignment assignment : _assignments)
-				_assignmentPlans.add(assignment.planIterator());
-		}
-		
-		@Override
-		final public boolean hasNext()
-		{
-			return _assignmentPlans.get(0).hasNext();
-		}
 
-		@Override
-		final public EvaluationPlan next()
-		{
-			EvaluationPlan ret = new EvaluationPlan();
-			
-			for (Iterator<EvaluationPlan> plan : _assignmentPlans)
-				ret.addPlan(plan.next());
-
-			return ret;
-		}
-
-		@Override
-		final public void remove()
-		{
-			throw new UnsupportedOperationException(
-				"Not allowed to remove items from this iterator.");
-		}
-	}
-	
-	private class SubPlanIterator implements Iterator<EvaluationPlan>
+	@Override
+	public void evaluate(EvaluationContext context) throws SweepException
 	{
-		private Iterator<EvaluationPlan> _nextPlan;
-		private Iterator<Iterator<EvaluationPlan>> _subPlans;
+		boolean emittable = (_subSweeps == null) || (_subSweeps.isEmpty());
+		List<Iterator<Evaluable>> concurrentAssignments = 
+			new Vector<Iterator<Evaluable>>(_assignments.size());
+		Iterator<Evaluable> firstAssignment = null;
 		
-		private SubPlanIterator()
+		for (SweepAssignment assignment : _assignments)
 		{
-			Collection<Iterator<EvaluationPlan>> subPlans = 
-				new LinkedList<Iterator<EvaluationPlan>>();
-			for (Sweep subSweep : _subSweeps)
-				subPlans.add(subSweep.planIterator());
-			_subPlans = subPlans.iterator();
+			Iterator<Evaluable> e = assignment.iterator();
+			if (firstAssignment == null)
+				firstAssignment = e;
 			
-			if (_subPlans.hasNext())
-				_nextPlan = _subPlans.next();
+			concurrentAssignments.add(e);
 		}
 		
-		@Override
-		public boolean hasNext()
+		while (firstAssignment.hasNext())
 		{
-			if (_nextPlan == null)
-				return false;
+			EvaluationContext firstCopy = (EvaluationContext)context.clone();
+			for (Iterator<Evaluable> i : concurrentAssignments)
+				i.next().evaluate(firstCopy);
 			
-			if (_nextPlan.hasNext())
-				return true;
-			
-			while (_subPlans.hasNext())
+			if (emittable)
+				firstCopy.emit();
+			else
 			{
-				_nextPlan = _subPlans.next();
-				if (_nextPlan.hasNext())
-					return true;
+				for (Sweep s : _subSweeps)
+				{
+					EvaluationContext secondCopy = 
+						(EvaluationContext)firstCopy.clone();
+					s.evaluate(secondCopy);
+				}
 			}
-			
-			return false;
-		}
-
-		@Override
-		public EvaluationPlan next()
-		{
-			if (_nextPlan == null)
-				return null;
-			
-			if (_nextPlan.hasNext())
-				return _nextPlan.next();
-			
-			while (_subPlans.hasNext())
-			{
-				_nextPlan = _subPlans.next();
-				if (_nextPlan.hasNext())
-					return _nextPlan.next();
-			}
-			
-			return null;
-		}
-
-		@Override
-		public void remove()
-		{
-			throw new UnsupportedOperationException(
-				"Not allowed to remove items from this iterator.");
-		}
-	}
-	
-	private class ComplexPlanIterator implements Iterator<EvaluationPlan>
-	{
-		private EvaluationPlan _nextSimplePlan = null;
-		private SimplePlanIterator _simpleIterator;
-		
-		private ComplexPlanIterator()
-		{
-			_simpleIterator = new SimplePlanIterator();
-			if (_simpleIterator.hasNext())
-			{
-				_nextSimplePlan = _simpleIterator.next();
-			}
-		}
-		
-		@Override
-		final public boolean hasNext()
-		{
-			return _nextSimplePlan != null;
-		}
-
-		@Override
-		final public EvaluationPlan next()
-		{
-			// TODO
-			return null;
-		}
-
-		@Override
-		final public void remove()
-		{
-			throw new UnsupportedOperationException(
-				"Not allowed to remove items from this iterator.");
 		}
 	}
 }

@@ -8,14 +8,15 @@ import java.util.Vector;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 
-import edu.virginia.vcgr.genii.client.jsdl.sweep.eval.EvaluationPlan;
+import edu.virginia.vcgr.genii.client.jsdl.sweep.eval.Evaluable;
 import edu.virginia.vcgr.genii.client.jsdl.sweep.eval.EvaluationStep;
+import edu.virginia.vcgr.genii.client.jsdl.sweep.eval.SweepTargetIdentifier;
 import edu.virginia.vcgr.genii.client.jsdl.sweep.functions.LoopDoubleSweepFunction;
 import edu.virginia.vcgr.genii.client.jsdl.sweep.functions.LoopIntegerSweepFunction;
 import edu.virginia.vcgr.genii.client.jsdl.sweep.functions.ValuesSweepFunction;
 import edu.virginia.vcgr.genii.client.jsdl.sweep.parameters.DocumentNodeSweepParameter;
 
-public class SweepAssignment implements Serializable, Countable
+public class SweepAssignment implements Serializable, Countable, Iterable<Evaluable>
 {
 	static final long serialVersionUID = 0L;
 	
@@ -62,42 +63,58 @@ public class SweepAssignment implements Serializable, Countable
 	{
 		return _function.size();
 	}
-	
-	final public Iterator<EvaluationPlan> planIterator()
+
+	@Override
+	final public Iterator<Evaluable> iterator()
 	{
-		return new PlanIterator();
+		try
+		{
+			return new EvaluationIterator();
+		}
+		catch (SweepException e)
+		{
+			throw new RuntimeException(
+				"Unable to create evaluation iterator.", e);
+		}
 	}
 	
-	private class PlanIterator implements Iterator<EvaluationPlan>
+	private class EvaluationIterator implements Iterator<Evaluable>
 	{
-		private Iterator<Object> _functionIterator;
+		private Iterator<Object> _values;
+		private List<SweepTargetIdentifier> _targets;
 		
-		private PlanIterator()
+		private EvaluationIterator() throws SweepException
 		{
-			_functionIterator = _function.iterator();
-		}
-		
-		@Override
-		public boolean hasNext()
-		{
-			return _functionIterator.hasNext();
-		}
-
-		@Override
-		public EvaluationPlan next()
-		{
-			Object value = _functionIterator.next();
-			EvaluationPlan plan = new EvaluationPlan();
+			if (_function == null)
+				_values = null;
+			else
+				_values = _function.iterator();
 			
+			if (_parameters == null)
+				_parameters = new Vector<SweepParameter>(0);
+			
+			_targets = new Vector<SweepTargetIdentifier>(_parameters.size());
 			for (SweepParameter parameter : _parameters)
-				plan.addStep(new EvaluationStep(
-					parameter.targetIdentifier(), value));
-
-			return plan;
+				_targets.add(parameter.targetIdentifier());
+		}
+		
+		@Override
+		final public boolean hasNext()
+		{
+			if (_values == null)
+				return false;
+			
+			return _values.hasNext();
 		}
 
 		@Override
-		public void remove()
+		final public Evaluable next()
+		{
+			return new EvaluationStep(_targets, _values.next());
+		}
+
+		@Override
+		final public void remove()
 		{
 			throw new UnsupportedOperationException(
 				"Not allowed to remove elements from this iterator.");

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PersonDocument
+	xmlns="http://mark-morgan.org/person"
+	xmlns:person="http://mark-morgan.org/person">
+	
+	<Person name="Mark Morgan">
+		<Age>34</Age>
+		<Address>
+			<Street>109 ${street} ${street-type}</Street>
+			<City>${city}</City>
+			<State>Virginia</State>
+			<ZipCode>22901</ZipCode>
+		</Address>
+	</Person>
+	
+	<Sweep 
+		xmlns="http://schemas.ogf.org/jsdl/2009/03/sweep"
+	    xmlns:sweep="http://schemas.ogf.org/jsdl/2009/03/sweep"
+	    xmlns:sweepfunc="http://schemas.ogf.org/jsdl/2009/03/sweep/functions">
+	    <Assignment>
+	    	<DocumentNode>
+	    		<NamespaceBinding
+	    			ns="http://mark-morgan.org/person"
+	    			prefix="person"/>
+	    		<Match>
+	    			/*//person:City
+	    		</Match>
+	    	</DocumentNode>
+	    	<sweepfunc:Values>
+	    		<sweepfunc:Value>Charlottesville</sweepfunc:Value>
+	    		<sweepfunc:Value>Earlysville</sweepfunc:Value>
+	    		<sweepfunc:Value>Manassas</sweepfunc:Value>
+	    	</sweepfunc:Values>
+	    </Assignment>
+	    <Assignment>
+	    	<DocumentNode>
+	    		<NamespaceBinding
+	    			ns="http://mark-morgan.org/person"
+	    			prefix="person"/>
+	    		<Match>
+	    			substring(/*//person:Street, 14)
+	    		</Match>
+	    	</DocumentNode>
+	    	<sweepfunc:Values>
+	    		<sweepfunc:Value>Ct.</sweepfunc:Value>
+	    		<sweepfunc:Value>Dr.</sweepfunc:Value>
+	    		<sweepfunc:Value>Cir.</sweepfunc:Value>
+	    	</sweepfunc:Values>
+	    </Assignment>
+	    <Assignment>
+	    	<DocumentNode>
+	    		<NamespaceBinding
+	    			ns="http://mark-morgan.org/person"
+	    			prefix="person"/>
+	    		<Match>
+	    			substring(/*//person:Street, 4, 9)
+	    		</Match>
+	    	</DocumentNode>
+	    	<sweepfunc:Values>
+	    		<sweepfunc:Value>Tintern</sweepfunc:Value>
+	    		<sweepfunc:Value>Claymont</sweepfunc:Value>
+	    		<sweepfunc:Value>Wild Ginger</sweepfunc:Value>
+	    	</sweepfunc:Values>
+	    </Assignment>
+	</Sweep>
+</PersonDocument>

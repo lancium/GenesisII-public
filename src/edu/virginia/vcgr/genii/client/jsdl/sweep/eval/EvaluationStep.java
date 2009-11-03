@@ -1,22 +1,25 @@
 package edu.virginia.vcgr.genii.client.jsdl.sweep.eval;
 
-import org.w3c.dom.Node;
+import java.util.List;
 
 import edu.virginia.vcgr.genii.client.jsdl.sweep.SweepException;
 
-public class EvaluationStep
+public class EvaluationStep implements Evaluable
 {
-	private SweepTargetIdentifier _identifier;
+	private List<SweepTargetIdentifier> _identifiers;
 	private Object _value;
 	
-	public EvaluationStep(SweepTargetIdentifier identifier, Object value)
+	public EvaluationStep(List<SweepTargetIdentifier> identifiers,
+		Object value)
 	{
-		_identifier = identifier;
+		_identifiers = identifiers;
 		_value = value;
 	}
-	
-	final public void evalutate(Node evalutationContext) throws SweepException
+
+	@Override
+	final public void evaluate(EvaluationContext context) throws SweepException
 	{
-		_identifier.identify(evalutationContext).replace(_value);
+		for (SweepTargetIdentifier identifier : _identifiers)
+			identifier.identify(context.document()).replace(_value);
 	}
 }

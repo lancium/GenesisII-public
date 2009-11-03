@@ -14,5 +14,6 @@ public abstract class SweepParameter implements Serializable
 {
 	static final long serialVersionUID = 0L;
 	
-	public abstract SweepTargetIdentifier targetIdentifier();
+	public abstract SweepTargetIdentifier targetIdentifier() 
+		throws SweepException;
 }

@@ -7,8 +7,10 @@ import java.util.Vector;
 import javax.xml.bind.annotation.XmlElement;
 
 import edu.virginia.vcgr.genii.client.jsdl.sweep.SweepConstants;
+import edu.virginia.vcgr.genii.client.jsdl.sweep.SweepException;
 import edu.virginia.vcgr.genii.client.jsdl.sweep.SweepParameter;
 import edu.virginia.vcgr.genii.client.jsdl.sweep.eval.SweepTargetIdentifier;
+import edu.virginia.vcgr.genii.client.jsdl.sweep.parameters.xpath.XPathTargetIdentifierFactory;
 
 public class DocumentNodeSweepParameter extends SweepParameter
 {
@@ -45,10 +47,9 @@ public class DocumentNodeSweepParameter extends SweepParameter
 	}
 	
 	@Override
-	final public SweepTargetIdentifier targetIdentifier()
+	final public SweepTargetIdentifier targetIdentifier() throws SweepException
 	{
-		// TODO
-		// MOOCH -- must implement.
-		return null;
+		return XPathTargetIdentifierFactory.createIdentifier(
+			new NamespaceBindingsContext(_bindings), _matchExpression);
 	}
 }
