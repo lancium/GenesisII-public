@@ -24,16 +24,17 @@ public class Address
 		required = true, nillable = false)
 	private String _zipcode;
 	
+	@SuppressWarnings("unused")
+	private Address()
+	{
+		this(null, null, null, null);
+	}
+	
 	public Address(String street, String city, String state, String zipcode)
 	{
 		_street = street;
 		_city = city;
 		_state = state;
 		_zipcode = zipcode;
-	}
-	
-	public Address()
-	{
-		this(null, null, null, null);
 	}
 }

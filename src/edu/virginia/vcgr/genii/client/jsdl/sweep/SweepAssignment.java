@@ -40,17 +40,21 @@ public class SweepAssignment implements Serializable, Countable, Iterable<Evalua
 	})
 	private SweepFunction _function;
 	
+	/**
+	 * For use by XML unmarshalling only.
+	 */
+	@SuppressWarnings("unused")
+	private SweepAssignment()
+	{
+		this(null);
+	}
+	
 	public SweepAssignment(SweepFunction function, SweepParameter...parameters)
 	{
 		_function = function;
 		_parameters = new Vector<SweepParameter>(parameters.length);
 		for (SweepParameter parameter : parameters)
 			_parameters.add(parameter);
-	}
-	
-	public SweepAssignment()
-	{
-		this(null);
 	}
 	
 	final public void addParameter(SweepParameter parameter)
