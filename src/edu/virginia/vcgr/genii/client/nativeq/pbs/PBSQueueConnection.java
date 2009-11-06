@@ -415,23 +415,6 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 			command.add(builder.toString());
 		}
 		
-		Map<String, String> environment = application.getEnvironment();
-		if (environment.size() > 0)
-		{
-			command.add("-v");
-			StringBuilder builder = new StringBuilder();
-			boolean first = true;
-			for (String key : environment.keySet())
-			{
-				if (!first)
-					builder.append(",");
-				first = false;
-				builder.append(String.format(
-					"%s=%s", key, environment.get(key)));
-			}
-			command.add(builder.toString());
-		}
-		
 		for (String additionalArgString : _additionalArguments.qsubArguments())
 			command.add(additionalArgString);
 		

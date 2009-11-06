@@ -214,7 +214,7 @@ public class JobManager implements Closeable
 					_queuedJobs.put(new SortableJobKey(
 						job.getJobID(), job.getPriority(), 
 						job.getSubmitTime()), job);
-				} else if (jobState.equals(QueueStates.RUNNING))
+				} else if (jobState.equals(QueueStates.RUNNING) || job.getBESID() != null)
 				{
 					/* Otherwise, if the job was listed as running, we need to put
 					 * it into the running list.

@@ -11,6 +11,8 @@ import java.util.HashMap;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -21,11 +23,14 @@ import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.common.notification.UserDataType;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
+import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
 public class DBSubscriptionResource 
 	extends BasicDBResource implements ISubscriptionResource
 {
+	static private Log _logger = LogFactory.getLog(DBSubscriptionResource.class);
+	
 	static private final String _CREATE_SUBSCRIPTION =
 		"INSERT INTO subscriptions VALUES (?, ?, ?, ?, ?)";
 	static private final String _DESTROY_SUBSCRIPTION =
@@ -36,8 +41,6 @@ public class DBSubscriptionResource
 	static private final String _SELECT_SUBSCRIPTIONS_BEGIN =
 		"SELECT subscriptionid, topic, targetendpoint, userdata " +
 		"FROM subscriptions WHERE sourcekey = ? AND ";
-	static private final String _DESTROY_SUBSCRIPTION_ENTRIES =
-		"DELETE FROM subscriptions WHERE sourcekey = ?";
 	
 	public DBSubscriptionResource(
 			ResourceKey parentKey, 
@@ -201,28 +204,23 @@ public class DBSubscriptionResource
 	static public void destroySubscriptions(BasicDBResource sourceResource)
 		throws ResourceException
 	{
-		String sourceResourceKey = (String)sourceResource.getKey();
-		Connection connection = sourceResource.getConnection();
-		PreparedStatement stmt = null;
-		
 		Collection<SubscriptionInformation> subscriptions = 
 			matchSubscriptions(sourceResource, null);
-		ArrayList<String> keys = new ArrayList<String>(subscriptions.size());
-		destroyAll(connection, keys);
 		
-		try
+		/* Added by Mark Morgan to fix a bug */
+		for (SubscriptionInformation subInfo : subscriptions)
 		{
-			stmt = connection.prepareStatement(_DESTROY_SUBSCRIPTION_ENTRIES);
-			stmt.setString(1, sourceResourceKey);
-			stmt.executeUpdate();
-		}
-		catch (SQLException sqe)
-		{
-			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
-		}
-		finally
-		{
-			StreamUtils.close(stmt);
+			try
+			{
+				ResourceManager.getTargetResource(
+					subInfo.getTarget()).destroy();
+			}
+			catch (Throwable cause)
+			{
+				_logger.warn(String.format(
+					"Unable to delete subscription %s.",
+					subInfo.getSubscriptionKey()), cause);
+			}
 		}
 	}
 }

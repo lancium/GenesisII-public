@@ -80,11 +80,6 @@ public class WorkingContext implements Closeable, Cloneable
 		try
 		{
 			String serviceName = EPRUtils.extractServiceName(newTarget);
-			int index = serviceName.lastIndexOf('/');
-			if (index < 0)
-				throw new ContextException("Couldn't determine service name for service at URI \"" +
-					serviceName + "\".");
-			serviceName = serviceName.substring(index + 1);
 			WorkingContext newContext = stack.peek();
 			newContext = (WorkingContext)newContext.clone();
 			newContext.setProperty(EPR_PROPERTY_NAME, newTarget);

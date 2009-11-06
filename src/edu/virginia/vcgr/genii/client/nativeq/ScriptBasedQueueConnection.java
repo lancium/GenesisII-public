@@ -9,6 +9,7 @@ import java.io.PrintStream;
 import java.io.StringReader;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -142,6 +143,11 @@ public abstract class ScriptBasedQueueConnection
 		}
 			
 		script.format("export QUEUE_SCRIPT_RESULT=0\n");
+		
+		Map<String, String> environment = application.getEnvironment();
+		for (String key : environment.keySet())
+			script.format("export %s='%s'\n",
+				key, environment.get(key));
 	}
 
 	protected void generateQueueApplicationFooter(PrintStream script,

@@ -23,6 +23,7 @@
 		<tab name="Security"/>
 	</plugin>
 	
+	<!--
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.debug.DebugPlugin">
 		<top-menu menu-name="Debug" group="Debug"
 			item-name="Debug"/>
@@ -37,6 +38,7 @@
 			<property name="plugin-property" value="plugin-value"/>
 		</plugin-properties>
 	</plugin>
+	-->
 	
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.jsdltool.JSDLToolPlugin">
 		<top-menu menu-name="Jobs" group="JSDL" item-name="Create Job"/>

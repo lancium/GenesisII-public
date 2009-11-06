@@ -7,6 +7,8 @@ import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.ggf.bes.factory.ActivityStateEnumeration;
+import org.ggf.bes.factory.ActivityStatusType;
 import org.ggf.bes.factory.GetActivityStatusResponseType;
 import org.ggf.bes.factory.GetActivityStatusesType;
 import org.ws.addressing.EndpointReferenceType;
@@ -19,6 +21,7 @@ import edu.virginia.vcgr.genii.client.gridlog.GridLogTarget;
 import edu.virginia.vcgr.genii.client.postlog.JobEvent;
 import edu.virginia.vcgr.genii.client.postlog.PostTargets;
 import edu.virginia.vcgr.genii.container.cservices.gridlogger.GridLogDevice;
+import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 
 /**
@@ -119,6 +122,7 @@ public class JobUpdateWorker implements OutcallHandler
 				return;
 			}
 			
+			boolean wasSecurityException = false;
 			GetActivityStatusResponseType []activityStatuses;
 			try
 			{
@@ -129,6 +133,15 @@ public class JobUpdateWorker implements OutcallHandler
 						new EndpointReferenceType[] { jobEndpoint }, null)).getResponse();
 				_jobManager.resetJobCommunicationAttempts(connection, _jobInfo.getJobID());
 				connection.commit();
+			}
+			catch (GenesisIISecurityException gse)
+			{
+				wasSecurityException = true;
+				activityStatuses = new GetActivityStatusResponseType[] {
+					new GetActivityStatusResponseType(
+						jobEndpoint, new ActivityStatusType(null, ActivityStateEnumeration.Failed),
+						null, null)
+				};
 			}
 			finally
 			{
@@ -144,9 +157,17 @@ public class JobUpdateWorker implements OutcallHandler
 					+ _jobInfo.getJobID());
 			} else
 			{
-				List<String> faults = 
-					BESFaultManager.getFaultDetail(
+				List<String> faults = null;
+				
+				try
+				{ 
+					faults = BESFaultManager.getFaultDetail(
 						activityStatuses[0].getFault());
+				}
+				catch (Throwable cause)
+				{
+					_logger.error("Error trying to get fault detail.", cause);
+				}
 				
 				if (faults == null)
 					faults = new Vector<String>(1);
@@ -158,6 +179,13 @@ public class JobUpdateWorker implements OutcallHandler
 					_jobManager.addJobErrorInformation(
 						connection, _jobInfo.getJobID(), 
 						_data.getRunAttempts(), faults);
+				}
+				
+				if (wasSecurityException)
+				{
+					Collection<String> messages = new Vector<String>();
+					messages.add("The certificates for this job have expired.");
+					_jobManager.addJobErrorInformation(connection, _jobInfo.getJobID(), _data.getRunAttempts(), messages);
 				}
 				
 				/* We have it's status, convert it to a more reasonable data

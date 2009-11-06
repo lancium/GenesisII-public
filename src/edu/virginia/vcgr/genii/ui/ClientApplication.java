@@ -21,18 +21,10 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 
-import org.ggf.rns.EntryType;
-import org.ggf.rns.List;
-import org.ggf.rns.ListResponse;
 import org.morgan.utils.gui.GUIUtils;
 import org.morgan.utils.gui.tearoff.TearoffPanel;
-import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
-import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
-import edu.virginia.vcgr.genii.ui.container.ContainerNotRunningException;
-import edu.virginia.vcgr.genii.ui.container.LocalContainer;
 import edu.virginia.vcgr.genii.ui.plugins.EndpointDescription;
 import edu.virginia.vcgr.genii.ui.plugins.LazilyLoadedTab;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginContext;
@@ -132,6 +124,7 @@ public class ClientApplication extends UIFrame
 		
 		_browserTree.addMouseListener(new RNSTreePopupListener(plugins));
 		
+		/*
 		try
 		{
 			EndpointReferenceType epr = new LocalContainer(_uiContext).getEndpoint();
@@ -146,6 +139,7 @@ public class ClientApplication extends UIFrame
 		{
 			cnre.printStackTrace(System.err);
 		}
+		*/
 	}
 	
 	@Override

@@ -321,7 +321,7 @@ public class BES implements Closeable
 			stmt.setTimestamp(7, new Timestamp(System.currentTimeMillis()));
 			stmt.setShort(8, (short)0);
 			stmt.setShort(9, (short)0);
-			stmt.setString(10, String.format("%s%s", 
+			stmt.setString(10, String.format("%s|%s", 
 				activityCWD.mustDelete() ? "d" : "k",
 				activityCWD.getWorkingDirectory().getAbsolutePath()));
 			stmt.setBlob(11, DBSerializer.toBlob(executionPlan,
@@ -382,6 +382,12 @@ public class BES implements Closeable
 			stmt = null;
 			stmt = connection.prepareStatement(
 				"DELETE FROM besactivitypropertiestable WHERE activityid = ?");
+			stmt.setString(1, activityid);
+			stmt.executeUpdate();
+			stmt.close();
+			stmt = null;
+			stmt = connection.prepareStatement(
+				"DELETE FROM besactivityfaultstable WHERE besactivityid = ?");
 			stmt.setString(1, activityid);
 			stmt.executeUpdate();
 			connection.commit();

@@ -436,7 +436,7 @@ public class BESManager implements Closeable
 	 * @throws ConfigurationException
 	 * @throws GenesisIISecurityException
 	 */
-	synchronized private void updateResources(Connection connection,
+	private void updateResources(Connection connection,
 		Collection<BESUpdateInformation> resourcesToUpdate)
 		throws SQLException, ResourceException,
 			GenesisIISecurityException
@@ -464,11 +464,18 @@ public class BESManager implements Closeable
 			/* Go ahead and enqueue a new "update" worker into the outcall 
 			 * thread pool. */
 			String besName = "<unknown>";
-			BESData data = _containersByID.get(new Long(info.getBESID()));
-			if (data != null)
-				besName = data.getName();
+			BESData data;
 			
-			markBESAsMissed(data.getID(), "Startup Procedure.");
+			synchronized(this)
+			{
+				data = _containersByID.get(new Long(info.getBESID()));
+			
+				if (data != null)
+					besName = data.getName();
+				
+				markBESAsMissed(data.getID(), "Startup Procedure.");
+			}
+			
 			_informationPortal.getInformation(
 				new BESEndpoint(_database.getQueueID(),
 					info.getBESID(), besName, resolver),
