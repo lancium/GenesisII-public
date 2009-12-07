@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.Calendar;
-import java.util.SortedSet;
+import java.util.NavigableSet;
 import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
@@ -65,7 +65,7 @@ public class PersistentOutcallDatabase
 		}
 	}
 	
-	static public SortedSet<PersistentOutcallEntry> readTable(Connection connection)
+	static public NavigableSet<PersistentOutcallEntry> readTable(Connection connection)
 		throws SQLException
 	{
 		TreeSet<PersistentOutcallEntry> ret = new TreeSet<PersistentOutcallEntry>(
