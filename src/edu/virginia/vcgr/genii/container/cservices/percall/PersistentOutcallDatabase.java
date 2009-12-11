@@ -13,6 +13,7 @@ import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.morgan.util.Triple;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -23,7 +24,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
 
-public class PersistentOutcallDatabase
+class PersistentOutcallDatabase
 {
 	static private Log _logger = LogFactory.getLog(PersistentOutcallDatabase.class);
 	
@@ -51,7 +52,7 @@ public class PersistentOutcallDatabase
 		return ts;
 	}
 	
-	static public void createTables(Connection connection)
+	static void createTables(Connection connection)
 	{
 		try
 		{
@@ -65,7 +66,7 @@ public class PersistentOutcallDatabase
 		}
 	}
 	
-	static public NavigableSet<PersistentOutcallEntry> readTable(Connection connection)
+	static NavigableSet<PersistentOutcallEntry> readTable(Connection connection)
 		throws SQLException
 	{
 		TreeSet<PersistentOutcallEntry> ret = new TreeSet<PersistentOutcallEntry>(
@@ -77,15 +78,15 @@ public class PersistentOutcallDatabase
 		{
 			stmt = connection.createStatement();
 			rs = stmt.executeQuery(
-				"SELECT id, outcallhandler, nextattempt, createtime," +
+				"SELECT id, nextattempt, createtime," +
 				"attemptscheduler, numattempts FROM persistentoutcalls");
 			while (rs.next())
 			{
 				ret.add(new PersistentOutcallEntry(
-					rs.getLong(1), rs.getInt(2), convert(rs.getTimestamp(3)),
-					convert(rs.getTimestamp(4)),
-					(OutcallActor)DBSerializer.fromBlob(rs.getBlob(5)),
-					(AttemptScheduler)DBSerializer.fromBlob(rs.getBlob(6))));
+					rs.getLong(1), rs.getInt(5),
+					convert(rs.getTimestamp(2)),
+					convert(rs.getTimestamp(3)),
+					(AttemptScheduler)DBSerializer.fromBlob(rs.getBlob(4))));
 					
 			}
 			
@@ -98,7 +99,7 @@ public class PersistentOutcallDatabase
 		}
 	}
 	
-	static public PersistentOutcallEntry add(Connection connection,
+	static PersistentOutcallEntry add(Connection connection,
 		EndpointReferenceType target, ICallingContext callingContext,
 		OutcallActor outcallActor, AttemptScheduler scheduler) 
 			throws SQLException
@@ -148,7 +149,7 @@ public class PersistentOutcallDatabase
 			if (!rs.next())
 				throw new SQLException("Unable to get last added id from db.");
 			return new PersistentOutcallEntry(rs.getLong(1), numAttempts,
-				nextAttempt, createTime, outcallActor, scheduler);
+				nextAttempt, createTime, scheduler);
 		}
 		catch (ResourceException e)
 		{
@@ -158,11 +159,13 @@ public class PersistentOutcallDatabase
 		{
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
+			StreamUtils.close(sstmt);
 		}
 	}
 
-	static public CommunicationInformation getCommunicationInformation(
-		Connection connection, PersistentOutcallEntry entry) throws SQLException
+	static Triple<EndpointReferenceType, ICallingContext, OutcallActor> 
+		getCommunicationInformation(Connection connection, 
+			PersistentOutcallEntry entry) throws SQLException
 	{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -170,14 +173,15 @@ public class PersistentOutcallDatabase
 		try
 		{
 			stmt = connection.prepareStatement(
-				"SELECT target, callingcontext FROM persistentoutcalls " +
-				"WHERE id = ?");
+				"SELECT target, callingcontext, outcallhandler " +
+				"FROM persistentoutcalls WHERE id = ?");
 			stmt.setLong(1, entry.entryID());
 			rs = stmt.executeQuery();
 			if (rs.next())
-				return new CommunicationInformation(
+				return new Triple<EndpointReferenceType, ICallingContext, OutcallActor>(
 					EPRUtils.fromBlob(rs.getBlob(1)),
-					(ICallingContext)DBSerializer.fromBlob(rs.getBlob(2)));
+					(ICallingContext)DBSerializer.fromBlob(rs.getBlob(2)),
+					(OutcallActor)DBSerializer.fromBlob(rs.getBlob(3)));
 			else
 				throw new SQLException(String.format(
 					"Unable to find persistent outcall entry %d",
@@ -196,7 +200,7 @@ public class PersistentOutcallDatabase
 		}
 	}
 	
-	static public void update(Connection connection, 
+	static void update(Connection connection, 
 		PersistentOutcallEntry entry)
 			throws SQLException
 	{
@@ -205,12 +209,14 @@ public class PersistentOutcallDatabase
 		try
 		{
 			stmt = connection.prepareStatement(
-				"UPDATE persisentoutcalls " +
+				"UPDATE persistentoutcalls " +
 					"SET nextattempt = ?, numattempts = ? WHERE id = ?");
 			stmt.setTimestamp(1, convert(entry.nextAttempt()));
 			stmt.setInt(2, entry.numAttempts());
 			stmt.setLong(3, entry.entryID());
-			stmt.executeUpdate();
+			if (stmt.executeUpdate() != 1)
+				throw new SQLException(
+					"Unable to update persistent outcall entry.");
 		}
 		finally
 		{
@@ -218,7 +224,7 @@ public class PersistentOutcallDatabase
 		}
 	}
 	
-	static public void remove(Connection connection,
+	static void remove(Connection connection,
 		PersistentOutcallEntry entry) throws SQLException
 	{
 		PreparedStatement stmt = null;
@@ -226,7 +232,7 @@ public class PersistentOutcallDatabase
 		try
 		{
 			stmt = connection.prepareStatement(
-				"DELETE FROM persisentoutcalls WHERE id = ?");
+				"DELETE FROM persistentoutcalls WHERE id = ?");
 			stmt.setLong(1, entry.entryID());
 			stmt.executeUpdate();
 		}

@@ -10,19 +10,17 @@ class PersistentOutcallEntry
 	private Calendar _nextAttempt;
 	private Calendar _createTime;
 	
-	private OutcallActor _outcallActor;
 	private AttemptScheduler _scheduler;
 	
 	PersistentOutcallEntry(long id,
 		int numAttempts, Calendar nextAttempt, Calendar createTime,
-		OutcallActor outcallActor, AttemptScheduler scheduler)
+		AttemptScheduler scheduler)
 	{
 		_entryID = id;
 		_numAttempts = numAttempts;
 		_nextAttempt = nextAttempt;
 		_createTime = createTime;
-		
-		_outcallActor = outcallActor;
+
 		_scheduler = scheduler;
 	}
 	
@@ -54,11 +52,6 @@ class PersistentOutcallEntry
 	final Calendar createTime()
 	{
 		return _createTime;
-	}
-	
-	final OutcallActor outcallActor()
-	{
-		return _outcallActor;
 	}
 	
 	final AttemptScheduler scheduler()

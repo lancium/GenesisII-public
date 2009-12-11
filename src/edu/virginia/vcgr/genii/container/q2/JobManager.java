@@ -30,7 +30,6 @@ import org.ggf.bes.factory.CreateActivityType;
 import org.ggf.bes.factory.InvalidRequestMessageFaultType;
 import org.ggf.bes.factory.NotAcceptingNewActivitiesFaultType;
 import org.ggf.bes.factory.NotAuthorizedFaultType;
-import org.ggf.bes.factory.TerminateActivitiesType;
 import org.ggf.bes.factory.UnsupportedFeatureFaultType;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.rns.EntryType;
@@ -1872,16 +1871,9 @@ public class JobManager implements Closeable
 			{
 				ICallingContext ctxt = killInfo.getCallingContext();
 				
-				/* Create the proxy and terminate the activity */
-				GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, 
-					killInfo.getBESEndpoint(), 
+				PersistentOutcallJobKiller.killJob(
+					killInfo.getBESEndpoint(), killInfo.getJobEndpoint(),
 					killInfo.getCallingContext());
-				ClientUtils.setTimeout(bes, 30 * 1000);
-				_jobLogger.log(logTargets, "Making grid outcall to kill the activity.");
-				bes.terminateActivities(new TerminateActivitiesType(
-					new EndpointReferenceType[] {
-						killInfo.getJobEndpoint()
-					}, null ));
 				return ctxt;
 			}
 			catch (Throwable cause)

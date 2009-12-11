@@ -6,6 +6,12 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 
+/**
+ * This interface represents the ability to perform the outcall (or whatever
+ * action) that the client wants to perform persistently until it works.
+ * 
+ * @author morgan
+ */
 public interface OutcallActor extends Serializable
 {
 	/**

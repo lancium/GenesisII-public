@@ -7,10 +7,12 @@ import java.util.NavigableSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.morgan.util.Triple;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.container.cservices.AbstractContainerService;
+import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 
 public class PersistentOutcallContainerService extends AbstractContainerService
 {
@@ -29,7 +31,7 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 		super(SERVICE_NAME);
 	}
 	
-	public boolean schedule(
+	final public boolean schedule(
 		OutcallActor actor, AttemptScheduler scheduler,
 		EndpointReferenceType target, ICallingContext callingContext)
 	{
@@ -63,7 +65,7 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 	}
 
 	@Override
-	protected void loadService() throws Throwable
+	final protected void loadService() throws Throwable
 	{
 		_logger.info(String.format("Loading %s.", SERVICE_NAME));
 		Connection connection = null;
@@ -71,6 +73,7 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 		try
 		{
 			connection = getConnectionPool().acquire(true);
+			PersistentOutcallDatabase.createTables(connection);
 			_entries = PersistentOutcallDatabase.readTable(connection);
 			_logger.debug(String.format(
 				"%s loaded %d entries", SERVICE_NAME, _entries.size()));
@@ -82,7 +85,7 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 	}
 
 	@Override
-	protected void startService() throws Throwable
+	final protected void startService() throws Throwable
 	{
 		_logger.info(String.format("Starting %s.", SERVICE_NAME));
 		
@@ -94,25 +97,28 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 	}
 	
 	
-	private void reAdd(Connection connection, PersistentOutcallEntry entry)
+	final private void reAdd(Connection connection, PersistentOutcallEntry entry)
 	{
-		Calendar now = Calendar.getInstance();
-		if (now.getTimeInMillis() - entry.createTime().getTimeInMillis() > MAX_TIME_TO_LIVE)
-		{
-			_logger.warn("A persistent outcall has exceeded the maximum allowed time to live -- it is being removed.");
-			return;
-		}
-		
 		try
 		{
+			Calendar now = Calendar.getInstance();
+			if (now.getTimeInMillis() - entry.createTime().getTimeInMillis() > MAX_TIME_TO_LIVE)
+			{
+				_logger.warn("A persistent outcall has exceeded the maximum allowed time to live -- it is being removed.");
+				PersistentOutcallDatabase.remove(connection, entry);
+				return;
+			}
+			
 			entry.numAttempts(entry.numAttempts() + 1);
 			Calendar nextAttempt = 
 				entry.scheduler().nextAttempt(
 						Calendar.getInstance(), entry.numAttempts());
 			if (nextAttempt == null)
+			{
 				_logger.warn(
 					"Giving up on persistent outcall that we could never make.");
-			else
+				PersistentOutcallDatabase.remove(connection, entry);
+			} else
 			{
 				entry.nextAttempt(nextAttempt);
 				PersistentOutcallDatabase.update(connection, entry);
@@ -125,12 +131,12 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 		catch (Throwable cause)
 		{
 			_logger.warn(
-				"Unable to re-add persistent outcall entry into database.", 
+				"Unable to re-add/remove persistent outcall entry into/from database.",
 				cause);
 		}
 	}
 	
-	private void doOutcall(PersistentOutcallEntry entry)
+	final private void doOutcall(PersistentOutcallEntry entry)
 	{
 		Connection connection = null;
 		
@@ -139,12 +145,12 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 		try
 		{
 			connection = getConnectionPool().acquire(false);
-			CommunicationInformation commInfo = 
+			Triple<EndpointReferenceType, ICallingContext, OutcallActor> commInfo = 
 				PersistentOutcallDatabase.getCommunicationInformation(
 					connection, entry);
 			connection.commit();
-			if (entry.outcallActor().enactOutcall(
-				commInfo.callingContext(), commInfo.epr()))
+			if (commInfo.third().enactOutcall(
+				commInfo.second(), commInfo.first()))
 			{
 				_logger.debug("Successfully made persistent outcall -- forgetting it.");
 				
@@ -178,7 +184,7 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 	private class OutcallWorker implements Runnable
 	{
 		@Override
-		public void run()
+		final public void run()
 		{
 			while (true)
 			{
@@ -211,5 +217,20 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 				}
 			}
 		}
+	}
+	
+	static public boolean schedulePersistentOutcall(
+		OutcallActor actor, AttemptScheduler scheduler,
+		EndpointReferenceType target, ICallingContext callingContext)
+	{
+		PersistentOutcallContainerService service = 
+			(PersistentOutcallContainerService)ContainerServices.findService(
+				SERVICE_NAME);
+		if (service != null)
+			return service.schedule(actor, scheduler, target, callingContext);
+		else
+			_logger.warn("Unable to find persistent oucall service.");
+		
+		return false;
 	}
 }

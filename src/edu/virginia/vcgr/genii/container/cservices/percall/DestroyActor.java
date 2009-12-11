@@ -7,12 +7,19 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 
+/**
+ * This is a simple outcall actor that merely does destroy calls on remote
+ * endpoints.
+ * 
+ * @author morgan
+ */
 public class DestroyActor implements OutcallActor
 {
 	static final long serialVersionUID = 0L;
 	
 	@Override
-	public boolean enactOutcall(ICallingContext callingContext,
+	/** @{inheritDoc} */
+	final public boolean enactOutcall(ICallingContext callingContext,
 			EndpointReferenceType target) throws Throwable
 	{
 		GeniiCommon common = ClientUtils.createProxy(

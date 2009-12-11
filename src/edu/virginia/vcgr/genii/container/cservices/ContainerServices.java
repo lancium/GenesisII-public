@@ -17,6 +17,7 @@ import edu.virginia.vcgr.genii.client.configuration.Deployment;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
+import edu.virginia.vcgr.genii.container.cservices.percall.PersistentOutcallContainerService;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 
 public class ContainerServices
@@ -31,7 +32,13 @@ public class ContainerServices
 	static private Collection<ContainerService> getServices(File configFile)
 		throws IOException
 	{
-		return ContainerServicesParser.parseConfigFile(configFile);
+		Collection<ContainerService> services = 
+			ContainerServicesParser.parseConfigFile(configFile);
+		
+		// This is a hack for now -- add in services that are always there.
+		services.add(new PersistentOutcallContainerService());
+		
+		return services;
 	}
 	
 	static private DatabaseConnectionPool findConnectionPool()

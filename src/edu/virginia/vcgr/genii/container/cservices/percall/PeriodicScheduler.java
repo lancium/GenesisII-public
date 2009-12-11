@@ -13,19 +13,25 @@ public class PeriodicScheduler implements AttemptScheduler
 	
 	public PeriodicScheduler(Calendar lifetime, Integer maxFailedAttempts,
 		long period, TimeUnit periodUnits)
-	{
+	{	
+		if (period < 0L)
+			throw new IllegalArgumentException("Period cannot be negative.");
+	
 		if (periodUnits == null)
 			periodUnits = TimeUnit.MILLISECONDS;
 		
 		_lifetime = lifetime;
 		_maxFailedAttempts = maxFailedAttempts;
-		_period = periodUnits.convert(period, TimeUnit.MILLISECONDS);
+		_period = TimeUnit.MILLISECONDS.convert(period, periodUnits);
 	}
 	
 	public PeriodicScheduler(long lifetime, TimeUnit lifetimeUnits,
 		Integer maxFailedAttempts,
 		long period, TimeUnit periodUnits)
 	{
+		if (period < 0L)
+			throw new IllegalArgumentException("Period cannot be negative.");
+		
 		if (lifetimeUnits == null)
 			lifetimeUnits = TimeUnit.MILLISECONDS;
 		
@@ -34,14 +40,14 @@ public class PeriodicScheduler implements AttemptScheduler
 		
 		_lifetime = Calendar.getInstance();
 		_lifetime.setTimeInMillis(System.currentTimeMillis() +
-			lifetimeUnits.convert(lifetime, TimeUnit.MILLISECONDS));
+			TimeUnit.MILLISECONDS.convert(lifetime, lifetimeUnits));
 		
 		_maxFailedAttempts = maxFailedAttempts;
-		_period = periodUnits.convert(period, TimeUnit.MILLISECONDS);
+		_period = TimeUnit.MILLISECONDS.convert(period, periodUnits);
 	}
 	
 	@Override
-	public Calendar nextAttempt(Calendar now, int numFailedAttempts)
+	final public Calendar nextAttempt(Calendar now, int numFailedAttempts)
 	{
 		if (_lifetime != null && now.after(_lifetime))
 			return null;
