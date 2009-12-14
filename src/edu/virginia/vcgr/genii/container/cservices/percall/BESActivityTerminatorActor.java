@@ -8,7 +8,9 @@ import java.io.StreamCorruptedException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.ggf.bes.factory.TerminateActivitiesResponseType;
 import org.ggf.bes.factory.TerminateActivitiesType;
+import org.ggf.bes.factory.TerminateActivityResponseType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
@@ -39,9 +41,24 @@ public class BESActivityTerminatorActor implements OutcallActor
 		GeniiBESPortType bes = ClientUtils.createProxy(
 			GeniiBESPortType.class, target, callingContext);
 		ClientUtils.setTimeout(bes, 8 * 1000);
-		bes.terminateActivities(new TerminateActivitiesType(
-			new EndpointReferenceType[] { _activityEPR }, null));
-		return true;
+		TerminateActivitiesResponseType resp = 
+			bes.terminateActivities(new TerminateActivitiesType(
+				new EndpointReferenceType[] { _activityEPR }, null));
+		if (resp != null)
+		{
+			TerminateActivityResponseType []resps = resp.getResponse();
+			if (resps != null && resps.length == 1)
+			{
+				if (resps[0].isTerminated())
+					return true;
+				_logger.warn(
+					"Response says that we didn't terminate the activity:  "+ 
+					resps[0].getFault());
+			}
+		}
+		
+		_logger.warn("Tried to kill activity, but didn't get right number of response values back.");
+		return false;
 	}
 	
 	private void writeObject(ObjectOutputStream out)

@@ -121,38 +121,63 @@ public class DownloadManagerContainerService extends AbstractContainerService
 	{
 		target = target.getAbsoluteFile();
 		InProgressLock lock;
+		boolean iAmResponsible = false;
 		
+		_logger.info(String.format(
+			"(Download Manager) -- About to check for %s", target));
 		synchronized(_inProgressLocks)
 		{
 			lock = _inProgressLocks.get(target);
-			if (lock != null)
+			if (lock == null)
 			{
-				synchronized(lock)
+				if (target.exists())
 				{
-					try { lock.wait(); } catch (InterruptedException ie) {}
-					lock.checkException();
+					_logger.info(String.format(
+						"(Download Manager) -- %s already exists.", target));
 					return;
 				}
+				
+				_logger.info(String.format(
+					"(Download Manager) -- %s needs to be copied from source",
+					target));
+				_inProgressLocks.put(target, lock = new InProgressLock());
+				iAmResponsible = true;
 			}
-			
-			if (target.exists())
-				return;
-			
-			_inProgressLocks.put(target, (lock = new InProgressLock()));
+		}
+		
+		if (!iAmResponsible)
+		{
+			_logger.info(String.format(
+				"(Download Manager) -- Another thread is downloading %s so I'll wait.",
+				target));
+			try { lock.waitForSignal(); } catch (InterruptedException ie) {}
+			_logger.info(String.format(
+				"(Download Manager) -- The other thread signaled me that %s is done.",
+				target));
+			lock.checkException();
+			return;
 		}
 		
 		IOException exception = null;
 		
 		try
 		{
+			_logger.info(String.format(
+				"(Download Manager) -- Copy %s from source.", target));
 			doDownload(source, target, credential);
 		}
 		catch (IOException ioe)
 		{
+			_logger.warn(String.format(
+				"(Download Manager) -- Unable to copy %s from source.", target),
+				ioe);
 			exception = ioe;
 		}
 		catch (Throwable e)
 		{
+			_logger.warn(String.format(
+				"(Download Manager) -- Unable to copy %s from source.", target),
+				e);
 			exception = new IOException("Unable to download file.", e);
 		}
 		
@@ -163,7 +188,11 @@ public class DownloadManagerContainerService extends AbstractContainerService
 			synchronized(lock)
 			{
 				lock.setException(exception);
-				lock.notifyAll();
+				
+				_logger.info(String.format(
+					"(Download Manager) -- Signalling waiting threads that %s is done.",
+					target));
+				lock.signal();
 			}
 		}
 		

@@ -1,33 +1,21 @@
 package edu.virginia.vcgr.genii.container.cservices.gridlogger;
 
 import java.io.Serializable;
-import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.PriorityQueue;
 import java.util.Properties;
-import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.morgan.util.io.StreamUtils;
 
-import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.gridlog.GridLogTarget;
-import edu.virginia.vcgr.genii.client.gridlog.GridLogUtils;
-import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.container.cservices.AbstractContainerService;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServicePropertyListener;
 import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
-import edu.virginia.vcgr.genii.gridlog.AppendToLogRequestType;
-import edu.virginia.vcgr.genii.gridlog.GridLogPortType;
 
 public class GridLoggerContainerService extends AbstractContainerService
 {
@@ -153,7 +141,7 @@ public class GridLoggerContainerService extends AbstractContainerService
 	{
 		_logger.info(String.format("Starting %s.", SERVICE_NAME));
 		
-		setupLog4jAppender();
+		// setupLog4jAppender();
 		
 		Thread th = new Thread(new LogEventSender(), "Log Event Sender");
 		th.setDaemon(true);
@@ -163,6 +151,11 @@ public class GridLoggerContainerService extends AbstractContainerService
 	public void logEvent(LoggingEvent event, Collection<GridLogTarget> targets)
 	{
 		// We can't use log4j in this method, or we'll have an infinite loop.
+		
+		/* Was this all causing unnecessary load on the Queue?  We're
+		 * commenting it out to find out.
+		 * Mark Morgan
+		 *
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		PreparedStatement qStmt = null;
@@ -214,15 +207,19 @@ public class GridLoggerContainerService extends AbstractContainerService
 			StreamUtils.close(qStmt);
 			getConnectionPool().release(conn);
 		}
+		*/
 	}
 	
+	/*
 	private void setupLog4jAppender()
 	{
 		GridLoggerAppender appender = new GridLoggerAppender();
 		appender.setThreshold(Level.ALL);
 		Logger.getRoot().addAppender(appender);
 	}
+	*/
 	
+	/*
 	private class GridLoggerAppender extends AppenderSkeleton
 	{
 		@Override
@@ -252,6 +249,7 @@ public class GridLoggerContainerService extends AbstractContainerService
 			return false;
 		}
 	}
+	*/
 	
 	private class PropertyChangeListener
 		implements ContainerServicePropertyListener
@@ -314,12 +312,14 @@ public class GridLoggerContainerService extends AbstractContainerService
 		{
 			try
 			{
+				/* Was this causing the Queue to have high load?
 				GridLogTarget target = _event.target();
 				GridLogPortType stub = target.connect();
 				stub.appendToLog(
 					new AppendToLogRequestType(target.loggerID(),
 						GridLogUtils.convert(_event.content()),
 						Hostname.getLocalHostname().toString()));
+				*/
 				removeEvent(_event.id());
 			}
 			catch (Throwable cause)

@@ -213,7 +213,8 @@ public class DBSubscriptionResource
 			try
 			{
 				ResourceManager.getTargetResource(
-					subInfo.getTarget()).destroy();
+					"GeniiSubscriptionPortType",
+					subInfo.getSubscriptionKey()).destroy();
 			}
 			catch (Throwable cause)
 			{

@@ -500,20 +500,24 @@ public class QueueDatabase
 			stmt.close();
 			stmt = null;
 			
-			stmt = connection.prepareStatement(
-				"INSERT INTO q2logs (jobid, queueid, logtarget, logepr) " +
-				"VALUES (?, ?, ?, ?)");
-			stmt.setLong(1, jobid);
-			stmt.setString(2, _queueID);
-			stmt.setBlob(3, DBSerializer.toBlob(
-				bundle.target(), "q2logs", "logtarget"));
-			stmt.setBlob(4, EPRUtils.toBlob(bundle.epr(), "q2logs", "logepr"));
-			if (stmt.executeUpdate() != 1)
-				throw new SQLException(
-					"Unable to set job log information.");
+			if (bundle != null)
+			{
+				stmt = connection.prepareStatement(
+					"INSERT INTO q2logs (jobid, queueid, logtarget, logepr) " +
+					"VALUES (?, ?, ?, ?)");
+				stmt.setLong(1, jobid);
+				stmt.setString(2, _queueID);
+				stmt.setBlob(3, DBSerializer.toBlob(
+					bundle.target(), "q2logs", "logtarget"));
+				stmt.setBlob(4, EPRUtils.toBlob(bundle.epr(), "q2logs", "logepr"));
+				if (stmt.executeUpdate() != 1)
+					throw new SQLException(
+						"Unable to set job log information.");
+				
+				stmt.close();
+				stmt = null;
+			}
 			
-			stmt.close();
-			stmt = null;
 			stmt = connection.prepareStatement(
 				"INSERT INTO q2joblogtargets (jobid, queueid, target) VALUES (?, ?, ?)");
 			for (GridLogTarget target : gridLogTargets)
@@ -929,7 +933,8 @@ public class QueueDatabase
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
-	public KillInformation getKillInfo(Connection connection, long jobID) 
+	public KillInformation getKillInfo(Connection connection, long jobID,
+		Long besID) 
 		throws SQLException, ResourceException
 	{
 		PreparedStatement stmt = null;
@@ -949,10 +954,18 @@ public class QueueDatabase
 			
 			try
 			{
+				EndpointReferenceType bes = EPRUtils.fromBlob(rs.getBlob(3));
+				if (bes == null && besID != null)
+				{
+					HashMap<Long, EntryType> entryMap = new HashMap<Long, EntryType>();
+					entryMap.put(besID, new EntryType());
+					fillInBESEPRs(connection, entryMap);
+					bes = entryMap.get(besID).getEntry_reference();
+				}
 				return new KillInformation(
 					(ICallingContext)DBSerializer.fromBlob(rs.getBlob(1)),
 					EPRUtils.fromBlob(rs.getBlob(2)),
-					EPRUtils.fromBlob(rs.getBlob(3)));
+					bes);
 			}
 			catch (IOException ioe)
 			{

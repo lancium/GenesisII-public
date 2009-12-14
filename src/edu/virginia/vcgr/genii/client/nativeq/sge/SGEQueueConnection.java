@@ -29,6 +29,7 @@ import edu.virginia.vcgr.genii.client.nativeq.JobToken;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueException;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueState;
 import edu.virginia.vcgr.genii.client.nativeq.ScriptBasedQueueConnection;
+import edu.virginia.vcgr.genii.client.nativeq.execution.ParsingExecutionEngine;
 import edu.virginia.vcgr.genii.client.spmd.SPMDException;
 import edu.virginia.vcgr.genii.client.spmd.SPMDTranslator;
 import edu.virginia.vcgr.genii.client.spmd.SPMDTranslatorFactories;
@@ -283,17 +284,6 @@ public class SGEQueueConnection extends ScriptBasedQueueConnection
 	static final private Pattern JOB_TOKEN_PATTERN = Pattern.compile(
 		"^.*Your job ([a-zA-Z0-9.]+)\\s+.*$");
 	
-	static private String extractJobToken(String text)
-		throws NativeQueueException
-	{
-		Matcher matcher = JOB_TOKEN_PATTERN.matcher(text);
-		if (matcher.matches())
-			return matcher.group(1);
-		
-		throw new NativeQueueException(String.format(
-			"Unable to parse job token from result string \"%s\".", text));
-	}
-	
 	@Override
 	public JobToken submit(ApplicationDescription application) 
 		throws NativeQueueException
@@ -319,23 +309,6 @@ public class SGEQueueConnection extends ScriptBasedQueueConnection
 		command.add("-wd");
 		command.add(getWorkingDirectory().getAbsolutePath());
 		
-		Map<String, String> environment = application.getEnvironment();
-		if (environment.size() > 0)
-		{
-			command.add("-v");
-			StringBuilder builder = new StringBuilder();
-			boolean first = true;
-			for (String key : environment.keySet())
-			{
-				if (!first)
-					builder.append(",");
-				first = false;
-				builder.append(String.format(
-					"%s=%s", key, environment.get(key)));
-			}
-			command.add(builder.toString());
-		}
-		
 		for (String additionalArgString : _additionalArguments.qsubArguments())
 			command.add(additionalArgString);
 		
@@ -343,8 +316,18 @@ public class SGEQueueConnection extends ScriptBasedQueueConnection
 		
 		ProcessBuilder builder = new ProcessBuilder(command);
 		builder.directory(getWorkingDirectory());
-		return new SGEJobToken(extractJobToken(
-			execute(builder).trim()));
+		
+		Map<Pattern, List<Matcher>> matches =
+			ParsingExecutionEngine.executeAndParse(builder, JOB_TOKEN_PATTERN);
+		List<Matcher> matchers = matches.get(JOB_TOKEN_PATTERN);
+		if (matchers == null || matchers.size() < 1)
+			throw new NativeQueueException(
+				"qsub didn't result in a job ticket number being output.");
+		if (matchers.size() > 1)
+			throw new NativeQueueException(
+				"qsub resulted in multiple job ticket numbers being output.");
+		
+		return new SGEJobToken(matchers.get(0).group(1).trim());
 	}
 
 	@Override

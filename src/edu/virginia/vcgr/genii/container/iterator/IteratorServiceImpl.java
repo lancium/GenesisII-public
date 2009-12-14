@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.container.iterator;
 
 import java.rmi.RemoteException;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -43,6 +44,9 @@ import edu.virginia.vcgr.genii.iterator.IteratorPortType;
 public class IteratorServiceImpl extends GenesisIIBase implements
 		IteratorPortType
 {
+	/* Lifetime of 1 hour */
+	static private final long ITERATOR_LIFETIME = 1000L * 60 * 60;
+	
 	@Override
 	protected void postCreate(ResourceKey key, EndpointReferenceType newEPR,
 			HashMap<QName, Object> constructionParameters, 
@@ -58,6 +62,11 @@ public class IteratorServiceImpl extends GenesisIIBase implements
 				"Unable to construct an iterator without an iterator id.");
 		String id = elem.getValue();
 		((IteratorResource)key.dereference()).setIteratorID(id);
+		
+		Calendar future = Calendar.getInstance();
+		future.setTimeInMillis(System.currentTimeMillis() +
+			ITERATOR_LIFETIME);
+		setScheduledTerminationTime(future, key);
 	}
 
 	public IteratorServiceImpl()

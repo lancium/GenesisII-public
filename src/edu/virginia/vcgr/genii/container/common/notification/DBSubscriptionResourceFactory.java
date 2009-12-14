@@ -17,6 +17,8 @@ public class DBSubscriptionResourceFactory extends BasicDBResourceFactory
 		"subscriptionid VARCHAR(128) PRIMARY KEY, sourcekey VARCHAR(128)," +
 		"topic VARCHAR(256), targetendpoint BLOB(2G)," +
 		"userdata VARCHAR (8192) FOR BIT DATA)";
+	static private final String _CREATE_SUBSCRIPTIONS_SOURCE_INDEX =
+		"CREATE INDEX subscriptionssourceidx ON subscriptions(sourcekey)";
 	
 	public DBSubscriptionResourceFactory(
 			DatabaseConnectionPool pool)
@@ -46,7 +48,8 @@ public class DBSubscriptionResourceFactory extends BasicDBResourceFactory
 		{
 			conn = _pool.acquire(false);
 			DatabaseTableUtils.createTables(conn, false, 
-				_CREATE_SUBSCRIPTIONS_TABLE);
+				_CREATE_SUBSCRIPTIONS_TABLE,
+				_CREATE_SUBSCRIPTIONS_SOURCE_INDEX);
 			conn.commit();
 		}
 		finally

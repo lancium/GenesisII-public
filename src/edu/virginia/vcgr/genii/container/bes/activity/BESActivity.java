@@ -55,9 +55,10 @@ import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
 public class BESActivity implements Closeable
 {
 	static private Log _logger = LogFactory.getLog(BESActivity.class);
-	
+
 	private DatabaseConnectionPool _connectionPool;
 	
+	private boolean _finishCaseHandled = false;
 	private BES _bes;
 	private PolicyListener _policyListener;
 	private String _activityid;
@@ -95,9 +96,13 @@ public class BESActivity implements Closeable
 		_policyListener = new PolicyListener();
 		_bes.getPolicyEnactor().addBESPolicyListener(_policyListener);
 		
-		Thread thread = new Thread(_runner, "BES Activity Runner Thread");
-		thread.setDaemon(true);
-		thread.start();
+		
+		if (!handleFinishedCase())
+		{	
+			Thread thread = new Thread(_runner, "BES Activity Runner Thread");
+			thread.setDaemon(true);
+			thread.start();
+		}
 	}
 	
 	public BESWorkingDirectory getActivityCWD()
@@ -237,16 +242,16 @@ public class BESActivity implements Closeable
 		{
 			_bes.getPolicyEnactor().removeBESPolicyListener(_policyListener);
 			_policyListener = null;
+		}
 			
-			try
-			{
-				terminate();
-			}
-			catch (Throwable ee)
-			{
-				_logger.error("Problem trying to early terminate activity.", 
-					ee);
-			}
+		try
+		{
+			terminate();
+		}
+		catch (Throwable ee)
+		{
+			_logger.error("Problem trying to early terminate activity.", 
+				ee);
 		}
 	}
 	
@@ -262,7 +267,8 @@ public class BESActivity implements Closeable
 			return;
 		
 		updateState(true, _terminateRequested);
-		_runner.requestSuspend();
+		if (_runner != null)
+			_runner.requestSuspend();
 	}
 	
 	synchronized public void terminate() throws ExecutionException,
@@ -272,7 +278,8 @@ public class BESActivity implements Closeable
 			return;
 		
 		updateState(false, true);
-		_runner.requestTerminate(false);
+		if (_runner != null)
+			_runner.requestTerminate(false);
 	}
 	
 	synchronized public void resume() throws ExecutionException,
@@ -282,13 +289,14 @@ public class BESActivity implements Closeable
 			return;
 		
 		updateState(false, _terminateRequested);
-		_runner.requestResume();
+		if (_runner != null)
+			_runner.requestResume();
 	}
 	
-	public ActivityState getState()
+	synchronized public ActivityState getState()
 	{
 		ActivityState retState = (ActivityState)_state.clone();
-		if (_runner.isSuspended())
+		if (_runner != null && _runner.isSuspended())
 			retState.suspend(true);
 		
 		return retState;
@@ -661,6 +669,118 @@ public class BESActivity implements Closeable
 		}
 	}
 	
+	private void cleanupUnnecessaryMemory()
+	{
+		// Now that we are done running, we should free up any memory that
+		// we no longer need to use.
+		
+		/* These either can't be free'd (they aren't objects), or they are
+		 * merely references to objects that are held in other places:
+			_connectionPool;
+			_suspendRequested;
+			_terminateRequested;
+			_nextPhase;
+			_bes
+		*/
+		
+		if (_policyListener != null)
+		{
+			_bes.getPolicyEnactor().removeBESPolicyListener(_policyListener);
+			_policyListener = null;
+		}
+			
+		_executionPlan.clear();
+		_executionPlan = null;
+		_runner = null;
+		_activityServiceName = null;
+		
+		/* And these we may need later:
+		 * _activityid
+		 * _state
+		 * _jobName;
+		 * _activityCWD = null;
+		 */
+	}
+	
+	final private boolean finishedExecution()
+	{
+		return _nextPhase >= _executionPlan.size();
+	}
+	
+	private boolean containsIgnoreableFault(Collection<Throwable> faults)
+	{
+		for (Throwable fault : faults)
+		{
+			if (fault instanceof IgnoreableFault)
+				return true;
+		}
+		
+		return false;
+	}
+	
+	private boolean handleFinishedCase()
+	{
+		if (finishedExecution())
+		{
+			synchronized(this)
+			{
+				if (_finishCaseHandled)
+					return true;
+				_finishCaseHandled = true;
+			}
+			
+			try
+			{
+				Collection<Throwable> faults = getFaults();
+				if (getFaults().size() > 0)
+				{
+					if (!containsIgnoreableFault(faults))
+					{
+						updateState(_executionPlan.size(),
+							new ActivityState(
+								ActivityStateEnumeration.Failed, 
+								null, false));
+					} else
+					{
+						updateState(_executionPlan.size(),
+							new ActivityState(
+								ActivityStateEnumeration.Failed,
+								"Ignoreable", false));
+					}
+				} else
+					updateState(_executionPlan.size(),
+						new ActivityState(
+							ActivityStateEnumeration.Finished, 
+							null, false));
+			}
+			catch (SQLException cause)
+			{
+				_logger.error("BES Activity Unrecoverably Faulted.", cause);
+				addFault(cause, 3);
+				try
+				{
+					updateState(_executionPlan.size(),
+						new ActivityState(ActivityStateEnumeration.Failed, 
+							null, false));
+				}
+				catch (Throwable cause2)
+				{
+					_logger.error(
+						"Unexpected exception occured in bes activity.", 
+						cause2);
+					return true;
+				}
+			}
+			finally
+			{
+				cleanupUnnecessaryMemory();
+			}
+			
+			return true;
+		} else
+			return false;
+	}
+	
 	private class ActivityRunner implements Runnable
 	{
 		private boolean _terminateRequested = false;
@@ -676,11 +796,6 @@ public class BESActivity implements Closeable
 		{
 			_terminateRequested = terminateRequested;
 			_suspendRequested = suspendRequested;
-		}
-		
-		final private boolean finishedExecution()
-		{
-			return _nextPhase >= _executionPlan.size();
 		}
 		
 		final public boolean isSuspended()
@@ -756,17 +871,6 @@ public class BESActivity implements Closeable
 			}
 		}
 		
-		private boolean containsIgnoreableFault(Collection<Throwable> faults)
-		{
-			for (Throwable fault : faults)
-			{
-				if (fault instanceof IgnoreableFault)
-					return true;
-			}
-			
-			return false;
-		}
-		
 		public void run()
 		{
 			while (true)
@@ -775,31 +879,8 @@ public class BESActivity implements Closeable
 				{
 					synchronized(_phaseLock)
 					{
-						if (finishedExecution())
-						{
-							Collection<Throwable> faults = getFaults();
-							if (getFaults().size() > 0)
-							{
-								if (!containsIgnoreableFault(faults))
-								{
-									updateState(_executionPlan.size(),
-										new ActivityState(
-											ActivityStateEnumeration.Failed, 
-											null, false));
-								} else
-								{
-									updateState(_executionPlan.size(),
-										new ActivityState(
-											ActivityStateEnumeration.Failed,
-											"Ignoreable", false));
-								}
-							} else
-								updateState(_executionPlan.size(),
-									new ActivityState(
-										ActivityStateEnumeration.Finished, 
-										null, false));
+						if (handleFinishedCase())
 							break;
-						}
 					
 						if (_terminateRequested)
 						{

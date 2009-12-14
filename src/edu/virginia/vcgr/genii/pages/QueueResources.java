@@ -24,7 +24,7 @@ import edu.virginia.vcgr.genii.container.q2.summary.SlotSummary;
 public class QueueResources extends ImageSourceDynamicPage
 	implements DynamicPage
 {
-	static final int WIDTH = 600;
+	static final int WIDTH = 800;
 	static final int HEIGHT = 400;
 	
 	@InjectParameter("queueID")

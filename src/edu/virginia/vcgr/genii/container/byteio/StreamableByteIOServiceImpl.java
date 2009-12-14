@@ -55,6 +55,9 @@ import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 public class StreamableByteIOServiceImpl extends GenesisIIBase implements
 		StreamableByteIOPortType
 {
+	/* One Hour Lifetime */
+	static private final long SBYTEIO_LIFETIME = 1000L * 60 * 60;
+	
 	static private Log _logger = LogFactory.getLog(RandomByteIOServiceImpl.class);
 	
 	protected Object translateConstructionParameter(MessageElement property)
@@ -156,6 +159,10 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements
 				key.dereference().commit();
 			}
 		}
+		
+		Calendar future = Calendar.getInstance();
+		future.setTimeInMillis(System.currentTimeMillis() + SBYTEIO_LIFETIME);
+		setScheduledTerminationTime(future, rKey);
 	}
 	
 	public StreamableByteIOServiceImpl() throws RemoteException

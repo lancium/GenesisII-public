@@ -48,6 +48,25 @@ import edu.virginia.vcgr.genii.container.security.authz.providers.*;
 
 public class ResourceManager
 {
+	static public ResourceKey getTargetResource(
+		String serviceName, String resourceKey)
+			throws ResourceException, ResourceUnknownFaultType
+	{
+		try
+		{
+			WorkingContext ctxt = WorkingContext.getCurrentWorkingContext();
+			ResourceKey rKey =
+				new ResourceKey(serviceName, new AddressingParameters(
+					resourceKey, null, null));
+			ctxt.setProperty(new GUID().toString(), rKey);
+			return rKey;
+		}
+		catch (AxisFault af)
+		{
+			throw new ResourceException(af.getLocalizedMessage(), af);
+		}
+	}
+	
 	static public ResourceKey getTargetResource(EndpointReferenceType epr)
 			throws ResourceException, ResourceUnknownFaultType
 	{

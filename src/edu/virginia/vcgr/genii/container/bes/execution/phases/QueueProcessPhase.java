@@ -179,7 +179,14 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 	static private ExitCondition interpretExitCode(int exitCode)
 	{
 		if (exitCode > 128)
+		{
+			int index = exitCode - 128 - 1;
+			if (index < 0 || index >= Signals.values().length)
+				return new NormalExit(exitCode);
+			
 			return new SignaledExit(Signals.values()[exitCode - 128 - 1]);
+		}
+		
 		return new NormalExit(exitCode);
 	}
 	

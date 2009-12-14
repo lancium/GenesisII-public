@@ -428,6 +428,7 @@ public class BES implements Closeable
 					"nextphase, activityservicename, jobname " +
 				"FROM besactivitiestable WHERE besid = ?");
 			
+			int count = 0;
 			queryStmt.setString(1, _besid);
 			rs = queryStmt.executeQuery();
 			while (rs.next())
@@ -457,7 +458,9 @@ public class BES implements Closeable
 				int nextPhase = rs.getInt(7);
 				String activityServiceName = rs.getString(8);
 				String jobName = rs.getString(9);
-								
+						
+				_logger.info(String.format("Starting activity %d\n", count++));
+				
 				BESActivity activity = new BESActivity(_connectionPool,
 					this, activityid, state, activityCWD, executionPlan, 
 					nextPhase, activityServiceName, jobName, suspendRequested, 

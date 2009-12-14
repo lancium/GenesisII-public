@@ -200,7 +200,7 @@ public class BESManager implements Closeable
 	 * @throws ConfigurationException
 	 * @throws GenesisIISecurityException
 	 */
-	synchronized public void addNewBES(Connection connection, String name,
+	public void addNewBES(Connection connection, String name,
 			EndpointReferenceType epr)
 		throws SQLException, ResourceException,
 			GenesisIISecurityException
@@ -217,13 +217,16 @@ public class BESManager implements Closeable
 		/* We've committed to the DB, if we fail now, it'll get loaded into 
 		 * memory when we restart. */
 		
-		/* Go ahead and put the "in-memory" information into the 
-		 * correct lists. */
-		BESData data = new BESData(id, name, 1);
-		_containersByID.put(new Long(id), data);
-		_containersByName.put(name, data);
-		_updateInformation.put(new Long(id), updateInfo = new BESUpdateInformation(
-			id, _BES_UPDATE_CYCLE, _MISS_CAP));
+		synchronized(this)
+		{
+			/* Go ahead and put the "in-memory" information into the 
+			 * correct lists. */
+			BESData data = new BESData(id, name, 1);
+			_containersByID.put(new Long(id), data);
+			_containersByName.put(name, data);
+			_updateInformation.put(new Long(id), updateInfo = new BESUpdateInformation(
+				id, _BES_UPDATE_CYCLE, _MISS_CAP));
+		}
 		
 		/* Finally, go ahead and kick off an update of this information.  By 
 		 * doing this early, we could potentially get a near simultaneous 
@@ -530,7 +533,7 @@ public class BESManager implements Closeable
 	 * @throws ConfigurationException
 	 * @throws GenesisIISecurityException
 	 */
-	synchronized public void updateResources(Connection connection)
+	public void updateResources(Connection connection)
 		throws SQLException, ResourceException,
 			GenesisIISecurityException
 	{
@@ -543,15 +546,18 @@ public class BESManager implements Closeable
 		/* Get the current timestamp */
 		Date now = new Date();
 		
-		/* Loop through all containers (their update information 
-		 * structures actually) */
-		for (BESUpdateInformation updateInfo : _updateInformation.values())
+		synchronized(this)
 		{
-			/* If this container is ready for an update, go ahead and add it
-			 * to the "to-update" list.
-			 */
-			if (updateInfo.timeForUpdate(now))
-				resourcesToUpdate.add(updateInfo);
+			/* Loop through all containers (their update information 
+			 * structures actually) */
+			for (BESUpdateInformation updateInfo : _updateInformation.values())
+			{
+				/* If this container is ready for an update, go ahead and add it
+				 * to the "to-update" list.
+				 */
+				if (updateInfo.timeForUpdate(now))
+					resourcesToUpdate.add(updateInfo);
+			}
 		}
 		
 		/* Now, call update on all of the resources ready for an update */

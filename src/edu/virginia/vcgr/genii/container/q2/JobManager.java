@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.Vector;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.Token;
@@ -215,6 +216,11 @@ public class JobManager implements Closeable
 						job.getSubmitTime()), job);
 				} else if (jobState.equals(QueueStates.RUNNING) || job.getBESID() != null)
 				{
+					if (!jobState.equals(QueueStates.RUNNING))
+					{
+						_logger.debug("Found a job not marked as running in the database, but with a bes id.");
+						job.setJobState(QueueStates.RUNNING);
+					}
 					/* Otherwise, if the job was listed as running, we need to put
 					 * it into the running list.
 					 */
@@ -237,12 +243,10 @@ public class JobManager implements Closeable
 		/* Finally, we have to actually fail all of the jobs that were marked as
 		 * starting.
 		 */
-		_logger.debug("Failing all jobs that were marked as starting when the " +
-			"container went down.");
+		_logger.debug(String.format("Failing %d jobs that were marked as starting when the " +
+			"container went down.", starting.size()));
 		for (JobData job : starting)
-		{
 			failJob(connection, job.getJobID(), false, false, true);
-		}
 	}
 	
 	/**
@@ -273,6 +277,13 @@ public class JobManager implements Closeable
 		}
 		
 		logTargets = job.gridLogTargets();
+		_logger.debug(String.format(
+			"Failing job(%s, %s, %s)",
+			countAsAnAttempt ? "This failure counts against the job" :
+				"This failure does NOT count against the job",
+			isPermanent ? "Failure is permanent" : "Failure is NOT permanent",
+			attemptKill ? "Attempting to kill the job" :
+				"NOT attempting to kill the job"));
 		_jobLogger.log(logTargets, String.format(
 			"Failing job(%s, %s, %s)",
 			countAsAnAttempt ? "This failure counts against the job" :
@@ -310,6 +321,9 @@ public class JobManager implements Closeable
 			ret = true;
 		}
 		
+		_logger.debug(String.format("Job %s's new states is %s",
+			job.getJobTicket(), newState));
+		
 		// This is one of the few times we are going to break our pattern and
 		// modify the in memory state before the database.  The reason for this
 		// is that we can't afford to forget that the BES container has a job
@@ -334,8 +348,7 @@ public class JobManager implements Closeable
 		 * (if that's where he's destined for) when the database has been 
 		 * updated and the outcall has been made).
 		 */
-		if (attemptKill)
-			_outcallThreadPool.enqueue(new JobKiller(job, newState, false));
+		_outcallThreadPool.enqueue(new JobKiller(job, newState, false, attemptKill, null));
 		return ret;
 	}
 	
@@ -396,7 +409,7 @@ public class JobManager implements Closeable
 		/* See failJob for a complete discussion of why we enqueue an outcall
 		 * worker at this point -- the reasons are the same.
 		 */
-		_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED, false));
+		_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED, false, true, null));
 	}
 	
 	synchronized public void killJob(Connection connection, long jobID)
@@ -422,9 +435,13 @@ public class JobManager implements Closeable
 		_runningJobs.remove(new Long(jobID));
 		job.incrementRunAttempts();
 		
+		Long besID = job.getBESID();
+		/* This shouldn't be necessary */
+		/*
 		_database.modifyJobState(connection, job.getJobID(),
 			job.getRunAttempts(), QueueStates.FINISHED, new Date(), null, null, null);
 		connection.commit();
+		*/
 		
 		/* Finally, note the new state in memory and clear the 
 		 * old BES information. */
@@ -436,7 +453,7 @@ public class JobManager implements Closeable
 		_logger.debug("Moving job \"" + job.getJobTicket()
 			+ "\" to the " + QueueStates.FINISHED + " state.");
 	
-		_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED, true));
+		_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED, true, true, besID));
 		
 		_schedulingEvent.notifySchedulingEvent();
 	}
@@ -474,9 +491,16 @@ public class JobManager implements Closeable
 			 */
 			ICallingContext callingContext = ContextManager.getCurrentContext(false);
 			
+			Collection<GridLogTarget> gridLogTargets = null;
 			bundle = GridLogServiceUtils.createLog();
-			GridLogUtils.addTarget(callingContext, bundle.target());
-			Collection<GridLogTarget> gridLogTargets = GridLogUtils.getTargets(callingContext);
+			if (bundle != null)
+			{
+				GridLogUtils.addTarget(callingContext, bundle.target());
+				gridLogTargets = GridLogUtils.getTargets(callingContext);
+			}
+			
+			if (gridLogTargets == null)
+				gridLogTargets = new Vector<GridLogTarget>();
 			
 			/* Similarly, get the current caller's security identity so that 
 			 * we can store that.  This is used to protect different users 
@@ -1805,15 +1829,19 @@ public class JobManager implements Closeable
 	private class JobKiller implements OutcallHandler
 	{
 		private boolean _outcallOnly;
+		private boolean _attemptKill;
 		private JobData _jobData;
 		private QueueStates _newState;
+		private Long _besID;
 		
 		public JobKiller(JobData jobData, QueueStates newState,
-			boolean outcallOnly)
+			boolean outcallOnly, boolean attemptKill, Long besID)
 		{
 			_outcallOnly = outcallOnly;
 			_jobData = jobData;
 			_newState = newState;
+			_attemptKill = attemptKill;
+			_besID = besID;
 		}
 		
 		public boolean equals(JobKiller other)
@@ -1856,7 +1884,7 @@ public class JobManager implements Closeable
 			 * terminate the activity at the BES container.
 			 */
 			KillInformation killInfo = _database.getKillInfo(
-				connection, _jobData.getJobID());
+				connection, _jobData.getJobID(), _besID);
 			connection.commit();
 				
 			String oldAction = _jobData.setJobAction("Terminating");
@@ -1871,9 +1899,13 @@ public class JobManager implements Closeable
 			{
 				ICallingContext ctxt = killInfo.getCallingContext();
 				
-				PersistentOutcallJobKiller.killJob(
-					killInfo.getBESEndpoint(), killInfo.getJobEndpoint(),
-					killInfo.getCallingContext());
+				if (_attemptKill)
+				{
+					PersistentOutcallJobKiller.killJob(
+						killInfo.getBESEndpoint(), killInfo.getJobEndpoint(),
+						killInfo.getCallingContext());
+				}
+
 				return ctxt;
 			}
 			catch (Throwable cause)
@@ -1905,6 +1937,12 @@ public class JobManager implements Closeable
 				if (_outcallOnly)
 				{
 					terminateActivity(connection, logTargets);
+					
+					/* Ask the database to update the job state */
+					_database.modifyJobState(connection, _jobData.getJobID(),
+						_jobData.getRunAttempts(), _newState, new Date(), null, null, null);
+					connection.commit();
+					
 					return;
 				}
 				
@@ -1931,9 +1969,13 @@ public class JobManager implements Closeable
 				if (_newState.equals(QueueStates.REQUEUED))
 				{
 					event = JobEvent.jobRequeued(ctxt, jobid);
-					pt.post(event);
+					if (pt != null)
+						pt.post(event);
 					_logger.debug("Re-queing job " + _jobData.getJobTicket());
-					_queuedJobs.put(new SortableJobKey(_jobData), _jobData);
+					synchronized (JobManager.this)
+					{
+						_queuedJobs.put(new SortableJobKey(_jobData), _jobData);
+					}
 				} else
 				{
 					/* Otherwise, we assume that he's already in 

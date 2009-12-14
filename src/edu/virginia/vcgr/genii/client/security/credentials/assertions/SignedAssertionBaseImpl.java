@@ -59,6 +59,9 @@ public abstract class SignedAssertionBaseImpl implements SignedAssertion,
 
 	public boolean equals(Object o)
 	{
+		if (!(o instanceof SignedAssertionBaseImpl))
+			return false;
+		
 		SignedAssertionBaseImpl other = (SignedAssertionBaseImpl) o;
 		// force encoded values to represent signed assertion
 		try

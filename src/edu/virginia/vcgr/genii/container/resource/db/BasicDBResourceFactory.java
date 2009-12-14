@@ -37,10 +37,6 @@ public class BasicDBResourceFactory implements IResourceFactory
 			"epi VARCHAR(512) NOT NULL, " +
 			"humanname VARCHAR(512), " +
 			"epr BLOB(2G))";
-	static private final String _CREATE_RESOURCES_IMPL_CLASS_INDEX =
-		"CREATE INDEX resources2implclassindex ON resources2(implementingclass)";
-	static private final String _CREATE_RESOURCES_EPI_INDEX =
-		"CREATE INDEX resources2epiindex ON resources2(epi)";
 	
 	protected DatabaseConnectionPool _pool;
 	
@@ -74,9 +70,7 @@ public class BasicDBResourceFactory implements IResourceFactory
 				_CREATE_KEY_TABLE_STMT,
 				_CREATE_PROPERTY_TABLE_STMT,
 				_CREATE_MATCHING_PARAMS_STMT,
-				_CREATE_RESOURCES_TABLE_STMT,
-				_CREATE_RESOURCES_IMPL_CLASS_INDEX,
-				_CREATE_RESOURCES_EPI_INDEX);
+				_CREATE_RESOURCES_TABLE_STMT);
 			
 			try
 			{

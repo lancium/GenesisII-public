@@ -20,7 +20,6 @@ import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
@@ -47,8 +46,6 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
 import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
-import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
-import edu.virginia.vcgr.genii.container.bes.activity.NoSuchActivityFault;
 import edu.virginia.vcgr.genii.container.bes.resource.IBESResource;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
@@ -57,6 +54,7 @@ import edu.virginia.vcgr.genii.container.sysinfo.SystemInfoUtils;
 public class BESAttributesHandler extends AbstractAttributeHandler
 	implements BESConstants
 {
+	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(BESAttributesHandler.class);
 	
 	static private final String _DESCRIPTION_PROPERTY = "attribute:description";
@@ -106,6 +104,8 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		throws ResourceUnknownFaultType, ResourceException, 
 			RemoteException, SQLException
 	{
+		/* THIS IS TOO HUGE!!! */
+		/*
 		IBESResource resource = null;
 	
 		resource = (IBESResource)ResourceManager.getCurrentResource().dereference();
@@ -127,6 +127,9 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		}
 		
 		return eprs.toArray(new EndpointReferenceType[0]);
+		*/
+		
+		return new EndpointReferenceType[0];
 	}
 	
 	static public String getDescription()

@@ -61,6 +61,7 @@ public class QueueDBResourceFactory extends BasicDBResourceFactory
 			"jobid BIGINT NOT NULL, " +
 			"queueid VARCHAR(256) NOT NULL, " +
 			"target BLOB(2G) NOT NULL)",
+		"CREATE INDEX q2joberrorsjobididx ON q2errors(jobid)",
 		"CREATE INDEX q2joblogtargetsjobididx ON q2joblogtargets(jobid)",
 		"CREATE TABLE q2jobpings (" +
 			"jobid BIGINT PRIMARY KEY," +

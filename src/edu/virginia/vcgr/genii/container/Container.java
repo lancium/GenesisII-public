@@ -57,6 +57,8 @@ import edu.virginia.vcgr.genii.client.configuration.SecurityConstants;
 import edu.virginia.vcgr.genii.client.container.ContainerIDFile;
 import edu.virginia.vcgr.genii.client.comm.jetty.TrustAllSslSocketConnector;
 import edu.virginia.vcgr.genii.client.install.InstallationState;
+import edu.virginia.vcgr.genii.client.mem.LowMemoryExitHandler;
+import edu.virginia.vcgr.genii.client.mem.LowMemoryWarning;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
@@ -108,6 +110,9 @@ public class Container extends ApplicationBase
 			System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, args[0]);
 		
 		prepareServerApplication();
+		
+		LowMemoryWarning.INSTANCE.addLowMemoryListener(
+			new LowMemoryExitHandler(7));
 		
 		_logger.info(String.format(
 			"Deployment name is %s.\n", new DeploymentName()));

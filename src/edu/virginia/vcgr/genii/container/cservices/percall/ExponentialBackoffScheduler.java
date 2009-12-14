@@ -61,15 +61,14 @@ public class ExponentialBackoffScheduler implements AttemptScheduler
 		
 		_lifetime = Calendar.getInstance();
 		_lifetime.setTimeInMillis(System.currentTimeMillis() +
-			lifetimeUnits.convert(lifetime, TimeUnit.MILLISECONDS));
+			TimeUnit.MILLISECONDS.convert(lifetime, lifetimeUnits));
 		
 		_exponentAttemptCap = exponentAttemptCap;
 		_maxFailedAttempts = maxFailedAttempts;
-		_backoffBase = backoffBaseUnits.convert(backoffBase,
-			TimeUnit.MILLISECONDS);
+		_backoffBase = TimeUnit.MILLISECONDS.convert(
+			backoffBase, backoffBaseUnits);
 		_backoffTwitterBase = (backoffTwitterBase == null) ? null :
-			backoffTwitterBaseUnits.convert(backoffTwitterBase,
-				TimeUnit.MILLISECONDS);
+			TimeUnit.MILLISECONDS.convert(backoffTwitterBase, backoffTwitterBaseUnits);
 	}
 	
 	@Override
