@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.LinkedList;
@@ -20,6 +21,7 @@ import edu.virginia.vcgr.genii.client.locking.GReadWriteLock;
 import edu.virginia.vcgr.genii.client.locking.UnfairReadWriteLock;
 import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
 import edu.virginia.vcgr.genii.client.stats.DBConnectionDataPoint;
+import edu.virginia.vcgr.genii.client.stats.DatabaseHistogramStatistics;
 import edu.virginia.vcgr.genii.container.Container;
 
 public class DatabaseConnectionPool
@@ -114,35 +116,52 @@ public class DatabaseConnectionPool
 	
 	private Connection acquire() throws SQLException
 	{
+		SQLException lastException = null;
 		Connection connection = null;
 		_logger.debug("Acquiring DB connection[" + _connPool.size() + "]");
 		boolean succeeded = false;
 		
-		try
+		for (int lcv = 0; lcv < 5; lcv++)
 		{
-			_lock.readLock().lock();
-			synchronized(_connPool)
+			try
 			{
-				if (!_connPool.isEmpty())
+				_lock.readLock().lock();
+				synchronized(_connPool)
 				{
-					connection = _connPool.removeFirst();
+					if (!_connPool.isEmpty())
+					{
+						connection = _connPool.removeFirst();
+					}
 				}
-			}
+					
+				if (connection == null)
+					connection = createConnection();
 				
-			if (connection == null)
-				connection = createConnection();
+				((ConnectionInterceptor)Proxy.getInvocationHandler(
+					connection)).setAcquired();
+				
+				succeeded = true;
+				return connection;
+			}
+			catch (SQLException sqe)
+			{
+				_logger.error(String.format(
+					"Unable to acquire/create connection to database on attempt %d.", lcv),
+					sqe);
+				lastException = sqe;
+			}
+			finally
+			{
+				if (!succeeded)
+					_lock.readLock().unlock();
+			}
 			
-			((ConnectionInterceptor)Proxy.getInvocationHandler(
-				connection)).setAcquired();
-			
-			succeeded = true;
-			return connection;
+			try { Thread.sleep(1000L); } catch (Throwable cause) {}
 		}
-		finally
-		{
-			if (!succeeded)
-				_lock.readLock().unlock();
-		}
+		
+		_logger.error("Unable to acquire/create connections in 5 attempts.  Giving up.",
+			lastException);
+		throw lastException;
 	}
 	
 	public Connection acquire(boolean useAutoCommit) throws SQLException
@@ -221,6 +240,11 @@ public class DatabaseConnectionPool
 	
 	private void rejuvenate()
 	{
+		boolean skipRejuvenate = false;
+		
+		if (skipRejuvenate)
+			return;
+		
 		_logger.info("Rejuvenating database.");
 		Connection connection = null;
 		
@@ -267,6 +291,17 @@ public class DatabaseConnectionPool
 			{
 				StreamUtils.close(connection);
 				connection = null;
+			}
+			
+			try
+			{
+				Driver oldDriver = DriverManager.getDriver("jdbc:derby:");
+				if (oldDriver != null)
+					DriverManager.deregisterDriver(oldDriver);
+			}
+			catch (Throwable cause)
+			{
+				_logger.debug("Unable to deregister db driver.", cause);
 			}
 			
 			/* There's no way in our system to "guarantee" that all references
@@ -344,6 +379,7 @@ public class DatabaseConnectionPool
 		
 		private DBConnectionDataPoint _stat = null;
 		private Object _instance;
+		private DatabaseHistogramStatistics _histo = null;
 		
 		public ConnectionInterceptor(Object instance)
 		{
@@ -359,13 +395,20 @@ public class DatabaseConnectionPool
 		{
 			_stat = ContainerStatistics.instance(
 				).getDatabaseStatistics().openConnection();
+			_histo = ContainerStatistics.instance().getDatabaseHistogramStatistics();
+			_histo.addActiveConnection();
 		}
 		
 		public void setReleased()
 		{
 			if (_stat != null)
+			{
 				_stat.markClosed();
+				_histo.removeActiveConncetion();
+			}
+			
 			_stat = null;
+			_histo = null;
 		}
 		
 		public Object invoke(Object proxy, Method method, Object[] args)

@@ -50,6 +50,34 @@ class DefaultMatchingParameter extends MatchingParameter
 	}
 	
 	@Override
+	public int hashCode()
+	{
+		int ret = 0x0;
+		
+		if (_property != null)
+			ret ^= _property.hashCode();
+		
+		if (_value != null)
+			ret ^= _value.hashCode();
+		
+		return ret;
+	}
+	
+	public boolean equals(DefaultMatchingParameter other)
+	{
+		return toString().equals(other.toString());
+	}
+	
+	@Override
+	public boolean equals(Object other)
+	{
+		if (other instanceof DefaultMatchingParameter)
+			return equals((DefaultMatchingParameter)other);
+		
+		return false;
+	}
+	
+	@Override
 	public String toString()
 	{
 		return String.format("%s = %s", _property, _value);

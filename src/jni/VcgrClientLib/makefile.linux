@@ -1,6 +1,6 @@
 CC		=		gcc
 CFLAGS	=		-Wall -I$(JAVA_HOME)/include								\
-	-I$(JAVA_HOME)/include/linux -fpic
+	-I$(JAVA_HOME)/include/linux -fpic -m32
 LFLAGS	=
 
 OBJDIR	=		Release

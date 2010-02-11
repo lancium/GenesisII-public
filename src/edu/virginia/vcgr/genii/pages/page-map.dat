@@ -5,3 +5,5 @@ bes-info.html=[class]BESInformation
 queue-info.html=[class]QueueInformation
 
 queue-resources.png=[class]QueueResources
+database-histogram.png=[class]DatabaseHistogram
+method-histogram.png=[class]MethodHistogram

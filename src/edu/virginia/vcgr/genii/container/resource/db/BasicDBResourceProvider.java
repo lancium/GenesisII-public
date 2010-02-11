@@ -5,13 +5,14 @@ import java.util.Properties;
 
 import org.morgan.util.configuration.ConfigurationException;
 
+import edu.virginia.vcgr.genii.client.configuration.Initializable;
 import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResourceFactory;
 import edu.virginia.vcgr.genii.container.resource.IResourceProvider;
 
-public class BasicDBResourceProvider implements IResourceProvider
+public class BasicDBResourceProvider implements IResourceProvider, Initializable
 {
 	static private final String _CONNECTION_POOL_NAME = 
 		"edu.virginia.vcgr.genii.db.connection-pool";
@@ -67,5 +68,11 @@ public class BasicDBResourceProvider implements IResourceProvider
 		throws SQLException, ResourceException
 	{
 		return new BasicDBResourceFactory(pool);
+	}
+
+	@Override
+	public void initialize() throws Throwable
+	{
+		getFactory();
 	}
 }

@@ -31,6 +31,8 @@ import org.apache.axis.MessageContext;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPHeaderElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.GUID;
 import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.ReferenceParametersType;
@@ -54,6 +56,9 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 public class AxisClientHeaderHandler extends BasicHandler
 {
 	static final long serialVersionUID = 0L;
+	
+	static private Log _logger = LogFactory.getLog(
+		AxisClientHeaderHandler.class);
 	
 	private void setGenesisIIHeaders(MessageContext msgContext)
 		throws AxisFault
@@ -262,6 +267,19 @@ public class AxisClientHeaderHandler extends BasicHandler
 				callContext, 
 				msgContext.getOperation().getMethod(), 
 				msgSecData);
+		
+		try
+		{
+			if (_logger.isDebugEnabled())
+			{
+				_logger.debug(String.format("Calling Context:\n%s",
+					callContext.describe()));
+			}
+		}
+		catch (Throwable cause)
+		{
+			_logger.warn("Unable to log calling context information.", cause);
+		}
 		
 		try
 		{

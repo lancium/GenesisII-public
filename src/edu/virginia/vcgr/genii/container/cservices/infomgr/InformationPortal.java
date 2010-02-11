@@ -142,6 +142,17 @@ public class InformationPortal<InformationType> implements Closeable
 			_defaultCacheWindow);
 	}
 	
+	public void getInformation(InformationEndpoint endpoint,
+		InformationListener<InformationType> listener, boolean force)
+	{
+		if (!force)
+			getInformation(endpoint, listener, _defaultTimeout,
+				_defaultCacheWindow);
+		else
+			getInformation(endpoint, listener, _defaultTimeout,
+				new Duration(1));
+	}
+	
 	public InformationResult<InformationType> getInformation(
 		InformationEndpoint endpoint,
 		Duration timeout, Duration cacheWindow) throws InterruptedException

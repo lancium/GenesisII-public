@@ -8,8 +8,11 @@ import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.TrustManager;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mortbay.jetty.security.Password;
 import org.mortbay.jetty.security.SslSocketConnector;
 import org.mortbay.resource.Resource;
@@ -28,6 +31,7 @@ import edu.virginia.vcgr.genii.client.security.x509.TrustAllX509TrustManager;
  */
 public class TrustAllSslSocketConnector extends SslSocketConnector {
 
+	static private Log _logger = LogFactory.getLog(TrustAllSslSocketConnector.class);
 	
     private Password _password;
 	private Password _keyPassword;
@@ -81,8 +85,33 @@ public class TrustAllSslSocketConnector extends SslSocketConnector {
         SecureRandom secureRandom = getSecureRandomAlgorithm()==null?null:SecureRandom.getInstance(getSecureRandomAlgorithm());
 
         SSLContext context = getProvider()==null?SSLContext.getInstance(getProtocol()):SSLContext.getInstance(getProtocol(), getProvider());
-
-        context.init(keyManagers, trustManagers, secureRandom);
+        SSLContext sslcontext = context;
+        
+        SSLSessionContext sessionContext = sslcontext.getServerSessionContext();
+		if (sessionContext == null)
+			_logger.debug("Couldn't get a session context on which to set the cache size.");
+		else
+		{
+			if (sessionContext.getSessionCacheSize() > 1000)
+			{
+				_logger.debug("Setting server ssl session context cache size to 1000.");
+				sessionContext.setSessionCacheSize(1000);
+			}
+		}
+		
+		context.init(keyManagers, trustManagers, secureRandom);
+		
+		sessionContext = sslcontext.getServerSessionContext();
+		if (sessionContext == null)
+			_logger.debug("Couldn't get a session context on which to set the cache size.");
+		else
+		{
+			if (sessionContext.getSessionCacheSize() > 1000)
+			{
+				_logger.debug("Setting server ssl session context cache size to 1000.");
+				sessionContext.setSessionCacheSize(1000);
+			}
+		}
 
         return context.getServerSocketFactory();
     }	

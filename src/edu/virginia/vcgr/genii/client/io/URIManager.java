@@ -69,11 +69,15 @@ public class URIManager
 			}
 		}
 		
-		_connectionSemaphore = new Semaphore(Integer.parseInt(
+		int count = Integer.parseInt(
 			Installation.getDeployment(
-				new DeploymentName()).uriManagerProperties().getProperty(
-					MAXIMUM_SIMULTANEOUS_CONNECTIONS_PROPERTY,
-					DEFAULT_MAXIMUM_SIMULTANEOUS_CONNECTIONS)), true);
+					new DeploymentName()).uriManagerProperties().getProperty(
+						MAXIMUM_SIMULTANEOUS_CONNECTIONS_PROPERTY,
+						DEFAULT_MAXIMUM_SIMULTANEOUS_CONNECTIONS));
+		_logger.info(String.format(
+			"UIManager configured to allow up to %d simultaneous connections.",
+			count));
+		_connectionSemaphore = new Semaphore(count, true);
 	}
 	
 	static public String[] getHandledProtocols()

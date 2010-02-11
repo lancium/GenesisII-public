@@ -171,9 +171,7 @@ public class QueueTableModel extends AbstractTableModel
 				TimeZone tz = TimeZone.getDefault();
 				Calendar submitTime = info.getSubmitTime();
 				submitTime.setTimeZone(tz);
-				
-				return String.format("%1$tH:%1$tM %1$tZ %1$td %1$tb %1$tY",
-					submitTime);
+				return submitTime;
 				
 			case 2 :
 				StringBuilder builder = new StringBuilder();

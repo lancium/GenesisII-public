@@ -6,6 +6,7 @@ import java.rmi.RemoteException;
 import java.util.LinkedList;
 
 import org.ggf.rbyteio.RandomByteIOPortType;
+import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransfererFactory;
@@ -16,6 +17,7 @@ import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.common.GeniiCommon;
 
 public class ByteIOPerformanceTool extends BaseGridTool
 {
@@ -150,6 +152,15 @@ public class ByteIOPerformanceTool extends BaseGridTool
 	protected int runCommand() throws Throwable
 	{
 		RNSPath source = RNSPath.getCurrent().lookup(getArgument(0));
+		
+		boolean testRPC = true;
+		
+		if (testRPC)
+		{
+			RPCTest(source.getEndpoint());
+			return 0;
+		}
+		
 		int blockSize = Integer.parseInt(getArgument(1));
 		int numThreads = Integer.parseInt(getArgument(2));
 		long startTime;
@@ -182,5 +193,21 @@ public class ByteIOPerformanceTool extends BaseGridTool
 	{
 		if (numArguments() != 3)
 			throw new InvalidToolUsageException();
+	}
+	
+	private boolean RPCTest(EndpointReferenceType target) 
+		throws RemoteException
+	{
+		stdout.println("Running 100 RPCs.");
+		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, target);
+		long start = System.currentTimeMillis();
+		for (int lcv = 0; lcv < 100; lcv++)
+			common.ping("Hello, World!");
+		long stop = System.currentTimeMillis();
+		
+		stdout.format("It took %d ms to run them.  That's %.2f ms/rpc.\n",
+			(stop - start), (stop - start) / 100.0);
+		
+		return true;
 	}
 }

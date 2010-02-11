@@ -1,6 +1,5 @@
 CC		=		gcc
 JNI_HEADERS=/System/Library/Frameworks/JavaVM.framework/Headers
-INSTALL_PATH=/Users/morgan/Documents/workspace/Genii-2.0
 CFLAGS	=		-Wall -I$(JNI_HEADERS) -fPIC -m64
 LFLAGS	=
 
@@ -11,7 +10,7 @@ OBJECTS	=		$(OBJDIR)/ExceptionUtils.o									\
 				$(OBJDIR)/FileSystemUtils.o								\
 				$(OBJDIR)/GetPassword.o
 
-LIBRARIES	=	$(LIBDIR)/libVcgrClientLib.so
+LIBRARIES	=	$(LIBDIR)/libVcgrClientLib.jnilib
 
 ##########################################################################
 
@@ -34,5 +33,5 @@ $(OBJDIR)/FileSystemUtils.o:	FileSystemUtils.jh FileSystemUtils.c		\
 
 ##########################################################################
 
-$(LIBDIR)/libVcgrClientLib.so:	$(OBJECTS)
-	$(CC) $(CFLAGS) -dynamiclib $(OBJECTS) -o $(LIBDIR)/libVcgrClientLib.so -framework JavaVM
+$(LIBDIR)/libVcgrClientLib.jnilib:	$(OBJECTS)
+	$(CC) $(CFLAGS) -dynamiclib $(OBJECTS) -o $(LIBDIR)/libVcgrClientLib.jnilib -framework JavaVM

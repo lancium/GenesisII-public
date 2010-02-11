@@ -39,6 +39,9 @@ public class DatabaseStatisticsReport implements Serializable
 	
 	public long averageDuration()
 	{
+		if (_numClosed == 0)
+			return -1L;
+		
 		return _totalDuration / _numClosed;
 	}
 }

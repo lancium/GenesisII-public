@@ -992,7 +992,6 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 	}	
 	
 /* Streamable ByteIO Factory Operations */
-	@SuppressWarnings("unchecked")
 	@Override
 	@RWXMapping(RWXCategory.OPEN)
 	public OpenStreamResponse openStream(Object arg0) throws RemoteException,
@@ -1016,7 +1015,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 					true : configuration.notifyOnDestroy();
 			
 			if (configuration == null && 
-				(fork instanceof SimpleStateResourceFork))
+				(fork instanceof SimpleStateResourceFork<?>))
 			{
 				StateDescription description =
 					fork.getClass().getAnnotation(StateDescription.class);

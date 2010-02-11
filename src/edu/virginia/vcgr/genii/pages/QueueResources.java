@@ -57,7 +57,7 @@ public class QueueResources extends ImageSourceDynamicPage
 			JFreeChart chart = ChartFactory.createStackedBarChart3D(
 				"XCG Current Load", "Machine Type", "Job Slots", dataset,
 				PlotOrientation.VERTICAL, true, true, true);
-			return chart.createBufferedImage(WIDTH, HEIGHT);
+			return chart.createBufferedImage(width(), height());
 		}
 		catch (SQLException sqe)
 		{

@@ -78,6 +78,18 @@ public class QueueManagerDialog extends JFrame
 		}
 	}
 	
+	static private class TimestampRenderer extends DefaultTableCellRenderer
+	{
+		private static final long serialVersionUID = 0L;
+
+		@Override
+		protected void setValue(Object value)
+		{
+			super.setValue(String.format("%1$tH:%1$tM %1$tZ %1$td %1$tb %1$tY",
+				value));
+		}
+	}
+	
 	private class QueueManipulatorWorker implements Runnable
 	{
 		private Collection<JobTicket> _tickets;
@@ -138,6 +150,8 @@ public class QueueManagerDialog extends JFrame
 		_table.setAutoCreateRowSorter(true);
 		_table.getColumnModel().getColumn(4).setCellRenderer(
 			new StateRenderer());
+		_table.getColumnModel().getColumn(1).setCellRenderer(
+			new TimestampRenderer());
 		prepareColumns(_table);
 		JScrollPane scroller = new JScrollPane(_table);
 		scroller.setPreferredSize(new Dimension(1000, 500));

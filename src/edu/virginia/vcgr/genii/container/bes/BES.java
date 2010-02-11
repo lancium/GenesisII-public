@@ -467,6 +467,40 @@ public class BES implements Closeable
 					terminateRequested);
 				_containedActivities.put(activityid, activity);
 				addActivityToBESMapping(activityid, this);
+				
+				/* Delete all activities
+				 */
+				/*
+				WorkingContext.setCurrentWorkingContext(new WorkingContext());
+				boolean assumed = false;
+				try
+				{
+					_logger.info("Attempting to destroy activity.");
+					EndpointReferenceType epr = activity.getActivityEPR();
+					WorkingContext.temporarilyAssumeNewIdentity(epr);
+					assumed = true;
+					IResource resource = ResourceManager.getTargetResource(epr).dereference();
+					resource.destroy();
+				}
+				catch (Throwable cause)
+				{
+					_logger.error("Failed to destroy activity.", cause);
+				}
+				finally
+				{
+					if (assumed)
+					{
+						try
+						{
+							WorkingContext.releaseAssumedIdentity();
+						}
+						catch (Throwable cause)
+						{
+							_logger.error("Unable to release assumed identity.", cause);
+						}
+					}
+				}
+				*/
 			}
 		}
 		finally

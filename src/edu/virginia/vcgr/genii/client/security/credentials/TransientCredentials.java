@@ -59,4 +59,18 @@ public class TransientCredentials implements Serializable
 		_logger.debug("Clearing current calling context credentials.");
 	}
 
+	@Override
+	public String toString()
+	{
+		StringBuilder builder = new StringBuilder();
+		
+		for (GIICredential cred : _credentials)
+		{
+			if (builder.length() != 0)
+				builder.append("\n");
+			builder.append(cred.toString());
+		}
+		
+		return builder.toString();
+	}
 }

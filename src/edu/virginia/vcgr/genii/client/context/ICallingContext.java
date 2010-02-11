@@ -82,4 +82,5 @@ public interface ICallingContext
 	public void serializeTransientProperties(ObjectOutput out) throws IOException;
 	public void deserializeTransientProperties(ObjectInput in) throws IOException;
 	
+	public ContextDescription describe();
 }

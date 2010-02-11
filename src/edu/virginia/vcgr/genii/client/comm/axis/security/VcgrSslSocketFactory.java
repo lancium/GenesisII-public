@@ -27,6 +27,9 @@ import java.util.Date;
 
 import javax.net.ssl.*;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.comm.socket.SocketConfigurer;
@@ -51,6 +54,8 @@ public class VcgrSslSocketFactory
 		extends SSLSocketFactory 
 		implements ConfigurationUnloadedListener
 {
+	static private Log _logger = LogFactory.getLog(VcgrSslSocketFactory.class);
+	
 	static public InheritableThreadLocal<ICallingContext> threadCallingContext =
 		new InheritableThreadLocal<ICallingContext>();
 	
@@ -127,7 +132,33 @@ public class VcgrSslSocketFactory
 			kms[0] = new SingleSSLX509KeyManager(clientKeyMaterial);
 			
 			SSLContext sslcontext = SSLContext.getInstance("TLS");
+			
+			SSLSessionContext sessionContext = sslcontext.getServerSessionContext();
+			if (sessionContext == null)
+				_logger.debug("Couldn't get a session context on which to set the cache size.");
+			else
+			{
+				if (sessionContext.getSessionCacheSize() > 1000)
+				{
+					_logger.debug("Setting server ssl session context cache size to 1000.");
+					sessionContext.setSessionCacheSize(1000);
+				}
+			}
+			
 			sslcontext.init(kms, _trustManagers, _random);
+			
+			sessionContext = sslcontext.getServerSessionContext();
+			if (sessionContext == null)
+				_logger.debug("Couldn't get a session context on which to set the cache size.");
+			else
+			{
+				if (sessionContext.getSessionCacheSize() > 1000)
+				{
+					_logger.debug("Setting server ssl session context cache size to 1000.");
+					sessionContext.setSessionCacheSize(1000);
+				}
+			}
+			
 			return (SSLSocketFactory) sslcontext.getSocketFactory();
 	
 		} catch (GeneralSecurityException e) {

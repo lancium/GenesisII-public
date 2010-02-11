@@ -132,7 +132,7 @@ public class BESManager implements Closeable
 		_updater = new BESResourceUpdater(connectionPool, this, _BES_UPDATE_CYCLE / 10);
 	}
 	
-	BESInformation getBESInformation(long besID)
+	public BESInformation getBESInformation(long besID)
 	{
 		synchronized(_besInformation)
 		{
@@ -152,6 +152,11 @@ public class BESManager implements Closeable
 		
 		_closed = true;
 		_updater.close();
+	}
+	
+	synchronized public BESData getBESData(String name)
+	{
+		return _containersByName.get(name);
 	}
 	
 	/**
@@ -233,12 +238,36 @@ public class BESManager implements Closeable
 		 * update from our update thread, but it's OK...two updates won't 
 		 * hurt us. */
 		toUpdate.add(updateInfo);
-		updateResources(connection, toUpdate);
+		updateResources(connection, toUpdate, false);
 		
 		_logger.debug("Added new bes container \"" + name + 
 			"\" into queue as resource " + id);
 	}
 	
+	public void forceUpdate(Connection connection, String name)
+		throws ResourceException, GenesisIISecurityException, SQLException
+	{
+		Collection<BESUpdateInformation> toUpdate =
+			new ArrayList<BESUpdateInformation>(1);
+		long besid;
+		
+		synchronized(this)
+		{
+			BESData data = _containersByName.get(name);
+			if (data == null)
+				return;
+			
+			besid = data.getID();
+			BESUpdateInformation info = getUpdateInformation(besid);
+			if (info != null)
+				toUpdate.add(info);
+		}
+		
+		_logger.debug(String.format("Updating %s(%d).",
+			name, besid));
+		updateResources(connection, toUpdate, true);
+	}
+		
 	private class BESAttributePrefetcher implements AttributePreFetcher
 	{
 		@Override
@@ -440,7 +469,7 @@ public class BESManager implements Closeable
 	 * @throws GenesisIISecurityException
 	 */
 	private void updateResources(Connection connection,
-		Collection<BESUpdateInformation> resourcesToUpdate)
+		Collection<BESUpdateInformation> resourcesToUpdate, boolean force)
 		throws SQLException, ResourceException,
 			GenesisIISecurityException
 	{
@@ -482,7 +511,7 @@ public class BESManager implements Closeable
 			_informationPortal.getInformation(
 				new BESEndpoint(_database.getQueueID(),
 					info.getBESID(), besName, resolver),
-				new InformationUpdateListener());
+				new InformationUpdateListener(), force);
 		}
 	}
 	
@@ -561,7 +590,7 @@ public class BESManager implements Closeable
 		}
 		
 		/* Now, call update on all of the resources ready for an update */
-		updateResources(connection, resourcesToUpdate);
+		updateResources(connection, resourcesToUpdate, false);
 	}
 	
 	/**
@@ -741,5 +770,11 @@ public class BESManager implements Closeable
 			out.format("%s(%d) -- %s.\n", data.getName(), data.getTotalSlots(),
 				responsiveness);
 		}
+	}
+	
+	synchronized public BESUpdateInformation getUpdateInformation(long besid)
+	{
+		BESUpdateInformation info = _updateInformation.get(besid);
+		return info;
 	}
 }

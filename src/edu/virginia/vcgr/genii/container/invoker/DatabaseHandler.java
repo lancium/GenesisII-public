@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
 import edu.virginia.vcgr.genii.client.stats.MethodDataPoint;
+import edu.virginia.vcgr.genii.client.stats.MethodHistogramStatistics;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 
 public class DatabaseHandler implements IAroundInvoker
@@ -20,7 +21,10 @@ public class DatabaseHandler implements IAroundInvoker
 			).getMethodStatistics().startMethod(
 				invocationContext.getTarget().getClass(),
 				invocationContext.getMethod());
+		MethodHistogramStatistics mhs = ContainerStatistics.instance(
+			).getMethodHistogramStatistics();
 		
+		mhs.addActiveMethod();
 		try
 		{
 			result = invocationContext.proceed();
@@ -30,6 +34,8 @@ public class DatabaseHandler implements IAroundInvoker
 		}
 		finally
 		{
+			mhs.removeActiveMethod();
+			
 			if (!succeeded)
 			{
 				_logger.warn(

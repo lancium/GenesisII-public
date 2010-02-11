@@ -8,9 +8,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.morgan.util.Counter;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.cservices.gridlogger.GridLogDevice;
@@ -75,187 +77,202 @@ public class Scheduler implements Closeable
 	{
 		HashMap<Long, ResourceSlots> slots = 
 			new HashMap<Long, ResourceSlots>();
+		HashMap<JobResourceRequirements, Counter> jobCounts =
+			new HashMap<JobResourceRequirements, Counter>();
 		
-		/* First, we have to find all bes managers that are
-		 * availble to accept jobs.  In this case, available simply means
-		 * that they are responsive to communication and accepting activities
-		 * and have more then 0 slots allocated.  It does NOT imply that the
-		 * slots aren't being used.  We determine that later.
-		 */
-		synchronized(_besManager)
+		try
 		{
-			/* Get all available resources */
-			Collection<BESData> availableResources = 
-				_besManager.getAvailableBESs();
-
-			/* If we didn't get any resources back, then there's no reason
-			 * to continue.
+			/* First, we have to find all bes managers that are
+			 * availble to accept jobs.  In this case, available simply means
+			 * that they are responsive to communication and accepting activities
+			 * and have more then 0 slots allocated.  It does NOT imply that the
+			 * slots aren't being used.  We determine that later.
 			 */
-			if (availableResources.size() == 0)
-				return;
-			
-			/* Now we go through the list and get rid of all resources that
-			 * had no slots allocated.
-			 */
-			for (BESData data : availableResources)
+			synchronized(_besManager)
 			{
-				ResourceSlots rs = new ResourceSlots(data);
-				if (rs.slotsAvailable() > 0)
-					slots.put(new Long(data.getID()), rs);
-			}
-		}
-		
-		/* If there are no slots available, then we are done. */
-		if (slots.size() <= 0)
-			return;
-		
-		// We've left the synchronized block for BESs, so we have to keep in
-		// mind that they could dissapear out from under us during this time.
-		
-		synchronized(_jobManager)
-		{
-			/* If the job manager has no queued jobs, then we don't need to 
-			 * continue.
-			 */
-			if (!_jobManager.hasQueuedJobs())
-				return;
-			
-			/* Ask the job manager to remove all slots from the slot list that
-			 * are currently being used.
-			 */ 
-			_jobManager.recordUsedSlots(slots);
-			
-			/* If there are no slots left, we're done. */
-			if (slots.isEmpty())
-				return;
-			
-			// At this point, we have slots available (probably) and we have 
-			// jobs to run
-			
-			ResourceMatcher matcher = new ResourceMatcher();
-			Collection<ResourceMatch> matches = new LinkedList<ResourceMatch>();
-			Iterator<ResourceSlots> slotIter = null;
-			ResourceMatch match;
-			
-			/* We are now going to match as many jobs to as many slots as 
-			 * possible. To make this as efficient as possible, we keep track
-			 * of the iterator and continually re-iterate until we go through
-			 * all the jobs waiting for a slot, or we run out of resources to
-			 * scheduling against.  We are also going to keep track of the next
-			 * job that should be scheduled, but can't be scheduled now (for
-			 * exponential backoff purposes).
-			 */
-			Date now = new Date();
-			Date nextScheduledEvent = null;
-			for (JobData queuedJob : _jobManager.getQueuedJobs())
-			{
-				match = null;
-				if (!queuedJob.canRun(now))
+				/* Get all available resources */
+				Collection<BESData> availableResources = 
+					_besManager.getAvailableBESs();
+	
+				/* If we didn't get any resources back, then there's no reason
+				 * to continue.
+				 */
+				if (availableResources.size() == 0)
+					return;
+				
+				/* Now we go through the list and get rid of all resources that
+				 * had no slots allocated.
+				 */
+				for (BESData data : availableResources)
 				{
-					Date nextRun = queuedJob.getNextCanRun();
-					if (nextRun != null)
+					ResourceSlots rs = new ResourceSlots(data);
+					if (rs.slotsAvailable() > 0)
+						slots.put(new Long(data.getID()), rs);
+				}
+			}
+			
+			/* If there are no slots available, then we are done. */
+			if (slots.size() <= 0)
+				return;
+			
+			// We've left the synchronized block for BESs, so we have to keep in
+			// mind that they could dissapear out from under us during this time.
+			
+			synchronized(_jobManager)
+			{
+				/* If the job manager has no queued jobs, then we don't need to 
+				 * continue.
+				 */
+				if (!_jobManager.hasQueuedJobs())
+					return;
+				
+				/* Ask the job manager to remove all slots from the slot list that
+				 * are currently being used.
+				 */ 
+				_jobManager.recordUsedSlots(slots);
+				
+				/* If there are no slots left, we're done. */
+				if (slots.isEmpty())
+					return;
+				
+				// At this point, we have slots available (probably) and we have 
+				// jobs to run
+				
+				ResourceMatcher matcher = new ResourceMatcher();
+				Collection<ResourceMatch> matches = new LinkedList<ResourceMatch>();
+				Iterator<ResourceSlots> slotIter = null;
+				ResourceMatch match;
+				
+				/* We are now going to match as many jobs to as many slots as 
+				 * possible. To make this as efficient as possible, we keep track
+				 * of the iterator and continually re-iterate until we go through
+				 * all the jobs waiting for a slot, or we run out of resources to
+				 * scheduling against.  We are also going to keep track of the next
+				 * job that should be scheduled, but can't be scheduled now (for
+				 * exponential backoff purposes).
+				 */
+				Date now = new Date();
+				Date nextScheduledEvent = null;
+				for (JobData queuedJob : _jobManager.getQueuedJobs())
+				{
+					match = null;
+					if (!queuedJob.canRun(now))
 					{
-						if (nextScheduledEvent == null)
-							nextScheduledEvent = nextRun;
-						else
+						Date nextRun = queuedJob.getNextCanRun();
+						if (nextRun != null)
 						{
-							if (nextScheduledEvent.after(nextRun))
+							if (nextScheduledEvent == null)
 								nextScheduledEvent = nextRun;
+							else
+							{
+								if (nextScheduledEvent.after(nextRun))
+									nextScheduledEvent = nextRun;
+							}
 						}
+						
+						continue;
 					}
 					
-					continue;
-				}
-				
-				JobResourceRequirements requirements = null;
-				
-				try
-				{
-					requirements = queuedJob.getResourceRequirements(_jobManager);
-				}
-				catch (Throwable cause)
-				{
-					_logger.warn(
-						"Error trying to get job resource requirements for matching.", 
-						cause);
-					requirements = new JobResourceRequirements();
-				}
-				
-				/* If we haven't created an iterator yet, do so now. */
-				if (slotIter == null)
-				{
-					/* If there aren't any slots, we're done */
-					if (slots.isEmpty())
-						break;
+					JobResourceRequirements requirements = null;
 					
-					slotIter = slots.values().iterator();
-					
-					/* Try to find a match */
-					match = findSlot(matcher, queuedJob, requirements, slotIter);
-				} else
-				{
-					/* If we got here, then we already had an iterator 
-					 * from before.  Try to find a match with it. */
-					match = findSlot(matcher, queuedJob, requirements, slotIter);
-					
-					/* If we couldn't find a match, it may have been the case
-					 * that we simply had already passed a potential match with
-					 * the iterator before getting here, so give the iterator
-					 * a new chance from the begining.
-					 */
-					if (match == null)
+					try
 					{
-						/* If there are no slots available, we're done. */
+						requirements = queuedJob.getResourceRequirements(_jobManager);
+					}
+					catch (Throwable cause)
+					{
+						_logger.warn(
+							"Error trying to get job resource requirements for matching.", 
+							cause);
+						requirements = new JobResourceRequirements();
+					}
+					
+					/* If we haven't created an iterator yet, do so now. */
+					if (slotIter == null)
+					{
+						/* If there aren't any slots, we're done */
 						if (slots.isEmpty())
 							break;
 						
-						/* Create a new iterator and try to find 
-						 * a match again. */
 						slotIter = slots.values().iterator();
+						
+						/* Try to find a match */
 						match = findSlot(matcher, queuedJob, requirements, slotIter);
+					} else
+					{
+						/* If we got here, then we already had an iterator 
+						 * from before.  Try to find a match with it. */
+						match = findSlot(matcher, queuedJob, requirements, slotIter);
+						
+						/* If we couldn't find a match, it may have been the case
+						 * that we simply had already passed a potential match with
+						 * the iterator before getting here, so give the iterator
+						 * a new chance from the begining.
+						 */
+						if (match == null)
+						{
+							/* If there are no slots available, we're done. */
+							if (slots.isEmpty())
+								break;
+							
+							/* Create a new iterator and try to find 
+							 * a match again. */
+							slotIter = slots.values().iterator();
+							match = findSlot(matcher, queuedJob, requirements, slotIter);
+						}
 					}
+					
+					/* If we found a match, then go ahead and add it 
+					 * to our list. */
+					if (match != null)
+					{
+						_jobLogger.log(queuedJob.gridLogTargets(),
+							String.format("Matched job against resource \"%s\".",
+								_besManager.getBESName(match.getBESID())));
+						matches.add(match);
+					} else
+					{
+						_jobLogger.log(queuedJob.gridLogTargets(),
+							"Unable to find any suitable matches at the moment." +
+							"  Will try again later.");
+						Counter c = jobCounts.get(requirements);
+						if (c == null)
+							jobCounts.put(requirements, c = new Counter());
+						c.modify(1);
+					}		
 				}
 				
-				/* If we found a match, then go ahead and add it 
-				 * to our list. */
-				if (match != null)
-				{
-					_jobLogger.log(queuedJob.gridLogTargets(),
-						String.format("Matched job against resource \"%s\".",
-							_besManager.getBESName(match.getBESID())));
-					matches.add(match);
-				} else
-				{
-					_jobLogger.log(queuedJob.gridLogTargets(),
-						"Unable to find any suitable matches at the moment." +
-						"  Will try again later.");
-					_logger.debug(String.format(
-						"Unable to find resource match for job %s[%s].",
-						queuedJob.getJobTicket(), requirements));
-				}		
-			}
-			
-			_schedulingEvent.setScheduledEvent(nextScheduledEvent);
-			
-			/* OK, now that we have a list of matches, go ahead and try to
-			 * start the jobs.
-			 */
-			Connection connection = null;
-			try
-			{
-				/* Acquire a new connection from the pool */
-				connection = _connectionPool.acquire(false);
+				_schedulingEvent.setScheduledEvent(nextScheduledEvent);
 				
-				/* And start the jobs. */
-				_jobManager.startJobs(connection, matches);
+				/* OK, now that we have a list of matches, go ahead and try to
+				 * start the jobs.
+				 */
+				Connection connection = null;
+				try
+				{
+					/* Acquire a new connection from the pool */
+					connection = _connectionPool.acquire(false);
+					
+					/* And start the jobs. */
+					_jobManager.startJobs(connection, matches);
+				}
+				catch (Throwable cause)
+				{
+					_logger.warn("Unable to schedule jobs.", cause);
+				}
+				finally
+				{
+					_connectionPool.release(connection);
+				}
 			}
-			catch (Throwable cause)
+		}
+		finally
+		{
+			for (Map.Entry<JobResourceRequirements, Counter> entry : jobCounts.entrySet())
 			{
-				_logger.warn("Unable to schedule jobs.", cause);
-			}
-			finally
-			{
-				_connectionPool.release(connection);
+				_logger.debug(String.format(
+					"%d jobs failed to match any resources with requirements %s",
+					entry.getValue().get(), entry.getKey()));
 			}
 		}
 	}

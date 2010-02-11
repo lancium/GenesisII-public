@@ -14,7 +14,7 @@ extern "C" {
  * Signature: (D)Z
  */
 JNIEXPORT jboolean JNICALL Java_edu_virginia_vcgr_genii_container_processmanager_WindowsProvider_kill
-  (JNIEnv *env, jobject obj, jdouble thePID);
+  (JNIEnv *, jobject, jdouble);
 
 /*
  * Class:     edu_virginia_vcgr_genii_container_processmanager_WindowsProvider
@@ -22,7 +22,7 @@ JNIEXPORT jboolean JNICALL Java_edu_virginia_vcgr_genii_container_processmanager
  * Signature: (D)Z
  */
 JNIEXPORT jboolean JNICALL Java_edu_virginia_vcgr_genii_container_processmanager_WindowsProvider_resume
-  (JNIEnv *env, jobject obj, jdouble thePID);
+  (JNIEnv *, jobject, jdouble);
 
 /*
  * Class:     edu_virginia_vcgr_genii_container_processmanager_WindowsProvider
@@ -30,7 +30,7 @@ JNIEXPORT jboolean JNICALL Java_edu_virginia_vcgr_genii_container_processmanager
  * Signature: (D)Z
  */
 JNIEXPORT jboolean JNICALL Java_edu_virginia_vcgr_genii_container_processmanager_WindowsProvider_suspend
-  (JNIEnv *env, jobject obj, jdouble thePID);
+  (JNIEnv *, jobject, jdouble);
 
 #ifdef __cplusplus
 }

@@ -21,11 +21,16 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.client.jni.JNIClientBaseClass;
 
 public class FileSystemUtils extends JNIClientBaseClass
 {
+	static private Log _logger = LogFactory.getLog(FileSystemUtils.class);
+	
 	static public final int MODE_SET_UID = 04000;
 	static public final int MODE_SET_GID = 02000;
 	static public final int MODE_STICKY = 01000;
@@ -104,5 +109,73 @@ public class FileSystemUtils extends JNIClientBaseClass
 			
 			return filepath;
 		}
+	}
+	
+	static public boolean isSoftLink(File file) throws IOException
+	{
+		if (OperatingSystemType.getCurrent().isWindows())
+			return false;
+		
+		if (file == null)
+			throw new NullPointerException("File must not be null");
+		
+		File canon;
+		
+		if (file.getParent() == null)
+			canon = file;
+		else 
+		{
+			File canonDir = file.getParentFile().getCanonicalFile();
+			canon = new File(canonDir, file.getName());
+		}
+		
+		return !canon.getCanonicalFile().equals(canon.getAbsoluteFile());
+	}
+	
+	static public boolean recursiveDelete(File target, boolean followSoftLinks)
+	{
+		boolean succeed = true;
+		
+		if (target == null)
+			return succeed;
+		
+		if (target.isFile())
+		{
+			if (!target.delete())
+			{
+				succeed = false;
+				_logger.warn(String.format(
+					"Unable to remove file system entry %s", target));
+			}
+		} else if (target.isDirectory())
+		{
+			try
+			{
+				if (followSoftLinks || !isSoftLink(target))
+				{
+					for (File entry : target.listFiles())
+					{
+						if (!recursiveDelete(entry, followSoftLinks))
+							succeed = false;
+					}
+				}
+				
+				if (!target.delete())
+				{
+					succeed = false;
+					_logger.warn(String.format(
+						"Unable to remove file system entry %s.", target));
+				}
+			}
+			catch (IOException ioe)
+			{
+				succeed = false;
+				_logger.error(String.format(
+					"Error trying to determine whether or not %s is a soft-link.", 
+					target), ioe);
+			}
+		}
+		
+		return succeed;
 	}
 }

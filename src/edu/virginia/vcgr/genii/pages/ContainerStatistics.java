@@ -69,6 +69,11 @@ public class ContainerStatistics extends GenesisIIStyledPage
 		}
 		ps.println("</TABLE>");
 		
+		ps.println("<BR>");
+		ps.format("<IMG SRC=\"database-histogram.png?width=%1$d&height=%2$d\" " +
+			"ALT=\"*\" width\"%1$d\" height=\"%2$d\"/>",
+			DatabaseHistogram.WIDTH, DatabaseHistogram.HEIGHT);
+		
 		ps.println("<BR><BR>");
 		ps.println("<H2>Method Statistics</H2>");
 		ps.println("<H3>Container-wide Method Statistics</H3>");
@@ -85,6 +90,11 @@ public class ContainerStatistics extends GenesisIIStyledPage
 				point.failureRate() * 100.0, point.averageDuration());
 		}
 		ps.println("</TABLE>");
+		
+		ps.println("<BR");
+		ps.format("<IMG SRC=\"method-histogram.png?width=%1$d&height=%2$d\" " +
+			"ALT=\"*\" width\"%1$d\" height=\"%2$d\"/>",
+			MethodHistogram.WIDTH, MethodHistogram.HEIGHT);
 		
 		Set<String> classes = mStats.report().get(TimeInterval.THIRTY_SECONDS).classTotals().keySet();
 		for (String className : classes)

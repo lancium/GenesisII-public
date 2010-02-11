@@ -12,6 +12,8 @@ public class ContainerStatistics
 	private long _startTime;
 	private DatabaseStatistics _dbStats = new DatabaseStatistics();
 	private MethodStatistics _methodStats = new MethodStatistics();
+	private DatabaseHistogramStatistics _dbHistoStats = new DatabaseHistogramStatistics();
+	private MethodHistogramStatistics _methodHistoStats = new MethodHistogramStatistics();
 	
 	private ContainerStatistics()
 	{
@@ -28,8 +30,18 @@ public class ContainerStatistics
 		return _dbStats;
 	}
 	
+	public DatabaseHistogramStatistics getDatabaseHistogramStatistics()
+	{
+		return _dbHistoStats;
+	}
+	
 	public MethodStatistics getMethodStatistics()
 	{
 		return _methodStats;
+	}
+	
+	public MethodHistogramStatistics getMethodHistogramStatistics()
+	{
+		return _methodHistoStats;
 	}
 }

@@ -143,8 +143,6 @@ public class GeniiFuse
 	
 	static private class GeniiMountRunner implements Runnable
 	{
-		volatile private Exception _error = null;
-		
 		private String []_arguments;
 		private Filesystem _fs;
 		private ICallingContext _callingContext;
@@ -168,16 +166,9 @@ public class GeniiFuse
 			catch (Exception e)
 			{
 				_logger.error("Error occurred in fuse mount.", e);
-				_error = e;
 			}
 
 			System.err.println("Exiting fuse mount.");
-		}
-		
-		@SuppressWarnings("unused")
-		public Exception getError()
-		{
-			return _error;
 		}
 	}
 }

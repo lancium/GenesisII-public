@@ -8,6 +8,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 
@@ -42,7 +44,7 @@ class PersistentOutcallDatabase
 	static private Calendar convert(Timestamp ts)
 	{
 		Calendar c = Calendar.getInstance();
-		c.setTime(ts);
+		c.setTimeInMillis(ts.getTime());
 		return c;
 	}
 	
@@ -69,9 +71,15 @@ class PersistentOutcallDatabase
 	static NavigableSet<PersistentOutcallEntry> readTable(Connection connection)
 		throws SQLException
 	{
+		Collection<Long> toDelete = new LinkedList<Long>();
+		
+		int success = 0;
+		int total = 0;
+		
 		TreeSet<PersistentOutcallEntry> ret = new TreeSet<PersistentOutcallEntry>(
 			PersistentOutcallEntry.NEXT_ATTEMPT_COMPARATOR);
 		Statement stmt = null;
+		PreparedStatement pStmt = null;
 		ResultSet rs = null;
 		
 		try
@@ -82,12 +90,56 @@ class PersistentOutcallDatabase
 				"attemptscheduler, numattempts FROM persistentoutcalls");
 			while (rs.next())
 			{
-				ret.add(new PersistentOutcallEntry(
-					rs.getLong(1), rs.getInt(5),
-					convert(rs.getTimestamp(2)),
-					convert(rs.getTimestamp(3)),
-					(AttemptScheduler)DBSerializer.fromBlob(rs.getBlob(4))));
+				total++;
+				long id = -1L;
+				try
+				{
+					id = rs.getLong(1);
+					ret.add(new PersistentOutcallEntry(
+						id, rs.getInt(5),
+						convert(rs.getTimestamp(2)),
+						convert(rs.getTimestamp(3)),
+						(AttemptScheduler)DBSerializer.fromBlob(rs.getBlob(4))));
+					success++;
+				}
+				catch (Throwable cause)
+				{
+					_logger.warn(
+						"Unable to read an entry from the persistent outcall " +
+						"table.  Skipping for the time being.", cause);
 					
+					if (id >= 0)
+						toDelete.add(new Long(id));
+				}
+			}
+			
+			_logger.info(String.format(
+				"Successfully loaded %d/%d entries from the persistent outcall database.",
+				success, total));
+			
+			try
+			{
+				if (toDelete.size() > 0)
+				{
+					_logger.info(String.format(
+						"Cleaning up %d bad records.", toDelete.size()));
+					pStmt = connection.prepareStatement(
+						"DELETE FROM persistentoutcalls WHERE id = ?");
+					
+					for (Long id : toDelete)
+					{
+						pStmt.setLong(1, id.longValue());
+						pStmt.addBatch();
+					}
+					
+					pStmt.executeBatch();
+				}
+			}
+			catch (Throwable cause)
+			{
+				_logger.warn(
+					"Unable to clean-up failed entries in persistent " +
+					"outcall database.", cause);
 			}
 			
 			return ret;
@@ -96,6 +148,7 @@ class PersistentOutcallDatabase
 		{
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
+			StreamUtils.close(pStmt);
 		}
 	}
 	

@@ -129,6 +129,7 @@ import edu.virginia.vcgr.genii.container.invoker.DatabaseHandler;
 import edu.virginia.vcgr.genii.container.invoker.DebugInvoker;
 import edu.virginia.vcgr.genii.container.invoker.GAroundInvoke;
 import edu.virginia.vcgr.genii.container.invoker.ScheduledTerminationInvoker;
+import edu.virginia.vcgr.genii.container.invoker.ServiceInitializationLocker;
 import edu.virginia.vcgr.genii.container.invoker.SoapHeaderHandler;
 import edu.virginia.vcgr.genii.container.invoker.timing.TimingHandler;
 import edu.virginia.vcgr.genii.container.iterator.IteratorResource;
@@ -152,7 +153,8 @@ import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
 import edu.virginia.vcgr.genii.iterator.IteratorInitializationType;
 import edu.virginia.vcgr.genii.iterator.IteratorMemberType;
 
-@GAroundInvoke({BaseFaultFixer.class, SoapHeaderHandler.class, DatabaseHandler.class, 
+@GAroundInvoke({ServiceInitializationLocker.class, BaseFaultFixer.class, 
+	SoapHeaderHandler.class, DatabaseHandler.class, 
 	DebugInvoker.class, ScheduledTerminationInvoker.class, TimingHandler.class})
 public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 {
@@ -912,6 +914,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 			WorkingContext.setCurrentWorkingContext(null);
 		}
 
+		ServiceInitializationLocker.setInitialized(getClass());
 		return serviceCreated;
 	}
 	

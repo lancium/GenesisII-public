@@ -3,7 +3,7 @@ package edu.virginia.vcgr.genii.client.jsdl;
 import java.io.File;
 import java.io.IOException;
 
-import edu.virginia.vcgr.genii.client.io.FileUtils;
+import edu.virginia.vcgr.genii.client.io.FileSystemUtils;
 
 public class DirectoryBasedFileSystem extends AbstractJSDLFileSystem
 {
@@ -31,6 +31,6 @@ public class DirectoryBasedFileSystem extends AbstractJSDLFileSystem
 	public void release()
 	{
 		if (shouldDestroy())
-			FileUtils.recursivelyRemove(_directory);
+			FileSystemUtils.recursiveDelete(_directory, false);
 	}
 }

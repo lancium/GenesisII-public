@@ -9,7 +9,6 @@ class OrMatchingParameter extends MatchingParameter
 	private Collection<MatchingParameter> _parameters =
 		new LinkedList<MatchingParameter>();
 	
-	
 	OrMatchingParameter()
 	{
 	}
@@ -29,6 +28,48 @@ class OrMatchingParameter extends MatchingParameter
 		}
 		
 		return true;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		int ret = 0x0;
+		
+		for (MatchingParameter mp : _parameters)
+			ret ^= mp.hashCode();
+		
+		return ret;
+	}
+	
+	/**
+	 * Determines if this matching parameter set is equal to another one.
+	 * 
+	 * This operation is incredibly heavy weight and should not be used
+	 * lightly.  It would be better if we could sort these and then do
+	 * the comparison, but unfortunately, there isn't a natural sort
+	 * order for matching parameters.
+	 * 
+	 * @param other
+	 * @return
+	 */
+	public boolean equals(OrMatchingParameter other)
+	{
+		if (_parameters.size() != other._parameters.size())
+			return false;
+		
+		if (hashCode() != other.hashCode())
+			return false;
+		
+		return _parameters.containsAll(other._parameters);
+	}
+	
+	@Override
+	public boolean equals(Object other)
+	{
+		if (other instanceof OrMatchingParameter)
+			return equals((OrMatchingParameter)other);
+		
+		return false;
 	}
 	
 	@Override

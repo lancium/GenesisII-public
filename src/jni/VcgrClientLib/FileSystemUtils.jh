@@ -40,6 +40,14 @@ extern "C" {
 JNIEXPORT void JNICALL Java_edu_virginia_vcgr_genii_client_io_FileSystemUtils_chmod
   (JNIEnv *, jclass, jstring, jint);
 
+/*
+ * Class:     edu_virginia_vcgr_genii_client_io_FileSystemUtils
+ * Method:    isSoftLink
+ * Signature: (Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_virginia_vcgr_genii_client_io_FileSystemUtils_isSoftLink
+  (JNIEnv *, jclass, jstring);
+
 #ifdef __cplusplus
 }
 #endif

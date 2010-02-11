@@ -15,7 +15,7 @@ import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.GuaranteedDirectory;
 
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
-import edu.virginia.vcgr.genii.client.io.FileUtils;
+import edu.virginia.vcgr.genii.client.io.FileSystemUtils;
 import edu.virginia.vcgr.genii.container.cservices.AbstractContainerService;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServicePropertyListener;
 
@@ -98,7 +98,7 @@ public class ScratchFSManagerContainerService extends AbstractContainerService
 				DEFAULT_IDLE_TIMEOUT_MILLIS);
 			
 			for (File dir : directoriesToDelete)
-				FileUtils.recursivelyRemove(dir);
+				FileSystemUtils.recursiveDelete(dir, false);
 			
 			conn.commit();
 		}

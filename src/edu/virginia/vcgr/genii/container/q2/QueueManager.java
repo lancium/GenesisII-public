@@ -309,6 +309,22 @@ public class QueueManager implements Closeable
 		}
 	}
 	
+	public void forceBESUpdate(String name)
+		throws SQLException, ResourceException, GenesisIISecurityException
+	{
+		Connection connection = null;
+		
+		try
+		{
+			connection = _connectionPool.acquire(false);
+			_besManager.forceUpdate(connection, name);
+		}
+		finally
+		{
+			_connectionPool.release(connection);
+		}
+	}
+	
 	public void configureBES(String name, 
 		int newSlots) throws SQLException, ResourceException
 	{
@@ -590,5 +606,10 @@ public class QueueManager implements Closeable
 		}
 		
 		return summary;
+	}
+	
+	public BESManager getBESManager()
+	{
+		return _besManager;
 	}
 }

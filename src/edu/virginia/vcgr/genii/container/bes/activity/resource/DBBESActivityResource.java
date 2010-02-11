@@ -22,6 +22,7 @@ import org.ggf.bes.factory.UnknownActivityIdentifierFaultType;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 
+import edu.virginia.vcgr.genii.client.io.FileSystemUtils;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.postlog.JobEvent;
 import edu.virginia.vcgr.genii.client.postlog.PostTargets;
@@ -70,13 +71,13 @@ public class DBBESActivityResource extends BasicDBResource implements
 			{
 				if (BESUtilities.isDeletable(dir.getWorkingDirectory())
 					|| dir.mustDelete())
-					recursiveDelete(dir.getWorkingDirectory());				
+					FileSystemUtils.recursiveDelete(dir.getWorkingDirectory(), false);				
 			}
 		} else
 		{
 			if (BESUtilities.isDeletable(dir.getWorkingDirectory()) 
 				|| dir.mustDelete())
-				recursiveDelete(dir.getWorkingDirectory());	
+				FileSystemUtils.recursiveDelete(dir.getWorkingDirectory(), false);			
 		}
 		
 		try
@@ -125,19 +126,5 @@ public class DBBESActivityResource extends BasicDBResource implements
 				}, null));
 		
 		return activity;
-	}
-	
-	static private void recursiveDelete(File file)
-	{
-		if (!file.exists())
-			return;
-		
-		if (file.isDirectory())
-		{
-			for (File subfile : file.listFiles())
-				recursiveDelete(subfile);
-		}
-		
-		file.delete();	
 	}
 }

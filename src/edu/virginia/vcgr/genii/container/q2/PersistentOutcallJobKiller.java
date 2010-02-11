@@ -23,18 +23,20 @@ class PersistentOutcallJobKiller
 	static final private long BACKOFF_JITTER_BASE = 15;
 	static final private TimeUnit BACKOFF_JITTER_BASE_UNITS = TimeUnit.MINUTES;
 	
-	static private AttemptScheduler SCHEDULER =
-		new ExponentialBackoffScheduler(
+	static private AttemptScheduler SCHEDULER()
+	{
+		return new ExponentialBackoffScheduler(
 			LIFETIME_CAP, LIFETIME_CAP_UNITS,
 			null, EXPONENT_ATTEMPT_CAP,
 			BACKOFF_BASE, BACKOFF_BASE_UNITS,
 			BACKOFF_JITTER_BASE, BACKOFF_JITTER_BASE_UNITS);
+	}
 	
 	static boolean killJob(EndpointReferenceType bes,
 		EndpointReferenceType activity, ICallingContext context)
 	{
 		return PersistentOutcallContainerService.schedulePersistentOutcall(
 			new BESActivityTerminatorActor(activity),
-			SCHEDULER, bes, context);
+			SCHEDULER(), bes, context);
 	}
 }

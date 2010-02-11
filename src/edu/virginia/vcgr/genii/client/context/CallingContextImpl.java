@@ -373,4 +373,23 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		}
 	}	
 
+	private ContextDescription describe(ContextDescription desc)
+	{
+		if (_parent != null)
+			desc = _parent.describe(desc);
+		
+		for (String property : _properties.keySet())
+			desc.setProperty(property, _properties.get(property));
+		for (String property : _transientProperties.keySet())
+			desc.setTransientProperty(property, _transientProperties.get(
+				property));
+		
+		return desc;
+	}
+	
+	@Override
+	public ContextDescription describe()
+	{
+		return describe(new ContextDescription());
+	}
 }

@@ -52,3 +52,51 @@ JNIEXPORT void JNICALL
 
 	(*env)->ReleaseStringUTFChars(env, filepath, sFilepath);
 }
+
+JNIEXPORT jboolean JNICALL Java_edu_virginia_vcgr_genii_client_io_FileSystemUtils_isSoftLink
+  (JNIEnv *env, jclass cls, jstring filepath)
+{
+	struct stat statBuf;
+	const char *msg;
+	const char *sFilepath = (*env)->GetStringUTFChars(env, filepath, NULL);
+	if (sFilepath == NULL)
+		return;
+
+	if (lstat(sFilepath, &statBuf) < 0)
+	{
+		switch (errno)
+		{
+			case ENOENT :
+				msg = "The file does not exist.";
+				break;
+
+			case EPERM :
+				msg = "Permission denied for lstat command.";
+				break;
+
+			case ENAMETOOLONG :
+              	msg = "Path is too long.";
+				break;
+
+       		case EACCES :
+				msg = "Search  permission is denied on a component "
+					"of the path prefix.";
+				break;
+
+			case ELOOP :
+				msg = "Too many symbolic links were encountered in "
+					"resolving path.";
+				break;
+
+			default :
+				msg = "An I/O error occurred.";
+				break;
+		}
+
+		throwSimpleException(env, (char*)IO_EXCEPTION_CLASS, (char*)msg);
+	}
+
+	(*env)->ReleaseStringUTFChars(env, filepath, sFilepath);
+
+	return S_ISLNK(statBuf.st_mode);
+}

@@ -108,6 +108,97 @@ public class JobResourceRequirements
 			resources.get_any());
 	}
 	
+	/*
+	private ProcessorArchitectureEnumeration _arch = null;
+	private OperatingSystemTypeEnumeration _osType = null;
+	private String _osVersion = null;
+	private Double _memoryRequirement = null;
+	private MatchingParameter []_matchingParameters = null;
+	*/
+	
+	@Override
+	public int hashCode()
+	{
+		int ret = 0x0;
+		
+		if (_arch != null)
+			ret ^= _arch.hashCode();
+		
+		if (_osType != null)
+			ret ^= _osType.hashCode();
+		
+		if (_osVersion != null)
+			ret ^= _osVersion.hashCode();
+		
+		if (_memoryRequirement != null)
+			ret ^= _memoryRequirement.hashCode();
+		
+		if (_matchingParameters != null)
+		{
+			for (MatchingParameter param : _matchingParameters)
+				ret ^= param.hashCode();
+		}
+		
+		return ret;
+	}
+	
+	private boolean equalsWithNulls(Object one, Object two)
+	{
+		if (one == null && two == null)
+			return true;
+		if (one == null || two == null)
+			return false;
+		
+		return one.equals(two);
+	}
+	
+	public boolean equals(JobResourceRequirements other)
+	{
+		if (!equalsWithNulls(_arch, other._arch))
+			return false;
+		
+		if (!equalsWithNulls(_osType, other._osType))
+			return false;
+		
+		if (!equalsWithNulls(_osVersion, other._osVersion))
+			return false;
+		
+		if (!equalsWithNulls(_memoryRequirement, other._memoryRequirement))
+			return false;
+		
+		if (_matchingParameters == null && other._matchingParameters == null)
+			return true;
+		if (_matchingParameters == null || other._matchingParameters == null)
+			return false;
+		
+		for (MatchingParameter mp : other._matchingParameters)
+		{
+			boolean found = false;
+			for (MatchingParameter mp2 : _matchingParameters)
+			{
+				if (mp.equals(mp2))
+				{
+					found = true;
+					break;
+				}
+			}
+			
+			if (!found)
+				return false;
+		}
+		
+		return true;
+	}
+	
+	@Override
+	public boolean equals(Object other)
+	{
+		if (other instanceof JobResourceRequirements)
+			return equals((JobResourceRequirements)other);
+		
+		return false;
+	}
+	
 	public boolean matches(BESInformation besInfo)
 	{
 		if (besInfo == null)
