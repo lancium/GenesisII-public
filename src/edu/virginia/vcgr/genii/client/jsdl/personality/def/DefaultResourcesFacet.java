@@ -6,7 +6,7 @@ import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.UnsupportedJSDLElement;
 import edu.virginia.vcgr.genii.client.jsdl.personality.ResourcesFacet;
 import edu.virginia.vcgr.genii.client.jsdl.range.RangeExpression;
-import edu.virginia.vcgr.genii.jsdltool.doc.JSDLConstants;
+import edu.virginia.vcgr.jsdl.JSDLConstants;
 
 public class DefaultResourcesFacet extends DefaultPersonalityFacet implements
 		ResourcesFacet
@@ -131,6 +131,6 @@ public class DefaultResourcesFacet extends DefaultPersonalityFacet implements
 			RangeExpression wallclockTimeLimit) throws JSDLException
 	{
 		throw new UnsupportedJSDLElement(
-			new QName(JSDLConstants.GENII_NS, "WallclockTime"));
+			new QName("http://vcgr.cs.virginia.edu/jsdl/genii", "WallclockTime"));
 	}
 }

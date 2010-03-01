@@ -15,20 +15,34 @@
  */
 package edu.virginia.vcgr.genii.client.jsdl;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.Boundary_Type;
 import org.ggf.jsdl.CPUArchitecture_Type;
 import org.ggf.jsdl.Exact_Type;
+import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.jsdl.OperatingSystemTypeEnumeration;
 import org.ggf.jsdl.OperatingSystemType_Type;
 import org.ggf.jsdl.OperatingSystem_Type;
 import org.ggf.jsdl.ProcessorArchitectureEnumeration;
 import org.ggf.jsdl.RangeValue_Type;
 import org.ggf.jsdl.Range_Type;
+import org.w3c.dom.Element;
 
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.client.jni.JNIContainerBaseClass;
+import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
+import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
+import edu.virginia.vcgr.jsdl.JSDLConstants;
+import edu.virginia.vcgr.jsdl.JSDLUtility;
+import edu.virginia.vcgr.jsdl.JobDefinition;
 
 public class JSDLUtils extends JNIContainerBaseClass
 {
@@ -199,5 +213,23 @@ public class JSDLUtils extends JNIContainerBaseClass
 		}
 		
 		return true;
+	}
+	
+	static public JobDefinition convert(JobDefinition_Type axisType)
+		throws ResourceException, JAXBException
+	{
+		Element element = ObjectSerializer.toElement(axisType,
+			new QName(JSDLConstants.JSDL_NS, "JobDefinition"));
+		return (JobDefinition)JSDLUtility.JSDLContext.createUnmarshaller(
+			).unmarshal(element);
+	}
+	
+	static public JobDefinition_Type convert(JobDefinition jaxbType)
+		throws JAXBException, IOException
+	{
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		JSDLUtility.JSDLContext.createMarshaller().marshal(jaxbType, baos);
+		baos.close();
+		return ObjectDeserializer.fromBytes(JobDefinition_Type.class, baos.toByteArray());
 	}
 }

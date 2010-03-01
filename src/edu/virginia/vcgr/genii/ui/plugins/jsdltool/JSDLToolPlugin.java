@@ -1,89 +1,67 @@
 package edu.virginia.vcgr.genii.ui.plugins.jsdltool;
 
 import java.io.Closeable;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Collection;
 
-import javax.swing.SwingUtilities;
+import javax.xml.bind.JAXBException;
 
-import org.ggf.rns.EntryType;
-import org.ggf.rns.List;
-import org.ggf.rns.ListResponse;
+import org.apache.log4j.Logger;
+import org.ggf.bes.factory.ActivityDocumentType;
+import org.ggf.bes.factory.CreateActivityType;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
+import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
-import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
+import edu.virginia.vcgr.genii.client.queue.QueueManipulator;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
-import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
-import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
-import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
-import edu.virginia.vcgr.genii.jsdltool.exthooks.ExternalHooks;
-import edu.virginia.vcgr.genii.jsdltool.exthooks.ExternalJSDLSink;
-import edu.virginia.vcgr.genii.jsdltool.gui.JSDLTool;
+import edu.virginia.vcgr.genii.gjt.JobDefinitionListener;
+import edu.virginia.vcgr.genii.gjt.JobTool;
 import edu.virginia.vcgr.genii.ui.plugins.AbstractCombinedUIMenusPlugin;
 import edu.virginia.vcgr.genii.ui.plugins.EndpointDescription;
 import edu.virginia.vcgr.genii.ui.plugins.MenuType;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginContext;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginException;
+import edu.virginia.vcgr.jsdl.JobDefinition;
 
 public class JSDLToolPlugin extends AbstractCombinedUIMenusPlugin
 {
-	static private final String JOB_NAME_TEMPLATE =
-		"JSDL Tool Job %d";
+	static private Logger _logger = Logger.getLogger(JSDLToolPlugin.class);
 	
-	static private OutputStream openSinkToQueue(RNSPath targetPath, 
-		EndpointReferenceType targetEPR) throws IOException
+	static private void submitToBES(EndpointReferenceType targetEPR,
+		JobDefinition jobDefinition) throws IOException
 	{
 		try
 		{
-			AddressingParameters ap = new AddressingParameters(
-				targetEPR.getReferenceParameters());
-			targetEPR.setReferenceParameters(
-				ap.stripResourceForkInformation().toReferenceParameters());
+			GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class,
+				targetEPR);
+			bes.createActivity(new CreateActivityType(new ActivityDocumentType(
+				JSDLUtils.convert(jobDefinition), null), null));
 		}
-		catch (ResourceException re)
+		catch (JAXBException e)
 		{
-			// Not a Genii endpoint, just leave it alone
+			throw new IOException(
+				"Unable to convert from JAXB Type to Axis type.", e);
 		}
-		
-		EnhancedRNSPortType port = ClientUtils.createProxy(
-			EnhancedRNSPortType.class, targetEPR);
-		ListResponse response = port.list(new List("submission-point"));
-		EntryType[] list = response.getEntryList();
-		if (list.length != 1)
-			throw new FileNotFoundException(String.format(
-				"Unable to find submission point for %s.", targetPath.pwd()));
-		
-		return ByteIOStreamFactory.createOutputStream(
-			list[0].getEntry_reference());
 	}
 	
-	static private OutputStream openSinkToBES(RNSPath besPath, 
-		EndpointReferenceType besEPR) throws IOException
+	static private void submitToQueue(EndpointReferenceType targetEPR,
+		JobDefinition jobDefinition) throws IOException
 	{
 		try
 		{
-			RNSPath newJob = besPath.lookup(String.format(
-				JOB_NAME_TEMPLATE, System.currentTimeMillis()));
-			return ByteIOStreamFactory.createOutputStream(newJob);
+			QueueManipulator manip = new QueueManipulator(targetEPR);
+			manip.submit(JSDLUtils.convert(jobDefinition), 0);
 		}
-		catch (RNSPathDoesNotExistException rpdnee)
+		catch (JAXBException e)
 		{
-			throw new FileNotFoundException(String.format(
-				"Unable to find bes %s.", besPath.pwd()));
-		}
-		catch (RNSException rne)
-		{
-			throw new IOException(String.format(
-				"Unable to open stream to BES %s.", besPath.pwd()));
+			throw new IOException(
+				"Unable to convert from JAXB Type to Axis type.", e);
 		}
 	}
 	
@@ -91,15 +69,17 @@ public class JSDLToolPlugin extends AbstractCombinedUIMenusPlugin
 	protected void performMenuAction(UIPluginContext context, MenuType menuType)
 			throws UIPluginException
 	{
-		ExternalHooks externalHooks = new ExternalHooks();
-		
-		Collection<RNSPath> paths = 
-			context.endpointRetriever().getTargetEndpoints();
-		externalHooks.setExternalJSDLSink(new ExternalJSDLSinkImpl(
-			context.uiContext().callingContext(), paths.iterator().next()));
-		
-		JSDLTool.showJSDLTool(SwingUtilities.getWindowAncestor(
-			context.ownerComponent()), externalHooks);
+		try
+		{
+			Collection<RNSPath> paths = 
+				context.endpointRetriever().getTargetEndpoints();
+			JobTool.launch(null, new JobDefinitionListenerImpl(
+					context.uiContext().callingContext(), paths.iterator().next()));
+		}
+		catch (IOException ioe)
+		{
+			throw new UIPluginException("Unable to run Grid Job Tool.", ioe);
+		}
 	}
 
 	@Override
@@ -120,12 +100,13 @@ public class JSDLToolPlugin extends AbstractCombinedUIMenusPlugin
 		return false;
 	}
 	
-	static private class ExternalJSDLSinkImpl implements ExternalJSDLSink
+	static private class JobDefinitionListenerImpl
+		implements JobDefinitionListener
 	{
 		private ICallingContext _callingContext;
 		private RNSPath _target;
 		
-		private ExternalJSDLSinkImpl(ICallingContext callingContext, 
+		private JobDefinitionListenerImpl(ICallingContext callingContext, 
 			RNSPath target)
 		{
 			_callingContext = callingContext;
@@ -133,7 +114,7 @@ public class JSDLToolPlugin extends AbstractCombinedUIMenusPlugin
 		}
 		
 		@Override
-		public OutputStream openSink() throws IOException
+		public void jobDefinitionGenerated(JobDefinition jobDefinition)
 		{
 			Closeable assumedContextToken = null;
 			
@@ -145,32 +126,18 @@ public class JSDLToolPlugin extends AbstractCombinedUIMenusPlugin
 				EndpointReferenceType target = _target.getEndpoint();
 				TypeInformation typeInfo = new TypeInformation(target);
 				if (typeInfo.isQueue())
-					return openSinkToQueue(_target, target);
+					submitToQueue(target, jobDefinition);
 				else
-					return openSinkToBES(_target, target);
+					submitToBES(target, jobDefinition);
 			}
-			catch (RNSPathDoesNotExistException rpdnee)
+			catch (Throwable e)
 			{
-				throw new FileNotFoundException(String.format(
-					"Couldn't find RNS path \"%s\".", _target.pwd()));
+				_logger.error("Unable to submit JSDL.", e);
 			}
 			finally
 			{
 				StreamUtils.close(assumedContextToken);
 			}
-		}
-
-		@Override
-		public boolean supportsBatch()
-		{
-			try
-			{
-				return new TypeInformation(_target.getEndpoint()).isQueue();
-			}
-			catch (Throwable cause)
-			{
-				return false;
-			}
-		}
+		}	
 	}
 }

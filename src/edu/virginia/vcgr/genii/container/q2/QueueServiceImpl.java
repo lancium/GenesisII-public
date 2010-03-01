@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
@@ -25,6 +26,7 @@ import org.xml.sax.InputSource;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
+import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
 import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.queue.QueueConstants;
 import edu.virginia.vcgr.genii.client.resource.PortType;
@@ -60,6 +62,10 @@ import edu.virginia.vcgr.genii.queue.QueuePortType;
 import edu.virginia.vcgr.genii.queue.ReducedJobInformationType;
 import edu.virginia.vcgr.genii.queue.SubmitJobRequestType;
 import edu.virginia.vcgr.genii.queue.SubmitJobResponseType;
+import edu.virginia.vcgr.jsdl.JobDefinition;
+import edu.virginia.vcgr.jsdl.sweep.SweepException;
+import edu.virginia.vcgr.jsdl.sweep.SweepListener;
+import edu.virginia.vcgr.jsdl.sweep.SweepUtility;
 
 /**
  * This is the service class that the container redirects SOAP messages to.
@@ -445,18 +451,40 @@ public class QueueServiceImpl extends ResourceForkBaseService
 			throws RemoteException
 	{
 		ResourceKey rKey = ResourceManager.getCurrentResource();
+		String ticket;
+		SweepListenerImpl listener;
 		
 		try
 		{
 			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
-			String ticket = mgr.submitJob(submitJobRequest.getPriority(), 
+			
+			JobDefinition jobDefinition = JSDLUtils.convert(
 				submitJobRequest.getJobDefinition());
+			if (jobDefinition.parameterSweeps().size() > 0)
+			{
+				SweepUtility.performSweep(jobDefinition, 
+					listener = new SweepListenerImpl(
+						mgr, submitJobRequest.getPriority()));
+				ticket = listener._tickets.iterator().next();
+			} else
+			{
+				ticket = mgr.submitJob(submitJobRequest.getPriority(), 
+					submitJobRequest.getJobDefinition());
+			}
 			
 			return new SubmitJobResponseType(ticket);
 		}
 		catch (SQLException sqe)
 		{
 			throw new RemoteException("Unable to submit job to queue.", sqe);
+		}
+		catch (JAXBException e)
+		{
+			throw new RemoteException("Unable to submit job to queue.", e);
+		}
+		catch (SweepException e)
+		{
+			throw new RemoteException("Unable to submit job to queue.", e);
 		}
 	}
 
@@ -723,5 +751,51 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		
 		submitJob(new SubmitJobRequestType(jobDef, (byte)0x0));
 		return true;
+	}
+	
+	private class SweepListenerImpl implements SweepListener
+	{
+		private QueueManager _queueManager;
+		private Collection<String> _tickets;
+		private short _prioroity;
+		private int _count = 0;
+		
+		private SweepListenerImpl(QueueManager queueManager,
+			short priority)
+		{
+			_queueManager = queueManager;
+			_tickets = new LinkedList<String>();
+			_prioroity = priority;
+		}
+		
+		@Override
+		public void emitSweepInstance(JobDefinition jobDefinition) 
+			throws SweepException
+		{
+			try
+			{
+				_tickets.add(_queueManager.submitJob(_prioroity,
+					JSDLUtils.convert(jobDefinition)));
+				_logger.debug(String.format(
+					"Submitted job %d from a parameter sweep.", ++_count));
+			}
+			catch (JAXBException je)
+			{
+				throw new SweepException(
+					"Unable to convert JAXB type to Axis type.", je);
+			}
+			catch (ResourceException e)
+			{
+				throw new SweepException("Unable to submit job.", e);
+			}
+			catch (SQLException e)
+			{
+				throw new SweepException("Unable to submit job.", e);
+			}
+			catch (IOException e)
+			{
+				throw new SweepException("Unable to submit job.", e);
+			}
+		}
 	}
 }

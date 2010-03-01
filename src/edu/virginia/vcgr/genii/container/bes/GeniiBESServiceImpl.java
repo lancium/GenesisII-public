@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.Properties;
 import java.util.Random;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
@@ -83,6 +84,7 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
+import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.resource.PortType;
@@ -112,6 +114,7 @@ import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
+import edu.virginia.vcgr.jsdl.JobDefinition;
 
 public class GeniiBESServiceImpl extends GenesisIIBase implements
 	GeniiBESPortType, BESConstants
@@ -224,6 +227,23 @@ public class GeniiBESServiceImpl extends GenesisIIBase implements
 	{
 		ActivityDocumentType adt = parameters.getActivityDocument();
 		JobDefinition_Type jdt = adt.getJobDefinition();
+		
+		try
+		{
+			JobDefinition jaxbType = JSDLUtils.convert(jdt);
+			if (jaxbType.parameterSweeps().size() > 0)
+			{
+				throw new UnsupportedFeatureFaultType(new String[] {
+						"This BES container does not support JSDL parameter sweeps."
+					}, null);
+			}
+		}
+		catch (JAXBException je)
+		{
+			_logger.warn("Unable to parse using JAXB.", je);
+			// Ignore and hope that it still works out.
+		}
+		
 		ResourceKey key = ResourceManager.getCurrentResource();
 		MessageElement subscribe = null;
 		

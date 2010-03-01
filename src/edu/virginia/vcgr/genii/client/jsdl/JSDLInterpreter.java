@@ -71,7 +71,6 @@ import edu.virginia.vcgr.genii.client.jsdl.spmd.SPMDConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
-import edu.virginia.vcgr.genii.jsdltool.doc.JSDLConstants;
 
 public class JSDLInterpreter
 {
@@ -139,7 +138,7 @@ public class JSDLInterpreter
 						understandResourcesAny(provider, f2, newUnderstanding,
 							children.toArray(new MessageElement[children.size()]));
 						f2.completeFacet(understanding, newUnderstanding);
-					} else if (name.equals(new QName(JSDLConstants.GENII_NS, "WallclockTime")))
+					} else if (name.equals(new QName("http://vcgr.cs.virginia.edu/jsdl/genii", "WallclockTime")))
 					{
 						try
 						{

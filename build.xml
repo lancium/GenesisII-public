@@ -39,8 +39,16 @@
 		<fileset dir="${jfreechart.home}" includes="**/*.jar"/>
 	</path>
 
-	<path id="jsdltool.classpath">
-		<fileset dir="${jsdltool.home}" includes="**/*.jar"/>
+	<path id="gridjobtool.classpath">
+		<fileset dir="${gridjobtool.home}" includes="**/*.jar"/>
+	</path>
+
+	<path id="geniijsdl.classpath">
+		<fileset dir="${geniijsdl.home}" includes="**/*.jar"/>
+	</path>
+
+	<path id="macosxswing.classpath">
+		<fileset dir="${macosxswing.home}" includes="**/*.jar"/>
 	</path>
 
 	<path id="dpage.classpath">
@@ -89,7 +97,9 @@
 		<path refid="jsch.classpath"/>
 		<path refid="ant.classpath"/>
 		<path refid="jfreechart.classpath"/>
-		<path refid="jsdltool.classpath"/>
+		<path refid="gridjobtool.classpath"/>
+		<path refid="geniijsdl.classpath"/>
+		<path refid="macosxswing.classpath"/>
 		<path refid="dpage.classpath"/>
 		<path refid="axis.classpath"/>
 		<path refid="jetty.classpath"/>
