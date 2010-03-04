@@ -1,7 +1,9 @@
 package edu.virginia.vcgr.genii.container.q2;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.rmi.RemoteException;
@@ -26,6 +28,8 @@ import org.xml.sax.InputSource;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
+import edu.virginia.vcgr.genii.client.context.ContextManager;
+import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
 import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.queue.QueueConstants;
@@ -465,7 +469,7 @@ public class QueueServiceImpl extends ResourceForkBaseService
 				SweepUtility.performSweep(jobDefinition, 
 					listener = new SweepListenerImpl(
 						mgr, submitJobRequest.getPriority()));
-				ticket = listener._tickets.iterator().next();
+				ticket = listener.firstTicket();
 			} else
 			{
 				ticket = mgr.submitJob(submitJobRequest.getPriority(), 
@@ -473,6 +477,15 @@ public class QueueServiceImpl extends ResourceForkBaseService
 			}
 			
 			return new SubmitJobResponseType(ticket);
+		}
+		catch (IOException ioe)
+		{
+			throw new RemoteException("Unable to submit job to queue.", ioe);
+		}
+		catch (InterruptedException ie)
+		{
+			throw new RemoteException(
+				"Unable to wait for first ticket to get generated.", ie);
 		}
 		catch (SQLException sqe)
 		{
@@ -755,27 +768,47 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	
 	private class SweepListenerImpl implements SweepListener
 	{
+		private ICallingContext _callingContext;
 		private QueueManager _queueManager;
 		private Collection<String> _tickets;
 		private short _prioroity;
 		private int _count = 0;
 		
+		private String firstTicket() throws InterruptedException
+		{
+			synchronized(_tickets)
+			{
+				while (_tickets.isEmpty())
+					_tickets.wait();
+				
+				return _tickets.iterator().next();
+			}
+		}
+		
 		private SweepListenerImpl(QueueManager queueManager,
-			short priority)
+			short priority) throws FileNotFoundException, IOException
 		{
 			_queueManager = queueManager;
 			_tickets = new LinkedList<String>();
 			_prioroity = priority;
+			_callingContext = ContextManager.getCurrentContext();
 		}
 		
 		@Override
 		public void emitSweepInstance(JobDefinition jobDefinition) 
 			throws SweepException
 		{
+			Closeable token = null;
+			
 			try
 			{
-				_tickets.add(_queueManager.submitJob(_prioroity,
-					JSDLUtils.convert(jobDefinition)));
+				token = ContextManager.temporarilyAssumeContext(_callingContext);
+				synchronized(_tickets)
+				{
+					_tickets.add(_queueManager.submitJob(_prioroity,
+						JSDLUtils.convert(jobDefinition)));
+					_tickets.notifyAll();
+				}
 				_logger.debug(String.format(
 					"Submitted job %d from a parameter sweep.", ++_count));
 			}
@@ -795,6 +828,10 @@ public class QueueServiceImpl extends ResourceForkBaseService
 			catch (IOException e)
 			{
 				throw new SweepException("Unable to submit job.", e);
+			}
+			finally
+			{
+				StreamUtils.close(token);
 			}
 		}
 	}

@@ -33,7 +33,7 @@
 	<classpathentry kind="lib" path="ext/MorganU/MorganUtilities.jar"/>
 	<classpathentry kind="lib" path="ext/MacOSXSwing/MacOSXSwing.jar"/>
 	<classpathentry kind="lib" path="ext/GridJobTool/GridJobTool.jar"/>
-	<classpathentry kind="lib" path="ext/GeniiJSDL/GeniiJSDL.jar"/>
+	<classpathentry kind="lib" path="ext/GeniiJSDL/GeniiJSDL.jar" sourcepath="/GeniiJSDL/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="ext/derby/derby.jar"/>
 	<classpathentry kind="lib" path="ext/xmldb/db.jar"/>
