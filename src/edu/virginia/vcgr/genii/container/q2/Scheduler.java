@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.container.q2;
 import java.io.Closeable;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.cservices.gridlogger.GridLogDevice;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.matching.JobResourceRequirements;
+import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
 /**
  * The scheduler class is another manager used by the queue that actively
@@ -27,27 +29,55 @@ import edu.virginia.vcgr.genii.container.q2.matching.JobResourceRequirements;
  */
 public class Scheduler implements Closeable
 {
+	static final private String IS_SCHEDULING_PROPERTY = 
+		"edu.virginia.vcgr.genii.container.q2.is-scheulding";
+	
 	static private Log _logger = LogFactory.getLog(Scheduler.class);
 	static private GridLogDevice _jobLogger = new GridLogDevice(Scheduler.class);
 	
 	volatile private boolean _closed = false;
 	
+	private String _queueID;
+	
 	private SchedulingEvent _schedulingEvent;
 	private DatabaseConnectionPool _connectionPool;
+	
+	private volatile boolean _isSchedulingJobs;
 	
 	private JobManager _jobManager;
 	private BESManager _besManager;
 	
-	public Scheduler(
+	private void loadIsSchedulingJobs() throws SQLException
+	{
+		Connection connection = null;
+		
+		try
+		{
+			connection = _connectionPool.acquire(true);
+			String str = (String)BasicDBResource.getProperty(
+				connection, _queueID,
+				IS_SCHEDULING_PROPERTY);
+			_isSchedulingJobs = (str == null) ? true : Boolean.parseBoolean(str);
+		}
+		finally
+		{
+			_connectionPool.release(connection);
+		}
+	}
+	
+	public Scheduler(String queueID,
 		SchedulingEvent schedulingEvent, 
 		DatabaseConnectionPool connectionPool,
-		JobManager jobManager, BESManager besManager)
+		JobManager jobManager, BESManager besManager) throws SQLException
 	{
 		_schedulingEvent = schedulingEvent;
 		_connectionPool = connectionPool;
 		
 		_jobManager = jobManager;
 		_besManager = besManager;
+		_queueID = queueID;
+		
+		loadIsSchedulingJobs();
 		
 		Thread schedulerThread = new Thread(new SchedulerWorker());
 		schedulerThread.setDaemon(true);
@@ -75,6 +105,14 @@ public class Scheduler implements Closeable
 	 */
 	private void scheduleJobs() throws ResourceException
 	{
+		
+		if (!_isSchedulingJobs)
+		{
+			_logger.info("Skipping a scheduling loop because the \"" +
+				"isScheduling\" property of the queue is turned off.");
+			return;
+		}
+		
 		HashMap<Long, ResourceSlots> slots = 
 			new HashMap<Long, ResourceSlots>();
 		HashMap<JobResourceRequirements, Counter> jobCounts =
@@ -375,5 +413,31 @@ public class Scheduler implements Closeable
 				}
 			}
 		}
+	}
+	
+	public void storeIsScheduling(boolean isScheduling) 
+		throws SQLException
+	{
+		Connection connection = null;
+		
+		try
+		{
+			connection = _connectionPool.acquire(true);
+			BasicDBResource.setProperty(
+				connection, _queueID, IS_SCHEDULING_PROPERTY,
+				isScheduling);
+			_isSchedulingJobs = isScheduling;
+			if (_isSchedulingJobs)
+				_schedulingEvent.notifySchedulingEvent();
+		}
+		finally
+		{
+			_connectionPool.release(connection);
+		}
+	}
+	
+	final public boolean isSchedulingJobs()
+	{
+		return _isSchedulingJobs;
 	}
 }

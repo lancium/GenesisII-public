@@ -1,9 +1,13 @@
 package edu.virginia.vcgr.genii.client.nativeq;
 
+import java.io.File;
 import java.util.Properties;
 
 import org.ggf.jsdl.OperatingSystemTypeEnumeration;
 import org.ggf.jsdl.ProcessorArchitectureEnumeration;
+
+import edu.virginia.vcgr.genii.client.bes.GeniiBESConstants;
+import edu.virginia.vcgr.genii.container.bes.BESUtilities;
 
 public class NativeQProperties
 {
@@ -78,5 +82,24 @@ public class NativeQProperties
 			return Long.valueOf(value);
 		
 		return null;
+	}
+	
+	public File commonDirectory()
+	{
+		File basedir = null;
+		
+		String dir = _properties.getProperty(
+			GeniiBESConstants.SHARED_DIRECTORY_PROPERTY);
+		if (dir != null)
+			basedir = new File(dir);
+			
+		File configDir = null;
+		if (basedir == null)
+		{
+			configDir = BESUtilities.getBESWorkerDir();
+		} else
+			configDir = basedir;
+		
+		return configDir;
 	}
 }

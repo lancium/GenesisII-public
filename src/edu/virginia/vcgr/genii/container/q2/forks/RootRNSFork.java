@@ -22,5 +22,6 @@ public class RootRNSFork extends StaticRNSResourceFork
 		addDefaultEntry("jobs", JobsRNSFork.class);
 		addDefaultEntry("submission-point", JobSubmissionFork.class);
 		addDefaultEntry("summary", QueueSummaryResourceFork.class);
+		addDefaultEntry("is-scheduling-jobs", IsSchedulingPropertyFork.class);
 	}
 }

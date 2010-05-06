@@ -17,6 +17,7 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
@@ -150,9 +151,9 @@ public class ReplicatedExportTool extends BaseGridTool
 			try{
 				ContextManager.storeCurrentContext(createContext);
 				primaryRootEPR = CreateResourceTool.createInstance(exportService1EPR, 
-						targetFileRNSPath, creationProperties);
+						new GeniiPath(targetFileRNSPath), creationProperties);
 				secondaryRootEPR = CreateResourceTool.createInstance(exportService1EPR, 
-						targetFileRNSPath + "-R", creationProperties);
+					new GeniiPath(targetFileRNSPath + "-R"), creationProperties);
 			}
 			finally{
 				ContextManager.storeCurrentContext(origContext);
@@ -234,7 +235,7 @@ public class ReplicatedExportTool extends BaseGridTool
 			EndpointReferenceType exportServiceEPR, String localPath, String RNSPath) 
 		throws ResourceException,
 			ResourceCreationFaultType, RemoteException, RNSException,
-			CreationException
+			CreationException, InvalidToolUsageException
 	{
 		MessageElement[] createProps = new MessageElement[2];
 		createProps[0] = new MessageElement(new QName(
@@ -242,7 +243,8 @@ public class ReplicatedExportTool extends BaseGridTool
 		createProps[1] = new MessageElement(new QName(
 			GenesisIIConstants.GENESISII_NS, "parent-ids"), "");
 
-		return CreateResourceTool.createInstance(exportServiceEPR, RNSPath, createProps);
+		return CreateResourceTool.createInstance(exportServiceEPR, 
+			new GeniiPath(RNSPath), createProps);
 	}
 	
 	static public EndpointReferenceType createUpdateSubscription(

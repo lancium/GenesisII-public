@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.container.bes.jsdl.personality.common;
 
+import java.io.File;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,12 +11,7 @@ import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemRelativePath;
 import edu.virginia.vcgr.genii.client.jsdl.InvalidJSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
-import edu.virginia.vcgr.genii.container.bes.execution.phases.FileRedirectionSink;
-import edu.virginia.vcgr.genii.container.bes.execution.phases.FileRedirectionSource;
-import edu.virginia.vcgr.genii.container.bes.execution.phases.StreamRedirectionDescription;
-import edu.virginia.vcgr.genii.container.bes.execution.phases.StreamRedirectionSink;
-import edu.virginia.vcgr.genii.container.bes.execution.phases.StreamRedirectionSource;
-import edu.virginia.vcgr.genii.container.bes.execution.phases.TeeRedirectionSink;
+import edu.virginia.vcgr.genii.container.bes.execution.phases.PassiveStreamRedirectionDescription;
 
 public abstract class PosixLikeApplicationUnderstanding extends
 		CommonApplicationUnderstanding
@@ -138,9 +134,10 @@ public abstract class PosixLikeApplicationUnderstanding extends
 				"Can't run JSDL without an executable to run.");
 	}
 	
-	protected StreamRedirectionDescription getStreamRedirectionDescription()
+	protected PassiveStreamRedirectionDescription getStreamRedirectionDescription()
 		throws JSDLException
 	{
+		/* Old way
 		StreamRedirectionSource stdin = null;
 		StreamRedirectionSink stdout = null;
 		StreamRedirectionSink stderr = null;
@@ -172,7 +169,23 @@ public abstract class PosixLikeApplicationUnderstanding extends
 			else
 				stderr = tty;
 		}
+		*/
 		
-		return new StreamRedirectionDescription(stdin, stdout, stderr);
+		File stdin = null;
+		File stdout = null;
+		File stderr = null;
+		
+		FilesystemRelativePath stdinRedirect = getStdinRedirect();
+		FilesystemRelativePath stdoutRedirect = getStdoutRedirect();
+		FilesystemRelativePath stderrRedirect = getStderrRedirect();
+		
+		if (stdinRedirect != null)
+			stdin = getFilesystemManager().lookup(stdinRedirect);
+		if (stdoutRedirect != null)
+			stdout = getFilesystemManager().lookup(stdoutRedirect);
+		if (stderrRedirect != null)
+			stderr = getFilesystemManager().lookup(stderrRedirect);
+		
+		return new PassiveStreamRedirectionDescription(stdin, stdout, stderr);
 	}
 }

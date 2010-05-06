@@ -26,8 +26,6 @@ import edu.virginia.vcgr.genii.container.Container;
 
 public class DatabaseConnectionPool
 {
-	static private final String _DB_CLASS_NAME_PROPERTY =
-		"edu.virginia.vcgr.genii.container.db.db-class-name";
 	static private final String _DB_CONNECT_STRING_PROPERTY =
 		"edu.virginia.vcgr.genii.container.db.db-connect-string";
 	static private final String _DB_USER_PROPERTY =
@@ -40,7 +38,7 @@ public class DatabaseConnectionPool
 	static private final String _SPECIAL_STRING = "${server-dir}";
 	
 	static private final String _DB_POOL_SIZE_DEFAULT = "16";
-	static private final long REJUVENATION_CYCLE = 1000L * 60 * 60;
+	static private final long REJUVENATION_CYCLE = 1000L * 60 * 1;
 	
 	static private Log _logger = LogFactory.getLog(DatabaseConnectionPool.class);
 
@@ -52,7 +50,6 @@ public class DatabaseConnectionPool
 	private String _connectString;
 	private String _user;
 	private String _password;
-	private String _className;
 	
 	static private String replaceMacros(String str)
 	{
@@ -90,20 +87,12 @@ public class DatabaseConnectionPool
 		
 		_connPool = new LinkedList<Connection>();
 		
-		_className = connectionProperties.getProperty(
-			_DB_CLASS_NAME_PROPERTY);
-		if (_className == null)
-			throw new IllegalArgumentException(
-				"Class name for database connection cannot be null.");
-		
 		_connectString = connectionProperties.getProperty(_DB_CONNECT_STRING_PROPERTY);
 		if (_connectString == null)
 			throw new IllegalArgumentException(
 				"Connect string cannot be null for database connection.");
 		
 		_connectString = replaceMacros(_connectString);
-		
-		Class.forName(_className).newInstance();
 		
 		_user = connectionProperties.getProperty(_DB_USER_PROPERTY);
 		_password = connectionProperties.getProperty(_DB_PASSWORD_PROPERTY);
@@ -223,7 +212,27 @@ public class DatabaseConnectionPool
 			// If we got this far, something is seriously wrong with the 
 			// database.  Do a rejuvenation in the hopes that that will
 			// fix it.
-			rejuvenate();
+			try
+			{
+				rejuvenate();
+			}
+			catch (SQLException sqe)
+			{
+				throw new RuntimeException(
+					"Unable to reload JDBC Driver.", sqe);
+			} catch (InstantiationException e)
+			{
+				throw new RuntimeException(
+						"Unable to reload JDBC Driver.", e);
+			} catch (IllegalAccessException e)
+			{
+				throw new RuntimeException(
+						"Unable to reload JDBC Driver.", e);
+			} catch (ClassNotFoundException e)
+			{
+				throw new RuntimeException(
+						"Unable to reload JDBC Driver.", e);
+			}
 		}
 	}
 	
@@ -239,14 +248,17 @@ public class DatabaseConnectionPool
 	}
 	
 	private void rejuvenate()
+		throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException
 	{
-		boolean skipRejuvenate = false;
+		boolean skipRejuvenate = true;
 		
 		if (skipRejuvenate)
 			return;
 		
 		_logger.info("Rejuvenating database.");
 		Connection connection = null;
+		Driver oldDriver = null;
+		String oldDriverClass = null;
 		
 		try
 		{
@@ -275,6 +287,7 @@ public class DatabaseConnectionPool
 			 */
 			_connPool.clear();
 			
+			oldDriver = DriverManager.getDriver("jdbc:derby:");
 			try
 			{
 				/* I know that this breaks the pluggability of our database,
@@ -295,9 +308,12 @@ public class DatabaseConnectionPool
 			
 			try
 			{
-				Driver oldDriver = DriverManager.getDriver("jdbc:derby:");
 				if (oldDriver != null)
+				{
+					oldDriverClass = oldDriver.getClass().getName();
 					DriverManager.deregisterDriver(oldDriver);
+				} else
+					System.err.format("Old driver was null!\n");
 			}
 			catch (Throwable cause)
 			{
@@ -311,15 +327,12 @@ public class DatabaseConnectionPool
 			try { Thread.sleep(1000L * 5); } catch (Throwable cause) {}
 			System.gc();
 			
-			try
+			if (oldDriverClass != null)
 			{
-				Class.forName(_className).newInstance();
-			}
-			catch (Throwable cause)
-			{
-				_logger.error("Unable to reload database after rejuvenation -- shutting down.",
-					cause);
-				System.exit(1);
+				System.err.format("Re-registering \"%s\".\n", oldDriverClass);
+				DriverManager.registerDriver(
+					(Driver)Class.forName(oldDriverClass).newInstance());
+				System.err.format("Done re-registering \"%s\".\n", oldDriverClass);
 			}
 			
 			ContainerStatistics.instance().getDatabaseStatistics().resetDatabase();

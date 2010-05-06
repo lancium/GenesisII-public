@@ -13,6 +13,7 @@ import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransfererFact
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
@@ -151,7 +152,7 @@ public class ByteIOPerformanceTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		RNSPath source = RNSPath.getCurrent().lookup(getArgument(0));
+		RNSPath source = lookup(new GeniiPath(getArgument(0)));
 		
 		boolean testRPC = true;
 		

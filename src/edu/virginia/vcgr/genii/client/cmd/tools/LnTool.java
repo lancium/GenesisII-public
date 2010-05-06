@@ -1,9 +1,8 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.rmi.RemoteException;
 
 import org.morgan.util.io.StreamUtils;
@@ -12,6 +11,7 @@ import org.xml.sax.InputSource;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
@@ -29,6 +29,7 @@ public class LnTool extends BaseGridTool
 	
 	private String _eprFile = null;
 	private String _serviceURL = null;
+	private boolean _noLookup = false;
 	
 	public LnTool()
 	{
@@ -45,21 +46,27 @@ public class LnTool extends BaseGridTool
 		_serviceURL = serviceURL;
 	}
 	
+	public void setNo_lookup()
+	{
+		_noLookup = true;
+	}
+	
 	@Override
 	protected int runCommand() throws Throwable
 	{
 		if (numArguments() == 1)
 		{
 			if (_eprFile != null)
-				link(new File(_eprFile),
-					getArgument(0));
+				link(new GeniiPath(_eprFile),
+					new GeniiPath(getArgument(0)));
 			else if (_serviceURL != null)
-				link(EPRUtils.makeEPR(_serviceURL),
-					getArgument(0));
+				link(EPRUtils.makeEPR(_serviceURL, !_noLookup),
+					new GeniiPath(getArgument(0)));
 			else
-				link(getArgument(0), null);
+				link(new GeniiPath(getArgument(0)), null);
 		} else
-			link(getArgument(0), getArgument(1));
+			link(new GeniiPath(getArgument(0)),
+				new GeniiPath(getArgument(1)));
 		
 		return 0;
 	}
@@ -72,42 +79,40 @@ public class LnTool extends BaseGridTool
 	}
 	
 
-	static public void link(File eprFile, String target)
-		throws RNSException, IOException
+	static public void linkFromEPRFile(GeniiPath eprFile, GeniiPath target)
+		throws RNSException, IOException, InvalidToolUsageException
 	{
-		FileInputStream fin = null;
+		InputStream in = null;
 		
 		try
 		{
-			fin = new FileInputStream(eprFile);
+			in = eprFile.openInputStream();
 			link((EndpointReferenceType)ObjectDeserializer.deserialize(
-				new InputSource(fin), EndpointReferenceType.class), 
+				new InputSource(in), EndpointReferenceType.class), 
 				target);
 		}
 		finally
 		{
-			StreamUtils.close(fin);
+			StreamUtils.close(in);
 		}
 	}
 	
-	static public void link(EndpointReferenceType epr, String target)
-		throws RNSException, RemoteException
+	static public void link(EndpointReferenceType epr, GeniiPath target)
+		throws RNSException, RemoteException, InvalidToolUsageException
 	{
-		RNSPath currentPath = RNSPath.getCurrent();
-		RNSPath path = currentPath.lookup(target, RNSPathQueryFlags.MUST_NOT_EXIST);
+		RNSPath path = lookup(target, RNSPathQueryFlags.MUST_NOT_EXIST);
 		
 		link(epr, path);
 	}
 	
-	static public void link(String source, String target)
-		throws RNSException, IOException
+	static public void link(GeniiPath source, GeniiPath target)
+		throws RNSException, IOException, InvalidToolUsageException
 	{
-		RNSPath currentPath = RNSPath.getCurrent();
 		RNSPath sourcePath;
 		
 		try
 		{
-			sourcePath = currentPath.lookup(source, RNSPathQueryFlags.MUST_EXIST);
+			sourcePath = lookup(source, RNSPathQueryFlags.MUST_EXIST);
 		}
 		catch (RNSPathDoesNotExistException e)
 		{
@@ -115,9 +120,9 @@ public class LnTool extends BaseGridTool
 		}
 		
 		if (target == null)
-			target = sourcePath.getName();
+			target = new GeniiPath(sourcePath.getName());
 		
-		RNSPath targetPath = currentPath.lookup(target, 
+		RNSPath targetPath = lookup(target, 
 			RNSPathQueryFlags.MUST_NOT_EXIST);
 		
 		link(sourcePath.getEndpoint(), targetPath);

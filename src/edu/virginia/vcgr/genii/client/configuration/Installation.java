@@ -15,10 +15,12 @@ public class Installation
 		"deployments";
 	static private final String WEBAPPS_DIR_NAME = "webapps/axis";
 	static private final String OGRSH_DIRECTORY_NAME = "OGRSH";
+	static private final String PROCESS_WRAPPER_DIR_NAME = "ext/pwrapper/bin";
 	
 	static private File _installationDirectory;
 	static private File _deploymentsDirectory;
 	static private File _webAppDirectory;
+	static private File _processWrapperDirectory;
 	static private OGRSH _ogrsh = null;
 	
 	static
@@ -51,6 +53,9 @@ public class Installation
 				"Installation is corrupt -- " + 
 				WEBAPPS_DIR_NAME + " is not a directory.");
 		
+		_processWrapperDirectory = new File(_installationDirectory,
+			PROCESS_WRAPPER_DIR_NAME);
+		
 		reload();
 	}
 	
@@ -72,6 +77,11 @@ public class Installation
 	static public File axisWebApplicationPath()
 	{
 		return _webAppDirectory;
+	}
+	
+	static public File getProcessWrapperBinPath()
+	{
+		return _processWrapperDirectory;
 	}
 	
 	static public void reload()

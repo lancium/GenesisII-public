@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.nativeq;
 
+import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,13 +21,14 @@ public class ApplicationDescription
 	private String _stdoutRedirect;
 	private String _stderrRedirect;
 	private ResourceConstraints _resourceConstraints;
+	private File _resourceUsagePath;
 	
 	public ApplicationDescription(
 		URI spmdVariation, Integer numProcesses, Integer numProcessesPerHost,
 		String executableName, Collection<String> arguments,
 		Map<String, String> environment,
 		String stdinRedirect, String stdoutRedirect, String stderrRedirect,
-		ResourceConstraints resourceConstraints)
+		ResourceConstraints resourceConstraints, File resourceUsagePath)
 	{
 		_spmdVariation = spmdVariation;
 		_numProcesses = numProcesses;
@@ -49,6 +51,7 @@ public class ApplicationDescription
 		_stderrRedirect = stderrRedirect;
 		
 		_resourceConstraints = resourceConstraints;
+		_resourceUsagePath = resourceUsagePath;
 	}
 
 	public URI getSPMDVariation()
@@ -81,23 +84,49 @@ public class ApplicationDescription
 		return _environment;
 	}
 
-	public String getStdinRedirect()
+	public File getStdinRedirect(File workingDirectory)
 	{
-		return _stdinRedirect;
+		if (_stdinRedirect == null)
+			return null;
+		
+		File stdin = new File(_stderrRedirect);
+		if (stdin.isAbsolute())
+			return stdin;
+		
+		return new File(workingDirectory, _stdinRedirect);
 	}
 
-	public String getStdoutRedirect()
+	public File getStdoutRedirect(File workingDirectory)
 	{
-		return _stdoutRedirect;
+		if (_stdoutRedirect == null)
+			return null;
+		
+		File stdout = new File(_stdoutRedirect);
+		if (stdout.isAbsolute())
+			return stdout;
+		
+		return new File(workingDirectory, _stdoutRedirect);
 	}
 
-	public String getStderrRedirect()
+	public File getStderrRedirect(File workingDirectory)
 	{
-		return _stderrRedirect;
+		if (_stderrRedirect == null)
+			return null;
+		
+		File stderr = new File(_stderrRedirect);
+		if (stderr.isAbsolute())
+			return stderr;
+		
+		return new File(workingDirectory, _stderrRedirect);
 	}
 	
 	public ResourceConstraints getResourceConstraints()
 	{
 		return _resourceConstraints;
+	}
+	
+	public File getResourceUsagePath()
+	{
+		return _resourceUsagePath;
 	}
 }

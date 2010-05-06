@@ -1,5 +1,8 @@
 package edu.virginia.vcgr.genii.container.q2.matching;
 
+import java.util.Collection;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.Boundary_Type;
@@ -267,11 +270,37 @@ public class JobResourceRequirements
 				return false;
 		}
 		
+		// First check to see if all of the matching parameters that we
+		// asked for are matched.
 		if (_matchingParameters != null)
 		{
 			for (MatchingParameter parameter : _matchingParameters)
 			{
 				if (!parameter.matches(besInfo.getMatchingParameters()))
+					return false;
+			}
+		}
+		
+		// Now we check to see if there were any "required" matching parameters
+		// that were not matched.
+		Map<String, Collection<String>> besParams = 
+			besInfo.getMatchingParameters();
+		boolean found;
+		for (String paramName : besParams.keySet())
+		{
+			if (paramName.startsWith("requires"))
+			{
+				found = false;
+				for (MatchingParameter parameter : _matchingParameters)
+				{
+					if (parameter.supportsRequired(paramName, besParams.get(paramName)))
+					{
+						found = true;
+						break;
+					}
+				}
+				
+				if (!found)
 					return false;
 			}
 		}

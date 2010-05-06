@@ -15,6 +15,7 @@ import edu.virginia.vcgr.genii.client.jsdl.personality.GeniiPropertyFacet;
 abstract class MatchingParameter
 {
 	abstract boolean matches(Map<String, Collection<String>> besParameters);
+	abstract boolean supportsRequired(String parameterName, Collection<String> values);
 	
 	static private MatchingParameter createDefaultMatchingParameter(
 		MessageElement e)

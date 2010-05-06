@@ -27,6 +27,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.recursived.RNSRecursiveDescent;
 import edu.virginia.vcgr.genii.client.rns.recursived.RNSRecursiveDescentCallback;
+import edu.virginia.vcgr.genii.client.rns.recursived.RNSRecursiveDescentCallbackResult;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 
@@ -152,10 +153,10 @@ public class ExportedRootServiceImpl extends ExportedDirServiceImpl implements
 					}
 	
 					@Override
-					public boolean handleRNSPath(RNSPath path) throws Throwable
+					public RNSRecursiveDescentCallbackResult handleRNSPath(
+						RNSPath path) throws Throwable
 					{
-						// do nothing
-						return true;
+						return RNSRecursiveDescentCallbackResult.Continue;
 					}
 				});
 		}

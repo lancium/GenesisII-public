@@ -7,6 +7,7 @@ import java.net.URL;
 import java.rmi.RemoteException;
 import java.rmi.server.ExportException;
 
+import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.tools.ExportTool;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.rcreate.CreationException;
@@ -24,7 +25,7 @@ public class ExportManipulator
 		boolean isLightweight)
 			throws FileNotFoundException, ExportException,
 				RNSException, CreationException,
-				ResourceCreationFaultType, RemoteException, IOException
+				ResourceCreationFaultType, RemoteException, IOException, InvalidToolUsageException
 	{
 		validate(localPath);
 			

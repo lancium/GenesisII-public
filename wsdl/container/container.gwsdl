@@ -120,6 +120,21 @@
 		<wsdl:part name="shutdownResponse" 
 			element="container:shutdownResponse"/>
 	</wsdl:message>
+
+	<wsdl:message name="iterateAccountingRecordsRequest">
+		<wsdl:part name="iterateAccountingRecordsRequest"
+			element="container:IterateAccountingRecordsRequest"/>
+	</wsdl:message>
+
+	<wsdl:message name="iterateAccountingRecordsResponse">
+		<wsdl:part name="iterateAccountingRecordsResponse"
+			element="container:IterateAccountingRecordsResponse"/>
+	</wsdl:message>
+
+	<wsdl:message name="commitAccountingRecordsRequest">
+		<wsdl:part name="commitAccountingRecordsRequest"
+			element="container:CommitAccountingRecordsRequest"/>
+	</wsdl:message>
 	
 	<wsdl:portType name="VCGRContainerPortType">
 		<genii-ext:extend portType="rfork:ResourceForkPortType"/>
@@ -132,6 +147,15 @@
 		<wsdl:operation name="containerStatistics">
 			<wsdl:input message="container:containerStatistics"/>
 			<wsdl:output message="container:containerStatisticsResponse"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="iterateAccountingRecords">
+			<wsdl:input message="container:iterateAccountingRecordsRequest"/>
+			<wsdl:output message="container:iterateAccountingRecordsResponse"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="commitAccountingRecords">
+			<wsdl:input message="container:commitAccountingRecordsRequest"/>
 		</wsdl:operation>
 	</wsdl:portType>
 </wsdl:definitions>

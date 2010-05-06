@@ -4,8 +4,12 @@
 	targetNamespace="http://vcgr.cs.virginia.edu/container/2006/07/container"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	xmlns:container="http://vcgr.cs.virginia.edu/container/2006/07/container"
+	xmlns:iterator="http://vcgr.cs.virginia.edu/genii/iterator"
 	elementFormDefault="qualified"
 	attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://vcgr.cs.virginie.edu/genii/iterator"
+		schemaLocation="./iterator.xsd"/>
 
 	<xsd:complexType name="ContainerStatisticsResultType">
 		<xsd:sequence>
@@ -19,5 +23,59 @@
 	</xsd:complexType>
 	<xsd:element name="ContainerStatisticsResultType"
 		type="container:ContainerStatisticsResultType"/>
+
+	<xsd:complexType name="AccountingRecordType">
+		<xsd:sequence>
+			<xsd:element name="record-id" type="xsd:long"
+				minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="bes-epi" type="xsd:string"
+				minOccurs="0" maxOccurs="1" nillable="true"/>
+			<xsd:element name="arch" type="xsd:string"
+				minOccurs="1" maxOccurs="1" nillable="true"/>
+			<xsd:element name="os" type="xsd:string"
+				minOccurs="1" maxOccurs="1" nillable="true"/>
+			<xsd:element name="bes-machine-name" type="xsd:string"
+				minOccurs="1" maxOccurs="1" nillable="true"/>
+			<xsd:element name="command-line-value" type="xsd:string"
+				minOccurs="1" maxOccurs="unbounded" nillable="false"/>
+			<xsd:element name="exit-code" type="xsd:int"
+				minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="user-time" type="xsd:long"
+				minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="kernel-time" type="xsd:long"
+				minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="wallclock-time" type="xsd:long"
+				minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="maximum-rss" type="xsd:long"
+				minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="credentials"
+				type="xsd:base64Binary" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="recordaddtime"
+				type="xsd:dateTime" minOccurs="1" maxOccurs="1"
+				nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="AccountingRecord"
+		type="container:AccountingRecordType"/>
+
+	<xsd:element name="IterateAccountingRecordsRequest"/>
+	<xsd:complexType name="IterateAccountingRecordsResponseType">
+		<xsd:sequence>
+			<xsd:element name="result"
+				type="iterator:IteratorInitializationType"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="IterateAccountingRecordsResponse"
+		type="container:IterateAccountingRecordsResponseType"/>
+
+	<xsd:complexType name="CommitAccountingRecordsRequestType">
+		<xsd:sequence>
+			<xsd:element name="last-record-id-to-commit"
+				type="xsd:long" minOccurs="1" maxOccurs="1" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="CommitAccountingRecordsRequest"
+		type="container:CommitAccountingRecordsRequestType"/>
 
 </xsd:schema>

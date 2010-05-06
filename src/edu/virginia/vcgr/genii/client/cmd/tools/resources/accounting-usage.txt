@@ -1,0 +1,1 @@
+accounting --collect [--no-commit] [--recursive | -r] { <source-container> | <source-container-directory> } <target-database>

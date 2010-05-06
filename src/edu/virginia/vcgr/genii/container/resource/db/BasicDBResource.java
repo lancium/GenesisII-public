@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Properties;
 
 import javax.xml.namespace.QName;
 
@@ -170,21 +171,22 @@ public class BasicDBResource implements IResource
 		}
 	}
 
-	public void setProperty(String propertyName, Object value)
-		throws ResourceException
+	static public void setProperty(Connection connection,
+		String resourceKey, String propertyName, Object value)
+			throws SQLException
 	{
 		PreparedStatement stmt = null;
 		
 		try
 		{
-			stmt = _connection.prepareStatement(_REMOVE_PROPERTY_STMT);
-			stmt.setString(1, _resourceKey);
+			stmt = connection.prepareStatement(_REMOVE_PROPERTY_STMT);
+			stmt.setString(1, resourceKey);
 			stmt.setString(2, propertyName);
 			stmt.executeUpdate();
 			stmt.close();
 			stmt = null;
-			stmt = _connection.prepareStatement(_INSERT_PROPERTY_STMT);
-			stmt.setString(1, _resourceKey);
+			stmt = connection.prepareStatement(_INSERT_PROPERTY_STMT);
+			stmt.setString(1, resourceKey);
 			stmt.setString(2, propertyName);
 			
 			Blob b = DBSerializer.toBlob(value,
@@ -208,16 +210,8 @@ public class BasicDBResource implements IResource
 			
 			stmt.setBlob(3, b);
 			if (stmt.executeUpdate() != 1)
-				throw new ResourceException("Unable to update property \"" +
+				throw new SQLException("Unable to update property \"" +
 					propertyName + "\".");
-		}
-		catch (IOException ioe)
-		{
-			throw new ResourceException("Unable to serialize property value.", ioe);
-		}
-		catch (SQLException sqe)
-		{
-			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
 		}
 		finally
 		{
@@ -225,15 +219,29 @@ public class BasicDBResource implements IResource
 		}
 	}
 	
-	public Object getProperty(String propertyName) throws ResourceException
+	public void setProperty(String propertyName, Object value)
+		throws ResourceException
+	{
+		try
+		{
+			setProperty(_connection, _resourceKey, propertyName, value);
+		}
+		catch (SQLException sqe)
+		{
+			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
+		}
+	}
+	
+	static public Object getProperty(Connection connection, String resourceKey,
+		String propertyName) throws SQLException
 	{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		
 		try
 		{
-			stmt = _connection.prepareStatement(_GET_PROPERTY_STMT);
-			stmt.setString(1, _resourceKey);
+			stmt = connection.prepareStatement(_GET_PROPERTY_STMT);
+			stmt.setString(1, resourceKey);
 			stmt.setString(2, propertyName);
 			rs = stmt.executeQuery();
 			if (!rs.next())
@@ -245,14 +253,22 @@ public class BasicDBResource implements IResource
 			
 			return DBSerializer.fromBlob(blob);
 		}
-		catch (SQLException sqe)
-		{
-			throw new ResourceException("Unable to get property.", sqe);
-		}
 		finally
 		{
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
+		}
+	}
+	
+	public Object getProperty(String propertyName) throws ResourceException
+	{
+		try
+		{
+			return getProperty(_connection, _resourceKey, propertyName);
+		}
+		catch (SQLException sqe)
+		{
+			throw new ResourceException("Unable to get property.", sqe);
 		}
 	}
 
@@ -271,6 +287,11 @@ public class BasicDBResource implements IResource
 			stmt.executeUpdate();
 			stmt.close();
 			stmt = _connection.prepareStatement(_DESTROY_MATCHING_PARAMS_STMT);
+			stmt.setString(1, _resourceKey);
+			stmt.executeUpdate();
+			stmt.close();
+			stmt = _connection.prepareStatement(
+				"DELETE FROM persistedproperties WHERE resourceid = ?");
 			stmt.setString(1, _resourceKey);
 			stmt.executeUpdate();
 			ResourceSummary.removeResources(_connection, _resourceKey);
@@ -485,6 +506,207 @@ public class BasicDBResource implements IResource
 		}
 		finally
 		{
+			StreamUtils.close(stmt);
+		}
+	}
+
+	@Override
+	public Properties getPersistedProperties(String category)
+			throws ResourceException
+	{
+		Properties ret = new Properties();
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try
+		{
+			stmt = _connection.prepareStatement(
+				"SELECT propertyname, propertyvalue " +
+				"FROM persistedproperties " +
+					"WHERE resourceid = ? AND category = ?");
+			stmt.setString(1, _resourceKey);
+			stmt.setString(2, category);
+			rs = stmt.executeQuery();
+			
+			while (rs.next())
+			{
+				ret.setProperty(
+					rs.getString(1),
+					rs.getString(2));
+			}
+			
+			return ret;
+		}
+		catch (SQLException sqe)
+		{
+			throw new ResourceException("Unable to get persisted properties.",
+				sqe);
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+	}
+
+	@Override
+	public void removePersistedProperties(String category)
+			throws ResourceException
+	{
+		PreparedStatement stmt = null;
+		
+		try
+		{
+			stmt = _connection.prepareStatement(
+				"DELETE FROM persistedproperties " +
+					"WHERE resourceid = ? AND category = ?");
+			stmt.setString(1, _resourceKey);
+			stmt.setString(2, category);
+			stmt.executeUpdate();
+		}
+		catch (SQLException sqe)
+		{
+			throw new ResourceException("Unable to remove persisted properties.",
+				sqe);
+		}
+		finally
+		{
+			StreamUtils.close(stmt);
+		}
+	}
+
+	@Override
+	public void removePersistedProperty(String category, String propertyname)
+			throws ResourceException
+	{
+		PreparedStatement stmt = null;
+		
+		try
+		{
+			stmt = _connection.prepareStatement(
+				"DELETE FROM persistedproperties " +
+					"WHERE resourceid = ? AND category = ? AND propertyname = ?");
+			stmt.setString(1, _resourceKey);
+			stmt.setString(2, category);
+			stmt.setString(3, propertyname);
+			stmt.executeUpdate();
+		}
+		catch (SQLException sqe)
+		{
+			throw new ResourceException("Unable to remove persisted property.",
+				sqe);
+		}
+		finally
+		{
+			StreamUtils.close(stmt);
+		}
+	}
+
+	@Override
+	public void replacePersistedProperties(String category,
+		Properties replacement) throws ResourceException
+	{
+		removePersistedProperties(category);
+		PreparedStatement stmt = null;
+		
+		try
+		{
+			stmt = _connection.prepareStatement(
+				"INSERT INTO persistedproperties (" +
+					"resourceid, category, propertyname, propertyvalue) " +
+				"VALUES (?, ?, ?, ?)");
+			for (Object key : replacement.keySet())
+			{
+				stmt.setString(1, _resourceKey);
+				stmt.setString(2, category);
+				stmt.setString(3, key.toString());
+				stmt.setString(4, replacement.getProperty(key.toString()));
+				stmt.addBatch();
+			}
+			
+			stmt.executeBatch();
+		}
+		catch (SQLException sqe)
+		{
+			throw new ResourceException("Unable to remove persisted property.",
+				sqe);
+		}
+		finally
+		{
+			StreamUtils.close(stmt);
+		}
+	}
+
+	@Override
+	public void replacePersistedProperty(String category, String propertyName,
+		String newValue) throws ResourceException
+	{
+		removePersistedProperty(category, propertyName);
+		PreparedStatement stmt = null;
+		
+		if (newValue == null)
+			return;
+		
+		try
+		{
+			stmt = _connection.prepareStatement(
+				"INSERT INTO persistedproperties (" +
+					"resourceid, category, propertyname, propertyvalue) " +
+				"VALUES (?, ?, ?, ?)");
+			stmt.setString(1, _resourceKey);
+			stmt.setString(2, category);
+			stmt.setString(3, propertyName);
+			stmt.setString(4, newValue);
+			stmt.executeUpdate();
+		}
+		catch (SQLException sqe)
+		{
+			throw new ResourceException("Unable to remove persisted property.",
+				sqe);
+		}
+		finally
+		{
+			StreamUtils.close(stmt);
+		}
+	}
+	
+	static public String getEPI(Connection connection, String resourceID)
+		throws SQLException
+	{
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try
+		{
+			stmt = connection.prepareStatement(
+				"SELECT epi FROM resources2 WHERE resourceid = ?");
+			stmt.setString(1, resourceID);
+			rs = stmt.executeQuery();
+			if (rs.next())
+				return rs.getString(1);
+			
+			rs.close();
+			rs = null;
+			
+			stmt.close();
+			stmt = null;
+			
+			stmt = connection.prepareStatement(
+				"SELECT propvalue FROM properties " +
+				"WHERE resourceid = ? AND propname = ?");
+			stmt.setString(1, resourceID);
+			stmt.setString(2, IResource.ENDPOINT_IDENTIFIER_PROPERTY_NAME);
+			
+			rs = stmt.executeQuery();
+			if (rs.next())
+				return (String)DBSerializer.fromBlob(rs.getBlob(1));
+			
+			throw new SQLException(String.format(
+				"Unable to find EPI for resource \"%s\".", resourceID));
+		}
+		finally
+		{
+			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
 		}
 	}

@@ -4,6 +4,7 @@ import edu.virginia.vcgr.genii.common.security.*;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
@@ -24,8 +25,8 @@ public class AuthZTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		RNSPath path = RNSPath.getCurrent();
-		path = path.lookup(getArgument(0), RNSPathQueryFlags.MUST_EXIST);
+		RNSPath path = lookup(new GeniiPath(getArgument(0)),
+			RNSPathQueryFlags.MUST_EXIST);
 		
 		// get the authz config from the target's attributes
 		AuthZConfig config = null;

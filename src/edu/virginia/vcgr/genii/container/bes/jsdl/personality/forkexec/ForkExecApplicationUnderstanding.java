@@ -15,11 +15,12 @@ import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.GridFileSystem;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLFileSystem;
+import edu.virginia.vcgr.genii.container.bes.activity.BESActivityServiceImpl;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
+import edu.virginia.vcgr.genii.container.bes.execution.phases.PassiveStreamRedirectionDescription;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.PrepareApplicationPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.RunProcessPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.SetupFUSEPhase;
-import edu.virginia.vcgr.genii.container.bes.execution.phases.StreamRedirectionDescription;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.TeardownFUSEPhase;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.JobUnderstandingContext;
@@ -42,7 +43,7 @@ class ForkExecApplicationUnderstanding extends PosixLikeApplicationUnderstanding
 	{
 		String ogrshVersion = jobContext.getRequiredOGRSHVersion();
 		
-		StreamRedirectionDescription redirection = 
+		PassiveStreamRedirectionDescription redirection = 
 			getStreamRedirectionDescription();
 		
 		Deployment deployment = Installation.getDeployment(
@@ -86,6 +87,7 @@ class ForkExecApplicationUnderstanding extends PosixLikeApplicationUnderstanding
 		if (ogrshVersion == null)
 		{
 			executionPlan.add(new RunProcessPhase(
+				BESActivityServiceImpl.getCommonDirectory(creationProperties),
 				fsManager.lookup(getExecutable()), stringArgs.toArray(new String[0]),
 				stringEnv, redirection));
 		} else
@@ -101,6 +103,7 @@ class ForkExecApplicationUnderstanding extends PosixLikeApplicationUnderstanding
 			File shim = Installation.getOGRSH(
 				).getInstalledVersions().get(ogrshVersion).shimScript();
 			executionPlan.add(new RunProcessPhase(
+				BESActivityServiceImpl.getCommonDirectory(creationProperties),
 				shim, args.toArray(new String[0]), stringEnv,
 				redirection));
 		}

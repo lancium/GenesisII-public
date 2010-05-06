@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.container.bes.execution.phases;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,18 +18,22 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 		super(phaseState);
 	}
 	
-	static protected void overloadEnvironment(Map<String, String> processEnvironment,
+	static protected Map<String, String> overloadEnvironment(
 		Map<String, String> overload)
 	{
+		Map<String, String> ret = new HashMap<String, String>();
+		
 		if (overload == null || overload.size() == 0)
-			return;
+			return ret;
 		
 		OperatingSystemType os = OperatingSystemType.getCurrent();
 		
 		if (os.isWindows())
-			overloadWindowsEnvironment(processEnvironment, overload);
+			overloadWindowsEnvironment(ret, overload);
 		else
-			overloadLinuxEnvironment(processEnvironment, overload);
+			overloadLinuxEnvironment(ret, overload);
+		
+		return ret;
 	}
 	
 	static private void overloadLinuxEnvironment(
@@ -89,15 +94,15 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 		return null;
 	}
 	
-	static protected void resetCommand(ProcessBuilder builder)
+	static protected List<String> resetCommand(List<String> commandLine,
+		File workingDirectory, Map<String, String> environment)
 	{
-		List<String> commandLine = builder.command();
 		ArrayList<String> newCommandLine = new ArrayList<String>(commandLine.size());
 		
-		String command = findCommand(commandLine.get(0), builder.environment());
+		String command = findCommand(commandLine.get(0), environment);
 		if (command == null)
 		{
-			File f = new File(builder.directory(), commandLine.get(0));
+			File f = new File(workingDirectory, commandLine.get(0));
 			if (f.exists())
 				command = f.getAbsolutePath();
 			else
@@ -107,7 +112,7 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 		newCommandLine.add(command);
 		newCommandLine.addAll(commandLine.subList(1, commandLine.size()));
 		
-		builder.command(newCommandLine);
+		return newCommandLine;
 	}
 	
 	static private String findCommand(String command, Map<String, String> env)

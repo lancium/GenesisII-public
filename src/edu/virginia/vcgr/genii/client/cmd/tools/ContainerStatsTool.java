@@ -5,6 +5,7 @@ import java.util.Map;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
@@ -31,7 +32,7 @@ public class ContainerStatsTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		RNSPath container = RNSPath.getCurrent().lookup(getArgument(0), 
+		RNSPath container = lookup(new GeniiPath(getArgument(0)), 
 			RNSPathQueryFlags.MUST_EXIST);
 		
 		VCGRContainerPortType proxy = ClientUtils.createProxy(VCGRContainerPortType.class,

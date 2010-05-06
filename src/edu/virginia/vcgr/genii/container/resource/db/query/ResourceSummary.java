@@ -128,6 +128,30 @@ public class ResourceSummary
 		}
 	}
 	
+	static public EndpointReferenceType getEPRFromEPI(Connection connection,
+		String epi) throws ResourceException, SQLException
+	{
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try
+		{
+			stmt = connection.prepareStatement(
+				"SELECT epr FROM resources2 WHERE epi = ?");
+			stmt.setString(1, epi);
+			rs = stmt.executeQuery();
+			if (rs.next())
+				return EPRUtils.fromBlob(rs.getBlob(1));
+			
+			return null;
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+	}
+	
 	static public void addResource(Connection connection,
 		String resourceID, String humanName, Class<?> implementingClass,
 		EndpointReferenceType epr) throws SQLException, ResourceException

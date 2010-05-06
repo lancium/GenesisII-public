@@ -16,9 +16,14 @@ import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.cmd.ITool;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.rns.RNSMultiLookupResultException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
+import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
+import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.rns.filters.FilterFactory;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
@@ -34,6 +39,41 @@ public abstract class BaseGridTool implements ITool
 	
 	private boolean _useGui = true;
 	private List<String> _arguments = new ArrayList<String>();
+	
+	static protected RNSPath lookup(RNSPath parent, GeniiPath path) 
+		throws InvalidToolUsageException
+	{
+		if (path.pathType() != GeniiPathType.Grid)
+			throw new InvalidToolUsageException(String.format(
+				"%s is not a grid path!", path));
+		
+		return parent.lookup(path.path());
+	}
+	
+	static protected RNSPath lookup(GeniiPath path) 
+		throws InvalidToolUsageException
+	{
+		return lookup(RNSPath.getCurrent(), path);
+	}
+	
+	static protected RNSPath lookup(RNSPath parent, GeniiPath path,
+		RNSPathQueryFlags queryFlags)
+			throws InvalidToolUsageException, RNSPathDoesNotExistException, 
+				RNSPathAlreadyExistsException
+	{
+		if (path.pathType() != GeniiPathType.Grid)
+			throw new InvalidToolUsageException(String.format(
+				"%s is not a grid path!", path));
+		
+		return parent.lookup(path.path(), queryFlags);
+	}
+	
+	static protected RNSPath lookup(GeniiPath path, 
+		RNSPathQueryFlags queryFlags) throws InvalidToolUsageException,
+			RNSPathDoesNotExistException, RNSPathAlreadyExistsException
+	{
+		return lookup(RNSPath.getCurrent(), path, queryFlags);
+	}
 	
 	protected BaseGridTool(String description, String usage, boolean isHidden)
 	{

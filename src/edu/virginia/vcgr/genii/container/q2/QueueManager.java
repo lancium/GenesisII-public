@@ -254,7 +254,7 @@ public class QueueManager implements Closeable
 				connection, informationPortal(), _connectionPool);
 			_jobManager = new JobManager(_outcallThreadPool,
 				_database, _schedulingEvent, _besManager, connection, _connectionPool);
-			_scheduler = new Scheduler(_schedulingEvent, _connectionPool,
+			_scheduler = new Scheduler(_queueid, _schedulingEvent, _connectionPool,
 				_jobManager, _besManager);
 		}
 		catch (GenesisIISecurityException gse)
@@ -344,6 +344,11 @@ public class QueueManager implements Closeable
 	public int getBESConfiguration(String name) throws ResourceException
 	{
 		return _besManager.getConfiguration(name);
+	}
+	
+	public Scheduler getScheduler()
+	{
+		return _scheduler;
 	}
 	
 	public JobDefinition_Type getJSDL(String jobTicket)

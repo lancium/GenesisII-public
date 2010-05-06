@@ -16,7 +16,12 @@
 	xmlns:jsdl-posix="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"
 	xmlns:jsdl-spmd="http://schemas.ogf.org/jsdl/2007/02/jsdl-spmd"
 	xmlns:jsdl-hpcp="http://schemas.ggf.org/jsdl/2006/07/jsdl-hpcp"
+	xmlns:rfork="http://vcgr.cs.virginia.edu/genii/resource-fork"
 	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	xmlns:byteio="http://schemas.ggf.org/byteio/2005/10/byte-io"
+    xmlns:rbyteio="http://schemas.ggf.org/byteio/2005/10/random-access"
+    xmlns:sbyteio="http://schemas.ggf.org/byteio/2005/10/streamable-access"
+    xmlns:sfact="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory"
     xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"  
 	xmlns:rpw-2="http://docs.oasis-open.org/wsrf/rpw-2"
     xmlns:rw-2="http://docs.oasis-open.org/wsrf/rw-2">
@@ -28,6 +33,10 @@
 	<wsdl:import
 		namespace="http://docs.oasis-open.org/wsrf/rpw-2"
 		location="./wsrf/wsResourceProperties.wsdl"/>
+
+	<wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory"
+        location="./sbyteio-factory.wsdl"/>
 	
 	<wsdl:import namespace="http://schemas.ggf.org/bes/2006/08/bes-factory"
 		location="./bes-factory.wsdl"/>
@@ -42,6 +51,22 @@
     <wsdl:import
         namespace="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
         location="./enhanced-rns-generated.wsdl"/>
+
+	<wsdl:import
+        namespace="http://schemas.ggf.org/byteio/2005/10/random-access"
+        location="./rbyteio-generated.wsdl"/>
+
+    <wsdl:import
+        namespace="http://schemas.ggf.org/byteio/2005/10/streamable-access"
+        location="./sbyteio-generated.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory"
+        location="./sbyteio-factory.wsdl"/>
+
+    <wsdl:import
+        namespace="http://vcgr.cs.virginia.edu/genii/resource-fork"
+        location="./rfork-generated.wsdl"/>
 
 	<wsdl:import
 		namespace="http://docs.oasis-open.org/wsrf/rw-2"
@@ -97,7 +122,7 @@
 
 	<wsdl:portType name="GeniiBESPortType">
 		<genii-ext:extend portType="genii-common:GeniiCommon"/>
-		<genii-ext:extend portType="rns:RNSPortType"/>
+		<genii-ext:extend portType="rfork:ResourceForkPortType"/>
 		<genii-ext:extend portType="bes-factory:BESFactoryPortType"/>
 		<genii-ext:extend portType="bes-mgmt:BESManagementPortType"/>
 		<genii-ext:extend portType="rpw-2:GetResourceProperty"/>

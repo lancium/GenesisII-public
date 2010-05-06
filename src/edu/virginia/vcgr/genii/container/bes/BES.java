@@ -38,6 +38,7 @@ import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
 public class BES implements Closeable
 {
@@ -49,6 +50,11 @@ public class BES implements Closeable
 		new HashMap<String, BES>();
 	static private HashMap<String, BES> _activityToBESMap =
 		new HashMap<String, BES>();
+	
+	static private String findBESEPI(Connection connection, String besid) throws SQLException
+	{
+		return BasicDBResource.getEPI(connection, besid);
+	}
 	
 	static private void addActivityToBESMapping(
 		String activityid, BES bes)
@@ -111,7 +117,7 @@ public class BES implements Closeable
 				BESPolicy policy = new BESPolicy(
 					BESPolicyActions.valueOf(rs.getString(2)),
 					BESPolicyActions.valueOf(rs.getString(3)));
-				BES bes = new BES(besid, policy);
+				BES bes = new BES(connection, besid, policy);
 				_knownInstances.put(besid, bes);
 				bes.reloadAllActivities(connection);
 			}
@@ -155,7 +161,7 @@ public class BES implements Closeable
 			connection.commit();
 			
 			BES bes;
-			_knownInstances.put(besid, bes = new BES(besid, initialPolicy));
+			_knownInstances.put(besid, bes = new BES(null, besid, initialPolicy));
 			return bes;
 		}
 		finally
@@ -198,14 +204,21 @@ public class BES implements Closeable
 	}
 	
 	private String _besid;
+	private String _besEPI;
 	private BESPolicyEnactor _enactor;
 	private HashMap<String, BESActivity> _containedActivities =
 		new HashMap<String, BESActivity>();
 	
-	private BES(String besid, BESPolicy policy)
+	private BES(Connection connection, String besid, BESPolicy policy)
+		throws SQLException
 	{
 		_besid = besid;
 		_enactor = new BESPolicyEnactor(policy);
+		
+		if (connection != null)
+			_besEPI = findBESEPI(connection, besid);
+		else
+			_besEPI = null;
 	}
 	
 	protected void finalize() throws Throwable
@@ -417,96 +430,116 @@ public class BES implements Closeable
 	synchronized private void reloadAllActivities(Connection connection)
 		throws SQLException
 	{
-		PreparedStatement queryStmt = null;
+		PreparedStatement stmt = null;
 		ResultSet rs = null;
+		Collection<String> deleteSet = new Vector<String>();
 		
 		try
 		{
-			queryStmt = connection.prepareStatement(
+			stmt = connection.prepareStatement(
 				"SELECT activityid, state, suspendrequested, " +
 					"terminaterequested, activitycwd, executionplan, " +
 					"nextphase, activityservicename, jobname " +
 				"FROM besactivitiestable WHERE besid = ?");
 			
 			int count = 0;
-			queryStmt.setString(1, _besid);
-			rs = queryStmt.executeQuery();
+			stmt.setString(1, _besid);
+			rs = stmt.executeQuery();
 			while (rs.next())
 			{
-				String activityid = rs.getString(1);
-				ActivityState state = (ActivityState)DBSerializer.fromBlob(
-					rs.getBlob(2));
-				boolean suspendRequested = 
-					(rs.getShort(3) == 0) ? false : true;
-				boolean terminateRequested = 
-					(rs.getShort(4) == 0) ? false : true;
-				
-				
-				String activityCWDString = rs.getString(5);
-				BESWorkingDirectory activityCWD;
-				
-				if (activityCWDString.startsWith("d|"))
-					activityCWD = new BESWorkingDirectory(
-						new File(activityCWDString.substring(2)), true);
-				else
-					activityCWD = new BESWorkingDirectory(
-						new File(activityCWDString.substring(2)), false);
-				
-				Vector<ExecutionPhase> executionPlan = 
-					(Vector<ExecutionPhase>)DBSerializer.fromBlob(
-						rs.getBlob(6));
-				int nextPhase = rs.getInt(7);
-				String activityServiceName = rs.getString(8);
-				String jobName = rs.getString(9);
-						
-				_logger.info(String.format("Starting activity %d\n", count++));
-				
-				BESActivity activity = new BESActivity(_connectionPool,
-					this, activityid, state, activityCWD, executionPlan, 
-					nextPhase, activityServiceName, jobName, suspendRequested, 
-					terminateRequested);
-				_containedActivities.put(activityid, activity);
-				addActivityToBESMapping(activityid, this);
-				
-				/* Delete all activities
-				 */
-				/*
-				WorkingContext.setCurrentWorkingContext(new WorkingContext());
-				boolean assumed = false;
+				String activityid = null;
 				try
 				{
-					_logger.info("Attempting to destroy activity.");
-					EndpointReferenceType epr = activity.getActivityEPR();
-					WorkingContext.temporarilyAssumeNewIdentity(epr);
-					assumed = true;
-					IResource resource = ResourceManager.getTargetResource(epr).dereference();
-					resource.destroy();
+					activityid = rs.getString(1);
+					ActivityState state = (ActivityState)DBSerializer.fromBlob(
+						rs.getBlob(2));
+					boolean suspendRequested = 
+						(rs.getShort(3) == 0) ? false : true;
+					boolean terminateRequested = 
+						(rs.getShort(4) == 0) ? false : true;
+					
+					
+					String activityCWDString = rs.getString(5);
+					BESWorkingDirectory activityCWD;
+					
+					if (activityCWDString.startsWith("d|"))
+						activityCWD = new BESWorkingDirectory(
+							new File(activityCWDString.substring(2)), true);
+					else
+						activityCWD = new BESWorkingDirectory(
+							new File(activityCWDString.substring(2)), false);
+					
+					Vector<ExecutionPhase> executionPlan = 
+						(Vector<ExecutionPhase>)DBSerializer.fromBlob(
+							rs.getBlob(6));
+					int nextPhase = rs.getInt(7);
+					String activityServiceName = rs.getString(8);
+					String jobName = rs.getString(9);
+							
+					_logger.info(String.format("Starting activity %d\n", count++));
+					
+					BESActivity activity = new BESActivity(_connectionPool,
+						this, activityid, state, activityCWD, executionPlan, 
+						nextPhase, activityServiceName, jobName, suspendRequested, 
+						terminateRequested);
+					_containedActivities.put(activityid, activity);
+					addActivityToBESMapping(activityid, this);
 				}
 				catch (Throwable cause)
 				{
-					_logger.error("Failed to destroy activity.", cause);
+					_logger.error("Error loading activity from database.", 
+						cause);
+					if (activityid != null)
+						deleteSet.add(activityid);
 				}
-				finally
+			}
+			
+			if (!deleteSet.isEmpty())
+			{
+				stmt.close();
+				stmt = null;
+				stmt = connection.prepareStatement(
+					"DELETE FROM besactivitiestable " +
+					"WHERE besid = ? AND activityid = ?");
+				for (String activityid : deleteSet)
 				{
-					if (assumed)
-					{
-						try
-						{
-							WorkingContext.releaseAssumedIdentity();
-						}
-						catch (Throwable cause)
-						{
-							_logger.error("Unable to release assumed identity.", cause);
-						}
-					}
+					stmt.setString(1, _besid);
+					stmt.setString(2, activityid);
+					stmt.addBatch();
 				}
-				*/
+				
+				stmt.executeBatch();
 			}
 		}
 		finally
 		{
 			StreamUtils.close(rs);
-			StreamUtils.close(queryStmt);
+			StreamUtils.close(stmt);
 		}
+	}
+	
+	synchronized public String getBESEPI()
+	{
+		if (_besEPI == null)
+		{
+			Connection conn = null;
+			
+			try
+			{
+				conn = _connectionPool.acquire(true);
+				_besEPI = findBESEPI(conn, _besid);
+			}
+			catch (SQLException cause)
+			{
+				throw new RuntimeException(
+					"Unable to find BES EPI.", cause);
+			}
+			finally
+			{
+				_connectionPool.release(conn);
+			}
+		}
+		
+		return _besEPI;
 	}
 }

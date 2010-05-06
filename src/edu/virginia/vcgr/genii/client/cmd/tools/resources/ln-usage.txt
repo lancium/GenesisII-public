@@ -2,8 +2,8 @@ ln <source-path> [<target-path>]
 
 	OR
 	
-ln --epr-file=<epr-file> <target-path>
+ln --no-lookup --epr-file=<epr-file> <target-path>
 
 	OR
 	
-ln --service-url=<url> <target-path>
+ln --no-lookup --service-url=<url> <target-path>

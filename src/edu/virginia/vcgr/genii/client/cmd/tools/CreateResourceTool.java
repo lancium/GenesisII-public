@@ -1,8 +1,7 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,6 +17,7 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientConstructionParameters;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.rcreate.CreationException;
@@ -25,7 +25,6 @@ import edu.virginia.vcgr.genii.client.rcreate.ResourceCreator;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
-import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.client.utils.creation.CreationProperties;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
@@ -38,16 +37,12 @@ public class CreateResourceTool extends BaseGridTool
 		"edu/virginia/vcgr/genii/client/cmd/tools/resources/create-resource-usage.txt";
 
 	private boolean _url = false;
-	private File _creationProperties = null;
+	private GeniiPath _creationProperties = null;
 	private String _shortDescription = null;
 	
 	public CreateResourceTool()
 	{
 		super(_DESCRIPTION, new FileResource(_USAGE_RESOURCE), false);
-	}
-	
-	public void setRns()
-	{
 	}
 	
 	public void setUrl()
@@ -57,7 +52,7 @@ public class CreateResourceTool extends BaseGridTool
 	
 	public void setCreation_properties(String propertiesFile)
 	{
-		_creationProperties = new File(propertiesFile);
+		_creationProperties = new GeniiPath(propertiesFile);
 	}
 	
 	public void setDescription(String shortDescription)
@@ -73,11 +68,13 @@ public class CreateResourceTool extends BaseGridTool
 		String targetName = getArgument(1);
 		Properties creationProperties = getCreationProperties();
 		
+		GeniiPath target = (targetName == null) ? null : new GeniiPath(targetName);
+		
 		if (_url)
-			epr = createFromURLService(serviceLocation, targetName,
+			epr = createFromURLService(serviceLocation, target,
 				creationProperties, _shortDescription);
 		else
-			epr = createFromRNSService(serviceLocation, targetName,
+			epr = createFromRNSService(new GeniiPath(serviceLocation), target,
 				creationProperties, _shortDescription);
 		
 		if (targetName == null)
@@ -99,41 +96,42 @@ public class CreateResourceTool extends BaseGridTool
 		throws IOException
 	{
 		Properties props = new Properties();
-		FileInputStream fin = null;
+		InputStream in = null;
 		
 		if (_creationProperties != null)
 		{
 			try
 			{
-				fin = new FileInputStream(_creationProperties);
-				props.load(fin);
+				in = _creationProperties.openInputStream();
+				props.load(in);
 			}
 			finally
 			{
-				StreamUtils.close(fin);
+				StreamUtils.close(in);
 			}
 		}
 		
 		return props;
 	}
 	
-	static public EndpointReferenceType createFromRNSService(String rnsPath, 
-		String optTargetName, Properties creationProperties,
+	static public EndpointReferenceType createFromRNSService(
+		GeniiPath rnsPath, 
+		GeniiPath optTarget, Properties creationProperties,
 		String shortDescription)
-		throws IOException, RNSException, CreationException
+		throws IOException, RNSException, CreationException,
+			InvalidToolUsageException
 	{
-		RNSPath path = RNSPath.getCurrent();
-		path = path.lookup(rnsPath, RNSPathQueryFlags.MUST_EXIST);
-		return createInstance(path.getEndpoint(), optTargetName, 
+		RNSPath path = lookup(rnsPath);
+		return createInstance(path.getEndpoint(), optTarget, 
 			creationProperties, shortDescription);
 	}
 	
 	static public EndpointReferenceType createFromURLService(
-		String url, String optTargetName, Properties creationProperties,
+		String url, GeniiPath optTargetName, Properties creationProperties,
 		String shortDescription)
 			throws ResourceException,
 				ResourceCreationFaultType, RemoteException, RNSException,
-				CreationException
+				CreationException, InvalidToolUsageException
 	{
 		return createInstance(EPRUtils.makeEPR(url), optTargetName,
 				creationProperties, shortDescription);
@@ -141,11 +139,11 @@ public class CreateResourceTool extends BaseGridTool
 	
 	static public EndpointReferenceType createInstance(
 		EndpointReferenceType service,
-		String optTargetName,
+		GeniiPath optTargetName,
 		MessageElement [] createProperties) 
 		throws ResourceException,
 			ResourceCreationFaultType, RemoteException, RNSException, 
-			CreationException
+			CreationException, InvalidToolUsageException
 	{
 		EndpointReferenceType epr = ResourceCreator.createNewResource(
 			service, createProperties, null);
@@ -167,11 +165,11 @@ public class CreateResourceTool extends BaseGridTool
 	}
 	
 	static public EndpointReferenceType createInstance(
-		EndpointReferenceType service, String optTargetName,
+		EndpointReferenceType service, GeniiPath optTargetName,
 		Properties creationProperties, String shortDescription)
 		throws ResourceException,
 			ResourceCreationFaultType, RemoteException, RNSException, 
-			CreationException
+			CreationException, InvalidToolUsageException
 	{
 		Collection<MessageElement> constructionProperties = 
 			new ArrayList<MessageElement>();

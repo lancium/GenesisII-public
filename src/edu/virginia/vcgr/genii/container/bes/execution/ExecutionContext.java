@@ -25,6 +25,8 @@ public interface ExecutionContext
 	public ICallingContext getCallingContext()
 		throws ExecutionException;
 	
+	public String getBESEPI();
+	
 	/**
 	 * Get the current working directory to use
 	 * for the execution.

@@ -60,6 +60,13 @@ public class EPRUtils
 	static private final Pattern GENII_CONTAINER_ID_PATTERN = 
 		Pattern.compile(String.format("%s=([-a-fA-F0-9]+)",
 			Pattern.quote(GENII_CONTAINER_ID_PARAMETER)));
+	
+	static public final String GENII_SHORT_PARAMETER_NAME =
+		"genii-short-parameter";
+	static private final Pattern GENII_SHORT_PARAMTER_PATTERN =
+		Pattern.compile(String.format("%s=([-a-fA-F0-9:]+)",
+			Pattern.quote(GENII_SHORT_PARAMETER_NAME)));
+	
 	/**
 	 * Generates a temporary EPR to (hopefully) obtain the full (incl.
 	 * porttypes, certs, etc.) EPR from the service's attributes. The full one
@@ -468,6 +475,28 @@ public class EPRUtils
 						query);
 					if (matcher.matches())
 						return GUID.fromString(matcher.group(1));
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	static public String getEPIShortParameter(EndpointReferenceType epr)
+	{
+		AttributedURIType uriType = epr.getAddress();
+		if (uriType != null)
+		{
+			URI uri = uriType.get_value();
+			if (uri != null)
+			{
+				String query = uri.getQueryString();
+				if (query != null)
+				{
+					Matcher matcher = GENII_SHORT_PARAMTER_PATTERN.matcher(
+						query);
+					if (matcher.matches())
+						return matcher.group(1);
 				}
 			}
 		}

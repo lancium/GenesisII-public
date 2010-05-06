@@ -11,13 +11,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStateEnumeration;
 
-import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
+import edu.virginia.vcgr.genii.client.pwrapper.ExitResults;
+import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
+import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperFactory;
+import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperToken;
 import edu.virginia.vcgr.genii.container.bes.execution.ContinuableExecutionException;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionException;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
-import edu.virginia.vcgr.genii.procmgmt.ProcessManager;
+import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
+import edu.virginia.vcgr.genii.container.cservices.accounting.AccountingService;
 
 public class RunProcessPhase extends AbstractRunProcessPhase 
 	implements TerminateableExecutionPhase, Serializable
@@ -28,38 +32,31 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 	
 	static private Log _logger = LogFactory.getLog(RunProcessPhase.class);
 	
+	private File _commonDirectory;
 	private File _executable;
 	private String []_arguments;
 	private Map<String, String> _environment;
-	transient private Process _process = null;
+	transient private ProcessWrapperToken _process = null;
 	private String _processLock = new String();
 	transient private Boolean _hardTerminate = null;
 	transient private boolean _countAsFailedAttempt = true;
 	
-	private StreamRedirectionDescription _redirects;
+	private PassiveStreamRedirectionDescription _redirects;
 	
-	static private void destroyProcess(Process process)
+	static private void destroyProcess(ProcessWrapperToken process)
 	{
-		try
-		{
-			_logger.info("Attempting to kill running process.");
-			if (OperatingSystemType.getCurrent().isWindows())
-				ProcessManager.kill(process);
-		}
-		catch (Throwable cause)
-		{
-			_logger.error("Problem killing process.", cause);
-		}
-		
-		process.destroy();
+		process.cancel();
 	}
 	
-	public RunProcessPhase(File executable, String []arguments, 
+	public RunProcessPhase(File commonDirectory,
+		File executable, String []arguments, 
 		Map<String, String> environment,
-		StreamRedirectionDescription redirects)
+		PassiveStreamRedirectionDescription redirects)
 	{
 		super(new ActivityState(ActivityStateEnumeration.Running,
 			EXECUTING_STAGE, false));
+		
+		_commonDirectory = commonDirectory;
 		
 		if (executable == null)
 			throw new IllegalArgumentException(
@@ -68,7 +65,8 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 			arguments = new String[0];
 		
 		if (redirects == null)
-			redirects = new StreamRedirectionDescription(null, null, null);
+			redirects = new PassiveStreamRedirectionDescription(
+				null, null, null);
 		
 		_executable = executable;
 		_arguments = arguments;
@@ -89,16 +87,21 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 	@Override
 	public void execute(ExecutionContext context) throws Throwable
 	{
+		List<String> command;
+		ProcessWrapperToken token;
 		synchronized(_processLock)
 		{
-			List<String> command = new Vector<String>();
+			command = new Vector<String>();
 			command.add(_executable.getAbsolutePath());
 			for (String arg : _arguments)
 				command.add(arg);
 			
-			ProcessBuilder builder = new ProcessBuilder(command);
-			builder.directory(
-				context.getCurrentWorkingDirectory().getWorkingDirectory());
+			File workingDirectory = context.getCurrentWorkingDirectory(
+				).getWorkingDirectory();
+			
+			ProcessWrapper wrapper = ProcessWrapperFactory.createWrapper(
+				_commonDirectory);
+		
 			if (_environment == null)
 				_environment = new HashMap<String, String>();
 			
@@ -108,9 +111,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 				if (ogrshConfig != null)
 				{
 					File f = new File(
-						context.getCurrentWorkingDirectory(
-							).getWorkingDirectory(), 
-						ogrshConfig);
+						workingDirectory, ogrshConfig);
 					_environment.put("OGRSH_CONFIG", f.getAbsolutePath());
 				}
 				
@@ -118,27 +119,28 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 				if (geniiUserDir != null && !geniiUserDir.startsWith("/"))
 				{
 					File f = new File(
-						context.getCurrentWorkingDirectory(
-							).getWorkingDirectory(), 
-						geniiUserDir);
+						workingDirectory, geniiUserDir);
 					_environment.put("GENII_USER_DIR", f.getAbsolutePath());
 				}
 				
-				overloadEnvironment(builder.environment(), _environment);
+				_environment = overloadEnvironment(_environment);
 			}
-			resetCommand(builder);
+			resetCommand(command, workingDirectory, _environment);
 			
 			_logger.info("Trying to start a new process on machine using fork/exec or spawn.");
-			_process = builder.start();
-			_redirects.enact(context,
-				_process.getOutputStream(),
-				_process.getInputStream(),
-				_process.getErrorStream());
+			String []arguments = new String[command.size() - 1];
+			for (int lcv = 1; lcv < command.size(); lcv++)
+				arguments[lcv - 1] = command.get(lcv);
+			token = wrapper.execute(_environment, workingDirectory, 
+				_redirects.stdinSource(), _redirects.stdoutSink(), 
+				_redirects.stderrSink(), command.get(0), arguments);
+			
 		}
 		
 		try
 		{
-			int eValue = _process.waitFor();
+			token.join();
+			ExitResults results = token.results();
 			
 			if (_hardTerminate != null && _hardTerminate.booleanValue())
 			{
@@ -149,11 +151,26 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 				return;
 			}
 			
-			if (eValue != 0)
-				_logger.info(String.format(
-					"Process exited with non-zero value:  %d", eValue));
+			if (results == null)
+				_logger.error("Somehow we got an exit with no exit results.");
 			else
-				_logger.info("Process exited with an exit code of 0.");
+			{
+				_logger.info(String.format("Process exited with exit-code %d.",
+					results.exitCode()));
+				
+				AccountingService acctService = 
+					(AccountingService)ContainerServices.findService(
+						AccountingService.SERVICE_NAME);
+				if (acctService != null)
+				{
+					acctService.addAccountingRecord(
+						context.getCallingContext(), context.getBESEPI(),
+						null, null, null, command,
+						results.exitCode(),
+						results.userTime(), results.kernelTime(),
+						results.wallclockTime(), results.maximumRSS());
+				}
+			}
 		}
 		catch (InterruptedException ie)
 		{

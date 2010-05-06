@@ -39,8 +39,6 @@
 			
 		<mconf:instance name="connection-pool"
 			type="edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool">
-			<mconf:property name="edu.virginia.vcgr.genii.container.db.db-class-name"
-				value="org.apache.derby.jdbc.EmbeddedDriver"/>
 			<mconf:property name="edu.virginia.vcgr.genii.container.db.db-connect-string"
 				value="jdbc:derby:${edu.virginia.vcgr.genii.client.configuration.user-dir}/derby-db;create=true"/>
 			<mconf:property name="edu.virginia.vcgr.genii.container.db.db-user"
@@ -54,8 +52,6 @@
 		<!--
 		<mconf:instance name="connection-pool"
 			type="edu.virginia.vcgr.genii.container.db.HypersonicDatabaseConnectionPool">
-			<mconf:property name="edu.virginia.vcgr.genii.container.db.db-class-name"
-				value="org.hsqldb.jdbcDriver"/>
 			<mconf:property name="edu.virginia.vcgr.genii.container.db.db-connect-string"
 				value="jdbc:hsqldb:file:${edu.virginia.vcgr.genii.client.configuration.user-dir}/database"/>
 			<mconf:property name="edu.virginia.vcgr.genii.container.db.db-user"

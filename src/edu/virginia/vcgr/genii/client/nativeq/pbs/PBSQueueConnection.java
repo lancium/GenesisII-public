@@ -34,6 +34,9 @@ import edu.virginia.vcgr.genii.client.nativeq.NativeQueueState;
 import edu.virginia.vcgr.genii.client.nativeq.ScriptBasedQueueConnection;
 import edu.virginia.vcgr.genii.client.nativeq.ScriptLineParser;
 import edu.virginia.vcgr.genii.client.nativeq.UnixSignals;
+import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
+import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperException;
+import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperFactory;
 import edu.virginia.vcgr.genii.client.spmd.SPMDException;
 import edu.virginia.vcgr.genii.client.spmd.SPMDTranslator;
 import edu.virginia.vcgr.genii.client.spmd.SPMDTranslatorFactories;
@@ -290,14 +293,6 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 	{
 		super.generateQueueHeaders(script, workingDirectory, application);
 		
-		String stdout = application.getStdoutRedirect();
-		String stderr = application.getStderrRedirect();
-		
-		if (stdout != null)
-			script.format("#PBS -o %s\n", stdout);
-		if (stderr != null)
-			script.format("#PBS -e %s\n", stderr);
-		
 		if (application.getSPMDVariation() != null)
 		{
 			Integer numProcs = application.getNumProcesses();
@@ -368,22 +363,38 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 			
 			try
 			{
+				ProcessWrapper wrapper = ProcessWrapperFactory.createWrapper(
+					getCommonDirectory(),
+					getOperatingSystem(), getProcessorArchitecture());
 				commandLine = translator.translateCommandLine(commandLine);
+				String []args = new String[commandLine.size() - 1];
+				for (int lcv = 1; lcv < commandLine.size(); lcv++)
+					args[lcv - 1] = commandLine.get(lcv);
+				
 				boolean first = true;
-				for (String val : commandLine)
+				for (String element : wrapper.formCommandLine(
+					application.getEnvironment(),
+					workingDirectory, 
+					application.getStdinRedirect(workingDirectory), 
+					application.getStdoutRedirect(workingDirectory),
+					application.getStderrRedirect(workingDirectory),
+					application.getResourceUsagePath(), commandLine.get(0),
+					args))
 				{
-					script.format("%s\"%s\"", (first ? "" : " "), val);
+					script.format("%s\"%s\"", (first ? "" : " "), element);
 					first = false;
 				}
+			}
+			catch (ProcessWrapperException pwe)
+			{
+				throw new NativeQueueException(
+					"Unable to create command line for SPMD command.", pwe);
 			}
 			catch (SPMDException se)
 			{
 				throw new NativeQueueException(
 					"Unable to translate SPMD command.", se);
 			}
-			
-			if (application.getStdinRedirect() != null)
-				script.format(" < \"%s\"", application.getStdinRedirect());
 			
 			if (signals.size() > 0)
 				script.print(" &");

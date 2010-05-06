@@ -7,7 +7,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.ggf.jsdl.OperatingSystemTypeEnumeration;
+import org.ggf.jsdl.ProcessorArchitectureEnumeration;
+
 import edu.virginia.vcgr.genii.client.spmd.SPMDTranslator;
+import edu.virginia.vcgr.jsdl.OperatingSystemNames;
+import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
 
 public abstract class AbstractNativeQueueConnection 
 	implements NativeQueueConnection
@@ -17,6 +22,7 @@ public abstract class AbstractNativeQueueConnection
 	private Map<URI, SPMDTranslator> _supportedSPMDVariations = 
 		new HashMap<URI, SPMDTranslator>(4);
 	private Properties _connectionProperties;
+	private NativeQProperties _queueProperties;
 	
 	protected AbstractNativeQueueConnection(
 		File workingDirectory, Properties connectionProperties) 
@@ -28,11 +34,37 @@ public abstract class AbstractNativeQueueConnection
 			connectionProperties);
 		
 		_connectionProperties = connectionProperties;
+		_queueProperties = new NativeQProperties(_connectionProperties);
 	}
 	
 	protected Properties connectionProperties()
 	{
 		return _connectionProperties;
+	}
+	
+	protected OperatingSystemNames getOperatingSystem()
+	{
+		OperatingSystemTypeEnumeration ret = 
+			_queueProperties.operatingSystemName();
+		if (ret == null)
+			return null;
+		
+		return OperatingSystemNames.valueOf(ret.getValue());
+	}
+	
+	protected ProcessorArchitecture getProcessorArchitecture()
+	{
+		ProcessorArchitectureEnumeration ret =
+			_queueProperties.cpuArchitecture();
+		if (ret == null)
+			return null;
+		
+		return ProcessorArchitecture.valueOf(ret.getValue());
+	}
+	
+	protected File getCommonDirectory()
+	{
+		return _queueProperties.commonDirectory();
 	}
 	
 	protected void initialize(Properties connectionProperties)

@@ -17,7 +17,11 @@ package edu.virginia.vcgr.genii.container.container;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.LinkedList;
 
+import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
@@ -27,11 +31,17 @@ import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
+import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
+import edu.virginia.vcgr.genii.container.AccountingRecordType;
+import edu.virginia.vcgr.genii.container.CommitAccountingRecordsRequestType;
 import edu.virginia.vcgr.genii.container.ContainerStatisticsResultType;
+import edu.virginia.vcgr.genii.container.IterateAccountingRecordsResponseType;
 import edu.virginia.vcgr.genii.container.VCGRContainerPortType;
 import edu.virginia.vcgr.genii.container.container.forks.RootRNSFork;
+import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
+import edu.virginia.vcgr.genii.container.cservices.accounting.AccountingService;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkBaseService;
 
@@ -97,5 +107,59 @@ public class VCGRContainerServiceImpl extends ResourceForkBaseService
 	{
 		throw new RemoteException(
 			"Not allowed to shut down the container this way.");
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.READ)
+	public IterateAccountingRecordsResponseType iterateAccountingRecords(
+		Object arg0) throws RemoteException
+	{
+		Collection<MessageElement> col = new LinkedList<MessageElement>();
+		
+		AccountingService acctService = 
+			(AccountingService)ContainerServices.findService(
+				AccountingService.SERVICE_NAME);
+		
+		try
+		{
+			if (acctService != null)
+			{
+				for (AccountingRecordType art : acctService.getAccountingRecords())
+					col.add(AnyHelper.toAny(art));
+			}
+			
+			return new IterateAccountingRecordsResponseType(
+				super.createWSIterator(col.iterator(), 100));
+		}
+		catch (IOException ioe)
+		{
+			throw new RemoteException("Unable to create iterator.", ioe);
+		}
+		catch (SQLException sqe)
+		{
+			throw new RemoteException("Unable to create iterator.", sqe);
+		}
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.WRITE)
+	public void commitAccountingRecords(CommitAccountingRecordsRequestType arg0)
+			throws RemoteException
+	{
+		AccountingService acctService = 
+			(AccountingService)ContainerServices.findService(
+				AccountingService.SERVICE_NAME);
+		
+		try
+		{
+			if (acctService != null)
+				acctService.deleteAccountingRecords(
+					arg0.getLastRecordIdToCommit());
+		}
+		catch (SQLException sqe)
+		{
+			throw new RemoteException(
+				"Unable to commit accounting records.", sqe);
+		}
 	}
 }

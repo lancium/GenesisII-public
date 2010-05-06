@@ -24,6 +24,7 @@
 				<jsdl-posix:WorkingDirectory>/home/mmm2a/WorkingDirectory</jsdl-posix:WorkingDirectory>
 -->
 				<jsdl-posix:Output>stdout</jsdl-posix:Output>
+				<jsdl-posix:Error>stderr</jsdl-posix:Error>
 				<jsdl-posix:Argument>seven.dat</jsdl-posix:Argument>
 				<jsdl-posix:Argument>fourty-two.dat</jsdl-posix:Argument>
 				<jsdl-posix:Argument>sum.dat</jsdl-posix:Argument>
@@ -84,6 +85,15 @@
 			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
 			<jsdl:Target>
 				<jsdl:URI>mailto:mmm2a@cs.virginia.edu?subject=jobOutput&amp;X-AttachmentFilename=stdout.txt</jsdl:URI>
+			</jsdl:Target>
+		</jsdl:DataStaging>
+
+		<jsdl:DataStaging>
+			<jsdl:FileName>stderr</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Target>
+				<jsdl:URI>mailto:mmm2a@cs.virginia.edu?subject=jobOutput&amp;X-AttachmentFilename=stderr.txt</jsdl:URI>
 			</jsdl:Target>
 		</jsdl:DataStaging>
 	</jsdl:JobDescription>

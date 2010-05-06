@@ -565,7 +565,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 	@Override
 	@RWXMappingResolver(ForkMappingResolver.class)
 	@MappingRedirect(methodName = "add")
-	public AddResponse add(Add arg0) throws RemoteException,
+	final public AddResponse add(Add arg0) throws RemoteException,
 			RNSEntryExistsFaultType, RNSFaultType, ResourceUnknownFaultType,
 			RNSEntryNotDirectoryFaultType
 	{
@@ -596,7 +596,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 	@Override
 	@RWXMappingResolver(ForkMappingResolver.class)
 	@MappingRedirect(methodName = "list")
-	public IterateListResponseType iterateList(IterateListRequestType arg0)
+	final public IterateListResponseType iterateList(IterateListRequestType arg0)
 			throws RemoteException
 	{
 		TimingSink tSink = TimingSink.sink();
@@ -655,7 +655,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 	@Override
 	@RWXMappingResolver(ForkMappingResolver.class)
 	@MappingRedirect(methodName = "list")
-	public ListResponse list(List arg0) throws RemoteException, RNSFaultType,
+	final public ListResponse list(List arg0) throws RemoteException, RNSFaultType,
 			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType
 	{
 		ResourceFork tFork = getResourceFork();
@@ -695,7 +695,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 
 	@Override
 	@RWXMappingResolver(ForkMappingResolver.class)
-	public MoveResponse move(Move arg0) throws RemoteException, RNSFaultType,
+	final public MoveResponse move(Move arg0) throws RemoteException, RNSFaultType,
 			ResourceUnknownFaultType
 	{
 		throw FaultManipulator.fillInFault(new RNSFaultType());
@@ -704,7 +704,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 	@Override
 	@RWXMappingResolver(ForkMappingResolver.class)
 	@MappingRedirect(methodName = "createFile")
-	public CreateFileResponse createFile(CreateFile arg0)
+	final public CreateFileResponse createFile(CreateFile arg0)
 			throws RemoteException, RNSEntryExistsFaultType, RNSFaultType,
 			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType
 	{
@@ -728,7 +728,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 	@Override
 	@RWXMappingResolver(ForkMappingResolver.class)
 	@MappingRedirect(methodName = "remove")
-	public String[] remove(Remove arg0) throws RemoteException, RNSFaultType,
+	final public String[] remove(Remove arg0) throws RemoteException, RNSFaultType,
 			ResourceUnknownFaultType, RNSDirectoryNotEmptyFaultType
 	{
 		ResourceFork tFork = getResourceFork();
@@ -751,7 +751,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 
 	@Override
 	@RWXMappingResolver(ForkMappingResolver.class)
-	public QueryResponse query(Query arg0) throws RemoteException,
+	final public QueryResponse query(Query arg0) throws RemoteException,
 			RNSFaultType, ResourceUnknownFaultType
 	{
 		throw FaultManipulator.fillInFault(new RNSFaultType());
@@ -761,7 +761,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 	@Override
 	@RWXMappingResolver(ForkMappingResolver.class)
 	@MappingRedirect(methodName = "truncAppend")
-	public AppendResponse append(Append arg0) throws RemoteException,
+	final public AppendResponse append(Append arg0) throws RemoteException,
 			ResourceUnknownFaultType, WriteNotPermittedFaultType,
 			UnsupportedTransferFaultType, CustomFaultType
 	{
@@ -787,7 +787,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 	@Override
 	@RWXMappingResolver(ForkMappingResolver.class)
 	@MappingRedirect(methodName = "read")
-	public ReadResponse read(Read arg0) throws RemoteException,
+	final public ReadResponse read(Read arg0) throws RemoteException,
 			ReadNotPermittedFaultType, ResourceUnknownFaultType,
 			UnsupportedTransferFaultType, CustomFaultType
 	{
@@ -836,7 +836,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 	@Override
 	@RWXMappingResolver(ForkMappingResolver.class)
 	@MappingRedirect(methodName = "truncAppend")
-	public TruncAppendResponse truncAppend(TruncAppend arg0)
+	final public TruncAppendResponse truncAppend(TruncAppend arg0)
 			throws RemoteException, ResourceUnknownFaultType,
 			WriteNotPermittedFaultType, TruncateNotPermittedFaultType,
 			UnsupportedTransferFaultType, CustomFaultType
@@ -864,7 +864,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 	@Override
 	@RWXMappingResolver(ForkMappingResolver.class)
 	@MappingRedirect(methodName = "write")
-	public WriteResponse write(Write arg0) throws RemoteException,
+	final public WriteResponse write(Write arg0) throws RemoteException,
 			ResourceUnknownFaultType, WriteNotPermittedFaultType,
 			UnsupportedTransferFaultType, CustomFaultType
 	{
@@ -922,7 +922,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 	@Override
 	@RWXMappingResolver(ForkMappingResolver.class)
 	@MappingRedirect(methodName = "seekRead")
-	public SeekReadResponse seekRead(SeekRead seekReadRequest) 
+	final public SeekReadResponse seekRead(SeekRead seekReadRequest) 
 		throws RemoteException,
 			ReadNotPermittedFaultType, SeekNotPermittedFaultType,
 			ResourceUnknownFaultType, UnsupportedTransferFaultType,
@@ -959,7 +959,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 	@Override
 	@RWXMappingResolver(ForkMappingResolver.class)
 	@MappingRedirect(methodName = "seekWrite")
-	public SeekWriteResponse seekWrite(SeekWrite seekWriteRequest)
+	final public SeekWriteResponse seekWrite(SeekWrite seekWriteRequest)
 		throws RemoteException,
 			SeekNotPermittedFaultType, ResourceUnknownFaultType,
 			WriteNotPermittedFaultType, UnsupportedTransferFaultType,
@@ -994,7 +994,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 /* Streamable ByteIO Factory Operations */
 	@Override
 	@RWXMapping(RWXCategory.OPEN)
-	public OpenStreamResponse openStream(Object arg0) throws RemoteException,
+	final public OpenStreamResponse openStream(Object arg0) throws RemoteException,
 			ResourceUnknownFaultType, ResourceCreationFaultType
 	{
 		ResourceFork tFork = getResourceFork();

@@ -16,6 +16,7 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.client.gui.exportdir.ExportDirDialog;
 import edu.virginia.vcgr.genii.client.io.FileResource;
@@ -227,7 +228,7 @@ public class ExportTool extends BaseGridTool
 		String localPath, String RNSPath, boolean isReplicated) 
 		throws ResourceException,
 			ResourceCreationFaultType, RemoteException, RNSException,
-			CreationException, IOException
+			CreationException, IOException, InvalidToolUsageException
 	{
 		EndpointReferenceType newEPR = null;
 		
@@ -267,6 +268,7 @@ public class ExportTool extends BaseGridTool
 	 * @throws RNSException
 	 * @throws CreationException
 	 * @throws IOException
+	 * @throws InvalidToolUsageException 
 	 */
 	static public EndpointReferenceType createInstance(
 			EndpointReferenceType service,
@@ -274,7 +276,7 @@ public class ExportTool extends BaseGridTool
 			MessageElement [] createProperties) 
 		throws ResourceException,
 			ResourceCreationFaultType, RemoteException, RNSException, 
-			CreationException, IOException
+			CreationException, IOException, InvalidToolUsageException
 	{
 		EndpointReferenceType epr = ResourceCreator.createNewResource(
 			service, createProperties, null);
@@ -282,7 +284,7 @@ public class ExportTool extends BaseGridTool
 		if (optTargetName != null)
 		{
 			try{
-				LnTool.link(epr, optTargetName);
+				LnTool.link(epr, new GeniiPath(optTargetName));
 			}
 			catch (RNSException re){
 				quitExportedRoot(epr, false);
@@ -299,7 +301,7 @@ public class ExportTool extends BaseGridTool
 			EndpointReferenceType replicationService) 
 		throws ResourceException,
 			ResourceCreationFaultType, RemoteException, RNSException,
-			CreationException, IOException
+			CreationException, IOException, InvalidToolUsageException
 	{
 		EndpointReferenceType newEPR = null;
 		String replicationIndicator = "false";

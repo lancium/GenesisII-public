@@ -45,8 +45,6 @@ import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
 public class DBBESResource extends BasicDBResource implements IBESResource
 {	
-	private Properties _nativeQProperties = null;
-	
 	@Override
 	public void initialize(HashMap<QName, Object> constructionParams)
 			throws ResourceException
@@ -218,22 +216,13 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 	@Override
 	public void nativeQProperties(Properties props) throws RemoteException
 	{
-		synchronized(this)
-		{
-			setProperty(GeniiBESConstants.NATIVEQ_PROVIDER_PROPERTY, props);
-			_nativeQProperties = props;
-		}
+		replacePersistedProperties(
+			GeniiBESConstants.NATIVE_QUEUE_CONF_CATEGORY, props);
 	}
 	@Override
 	public Properties nativeQProperties() throws RemoteException
 	{
-		synchronized(this)
-		{
-			if (_nativeQProperties == null)
-				_nativeQProperties = (Properties)getProperty(
-					GeniiBESConstants.NATIVEQ_PROVIDER_PROPERTY);
-		}
-		
-		return _nativeQProperties;
+		return getPersistedProperties(
+			GeniiBESConstants.NATIVE_QUEUE_CONF_CATEGORY);
 	}
 }

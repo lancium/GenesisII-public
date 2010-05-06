@@ -27,6 +27,7 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.rcreate.CreationException;
@@ -216,7 +217,7 @@ public class CertGeneratorTool extends BaseGridTool
 		String issuerCertKSPassword, String issuerCertAlias, 
 		String issuerCertEntryPassword, Long defaultValidity) 
 		throws IOException, RNSException, CreationException, KeyStoreException,
-			GeneralSecurityException
+			GeneralSecurityException, InvalidToolUsageException
 	{
 		EndpointReferenceType epr;
 		PrivateKey issuerPrivateKey = null;
@@ -284,11 +285,15 @@ public class CertGeneratorTool extends BaseGridTool
 		{
 			RNSPath path = RNSPath.getCurrent();
 			path = path.lookup(service, RNSPathQueryFlags.MUST_EXIST);
-			epr = CreateResourceTool.createInstance(path.getEndpoint(), optTargetName, createProps);
+			epr = CreateResourceTool.createInstance(path.getEndpoint(), 
+				(optTargetName == null) ? null : new GeniiPath(optTargetName),
+				createProps);
 		}
 		else
 		{
-			epr = CreateResourceTool.createInstance(EPRUtils.makeEPR(service), optTargetName, createProps);
+			epr = CreateResourceTool.createInstance(EPRUtils.makeEPR(service),
+				(optTargetName == null) ? null : new GeniiPath(optTargetName),
+				createProps);
 		}
 		return epr;
 	}

@@ -9,7 +9,6 @@ import java.io.PrintStream;
 import java.io.StringReader;
 import java.util.Collection;
 import java.util.EnumSet;
-import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,6 +16,10 @@ import java.util.regex.Pattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
+
+import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
+import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperException;
+import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperFactory;
 
 public abstract class ScriptBasedQueueConnection 
 	extends AbstractNativeQueueConnection
@@ -73,7 +76,8 @@ public abstract class ScriptBasedQueueConnection
 	}
 	
 	final protected File generateSubmitScript(File workingDirectory,
-		ApplicationDescription application) throws NativeQueueException
+		ApplicationDescription application)
+			throws NativeQueueException
 	{
 		PrintStream ps = null;
 		
@@ -143,11 +147,6 @@ public abstract class ScriptBasedQueueConnection
 		}
 			
 		script.format("export QUEUE_SCRIPT_RESULT=0\n");
-		
-		Map<String, String> environment = application.getEnvironment();
-		for (String key : environment.keySet())
-			script.format("export %s='%s'\n",
-				key, environment.get(key));
 	}
 
 	protected void generateQueueApplicationFooter(PrintStream script,
@@ -180,13 +179,34 @@ public abstract class ScriptBasedQueueConnection
 		String execName = application.getExecutableName();
 		if (!execName.contains("/"))
 			execName = String.format("./%s", execName);
-		script.format("\"%s\"", execName);
 		
-		for (String arg : application.getArguments())
-			script.format(" \"%s\"", arg);
-		
-		if (application.getStdinRedirect() != null)
-			script.format(" < \"%s\"", application.getStdinRedirect());
+		try
+		{
+			ProcessWrapper wrapper = ProcessWrapperFactory.createWrapper(
+				getCommonDirectory(),
+				getOperatingSystem(), getProcessorArchitecture());
+			
+			boolean first = true;
+			for (String element : wrapper.formCommandLine(
+					application.getEnvironment(), workingDirectory,
+					application.getStdinRedirect(workingDirectory), 
+					application.getStdoutRedirect(workingDirectory),
+					application.getStderrRedirect(workingDirectory),
+					application.getResourceUsagePath(),
+					execName, application.getArguments().toArray(
+						new String[application.getArguments().size()])))
+			{
+				if (!first)
+					script.format(" ");
+				first = false;
+				script.format("\"%s\"", element);
+			}
+		}
+		catch (ProcessWrapperException e)
+		{
+			throw new NativeQueueException(
+				"Unable to generate submission script.", e);
+		}
 		
 		if (signals.size() > 0)
 			script.print(" &");

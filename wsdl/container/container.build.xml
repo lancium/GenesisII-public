@@ -23,6 +23,9 @@
 				<srcfiles dir="${wsdl.dir}/rns">
 					<include name="rns.gwsdl"/>
 				</srcfiles>
+				<srcfiles dir="${wsdl.dir}/iterator">
+					<include name="iterator.xsd"/>
+				</srcfiles>
 			</uptodate>
 		</and>
 	</condition>
@@ -33,6 +36,9 @@
 			<fileset dir="${wsdl.dir}/container">
 				<include name="container.gwsdl"/>
 				<include name="container.xsd"/>
+			</fileset>
+			<fileset dir="${wsdl.dir}/iterator">
+				<include name="iterator.xsd"/>
 			</fileset>
 		</copy>
 

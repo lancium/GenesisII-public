@@ -7,6 +7,7 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
@@ -42,16 +43,16 @@ public class CdTool extends BaseGridTool
 
 	static public void chdir(String target)
 		throws ResourceException, RNSException, RemoteException,
-			IOException
+			IOException, InvalidToolUsageException
 	{
-		ICallingContext ctxt = ContextManager.getCurrentContext();
-		RNSPath path = ctxt.getCurrentPath().lookup(
-			target, RNSPathQueryFlags.MUST_EXIST);
+		RNSPath path = lookup(
+			new GeniiPath(target), RNSPathQueryFlags.MUST_EXIST);
 		TypeInformation typeInfo = new TypeInformation(path.getEndpoint());
 		if (!typeInfo.isRNS())
 			throw new RNSException("Path \"" + path.pwd() + 
 				"\" is not an RNS directory.");
 		
+		ICallingContext ctxt = ContextManager.getCurrentContext();
 		ctxt.setCurrentPath(path);
 		ContextManager.storeCurrentContext(ctxt);
 	}

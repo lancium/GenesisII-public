@@ -36,6 +36,7 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientConstructionParameters;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.naming.ResolverDescription;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.rcreate.CreationException;
@@ -111,7 +112,7 @@ public class ReplicatedFileTool extends BaseGridTool
 	static public void makeReplicatedFile(String sourcePath, boolean isLocalSource,
 			String targetPath, String [] containerNames) 
 		throws FileNotFoundException, IOException,
-		RNSException, CreationException, RNSPathAlreadyExistsException
+		RNSException, CreationException, RNSPathAlreadyExistsException, InvalidToolUsageException
 	{
 		RNSPath currentPath = RNSPath.getCurrent();
 		URI epi = WSName.generateNewEPI();
@@ -182,7 +183,7 @@ public class ReplicatedFileTool extends BaseGridTool
 	static protected EndpointReferenceType createFile(RNSPath currentPath, URI epi, String replicaRNSPath, String containerName)
 	throws ResourceException,
 		ResourceCreationFaultType, RemoteException, RNSException,
-		CreationException, FileNotFoundException, IOException
+		CreationException, FileNotFoundException, IOException, InvalidToolUsageException
 	{
 		String ByteIOServiceLocation = _CONTAINERS_DIR_RNS_PATH + "/" + containerName + _CONTAINER_SERVICES_DIR_PATH + "/" + _BYTEIO_FACTORY_SERVICE_NAME;
 		RNSPath byteIOServiceRNS = currentPath.lookup(ByteIOServiceLocation, RNSPathQueryFlags.MUST_EXIST);
@@ -201,7 +202,8 @@ public class ReplicatedFileTool extends BaseGridTool
 		try
 		{
 			ContextManager.storeCurrentContext(createContext);
-			fileEPR = CreateResourceTool.createInstance(byteIOServiceEPR, replicaRNSPath, any);
+			fileEPR = CreateResourceTool.createInstance(byteIOServiceEPR, 
+				new GeniiPath(replicaRNSPath), any);
 		}
 		finally
 		{
@@ -222,7 +224,7 @@ public class ReplicatedFileTool extends BaseGridTool
 			String targetFileRNSPath,
 			int replicaNumber)
 	throws FileNotFoundException, IOException,
-		RNSException, RNSPathDoesNotExistException, CreationException
+		RNSException, RNSPathDoesNotExistException, CreationException, InvalidToolUsageException
 	{
 		OutputStream out = null;
 		InputStream in = null;

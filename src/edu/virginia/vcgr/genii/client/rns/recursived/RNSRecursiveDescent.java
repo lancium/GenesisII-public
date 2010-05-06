@@ -79,13 +79,13 @@ public class RNSRecursiveDescent
 		_filter = filter;
 	}
 	
-	private boolean callCallback(RNSPath path, 
+	private RNSRecursiveDescentCallbackResult callCallback(RNSPath path, 
 		RNSRecursiveDescentCallback callback)
 	{
 		if (_filter != null)
 		{
 			if (!_filter.matches(path))
-				return true;
+				return RNSRecursiveDescentCallbackResult.Continue;
 		}
 		
 		try
@@ -95,12 +95,12 @@ public class RNSRecursiveDescent
 		catch (Throwable cause)
 		{
 			_logger.warn("RNSRecursiveDescentHandler threw exception.", cause);
-			return true;
+			return RNSRecursiveDescentCallbackResult.Continue;
 		}
 	}
 	
-	private boolean descend(Set<URI> visited, RNSPath root, 
-		RNSRecursiveDescentCallback callback, int depth)
+	private RNSRecursiveDescentCallbackResult descend(Set<URI> visited,
+		RNSPath root, RNSRecursiveDescentCallback callback, int depth)
 	{
 		int attempt = 0;
 		EndpointReferenceType epr = null;
@@ -130,66 +130,75 @@ public class RNSRecursiveDescent
 		} while ( (attempt - 1) < _allowedRetries);
 		
 		if (cause != null)
-			return true;
+			return RNSRecursiveDescentCallbackResult.Continue;
 		
 		if ( (_maximumDepth >= 0) && (depth > _maximumDepth) )
-			return true;
+			return RNSRecursiveDescentCallbackResult.ContinueLeaf;
+		
+		URI uri = name.getEndpointIdentifier();
+		if (_avoidCycles && visited.contains(uri))
+			return RNSRecursiveDescentCallbackResult.ContinueLeaf;
+		
+		RNSRecursiveDescentCallbackResult result = 
+			RNSRecursiveDescentCallbackResult.Continue;
 		
 		if (!_reversed)
 		{
-			if (!callCallback(root, callback))
-				return false;
+			result = callCallback(root, callback);
+			
+			if (result == RNSRecursiveDescentCallbackResult.Halt)
+				return result;
 		}
-		
-		URI uri = name.getEndpointIdentifier();
+			
 		if (!(name.isValidWSName() && visited.contains(uri)))
 		{
 			if (name.isValidWSName() && _avoidCycles)
 				visited.add(uri);
 			
-			TypeInformation typeInfo = new TypeInformation(epr);
-			if (typeInfo.isRNS())
-			{			
-				Collection<RNSPath> contents = null;
-				attempt = 0;
-				do
-				{
-					if (attempt > 0)
+			if (result == RNSRecursiveDescentCallbackResult.Continue)
+			{
+				TypeInformation typeInfo = new TypeInformation(epr);
+				if (typeInfo.isRNS())
+				{			
+					Collection<RNSPath> contents = null;
+					attempt = 0;
+					do
 					{
-						try { Thread.sleep(5000L * (1 << (attempt - 1))); } 
-						catch (Throwable c) {}
-					}
+						if (attempt > 0)
+						{
+							try { Thread.sleep(5000L * (1 << (attempt - 1))); } 
+							catch (Throwable c) {}
+						}
+						
+						attempt++;
+						try
+						{
+							contents = root.listContents();
+							break;
+						}
+						catch (Throwable c)
+						{
+							cause = c;
+						}
+					} while ( (attempt - 1) < _allowedRetries);
 					
-					attempt++;
-					try
+					if (cause == null)
 					{
-						contents = root.listContents();
-						break;
-					}
-					catch (Throwable c)
-					{
-						cause = c;
-					}
-				} while ( (attempt - 1) < _allowedRetries);
-				
-				if (cause == null)
-				{
-					for (RNSPath child : contents)
-					{
-						if (!descend(visited, child, callback, depth + 1))
-							return false;
+						for (RNSPath child : contents)
+						{
+							result = descend(visited, child, callback, depth + 1);
+							if (result == RNSRecursiveDescentCallbackResult.Halt)
+								return result;
+						}
 					}
 				}
 			}
 		}
 		
 		if (_reversed)
-		{
-			if (!callCallback(root, callback))
-				return false;
-		}
+			return callCallback(root, callback);
 		
-		return true;
+		return RNSRecursiveDescentCallbackResult.Continue;
 	}
 	
 	public void descend(RNSPath root, RNSRecursiveDescentCallback callback)

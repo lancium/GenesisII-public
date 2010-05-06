@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.container.resource;
 import java.io.Closeable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Properties;
 
 import javax.xml.namespace.QName;
 
@@ -148,5 +149,16 @@ public interface IResource extends Closeable
 	public void addMatchingParameter(MatchingParameter...parameters)
 		throws ResourceException;
 	public void removeMatchingParameter(MatchingParameter...parameters)
+		throws ResourceException;
+	
+	public Properties getPersistedProperties(String category)
+		throws ResourceException;
+	public void replacePersistedProperty(String category,
+		String propertyName, String newValue) throws ResourceException;
+	public void replacePersistedProperties(String category, 
+		Properties replacement) throws ResourceException;
+	public void removePersistedProperty(String category,
+		String propertyname) throws ResourceException;
+	public void removePersistedProperties(String category)
 		throws ResourceException;
 }

@@ -204,17 +204,13 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements
 		}
 	}
 	
-	static private File chooseDirectory(
-		HashMap<QName, Object> creationParameters, 
-		int attempts) throws ResourceException
+	static public File getCommonDirectory(Properties creationProperties)
 	{
 		File basedir = null;
 		
-		Properties props = (Properties)creationParameters.get(
-			CreationProperties.CREATION_PROPERTIES_QNAME);
-		if (props != null)
+		if (creationProperties != null)
 		{
-			String dir = props.getProperty(
+			String dir = creationProperties.getProperty(
 				GeniiBESConstants.SHARED_DIRECTORY_PROPERTY);
 			if (dir != null)
 				basedir = new File(dir);
@@ -227,7 +223,23 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements
 		} else
 			configDir = basedir;
 		
-		return new File(configDir, new GUID().toString());
+		return configDir;
+	}
+	
+	static public File getCommonDirectory(
+		HashMap<QName, Object> creationParameters)
+	{
+		return getCommonDirectory(
+			(Properties)creationParameters.get(
+				CreationProperties.CREATION_PROPERTIES_QNAME));
+	}
+	
+	static private File chooseDirectory(
+		HashMap<QName, Object> creationParameters, 
+		int attempts) throws ResourceException
+	{
+		return new File(getCommonDirectory(creationParameters),
+			new GUID().toString());
 	}
 
 	@Override

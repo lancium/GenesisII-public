@@ -5,6 +5,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.besmgr.BESManagerDialog;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.client.gui.bes.BESSelectorDialog;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
@@ -34,8 +35,7 @@ public class BESManager extends BaseGridTool
 		
 		if (numArguments() == 1)
 		{
-			RNSPath current = RNSPath.getCurrent();
-			RNSPath targetPath = current.lookup(getArgument(0), 
+			RNSPath targetPath = lookup(new GeniiPath(getArgument(0)), 
 				RNSPathQueryFlags.MUST_EXIST);
 			target = targetPath.getEndpoint();
 		} else

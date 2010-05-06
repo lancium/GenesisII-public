@@ -11,6 +11,7 @@ import java.util.Collection;
 
 import javax.swing.AbstractAction;
 
+import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.client.rcreate.CreationException;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
@@ -77,7 +78,7 @@ class ExportDataAction extends AbstractAction
 	
 	private void createExport(ExportCreationInformation creationInfo)
 		throws FileLockException, IOException, ExportException, RNSException,
-		CreationException, ResourceCreationFaultType, RemoteException
+		CreationException, ResourceCreationFaultType, RemoteException, InvalidToolUsageException
 	{
 		String rnsPath = creationInfo.getRNSPath();
 		File localPath = new File(creationInfo.getLocalPath());

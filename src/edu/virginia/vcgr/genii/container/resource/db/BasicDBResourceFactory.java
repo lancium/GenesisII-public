@@ -37,6 +37,14 @@ public class BasicDBResourceFactory implements IResourceFactory
 			"epi VARCHAR(512) NOT NULL, " +
 			"humanname VARCHAR(512), " +
 			"epr BLOB(2G))";
+	static private final String _CREATE_PERSISTED_PROPERTIES_TABLE_STMT =
+		"CREATE TABLE persistedproperties(" +
+			"resourceid VARCHAR(128) NOT NULL," +
+			"category VARCHAR(128) NOT NULL," +
+			"propertyname VARCHAR(512) NOT NULL," +
+			"propertyvalue VARCHAR(512) NOT NULL," +
+			"CONSTRAINT persistedpropertiesconstraints1 PRIMARY KEY (" +
+				"resourceid, category, propertyname))";
 	
 	protected DatabaseConnectionPool _pool;
 	
@@ -45,6 +53,7 @@ public class BasicDBResourceFactory implements IResourceFactory
 	{
 		_pool = pool;
 		createTables();
+		upgradeTables();
 	}
 	
 	public IResource instantiate(ResourceKey parentKey) throws ResourceException
@@ -70,7 +79,8 @@ public class BasicDBResourceFactory implements IResourceFactory
 				_CREATE_KEY_TABLE_STMT,
 				_CREATE_PROPERTY_TABLE_STMT,
 				_CREATE_MATCHING_PARAMS_STMT,
-				_CREATE_RESOURCES_TABLE_STMT);
+				_CREATE_RESOURCES_TABLE_STMT,
+				_CREATE_PERSISTED_PROPERTIES_TABLE_STMT);
 			
 			try
 			{
@@ -81,6 +91,27 @@ public class BasicDBResourceFactory implements IResourceFactory
 				_logger.warn("Unable to clean up leaked resources.", cause);
 			}
 			
+			conn.commit();
+		}
+		finally
+		{
+			_pool.release(conn);
+		}
+	}
+	
+	protected void upgradeTables(Connection connection) throws SQLException
+	{
+		// Nothing to do here.
+	}
+	
+	final private void upgradeTables() throws SQLException
+	{
+		Connection conn = null;
+		
+		try
+		{
+			conn = _pool.acquire(false);
+			upgradeTables(conn);
 			conn.commit();
 		}
 		finally

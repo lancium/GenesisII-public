@@ -11,6 +11,7 @@ import edu.virginia.vcgr.genii.client.dialog.DialogProvider;
 import edu.virginia.vcgr.genii.client.dialog.SimpleMenuItem;
 import edu.virginia.vcgr.genii.client.dialog.TextContent;
 import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
@@ -52,7 +53,7 @@ public class BesPolicyTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		RNSPath bes = RNSPath.getCurrent().lookup(getArgument(0), 
+		RNSPath bes = lookup(new GeniiPath(getArgument(0)), 
 			RNSPathQueryFlags.MUST_EXIST);
 		
 		if (_query)

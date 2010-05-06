@@ -5,6 +5,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.ogsa.OGSARP;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
@@ -27,11 +28,10 @@ public class AttachHostTool extends BaseGridTool
 	protected int runCommand() throws Throwable
 	{
 		String containerURL = getArgument(0);
-		String rnsPath = getArgument(1);
+		RNSPath path = lookup(new GeniiPath(getArgument(1)),
+			RNSPathQueryFlags.MUST_NOT_EXIST);
 		
 		containerURL = Hostname.normalizeURL(containerURL);
-		RNSPath path = RNSPath.getCurrent();
-		path = path.lookup(rnsPath, RNSPathQueryFlags.MUST_NOT_EXIST);
 		
 		OGSARP rp = (OGSARP)ResourcePropertyManager.createRPInterface(
 			EPRUtils.makeEPR(containerURL), OGSARP.class);

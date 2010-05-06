@@ -528,6 +528,11 @@ public class BESActivity implements Closeable
 					_connectionPool.release(connection);
 				}
 			}
+			
+			public String getBESEPI()
+			{
+				return _bes.getBESEPI();
+			}
 
 			@Override
 			public BESWorkingDirectory getCurrentWorkingDirectory()

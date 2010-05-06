@@ -23,11 +23,23 @@ class OrMatchingParameter extends MatchingParameter
 	{
 		for (MatchingParameter parameter : _parameters)
 		{
-			if (!parameter.matches(besParameters))
-				return false;
+			if (parameter.matches(besParameters))
+				return true;
 		}
 		
-		return true;
+		return false;
+	}
+	
+	@Override
+	final boolean supportsRequired(String parameterName, Collection<String> values)
+	{
+		for (MatchingParameter parameter : _parameters)
+		{
+			if (parameter.supportsRequired(parameterName, values))
+				return true;
+		}
+		
+		return false;
 	}
 	
 	@Override

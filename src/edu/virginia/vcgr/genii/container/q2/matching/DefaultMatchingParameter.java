@@ -50,6 +50,27 @@ class DefaultMatchingParameter extends MatchingParameter
 	}
 	
 	@Override
+	final boolean supportsRequired(String parameterName, Collection<String> values)
+	{
+		if (_property == null)
+			return false;
+		
+		if (_property.equals(parameterName))
+		{
+			if (_value == null)
+				return true;
+			
+			for (String value : values)
+			{
+				if (value.equals(_value))
+					return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	@Override
 	public int hashCode()
 	{
 		int ret = 0x0;

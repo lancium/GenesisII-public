@@ -2,15 +2,13 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
-import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
-import edu.virginia.vcgr.genii.client.resource.TypeInformation;
-import edu.virginia.vcgr.genii.client.rns.RNSException;
-import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 
 public class CatTool extends BaseGridTool
 {
@@ -27,11 +25,8 @@ public class CatTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		RNSPath path = RNSPath.getCurrent();
 		for (int lcv = 0; lcv < numArguments(); lcv++)
-		{
-			cat(path, getArgument(lcv));
-		}
+			cat(getArgument(lcv));
 		
 		return 0;
 	}
@@ -41,36 +36,28 @@ public class CatTool extends BaseGridTool
 	{
 	}
 	
-	public void cat(RNSPath currentPath,
-		String filePath)
-		throws RNSException, IOException
+	public void cat(String filePath)
+		throws IOException
 	{
-		for (RNSPath file : currentPath.expand(filePath))		
-			cat(file);
-	}
-	
-	 public void cat(RNSPath file)
-		throws RNSException, IOException
-	{
-		byte []data = new byte[ByteIOConstants.PREFERRED_SIMPLE_XFER_BLOCK_SIZE];
+		char []data = new char[ByteIOConstants.PREFERRED_SIMPLE_XFER_BLOCK_SIZE];
 		int read;
-		TypeInformation typeInfo = new TypeInformation(file.getEndpoint());
-		if (!typeInfo.isByteIO())
-			throw new RNSException("Path \"" + file.pwd() +
-				"\" is not a file.");
-		
 		InputStream in = null;
+		InputStreamReader reader = null;
 		
 		try
 		{
-			in = ByteIOStreamFactory.createInputStream(file);
-			while ( (read = in.read(data)) >= 0)
-				stdout.write(new String(data, 0, read));
+			GeniiPath path = new GeniiPath(filePath);
+			in = path.openInputStream();
+			reader = new InputStreamReader(in);
+			
+			while ( (read = reader.read(data, 0, data.length)) > 0)
+				stdout.write(data, 0, read);
+			
+			stdout.flush();
 		}
 		finally
 		{
 			StreamUtils.close(in);
-			stdout.flush();
 		}
 	}
 }

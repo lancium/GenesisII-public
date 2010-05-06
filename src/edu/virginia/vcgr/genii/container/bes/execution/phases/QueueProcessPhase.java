@@ -5,10 +5,13 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStateEnumeration;
+import org.ggf.jsdl.OperatingSystemTypeEnumeration;
+import org.ggf.jsdl.ProcessorArchitectureEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.ExitCondition;
@@ -18,17 +21,26 @@ import edu.virginia.vcgr.genii.client.bes.SignaledExit;
 import edu.virginia.vcgr.genii.client.bes.Signals;
 import edu.virginia.vcgr.genii.client.nativeq.ApplicationDescription;
 import edu.virginia.vcgr.genii.client.nativeq.JobToken;
+import edu.virginia.vcgr.genii.client.nativeq.NativeQProperties;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueue;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConnection;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueException;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueState;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueues;
+import edu.virginia.vcgr.genii.client.pwrapper.ExitResults;
+import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
+import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperException;
+import edu.virginia.vcgr.genii.client.pwrapper.ResourceUsageDirectory;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionException;
 import edu.virginia.vcgr.genii.container.bes.execution.IgnoreableFault;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.ResourceConstraints;
+import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
+import edu.virginia.vcgr.genii.container.cservices.accounting.AccountingService;
+import edu.virginia.vcgr.jsdl.OperatingSystemNames;
+import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
 
 public class QueueProcessPhase extends AbstractRunProcessPhase 
 	implements TerminateableExecutionPhase
@@ -116,6 +128,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 	@Override
 	public void execute(ExecutionContext context) throws Throwable
 	{
+		File resourceUsageFile = null;
+		
 		synchronized(_phaseShiftLock)
 		{
 			if (_terminate != null && _terminate.booleanValue())
@@ -143,11 +157,14 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 				
 				_logger.info(String.format(
 					"Asking batch system (%s) to submit the job.", queue));
+				resourceUsageFile = new ResourceUsageDirectory(_workingDirectory.getWorkingDirectory(
+					)).getNewResourceUsageFile();
 				_jobToken = queue.submit(new ApplicationDescription(
 					_spmdVariation, _numProcesses, _numProcessesPerHost, _executable.getAbsolutePath(),
 					_arguments,
 					_environment, fileToPath(_stdin),
-					fileToPath(_stdout), fileToPath(_stderr), _resourceConstraints));
+					fileToPath(_stdout), fileToPath(_stderr), _resourceConstraints,
+					resourceUsageFile));
 				context.setProperty(JOB_TOKEN_PROPERTY, _jobToken);
 			}
 			
@@ -165,6 +182,52 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 			context.setProperty(JOB_TOKEN_PROPERTY, null);
 			
 			int exitCode = queue.getExitCode(_jobToken);
+			if (resourceUsageFile != null)
+			{
+				try
+				{
+					ExitResults eResults = ProcessWrapper.readResults(
+						resourceUsageFile);
+					exitCode = eResults.exitCode();
+					AccountingService acctService =
+						(AccountingService)ContainerServices.findService(
+							AccountingService.SERVICE_NAME);
+					if (acctService != null)
+					{
+						NativeQProperties nqProperties = new NativeQProperties(
+							_queueProperties);
+						
+						OperatingSystemNames osName = null;
+						OperatingSystemTypeEnumeration osType =
+							nqProperties.operatingSystemName();
+						if (osType != null)
+							osName = OperatingSystemNames.valueOf(osType.getValue());
+						
+						ProcessorArchitecture arch = null;
+						ProcessorArchitectureEnumeration archEnum =
+							nqProperties.cpuArchitecture();
+						if (archEnum != null)
+							arch = ProcessorArchitecture.valueOf(archEnum.getValue());
+						
+						Vector<String> command = new Vector<String>(
+							_arguments);
+						command.add(0, _executable.getAbsolutePath());
+						acctService.addAccountingRecord(
+							context.getCallingContext(), context.getBESEPI(),
+							arch, osName, null, command, exitCode,
+							eResults.userTime(), eResults.kernelTime(),
+							eResults.wallclockTime(), eResults.maximumRSS());
+					}
+					
+				}
+				catch (ProcessWrapperException pwe)
+				{
+					throw new IgnoreableFault(
+						"Error trying to read resource usage information.",
+						pwe);
+				}
+			}
+			
 			ExitCondition exitCondition = interpretExitCode(exitCode);
 			_logger.info(String.format("Process exited with %s.",
 				(exitCondition instanceof SignaledExit) ?

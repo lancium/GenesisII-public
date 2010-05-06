@@ -238,14 +238,6 @@ public class SGEQueueConnection extends ScriptBasedQueueConnection
 	{
 		super.generateQueueHeaders(script, workingDirectory, application);
 		
-		String stdout = application.getStdoutRedirect();
-		String stderr = application.getStderrRedirect();
-		
-		if (stdout != null)
-			script.format("#$ -o %s\n", stdout);
-		if (stderr != null)
-			script.format("#$ -e %s\n", stderr);
-		
 		if (application.getSPMDVariation() != null)
 		{
 			throw new NativeQueueException(

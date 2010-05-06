@@ -36,8 +36,10 @@ import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.MetadataType;
 import org.ws.addressing.ReferenceParametersType;
 
+import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.container.Container;
+import edu.virginia.vcgr.genii.container.cservices.eprmapper.EPRMapperService;
 
 public class WSAddressingExtractor extends BasicHandler
 {
@@ -123,6 +125,15 @@ public class WSAddressingExtractor extends BasicHandler
 					.getCurrentServiceURL(ctxt)));
 			_logger.debug("WSAddressingExtractor setting target address to \""
 					+ epr.getAddress().get_value() + "\".");
+		}
+		
+		String shortParameterName = EPRUtils.getEPIShortParameter(epr);
+		if (shortParameterName != null)
+		{
+			_logger.debug(String.format(
+				"Found a shorthand epi of %s.  Looking it up.",
+				shortParameterName));
+			epr = EPRMapperService.lookup(shortParameterName);
 		}
 
 		ctxt.setProperty(AXIS_MESSAGE_CTXT_EPR_PROPERTY, epr);
