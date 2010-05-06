@@ -69,6 +69,7 @@ import edu.virginia.vcgr.genii.queue.SubmitJobResponseType;
 import edu.virginia.vcgr.jsdl.JobDefinition;
 import edu.virginia.vcgr.jsdl.sweep.SweepException;
 import edu.virginia.vcgr.jsdl.sweep.SweepListener;
+import edu.virginia.vcgr.jsdl.sweep.SweepToken;
 import edu.virginia.vcgr.jsdl.sweep.SweepUtility;
 
 /**
@@ -466,9 +467,11 @@ public class QueueServiceImpl extends ResourceForkBaseService
 				submitJobRequest.getJobDefinition());
 			if (jobDefinition.parameterSweeps().size() > 0)
 			{
-				SweepUtility.performSweep(jobDefinition, 
+				SweepToken token;
+				token = SweepUtility.performSweep(jobDefinition, 
 					listener = new SweepListenerImpl(
 						mgr, submitJobRequest.getPriority()));
+				token.join();
 				ticket = listener.firstTicket();
 			} else
 			{

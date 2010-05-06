@@ -246,6 +246,9 @@ This document and the information contained herein is provided on an "AS IS" bas
 			<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
 		<xsd:attribute name="name" type="xsd:NCName" use="required"/>
+		<xsd:attribute name="unique-id"
+			namespace="http://vcgr.cs.virginia.edu/jsdl" type="xsd:string"
+			use="optional"/>
 		<xsd:anyAttribute namespace="##other" processContents="lax"/>
 	</xsd:complexType>
 	<!--========================================================================-->

@@ -84,7 +84,6 @@ import org.xml.sax.InputSource;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.comm.ClientConstructionParameters;
-import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextException;
@@ -103,7 +102,6 @@ import edu.virginia.vcgr.genii.common.AddMatchingParameterResponseType;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.MatchingParameter;
 import edu.virginia.vcgr.genii.common.RemoveMatchingParameterResponseType;
-import edu.virginia.vcgr.genii.common.notification.GeniiSubscriptionPortType;
 import edu.virginia.vcgr.genii.common.notification.Subscribe;
 import edu.virginia.vcgr.genii.common.notification.SubscribeResponse;
 import edu.virginia.vcgr.genii.common.notification.UserDataType;
@@ -119,6 +117,7 @@ import edu.virginia.vcgr.genii.container.alarms.AlarmManager;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
 import edu.virginia.vcgr.genii.container.attrs.AttributePreFetcher;
 import edu.virginia.vcgr.genii.container.attrs.IAttributeManipulator;
+import edu.virginia.vcgr.genii.container.common.notification.GeniiSubscriptionServiceImpl;
 import edu.virginia.vcgr.genii.container.common.notification.SubscriptionConstructionParameters;
 import edu.virginia.vcgr.genii.container.common.notification.TopicSpace;
 import edu.virginia.vcgr.genii.container.configuration.ServiceDescription;
@@ -1120,9 +1119,11 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		Token topic = subscribeRequest.getTopic();
 		UserDataType userData = subscribeRequest.getUserData();
 		
+		/*
 		GeniiSubscriptionPortType subscription =
 			ClientUtils.createProxy(GeniiSubscriptionPortType.class,
 			EPRUtils.makeEPR(Container.getServiceURL("GeniiSubscriptionPortType")));
+		*/
 
 		HashMap<QName, MessageElement> constructionParameters =
 			new HashMap<QName, MessageElement>();
@@ -1135,8 +1136,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		MessageElement []params = new MessageElement[constructionParameters.size()];
 		constructionParameters.values().toArray(params);
 		return new SubscribeResponse(
-			subscription.vcgrCreate(
-				new VcgrCreate(params)).getEndpoint());
+			new GeniiSubscriptionServiceImpl().CreateEPR(params, 
+				Container.getServiceURL("GeniiSubscriptionPortType")));
 	}
 	
 	@RWXMapping(RWXCategory.EXECUTE)

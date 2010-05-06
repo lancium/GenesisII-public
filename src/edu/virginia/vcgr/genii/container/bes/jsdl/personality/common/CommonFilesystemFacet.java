@@ -36,6 +36,13 @@ public class CommonFilesystemFacet extends DefaultFileSystemFacet
 		((FilesystemUnderstanding)currentUnderstanding).setFileSystemName(
 			name);
 	}
+	
+	@Override
+	public void consumeUniqueID(Object currentUnderstanding, String uniqueID)
+		throws JSDLException
+	{
+		((FilesystemUnderstanding)currentUnderstanding).setUniqueID(uniqueID);
+	}
 
 	@Override
 	public void consumeMountSource(Object currentUnderstanding,

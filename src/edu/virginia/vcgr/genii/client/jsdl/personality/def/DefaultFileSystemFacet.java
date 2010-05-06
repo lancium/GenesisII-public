@@ -58,4 +58,11 @@ public class DefaultFileSystemFacet extends DefaultPersonalityFacet implements
 		throw new UnsupportedJSDLElement(
 			new QName(JSDLConstants.JSDL_NS, "Name"));
 	}
+	
+	@Override
+	public void consumeUniqueID(Object currentUnderstanding,
+		String uniqueID) throws JSDLException
+	{
+		// Ignore
+	}
 }

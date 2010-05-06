@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.xml.namespace.QName;
+
+import org.ggf.jsdl.FileSystem_Type;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
 
@@ -32,6 +35,12 @@ public class ConfigurationManager
 	// denotes type of configuration for this process
 	private Boolean _isClient = null;
 	
+	static
+	{
+		FileSystem_Type.getTypeDesc().getFieldByName(
+			"uniqueId").setXmlName(new QName(
+				"http://vcgr.cs.virginia.edu/genesisII/jsdl", "unique-id"));
+	}
 
 	/** 
 	 * Add a listener to be notified when the current configuration is unloaded

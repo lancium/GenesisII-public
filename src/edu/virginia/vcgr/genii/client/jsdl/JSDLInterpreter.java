@@ -812,6 +812,10 @@ public class JSDLInterpreter
 		if (nString != null)
 			facet.consumeName(understanding, nString.toString());
 		
+		String uniqueID = fst.getUniqueId();
+		if (uniqueID != null)
+			facet.consumeUniqueID(understanding, uniqueID);
+		
 		String str = fst.getDescription();
 		if (str != null)
 			facet.consumeDescription(understanding, str);

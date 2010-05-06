@@ -17,6 +17,7 @@ public class FilesystemUnderstanding
 	private FileSystemTypeEnumeration _fsType = null;
 	private String _fsName = null;
 	private String _fsSource = null;
+	private String _uniqueID = null;
 	
 	public void setFileSystemType(FileSystemTypeEnumeration fsType)
 	{
@@ -36,6 +37,11 @@ public class FilesystemUnderstanding
 	public void setFileSystemSource(String fsSource)
 	{
 		_fsSource = fsSource;
+	}
+	
+	public void setUniqueID(String uniqueID)
+	{
+		_uniqueID = uniqueID;
 	}
 	
 	public boolean isScratchFileSystem()
@@ -66,17 +72,21 @@ public class FilesystemUnderstanding
 				"Don't know how to handle file system \"%s\".",
 				_fsName));
 		
-		if (jobAnnotation == null)
+		if (_uniqueID == null && jobAnnotation == null)
 			throw new JSDLException(
-				"Cannot create SCRATCH file system without a job annotation.");
+				"Cannot create SCRATCH file system without a job annotation or unique-id.");
 		
 		try
 		{
+			String uniqueID = _uniqueID;
+			if (uniqueID == null)
+				uniqueID = jobAnnotation;
+			
 			ScratchFSManagerContainerService service =
 				(ScratchFSManagerContainerService)ContainerServices.findService(
 					ScratchFSManagerContainerService.SERVICE_NAME);
 			return service.reserveSwapFilesystem(GUID.fromRandomBytes(
-				jobAnnotation.getBytes()).toString());
+				uniqueID.getBytes()).toString());
 		}
 		catch (IOException ioe)
 		{

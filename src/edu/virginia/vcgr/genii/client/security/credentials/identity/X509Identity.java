@@ -150,10 +150,8 @@ public class X509Identity implements HolderOfKeyIdentity, SignedAssertion
 	@Override
 	public int hashCode() 
 	{
-		if ((_identity != null) && (_identity.length != 0)) 
-		{
+		if ((_identity != null) && (_identity.length != 0))
 			return _identity[0].hashCode();
-		}
 		
 		return 0;
 	}
@@ -161,25 +159,20 @@ public class X509Identity implements HolderOfKeyIdentity, SignedAssertion
 	public boolean equals(Object other)
 	{
 		if (other == null)
-		{
 			return false;
-		}
 
 		if (!(other instanceof X509Identity))
-		{
 			return false;
-		}
-
+		
 		if ((_identity == null) || (((X509Identity) other)._identity == null))
 		{
 			// one or the other is null
-			if (_identity == ((X509Identity) other)._identity)
+			if (_identity != ((X509Identity) other)._identity)
 			{
 				// they're not both null
 				return false;
 			}
-		}
-		else if (!_identity[0].equals(((X509Identity) other)._identity[0]))
+		} else if (!_identity[0].equals(((X509Identity) other)._identity[0]))
 		{
 			// only check the first cert in the chain
 			return false;
