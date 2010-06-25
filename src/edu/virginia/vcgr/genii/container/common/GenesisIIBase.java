@@ -917,6 +917,11 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		return serviceCreated;
 	}
 	
+	public void postStartup()
+	{
+		// Do nothing by default.
+	}
+	
 	static private Long _serviceCertificateLifetime = null;
 	static private Long _resourceCertificateLifetime = null;
 	

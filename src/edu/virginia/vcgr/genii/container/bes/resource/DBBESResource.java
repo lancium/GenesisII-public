@@ -68,8 +68,6 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 	@Override
 	public void destroy() throws ResourceException
 	{
-		PreparedStatement stmt = null;
-		
 		try
 		{
 			BES.deleteBES(_resourceKey);
@@ -77,10 +75,6 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 		catch (SQLException sqe)
 		{
 			throw new ResourceException("Unable to delete resource.", sqe);
-		}
-		finally
-		{
-			StreamUtils.close(stmt);
 		}
 		
 		super.destroy();

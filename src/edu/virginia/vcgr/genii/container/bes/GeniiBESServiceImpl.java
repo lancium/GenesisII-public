@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.container.bes;
 import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -58,7 +59,6 @@ import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.utils.creation.CreationProperties;
@@ -85,6 +85,82 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 	GeniiBESPortType, BESConstants
 {
 	static private Log _logger = LogFactory.getLog(GeniiBESServiceImpl.class);
+	
+	private void cleanupBadActivities()
+	{
+		Collection<BESActivity> allActivities = BES.getAllActivities();
+		boolean isGood;
+		
+		for (BESActivity activity : allActivities)
+		{
+			isGood = false;
+			try
+			{
+				isGood = activity.isGood();
+			}
+			catch (Throwable cause)
+			{
+				_logger.warn(String.format(
+					"Unable to determine is activity %s is good -- deleting it!", 
+					activity.getActivityID()), cause);
+			}
+			
+			boolean success = false;
+			try
+			{
+				WorkingContext.temporarilyAssumeNewIdentity(
+					activity.getActivityEPR());
+				success = true;
+				
+				if (isGood)
+				{
+					isGood = true;
+					try
+					{
+						Calendar createTime = 
+							ResourceManager.getCurrentResource().dereference().createTime();
+						isGood = (System.currentTimeMillis() - createTime.getTimeInMillis()) <
+							(1000L * 60 * 60 * 24 * 28);
+					}
+					catch (Throwable cause)
+					{
+						_logger.warn(
+							"Couldn't get create time for activity.", cause);
+					}
+				}
+				
+				if (!isGood)
+				{
+					_logger.info(String.format(
+						"Cleaning up a BES activity that we have determined is bad:  %s.", 
+						activity.getActivityID()));
+					
+					new BESActivityServiceImpl().destroy(new Destroy());
+				}
+			}
+			catch (Throwable cause)
+			{
+				_logger.error(String.format(
+					"Unable to cleanup \"bad\" activity %s.", 
+					activity.getActivityID()), cause);
+			}
+			finally
+			{
+				if (success)
+				{
+					try
+					{
+						WorkingContext.releaseAssumedIdentity();
+					}
+					catch (Throwable cause)
+					{
+						_logger.error("Unable to release assumed context.",
+							cause);
+					}
+				}
+			}
+		}
+	}
 	
 	@Override
 	public boolean startup()
@@ -116,6 +192,12 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 		}
 
 		return ret;
+	}
+	
+	@Override
+	public void postStartup()
+	{
+		cleanupBadActivities();
 	}
 	
 	protected void setAttributeHandlers()
@@ -159,7 +241,6 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 		addImplementedPortType(BES_FACTORY_PORT_TYPE);
 		addImplementedPortType(BES_MANAGEMENT_PORT_TYPE);
 		addImplementedPortType(GENII_BES_PORT_TYPE);
-		addImplementedPortType(RNSConstants.RNS_PORT_TYPE);
 	}
 	
 	@Override
@@ -308,10 +389,12 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 			{
 				BESActivity activity = resource.getActivity(target);
 				activity.verifyOwner();
+				Collection<Throwable> faults = activity.getFaults();
 				response.add(new GetActivityStatusResponseType(
 					target, activity.getState().toActivityStatusType(),
+					((faults == null) || (faults.size() == 0)) ? null :
 					BESFaultManager.constructFault(
-						activity.getFaults().toArray(new Throwable[0])),
+						faults.toArray(new Throwable[faults.size()])),
 					null));
 			}
 			catch (Throwable cause)

@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -21,6 +23,8 @@ import edu.virginia.vcgr.genii.queue.ReducedJobInformationType;
 
 public class JobListingRNSFork extends AbstractRNSResourceFork
 {
+	static private Log _logger = LogFactory.getLog(JobListingRNSFork.class);
+	
 	public JobListingRNSFork(ResourceForkService service, String forkPath)
 	{
 		super(service, forkPath);
@@ -93,13 +97,29 @@ public class JobListingRNSFork extends AbstractRNSResourceFork
 			else
 				jobs = mgr.getJobStatus(null);
 			
+			_logger.debug(String.format(
+				"JobListingRNSFork:  Getting the total listed of jobs.  Entry Name is \"%s\".",
+				entryName));
 			for (ReducedJobInformationType job : jobs)
 			{
-				if (entryName != null && !job.getJobTicket().equals(entryName))
-					continue;
+				if (entryName != null)
+				{
+					if (!job.getJobTicket().equals(entryName))
+						continue;
+					else
+						_logger.debug(String.format(
+							"Found the entry name \"%s\" in the JobListingRNSFork.",
+							entryName));
+				}
 				
 				boolean passes = false;
 				JobStateEnumerationType status = job.getJobStatus();
+				
+				if (entryName != null)
+				{
+					_logger.debug(String.format(
+						"Checking that a job status of %s is acceptable for entryName %s.", status, entryName));
+				}
 				for (String acc : acceptableStatuses)
 				{
 					if (acc.equals(status.getValue()))

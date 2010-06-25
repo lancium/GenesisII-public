@@ -38,7 +38,7 @@ public abstract class BaseGridTool implements ITool
 	private boolean _isHidden;
 	
 	private boolean _useGui = true;
-	private List<String> _arguments = new ArrayList<String>();
+	protected List<String> _arguments = new ArrayList<String>();
 	
 	static protected RNSPath lookup(RNSPath parent, GeniiPath path) 
 		throws InvalidToolUsageException

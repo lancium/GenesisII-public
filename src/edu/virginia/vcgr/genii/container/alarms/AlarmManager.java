@@ -429,15 +429,23 @@ public class AlarmManager
 			{
 				try
 				{
+					AlarmInformation aInfo;
 					getInfoStmt.setLong(1, desc.getAlarmID());
 					rs = getInfoStmt.executeQuery();
 					if (rs.next())
 					{
-						performAlarm(conn, removeStmt, updateStmt,
+						aInfo = new AlarmInformation(
 							desc.getAlarmID(), rs.getLong(1),
 							(ICallingContext)DBSerializer.fromBlob(rs.getBlob(2)),
 							(EndpointReferenceType)EPRUtils.fromBlob(rs.getBlob(3)),
 							rs.getString(4), DBSerializer.fromBlob(rs.getBlob(5)));
+						StreamUtils.close(rs);
+						rs = null;
+						
+						performAlarm(conn, removeStmt, updateStmt,
+							aInfo.alarmID(), aInfo.repeatInterval(),
+							aInfo.callingContext(), aInfo.target(),
+							aInfo.methodName(), aInfo.userData());
 					}
 				}
 				catch (Throwable cause)

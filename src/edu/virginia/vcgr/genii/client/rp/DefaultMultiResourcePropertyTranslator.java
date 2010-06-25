@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.client.rp;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Vector;
 
 import javax.xml.namespace.QName;
 
@@ -30,6 +31,9 @@ public class DefaultMultiResourcePropertyTranslator implements
 			Collection<MessageElement> elements)
 			throws ResourcePropertyException
 	{
+		if (elements == null)
+			elements = new Vector<MessageElement>();
+		
 		Collection<Type> ret = new ArrayList<Type>(elements.size());
 		for (MessageElement element : elements)
 		{

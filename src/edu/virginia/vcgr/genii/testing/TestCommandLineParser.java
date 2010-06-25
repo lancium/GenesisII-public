@@ -1,5 +1,8 @@
 package edu.virginia.vcgr.genii.testing;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -9,7 +12,7 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 public class TestCommandLineParser
 {
 	@Test
-	public void testCommandLineParser() throws ToolException
+	public void testCommandLineParser() throws ToolException, FileNotFoundException, IOException
 	{
 		String []cLine = CommandLineFormer.formCommandLine(
 			"a bb ccc abc   abfoo");

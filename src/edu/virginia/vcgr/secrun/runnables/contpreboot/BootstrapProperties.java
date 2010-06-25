@@ -2,24 +2,15 @@ package edu.virginia.vcgr.secrun.runnables.contpreboot;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
-
-import edu.virginia.vcgr.genii.client.postlog.PostTarget;
-import edu.virginia.vcgr.genii.client.postlog.empty.EmptyPostTarget;
-import edu.virginia.vcgr.genii.client.postlog.http.HttpPostTarget;
 
 public class BootstrapProperties extends Properties
 {
 	static final long serialVersionUID = 0L;
 
-	static private Log _logger = LogFactory.getLog(BootstrapProperties.class);
-	
 	static final private String BOOTSTRAP_PROPERTIES_RESOURCE =
 		"META-INF/secure-runnable/runnable-description.properties";
 	
@@ -60,8 +51,6 @@ public class BootstrapProperties extends Properties
 	static final public String CERT_GENERATOR_ST_PROPERTY_NAME =
 		"edu.virginia.vcgr.genii.container.cert-generator.st";
 	
-	private PostTarget _exceptionLogger = null;
-	
 	public BootstrapProperties()
 		throws IOException
 	{
@@ -81,35 +70,6 @@ public class BootstrapProperties extends Properties
 		{
 			StreamUtils.close(in);
 		}
-	}
-	
-	public PostTarget getExceptionLogger()
-	{
-		synchronized(this)
-		{
-			if (_exceptionLogger == null)
-			{
-				String url = getProperty(
-					GENII_EXCEPTION_POST_LOG_URL_PROPERTY_NAME);
-				if (url == null)
-					_exceptionLogger = new EmptyPostTarget();
-				else
-				{
-					try
-					{
-						_exceptionLogger = new HttpPostTarget(url);
-					}
-					catch (MalformedURLException mue)
-					{
-						_exceptionLogger = new EmptyPostTarget();
-						_logger.error("Unable to connect logger to \""
-							+ url + "\"...defaulting to empty logger.", mue);
-					}
-				}
-			}
-		}
-		
-		return _exceptionLogger;
 	}
 
 	public String getConnectURL()

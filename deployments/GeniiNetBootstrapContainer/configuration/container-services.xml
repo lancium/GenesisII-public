@@ -43,17 +43,4 @@
 	<container-service
 		class="${CSERVICES_PKG}.executionmgr.ExecutionManagerService">
 	</container-service>
-
-	<!--
-		This service is used to persistently log jobs to grid log targets.
-	-->
-	<container-service
-		class="${CSERVICES_PKG}.gridlogger.GridLoggerContainerService">
-		<property
-			name="edu.virginia.vcgr.genii.cservices.gridlogger.num-tries"
-			value="8"/>
-		<property
-			name="edu.virginia.vcgr.genii.cservices.gridlogger.backoff-base"
-			value="16384"/>
-	</container-service>
 </container-services>

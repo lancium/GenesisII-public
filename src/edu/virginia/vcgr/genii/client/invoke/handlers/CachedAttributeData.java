@@ -22,13 +22,16 @@ public class CachedAttributeData
 	{
 		_isFull = isFull;
 		_all = elements;
-		for (MessageElement element : elements)
+		if (elements != null)
 		{
-			QName attrName = element.getQName();
-			Collection<MessageElement> col = _attrs.get(attrName);
-			if (col == null)
-				_attrs.put(attrName, col = new ArrayList<MessageElement>());
-			col.add(element);
+			for (MessageElement element : elements)
+			{
+				QName attrName = element.getQName();
+				Collection<MessageElement> col = _attrs.get(attrName);
+				if (col == null)
+					_attrs.put(attrName, col = new ArrayList<MessageElement>());
+				col.add(element);
+			}
 		}
 	}
 	

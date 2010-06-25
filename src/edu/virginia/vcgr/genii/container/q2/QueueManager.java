@@ -486,6 +486,23 @@ public class QueueManager implements Closeable
 		}
 	}
 	
+	public void rescheduleJobs(String []jobs)
+		throws SQLException, ResourceException, 
+			GenesisIISecurityException
+	{
+		Connection connection = null;
+		
+		try
+		{
+			connection = _connectionPool.acquire(false);
+			_jobManager.rescheduleJobs(connection, jobs);
+		}
+		finally
+		{
+			_connectionPool.release(connection);
+		}
+	}
+	
 	public void killJobs(String []jobs)
 		throws SQLException, ResourceException, GenesisIISecurityException
 	{

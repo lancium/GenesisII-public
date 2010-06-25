@@ -6,6 +6,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -146,7 +148,25 @@ public class RPInvoker implements InvocationHandler
 		public Object handle(Method method, Object []args)
 			throws Throwable
 		{
-			return _translator.deserialize(method.getReturnType(), 
+			Class<?> retType = method.getReturnType();
+			if (!Collection.class.isAssignableFrom(retType))
+				throw new IllegalArgumentException(String.format(
+					"The return type for property \"%s\" is not a collection.", 
+					_propName));
+			
+			Type gRetType = method.getGenericReturnType();
+			if (!(gRetType instanceof ParameterizedType))
+				throw new IllegalArgumentException(String.format(
+					"Unable to determine actual type for property \"%s\".",
+					_propName));
+			Type actualType = 
+				((ParameterizedType)gRetType).getActualTypeArguments()[0];
+			if (!(actualType instanceof Class<?>))
+				throw new IllegalArgumentException(String.format(
+					"Unable to determine actual type for property \"%s\".",
+					_propName));
+			
+			return _translator.deserialize((Class<?>)actualType,
 				getProperties(_propName));
 		}
 	}

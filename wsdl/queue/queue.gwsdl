@@ -150,6 +150,16 @@
 			element="queue:CompleteResponse"/>
 	</wsdl:message>
 	
+	<wsdl:message name="RescheduleJobsRequest">
+		<wsdl:part name="RescheduleJobsRequest"
+			element="queue:RescheduleJobsRequest"/>
+	</wsdl:message>
+
+	<wsdl:message name="RescheduleJobsResponse">
+		<wsdl:part name="RescheduleJobsResponse"
+			element="queue:RescheduleJobsResponse"/>
+	</wsdl:message>
+
 	<wsdl:message name="ConfigureRequest">
 		<wsdl:part name="ConfigureRequest"
 			element="queue:ConfigureRequestType"/>
@@ -206,6 +216,11 @@
 		<wsdl:operation name="completeJobs">
 			<wsdl:input message="queue:CompleteRequest"/>
 			<wsdl:output message="queue:CompleteResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="rescheduleJobs">
+			<wsdl:input message="queue:RescheduleJobsRequest"/>
+			<wsdl:output message="queue:RescheduleJobsResponse"/>
 		</wsdl:operation>
 		
 		<wsdl:operation name="configureResource">

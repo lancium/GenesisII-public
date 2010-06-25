@@ -24,8 +24,10 @@
 	<xsd:complexType name="BasicResourceAttributesDocumentType">
 		<xsd:sequence>
 			<xsd:element name="ResourceName" type="xsd:string" minOccurs="0"/>
-			<xsd:element name="OperatingSystem" type="jsdl:OperatingSystem_Type"/>
-			<xsd:element name="CPUArchitecture" type="jsdl:CPUArchitecture_Type"/>
+			<xsd:element name="OperatingSystem"
+				type="jsdl:OperatingSystem_Type" minOccurs="0"/>
+			<xsd:element name="CPUArchitecture"
+				type="jsdl:CPUArchitecture_Type" minOccurs="0"/>
 			<xsd:element name="CPUCount" type="xsd:double" minOccurs="0"/>
 			<xsd:element name="CPUSpeed" type="xsd:double" minOccurs="0"/>
 			<xsd:element name="PhysicalMemory" type="xsd:double" minOccurs="0"/>

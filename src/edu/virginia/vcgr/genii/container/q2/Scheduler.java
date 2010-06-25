@@ -16,7 +16,6 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.Counter;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.container.cservices.gridlogger.GridLogDevice;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.matching.JobResourceRequirements;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
@@ -33,7 +32,6 @@ public class Scheduler implements Closeable
 		"edu.virginia.vcgr.genii.container.q2.is-scheulding";
 	
 	static private Log _logger = LogFactory.getLog(Scheduler.class);
-	static private GridLogDevice _jobLogger = new GridLogDevice(Scheduler.class);
 	
 	volatile private boolean _closed = false;
 	
@@ -42,7 +40,7 @@ public class Scheduler implements Closeable
 	private SchedulingEvent _schedulingEvent;
 	private DatabaseConnectionPool _connectionPool;
 	
-	private volatile boolean _isSchedulingJobs;
+	private volatile Boolean _isSchedulingJobs;
 	
 	private JobManager _jobManager;
 	private BESManager _besManager;
@@ -54,10 +52,11 @@ public class Scheduler implements Closeable
 		try
 		{
 			connection = _connectionPool.acquire(true);
-			String str = (String)BasicDBResource.getProperty(
+			Boolean isSchedulingJobs = (Boolean)BasicDBResource.getProperty(
 				connection, _queueID,
 				IS_SCHEDULING_PROPERTY);
-			_isSchedulingJobs = (str == null) ? true : Boolean.parseBoolean(str);
+			_isSchedulingJobs = (isSchedulingJobs == null) ||
+				(isSchedulingJobs.booleanValue());
 		}
 		finally
 		{
@@ -264,15 +263,9 @@ public class Scheduler implements Closeable
 					 * to our list. */
 					if (match != null)
 					{
-						_jobLogger.log(queuedJob.gridLogTargets(),
-							String.format("Matched job against resource \"%s\".",
-								_besManager.getBESName(match.getBESID())));
 						matches.add(match);
 					} else
 					{
-						_jobLogger.log(queuedJob.gridLogTargets(),
-							"Unable to find any suitable matches at the moment." +
-							"  Will try again later.");
 						Counter c = jobCounts.get(requirements);
 						if (c == null)
 							jobCounts.put(requirements, c = new Counter());

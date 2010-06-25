@@ -17,10 +17,6 @@ import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.BESFaultManager;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
-import edu.virginia.vcgr.genii.client.gridlog.GridLogTarget;
-import edu.virginia.vcgr.genii.client.postlog.JobEvent;
-import edu.virginia.vcgr.genii.client.postlog.PostTargets;
-import edu.virginia.vcgr.genii.container.cservices.gridlogger.GridLogDevice;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 
@@ -33,8 +29,7 @@ import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 public class JobUpdateWorker implements OutcallHandler
 {
 	static private Log _logger = LogFactory.getLog(JobUpdateWorker.class);
-	static private GridLogDevice _jobLogger = new GridLogDevice(JobUpdateWorker.class);
-	
+
 	private IBESPortTypeResolver _clientStubResolver;
 	private JobCommunicationInfo _jobInfo;
 	private JobManager _jobManager;
@@ -81,15 +76,12 @@ public class JobUpdateWorker implements OutcallHandler
 	
 	public void run()
 	{
-		Collection<GridLogTarget> logTargets = _data.gridLogTargets();
-		
 		Connection connection = null;
 		long besID = -1L;
 		
 		try
 		{
-			_jobLogger.log(logTargets, "Checking status of the job.");
-			_logger.debug("Checking status of job " + _jobInfo.getJobID());
+			_logger.debug("Checking status of job " + _data);
 	
 			/* Get a connection from the connection pool and then ask the 
 			 * resolvers to get the memory "large" information from the
@@ -108,9 +100,10 @@ public class JobUpdateWorker implements OutcallHandler
 			if (jobEndpoint == null)
 			{
 				// Another thread has removed this from the database.
-				_logger.debug(
-					"Asked to check status on a job which is " +
-					"no longer running according to the database.");
+				_logger.debug(String.format(
+					"Asked to check status on job %s which is " +
+					"no longer running according to the database.",
+					_data));
 				_jobManager.failJob(connection, _jobInfo.getJobID(), false, false, false);
 				return;
 			}
@@ -118,8 +111,10 @@ public class JobUpdateWorker implements OutcallHandler
 			String oldAction = _data.setJobAction("Checking");
 			if (oldAction != null)
 			{
-				_logger.error("Attempting to check job status, found that " +
-					"we are in the process of doing action:  " + oldAction);
+				_logger.error(String.format(
+					"Attempting to check job status for %s, found that " +
+					"we are in the process of doing action:  " + oldAction,
+					_data));
 				return;
 			}
 			
@@ -127,7 +122,8 @@ public class JobUpdateWorker implements OutcallHandler
 			GetActivityStatusResponseType []activityStatuses;
 			try
 			{
-				_jobLogger.log(logTargets, "Making grid outcall to get activity status.");
+				_logger.debug(String.format(
+					"Making grid outcall to check status of job %s", _data));
 				/* call the BES container to get the activity's status. */
 				activityStatuses 
 					= clientStub.getActivityStatuses(new GetActivityStatusesType(
@@ -137,6 +133,9 @@ public class JobUpdateWorker implements OutcallHandler
 			}
 			catch (GenesisIISecurityException gse)
 			{
+				_logger.debug(String.format(
+					"There was a security exception checking on status of job %s.",
+					_data), gse);
 				wasSecurityException = true;
 				activityStatuses = new GetActivityStatusResponseType[] {
 					new GetActivityStatusResponseType(
@@ -153,11 +152,12 @@ public class JobUpdateWorker implements OutcallHandler
 			 * a weird internal error. */
 			if (activityStatuses == null || activityStatuses.length != 1)
 			{
-				_jobLogger.log(logTargets, "Unable to get activity status for the job.");
 				_logger.error("Unable to get activity status for job " 
-					+ _jobInfo.getJobID());
+					+ _data);
 			} else
 			{
+				_logger.debug(String.format(
+					"Successfully got status of job %s.", _data));
 				List<String> faults = null;
 				
 				try
@@ -167,7 +167,8 @@ public class JobUpdateWorker implements OutcallHandler
 				}
 				catch (Throwable cause)
 				{
-					_logger.error("Error trying to get fault detail.", cause);
+					_logger.error(String.format(
+						"Error trying to get fault detail for job %s.", _data), cause);
 				}
 				
 				if (faults == null)
@@ -195,49 +196,40 @@ public class JobUpdateWorker implements OutcallHandler
 				 */
 				ActivityState state = new ActivityState(
 					activityStatuses[0].getActivityStatus());
-				_jobLogger.log(logTargets, String.format(
-					"The activity's status is \"%s\".", state));
+				_logger.debug(String.format(
+					"Job %s has activity status %s.", _data, state));
 				if (state.isFailedState())
 				{
 					/* If the job failed in the BES, fail it in the queue */
-					if (!_jobManager.failJob(connection, _jobInfo.getJobID(), 
-						!state.isIgnoreable(), false, true))
-						PostTargets.poster().post(
-							JobEvent.jobFailed(null, 
-								Long.toString(_jobInfo.getJobID())));
+					_jobManager.failJob(connection, _jobInfo.getJobID(), 
+						!state.isIgnoreable(), false, true);
 				} else if (state.isCancelledState())
 				{
 					/* If the job was cancelled, then finish it here */
 					_jobManager.failJob(connection, _jobInfo.getJobID(), 
 							false, false, true);
-					PostTargets.poster().post(JobEvent.jobKilled(null,
-						Long.toString(_jobInfo.getJobID())));
 				} else if (state.isFinishedState())
 				{
 					/* If the job finished on the bes, finish it here */
 					_jobManager.finishJob(_jobInfo.getJobID());
-					PostTargets.poster().post(JobEvent.jobFinished(null,
-						Long.toString(_jobInfo.getJobID())));
 				}
 			}
 		}
 		catch (Throwable cause)
 		{
-			_jobLogger.log(logTargets, "Unable to update job status for job.", cause);
 			_logger.warn("Unable to update job status for job " 
-				+ _jobInfo.getJobID(), cause);
+				+ _data, cause);
 			try
 			{
 				_jobManager.addJobCommunicationAttempt(connection,
-					_data.getJobID(), _data.getBESID().longValue(),
-					logTargets);
+					_data.getJobID(), _data.getBESID().longValue());
 				connection.commit();
 			}
 			catch (Throwable cause2)
 			{
 				_logger.warn(String.format(
-					"Unable to update database for failed job %d.", 
-					_jobInfo.getJobID()), cause2);
+					"Unable to update database for failed job %s.", 
+					_data), cause2);
 			}
 		}
 		finally

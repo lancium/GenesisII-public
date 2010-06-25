@@ -177,6 +177,24 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	}
 
 	@Override
+	@RWXMapping(RWXCategory.OPEN)
+	public Object rescheduleJobs(String[] jobs) throws RemoteException
+	{
+		ResourceKey rKey = ResourceManager.getCurrentResource();
+		
+		try
+		{
+			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
+			mgr.rescheduleJobs(jobs);
+			return null;
+		}
+		catch (SQLException sqe)
+		{
+			throw new RemoteException("Unable to reschedule jobs in queue.", sqe);
+		}
+	}
+	
+	@Override
 	@RWXMapping(RWXCategory.WRITE)
 	public Object configureResource(ConfigureRequestType configureRequest)
 			throws RemoteException

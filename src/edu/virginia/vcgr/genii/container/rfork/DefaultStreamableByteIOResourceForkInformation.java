@@ -53,6 +53,12 @@ public class DefaultStreamableByteIOResourceForkInformation
 		}
 	}
 	
+	@Override
+	public Class<? extends ResourceFork> forkClass()
+	{
+		return _dependentForkInfo.forkClass();
+	}
+	
 	private void writeObject(ObjectOutputStream out)
     	throws IOException
 	{

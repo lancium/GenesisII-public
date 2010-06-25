@@ -17,14 +17,22 @@ package edu.virginia.vcgr.genii.client.resource;
 
 import java.rmi.RemoteException;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedList;
 
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.morgan.util.GUID;
 import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyResponse;
 import org.ws.addressing.EndpointReferenceType;
+import org.ws.addressing.MetadataType;
 
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.bes.BESActivityConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
@@ -40,19 +48,25 @@ import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.tty.TTYConstants;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
+import edu.virginia.vcgr.genii.common.XMLCommandFunction;
 
 public class TypeInformation
 {
+	static private Log _logger = LogFactory.getLog(TypeInformation.class);
+	
 	private EndpointReferenceType _epr;
 	
-	private boolean _pureURL;
+	private GUID _containerID;
+	private String _pureURL = null;
 	private PortType []_implementedPortTypes;
+	private Collection<JavaCommandFunction> _commandFunctions;
 	
 	public TypeInformation(EndpointReferenceType epr)
 	{
 		_epr = epr;
-		_pureURL = false;
 		_implementedPortTypes = EPRUtils.getImplementedPortTypes(epr);
+		
+		_containerID = EPRUtils.getGeniiContainerID(epr);
 		
 		if (_implementedPortTypes == null)
 		{
@@ -62,7 +76,38 @@ public class TypeInformation
 				epr.get_any() == null &&
 				epr.getMetadata() == null &&
 				epr.getReferenceParameters() == null)
-				_pureURL = true;
+			{
+				_pureURL = epr.getAddress().get_value().toString();
+			}
+		}
+		
+		_commandFunctions = new LinkedList<JavaCommandFunction>();
+		MetadataType mdt = epr.getMetadata();
+		if (mdt != null)
+		{
+			MessageElement []any = mdt.get_any();
+			if (any != null)
+			{
+				for (MessageElement e : any)
+				{
+					QName eName = e.getQName();
+					if (eName.equals(
+						GenesisIIConstants.COMMAND_FUNCTION_QNAME))
+					{
+						try
+						{
+							XMLCommandFunction xf = ObjectDeserializer.toObject(
+								e, XMLCommandFunction.class);
+							_commandFunctions.add(new JavaCommandFunction(xf));
+						}
+						catch (ResourceException re)
+						{
+							_logger.warn("Unable to deserialize command function description.", 
+								re);
+						}
+					}
+				}
+			}
 		}
 	}
 	
@@ -74,6 +119,11 @@ public class TypeInformation
 	public PortType[] getImplementedPortTypes()
 	{
 		return _implementedPortTypes;
+	}
+	
+	public Collection<JavaCommandFunction> commandFunctions()
+	{
+		return Collections.unmodifiableCollection(_commandFunctions);
 	}
 	
 	public boolean hasPortType(PortType targetPortType)
@@ -120,6 +170,11 @@ public class TypeInformation
 	public boolean isQueue()
 	{
 		return hasPortType(QueueConstants.QUEUE_PORT_TYPE);
+	}
+	
+	public boolean isResourceFork()
+	{
+		return hasPortType(WellKnownPortTypes.RESOURCE_FORK_PORT_TYPE);
 	}
 	
 	public boolean isContainer()
@@ -183,7 +238,12 @@ public class TypeInformation
 	
 	public boolean isPureURL()
 	{
-		return _pureURL;
+		return _pureURL != null;
+	}
+	
+	public boolean isJDBCURL()
+	{
+		return _pureURL != null && _pureURL.toString().startsWith("jdbc:");
 	}
 	
 	public boolean isTool()
@@ -300,5 +360,10 @@ public class TypeInformation
 			return "[file(non-rsp.)]";
 		
 		return Long.toString(size);
+	}
+	
+	public GUID getGenesisIIContainerID()
+	{
+		return _containerID;
 	}
 }

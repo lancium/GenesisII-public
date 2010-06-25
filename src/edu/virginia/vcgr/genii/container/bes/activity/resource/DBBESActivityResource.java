@@ -24,8 +24,6 @@ import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 
 import edu.virginia.vcgr.genii.client.io.FileSystemUtils;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
-import edu.virginia.vcgr.genii.client.postlog.JobEvent;
-import edu.virginia.vcgr.genii.client.postlog.PostTargets;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.bes.BES;
 import edu.virginia.vcgr.genii.container.bes.BESUtilities;
@@ -83,8 +81,6 @@ public class DBBESActivityResource extends BasicDBResource implements
 		try
 		{
 			bes.deleteActivity(_resourceKey);
-			PostTargets.poster().post(JobEvent.activityDeleted(
-				null, _resourceKey));
 		}
 		catch (UnknownActivityIdentifierFaultType uaift)
 		{

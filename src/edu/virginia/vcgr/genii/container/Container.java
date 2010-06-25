@@ -62,6 +62,7 @@ import edu.virginia.vcgr.genii.client.mem.LowMemoryWarning;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
+import edu.virginia.vcgr.genii.client.utils.barrier.BarrieredWorkQueue;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 import edu.virginia.vcgr.genii.container.configuration.ContainerConfiguration;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
@@ -92,6 +93,8 @@ public class Container extends ApplicationBase
 		System.out.println("Container [deployment-name]");
 	}
 	
+	static private BarrieredWorkQueue _postStartupWorkQueue =
+		new BarrieredWorkQueue();
 	static private SecureRunnerManager _secRunManager;
 	
 	static public void main(String []args)
@@ -137,6 +140,8 @@ public class Container extends ApplicationBase
 			_secRunManager.run(SecureRunnableHooks.CONTAINER_POST_STARTUP, 
 				secRunProperties);
 			AlarmManager.initializeAlarmManager();
+			
+			_postStartupWorkQueue.release();
 		}
 		catch (Throwable t)
 		{
@@ -254,6 +259,7 @@ public class Container extends ApplicationBase
 			initializeServices(webAppCtxt);
 		
 		ServiceDeployer.startServiceDeployer(_axisServer,
+			_postStartupWorkQueue,
 			Installation.getDeployment(
 				new DeploymentName()).getServicesDirectory());
 		
@@ -265,6 +271,8 @@ public class Container extends ApplicationBase
 				IContainerManaged base =
 					(IContainerManaged)cons.newInstance(new Object[0]);
 				base.startup();
+				_postStartupWorkQueue.enqueue(
+					new PostStartupRunnable(base));
 			}
 			catch (Throwable cause)
 			{

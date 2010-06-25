@@ -21,7 +21,6 @@
 	<classpathentry kind="lib" path="lib"/>
 	<classpathentry kind="lib" path="security"/>
 	<classpathentry kind="lib" path="ext/wss4j/wss4j-1.5.1.jar" sourcepath="C:/Dev/wss4j/src"/>
-	<classpathentry kind="lib" path="ext/jsch/jsch-0.1.38.jar"/>
 	<classpathentry kind="lib" path="ext/ant/ant.jar"/>
 	<classpathentry kind="lib" path="ext/ant/ant-jsch.jar"/>
 	<classpathentry kind="lib" path="ext/fuse/fuse-j.jar"/>
@@ -45,5 +44,6 @@
 	<classpathentry kind="lib" path="ext/jetty/lib/jetty-6.1.17.jar"/>
 	<classpathentry kind="lib" path="ext/jetty/lib/jetty-util-6.1.17.jar"/>
 	<classpathentry kind="lib" path="lib/GenesisII-ws.jar"/>
+	<classpathentry kind="lib" path="ext/jsch/jsch-0.1.42.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

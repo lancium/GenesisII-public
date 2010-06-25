@@ -3,6 +3,9 @@ package edu.virginia.vcgr.genii.container.q2.forks;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.container.q2.QueueManager;
@@ -15,6 +18,8 @@ import edu.virginia.vcgr.genii.container.rfork.sd.TextStateTranslator;
 @StateDescription( { TextStateTranslator.class })
 public class IsSchedulingPropertyFork extends SimpleStateResourceFork<Boolean>
 {
+	static private Log _logger = LogFactory.getLog(IsSchedulingPropertyFork.class);
+	
 	@Override
 	@RWXMapping(RWXCategory.READ)
 	protected Boolean get() throws Throwable
@@ -36,6 +41,8 @@ public class IsSchedulingPropertyFork extends SimpleStateResourceFork<Boolean>
 	@RWXMapping(RWXCategory.WRITE)
 	protected void set(Boolean state) throws Throwable
 	{
+		_logger.debug(String.format(
+			"Setting \"is-scheduling-jobs\" property to %s.", state));
 		ResourceKey rKey = getService().getResourceKey();
 		
 		try

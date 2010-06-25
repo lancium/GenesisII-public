@@ -8,4 +8,6 @@ public interface ResourceForkInformation extends Serializable
 {
 	public ResourceFork instantiateFork(ResourceForkService forkService)
 		throws ResourceException;
+	
+	public Class<? extends ResourceFork> forkClass();
 }

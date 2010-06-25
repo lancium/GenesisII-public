@@ -37,7 +37,7 @@
 			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
 			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
 			<jsdl:Source>
-				<jsdl:URI>http://www.cs.virginia.edu/~mmm2a/test/adder.sh</jsdl:URI>
+				<jsdl:URI>http://www.cs.virginia.edu/~mmm2a/test/adder-nosleep.sh</jsdl:URI>
 			</jsdl:Source>
 		</jsdl:DataStaging>
 		

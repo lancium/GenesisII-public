@@ -45,6 +45,7 @@ public class CommandDisplay extends JTextPane
 			try
 			{
 				doc.insertString(doc.getLength(), str, myStyle);
+				setCaretPosition(doc.getLength());
 			}
 			catch (BadLocationException ble)
 			{

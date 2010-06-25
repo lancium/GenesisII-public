@@ -2,10 +2,12 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.Map;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
+import edu.virginia.vcgr.genii.client.context.GridUserEnvironment;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -19,7 +21,7 @@ public class CdTool extends BaseGridTool
 	static final private String _DESCRIPTION =
 		"Changes the current directory to the one indicated.";
 	static final private String _USAGE =
-		"cd <target-dir>";
+		"cd [<target-dir>]";
 	
 	public CdTool()
 	{
@@ -36,6 +38,18 @@ public class CdTool extends BaseGridTool
 	@Override
 	protected void verify() throws ToolException
 	{
+		if (numArguments() == 0)
+		{
+			Map<String, String> env = 
+				GridUserEnvironment.getGridUserEnvironment();
+			String value = env.get("HOME");
+			if (value == null)
+				throw new InvalidToolUsageException(
+					"\"HOME\" variable undefined.");
+			
+			addArgument(value);
+		}
+		
 		if (numArguments() != 1)
 			throw new InvalidToolUsageException();
 	}

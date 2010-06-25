@@ -79,6 +79,12 @@ public class DefaultResourceForkInformation implements ResourceForkInformation
 		}
 	}
 	
+	@Override
+	public Class<? extends ResourceFork> forkClass()
+	{
+		return _resourceForkClass;
+	}
+	
 	private void writeObject(ObjectOutputStream out)
     	throws IOException
 	{

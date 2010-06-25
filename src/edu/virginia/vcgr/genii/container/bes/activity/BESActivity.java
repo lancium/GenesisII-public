@@ -23,14 +23,12 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
+import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
 import edu.virginia.vcgr.genii.client.notification.UnknownTopicException;
 import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
-import edu.virginia.vcgr.genii.client.postlog.JobEvent;
-import edu.virginia.vcgr.genii.client.postlog.PostTarget;
-import edu.virginia.vcgr.genii.client.postlog.PostTargets;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
@@ -103,6 +101,43 @@ public class BESActivity implements Closeable
 			thread.setDaemon(true);
 			thread.start();
 		}
+	}
+	
+	public boolean isGood()
+		throws SQLException
+	{
+		Connection connection = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try
+        {
+            connection = _connectionPool.acquire(true);
+            stmt = connection.prepareStatement(
+                "SELECT callingcontext " +
+                    "FROM besactivitiestable " +
+                "WHERE activityid = ?");
+            stmt.setString(1, _activityid);
+            rs = stmt.executeQuery();
+            if (!rs.next())
+                return false;
+            
+            ICallingContext cctxt = (ICallingContext)DBSerializer.fromBlob(
+                rs.getBlob(1));
+            
+            return ContextManager.isGood(cctxt);
+        }
+        finally
+        {
+            StreamUtils.close(rs);
+            StreamUtils.close(stmt);
+            _connectionPool.release(connection);
+        }
+	}
+	
+	public String getActivityID()
+	{
+		return _activityid;
 	}
 	
 	public BESWorkingDirectory getActivityCWD()
@@ -352,19 +387,6 @@ public class BESActivity implements Closeable
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException("Unable to update database.");
 			connection.commit();
-						
-			PostTarget pt = PostTargets.poster();
-			
-			if (state.isCancelledState())
-			{
-				pt.post(JobEvent.activityTerminated(null, _activityid));
-			} else if (state.isFailedState())
-			{
-				pt.post(JobEvent.activityFailed(null, _activityid));
-			} else if (state.isFinishedState())
-			{
-				pt.post(JobEvent.activityFinished(null, _activityid));
-			}
 			
 			_nextPhase = nextPhase;
 			_state = state;

@@ -7,4 +7,6 @@ public interface IContainerManaged
 	 * service is being *created* for the first time.
 	 */
 	public boolean startup();
+	
+	public void postStartup();
 }

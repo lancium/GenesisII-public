@@ -17,7 +17,6 @@ public class RootRNSFork extends StaticRNSResourceFork
 	protected void addEntries(Map<String, ResourceForkInformation> entries)
 	{
 		addDefaultEntry("resources", ResourcesRNSFork.class);
-		addDefaultEntry("resource-slots", ResourceSlotsRNSFork.class);
 		addDefaultEntry("resource-management", ResourceManagementRNSFork.class);
 		addDefaultEntry("jobs", JobsRNSFork.class);
 		addDefaultEntry("submission-point", JobSubmissionFork.class);

@@ -24,13 +24,11 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import edu.virginia.vcgr.genii.client.gridlog.GridLogTarget;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
-import edu.virginia.vcgr.genii.container.gridlog.GridLogTargetBundle;
 import edu.virginia.vcgr.genii.container.q2.resource.IQueueResource;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 
@@ -297,32 +295,6 @@ public class QueueDatabase
 		}
 	}
 	
-	public Collection<GridLogTarget> getGridLogTargets(Connection connection,
-		long jobid) throws SQLException
-	{
-		Collection<GridLogTarget> ret = new LinkedList<GridLogTarget>();
-		
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		
-		try
-		{
-			stmt = connection.prepareStatement("SELECT target FROM q2joblogtargets WHERE jobid = ?");
-			stmt.setLong(1, jobid);
-			rs = stmt.executeQuery();
-			
-			while (rs.next())
-				ret.add((GridLogTarget)DBSerializer.fromBlob(rs.getBlob(1)));
-			
-			return ret;
-		}
-		finally
-		{
-			StreamUtils.close(rs);
-			StreamUtils.close(stmt);
-		}
-	}
-	
 	/**
 	 * Load all jobs from the database for the given queue.
 	 * 
@@ -355,8 +327,7 @@ public class QueueDatabase
 					jobid, rs.getString(2), rs.getShort(3),
 					QueueStates.valueOf(rs.getString(4)),
 					new Date(rs.getTimestamp(5).getTime()),
-					rs.getShort(6), (Long)rs.getObject(7),
-					getGridLogTargets(connection, jobid)));
+					rs.getShort(6), (Long)rs.getObject(7)));
 			}
 			
 			return allJobs;
@@ -447,8 +418,7 @@ public class QueueDatabase
 		Connection connection, String ticket, short priority, 
 		JobDefinition_Type jsdl, ICallingContext callingContext, 
 		Collection<Identity> identities, 
-		QueueStates state, Date submitTime, GridLogTargetBundle bundle,
-		Collection<GridLogTarget> gridLogTargets) 
+		QueueStates state, Date submitTime) 
 		throws SQLException, IOException
 	{
 		PreparedStatement stmt = null;
@@ -497,38 +467,6 @@ public class QueueDatabase
 				throw new SQLException(
 					"Unable to set job communication attempts.");
 		
-			stmt.close();
-			stmt = null;
-			
-			if (bundle != null)
-			{
-				stmt = connection.prepareStatement(
-					"INSERT INTO q2logs (jobid, queueid, logtarget, logepr) " +
-					"VALUES (?, ?, ?, ?)");
-				stmt.setLong(1, jobid);
-				stmt.setString(2, _queueID);
-				stmt.setBlob(3, DBSerializer.toBlob(
-					bundle.target(), "q2logs", "logtarget"));
-				stmt.setBlob(4, EPRUtils.toBlob(bundle.epr(), "q2logs", "logepr"));
-				if (stmt.executeUpdate() != 1)
-					throw new SQLException(
-						"Unable to set job log information.");
-				
-				stmt.close();
-				stmt = null;
-			}
-			
-			stmt = connection.prepareStatement(
-				"INSERT INTO q2joblogtargets (jobid, queueid, target) VALUES (?, ?, ?)");
-			for (GridLogTarget target : gridLogTargets)
-			{
-				stmt.setLong(1, jobid);
-				stmt.setString(2, _queueID);
-				stmt.setBlob(3, DBSerializer.toBlob(target, "q2joblogtargets", "target"));
-				stmt.addBatch();
-			}
-			stmt.executeBatch();
-			
 			return jobid;
 		}
 		finally

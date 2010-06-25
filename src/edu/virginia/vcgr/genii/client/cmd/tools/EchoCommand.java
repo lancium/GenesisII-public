@@ -36,4 +36,10 @@ public class EchoCommand extends BaseGridTool
 	protected void verify() throws ToolException
 	{
 	}
+	
+	@Override
+	public void addArgument(String argument)
+	{
+		_arguments.add(argument);
+	}
 }

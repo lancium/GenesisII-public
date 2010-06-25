@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.container.resource;
 
 import java.io.Closeable;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Properties;
@@ -161,4 +162,6 @@ public interface IResource extends Closeable
 		String propertyname) throws ResourceException;
 	public void removePersistedProperties(String category)
 		throws ResourceException;
+	
+	public Calendar createTime() throws ResourceException;
 }

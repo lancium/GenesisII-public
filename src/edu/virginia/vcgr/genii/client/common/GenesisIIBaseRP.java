@@ -35,7 +35,8 @@ public interface GenesisIIBaseRP
 	
 	@ResourceProperty(
 		namespace = GENII_COMMON_NS,
-		localname = MATCHING_PARAMETER_ATTR_NAME)
+		localname = MATCHING_PARAMETER_ATTR_NAME,
+		max = "unbounded")
 	public Collection<MatchingParameter> getMatchingParameter();
 	
 	@ResourceProperty(

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,8 +30,6 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
-import edu.virginia.vcgr.genii.client.postlog.JobEvent;
-import edu.virginia.vcgr.genii.client.postlog.PostTargets;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
@@ -79,6 +78,24 @@ public class BES implements Closeable
 		{
 			return new Vector<String>(_knownInstances.keySet());
 		}
+	}
+	
+	static public Collection<BESActivity> getAllActivities()
+	{
+		Collection<BESActivity> allActivities = new LinkedList<BESActivity>();
+		
+		synchronized(_knownInstances)
+		{
+			for (BES bes : _knownInstances.values())
+			{
+				for (BESActivity activity : bes.getContainedActivities())
+				{
+					allActivities.add(activity);
+				}
+			}
+		}
+		
+		return allActivities;
 	}
 	
 	static public BES findBESForActivity(String activityid)
@@ -349,10 +366,6 @@ public class BES implements Closeable
 					"Unable to update database for bes activity creation.");
 			connection.commit();
 			
-			PostTargets.poster().post(
-				JobEvent.activityCreated(callingContext,
-				activityid));
-			
 			BESActivity activity = new BESActivity(_connectionPool, 
 				this, activityid, state, activityCWD, executionPlan,
 				0, activityServiceName, jobName, false, false);
@@ -375,11 +388,14 @@ public class BES implements Closeable
 	synchronized public void deleteActivity(String activityid)
 		throws UnknownActivityIdentifierFaultType, SQLException
 	{
+		UnknownActivityIdentifierFaultType fault = null;
+		
 		BESActivity activity = _containedActivities.get(activityid);
 		if (activity == null)
-			throw new UnknownActivityIdentifierFaultType(
+			fault = new UnknownActivityIdentifierFaultType(
 				"Couldn't find activity \"" + activityid + "\".", null);
-		StreamUtils.close(activity);
+		else
+			StreamUtils.close(activity);
 		
 		Connection connection = null;
 		PreparedStatement stmt = null;
@@ -407,6 +423,9 @@ public class BES implements Closeable
 			
 			_containedActivities.remove(activityid);
 			removeActivityToBESMapping(activityid);
+			
+			if (fault != null)
+				throw fault;
 		}
 		finally
 		{
@@ -432,7 +451,6 @@ public class BES implements Closeable
 	{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
-		Collection<String> deleteSet = new Vector<String>();
 		
 		try
 		{
@@ -489,26 +507,7 @@ public class BES implements Closeable
 				{
 					_logger.error("Error loading activity from database.", 
 						cause);
-					if (activityid != null)
-						deleteSet.add(activityid);
 				}
-			}
-			
-			if (!deleteSet.isEmpty())
-			{
-				stmt.close();
-				stmt = null;
-				stmt = connection.prepareStatement(
-					"DELETE FROM besactivitiestable " +
-					"WHERE besid = ? AND activityid = ?");
-				for (String activityid : deleteSet)
-				{
-					stmt.setString(1, _besid);
-					stmt.setString(2, activityid);
-					stmt.addBatch();
-				}
-				
-				stmt.executeBatch();
 			}
 		}
 		finally

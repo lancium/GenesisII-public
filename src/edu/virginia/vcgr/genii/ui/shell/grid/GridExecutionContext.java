@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.ui.shell.grid;
 
+import java.io.File;
 import java.io.Reader;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -14,6 +15,9 @@ import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.IContextResolver;
 import edu.virginia.vcgr.genii.client.context.MemoryBasedContextResolver;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
+import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.ui.shell.Display;
 import edu.virginia.vcgr.genii.ui.shell.ExecutionContext;
@@ -118,11 +122,14 @@ public class GridExecutionContext implements ExecutionContext
 	private class PathCompleter implements WordCompleter
 	{
 		@Override
-		public String[] completions(String partial) throws Exception
+		public String[] completions(String originalPartial) throws Exception
 		{
 			Collection<String> ret = new LinkedList<String>();
 			String directory;
 			String partialFile;
+			
+			GeniiPath path = new GeniiPath(originalPartial);
+			String partial = path.path();
 			
 			int index = partial.lastIndexOf('/');
 			if (index < 0)
@@ -138,30 +145,51 @@ public class GridExecutionContext implements ExecutionContext
 			if (directory.length() == 0)
 				directory = "/";
 			
-			IContextResolver resolver = ContextManager.getResolver();
-			
-			try
+			if (path.pathType() == GeniiPathType.Grid)
 			{
-				ContextManager.setResolver(
-					new MemoryBasedContextResolver(_callingContext));
-				RNSPath directoryPath = RNSPath.getCurrent().lookup(directory);
-				for (RNSPath entry : directoryPath.listContents())
+				IContextResolver resolver = ContextManager.getResolver();
+				
+				try
+				{
+					ContextManager.setResolver(
+						new MemoryBasedContextResolver(_callingContext));
+					RNSPath directoryPath = RNSPath.getCurrent().lookup(directory);
+					for (RNSPath entry : directoryPath.listContents())
+					{
+						String entryName = entry.getName();
+						
+						if (entryName.startsWith(partialFile))
+						{
+							TypeInformation type = new TypeInformation(entry.getEndpoint());
+							ret.add(originalPartial + entryName.substring(
+								partialFile.length()) +
+								(type.isRNS() ? "/" : ""));
+						}
+					}
+					
+					return ret.toArray(new String[ret.size()]);
+				}
+				finally
+				{
+					_callingContext = ContextManager.getCurrentContext();
+					ContextManager.setResolver(resolver);
+				}
+			} else
+			{
+				File directoryPath = new File(directory);
+				for (File entry : directoryPath.listFiles())
 				{
 					String entryName = entry.getName();
 					
 					if (entryName.startsWith(partialFile))
 					{
-						ret.add(partial + entryName.substring(
-							partialFile.length()));
+						ret.add(originalPartial + entryName.substring(
+							partialFile.length()) +
+							(entry.isDirectory() ? "/" : ""));
 					}
 				}
 				
 				return ret.toArray(new String[ret.size()]);
-			}
-			finally
-			{
-				_callingContext = ContextManager.getCurrentContext();
-				ContextManager.setResolver(resolver);
 			}
 		}
 	}

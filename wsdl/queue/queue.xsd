@@ -138,6 +138,16 @@
 	<xsd:element name="CompleteRequestType"
 		type="queue:CompleteRequestType"/>
 	<xsd:element name="CompleteResponse"/>
+
+	<xsd:complexType name="RescheduleJobsRequestType">
+		<xsd:sequence>
+			<xsd:element name="job-ticket" type="xsd:string"
+				minOccurs="1" maxOccurs="unbounded" nillable="true"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="RescheduleJobsRequest"
+		type="queue:RescheduleJobsRequestType"/>
+	<xsd:element name="RescheduleJobsResponse"/>
 	
 	<xsd:complexType name="ConfigureRequestType">
 		<xsd:sequence>

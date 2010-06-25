@@ -9,14 +9,21 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Vector;
 
+import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.ws.addressing.EndpointReferenceType;
+import org.ws.addressing.MetadataType;
 
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cmd.CommandLineFormer;
 import edu.virginia.vcgr.genii.client.utils.instantiation.FromString;
+import edu.virginia.vcgr.genii.common.XMLCommandFunction;
+import edu.virginia.vcgr.genii.common.XMLCommandParameter;
 
 public class CommandChannelManager
 {
@@ -206,5 +213,91 @@ public class CommandChannelManager
 		}
 		
 		return ret.toArray(new String[ret.size()]);
+	}
+	
+	static public void appendMetadata(EndpointReferenceType epr,
+		Class<?> source)
+	{
+		Map<String, Method> handlers = getHandlers(source);
+		if (handlers == null || handlers.size() == 0)
+			return;
+		
+		Collection<MessageElement> metadata = new LinkedList<MessageElement>();
+		MetadataType mdt = epr.getMetadata();
+		if (mdt != null)
+		{
+			MessageElement []any = mdt.get_any();
+			if (any != null && any.length > 0)
+			{
+				for (MessageElement e : any)
+					metadata.add(e);
+			}
+		}
+		
+		for (String commandName : handlers.keySet())
+		{
+			Method method = handlers.get(commandName);
+			Class<?> []methodParameters = method.getParameterTypes();
+			Annotation [][]annotations = method.getParameterAnnotations();
+			
+			Collection<XMLCommandParameter> parameters =
+				new Vector<XMLCommandParameter>(methodParameters.length);
+			
+			for (int lcv = 0; lcv < methodParameters.length; lcv++)
+			{
+				Class<?> parameterType = methodParameters[lcv];
+				Annotation []parameterAnnotations = annotations[lcv];
+				CommandParameter cp = null;
+				
+				for (Annotation annotation : parameterAnnotations)
+				{
+					if (annotation instanceof CommandParameter)
+					{
+						cp = (CommandParameter)annotation;
+						break;
+					}
+				}
+				
+				String parameterName = null;
+				String parameterDescription = null;
+				
+				if (cp != null)
+				{
+					parameterName = cp.value();
+					parameterDescription = cp.description();
+					
+					if (parameterName.length() == 0)
+						parameterName = null;
+					
+					if (parameterDescription.length() == 0)
+						parameterDescription = null;
+				}
+				
+				parameters.add(new XMLCommandParameter(
+					parameterName, parameterType.toString(),
+					parameterDescription));
+			}
+			
+			CommandHandler cHandler = method.getAnnotation(
+				CommandHandler.class);
+			String description = null;
+			
+			if (cHandler != null)
+			{
+				description = cHandler.description();
+				if (description.length() == 0)
+					description = null;
+			}
+			
+			XMLCommandFunction function = new XMLCommandFunction(
+				description, parameters.toArray(
+					new XMLCommandParameter[parameters.size()]), commandName);
+			metadata.add(new MessageElement(
+				GenesisIIConstants.COMMAND_FUNCTION_QNAME,
+				function));
+		}
+		
+		epr.setMetadata(new MetadataType(metadata.toArray(
+			new MessageElement[metadata.size()])));
 	}
 }

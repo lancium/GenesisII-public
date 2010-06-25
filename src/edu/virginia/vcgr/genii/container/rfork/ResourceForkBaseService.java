@@ -94,6 +94,7 @@ import edu.virginia.vcgr.genii.container.invoker.timing.TimingSink;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
+import edu.virginia.vcgr.genii.container.rfork.cmd.CommandChannelManager;
 import edu.virginia.vcgr.genii.container.rfork.sd.SimpleStateResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.sd.StateDescription;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
@@ -515,6 +516,8 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 			ret.getReferenceParameters());
 		ap.setResourceForkInformation(rif);
 		ret.setReferenceParameters(ap.toReferenceParameters());
+		
+		CommandChannelManager.appendMetadata(ret, rif.forkClass());
 		
 		return ret;
 	}

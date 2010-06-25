@@ -55,20 +55,13 @@ public class AccountingTool extends BaseGridTool
 	static private final String USAGE_RESOURCE =
 		"edu/virginia/vcgr/genii/client/cmd/tools/resources/accounting-usage.txt";
 	
-	static private boolean nullSafeEquals(String one, String two)
-	{
-		if (one == null)
-			return two == null;
-		else
-			return (two != null && one.equals(two));
-	}
-	
 	static private class StatementBundle implements Closeable
 	{
 		private PreparedStatement _lookupCID = null;
 		private PreparedStatement _insertCredential = null;
 		private PreparedStatement _lookupBESID = null;
 		private PreparedStatement _insertBES = null;
+		private PreparedStatement _lookupAccountingRecord = null;
 		private PreparedStatement _insertAccountingRecord = null;
 		private PreparedStatement _insertMapping = null;
 		private PreparedStatement _insertCommandLineElement = null;
@@ -88,8 +81,11 @@ public class AccountingTool extends BaseGridTool
 					"FROM xcgbescontainers WHERE besepi = ?");
 			_insertBES = connection.prepareStatement(
 				"INSERT INTO xcgbescontainers " +
-					"(besepi, besmachinename, arch, os) VALUES(?, ?, ?, ?)",
+					"(besepi, besmachinename, arch, os) VALUES (?, ?, ?, ?)",
 				Statement.RETURN_GENERATED_KEYS);
+			_lookupAccountingRecord = connection.prepareStatement(
+				"SELECT arid FROM xcgaccountingrecords " +
+				"WHERE besaccountingrecordid = ? AND besid = ?");
 			_insertAccountingRecord = connection.prepareStatement(
 				"INSERT INTO xcgaccountingrecords " +
 					"(besaccountingrecordid, besid, exitcode, " +
@@ -101,7 +97,7 @@ public class AccountingTool extends BaseGridTool
 				"INSERT INTO xcgareccredmap (cid, arid) VALUES (?, ?)");
 			
 			_insertCommandLineElement = connection.prepareStatement(
-				"INSERT INTO xcgcommandlines (arid, index, value) VALUES (?, ?, ?)");
+				"INSERT INTO xcgcommandlines (arid, elementindex, element) VALUES (?, ?, ?)");
 		}
 		
 		@Override
@@ -110,6 +106,7 @@ public class AccountingTool extends BaseGridTool
 			StreamUtils.close(_lookupCID);
 			StreamUtils.close(_insertCredential);
 			StreamUtils.close(_lookupBESID);
+			StreamUtils.close(_lookupAccountingRecord);
 			StreamUtils.close(_insertAccountingRecord);
 			StreamUtils.close(_insertMapping);
 			StreamUtils.close(_insertCommandLineElement);
@@ -203,13 +200,7 @@ public class AccountingTool extends BaseGridTool
 			rs = sBundle._lookupBESID.executeQuery();
 			if (rs.next())
 			{
-				String rMachineName = rs.getString("besmachinename");
-				String rArch = rs.getString("arch");
-				String rOs = rs.getString("os");
-				
-				if (nullSafeEquals(rMachineName, besMachineName) &&
-					nullSafeEquals(arch, rArch) && nullSafeEquals(os, rOs))
-					return rs.getLong("besid");
+				return rs.getLong("besid");
 			}
 			
 			rs.close();
@@ -243,11 +234,46 @@ public class AccountingTool extends BaseGridTool
 		}
 	}
 	
+	private Long lookupAccountingRecordID(StatementBundle sBundle,
+		long besaccountingrecordid, long besid) throws SQLException
+	{
+		ResultSet rs = null;
+		
+		try
+		{
+			sBundle._lookupAccountingRecord.setLong(1, besaccountingrecordid);
+			sBundle._lookupAccountingRecord.setLong(2, besid);
+			
+			rs = sBundle._lookupAccountingRecord.executeQuery();
+			if (rs.next())
+				return new Long(rs.getLong(1));
+			
+			return null;
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+		}
+	}
+	
 	@SuppressWarnings("unchecked")
 	private void addRecordToTargetDatabase(AccountingRecordType art,
 		StatementBundle sBundle) throws IOException, ClassNotFoundException, SQLException
 	{
 		ResultSet rs = null;
+		
+		long besid = getBESId(sBundle, art.getBesEpi(),
+				art.getBesMachineName(), art.getArch(), art.getOs());
+		
+		if (lookupAccountingRecordID(
+			sBundle, art.getRecordId(), besid) != null)
+		{
+			stdout.format(
+				"Accounting record %d from bes %s already exists.  " +
+				"Skipping.\n", art.getRecordId(), art.getBesEpi());
+			return;
+		}
+		
 		Collection<Identity> credentials =
 			(Collection<Identity>)DBSerializer.deserialize(art.getCredentials());
 	
@@ -255,9 +281,6 @@ public class AccountingTool extends BaseGridTool
 		
 		for (Identity id : credentials)
 			cids.add(new Long(getCID(sBundle, id)));
-		
-		long besid = getBESId(sBundle, art.getBesEpi(),
-			art.getBesMachineName(), art.getArch(), art.getOs());
 		
 		try
 		{
@@ -292,10 +315,11 @@ public class AccountingTool extends BaseGridTool
 				sBundle._insertCommandLineElement.setLong(1, arid);
 				sBundle._insertCommandLineElement.setInt(2, lcv++);
 				sBundle._insertCommandLineElement.setString(3, value);
+				
 				sBundle._insertCommandLineElement.addBatch();
 			}
 			
-			sBundle._insertCommandLineElement.executeBatch();
+			sBundle._insertCommandLineElement.executeUpdate();
 		}
 		finally
 		{
@@ -407,6 +431,7 @@ public class AccountingTool extends BaseGridTool
 		
 		try
 		{
+			ClientUtils.setTimeout(container, 1000 * 60 * 20);
 			iterable = new WSIterable<AccountingRecordType>(
 				AccountingRecordType.class, 
 				container.iterateAccountingRecords(null).getResult(), 
@@ -418,9 +443,9 @@ public class AccountingTool extends BaseGridTool
 			{
 				read++;
 				maxRecordId = Math.max(maxRecordId, art.getRecordId());
-				_logger.trace(String.format(
-					"Retrieved record %d from %s.", art.getRecordId(),
-					containerEPI));
+				stdout.format(
+					"Retrieved record %d from %s.\n", art.getRecordId(),
+					containerEPI);
 				
 				addRecordToTargetDatabase(art, sBundle);
 			}
@@ -429,9 +454,9 @@ public class AccountingTool extends BaseGridTool
 			{
 				targetConnection.commit();
 				
-				_logger.info(String.format(
+				stdout.format(
 					"Committing up to record %d on %s.",
-					maxRecordId, containerEPI));
+					maxRecordId, containerEPI);
 				
 				container.commitAccountingRecords(
 					new CommitAccountingRecordsRequestType(maxRecordId));
@@ -486,8 +511,7 @@ public class AccountingTool extends BaseGridTool
 		public RNSRecursiveDescentCallbackResult handleRNSPath(
 			RNSPath path) throws Throwable
 		{
-			_logger.info(String.format(
-				"Handling \"%s\".\n", path));
+			stdout.format("Handling \"%s\".\n", path);
 			
 			try
 			{
@@ -503,9 +527,10 @@ public class AccountingTool extends BaseGridTool
 			}
 			catch (Throwable cause)
 			{
-				_logger.warn(
-					"Unable to collect accounting information from container.",
+				stderr.format(
+					"Unable to collect accounting information from container:  %s.\n",
 					cause);
+				cause.printStackTrace(stderr);
 			}
 			
 			return RNSRecursiveDescentCallbackResult.ContinueLeaf;

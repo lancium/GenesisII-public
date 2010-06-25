@@ -2,10 +2,12 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -18,15 +20,13 @@ import javax.script.ScriptException;
 
 import org.morgan.util.io.StreamUtils;
 
-import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.xscript.jsr.Grid;
 import edu.virginia.vcgr.genii.client.configuration.GridEnvironment;
 import edu.virginia.vcgr.genii.client.configuration.PathVariable;
-import edu.virginia.vcgr.genii.client.rns.RNSException;
-import edu.virginia.vcgr.genii.client.rns.RNSPath;
-import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 
 public class ScriptTool extends BaseGridTool
 {
@@ -34,7 +34,15 @@ public class ScriptTool extends BaseGridTool
 		"Executes a script.";
 	
 	static final private String _USAGE =
-		"script [var=val ...] <script-file>";
+		"script [--global-properties=<properties-file>] [var=val ...] <script-file>";
+	
+	private Collection<String> _globalPropertiesPaths =
+		new LinkedList<String>();
+	
+	public void setGlobal_properties(String propertiesPath)
+	{
+		_globalPropertiesPaths.add(propertiesPath);
+	}
 	
 	public ScriptTool()
 	{
@@ -50,29 +58,27 @@ public class ScriptTool extends BaseGridTool
 		return filename.substring(index + 1);
 	}
 	
-	static private Reader openReader(String path) throws IOException
+	static private Reader openReader(GeniiPath path) throws IOException
 	{
+		return new InputStreamReader(path.openInputStream());
+	}
+	
+	static private Properties loadProperties(String propertiesPath) 
+		throws IOException
+	{
+		Properties ret = new Properties();
+		InputStream in = null;
+		
 		try
 		{
-			if (path.startsWith("rns:"))
-			{
-				return new InputStreamReader(
-					ByteIOStreamFactory.createInputStream(
-						RNSPath.getCurrent().lookup(path.substring(4)), true));
-			} else
-			{
-				return new FileReader(path);
-			}
+			GeniiPath path = new GeniiPath(propertiesPath);
+			in = path.openInputStream();
+			ret.load(in);
+			return ret;
 		}
-		catch (RNSPathDoesNotExistException rpdnee)
+		finally
 		{
-			throw new FileNotFoundException(String.format(
-				"The path %s does not exist.", path));
-		}
-		catch (RNSException rne)
-		{
-			throw new IOException(String.format(
-				"Unable to open file %s.", path), rne);
+			StreamUtils.close(in);
 		}
 	}
 	
@@ -81,6 +87,17 @@ public class ScriptTool extends BaseGridTool
 	{	
 		int lcv;
 		Properties initialProperties = new Properties();
+		
+		for (String propertiesPath : _globalPropertiesPaths)
+		{
+			Properties props = loadProperties(propertiesPath);
+			for (Object propName : props.keySet())
+			{
+				initialProperties.setProperty(
+					propName.toString(), props.getProperty(
+						propName.toString()));
+			}
+		}
 		
 		for (Object key : System.getProperties().keySet())
 		{
@@ -104,16 +121,18 @@ public class ScriptTool extends BaseGridTool
 			initialProperties.put(arg.substring(0, index), arg.substring(index + 1));
 		}
 		
-		String scriptFileString = getArgument(lcv);
-		if (!scriptFileString.startsWith("rns:"))
+		GeniiPath scriptFilePath = new GeniiPath(getArgument(lcv));
+		if (scriptFilePath.pathType() == GeniiPathType.Local)
 		{
 			File scriptFile = PathVariable.lookupVariable(System.getProperties(), 
-				GridEnvironment.GRID_PATH_ENV_VARIABLE).find(scriptFileString,
+				GridEnvironment.GRID_PATH_ENV_VARIABLE).find(
+					scriptFilePath.path(),
 					PathVariable.FindTypes.FILE);
 			if (scriptFile == null)
 				throw new FileNotFoundException(String.format(
-					"Unable to locate script file %s.", scriptFileString));
-			scriptFileString = scriptFile.getAbsolutePath();
+					"Unable to locate script file %s.", scriptFilePath));
+			scriptFilePath = new GeniiPath(
+				"local:" + scriptFile.getAbsolutePath());
 		}
 		
 		String []cArgs = new String[args.size() - lcv];
@@ -121,9 +140,17 @@ public class ScriptTool extends BaseGridTool
 		for (;lcv < args.size(); lcv++)
 			cArgs[lcv - start] = args.get(lcv);
 		
-		String extension = getExtension(scriptFileString);
+		String extension = getExtension(scriptFilePath.path());
 		ScriptEngineManager manager = new ScriptEngineManager();
 		ScriptEngine engine = manager.getEngineByExtension(extension);
+		
+		if (engine == null)
+		{
+			stderr.format("No scripting engine registered for extension %s!\n",
+				extension);
+			return -1;
+		}
+		
 		engine.put("grid", new Grid(
 			initialProperties, stdin, stdout, stderr));
 		Bindings b = engine.getBindings(ScriptContext.GLOBAL_SCOPE);
@@ -135,7 +162,7 @@ public class ScriptTool extends BaseGridTool
 		Reader reader = null;
 		try
 		{	
-			reader = openReader(scriptFileString);
+			reader = openReader(scriptFilePath);
 			engine.eval(reader);
 			
 			return 0;

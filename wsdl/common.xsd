@@ -13,6 +13,29 @@
 		<xsd:attribute name="value" type="xsd:string" use="required"/>
 	</xsd:complexType>
 
+	<xsd:complexType name="XMLCommandParameter">
+		<xsd:attribute name="name" type="xsd:string" use="optional"/>
+		<xsd:attribute name="type" type="xsd:string" use="required"/>
+		<xsd:attribute name="description" type="xsd:string" use="optional"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="XMLCommandFunction">
+		<xsd:sequence>
+			<xsd:element name="description" type="xsd:string"
+				minOccurs="0" maxOccurs="1" nillable="true"/>
+			<xsd:element name="parameter"
+				type="genii-common:XMLCommandParameter"
+				minOccurs="0" maxOccurs="unbounded" nillable="false"/>
+		</xsd:sequence>
+		<xsd:attribute name="name" type="xsd:string" use="required"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="dummy">
+		<xsd:sequence>
+			<xsd:element name="function" type="genii-common:XMLCommandFunction"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
 <!-- Message Types -->
 	<xsd:complexType name="AddMatchingParameterRequestType">
 		<xsd:sequence>

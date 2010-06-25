@@ -81,7 +81,10 @@ public class WorkingContext implements Closeable, Cloneable
 		{
 			String serviceName = EPRUtils.extractServiceName(newTarget);
 			WorkingContext newContext = stack.peek();
-			newContext = (WorkingContext)newContext.clone();
+			if (newContext != null)
+				newContext = (WorkingContext)newContext.clone();
+			else
+				newContext = new WorkingContext();
 			newContext.setProperty(EPR_PROPERTY_NAME, newTarget);
 			newContext.setProperty(TARGETED_SERVICE_NAME, serviceName);
 			stack.push(newContext);

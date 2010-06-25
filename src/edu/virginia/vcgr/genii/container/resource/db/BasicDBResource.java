@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -699,10 +700,47 @@ public class BasicDBResource implements IResource
 			
 			rs = stmt.executeQuery();
 			if (rs.next())
-				return (String)DBSerializer.fromBlob(rs.getBlob(1));
+			{
+				Object obj = DBSerializer.fromBlob(rs.getBlob(1));
+				if (obj != null)
+					return obj.toString();
+				
+				return null;
+			}
 			
 			throw new SQLException(String.format(
 				"Unable to find EPI for resource \"%s\".", resourceID));
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+	}
+
+	@Override
+	public Calendar createTime() throws ResourceException
+	{
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try
+		{
+			stmt = _connection.prepareStatement(
+				"SELECT createtime FROM resources WHERE resourceid = ?");
+			stmt.setString(1, _resourceKey);
+			rs = stmt.executeQuery();
+			if (!rs.next())
+				return null;
+			Timestamp ts = rs.getTimestamp(1);
+			Calendar c = Calendar.getInstance();
+			c.setTime(ts);
+			return c;
+		}
+		catch (SQLException sqe)
+		{
+			throw new ResourceException("Unable to get create time.",
+				sqe);
 		}
 		finally
 		{

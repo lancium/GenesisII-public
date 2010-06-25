@@ -1,6 +1,5 @@
 package edu.virginia.vcgr.genii.client.cmd;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
@@ -15,11 +14,10 @@ import javax.xml.namespace.QName;
 import org.morgan.util.configuration.XMLConfiguration;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
-import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.cmd.tools.HelpTool;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
-import edu.virginia.vcgr.genii.client.rns.RNSPath;
 
 public class CommandLineRunner
 {	
@@ -34,16 +32,8 @@ public class CommandLineRunner
 	static private Writer openRedirect(String redirectTarget) 
 		throws IOException, RNSException
 	{
-		if (redirectTarget.startsWith("file:"))
-			return new FileWriter(redirectTarget.substring(5));
-		else if (redirectTarget.startsWith("rns:"))
-		{
-			return new OutputStreamWriter(
-				ByteIOStreamFactory.createOutputStream(
-					RNSPath.getCurrent().lookup(redirectTarget.substring(4))));
-		}
-		
-		return new FileWriter(redirectTarget);
+		return new OutputStreamWriter(
+			new GeniiPath(redirectTarget).openOutputStream());
 	}
 	
 	public int runCommand(String []cLine, Writer out, Writer err, Reader in)

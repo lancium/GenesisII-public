@@ -24,8 +24,10 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeWillExpandListener;
+import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 import org.morgan.util.Pair;
 import org.morgan.utils.gui.tearoff.TearoffHandler;
@@ -114,6 +116,12 @@ public class RNSTree extends JTree implements EndpointRetriever
 	private RNSTree(RNSTreeModel model)
 	{
 		super(model);
+		
+		DefaultTreeSelectionModel selectionModel =
+			new DefaultTreeSelectionModel();
+		selectionModel.setSelectionMode(
+			TreeSelectionModel.SINGLE_TREE_SELECTION);
+		setSelectionModel(selectionModel);
 		
 		setCellRenderer(new RNSTreeCellRenderer(model.appContext()));
 		setAutoscrolls(true);

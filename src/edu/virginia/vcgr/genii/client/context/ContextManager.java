@@ -18,17 +18,26 @@ package edu.virginia.vcgr.genii.client.context;
 import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Date;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.configuration.ConfigurationException;
 
+import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.security.SecurityUtils;
+import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
 import edu.virginia.vcgr.genii.context.ContextType;
 
 public class ContextManager
 {
 	static private final String _CONTEXT_RESOLVER_NAME = "context-resolver";
-	
+	static private Log _logger = LogFactory.getLog(ContextManager.class)
+	;
 	static private class ResolverThreadLocal 
 		extends InheritableThreadLocal<IContextResolver>
 	{
@@ -129,5 +138,32 @@ public class ContextManager
 		{
 			ContextManager.setResolver(_oldResolver);
 		}
+	}
+	
+	static public boolean isGood(ICallingContext ctxt)
+	{
+		try
+		{
+			SecurityUpdateResults secResults = new SecurityUpdateResults();
+			Date validUntil = new Date();
+			validUntil.setTime(validUntil.getTime() + 1000L);
+			ClientUtils.checkAndRenewCredentials(ctxt, validUntil, secResults);
+			if (secResults.removedCredentials().size() > 0)
+				return false;
+			Collection<Identity> identities = 
+				SecurityUtils.getCallerIdentities(ctxt);
+			if (identities == null || identities.size() == 0)
+				return false;
+			
+			return true;
+		}
+		catch (Throwable cause)
+		{
+			_logger.warn(
+				"Got an exception trying to check validity of calling " +
+				"context -- marking it bad.", cause);
+		}
+		
+		return false;
 	}
 }

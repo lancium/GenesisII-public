@@ -74,7 +74,7 @@ public class ScpURIHandler extends AbstractURIHandler
 		if (port < 0)
 			port = 22;
 		
-		ScpUtility.get(target, user, password, host, port, remotePath);
+		ScpUtility.get(target, user, password, host, port, remotePath, false);
 	}
 
 	@Override
@@ -119,7 +119,7 @@ public class ScpURIHandler extends AbstractURIHandler
 		if (port < 0)
 			port = 22;
 		
-		ScpUtility.put(source, user, password, host, port, remotePath);
+		ScpUtility.put(source, user, password, host, port, remotePath, false);
 	}
 
 	@Override

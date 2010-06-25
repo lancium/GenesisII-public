@@ -41,7 +41,8 @@ public class ProcessWrapperFactory
 				targetDirectory));
 		
 		File targetPath = new File(targetDirectory, originalPath.getName());
-		if (!targetPath.exists())
+		if (!targetPath.exists() ||
+			targetPath.lastModified() < originalPath.lastModified())
 		{
 			File tmp = new File(targetPath.getParentFile(),
 				targetPath.getName() + ".tmp");
@@ -54,6 +55,8 @@ public class ProcessWrapperFactory
 				fos = new FileOutputStream(tmp);
 				
 				StreamUtils.copyStream(fin, fos);
+				fos.close();
+				fos = null;
 				tmp.renameTo(targetPath);
 			}
 			finally
@@ -112,6 +115,11 @@ public class ProcessWrapperFactory
 				desiredArch == ProcessorArchitecture.x86_32 ||
 				desiredArch == ProcessorArchitecture.x86_64)
 				pwrapperPath = new File(binDir, "pwrapper-macosx");
+		}
+		
+		if (pwrapperPath == null)
+		{
+			pwrapperPath = new File(binDir, "pwrapper.sh");
 		}
 		
 		if (pwrapperPath == null)

@@ -35,7 +35,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import edu.virginia.vcgr.genii.client.utils.barrier.BarrieredWorkQueue;
 import edu.virginia.vcgr.genii.container.IContainerManaged;
+import edu.virginia.vcgr.genii.container.PostStartupRunnable;
 
 public class ServiceDeployer extends Thread
 {
@@ -50,6 +52,7 @@ public class ServiceDeployer extends Thread
 		new Pattern[] { _DEPLOYMENT_FILE_PATTERN, _WSDD_FILE_PATTERN });
 	
 	private AxisEngine _axisEngine;
+	private BarrieredWorkQueue _postStartupQueue;
 	private File _watchDirectory;
 	private HashMap<String, DeploymentInformation> _deploymentInformation;
 	
@@ -88,9 +91,10 @@ public class ServiceDeployer extends Thread
 	}
 	
 	static public void startServiceDeployer(AxisEngine axisEngine, 
-		File watchDirectory)
+		BarrieredWorkQueue postStartupQueue, File watchDirectory)
 	{
-		ServiceDeployer sd = new ServiceDeployer(axisEngine, watchDirectory);
+		ServiceDeployer sd = new ServiceDeployer(axisEngine, postStartupQueue,
+			watchDirectory);
 		sd.setDaemon(true);
 		sd.start();
 	}
@@ -111,8 +115,10 @@ public class ServiceDeployer extends Thread
 		}
 	}
 	
-	private ServiceDeployer(AxisEngine axisEngine, File watchDir)
+	private ServiceDeployer(AxisEngine axisEngine, 
+			BarrieredWorkQueue postStartupQueue, File watchDir)
 	{
+		_postStartupQueue = postStartupQueue;
 		_axisEngine = axisEngine;
 		_watchDirectory = watchDir;
 		_deploymentInformation = new HashMap<String, DeploymentInformation>();
@@ -240,6 +246,7 @@ public class ServiceDeployer extends Thread
 	        			IContainerManaged base = 
 	        				(IContainerManaged)cons.newInstance(new Object[0]);
 	        			base.startup();
+	        			_postStartupQueue.enqueue(new PostStartupRunnable(base));
 	        		}
 				}
 				catch (NoSuchMethodException nsme)

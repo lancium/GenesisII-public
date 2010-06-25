@@ -33,7 +33,7 @@
 		<genii:uri-handler>edu.virginia.vcgr.genii.client.io.JavaURIAsURLHandler</genii:uri-handler>
 		<genii:uri-handler>edu.virginia.vcgr.genii.client.io.MailtoURIHandler</genii:uri-handler>
 		<genii:uri-handler>edu.virginia.vcgr.genii.client.io.RNSURIHandler</genii:uri-handler>
-		<genii:uri-handler>edu.virginia.vcgr.genii.client.io.ScpURIHandler</genii:uri-handler>
+		<genii:uri-handler>edu.virginia.vcgr.genii.client.io.SFtpURIHandler</genii:uri-handler>
 	</genii:uri-handlers>
 	
 	<genii:locator-registry>
@@ -92,8 +92,6 @@
 			locator-type="edu.virginia.vcgr.genii.queue.QueueServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.iterator.IteratorPortType"
 			locator-type="edu.virginia.vcgr.genii.iterator.IteratorServiceLocator"/>
-		<locator interface="edu.virginia.vcgr.genii.gridlog.GridLogPortType"
-			locator-type="edu.virginia.vcgr.genii.gridlog.GridLogServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.x509authn.X509AuthnPortType"
 			locator-type="edu.virginia.vcgr.genii.x509authn.X509AuthnServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.jndiauthn.JNDIAuthnPortType"
@@ -260,6 +258,12 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ClientApplicationUITool</mconf:class>
 		<mconf:class name="accounting"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.AccountingTool</mconf:class>
+		<mconf:class name="env"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.EnvTool</mconf:class>
+		<mconf:class name="clearenv"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ClearEnvTool</mconf:class>
+		<mconf:class name="set"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.SetTool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

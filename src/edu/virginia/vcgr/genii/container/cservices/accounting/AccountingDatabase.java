@@ -10,7 +10,8 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
@@ -56,7 +57,10 @@ class AccountingDatabase
 		"CREATE TABLE acctreccredmap(" +
 			"id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY," +
 			"arid BIGINT NOT NULL," +
-			"cid BIGINT NOT NULL)"
+			"cid BIGINT NOT NULL)",
+		"CREATE INDEX acctreccredmaparididx ON acctreccredmap(arid)",
+		"CREATE INDEX acctreccredmapcididx ON acctreccredmap(cid)",
+		"CREATE INDEX acctcommandlinesarididx ON acctcommandlines(arid)"
 	};
 	
 	static private Calendar convert(Timestamp stamp)
@@ -179,6 +183,7 @@ class AccountingDatabase
 		}
 	}
 	
+	/*
 	static Collection<AccountingRecordType> getAccountingRecords(
 		Connection conn) throws SQLException, IOException
 	{
@@ -192,6 +197,8 @@ class AccountingDatabase
 		ResultSet rs2 = null;
 		ResultSet rs3 = null;
 		
+		int numRecords = 0;
+		long startTime = System.currentTimeMillis();
 		try
 		{
 			stmt1 = conn.prepareStatement(
@@ -248,12 +255,18 @@ class AccountingDatabase
 					rs1.getLong("maxrssbytes"), 
 					DBSerializer.serialize(credentials, Long.MAX_VALUE), 
 					convert(rs1.getTimestamp("addtime"))));
+				numRecords++;
 			}
 			
 			return ret;
 		}
 		finally
 		{
+			long stopTime = System.currentTimeMillis();
+			
+			_logger.info(String.format(
+				"Retrieve %d accounting records from db in %d milliseconds.",
+				numRecords, (stopTime - startTime)));
 			StreamUtils.close(rs3);
 			StreamUtils.close(stmt3);
 			StreamUtils.close(rs2);
@@ -262,6 +275,146 @@ class AccountingDatabase
 			StreamUtils.close(stmt1);
 		}
 	}
+	*/
+	
+//	static Collection<AccountingRecordType> getAccountingRecords(
+//		Connection conn) throws SQLException, IOException
+//	{
+//		Map<Long, AccountingRecord> map =
+//			new HashMap<Long, AccountingRecord>();
+//		
+//		PreparedStatement stmt = null;
+//		ResultSet rs = null;
+//		
+//		long startTime = System.currentTimeMillis();
+//		try
+//		{
+//			stmt = conn.prepareStatement(
+//				"SELECT arec.*, c.credential, cl.index, cl.value " +
+//				"FROM accountingrecords AS arec, acctreccredmap AS a, credentials AS c, acctcommandlines AS cl " +
+//				"WHERE arec.arid = a.arid AND arec.arid = cl.arid AND a.cid = c.cid");
+//		
+//			rs = stmt.executeQuery();
+//			while (rs.next())
+//			{
+//				long arid = rs.getLong("arid");
+//				AccountingRecord ar = map.get(new Long(arid));
+//				if (ar == null)
+//					map.put(new Long(arid), ar = new AccountingRecord(
+//						arid, rs.getString("besepi"), rs.getString("arch"),
+//						rs.getString("os"), rs.getString("besmachinename"),
+//						rs.getInt("exitcode"), rs.getLong("usertimemicrosecs"),
+//						rs.getLong("kerneltimemicrosecs"),
+//						rs.getLong("wallclocktimemicrosecs"),
+//						rs.getLong("maxrssbytes"),
+//						convert(rs.getTimestamp("addtime"))));
+//
+//				int clineIndex = rs.getInt("index");
+//				String clineElement = rs.getString("value");
+//				ar.addCommandLineElement(clineIndex, clineElement);
+//				
+//				Identity id = (Identity)DBSerializer.fromBlob(rs.getBlob("credential"));
+//				ar.addCredential(id);
+//			}
+//			
+//			Collection<AccountingRecordType> ret = 
+//				new Vector<AccountingRecordType>(map.size());
+//			for (AccountingRecord ar : map.values())
+//				ret.add(ar.convert());
+//			
+//			return ret;
+//		}
+//		finally
+//		{
+//			long stopTime = System.currentTimeMillis();
+//			_logger.info(String.format(
+//				"Retrieve %d accounting records from db in %d milliseconds.",
+//				map.size(), (stopTime - startTime)));
+//			StreamUtils.close(rs);
+//			StreamUtils.close(stmt);
+//		}
+//	}
+	
+	static Collection<AccountingRecordType> getAccountingRecords(
+		Connection conn) throws SQLException, IOException
+	{
+		Map<Long, AccountingRecord> map =
+			new HashMap<Long, AccountingRecord>();
+		
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		long startTime = System.currentTimeMillis();
+		try
+		{
+			stmt = conn.prepareStatement(
+				"SELECT arec.*, cl.index, cl.value " +
+				"FROM accountingrecords AS arec, acctcommandlines AS cl " +
+				"WHERE arec.arid = cl.arid");
+		
+			rs = stmt.executeQuery();
+			while (rs.next())
+			{
+				long arid = rs.getLong("arid");
+				AccountingRecord ar = map.get(new Long(arid));
+				if (ar == null)
+					map.put(new Long(arid), ar = new AccountingRecord(
+						arid, rs.getString("besepi"), rs.getString("arch"),
+						rs.getString("os"), rs.getString("besmachinename"),
+						rs.getInt("exitcode"), rs.getLong("usertimemicrosecs"),
+						rs.getLong("kerneltimemicrosecs"),
+						rs.getLong("wallclocktimemicrosecs"),
+						rs.getLong("maxrssbytes"),
+						convert(rs.getTimestamp("addtime"))));
+
+				int clineIndex = rs.getInt("index");
+				String clineElement = rs.getString("value");
+				ar.addCommandLineElement(clineIndex, clineElement);
+			}
+			
+			rs.close();
+			rs = null;
+			
+			stmt.close();
+			stmt = null;
+			
+			stmt = conn.prepareStatement(
+				"SELECT c.credential " +
+					"FROM credentials AS c, acctreccredmap AS a " +
+				"WHERE a.arid = ? AND a.cid = c.cid");
+			
+			Collection<AccountingRecordType> ret = 
+				new Vector<AccountingRecordType>(map.size());
+			for (AccountingRecord ar : map.values())
+			{
+				stmt.setLong(1, ar.recordID());
+				rs = stmt.executeQuery();
+				while (rs.next())
+				{
+					ar.addCredential(
+						(Identity)DBSerializer.fromBlob(
+							rs.getBlob("credential")));
+				}
+				
+				rs.close();
+				rs = null;
+				
+				ret.add(ar.convert());
+			}
+			
+			return ret;
+		}
+		finally
+		{
+			long stopTime = System.currentTimeMillis();
+			_logger.info(String.format(
+				"Retrieve %d accounting records from db in %d milliseconds.",
+				map.size(), (stopTime - startTime)));
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+	}
+				
 	
 	static public void deleteAccountingRecords(
 		Connection conn, long lastRecordToDelete) throws SQLException

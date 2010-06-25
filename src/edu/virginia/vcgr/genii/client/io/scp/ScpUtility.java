@@ -13,7 +13,8 @@ public class ScpUtility
 {
 	static public void put(File localFile, 
 		String user, String password,
-		String host, int port, String remotePath)
+		String host, int port, String remotePath,
+		boolean useSFTP)
 		throws IOException
 	{
 		Scp copier = new Scp();
@@ -22,7 +23,7 @@ public class ScpUtility
 		copier.setRemoteTofile(String.format("%s@%s:%s",
 			user, host, remotePath));
 		copier.setPassword(password);
-		copier.setSftp(false);
+		copier.setSftp(useSFTP);
 		copier.setTrust(true);
 		copier.setProject(new Project());
 		copier.execute();
@@ -33,7 +34,8 @@ public class ScpUtility
 	
 	static public void get(File localFile,
 		String user, String password,
-		String host, int port, String remotePath)
+		String host, int port, String remotePath,
+		boolean useSFTP)
 		throws IOException
 	{
 		try
@@ -44,7 +46,7 @@ public class ScpUtility
 				user, host, remotePath));
 			copier.setLocalTofile(localFile.getAbsolutePath());
 			copier.setPassword(password);
-			copier.setSftp(false);
+			copier.setSftp(useSFTP);
 			copier.setTrust(true);
 			copier.setProject(new Project());
 			copier.execute();

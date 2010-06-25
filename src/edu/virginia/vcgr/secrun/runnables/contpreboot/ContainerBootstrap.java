@@ -36,7 +36,6 @@ import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ContextStreamUtils;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.MemoryBasedContextResolver;
-import edu.virginia.vcgr.genii.client.postlog.ExceptionEvent;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.secrun.SecureRunnable;
 
@@ -93,8 +92,6 @@ public class ContainerBootstrap implements SecureRunnable
 		catch (Throwable cause)
 		{
 			_logger.error("Unable to bootstrap container.", cause);
-			bProperties.getExceptionLogger().post(new ExceptionEvent(
-				"Unable to bootstrap container.", cause));
 			throw cause;
 		}
 	}

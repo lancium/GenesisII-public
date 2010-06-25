@@ -231,12 +231,12 @@ public class ClientUtils
 				updated = true;
 				if (cred instanceof Renewable)
 				{
-					_logger.warn(e.getMessage() + " : Attempting to renew credential " + cred);
+					_logger.warn("Attempting to renew credential " + cred, e);
 					((Renewable) cred).renew();
 					results.noteRenewedCredential(cred);
 				} else 
 				{
-					_logger.warn(e.getMessage() + " : Discarding credential " + cred);
+					_logger.warn("Discarding credential " + cred, e);
 					itr.remove();
 					results.noteRemovedCredential(cred);
 				}
@@ -246,7 +246,8 @@ public class ClientUtils
 		// persist any updates
 		try 
 		{
-			if (updated) 
+			if (updated && 
+				ConfigurationManager.getCurrentConfiguration().isClientRole()) 
 			{
 				ContextManager.storeCurrentContext(callContext);
 			}
