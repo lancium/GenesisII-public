@@ -6,6 +6,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.io.File;
 
 import javax.xml.namespace.QName;
 
@@ -17,8 +18,11 @@ import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
+import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 
 public class LsTool extends BaseGridTool
 {
@@ -93,17 +97,25 @@ public class LsTool extends BaseGridTool
 		boolean isEPR = _epr;
 		List<String> arguments = getArguments();
 		ICallingContext ctxt = ContextManager.getCurrentContext();
-		
 		if (arguments.size() == 0)
 			arguments.add(".");
 		ArrayList<RNSPath> targets = new ArrayList<RNSPath>();
+		ArrayList<String> locals = new ArrayList<String>();
 		
 		for (String arg : arguments)
 		{
-			for (RNSPath path : ctxt.getCurrentPath().expand(arg))
-				targets.add(path);
+			GeniiPath gPath = new GeniiPath(arg);
+			if(! gPath.exists())
+				throw new RNSPathDoesNotExistException(gPath.path());
+			if (gPath.pathType() == GeniiPathType.Grid)
+			{
+				
+				for (RNSPath path : ctxt.getCurrentPath().expand(gPath.path()))
+					targets.add(path);
+			}
+			else
+				locals.add(gPath.path());
 		}
-		
 		if (isDirectory)
 		{
 			for (RNSPath path : targets)
@@ -123,7 +135,6 @@ public class LsTool extends BaseGridTool
 					dirs.add(path);
 				}
 			}
-			
 			for (RNSPath path : dirs)
 			{
 				if (path.getName() == null)
@@ -146,8 +157,40 @@ public class LsTool extends BaseGridTool
 				
 				stdout.println();
 			}
+			
 		}
-		
+		if(locals.size() > 0 && targets.size() > 0)
+			stdout.println("local:");
+		for (String path : locals)
+		{
+			if(!isDirectory)
+			{
+				String name = path;
+				while((name.lastIndexOf("/") == name.length() - 1) && (name.length() > 1))
+					name = name.substring(0,name.length() - 1);
+				if(name.length()>1)
+					if(name.lastIndexOf("/") > 0)
+						name = path.substring(path.lastIndexOf("/"));
+					else
+						name = path;
+				stdout.println(name + ":");
+			}
+			File dir = new File(path);
+			if(isDirectory || dir.isFile())
+			{
+				printEntry(stdout, dir, isLong, isAll);
+			}
+			else
+			{
+				File[] files = dir.listFiles();
+
+				for ( File cur : files) 
+				{
+					printEntry(stdout, cur, isLong, isAll);
+				}
+			}
+			stdout.println();
+		}
 		return 0;
 	}
 
@@ -163,6 +206,27 @@ public class LsTool extends BaseGridTool
 	{
 		printEntry(out, new TypeInformation(path.getEndpoint()),
 			path, isLong, isAll, isEPR, isCertChain);
+	}
+	
+	static private void printEntry(PrintWriter out, File path, boolean isLong, boolean isAll)
+	{
+		if(path.getName().startsWith(".") && !isAll && (path.getName().length() > 1))
+			return;
+		if(isLong)
+			printLong(path, out);
+		else
+			out.println(path.getName());
+	}
+	
+	static private void printLong(File path, PrintWriter out)
+	{
+		String typeDesc = "";
+		if(path.isDirectory())
+			typeDesc = "[directory]";
+		else
+			typeDesc = new Long(path.length()).toString();
+		out.format("%1$-16s%2$s",typeDesc, path.getName());
+		out.println();
 	}
 	
 	static private void printEntry(PrintWriter out, TypeInformation type,

@@ -17,6 +17,8 @@ import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.container.VCGRContainerPortType;
+import edu.virginia.vcgr.genii.client.gpath.*;
+import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 
 public class SetContainerServicePropertiesTool extends BaseGridTool
 {
@@ -75,13 +77,15 @@ public class SetContainerServicePropertiesTool extends BaseGridTool
 	protected int runCommand() throws Throwable
 	{
 		SetResourceProperties request = generateSetRequest();
-		RNSPath current = RNSPath.getCurrent();
 		
 		for (String arg : getArguments())
 		{
 			try
 			{
-				RNSPath target = current.lookup(arg, 
+				GeniiPath gPath = new GeniiPath(arg);
+				if(gPath.pathType() != GeniiPathType.Grid)
+					throw new InvalidToolUsageException("<container> must be a grid path");
+				RNSPath target = lookup(gPath, 
 					RNSPathQueryFlags.MUST_EXIST);
 				VCGRContainerPortType stub = ClientUtils.createProxy(
 					VCGRContainerPortType.class, target.getEndpoint());

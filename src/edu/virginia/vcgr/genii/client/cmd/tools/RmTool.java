@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.File;
 import java.io.IOException;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
@@ -7,7 +8,8 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
-
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 public class RmTool extends BaseGridTool
 {
 	static private final String _DESCRIPTION =
@@ -50,13 +52,20 @@ public class RmTool extends BaseGridTool
 		boolean force = _force;
 		
 		RNSPath path = RNSPath.getCurrent();
-			
+		int toReturn=0;
 		for (int lcv = 0; lcv < numArguments(); lcv++)
 		{
-			rm(path, getArgument(lcv), recursive, force);
+			GeniiPath gPath = new GeniiPath(getArgument(lcv));
+			if(gPath.pathType() == GeniiPathType.Grid)
+				rm(path, gPath.path(), recursive, force);
+			else
+			{
+				File fPath = new File(gPath.path());
+				toReturn+=rm(fPath, recursive, force);
+			}
 		}
 			
-		return 0;
+		return toReturn;
 	}
 
 	@Override
@@ -64,6 +73,51 @@ public class RmTool extends BaseGridTool
 	{
 		if (numArguments() < 1)
 			throw new InvalidToolUsageException();
+	}
+	
+	private int rm(File path, boolean recursive, boolean force)
+	{
+		if ( ! path.exists())
+		{
+			if ( !force)
+			{
+				stderr.println(path.getName() + " does not exist.");
+				return 1;
+			}
+			return 0;
+		}
+		if ((!recursive) && path.isDirectory())
+		{
+			if(force)
+				return 1;
+			stderr.println(path.getName() + " is a directory; Use -r to delete a local directory.");
+			return 1;
+		}
+		if(path.isDirectory())
+		{
+			File[] files = path.listFiles();
+			if (recursive)
+			{
+				for(File cur : files)
+				{
+					rm(cur, recursive, force);
+				}
+			}
+			else
+			{
+				if (files.length != 0)
+				{
+					if (force)
+						return 1;
+					stderr.println(path.getName() + ": attempt to remove nonempty directory.");
+					return 1;
+				}
+			}
+		}
+		boolean success = path.delete();
+		if(!success && !force)
+			return 1;
+		return 0;
 	}
 	
 	public void rm(RNSPath currentPath,

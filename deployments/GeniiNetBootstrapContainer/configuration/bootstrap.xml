@@ -232,12 +232,6 @@
 			<gsh:param>--everyone</gsh:param>
 		</geniix:chmod>
 
-		<gsh:echo message="Setting deployer for bes ${CONTAINER}."/>
-		<geniix:set-deployers>
-			<gsh:param>/bes-containers/${CONTAINER}</gsh:param>
-			<gsh:param>/containers/${CONTAINER}/Services/ApplicationDeployerPortType</gsh:param>
-		</geniix:set-deployers>
-
 		<gsh:foreach param-name="GROUP" source-rns="/groups">
 			<geniix:chmod>
 				<gsh:param>/bes-containers/${CONTAINER}</gsh:param>

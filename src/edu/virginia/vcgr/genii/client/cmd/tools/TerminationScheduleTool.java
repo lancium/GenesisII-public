@@ -17,6 +17,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
+import edu.virginia.vcgr.genii.client.gpath.*;
 
 public class TerminationScheduleTool extends BaseGridTool
 {
@@ -38,11 +39,10 @@ public class TerminationScheduleTool extends BaseGridTool
 		Date targetTime = null;
 		
 		targetTime = parseTargetTime(getArgument(numArgs -1));
-		RNSPath path = RNSPath.getCurrent();
 		
 		for (int lcv = 0; lcv < (numArgs - 1); lcv++)
 		{
-			RNSPath target = path.lookup(getArgument(lcv),
+			RNSPath target = lookup(new GeniiPath(getArgument(lcv)),
 				RNSPathQueryFlags.MUST_EXIST);
 			schedTerm(target, targetTime);
 		}
@@ -81,5 +81,9 @@ public class TerminationScheduleTool extends BaseGridTool
 	{
 		if (numArguments() != 2)
 			throw new InvalidToolUsageException();
+		int numArgs=numArguments();
+		for (int lcv = 0; lcv < numArgs-1; lcv ++)
+			if(new GeniiPath(getArgument(lcv)).pathType() != GeniiPathType.Grid)
+				throw new InvalidToolUsageException("<target> must be a grid path. ");
 	}
 }

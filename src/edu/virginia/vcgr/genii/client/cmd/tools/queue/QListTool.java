@@ -9,6 +9,7 @@ import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
 import edu.virginia.vcgr.genii.client.queue.QueueManipulator;
 import edu.virginia.vcgr.genii.client.queue.ReducedJobInformation;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
+import edu.virginia.vcgr.genii.client.gpath.*;
 
 public class QListTool extends BaseGridTool
 {
@@ -25,7 +26,10 @@ public class QListTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		QueueManipulator manipulator = new QueueManipulator(getArgument(0));
+		GeniiPath gPath = new GeniiPath(getArgument(0));
+		if(gPath.pathType() != GeniiPathType.Grid)
+			throw new InvalidToolUsageException("<queue-path> must be a grid path. ");
+		QueueManipulator manipulator = new QueueManipulator(gPath.path());
 		Iterator<ReducedJobInformation> jobs = manipulator.list();
 		
 		printHeader();

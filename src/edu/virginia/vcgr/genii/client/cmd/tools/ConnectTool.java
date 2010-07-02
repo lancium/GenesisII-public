@@ -14,6 +14,7 @@ import edu.virginia.vcgr.genii.client.context.ContextStreamUtils;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.utils.urls.URLUtilities;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 
 public class ConnectTool extends BaseGridTool
 {
@@ -30,7 +31,8 @@ public class ConnectTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		String connectURL = getArgument(0);
+		GeniiPath gPath = new GeniiPath(getArgument(0));
+		String connectURL = gPath.path();
 		String deploymentName = null;
 		if (numArguments() > 1)
 			deploymentName = getArgument(1);

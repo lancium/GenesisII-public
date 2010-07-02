@@ -53,7 +53,7 @@
 	</geniix:ln>
 
 	<gsh:echo
-		message="Setting permissions for bootstrap directories and services"/>
+		message="Setting permissions for bootstrap directories and services"></gsh:echo>
 	<geniix:chmod>
 		<gsh:param>/</gsh:param>
 		<gsh:param>+r</gsh:param>
@@ -245,12 +245,6 @@
 			<gsh:param>+r</gsh:param>
 			<gsh:param>--everyone</gsh:param>
 		</geniix:chmod>
-
-		<gsh:echo message="Setting deployer for bes ${CONTAINER}."/>
-		<geniix:set-deployers>
-			<gsh:param>/bes-containers/${CONTAINER}</gsh:param>
-			<gsh:param>/containers/${CONTAINER}/Services/ApplicationDeployerPortType</gsh:param>
-		</geniix:set-deployers>
 
 		<gsh:foreach param-name="GROUP" source-rns="/groups">
 			<geniix:chmod>

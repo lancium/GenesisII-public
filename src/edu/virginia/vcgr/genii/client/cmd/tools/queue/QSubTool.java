@@ -7,6 +7,7 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
 import edu.virginia.vcgr.genii.client.queue.JobTicket;
 import edu.virginia.vcgr.genii.client.queue.QueueManipulator;
+import edu.virginia.vcgr.genii.client.gpath.*;
 
 public class QSubTool extends BaseGridTool
 {
@@ -33,11 +34,22 @@ public class QSubTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		String queuePath = getArgument(0);
-		String jsdlFile = getArgument(1);
-		
+		GeniiPath gPath = new GeniiPath(getArgument(0));
+		if(gPath.pathType() != GeniiPathType.Grid)
+			throw new InvalidToolUsageException("<queue-path> must be a grid path");
+		String queuePath = gPath.path();
 		QueueManipulator manipulator = new QueueManipulator(queuePath);
-		JobTicket ticket = manipulator.submit(new File(jsdlFile), _priority);
+		gPath = new GeniiPath(getArgument(1));
+		JobTicket ticket;
+		if(gPath.pathType() == GeniiPathType.Local)
+		{
+			String jsdlFile = new GeniiPath(getArgument(1)).path();
+			ticket = manipulator.submit(new File(jsdlFile), _priority);
+		}
+		else		
+		{
+			ticket = manipulator.submit(gPath.openInputStream(), _priority);
+		}
 		
 		stdout.println("Job Submitted.  Ticket is \"" + ticket + "\".");
 		return 0;

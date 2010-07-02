@@ -1,12 +1,16 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.File;
 import java.io.IOException;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 
 public class UnlinkTool extends BaseGridTool
 {
@@ -24,12 +28,21 @@ public class UnlinkTool extends BaseGridTool
 	protected int runCommand() throws Throwable
 	{
 		RNSPath path = RNSPath.getCurrent();
+		int toReturn = 0;
 		for (int lcv = 0; lcv < numArguments(); lcv++)
 		{
-			unlink(path, getArgument(lcv));
+			GeniiPath gPath = new GeniiPath(getArgument(lcv));
+			if ( gPath.pathType() == GeniiPathType.Local)
+			{
+				File fPath = new File(gPath.path());
+				toReturn+=unlink(fPath);
+			}
+			else
+				unlink(path, new GeniiPath(getArgument(lcv)).path());
 		}
+
 		
-		return 0;
+		return toReturn;
 	}
 
 	@Override
@@ -47,5 +60,20 @@ public class UnlinkTool extends BaseGridTool
 			filePath, RNSPathQueryFlags.MUST_EXIST);
 		
 		file.unlink();
+	}
+	
+	private int unlink(File path) throws RNSPathDoesNotExistException
+	{
+		if ( ! path.exists())
+		{
+				throw new RNSPathDoesNotExistException(path.getName());
+		}
+		boolean success = path.delete();
+		if(!success)
+		{
+			stderr.println(path.getName() + " failed to delete");
+			return 1;
+		}
+		return 0;
 	}
 }

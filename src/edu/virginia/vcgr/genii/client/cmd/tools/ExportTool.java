@@ -17,6 +17,7 @@ import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.client.gui.exportdir.ExportDirDialog;
 import edu.virginia.vcgr.genii.client.io.FileResource;
@@ -83,7 +84,10 @@ public class ExportTool extends BaseGridTool
 			/* get rns path for exported root and ensure dne*/			
 			String targetRNSName = null;
 			if (numArgs == 3){
-				targetRNSName = getArgument(2);
+				GeniiPath gPath = new GeniiPath(getArgument(2));
+				if (gPath.pathType() != GeniiPathType.Grid)
+					throw new InvalidToolUsageException("[new-rns-path] must be a grid path. ");
+				targetRNSName = gPath.path();
 				
 				//ensure location does not already exist
 				ensureTargetDNE(targetRNSName);
@@ -104,7 +108,10 @@ public class ExportTool extends BaseGridTool
 			}
 
 			/* get local directory path to be exported */
-			String localPath = getArgument(1);
+			GeniiPath gPath = new GeniiPath(getArgument(1));
+			if (gPath.pathType() != GeniiPathType.Local)
+				throw new InvalidToolUsageException("<local-path> must be a local path beginning with 'local:' ");
+			String localPath = gPath.path();
 			
 			EndpointReferenceType epr = createExportedRoot(targetRNSName,
 				exportServiceEPR, localPath, targetRNSName, _replicate);
@@ -121,7 +128,10 @@ public class ExportTool extends BaseGridTool
 			/* get rns path for exported root and ensure dne*/			
 			String targetRNSName = null;
 			if (numArgs == 4){
-				targetRNSName = getArgument(3);
+				GeniiPath gPath = new GeniiPath(getArgument(3));
+				if ( gPath.pathType() != GeniiPathType.Grid)
+					throw new InvalidToolUsageException("[new-rns-path] must be a grid path. ");
+				targetRNSName = gPath.path();
 				
 				//ensure location does not already exist
 				ensureTargetDNE(targetRNSName);
@@ -153,7 +163,10 @@ public class ExportTool extends BaseGridTool
 			}
 			
 			/* get local directory path to be exported */
-			String localPath = getArgument(2);
+			GeniiPath gPath = new GeniiPath(getArgument(2));
+			if(gPath.pathType() != GeniiPathType.Local)
+				throw new InvalidToolUsageException("<primary-local-path> must be a local path beginning with 'local:' ");
+			String localPath = gPath.path();
 			
 			EndpointReferenceType epr = createReplicatedExportedRoot(
 				exportServiceEPR, localPath, targetRNSName, 
@@ -168,7 +181,10 @@ public class ExportTool extends BaseGridTool
 			return 0;
 		}else if (_quit)
 		{
-			String exportedRootLocation = getArgument(0);
+			GeniiPath gPath = new GeniiPath(getArgument(0));
+			if ( gPath.pathType() != GeniiPathType.Grid)
+				throw new InvalidToolUsageException("export-root must be a grid path. ");
+			String exportedRootLocation = gPath.path();
 			/* get EPR for target export service that will create exported root */
 			if (_url)
 				quitExportedRootFromURL(exportedRootLocation);

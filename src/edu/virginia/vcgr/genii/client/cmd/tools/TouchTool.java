@@ -9,6 +9,8 @@ import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
+import edu.virginia.vcgr.genii.client.gpath.*;
+import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 
 public class TouchTool extends BaseGridTool
 {
@@ -26,11 +28,9 @@ public class TouchTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		RNSPath current = RNSPath.getCurrent();
-		
 		for (String arg : getArguments())
 		{
-			RNSPath newPath = current.lookup(arg, RNSPathQueryFlags.MUST_EXIST);
+			RNSPath newPath = lookup(new GeniiPath(arg), RNSPathQueryFlags.MUST_EXIST);
 			TypeInformation typeInfo = new TypeInformation(newPath.getEndpoint());
 			if (typeInfo.isSByteIO())
 			{
@@ -57,5 +57,12 @@ public class TouchTool extends BaseGridTool
 	@Override
 	protected void verify() throws ToolException
 	{
+		for(String arg : getArguments())
+		{
+			if(new GeniiPath(arg).pathType() != GeniiPathType.Grid)
+			{
+				throw new InvalidToolUsageException("rns-path must be a grid path. ");
+			}
+		}
 	}
 }

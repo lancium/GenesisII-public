@@ -10,6 +10,8 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.fuse.GeniiFuse;
 import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.utils.exec.ExecutionEngine;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 
 public class FuseTool extends BaseGridTool
 {
@@ -73,13 +75,16 @@ public class FuseTool extends BaseGridTool
 			}
 		}
 		
+		GeniiPath gPath = new GeniiPath(getArgument(0));
+		if ( gPath.pathType() != GeniiPathType.Local)
+			throw new InvalidToolUsageException("mount-point must be a local path beginning with 'local:' ");
 		if (_isMount)
 		{
-			GeniiFuse.mountGenesisII(new File(getArgument(0)), 
+			GeniiFuse.mountGenesisII(new File(gPath.path()), 
 				new String[] { "-f", "-s" }, null, _sandbox, _uid, _daemon);
 		} else
 		{
-			GeniiFuse.unmountGenesisII(new File(getArgument(0)));
+			GeniiFuse.unmountGenesisII(new File(gPath.path()));
 		}
 		
 		return 0;

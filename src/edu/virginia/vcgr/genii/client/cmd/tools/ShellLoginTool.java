@@ -8,6 +8,7 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.rns.filters.RNSFilter;
+import edu.virginia.vcgr.genii.client.gpath.*;
 
 public class ShellLoginTool extends BaseGridTool
 {
@@ -42,7 +43,12 @@ public class ShellLoginTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		for (RNSPath path : getLoginScripts(getArgument(0)))
+		GeniiPath gPath = new GeniiPath(getArgument(0));
+		if(gPath.pathType() != GeniiPathType.Grid)
+		{
+			throw new InvalidToolUsageException("<home-dir> must be a grid path. ");
+		}
+		for (RNSPath path : getLoginScripts(gPath.path()))
 		{
 			ScriptTool tool = new ScriptTool();
 			tool.addArgument("rns:" + path.pwd());

@@ -10,6 +10,7 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.gpath.*;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.MatchingParameter;
 
@@ -96,6 +97,11 @@ public class MatchingParamsTool extends BaseGridTool
 				throw new InvalidToolUsageException(
 					"Unknown error occurred in tool.");
 		} else
+		{
+			GeniiPath gPath = new GeniiPath(argument);
+			if(gPath.pathType() != GeniiPathType.Grid)
+				throw new InvalidToolUsageException("<target> must be a grid path. ");
 			_targets.add(argument);
+		}
 	}
 }

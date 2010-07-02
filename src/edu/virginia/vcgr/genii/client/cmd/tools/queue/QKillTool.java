@@ -7,6 +7,7 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
 import edu.virginia.vcgr.genii.client.queue.JobTicket;
 import edu.virginia.vcgr.genii.client.queue.QueueManipulator;
+import edu.virginia.vcgr.genii.client.gpath.*;
 
 public class QKillTool extends BaseGridTool
 {
@@ -23,8 +24,11 @@ public class QKillTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
+		GeniiPath gPath = new GeniiPath(getArgument(0));
+		if(gPath.pathType() != GeniiPathType.Grid)
+			throw new InvalidToolUsageException("<queue-path> must be a grid path. ");
 		ArrayList<JobTicket> tickets = new ArrayList<JobTicket>(numArguments() - 1);
-		QueueManipulator manipulator = new QueueManipulator(getArgument(0));
+		QueueManipulator manipulator = new QueueManipulator(gPath.path());
 		
 		for (String arg : getArguments().subList(1, numArguments()))
 		{

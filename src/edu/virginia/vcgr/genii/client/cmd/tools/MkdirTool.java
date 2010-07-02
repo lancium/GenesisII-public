@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
@@ -21,6 +22,9 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
+import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
 
 public class MkdirTool extends BaseGridTool
 {
@@ -69,9 +73,10 @@ public class MkdirTool extends BaseGridTool
 		throws RNSPathDoesNotExistException, RNSException,
 			FileNotFoundException
 	{
+
 		return RNSUtilities.findService("/containers/BootstrapContainer",
 			"EnhancedRNSPortType", 
-			new PortType[] { RNSConstants.RNS_PORT_TYPE }, path).getEndpoint();
+			new PortType[] { RNSConstants.RNS_PORT_TYPE }, new GeniiPath(path).path()).getEndpoint();
 	}
 	
 	private int runECatcher()
@@ -81,7 +86,12 @@ public class MkdirTool extends BaseGridTool
 		EndpointReferenceType service = null;
 	
 		if (_rnsService != null)
+		{
+			GeniiPath gPath = new GeniiPath(_rnsService);
+			if(gPath.pathType() != GeniiPathType.Grid)
+				throw new InvalidToolUsageException("RNSService must be a grid path. ");
 			service = lookupPath(_rnsService);
+		}
 		
 		ICallingContext ctxt = ContextManager.getCurrentContext();
 		
@@ -91,57 +101,80 @@ public class MkdirTool extends BaseGridTool
 		RNSPath path = ctxt.getCurrentPath();
 		for (String sPath : getArguments())
 		{
-			RNSPath newDir = path.lookup(sPath, 
-				RNSPathQueryFlags.MUST_NOT_EXIST);
-			
-			path = newDir;
-			
-			if (service == null)
+			GeniiPath gPath = new GeniiPath(sPath);
+			if(gPath.exists())
+				throw new RNSPathAlreadyExistsException(gPath.path());
+			if(gPath.pathType() == GeniiPathType.Grid)
 			{
-				if (createParents)
-					path.mkdirs();
-				else
-					path.mkdir();
-			} else
-			{
-				RNSPath parent = path.getParent();
+				RNSPath newDir = lookup(gPath, 
+						RNSPathQueryFlags.MUST_NOT_EXIST);
+		
+				path = newDir;
+		
+				if (service == null)
+				{
+					if (createParents)
+						path.mkdirs();
+					else
+						path.mkdir();
+				} else
+				{
+					RNSPath parent = path.getParent();
 				
-				if (!parent.exists())
-				{
-					stderr.println("Can't create directory \"" + path.pwd() 
-						+ "\".");
-					return 1;
-				}
-				
-				TypeInformation typeInfo = new TypeInformation(parent.getEndpoint());
-				if (!typeInfo.isRNS())
-				{
-					stderr.println("\"" + parent.pwd() + 
-						"\" is not a directory.");
-					return 1;
-				}
-				
-				GeniiCommon common = ClientUtils.createProxy(
-					GeniiCommon.class, service);
-				EndpointReferenceType newEPR = common.vcgrCreate(
-					new VcgrCreate(null)).getEndpoint();
-				try
-				{
-					path.link(newEPR);
-					newEPR = null;
-				}
-				finally
-				{
-					if (newEPR != null)
+					if (!parent.exists())
 					{
-						common = ClientUtils.createProxy(
-							GeniiCommon.class, newEPR);
-						common.destroy(new Destroy());
+						stderr.println("Can't create directory \"" + path.pwd() 
+								+ "\".");
+						return 1;
+					}
+				
+					TypeInformation typeInfo = new TypeInformation(parent.getEndpoint());
+					if (!typeInfo.isRNS())
+					{
+						stderr.println("\"" + parent.pwd() + 
+						"\" is not a directory.");
+						return 1;
+					}
+				
+					GeniiCommon common = ClientUtils.createProxy(
+							GeniiCommon.class, service);
+					EndpointReferenceType newEPR = common.vcgrCreate(
+							new VcgrCreate(null)).getEndpoint();
+					try
+					{
+						path.link(newEPR);
+						newEPR = null;
+					}
+					finally
+					{
+						if (newEPR != null)
+						{
+							common = ClientUtils.createProxy(
+									GeniiCommon.class, newEPR);
+							common.destroy(new Destroy());
+						}
 					}
 				}
 			}
+			else
+			{
+				File newFile = new File(gPath.path());
+				if(createParents)
+				{
+					if(!newFile.mkdirs())
+					{
+						stderr.println("Could not create directory " + gPath.path());
+						return 1;
+					}
+				}
+				else
+					if(!newFile.mkdir())
+					{
+						stderr.println("Could not create directory " + gPath.path());
+						return 1;
+					}
+			}
 		}
-		
-		return 0;
+	return 0;
 	}
 }

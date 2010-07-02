@@ -18,6 +18,8 @@ import edu.virginia.vcgr.genii.client.naming.ResolverUtils;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 
 public class DownloadCertificateTool extends BaseGridTool
 {
@@ -50,9 +52,13 @@ public class DownloadCertificateTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		RNSPath current = RNSPath.getCurrent();
-		RNSPath target = current.lookup(getArgument(0), 
-			RNSPathQueryFlags.MUST_EXIST);
+		GeniiPath gPath = new GeniiPath(getArgument(0));
+		if(gPath.pathType() != GeniiPathType.Grid)
+			throw new InvalidToolUsageException("<rns-path-to-idp> must be a grid path. ");
+		GeniiPath localPath = new GeniiPath(getArgument(1));
+		if(localPath.pathType() != GeniiPathType.Local)
+			throw new InvalidToolUsageException("<target-local-file> must be a local path begining with 'local:' ");
+		RNSPath target = lookup(gPath, RNSPathQueryFlags.MUST_EXIST);
 		TypeInformation typeInfo = new TypeInformation(
 			target.getEndpoint());
 		
@@ -76,8 +82,7 @@ public class DownloadCertificateTool extends BaseGridTool
 				in = new ByteArrayInputStream(
 					chain[0].getEncoded());
 			}
-			
-			writeFile(in, new File(getArgument(1)));
+			writeFile(in, new File(localPath.path()));
 		}
 		finally
 		{

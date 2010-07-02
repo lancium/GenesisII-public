@@ -13,6 +13,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.genii.client.security.authz.acl.AclAuthZClientTool;
+import edu.virginia.vcgr.genii.client.gpath.*;
 
 public class GamlChmodTool extends BaseGridTool
 {
@@ -37,6 +38,7 @@ public class GamlChmodTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
+		parseCommandLine();
 		CommandLine cLine = new CommandLine(commandLine);
 		ReducedCommandLine reducedCline = 
 			new ReducedCommandLine(cLine, 1);
@@ -45,9 +47,9 @@ public class GamlChmodTool extends BaseGridTool
 		AclAuthZClientTool clientTool = new AclAuthZClientTool();
 
 		// create a proxy to the target
-		RNSPath path = RNSPath.getCurrent();
-		path = path.lookup(
-				cLine.getArgument(0), 
+		GeniiPath gPath = new GeniiPath(cLine.getArgument(0));
+		RNSPath path = lookup(
+				gPath, 
 				RNSPathQueryFlags.MUST_EXIST);
 		
 		GenesisIIBaseRP rp =  
@@ -83,5 +85,28 @@ public class GamlChmodTool extends BaseGridTool
 			throw new InvalidToolUsageException();
 		}
 		
+	}
+	
+	//Deals with new syntax for local and grid paths.
+	private void parseCommandLine() throws
+	InvalidToolUsageException
+	{
+		int size = commandLine.size();
+		for ( int i = 0; i < size; i++)
+		{
+			if(commandLine.get(i).equals("--local-src"))
+				throw new InvalidToolUsageException("--local-src flag is no longer supported.  " +
+					"Use 'local:' to indicate a local path. ");
+			GeniiPath gPath = new GeniiPath(commandLine.get(i));
+			if(i != 2)
+			{
+				if(gPath.pathType() != GeniiPathType.Grid)
+					throw new InvalidToolUsageException("Unexpected local path. ");
+			}
+			else
+				if(gPath.pathType() == GeniiPathType.Local)
+					commandLine.add("--local-src");
+			commandLine.set(i, gPath.path());
+		}
 	}
 }

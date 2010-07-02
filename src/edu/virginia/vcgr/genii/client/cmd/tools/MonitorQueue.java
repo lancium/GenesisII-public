@@ -6,6 +6,7 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.queue.JobInformation;
 import edu.virginia.vcgr.genii.client.queue.QueueManipulator;
+import edu.virginia.vcgr.genii.client.gpath.*;
 
 public class MonitorQueue extends BaseGridTool
 {
@@ -22,7 +23,10 @@ public class MonitorQueue extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		QueueManipulator manipulator = new QueueManipulator(getArgument(0));
+		GeniiPath gPath = new GeniiPath(getArgument(0));
+		if(gPath.pathType() != GeniiPathType.Grid)
+			throw new InvalidToolUsageException("queue-path must be a grid path. ");
+		QueueManipulator manipulator = new QueueManipulator(gPath.path());
 		int finished;
 		int total;
 		long sleepInterval = Long.parseLong(getArgument(1)) * 1000L;

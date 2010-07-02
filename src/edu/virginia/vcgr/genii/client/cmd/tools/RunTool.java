@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.rmi.RemoteException;
@@ -45,7 +46,6 @@ import edu.virginia.vcgr.genii.client.bes.BESUtils;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
-import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.deployer.AppDeployerConstants;
 import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.notification.INotificationHandler;
@@ -64,6 +64,7 @@ import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.notification.Notify;
 import edu.virginia.vcgr.genii.common.notification.Subscribe;
+import edu.virginia.vcgr.genii.client.gpath.*;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
@@ -82,7 +83,6 @@ public class RunTool extends BaseGridTool
 		"Runs the indicated JSDL file at the target BES container.";
 	static private final String _USAGE_RESOURCE =
 		"edu/virginia/vcgr/genii/client/cmd/tools/resources/run-usage.txt";
-	
 	private Object _stateLock = new Object();
 	private ActivityState _state = null;
 	
@@ -225,16 +225,24 @@ public class RunTool extends BaseGridTool
 	{
 		NotificationServer server = null;
 		
-		String asyncPath = _asyncName;
+		GeniiPath gPath = new GeniiPath(_asyncName);
+		if(gPath.pathType() != GeniiPathType.Grid)
+			throw new InvalidToolUsageException("[async-name] must be a grid path. ");
+		String asyncPath = gPath.path();;
 		EndpointReferenceType activity = null;
+		GeniiPath gPath0 = new GeniiPath(getArgument(0));
+		if(gPath0.pathType() != GeniiPathType.Grid)
+			if(_checkStatus)
+				throw new InvalidToolUsageException("<job-path> must be a grid path");
+			else
+				throw new InvalidToolUsageException("<bes-container> | <scheduler> must be a grid path");
 		
 		RNSPath besOrSchedPath;
 		EndpointReferenceType besContainer;
 		
 		if (_checkStatus)
 		{
-			RNSPath path = RNSPath.getCurrent();
-			path = path.lookup(getArgument(0), RNSPathQueryFlags.MUST_EXIST);
+			RNSPath path = lookup(gPath0, RNSPathQueryFlags.MUST_EXIST);
 			
 			ActivityState state = checkStatus(path.getEndpoint());
 			stdout.println("Status:  " + state);
@@ -245,7 +253,7 @@ public class RunTool extends BaseGridTool
 		{
 			Subscribe subscribeRequest = null;
 			
-			if (asyncPath == null)
+			if (asyncPath.equals(""));
 			{
 				server = NotificationServer.createStandardServer();
 				server.start();
@@ -262,18 +270,14 @@ public class RunTool extends BaseGridTool
 			if (_jsdl != null)
 			{
 				String jobName = _name;
-				RNSPath path = ContextManager.getCurrentContext(
-					).getCurrentPath();
-				besOrSchedPath = path.lookup(getArgument(0), 
+				besOrSchedPath = lookup(gPath0, 
 					RNSPathQueryFlags.MUST_EXIST);
 				besContainer = getBESContainer(besOrSchedPath);
 				activity = submitJob(
 					_jsdl, besContainer, jobName, subscribeRequest);
 			} else
 			{
-				RNSPath path = ContextManager.getCurrentContext(
-					).getCurrentPath();
-				besOrSchedPath = path.lookup(getArgument(0), 
+				besOrSchedPath = lookup(gPath0, 
 					RNSPathQueryFlags.MUST_EXIST);
 				besContainer = getBESContainer(besOrSchedPath);
 				String jobName = _name;
@@ -286,10 +290,9 @@ public class RunTool extends BaseGridTool
 			}
 		}
 		
-		if (asyncPath != null)
+		if (!asyncPath.equals(""))
 		{
-			RNSPath path = RNSPath.getCurrent();
-			path = path.lookup(asyncPath, RNSPathQueryFlags.MUST_NOT_EXIST);
+			RNSPath path = lookup(gPath, RNSPathQueryFlags.MUST_NOT_EXIST);
 			path.link(activity);
 			
 			return 0;
@@ -414,10 +417,10 @@ public class RunTool extends BaseGridTool
 	}
 	
 	static public ActivityState checkStatus(String jobPath)
-		throws RemoteException, RNSException, IOException
+		throws RemoteException, RNSException, IOException, InvalidToolUsageException
 	{
-		RNSPath path = RNSPath.getCurrent();
-		path = path.lookup(jobPath, RNSPathQueryFlags.MUST_EXIST);
+		GeniiPath gPath = new GeniiPath(jobPath);
+		RNSPath path = lookup(gPath, RNSPathQueryFlags.MUST_EXIST);
 		
 		return checkStatus(path.getEndpoint());
 	}
@@ -452,11 +455,15 @@ public class RunTool extends BaseGridTool
 			throws IOException, ResourceException,
 				RNSException
 	{
-		FileInputStream fin = null;
+		InputStream fin = null;
 		
 		try
 		{
-			fin = new FileInputStream(jsdlFileName);
+			GeniiPath gPath = new GeniiPath(jsdlFileName);
+			if(gPath.pathType() == GeniiPathType.Grid)
+				fin = gPath.openInputStream();
+			else
+				fin = new FileInputStream(gPath.path());
 			JobDefinition_Type jobDef = 
 				(JobDefinition_Type)ObjectDeserializer.deserialize(
 					new InputSource(fin), JobDefinition_Type.class);

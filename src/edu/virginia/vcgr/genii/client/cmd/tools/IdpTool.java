@@ -16,6 +16,8 @@ import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePass
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.rns.*;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 
 public class IdpTool extends GamlLoginTool {
 
@@ -58,7 +60,10 @@ public class IdpTool extends GamlLoginTool {
 		}
 		
 		// get rns path to idp service
-		RNSPath idpService = RNSPath.getCurrent().lookup(idpServiceRelPath,
+		GeniiPath gPath = new GeniiPath(idpServiceRelPath);
+		if(gPath.pathType() != GeniiPathType.Grid)
+			throw new InvalidToolUsageException("idpServicePath must be a grid path. ");
+		RNSPath idpService = lookup(gPath,
 				RNSPathQueryFlags.MUST_EXIST);
 
 		// get the identity of the idp service

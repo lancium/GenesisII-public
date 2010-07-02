@@ -34,6 +34,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
+import edu.virginia.vcgr.genii.client.gpath.*;
 
 public class PatchIPTool extends BaseGridTool
 {
@@ -145,7 +146,7 @@ public class PatchIPTool extends BaseGridTool
 	}
 	
 	private String getHostname(EndpointReferenceType bes) 
-		throws IOException, RNSException
+		throws IOException, RNSException, InvalidToolUsageException
 	{
 		EndpointReferenceType job = null;
 		ActivityState state = null;
@@ -186,7 +187,10 @@ public class PatchIPTool extends BaseGridTool
 		RNSPath file = null;
 		try
 		{
-			file = path.lookup(getArgument(3));
+			GeniiPath gPath = new GeniiPath(getArgument(3));
+			if(gPath.pathType() != GeniiPathType.Grid)
+				throw new InvalidToolUsageException("<output-file> must be a grid path. ");
+			file = path.lookup(new GeniiPath(getArgument(3)).path());
 			in = ByteIOStreamFactory.createInputStream(file);
 			BufferedReader reader = new BufferedReader(
 				new InputStreamReader(in));

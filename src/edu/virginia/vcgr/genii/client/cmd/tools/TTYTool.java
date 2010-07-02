@@ -16,6 +16,8 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.tty.TTYConstants;
 import edu.virginia.vcgr.genii.client.tty.TTYException;
 import edu.virginia.vcgr.genii.client.tty.TTYWatcher;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 
 public class TTYTool extends BaseGridTool
 {
@@ -53,6 +55,8 @@ public class TTYTool extends BaseGridTool
 				return;
 		} else if (numArgs == 2)
 		{
+			if (new GeniiPath(getArgument(1)).pathType() != GeniiPathType.Grid)
+				throw new InvalidToolUsageException("<tty-object-path> must be a grid path. ");
 			if (getArgument(0).equals(WATCH_TOKEN))
 				return;
 		}
@@ -65,8 +69,7 @@ public class TTYTool extends BaseGridTool
 			ToolException, TTYException, FileNotFoundException,
 			RemoteException, IOException
 	{
-		RNSPath rPath = RNSPath.getCurrent().lookup(
-			path, RNSPathQueryFlags.MUST_EXIST);
+		RNSPath rPath = lookup(new GeniiPath(path), RNSPathQueryFlags.MUST_EXIST);
 		TypeInformation tInfo = new TypeInformation(rPath.getEndpoint());
 		if (!tInfo.isTTY())
 			throw new ToolException("Target path \"" + path + 

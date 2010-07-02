@@ -8,6 +8,8 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 
 public class PingTool extends BaseGridTool
 {
@@ -31,9 +33,10 @@ public class PingTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		RNSPath path = RNSPath.getCurrent();
-		
-		path = path.lookup(getArgument(0), RNSPathQueryFlags.MUST_EXIST);
+		GeniiPath gPath = new GeniiPath(getArgument(0));
+		if(gPath.pathType() != GeniiPathType.Grid)
+			throw new InvalidToolUsageException("<target> must be a grid path. ");
+		RNSPath path = lookup(gPath, RNSPathQueryFlags.MUST_EXIST);
 		
 		EndpointReferenceType target = path.getEndpoint();
 		/*
