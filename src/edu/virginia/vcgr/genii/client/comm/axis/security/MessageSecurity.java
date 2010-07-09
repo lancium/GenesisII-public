@@ -130,7 +130,7 @@ public class MessageSecurity
 						// If we have key material for the callee, pre-delegate 
 						if (resourceCertChain != null)
 						{
-							// TODO: We may not always want to:
+							// Duane Merrill: We may not always want to:
 							// - insert this assertion at all
 							// - authorize the remote resource to use this assertion
 	

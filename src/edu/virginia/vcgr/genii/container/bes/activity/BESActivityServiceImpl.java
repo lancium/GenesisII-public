@@ -116,26 +116,6 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements
 			"Post creating a BES Activity with resource key \"%s\".", 
 			rKey.getResourceKey()));
 		
-		/* MOOCH
-		try
-		{
-			ICallingContext ctxt = ContextManager.getCurrentContext();
-			Collection<Identity> ids = SecurityUtils.getCallerIdentities(ctxt);
-			System.err.println("BEGIN");
-			for (Identity id : ids)
-			{
-				System.err.println("*************************");
-				System.err.println(id.describe(VerbosityLevel.HIGH));
-			}
-			System.err.println("END");
-		}
-		catch (Throwable cause)
-		{
-			cause.printStackTrace(System.err);
-		}
-		*/
-		
-		
 		IBESActivityResource resource = (IBESActivityResource)rKey.dereference();
 		BESActivityInitInfo initInfo = BESActivityUtils.extractCreationProperties(
 			creationParameters);

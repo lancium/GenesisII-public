@@ -115,7 +115,6 @@ public class FTPDaemon
 			}
 			finally
 			{
-				// MOOCH
 				// closeAllSessions();
 			}
 		}

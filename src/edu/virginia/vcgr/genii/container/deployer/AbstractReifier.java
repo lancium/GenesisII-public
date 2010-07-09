@@ -36,7 +36,7 @@ public abstract class AbstractReifier implements IJSDLReifier
 		application = reifyApplication(deployDirectory, application);
 		description.setApplication(application);
 		
-		// TODO we should really reify the resources as well
+		// Mark Morgan we should really reify the resources as well
 		
 		
 		return jobDef;

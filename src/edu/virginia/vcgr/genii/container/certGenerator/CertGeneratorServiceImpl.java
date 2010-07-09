@@ -156,7 +156,6 @@ public class CertGeneratorServiceImpl extends GenesisIIBase implements CertGener
 		catch(GeneralSecurityException gse)
 		{
 			_logger.error("A security exception occurred.", gse);
-			// TODO:  Add a better exception for these types of failures...
 			throw FaultManipulator.fillInFault(
 				new InvalidCertificateRequestFaultType());
 		}

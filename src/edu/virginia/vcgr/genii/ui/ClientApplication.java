@@ -163,7 +163,6 @@ public class ClientApplication extends UIFrame
 		@Override
 		public void aboutRequested()
 		{
-			// TODO
 			System.err.println("About not implemented.");
 		}
 

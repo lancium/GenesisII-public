@@ -32,6 +32,5 @@ public class ExecutionManagerService extends AbstractContainerService
 	
 	public void launch(ICallingContext callingContext, JobRequest request)
 	{
-		// TODO
 	}
 }

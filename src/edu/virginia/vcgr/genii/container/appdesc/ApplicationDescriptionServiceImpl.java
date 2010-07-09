@@ -192,9 +192,6 @@ public class ApplicationDescriptionServiceImpl
 				}, null, null));
 		}
 		
-		// TODO: For now, we'll allow this, but we should re-examine this
-		// later
-		
 		return super.add(addRequest);
 	}
 
@@ -217,7 +214,6 @@ public class ApplicationDescriptionServiceImpl
 			throws RemoteException, ResourceCreationFaultType,
 			ResourceUnknownFaultType
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 }

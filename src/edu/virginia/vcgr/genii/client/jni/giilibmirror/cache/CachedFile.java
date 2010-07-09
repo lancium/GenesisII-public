@@ -71,7 +71,7 @@ public class CachedFile extends CachedResource {
 		isDirectory = false;		
 		isReadable = isRead;
 		isWritable = isWrite | isAppend;  // Modified to work around comment below
-		isAppendable = false;  //TODO: Does not work on ByteIO side
+		isAppendable = false;  //Mark Morgan: Does not work on ByteIO side
 		
 		//If ONLY information, then don't connect to ByteIO
 		if(isByteIO && desiredAccess != WindowsResourceHandle.INFORMATION_ONLY){
@@ -214,7 +214,7 @@ public class CachedFile extends CachedResource {
 				throw new RNSException("SByteIOFactory is unimplemented.");
 			} else
 			{
-				//TODO: Implement this (SEE Mark's code)
+				//Chris Sosa: Implement this (SEE Mark's code)
 				throw new RNSException("The path refers to an " +
 						"object that isn't a file.");
 			}					

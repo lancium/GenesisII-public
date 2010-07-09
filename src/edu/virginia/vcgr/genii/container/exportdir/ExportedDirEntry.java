@@ -38,19 +38,6 @@ class ExportedDirEntry
 		_name = name;
 		
 		_entryReference = entryReference;
-		/* TODO:  The following code was used to alleviate a problem where EPRs
-		 * maintained references to the original SOAP message which was too large and
-		 * forcing unreasonable amounts of memory usage.
-		try
-		{
-			_entryReference = EPRUtils.fromBytes(EPRUtils.toBytes(entryReference));
-		}
-		catch (Throwable t)
-		{
-			System.err.println("MOOCH:  Error.");
-			t.printStackTrace(System.err);
-		}
-		*/
 		
 		_id = id;
 		_type = type;

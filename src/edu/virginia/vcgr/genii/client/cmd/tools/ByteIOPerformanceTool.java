@@ -154,7 +154,7 @@ public class ByteIOPerformanceTool extends BaseGridTool
 	{
 		RNSPath source = lookup(new GeniiPath(getArgument(0)));
 		
-		boolean testRPC = true;
+		boolean testRPC = false;
 		
 		if (testRPC)
 		{
@@ -183,7 +183,7 @@ public class ByteIOPerformanceTool extends BaseGridTool
 		bytesTransferred = readFile(numThreads, blockSize);
 		stopTime = System.currentTimeMillis();
 		
-		stderr.format("Transfered %d bytes in %d milliseconds\n",
+		stdout.format("Transfered %d bytes in %d milliseconds\n",
 			bytesTransferred, (stopTime - startTime));
 		
 		return 0;

@@ -68,7 +68,6 @@ public class ServiceDescription
 			{
 				try
 				{
-					/* TODO: check if this is the right way to create proxy class from name */
 					_defaultResolverFactoryProxyClass = 
 						(Class<? extends IResolverFactoryProxy>)Thread.currentThread().getContextClassLoader(
 							).loadClass(tmp);

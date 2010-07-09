@@ -570,9 +570,6 @@ public class RunTool extends BaseGridTool
 			Collection<EndpointReferenceType> deployers =
 				getPossibleBESDeployers(bes);
 			
-			// TODO -- right now, for testing and expediency, we assume
-			// that any deployer can handle the deployment.  No matching
-			// takes place.
 			if (deployers.size() == 0)
 				throw new ConfigurationException(
 					"Couldn't find an appropriate deployer for the application.");

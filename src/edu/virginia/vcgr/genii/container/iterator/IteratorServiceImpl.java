@@ -120,7 +120,6 @@ public class IteratorServiceImpl extends GenesisIIBase implements
 			RNSFaultType, ResourceUnknownFaultType,
 			RNSEntryNotDirectoryFaultType
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 

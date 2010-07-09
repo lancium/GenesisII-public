@@ -12,6 +12,7 @@ import org.ggf.bes.factory.ActivityStatusType;
 import org.ggf.bes.factory.GetActivityStatusResponseType;
 import org.ggf.bes.factory.GetActivityStatusesType;
 import org.ws.addressing.EndpointReferenceType;
+import org.xmlsoap.schemas.soap.envelope.Fault;
 
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
@@ -161,9 +162,14 @@ public class JobUpdateWorker implements OutcallHandler
 				List<String> faults = null;
 				
 				try
-				{ 
-					faults = BESFaultManager.getFaultDetail(
-						activityStatuses[0].getFault());
+				{
+					if (activityStatuses[0] != null)
+					{
+						Fault fault = activityStatuses[0].getFault();
+						if (fault != null)
+							faults = BESFaultManager.getFaultDetail(
+								fault);
+					}
 				}
 				catch (Throwable cause)
 				{

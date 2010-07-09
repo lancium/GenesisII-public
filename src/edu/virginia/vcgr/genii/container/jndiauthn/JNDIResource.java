@@ -154,7 +154,7 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource
 			return;
 		}
 
-		/* TODO -- We can't do this any more.  Will have to revisit soon.
+		/* Mark Morgan -- We can't do this any more.  Will have to revisit soon.
 		for (MessageElement element : refParams.get_any())
 		{
 			if (element.getQName().equals(_RESOURCE_CERT_QNAME))
@@ -329,7 +329,7 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource
 				"Cannot match subscriptions on transparent resources");
 	}
 
-	/* TODO -- This functionis no longer contained here.  We'll have to
+	/* Mark Morgan -- This functionis no longer contained here.  We'll have to
 	 * revisit this issue again.
 	public ReferenceParametersType getResourceParameters()
 			throws ResourceException

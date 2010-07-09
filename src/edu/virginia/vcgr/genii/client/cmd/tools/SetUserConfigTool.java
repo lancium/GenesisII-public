@@ -27,7 +27,6 @@ public class SetUserConfigTool extends BaseGridTool
 		
 		// reload configuration information so that rest of application uses new configuration information 
 		// (necessary for example during a grid script).
-		// TODO:  make a switch to program...
 		UserConfigUtils.reloadConfiguration();
 		return 0;
 	}
