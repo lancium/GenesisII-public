@@ -13,6 +13,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.gpath.*;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.MatchingParameter;
+import edu.virginia.vcgr.genii.container.q2.matching.MatchingParamEnum;
 
 public class MatchingParamsTool extends BaseGridTool
 {
@@ -29,6 +30,22 @@ public class MatchingParamsTool extends BaseGridTool
 		new LinkedList<MatchingParameter>();
 	private Collection<MatchingParameter> _removes =
 		new LinkedList<MatchingParameter>();
+	
+	private void verifyParameterName(String name) throws InvalidToolUsageException
+	{
+		try
+		{
+			int index = name.indexOf(':');
+			if (index > 0)
+				MatchingParamEnum.valueOf(name.substring(0, index));
+		}
+		catch (IllegalArgumentException e)
+		{
+			throw new InvalidToolUsageException(String.format(
+				"Matching parameter name %s is not valid (requirment indicator must be %s, or %s).",
+				name, MatchingParamEnum.requires, MatchingParamEnum.supports));
+		}
+	}
 	
 	public MatchingParamsTool()
 	{
@@ -88,6 +105,8 @@ public class MatchingParamsTool extends BaseGridTool
 			String addRemove = matcher.group(1).trim();
 			String name = matcher.group(2).trim();
 			String value = matcher.group(3).trim();
+			
+			verifyParameterName(name);
 			
 			if (addRemove.equals("add"))
 				_adds.add(new MatchingParameter(name, value));

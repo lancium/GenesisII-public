@@ -1,1 +1,7 @@
-matching-params <target> + { <add|remove>(name, value) } *
+matching-params <target> + { <add|remove>(property-identifier, value) } *
+
+	WHERE
+	
+	property-identifier is a property name with an optional "requirement" indicator
+	
+		[{supports|requires}:]<property-name>
