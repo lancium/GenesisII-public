@@ -185,6 +185,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.queue.QListTool</mconf:class>
 		<mconf:class name="qstat"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.queue.QStatTool</mconf:class>
+		<mconf:class name="qreschedule"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.queue.QRescheduleTool</mconf:class>
 		<mconf:class name="qmgr"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.queue.gui.QueueManager</mconf:class>
 		<mconf:class name="qsub"

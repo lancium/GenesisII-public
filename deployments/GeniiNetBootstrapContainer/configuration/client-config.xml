@@ -188,6 +188,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.queue.gui.QueueManager</mconf:class>
 		<mconf:class name="qsub"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.queue.QSubTool</mconf:class>
+		<mconf:class name="qreschedule"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.queue.QRescheduleTool</mconf:class>
 		<mconf:class name="get-bes-attributes"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.GetBESFactoryAttributesTool</mconf:class>
 		<mconf:class name="cert-generator"

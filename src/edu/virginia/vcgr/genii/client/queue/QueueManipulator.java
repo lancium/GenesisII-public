@@ -51,6 +51,13 @@ public class QueueManipulator
 		_queue = queue;
 	}
 	
+	
+	public void rescheduleJobs(String[] jobs) throws RemoteException
+	{
+		QueuePortType queue = ClientUtils.createProxy(QueuePortType.class, _queue);
+		queue.rescheduleJobs(jobs);
+	}
+	
 	public JobTicket submit(File jsdlFile, int priority)
 		throws FileNotFoundException, ResourceException,
 			RemoteException
