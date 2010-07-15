@@ -2,47 +2,35 @@ package edu.virginia.vcgr.genii.container.q2.matching;
 
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.Map;
 
 class OrMatchingParameter extends MatchingParameter
 {
-	private Collection<MatchingParameter> _parameters =
-		new LinkedList<MatchingParameter>();
+	//Does not support nested ORs
+	private Collection<DefaultMatchingParameter> _parameters;
 	
 	OrMatchingParameter()
 	{
+		 _parameters = new LinkedList<DefaultMatchingParameter>();
 	}
 	
-	final void addMatchingParameter(MatchingParameter parameter)
+	final void addMatchingParameter(DefaultMatchingParameter parameter)
 	{
 		_parameters.add(parameter);
 	}
 	
 	@Override
-	final boolean matches(Map<String, Collection<String>> besParameters)
+	final boolean matches(MatchingParameter param)
 	{
 		for (MatchingParameter parameter : _parameters)
 		{
-			if (parameter.matches(besParameters))
+			if (parameter.matches(param))
 				return true;
 		}
 		
 		return false;
 	}
 	
-	@Override
-	final boolean supportsRequired(String parameterName, Collection<String> values)
-	{
-		for (MatchingParameter parameter : _parameters)
-		{
-			if (parameter.supportsRequired(parameterName, values))
-				return true;
-		}
-		
-		return false;
-	}
-	
-	@Override
+    @Override
 	public int hashCode()
 	{
 		int ret = 0x0;
@@ -87,22 +75,31 @@ class OrMatchingParameter extends MatchingParameter
 	@Override
 	public String toString()
 	{
-		if (_parameters.size() == 0)
-			return "";
-		else if (_parameters.size() == 1)
-			return _parameters.iterator().next().toString();
-		else
+		StringBuilder result = new StringBuilder();
+		
+		for(MatchingParameter p : _parameters)
 		{
-			StringBuilder ret = new StringBuilder();
-			for (MatchingParameter parameter : _parameters)
-			{
-				if (ret.length() > 0)
-					ret.append(" | ");
-				
-				ret.append(parameter);
-			}
-			
-			return String.format("(%s)", ret);
+			result.append(p);
+			result.append('\n');
 		}
+		
+		return result.toString();
 	}
+
+
+	@Override
+	boolean isRequired() {
+		//ORS always required
+		return true;
+	}
+
+	@Override
+	boolean matches(Collection<MatchingParameter> params) {
+		for (MatchingParameter p  : params){
+			if (this.matches(p))
+				return true;
+		}
+		return false;
+	}
+
 }

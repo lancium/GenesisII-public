@@ -2,10 +2,6 @@ package edu.virginia.vcgr.genii.container.q2.besinfo;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.xml.namespace.QName;
 
@@ -25,12 +21,14 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.common.MatchingParameter;
+import edu.virginia.vcgr.genii.container.q2.matching.DefaultMatchingParameter;
+import edu.virginia.vcgr.genii.container.q2.matching.MatchingParameters;
 
 public class BESInformation
 {
 	static private Log _logger = LogFactory.getLog(BESInformation.class);
 	
-	private Map<String, Collection<String>> _matchingParameters;
+	private MatchingParameters _matchingParameters;
 	
 	private ProcessorArchitectureEnumeration _processorArchitecture;
 	private OperatingSystemTypeEnumeration _operatingSystemType;
@@ -42,8 +40,7 @@ public class BESInformation
 	
 	public BESInformation(GetFactoryAttributesDocumentResponseType attrs)
 	{
-		_matchingParameters = 
-			new HashMap<String, Collection<String>>();
+		_matchingParameters = new MatchingParameters();
 		
 		_numContainedActivities = -1L;
 		_isAcceptingNewActivites = false;
@@ -93,12 +90,12 @@ public class BESInformation
 						{
 							MatchingParameter mp = ObjectDeserializer.toObject(
 								a, MatchingParameter.class);
-							Collection<String> values = _matchingParameters.get(
-								mp.getName());
-							if (values == null)
-								_matchingParameters.put(mp.getName(), 
-									values = new ArrayList<String>());
-							values.add(mp.getValue());
+						
+							//Need to create new matching parameter
+							edu.virginia.vcgr.genii.container.q2.matching.MatchingParameter tParam;
+							tParam = new DefaultMatchingParameter(mp.getName(), mp.getValue(), false);
+							_matchingParameters.add(tParam);
+									
 						}
 						catch (Throwable cause)
 						{
@@ -126,17 +123,15 @@ public class BESInformation
 		pw.format(
 			"%d activites contained; accepting new ones?  %s\n",
 			_numContainedActivities, _isAcceptingNewActivites);
-		for (String key : _matchingParameters.keySet())
-		{
-			pw.format("\t%s=%s\n", key, _matchingParameters.get(key));
-		}
 		
+		pw.println(_matchingParameters);
+			
 		pw.close();
 		StreamUtils.close(writer);
 		return writer.toString();
 	}
 	
-	final public Map<String, Collection<String>> getMatchingParameters()
+	final public MatchingParameters getMatchingParameters()
 	{
 		return _matchingParameters;
 	}

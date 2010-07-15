@@ -1,27 +1,54 @@
 package edu.virginia.vcgr.genii.container.q2.matching;
 
 import java.util.Collection;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-class DefaultMatchingParameter extends MatchingParameter
+public class DefaultMatchingParameter extends MatchingParameter
 {
 	static private Log _logger = LogFactory.getLog(DefaultMatchingParameter.class);
 	
 	private String _property;
 	private String _value;
 	
-	DefaultMatchingParameter(String property, String value)
-	{
-		_property = property;
-		_value = value;
+	private MatchingParamEnum _paramType;
+	private boolean _fromJSDL;
 		
+	
+	public boolean isRequired()
+	{
+		return _paramType == MatchingParamEnum.requires;
+	}
+	
+	public DefaultMatchingParameter(String property, String value, Boolean fromJSDL)
+	{
+		checkProperty(property);
+		_value = value;
+		_fromJSDL = fromJSDL;
+	}
+	
+	private void checkProperty(String property)
+	{
+		int index = property.indexOf(':');
+		if (index > 0)
+		{
+			String enumValue = property.substring(0, index);
+			_property = property.substring(index + 1);
+			
+			_paramType = MatchingParamEnum.valueOf(enumValue);
+		} else
+		{
+			_property = property;
+			if (_fromJSDL)
+				_paramType =  MatchingParamEnum.requires;
+			else
+				_paramType =  MatchingParamEnum.supports;
+		}
 	}
 	
 	@Override
-	final boolean matches(Map<String, Collection<String>> properties)
+	final boolean matches(MatchingParameter param)
 	{
 		if (_property == null)
 		{
@@ -33,47 +60,23 @@ class DefaultMatchingParameter extends MatchingParameter
 			_logger.trace("Found a matching parameter property with no " +
 				"value...assuming it's a set test.");
 		
-		Collection<String> values = properties.get(_property);
-		if (values == null || values.size() == 0)
-			return false;
-		
-		if (_value == null)
-			return true;
-		
-		for (String value : values)
+		if (param instanceof OrMatchingParameter)
+			return param.matches(this);
+		else if (param instanceof DefaultMatchingParameter)
 		{
-			if (value.equals(_value))
-				return true;
+			DefaultMatchingParameter other = (DefaultMatchingParameter)param;
+			return (_property.equals(other.getProperty()) && 
+					_value.equals(other.getValue()));
 		}
 		
 		return false;
 	}
 	
-	@Override
-	final boolean supportsRequired(String parameterName, Collection<String> values)
-	{
-		if (_property == null)
-			return false;
-		
-		if (_property.equals(parameterName))
-		{
-			if (_value == null)
-				return true;
-			
-			for (String value : values)
-			{
-				if (value.equals(_value))
-					return true;
-			}
-		}
-		
-		return false;
-	}
 	
 	@Override
 	public int hashCode()
 	{
-		int ret = 0x0;
+		int ret = _paramType.hashCode();
 		
 		if (_property != null)
 			ret ^= _property.hashCode();
@@ -84,9 +87,21 @@ class DefaultMatchingParameter extends MatchingParameter
 		return ret;
 	}
 	
+	private String getProperty()
+	{
+		return _property;
+	}
+	
+	private String getValue()
+	{
+		return _value;
+	}
+	
 	public boolean equals(DefaultMatchingParameter other)
 	{
-		return toString().equals(other.toString());
+		return (_property.equals(other.getProperty()) && 
+			_value.equals(other.getValue()) &&
+			_paramType == other._paramType);
 	}
 	
 	@Override
@@ -101,6 +116,26 @@ class DefaultMatchingParameter extends MatchingParameter
 	@Override
 	public String toString()
 	{
-		return String.format("%s = %s", _property, _value);
+		//return String.format("%s = %s", _property, _value);
+		return (_paramType.toString() + ":" + _property + " = " + _value);
+	}
+	@Override
+	boolean matches(Collection<MatchingParameter> params) {
+		if (_property == null)
+		{
+			_logger.warn("Found a matching parameter property with no name.");
+			return true;
+		}
+		
+		if (_value == null)
+			_logger.trace("Found a matching parameter property with no " +
+				"value...assuming it's a set test.");
+		
+		for (MatchingParameter p: params){
+			if (this.matches(p))
+				return true;
+		}
+		return false;
+		
 	}
 }

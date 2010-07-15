@@ -1,8 +1,5 @@
 package edu.virginia.vcgr.genii.container.q2.matching;
 
-import java.util.Collection;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.Boundary_Type;
@@ -45,7 +42,7 @@ public class JobResourceRequirements
 	private OperatingSystemTypeEnumeration _osType = null;
 	private String _osVersion = null;
 	private Double _memoryRequirement = null;
-	private MatchingParameter []_matchingParameters = null;
+	private MatchingParameters _matchingParameters = null;
 	
 	private void fillInArchInformation(CPUArchitecture_Type arch)
 	{
@@ -107,8 +104,8 @@ public class JobResourceRequirements
 		if (memoryRange != null)
 			fillInMemoryInformation(memoryRange);
 		
-		_matchingParameters = MatchingParameter.matchingParameters(
-			resources.get_any());
+		_matchingParameters = new MatchingParameters(MatchingParameter.matchingParameters(
+			resources.get_any(), true));
 	}
 	
 	/*
@@ -138,7 +135,7 @@ public class JobResourceRequirements
 		
 		if (_matchingParameters != null)
 		{
-			for (MatchingParameter param : _matchingParameters)
+			for (MatchingParameter param : _matchingParameters.getParameters())
 				ret ^= param.hashCode();
 		}
 		
@@ -174,10 +171,10 @@ public class JobResourceRequirements
 		if (_matchingParameters == null || other._matchingParameters == null)
 			return false;
 		
-		for (MatchingParameter mp : other._matchingParameters)
+		for (MatchingParameter mp : other._matchingParameters.getParameters())
 		{
 			boolean found = false;
-			for (MatchingParameter mp2 : _matchingParameters)
+			for (MatchingParameter mp2 : _matchingParameters.getParameters())
 			{
 				if (mp.equals(mp2))
 				{
@@ -270,42 +267,8 @@ public class JobResourceRequirements
 				return false;
 		}
 		
-		// First check to see if all of the matching parameters that we
-		// asked for are matched.
-		if (_matchingParameters != null)
-		{
-			for (MatchingParameter parameter : _matchingParameters)
-			{
-				if (!parameter.matches(besInfo.getMatchingParameters()))
-					return false;
-			}
-		}
 		
-		// Now we check to see if there were any "required" matching parameters
-		// that were not matched.
-		Map<String, Collection<String>> besParams = 
-			besInfo.getMatchingParameters();
-		boolean found;
-		for (String paramName : besParams.keySet())
-		{
-			if (paramName.startsWith("requires"))
-			{
-				found = false;
-				for (MatchingParameter parameter : _matchingParameters)
-				{
-					if (parameter.supportsRequired(paramName, besParams.get(paramName)))
-					{
-						found = true;
-						break;
-					}
-				}
-				
-				if (!found)
-					return false;
-			}
-		}
-		
-		return true;
+		return MatchingParameter.matches(besInfo.getMatchingParameters(), _matchingParameters);
 	}
 	
 	@Override
@@ -318,7 +281,7 @@ public class JobResourceRequirements
 		appendParameter(parameters, "Memory Requirement", _memoryRequirement);
 		if (_matchingParameters != null)
 		{
-			for (MatchingParameter parameter : _matchingParameters)
+			for (MatchingParameter parameter : _matchingParameters.getParameters())
 				appendParameter(parameters, parameter);
 		}
 		

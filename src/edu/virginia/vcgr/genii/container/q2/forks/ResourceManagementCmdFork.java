@@ -5,8 +5,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Map;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
@@ -19,6 +17,7 @@ import edu.virginia.vcgr.genii.container.q2.BESManager;
 import edu.virginia.vcgr.genii.container.q2.BESUpdateInformation;
 import edu.virginia.vcgr.genii.container.q2.QueueManager;
 import edu.virginia.vcgr.genii.container.q2.besinfo.BESInformation;
+import edu.virginia.vcgr.genii.container.q2.matching.MatchingParameters;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.rfork.AbstractStreamableByteIOFactoryResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
@@ -89,23 +88,11 @@ public class ResourceManagementCmdFork
 						besInfo.getProcessorArchitecture());
 					ps.format("\tMemory:  %d\n",
 						besInfo.getPhysicalMemory().longValue());
-					Map<String, Collection<String>> matching = 
+					MatchingParameters matching = 
 						besInfo.getMatchingParameters();
 					ps.format("\tMatching Parameters:\n");
-					for (String key : matching.keySet())
-					{
-						ps.format("\t\t%s=", key);
-						boolean first = true;
-						for (String value : matching.get(key))
-						{
-							if (!first)
-								ps.format(",");
-							first = false;
-							ps.format("%s", value);
-						}
-						
-						ps.println();
-					}
+					
+					ps.println(matching);
 					
 					BESUpdateInformation updateInfo = besMgr.getUpdateInformation(
 						data.getID());

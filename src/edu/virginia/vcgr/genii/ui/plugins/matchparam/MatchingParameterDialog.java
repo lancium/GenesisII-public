@@ -9,7 +9,9 @@ import java.awt.event.ActionEvent;
 import java.util.Collection;
 
 import javax.swing.AbstractAction;
+import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -18,11 +20,13 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableColumn;
 
 import org.morgan.util.Pair;
 import org.morgan.utils.gui.ButtonPanel;
 
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
+import edu.virginia.vcgr.genii.container.q2.matching.MatchingParamEnum;
 import edu.virginia.vcgr.genii.ui.utils.ShapeIcons;
 import edu.virginia.vcgr.genii.ui.utils.SimpleIconButton;
 
@@ -49,6 +53,13 @@ class MatchingParameterDialog extends JDialog
 			Boolean.TRUE);
 		_table.setSelectionMode(
 			ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		
+		TableColumn typeColumn = _table.getColumnModel().getColumn(2);
+		JComboBox comboBox = new JComboBox();
+		comboBox.addItem(MatchingParamEnum.requires);
+		comboBox.addItem(MatchingParamEnum.supports);
+		typeColumn.setCellEditor(new DefaultCellEditor(comboBox));
+		
 		
 		content.add(new JScrollPane(_table), new GridBagConstraints(
 			0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
