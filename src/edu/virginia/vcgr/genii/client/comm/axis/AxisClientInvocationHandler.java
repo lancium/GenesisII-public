@@ -21,6 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
+import java.net.SocketException;
 import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.*;
@@ -450,6 +451,11 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		{
 			if (cause instanceof ConnectException)
 				return true;
+			if (cause instanceof SocketException)
+			{
+				if (cause.getMessage().contains("Connection reset"))
+					return true;
+			}
 			cause = cause.getCause();
 		}
 		

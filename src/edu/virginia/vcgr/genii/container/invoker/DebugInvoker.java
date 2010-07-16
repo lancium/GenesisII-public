@@ -16,18 +16,28 @@ public class DebugInvoker implements IAroundInvoker
 			" on class " + 
 			invocationContext.getTarget().getClass().getName() + ".";
 		
-		_logger.debug("Calling " + description + " from a "
+		_logger.trace("Calling " + description + " from a "
 			+ (NamingUtils.isWSNamingAwareClient() ? "" : "non-") + "WS-Naming aware client.");
+		
+		long start = System.currentTimeMillis();
 		
 		try
 		{
 			Object obj = invocationContext.proceed();
-			_logger.debug("Successfully called " + description);
+			long stop = System.currentTimeMillis();
+			
+			_logger.debug(String.format("Successfully called %s in %d ms.",
+				description, (stop - start)));
+			
 			return obj;
 		}
 		catch (Exception e)
 		{
-			_logger.debug("Failed call to " + description, e);
+			long stop = System.currentTimeMillis();
+			
+			_logger.debug(String.format("Failed to call %s in %d ms.",
+				description, (stop - start)), e);
+			
 			throw e;
 		}
 	}

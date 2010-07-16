@@ -19,6 +19,7 @@ import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
 import edu.virginia.vcgr.genii.container.cservices.accounting.AccountingService;
 import edu.virginia.vcgr.genii.container.cservices.percall.PersistentOutcallContainerService;
+import edu.virginia.vcgr.genii.container.cservices.ver1.Version1Upgrader;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 
 public class ContainerServices
@@ -33,6 +34,8 @@ public class ContainerServices
 	static private Collection<ContainerService> getServices(File configFile)
 		throws IOException
 	{
+		Version1Upgrader.upgrade(configFile, new File(configFile.getParentFile(), "cservices"));
+		
 		Collection<ContainerService> services = 
 			ContainerServicesParser.parseConfigFile(configFile);
 		
