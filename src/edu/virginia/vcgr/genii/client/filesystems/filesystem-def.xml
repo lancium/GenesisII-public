@@ -1,0 +1,36 @@
+<filesystems xmlns="http://vcgr.cs.virginia.edu/filesystems">
+	<filesystem name="Filesystem 1" path="/Users/morgan/print">
+		<filesystem-property>Local</filesystem-property>
+		<filesystem-property>Shared</filesystem-property>
+		<filesystem-sandbox name="BES" relative-path="bes"/>
+	</filesystem>
+	
+	<filesystem name="Filesystem 2" path="/Users/morgan/tmp">
+		<filesystem-property>Local</filesystem-property>
+		<filesystem-property>Scratch</filesystem-property>
+		<filesystem-sandbox name="download-tmp" relative-path="download-tmp"/>
+		<filesystem-sandbox name="scratch" relative-path="scratch"/>
+	</filesystem>
+	
+	<filesystem-watcher check-period="15 seconds" filesystem-name="Filesystem 1">
+		<filter-expression>
+			<or xmlns="http://vcgr.cs.virginia.edu/filesystems/filter-script">
+				<less>
+					<variable name="spaceUsable"/>
+					<literal value="10000000"/>
+				</less>
+				<less>
+					<variable name="percentAvailable"/>
+					<literal value="82"/>
+				</less>
+			</or>
+		</filter-expression>
+		
+		<watch-callback call-limit="1" register-anti-callback="true"
+			class="edu.virginia.vcgr.genii.filesystems.log.LogWatchHandler">
+			<log-watch-config xmlns="http://vcgr.cs.virginia.edu/filesystems/log-watch">
+				<message>Filesystem "%s" is %.2f%% full</message>
+			</log-watch-config>
+		</watch-callback>
+	</filesystem-watcher>
+</filesystems>

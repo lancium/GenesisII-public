@@ -10,6 +10,8 @@ import org.ggf.jsdl.FileSystem_Type;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.configuration.XMLConfiguration;
 
+import edu.virginia.vcgr.genii.client.filesystems.FilesystemManager;
+
 public class ConfigurationManager
 {
 	static public final String _USER_DIR_PROPERTY =
@@ -34,6 +36,8 @@ public class ConfigurationManager
 	
 	// denotes type of configuration for this process
 	private Boolean _isClient = null;
+	
+	private FilesystemManager _filesystemManager = null;
 	
 	static
 	{
@@ -136,6 +140,17 @@ public class ConfigurationManager
 				deployment.getConfigurationFile(_CLIENT_CONF_FILENAME));
 			_serverConf = new XMLConfiguration(
 				deployment.getConfigurationFile(_SERVER_CONF_FILENAME));
+			
+			File fsConf = deployment.getConfigurationFile("filesystems.xml");
+			if (fsConf.exists())
+				_filesystemManager = new FilesystemManager(fsConf);
+			else
+				_filesystemManager= new FilesystemManager();
+			
+			Thread th = new Thread(new FilesystemPoller(_filesystemManager),
+				"Filesystem Polling Thread");
+			th.setDaemon(true);
+			th.start();
 		}
 		catch (IOException ioe)
 		{
@@ -155,6 +170,11 @@ public class ConfigurationManager
 	
 	public File getUserDirectory() {
 		return _userDir;
+	}
+	
+	final public FilesystemManager filesystemManager()
+	{
+		return _filesystemManager;
 	}
 	
 	synchronized private void setRole(Boolean isClient)
@@ -199,4 +219,29 @@ public class ConfigurationManager
 			return false;
 	}
 	
+	static private class FilesystemPoller implements Runnable 
+	{
+		private FilesystemManager _manager;
+		
+		private FilesystemPoller(FilesystemManager manager)
+		{
+			_manager = manager;
+		}
+		
+		@Override
+		public void run()
+		{
+			while (true)
+			{
+				try
+				{
+					_manager.enterPollingLoop();
+				}
+				catch (InterruptedException ie)
+				{
+					// Ignore
+				}
+			}
+		}
+	}
 }

@@ -9,6 +9,8 @@ import javax.xml.bind.annotation.XmlElement;
 
 import org.morgan.util.MacroUtils;
 
+import edu.virginia.vcgr.genii.container.cservices.ContainerService;
+
 class Version1ContainerService
 {
 	@XmlAttribute(name = "class", required = true)
@@ -18,16 +20,22 @@ class Version1ContainerService
 	private Collection<Version1Property> _properties =
 		new LinkedList<Version1Property>();
 	
-	final String className(Properties macros)
+	@SuppressWarnings("unchecked")
+	final Class<? extends ContainerService> serviceClass(Properties macros) throws ClassNotFoundException
 	{
-		return MacroUtils.replaceMacros(macros, _className);
+		String className = MacroUtils.replaceMacros(macros, _className);
+		Class<? extends ContainerService> serviceClass =
+			(Class<? extends ContainerService>)Version1Upgrader.class.getClassLoader().loadClass(className);
+		
+		return serviceClass;
 	}
 	
 	final Properties properties(Properties macros)
 	{
 		Properties ret = new Properties();
 		for (Version1Property property : _properties)
-			ret.setProperty(MacroUtils.replaceMacros(macros, property.name()),
+			ret.setProperty(
+				MacroUtils.replaceMacros(macros, property.name()),
 				MacroUtils.replaceMacros(macros, property.value()));
 		
 		return ret;

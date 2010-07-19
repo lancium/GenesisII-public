@@ -39,10 +39,14 @@ public class InformationContainerService extends AbstractContainerService
 	 * @param infoMgrProperties A properties object representing configuration
 	 * properties given when the container service was configured.
 	 */
-	public InformationContainerService(Properties infoMgrProperties)
+	public InformationContainerService()
 	{
 		super(SERVICE_NAME);
-		
+	}
+	
+	@Override
+	public void setProperties(Properties infoMgrProperties)
+	{	
 		_configurationProperties = infoMgrProperties;
 	}
 	

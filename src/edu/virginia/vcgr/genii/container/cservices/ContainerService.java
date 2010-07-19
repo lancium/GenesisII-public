@@ -1,11 +1,14 @@
 package edu.virginia.vcgr.genii.container.cservices;
 
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 
 public interface ContainerService
 {
+	public void setProperties(Properties properties);
+	
 	public boolean started();
 	public String serviceName();
 	

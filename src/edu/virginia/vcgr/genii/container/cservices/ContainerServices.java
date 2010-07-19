@@ -2,6 +2,8 @@ package edu.virginia.vcgr.genii.container.cservices;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -17,8 +19,7 @@ import edu.virginia.vcgr.genii.client.configuration.Deployment;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
-import edu.virginia.vcgr.genii.container.cservices.accounting.AccountingService;
-import edu.virginia.vcgr.genii.container.cservices.percall.PersistentOutcallContainerService;
+import edu.virginia.vcgr.genii.container.cservices.conf.ContainerServiceConfiguration;
 import edu.virginia.vcgr.genii.container.cservices.ver1.Version1Upgrader;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 
@@ -34,16 +35,40 @@ public class ContainerServices
 	static private Collection<ContainerService> getServices(File configFile)
 		throws IOException
 	{
-		Version1Upgrader.upgrade(configFile, new File(configFile.getParentFile(), "cservices"));
+		File configurationDirectory = new File(configFile.getParentFile(),
+			"cservices");
+		Version1Upgrader.upgrade(configFile, configurationDirectory);
+		Collection<ContainerServiceConfiguration> configs =
+			ContainerServiceConfiguration.loadConfigurations(
+				configurationDirectory);
+		Collection<ContainerService> ret = new ArrayList<ContainerService>(
+			configs.size());
+		Class<? extends ContainerService> serviceClass = null;
 		
-		Collection<ContainerService> services = 
-			ContainerServicesParser.parseConfigFile(configFile);
+		for (ContainerServiceConfiguration configuration : configs)
+		{
+			try
+			{
+				serviceClass = configuration.serviceClass();
+				ret.add(configuration.instantiate());
+			}
+			catch (InvocationTargetException e)
+			{
+				_logger.error(String.format(
+					"Error loading container service %s from file %s.",
+					serviceClass,
+					configuration.configurationFile()), e.getCause());
+			}
+			catch (Throwable cause)
+			{
+				_logger.error(String.format(
+					"Error loading container service %s from file %s.",
+					serviceClass,
+					configuration.configurationFile()), cause);
+			}
+		}
 		
-		// This is a hack for now -- add in services that are always there.
-		services.add(new PersistentOutcallContainerService());
-		services.add(new AccountingService());
-		
-		return services;
+		return ret;
 	}
 	
 	static private DatabaseConnectionPool findConnectionPool()

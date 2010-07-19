@@ -26,7 +26,11 @@ public class QRescheduleTool extends BaseGridTool {
 		
 		System.arraycopy(getArguments(), 2, tickets, 0, numArguments() - 2);
 		
-		manipulator.configure(getArgument(1), 0);
+		/* Andrew actually doesn't want us to do this in the tool, he wants to
+		 * do it outside the tool.
+		 */
+		// manipulator.configure(getArgument(1), 0);
+		
 		manipulator.rescheduleJobs(tickets);
 		
 		return 0;

@@ -1,0 +1,16 @@
+<and xmlns="http://vcgr.cs.virginia.edu/filesystems/filter-script">
+	<less-equals>
+		<variable name="spaceAvailable"/>
+		<literal value="5.6"/>
+	</less-equals>
+	<or>
+		<greater>
+			<variable name="spaceUsed"/>
+			<literal value="4"/>
+		</greater>
+		<less>
+			<variable name="spaceUsed"/>
+			<literal value="1"/>
+		</less>
+	</or>
+</and>

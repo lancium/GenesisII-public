@@ -13,12 +13,16 @@ import edu.virginia.vcgr.genii.container.cservices.conf.ContainerServiceConfigur
 public class Version1Upgrader
 {
 	static private void writeUpgrade(File targetDirectory,
-		ContainerServiceConfiguration conf) throws JAXBException
+		ContainerServiceConfiguration conf) 
+			throws JAXBException, ClassNotFoundException
 	{
-		File target = null;
-		if (targetDirectory.isDirectory())
-			return;
+		String className = conf.serviceClass().getName();
+		int index = className.lastIndexOf('.');
+		if (index >= 0)
+			className = className.substring(index + 1);
 		
+		File target = new File(targetDirectory,
+			className + ".xml");
 		JAXBContext v2Context = JAXBContext.newInstance(
 			ContainerServiceConfiguration.class);
 		v2Context.createMarshaller().marshal(conf, target);
@@ -48,9 +52,16 @@ public class Version1Upgrader
 			for (Version1ContainerService v1Service : v1Conf.services())
 			{
 				ContainerServiceConfiguration v2Conf = new ContainerServiceConfiguration(
-					v1Service.className(macros), v1Service.properties(v1Conf.variables()));
+					v1Service.serviceClass(macros), v1Service.properties(macros));
 				writeUpgrade(targetDirectory, v2Conf);
 			}
+			
+			version1File.delete();
+		}
+		catch (ClassNotFoundException e)
+		{
+			throw new IOException(
+				"Unable to load class.", e);
 		}
 		catch (JAXBException e)
 		{

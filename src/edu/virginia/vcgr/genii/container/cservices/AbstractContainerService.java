@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.container.cservices;
 
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 
 import org.morgan.util.configuration.ConfigurationException;
@@ -42,6 +43,12 @@ public abstract class AbstractContainerService implements ContainerService
 		_cservicesProperties = cservicesProperties;
 		
 		loadService();
+	}
+	
+	@Override
+	public void setProperties(Properties properties)
+	{
+		// By default, we ignore properties.
 	}
 
 	@Override
