@@ -1,22 +1,25 @@
 package edu.virginia.vcgr.genii.client.filesystems.script;
 
+import java.text.ParseException;
+
 import edu.virginia.vcgr.genii.client.filesystems.FilesystemUsageInformation;
+import edu.virginia.vcgr.genii.client.utils.units.Size;
 
 class LiteralNumericValueExpression implements NumericValueExpression
 {
-	private double _value;
+	private Size _value;
 	
 	public LiteralNumericValueExpression(String literal) 
 		throws FilterScriptException
 	{
 		try
 		{
-			_value = Double.parseDouble(literal);
+			_value = Size.parse(literal);
 		}
-		catch (NumberFormatException nfe)
+		catch (ParseException nfe)
 		{
 			throw new FilterScriptException(String.format(
-				"Literal \"%s\" is not a floating point number.",
+				"Literal \"%s\" is not a valid size.",
 				literal), nfe);
 		}
 	}
@@ -24,12 +27,12 @@ class LiteralNumericValueExpression implements NumericValueExpression
 	@Override
 	final public double evaluate(FilesystemUsageInformation usageInformation)
 	{
-		return _value;
+		return _value.getBytes();
 	}
 	
 	@Override
 	final public String toString()
 	{
-		return Double.toString(_value);
+		return _value.toString();
 	}
 }

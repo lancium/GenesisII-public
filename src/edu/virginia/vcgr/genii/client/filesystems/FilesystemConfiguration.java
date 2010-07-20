@@ -4,14 +4,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
-class FilesystemConfiguration
+import org.morgan.util.MacroUtils;
+
+class FilesystemConfiguration extends FilesystemSandboxContainerConfiguration
 {
-	@XmlAttribute(name = "name", required = true)
-	private String _name = null;
-	
 	@XmlAttribute(name = "path", required = true)
 	private String _path = null;
 	
@@ -20,14 +20,10 @@ class FilesystemConfiguration
 	private Collection<FilesystemProperties> _properties =
 		new LinkedList<FilesystemProperties>();
 	
-	@XmlElement(namespace = FilesystemConstants.CONFIGURATION_NS,
-		name = "filesystem-sandbox", required = false)
-	private Collection<FilesystemSandboxConfiguration> _sandboxes =
-		new LinkedList<FilesystemSandboxConfiguration>();
-	
-	final String name() 
+	@SuppressWarnings("unused")
+	private void afterUnmarshal(Unmarshaller u, Object parent)
 	{
-		return _name;
+		_path = MacroUtils.replaceMacros(System.getProperties(), _path);
 	}
 	
 	final String path()
@@ -38,10 +34,5 @@ class FilesystemConfiguration
 	final Collection<FilesystemProperties> properties()
 	{
 		return Collections.unmodifiableCollection(_properties);
-	}
-	
-	final Collection<FilesystemSandboxConfiguration> sandboxes()
-	{
-		return Collections.unmodifiableCollection(_sandboxes);
 	}
 }

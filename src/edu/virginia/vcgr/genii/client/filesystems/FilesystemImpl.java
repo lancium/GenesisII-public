@@ -39,11 +39,7 @@ class FilesystemImpl implements Filesystem
 		_filesystemRoot = root;
 		
 		for (FilesystemSandboxConfiguration boxConf : conf.sandboxes())
-		{
-			FilesystemSandbox sandbox = new FilesystemSandboxImpl(
-				new File(root, boxConf.relativePath()));
-			_sandboxes.put(boxConf.name(), sandbox);
-		}
+			addSandbox(boxConf.name(), boxConf.relativePath());
 		
 		for (FilesystemProperties property : conf.properties())
 			_properties.add(property);
@@ -53,6 +49,15 @@ class FilesystemImpl implements Filesystem
 	final public File filesystemRoot()
 	{
 		return _filesystemRoot;
+	}
+	
+	@Override
+	public void addSandbox(String sandboxName, String relativePath)
+		throws FileNotFoundException
+	{
+		FilesystemSandbox sandbox = new FilesystemSandboxImpl(
+			new File(_filesystemRoot, relativePath));
+		_sandboxes.put(sandboxName, sandbox);
 	}
 	
 	@Override

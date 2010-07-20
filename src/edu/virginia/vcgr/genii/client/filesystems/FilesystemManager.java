@@ -116,6 +116,13 @@ public class FilesystemManager
 			_filesystems.put(fsConf.name(), fs);
 		}
 		
+		for (FilesystemAliasConfiguration aliasConf : conf.aliases())
+		{
+			Filesystem fs = new FilesystemAliasImpl(
+				this, aliasConf.name(), aliasConf);
+			_filesystems.put(aliasConf.name(), fs);
+		}
+		
 		for (FilesystemWatcherConfiguration watcherConfig : conf.watchers())
 		{
 			String filesystemName = watcherConfig.filesystemName();

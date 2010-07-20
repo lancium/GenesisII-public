@@ -17,6 +17,11 @@ class FilesystemsConfiguration
 		new LinkedList<FilesystemConfiguration>();
 	
 	@XmlElement(namespace = FilesystemConstants.CONFIGURATION_NS,
+		name = "filesystem-alias")
+	private Collection<FilesystemAliasConfiguration> _aliases =
+		new LinkedList<FilesystemAliasConfiguration>();
+	
+	@XmlElement(namespace = FilesystemConstants.CONFIGURATION_NS,
 		name = "filesystem-watcher", required = false)
 	private Collection<FilesystemWatcherConfiguration> _watchers =
 		new LinkedList<FilesystemWatcherConfiguration>();
@@ -24,6 +29,11 @@ class FilesystemsConfiguration
 	final Collection<FilesystemConfiguration> filesystems()
 	{
 		return Collections.unmodifiableCollection(_filesystems);
+	}
+	
+	final Collection<FilesystemAliasConfiguration> aliases()
+	{
+		return Collections.unmodifiableCollection(_aliases);
 	}
 	
 	final Collection<FilesystemWatcherConfiguration> watchers()

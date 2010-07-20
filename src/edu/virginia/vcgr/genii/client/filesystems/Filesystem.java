@@ -7,6 +7,9 @@ import java.util.concurrent.TimeUnit;
 
 public interface Filesystem
 {
+	void addSandbox(String sandboxName, String relativePath)
+		throws FileNotFoundException;
+	
 	public Set<FilesystemProperties> properties();
 	
 	public File filesystemRoot();

@@ -1,6 +1,9 @@
 package edu.virginia.vcgr.genii.client.filesystems;
 
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
+
+import org.morgan.util.MacroUtils;
 
 class FilesystemSandboxConfiguration
 {
@@ -9,6 +12,12 @@ class FilesystemSandboxConfiguration
 	
 	@XmlAttribute(name = "relative-path", required = true)
 	private String _relativePath = null;
+	
+	@SuppressWarnings("unused")
+	private void afterUnmarshal(Unmarshaller u, Object parent)
+	{
+		MacroUtils.replaceMacros(System.getProperties(), _relativePath);
+	}
 	
 	final String name()
 	{
