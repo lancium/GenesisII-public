@@ -1,0 +1,17 @@
+<email-watch-config xmlns="http://vcgr.cs.virginia.edu/filesystems/email-watch">
+	<connection xmlns="http://vcgr.cs.virginia.edu/filesystems/connect" isSSL="true">
+		<smtp-server>smtp.gmail.com</smtp-server>
+		<port>465</port>
+		<username>mmm2a42</username>
+		<password>password</password>
+		<debug-on>true</debug-on>
+	</connection>
+	<addressing-info xmlns="http://vcgr.cs.virginia.edu/filesystems/address-info">
+		<addressTo>mmm2a@virginia.edu</addressTo>
+		<addressTo>mmm2a42@gmail.com</addressTo>
+		<addressTo>mark@mark-morgan.net</addressTo>
+		<addressFrom>mmm2a@virginia.edu</addressFrom>
+	</addressing-info>
+	<subject>Testing...</subject>
+	<message>Filesystem "%s" is %.2f%% full</message>
+</email-watch-config>

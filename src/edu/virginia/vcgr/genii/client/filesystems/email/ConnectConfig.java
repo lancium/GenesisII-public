@@ -29,6 +29,11 @@ public class ConnectConfig
 		name = "password", required = true)
 	private String _password = null;
 	
+	@XmlElement(
+		namespace = "http://vcgr.cs.virginia.edu/filesystems/connect",
+		name = "debug-on", required = false)
+	private boolean _debugOn = false;
+	
 	final boolean isSSL()
 	{
 		return _isSSL;
@@ -54,4 +59,8 @@ public class ConnectConfig
 		return _password;
 	}
 	
+	final boolean debugOn()
+	{
+		return _debugOn;
+	}
 }
