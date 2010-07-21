@@ -319,7 +319,7 @@ public class AccountingTool extends BaseGridTool
 				sBundle._insertCommandLineElement.addBatch();
 			}
 			
-			sBundle._insertCommandLineElement.executeUpdate();
+			sBundle._insertCommandLineElement.executeBatch();
 		}
 		finally
 		{
