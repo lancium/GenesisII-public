@@ -30,6 +30,7 @@
 			class="edu.virginia.vcgr.genii.filesystems.log.LogWatchHandler">
 			<log-watch-config xmlns="http://vcgr.cs.virginia.edu/filesystems/log-watch">
 				<message>Filesystem "%s" is %.2f%% full</message>
+				<level>WARN</level>
 			</log-watch-config>
 		</watch-callback>
 	</filesystem-watcher>

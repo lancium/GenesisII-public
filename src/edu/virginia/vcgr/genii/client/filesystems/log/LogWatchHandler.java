@@ -29,11 +29,36 @@ public class LogWatchHandler implements FilesystemWatchHandler
 	
 	@Override
 	public void notifyFilesystemEvent(FilesystemManager manager,
-			String filesystemName, Filesystem filesystem,
-			FilesystemUsageInformation usageInformation,
-			boolean matched)
+		String filesystemName, Filesystem filesystem,
+		FilesystemUsageInformation usageInformation,
+		boolean matched)
 	{
-		_logger.warn(_config.format(filesystemName,
-			usageInformation.percentUsed()));
+		switch (_config.level())
+		{
+			case Trace :
+				_logger.trace(_config.format(filesystemName,
+					usageInformation.percentUsed()));
+				break;
+			case Debug :
+				_logger.debug(_config.format(filesystemName,
+					usageInformation.percentUsed()));
+				break;
+			case Info :
+				_logger.info(_config.format(filesystemName,
+					usageInformation.percentUsed()));
+				break;
+			case Warn :
+				_logger.warn(_config.format(filesystemName,
+					usageInformation.percentUsed()));
+				break;
+			case Error :
+				_logger.error(_config.format(filesystemName,
+					usageInformation.percentUsed()));
+				break;
+			case Fatal :
+				_logger.fatal(_config.format(filesystemName,
+					usageInformation.percentUsed()));
+						break;
+		}
 	}
 }

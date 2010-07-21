@@ -15,6 +15,7 @@ class FilesystemWatchCallback
 	static private Log _logger = LogFactory.getLog(
 		FilesystemWatchCallback.class);
 	
+	private boolean _firstTime = true;
 	private boolean _lastMatched = false;
 	private Integer _callLimit;
 	private boolean _registerAntiCallback;
@@ -115,15 +116,20 @@ class FilesystemWatchCallback
 		{
 			try
 			{
-				_handler.notifyFilesystemEvent(
-					manager, filesystemName, filesystem, usageInformation,
-					matched);
+				if (!_firstTime || matched)
+					_handler.notifyFilesystemEvent(
+						manager, filesystemName, filesystem, usageInformation,
+						matched);
 			}
 			catch (Throwable throwable)
 			{
 				_logger.error(String.format(
 					"Error thrown by file system watcher on filesystem %s.",
 					filesystemName), throwable);
+			}
+			finally
+			{
+				_firstTime = false;
 			}
 		}
 		
