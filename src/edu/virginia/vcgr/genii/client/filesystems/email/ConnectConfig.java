@@ -21,12 +21,12 @@ public class ConnectConfig
 	
 	@XmlElement (
 		namespace = "http://vcgr.cs.virginia.edu/filesystems/connect",
-		name = "username", required = true)
+		name = "username", required = false)
 	private String _username = null;
 	
 	@XmlElement (
 		namespace = "http://vcgr.cs.virginia.edu/filesystems/connect",
-		name = "password", required = true)
+		name = "password", required = false)
 	private String _password = null;
 	
 	@XmlElement(
