@@ -412,24 +412,34 @@ public class CommandField extends JTextField
 					wordCount++;
 			}
 			
-			if (wordCount <= 1)
-				completer = _executionContext.commandCompleter();
-			else
-				completer = _executionContext.pathCompleter();
+			String lastWord = "";
+			String partial = "";
+			if (words.length > 0)
+				lastWord = words[words.length - 1].token();
+			if(lastWord.startsWith("-"))
+			{
+				completer = _executionContext.optionCompleter();
+				partial = stripEscapesAndQuotes(left);
+			}
+			else 
+			{
+				partial = stripEscapesAndQuotes(lastWord);
+				if (wordCount <= 1)
+					completer = _executionContext.commandCompleter();
+				else
+					completer = _executionContext.pathCompleter();
+			}
 			
 			if (completer == null)
 				beep();
 			else
 			{
-				String lastWord = "";
-				if (words.length > 0)
-					lastWord = words[words.length - 1].token();
 				setText("forming completions...");
 				setEnabled(false);
 				_uiContext.progressMonitorFactory().monitor(
 					CommandField.this, "Forming Completions",
 					"Forming completions.", 1000L,
-					new CompleterTask(completer, stripEscapesAndQuotes(lastWord)),
+					new CompleterTask(completer, partial),
 					new CompletionFinisher(lastWord, right, words, left));
 			}
 			

@@ -53,18 +53,22 @@ public class CreateJndiStsTool extends BaseGridTool
 			false);
 	}
 	
+	@Option({"jnditype"})
 	public void setJnditype(String jndiType) {
 		_jndiType = jndiType.toUpperCase();
 	}
 	
+	@Option({"searchbase"})
 	public void setSearchBase(String searchBase) {
 		_searchBases.add(searchBase);
 	}
 	
+	@Option({"domain"})
 	public void setDomain(String domain) {
 		_domain = domain;
 	}
 	
+	@Option({"host"})
 	public void setHost(String host) {
 		_host = host;
 	}	

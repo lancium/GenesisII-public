@@ -35,21 +35,25 @@ public class CreateRNSRootTool extends BaseGridTool
 		super(_DESCRIPTION, new FileResource(_USAGE_RESOURCE), true);
 	}
 	
+	@Option({"protocol"})
 	public void setProtocol(String protocol)
 	{
 		_protocol = protocol;
 	}
 	
+	@Option({"host"})
 	public void setHost(String host)
 	{
 		_host = host;
 	}
 	
+	@Option({"port"})
 	public void setPort(String portString)
 	{
 		_port = Integer.parseInt(portString);
 	}
 	
+	@Option({"base-path"})
 	public void setBase_path(String baseURLPath)
 	{
 		_baseURLPath = baseURLPath;

@@ -33,26 +33,31 @@ public class FuseTool extends BaseGridTool
 		super(_DESCRIPTION, _USAGE, false);
 	}
 	
+	@Option({"daemon"})
 	public void setDaemon()
 	{
 		_daemon = true;
 	}
 	
+	@Option({"sandbox"})
 	public void setSandbox(String sandbox)
 	{
 		_sandbox = sandbox;
 	}
 
+	@Option({"mount"})
 	public void setMount()
 	{
 		_isMount = true;
 	}
 	
+	@Option({"unmount"})
 	public void setUnmount()
 	{
 		_isUnmount = true;
 	}
 	
+	@Option({"uid"})
 	public void setUid(String uid)
 	{
 		_uid = Integer.parseInt(uid);

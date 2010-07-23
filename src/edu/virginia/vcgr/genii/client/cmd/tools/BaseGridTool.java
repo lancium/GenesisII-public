@@ -6,10 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.morgan.util.io.StreamUtils;
@@ -30,8 +27,7 @@ import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 
 public abstract class BaseGridTool implements ITool
 {
-	private HashMap<String, Method> _setters = 
-		new HashMap<String, Method>();
+	private OptionSetter _setter = null;
 	
 	private String _description;
 	private String _usage;
@@ -155,6 +151,7 @@ public abstract class BaseGridTool implements ITool
 		return _arguments.get(argNumber);
 	}
 	
+	@Option({"no-gui"})
 	public void setNo_gui()
 	{
 		_useGui = false;
@@ -162,8 +159,9 @@ public abstract class BaseGridTool implements ITool
 	
 	public void addArgument(String argument) throws ToolException
 	{
-		Class<? extends ITool> toolClass = getClass();
-		
+		if (_setter == null)
+			_setter = new OptionSetter(this);
+		Class<? extends ITool> toolClass = getClass();	
 		if (argument.startsWith("--"))
 			handleLongOptionFlag(
 				toolClass, argument.substring(2));
@@ -259,122 +257,18 @@ public abstract class BaseGridTool implements ITool
 		}
 	}
 	
-	static private String formatMethodPortion(String optionFlag)
-	{
-		optionFlag = optionFlag.substring(0, 1).toUpperCase() +
-			optionFlag.substring(1);
-		return optionFlag.replaceAll("-", "_");
-	}
-	
 	private void handleOption(
 		Class<? extends ITool> toolClass, String option, String value)
 			throws ToolException
 	{
-		Method method;
-		String optionMethod = formatMethodPortion(option);
-		
-		synchronized(_setters)
-		{
-			method = _setters.get(option);
-			if (method != null && method.getName().startsWith("set"))
-			{
-				// We have this method in our table which means we've already
-				// set this option before.
-				throw new ToolException("Invalid Usage.  Option \"" +
-					option + "\" can only be given once.");
-			}
-			
-			if (method == null)
-			{
-				try
-				{
-					// look for set method
-					method = toolClass.getMethod(
-						String.format("set%s", optionMethod),
-						String.class);
-				}
-				catch (NoSuchMethodException nsme)
-				{
-					try
-					{
-						// look for add method
-						method = toolClass.getMethod(
-							String.format("add%s", optionMethod),
-							String.class);
-					}
-					catch (NoSuchMethodException nsme2)
-					{
-						throw new ToolException("Option \"" + option +
-							"\" is unrecognized."); 
-					}
-				}
-				
-				_setters.put(option, method);
-			}
-		}
-			
-		try
-		{
-			method.invoke(this, new Object[] { value });
-		}
-		catch (InvocationTargetException ite)
-		{
-			throw new ToolException(
-				"Tool threw an exception while setting option \"" + 
-				option + "\".", ite.getCause());
-		}
-		catch (IllegalAccessException iae)
-		{
-			throw new ToolException(
-				"Tool cannot handle option \"" + option +
-				"\" due to protection issue.", iae);
-		}
+		_setter.set(option,value);
 	}
 	
 	private void handleFlag(
 		Class<? extends ITool> toolClass, String flag)
 			throws ToolException
 	{
-		String flagMethod = formatMethodPortion(flag);
-		Method method;
-		
-		synchronized(_setters)
-		{
-			method = _setters.get(flag);
-			if (method == null)
-			{
-				try
-				{
-					// look for add method
-					method = toolClass.getMethod(
-						String.format("set%s", flagMethod));
-				}
-				catch (NoSuchMethodException nsme2)
-				{
-					throw new ToolException("Flag \"" + flag +
-						"\" is unrecognized."); 
-				}
-				
-				_setters.put(flag, method);
-			}
-		}
-		
-		try
-		{
-			method.invoke(this, new Object[0]);
-		}
-		catch (InvocationTargetException ite)
-		{
-			throw new ToolException(
-				"Tool threw an exception while setting flag \"" + 
-				flag + "\".", ite.getCause());
-		}
-		catch (IllegalAccessException iae)
-		{
-			throw new ToolException(
-				"Tool cannot handle flag \"" + flag +
-				"\" due to protection issue.", iae);
-		}
+		_setter.set(flag);
 	}
 	
 	protected RNSPath expandSingleton(String pathExpression)

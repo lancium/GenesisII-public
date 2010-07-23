@@ -36,16 +36,19 @@ public class LnTool extends BaseGridTool
 		super(_DESCRIPTION, new FileResource(_USAGE_RESOURCE), false);
 	}
 	
+	@Option({"epr-file"})
 	public void setEpr_file(String eprFile)
 	{
 		_eprFile = eprFile;
 	}
 	
+	@Option({"service-url"})
 	public void setService_url(String serviceURL)
 	{
 		_serviceURL = serviceURL;
 	}
 	
+	@Option({"no-lookup"})
 	public void setNo_lookup()
 	{
 		_noLookup = true;

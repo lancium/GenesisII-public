@@ -2,15 +2,22 @@ package edu.virginia.vcgr.genii.ui.shell.grid;
 
 import java.io.File;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import java.lang.reflect.AccessibleObject;
+
 import edu.virginia.vcgr.genii.client.cmd.CommandLineFormer;
 import edu.virginia.vcgr.genii.client.cmd.CommandLineRunner;
 import edu.virginia.vcgr.genii.client.cmd.ToolDescription;
+import edu.virginia.vcgr.genii.client.cmd.tools.Option;
+import edu.virginia.vcgr.genii.client.cmd.tools.OptionSetter;
+import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.IContextResolver;
@@ -28,6 +35,7 @@ public class GridExecutionContext implements ExecutionContext
 	private ICallingContext _callingContext;
 	private CommandLineRunner _runner;
 	private SortedSet<String> _sortedCommands;
+	private Map<String, ToolDescription> _tools;
 	
 	private void executeGridCommand(String []cLine, Display display, Reader stdin) 
 		throws Exception
@@ -60,6 +68,8 @@ public class GridExecutionContext implements ExecutionContext
 		_callingContext = callingContext;
 		_runner = new CommandLineRunner();
 		_sortedCommands = new TreeSet<String>();
+		_tools = CommandLineRunner.getToolList(
+				ConfigurationManager.getCurrentConfiguration().getClientConfiguration());
 		
 		for (String toolName : _runner.getToolList().keySet())
 		{
@@ -89,6 +99,12 @@ public class GridExecutionContext implements ExecutionContext
 	public WordCompleter pathCompleter()
 	{
 		return new PathCompleter();
+	}
+	
+	@Override
+	public WordCompleter optionCompleter() 
+	{
+		return new OptionCompleter();
 	}
 	
 	@Override
@@ -192,5 +208,115 @@ public class GridExecutionContext implements ExecutionContext
 				return ret.toArray(new String[ret.size()]);
 			}
 		}
+	}
+	
+	private class OptionCompleter implements WordCompleter
+	{
+
+		@Override
+		public String[] completions(String partial) throws Exception {
+			
+			String stem;
+			int last = partial.lastIndexOf(" ");
+			if(partial.contains("="))
+			{
+				String lastWord = partial.substring(last+1);
+				if(lastWord.contains("="))
+				{
+					int eql = lastWord.indexOf('=');
+					stem = lastWord.substring(0,eql+1);
+					PathCompleter comp = new PathCompleter();
+					String paths[];
+					if(eql+1 < lastWord.length())
+						paths = comp.completions(lastWord.substring(
+								eql+1));
+					else
+						paths = comp.completions("");
+					Collection<String> ret = new ArrayList<String>();
+					for (String str: paths)
+					{
+						ret.add(stem + str);
+					}
+					return ret.toArray(new String[ret.size()]);
+				}
+			}
+			
+			boolean isLong;
+			char temp;
+			
+			try
+			{
+				temp = partial.charAt(last + 2);
+			}
+			catch (IndexOutOfBoundsException iobe)
+			{
+				temp=' ';
+			}
+			isLong = (temp == '-');
+			try
+			{
+				if(isLong)
+					stem = partial.substring(last+3);
+				else
+					stem = partial.substring(last+2);
+			}
+			catch (IndexOutOfBoundsException iobe)
+			{
+				stem = "";
+			}
+			
+			int index = partial.indexOf(' ');
+			String cmd = partial.substring(0, index);
+			ToolDescription desc = _tools.get(cmd);
+			AccessibleObject options[] = new OptionSetter(
+					desc.getToolInstance()).getOptions();
+			ArrayList<String> ret = new ArrayList<String>();
+			int shortsFound = 0;
+			int shortsToFind = 0;
+			char[] shorts = {};
+			if(!isLong && stem.length() > 0)
+			{
+				shortsToFind = stem.length();
+				shorts = stem.toCharArray();
+			}
+		
+			
+			for (AccessibleObject opt : options)
+			{
+				Option option = opt.getAnnotation(Option.class);
+				if(option == null)
+					continue;
+				String[] value = option.value();
+				for(String val : value)
+				{
+					if(shortsToFind > shortsFound && val.length() == 1)
+						for(char c : shorts)
+						{
+							if(val.toCharArray()[0] == c)
+							{
+								shortsFound++;
+								break;
+							}
+						}
+					if(!isLong)
+					{
+						if(val.length() == 1 && !stem.contains(val))
+							ret.add("-" + stem + val);
+						else if(stem.equals("") && val.length() > 1)
+						{
+							ret.add("--" + val);
+						}
+					}
+					else if(val.startsWith(stem) && val.length() > 1)
+						ret.add("--" + val);
+				}
+			}
+			if(shortsToFind > 0)
+				if(shortsFound < shortsToFind)
+					ret.clear();
+			
+			return ret.toArray(new String[ret.size()]);
+		}
+		
 	}
 }

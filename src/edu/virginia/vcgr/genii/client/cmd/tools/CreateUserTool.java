@@ -78,6 +78,7 @@ public class CreateUserTool extends BaseGridTool
 	 * Set the login name for the new IDP service instance.
 	 * @param loginName The new login name.
 	 */
+	@Option({"login-name"})
 	public void setLogin_name(String loginName)
 	{
 		_loginName = loginName;
@@ -88,6 +89,7 @@ public class CreateUserTool extends BaseGridTool
 	 * 
 	 * @param password The new password
 	 */
+	@Option({"login-password"})
 	public void setLogin_password(String password)
 	{
 		_password = password;
@@ -100,6 +102,7 @@ public class CreateUserTool extends BaseGridTool
 	 * a formatted duration string.  See Genesis II wiki page for a 
 	 * description.
 	 */
+	@Option({"validDuration"})
 	public void setValidDuration(String validDuration)
 	{
 		_durationString = validDuration;

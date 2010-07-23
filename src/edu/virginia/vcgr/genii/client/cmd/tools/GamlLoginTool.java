@@ -82,30 +82,37 @@ public class GamlLoginTool extends BaseGridTool {
 		super(_DESCRIPTION, new FileResource(_USAGE_RESOURCE), false);
 	}
 
+	@Option({"storetype"})
 	public void setStoretype(String storeType) {
 		_storeType = storeType;
 	}
 
+	@Option({"password"})
 	public void setPassword(String password) {
 		_password = password;
 	}
 
+	@Option({"username"})
 	public void setUsername(String username) {
 		_username = username;
 	}
 
+	@Option({"alias"})
 	public void setAlias() {
 		_aliasPatternFlag = true;
 	}
 	
+	@Option({"toolIdentity"})
 	public void setToolIdentity() {
 		_replaceClientToolIdentityFlag = true;
 	}
 
+	@Option({"pattern"})
 	public void setPattern(String pattern) {
 		_pattern = pattern;
 	}
 
+	@Option({"validDuration"})
 	public void setValidDuration(String durationString) 
 		throws ParseException
 	{

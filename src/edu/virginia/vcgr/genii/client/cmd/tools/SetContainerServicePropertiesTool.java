@@ -35,11 +35,13 @@ public class SetContainerServicePropertiesTool extends BaseGridTool
 		super(_DESCRIPTION, _USAGE, false);
 	}
 	
+	@Option({"download-mgr-tmpdir"})
 	public void setDownload_mgr_tmpdir(String path)
 	{
 		_downloadMgrTmpDir = path;
 	}
 	
+	@Option({"scratch-space-dir"})
 	public void setScratch_space_dir(String path)
 	{
 		_scratchSpaceDir = path;

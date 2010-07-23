@@ -31,18 +31,22 @@ public class RNSInteropTool extends BaseGridTool
 		super(_DESCRIPTION, _USAGE, false);
 	}
 	
+	@Option({"serviceURL"})
 	public void setServiceURL(String serviceURL){
 		_srvURL = serviceURL;
 	}
 	
+	@Option({"addName"})
 	public void setAddName(String entryName){
 		_addName = entryName;
 	}
 	
+	@Option({"ls"})
 	public void setLs(String entryName){
 		_ls = entryName;
 	}
 	
+	@Option({"rm"})
 	public void setRm(String entryName){
 		_rm = entryName;
 	}

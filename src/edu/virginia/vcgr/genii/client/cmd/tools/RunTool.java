@@ -140,46 +140,55 @@ public class RunTool extends BaseGridTool
 		super(_DESCRIPTION, new FileResource(_USAGE_RESOURCE), false);
 	}
 	
+	@Option({"name"})
 	public void setName(String name)
 	{
 		_name = name;
 	}
 	
+	@Option({"async-name"})
 	public void setAsync_name(String asyncName)
 	{
 		_asyncName = asyncName;
 	}
 	
+	@Option({"jsdl"})
 	public void setJsdl(String jsdl)
 	{
 		_jsdl = jsdl;
 	}
 	
+	@Option({"check-status"})
 	public void setCheck_status()
 	{
 		_checkStatus = true;
 	}
 	
+	@Option({"stdout"})
 	public void setStdout(String sout)
 	{
 		_stdout = sout;
 	}
 	
+	@Option({"stdin"})
 	public void setStdin(String sin)
 	{
 		_stdin = sin;
 	}
 	
+	@Option({"stderr"})
 	public void setStderr(String serr)
 	{
 		_stderr = serr;
 	}
 	
+	@Option(value = {"stage-in"}, maxOccurances = "unbounded")
 	public void addStage_in(String value)
 	{
 		_stageIns.add(value);
 	}
 	
+	@Option(value = {"stage-out"}, maxOccurances = "unbounded")
 	public void addStage_out(String value)
 	{
 		_stageOuts.add(value);

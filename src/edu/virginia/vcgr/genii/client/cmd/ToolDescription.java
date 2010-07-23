@@ -17,6 +17,7 @@ public class ToolDescription
 	{
 		_toolClass = toolClass;
 		_toolName = toolName;
+		
 	}
 	
 	public Class<? extends ITool> getToolClass()

@@ -29,27 +29,32 @@ public class FtpdTool extends BaseGridTool
 	{
 		super(_DESCRIPTION, new FileResource(_USAGE_RESOURCE), false);
 	}
-
+	
+	@Option({"block"})
 	public void setBlock()
 	{
 		_block = true;
 	}
 	
+	@Option({"idle-timeout"})
 	public void setIdle_timeout(String seconds)
 	{
 		_idleTimeout = Integer.parseInt(seconds);
 	}
 	
+	@Option({"data-connection-timeout"})
 	public void setData_connection_timeout(String timeout)
 	{
 		_dataConnectionTimeout = Integer.parseInt(timeout);
 	}
 	
+	@Option({"max-auth-attempts"})
 	public void setMax_auth_attempts(String max)
 	{
 		_maxAuthAttempts = Integer.parseInt(max);
 	}
 	
+	@Option({"sandbox"})
 	public void setSandbox(String sandBox)
 	{
 		_sandbox = sandBox;

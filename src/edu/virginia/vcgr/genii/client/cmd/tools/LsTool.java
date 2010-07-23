@@ -31,7 +31,7 @@ public class LsTool extends BaseGridTool
 	static final private String _USAGE =
 		"ls [-ldae] [--long] [--all] [--directory] [--epr] [--cert-chain] [<target> *]\n" +
 		"\tWHERE -e means to show the EPR.";
-	
+
 	private boolean _long = false;
 	private boolean _all = false;
 	private boolean _directory = false;
@@ -43,51 +43,36 @@ public class LsTool extends BaseGridTool
 		super(_DESCRIPTION, _USAGE, false);
 	}
 	
+	@Option({"long", "l"})
 	public void setLong()
 	{
 		_long = true;
 	}
 	
+	@Option({"cert-chain"})
 	public void setCert_chain()
 	{
 		_certChain = true;
 	}
 	
-	public void setL()
-	{
-		setLong();
-	}
-	
+	@Option({"all", "a"})
 	public void setAll()
 	{
 		_all = true;
 	}
 	
-	public void setA()
-	{
-		setAll();
-	}
-	
+	@Option({"directory", "d"})
 	public void setDirectory()
 	{
 		_directory = true;
 	}
 	
-	public void setD()
-	{
-		setDirectory();
-	}
-	
+	@Option({"epr", "e"})
 	public void setEpr()
 	{
 		_epr = true;
 	}
-	
-	public void setE()
-	{
-		setEpr();
-	}
-	
+
 	@Override
 	protected int runCommand() throws Throwable
 	{

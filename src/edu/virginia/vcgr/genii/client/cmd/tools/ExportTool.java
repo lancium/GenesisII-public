@@ -55,21 +55,25 @@ public class ExportTool extends BaseGridTool
 		super(_DESCRIPTION, new FileResource(_USAGE_RESOURCE), false);
 	}
 	
+	@Option({"create"})
 	public void setCreate()
 	{
 		_create = true;
 	}
 	
+	@Option({"quit"})
 	public void setQuit()
 	{
 		_quit = true;
 	}
 	
+	@Option({"url"})
 	public void setUrl()
 	{
 		_url = true;
 	}
 	
+	@Option({"replicate"})
 	public void setReplicate()
 	{
 		_replicate = true;

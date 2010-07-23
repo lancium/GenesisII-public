@@ -48,6 +48,7 @@ public class CreateUserDelegateTool extends CreateUserTool
 	 * 
 	 * @param storeType The new store type (one of WIN, JKS, PKCS12).
 	 */
+	@Option({"storetype"})
 	public void setStoretype(String storeType)
 	{
 		_storeType = storeType;

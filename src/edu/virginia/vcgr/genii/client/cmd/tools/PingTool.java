@@ -26,6 +26,7 @@ public class PingTool extends BaseGridTool
 	
 	private int _attempts = 1;
 	
+	@Option({"attempts"})
 	public void setAttempts(String attempts) {
 		_attempts = Integer.parseInt(attempts);
 	}

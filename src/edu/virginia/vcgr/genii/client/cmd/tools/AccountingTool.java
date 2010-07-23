@@ -361,21 +361,19 @@ public class AccountingTool extends BaseGridTool
 			new FileResource(USAGE_RESOURCE), true);
 	}
 	
+	@Option({"collect"})
 	public void setCollect()
 	{
 		_isCollect = true;
 	}
 	
+	@Option({"recursive","r"})
 	public void setRecursive()
 	{
 		_isRecursive = true;
 	}
 	
-	public void setR()
-	{
-		setRecursive();
-	}
-	
+	@Option({"no-commit"})
 	public void setNo_commit()
 	{
 		_isNoCommit = true;

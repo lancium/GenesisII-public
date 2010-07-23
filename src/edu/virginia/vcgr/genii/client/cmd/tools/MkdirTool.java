@@ -41,16 +41,13 @@ public class MkdirTool extends BaseGridTool
 		super(_DESCRIPTION, new FileResource(_USAGE_RESOURCE), false);
 	}
 	
+	@Option({"parents", "p"})
 	public void setParents()
 	{
 		_parents = true;
 	}
-	
-	public void setP()
-	{
-		setParents();
-	}
-	
+
+	@Option({"rns-service"})
 	public void setRns_service(String service)
 	{
 		_rnsService = service;

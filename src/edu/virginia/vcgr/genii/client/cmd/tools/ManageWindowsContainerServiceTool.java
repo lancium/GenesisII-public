@@ -42,26 +42,31 @@ public class ManageWindowsContainerServiceTool extends BaseGridTool
 		super(DESCRIPTION, USAGE, true);
 	}
 	
+	@Option({"service-name"})
 	public void setService_name(String serviceName)
 	{
 		_serviceName = serviceName;
 	}
 	
+	@Option({"account"})
 	public void setAccount(String account)
 	{
 		_account = account;
 	}
 	
+	@Option({"password"})
 	public void setPassword(String password)
 	{
 		_password = password;
 	}
 	
+	@Option({"i"})
 	public void setI()
 	{
 		_install = true;
 	}
 	
+	@Option({"u"})
 	public void setU()
 	{
 		_uninstall = true;

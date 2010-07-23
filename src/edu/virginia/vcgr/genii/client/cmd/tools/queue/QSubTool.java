@@ -8,6 +8,7 @@ import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
 import edu.virginia.vcgr.genii.client.queue.JobTicket;
 import edu.virginia.vcgr.genii.client.queue.QueueManipulator;
 import edu.virginia.vcgr.genii.client.gpath.*;
+import edu.virginia.vcgr.genii.client.cmd.tools.Option;
 
 public class QSubTool extends BaseGridTool
 {
@@ -23,6 +24,7 @@ public class QSubTool extends BaseGridTool
 		super(_DESCRIPTION, _USAGE, false);
 	}
 	
+	@Option({"priority"})
 	public void setPriority(String priority)
 		throws ToolException
 	{

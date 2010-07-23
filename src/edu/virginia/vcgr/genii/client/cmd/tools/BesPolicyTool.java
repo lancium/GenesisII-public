@@ -35,16 +35,19 @@ public class BesPolicyTool extends BaseGridTool
 		super(_DESCRIPTION, _USAGE, false);
 	}
 	
+	@Option({"set-user-logged-in"})
 	public void setSet_user_logged_in(String action)
 	{
 		_userLoggedInAction = BESPolicyActions.valueOf(action);
 	}
 	
+	@Option({"set-screensaver-inactive"})
 	public void setSet_screensaver_inactive(String action)
 	{
 		_screenSaverInactiveAction = BESPolicyActions.valueOf(action);
 	}
 	
+	@Option({"query"})
 	public void setQuery()
 	{
 		_query = true;

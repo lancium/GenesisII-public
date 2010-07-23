@@ -312,6 +312,7 @@ public class PatchIPTool extends BaseGridTool
 		super(_DESCRIPTION, _USAGE, true);
 	}
 	
+	@Option({"ignore"})
 	public void setIgnore(String ignoreFile)
 	{
 		_ignoreFile = ignoreFile;

@@ -29,10 +29,12 @@ public class LogoutTool extends BaseGridTool
 		super(_DESCRIPTION, _USAGE, false);
 	}
 
+	@Option({"pattern"})
 	public void setPattern(String pattern) {
 		_pattern = pattern;
 	}
 	
+	@Option({"all"})
 	public void setAll() {
 		_all = true;
 	}

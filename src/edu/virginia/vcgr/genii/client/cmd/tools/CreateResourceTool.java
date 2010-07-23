@@ -45,16 +45,19 @@ public class CreateResourceTool extends BaseGridTool
 		super(_DESCRIPTION, new FileResource(_USAGE_RESOURCE), false);
 	}
 	
+	@Option({"url"})
 	public void setUrl()
 	{
 		_url = true;
 	}
 	
+	@Option({"creation-properties"})
 	public void setCreation_properties(String propertiesFile)
 	{
 		_creationProperties = new GeniiPath(propertiesFile);
 	}
 	
+	@Option({"description"})
 	public void setDescription(String shortDescription)
 	{
 		_shortDescription = shortDescription;

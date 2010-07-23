@@ -22,6 +22,7 @@ public class WhoamiTool extends BaseGridTool
 	
 	private VerbosityLevel _verbosity = VerbosityLevel.OFF;
 	
+	@Option({"verbosity"})
 	public void setVerbosity(String verbosityString)
 		throws InvalidToolUsageException
 	{

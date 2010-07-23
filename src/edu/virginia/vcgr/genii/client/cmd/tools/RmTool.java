@@ -20,26 +20,18 @@ public class RmTool extends BaseGridTool
 	private boolean _recursive = false;
 	private boolean _force = false;
 	
+	@Option({"recursive", "r"})
 	public void setRecursive()
 	{
 		_recursive = true;
 	}
 	
-	public void setR()
-	{
-		setRecursive();
-	}
-	
+	@Option({"force", "f"})
 	public void setForce()
 	{
 		_force = true;
 	}
-	
-	public void setF()
-	{
-		setForce();
-	}
-	
+
 	public RmTool()
 	{
 		super(_DESCRIPTION, _USAGE, false);

@@ -78,80 +78,96 @@ public class CertGeneratorTool extends BaseGridTool
 		super(_DESCRIPTION, new FileResource(_USAGE_RESOURCE), false);
 	}
 	
+	@Option({"create-generator"})
 	public void setCreate_generator()
 	{
 		_create_generator = true;
 	}
 	
+	@Option({"gen-cert"})
 	public void setGen_cert()
 	{
 		_gen_cert = true;
 	}
 	
+	@Option({"keysize"})
 	public void setKeysize(String keySizeStr) {
 		_keySize = Integer.parseInt(keySizeStr);
 	}
 	
+	@Option({"url"})
 	public void setUrl()
 	{
 		_url = true;
 	}
 	
+	@Option({"default-validity"})
 	public void setDefault_validity(String default_validity)
 	{
 		_default_validity = new Long(default_validity);
 	}
 	
+	@Option({"ks-path"})
 	public void setKs_path(String ks_path)
 	{
 		_ks_path = ks_path;
 	}
 	
+	@Option({"ks-pword"})
 	public void setKs_pword(String ks_pword)
 	{
 		_ks_password = ks_pword;
 	}
 	
+	@Option({"entry-pword"})
 	public void setEntry_pword(String entry_pword)
 	{
 		_entry_password = entry_pword;
 	}
 	
+	@Option({"ks-alias"})
 	public void setKs_alias(String ks_alias)
 	{
 		_ks_alias = ks_alias;
 	}
 	
+	@Option({"cn"})
 	public void setCn(String cn)
 	{
 		_cn = cn;
 	}
 	
+	@Option({"c"})
 	public void setC(String c)
 	{
 		_c = c;
 	}
 	
+	@Option({"st"})
 	public void setSt(String st)
 	{
 		_st = st;
 	}
 	
+	@Option({"l"})
 	public void setL(String l)
 	{
 		_l = l;
 	}
 	
+	@Option({"o"})
 	public void setO(String o)
 	{
 		_o = o;
 	}
 	
+	@Option({"ou"})
 	public void setOu(String ou)
 	{
 		_ou = ou;
 	}
 	
+	@Option({"email"})
 	public void setEmail(String email)
 	{
 		_email = email;
