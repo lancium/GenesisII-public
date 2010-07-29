@@ -34,12 +34,6 @@ public class BaseInputBindings implements InputBindings
 			listener.clear();
 	}
 
-	final protected void fireAddCharacter(char c)
-	{
-		for (BindingActionListener listener : getListeners())
-			listener.addCharacter(c);
-	}
-
 	final protected void fireBackspace()
 	{
 		for (BindingActionListener listener : getListeners())

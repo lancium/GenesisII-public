@@ -15,16 +15,21 @@ public class ViInputBindings extends BaseInputBindings
 	@Override
 	protected void keyPressed(int keyCode, KeyEvent e)
 	{
-		if (e.isControlDown())
+		boolean toConsume = false;
+		if (e.isControlDown() || e.isMetaDown())
 		{
-			if (keyCode == KeyEvent.VK_C)
+			if(keyCode == 72)
+				toConsume = true;
+			if (keyCode == KeyEvent.VK_BACK_SPACE)
 			{
 				fireClear();
 				_mode = ViMode.INPUT_MODE;
+				toConsume = true;
 			} else if (keyCode == KeyEvent.VK_R)
 			{
 				fireSearch();
 				_mode = ViMode.INPUT_MODE;
+				toConsume = true;
 			}
 		} else
 		{
@@ -34,57 +39,63 @@ public class ViInputBindings extends BaseInputBindings
 				{
 					fireStopSearch();
 					_mode = ViMode.COMMAND_MODE;
+					toConsume = true;
 				}
 			} else if (_mode == ViMode.COMMAND_MODE)
 			{
 				if (keyCode == KeyEvent.VK_ESCAPE)
+				{
 					fireBeep();
+					toConsume = true;
+				}
 			}
 			
 			if (keyCode == KeyEvent.VK_LEFT)
+			{
 				fireLeft();
+				toConsume = true;
+			}
 			else if (keyCode == KeyEvent.VK_RIGHT)
+			{
 				fireRight();
+				toConsume = true;
+			}
 			else if (keyCode == KeyEvent.VK_UP)
+			{
+				toConsume = true;
 				fireBackwardHistory();
+			}
 			else if (keyCode == KeyEvent.VK_DOWN)
+			{
 				fireForwardHistory();
+				toConsume = true;
+			}
 		}
 		
-		e.consume();
+		if(toConsume)
+			e.consume();
 	}
 
 	@Override
 	protected void keyTyped(char keyChar, KeyEvent e)
 	{
-		if (e.isControlDown())
-		{
-			if (keyChar == 'c')
-			{
-				fireClear();
-				_mode = ViMode.INPUT_MODE;
-			} else if (keyChar == 'r')
-			{
-				fireSearch();
-				_mode = ViMode.INPUT_MODE;
-			}
-		} else
-		{
+		boolean toConsume = true;
+		if(!e.isControlDown() || e.isMetaDown())
 			if (_mode == ViMode.INPUT_MODE)
 			{
 				if (keyChar == KeyEvent.VK_TAB)
 					fireComplete();
 				else if (Character.isLetterOrDigit(keyChar) || SYMBOLS.inSet(keyChar))
-					fireAddCharacter(keyChar);
-				else if (keyChar == KeyEvent.VK_BACK_SPACE)
-					fireBackspace();
+					toConsume = false;
 				else if (keyChar == KeyEvent.VK_ENTER)
 				{
 					fireEnter();
 					_mode = ViMode.INPUT_MODE;
 				}
+				else
+					toConsume = false;
 			} else if (_mode == ViMode.COMMAND_MODE)
-			{
+			{ 
 				if (keyChar == KeyEvent.VK_ENTER)
 					fireEnter();
 				else
@@ -124,11 +135,14 @@ public class ViInputBindings extends BaseInputBindings
 						case 'j' :
 							fireForwardHistory();
 							break;
+						default :
+							toConsume = true;
 					}
 				}
 			}
-		}
-		
-		e.consume();
+			else 
+				toConsume = false;
+		if(toConsume)
+			e.consume();
 	}
 }

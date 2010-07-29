@@ -10,57 +10,56 @@ public class DefaultInputBindings extends BaseInputBindings
 	@Override
 	protected void keyPressed(int keyCode, KeyEvent e)
 	{
-		if (e.isControlDown())
+		boolean toConsume = true;
+		if (e.isControlDown() || e.isMetaDown())
 		{
 			switch (keyCode)
 			{
-				case KeyEvent.VK_C :
+				case KeyEvent.VK_BACK_SPACE :
 					fireClear();
+					break;	
+				case 72:
+					break;
+				default :
+					toConsume = false;
 					break;
 			}
 		}
-	
-		switch (keyCode)
-		{
-			case KeyEvent.VK_ESCAPE :
-				fireBeep();
-				break;
-			case KeyEvent.VK_LEFT :
-				fireLeft();
-				break;
-			case KeyEvent.VK_RIGHT :
-				fireRight();
-				break;
-			case KeyEvent.VK_UP :
-				fireBackwardHistory();
-				break;
-			case KeyEvent.VK_DOWN :
-				fireForwardHistory();
-				break;		
-		}
-		
-		e.consume();
+		else
+			switch (keyCode)
+			{
+				case KeyEvent.VK_ESCAPE :
+					fireBeep();
+					break;
+				case KeyEvent.VK_LEFT :
+					fireLeft();
+					break;
+				case KeyEvent.VK_RIGHT :
+					fireRight();
+					break;
+				case KeyEvent.VK_UP :
+					fireBackwardHistory();
+					break;
+				case KeyEvent.VK_DOWN :
+					fireForwardHistory();
+					break;	
+				default : 
+					toConsume = false;
+					break;
+			}
+		if(toConsume)
+			e.consume();
 	}
 	
 	@Override
 	protected void keyTyped(char keyChar, KeyEvent e)
 	{
-		if (e.isControlDown())
-		{
-			switch (keyChar)
-			{
-				case 'c' :
-					fireClear();
-					break;
-			}
-		} else
-		{
+		boolean toConsume = true;
+		if (!(e.isControlDown() || e.isMetaDown()))
 			if (keyChar == KeyEvent.VK_TAB)
 				fireComplete();
 			else if (Character.isLetterOrDigit(keyChar) || SYMBOLS.inSet(keyChar))
-				fireAddCharacter(keyChar);
-			else if (keyChar == KeyEvent.VK_BACK_SPACE)
-				fireBackspace();
+				toConsume = false;
 			else if (keyChar == KeyEvent.VK_LEFT)
 				fireLeft();
 			else if (keyChar == KeyEvent.VK_RIGHT)
@@ -71,8 +70,9 @@ public class DefaultInputBindings extends BaseInputBindings
 				fireForwardHistory();
 			else if (keyChar == KeyEvent.VK_ENTER)
 				fireEnter();
-		}
-		
-		e.consume();
+			else
+				toConsume = false;
+		if(toConsume)
+			e.consume();
 	}
 }

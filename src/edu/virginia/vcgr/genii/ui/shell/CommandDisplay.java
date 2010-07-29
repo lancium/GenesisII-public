@@ -109,7 +109,6 @@ public class CommandDisplay extends JTextPane
 		_errorWriter = new PrintWriter(
 			new CommandDisplayWriter(_errorStyle));
 		
-		setFocusable(false);
 		setEditable(false);
 	}
 	

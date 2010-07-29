@@ -118,7 +118,7 @@ public class CommandField extends JTextField
 		InputBindings inputBindings = uiContext.preferences().preferenceSet(
 			GeneralUIPreferenceSet.class).createBindings();
 		
-		setHighlighter(null);
+		setDragEnabled(true);
 		
 		setFocusTraversalKeysEnabled(false);
 		addKeyListener(inputBindings);
