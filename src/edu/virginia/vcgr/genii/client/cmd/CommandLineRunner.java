@@ -14,6 +14,9 @@ import javax.xml.namespace.QName;
 import org.morgan.util.configuration.XMLConfiguration;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.cmd.ITool;
+import edu.virginia.vcgr.genii.client.cmd.ToolDescription;
+import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.HelpTool;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
@@ -22,6 +25,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSException;
 public class CommandLineRunner
 {	
 	private Map<String, ToolDescription> _tools;
+	private static ArrayList<String[]> _history = new ArrayList<String[]>();
 	
 	public CommandLineRunner()
 	{
@@ -48,6 +52,28 @@ public class CommandLineRunner
 			resultSoFar = 1;
 			out = err;
 		}
+		
+		if (cLine[0].startsWith("!"))
+		{
+			String index;
+			int intIndex;
+			try
+			{
+				index = cLine[0].substring(1);
+				intIndex = Integer.parseInt(index);
+				cLine = _history.get(intIndex);
+			}
+			catch (Exception e)
+			{
+				throw new ToolException("Could not retrieve requested event.");
+			}
+		}
+			
+		
+		if(_history.size() > 500)
+			_history.remove(0);
+		_history.add(cLine);
+		
 		
 		ToolDescription desc = _tools.get(cLine[0]);
 		if (desc == null)
@@ -118,5 +144,15 @@ public class CommandLineRunner
 		ret.put("help", new ToolDescription(HelpTool.class, "help"));
 		
 		return ret;
+	}
+	
+	public static ArrayList<String[]> history()
+	{
+		return _history;
+	}
+	
+	public static void clearHistory()
+	{
+		_history.clear();
 	}
 }
