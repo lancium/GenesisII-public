@@ -17,6 +17,7 @@ package edu.virginia.vcgr.genii.client.exportdir;
 
 import java.io.File;
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Vector;
@@ -29,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
-import edu.virginia.vcgr.genii.client.comm.ClientConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
 public class ExportedDirUtils
@@ -96,7 +97,7 @@ public class ExportedDirUtils
 	}
 	
 	static public MessageElement[] createCreationProperties(String humanName,
-		String path, String parentIds, String isReplicated)
+		String path, String parentIds, String isReplicated) throws RemoteException
 	{
 		Collection<MessageElement> any = new Vector<MessageElement>(6);
 		any.add(new MessageElement(new QName(
@@ -112,7 +113,11 @@ public class ExportedDirUtils
 			GenesisIIConstants.GENESISII_NS, _REXPORT_RESOLVER_EPR),
 			null));
 		if (humanName != null)
-			any.add(ClientConstructionParameters.createHumanNameProperty(humanName));
+		{
+			ConstructionParameters cParams = new ConstructionParameters();
+			cParams.humanName(humanName);
+			any.add(cParams.serializeToMessageElement());
+		}
 		
 		return any.toArray(new MessageElement[any.size()]);
 	}

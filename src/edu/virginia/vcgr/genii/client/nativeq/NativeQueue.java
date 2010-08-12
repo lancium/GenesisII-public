@@ -1,21 +1,17 @@
 package edu.virginia.vcgr.genii.client.nativeq;
 
 import java.io.File;
-import java.util.Properties;
+
+import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
 
 public interface NativeQueue
 {
-	static public final String SUBMIT_SCRIPT_NAME_PROPERTY =
-		"edu.virginia.vcgr.genii.client.nativeq.submit-script-name";
-	static public final String BASH_BINARY_PATH_PROPERTY =
-		"edu.virginia.vcgr.genii.client.nativeq.bash-binary";
-	
-	static public final String SIGNALS_TO_TRAP_AND_KILL =
-		"edu.virginia.vcgr.genii.client.nativeq.signals-to-trap-for-kill";
-	
 	public String getProviderName();
+	public Class<?> providerConfigurationType();
 	
 	public NativeQueueConnection connect(
+		ResourceOverrides resourceOverrides,
 		File workingDirectory,
-		Properties connectionProperties) throws NativeQueueException;
+		NativeQueueConfiguration nativeQueueConfiguration,
+		Object providerConfiguration) throws NativeQueueException;
 }

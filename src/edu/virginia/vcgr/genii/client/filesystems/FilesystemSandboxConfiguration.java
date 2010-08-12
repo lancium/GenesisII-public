@@ -13,6 +13,9 @@ class FilesystemSandboxConfiguration
 	@XmlAttribute(name = "relative-path", required = true)
 	private String _relativePath = null;
 	
+	@XmlAttribute(name = "create", required = false)
+	private boolean _create = true;
+	
 	@SuppressWarnings("unused")
 	private void afterUnmarshal(Unmarshaller u, Object parent)
 	{
@@ -27,5 +30,10 @@ class FilesystemSandboxConfiguration
 	final String relativePath()
 	{
 		return _relativePath;
+	}
+	
+	final boolean doCreate()
+	{
+		return _create;
 	}
 }

@@ -84,9 +84,12 @@ import org.xml.sax.InputSource;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.comm.ClientConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextException;
+import edu.virginia.vcgr.genii.client.iterator.IteratorConstructionParameters;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
@@ -131,7 +134,6 @@ import edu.virginia.vcgr.genii.container.invoker.ScheduledTerminationInvoker;
 import edu.virginia.vcgr.genii.container.invoker.ServiceInitializationLocker;
 import edu.virginia.vcgr.genii.container.invoker.SoapHeaderHandler;
 import edu.virginia.vcgr.genii.container.invoker.timing.TimingHandler;
-import edu.virginia.vcgr.genii.container.iterator.IteratorResource;
 import edu.virginia.vcgr.genii.container.iterator.IteratorServiceImpl;
 import edu.virginia.vcgr.genii.container.resolver.IResolverFactoryProxy;
 import edu.virginia.vcgr.genii.container.resolver.Resolution;
@@ -155,6 +157,7 @@ import edu.virginia.vcgr.genii.iterator.IteratorMemberType;
 @GAroundInvoke({ServiceInitializationLocker.class, BaseFaultFixer.class, 
 	SoapHeaderHandler.class, DatabaseHandler.class, 
 	DebugInvoker.class, ScheduledTerminationInvoker.class, TimingHandler.class})
+@ConstructionParametersType(ConstructionParameters.class)
 public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 {
 	static private Log _logger = LogFactory.getLog(GenesisIIBase.class);
@@ -246,15 +249,15 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		return ResourceManager.createNewResource(_serviceName, creationParameters);	
 	}
 	
-		protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
+	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
+		ConstructionParameters cParams,
 		HashMap<QName, Object> constructionParameters, 
 		Collection<MessageElement> resolverCreationParameters) 
 		throws ResourceException, BaseFaultType, RemoteException
 	{
 		IResource resource = rKey.dereference();
 		
-		Long timeToLive = (Long)constructionParameters.get(
-			ClientConstructionParameters.TIME_TO_LIVE_PROPERTY_ELEMENT);
+		Long timeToLive = cParams.timeToLive();
 		if (timeToLive != null)
 		{
 			Calendar termTime = Calendar.getInstance();
@@ -268,6 +271,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		if (gDur != null)
 			resource.setProperty(
 				IResource.CACHE_COHERENCE_WINDOW_PROPERTY, gDur);
+		
+		resource.constructionParameters(cParams);
 	}
 	
 	static protected Calendar getScheduledTerminationTime()
@@ -385,19 +390,16 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	{
 		QName name = property.getQName();
 		
-		if (name.equals(ClientConstructionParameters.TIME_TO_LIVE_PROPERTY_ELEMENT))
-		{
-			return new Long(ClientConstructionParameters.getTimeToLiveProperty(
-				property));
-		} else if (name.equals(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM))
+		if (name.equals(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM))
 		{
 			return ClientConstructionParameters.getEndpointIdentifierProperty(property);
 		} else if (name.equals(CreationProperties.CREATION_PROPERTIES_QNAME))
 		{
 			return CreationProperties.translate(property);
-		} else if (name.equals(ClientConstructionParameters.HUMAN_NAME_PROPERTY_ELEMENT))
+		} else if (name.equals(ConstructionParameters.CONSTRUCTION_PARAMTERS_QNAME))
 		{
-			return ClientConstructionParameters.getHumanNameProperty(property);
+			return ConstructionParameters.deserializeConstructionParameters(
+				getClass(), property);
 		} else
 			return property;
 	}
@@ -613,7 +615,16 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 				}
 			}
 		}
-	
+		
+		ConstructionParameters cParams = 
+			(ConstructionParameters)constructionParameters.get(
+				ConstructionParameters.CONSTRUCTION_PARAMTERS_QNAME);
+		if (cParams == null)
+		{
+			cParams = ConstructionParameters.instantiateDefault(getClass());
+			constructionParameters.put(
+				ConstructionParameters.CONSTRUCTION_PARAMTERS_QNAME, cParams);
+		}
 
 		ResourceKey rKey = createResource(constructionParameters);
 		EndpointReferenceType epr = ResourceManager.createEPR(rKey, 
@@ -651,17 +662,17 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 			Collection<MessageElement> resolverCreationParams = new Vector<MessageElement>();
 		
 			// allow subclasses to do creation work
-			postCreate(rKey, epr, constructionParameters, resolverCreationParams);
+			postCreate(rKey, epr, cParams, constructionParameters, resolverCreationParams);
 			IResource resource = rKey.dereference();
 			if (resource instanceof BasicDBResource)
 			{
 				try
 				{
-					Object obj = constructionParameters.get(ClientConstructionParameters.HUMAN_NAME_PROPERTY_ELEMENT);
+					String hName = cParams.humanName();
 					ResourceSummary.addResource(
 						((BasicDBResource)resource).getConnection(),
 						rKey.getResourceKey(),
-						obj == null ? null : obj.toString(),
+						hName,
 						Container.getClassForServiceURL(targetServiceURL), epr);
 				}
 				catch (Throwable cause)
@@ -728,6 +739,16 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 			}
 		}
 
+		ConstructionParameters cParams = 
+			(ConstructionParameters)constructionParameters.get(
+				ConstructionParameters.CONSTRUCTION_PARAMTERS_QNAME);
+		if (cParams == null)
+		{
+			cParams = ConstructionParameters.instantiateDefault(getClass());
+			constructionParameters.put(
+				ConstructionParameters.CONSTRUCTION_PARAMTERS_QNAME, cParams);
+		}
+
 		ResourceKey rKey = createResource(constructionParameters);
 		AttributedURIType targetAddress = myEPR.getAddress();
 		if (EPRUtils.getGeniiContainerID(myEPR) == null)
@@ -763,7 +784,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		Collection<MessageElement> resolverCreationParams = new Vector<MessageElement>();
 		
 		// allow subclasses to do creation work
-		postCreate(rKey, epr, constructionParameters, resolverCreationParams);
+		postCreate(rKey, epr, cParams, constructionParameters, resolverCreationParams);
 	
 		IResource resource = rKey.dereference();
 		resource.commit();
@@ -774,11 +795,11 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		{
 			try
 			{
-				Object obj = constructionParameters.get(ClientConstructionParameters.HUMAN_NAME_PROPERTY_ELEMENT);
+				String hName = cParams.humanName();
 				ResourceSummary.addResource(
 					((BasicDBResource)resource).getConnection(),
 					rKey.getResourceKey(),
-					obj == null ? null : obj.toString(),
+					hName,
 					getClass(),
 					resolveEPR);
 			}
@@ -1067,14 +1088,9 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 			
 			EndpointReferenceType epr;
 
-			
-			MessageElement []createRequest =
-				new MessageElement[2];
-			createRequest[0] = new MessageElement(
-				IteratorResource.ITERATOR_CONSTRUCTION_PARAM_ID, id);
-			createRequest[1] = 
-				ClientConstructionParameters.createTimeToLiveProperty(
-					1000L * 60 * 60);
+			ConstructionParameters cParams =
+				new IteratorConstructionParameters(id);
+			cParams.timeToLive(1000L * 60 * 60);
 
 			if (_iteratorServiceEPR == null)
 				_iteratorServiceEPR = EPRUtils.makeEPR(
@@ -1087,7 +1103,9 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 */							
 			//long start = System.currentTimeMillis();
 			// ASG Here is where we need to directly create in the current container */
-			epr = new IteratorServiceImpl().CreateEPR(createRequest, Container.getServiceURL("IteratorPortType"));
+			epr = new IteratorServiceImpl().CreateEPR(
+				new MessageElement[] { cParams.serializeToMessageElement() },
+				Container.getServiceURL("IteratorPortType"));
 			//System.err.println("createWSIterator: time to createEPR " + (System.currentTimeMillis()-start));
 
 			connection.commit();
@@ -1130,14 +1148,19 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 			EPRUtils.makeEPR(Container.getServiceURL("GeniiSubscriptionPortType")));
 		*/
 
+		ConstructionParameters cParams = new ConstructionParameters();
 		HashMap<QName, MessageElement> constructionParameters =
 			new HashMap<QName, MessageElement>();
 		SubscriptionConstructionParameters.insertSubscriptionParameters(
-			constructionParameters, 
+			cParams, constructionParameters, 
 			subscribee,
 			target, topic.toString(), 
 			(ttl == null) ? null : new Long(ttl.longValue()),
 			userData);
+		
+		MessageElement cParamsMe = cParams.serializeToMessageElement();
+		constructionParameters.put(cParamsMe.getQName(), cParamsMe);
+		
 		MessageElement []params = new MessageElement[constructionParameters.size()];
 		constructionParameters.values().toArray(params);
 		return new SubscribeResponse(

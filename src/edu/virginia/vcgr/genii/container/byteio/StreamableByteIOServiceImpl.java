@@ -35,6 +35,7 @@ import org.ws.addressing.MetadataType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
+import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
 import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.resource.PortType;
@@ -90,12 +91,12 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements
 	}
 	
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
-		HashMap<QName, Object> creationParameters,
+		ConstructionParameters cParams, HashMap<QName, Object> creationParameters,
 		Collection<MessageElement> resolverCreationParams)	
 			throws ResourceException, BaseFaultType, RemoteException
 	{
 		_logger.debug("Creating new StreamableByteIO Resource.");
-		super.postCreate(rKey, newEPR, creationParameters, resolverCreationParams);
+		super.postCreate(rKey, newEPR, cParams, creationParameters, resolverCreationParams);
 		
 		ISByteIOResource resource = null;
 		

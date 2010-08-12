@@ -15,10 +15,10 @@
  */
 package edu.virginia.vcgr.genii.container.bes.activity;
 
+import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Properties;
 
 import javax.xml.namespace.QName;
 
@@ -27,9 +27,9 @@ import org.ggf.jsdl.JobDefinition_Type;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
+import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
-import edu.virginia.vcgr.genii.client.utils.creation.CreationProperties;
 import edu.virginia.vcgr.genii.common.notification.Subscribe;
 
 public class BESActivityUtils
@@ -71,7 +71,8 @@ public class BESActivityUtils
 	
 	static public MessageElement[] createCreationProperties(
 		JobDefinition_Type jobDefinition, String containerID, 
-		Properties nativeqProperties, MessageElement subscribe)
+		BESConstructionParameters nativeqProperties, MessageElement subscribe)
+			throws RemoteException
 	{
 		Collection<MessageElement> ret = new LinkedList<MessageElement>();
 		
@@ -79,7 +80,7 @@ public class BESActivityUtils
 		ret.add(new MessageElement(CONTAINER_ID_QNAME, containerID));
 		
 		if (nativeqProperties != null)
-			ret.add(CreationProperties.translate(nativeqProperties));
+			ret.add(nativeqProperties.serializeToMessageElement());
 		if (subscribe != null)
 			ret.add(subscribe);
 		

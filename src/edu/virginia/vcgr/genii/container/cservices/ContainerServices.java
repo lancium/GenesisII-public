@@ -25,7 +25,7 @@ import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 
 public class ContainerServices
 {
-	static private Log _logger = LogFactory.getLog(ContainerServices.class);
+static private Log _logger = LogFactory.getLog(ContainerServices.class);
 	
 	static final private String _CONTAINER_SERVICES_FILENAME = 
 		"container-services.xml";
@@ -110,7 +110,7 @@ public class ContainerServices
 			new DeploymentName());
 		File configFile = deployment.getConfigurationFile(
 			_CONTAINER_SERVICES_FILENAME);
-		if (configFile != null && configFile.exists())
+		if (configFile != null)
 		{
 			try
 			{

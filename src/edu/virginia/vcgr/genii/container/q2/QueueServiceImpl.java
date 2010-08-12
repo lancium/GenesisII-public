@@ -28,6 +28,7 @@ import org.xml.sax.InputSource;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
+import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
@@ -116,11 +117,11 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	
 	@Override
 	protected void postCreate(ResourceKey key, EndpointReferenceType newEPR,
-			HashMap<QName, Object> constructionParameters,
-			Collection<MessageElement> resolverCreationParameters)
+		ConstructionParameters cParams, HashMap<QName, Object> constructionParameters,
+		Collection<MessageElement> resolverCreationParameters)
 			throws ResourceException, BaseFaultType, RemoteException
 	{
-		super.postCreate(key, newEPR, constructionParameters,
+		super.postCreate(key, newEPR, cParams, constructionParameters,
 			resolverCreationParameters);
 		
 		IQueueResource resource = (IQueueResource)key.dereference();

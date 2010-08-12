@@ -7,43 +7,29 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
-import edu.virginia.vcgr.genii.client.nativeq.AdditionalArguments;
+import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
 import edu.virginia.vcgr.genii.client.nativeq.ApplicationDescription;
-import edu.virginia.vcgr.genii.client.nativeq.BasicResourceAttributes;
 import edu.virginia.vcgr.genii.client.nativeq.BulkStatusFetcher;
-import edu.virginia.vcgr.genii.client.nativeq.FactoryResourceAttributes;
 import edu.virginia.vcgr.genii.client.nativeq.JobStateCache;
 import edu.virginia.vcgr.genii.client.nativeq.JobToken;
-import edu.virginia.vcgr.genii.client.nativeq.NativeQueue;
+import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueException;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueState;
 import edu.virginia.vcgr.genii.client.nativeq.ScriptBasedQueueConnection;
 import edu.virginia.vcgr.genii.client.nativeq.ScriptLineParser;
-import edu.virginia.vcgr.genii.client.nativeq.UnixSignals;
-import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
-import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperException;
-import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperFactory;
-import edu.virginia.vcgr.genii.client.spmd.SPMDException;
-import edu.virginia.vcgr.genii.client.spmd.SPMDTranslator;
-import edu.virginia.vcgr.genii.client.spmd.SPMDTranslatorFactories;
-import edu.virginia.vcgr.genii.client.spmd.SPMDTranslatorFactory;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.ResourceConstraints;
 
-public class PBSQueueConnection extends ScriptBasedQueueConnection
+public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfiguration>
 {
 	static private Log _logger = LogFactory.getLog(PBSQueueConnection.class);
 	
@@ -73,22 +59,21 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 	private String _qName;
 	private String _destination = null;
 	
-	private File _qsubBinary;
-	private File _qstatBinary;
-	private File _qdelBinary;
+	private List<String> _qsubStart;
+	private List<String> _qstatStart;
+	private List<String> _qdelStart;
 	
-	private AdditionalArguments _additionalArguments;
-	
-	PBSQueueConnection(File workingDirectory, Properties connectionProperties,
-		String queueName, File qsubBinary, File qstatBinary, File qdelBinary,
-		AdditionalArguments additionalArguments, JobStateCache statusCache)
+	PBSQueueConnection(ResourceOverrides resourceOverrides,
+		File workingDirectory,
+		NativeQueueConfiguration nativeQueueConfig,
+		PBSQueueConfiguration pbsConfig, String queueName,
+		List<String> qsubStart, List<String> qstatStart, List<String> qdelStart,
+		JobStateCache statusCache)
 			throws NativeQueueException
 	{
-		super(workingDirectory, connectionProperties);
+		super(workingDirectory, resourceOverrides, nativeQueueConfig, pbsConfig);
 		
 		_statusCache = statusCache;
-		
-		_additionalArguments = additionalArguments;
 		
 		int index = queueName.indexOf('@');
 		if (index >= 0)
@@ -101,88 +86,16 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 			_destination = null;
 		}
 		
-		_qsubBinary = qsubBinary;
-		_qstatBinary = qstatBinary;
-		_qdelBinary = qdelBinary;
-		
-		checkBinary(_qsubBinary);
-		checkBinary(_qstatBinary);
-		checkBinary(_qdelBinary);
-	}
-	
-	@Override
-	protected void addSupportedSPMDVariations(
-		Map<URI, SPMDTranslator> variations, Properties connectionProperties)
-			throws NativeQueueException
-	{
-		super.addSupportedSPMDVariations(variations, connectionProperties);
-		
-		try
-		{
-			for (int lcv = 0; true; lcv++)
-			{
-				String variationProperty =
-					PBSQueue.QUEUE_SUPPORTED_SPMD_VARIATIONS_PROPERTY_BASE +
-					"." + lcv;
-				
-				String variation = connectionProperties.getProperty(
-					variationProperty);
-				
-				if (variation == null)
-					break;
-				
-				String providerName = connectionProperties.getProperty(
-					variationProperty + "." + 
-					PBSQueue.QUEUE_SUPPORTED_SPMD_VARIATION_PROVIDER_FOOTER);
-				
-				if (providerName == null)
-					throw new NativeQueueException(String.format(
-						"Native PBS Queue couldn't find SPMD Provider for type \"%s\".",
-						variation));
-				
-				SPMDTranslatorFactory factory = 
-					SPMDTranslatorFactories.getSPMDTranslatorFactory(
-						providerName);
-				
-				Properties constructionProps = new Properties();
-				String value =
-					connectionProperties.getProperty(variationProperty + "." +
-						PBSQueue.QUEUE_SUPPORTED_SPMD_ADDITIONAL_CMDLINE_ARGS);
-				if (value != null)
-					constructionProps.setProperty(
-						SPMDTranslatorFactory.ADDITIONAL_CMDLINE_ARGS_PROPERTY,
-						value);
-				
-				variations.put(URI.create(variation), 
-					factory.newTranslator(constructionProps));
-			}
-		}
-		catch (SPMDException se)
-		{
-			throw new NativeQueueException(
-				"Unable to instantiate queue provider.", se);
-		}
-	}
-
-	@Override
-	public FactoryResourceAttributes describe() throws NativeQueueException
-	{
-		return new FactoryResourceAttributes(
-			new BasicResourceAttributes(
-				JSDLUtils.getLocalOperatingSystem(),
-				JSDLUtils.getLocalCPUArchitecture(),
-				null, null, null, null),
-			null, PBS_MANAGER_TYPE);
+		_qsubStart = qsubStart;
+		_qstatStart = qstatStart;
+		_qdelStart = qdelStart;
 	}
 
 	@Override
 	public void cancel(JobToken token) throws NativeQueueException
 	{
 		List<String> commandLine = new LinkedList<String>();
-		commandLine.add(_qdelBinary.getAbsolutePath());
-		
-		for (String additionalArgString : _additionalArguments.qdelArguments())
-			commandLine.add(additionalArgString);
+		commandLine.addAll(_qdelStart);
 		
 		String arg = token.toString();
 		if (_destination != null)
@@ -248,10 +161,8 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 				new HashMap<JobToken, NativeQueueState>();
 			
 			List<String> commandLine = new LinkedList<String>();
-			commandLine.add(_qstatBinary.getAbsolutePath());
+			commandLine.addAll(_qstatStart);
 			commandLine.add("-f");
-			for (String additionalArgString : _additionalArguments.qstatArguments())
-				commandLine.add(additionalArgString);
 			
 			if (_destination != null)
 				commandLine.add(String.format("@%s", _destination));
@@ -330,81 +241,6 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 	}
 
 	@Override
-	protected void generateApplicationBody(PrintStream script,
-			File workingDirectory, ApplicationDescription application)
-			throws NativeQueueException, IOException
-	{
-		EnumSet<UnixSignals> signals = UnixSignals.parseTrapAndKillSet(
-			connectionProperties().getProperty(
-				NativeQueue.SIGNALS_TO_TRAP_AND_KILL));
-		
-		URI variation = application.getSPMDVariation();
-		if (variation != null)
-		{
-			SPMDTranslator translator = supportedSPMDVariations().get(
-				variation);
-			if (translator == null)
-				throw new NativeQueueException(String.format(
-					"Unable to find SPMD translator for variation \"%s\".",
-					variation));
-			
-			script.format("cd \"%s\"\n", workingDirectory.getAbsolutePath());
-			
-			List<String> commandLine = new ArrayList<String>(16);
-			
-			String execName = application.getExecutableName();
-			if (!execName.contains("/"))
-				execName = String.format("./%s", execName);
-			
-			commandLine.add(execName);
-			
-			for (String arg : application.getArguments())
-				commandLine.add(arg);
-			
-			try
-			{
-				ProcessWrapper wrapper = ProcessWrapperFactory.createWrapper(
-					getCommonDirectory(),
-					getOperatingSystem(), getProcessorArchitecture());
-				commandLine = translator.translateCommandLine(commandLine);
-				String []args = new String[commandLine.size() - 1];
-				for (int lcv = 1; lcv < commandLine.size(); lcv++)
-					args[lcv - 1] = commandLine.get(lcv);
-				
-				boolean first = true;
-				for (String element : wrapper.formCommandLine(
-					application.getEnvironment(),
-					workingDirectory, 
-					application.getStdinRedirect(workingDirectory), 
-					application.getStdoutRedirect(workingDirectory),
-					application.getStderrRedirect(workingDirectory),
-					application.getResourceUsagePath(), commandLine.get(0),
-					args))
-				{
-					script.format("%s\"%s\"", (first ? "" : " "), element);
-					first = false;
-				}
-			}
-			catch (ProcessWrapperException pwe)
-			{
-				throw new NativeQueueException(
-					"Unable to create command line for SPMD command.", pwe);
-			}
-			catch (SPMDException se)
-			{
-				throw new NativeQueueException(
-					"Unable to translate SPMD command.", se);
-			}
-			
-			if (signals.size() > 0)
-				script.print(" &");
-			
-			script.println();
-		} else
-			super.generateApplicationBody(script, workingDirectory, application);
-	}
-
-	@Override
 	public JobToken submit(ApplicationDescription application) 
 		throws NativeQueueException
 	{
@@ -412,7 +248,7 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 		
 		List<String> command = new LinkedList<String>();
 		
-		command.add(_qsubBinary.getAbsolutePath());
+		command.addAll(_qsubStart);
 		if (_qName != null || _destination != null)
 		{
 			command.add("-q");
@@ -425,9 +261,6 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection
 
 			command.add(builder.toString());
 		}
-		
-		for (String additionalArgString : _additionalArguments.qsubArguments())
-			command.add(additionalArgString);
 		
 		command.add(submitScript.getAbsolutePath());
 		

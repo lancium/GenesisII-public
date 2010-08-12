@@ -21,6 +21,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
 import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -123,9 +124,9 @@ public class ExportedRootServiceImpl extends ExportedDirServiceImpl implements
 	}
 	
 	public void postCreate(ResourceKey rKey, EndpointReferenceType myEPR,
-			HashMap<QName, Object> constructionParameters, 
-			Collection<MessageElement> resolverCreationParams)
-		throws ResourceException, BaseFaultType, RemoteException
+		ConstructionParameters cParams, HashMap<QName, Object> constructionParameters, 
+		Collection<MessageElement> resolverCreationParams)
+			throws ResourceException, BaseFaultType, RemoteException
 	{
 		//get construction params
 		ExportedDirUtils.ExportedDirInitInfo initInfo = 
@@ -136,7 +137,7 @@ public class ExportedRootServiceImpl extends ExportedDirServiceImpl implements
 			ExportedDirUtils.createResolverCreationProperties(resolverCreationParams,
 				initInfo);
 		 
-		super.postCreate(rKey, myEPR, constructionParameters, resolverCreationParams);	
+		super.postCreate(rKey, myEPR, cParams, constructionParameters, resolverCreationParams);	
 
 		try
 		{

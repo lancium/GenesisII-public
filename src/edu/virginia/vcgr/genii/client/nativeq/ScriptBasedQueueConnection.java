@@ -8,8 +8,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.util.Collection;
-import java.util.EnumSet;
-import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,12 +16,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperException;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperFactory;
 
-public abstract class ScriptBasedQueueConnection 
-	extends AbstractNativeQueueConnection
+public abstract class ScriptBasedQueueConnection<ProviderConfigType extends ScriptBasedQueueConfiguration>
+	extends AbstractNativeQueueConnection<ProviderConfigType>
 {
 	static private Log _logger = LogFactory.getLog(
 		ScriptBasedQueueConnection.class);
@@ -30,49 +30,48 @@ public abstract class ScriptBasedQueueConnection
 	static public final String QUEUE_SCRIPT_RESULT_FILENAME = 
 		"queue.script.result";
 	
-	static private final String DEFAULT_BASH_BINARY_PATH = "/bin/bash";
-	
-	private String _submitScriptName;
-	private File _bashBinary;
-	
 	protected ScriptBasedQueueConnection(File workingDirectory,
-		Properties connectionProperties)
-		throws NativeQueueException
+		ResourceOverrides resourceOverrides,
+		NativeQueueConfiguration queueConfig,
+		ProviderConfigType providerConfig)
+			throws NativeQueueException
 	{
-		super(workingDirectory, connectionProperties);
+		super(workingDirectory, resourceOverrides, queueConfig, providerConfig);
 	}
 	
 	@Override
-	protected void initialize(Properties connectionProperties)
+	protected void initialize()
 		throws NativeQueueException
 	{
-		super.initialize(connectionProperties);
+		super.initialize();
 		
-		_submitScriptName = connectionProperties.getProperty(
-			NativeQueue.SUBMIT_SCRIPT_NAME_PROPERTY);
+		String submitScriptName = providerConfiguration().submitScriptName();
 		
-		if (_submitScriptName != null && _submitScriptName.contains("/"))
+		if (submitScriptName != null && submitScriptName.contains("/"))
 			throw new IllegalArgumentException(
 				"SubmitScriptName must not contain any " +
 				"path characters (such as '/').");
 		
-		_bashBinary = new File(connectionProperties.getProperty(
-			NativeQueue.BASH_BINARY_PATH_PROPERTY, DEFAULT_BASH_BINARY_PATH));
-		checkBinary(_bashBinary);	
+		File bashBinary = providerConfiguration().bashBinary(
+			new File("/bin/bash"));
+		checkBinary(bashBinary);	
 	}
 	
 	final protected File getSubmitScript(File workingDirectory)
 		throws IOException
 	{
-		if (_submitScriptName == null)
+		String submitScriptName = providerConfiguration().submitScriptName();
+		
+		if (submitScriptName == null)
 			return File.createTempFile("qsub", ".sh", workingDirectory);
 		
-		return new File(workingDirectory, _submitScriptName);
+		return new File(workingDirectory, submitScriptName);
 	}
 	
 	final protected File getBashBinary()
 	{
-		return _bashBinary;
+		return providerConfiguration().bashBinary(
+			new File("/bin/bash"));
 	}
 	
 	final protected File generateSubmitScript(File workingDirectory,
@@ -124,9 +123,7 @@ public abstract class ScriptBasedQueueConnection
 		File workingDirectory, ApplicationDescription application)
 			throws NativeQueueException, IOException
 	{
-		EnumSet<UnixSignals> signals = UnixSignals.parseTrapAndKillSet(
-			connectionProperties().getProperty(
-				NativeQueue.SIGNALS_TO_TRAP_AND_KILL));
+		Set<UnixSignals> signals = queueConfiguration().trapSignals();
 		
 		if (signals.size() > 0)
 		{
@@ -153,9 +150,7 @@ public abstract class ScriptBasedQueueConnection
 		File workingDirectory, ApplicationDescription application)
 			throws NativeQueueException, IOException
 	{
-		EnumSet<UnixSignals> signals = UnixSignals.parseTrapAndKillSet(
-			connectionProperties().getProperty(
-				NativeQueue.SIGNALS_TO_TRAP_AND_KILL));
+		Set<UnixSignals> signals = queueConfiguration().trapSignals();
 		
 		if (signals.size() > 0)
 		{
@@ -170,9 +165,7 @@ public abstract class ScriptBasedQueueConnection
 		File workingDirectory, ApplicationDescription application)
 			throws NativeQueueException, IOException
 	{
-		EnumSet<UnixSignals> signals = UnixSignals.parseTrapAndKillSet(
-			connectionProperties().getProperty(
-				NativeQueue.SIGNALS_TO_TRAP_AND_KILL));
+		Set<UnixSignals> signals = queueConfiguration().trapSignals();
 		
 		script.format("cd \"%s\"\n", workingDirectory.getAbsolutePath());
 		
@@ -182,9 +175,13 @@ public abstract class ScriptBasedQueueConnection
 		
 		try
 		{
+			ResourceOverrides overrides = resourceOverrides();
+			if (overrides == null)
+				overrides = new ResourceOverrides();
+			
 			ProcessWrapper wrapper = ProcessWrapperFactory.createWrapper(
-				getCommonDirectory(),
-				getOperatingSystem(), getProcessorArchitecture());
+				getCommonDirectory(), overrides.operatingSystemName(),
+				overrides.cpuArchitecture());
 			
 			boolean first = true;
 			for (String element : wrapper.formCommandLine(

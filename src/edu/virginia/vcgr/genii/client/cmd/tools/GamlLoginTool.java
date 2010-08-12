@@ -32,6 +32,7 @@ import edu.virginia.vcgr.genii.client.security.credentials.identity.*;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.client.utils.PathUtils;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
+import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 import edu.virginia.vcgr.genii.client.cmd.tools.gamllogin.*;
 import edu.virginia.vcgr.genii.client.dialog.DialogException;
 import edu.virginia.vcgr.genii.client.dialog.DialogFactory;
@@ -507,9 +508,10 @@ public class GamlLoginTool extends BaseGridTool {
 		{
 			try
 			{
-				_validMillis = Duration.parse(_durationString).getMilliseconds();
+				_validMillis = (long)new Duration(
+					_durationString).as(DurationUnits.Milliseconds);
 			}
-			catch (ParseException pe)
+			catch (IllegalArgumentException pe)
 			{
 				throw new ToolException("Invalid duration string given.", pe);
 			}

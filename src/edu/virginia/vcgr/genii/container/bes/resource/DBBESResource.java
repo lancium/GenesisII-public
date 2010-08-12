@@ -21,7 +21,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Properties;
 
 import javax.xml.namespace.QName;
 
@@ -31,7 +30,6 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.bes.GeniiBESConstants;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.bes.BES;
@@ -205,18 +203,5 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 			IBESResource.THRESHOLD_DB_PROPERTY_NAME);
 		
 		return getBES().isAcceptingActivites(threshold);
-	}
-	
-	@Override
-	public void nativeQProperties(Properties props) throws RemoteException
-	{
-		replacePersistedProperties(
-			GeniiBESConstants.NATIVE_QUEUE_CONF_CATEGORY, props);
-	}
-	@Override
-	public Properties nativeQProperties() throws RemoteException
-	{
-		return getPersistedProperties(
-			GeniiBESConstants.NATIVE_QUEUE_CONF_CATEGORY);
 	}
 }

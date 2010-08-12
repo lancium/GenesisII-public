@@ -5,9 +5,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Vector;
 
+import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.configuration.Deployment;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
@@ -33,7 +33,7 @@ class QSubApplicationUnderstanding
 	}
 	
 	@Override
-	public void addExecutionPhases(Properties creationProperties,
+	public void addExecutionPhases(BESConstructionParameters creationProperties,
 		Vector<ExecutionPhase> executionPlan,
 		Vector<ExecutionPhase> cleanupPhases, JobUnderstandingContext jobContext)
 		throws JSDLException

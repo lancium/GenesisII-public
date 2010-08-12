@@ -27,7 +27,10 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.iterator.IteratorConstants;
+import edu.virginia.vcgr.genii.client.iterator.IteratorConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
@@ -41,6 +44,7 @@ import edu.virginia.vcgr.genii.iterator.IterateRequestType;
 import edu.virginia.vcgr.genii.iterator.IteratorMemberType;
 import edu.virginia.vcgr.genii.iterator.IteratorPortType;
 
+@ConstructionParametersType(IteratorConstructionParameters.class)
 public class IteratorServiceImpl extends GenesisIIBase implements
 		IteratorPortType
 {
@@ -49,18 +53,16 @@ public class IteratorServiceImpl extends GenesisIIBase implements
 	
 	@Override
 	protected void postCreate(ResourceKey key, EndpointReferenceType newEPR,
-			HashMap<QName, Object> constructionParameters, 
-			Collection<MessageElement> resolverCreationParameters)
+		ConstructionParameters cParams, HashMap<QName, Object> constructionParameters, 
+		Collection<MessageElement> resolverCreationParameters)
 			throws ResourceException, BaseFaultType, RemoteException
 	{
-		super.postCreate(key, newEPR, constructionParameters, resolverCreationParameters);
+		super.postCreate(key, newEPR, cParams, constructionParameters, resolverCreationParameters);
 		
-		MessageElement elem = (MessageElement)constructionParameters.get(
-			IteratorResource.ITERATOR_CONSTRUCTION_PARAM_ID);
-		if (elem == null)
+		String id = ((IteratorConstructionParameters)cParams).iteratorID();
+		if (id == null)
 			throw new ResourceException(
 				"Unable to construct an iterator without an iterator id.");
-		String id = elem.getValue();
 		((IteratorResource)key.dereference()).setIteratorID(id);
 		
 		Calendar future = Calendar.getInstance();

@@ -25,6 +25,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
+import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
@@ -145,11 +146,11 @@ public class TTYServiceImpl extends GenesisIIBase implements TTYPortType
 	
 	@Override
 	protected void postCreate(ResourceKey key, EndpointReferenceType newEPR,
-			HashMap<QName, Object> constructionParameters,
-			Collection<MessageElement> resolverCreationParams)
+		ConstructionParameters cParams, HashMap<QName, Object> constructionParameters,
+		Collection<MessageElement> resolverCreationParams)
 			throws ResourceException, BaseFaultType, RemoteException
 	{
-		super.postCreate(key, newEPR, constructionParameters, resolverCreationParams);
+		super.postCreate(key, newEPR, cParams, constructionParameters, resolverCreationParams);
 	}
 
 	@Override

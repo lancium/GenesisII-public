@@ -33,14 +33,19 @@ import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
+import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
-import edu.virginia.vcgr.genii.client.nativeq.NativeQProperties;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.spmd.SPMDTranslatorFactories;
+import edu.virginia.vcgr.genii.client.utils.units.ClockSpeed;
+import edu.virginia.vcgr.genii.client.utils.units.ClockSpeedUnits;
+import edu.virginia.vcgr.genii.client.utils.units.Size;
+import edu.virginia.vcgr.genii.client.utils.units.SizeUnits;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
@@ -50,6 +55,8 @@ import edu.virginia.vcgr.genii.container.bes.resource.IBESResource;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.sysinfo.SystemInfoUtils;
+import edu.virginia.vcgr.jsdl.OperatingSystemNames;
+import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
 
 public class BESAttributesHandler extends AbstractAttributeHandler
 	implements BESConstants
@@ -145,13 +152,18 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 	{
 		IBESResource resource = null;
 		resource = (IBESResource)ResourceManager.getCurrentResource().dereference();
-		NativeQProperties qProps = new NativeQProperties(resource.nativeQProperties());
-		OperatingSystemTypeEnumeration osType = qProps.operatingSystemName();
-		String osVersion = qProps.operatingSystemVersion();
+		ConstructionParameters cParams = resource.constructionParameters(
+			GeniiBESServiceImpl.class);
+		BESConstructionParameters besParams = (BESConstructionParameters)cParams;
+		
+		OperatingSystemNames osType = besParams.getResourceOverrides().operatingSystemName();
+		String osVersion = besParams.getResourceOverrides().operatingSystemVersion();
 		
 		OperatingSystem_Type ret = JSDLUtils.getLocalOperatingSystem();
 		if (osType != null)
-			ret.setOperatingSystemType(new OperatingSystemType_Type(osType, null));
+			ret.setOperatingSystemType(new OperatingSystemType_Type(
+				OperatingSystemTypeEnumeration.fromString(
+					osType.name()), null));
 		if (osVersion != null)
 			ret.setOperatingSystemVersion(osVersion);
 		
@@ -162,11 +174,15 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 	{
 		IBESResource resource = null;
 		resource = (IBESResource)ResourceManager.getCurrentResource().dereference();
-		NativeQProperties qProps = new NativeQProperties(resource.nativeQProperties());
-		ProcessorArchitectureEnumeration override = qProps.cpuArchitecture();
+		ConstructionParameters cParams = resource.constructionParameters(
+			GeniiBESServiceImpl.class);
+		BESConstructionParameters besParams = (BESConstructionParameters)cParams;
+		ProcessorArchitecture override = besParams.getResourceOverrides().cpuArchitecture();
 		
 		if (override != null)
-			return new CPUArchitecture_Type(override, null);
+			return new CPUArchitecture_Type(
+				ProcessorArchitectureEnumeration.fromString(override.name()),
+				null);
 		
 		return JSDLUtils.getLocalCPUArchitecture();
 	}
@@ -175,10 +191,13 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 	{
 		IBESResource resource = null;
 		resource = (IBESResource)ResourceManager.getCurrentResource().dereference();
-		NativeQProperties qProps = new NativeQProperties(resource.nativeQProperties());
-		Integer cpuCount = qProps.cpuCount();
-		if (cpuCount != null)
-			return cpuCount.intValue();
+		ConstructionParameters cParams = resource.constructionParameters(
+			GeniiBESServiceImpl.class);
+		BESConstructionParameters besParams = (BESConstructionParameters)cParams;
+		
+		Integer i = besParams.getResourceOverrides().cpuCount();
+		if (i != null)
+			return i.intValue();
 		
 		return ManagementFactory.getOperatingSystemMXBean(
 			).getAvailableProcessors();
@@ -205,10 +224,13 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 	{
 		IBESResource resource = null;
 		resource = (IBESResource)ResourceManager.getCurrentResource().dereference();
-		NativeQProperties qProps = new NativeQProperties(resource.nativeQProperties());
-		Long override = qProps.cpuSpeed();
-		if (override != null)
-			return override.longValue();
+		ConstructionParameters cParams = resource.constructionParameters(
+			GeniiBESServiceImpl.class);
+		BESConstructionParameters besParams = (BESConstructionParameters)cParams;
+		
+		ClockSpeed cs = besParams.getResourceOverrides().cpuSpeed();
+		if (cs != null)
+			return (long)cs.as(ClockSpeedUnits.Hertz);
 		
 		return SystemInfoUtils.getIndividualCPUSpeed();
 	}
@@ -217,10 +239,12 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 	{
 		IBESResource resource = null;
 		resource = (IBESResource)ResourceManager.getCurrentResource().dereference();
-		NativeQProperties qProps = new NativeQProperties(resource.nativeQProperties());
-		Long override = qProps.physicalMemory();
+		ConstructionParameters cParams = resource.constructionParameters(
+			GeniiBESServiceImpl.class);
+		BESConstructionParameters besParams = (BESConstructionParameters)cParams;
+		Size override = besParams.getResourceOverrides().physicalMemory();
 		if (override != null)
-			return override.longValue();
+			return (long)override.as(SizeUnits.Bytes);
 		
 		return SystemInfoUtils.getPhysicalMemory();
 	}
@@ -229,10 +253,12 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 	{
 		IBESResource resource = null;
 		resource = (IBESResource)ResourceManager.getCurrentResource().dereference();
-		NativeQProperties qProps = new NativeQProperties(resource.nativeQProperties());
-		Long override = qProps.virtualMemory();
+		ConstructionParameters cParams = resource.constructionParameters(
+			GeniiBESServiceImpl.class);
+		BESConstructionParameters besParams = (BESConstructionParameters)cParams;
+		Size override = besParams.getResourceOverrides().virtualMemory();
 		if (override != null)
-			return override.longValue();
+			return (long)override.as(SizeUnits.Bytes);
 		
 		return SystemInfoUtils.getVirtualMemory();
 	}

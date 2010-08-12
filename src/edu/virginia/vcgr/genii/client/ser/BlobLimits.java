@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -16,6 +15,7 @@ import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.utils.units.Size;
+import edu.virginia.vcgr.genii.client.utils.units.SizeUnits;
 
 public class BlobLimits
 {
@@ -60,10 +60,10 @@ public class BlobLimits
 	{
 		try
 		{
-			Size s = Size.parse(str);
-			return new Long(s.getBytes());
+			Size s = new Size(str);
+			return new Long((long)s.as(SizeUnits.Bytes));
 		}
-		catch (ParseException e)
+		catch (IllegalArgumentException e)
 		{
 			throw new ConfigurationException(String.format(
 				"Unable to parse size \"%s\".", str), e);

@@ -77,6 +77,7 @@ import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.client.security.*;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto;
+import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
@@ -155,8 +156,8 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 	}
 
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
-			HashMap<QName, Object> constructionParameters,
-			Collection<MessageElement> resolverCreationParams)
+		ConstructionParameters cParams, HashMap<QName, Object> constructionParameters,
+		Collection<MessageElement> resolverCreationParams)
 			throws ResourceException, BaseFaultType, RemoteException
 	{
 
@@ -268,7 +269,7 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 			throw new RemoteException(e.getMessage(), e);
 		}
 
-		super.postCreate(rKey, newEPR, constructionParameters,
+		super.postCreate(rKey, newEPR, cParams, constructionParameters,
 				resolverCreationParams);
 	}
 

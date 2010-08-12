@@ -2,79 +2,55 @@ package edu.virginia.vcgr.genii.client.nativeq;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 
-import org.ggf.jsdl.OperatingSystemTypeEnumeration;
-import org.ggf.jsdl.ProcessorArchitectureEnumeration;
+import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
 
-import edu.virginia.vcgr.genii.client.spmd.SPMDTranslator;
-import edu.virginia.vcgr.jsdl.OperatingSystemNames;
-import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
-
-public abstract class AbstractNativeQueueConnection 
+public abstract class AbstractNativeQueueConnection<ProviderConfigType>
 	implements NativeQueueConnection
 {
 	transient private boolean _closed = false;
 	private File _workingDirectory = null;
-	private Map<URI, SPMDTranslator> _supportedSPMDVariations = 
-		new HashMap<URI, SPMDTranslator>(4);
-	private Properties _connectionProperties;
-	private NativeQProperties _queueProperties;
+	private ResourceOverrides _resourceOverrides;
+	private NativeQueueConfiguration _queueConfiguration;
+	private ProviderConfigType _providerConfiguration;
 	
 	protected AbstractNativeQueueConnection(
-		File workingDirectory, Properties connectionProperties) 
+		File workingDirectory, 
+		ResourceOverrides resourceOverrides,
+		NativeQueueConfiguration queueConfig,
+		ProviderConfigType providerConfig) 
 			throws NativeQueueException
 	{
 		_workingDirectory = workingDirectory;
-		initialize(connectionProperties);
-		addSupportedSPMDVariations(_supportedSPMDVariations, 
-			connectionProperties);
+		_resourceOverrides = resourceOverrides;
+		_queueConfiguration = queueConfig;
+		_providerConfiguration = providerConfig;
 		
-		_connectionProperties = connectionProperties;
-		_queueProperties = new NativeQProperties(_connectionProperties);
+		initialize();
 	}
 	
-	protected Properties connectionProperties()
+	protected ResourceOverrides resourceOverrides()
 	{
-		return _connectionProperties;
+		return _resourceOverrides;
 	}
 	
-	protected OperatingSystemNames getOperatingSystem()
+	protected NativeQueueConfiguration queueConfiguration()
 	{
-		OperatingSystemTypeEnumeration ret = 
-			_queueProperties.operatingSystemName();
-		if (ret == null)
-			return null;
-		
-		return OperatingSystemNames.valueOf(ret.getValue());
+		return _queueConfiguration;
 	}
 	
-	protected ProcessorArchitecture getProcessorArchitecture()
+	protected ProviderConfigType providerConfiguration()
 	{
-		ProcessorArchitectureEnumeration ret =
-			_queueProperties.cpuArchitecture();
-		if (ret == null)
-			return null;
-		
-		return ProcessorArchitecture.valueOf(ret.getValue());
+		return _providerConfiguration;
 	}
 	
 	protected File getCommonDirectory()
 	{
-		return _queueProperties.commonDirectory();
+		return _queueConfiguration.sharedDirectory();
 	}
 	
-	protected void initialize(Properties connectionProperties)
+	protected void initialize()
 		throws NativeQueueException
-	{
-	}
-	
-	protected void addSupportedSPMDVariations(
-		Map<URI, SPMDTranslator> variations, Properties connectionProperties)
-			throws NativeQueueException
 	{
 	}
 	
@@ -100,12 +76,6 @@ public abstract class AbstractNativeQueueConnection
 	protected File getWorkingDirectory()
 	{
 		return _workingDirectory;
-	}
-	
-	@Override
-	public Map<URI, SPMDTranslator> supportedSPMDVariations()
-	{
-		return _supportedSPMDVariations;
 	}
 	
 	@Override

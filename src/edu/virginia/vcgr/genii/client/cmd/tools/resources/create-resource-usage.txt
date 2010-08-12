@@ -1,1 +1,1 @@
-create-resource [--description=<short-description>] [--creation-properties=<properties-file>] [--url] <service-path-or-url> [<new-rns-path>]
+create-resource [--description=<short-description>] [--construction-properties=<xml-config-file>] [--url] <service-path-or-url> [<new-rns-path>]

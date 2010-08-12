@@ -16,6 +16,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
+import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.client.gpath.*;
 
@@ -55,8 +56,8 @@ public class TerminationScheduleTool extends BaseGridTool
 	{
 		if (targetTime.startsWith("+"))
 		{
-			Duration d = Duration.parse(targetTime.substring(1));
-			return new Date(new Date().getTime() + d.getMilliseconds());
+			Duration d = new Duration(targetTime.substring(1));
+			return new Date(new Date().getTime() + (long)d.as(DurationUnits.Milliseconds));
 		} else
 		{
 			DateFormat format = DateFormat.getDateTimeInstance();

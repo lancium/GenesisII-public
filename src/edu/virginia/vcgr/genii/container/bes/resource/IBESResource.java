@@ -17,7 +17,6 @@ package edu.virginia.vcgr.genii.container.bes.resource;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
-import java.util.Properties;
 
 import org.ggf.bes.factory.UnknownActivityIdentifierFaultType;
 import org.ws.addressing.EndpointReferenceType;
@@ -49,7 +48,4 @@ public interface IBESResource extends IResource
 	
 	public boolean isAcceptingNewActivities()
 		throws RemoteException;
-	
-	public void nativeQProperties(Properties props) throws RemoteException;
-	public Properties nativeQProperties() throws RemoteException;
 }

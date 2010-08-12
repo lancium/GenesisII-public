@@ -4,9 +4,9 @@ import java.io.File;
 import java.net.URI;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.Properties;
 import java.util.Vector;
 
+import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
@@ -152,7 +152,7 @@ public class CommonExecutionUnderstanding
 	}
 	
 	public Vector<ExecutionPhase> createExecutionPlan(
-		Properties creationProperties) throws JSDLException
+		BESConstructionParameters creationProperties) throws JSDLException
 	{
 		Vector<ExecutionPhase> ret = new Vector<ExecutionPhase>();
 		Vector<ExecutionPhase> cleanups = new Vector<ExecutionPhase>();

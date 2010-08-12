@@ -1,6 +1,5 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
-import java.text.ParseException;
 import java.util.LinkedList;
 
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
@@ -74,9 +73,9 @@ public class CreateUserDelegateTool extends CreateUserTool
 		{
 			try
 			{
-				_duration = Duration.parse(_durationString);
+				_duration = new Duration(_durationString);
 			}
-			catch (ParseException pe)
+			catch (IllegalArgumentException pe)
 			{
 				throw new ToolException("Unable to parse duration string.", pe);
 			}

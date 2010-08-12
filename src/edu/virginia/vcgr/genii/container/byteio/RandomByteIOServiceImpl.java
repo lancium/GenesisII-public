@@ -54,6 +54,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
@@ -103,13 +104,13 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 	}
 	
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
-		HashMap<QName, Object> creationParameters,
+		ConstructionParameters cParams, HashMap<QName, Object> creationParameters,
 		Collection<MessageElement> resolverCreationParams)
 			throws ResourceException, BaseFaultType, RemoteException
 	{
 		_logger.debug("Creating new RandomByteIO Resource.");
 		
-		super.postCreate(rKey, newEPR, creationParameters, resolverCreationParams);
+		super.postCreate(rKey, newEPR, cParams, creationParameters, resolverCreationParams);
 		
 		IRByteIOResource resource = null;
 		

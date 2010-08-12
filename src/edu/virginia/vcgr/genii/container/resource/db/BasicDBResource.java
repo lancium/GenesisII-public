@@ -12,7 +12,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Properties;
 
 import javax.xml.namespace.QName;
 
@@ -22,6 +21,7 @@ import org.morgan.util.GUID;
 import org.morgan.util.io.StreamUtils;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 
+import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 
@@ -510,166 +510,6 @@ public class BasicDBResource implements IResource
 			StreamUtils.close(stmt);
 		}
 	}
-
-	@Override
-	public Properties getPersistedProperties(String category)
-			throws ResourceException
-	{
-		Properties ret = new Properties();
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		
-		try
-		{
-			stmt = _connection.prepareStatement(
-				"SELECT propertyname, propertyvalue " +
-				"FROM persistedproperties " +
-					"WHERE resourceid = ? AND category = ?");
-			stmt.setString(1, _resourceKey);
-			stmt.setString(2, category);
-			rs = stmt.executeQuery();
-			
-			while (rs.next())
-			{
-				ret.setProperty(
-					rs.getString(1),
-					rs.getString(2));
-			}
-			
-			return ret;
-		}
-		catch (SQLException sqe)
-		{
-			throw new ResourceException("Unable to get persisted properties.",
-				sqe);
-		}
-		finally
-		{
-			StreamUtils.close(rs);
-			StreamUtils.close(stmt);
-		}
-	}
-
-	@Override
-	public void removePersistedProperties(String category)
-			throws ResourceException
-	{
-		PreparedStatement stmt = null;
-		
-		try
-		{
-			stmt = _connection.prepareStatement(
-				"DELETE FROM persistedproperties " +
-					"WHERE resourceid = ? AND category = ?");
-			stmt.setString(1, _resourceKey);
-			stmt.setString(2, category);
-			stmt.executeUpdate();
-		}
-		catch (SQLException sqe)
-		{
-			throw new ResourceException("Unable to remove persisted properties.",
-				sqe);
-		}
-		finally
-		{
-			StreamUtils.close(stmt);
-		}
-	}
-
-	@Override
-	public void removePersistedProperty(String category, String propertyname)
-			throws ResourceException
-	{
-		PreparedStatement stmt = null;
-		
-		try
-		{
-			stmt = _connection.prepareStatement(
-				"DELETE FROM persistedproperties " +
-					"WHERE resourceid = ? AND category = ? AND propertyname = ?");
-			stmt.setString(1, _resourceKey);
-			stmt.setString(2, category);
-			stmt.setString(3, propertyname);
-			stmt.executeUpdate();
-		}
-		catch (SQLException sqe)
-		{
-			throw new ResourceException("Unable to remove persisted property.",
-				sqe);
-		}
-		finally
-		{
-			StreamUtils.close(stmt);
-		}
-	}
-
-	@Override
-	public void replacePersistedProperties(String category,
-		Properties replacement) throws ResourceException
-	{
-		removePersistedProperties(category);
-		PreparedStatement stmt = null;
-		
-		try
-		{
-			stmt = _connection.prepareStatement(
-				"INSERT INTO persistedproperties (" +
-					"resourceid, category, propertyname, propertyvalue) " +
-				"VALUES (?, ?, ?, ?)");
-			for (Object key : replacement.keySet())
-			{
-				stmt.setString(1, _resourceKey);
-				stmt.setString(2, category);
-				stmt.setString(3, key.toString());
-				stmt.setString(4, replacement.getProperty(key.toString()));
-				stmt.addBatch();
-			}
-			
-			stmt.executeBatch();
-		}
-		catch (SQLException sqe)
-		{
-			throw new ResourceException("Unable to remove persisted property.",
-				sqe);
-		}
-		finally
-		{
-			StreamUtils.close(stmt);
-		}
-	}
-
-	@Override
-	public void replacePersistedProperty(String category, String propertyName,
-		String newValue) throws ResourceException
-	{
-		removePersistedProperty(category, propertyName);
-		PreparedStatement stmt = null;
-		
-		if (newValue == null)
-			return;
-		
-		try
-		{
-			stmt = _connection.prepareStatement(
-				"INSERT INTO persistedproperties (" +
-					"resourceid, category, propertyname, propertyvalue) " +
-				"VALUES (?, ?, ?, ?)");
-			stmt.setString(1, _resourceKey);
-			stmt.setString(2, category);
-			stmt.setString(3, propertyName);
-			stmt.setString(4, newValue);
-			stmt.executeUpdate();
-		}
-		catch (SQLException sqe)
-		{
-			throw new ResourceException("Unable to remove persisted property.",
-				sqe);
-		}
-		finally
-		{
-			StreamUtils.close(stmt);
-		}
-	}
 	
 	static public String getEPI(Connection connection, String resourceID)
 		throws SQLException
@@ -747,5 +587,49 @@ public class BasicDBResource implements IResource
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
 		}
+	}
+
+	static public ConstructionParameters constructionParameters(
+		Connection connection,
+		Class<?> serviceClass, String resourceid) throws SQLException
+	{
+		ConstructionParameters cParams =
+			(ConstructionParameters)getProperty(connection, resourceid,
+				ConstructionParameters.CONSTRUCTION_PARAMTERS_QNAME.toString());
+		
+		if (cParams == null)
+			cParams = ConstructionParameters.instantiateDefault(serviceClass);
+		
+		return cParams;
+	}
+	
+	@Override
+	public ConstructionParameters constructionParameters(Class<?> serviceClass)
+			throws ResourceException
+	{
+		ConstructionParameters cParams = (ConstructionParameters)getProperty(
+			ConstructionParameters.CONSTRUCTION_PARAMTERS_QNAME.toString());
+		
+		if (cParams == null)
+			cParams = ConstructionParameters.instantiateDefault(serviceClass);
+		
+		return cParams;
+	}
+
+	static public void constructionParameters(Connection connection,
+		String resourceid, ConstructionParameters parameters) throws SQLException
+	{
+		setProperty(connection, resourceid,
+			ConstructionParameters.CONSTRUCTION_PARAMTERS_QNAME.toString(),
+			parameters);
+	}
+	
+	@Override
+	public void constructionParameters(ConstructionParameters parameters)
+			throws ResourceException
+	{
+		setProperty(
+			ConstructionParameters.CONSTRUCTION_PARAMTERS_QNAME.toString(),
+			parameters);
 	}
 }

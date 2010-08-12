@@ -4,29 +4,24 @@ import java.io.File;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStateEnumeration;
-import org.ggf.jsdl.OperatingSystemTypeEnumeration;
-import org.ggf.jsdl.ProcessorArchitectureEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
+import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.bes.ExitCondition;
-import edu.virginia.vcgr.genii.client.bes.GeniiBESConstants;
 import edu.virginia.vcgr.genii.client.bes.NormalExit;
 import edu.virginia.vcgr.genii.client.bes.SignaledExit;
 import edu.virginia.vcgr.genii.client.bes.Signals;
 import edu.virginia.vcgr.genii.client.nativeq.ApplicationDescription;
 import edu.virginia.vcgr.genii.client.nativeq.JobToken;
-import edu.virginia.vcgr.genii.client.nativeq.NativeQProperties;
-import edu.virginia.vcgr.genii.client.nativeq.NativeQueue;
+import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConnection;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueException;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueState;
-import edu.virginia.vcgr.genii.client.nativeq.NativeQueues;
 import edu.virginia.vcgr.genii.client.pwrapper.ExitResults;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperException;
@@ -67,16 +62,18 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 	private File _stdout;
 	private File _stderr;
 	private Map<String, String> _environment;
-	private Properties _queueProperties;
+	private BESConstructionParameters _constructionParameters;
 	
 	private ResourceConstraints _resourceConstraints;
 	
 	transient private JobToken _jobToken = null;
 	transient private Boolean _terminate = null;
 	
-	public QueueProcessPhase(URI spmdVariation, Integer numProcesses, Integer numProcessesPerHost,
-		File executable, Collection<String> arguments, Map<String, String> environment,
-		File stdin, File stdout, File stderr, Properties queueProperties, 
+	public QueueProcessPhase(URI spmdVariation, Integer numProcesses,
+		Integer numProcessesPerHost, File executable, 
+		Collection<String> arguments, Map<String, String> environment,
+		File stdin, File stdout, File stderr, 
+		BESConstructionParameters constructionParameters, 
 		ResourceConstraints resourceConstraints)
 	{
 		super(new ActivityState(
@@ -88,7 +85,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 		_executable = executable;
 		_arguments = arguments;
 		_environment = environment;
-		_queueProperties = queueProperties;
+		_constructionParameters = constructionParameters;
 		_stdin = stdin;
 		_stdout = stdout;
 		_stderr = stderr;
@@ -194,20 +191,13 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 							AccountingService.SERVICE_NAME);
 					if (acctService != null)
 					{
-						NativeQProperties nqProperties = new NativeQProperties(
-							_queueProperties);
+						OperatingSystemNames osName = 
+							_constructionParameters.getResourceOverrides(
+								).operatingSystemName();
 						
-						OperatingSystemNames osName = null;
-						OperatingSystemTypeEnumeration osType =
-							nqProperties.operatingSystemName();
-						if (osType != null)
-							osName = OperatingSystemNames.valueOf(osType.getValue());
-						
-						ProcessorArchitecture arch = null;
-						ProcessorArchitectureEnumeration archEnum =
-							nqProperties.cpuArchitecture();
-						if (archEnum != null)
-							arch = ProcessorArchitecture.valueOf(archEnum.getValue());
+						ProcessorArchitecture arch = 
+							_constructionParameters.getResourceOverrides(
+								).cpuArchitecture();
 						
 						Vector<String> command = new Vector<String>(
 							_arguments);
@@ -271,13 +261,17 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 		if (workingDirectory == null)
 			throw new IllegalArgumentException("Working directory cannot be null.");
 		
-		String providerName = _queueProperties.getProperty(
-			GeniiBESConstants.NATIVEQ_PROVIDER_PROPERTY);
-		
 		try
 		{
-			NativeQueue queue = NativeQueues.getNativeQueue(providerName);
-			return queue.connect(workingDirectory, _queueProperties);
+			NativeQueueConfiguration conf = 
+			_constructionParameters.getNativeQueueConfiguration();
+			if (conf == null)
+				throw new RuntimeException(
+					"Unable to acquire connection to native queue -- no queue defined.");
+			
+			return conf.connect(
+				_constructionParameters.getResourceOverrides(),
+				workingDirectory);
 		}
 		catch (NativeQueueException nqe)
 		{

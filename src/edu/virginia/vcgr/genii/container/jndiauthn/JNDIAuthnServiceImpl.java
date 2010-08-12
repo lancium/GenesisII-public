@@ -72,6 +72,7 @@ import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.client.security.*;
 import edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto;
+import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
@@ -185,8 +186,8 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 	}
 
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
-			HashMap<QName, Object> constructionParameters,
-			Collection<MessageElement> resolverCreationParams)
+		ConstructionParameters cParams, HashMap<QName, Object> constructionParameters,
+		Collection<MessageElement> resolverCreationParams)
 			throws ResourceException, BaseFaultType, RemoteException
 	{
 
@@ -195,7 +196,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		if (!myResource.isServiceResource())
 		{
 			// we're an STS resource creating directory entries
-			super.postCreate(rKey, newEPR, constructionParameters,
+			super.postCreate(rKey, newEPR, cParams, constructionParameters,
 					resolverCreationParams);
 			return;
 		}
@@ -217,7 +218,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		myResource.addEntry(new InternalEntry(newStsName, newEPR, null));
 		myResource.commit();
 
-		super.postCreate(rKey, newEPR, constructionParameters,
+		super.postCreate(rKey, newEPR, cParams, constructionParameters,
 				resolverCreationParams);
 	}
 

@@ -1,6 +1,5 @@
 package edu.virginia.vcgr.genii.client.filesystems;
 
-import java.text.ParseException;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -27,9 +26,9 @@ class FilesystemWatcherConfiguration
 	private Collection<WatchCallbackConfiguration> _watchCallback =
 		new LinkedList<WatchCallbackConfiguration>();
 	
-	final Duration checkPeriod() throws ParseException
+	final Duration checkPeriod()
 	{
-		return Duration.parse(_checkPeriod);
+		return new Duration(_checkPeriod);
 	}
 	
 	final String filesystemName()

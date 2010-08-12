@@ -1,10 +1,6 @@
 package edu.virginia.vcgr.genii.client.utils.units;
 
-import java.io.Serializable;
-import java.text.ParseException;
-import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * A simple class to store a duration.  Durations are nothing more then
@@ -14,111 +10,58 @@ import java.util.regex.Pattern;
  * 
  * @author mmm2a
  */
-public class Duration implements Serializable
+@XmlJavaTypeAdapter(DurationXmlAdapter.class)
+public class Duration extends UnitableValue<DurationUnits>
 {
 	static final long serialVersionUID = 0L;
 	
-	static private final long MILLISECONDS_PER_YEAR = 
-		365 * 24 * 60 * 60 * 1000L;
-	static private final long MILLISECONDS_PER_MONTH =
-		30 * 24 * 60 * 60 * 1000L;
-	static private final long MILLISECONDS_PER_WEEK =
-		7 * 24 * 60 * 60 * 1000L;
-	static private final long MILLISECONDS_PER_DAY =
-		24 * 60 * 60 * 1000L;
-	static private final long MILLISECONDS_PER_HOUR =
-		60 * 60 * 1000L;
-	static private final long MILLISECONDS_PER_MINUTE =
-		60 * 1000L;
-	static private final long MILLISECONDS_PER_SECOND =
-		1000L;
-	
-	static private HashMap<String, Long> _milliSecondMap;
-	
-	static
+	static private final long MILLISECONDS_PER_YEAR = DurationUnits.Years.multiplier();
+	static private final long MILLISECONDS_PER_MONTH = DurationUnits.Months.multiplier();
+	@SuppressWarnings("unused")
+	static private final long MILLISECONDS_PER_WEEK = DurationUnits.Weeks.multiplier();
+	static private final long MILLISECONDS_PER_DAY = DurationUnits.Days.multiplier();
+	static private final long MILLISECONDS_PER_HOUR = DurationUnits.Hours.multiplier();
+	static private final long MILLISECONDS_PER_MINUTE = DurationUnits.Minutes.multiplier();
+	static private final long MILLISECONDS_PER_SECOND = DurationUnits.Seconds.multiplier();
+
+	@Override
+	protected DurationUnits defaultUnits()
 	{
-		/* We initialize a milli-second map so that we can
-		 * easily convert from a duration unit (like days)
-		 * into milliseconds.
-		 */
-		_milliSecondMap = new HashMap<String, Long>();
-		Long value;
-		
-		value = new Long(MILLISECONDS_PER_YEAR);
-		_milliSecondMap.put("year", value);
-		_milliSecondMap.put("years", value);
-		_milliSecondMap.put("yr", value);
-		_milliSecondMap.put("yrs", value);
-		_milliSecondMap.put("y", value);
-		
-		value = new Long(MILLISECONDS_PER_MONTH);
-		_milliSecondMap.put("month", value);
-		_milliSecondMap.put("months", value);
-		
-		value = new Long(MILLISECONDS_PER_WEEK);
-		_milliSecondMap.put("week", value);
-		_milliSecondMap.put("weeks", value);
-		_milliSecondMap.put("wks", value);
-		_milliSecondMap.put("w", value);
-		
-		value = new Long(MILLISECONDS_PER_DAY);
-		_milliSecondMap.put("day", value);
-		_milliSecondMap.put("days", value);
-		_milliSecondMap.put("d", value);
-		
-		value = new Long(MILLISECONDS_PER_HOUR);
-		_milliSecondMap.put("hour", value);
-		_milliSecondMap.put("hours", value);
-		_milliSecondMap.put("hrs", value);
-		_milliSecondMap.put("hr", value);
-		_milliSecondMap.put("h", value);
-		
-		value = new Long(MILLISECONDS_PER_MINUTE);
-		_milliSecondMap.put("minute", value);
-		_milliSecondMap.put("minutes", value);
-		_milliSecondMap.put("min", value);
-		_milliSecondMap.put("mins", value);
-		_milliSecondMap.put("m", value);
-		
-		value = new Long(MILLISECONDS_PER_SECOND);
-		_milliSecondMap.put("second", value);
-		_milliSecondMap.put("seconds", value);
-		_milliSecondMap.put("sec", value);
-		_milliSecondMap.put("secs", value);
-		_milliSecondMap.put("s", value);
-		
-		value = new Long(1L);
-		_milliSecondMap.put("millisecond", value);
-		_milliSecondMap.put("milliseconds", value);
-		_milliSecondMap.put("milli", value);
-		_milliSecondMap.put("millis", value);
-		_milliSecondMap.put("ms", value);
+		return DurationUnits.Milliseconds;
+	}
+
+	@Override
+	protected DurationUnits parseUnits(String textRepresentation)
+	{
+		return DurationUnits.parse(textRepresentation);
 	}
 	
-	private long _milliseconds;
-	
-	/**
-	 * Create a new duration with the given number of
-	 * milliseconds.
-	 * 
-	 * @param milliseconds The number of milliseconds in this
-	 * duration.
-	 */
-	public Duration(long milliseconds)
+	@Override
+	public double as(DurationUnits targetUnits)
 	{
-		_milliseconds = milliseconds;
+		return targetUnits.convert(value(), units());
 	}
 	
-	/**
-	 * Acquire the number of milliseconds in this duration.
-	 * 
-	 * @return The number of milliseconds in this duration.
-	 */
-	public long getMilliseconds()
+	public Duration()
 	{
-		return _milliseconds;
+		super();
 	}
-	
+
+	public Duration(double value, DurationUnits units)
+	{
+		super(value, units);
+	}
+
+	public Duration(double value)
+	{
+		super(value);
+	}
+
+	public Duration(String textRepresentation)
+	{
+		super(textRepresentation);
+	}
+
 	public org.apache.axis.types.Duration toApacheDuration()
 	{
 		int years;
@@ -127,7 +70,7 @@ public class Duration implements Serializable
 		int minutes;
 		int seconds;
 		
-		long millis = _milliseconds;
+		long millis = (long)units().toMilliseconds(value());
 		years = (int)(millis / MILLISECONDS_PER_YEAR);
 		millis %= MILLISECONDS_PER_YEAR;
 		
@@ -146,100 +89,6 @@ public class Duration implements Serializable
 			false, years, 0, days, hours, minutes, seconds);
 	}
 	
-	@Override
-	public String toString()
-	{
-		int years;
-		int days;
-		int hours;
-		int minutes;
-		int seconds;
-		
-		long millis = _milliseconds;
-		years = (int)(millis / MILLISECONDS_PER_YEAR);
-		millis %= MILLISECONDS_PER_YEAR;
-		
-		days = (int)(millis / MILLISECONDS_PER_DAY);
-		millis %= MILLISECONDS_PER_DAY;
-		
-		hours = (int)(millis/ MILLISECONDS_PER_HOUR);
-		millis %= MILLISECONDS_PER_HOUR;
-		
-		minutes = (int)(millis / MILLISECONDS_PER_MINUTE);
-		millis %= MILLISECONDS_PER_MINUTE;
-		
-		seconds = (int)(millis / MILLISECONDS_PER_SECOND);
-	
-		return String.format("%d years, %d days, %d hours, %d minutes, %d seconds", 
-			years, days, hours, minutes, seconds);
-	}
-	
-	static private Pattern _NUMBER_ONLY = Pattern.compile("^\\d+$");
-	static private Pattern _TOKENS = Pattern.compile("\\W*(\\d+)\\s*([a-zA-Z]+)");
-	/**
-	 * This method creates a duration by parsing a string which represents 
-	 * the duration with units included.  There are two possible ways to
-	 * parse it.  If the string contains ONLY digits, then it is assumed to
-	 * be milliseconds.  Otherwise, the string is one or more unit tokens
-	 * where a unit token is an integer followed by one of<BR>
-	 * <UL>
-	 * <LI>year, years, or y (assumed to be 365 days)</LI>
-	 * <LI>month or months (assumed to be 30 days)</LI>
-	 * <LI>week, weeks, or w</LI>
-	 * <LI>day, days, or d</LI>
-	 * <LI>hour, hours, or h<LI>
-	 * <LI>minute, minutes, min, mins, or m</LI>
-	 * <LI>second, seconds, sec, secs, or s</LI>
-	 * <LI>millisecond, milliseconds, or ms</LI>
-	 * </UL>
-	 * All non-alphanumerics are ignored between tokens and spaces are irrelevant.
-	 * So, for example, it would parse both the string 
-	 * "1 day, 5 minutes, 3 seconds" and the string
-	 * "1d5m3s" as being 1 day, 5 minutes, and 3 seconds, or
-	 * (3 + (5 + (1 * 24 * 60)) * 60) * 1000 milliseconds.
-	 * 
-	 * @param durationString The duration string to parse.
-	 * @return A duration with the correct number of milliseconds represented.
-	 */
-	static public Duration parse(String durationString)
-		throws ParseException
-	{
-		Matcher matcher;
-		
-		/* First, let's see if the string was just a simple number in which
-		 * case we assume that that number represents milliseconds.
-		 */
-		matcher = _NUMBER_ONLY.matcher(durationString);
-		if (matcher.matches())
-			return new Duration(Long.parseLong(durationString));
-		
-		/*
-		 * If it wasn't a simple number, then we parse a fancy duration
-		 * string.
-		 */
-		long total = 0L;
-		
-		matcher = _TOKENS.matcher(durationString);
-		
-		/*
-		 * While there are more tokens that match...
-		 */
-		while (matcher.find())
-		{
-			long value = Long.parseLong(matcher.group(1));
-			String unit = matcher.group(2);
-			
-			Long multiplier = _milliSecondMap.get(unit);
-			if (multiplier == null)
-				throw new ParseException("Unknown duration unit encountered (" +
-					unit + ").", matcher.regionStart());
-			
-			total += value * multiplier.longValue();
-		}
-		
-		return new Duration(total);
-	}
-	
 	static public Duration fromApacheDuration(
 		org.apache.axis.types.Duration aDur)
 	{
@@ -254,11 +103,5 @@ public class Duration implements Serializable
 		millis += aDur.getSeconds() * MILLISECONDS_PER_SECOND;
 		
 		return new Duration(millis);
-	}
-	
-	static public void main(String []args) throws Throwable
-	{
-		parse("123");
-		parse("1 day, 5hours, 3    seconds");
 	}
 }

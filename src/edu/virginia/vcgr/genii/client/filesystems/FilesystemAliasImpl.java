@@ -21,7 +21,8 @@ public class FilesystemAliasImpl implements Filesystem
 		_trueFS = manager.lookup(conf.aliasFor());
 		
 		for (FilesystemSandboxConfiguration boxConf : conf.sandboxes())
-			_trueFS.addSandbox(boxConf.name(), boxConf.relativePath());
+			_trueFS.addSandbox(boxConf.name(), boxConf.relativePath(),
+				boxConf.doCreate());
 	}
 	
 	@Override
@@ -41,10 +42,10 @@ public class FilesystemAliasImpl implements Filesystem
 	}
 
 	@Override
-	public void addSandbox(String sandboxName, String relativePath)
-		throws FileNotFoundException
+	public void addSandbox(String sandboxName, String relativePath,
+		boolean doCreate) throws FileNotFoundException
 	{
-		_trueFS.addSandbox(sandboxName, relativePath);
+		_trueFS.addSandbox(sandboxName, relativePath, doCreate);
 	}
 	
 	@Override

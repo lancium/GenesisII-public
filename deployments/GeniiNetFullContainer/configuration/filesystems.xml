@@ -2,7 +2,8 @@
 	<filesystem name="local" path="${user.home}/.genesisII-2.0">
 		<filesystem-property>Local</filesystem-property>
 		<filesystem-property>Shared</filesystem-property>
-		<filesystem-sandbox name="database" relative-path="derby-db"/>
+		<filesystem-sandbox name="database" relative-path="derby-db"
+			create="false"/>
 		<filesystem-sandbox name="rbyteio" relative-path="rbyteio"/>
 		<filesystem-sandbox name="sbyteio" relative-path="sbyteio"/>
 	</filesystem>

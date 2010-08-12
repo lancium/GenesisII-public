@@ -38,6 +38,7 @@ import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedFileUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
@@ -123,11 +124,11 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 	}
 	
 	protected void fillIn(ResourceKey rKey, EndpointReferenceType newEPR,
-			HashMap<QName, Object> creationParameters,
-			Collection<MessageElement> resolverCreationParams) 
-		throws ResourceException, BaseFaultType, RemoteException
+		ConstructionParameters cParams, HashMap<QName, Object> creationParameters,
+		Collection<MessageElement> resolverCreationParams) 
+			throws ResourceException, BaseFaultType, RemoteException
 	{
-		super.postCreate(rKey, newEPR, creationParameters, resolverCreationParams);
+		super.postCreate(rKey, newEPR, cParams, creationParameters, resolverCreationParams);
 		
 		Date d = new Date();
 		Calendar c = Calendar.getInstance();

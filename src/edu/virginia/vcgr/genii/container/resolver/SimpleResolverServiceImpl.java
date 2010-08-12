@@ -49,6 +49,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
+import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.resource.PortType;
@@ -329,11 +330,11 @@ public class SimpleResolverServiceImpl extends GenesisIIBase implements SimpleRe
 
 	/* create/initialization helper methods */
 	public void postCreate(ResourceKey rKey, EndpointReferenceType myEPR,
-			HashMap<QName, Object> constructionParameters,
-			Collection<MessageElement> resolverCreationParams)
-		throws ResourceException, BaseFaultType, RemoteException
+		ConstructionParameters cParams, HashMap<QName, Object> constructionParameters,
+		Collection<MessageElement> resolverCreationParams)
+			throws ResourceException, BaseFaultType, RemoteException
 	{
-		super.postCreate(rKey, myEPR, constructionParameters, resolverCreationParams);
+		super.postCreate(rKey, myEPR, cParams, constructionParameters, resolverCreationParams);
 		
 		/* grab targetEPR construction parameter and initialize resource with its information */
 		EndpointReferenceType targetEPR = (EndpointReferenceType) constructionParameters.get(SIMPLE_RESOLVER_TARGET_CONSTRUCTION_PARAMETER);

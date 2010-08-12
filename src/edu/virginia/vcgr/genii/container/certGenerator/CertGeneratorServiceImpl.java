@@ -38,6 +38,7 @@ import edu.virginia.vcgr.genii.certGenerator.CertGeneratorPortType;
 import edu.virginia.vcgr.genii.certGenerator.GenerateX509V3CertificateChainResponseType;
 import edu.virginia.vcgr.genii.certGenerator.InvalidCertificateRequestFaultType;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
+import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
@@ -164,13 +165,14 @@ public class CertGeneratorServiceImpl extends GenesisIIBase implements CertGener
 	}
 	
 	protected void postCreate(ResourceKey rKey, EndpointReferenceType newEPR,
+		ConstructionParameters cParams,
 		HashMap<QName, Object> creationParameters,
 		Collection<MessageElement> resolverCreationParams)
 			throws ResourceException, BaseFaultType, RemoteException
 	{
 		_logger.debug("Creating new certGenerator Resource.");
 		
-		super.postCreate(rKey, newEPR, creationParameters, resolverCreationParams);
+		super.postCreate(rKey, newEPR, cParams, creationParameters, resolverCreationParams);
 		
 		
 		ICertGeneratorResource resource = null;

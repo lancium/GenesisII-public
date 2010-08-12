@@ -2,7 +2,6 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.net.URI;
 import java.security.cert.X509Certificate;
-import java.text.ParseException;
 import java.util.*;
 
 import org.apache.axis.message.MessageElement;
@@ -14,6 +13,7 @@ import edu.virginia.vcgr.genii.client.security.*;
 import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
+import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.rns.*;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
@@ -153,9 +153,9 @@ public class IdpTool extends GamlLoginTool {
 		{
 			try
 			{
-				_validMillis = Duration.parse(_durationString).getMilliseconds();
+				_validMillis = (long)new Duration(_durationString).as(DurationUnits.Milliseconds);
 			}
-			catch (ParseException pe)
+			catch (IllegalArgumentException pe)
 			{
 				throw new ToolException("Invalid duration string given.", pe);
 			}

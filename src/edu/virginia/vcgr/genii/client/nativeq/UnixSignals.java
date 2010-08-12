@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.client.nativeq;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.EnumSet;
 
 public enum UnixSignals
@@ -54,18 +55,17 @@ public enum UnixSignals
 		return (this != SIGSTOP) && (this != SIGKILL);
 	}
 	
-	static public EnumSet<UnixSignals> parseTrapAndKillSet(String description)
-		throws IOException
+	static public EnumSet<UnixSignals> parseTrapAndKillSet(
+		Collection<String> signals)
+			throws IOException
 	{
 		EnumSet<UnixSignals> ret = EnumSet.noneOf(UnixSignals.class);
 		
-		if (description == null)
+		if (signals == null)
 			return ret;
 		
-		for (String signal : description.split(","))
+		for (String signal : signals)
 		{
-			if (signal == null)
-				continue;
 			signal = signal.trim();
 			if (signal.length() == 0)
 				continue;

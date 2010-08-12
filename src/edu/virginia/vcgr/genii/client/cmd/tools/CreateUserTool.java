@@ -1,7 +1,6 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.io.IOException;
-import java.text.ParseException;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
@@ -169,9 +168,9 @@ public class CreateUserTool extends BaseGridTool
 		{
 			try
 			{
-				_duration = Duration.parse(_durationString);
+				_duration = new Duration(_durationString);
 			}
-			catch (ParseException pe)
+			catch (IllegalArgumentException pe)
 			{
 				throw new ToolException("Unable to parse duration string.", pe);
 			}

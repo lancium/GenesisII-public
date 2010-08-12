@@ -7,7 +7,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Properties;
 import java.util.Random;
 
 import javax.xml.bind.JAXBException;
@@ -50,9 +49,11 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
+import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.bes.BESFaultManager;
-import edu.virginia.vcgr.genii.client.bes.GeniiBESConstants;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
@@ -61,7 +62,6 @@ import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
-import edu.virginia.vcgr.genii.client.utils.creation.CreationProperties;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.MatchingParameter;
 import edu.virginia.vcgr.genii.container.Container;
@@ -81,6 +81,7 @@ import edu.virginia.vcgr.genii.container.rfork.ResourceForkBaseService;
 import edu.virginia.vcgr.jsdl.JobDefinition;
 
 @ForkRoot(BESRootRNSFork.class)
+@ConstructionParametersType(BESConstructionParameters.class)
 public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 	GeniiBESPortType, BESConstants
 {
@@ -211,25 +212,12 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 	
 	@Override
 	protected void postCreate(ResourceKey key, EndpointReferenceType newEPR,
-			HashMap<QName, Object> constructionParameters,
-			Collection<MessageElement> resolverCreationParameters)
+		ConstructionParameters cParams, HashMap<QName, Object> constructionParameters,
+		Collection<MessageElement> resolverCreationParameters)
 			throws ResourceException, BaseFaultType, RemoteException
 	{
-		super.postCreate(key, newEPR, constructionParameters,
+		super.postCreate(key, newEPR, cParams, constructionParameters,
 			resolverCreationParameters);
-		
-		Properties props = (Properties)constructionParameters.get(
-			CreationProperties.CREATION_PROPERTIES_QNAME);
-		if (props != null)
-		{
-			String queueProvider = props.getProperty(
-				GeniiBESConstants.NATIVEQ_PROVIDER_PROPERTY);
-			if (queueProvider != null)
-			{
-				IBESResource resource = (IBESResource)key.dereference();
-				resource.nativeQProperties(props);
-			}
-		}
 	}
 
 	static private EndpointReferenceType _localActivityServiceEPR = null;
@@ -315,10 +303,10 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 		/* ASG August 28,2008, replaced RPC with direct call to CreateEPR */
 		EndpointReferenceType entryReference = 
 			new BESActivityServiceImpl().CreateEPR(BESActivityUtils.createCreationProperties(
-							jdt, (String)resource.getKey(),
-							resource.nativeQProperties(),
-							subscribe),
-					Container.getServiceURL("BESActivityPortType"));
+				jdt, (String)resource.getKey(),
+				(BESConstructionParameters)resource.constructionParameters(getClass()),
+				subscribe),
+				Container.getServiceURL("BESActivityPortType"));
 
 /*		
 		BESActivityPortType activity = ClientUtils.createProxy(

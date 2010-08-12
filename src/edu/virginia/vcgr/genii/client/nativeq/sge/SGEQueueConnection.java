@@ -11,32 +11,25 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
-import edu.virginia.vcgr.genii.client.nativeq.AdditionalArguments;
+import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
 import edu.virginia.vcgr.genii.client.nativeq.ApplicationDescription;
-import edu.virginia.vcgr.genii.client.nativeq.BasicResourceAttributes;
 import edu.virginia.vcgr.genii.client.nativeq.BulkStatusFetcher;
-import edu.virginia.vcgr.genii.client.nativeq.FactoryResourceAttributes;
 import edu.virginia.vcgr.genii.client.nativeq.JobStateCache;
 import edu.virginia.vcgr.genii.client.nativeq.JobToken;
+import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueException;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueState;
 import edu.virginia.vcgr.genii.client.nativeq.ScriptBasedQueueConnection;
 import edu.virginia.vcgr.genii.client.nativeq.execution.ParsingExecutionEngine;
-import edu.virginia.vcgr.genii.client.spmd.SPMDException;
-import edu.virginia.vcgr.genii.client.spmd.SPMDTranslator;
-import edu.virginia.vcgr.genii.client.spmd.SPMDTranslatorFactories;
-import edu.virginia.vcgr.genii.client.spmd.SPMDTranslatorFactory;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.ResourceConstraints;
 
-public class SGEQueueConnection extends ScriptBasedQueueConnection
+public class SGEQueueConnection extends ScriptBasedQueueConnection<SGEQueueConfiguration>
 {
 	static private Log _logger = LogFactory.getLog(SGEQueueConnection.class);
 	
@@ -66,22 +59,21 @@ public class SGEQueueConnection extends ScriptBasedQueueConnection
 	private String _qName;
 	private String _destination = null;
 	
-	private File _qsubBinary;
-	private File _qstatBinary;
-	private File _qdelBinary;
+	private List<String> _qsubStart;
+	private List<String> _qstatStart;
+	private List<String> _qdelStart;
 	
-	private AdditionalArguments _additionalArguments;
-	
-	SGEQueueConnection(File workingDirectory, Properties connectionProperties,
-		String queueName, File qsubBinary, File qstatBinary, File qdelBinary,
-		AdditionalArguments additionalArguments, JobStateCache statusCache)
+	SGEQueueConnection(ResourceOverrides resourceOverrides,
+		File workingDirectory,
+		NativeQueueConfiguration nativeQueueConfig,
+		SGEQueueConfiguration sgeConfig, String queueName,
+		List<String> qsubStart, List<String> qstatStart, List<String> qdelStart,
+		JobStateCache statusCache)
 			throws NativeQueueException
 	{
-		super(workingDirectory, connectionProperties);
+		super(workingDirectory, resourceOverrides, nativeQueueConfig, sgeConfig);
 		
 		_statusCache = statusCache;
-		
-		_additionalArguments = additionalArguments;
 		
 		int index = queueName.indexOf('@');
 		if (index >= 0)
@@ -94,88 +86,16 @@ public class SGEQueueConnection extends ScriptBasedQueueConnection
 			_destination = null;
 		}
 		
-		_qsubBinary = qsubBinary;
-		_qstatBinary = qstatBinary;
-		_qdelBinary = qdelBinary;
-		
-		checkBinary(_qsubBinary);
-		checkBinary(_qstatBinary);
-		checkBinary(_qdelBinary);
-	}
-	
-	@Override
-	protected void addSupportedSPMDVariations(
-		Map<URI, SPMDTranslator> variations, Properties connectionProperties)
-			throws NativeQueueException
-	{
-		super.addSupportedSPMDVariations(variations, connectionProperties);
-		
-		try
-		{
-			for (int lcv = 0; true; lcv++)
-			{
-				String variationProperty =
-					SGEQueue.QUEUE_SUPPORTED_SPMD_VARIATIONS_PROPERTY_BASE +
-					"." + lcv;
-				
-				String variation = connectionProperties.getProperty(
-					variationProperty);
-				
-				if (variation == null)
-					break;
-				
-				String providerName = connectionProperties.getProperty(
-					variationProperty + "." + 
-					SGEQueue.QUEUE_SUPPORTED_SPMD_VARIATION_PROVIDER_FOOTER);
-				
-				if (providerName == null)
-					throw new NativeQueueException(String.format(
-						"Native SGE Queue couldn't find SPMD Provider for type \"%s\".",
-						variation));
-				
-				SPMDTranslatorFactory factory = 
-					SPMDTranslatorFactories.getSPMDTranslatorFactory(
-						providerName);
-				
-				Properties constructionProps = new Properties();
-				String value =
-					connectionProperties.getProperty(variationProperty + "." +
-						SGEQueue.QUEUE_SUPPORTED_SPMD_ADDITIONAL_CMDLINE_ARGS);
-				if (value != null)
-					constructionProps.setProperty(
-						SPMDTranslatorFactory.ADDITIONAL_CMDLINE_ARGS_PROPERTY,
-						value);
-				
-				variations.put(URI.create(variation), 
-					factory.newTranslator(constructionProps));
-			}
-		}
-		catch (SPMDException se)
-		{
-			throw new NativeQueueException(
-				"Unable to instantiate queue provider.", se);
-		}
-	}
-
-	@Override
-	public FactoryResourceAttributes describe() throws NativeQueueException
-	{
-		return new FactoryResourceAttributes(
-			new BasicResourceAttributes(
-				JSDLUtils.getLocalOperatingSystem(),
-				JSDLUtils.getLocalCPUArchitecture(),
-				null, null, null, null),
-			null, SGE_MANAGER_TYPE);
+		_qsubStart = qsubStart;
+		_qstatStart = qstatStart;
+		_qdelStart = qdelStart;
 	}
 
 	@Override
 	public void cancel(JobToken token) throws NativeQueueException
 	{
 		List<String> commandLine = new LinkedList<String>();
-		commandLine.add(_qdelBinary.getAbsolutePath());
-		
-		for (String additionalArgString : _additionalArguments.qdelArguments())
-			commandLine.add(additionalArgString);
+		commandLine.addAll(_qdelStart);
 		
 		String arg = token.toString();
 		if (_destination != null)
@@ -195,9 +115,7 @@ public class SGEQueueConnection extends ScriptBasedQueueConnection
 				new HashMap<JobToken, NativeQueueState>();
 			
 			List<String> commandLine = new LinkedList<String>();
-			commandLine.add(_qstatBinary.getAbsolutePath());
-			for (String additionalArgString : _additionalArguments.qstatArguments())
-				commandLine.add(additionalArgString);
+			commandLine.addAll(_qstatStart);
 			commandLine.add("-xml");
 			
 			if (_destination != null)
@@ -284,7 +202,7 @@ public class SGEQueueConnection extends ScriptBasedQueueConnection
 		
 		List<String> command = new LinkedList<String>();
 		
-		command.add(_qsubBinary.getAbsolutePath());
+		command.addAll(_qsubStart);
 		if (_qName != null || _destination != null)
 		{
 			command.add("-q");
@@ -300,9 +218,6 @@ public class SGEQueueConnection extends ScriptBasedQueueConnection
 		
 		command.add("-wd");
 		command.add(getWorkingDirectory().getAbsolutePath());
-		
-		for (String additionalArgString : _additionalArguments.qsubArguments())
-			command.add(additionalArgString);
 		
 		command.add(submitScript.getAbsolutePath());
 		

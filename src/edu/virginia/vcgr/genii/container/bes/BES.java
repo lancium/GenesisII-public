@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Properties;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,6 +29,9 @@ import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
+import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
+import edu.virginia.vcgr.genii.client.bes.GeniiBESConstants;
+import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -36,6 +40,7 @@ import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
+import edu.virginia.vcgr.genii.container.bes.resource.DBBESResource;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
@@ -69,6 +74,50 @@ public class BES implements Closeable
 		synchronized(_activityToBESMap)
 		{
 			_activityToBESMap.remove(activityid);
+		}
+	}
+	
+	static private void upgradeNativeQPropsToCreationParams(
+		String besid, Connection connection) throws SQLException, IOException
+	{
+		ConstructionParameters cParams = DBBESResource.constructionParameters(
+			connection, GeniiBESServiceImpl.class, besid);
+		
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try
+		{
+			stmt = connection.prepareStatement(
+				"SELECT propertyname, propertyvalue " +
+					"FROM persistedproperties " +
+				"WHERE resourceid = ? AND category = ?");
+			stmt.setString(1, besid);
+			stmt.setString(2, GeniiBESConstants.NATIVE_QUEUE_CONF_CATEGORY);
+			rs = stmt.executeQuery();
+			Properties props = new Properties();
+			while (rs.next())
+				props.setProperty(rs.getString(1), rs.getString(2));
+			
+			if (Version1Upgrader.upgrade(
+				(BESConstructionParameters)cParams, props))
+				DBBESResource.constructionParameters(
+					connection, besid, cParams);
+			
+			stmt.close();
+			stmt = null;
+			
+			stmt = connection.prepareStatement(
+				"DELETE FROM persistedproperties " +
+				"WHERE resourceid = ? AND category = ?");
+			stmt.setString(1, besid);
+			stmt.setString(2, GeniiBESConstants.NATIVE_QUEUE_CONF_CATEGORY);
+			stmt.executeUpdate();
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
 		}
 	}
 	
@@ -107,7 +156,7 @@ public class BES implements Closeable
 	}
 	
 	synchronized static public void loadAllInstances(
-		DatabaseConnectionPool connectionPool) throws SQLException
+		DatabaseConnectionPool connectionPool) throws SQLException, IOException
 	{
 		Connection connection = null;
 		Statement stmt = null;
@@ -123,7 +172,7 @@ public class BES implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire(true);
+			connection = _connectionPool.acquire(false);
 			stmt = connection.createStatement();
 			rs = stmt.executeQuery(
 				"SELECT besid, userloggedinaction, screensaverinactiveaction " +
@@ -134,9 +183,14 @@ public class BES implements Closeable
 				BESPolicy policy = new BESPolicy(
 					BESPolicyActions.valueOf(rs.getString(2)),
 					BESPolicyActions.valueOf(rs.getString(3)));
+				
+				upgradeNativeQPropsToCreationParams(besid, connection);
+				
 				BES bes = new BES(connection, besid, policy);
 				_knownInstances.put(besid, bes);
 				bes.reloadAllActivities(connection);
+				
+				connection.commit();
 			}
 		}
 		finally

@@ -1,9 +1,8 @@
 package edu.virginia.vcgr.genii.client.filesystems.script;
 
-import java.text.ParseException;
-
 import edu.virginia.vcgr.genii.client.filesystems.FilesystemUsageInformation;
 import edu.virginia.vcgr.genii.client.utils.units.Size;
+import edu.virginia.vcgr.genii.client.utils.units.SizeUnits;
 
 class LiteralNumericValueExpression implements NumericValueExpression
 {
@@ -14,9 +13,9 @@ class LiteralNumericValueExpression implements NumericValueExpression
 	{
 		try
 		{
-			_value = Size.parse(literal);
+			_value = new Size(literal);
 		}
-		catch (ParseException nfe)
+		catch (IllegalArgumentException nfe)
 		{
 			throw new FilterScriptException(String.format(
 				"Literal \"%s\" is not a valid size.",
@@ -27,7 +26,7 @@ class LiteralNumericValueExpression implements NumericValueExpression
 	@Override
 	final public double evaluate(FilesystemUsageInformation usageInformation)
 	{
-		return _value.getBytes();
+		return _value.as(SizeUnits.Bytes);
 	}
 	
 	@Override

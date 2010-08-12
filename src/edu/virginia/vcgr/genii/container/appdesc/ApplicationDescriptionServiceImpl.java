@@ -40,6 +40,7 @@ import edu.virginia.vcgr.genii.client.appdesc.ApplicationDescriptionUtils;
 import edu.virginia.vcgr.genii.client.appdesc.ApplicationVersion;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
@@ -76,11 +77,12 @@ public class ApplicationDescriptionServiceImpl
 	}
 	
 	protected void postCreate(ResourceKey rKey,
-		EndpointReferenceType myEPR, HashMap<QName, Object> creationParameters,
+		EndpointReferenceType myEPR, ConstructionParameters cParams,
+		HashMap<QName, Object> creationParameters,
 		Collection<MessageElement> resolverCreationParams)
 		throws ResourceException, BaseFaultType, RemoteException
 	{
-		super.postCreate(rKey, myEPR, creationParameters, resolverCreationParams);
+		super.postCreate(rKey, myEPR, cParams, creationParameters, resolverCreationParams);
 		
 		IResource resource = rKey.dereference();
 		

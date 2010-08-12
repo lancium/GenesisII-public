@@ -4,11 +4,11 @@ import java.io.Closeable;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Properties;
 
 import javax.xml.namespace.QName;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
@@ -115,6 +115,9 @@ public interface IResource extends Closeable
 	public void setProperty(String propertyName, Object value) 
 		throws ResourceException;
 	
+	public ConstructionParameters constructionParameters(Class<?> serviceClass) throws ResourceException;
+	public void constructionParameters(ConstructionParameters parameters) throws ResourceException;
+	
 	/**
 	 * Destroy all state associated with this resource.
 	 * 
@@ -150,17 +153,6 @@ public interface IResource extends Closeable
 	public void addMatchingParameter(MatchingParameter...parameters)
 		throws ResourceException;
 	public void removeMatchingParameter(MatchingParameter...parameters)
-		throws ResourceException;
-	
-	public Properties getPersistedProperties(String category)
-		throws ResourceException;
-	public void replacePersistedProperty(String category,
-		String propertyName, String newValue) throws ResourceException;
-	public void replacePersistedProperties(String category, 
-		Properties replacement) throws ResourceException;
-	public void removePersistedProperty(String category,
-		String propertyname) throws ResourceException;
-	public void removePersistedProperties(String category)
 		throws ResourceException;
 	
 	public Calendar createTime() throws ResourceException;

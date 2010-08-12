@@ -721,12 +721,19 @@ public class ExportedDirDBResource extends BasicDBResource implements
 					
 				} else if (nextReal.isDirectory())
 				{
-					/* moved code to check if _dirServiceEPR set to constructor */
-					serviceEPR = _dirServiceEPR;
-					entryType = ExportedDirEntry._DIR_TYPE;
-					creationProperties = ExportedDirUtils.createCreationProperties(null,
-						newPath, childrenParentIds, getReplicationState());
-					
+					try
+					{
+						/* moved code to check if _dirServiceEPR set to constructor */
+						serviceEPR = _dirServiceEPR;
+						entryType = ExportedDirEntry._DIR_TYPE;
+						creationProperties = ExportedDirUtils.createCreationProperties(null,
+							newPath, childrenParentIds, getReplicationState());
+					}
+					catch (RemoteException re)
+					{
+						throw new ResourceException(
+							"Unable to create construction parameters.", re);
+					}
 				} else
 				{
 					throw new ResourceException("Local directory " + getLocalPath()

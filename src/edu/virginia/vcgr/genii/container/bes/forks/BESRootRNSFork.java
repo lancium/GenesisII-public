@@ -2,13 +2,11 @@ package edu.virginia.vcgr.genii.container.bes.forks;
 
 import java.util.Map;
 
-import edu.virginia.vcgr.genii.client.bes.GeniiBESConstants;
+import edu.virginia.vcgr.genii.container.common.forks.CommonRootRNSFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkInformation;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
-import edu.virginia.vcgr.genii.container.rfork.persprop.PersistedPropertyRNSFork;
-import edu.virginia.vcgr.genii.container.rfork.sfd.StaticRNSResourceFork;
 
-public class BESRootRNSFork extends StaticRNSResourceFork
+public class BESRootRNSFork extends CommonRootRNSFork
 {
 	public BESRootRNSFork(ResourceForkService service, String forkPath)
 	{
@@ -18,14 +16,8 @@ public class BESRootRNSFork extends StaticRNSResourceFork
 	@Override
 	protected void addEntries(Map<String, ResourceForkInformation> entries)
 	{
-		addDefaultEntry("activities", ActivityListRNSResourceFork.class);
-		addDefaultEntry(GeniiBESConstants.NATIVE_QUEUE_CONF_CATEGORY,
-			PersistedPropertyRNSFork.class);
+		super.addEntries(entries);
 		
-		/*
-		addDefaultEntry("status", ActivitySummaryResourceFork.class);
-		addDefaultEntry(WorkingDirectoryFork.FORK_BASE_PATH_NAME,
-			WorkingDirectoryFork.class);
-		*/
+		addDefaultEntry("activities", ActivityListRNSResourceFork.class);
 	}
 }

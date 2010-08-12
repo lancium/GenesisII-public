@@ -21,6 +21,8 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
+
 public class FilesystemManager
 {
 	static private Log _logger = LogFactory.getLog(FilesystemManager.class);
@@ -147,7 +149,7 @@ public class FilesystemManager
 				}
 				
 				FilesystemWatcher watcher = new FilesystemWatcher(
-					watcherConfig.checkPeriod().getMilliseconds(),
+					(long)watcherConfig.checkPeriod().as(DurationUnits.Milliseconds),
 					filesystemName, filesystem,
 					watcherConfig.filter(), callbacks);
 				_watchers.add(watcher);

@@ -21,7 +21,6 @@ import java.rmi.RemoteException;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Properties;
 import java.sql.SQLException;
 
 import javax.xml.namespace.QName;
@@ -38,11 +37,14 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.bes.activity.BESActivityGetErrorResponseType;
 import edu.virginia.vcgr.genii.bes.activity.BESActivityPortType;
 import edu.virginia.vcgr.genii.client.bes.BESActivityConstants;
-import edu.virginia.vcgr.genii.client.bes.GeniiBESConstants;
+import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.context.*;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLInterpreter;
+import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
 import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
 import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.resource.PortType;
@@ -51,7 +53,6 @@ import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
-import edu.virginia.vcgr.genii.client.utils.creation.CreationProperties;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
@@ -75,6 +76,7 @@ import edu.virginia.vcgr.genii.container.rfork.ResourceForkBaseService;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
 @ForkRoot(RootRNSFork.class)
+@ConstructionParametersType(BESConstructionParameters.class)
 public class BESActivityServiceImpl extends ResourceForkBaseService implements
 		BESActivityPortType, BESActivityConstants
 {
@@ -106,17 +108,19 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements
 	}
 
 	protected void postCreate(ResourceKey rKey,
-		EndpointReferenceType activityEPR, HashMap<QName, Object> creationParameters,
+		EndpointReferenceType activityEPR, ConstructionParameters cParams,
+		HashMap<QName, Object> creationParameters,
 		Collection<MessageElement> resolverCreationParams)
 		throws ResourceException, BaseFaultType, RemoteException
 	{
-		super.postCreate(rKey, activityEPR, creationParameters, resolverCreationParams);
+		super.postCreate(rKey, activityEPR, cParams, creationParameters, resolverCreationParams);
 		
 		_logger.debug(String.format(
 			"Post creating a BES Activity with resource key \"%s\".", 
 			rKey.getResourceKey()));
 		
 		IBESActivityResource resource = (IBESActivityResource)rKey.dereference();
+		
 		BESActivityInitInfo initInfo = BESActivityUtils.extractCreationProperties(
 			creationParameters);
 		
@@ -124,14 +128,14 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements
 		if (subscribe != null)
 			subscribe((String)resource.getKey(), subscribe);
 		
-		Properties creationProperties = (Properties)creationParameters.get(
-			CreationProperties.CREATION_PROPERTIES_QNAME);
-		
 		String activityServiceName = "BESActivityPortType";
 		Collection<Identity> owners = QueueSecurity.getCallerIdentities(true);
 		
 		BESWorkingDirectory workingDirectory = new BESWorkingDirectory(
-			chooseDirectory(creationParameters, 5), true);
+			chooseDirectory(
+				(BESConstructionParameters)resource.constructionParameters(getClass()), 
+				5), true);
+		
 		FilesystemManager fsManager = new FilesystemManager();
 		fsManager.setWorkingDirectory(workingDirectory.getWorkingDirectory());
 		
@@ -140,9 +144,10 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements
 			JobDefinition_Type jsdl = initInfo.getJobDefinition();
 			CommonExecutionUnderstanding executionUnderstanding;
 			
-			if (creationProperties != null && 
-				creationProperties.getProperty(
-					GeniiBESConstants.NATIVEQ_PROVIDER_PROPERTY) != null)
+			NativeQueueConfiguration qConf = 
+				((BESConstructionParameters)cParams).getNativeQueueConfiguration();
+			
+			if (qConf != null)
 			{
 				Object understanding = JSDLInterpreter.interpretJSDL(
 					new QSubPersonalityProvider(fsManager, workingDirectory), jsdl);
@@ -180,7 +185,7 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements
 				ContextManager.getCurrentContext(), 
 				workingDirectory,
 				executionUnderstanding.createExecutionPlan(
-					creationProperties),
+					(BESConstructionParameters)cParams),
 				activityEPR, activityServiceName, executionUnderstanding.getJobName());
 			Calendar future = Calendar.getInstance();
 			future.setTimeInMillis(System.currentTimeMillis() +
@@ -204,16 +209,19 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements
 		}
 	}
 	
-	static public File getCommonDirectory(Properties creationProperties)
+	static public File getCommonDirectory(BESConstructionParameters creationProperties)
 	{
 		File basedir = null;
 		
 		if (creationProperties != null)
 		{
-			String dir = creationProperties.getProperty(
-				GeniiBESConstants.SHARED_DIRECTORY_PROPERTY);
-			if (dir != null)
-				basedir = new File(dir);
+			NativeQueueConfiguration qConf = creationProperties.getNativeQueueConfiguration();
+			if (qConf != null)
+			{
+				File dir = qConf.sharedDirectory();
+				if (dir != null)
+					basedir = dir;
+			}
 		}
 			
 		File configDir = null;
@@ -226,19 +234,11 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements
 		return configDir;
 	}
 	
-	static public File getCommonDirectory(
-		HashMap<QName, Object> creationParameters)
-	{
-		return getCommonDirectory(
-			(Properties)creationParameters.get(
-				CreationProperties.CREATION_PROPERTIES_QNAME));
-	}
-	
 	static private File chooseDirectory(
-		HashMap<QName, Object> creationParameters, 
+		BESConstructionParameters constructionParameters, 
 		int attempts) throws ResourceException
 	{
-		return new File(getCommonDirectory(creationParameters),
+		return new File(getCommonDirectory(constructionParameters),
 			new GUID().toString());
 	}
 
