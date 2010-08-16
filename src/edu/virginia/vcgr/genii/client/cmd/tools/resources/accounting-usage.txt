@@ -1,1 +1,1 @@
-accounting --collect [--no-commit] [--recursive | -r] { <source-container> | <source-container-directory> } <target-database>
+accounting --collect [--no-commit] [--recursive | -r] [--max-threads=<max-threads>] { <source-container> | <source-container-directory> } <target-database>

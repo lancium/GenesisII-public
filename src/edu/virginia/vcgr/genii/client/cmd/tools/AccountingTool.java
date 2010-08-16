@@ -13,6 +13,8 @@ import java.sql.Types;
 import java.util.Collection;
 import java.util.Properties;
 import java.util.Vector;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
@@ -113,11 +115,8 @@ public class AccountingTool extends BaseGridTool
 		}
 	}
 	
-	private Connection openTargetConnection(EndpointReferenceType epr)
-		throws SQLException
+	private void setPassword()
 	{
-		URI uri = epr.getAddress().get_value();
-		
 		AbstractGamlLoginHandler handler = null;
 		if (!useGui() || !GuiUtils.supportsGraphics() 
 			|| !UserPreferences.preferences().preferGUI()) 
@@ -129,15 +128,24 @@ public class AccountingTool extends BaseGridTool
 		char []pword = handler.getPassword("Accounting Database Password",
 			"Password for accounting database:  ");
 		String password = (pword == null) ? "" : new String(pword);
+		_connectProperties = new Properties();
+		_connectProperties.setProperty("password", password);
 		
-		Properties connectProperties = new Properties();
-		connectProperties.setProperty("password", password);
+	}
+	
+	private Connection openTargetConnection(EndpointReferenceType epr)
+		throws SQLException
+	{
+		URI uri = epr.getAddress().get_value();
 		
 		Connection cleanupConn = null;
 		try
 		{
-			cleanupConn = DriverManager.getConnection(uri.toString(),
-				connectProperties);
+			synchronized(_connect)
+			{
+				cleanupConn = DriverManager.getConnection(uri.toString(),
+					_connectProperties);
+			}
 			cleanupConn.setAutoCommit(false);
 			Connection ret = cleanupConn;
 			cleanupConn = null;
@@ -330,6 +338,11 @@ public class AccountingTool extends BaseGridTool
 	private boolean _isCollect = false;
 	private boolean _isRecursive = false;
 	private boolean _isNoCommit = false;
+	private int _maxThreads = 1;
+	
+	private Properties _connectProperties;
+	private Lock _count;
+	private Object _connect;
 	
 	@Override
 	protected int runCommand() throws Throwable
@@ -338,8 +351,15 @@ public class AccountingTool extends BaseGridTool
 		RNSPath source = lookup(current, new GeniiPath(getArgument(0)));
 		RNSPath target = lookup(current, new GeniiPath(getArgument(1)));
 		
+		setPassword();
+		_count = new Lock();
+		_connect = new Object();
+		
 		collect(source.getEndpoint(), target.getEndpoint(), !_isNoCommit,
 			_isRecursive);
+		
+		_count.join();
+		
 		return 0;
 	}
 
@@ -379,6 +399,12 @@ public class AccountingTool extends BaseGridTool
 		_isNoCommit = true;
 	}
 	
+	@Option({"max-threads"})
+	public void setMax_threads(String max)
+	{
+		_maxThreads = Integer.parseInt(max);
+	}
+	
 	public void collect(EndpointReferenceType source,
 		EndpointReferenceType target, boolean doCommit, boolean isRecursive)
 			throws Throwable
@@ -405,8 +431,7 @@ public class AccountingTool extends BaseGridTool
 			} else if (typeInfo.isRNS())
 			{
 				RNSPath sourceRoot = new RNSPath(source);
-				targetConnection = openTargetConnection(target);
-				collect(sourceRoot, targetConnection, doCommit, isRecursive);
+				collect(sourceRoot, target, doCommit, isRecursive);
 			} else
 				throw new InvalidToolUsageException(
 					"Source is neither a directory nor a GenesisII container.");
@@ -471,7 +496,7 @@ public class AccountingTool extends BaseGridTool
 	}
 	
 	public void collect(RNSPath sourceDirectory,
-		Connection targetConnection, boolean doCommit, boolean isRecursive)
+		EndpointReferenceType target, boolean doCommit, boolean isRecursive)
 			throws Throwable
 	{
 		RNSRecursiveDescent descent = RNSRecursiveDescent.createDescent();
@@ -483,20 +508,22 @@ public class AccountingTool extends BaseGridTool
 		
 		descent.descend(sourceDirectory,
 			new RNSRecursiveDescentCallbackHandler(
-				targetConnection, doCommit));	
+				target, doCommit));	
 	}
 	
 	private class RNSRecursiveDescentCallbackHandler
 		implements RNSRecursiveDescentCallback
 	{
 		private boolean _doCommit;
-		private Connection _targetConnection;
+		private ExecutorService _exec;
+		private EndpointReferenceType _target;
 		
 		private RNSRecursiveDescentCallbackHandler(
-			Connection targetConnection, boolean doCommit)
+			EndpointReferenceType target, boolean doCommit)
 		{
-			_targetConnection = targetConnection;
+			_target = target;
 			_doCommit = doCommit;
+			_exec = Executors.newFixedThreadPool(_maxThreads);
 		}
 		
 		@Override
@@ -509,29 +536,92 @@ public class AccountingTool extends BaseGridTool
 		public RNSRecursiveDescentCallbackResult handleRNSPath(
 			RNSPath path) throws Throwable
 		{
-			stdout.format("Handling \"%s\".\n", path);
-			
-			try
-			{
-				EndpointReferenceType epr = path.getEndpoint();
-				WSName name = new WSName(epr);
-				if (!name.isValidWSName())
-					throw new IllegalArgumentException(
-						"Container EPR is not a valid WS-Name.");
-				VCGRContainerPortType container = ClientUtils.createProxy(
-					VCGRContainerPortType.class, epr);
-				collect(container, name.getEndpointIdentifier().toString(),
-					_targetConnection, _doCommit);
-			}
-			catch (Throwable cause)
-			{
-				stderr.format(
-					"Unable to collect accounting information from container:  %s.\n",
-					cause);
-				cause.printStackTrace(stderr);
-			}
+			_count.increment();
+			_exec.submit(new ThreadHandler(path));
 			
 			return RNSRecursiveDescentCallbackResult.ContinueLeaf;
+		}
+		
+		private class ThreadHandler implements Runnable
+		{
+			RNSPath _path;
+			
+			public ThreadHandler(RNSPath path)
+			{
+				_path = path;
+			}
+			
+			public void run()
+			{
+				stdout.format("Handling \"%s\".\n", _path);
+				stdout.flush();
+				
+				Connection targetConnection = null;
+				
+				try
+				{
+					EndpointReferenceType epr = _path.getEndpoint();
+					WSName name = new WSName(epr);
+					if (!name.isValidWSName())
+						throw new IllegalArgumentException(
+							"Container EPR is not a valid WS-Name.");
+					VCGRContainerPortType container = ClientUtils.createProxy(
+						VCGRContainerPortType.class, epr);
+					targetConnection = openTargetConnection(_target);
+					collect(container, name.getEndpointIdentifier().toString(),
+						targetConnection, _doCommit);
+				}
+				catch (Throwable cause)
+				{
+					stderr.format(
+						"Unable to collect accounting information from container %s:  %s.\n",
+						_path, cause);
+					cause.printStackTrace(stderr);
+				}
+				finally
+				{
+					StreamUtils.close(targetConnection);
+				}
+				
+				_count.decrement();
+			}	
+		}
+	}
+	
+	private class Lock
+	{
+		private int _count;
+		
+		public Lock()
+		{
+			_count = 0;
+		}
+		
+		public synchronized void increment()
+		{
+			_count++;
+		}
+		
+		public synchronized void decrement()
+		{
+			_count--;
+			if (_count < 0)
+				throw new RuntimeException(
+					"Count Underflow exception.");
+			
+			if (_count <= 0)
+				notifyAll();
+		}
+
+		public synchronized void join() throws InterruptedException
+		{
+			while (_count > 0)
+				wait();
+		}
+		
+		public String toString()
+		{
+			return Integer.toString(_count);
 		}
 	}
 	
