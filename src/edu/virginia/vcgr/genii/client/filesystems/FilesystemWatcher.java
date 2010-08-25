@@ -58,8 +58,8 @@ class FilesystemWatcher
 	
 	final Calendar performCheck(FilesystemManager manager)
 	{
-		FilesystemUsageInformation usageInformation = 
-			new FilesystemUsageInformation(_filesystem.filesystemRoot());
+		FilesystemUsageInformation usageInformation =
+			_filesystem.currentUsage();
 		
 		_logger.trace(String.format(
 			"Performing check on %s:\n%s\n",

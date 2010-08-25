@@ -54,6 +54,7 @@ public class JobListingRNSFork extends AbstractRNSResourceFork
 			String entryName) throws IOException
 	{
 		boolean mineOnly = false;
+		boolean showEPR = false;
 		String forkPath = getForkPath();
 		String []acceptableStatuses = null;
 
@@ -72,11 +73,13 @@ public class JobListingRNSFork extends AbstractRNSResourceFork
 				JobStateEnumerationType._REQUEUED
 			};
 		else if (forkPath.endsWith("/running"))
+		{
 			acceptableStatuses = new String[] { 
 				JobStateEnumerationType._RUNNING,
 				JobStateEnumerationType._STARTING
 			};
-		else if (forkPath.endsWith("/finished"))
+			showEPR = true;
+		} else if (forkPath.endsWith("/finished"))
 			acceptableStatuses = new String[] {
 				JobStateEnumerationType._ERROR,
 				JobStateEnumerationType._FINISHED
@@ -135,6 +138,23 @@ public class JobListingRNSFork extends AbstractRNSResourceFork
 				ret.add(createInternalEntry(exemplarEPR, job.getJobTicket(),
 					new JobInformationFork(getService(), 
 						formForkPath(job.getJobTicket())).describe()));
+				if (mineOnly && showEPR)
+				{
+					try
+					{
+						EndpointReferenceType epr = mgr.getActivityEPR(job.getJobTicket());
+						if (epr != null)
+							ret.add(new InternalEntry(
+								job.getJobTicket() + ".activity",
+								epr));
+					}
+					catch (Throwable cause)
+					{
+						_logger.warn(String.format(
+							"Unable to get job EPR for job %s.",
+							job.getJobTicket()));
+					}
+				}
 			}
 			
 			return ret;

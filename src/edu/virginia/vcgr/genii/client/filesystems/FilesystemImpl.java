@@ -26,6 +26,9 @@ class FilesystemImpl implements Filesystem
 		_filesystemName = filesystemName;
 		
 		File root = new File(conf.path());
+		
+		/* Mark Morgan -- We're not ready to do this yet.  We need to fully
+		 * go down this root first.
 		if (!root.exists())
 			root.mkdirs();
 
@@ -35,6 +38,7 @@ class FilesystemImpl implements Filesystem
 		else if (!root.isDirectory())
 			throw new FileNotFoundException(String.format(
 				"Unable to find directory \"%s\".", root));
+		*/
 		
 		_filesystemRoot = root;
 		
@@ -87,5 +91,11 @@ class FilesystemImpl implements Filesystem
 	public Set<FilesystemProperties> properties()
 	{
 		return Collections.unmodifiableSet(_properties);
+	}
+	
+	@Override
+	final public FilesystemUsageInformation currentUsage()
+	{
+		return new FilesystemUsageInformation(_filesystemRoot);
 	}
 }

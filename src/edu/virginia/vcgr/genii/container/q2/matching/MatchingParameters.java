@@ -16,13 +16,17 @@ public class MatchingParameters
 	
 	public MatchingParameters(Collection<MatchingParameter> params)
 	{
-		_matchingParameters = new LinkedList<MatchingParameter>();
-		_requiredParameters = new LinkedList<MatchingParameter>();
-		for(MatchingParameter p : params){
-			if (p.isRequired())
-				_requiredParameters.add(p);
-			else
-				_matchingParameters.add(p);
+		this();
+		
+		if (params != null)
+		{
+			for(MatchingParameter p : params)
+			{
+				if (p.isRequired())
+					_requiredParameters.add(p);
+				else
+					_matchingParameters.add(p);
+			}
 		}
 	}
 	

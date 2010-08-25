@@ -28,7 +28,7 @@
 				<jsdl-posix:Argument>seven.dat</jsdl-posix:Argument>
 				<jsdl-posix:Argument>fourty-two.dat</jsdl-posix:Argument>
 				<jsdl-posix:Argument>sum.dat</jsdl-posix:Argument>
-				<jsdl-posix:Argument>10</jsdl-posix:Argument>
+				<jsdl-posix:Argument>120</jsdl-posix:Argument>
 			</jsdl-posix:POSIXApplication>
 		</jsdl:Application>
 
@@ -37,7 +37,7 @@
 			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
 			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
 			<jsdl:Source>
-				<jsdl:URI>http://www.cs.virginia.edu/~mmm2a/test/adder-nosleep.sh</jsdl:URI>
+				<jsdl:URI>http://www.cs.virginia.edu/~mmm2a/test/adder.sh</jsdl:URI>
 			</jsdl:Source>
 		</jsdl:DataStaging>
 		

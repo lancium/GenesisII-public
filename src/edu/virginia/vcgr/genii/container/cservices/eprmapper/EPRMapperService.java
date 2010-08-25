@@ -58,7 +58,7 @@ public class EPRMapperService extends AbstractContainerService
 		throws ResourceException
 	{
 		EPRMapperService service =
-			(EPRMapperService)ContainerServices.findService(SERVICE_NAME);
+			ContainerServices.findService(EPRMapperService.class);
 		
 		if (service == null)
 			throw new RuntimeException(String.format(

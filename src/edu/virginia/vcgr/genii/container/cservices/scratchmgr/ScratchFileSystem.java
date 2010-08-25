@@ -37,8 +37,8 @@ public class ScratchFileSystem extends DirectoryBasedFileSystem
 		try
 		{
 			ScratchFSManagerContainerService service =
-				(ScratchFSManagerContainerService)ContainerServices.findService(
-					ScratchFSManagerContainerService.SERVICE_NAME);
+				ContainerServices.findService(
+					ScratchFSManagerContainerService.class);
 			service.releaseReservation(this);
 		}
 		catch (Throwable cause)

@@ -83,8 +83,8 @@ public class FilesystemUnderstanding
 				uniqueID = jobAnnotation;
 			
 			ScratchFSManagerContainerService service =
-				(ScratchFSManagerContainerService)ContainerServices.findService(
-					ScratchFSManagerContainerService.SERVICE_NAME);
+				ContainerServices.findService(
+					ScratchFSManagerContainerService.class);
 			return service.reserveSwapFilesystem(GUID.fromRandomBytes(
 				uniqueID.getBytes()).toString());
 		}

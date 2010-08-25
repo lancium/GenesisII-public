@@ -20,4 +20,6 @@ public interface Filesystem
 	public FilesystemWatchRegistration addWatch(Integer callLimit, 
 		long checkPeriod, TimeUnit checkPeriodUnits, 
 		FilesystemWatchFilter filter, FilesystemWatchHandler handler);
+	
+	public FilesystemUsageInformation currentUsage();
 }

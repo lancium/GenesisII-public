@@ -13,10 +13,14 @@ import javax.management.Notification;
 import javax.management.NotificationEmitter;
 import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
-import javax.management.openmbean.CompositeData;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class LowMemoryWarning
 {
+	static private Log _logger = LogFactory.getLog(LowMemoryWarning.class);
+	
 	static private final double PERCENTAGE_THRESHOLD = 0.95;
 	
 	static public LowMemoryWarning INSTANCE = new LowMemoryWarning();
@@ -73,10 +77,18 @@ public class LowMemoryWarning
 		@Override
 		public void handleNotification(Notification n, Object hb)
 		{
-			CompositeData cd = (CompositeData)n.getUserData();
-			MemoryNotificationInfo info = MemoryNotificationInfo.from(cd);
-			MemoryUsage usage = info.getUsage();
-			fireLowMemoryWarning(usage.getUsed(), usage.getMax());
+			ManagementFactory.getMemoryMXBean().gc();
+			MemoryUsage usage =
+				ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
+			long threshold = (long)(usage.getMax() * PERCENTAGE_THRESHOLD);
+			if (usage.getUsed() >= threshold)
+				fireLowMemoryWarning(usage.getUsed(), usage.getMax());
+			else
+				_logger.info(String.format(
+					"We were about to run out of memory, but a forced " +
+					"garbage collection saved us.  " +
+					"Current Memory usage is %.2f%%.", 
+					(double)usage.getUsed() / (double)usage.getMax() * 100));
 		}	
 	}
 	

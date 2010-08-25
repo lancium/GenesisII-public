@@ -60,4 +60,10 @@ public class FilesystemAliasImpl implements Filesystem
 	{
 		return _trueFS.properties();
 	}
+
+	@Override
+	final public FilesystemUsageInformation currentUsage()
+	{
+		return _trueFS.currentUsage();
+	}
 }

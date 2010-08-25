@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><container-service class="edu.virginia.vcgr.genii.container.cservices.infomgr.InformationContainerService"><property value="8" name="edu.virginia.vcgr.genii.cservices.infomgr.num-threads"/></container-service>

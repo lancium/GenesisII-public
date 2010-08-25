@@ -24,6 +24,10 @@ class Version1ContainerService
 	final Class<? extends ContainerService> serviceClass(Properties macros) throws ClassNotFoundException
 	{
 		String className = MacroUtils.replaceMacros(macros, _className);
+		
+		if (className.endsWith(".GridLoggerContainerService"))
+			return null;
+		
 		Class<? extends ContainerService> serviceClass =
 			(Class<? extends ContainerService>)Version1Upgrader.class.getClassLoader().loadClass(className);
 		

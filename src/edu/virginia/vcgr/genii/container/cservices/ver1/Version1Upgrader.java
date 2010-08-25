@@ -8,6 +8,7 @@ import java.util.Properties;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
+import edu.virginia.vcgr.genii.container.cservices.ContainerService;
 import edu.virginia.vcgr.genii.container.cservices.conf.ContainerServiceConfiguration;
 
 public class Version1Upgrader
@@ -51,9 +52,15 @@ public class Version1Upgrader
 			
 			for (Version1ContainerService v1Service : v1Conf.services())
 			{
-				ContainerServiceConfiguration v2Conf = new ContainerServiceConfiguration(
-					v1Service.serviceClass(macros), v1Service.properties(macros));
-				writeUpgrade(targetDirectory, v2Conf);
+				Class<? extends ContainerService> serviceClass =
+					v1Service.serviceClass(macros);
+				if (serviceClass != null)
+				{
+					ContainerServiceConfiguration v2Conf =
+						new ContainerServiceConfiguration(
+							serviceClass, v1Service.properties(macros));
+					writeUpgrade(targetDirectory, v2Conf);
+				}
 			}
 			
 			version1File.delete();

@@ -98,6 +98,15 @@ public class DownloadManagerContainerService extends AbstractContainerService
 	}
 	
 	@Override
+	public void setProperties(Properties properties)
+	{
+		super.setProperties(properties);
+		
+		_configuredDownloadTmpDir = properties.getProperty(
+			DOWNLOAD_TMP_DIR_PROPERTY);
+	}
+
+	@Override
 	protected void loadService() throws Throwable
 	{
 		_logger.info("Loading DownloadManager Constainer Service.");

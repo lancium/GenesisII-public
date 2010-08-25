@@ -89,8 +89,8 @@ public class QueueManager implements Closeable
 		if (_informationPortal == null)
 		{
 			InformationContainerService service = 
-				(InformationContainerService)ContainerServices.findService(
-						InformationContainerService.SERVICE_NAME);
+				ContainerServices.findService(
+					InformationContainerService.class);
 			_informationPortal = service.createNewPortal(
 				new InMemoryPersister<BESInformation>(),
 				new BESInformationResolver(_connectionPool),
@@ -418,6 +418,22 @@ public class QueueManager implements Closeable
 		{
 			connection = _connectionPool.acquire(true);
 			return _jobManager.listJobs(connection, ticket);
+		}
+		finally
+		{
+			_connectionPool.release(connection);
+		}
+	}
+	
+	public EndpointReferenceType getActivityEPR(String ticket)
+		throws ResourceException, SQLException
+	{
+		Connection connection = null;
+		
+		try
+		{
+			connection = _connectionPool.acquire(true);
+			return _jobManager.getActivityEPR(connection, ticket);
 		}
 		finally
 		{

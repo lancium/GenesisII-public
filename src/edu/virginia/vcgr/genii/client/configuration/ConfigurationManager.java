@@ -146,11 +146,6 @@ public class ConfigurationManager
 				_filesystemManager = new FilesystemManager(fsConf);
 			else
 				_filesystemManager= new FilesystemManager();
-			
-			Thread th = new Thread(new FilesystemPoller(_filesystemManager),
-				"Filesystem Polling Thread");
-			th.setDaemon(true);
-			th.start();
 		}
 		catch (IOException ioe)
 		{
@@ -195,6 +190,11 @@ public class ConfigurationManager
 	public void setRoleServer()
 	{
 		setRole(Boolean.FALSE);
+		
+		Thread th = new Thread(new FilesystemPoller(_filesystemManager),
+			"Filesystem Polling Thread");
+		th.setDaemon(true);
+		th.start();
 	}
 	
 	synchronized public XMLConfiguration getRoleSpecificConfiguration()

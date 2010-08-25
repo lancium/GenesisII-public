@@ -107,9 +107,8 @@ public class EmailWatchHandler implements FilesystemWatchHandler
 			FilesystemUsageInformation usageInformation,
 			boolean matched)
 	{			
-		final String SUBJECT = _config.subject();
-		final String MESSAGE = _config.format(filesystemName,
-				usageInformation.percentUsed());
+		final String SUBJECT = _config.subject(matched);
+		final String MESSAGE = _config.message(matched);
 		
 		sendMessage(SUBJECT, MESSAGE);
 	}

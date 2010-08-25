@@ -111,7 +111,7 @@ class FilesystemWatchCallback
 		
 		_lastMatched = matched;
 		
-		if ((matched || _registerAntiCallback) &&
+		if ((matched || (_registerAntiCallback && _callsMade < 1)) &&
 			(_callLimit == null || _callsMade < _callLimit))
 		{
 			try

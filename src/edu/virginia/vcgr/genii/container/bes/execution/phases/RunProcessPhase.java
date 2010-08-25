@@ -159,8 +159,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 					results.exitCode()));
 				
 				AccountingService acctService = 
-					(AccountingService)ContainerServices.findService(
-						AccountingService.SERVICE_NAME);
+					ContainerServices.findService(AccountingService.class);
 				if (acctService != null)
 				{
 					acctService.addAccountingRecord(

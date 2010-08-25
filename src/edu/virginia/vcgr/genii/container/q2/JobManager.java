@@ -527,6 +527,16 @@ public class JobManager implements Closeable
 		}
 	}
 	
+	synchronized public EndpointReferenceType getActivityEPR(
+		Connection connection, String jobTicket) throws ResourceException, SQLException
+	{
+		JobData jData = _jobsByTicket.get(jobTicket);
+		JobStatusInformation info = _database.getJobStatusInformation(
+			connection, jData.getJobID());
+			
+		return info.getJobEndpoint();
+	}
+	
 	/**
 	 * List all jobs currently in the queue.  This operation is considered
 	 * "safe" from a security point of view and is not subject to verifying

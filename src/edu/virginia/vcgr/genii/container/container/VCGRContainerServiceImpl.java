@@ -117,8 +117,8 @@ public class VCGRContainerServiceImpl extends ResourceForkBaseService
 		Collection<MessageElement> col = new LinkedList<MessageElement>();
 		
 		AccountingService acctService = 
-			(AccountingService)ContainerServices.findService(
-				AccountingService.SERVICE_NAME);
+			ContainerServices.findService(
+				AccountingService.class);
 		
 		try
 		{
@@ -147,8 +147,8 @@ public class VCGRContainerServiceImpl extends ResourceForkBaseService
 			throws RemoteException
 	{
 		AccountingService acctService = 
-			(AccountingService)ContainerServices.findService(
-				AccountingService.SERVICE_NAME);
+			ContainerServices.findService(
+				AccountingService.class);
 		
 		try
 		{

@@ -162,6 +162,15 @@ public class ScratchFSManagerContainerService extends AbstractContainerService
 		this((String)null);
 	}
 	
+	@Override
+	public void setProperties(Properties properties)
+	{
+		super.setProperties(properties);
+		
+		_configuredScratchSpaceName = properties.getProperty(
+			SCRATCH_DIRECTORY_PROPERTY);
+	}
+	
 	public ScratchFileSystem reserveSwapFilesystem(String directoryName)
 		throws IOException
 	{

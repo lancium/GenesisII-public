@@ -218,18 +218,6 @@ public class JobInformationFork
 					if (writer != null)
 						writer.flush();
 				}
-				
-				pStream.println();
-				pStream.println("Log:");
-				try
-				{
-					mgr.printLog(jobTicket, pStream);
-				}
-				catch (Throwable cause)
-				{
-					pStream.println("Unable to print job log.");
-					cause.printStackTrace(pStream);
-				}
 			}
 			
 			pStream.flush();

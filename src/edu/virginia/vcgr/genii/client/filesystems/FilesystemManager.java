@@ -216,6 +216,11 @@ public class FilesystemManager
 		return fs;
 	}
 	
+	final public Iterable<String> filesystems()
+	{
+		return _filesystems.keySet();
+	}
+	
 	final public void enterPollingLoop() throws InterruptedException
 	{
 		Collection<FilesystemWatcher> toHandle = 

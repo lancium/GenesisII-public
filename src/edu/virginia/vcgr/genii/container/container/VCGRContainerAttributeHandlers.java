@@ -20,7 +20,7 @@ public class VCGRContainerAttributeHandlers extends AbstractAttributeHandler
 	private Serializable getContainerServiceProperty(String propertyName)
 	{
 		ContainerService exemplar = ContainerServices.findService(
-			DownloadManagerContainerService.SERVICE_NAME);
+			DownloadManagerContainerService.class);
 		return exemplar.getContainerServicesProperties().getProperty(
 			propertyName);
 	}
@@ -29,7 +29,7 @@ public class VCGRContainerAttributeHandlers extends AbstractAttributeHandler
 		Serializable newValue)
 	{
 		ContainerService exemplar = ContainerServices.findService(
-			DownloadManagerContainerService.SERVICE_NAME);
+			DownloadManagerContainerService.class);
 		exemplar.getContainerServicesProperties().setProperty(propertyName, 
 			newValue);
 	}

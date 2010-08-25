@@ -54,8 +54,8 @@ public class StageInPhase extends AbstractExecutionPhase
 		if (_creationFlag.equals(CreationFlagEnumeration.dontOverwrite))
 		{
 			DownloadManagerContainerService service =
-				(DownloadManagerContainerService)ContainerServices.findService(
-					DownloadManagerContainerService.SERVICE_NAME);
+				ContainerServices.findService(
+					DownloadManagerContainerService.class);
 			service.download(_source, target, _credential);
 		} else
 			URIManager.get(_source, target, _credential);

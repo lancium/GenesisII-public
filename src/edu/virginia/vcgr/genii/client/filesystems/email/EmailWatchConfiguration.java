@@ -19,19 +19,33 @@ public class EmailWatchConfiguration
 		name = "subject", required = false)
 	private String _subject = null;
 	
+	@XmlElement(
+		namespace = "http://vcgr.cs.virginia.edu/filesystems/email-watch",
+		name = "positive-subject", required = false)
+	private String _positiveSubject = null;
+	
 	@XmlElement (
 		namespace = "http://vcgr.cs.virginia.edu/filesystems/email-watch",
 		name = "message", required = false)
-	private String _messageFormat = null;
+	private String _message = null;
 	
-	String message()
+	@XmlElement (
+		namespace = "http://vcgr.cs.virginia.edu/filesystems/email-watch",
+		name = "positive-message", required = false)
+	private String _positiveMessage = null;
+	
+	String message(boolean isNegative)
 	{
-		return _messageFormat;
+		if (!isNegative || _positiveMessage == null)
+			return _message;
+		return _positiveMessage;
 	}
-		
-	String subject()
+	
+	String subject(boolean isNegative)
 	{
-		return _subject;
+		if (!isNegative || _positiveMessage == null)
+			return _subject;
+		return _positiveSubject;
 	}
 	
 	AddressInfoConfiguration addr()
@@ -43,10 +57,4 @@ public class EmailWatchConfiguration
 	{
 		return _connection;
 	}
-	
-	final String format(Object...args)
-	{
-		return String.format(_messageFormat, args);
-	}
-	
 }

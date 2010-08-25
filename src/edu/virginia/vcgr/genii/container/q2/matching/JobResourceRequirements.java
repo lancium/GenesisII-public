@@ -81,6 +81,8 @@ public class JobResourceRequirements
 	
 	public JobResourceRequirements(JobDefinition_Type jsdl)
 	{
+		_matchingParameters = new MatchingParameters();
+		
 		if (jsdl == null)
 			return;
 		

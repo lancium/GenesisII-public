@@ -30,7 +30,7 @@ static private Log _logger = LogFactory.getLog(ContainerServices.class);
 	static final private String _CONTAINER_SERVICES_FILENAME = 
 		"container-services.xml";
 	
-	static private Map<String, ContainerService> _services = null;
+	static private Map<Class<? extends ContainerService>, ContainerService> _services = null;
 	
 	static private Collection<ContainerService> getServices(File configFile)
 		throws IOException
@@ -83,11 +83,12 @@ static private Log _logger = LogFactory.getLog(ContainerServices.class);
 		return ret;
 	}
 	
-	static public ContainerService findService(String serviceName)
+	static public <Type extends ContainerService> Type findService(
+		Class<Type> serviceClass)
 	{
-		ContainerService ret = _services.get(serviceName);
+		Type ret = serviceClass.cast(_services.get(serviceClass));
 		if (ret == null)
-			throw new NoSuchServiceException(serviceName);
+			throw new NoSuchServiceException(serviceClass.toString());
 		
 		return ret;
 	}
@@ -102,7 +103,7 @@ static private Log _logger = LogFactory.getLog(ContainerServices.class);
 		ContainerServicesProperties properties = new ContainerServicesProperties(
 			connectionPool);
 		
-		_services = new HashMap<String, ContainerService>();
+		_services = new HashMap<Class<? extends ContainerService>, ContainerService>();
 	
 		Collection<String> toRemove = new LinkedList<String>();
 		
@@ -119,7 +120,7 @@ static private Log _logger = LogFactory.getLog(ContainerServices.class);
 				{
 					for (ContainerService service : services)
 					{
-						_services.put(service.serviceName(), service);
+						_services.put(service.getClass(), service);
 						try
 						{
 							service.load(executor, connectionPool, properties);
