@@ -262,15 +262,18 @@
 <!-- ============= Notification Consumer PortType Definition ============ -->
 	<wsdl:portType name="NotificationConsumer">
 		<wsdl:operation name="Notify">
-			<wsdl:input message="wsntw:Notify"/>
+			<wsdl:input message="wsntw:Notify"
+				wsa:Action="http://docs.oasis-open.org/wsn/bw-2/NotificationConsumer/Notify"/>
 		</wsdl:operation>
 	</wsdl:portType>
 
 <!-- ============== NotificationProducer PortType Definition =========== -->
 	<wsdl:portType name="NotificationProducer">
 		<wsdl:operation name="Subscribe">
-			<wsdl:input message="wsntw:SubscribeRequest"/>
-			<wsdl:output message="wsntw:SubscribeResponse"/>
+			<wsdl:input message="wsntw:SubscribeRequest"
+				wsa:Action="http://docs.oasis-open.org/wsn/bw-2/NotificationProducer/SubscribeRequest"/>
+			<wsdl:output message="wsntw:SubscribeResponse"
+				wsa:Action="http://docs.oasis-open.org/wsn/bw-2/NotificationProducer/SubscribeResponse"/>
 			<wsdl:fault name="ResourceUnknownFault"
 				message="wsrf-rw:ResourceUnknownFault"/>
 			<wsdl:fault name="InvalidFilterFault"
@@ -298,8 +301,10 @@
 		</wsdl:operation>
 
 		<wsdl:operation name="GetCurrentMessage">
-			<wsdl:input message="wsntw:GetCurrentMessageRequest"/>
-			<wsdl:output message="wsntw:GetCurrentMessageResponse"/>
+			<wsdl:input message="wsntw:GetCurrentMessageRequest"
+				wsa:Action="http://docs.oasis-open.org/wsn/bw-2/NotificationProducer/GetCurrentMessageRequest"/>
+			<wsdl:output message="wsntw:GetCurrentMessageResponse"
+				wsa:Action="http://docs.oasis-open.org/wsn/bw-2/NotificationProducer/GetCurrentMessageResponse"/>
 			<wsdl:fault name="ResourceUnknownFault"
 				message="wsrf-rw:ResourceUnknownFault"/>
 			<wsdl:fault name="TopicExpressionDialectUnknownFault"
