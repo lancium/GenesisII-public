@@ -69,10 +69,14 @@
 			locator-type="edu.virginia.vcgr.genii.replicatedExport.RExportFileServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.replicatedExport.RExportDirPortType"
 			locator-type="edu.virginia.vcgr.genii.replicatedExport.RExportDirServiceLocator"/>
-		<locator interface="edu.virginia.vcgr.genii.common.notification.GeniiNotificationConsumerPortType"
-			locator-type="edu.virginia.vcgr.genii.common.notification.GeniiNotificationConsumerServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.common.notification.GeniiSubscriptionPortType"
 			locator-type="edu.virginia.vcgr.genii.common.notification.GeniiSubscriptionServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.common.notification.GeniiWSNBrokerPortType"
+			locator-type="edu.virginia.vcgr.genii.common.notification.GeniiWSNBrokerServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.common.notification.GeniiPublisherRegistrationPortType"
+			locator-type="edu.virginia.vcgr.genii.common.notification.GeniiPublisherRegistrationServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.common.notification.GeniiPullPointPortType"
+			locator-type="edu.virginia.vcgr.genii.common.notification.GeniiPullPointServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.naming.EndpointIdentifierResolver"
 			locator-type="edu.virginia.vcgr.genii.naming.EndpointIdentifierResolverServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.naming.ReferenceResolver"
@@ -251,6 +255,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.SetTool</mconf:class>
 		<mconf:class name="history"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.HistoryTool</mconf:class>
+		<mconf:class name="wsn-subscribe"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.WSNSubscribeTool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

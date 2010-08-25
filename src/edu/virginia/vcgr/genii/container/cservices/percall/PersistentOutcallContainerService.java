@@ -224,7 +224,8 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 		EndpointReferenceType target, ICallingContext callingContext)
 	{
 		PersistentOutcallContainerService service = 
-			ContainerServices.findService(PersistentOutcallContainerService.class);
+			ContainerServices.findService(
+				PersistentOutcallContainerService.class);
 		if (service != null)
 			return service.schedule(actor, scheduler, target, callingContext);
 		else

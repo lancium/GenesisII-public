@@ -10,7 +10,6 @@ import java.rmi.RemoteException;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
-import org.apache.axis.types.Token;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.RNSEntryExistsFaultType;
@@ -27,11 +26,13 @@ import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
-import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.DefaultSubscriptionFactory;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscribeException;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscriptionFactory;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ByteIOTopics;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.GenesisIIBaseTopics;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
-import edu.virginia.vcgr.genii.common.notification.Subscribe;
-import edu.virginia.vcgr.genii.common.notification.UserDataType;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
@@ -199,43 +200,41 @@ public class RExportUtils
 			String replicaType)
 		throws ResourceException
 	{
-		UserDataType commonUserData = new UserDataType(new MessageElement[] { 
-				new MessageElement(new QName(
-						GenesisIIConstants.GENESISII_NS, "primary-export-localpath"),
-						primaryLocalPath)
-			});
-
-		//subscribe all replicas to resolver termination
-		try{
-			GeniiCommon producer = ClientUtils.createProxy(
-					GeniiCommon.class, resolverEPR);
-			producer.subscribe(new Subscribe(
-					new Token(WellknownTopics.TERMINATED), 
-					null, 
-					replicaEPR, 
-					commonUserData));
-		}
-		catch (Exception e){ 
-			_logger.error("Could not create replica subscription to rexport resolver termination.");
-			throw new ResourceException(
-					"Could not create replica subscription to rexport resolver termination.", e);
-		}
+		PrimaryExportLocalpathUserData userData =
+			new PrimaryExportLocalpathUserData(primaryLocalPath);
+		SubscriptionFactory factory = new DefaultSubscriptionFactory(
+			replicaEPR);
 		
+		try
+		{
+			factory.subscribe(resolverEPR,
+				GenesisIIBaseTopics.RESOURCE_TERMINATION_TOPIC.asConcreteQueryExpression(),
+				null, userData);
+		}
+		catch (SubscribeException e1)
+		{
+			_logger.error(
+				"Could not create replica subscription to rexport resolver termination.", e1);
+			throw new ResourceException(
+				"Could not create replica subscription to rexport resolver termination.", e1);
+		}
+
 		//subscribe resolver of file replica to RandomeByteIO notifications from export
-		if (replicaType.equals(RExportResolverUtils._FILE_TYPE)){
-			try{
-				GeniiCommon primaryProxy = ClientUtils.createProxy(
-						GeniiCommon.class, primaryEPR);
-				primaryProxy.subscribe(new Subscribe(
-						new Token(WellknownTopics.RANDOM_BYTEIO_OP), 
-						null, 
-						resolverEPR, 
-						commonUserData));
+		if (replicaType.equals(RExportResolverUtils._FILE_TYPE))
+		{
+			factory = new DefaultSubscriptionFactory(resolverEPR);
+			
+			try
+			{
+				factory.subscribe(primaryEPR,
+					ByteIOTopics.BYTEIO_CONTENTS_CHANGED_TOPIC.asConcreteQueryExpression(),
+					null, userData);
 			}
-			catch (Exception e){ 
+			catch (SubscribeException e)
+			{
 				_logger.debug("Could not subscribe resolver to export randomByteIO ops.");
 				throw new ResourceException(
-						"Could not subscribe resolver to export randomByteIO ops.", e);
+					"Could not subscribe resolver to export randomByteIO ops.", e);
 			}
 		}
 	}

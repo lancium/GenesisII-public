@@ -1,8 +1,6 @@
 package edu.virginia.vcgr.genii.container.q2;
 
 import java.io.Closeable;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,7 +16,6 @@ import javax.xml.namespace.QName;
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.ggf.bes.factory.ActivityStatusType;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.jsdl.JobMultiDefinition_Type;
 import org.morgan.util.io.StreamUtils;
@@ -27,12 +24,10 @@ import org.xml.sax.InputSource;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
-import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
-import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.queue.QueueConstants;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -40,10 +35,12 @@ import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
-import edu.virginia.vcgr.genii.common.notification.Notify;
-import edu.virginia.vcgr.genii.common.notification.UserDataType;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.AbstractNotificationHandler;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.BESActivityStateChangedContents;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.BESActivityTopics;
 
-import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
@@ -87,10 +84,6 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	//static private final long _DEFAULT_TIME_TO_LIVE = 1000L * 60 * 60;
 	static public QName _JOBID_QNAME =
 		new QName(GenesisIIConstants.GENESISII_NS, "job-id");
-	static private QName _FILENAME_QNAME =
-		new QName(GenesisIIConstants.GENESISII_NS, "create-file-filename");
-	static private QName _FILEPATH_QNAME =
-		new QName(GenesisIIConstants.GENESISII_NS, "data-filepath");
 	
 	/*
 	static private UserDataType createUserData(String filename, String filepath)
@@ -582,113 +575,51 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		}
 	}
 	
-	@RWXMapping(RWXCategory.OPEN)
-	public void notify(Notify notify) throws RemoteException, ResourceUnknownFaultType
+	@Override
+	protected void registerNotificationHandlers(
+			NotificationMultiplexer multiplexer)
 	{
-		super.notify(notify);
+		super.registerNotificationHandlers(multiplexer);
 		
-		try
+		multiplexer.registerNotificationHandler(
+			BESActivityTopics.ACTIVITY_STATE_CHANGED_TO_FINAL_TOPIC.asConcreteQueryExpression(),
+			new LegacyBESActivityStateChangeFinalNotificationHandler());
+	}
+
+	private class LegacyBESActivityStateChangeFinalNotificationHandler
+		extends AbstractNotificationHandler<BESActivityStateChangedContents>
+	{
+		private LegacyBESActivityStateChangeFinalNotificationHandler()
 		{
-			String topic = notify.getTopic().toString();
-			String name = null;
+			super(BESActivityStateChangedContents.class);
+		}
+
+		@Override
+		public void handleNotification(TopicPath topic,
+				EndpointReferenceType producerReference,
+				EndpointReferenceType subscriptionReference,
+				BESActivityStateChangedContents contents) throws Exception
+		{
+			JobCompletedAdditionUserData userData = 
+				contents.additionalUserData(
+					JobCompletedAdditionUserData.class);
 			
-			if (topic.equals(WellknownTopics.SBYTEIO_INSTANCE_DYING))
+			if (userData == null)
+				throw new RemoteException(
+					"Missing required user data for notification");
+			
+			long jobid = userData.jobID();
+			ActivityState state = contents.activityState();
+			if (state.isFinalState())
 			{
-				UserDataType userData = notify.getUserData();
-				if (userData == null || (userData.get_any() == null) )
-					throw new RemoteException(
-						"Missing required user data for notification");
-				MessageElement []data = userData.get_any();
-				if (data.length != 2)
-					throw new RemoteException(
-						"Missing required user data for notification");
-				String filepath = null;
-				
-				for (MessageElement elem : data)
-				{
-					QName elemName = elem.getQName();
-					if (elemName.equals(_FILENAME_QNAME))
-					{
-						name = elem.getValue();
-					} else if (elemName.equals(_FILEPATH_QNAME))
-					{
-						filepath = elem.getValue();
-					} else
-					{
-						throw new RemoteException(
-							"Unknown user data found in notification.");
-					}
-				}
-				
-				if (name == null)
-					throw new ResourceException(
-						"Couldn't locate name parameter in UserData for notification.");
-				if (filepath == null)
-					throw new ResourceException(
-						"Couldn't locate filepath parameter in UserData " +
-						"for notification.");
-				
-				if (!name.endsWith(".txt"))
-					name += ".txt";
-				
-				submitJob(filepath);
-			} else if (topic.equals(WellknownTopics.BES_ACTIVITY_STATUS_CHANGE_FINAL))
-			{
-				UserDataType userData = notify.getUserData();
-				if (userData == null || (userData.get_any() == null) )
-					throw new RemoteException(
-						"Missing required user data for notification");
-				MessageElement []data = userData.get_any();
-				if (data.length != 1)
-					throw new RemoteException(
-						"Missing required user data for notification");
-				
-				String jobid = null;
-				MessageElement elem = data[0];
-				QName elemName = elem.getQName();
-				if (elemName.equals(_JOBID_QNAME))
-				{
-					ActivityStatusType ast = null;
-					jobid = elem.getValue();
-					MessageElement []any = notify.get_any();
-					if (any == null || any.length == 0)
-						throw new RemoteException(
-							"Missing required notification body.");
-					
-					for (MessageElement a : any)
-					{
-						if (a.getQName().equals(
-							BESConstants.GENII_BES_NOTIFICATION_STATE_ELEMENT_QNAME))
-							ast = ObjectDeserializer.toObject(a, 
-								ActivityStatusType.class);
-					}
-					
-					if (ast == null)
-						throw new RemoteException(
-							"Missing required notification body element.");
-					
-					ActivityState state = new ActivityState(ast);
-					if (state.isFinalState())
-					{
-						QueueManager mgr = QueueManager.getManager(
-							ResourceManager.getCurrentResource().getResourceKey());
-						mgr.checkJobStatus(jobid);
-					}
-					
-				} else
-				{
-					throw new RemoteException(
-						"Unknown user data found in notification.");
-				}
+				QueueManager mgr = QueueManager.getManager(
+					ResourceManager.getCurrentResource().getResourceKey());
+				mgr.checkJobStatus(jobid);
 			}
-		} 
-		catch (Throwable t)
-		{
-			_logger.warn(t.getLocalizedMessage(), t);
 		}
 	}
 	
-	public void submitJob(InputStream in)
+	public void submitJobStream(InputStream in)
 		throws IOException
 	{
 		if (!in.markSupported())
@@ -701,38 +632,6 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		{
 			in.reset();
 			submitJobTryMulti(in);
-		}
-	}
-	
-	private void submitJob(String filepath)
-		throws IOException
-	{
-		File file = new File(filepath);
-		
-		try
-		{
-			if (!submitJobTrySingle(file))
-				submitJobTryMulti(file);
-		}
-		finally
-		{
-			file.delete();
-		}
-	}
-	
-	private boolean submitJobTryMulti(File file)
-		throws IOException
-	{
-		FileInputStream fin = null;
-		
-		try
-		{
-			fin = new FileInputStream(file);
-			return submitJobTryMulti(fin);
-		}
-		finally
-		{
-			StreamUtils.close(fin);
 		}
 	}
 	
@@ -749,30 +648,6 @@ public class QueueServiceImpl extends ResourceForkBaseService
 			submitJob(new SubmitJobRequestType(jobDef, (byte)0x0));
 		
 		return true;
-	}
-	
-	private boolean submitJobTrySingle(File file)
-		throws IOException
-	{
-		FileInputStream fin = null;
-		
-		try
-		{
-			fin = new FileInputStream(file);
-			return submitJobTrySingle(fin);
-		}
-		catch (IOException ioe)
-		{
-			throw ioe;
-		}
-		catch (Throwable cause)
-		{
-			return false;
-		}
-		finally
-		{
-			StreamUtils.close(fin);
-		}
 	}
 	
 	private boolean submitJobTrySingle(InputStream in)

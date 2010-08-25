@@ -211,8 +211,10 @@
 
 	<target name="generate.ws.source" depends="genii.wsdl.tools">
 		<ant antfile="${wsdl.dir}/common.build.xml"/>
-		<ant antfile="${wsdl.dir}/notification-consumer.build.xml"/>
+		<ant antfile="${wsdl.dir}/geniiPullPoint.build.xml"/>
 		<ant antfile="${wsdl.dir}/subscription.build.xml"/>
+		<ant antfile="${wsdl.dir}/publisher-registration.build.xml"/>
+		<ant antfile="${wsdl.dir}/geniiWSNBroker.build.xml"/>
 		<ant antfile="${wsdl.dir}/rns/rns.build.xml"/>
 		<ant antfile="${wsdl.dir}/deployment/gapp-description.build.xml"/>
 		<ant antfile="${wsdl.dir}/deployment/deployer.build.xml"/>

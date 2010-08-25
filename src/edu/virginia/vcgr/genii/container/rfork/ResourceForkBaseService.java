@@ -78,8 +78,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.*;
 import edu.virginia.vcgr.genii.client.ser.AnyHelper;
-import edu.virginia.vcgr.genii.common.notification.Notify;
-import edu.virginia.vcgr.genii.common.notification.UserDataType;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.attrs.AttributePreFetcher;
@@ -344,6 +343,30 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 		}
 	}
 	
+	@Override
+	protected void registerNotificationHandlers(
+		NotificationMultiplexer multiplexer)
+	{
+		super.registerNotificationHandlers(multiplexer);
+		
+		try
+		{
+			ResourceFork fork = getResourceFork();
+			if (fork != null)
+				fork.registerNotificationHandlers(multiplexer);
+		}
+		catch (ResourceUnknownFaultType f)
+		{
+			_logger.warn("Unable to register notification handlers on fork.",
+				f);
+		}
+		catch (ResourceException e)
+		{
+			_logger.warn("Unable to register notification handlers on fork.",
+				e);
+		}
+	}
+
 	protected ResourceForkBaseService(String serviceName) throws RemoteException
 	{
 		super(serviceName);
@@ -533,20 +556,6 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 			
 			return _resourceKey;
 		}
-	}
-	
-	@Override
-	@RWXMapping(RWXCategory.OPEN)
-	public void notify(Notify n) throws RemoteException,
-			ResourceUnknownFaultType
-	{
-		EndpointReferenceType source = n.getSource();
-		String topic = n.getTopic().toString();
-		UserDataType udt = n.getUserData();
-		
-		ResourceFork fork = getResourceFork();
-		fork.notify(source, topic, 
-			(udt == null) ? null : udt.get_any());
 	}
 	
 	@Override

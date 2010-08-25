@@ -40,16 +40,16 @@
 		location="wsrf/wsResourceLifetime.wsdl"/>
 
 	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsn/bw-2"
+		location="wsrf/wsBaseNotification.wsdl"/>
+
+	<wsdl:import
 		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-authz"
 		location="./resource-authz.wsdl"/>
 
     <wsdl:import
         namespace="http://vcgr.cs.virginia.edu/genii/2006/12/common"
         location="./common-generated.wsdl"/>
-
-    <wsdl:import
-        namespace="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
-        location="./notification.wsdl"/>
 
 	<!-- ===== Types Definitions ==== -->
     <wsdl:types>

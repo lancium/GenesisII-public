@@ -22,8 +22,6 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,21 +44,18 @@ import org.ggf.rns.RNSFaultType;
 import org.ggf.rns.Remove;
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.GenesisIIConstants;
-
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
-import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
-import edu.virginia.vcgr.genii.client.notification.UnknownTopicException;
-import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.ser.AnyHelper;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.RNSEntryAddedContents;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.RNSTopics;
 
 import edu.virginia.vcgr.genii.enhancedrns.*;
 
@@ -73,7 +68,6 @@ import edu.virginia.vcgr.genii.container.byteio.RandomByteIOServiceImpl;
 import edu.virginia.vcgr.genii.container.common.AttributesPreFetcherFactory;
 import edu.virginia.vcgr.genii.container.common.DefaultGenesisIIAttributesPreFetcher;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
-import edu.virginia.vcgr.genii.container.common.notification.TopicSpace;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.invoker.timing.Timer;
 import edu.virginia.vcgr.genii.container.invoker.timing.TimingSink;
@@ -82,8 +76,11 @@ import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
+import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.PublisherTopic;
+import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.TopicSet;
 
-public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNSPortType
+public class EnhancedRNSServiceImpl extends GenesisIIBase
+	implements EnhancedRNSPortType, RNSTopics
 {	
 	static private Log _logger = LogFactory.getLog(EnhancedRNSServiceImpl.class);
 	
@@ -106,14 +103,6 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
 	public PortType getFinalWSResourceInterface()
 	{
 		return RNSConstants.ENHANCED_RNS_PORT_TYPE;
-	}
-	
-	protected void registerTopics(TopicSpace topicSpace)
-		throws InvalidTopicException
-	{
-		super.registerTopics(topicSpace);
-		
-		topicSpace.registerTopic(WellknownTopics.RNS_ENTRY_ADDED);
 	}
 	
 	@RWXMapping(RWXCategory.EXECUTE)
@@ -360,28 +349,10 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase implements EnhancedRNS
     private void fireRNSEntryAdded(String name, EndpointReferenceType entry)
     	throws ResourceUnknownFaultType, ResourceException
     {
-    	try
-    	{
-	    	MessageElement []payload = new MessageElement[2];
-	    	
-	    	payload[0] = new MessageElement(
-	    		new QName(GenesisIIConstants.GENESISII_NS, "entry-name"),
-	    		name);
-	    	payload[1] = new MessageElement(
-	    		new QName(GenesisIIConstants.GENESISII_NS, "entry-reference"),
-	    		entry);
-	    	
-	    	getTopicSpace().getTopic(WellknownTopics.RNS_ENTRY_ADDED).notifyAll(
-	    		payload);
-    	}
-    	catch (InvalidTopicException ite)
-    	{
-    		_logger.warn(ite.getLocalizedMessage(), ite);
-    	}
-    	catch (UnknownTopicException ute)
-    	{
-    		_logger.warn(ute.getLocalizedMessage(), ute);
-    	}
+    	TopicSet space = TopicSet.forPublisher(getClass());
+    	PublisherTopic topic = space.createPublisherTopic(
+    		RNS_ENTRY_ADDED_TOPIC);
+    	topic.publish(new RNSEntryAddedContents(name, entry));
     }
     
 	static EndpointReferenceType prepareEPRToStore(EndpointReferenceType origEPR)

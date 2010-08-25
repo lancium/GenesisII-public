@@ -24,13 +24,13 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 import org.ggf.jsdl.JobDefinition_Type;
+import org.oasis_open.wsn.base.Subscribe;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
-import edu.virginia.vcgr.genii.common.notification.Subscribe;
 
 public class BESActivityUtils
 {

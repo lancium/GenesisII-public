@@ -28,8 +28,9 @@
 		<file name="wsrf/wsResourceProperties.wsdl"/>
 		<file name="wsrf/wsResourceLifetime.wsdl"/>
 		<file name="wsrf/wsResourceLifetime.xsd"/>
-		<file name="notification.wsdl"/>
-		<file name="notification.xsd"/>
+		<file name="wsrf/wsTopic.xsd"/>
+		<file name="wsrf/wsBaseNotification.xsd"/>
+		<file name="wsrf/wsBaseNotification.wsdl"/>
 		<file name="resource-simple.wsdl"/>
 		<file name="ws-addr.xsd"/>
 		<file name="xml.xsd"/>

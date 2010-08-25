@@ -1,12 +1,12 @@
 package edu.virginia.vcgr.genii.container.replicatedExport.resolver;
 
+import java.net.URI;
 import java.rmi.RemoteException;
 import java.util.List;
 
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
-import org.apache.axis.types.Token;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.RNSFaultType;
@@ -21,10 +21,6 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.ResolverDescription;
 import edu.virginia.vcgr.genii.client.naming.WSName;
-import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
-import edu.virginia.vcgr.genii.common.GeniiCommon;
-import edu.virginia.vcgr.genii.common.notification.Subscribe;
-import edu.virginia.vcgr.genii.common.notification.UserDataType;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -32,6 +28,10 @@ import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.client.rcreate.CreationException;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.DefaultSubscriptionFactory;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscribeException;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscriptionFactory;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.GenesisIIBaseTopics;
 import edu.virginia.vcgr.genii.replicatedExport.resolver.InvalidWSNameFaultType;
 import edu.virginia.vcgr.genii.replicatedExport.resolver.RExportResolverFactoryPortType;
 import edu.virginia.vcgr.genii.resolver.simple.CreateResolverRequestType;
@@ -137,25 +137,24 @@ public class RExportResolverUtils
 	 * 
 	 * @param entry: db entry for resolver containing all relavent info
 	 */
-	static public void createTerminationSubscription(RExportResolverEntry entry)
-		throws ResourceException
+	static public void createTerminationSubscription(
+		RExportResolverEntry entry) throws ResourceException
 	{
-		try{
-			UserDataType userData = new UserDataType(new MessageElement[] { 
-					new MessageElement(
-							REFERENCE_RESOLVER_EPI_QNAME, 
-							entry.getCommonEPI().toString())});
-			GeniiCommon producer = ClientUtils.createProxy(
-					GeniiCommon.class, entry.getPrimaryEPR());
-			producer.subscribe(new Subscribe(
-					new Token(WellknownTopics.TERMINATED), 
-					null, 
-					entry.getResolverEPR(), 
-					userData));
+		try
+		{
+			EndpointReferenceType resolverEPR = entry.getResolverEPR();
+			SubscriptionFactory factory = new DefaultSubscriptionFactory(resolverEPR);
+			RExportResolverTerminateUserData userData = 
+				new RExportResolverTerminateUserData(URI.create(
+					entry.getCommonEPI().toString()));
+			factory.subscribe(entry.getPrimaryEPR(),
+				GenesisIIBaseTopics.RESOURCE_TERMINATION_TOPIC.asConcreteQueryExpression(),
+				null, userData);
 		}
-		catch (Exception e){ 
+		catch (SubscribeException se)
+		{
 			throw new ResourceException(
-					"Could not create subscription to resource termination.", e);
+				"Unable to subscribe to termination event.", se);
 		}
 	}
 	

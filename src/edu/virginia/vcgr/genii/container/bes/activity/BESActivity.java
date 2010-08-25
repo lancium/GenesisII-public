@@ -12,7 +12,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Vector;
 
-import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStateEnumeration;
@@ -22,17 +21,15 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
-import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
-import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
-import edu.virginia.vcgr.genii.client.notification.UnknownTopicException;
-import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.BESActivityStateChangedContents;
 import edu.virginia.vcgr.genii.container.bes.BES;
 import edu.virginia.vcgr.genii.container.bes.BESPolicyListener;
 import edu.virginia.vcgr.genii.container.bes.execution.ContinuableExecutionException;
@@ -43,12 +40,11 @@ import edu.virginia.vcgr.genii.container.bes.execution.IgnoreableFault;
 import edu.virginia.vcgr.genii.container.bes.execution.SuspendableExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
-import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
-import edu.virginia.vcgr.genii.container.common.notification.Topic;
-import edu.virginia.vcgr.genii.container.common.notification.TopicSpace;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
+import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.PublisherTopic;
+import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.TopicSet;
 
 public class BESActivity implements Closeable
 {
@@ -400,14 +396,6 @@ public class BESActivity implements Closeable
 		catch (ResourceUnknownFaultType e)
 		{
 			_logger.warn("Unable to send notification for status change.", e);
-		} 
-		catch (InvalidTopicException e)
-		{
-			_logger.warn("Unable to send notification for status change.", e);
-		}
-		catch (UnknownTopicException e)
-		{
-			_logger.warn("Unable to send notification for status change.", e);
 		}
 		finally
 		{
@@ -474,8 +462,7 @@ public class BESActivity implements Closeable
 	}
 	
 	private void notifyStateChange()
-		throws InvalidTopicException, UnknownTopicException, 
-			ResourceException, ResourceUnknownFaultType, SQLException
+		throws ResourceException, ResourceUnknownFaultType, SQLException
 	{
 		WorkingContext ctxt = createWorkingContext();
 		ActivityState state = getState();
@@ -483,23 +470,18 @@ public class BESActivity implements Closeable
 		try
 		{
 			WorkingContext.setCurrentWorkingContext(ctxt);
-			TopicSpace space = GenesisIIBase.getTopicSpace(
-				BESActivityServiceImpl.class);
-			Topic topic = space.getTopic(WellknownTopics.BES_ACTIVITY_STATUS_CHANGE);
-			topic.notifyAll(new MessageElement[] {
-				new MessageElement(
-					BESConstants.GENII_BES_NOTIFICATION_STATE_ELEMENT_QNAME,
-					state.toActivityStatusType())
-			});
+			TopicSet space = TopicSet.forPublisher(BESActivityServiceImpl.class);
+			TopicPath topicPath;
+			
 			if (state.isFinalState())
-			{
-				topic = space.getTopic(WellknownTopics.BES_ACTIVITY_STATUS_CHANGE_FINAL);
-				topic.notifyAll(new MessageElement[] {
-					new MessageElement(
-						BESConstants.GENII_BES_NOTIFICATION_STATE_ELEMENT_QNAME,
-						state.toActivityStatusType())
-				});
-			}
+				topicPath =
+					BESActivityServiceImpl.ACTIVITY_STATE_CHANGED_TO_FINAL_TOPIC;
+			else
+				topicPath =
+					BESActivityServiceImpl.ACTIVITY_STATE_CHANGED_TOPIC;
+			
+			PublisherTopic topic = space.createPublisherTopic(topicPath);
+			topic.publish(new BESActivityStateChangedContents(state));
 		}
 		finally
 		{

@@ -51,14 +51,16 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.naming.WSName;
-import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
-import edu.virginia.vcgr.genii.common.notification.Notify;
-import edu.virginia.vcgr.genii.common.notification.UserDataType;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.AbstractNotificationHandler;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.GenesisIIBaseTopics;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ResourceTerminationContents;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
@@ -295,36 +297,49 @@ public class SimpleResolverServiceImpl extends GenesisIIBase implements SimpleRe
 		throw new RemoteException("\"remove\" not applicable.");
 	}
 
-
-	/* NotificationConsumer port type */
-	@RWXMapping(RWXCategory.OPEN)
-	public void notify(Notify notify) throws RemoteException, ResourceUnknownFaultType
+	
+	@Override
+	protected void registerNotificationHandlers(
+			NotificationMultiplexer multiplexer)
 	{
-		try
+		super.registerNotificationHandlers(multiplexer);
+		
+		multiplexer.registerNotificationHandler(
+			GenesisIIBaseTopics.RESOURCE_TERMINATION_TOPIC.asConcreteQueryExpression(),
+			new LegacyResourceTerminationNotificationHandler());
+	}
+
+
+	private class LegacyResourceTerminationNotificationHandler
+		extends AbstractNotificationHandler<ResourceTerminationContents>
+	{
+		private LegacyResourceTerminationNotificationHandler()
 		{
-			String topic = notify.getTopic().toString();
-			if (topic.equals(WellknownTopics.TERMINATED))
-			{
-				UserDataType userData = notify.getUserData();
-				SimpleResolverTerminateUserData notifyData = new SimpleResolverTerminateUserData(userData);
-
-				/* check if EPI, version, and ID match */
-				ResourceKey rKey = ResourceManager.getCurrentResource();
-				ISimpleResolverResource resource = (ISimpleResolverResource) rKey.dereference();
-				SimpleResolverEntry entry = resource.getEntry();
-
-				if (entry.getTargetEPI().equals(notifyData.getEPI())  &&
-						entry.getVersion() == notifyData.getVersion() &&
-						entry.getSubscriptionGUID().equals(notifyData.getSubscriptionGUID()))
-				{
-					/* kill myself */
-					destroy(new Destroy());
-				}
-			}
+			super(ResourceTerminationContents.class);
 		}
-		catch (Throwable t)
+
+		@Override
+		public void handleNotification(TopicPath topic,
+			EndpointReferenceType producerReference,
+			EndpointReferenceType subscriptionReference,
+			ResourceTerminationContents contents) throws Exception
 		{
-			_logger.warn(t.getLocalizedMessage(), t);
+			SimpleResolverTerminateUserData notifyData = 
+				contents.additionalUserData(
+					SimpleResolverTerminateUserData.class);
+			
+			/* check if EPI, version, and ID match */
+			ResourceKey rKey = ResourceManager.getCurrentResource();
+			ISimpleResolverResource resource = (ISimpleResolverResource) rKey.dereference();
+			SimpleResolverEntry entry = resource.getEntry();
+
+			if (entry.getTargetEPI().equals(notifyData.getEPI())  &&
+					entry.getVersion() == notifyData.getVersion() &&
+					entry.getSubscriptionGUID().equals(notifyData.getSubscriptionGUID()))
+			{
+				/* kill myself */
+				destroy(new Destroy());
+			}
 		}
 	}
 

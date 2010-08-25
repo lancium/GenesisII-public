@@ -28,8 +28,7 @@ import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
 import edu.virginia.vcgr.genii.common.MatchingParameter;
-import edu.virginia.vcgr.genii.container.common.notification.DBSubscriptionResource;
-import edu.virginia.vcgr.genii.container.common.notification.SubscriptionInformation;
+import edu.virginia.vcgr.genii.container.common.notification.SubscriptionsDatabase;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -65,6 +64,15 @@ public class BasicDBResource implements IResource
 	protected String _resourceKey;
 	protected ResourceKey _parentKey;
 
+	protected BasicDBResource(String parentKey,
+		Connection connection)
+	{
+		_parentKey = null;
+		_resourceKey = parentKey;
+		_connection = connection;
+		_connectionPool = null;
+	}
+	
 	public BasicDBResource(
 			ResourceKey parentKey, 
 			DatabaseConnectionPool connectionPool)
@@ -296,8 +304,9 @@ public class BasicDBResource implements IResource
 			stmt.setString(1, _resourceKey);
 			stmt.executeUpdate();
 			ResourceSummary.removeResources(_connection, _resourceKey);
-			
-			DBSubscriptionResource.destroySubscriptions(this);
+
+			SubscriptionsDatabase.destroyMySubscriptions(
+				_connection, _resourceKey);
 		}
 		catch (SQLException sqe)
 		{
@@ -349,7 +358,7 @@ public class BasicDBResource implements IResource
 
 	synchronized public void close() throws IOException
 	{
-		if (_connection != null)
+		if (_connection != null && _connectionPool != null)
 		{
 			_connectionPool.release(_connection);
 			_connection = null;
@@ -392,13 +401,6 @@ public class BasicDBResource implements IResource
 		}
 	}
 
-	public Collection<SubscriptionInformation> matchSubscriptions(
-		String topicExpression) throws ResourceException
-	{
-		return DBSubscriptionResource.matchSubscriptions(
-			this, topicExpression);
-	}
-	
 	/**
 	 * Return whether or not the resource is a service resource
 	 */

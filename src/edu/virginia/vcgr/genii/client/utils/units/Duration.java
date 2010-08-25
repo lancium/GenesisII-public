@@ -1,5 +1,7 @@
 package edu.virginia.vcgr.genii.client.utils.units;
 
+import java.util.Calendar;
+
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
@@ -62,6 +64,13 @@ public class Duration extends UnitableValue<DurationUnits>
 		super(textRepresentation);
 	}
 
+	final public Calendar getTime()
+	{
+		Calendar ret = Calendar.getInstance();
+		ret.setTimeInMillis(ret.getTimeInMillis() + (long)as(DurationUnits.Milliseconds));
+		return ret;
+	}
+	
 	public org.apache.axis.types.Duration toApacheDuration()
 	{
 		int years;

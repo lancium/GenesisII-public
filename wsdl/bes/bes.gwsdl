@@ -9,7 +9,6 @@
 	xmlns:rns="http://schemas.ggf.org/rns/2006/05/rns"
 	xmlns:enhanced-rns="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
 	xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common"
-	xmlns:genii-not="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
     xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
@@ -85,16 +84,16 @@
 		location="wsrf/wsResourceLifetime.wsdl"/>
 
 	<wsdl:import
+        namespace="http://docs.oasis-open.org/wsn/bw-2"
+		location="wsrf/wsBaseNotification.wsdl"/>
+
+	<wsdl:import
 		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-authz"
 		location="./resource-authz.wsdl"/>
 
     <wsdl:import
         namespace="http://vcgr.cs.virginia.edu/genii/2006/12/common"
         location="./common-generated.wsdl"/>
-
-    <wsdl:import
-        namespace="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
-        location="./notification.wsdl"/>
 
 	<wsdl:types>
 		<xsd:schema
@@ -127,6 +126,5 @@
 		<genii-ext:extend portType="bes-mgmt:BESManagementPortType"/>
 		<genii-ext:extend portType="rpw-2:GetResourceProperty"/>
 		<genii-ext:extend portType="rpw-2:GetMultipleResourceProperties"/>
-		<genii-ext:extend portType="genii-not:GeniiNotificationConsumerPortType"/>
 	</wsdl:portType>
 </wsdl:definitions>

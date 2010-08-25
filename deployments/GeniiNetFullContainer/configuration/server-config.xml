@@ -186,6 +186,24 @@
 			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
 				value="connection-pool"/>
 		</mconf:instance>
+		
+		<mconf:instance name="broker-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.common.notification.DBBrokerResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
+		
+		<mconf:instance name="publisher-registration-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.common.notification.DBPublisherRegistrationResourceProvider">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
+
+		<mconf:instance name="pullpoint-db-resource-provider"
+			type="edu.virginia.vcgr.genii.container.common.notification.DBPullPoint">
+			<mconf:property name="edu.virginia.vcgr.genii.db.connection-pool"
+				value="connection-pool"/>
+		</mconf:instance>
 
 		<mconf:instance name="simple-resolver-db-resource-provider"
 			type="edu.virginia.vcgr.genii.container.resolver.SimpleResolverDBResourceProvider">
@@ -372,6 +390,21 @@
 		
 		<genii:service name="GeniiSubscriptionPortType">
 			<genii:resource-provider name="subscription-db-resource-provider"/>
+			<genii:authz-provider name="gamlacl-authz-provider"/>
+		</genii:service>
+
+		<genii:service name="GeniiBrokerPortType">
+			<genii:resource-provider name="broker-db-resource-provider"/>
+			<genii:authz-provider name="gamlacl-authz-provider"/>
+		</genii:service>
+
+		<genii:service name="GeniiPublisherRegistrationPortType">
+			<genii:resource-provider name="publisher-registration-db-resource-provider"/>
+			<genii:authz-provider name="gamlacl-authz-provider"/>
+		</genii:service>
+
+		<genii:service name="GeniiPullPointPortType">
+			<genii:resource-provider name="pullpoint-db-resource-provider"/>
 			<genii:authz-provider name="gamlacl-authz-provider"/>
 		</genii:service>
 

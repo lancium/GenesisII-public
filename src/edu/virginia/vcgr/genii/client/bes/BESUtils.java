@@ -6,12 +6,12 @@ import java.util.Collection;
 import org.apache.axis.message.MessageElement;
 import org.ggf.bes.factory.ActivityDocumentType;
 
-import edu.virginia.vcgr.genii.common.notification.Subscribe;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscribeRequest;
 
 public class BESUtils
 {
 	static public void addSubscription(ActivityDocumentType adt,
-		Subscribe s)
+		SubscribeRequest s)
 	{
 		Collection<MessageElement> anyC;
 		
@@ -27,7 +27,7 @@ public class BESUtils
 		
 		anyC.add(new MessageElement(
 			BESConstants.GENII_BES_NOTIFICATION_SUBSCRIBE_ELEMENT_QNAME,
-			s));
+			s.asRequestType()));
 		adt.set_any(anyC.toArray(new MessageElement[0]));
 	}
 }

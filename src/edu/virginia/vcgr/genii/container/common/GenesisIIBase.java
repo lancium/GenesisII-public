@@ -30,10 +30,8 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.axis.message.MessageElement;
-import org.apache.axis.types.Token;
 import org.apache.axis.types.URI;
 import org.apache.axis.types.UnsignedInt;
-import org.apache.axis.types.UnsignedLong;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 import org.morgan.util.GUID;
@@ -75,6 +73,24 @@ import org.oasis_open.docs.wsrf.rp_2.UpdateResourceProperties;
 import org.oasis_open.docs.wsrf.rp_2.UpdateResourcePropertiesRequestFailedFaultType;
 import org.oasis_open.docs.wsrf.rp_2.UpdateResourcePropertiesResponse;
 import org.oasis_open.docs.wsrf.rp_2.UpdateType;
+import org.oasis_open.wsn.base.GetCurrentMessage;
+import org.oasis_open.wsn.base.GetCurrentMessageResponse;
+import org.oasis_open.wsn.base.InvalidFilterFaultType;
+import org.oasis_open.wsn.base.InvalidMessageContentExpressionFaultType;
+import org.oasis_open.wsn.base.InvalidProducerPropertiesExpressionFaultType;
+import org.oasis_open.wsn.base.InvalidTopicExpressionFaultType;
+import org.oasis_open.wsn.base.MultipleTopicsSpecifiedFaultType;
+import org.oasis_open.wsn.base.NoCurrentMessageOnTopicFaultType;
+import org.oasis_open.wsn.base.Notify;
+import org.oasis_open.wsn.base.NotifyMessageNotSupportedFaultType;
+import org.oasis_open.wsn.base.Subscribe;
+import org.oasis_open.wsn.base.SubscribeCreationFailedFaultType;
+import org.oasis_open.wsn.base.SubscribeResponse;
+import org.oasis_open.wsn.base.TopicExpressionDialectUnknownFaultType;
+import org.oasis_open.wsn.base.TopicNotSupportedFaultType;
+import org.oasis_open.wsn.base.UnacceptableInitialTerminationTimeFaultType;
+import org.oasis_open.wsn.base.UnrecognizedPolicyRequestFaultType;
+import org.oasis_open.wsn.base.UnsupportedPolicyRequestFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.AttributedURIType;
@@ -92,9 +108,6 @@ import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.iterator.IteratorConstructionParameters;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
-import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
-import edu.virginia.vcgr.genii.client.notification.UnknownTopicException;
-import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -105,9 +118,6 @@ import edu.virginia.vcgr.genii.common.AddMatchingParameterResponseType;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.MatchingParameter;
 import edu.virginia.vcgr.genii.common.RemoveMatchingParameterResponseType;
-import edu.virginia.vcgr.genii.common.notification.Subscribe;
-import edu.virginia.vcgr.genii.common.notification.SubscribeResponse;
-import edu.virginia.vcgr.genii.common.notification.UserDataType;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
@@ -122,7 +132,6 @@ import edu.virginia.vcgr.genii.container.attrs.AttributePreFetcher;
 import edu.virginia.vcgr.genii.container.attrs.IAttributeManipulator;
 import edu.virginia.vcgr.genii.container.common.notification.GeniiSubscriptionServiceImpl;
 import edu.virginia.vcgr.genii.container.common.notification.SubscriptionConstructionParameters;
-import edu.virginia.vcgr.genii.container.common.notification.TopicSpace;
 import edu.virginia.vcgr.genii.container.configuration.ServiceDescription;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
@@ -144,6 +153,8 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 import edu.virginia.vcgr.genii.container.resource.db.query.ResourceSummary;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
+import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.PublisherTopic;
+import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.TopicSet;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
@@ -151,6 +162,15 @@ import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.client.utils.creation.CreationProperties;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.DefaultNotificationMultiplexer;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.notification.NotificationHelper;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.DefaultSubscriptionFactory;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscribeRequest;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscriptionFactory;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.TerminationTimeType;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.GenesisIIBaseTopics;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ResourceTerminationContents;
 import edu.virginia.vcgr.genii.iterator.IteratorInitializationType;
 import edu.virginia.vcgr.genii.iterator.IteratorMemberType;
 
@@ -158,17 +178,26 @@ import edu.virginia.vcgr.genii.iterator.IteratorMemberType;
 	SoapHeaderHandler.class, DatabaseHandler.class, 
 	DebugInvoker.class, ScheduledTerminationInvoker.class, TimingHandler.class})
 @ConstructionParametersType(ConstructionParameters.class)
-public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
+public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
+	GenesisIIBaseTopics
 {
 	static private Log _logger = LogFactory.getLog(GenesisIIBase.class);
 
 	static private QName _SERVICES_QNAME = new QName(
 			GenesisIIConstants.GENESISII_NS, "services");
 	
-	static private HashMap<Class<? extends GenesisIIBase>, TopicSpace> _topicSpaces =
-		new HashMap<Class<? extends GenesisIIBase>, TopicSpace>();
-	
 	static private EndpointReferenceType _iteratorServiceEPR = null;
+	
+	static private class ServiceBasedSubscriptionFactory
+		extends DefaultSubscriptionFactory
+	{
+		private ServiceBasedSubscriptionFactory(EndpointReferenceType consumer)
+		{
+			super(consumer);
+		}
+	}
+	
+	private NotificationMultiplexer _notificationMultiplexer = null;
 	
 	protected String _serviceName;
 	public ArrayList<PortType> _implementedPortTypes =
@@ -179,6 +208,34 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	private Class<? extends IResolverFactoryProxy> _defaultResolverFactoryProxyClass = null;
 	
 	public abstract PortType getFinalWSResourceInterface();
+	
+	final private NotificationMultiplexer notificationMultiplexer()
+	{
+		synchronized(this)
+		{
+			if (_notificationMultiplexer == null)
+			{
+				_notificationMultiplexer = 
+					new DefaultNotificationMultiplexer();
+				registerNotificationHandlers(_notificationMultiplexer);
+			}
+		}
+		
+		return _notificationMultiplexer;
+	}
+	
+	protected SubscriptionFactory subscriptionFactory()
+		throws ResourceUnknownFaultType, ResourceException
+	{
+		return new ServiceBasedSubscriptionFactory(
+			getMyEPR(false));
+	}
+	
+	protected void registerNotificationHandlers(
+		NotificationMultiplexer multiplexer)
+	{
+		// We don't implement this by default, but a derived service can.
+	}
 	
 	protected AttributePackage getAttributePackage()
 	{
@@ -207,12 +264,13 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		
 		addImplementedPortType(WellKnownPortTypes.GENII_RESOURCE_ATTRS_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.GENII_RESOURCE_FACTORY_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.GENII_NOTIFICATION_PRODUCER_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.VCGR_COMMON_PORT_TYPE);
 		addImplementedPortType(WSRFConstants.WSRF_RLW_IMMEDIATE_TERMINATE_PORT);
 		addImplementedPortType(WSRFConstants.WSRF_RLW_SCHEDULED_TERMINATE_PORT);
 		addImplementedPortType(WSRFConstants.WSRF_RPW_GET_RP_PORT);
 		addImplementedPortType(WSRFConstants.WSRF_RPW_GET_MULTIPLE_RP_PORT);
+		addImplementedPortType(WSRFConstants.WSN_NOTIFICATION_CONSUMER_PORT);
+		addImplementedPortType(WSRFConstants.WSN_NOTIFICATION_PRODUCER_PORT);
 		
 		try
 		{
@@ -318,71 +376,6 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	{
 		ResourceKey rKey = ResourceManager.getCurrentResource();
 		setScheduledTerminationTime(termTime, rKey);
-	}
-	
-	static public TopicSpace getTopicSpace(
-		Class<? extends GenesisIIBase> topicClass)
-			throws InvalidTopicException
-	{
-		TopicSpace ret;
-		
-		synchronized(_topicSpaces)
-		{
-			ret = _topicSpaces.get(topicClass);
-			if (ret == null)
-			{
-				ret = new TopicSpace();
-				registerTopics(topicClass, ret);
-				_topicSpaces.put(topicClass, ret);
-			}
-		}
-		
-		return ret;
-	}
-	
-	protected TopicSpace getTopicSpace() throws InvalidTopicException
-	{
-		TopicSpace ret;
-		Class<? extends GenesisIIBase> myClass = getClass();
-		
-		synchronized(_topicSpaces)
-		{
-			ret = _topicSpaces.get(myClass);
-			if (ret == null)
-			{
-				ret = new TopicSpace();
-				registerTopics(ret);
-				_topicSpaces.put(myClass, ret);
-			}
-		}
-		
-		return ret;
-	}
-	
-	static private void registerTopics(Class<? extends GenesisIIBase> topicClass,
-		TopicSpace topicSpace) throws InvalidTopicException
-	{
-		GenesisIIBase base;
-		
-		try
-		{
-			base = topicClass.newInstance();
-			base.registerTopics(topicSpace);
-		} 
-		catch (InstantiationException e)
-		{
-			_logger.error("Unable to register topics for class.", e);
-		}
-		catch (IllegalAccessException e)
-		{
-			_logger.error("Unable to register topics for class.", e);
-		}
-	}
-	
-	protected void registerTopics(TopicSpace topicSpace) throws InvalidTopicException
-	{
-		topicSpace.registerTopic(WellknownTopics.TERMINATED);
-		topicSpace.registerTopic(WellknownTopics.RANDOM_BYTEIO_OP);
 	}
 	
 	protected Object translateConstructionParameter(MessageElement property)
@@ -492,6 +485,79 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 		return ret;
 	}
 	
+	@Override
+	@RWXMapping(RWXCategory.READ)
+	public GetCurrentMessageResponse getCurrentMessage(GetCurrentMessage arg0)
+			throws RemoteException, TopicNotSupportedFaultType,
+			TopicExpressionDialectUnknownFaultType,
+			MultipleTopicsSpecifiedFaultType, InvalidTopicExpressionFaultType,
+			ResourceUnknownFaultType, NoCurrentMessageOnTopicFaultType
+	{
+		throw FaultManipulator.fillInFault(
+			new NoCurrentMessageOnTopicFaultType());
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.OPEN)
+	public void notify(Notify msg) throws RemoteException
+	{
+		NotificationHelper.notify(msg, notificationMultiplexer());
+	}
+
+	protected SubscribeResponse subscribe(String resourceKey, Subscribe arg)
+		throws RemoteException,
+			TopicNotSupportedFaultType, TopicExpressionDialectUnknownFaultType,
+			InvalidFilterFaultType,
+			UnacceptableInitialTerminationTimeFaultType,
+			SubscribeCreationFailedFaultType,
+			InvalidMessageContentExpressionFaultType,
+			InvalidTopicExpressionFaultType, UnsupportedPolicyRequestFaultType,
+			UnrecognizedPolicyRequestFaultType, ResourceUnknownFaultType,
+			NotifyMessageNotSupportedFaultType,
+			InvalidProducerPropertiesExpressionFaultType
+	{
+		SubscribeRequest request = new SubscribeRequest(arg);
+
+		Calendar currentTime = Calendar.getInstance();
+		TerminationTimeType ttt = request.terminationTime();
+		Calendar terminationTime = (ttt == null) ? null :
+			ttt.terminationTime();
+		
+		SubscriptionConstructionParameters cons = new SubscriptionConstructionParameters(
+			resourceKey, request.consumerReference(),
+			request.topicFilter(), request.policies(),
+			request.additionalUserData());
+		
+		if (terminationTime != null)
+			cons.timeToLive(terminationTime.getTimeInMillis() - currentTime.getTimeInMillis());
+		
+		EndpointReferenceType subscription = 
+			new GeniiSubscriptionServiceImpl().CreateEPR(
+				new MessageElement[] { cons.serializeToMessageElement() },
+				Container.getServiceURL("GeniiSubscriptionPortType"));
+		
+		
+		return new SubscribeResponse(
+			subscription, currentTime, terminationTime, null);
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public SubscribeResponse subscribe(Subscribe arg0) throws RemoteException,
+		TopicNotSupportedFaultType, TopicExpressionDialectUnknownFaultType,
+		InvalidFilterFaultType,
+		UnacceptableInitialTerminationTimeFaultType,
+		SubscribeCreationFailedFaultType,
+		InvalidMessageContentExpressionFaultType,
+		InvalidTopicExpressionFaultType, UnsupportedPolicyRequestFaultType,
+		UnrecognizedPolicyRequestFaultType, ResourceUnknownFaultType,
+		NotifyMessageNotSupportedFaultType,
+		InvalidProducerPropertiesExpressionFaultType
+	{
+		ResourceKey rKey = ResourceManager.getCurrentResource();
+		return subscribe(rKey.getResourceKey(), arg0);
+	}
+
 	@RWXMapping(RWXCategory.READ)
 	public final String ping(String request)
 	{
@@ -1132,51 +1198,6 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 			rKey, myAddress, implementedPortTypes);
 	}
 	
-	protected SubscribeResponse subscribe(String subscribee, 
-		Subscribe subscribeRequest) 
-			throws ResourceUnknownFaultType, ResourceCreationFaultType, 
-				RemoteException
-	{
-		EndpointReferenceType target = subscribeRequest.getTarget();
-		UnsignedLong ttl = subscribeRequest.getTimeToLive();
-		Token topic = subscribeRequest.getTopic();
-		UserDataType userData = subscribeRequest.getUserData();
-		
-		/*
-		GeniiSubscriptionPortType subscription =
-			ClientUtils.createProxy(GeniiSubscriptionPortType.class,
-			EPRUtils.makeEPR(Container.getServiceURL("GeniiSubscriptionPortType")));
-		*/
-
-		ConstructionParameters cParams = new ConstructionParameters();
-		HashMap<QName, MessageElement> constructionParameters =
-			new HashMap<QName, MessageElement>();
-		SubscriptionConstructionParameters.insertSubscriptionParameters(
-			cParams, constructionParameters, 
-			subscribee,
-			target, topic.toString(), 
-			(ttl == null) ? null : new Long(ttl.longValue()),
-			userData);
-		
-		MessageElement cParamsMe = cParams.serializeToMessageElement();
-		constructionParameters.put(cParamsMe.getQName(), cParamsMe);
-		
-		MessageElement []params = new MessageElement[constructionParameters.size()];
-		constructionParameters.values().toArray(params);
-		return new SubscribeResponse(
-			new GeniiSubscriptionServiceImpl().CreateEPR(params, 
-				Container.getServiceURL("GeniiSubscriptionPortType")));
-	}
-	
-	@RWXMapping(RWXCategory.EXECUTE)
-	public SubscribeResponse subscribe(Subscribe subscribeRequest) 
-		throws RemoteException, ResourceUnknownFaultType
-	{
-		return subscribe(
-			(String)ResourceManager.getCurrentResource().dereference().getKey(),
-			subscribeRequest);
-	}
-	
 	@SuppressWarnings("unchecked")
 	private void setDefaultResolverFactoryDescription()
 	{
@@ -1226,28 +1247,10 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged
 	{
 		preDestroy();
 		
-		try
-    	{
-	    	MessageElement []payload = new MessageElement[1];
-	    	
-	    	payload[0] = new MessageElement(
-	    		new QName(GenesisIIConstants.GENESISII_NS, "entry-reference"),
-	    		ResourceManager.createEPR(
-	    			ResourceManager.getCurrentResource(), 
-	    			Container.getServiceURL(_serviceName),
-	    			getImplementedPortTypes(null)));
-	    	
-	    	getTopicSpace().getTopic(WellknownTopics.TERMINATED).notifyAll(
-	    		payload);
-    	}
-    	catch (InvalidTopicException ite)
-    	{
-    		_logger.warn(ite.getLocalizedMessage(), ite);
-    	}
-    	catch (UnknownTopicException ute)
-    	{
-    		_logger.warn(ute.getLocalizedMessage(), ute);
-    	}
+		TopicSet space = TopicSet.forPublisher(getClass());
+		PublisherTopic topic = space.createPublisherTopic(
+			RESOURCE_TERMINATION_TOPIC);
+		topic.publish(new ResourceTerminationContents(Calendar.getInstance()));
 		
     	ResourceKey resource = ResourceManager.getCurrentResource();
     	try

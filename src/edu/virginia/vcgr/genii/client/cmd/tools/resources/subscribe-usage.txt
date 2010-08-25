@@ -1,0 +1,2 @@
+wsn-subscribe [--subscription-path=<subscription-path>] [xmlns:<prefix>=<uri>]*
+	[--topic-filter=<topic-path-expression>] <publisher-path> [<subscriber-path>]

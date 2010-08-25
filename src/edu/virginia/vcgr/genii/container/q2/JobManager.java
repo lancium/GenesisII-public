@@ -19,8 +19,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.axis.message.MessageElement;
-import org.apache.axis.types.Token;
 import org.apache.axis.types.UnsignedShort;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,14 +42,13 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.authz.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
-import edu.virginia.vcgr.genii.common.notification.Subscribe;
-import edu.virginia.vcgr.genii.common.notification.UserDataType;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.AbstractSubscriptionFactory;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.BESActivityTopics;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.summary.SlotSummary;
 import edu.virginia.vcgr.genii.queue.JobErrorPacket;
@@ -1726,16 +1723,11 @@ public class JobManager implements Closeable
 					EndpointReferenceType queueEPR = 
 						_database.getQueueEPR(connection);
 					if (queueEPR != null)
-						BESUtils.addSubscription(adt, new Subscribe(
-							new Token(
-								WellknownTopics.BES_ACTIVITY_STATUS_CHANGE_FINAL),
-							null,
-							queueEPR,
-							new UserDataType(new MessageElement[] {
-								new MessageElement(
-									QueueServiceImpl._JOBID_QNAME, 
-									Long.toString(_jobID)) })));
-					
+						BESUtils.addSubscription(adt,
+							AbstractSubscriptionFactory.createRequest(
+								queueEPR,
+								BESActivityTopics.ACTIVITY_STATE_CHANGED_TO_FINAL_TOPIC.asConcreteQueryExpression(),
+								null, new JobCompletedAdditionUserData(_jobID)));
 					resp = bes.createActivity(
 						new CreateActivityType(adt, null));
 				}

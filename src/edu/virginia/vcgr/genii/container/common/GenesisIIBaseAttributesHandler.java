@@ -10,13 +10,14 @@ import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.axis.types.URI;
+import org.apache.axis.types.URI.MalformedURIException;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.fsii.security.Permissions;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.gfs.GenesisIIACLManager;
-import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
 import edu.virginia.vcgr.genii.client.ogsa.OGSAQNameList;
 import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
 import edu.virginia.vcgr.genii.client.resource.PortType;
@@ -24,6 +25,9 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.security.authz.acl.Acl;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
+import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicQueryDialects;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
@@ -32,11 +36,11 @@ import edu.virginia.vcgr.genii.common.security.AuthZConfig;
 import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
 import edu.virginia.vcgr.genii.container.attrs.IAttributeManipulator;
-import edu.virginia.vcgr.genii.container.common.notification.Topic;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.security.authz.providers.*;
+import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.TopicSet;
 
 public class GenesisIIBaseAttributesHandler 
 	extends AbstractAttributeHandler
@@ -49,23 +53,6 @@ public class GenesisIIBaseAttributesHandler
 		super(pkg);
 		
 		_baseService = baseService;
-	}
-	
-	public Collection<MessageElement> getRegisteredTopics() 
-		throws InvalidTopicException
-	{
-		Collection<Topic> topics = _baseService.getTopicSpace().getRegisteredTopics();
-		ArrayList<MessageElement> document = new ArrayList<MessageElement>(
-			topics.size());
-		
-		for (Topic topic : topics)
-		{
-			document.add(new MessageElement(
-				GenesisIIConstants.REGISTERED_TOPICS_ATTR_QNAME,
-				topic.getTopicName()));
-		}
-		
-		return document;
 	}
 	
 	public Collection<MessageElement> getMatchingParameters()
@@ -270,9 +257,51 @@ public class GenesisIIBaseAttributesHandler
 			OGSAWSRFBPConstants.RESOURCE_PROPERTY_NAMES_ATTR_QNAME);
 	}
 	
+	public MessageElement getFixedTopicSet() throws SOAPException
+	{
+		return new MessageElement(WSRFConstants.FIXED_TOPIC_SET_QNAME,
+			false);
+	}
+	
+	public Collection<MessageElement> getTopicExpressionDialect() throws SOAPException, MalformedURIException
+	{
+		ArrayList<MessageElement> ret = new ArrayList<MessageElement>(2);
+		ret.add(new MessageElement(WSRFConstants.TOPIC_EXPRESSION_DIALECT_RP,
+			new URI(TopicQueryDialects.Simple.dialect().toString())));
+		ret.add(new MessageElement(WSRFConstants.TOPIC_EXPRESSION_DIALECT_RP,
+			new URI(TopicQueryDialects.Concrete.dialect().toString())));
+		return ret;
+	}
+	
+	public Collection<MessageElement> getTopicExpressions() throws SOAPException
+	{
+		TopicSet set = TopicSet.forPublisher(_baseService.getClass());
+		Collection<TopicPath> paths = set.knownTopics();
+		Collection<MessageElement> ret = new ArrayList<MessageElement>(
+			paths.size());
+		
+		for (TopicPath path : paths)
+		{
+			ret.add(path.asConcreteQueryExpression().toTopicExpressionElement(
+				WSRFConstants.TOPIC_EXPRESSION_RP, "ts%d"));
+		}
+		
+		return ret;
+	}
+	
+	public MessageElement getTopicSet() throws SOAPException
+	{
+		TopicSet set = TopicSet.forPublisher(_baseService.getClass());
+		return set.describe(WSRFConstants.TOPIC_SET_RP);
+	}
+	
 	@Override
 	protected void registerHandlers() throws NoSuchMethodException
 	{
+		addHandler(WSRFConstants.FIXED_TOPIC_SET_QNAME, "getFixedTopicSet");
+		addHandler(WSRFConstants.TOPIC_EXPRESSION_DIALECT_RP, "getTopicExpressionDialect");
+		addHandler(WSRFConstants.TOPIC_EXPRESSION_RP, "getTopicExpressions");
+		addHandler(WSRFConstants.TOPIC_SET_RP, "getTopicSet");
 		addHandler(
 			GenesisIIBaseRP.MATCHING_PARAMTER_ATTR_QNAME,
 			"getMatchingParameters");
@@ -297,10 +326,6 @@ public class GenesisIIBaseAttributesHandler
 		addHandler(
 			OGSAWSRFBPConstants.WS_FINAL_RESOURCE_INTERFACE_ATTR_QNAME,
 			"getFinalResourceInterface");
-		
-		addHandler(
-			GenesisIIConstants.REGISTERED_TOPICS_ATTR_QNAME,
-			"getRegisteredTopics");
 		
 		addHandler(
 			GenesisIIConstants.AUTHZ_CONFIG_ATTR_QNAME,

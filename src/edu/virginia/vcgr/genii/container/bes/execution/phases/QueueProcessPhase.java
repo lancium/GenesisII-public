@@ -188,7 +188,6 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 					exitCode = eResults.exitCode();
 					AccountingService acctService =
 						ContainerServices.findService(AccountingService.class);
-					
 					if (acctService != null)
 					{
 						OperatingSystemNames osName = 

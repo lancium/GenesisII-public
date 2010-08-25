@@ -14,7 +14,6 @@
     xmlns:rw-2="http://docs.oasis-open.org/wsrf/rw-2"
 	xmlns:wsrf-r="http://docs.oasis-open.org/wsrf/r-2"
 	xmlns:wsrf-rw="http://docs.oasis-open.org/wsrf/rw-2" 
-	xmlns:genii-not="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
     xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
     xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
 	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
@@ -75,16 +74,16 @@
 		location="wsrf/wsResourceLifetime.wsdl"/>
 
 	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsn/bw-2"
+		location="wsrf/wsBaseNotification.wsdl"/>
+
+	<wsdl:import
 		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-authz"
 		location="./resource-authz.wsdl"/>
 
     <wsdl:import
         namespace="http://vcgr.cs.virginia.edu/genii/2006/12/common"
         location="./common-generated.wsdl"/>
-
-    <wsdl:import
-        namespace="http://vcgr.cs.virginia.edu/genii/2006/12/notification"
-        location="./notification.wsdl"/>
 
 	<wsdl:types>
 		<xsd:schema

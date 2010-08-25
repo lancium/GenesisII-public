@@ -36,14 +36,14 @@ public class EmailWatchConfiguration
 	
 	String message(boolean isNegative)
 	{
-		if (!isNegative || _positiveMessage == null)
+		if (isNegative || _positiveMessage == null)
 			return _message;
 		return _positiveMessage;
 	}
 	
 	String subject(boolean isNegative)
 	{
-		if (!isNegative || _positiveMessage == null)
+		if (isNegative || _positiveMessage == null)
 			return _subject;
 		return _positiveSubject;
 	}

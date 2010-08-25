@@ -2,14 +2,14 @@ package edu.virginia.vcgr.genii.client.utils.units;
 
 public enum DurationUnits
 {
-	Milliseconds(1L, "ms", "milli", "millis", "millisecond"),
-	Seconds(1000L, "s", "sec", "secs", "second"),
-	Minutes(1000L * 60, "m", "min", "mins", "minute"),
-	Hours(1000L * 60 * 60, "h", "hr", "hrs", "hour"),
-	Days(1000L * 60 * 60 * 24, "d", "dy", "dys", "day"),
-	Weeks(1000L * 60 * 60 * 24 * 7, "w", "wks", "week"),
-	Months(1000L * 60 * 60 * 24 * 30, "mth", "mths", "mon", "mons", "month"),
-	Years(1000L * 60 * 60 * 24 * 365, "y", "yr", "yrs", "year");
+	Milliseconds(1L, "ms", "milli", "millis", "millisecond", "milliseconds"),
+	Seconds(1000L, "s", "sec", "secs", "second", "seconds"),
+	Minutes(1000L * 60, "m", "min", "mins", "minute", "minutes"),
+	Hours(1000L * 60 * 60, "h", "hr", "hrs", "hour", "hours"),
+	Days(1000L * 60 * 60 * 24, "d", "dy", "dys", "day", "days"),
+	Weeks(1000L * 60 * 60 * 24 * 7, "w", "wks", "week", "weeks"),
+	Months(1000L * 60 * 60 * 24 * 30, "mth", "mths", "mon", "mons", "month", "months"),
+	Years(1000L * 60 * 60 * 24 * 365, "y", "yr", "yrs", "year", "years");
 	
 	private long _multiplier;
 	private String []_alternateNames;

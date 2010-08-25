@@ -22,7 +22,7 @@ public class JobSubmissionFork extends
 	@RWXMapping(RWXCategory.EXECUTE)
 	public void modifyState(InputStream source) throws IOException
 	{
-		((QueueServiceImpl)getService()).submitJob(source);
+		((QueueServiceImpl)getService()).submitJobStream(source);
 	}
 
 	@Override

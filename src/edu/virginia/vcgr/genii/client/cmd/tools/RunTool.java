@@ -15,10 +15,8 @@ import java.util.regex.Pattern;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
-import org.apache.axis.types.Token;
 import org.apache.axis.types.URI;
 import org.ggf.bes.factory.ActivityDocumentType;
-import org.ggf.bes.factory.ActivityStatusType;
 import org.ggf.bes.factory.CreateActivityResponseType;
 import org.ggf.bes.factory.CreateActivityType;
 import org.ggf.bes.factory.GetActivityStatusesResponseType;
@@ -48,9 +46,6 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.deployer.AppDeployerConstants;
 import edu.virginia.vcgr.genii.client.io.FileResource;
-import edu.virginia.vcgr.genii.client.notification.INotificationHandler;
-import edu.virginia.vcgr.genii.client.notification.NotificationServer;
-import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
@@ -61,9 +56,14 @@ import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.AbstractNotificationHandler;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.notification.LightweightNotificationServer;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscribeRequest;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicQueryExpression;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.BESActivityStateChangedContents;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.BESActivityTopics;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
-import edu.virginia.vcgr.genii.common.notification.Notify;
-import edu.virginia.vcgr.genii.common.notification.Subscribe;
 import edu.virginia.vcgr.genii.client.gpath.*;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
@@ -86,38 +86,25 @@ public class RunTool extends BaseGridTool
 	private Object _stateLock = new Object();
 	private ActivityState _state = null;
 	
-	private class NotificationHandler implements INotificationHandler
+	private class NotificationHandler 
+		extends AbstractNotificationHandler<BESActivityStateChangedContents>
 	{
-		@Override
-		public void notify(Notify notify)
+		private NotificationHandler()
 		{
-			try
+			super(BESActivityStateChangedContents.class);
+		}
+
+		@Override
+		public void handleNotification(TopicPath topic,
+			EndpointReferenceType producerReference,
+			EndpointReferenceType subscriptionReference,
+			BESActivityStateChangedContents contents) throws Exception
+		{
+			ActivityState state = contents.activityState();
+			synchronized(_stateLock)
 			{
-				MessageElement []any = notify.get_any();
-				if (any != null)
-				{
-					for (MessageElement a : any)
-					{
-						QName name = a.getQName();
-						if (name.equals(
-							BESConstants.GENII_BES_NOTIFICATION_STATE_ELEMENT_QNAME))
-						{
-							ActivityStatusType ast = 
-								(ActivityStatusType)ObjectDeserializer.toObject(
-									a, ActivityStatusType.class);
-							ActivityState aState = new ActivityState(ast);
-							synchronized(_stateLock)
-							{
-								_state = aState;
-								_stateLock.notify();
-							}
-						}
-					}
-				}
-			}
-			catch (ResourceException re)
-			{
-				re.printStackTrace(System.err);
+				_state = state;
+				_stateLock.notify();
 			}
 		}
 	}
@@ -232,7 +219,7 @@ public class RunTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		NotificationServer server = null;
+		LightweightNotificationServer server = null;
 		
 		GeniiPath gPath = new GeniiPath(_asyncName);
 		if(gPath.pathType() != GeniiPathType.Grid)
@@ -260,20 +247,21 @@ public class RunTool extends BaseGridTool
 			return 0;
 		} else 
 		{
-			Subscribe subscribeRequest = null;
+			SubscribeRequest subscribeRequest = null;
 			
 			if (asyncPath.equals(""));
 			{
-				server = NotificationServer.createStandardServer();
+				server = LightweightNotificationServer.createStandardServer();
 				server.start();
-				EndpointReferenceType target = server.addNotificationHandler(
-					Pattern.compile(
-						String.format("^%s$", Pattern.quote(
-							WellknownTopics.BES_ACTIVITY_STATUS_CHANGE))),
-					new NotificationHandler());
-				subscribeRequest = new Subscribe(
-					new Token(WellknownTopics.BES_ACTIVITY_STATUS_CHANGE),
-					null, target, null);	
+				
+				TopicQueryExpression topicFilter =
+					BESActivityTopics.ACTIVITY_STATE_CHANGED_TOPIC.asConcreteQueryExpression();
+				
+				subscribeRequest = server.createSubscribeRequest(topicFilter,
+					null, null);
+					
+				server.registerNotificationHandler(
+					topicFilter, new NotificationHandler());
 			}
 			
 			if (_jsdl != null)
@@ -460,7 +448,7 @@ public class RunTool extends BaseGridTool
 	
 	static public EndpointReferenceType submitJob(String jsdlFileName,
 		EndpointReferenceType besContainer, String optJobName,
-		Subscribe subscribeRequest)
+		SubscribeRequest subscribeRequest)
 			throws IOException, ResourceException,
 				RNSException
 	{
@@ -501,7 +489,7 @@ public class RunTool extends BaseGridTool
 	}
 	
 	static public EndpointReferenceType submitJob(JobDefinition_Type jobDef,
-		EndpointReferenceType besContainer, Subscribe subscribeRequest) 
+		EndpointReferenceType besContainer, SubscribeRequest subscribeRequest) 
 		throws ResourceException,
 			RNSException, RemoteException
 	{

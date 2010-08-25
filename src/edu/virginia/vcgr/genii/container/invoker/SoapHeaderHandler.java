@@ -18,6 +18,7 @@ import edu.virginia.vcgr.appmgr.launcher.ApplicationLauncherConsole;
 import edu.virginia.vcgr.appmgr.version.Version;
 import edu.virginia.vcgr.genii.client.comm.GeniiSOAPHeaderConstants;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.naming.WSAddressingConstants;
 import edu.virginia.vcgr.genii.container.axis.WSAddressingExtractor;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.version.VersionHelper;
@@ -26,8 +27,7 @@ public class SoapHeaderHandler implements IAroundInvoker
 {
 	static private Log _logger = LogFactory.getLog(SoapHeaderHandler.class);
 	
-	static private final String _WS_ADDR_NS = 
-		"http://www.w3.org/2005/08/addressing";
+	static private final String _WS_ADDR_NS = WSAddressingConstants.WSA_NS;
 	
 	static private final String _WS_ADDR_MSG_ID = "MessageID";
 	static private final String _WS_ADDR_REPLY_TO = "ReplyTo";

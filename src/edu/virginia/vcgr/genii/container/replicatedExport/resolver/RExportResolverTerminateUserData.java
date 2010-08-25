@@ -1,53 +1,42 @@
 package edu.virginia.vcgr.genii.container.replicatedExport.resolver;
 
-import org.apache.axis.types.URI;
+import java.net.URI;
 
-import javax.xml.namespace.QName;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 
-import org.apache.axis.message.MessageElement;
+import org.apache.axis.types.URI.MalformedURIException;
 
-import edu.virginia.vcgr.genii.common.notification.UserDataType;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.AdditionalUserData;
 
-public class RExportResolverTerminateUserData
+@XmlAccessorType(XmlAccessType.NONE)
+public class RExportResolverTerminateUserData extends AdditionalUserData
 {
+	static final long serialVersionUID = 0L;
+	
+	@XmlAttribute(name = "epi", required = true)
 	private URI _epi = null;
 	
-	public RExportResolverTerminateUserData(URI epi){
+	protected RExportResolverTerminateUserData()
+	{	
+	}
+	
+	public RExportResolverTerminateUserData(URI epi)
+	{
 		_epi = epi;
 	}
 	
-	public RExportResolverTerminateUserData(UserDataType userData)
-		throws Exception{
-		if (userData == null || (userData.get_any() == null) )
-			throw new Exception(
-				"Missing required user data in notification payload");
-		MessageElement []data = userData.get_any();
-		if (data.length != 1)
-			throw new Exception(
-				"Invalid user data for notification payload"); 
-		
-		for (MessageElement elem : data)
-		{
-			QName elemName = elem.getQName();
-			if (elemName.equals(RExportResolverUtils.REFERENCE_RESOLVER_EPI_QNAME))
-			{
-				_epi = new URI(elem.getValue());
-			} else
-			{
-				throw new Exception(
-					"Unknown user data found in notification payload of RExportRexolver");
-			}
-		}
-		
-		if (_epi == null)
-		{
-			throw new Exception(
-				"Incomplete user data for notification payload of RExportRexolver");
-		}
-	}
-	
-	public URI getEPI()
+	final public org.apache.axis.types.URI getEPI()
 	{
-		return _epi;
+		try
+		{
+			return new org.apache.axis.types.URI(_epi.toString());
+		} 
+		catch (MalformedURIException e)
+		{
+			throw new RuntimeException(
+				"This shouldn't have happend.", e);
+		}
 	}
 }

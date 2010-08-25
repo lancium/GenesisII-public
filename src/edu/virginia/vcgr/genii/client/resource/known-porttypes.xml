@@ -140,7 +140,7 @@
 	</portType>
 
 	<portType name="{http://vcgr.cs.virginia.edu/genii/2006/12/notification}GeniiSubscriptionPortType">
-		<display-rank>100</display-rank>
+		<display-rank>-100</display-rank>
 		<description>Subscription</description>
 	</portType>
 
@@ -278,4 +278,65 @@
 		<display-rank>100</display-rank>
 		<description>Grid Logger</description>
 	</portType>
+	
+	<portType name="{http://docs.oasis-open.org/wsn/bw-2}NotificationConsumer">
+		<display-rank>-100</display-rank>
+		<description>Notification Consumer</description>
+	</portType>
+	
+	<portType name="{http://docs.oasis-open.org/wsn/bw-2}NotificationProducer">
+		<display-rank>-100</display-rank>
+		<description>Notification Producer</description>
+	</portType>
+	
+	<portType name="{http://docs.oasis-open.org/wsn/bw-2}PullPoint">
+		<display-rank>50</display-rank>
+		<description>Pull Point</description>
+	</portType>
+	
+	<portType name="{http://docs.oasis-open.org/wsn/bw-2}CreatePullPoint">
+		<display-rank>-100</display-rank>
+		<description>Pull Point Factory</description>
+	</portType>
+	
+	<portType name="{http://docs.oasis-open.org/wsn/bw-2}SubscriptionManager">
+		<display-rank>50</display-rank>
+		<description>Subscription Manager</description>
+	</portType>
+	
+	<portType name="{http://docs.oasis-open.org/wsn/bw-2}PausableSubscriptionManager">
+		<display-rank>50</display-rank>
+		<description>Pausable Subscription Manager</description>
+	</portType>
+	
+	<portType name="{http://vcgr.cs.virginia.edu/genii/2010/08/notification/pull-point}GeniiPullPointPortType">
+		<display-rank>50</display-rank>
+		<description>GeniiPullPoint</description>
+	</portType>
+	
+	<portType name="{http://docs.oasis-open.org/wsn/brw-2}RegisterPublisher">
+		<display-rank>50</display-rank>
+		<description>RegisterPublisher</description>
+	</portType>
+	
+	<portType name="{http://docs.oasis-open.org/wsn/brw-2}NotificationBroker">
+		<display-rank>100</display-rank>
+		<description>NotificationBroker</description>
+	</portType>
+	
+	<portType name="{http://docs.oasis-open.org/wsn/brw-2}PublisherRegistrationManager">
+		<display-rank>50</display-rank>
+		<description>PublisherRegistrationManager</description>
+	</portType>
+	
+	<portType name="{http://vcgr.cs.virginia.edu/genii/2010/08/notification}GeniiWSNBrokerPortType">
+		<display-rank>100</display-rank>
+		<description>GeniiBroker</description>
+	</portType>
+	
+	<portType name="{http://vcgr.cs.virginia.edu/genii/2010/08/notification}GeniiPublisherRegistrationManagerPortType">
+		<display-rank>50</display-rank>
+		<description>GeniiPublisherRegistrationManager</description>
+	</portType>
+	
 </known-porttypes>

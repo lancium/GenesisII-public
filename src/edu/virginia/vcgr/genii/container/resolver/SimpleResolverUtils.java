@@ -1,9 +1,9 @@
 package edu.virginia.vcgr.genii.container.resolver;
 
+import java.net.URI;
+
 import javax.xml.namespace.QName;
 
-import org.apache.axis.message.MessageElement;
-import org.apache.axis.types.Token;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
@@ -11,12 +11,12 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
-import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
-
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.DefaultSubscriptionFactory;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscribeException;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.Subscription;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscriptionFactory;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.GenesisIIBaseTopics;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
-import edu.virginia.vcgr.genii.common.notification.Subscribe;
-import edu.virginia.vcgr.genii.common.notification.SubscribeResponse;
-import edu.virginia.vcgr.genii.common.notification.UserDataType;
 
 public class SimpleResolverUtils
 {
@@ -75,24 +75,24 @@ public class SimpleResolverUtils
 		return newEPR;
 	}
 	
-	static public EndpointReferenceType createTerminateSubscription(SimpleResolverEntry entry, 
-			EndpointReferenceType resolverEPR)
+	static public EndpointReferenceType createTerminateSubscription(
+		SimpleResolverEntry entry, EndpointReferenceType resolverEPR)
 	{
 		EndpointReferenceType newSubscriptionEPR = null;
-
+		
 		try
 		{
-			/* create subscription to terminate event */
-			UserDataType userData = createTerminateSubscriptionUserData(entry);
-			GeniiCommon producer = ClientUtils.createProxy(GeniiCommon.class, entry.getTargetEPR());
-			SubscribeResponse subscription = producer.subscribe(new Subscribe(
-					new Token(WellknownTopics.TERMINATED), 
-					null, 
-					resolverEPR,
-					userData));
-			newSubscriptionEPR = subscription.getSubscription();
+			SubscriptionFactory factory = new DefaultSubscriptionFactory(
+				resolverEPR);
+			SimpleResolverTerminateUserData userData = 
+				createTerminateSubscriptionUserData(entry);
+			Subscription subscription = factory.subscribe(
+				entry.getTargetEPR(),
+				GenesisIIBaseTopics.RESOURCE_TERMINATION_TOPIC.asConcreteQueryExpression(),
+				null, userData);
+			newSubscriptionEPR = subscription.subscriptionReference();
 		}
-		catch (Exception e)
+		catch (SubscribeException e)
 		{ 
 			_logger.debug("Could not create subscription to resource termination.", e);
 		}
@@ -114,16 +114,12 @@ public class SimpleResolverUtils
 		}
 	}
 	
-	static protected UserDataType createTerminateSubscriptionUserData(SimpleResolverEntry entry)
+	static protected SimpleResolverTerminateUserData
+		createTerminateSubscriptionUserData(SimpleResolverEntry entry)
 	{
-		return new UserDataType(new MessageElement[] { 
-				new MessageElement(
-						REFERENCE_RESOLVER_EPI_QNAME, entry.getTargetEPI().toString()),
-				new MessageElement(
-						REFERENCE_RESOLVER_VERSION_QNAME, (new Integer(entry.getVersion())).toString()),
-				new MessageElement(
-						REFERENCE_RESOLVER_GUID_QNAME, entry.getSubscriptionGUID())
-			});
+		return new SimpleResolverTerminateUserData(
+			URI.create(entry.getTargetEPI().toString()),
+			entry.getVersion(),
+			entry.getSubscriptionGUID());
 	}
-
 }

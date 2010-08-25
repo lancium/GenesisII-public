@@ -53,9 +53,10 @@ import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
-import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ByteIOContentsChangedContents;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ByteIOTopics;
+import edu.virginia.vcgr.genii.client.byteio.ByteIOOperations;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
-import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
@@ -63,13 +64,13 @@ import edu.virginia.vcgr.genii.container.common.GeniiNoOutCalls;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
-import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
-import edu.virginia.vcgr.genii.client.notification.UnknownTopicException;
+import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.PublisherTopic;
+import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.TopicSet;
 
 import org.apache.axis.message.MessageElement;
 
 public class RandomByteIOServiceImpl extends GenesisIIBase
-	implements RandomByteIOPortType, GeniiNoOutCalls
+	implements RandomByteIOPortType, GeniiNoOutCalls, ByteIOTopics
 {
 	static private Log _logger = LogFactory.getLog(RandomByteIOServiceImpl.class);
 	
@@ -256,24 +257,11 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 				}
 				
 				//notify of rbyteio write event
-				try{
-					MessageElement []payload = new MessageElement[1];
-			    	
-					payload[0] = new MessageElement(
-			    		new QName(GenesisIIConstants.GENESISII_NS, "operation"),
-			    		"write");
-			    	
-			    	getTopicSpace().getTopic(WellknownTopics.RANDOM_BYTEIO_OP).notifyAll(
-			    		payload);
-			    	
-			    	_logger.debug("RandomByteIO write notification sent");
-				}
-				catch (InvalidTopicException ite){
-					_logger.warn(ite.getLocalizedMessage(), ite);
-				}
-				catch (UnknownTopicException ute){
-					_logger.warn(ute.getLocalizedMessage(), ute);
-				}
+				TopicSet space = TopicSet.forPublisher(getClass());
+				PublisherTopic publisherTopic = space.createPublisherTopic(
+					BYTEIO_CONTENTS_CHANGED_TOPIC);
+				publisherTopic.publish(new ByteIOContentsChangedContents(
+					ByteIOOperations.Write));
 			}
 			catch (IOException ioe)
 			{
@@ -316,24 +304,11 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 				raf.write(data);
 				
 				//notify of append
-				try{
-					MessageElement []payload = new MessageElement[1];
-			    	
-					payload[0] = new MessageElement(
-			    		new QName(GenesisIIConstants.GENESISII_NS, "operation"),
-			    		"append");
-			    	
-			    	getTopicSpace().getTopic(WellknownTopics.RANDOM_BYTEIO_OP).notifyAll(
-			    		payload);
-			    	
-			    	_logger.debug("RandomByteIO append notification sent");
-				}
-				catch (InvalidTopicException ite){
-					_logger.warn(ite.getLocalizedMessage(), ite);
-				}
-				catch (UnknownTopicException ute){
-					_logger.warn(ute.getLocalizedMessage(), ute);
-				}
+				TopicSet space = TopicSet.forPublisher(getClass());
+				PublisherTopic publisherTopic = space.createPublisherTopic(
+					BYTEIO_CONTENTS_CHANGED_TOPIC);
+				publisherTopic.publish(new ByteIOContentsChangedContents(
+					ByteIOOperations.Append));
 				
 				return new AppendResponse(new TransferInformationType(null,
 					append.getTransferInformation().getTransferMechanism()));
@@ -378,25 +353,11 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 				raf.write(data);
 				
 				//notify rbyteio truncappend event
-				try{
-					MessageElement []payload = new MessageElement[1];
-			    	
-					payload[0] = new MessageElement(
-			    		new QName(GenesisIIConstants.GENESISII_NS, "operation"),
-			    		"truncappend");
-			    	
-			    	getTopicSpace().getTopic(WellknownTopics.RANDOM_BYTEIO_OP).notifyAll(
-			    		payload);
-			    	
-			    	_logger.debug("RandomByteIO truncAppend notification sent");
-				}
-				catch (InvalidTopicException ite){
-					_logger.warn(ite.getLocalizedMessage(), ite);
-				}
-				catch (UnknownTopicException ute){
-					_logger.warn(ute.getLocalizedMessage(), ute);
-				}
-				
+				TopicSet space = TopicSet.forPublisher(getClass());
+				PublisherTopic publisherTopic = space.createPublisherTopic(
+					BYTEIO_CONTENTS_CHANGED_TOPIC);
+				publisherTopic.publish(new ByteIOContentsChangedContents(
+					ByteIOOperations.TruncAppend));
 			}
 			catch (IOException ioe)
 			{

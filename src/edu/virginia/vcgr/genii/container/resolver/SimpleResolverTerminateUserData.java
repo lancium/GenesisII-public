@@ -1,18 +1,37 @@
 package edu.virginia.vcgr.genii.container.resolver;
 
-import org.apache.axis.types.URI;
+import java.net.URI;
 
-import javax.xml.namespace.QName;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 
-import org.apache.axis.message.MessageElement;
+import org.apache.axis.types.URI.MalformedURIException;
 
-import edu.virginia.vcgr.genii.common.notification.UserDataType;
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.AdditionalUserData;
 
-class SimpleResolverTerminateUserData
+@XmlAccessorType(XmlAccessType.NONE)
+class SimpleResolverTerminateUserData extends AdditionalUserData
 {
+	static final long serialVersionUID = 0L;
+	
+	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS,
+		name = "epi", required = true, nillable = false)
 	private URI _epi = null;
+	
+	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS,
+		name = "version", required = true, nillable = false)
 	private int _version = -1;
+	
+	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS,
+		name = "guid", required = true, nillable = false)
 	private String _guid = null;
+	
+	@SuppressWarnings("unused")
+	private SimpleResolverTerminateUserData()
+	{
+	}
 	
 	public SimpleResolverTerminateUserData(URI epi, int version, String guid)
 	{
@@ -21,47 +40,17 @@ class SimpleResolverTerminateUserData
 		_guid = guid;
 	}
 	
-	public SimpleResolverTerminateUserData(UserDataType userData)
-		throws Exception
+	public org.apache.axis.types.URI getEPI()
 	{
-		if (userData == null || (userData.get_any() == null) )
-			throw new Exception(
-				"Missing required user data in notification payload");
-		MessageElement []data = userData.get_any();
-		if (data.length != 3)
-			throw new Exception(
-				"Invalid user data for notification payload");
-
-		for (MessageElement elem : data)
+		try
 		{
-			QName elemName = elem.getQName();
-			if (elemName.equals(SimpleResolverUtils.REFERENCE_RESOLVER_EPI_QNAME))
-			{
-				_epi = new URI(elem.getValue());
-			} else if (elemName.equals(SimpleResolverUtils.REFERENCE_RESOLVER_VERSION_QNAME))
-			{
-				String versionStr = (String) elem.getObjectValue(String.class);
-				_version = (new Integer(versionStr)).intValue();
-			} else if (elemName.equals(SimpleResolverUtils.REFERENCE_RESOLVER_GUID_QNAME))
-			{
-				_guid = (String) elem.getObjectValue(String.class);
-			} else
-			{
-				throw new Exception(
-					"Unknown user data found in notification payload.");
-			}
-		}
-		
-		if (_epi == null || _version == -1 || _guid == null)
+			return new org.apache.axis.types.URI(_epi.toString());
+		} 
+		catch (MalformedURIException e)
 		{
-			throw new Exception(
-				"Incomplete user data for notification payload");
+			throw new RuntimeException(
+				"This shouldn't have happend.", e);
 		}
-	}
-	
-	public URI getEPI()
-	{
-		return _epi;
 	}
 	
 	public int getVersion()

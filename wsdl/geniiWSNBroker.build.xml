@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="gen.wsnbroker">
+
+	<fail message="wsdl.dir variable not set.">
+		<condition>
+			<not>
+				<isset property="wsdl.dir"/>
+			</not>
+		</condition>
+	</fail>
+
+	<import file="${wsdl.dir}/wsdl-build.xml"/>
+	<import file="${wsdl.dir}/common.build.xml"/>
+
+	<condition property="gen.wsnbroker.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${temporary.codegen.dir}/wsdl/broker.flag"/>
+			<uptodate targetfile="${temporary.codegen.dir}/wsdl/broker.flag">
+				<srcfiles dir="${wsdl.dir}">
+					<include name="wsrf/wsTopic.xsd"/>
+					<include name="wsrf/wsBaseNotification.xsd"/>
+					<include name="wsrf/wsBaseNotification.wsdl"/>
+					<include name="wsrf/wsBrokeredNotification.xsd"/>
+					<include name="wsrf/wsBrokeredNotification.wsdl"/>
+					<include name="geniiWSNBroker.gwsdl"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.wsnbroker" unless="gen.wsnbroker.uptodate">
+		<copy todir="${temporary.codegen.dir}/wsdl">
+			<filelist refid="common.source.files"/>
+			<fileset dir="${wsdl.dir}">
+				<include name="wsrf/wsTopic.xsd"/>
+				<include name="wsrf/wsBaseNotification.xsd"/>
+				<include name="wsrf/wsBaseNotification.wsdl"/>
+				<include name="wsrf/wsBrokeredNotification.xsd"/>
+				<include name="wsrf/wsBrokeredNotification.wsdl"/>
+				<include name="geniiWSNBroker.gwsdl"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/geniiWSNBroker.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/geniiWSNBroker-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${temporary.codegen.dir}/wsdl/geniiWSNBroker-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/geniiWSNBroker-service.wsdl"
+			portType="{http://vcgr.cs.virginia.edu/genii/2010/08/notification/broker}GeniiWSNBrokerPortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/broker"/>
+			<param name="stub.gen.source-wsdl"
+				value="${temporary.codegen.dir}/wsdl/geniiWSNBroker-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${temporary.codegen.dir}/wsdl/broker.flag"/>
+		</antcall>
+		<move file="${temporary.codegen.dir}/broker/edu/virginia/vcgr/genii/common/notification/deploy.wsdd"
+			tofile="${wsdd.dir}/broker.deploy.wsdd"/>
+		<replace file="${wsdd.dir}/broker.deploy.wsdd"
+			token="edu.virginia.vcgr.genii.common.notification.GeniiWSNBrokerSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.common.notification.GeniiWSNBrokerServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd.dir}/broker.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>

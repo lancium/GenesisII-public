@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Vector;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
@@ -41,9 +42,22 @@ public class ActivityState implements Serializable, Cloneable
 	static final private QName _SUSPEND_STATE_ELEMENT_QNAME = new QName(
 		_GENII_SUS_NS, _SUSPEND_STATE_ELEMENT_NAME);
 	
+	@XmlAttribute(name = "bes-state", required = true)
 	private String _besState;
+	
+	@XmlAttribute(name = "genii-state", required = false)
 	private String _geniiState;
+	
+	@XmlAttribute(name = "is-suspended", required = false)
 	private boolean _isSuspended;
+	
+	@SuppressWarnings("unused")
+	private ActivityState()
+	{	
+		_besState = null;
+		_geniiState = null;
+		_isSuspended = false;
+	}
 	
 	public ActivityState(ActivityStateEnumeration besState, 
 		String geniiState, boolean isSuspended)

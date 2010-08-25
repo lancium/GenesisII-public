@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="gen.publisher-registration">
+
+	<fail message="wsdl.dir variable not set.">
+		<condition>
+			<not>
+				<isset property="wsdl.dir"/>
+			</not>
+		</condition>
+	</fail>
+
+	<import file="${wsdl.dir}/wsdl-build.xml"/>
+	<import file="${wsdl.dir}/common.build.xml"/>
+
+	<condition property="gen.publisher-registration.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${temporary.codegen.dir}/wsdl/publisher-registration.flag"/>
+			<uptodate targetfile="${temporary.codegen.dir}/wsdl/publisher-registration.flag">
+				<srcfiles dir="${wsdl.dir}">
+					<include name="wsrf/wsTopic.xsd"/>
+					<include name="wsrf/wsBaseNotification.xsd"/>
+					<include name="wsrf/wsBaseNotification.wsdl"/>
+					<include name="wsrf/wsBrokeredNotification.xsd"/>
+					<include name="wsrf/wsBrokeredNotification.wsdl"/>
+					<include name="publisher-registration.gwsdl"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.publisher-registration" unless="gen.publisher-registration.uptodate">
+		<copy todir="${temporary.codegen.dir}/wsdl">
+			<filelist refid="common.source.files"/>
+			<fileset dir="${wsdl.dir}">
+				<include name="wsrf/wsTopic.xsd"/>
+				<include name="wsrf/wsBaseNotification.xsd"/>
+				<include name="wsrf/wsBaseNotification.wsdl"/>
+				<include name="wsrf/wsBrokeredNotification.xsd"/>
+				<include name="wsrf/wsBrokeredNotification.wsdl"/>
+				<include name="publisher-registration.gwsdl"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/publisher-registration.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/publisher-registration-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${temporary.codegen.dir}/wsdl/publisher-registration-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/publisher-registration-service.wsdl"
+			portType="{http://vcgr.cs.virginia.edu/genii/2010/08/notification/publisher-registration-manager}GeniiPublisherRegistrationPortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/publisher-registration"/>
+			<param name="stub.gen.source-wsdl"
+				value="${temporary.codegen.dir}/wsdl/publisher-registration-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${temporary.codegen.dir}/wsdl/publisher-registration.flag"/>
+		</antcall>
+		<move file="${temporary.codegen.dir}/publisher-registration/edu/virginia/vcgr/genii/common/notification/deploy.wsdd"
+			tofile="${wsdd.dir}/publisher-registration.deploy.wsdd"/>
+		<replace file="${wsdd.dir}/publisher-registration.deploy.wsdd"
+			token="edu.virginia.vcgr.genii.common.notification.GeniiPublisherRegistrationSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.common.notification.GeniiPublisherRegistrationServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd.dir}/publisher-registration.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>

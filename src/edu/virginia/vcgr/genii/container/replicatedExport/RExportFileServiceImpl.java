@@ -28,20 +28,22 @@ import org.ggf.rns.RNSFaultType;
 import org.ggf.rns.Remove;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
-import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
-import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
-import edu.virginia.vcgr.genii.common.notification.Notify;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.AbstractNotificationHandler;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.GenesisIIBaseTopics;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ResourceTerminationContents;
+
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
+import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.container.byteio.RandomByteIOAttributeHandlers;
 import edu.virginia.vcgr.genii.container.byteio.RandomByteIOServiceImpl;
-import edu.virginia.vcgr.genii.container.common.notification.TopicSpace;
 import edu.virginia.vcgr.genii.replicatedExport.RExportFilePortType;
-
 
 public class RExportFileServiceImpl extends RandomByteIOServiceImpl 
 	implements RExportFilePortType
@@ -76,13 +78,6 @@ public class RExportFileServiceImpl extends RandomByteIOServiceImpl
 				WellKnownPortTypes.GENII_NOTIFICATION_CONSUMER_PORT_TYPE);
 	}
 	
-	protected void registerTopics(TopicSpace topicSpace)
-		throws InvalidTopicException
-	{
-		super.registerTopics(topicSpace);
-		topicSpace.registerTopic(WellknownTopics.RANDOM_BYTEIO_OP);
-	}
-	
 	public WriteResponse write(Write write)
 		throws RemoteException, CustomFaultType, 
 			ReadNotPermittedFaultType, UnsupportedTransferFaultType, 
@@ -93,29 +88,40 @@ public class RExportFileServiceImpl extends RandomByteIOServiceImpl
 		return writeResp; 
 	}
 	
-	/* NotificationConsumer port type */
-	@RWXMapping(RWXCategory.OPEN)
-	public void notify(Notify notify) 
-		throws RemoteException, ResourceUnknownFaultType
+	private class LegacyResourceTerminatedNotificationHandler
+		extends AbstractNotificationHandler<ResourceTerminationContents>
 	{
-		try{
-			String topic = notify.getTopic().toString();
+		private LegacyResourceTerminatedNotificationHandler()
+		{
+			super(ResourceTerminationContents.class);
+		}
+
+		@Override
+		public void handleNotification(TopicPath topic,
+			EndpointReferenceType producerReference,
+			EndpointReferenceType subscriptionReference,
+			ResourceTerminationContents contents) throws Exception
+		{
+			RExportSubscriptionUserData notifyData = 
+				contents.additionalUserData(RExportSubscriptionUserData.class);
 			
-			//destroy replica if notified of resolver termination
-			if (topic.equals(WellknownTopics.TERMINATED)){
-				RExportSubscriptionUserData notifyData = new RExportSubscriptionUserData(
-						notify.getUserData());
-				
-				String exportPath = notifyData.getPrimaryLocalPath();
-				
-				destroy(new Destroy());
-				
-				_logger.info("RExport replica " + exportPath + " terminated.");
-			}
+			String exportPath = notifyData.getPrimaryLocalPath();
+			
+			destroy(new Destroy());
+			
+			_logger.info("RExport replica " + exportPath + " terminated.");
 		}
-		catch (Throwable t){
-			_logger.warn(t.getLocalizedMessage(), t);
-		}
+	}
+
+	@Override
+	protected void registerNotificationHandlers(
+		NotificationMultiplexer multiplexer)
+	{
+		super.registerNotificationHandlers(multiplexer);
+		
+		multiplexer.registerNotificationHandler(
+			GenesisIIBaseTopics.RESOURCE_TERMINATION_TOPIC.asConcreteQueryExpression(),
+			new LegacyResourceTerminatedNotificationHandler());
 	}
 	
 	@RWXMapping(RWXCategory.WRITE)

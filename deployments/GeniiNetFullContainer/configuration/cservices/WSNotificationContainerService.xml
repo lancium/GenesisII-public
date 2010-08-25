@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<container-service
+	class="edu.virginia.vcgr.genii.container.cservices.wsn.WSNotificationContainerService">
+	<WSNNotificationConfiguration num-threads="4"/>
+</container-service>

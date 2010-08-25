@@ -27,6 +27,12 @@ public class WellKnownPortTypes
 	static public PortType GENII_SUBSCRIPTION_PORT_TYPE =
 		PortType.get(new QName("http://vcgr.cs.virginia.edu/genii/2006/12/notification",
 			"GeniiSubscriptionPortType"));
+	static public PortType GENII_WSNBROKER_PORT_TYPE =
+		PortType.get(new QName("http://vcgr.cs.virginia.edu/genii/2010/08/notification",
+			"GeniiWSNBrokerPortType"));
+	static public PortType GENII_PUB_REG_MGR_PORT_TYPE =
+		PortType.get(new QName("http://vcgr.cs.virginia.edu/genii/2010/08/notification",
+			"GeniiPublisherRegistrationManagerPortType"));
 	static public PortType GENII_NOTIFICATION_CONSUMER_PORT_TYPE =
 		PortType.get(new QName("http://vcgr.cs.virginia.edu/genii/2006/12/notification",
 			"GeniiNotificationConsumerPortType"));
@@ -159,4 +165,9 @@ public class WellKnownPortTypes
 	static public PortType GENESIS_DAIR_SQL_ROWSET_ACCESS_PORT_TYPE =
 		PortType.get(new QName("http://vcgr.cs.virginia.edu/genii/genesis_dair",
 			"SQLRowsetAccessPortType"));
+	
+	static public PortType GENII_PULL_POINT_PORT =
+		PortType.get(new QName(
+			"http://vcgr.cs.virginia.edu/genii/2010/08/notification/pull-point",
+			"GeniiPullPointPortType"));
 }

@@ -84,11 +84,11 @@ static private Log _logger = LogFactory.getLog(ContainerServices.class);
 	}
 	
 	static public <Type extends ContainerService> Type findService(
-		Class<Type> serviceClass)
+		Class<Type> serviceType)
 	{
-		Type ret = serviceClass.cast(_services.get(serviceClass));
+		Type ret = serviceType.cast(_services.get(serviceType));
 		if (ret == null)
-			throw new NoSuchServiceException(serviceClass.toString());
+			throw new NoSuchServiceException(serviceType.toString());
 		
 		return ret;
 	}

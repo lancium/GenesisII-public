@@ -28,7 +28,7 @@
 				<jsdl-posix:Argument>seven.dat</jsdl-posix:Argument>
 				<jsdl-posix:Argument>fourty-two.dat</jsdl-posix:Argument>
 				<jsdl-posix:Argument>sum.dat</jsdl-posix:Argument>
-				<jsdl-posix:Argument>120</jsdl-posix:Argument>
+				<jsdl-posix:Argument>5</jsdl-posix:Argument>
 			</jsdl-posix:POSIXApplication>
 		</jsdl:Application>
 

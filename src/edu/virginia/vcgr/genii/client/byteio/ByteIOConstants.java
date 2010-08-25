@@ -28,6 +28,9 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
  */
 public class ByteIOConstants
 {
+	static final public String BYTEIO_NS =
+		"http://schemas.ggf.org/byteio/2005/10";
+	
 	static public final String TRANSFER_TYPE_SIMPLE =
 		"http://schemas.ggf.org/byteio/2005/10/transfer-mechanisms/simple";
 	static public final String TRANSFER_TYPE_DIME =

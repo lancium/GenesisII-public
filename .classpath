@@ -43,7 +43,7 @@
 	<classpathentry kind="lib" path="ext/jetty/lib/servlet-api-2.5-20081211.jar"/>
 	<classpathentry kind="lib" path="ext/jetty/lib/jetty-6.1.17.jar"/>
 	<classpathentry kind="lib" path="ext/jetty/lib/jetty-util-6.1.17.jar"/>
-	<classpathentry kind="lib" path="lib/GenesisII-ws.jar"/>
 	<classpathentry kind="lib" path="ext/jsch/jsch-0.1.42.jar"/>
+	<classpathentry kind="lib" path="lib/GenesisII-ws.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

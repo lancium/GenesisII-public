@@ -14,7 +14,6 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
 import edu.virginia.vcgr.genii.common.MatchingParameter;
-import edu.virginia.vcgr.genii.container.common.notification.SubscriptionInformation;
 
 /**
  * A resource is the persistent state representation of a web service endpoint.
@@ -136,12 +135,6 @@ public interface IResource extends Closeable
 	 * Rolls back all changes made so far to this resource.
 	 */
 	public void rollback();
-	
-	/**
-	 * Retrieve the list of subscriptions for this resource that match a given topic.
-	 */
-	public Collection<SubscriptionInformation> matchSubscriptions(
-		String topicExpression) throws ResourceException;
 	
 	/**
 	 * Return whether or not the resource is a service resource

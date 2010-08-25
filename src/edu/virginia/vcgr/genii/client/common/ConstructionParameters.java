@@ -20,9 +20,7 @@ import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.axis.message.MessageElement;
@@ -225,19 +223,12 @@ public class ConstructionParameters implements Serializable
 			JAXBElement jbe = new JAXBElement(
 				ConstructionParameters.CONSTRUCTION_PARAMTERS_QNAME,
 				getClass(), this);
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			factory.setNamespaceAware(true);
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			Document doc = builder.newDocument();
-			m.marshal(jbe, doc);
-			return new MessageElement(doc.getDocumentElement());
+			DOMResult result = new DOMResult();
+			m.marshal(jbe, result);
+			return new MessageElement(
+				((Document)result.getNode()).getDocumentElement());
 		}
 		catch (JAXBException e)
-		{
-			throw new RemoteException(
-				"Unable to serialize construction parameters.", e);
-		} 
-		catch (ParserConfigurationException e)
 		{
 			throw new RemoteException(
 				"Unable to serialize construction parameters.", e);

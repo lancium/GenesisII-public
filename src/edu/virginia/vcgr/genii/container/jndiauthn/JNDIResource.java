@@ -16,7 +16,6 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.SecurityConstants;
-import edu.virginia.vcgr.genii.container.common.notification.SubscriptionInformation;
 import edu.virginia.vcgr.genii.container.configuration.ServiceDescription;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
@@ -316,6 +315,7 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource
 		throw new ResourceException("Cannot destroy transparent resources");
 	}
 
+	/* What does this do?
 	public Collection<SubscriptionInformation> matchSubscriptions(
 			String topicExpression) throws ResourceException
 	{
@@ -328,6 +328,7 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource
 		throw new ResourceException(
 				"Cannot match subscriptions on transparent resources");
 	}
+	*/
 
 	/* Mark Morgan -- This functionis no longer contained here.  We'll have to
 	 * revisit this issue again.

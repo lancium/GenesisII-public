@@ -36,7 +36,6 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
-import edu.virginia.vcgr.genii.common.notification.Notify;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
@@ -131,13 +130,6 @@ public class IteratorServiceImpl extends GenesisIIBase implements
 			RNSFaultType, ResourceUnknownFaultType
 	{
 		throw new RemoteException("Move not supported on iterators.");
-	}
-
-	@Override
-	@RWXMapping(RWXCategory.OPEN)
-	public void notify(Notify notify) throws RemoteException,
-			ResourceUnknownFaultType
-	{
 	}
 
 	@Override

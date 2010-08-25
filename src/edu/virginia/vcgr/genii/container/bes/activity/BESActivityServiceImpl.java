@@ -30,6 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.morgan.util.GUID;
+import org.oasis_open.wsn.base.Subscribe;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
@@ -45,18 +46,16 @@ import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLInterpreter;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
-import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
-import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.BESActivityTopics;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
-import edu.virginia.vcgr.genii.common.notification.Subscribe;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.container.bes.BES;
 import edu.virginia.vcgr.genii.container.bes.BESUtilities;
@@ -67,7 +66,6 @@ import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingD
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.CommonExecutionUnderstanding;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.forkexec.ForkExecPersonalityProvider;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.qsub.QSubPersonalityProvider;
-import edu.virginia.vcgr.genii.container.common.notification.TopicSpace;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
@@ -78,7 +76,7 @@ import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 @ForkRoot(RootRNSFork.class)
 @ConstructionParametersType(BESConstructionParameters.class)
 public class BESActivityServiceImpl extends ResourceForkBaseService implements
-		BESActivityPortType, BESActivityConstants
+	BESActivityPortType, BESActivityConstants, BESActivityTopics
 {
 	static private Log _logger = LogFactory.getLog(BESActivityServiceImpl.class);
 
@@ -95,16 +93,6 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements
 	public PortType getFinalWSResourceInterface()
 	{
 		return GENII_BES_ACTIVITY_PORT_TYPE;
-	}
-	
-	@Override
-	protected void registerTopics(TopicSpace topicSpace)
-			throws InvalidTopicException
-	{
-		super.registerTopics(topicSpace);
-		
-		topicSpace.registerTopic(WellknownTopics.BES_ACTIVITY_STATUS_CHANGE);
-		topicSpace.registerTopic(WellknownTopics.BES_ACTIVITY_STATUS_CHANGE_FINAL);
 	}
 
 	protected void postCreate(ResourceKey rKey,

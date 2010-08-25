@@ -30,19 +30,21 @@ import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
-import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
-import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
-import edu.virginia.vcgr.genii.common.notification.Notify;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.AbstractNotificationHandler;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.GenesisIIBaseTopics;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ResourceTerminationContents;
+
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
 import edu.virginia.vcgr.genii.container.byteio.RandomByteIOAttributeHandlers;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
-import edu.virginia.vcgr.genii.container.common.notification.TopicSpace;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.replicatedExport.RExportDirPortType;
@@ -89,50 +91,55 @@ public class RExportDirServiceImpl extends GenesisIIBase
 				WellKnownPortTypes.GENII_NOTIFICATION_CONSUMER_PORT_TYPE);
 	}
 	
-	protected void registerTopics(TopicSpace topicSpace)
-	throws InvalidTopicException
+	private class LegacyResourceTerminatedNotificationHandler
+		extends AbstractNotificationHandler<ResourceTerminationContents>
 	{
-		super.registerTopics(topicSpace);
-	}
-	
-	/* NotificationConsumer port type */
-	@RWXMapping(RWXCategory.OPEN)
-	public void notify(Notify notify) 
-		throws RemoteException, ResourceUnknownFaultType
-	{
-		try{
-			String topic = notify.getTopic().toString();
+		private LegacyResourceTerminatedNotificationHandler()
+		{
+			super(ResourceTerminationContents.class);
+		}
+
+		@Override
+		public void handleNotification(TopicPath topic,
+			EndpointReferenceType producerReference,
+			EndpointReferenceType subscriptionReference,
+			ResourceTerminationContents contents) throws Exception
+		{
+			/*ensure this notification is for matching resource*/
+			ResourceKey rKey = ResourceManager.getCurrentResource();
+			IRExportResource resource = (IRExportResource) rKey.dereference();
+			String resourcePrimaryLocalPath= resource.getLocalPath();
 			
-			//destroy replica if notified of resolver termination
-			if (topic.equals(WellknownTopics.TERMINATED)){
+			RExportSubscriptionUserData notifyData = 
+				contents.additionalUserData(
+					RExportSubscriptionUserData.class);
+			
+			String exportPath = notifyData.getPrimaryLocalPath();
+			if(resourcePrimaryLocalPath.equals(exportPath)){
+				//destroy resource DB info
+				//this will not send termination notification
+				resource.destroy(false);
 				
-				/*ensure this notification is for matching resource*/
-				ResourceKey rKey = ResourceManager.getCurrentResource();
-				IRExportResource resource = (IRExportResource) rKey.dereference();
-				String resourcePrimaryLocalPath= resource.getLocalPath();
-				
-				RExportSubscriptionUserData notifyData = new RExportSubscriptionUserData(
-						notify.getUserData());
-				
-				String exportPath = notifyData.getPrimaryLocalPath();
-				if(resourcePrimaryLocalPath.equals(exportPath)){
-					//destroy resource DB info
-					//this will not send termination notification
-					resource.destroy(false);
-					
-					_logger.info("RExportDir replica " + exportPath + " terminated.");
-				}
-				else{
-					_logger.error("Termination notification user" +
-							" data does not match RExportDir resource.");
-				}
+				_logger.info("RExportDir replica " + exportPath + " terminated.");
+			}
+			else{
+				_logger.error("Termination notification user" +
+						" data does not match RExportDir resource.");
 			}
 		}
-		catch (Throwable t){
-			_logger.warn(t.getLocalizedMessage(), t);
-		}
 	}
-
+	
+	@Override
+	protected void registerNotificationHandlers(
+		NotificationMultiplexer multiplexer)
+	{
+		super.registerNotificationHandlers(multiplexer);
+		
+		multiplexer.registerNotificationHandler(
+			GenesisIIBaseTopics.RESOURCE_TERMINATION_TOPIC.asConcreteQueryExpression(),
+			new LegacyResourceTerminatedNotificationHandler());
+	}
+	
 	@RWXMapping(RWXCategory.WRITE)
 	public AddResponse add(Add addRequest) 
 		throws RemoteException, RNSEntryExistsFaultType, 

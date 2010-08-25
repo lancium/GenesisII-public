@@ -441,10 +441,10 @@ public class QueueManager implements Closeable
 		}
 	}
 	
-	public void checkJobStatus(String jobID) 
+	public void checkJobStatus(long jobID) 
 		throws SQLException
 	{
-		_jobManager.checkJobStatus(Long.parseLong(jobID));
+		_jobManager.checkJobStatus(jobID);
 	}
 	
 	public Collection<JobInformationType> getJobStatus(String []jobs)

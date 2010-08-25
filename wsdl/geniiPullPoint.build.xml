@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="gen.pullpoint">
+
+	<fail message="wsdl.dir variable not set.">
+		<condition>
+			<not>
+				<isset property="wsdl.dir"/>
+			</not>
+		</condition>
+	</fail>
+
+	<import file="${wsdl.dir}/wsdl-build.xml"/>
+	<import file="${wsdl.dir}/common.build.xml"/>
+
+	<condition property="gen.pullpoint.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${temporary.codegen.dir}/wsdl/pullpoint.flag"/>
+			<uptodate targetfile="${temporary.codegen.dir}/wsdl/pullpoint.flag">
+				<srcfiles dir="${wsdl.dir}">
+					<include name="wsrf/wsTopic.xsd"/>
+					<include name="wsrf/wsBaseNotification.xsd"/>
+					<include name="wsrf/wsBaseNotification.wsdl"/>
+					<include name="geniiPullPoint.gwsdl"/>
+				</srcfiles>
+			</uptodate>
+		</and>
+	</condition>
+
+	<target name="gen.pullpoint" unless="gen.pullpoint.uptodate">
+		<copy todir="${temporary.codegen.dir}/wsdl">
+			<filelist refid="common.source.files"/>
+			<fileset dir="${wsdl.dir}">
+				<include name="wsrf/wsTopic.xsd"/>
+				<include name="wsrf/wsBaseNotification.xsd"/>
+				<include name="wsrf/wsBaseNotification.wsdl"/>
+				<include name="geniiPullPoint.gwsdl"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/geniiPullPoint.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/geniiPullPoint-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${temporary.codegen.dir}/wsdl/geniiPullPoint-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/geniiPullPoint-service.wsdl"
+			portType="{http://vcgr.cs.virginia.edu/genii/2010/08/notification/pull-point}GeniiPullPointPortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/geniiPullPoint"/>
+			<param name="stub.gen.source-wsdl"
+				value="${temporary.codegen.dir}/wsdl/geniiPullPoint-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${temporary.codegen.dir}/wsdl/pullpoint.flag"/>
+		</antcall>
+		<move file="${temporary.codegen.dir}/geniiPullPoint/edu/virginia/vcgr/genii/common/notification/deploy.wsdd"
+			tofile="${wsdd.dir}/pullpoint.deploy.wsdd"/>
+		<replace file="${wsdd.dir}/pullpoint.deploy.wsdd"
+			token="edu.virginia.vcgr.genii.common.notification.GeniiPullPointSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.common.notification.GeniiPullPointServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd.dir}/pullpoint.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>

@@ -28,6 +28,7 @@ import org.ggf.sbyteio.SeekWrite;
 import org.ggf.sbyteio.SeekWriteResponse;
 import org.ggf.sbyteio.StreamableByteIOPortType;
 import org.morgan.util.io.StreamUtils;
+import org.oasis_open.wsn.base.Subscribe;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
@@ -36,25 +37,25 @@ import org.ws.addressing.MetadataType;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
-import edu.virginia.vcgr.genii.client.notification.InvalidTopicException;
-import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
-import edu.virginia.vcgr.genii.common.notification.Subscribe;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ByteIOTopics;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ResourceTerminationContents;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.SByteIOTopics;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
-import edu.virginia.vcgr.genii.container.common.notification.Topic;
-import edu.virginia.vcgr.genii.container.common.notification.TopicSpace;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
+import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.PublisherTopic;
+import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.TopicSet;
 
-public class StreamableByteIOServiceImpl extends GenesisIIBase implements
-		StreamableByteIOPortType
+public class StreamableByteIOServiceImpl extends GenesisIIBase 
+	implements StreamableByteIOPortType, ByteIOTopics, SByteIOTopics
 {
 	/* One Hour Lifetime */
 	static private final long SBYTEIO_LIFETIME = 1000L * 60 * 60;
@@ -342,18 +343,14 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase implements
 		return newPosition;
 	}
 	
-	protected void registerTopics(TopicSpace topicSpace) throws InvalidTopicException
-	{
-		super.registerTopics(topicSpace);
-		
-		topicSpace.registerTopic(WellknownTopics.SBYTEIO_INSTANCE_DYING);
-	}
-	
 	protected void preDestroy() throws RemoteException, ResourceException
 	{
 		super.preDestroy();
 		
-		Topic t = getTopicSpace().getTopic(WellknownTopics.SBYTEIO_INSTANCE_DYING);
-		t.notifyAll(null);
+		TopicSet space = TopicSet.forPublisher(getClass());
+		PublisherTopic publisherTopic = space.createPublisherTopic(
+			SBYTEIO_INSTANCE_DYING);
+		publisherTopic.publish(new ResourceTerminationContents(
+			Calendar.getInstance()));
 	}
 }

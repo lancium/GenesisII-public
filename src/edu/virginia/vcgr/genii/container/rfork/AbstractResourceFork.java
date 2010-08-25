@@ -1,11 +1,9 @@
 package edu.virginia.vcgr.genii.container.rfork;
 
-import org.apache.axis.message.MessageElement;
-import org.ws.addressing.EndpointReferenceType;
-
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
 
 public abstract class AbstractResourceFork implements ResourceFork
 {
@@ -41,16 +39,15 @@ public abstract class AbstractResourceFork implements ResourceFork
 	}
 	
 	@Override
+	public void registerNotificationHandlers(NotificationMultiplexer multiplexer)
+	{
+		// By default, there is nothing to do.
+	}
+
+	@Override
 	public String getForkPath()
 	{
 		return _forkPath;
-	}
-	
-	@Override
-	public void notify(EndpointReferenceType source,
-		String topic, MessageElement []userData)
-	{
-		// Do nothing
 	}
 	
 	@Override

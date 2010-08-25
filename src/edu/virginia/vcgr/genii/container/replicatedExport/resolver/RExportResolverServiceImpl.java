@@ -49,18 +49,22 @@ import org.oasis_open.docs.wsrf.rl_2.Destroy;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
+import edu.virginia.vcgr.genii.client.byteio.ByteIOOperations;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.naming.WSName;
-import edu.virginia.vcgr.genii.client.notification.WellknownTopics;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
-import edu.virginia.vcgr.genii.common.notification.Notify;
-import edu.virginia.vcgr.genii.common.notification.UserDataType;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.AbstractNotificationHandler;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ByteIOContentsChangedContents;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ByteIOTopics;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.GenesisIIBaseTopics;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ResourceTerminationContents;
 
-import edu.virginia.vcgr.genii.container.byteio.RByteIOResource;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
@@ -94,7 +98,6 @@ public class RExportResolverServiceImpl extends GenesisIIBase
 		new QName(GenesisIIConstants.GENESISII_NS, "rexport-resolver-service-epr");
 	static public QName REXPORT_RESOLVER_TYPE =
 		new QName(GenesisIIConstants.GENESISII_NS, "rexport-resolver-type");
-	
 	
 	public RExportResolverServiceImpl() throws RemoteException
 	{
@@ -328,93 +331,101 @@ public class RExportResolverServiceImpl extends GenesisIIBase
 		return replicaEPR;
 	}
 	
-	@RWXMapping(RWXCategory.OPEN)
-	public void notify(Notify notify) 
-		throws RemoteException, ResourceUnknownFaultType
+	@Override
+	protected void registerNotificationHandlers(
+		NotificationMultiplexer multiplexer)
 	{
-		//get db entry associated with current resource
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		IRExportResolverResource resource = (IRExportResolverResource) rKey.dereference();
-		RExportResolverEntry thisEntry = resource.getEntry();
+		super.registerNotificationHandlers(multiplexer);
 		
-		
-		try
+		multiplexer.registerNotificationHandler(
+			GenesisIIBaseTopics.RESOURCE_TERMINATION_TOPIC.asConcreteQueryExpression(),
+			new LegacyResourceTerminationNotificationHandler());
+		multiplexer.registerNotificationHandler(
+			ByteIOTopics.BYTEIO_CONTENTS_CHANGED_TOPIC.asConcreteQueryExpression(),
+			new LegacyByteIOContentsChangedNotificationHandler());
+	}
+
+	private class LegacyResourceTerminationNotificationHandler
+		extends AbstractNotificationHandler<ResourceTerminationContents>
+	{
+		private LegacyResourceTerminationNotificationHandler()
 		{
-			//notification from quitting export
-			if (notify == null){
+			super(ResourceTerminationContents.class);
+		}
+
+		@Override
+		public void handleNotification(TopicPath topic,
+			EndpointReferenceType producerReference,
+			EndpointReferenceType subscriptionReference,
+			ResourceTerminationContents contents) throws Exception
+		{
+			//get db entry associated with current resource
+			ResourceKey rKey = ResourceManager.getCurrentResource();
+			IRExportResolverResource resource = (IRExportResolverResource) rKey.dereference();
+			RExportResolverEntry thisEntry = resource.getEntry();
+			
+			RExportResolverTerminateUserData userData = 
+				contents.additionalUserData(
+					RExportResolverTerminateUserData.class);
+			
+			/* check if EPI matches */
+			if (thisEntry.getCommonEPI().equals(userData.getEPI()))
+			{
+				/* kill this resolver */
 				_logger.info("Terminating RExport resolver for : "
 						+ thisEntry.getLocalPath());
 				destroy(new Destroy());
 			}
-			else {
-				String topic = notify.getTopic().toString();
-				
-				if (topic.equals(WellknownTopics.TERMINATED))
-				{
-					_logger.info("Resolver notified of termination");
-					
-					UserDataType userData = notify.getUserData();
-					RExportResolverTerminateUserData notifyData = new RExportResolverTerminateUserData(userData);
-					
-					/* check if EPI matches */
-					if (thisEntry.getCommonEPI().equals(notifyData.getEPI()))
-					{
-						/* kill this resolver */
-						_logger.info("Terminating RExport resolver for : "
-								+ thisEntry.getLocalPath());
-						destroy(new Destroy());
-					}
-				}
-				else if (topic.equals(WellknownTopics.RANDOM_BYTEIO_OP))
-				{
-					String specificOp = null;
-					_logger.info(
-							"RandomByteIO notification detected by rexport resolver");
-					
-					MessageElement []data = notify.get_any();
-					if (data.length != 1)
-						throw new Exception(
-							"Invalid payload for notification.");
+		}
+	}
+	
+	private class LegacyByteIOContentsChangedNotificationHandler
+		extends AbstractNotificationHandler<ByteIOContentsChangedContents>
+	{
+		private LegacyByteIOContentsChangedNotificationHandler()
+		{
+			super(ByteIOContentsChangedContents.class);
+		}
 
-					for (MessageElement elem : data){
-						QName elemName = elem.getQName();
-						if (elemName.equals(RByteIOResource.OPERATION)){
-							specificOp = (String) elem.getObjectValue(String.class);
-						} 
-						else{
-							throw new Exception(
-								"Unknown data found in notification payload.");
-						}
-					}
-					
-					if (specificOp.equals("write")){	
-						
-						//get local path of export on primary 
-						String primaryLocalPath = thisEntry.getLocalPath();
-						
-						_logger.info("RNS write detected for exportedFile: " 
-								+ primaryLocalPath);
-						
-						//get epr of primary exportedFile export
-						EndpointReferenceType primaryEPR = thisEntry.getPrimaryEPR();
-						
-						//get stream of new exportedFile data
-						EndpointReferenceType newDataStream = 
-							RExportResolverUtils.getExportFileData(
-								primaryLocalPath, primaryEPR);
-						
-						//update replica with data stream
-						RExportUtils.unpackDataStream(thisEntry.getReplicaEPR(),
-								newDataStream);
-					}
-				}
+		@Override
+		public void handleNotification(TopicPath topic,
+			EndpointReferenceType producerReference,
+			EndpointReferenceType subscriptionReference,
+			ByteIOContentsChangedContents contents) throws Exception
+		{
+			ByteIOOperations specificOp = null;
+			
+			_logger.info(
+					"RandomByteIO notification detected by rexport resolver");
+			
+			//get db entry associated with current resource
+			ResourceKey rKey = ResourceManager.getCurrentResource();
+			IRExportResolverResource resource = (IRExportResolverResource) rKey.dereference();
+			RExportResolverEntry thisEntry = resource.getEntry();
+			
+			specificOp = contents.responsibleOperation();
+			
+			if (specificOp == ByteIOOperations.Write)
+			{	
+				//get local path of export on primary 
+				String primaryLocalPath = thisEntry.getLocalPath();
 				
+				_logger.info("RNS write detected for exportedFile: " 
+						+ primaryLocalPath);
+				
+				//get epr of primary exportedFile export
+				EndpointReferenceType primaryEPR = thisEntry.getPrimaryEPR();
+				
+				//get stream of new exportedFile data
+				EndpointReferenceType newDataStream = 
+					RExportResolverUtils.getExportFileData(
+						primaryLocalPath, primaryEPR);
+				
+				//update replica with data stream
+				RExportUtils.unpackDataStream(thisEntry.getReplicaEPR(),
+						newDataStream);
 			}
 		}
-		catch (Throwable t){
-			_logger.warn(t.getLocalizedMessage(), t);
-		}
-				
 	}
 	
 	static public String _FILE_TYPE = "F";
