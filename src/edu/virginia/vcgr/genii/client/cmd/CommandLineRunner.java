@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.cmd;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
@@ -9,6 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.JOptionPane;
 import javax.xml.namespace.QName;
 
 import org.morgan.util.configuration.XMLConfiguration;
@@ -26,6 +28,28 @@ public class CommandLineRunner
 {	
 	private Map<String, ToolDescription> _tools;
 	private static ArrayList<String[]> _history = new ArrayList<String[]>();
+	
+	static private String[] editCommandLine(String []commandLine) throws FileNotFoundException, IOException
+	{
+		StringBuilder builder = new StringBuilder();
+		for (String arg : commandLine)
+		{
+			if (builder.length() > 0)
+				builder.append(' ');
+			
+			if (arg.matches("^.*\\s.*$"))
+				builder.append("\"" + arg + "\"");
+			else
+				builder.append(arg);
+		}
+		
+		String value = JOptionPane.showInputDialog("Edit command", 
+			builder.toString());
+		if (value == null)
+			return null;
+		
+		return CommandLineFormer.formCommandLine(value);
+	}
 	
 	public CommandLineRunner()
 	{
@@ -55,13 +79,24 @@ public class CommandLineRunner
 		
 		if (cLine[0].startsWith("!"))
 		{
-			String index;
-			int intIndex;
+			String arg = cLine[0].substring(1);
+			boolean edit = false;
+			
+			if (arg.startsWith("e"))
+			{
+				edit = true;
+				arg = arg.substring(1);
+			}
+			
+			int index = Integer.parseInt(arg);
+
 			try
 			{
-				index = cLine[0].substring(1);
-				intIndex = Integer.parseInt(index);
-				cLine = _history.get(intIndex);
+				cLine = _history.get(index);
+				if (edit)
+					cLine = editCommandLine(cLine);
+				if (cLine == null)
+					return 0;
 			}
 			catch (Exception e)
 			{
