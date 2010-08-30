@@ -3,9 +3,7 @@ package edu.virginia.vcgr.genii.container.exportdir;
 import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.sql.SQLException;
@@ -32,13 +30,13 @@ import org.ggf.rns.RNSEntryExistsFaultType;
 import org.ggf.rns.RNSEntryNotDirectoryFaultType;
 import org.ggf.rns.RNSFaultType;
 import org.ggf.rns.Remove;
+import org.morgan.inject.MInject;
 import org.morgan.util.GUID;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
-import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedDirUtils;
 import edu.virginia.vcgr.genii.client.exportdir.ExportedFileUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
@@ -62,6 +60,7 @@ import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.invoker.timing.Timer;
 import edu.virginia.vcgr.genii.container.invoker.timing.TimingSink;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
+import edu.virginia.vcgr.genii.container.resource.ResourceLock;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.exportdir.ExportedDirPortType;
@@ -72,6 +71,12 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 		ExportedDirPortType, GeniiNoOutCalls
 {
 	static private Log _logger = LogFactory.getLog(ExportedDirServiceImpl.class);
+	
+	@MInject(lazy = true)
+	private IExportedDirResource _resource;
+	
+	@MInject
+	private ResourceLock _resourceLock;
 	
 	public ExportedDirServiceImpl() throws RemoteException
 	{
@@ -123,6 +128,7 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 		return super.createResource(constructionParameters);
 	}
 	
+	/* Looks like this is dead code -- mmm2a
 	protected void fillIn(ResourceKey rKey, EndpointReferenceType newEPR,
 		ConstructionParameters cParams, HashMap<QName, Object> creationParameters,
 		Collection<MessageElement> resolverCreationParams) 
@@ -139,6 +145,7 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 		resource.setModTime(c);
 		resource.setAccessTime(c);
 	}
+	*/
 
 	@RWXMapping(RWXCategory.EXECUTE)
 	public CreateFileResponse createFile(CreateFile createFileRequest)
@@ -149,17 +156,15 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 		String filename = null;
 		EndpointReferenceType entryReference = null;
 		filename = createFileRequest.getFilename();
-		IExportedDirResource resource;
 		
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		synchronized(rKey.getLockObject())
+		try
 		{
-			resource = (IExportedDirResource)rKey.dereference();
+			_resourceLock.lock();
 			
 			String fullPath = ExportedFileUtils.createFullPath(
-				resource.getLocalPath(), filename);
+				_resource.getLocalPath(), filename);
 			String parentIds = ExportedDirUtils.createParentIdsString(
-				resource.getParentIds(), resource.getId());
+				_resource.getParentIds(), _resource.getId());
 			
 			try
 			{
@@ -183,14 +188,14 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 				
 				entryReference = new ExportedFileServiceImpl().vcgrCreate(new VcgrCreate(
 					ExportedFileUtils.createCreationProperties(
-							fullPath, parentIds, resource.getReplicationState()))).getEndpoint();
+							fullPath, parentIds, _resource.getReplicationState()))).getEndpoint();
 			
 				String newEntryId = (new GUID()).toString();
 				ExportedDirEntry newEntry = new ExportedDirEntry(
-					resource.getId(), filename, entryReference,
+					_resource.getId(), filename, entryReference,
 					newEntryId, ExportedDirEntry._FILE_TYPE, null);
-				resource.addEntry(newEntry, false);
-				resource.commit();
+				_resource.addEntry(newEntry, false);
+				_resource.commit();
 			}
 			catch (Throwable t)
 			{
@@ -225,6 +230,10 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 			{
 				WorkingContext.releaseAssumedIdentity();
 			}
+		}
+		finally
+		{
+			_resourceLock.unlock();
 		}
 		
 		return new CreateFileResponse(entryReference);
@@ -264,18 +273,16 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 		
 		_logger.debug("ExportDir asked to add \"" + name + "\".");
 		
-		IExportedDirResource resource;
-		ResourceKey rKey = ResourceManager.getCurrentResource();
 		EndpointReferenceType newRef;
 		
-		synchronized(rKey.getLockObject())
+		try
 		{
-			resource = (IExportedDirResource)rKey.dereference();
+			_resourceLock.lock();
 			String fullPath = ExportedFileUtils.createFullPath(
-				resource.getLocalPath(), name);
+				_resource.getLocalPath(), name);
 			String parentIds = ExportedDirUtils.createParentIdsString(
-				resource.getParentIds(), resource.getId());
-			String isReplicated = resource.getReplicationState();
+				_resource.getParentIds(), _resource.getId());
+			String isReplicated = _resource.getReplicationState();
 			newRef =
 				vcgrCreate(new VcgrCreate(ExportedDirUtils.createCreationProperties(null,
 					fullPath, 
@@ -284,9 +291,13 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 			
 			String newEntryId = (new GUID()).toString();
 			ExportedDirEntry newEntry = new ExportedDirEntry(
-				resource.getId(), name, newRef, newEntryId, ExportedDirEntry._DIR_TYPE, attrs);
-			resource.addEntry(newEntry, true);
-			resource.commit();
+				_resource.getId(), name, newRef, newEntryId, ExportedDirEntry._DIR_TYPE, attrs);
+			_resource.addEntry(newEntry, true);
+			_resource.commit();
+		}
+		finally
+		{
+			_resourceLock.unlock();
 		}
 		
 		//get and set modify time for newly created Dir
@@ -304,19 +315,22 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
     {
 		TimingSink tSink = TimingSink.sink();
 		Timer timer = null;
-		ResourceKey rKey = ResourceManager.getCurrentResource();
 		Collection<MessageElement> entryCollection;
 		Collection<ExportedDirEntry> entries = null;
 		
-		synchronized(rKey.getLockObject())
+		try
 		{
-			IExportedDirResource resource = 
-				(IExportedDirResource)rKey.dereference();
+			_resourceLock.lock();
 			
 			timer = tSink.getTimer("Retrieve Entries");
-			entries = resource.retrieveEntries(null);
+			entries = _resource.retrieveEntries(null);
 			timer.noteTime();
 		}
+		finally
+		{
+			_resourceLock.unlock();
+		}
+		
 		//create collection of MessageElement entries
 		entryCollection = new LinkedList<MessageElement>();
 		timer = tSink.getTimer("Prepare Entries");
@@ -350,14 +364,16 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType,
 			RNSFaultType
 	{
-		ResourceKey rKey = ResourceManager.getCurrentResource();
 		Collection<ExportedDirEntry> entries;
-		synchronized(rKey.getLockObject())
+		try
 		{
-			IExportedDirResource resource = 
-				(IExportedDirResource)rKey.dereference();
+			_resourceLock.lock();
 			
-			entries = resource.retrieveEntries(listRequest.getEntryName());
+			entries = _resource.retrieveEntries(listRequest.getEntryName());
+		}
+		finally
+		{
+			_resourceLock.unlock();
 		}
 		
 		EntryType []ret = new EntryType[entries.size()];
@@ -406,16 +422,18 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 			ResourceUnknownFaultType, RNSDirectoryNotEmptyFaultType,
 			RNSFaultType
 	{
-		ResourceKey rKey = ResourceManager.getCurrentResource();
 		String []ret;
 		Collection<String> removed; 
 		
-		synchronized(rKey.getLockObject())
+		try
 		{
-			IExportedDirResource resource = 
-				(IExportedDirResource)rKey.dereference();
-			removed = resource.removeEntries(removeRequest.getEntryName(), true);
-			resource.commit();
+			_resourceLock.lock();
+			removed = _resource.removeEntries(removeRequest.getEntryName(), true);
+			_resource.commit();
+		}
+		finally
+		{
+			_resourceLock.unlock();
 		}
 		
 		ret = new String[removed.size()];

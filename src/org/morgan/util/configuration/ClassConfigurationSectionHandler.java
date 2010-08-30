@@ -83,17 +83,16 @@ public class ClassConfigurationSectionHandler implements
 		return ret;
 	}
 	
-	@SuppressWarnings("unchecked")
-	static protected Class findClass(String className, String baseName)
+	static protected Class<?> findClass(String className, String baseName)
 		throws ConfigurationException
 	{
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		
 		try
 		{
-			Class base = (baseName == null) ? Object.class :
+			Class<?> base = (baseName == null) ? Object.class :
 				loader.loadClass(baseName);
-			Class target = loader.loadClass(className);
+			Class<?> target = loader.loadClass(className);
 			
 			if (!base.isAssignableFrom(target))
 				throw new ConfigurationException("Target class \"" + className

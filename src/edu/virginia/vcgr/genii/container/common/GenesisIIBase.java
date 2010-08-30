@@ -34,6 +34,7 @@ import org.apache.axis.types.URI;
 import org.apache.axis.types.UnsignedInt;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.morgan.inject.InjectionException;
 import org.morgan.util.GUID;
 import org.morgan.util.configuration.XMLConfiguration;
 import org.morgan.util.io.StreamUtils;
@@ -142,6 +143,7 @@ import edu.virginia.vcgr.genii.container.invoker.GAroundInvoke;
 import edu.virginia.vcgr.genii.container.invoker.ScheduledTerminationInvoker;
 import edu.virginia.vcgr.genii.container.invoker.ServiceInitializationLocker;
 import edu.virginia.vcgr.genii.container.invoker.SoapHeaderHandler;
+import edu.virginia.vcgr.genii.container.invoker.inject.MInjectionInvoker;
 import edu.virginia.vcgr.genii.container.invoker.timing.TimingHandler;
 import edu.virginia.vcgr.genii.container.iterator.IteratorServiceImpl;
 import edu.virginia.vcgr.genii.container.resolver.IResolverFactoryProxy;
@@ -176,7 +178,8 @@ import edu.virginia.vcgr.genii.iterator.IteratorMemberType;
 
 @GAroundInvoke({ServiceInitializationLocker.class, BaseFaultFixer.class, 
 	SoapHeaderHandler.class, DatabaseHandler.class, 
-	DebugInvoker.class, ScheduledTerminationInvoker.class, TimingHandler.class})
+	DebugInvoker.class, ScheduledTerminationInvoker.class, 
+	MInjectionInvoker.class, TimingHandler.class})
 @ConstructionParametersType(ConstructionParameters.class)
 public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 	GenesisIIBaseTopics
@@ -655,12 +658,11 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 	}
 	
 	public EndpointReferenceType CreateEPR(MessageElement []creationParameters, 
-			String targetServiceURL )
-	throws RemoteException, ResourceCreationFaultType, BaseFaultType
+		String targetServiceURL) throws RemoteException,
+			ResourceCreationFaultType, BaseFaultType
 	{
 		HashMap<QName, Object> constructionParameters 
-		= new HashMap<QName, Object>();
-
+			= new HashMap<QName, Object>();
 
 		if (creationParameters != null)
 		{
@@ -669,15 +671,15 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 				try
 				{
 					constructionParameters.put(property.getQName(),
-							translateConstructionParameter(property));
+						translateConstructionParameter(property));
 				}
 				catch (Exception e)
 				{
 					throw FaultManipulator.fillInFault(
-							new ResourceCreationFaultType(null, null, null, null,
-									new BaseFaultTypeDescription[] {
-									new BaseFaultTypeDescription(e.getLocalizedMessage()) },
-									null));
+						new ResourceCreationFaultType(null, null, null, null,
+							new BaseFaultTypeDescription[] {
+							new BaseFaultTypeDescription(e.getLocalizedMessage()) },
+							null));
 				}
 			}
 		}
@@ -696,13 +698,9 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 		EndpointReferenceType epr = ResourceManager.createEPR(rKey, 
 				targetServiceURL, getImplementedPortTypes(rKey));
 		
-		EndpointReferenceType oldEPR = null;
-		
-		oldEPR =
-			(EndpointReferenceType)WorkingContext.getCurrentWorkingContext().getProperty(
-				WorkingContext.EPR_PROPERTY_NAME);
+		WorkingContext.temporarilyAssumeNewIdentity(epr);
 		WorkingContext.getCurrentWorkingContext().setProperty(
-			WorkingContext.EPR_PROPERTY_NAME, epr);
+			WorkingContext.CURRENT_RESOURCE_KEY, rKey);
 		
 		try
 		{	
@@ -727,6 +725,16 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 		
 			Collection<MessageElement> resolverCreationParams = new Vector<MessageElement>();
 		
+			try
+			{
+				MInjectionInvoker.inject(this);
+			}
+			catch (InjectionException e)
+			{
+				throw new RemoteException(
+					"Unable to inject instance.", e);
+			}
+			
 			// allow subclasses to do creation work
 			postCreate(rKey, epr, cParams, constructionParameters, resolverCreationParams);
 			IResource resource = rKey.dereference();
@@ -751,8 +759,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 		}
 		finally
 		{
-			WorkingContext.getCurrentWorkingContext().setProperty(
-				WorkingContext.EPR_PROPERTY_NAME, oldEPR);
+			WorkingContext.releaseAssumedIdentity();
 		}
 	}
 

@@ -18,6 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.jsdl.JobMultiDefinition_Type;
+import org.morgan.inject.MInject;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
@@ -50,6 +51,7 @@ import edu.virginia.vcgr.genii.container.q2.resource.IQueueResource;
 import edu.virginia.vcgr.genii.container.q2.resource.QueueDBResourceFactory;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
+import edu.virginia.vcgr.genii.container.resource.StringResourceIdentifier;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkBaseService;
 import edu.virginia.vcgr.genii.queue.ConfigureRequestType;
@@ -85,17 +87,8 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	static public QName _JOBID_QNAME =
 		new QName(GenesisIIConstants.GENESISII_NS, "job-id");
 	
-	/*
-	static private UserDataType createUserData(String filename, String filepath)
-	{
-		return new UserDataType(new MessageElement[] { 
-			new MessageElement(
-				_FILENAME_QNAME, filename),
-			new MessageElement(
-				_FILEPATH_QNAME, filepath)
-		});
-	}
-	*/
+	@MInject
+	private StringResourceIdentifier _resourceID;
 	
 	public QueueServiceImpl() throws RemoteException
 	{
@@ -126,41 +119,13 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		return QueueConstants.QUEUE_PORT_TYPE;
 	}
 	
-	/*
-	@Override
-	@RWXMapping(RWXCategory.WRITE)
-	public AddResponse add(Add addRequest) throws RemoteException,
-			RNSEntryExistsFaultType, RNSFaultType, ResourceUnknownFaultType,
-			RNSEntryNotDirectoryFaultType
-	{
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		
-		if (addRequest == null || addRequest.getEntry_reference() == null 
-			|| addRequest.getEntry_name() == null)
-			throw new RemoteException("Only allowed to add BES containers to Queues.");
-		
-		try
-		{
-			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
-			mgr.addNewBES(addRequest.getEntry_name(), addRequest.getEntry_reference());
-			return new AddResponse(addRequest.getEntry_reference());
-		}
-		catch (SQLException sqe)
-		{
-			throw new RemoteException("Unable to add bes container.", sqe);
-		}
-	}
-	*/
-
 	@Override
 	@RWXMapping(RWXCategory.OPEN)
 	public Object completeJobs(String[] completeRequest) throws RemoteException
 	{
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		
 		try
 		{
-			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
+			QueueManager mgr = QueueManager.getManager(_resourceID.key());
 			mgr.completeJobs(completeRequest);
 			return null;
 		}
@@ -174,11 +139,9 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	@RWXMapping(RWXCategory.OPEN)
 	public Object rescheduleJobs(String[] jobs) throws RemoteException
 	{
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		
 		try
 		{
-			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
+			QueueManager mgr = QueueManager.getManager(_resourceID.key());
 			mgr.rescheduleJobs(jobs);
 			return null;
 		}
@@ -193,11 +156,9 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	public Object configureResource(ConfigureRequestType configureRequest)
 			throws RemoteException
 	{
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		
 		try
 		{
-			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
+			QueueManager mgr = QueueManager.getManager(_resourceID.key());
 			mgr.configureBES(configureRequest.getQueueResource(), 
 				configureRequest.getNumSlots().intValue());
 			return null;
@@ -208,70 +169,14 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		}
 	}
 
-	/*
-	@Override
-	@RWXMapping(RWXCategory.EXECUTE)
-	public CreateFileResponse createFile(CreateFile createFileRequest)
-			throws RemoteException, RNSEntryExistsFaultType, RNSFaultType,
-			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType
-	{
-		MessageElement []parameters = null;
-		
-		File filePath;
-		
-		try
-		{
-			File userDir = ConfigurationManager.getCurrentConfiguration().getUserDirectory();
-			GuaranteedDirectory sbyteiodir = new GuaranteedDirectory(userDir, "sbyteio");
-			filePath = File.createTempFile("sbyteio", ".dat", sbyteiodir);
-		}
-		catch (IOException ioe)
-		{
-			throw new ResourceException(ioe.getLocalizedMessage(), ioe);
-		}
-		
-		Subscribe subscribeRequest = new Subscribe(new Token(
-			WellknownTopics.SBYTEIO_INSTANCE_DYING),
-			new UnsignedLong(_DEFAULT_TIME_TO_LIVE),
-			(EndpointReferenceType)WorkingContext.getCurrentWorkingContext(
-				).getProperty(WorkingContext.EPR_PROPERTY_NAME),
-			createUserData(createFileRequest.getFilename(), 
-				filePath.getAbsolutePath()));
-			
-		
-		parameters = new MessageElement [] {
-			new MessageElement(RByteIOResource.FILE_PATH_PROPERTY,
-				filePath.getAbsolutePath()),
-			new MessageElement(
-				ByteIOConstants.SBYTEIO_SUBSCRIBE_CONSTRUCTION_PARAMETER,
-				subscribeRequest),
-			new MessageElement(
-				ByteIOConstants.MUST_DESTROY_PROPERTY,
-				Boolean.FALSE),
-            new MessageElement(
-            	ByteIOConstants.SBYTEIO_DESTROY_ON_CLOSE_FLAG,
-            	Boolean.TRUE),
-			ClientConstructionParameters.createTimeToLiveProperty(
-				_DEFAULT_TIME_TO_LIVE)
-		};
-
-		// ASG August 28,2008, replaced RPC with direct call to CreateEPR
-		EndpointReferenceType entryReference = 
-			new StreamableByteIOServiceImpl().CreateEPR(parameters,
-					Container.getServiceURL("StreamableByteIOPortType"));
-		return new CreateFileResponse(entryReference);
-	}
-*/
-
 	private JobInformationType[] getStatus(String[] getStatusRequest)
 			throws RemoteException
 	{
-		ResourceKey rKey = ResourceManager.getCurrentResource();
 		Collection<JobInformationType> jobs;
 		
 		try
 		{
-			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
+			QueueManager mgr = QueueManager.getManager(_resourceID.key());
 			jobs = mgr.getJobStatus(getStatusRequest);
 			return jobs.toArray(new JobInformationType[0]);
 		}
@@ -307,11 +212,9 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	public JobErrorPacket[] queryErrorInformation(QueryErrorRequest arg0)
 			throws RemoteException
 	{
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		
 		try
 		{
-			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
+			QueueManager mgr = QueueManager.getManager(_resourceID.key());
 			return mgr.queryErrorInformation(arg0.getJobTicket());
 		}
 		catch (SQLException sqe)
@@ -325,11 +228,9 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	public GetJobLogResponse getJobLog(GetJobLogRequest arg0)
 			throws RemoteException
 	{
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		
 		try
 		{
-			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
+			QueueManager mgr = QueueManager.getManager(_resourceID.key());
 			return mgr.getJobLog(arg0.getJobTicket());
 		}
 		catch (SQLException sqe)
@@ -342,11 +243,9 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	@RWXMapping(RWXCategory.OPEN)
 	public Object killJobs(String[] killRequest) throws RemoteException
 	{
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		
 		try
 		{
-			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
+			QueueManager mgr = QueueManager.getManager(_resourceID.key());
 			mgr.killJobs(killRequest);
 			return null;
 		}
@@ -356,38 +255,14 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		}
 	}
 
-	/*
-	@Override
-	@RWXMapping(RWXCategory.READ)
-	public ListResponse list(List listRequest) throws RemoteException,
-			RNSFaultType, ResourceUnknownFaultType,
-			RNSEntryNotDirectoryFaultType
-	{
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		Collection<EntryType> entries;
-		
-		try
-		{
-			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
-			entries = mgr.listBESs(listRequest.getEntryName());
-			return new ListResponse(entries.toArray(new EntryType[0]));
-		}
-		catch (SQLException sqe)
-		{
-			throw new RemoteException("Unable to add bes container.", sqe);
-		}
-	}
-	*/
-
 	private ReducedJobInformationType[] listJobs(Object listRequest)
 			throws RemoteException
 	{
-		ResourceKey rKey = ResourceManager.getCurrentResource();
 		Collection<ReducedJobInformationType> jobs;
 		
 		try
 		{
-			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
+			QueueManager mgr = QueueManager.getManager(_resourceID.key());
 			jobs = mgr.listJobs(null);
 			return jobs.toArray(new ReducedJobInformationType[0]);
 		}
@@ -420,60 +295,17 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		}
 	}
 
-	/*
-	@Override
-	@RWXMapping(RWXCategory.WRITE)
-	public MoveResponse move(Move moveRequest) throws RemoteException,
-			RNSFaultType, ResourceUnknownFaultType
-	{
-		throw new RemoteException(
-			"Move operation not supported for queues.");
-	}
-
-	@Override
-	@RWXMapping(RWXCategory.READ)
-	public QueryResponse query(Query queryRequest) throws RemoteException,
-			RNSFaultType, ResourceUnknownFaultType
-	{
-		throw new RemoteException(
-			"Query operation not supported for queues.");
-	}
-
-	@Override
-	@RWXMapping(RWXCategory.WRITE)
-	public String[] remove(Remove removeRequest) throws RemoteException,
-			RNSFaultType, ResourceUnknownFaultType,
-			RNSDirectoryNotEmptyFaultType
-	{
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		Collection<String> entries = new ArrayList<String>();
-		
-		try
-		{
-			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
-			entries = mgr.removeBESs(removeRequest.getEntryName());
-			
-			return entries.toArray(new String[0]);
-		}
-		catch (SQLException sqe)
-		{
-			throw new RemoteException("Unable to add bes container.", sqe);
-		}
-	}
-	*/
-
 	@Override
 	@RWXMapping(RWXCategory.EXECUTE)
 	public SubmitJobResponseType submitJob(SubmitJobRequestType submitJobRequest)
 			throws RemoteException
 	{
-		ResourceKey rKey = ResourceManager.getCurrentResource();
 		String ticket;
 		SweepListenerImpl listener;
 		
 		try
 		{
-			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
+			QueueManager mgr = QueueManager.getManager(_resourceID.key());
 			
 			JobDefinition jobDefinition = JSDLUtils.convert(
 				submitJobRequest.getJobDefinition());
@@ -534,7 +366,7 @@ public class QueueServiceImpl extends ResourceForkBaseService
 			
 			/* Now we get the database connection pool configured 
 			 * with this service */
-			DatabaseConnectionPool connectionPool =(
+			DatabaseConnectionPool connectionPool = (
 				(QueueDBResourceFactory)ResourceManager.getServiceResource(_serviceName
 					).getProvider().getFactory()).getConnectionPool();
 			
@@ -558,11 +390,9 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	{
 		super.preDestroy();
 		
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		
 		try
 		{
-			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
+			QueueManager mgr = QueueManager.getManager(_resourceID.key());
 			mgr.close();
 		}
 		catch (SQLException sqe)
@@ -612,8 +442,7 @@ public class QueueServiceImpl extends ResourceForkBaseService
 			ActivityState state = contents.activityState();
 			if (state.isFinalState())
 			{
-				QueueManager mgr = QueueManager.getManager(
-					ResourceManager.getCurrentResource().getResourceKey());
+				QueueManager mgr = QueueManager.getManager(_resourceID.key());
 				mgr.checkJobStatus(jobid);
 			}
 		}

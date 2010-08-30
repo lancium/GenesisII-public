@@ -36,6 +36,7 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
+import edu.virginia.vcgr.genii.container.resource.ResourceLock;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 
 public abstract class ByteIOAttributeHandlers
@@ -86,22 +87,25 @@ public abstract class ByteIOAttributeHandlers
 			if (storedModified == null || 
 				(storedModified.longValue() != f.lastModified()))
 			{
-				synchronized(rKey.getLockObject())
+				ResourceLock lock = rKey.getResourceLock();
+				try
 				{
-					try
-					{
-						long checksum = calculateChecksum(f);
-						resource.setProperty("genii.last-modified.property",
-							new Long(f.lastModified()));
-						resource.setProperty("genii.stored-checksum.property",
-							new Long(checksum));
-						return checksum;
-					}
-					catch (IOException ioe)
-					{
-						throw new ResourceException(
-							ioe.getLocalizedMessage(), ioe);
-					}
+					lock.lock();
+					long checksum = calculateChecksum(f);
+					resource.setProperty("genii.last-modified.property",
+						new Long(f.lastModified()));
+					resource.setProperty("genii.stored-checksum.property",
+						new Long(checksum));
+					return checksum;
+				}
+				catch (IOException ioe)
+				{
+					throw new ResourceException(
+						ioe.getLocalizedMessage(), ioe);
+				}
+				finally
+				{
+					lock.unlock();
 				}
 			} else
 			{

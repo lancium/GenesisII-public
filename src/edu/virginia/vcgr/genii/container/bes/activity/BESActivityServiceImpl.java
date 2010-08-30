@@ -29,6 +29,7 @@ import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.JobDefinition_Type;
+import org.morgan.inject.MInject;
 import org.morgan.util.GUID;
 import org.oasis_open.wsn.base.Subscribe;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
@@ -68,7 +69,6 @@ import edu.virginia.vcgr.genii.container.bes.jsdl.personality.forkexec.ForkExecP
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.qsub.QSubPersonalityProvider;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
-import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkBaseService;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
@@ -82,6 +82,9 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements
 
 	// One week of life
 	static private final long BES_ACTIVITY_LIFETIME = 1000L * 60 * 60 * 24 * 7 * 4;
+	
+	@MInject(lazy = true)
+	private IBESActivityResource _resource;
 	
 	public BESActivityServiceImpl() throws RemoteException
 	{
@@ -107,21 +110,19 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements
 			"Post creating a BES Activity with resource key \"%s\".", 
 			rKey.getResourceKey()));
 		
-		IBESActivityResource resource = (IBESActivityResource)rKey.dereference();
-		
 		BESActivityInitInfo initInfo = BESActivityUtils.extractCreationProperties(
 			creationParameters);
 		
 		Subscribe subscribe = initInfo.getSubscribeRequest();
 		if (subscribe != null)
-			subscribe((String)resource.getKey(), subscribe);
+			subscribe((String)_resource.getKey(), subscribe);
 		
 		String activityServiceName = "BESActivityPortType";
 		Collection<Identity> owners = QueueSecurity.getCallerIdentities(true);
 		
 		BESWorkingDirectory workingDirectory = new BESWorkingDirectory(
 			chooseDirectory(
-				(BESConstructionParameters)resource.constructionParameters(getClass()), 
+				(BESConstructionParameters)_resource.constructionParameters(getClass()), 
 				5), true);
 		
 		FilesystemManager fsManager = new FilesystemManager();
@@ -149,14 +150,14 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements
 					(CommonExecutionUnderstanding)understanding;
 			}
 			
-			resource.setProperty(IBESActivityResource.FILESYSTEM_MANAGER, 
+			_resource.setProperty(IBESActivityResource.FILESYSTEM_MANAGER, 
 				fsManager);
 			
 			String fuseMountDirectory = 
 				executionUnderstanding.getFuseMountDirectory();
 			
 			if (fuseMountDirectory != null)
-				resource.setProperty(IBESActivityResource.FUSE_MOUNT_PROPERTY,
+				_resource.setProperty(IBESActivityResource.FUSE_MOUNT_PROPERTY,
 					fuseMountDirectory);	
 			
 			BES bes = BES.getBES(initInfo.getContainerID());
@@ -169,7 +170,7 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements
 					}, null));
 			
 			bes.createActivity(
-				resource.getKey().toString(), jsdl,	owners, 
+				_resource.getKey().toString(), jsdl,	owners, 
 				ContextManager.getCurrentContext(), 
 				workingDirectory,
 				executionUnderstanding.createExecutionPlan(
@@ -239,9 +240,7 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements
 		try
 		{
 			byte []serializedFault = null;
-			IBESActivityResource resource = 
-				(IBESActivityResource)ResourceManager.getCurrentResource().dereference();
-			Collection<Throwable> faults = resource.findActivity().getFaults();
+			Collection<Throwable> faults = _resource.findActivity().getFaults();
 			if (faults != null && faults.size() > 0)
 			{
 				Throwable cause = faults.iterator().next();

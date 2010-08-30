@@ -43,6 +43,7 @@ import org.ggf.rbyteio.TruncAppendResponse;
 import org.ggf.rbyteio.TruncateNotPermittedFaultType;
 import org.ggf.rbyteio.Write;
 import org.ggf.rbyteio.WriteResponse;
+import org.morgan.inject.MInject;
 import org.morgan.util.io.StreamUtils;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
@@ -62,7 +63,7 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.common.GeniiNoOutCalls;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
-import edu.virginia.vcgr.genii.container.resource.ResourceManager;
+import edu.virginia.vcgr.genii.container.resource.ResourceLock;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.PublisherTopic;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.TopicSet;
@@ -73,6 +74,12 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 	implements RandomByteIOPortType, GeniiNoOutCalls, ByteIOTopics
 {
 	static private Log _logger = LogFactory.getLog(RandomByteIOServiceImpl.class);
+	
+	@MInject(lazy = true)
+	private IRByteIOResource _resource;
+	
+	@MInject
+	private ResourceLock _resourceLock;
 	
 	protected void setAttributeHandlers() 
 		throws NoSuchMethodException, ResourceException, 
@@ -113,18 +120,15 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 		
 		super.postCreate(rKey, newEPR, cParams, creationParameters, resolverCreationParams);
 		
-		IRByteIOResource resource = null;
-		
-		resource = (IRByteIOResource)rKey.dereference();
-		resource.chooseFile(creationParameters);
+		_resource.chooseFile(creationParameters);
 		
 		Date d = new Date();
 		Calendar c = Calendar.getInstance();
 		c.setTime(d);
 		
-		resource.setCreateTime(c);
-		resource.setModTime(c);
-		resource.setAccessTime(c);
+		_resource.setCreateTime(c);
+		_resource.setModTime(c);
+		_resource.setAccessTime(c);
 	}
 	
 	static private int readFully(RandomAccessFile raf,
@@ -163,57 +167,54 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 		int r;
 		File myFile = null;
 		RandomAccessFile raf = null;
-		IRByteIOResource resource = null;
 		
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		resource = (IRByteIOResource)rKey.dereference();
-		myFile = resource.getCurrentFile();
-		synchronized(rKey.getLockObject())
+		myFile = _resource.getCurrentFile();
+		
+		try
 		{
-			try
+			_resourceLock.lock();
+			raf = new RandomAccessFile(myFile, "r");
+			
+			for (int block = 0; block < numBlocks; block++)
 			{
-				raf = new RandomAccessFile(myFile, "r");
-				
-				for (int block = 0; block < numBlocks; block++)
+				raf.seek(startOffset);
+				r = readFully(raf, data, off, bytesPerBlock);
+				if (r <= 0)
+					break;
+				else if (r < bytesPerBlock)
 				{
-					raf.seek(startOffset);
-					r = readFully(raf, data, off, bytesPerBlock);
-					if (r <= 0)
-						break;
-					else if (r < bytesPerBlock)
-					{
-						off += r;
-						break;
-					}
-					
 					off += r;
-					startOffset += stride;
+					break;
 				}
-					
-				if (off < data.length)
-				{
-					byte []tmp = data;
-					data = new byte[off];
-					System.arraycopy(tmp, 0, data, 0, off);
-				}
-					
-				TransferAgent.sendData(data, transferInformation);
+				
+				off += r;
+				startOffset += stride;
 			}
-			catch(ResourceUnknownFaultType ruft){
-				throw FaultManipulator.fillInFault(ruft);
-			}
-			catch (IOException ioe)
+				
+			if (off < data.length)
 			{
-				throw FaultManipulator.fillInFault(
-					new CustomFaultType(null, null, null, null,
-						new BaseFaultTypeDescription[] {
-							new BaseFaultTypeDescription(ioe.toString())
-					}, null));
+				byte []tmp = data;
+				data = new byte[off];
+				System.arraycopy(tmp, 0, data, 0, off);
 			}
-			finally
-			{
-				StreamUtils.close(raf);
-			}
+				
+			TransferAgent.sendData(data, transferInformation);
+		}
+		catch(ResourceUnknownFaultType ruft){
+			throw FaultManipulator.fillInFault(ruft);
+		}
+		catch (IOException ioe)
+		{
+			throw FaultManipulator.fillInFault(
+				new CustomFaultType(null, null, null, null,
+					new BaseFaultTypeDescription[] {
+						new BaseFaultTypeDescription(ioe.toString())
+				}, null));
+		}
+		finally
+		{
+			StreamUtils.close(raf);
+			_resourceLock.unlock();
 		}
 		
 		return new ReadResponse(transferInformation);
@@ -235,50 +236,47 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 		int off = 0;
 		File myFile = null;
 		RandomAccessFile raf = null;
-		IRByteIOResource resource = null;
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		resource = (IRByteIOResource)rKey.dereference();
-		myFile = resource.getCurrentFile();
-		synchronized(rKey.getLockObject())
+		myFile = _resource.getCurrentFile();
+		
+		try
 		{
-			try
+			_resourceLock.lock();
+			raf = new RandomAccessFile(myFile, "rw");
+			while (off < data.length)
 			{
-				raf = new RandomAccessFile(myFile, "rw");
-				while (off < data.length)
-				{
-					int toWrite = (data.length - off);
-					if (toWrite > bytesPerBlock)
-						toWrite = bytesPerBlock;
-							
-					raf.seek(startOffset);
-					raf.write(data, off, toWrite);
-					startOffset += stride;
-					off += toWrite;
-				}
-				
-				//notify of rbyteio write event
-				TopicSet space = TopicSet.forPublisher(getClass());
-				PublisherTopic publisherTopic = space.createPublisherTopic(
-					BYTEIO_CONTENTS_CHANGED_TOPIC);
-				publisherTopic.publish(new ByteIOContentsChangedContents(
-					ByteIOOperations.Write));
+				int toWrite = (data.length - off);
+				if (toWrite > bytesPerBlock)
+					toWrite = bytesPerBlock;
+						
+				raf.seek(startOffset);
+				raf.write(data, off, toWrite);
+				startOffset += stride;
+				off += toWrite;
 			}
-			catch (IOException ioe)
-			{
-				throw FaultManipulator.fillInFault(
-					new CustomFaultType(null, null, null, null,
-						new BaseFaultTypeDescription[] {
-							new BaseFaultTypeDescription(ioe.toString())
-					}, null));
-			}
-			finally
-			{
-				StreamUtils.close(raf);
-			}
+			
+			//notify of rbyteio write event
+			TopicSet space = TopicSet.forPublisher(getClass());
+			PublisherTopic publisherTopic = space.createPublisherTopic(
+				BYTEIO_CONTENTS_CHANGED_TOPIC);
+			publisherTopic.publish(new ByteIOContentsChangedContents(
+				ByteIOOperations.Write));
+		}
+		catch (IOException ioe)
+		{
+			throw FaultManipulator.fillInFault(
+				new CustomFaultType(null, null, null, null,
+					new BaseFaultTypeDescription[] {
+						new BaseFaultTypeDescription(ioe.toString())
+				}, null));
+		}
+		finally
+		{
+			StreamUtils.close(raf);
+			_resourceLock.unlock();
 		}
 		
 		return new WriteResponse(new TransferInformationType(null,
-				transferInformation.getTransferMechanism()));
+			transferInformation.getTransferMechanism()));
 	}
 
 	@RWXMapping(RWXCategory.WRITE)
@@ -290,41 +288,37 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 		byte []data = TransferAgent.receiveData(append.getTransferInformation());
 		File myFile = null;
 		RandomAccessFile raf = null;
-		IRByteIOResource resource = null;
-		ResourceKey rKey = ResourceManager.getCurrentResource();
 		
-		resource = (IRByteIOResource)rKey.dereference();
-		myFile = resource.getCurrentFile();
-		synchronized(rKey.getLockObject())
+		myFile = _resource.getCurrentFile();
+		try
 		{
-			try
-			{
-				raf = new RandomAccessFile(myFile, "rw");
-				raf.seek(myFile.length());
-				raf.write(data);
-				
-				//notify of append
-				TopicSet space = TopicSet.forPublisher(getClass());
-				PublisherTopic publisherTopic = space.createPublisherTopic(
-					BYTEIO_CONTENTS_CHANGED_TOPIC);
-				publisherTopic.publish(new ByteIOContentsChangedContents(
-					ByteIOOperations.Append));
-				
-				return new AppendResponse(new TransferInformationType(null,
-					append.getTransferInformation().getTransferMechanism()));
-			}
-			catch (IOException ioe)
-			{
-				throw FaultManipulator.fillInFault(
-					new CustomFaultType(null, null, null, null,
-						new BaseFaultTypeDescription[] {
-							new BaseFaultTypeDescription(ioe.toString())
-					}, null));
-			}
-			finally
-			{
-				StreamUtils.close(raf);
-			}
+			_resourceLock.lock();
+			raf = new RandomAccessFile(myFile, "rw");
+			raf.seek(myFile.length());
+			raf.write(data);
+			
+			//notify of append
+			TopicSet space = TopicSet.forPublisher(getClass());
+			PublisherTopic publisherTopic = space.createPublisherTopic(
+				BYTEIO_CONTENTS_CHANGED_TOPIC);
+			publisherTopic.publish(new ByteIOContentsChangedContents(
+				ByteIOOperations.Append));
+			
+			return new AppendResponse(new TransferInformationType(null,
+				append.getTransferInformation().getTransferMechanism()));
+		}
+		catch (IOException ioe)
+		{
+			throw FaultManipulator.fillInFault(
+				new CustomFaultType(null, null, null, null,
+					new BaseFaultTypeDescription[] {
+						new BaseFaultTypeDescription(ioe.toString())
+				}, null));
+		}
+		finally
+		{
+			StreamUtils.close(raf);
+			_resourceLock.unlock();
 		}
 	}
 
@@ -338,39 +332,35 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 			truncAppend.getTransferInformation());
 		File myFile = null;
 		RandomAccessFile raf = null;
-		IRByteIOResource resource = null;
-		ResourceKey rKey = ResourceManager.getCurrentResource();
 		
-		resource = (IRByteIOResource)rKey.dereference();
-		myFile = resource.getCurrentFile();
-		synchronized(rKey.getLockObject())
+		myFile = _resource.getCurrentFile();
+		try
 		{
-			try
-			{
-				raf = new RandomAccessFile(myFile, "rw");
-				raf.setLength(truncAppend.getOffset());
-				raf.seek(truncAppend.getOffset());
-				raf.write(data);
-				
-				//notify rbyteio truncappend event
-				TopicSet space = TopicSet.forPublisher(getClass());
-				PublisherTopic publisherTopic = space.createPublisherTopic(
-					BYTEIO_CONTENTS_CHANGED_TOPIC);
-				publisherTopic.publish(new ByteIOContentsChangedContents(
-					ByteIOOperations.TruncAppend));
-			}
-			catch (IOException ioe)
-			{
-				throw FaultManipulator.fillInFault(
-					new CustomFaultType(null, null, null, null,
-						new BaseFaultTypeDescription[] {
-							new BaseFaultTypeDescription(ioe.toString())
-					}, null));
-			}
-			finally
-			{
-				StreamUtils.close(raf);
-			}
+			_resourceLock.lock();
+			raf = new RandomAccessFile(myFile, "rw");
+			raf.setLength(truncAppend.getOffset());
+			raf.seek(truncAppend.getOffset());
+			raf.write(data);
+			
+			//notify rbyteio truncappend event
+			TopicSet space = TopicSet.forPublisher(getClass());
+			PublisherTopic publisherTopic = space.createPublisherTopic(
+				BYTEIO_CONTENTS_CHANGED_TOPIC);
+			publisherTopic.publish(new ByteIOContentsChangedContents(
+				ByteIOOperations.TruncAppend));
+		}
+		catch (IOException ioe)
+		{
+			throw FaultManipulator.fillInFault(
+				new CustomFaultType(null, null, null, null,
+					new BaseFaultTypeDescription[] {
+						new BaseFaultTypeDescription(ioe.toString())
+				}, null));
+		}
+		finally
+		{
+			StreamUtils.close(raf);
+			_resourceLock.unlock();
 		}
 		
 		return new TruncAppendResponse(new TransferInformationType(null,

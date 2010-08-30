@@ -42,6 +42,7 @@ import org.ggf.bes.management.StartAcceptingNewActivitiesType;
 import org.ggf.bes.management.StopAcceptingNewActivitiesResponseType;
 import org.ggf.bes.management.StopAcceptingNewActivitiesType;
 import org.ggf.jsdl.JobDefinition_Type;
+import org.morgan.inject.MInject;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
@@ -73,7 +74,6 @@ import edu.virginia.vcgr.genii.container.bes.resource.DBBESResourceFactory;
 import edu.virginia.vcgr.genii.container.bes.resource.IBESResource;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
@@ -86,6 +86,9 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 	GeniiBESPortType, BESConstants
 {
 	static private Log _logger = LogFactory.getLog(GeniiBESServiceImpl.class);
+	
+	@MInject(lazy = true)
+	private IBESResource _resource;
 	
 	private void cleanupBadActivities()
 	{
@@ -118,8 +121,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 					isGood = true;
 					try
 					{
-						Calendar createTime = 
-							ResourceManager.getCurrentResource().dereference().createTime();
+						Calendar createTime = _resource.createTime();
 						isGood = (System.currentTimeMillis() - createTime.getTimeInMillis()) <
 							(1000L * 60 * 60 * 24 * 28);
 					}
@@ -263,7 +265,6 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 			// Ignore and hope that it still works out.
 		}
 		
-		ResourceKey key = ResourceManager.getCurrentResource();
 		MessageElement subscribe = null;
 		
 		MessageElement []any = adt.get_any();
@@ -280,9 +281,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 			}
 		}
 		
-		IBESResource resource = (IBESResource)key.dereference();
-		 
-		if (!resource.isAcceptingNewActivities())
+		if (!_resource.isAcceptingNewActivities())
 		{
 			_logger.info("BES container not currently accepting new activities.");
 			throw new NotAcceptingNewActivitiesFaultType(null);
@@ -298,13 +297,13 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 		
 		_logger.info(String.format(
 			"BES with resource key \"%s\" is creating an activity.",
-			key.getResourceKey()));
+			_resource.getKey()));
 		
 		/* ASG August 28,2008, replaced RPC with direct call to CreateEPR */
 		EndpointReferenceType entryReference = 
 			new BESActivityServiceImpl().CreateEPR(BESActivityUtils.createCreationProperties(
-				jdt, (String)resource.getKey(),
-				(BESConstructionParameters)resource.constructionParameters(getClass()),
+				jdt, _resource.getKey(),
+				(BESConstructionParameters)_resource.constructionParameters(getClass()),
 				subscribe),
 				Container.getServiceURL("BESActivityPortType"));
 
@@ -335,14 +334,11 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 		Collection<GetActivityDocumentResponseType> response =
 			new LinkedList<GetActivityDocumentResponseType>();
 		
-		IBESResource resource = 
-			(IBESResource)ResourceManager.getCurrentResource().dereference();
-		
 		for (EndpointReferenceType target : parameters.getActivityIdentifier())
 		{
 			try
 			{
-				BESActivity activity = resource.getActivity(target);
+				BESActivity activity = _resource.getActivity(target);
 				response.add(new GetActivityDocumentResponseType(
 					target, activity.getJobDefinition(),
 					null, null));
@@ -368,14 +364,11 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 		Collection<GetActivityStatusResponseType> response =
 			new LinkedList<GetActivityStatusResponseType>();
 		
-		IBESResource resource = 
-			(IBESResource)ResourceManager.getCurrentResource().dereference();
-		
 		for (EndpointReferenceType target : parameters.getActivityIdentifier())
 		{
 			try
 			{
-				BESActivity activity = resource.getActivity(target);
+				BESActivity activity = _resource.getActivity(target);
 				activity.verifyOwner();
 				Collection<Throwable> faults = activity.getFaults();
 				response.add(new GetActivityStatusResponseType(
@@ -423,9 +416,8 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 	private void addMatchingParameters(Collection<MessageElement> any) 
 		throws ResourceUnknownFaultType, ResourceException
 	{
-		IResource resource = ResourceManager.getCurrentResource().dereference();
 		Collection<MatchingParameter> matchingParams = 
-			resource.getMatchingParameters();
+			_resource.getMatchingParameters();
 		for (MatchingParameter param : matchingParams)
 		{
 			MessageElement me = new MessageElement(
@@ -500,9 +492,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 	public StartAcceptingNewActivitiesResponseType startAcceptingNewActivities(
 			StartAcceptingNewActivitiesType parameters) throws RemoteException
 	{
-		IResource resource = 
-			ResourceManager.getCurrentResource().dereference();
-		resource.setProperty(IBESResource.STORED_ACCEPTING_NEW_ACTIVITIES, 
+		_resource.setProperty(IBESResource.STORED_ACCEPTING_NEW_ACTIVITIES, 
 			Boolean.TRUE);
 		return new StartAcceptingNewActivitiesResponseType(null);
 	}
@@ -512,9 +502,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 	public StopAcceptingNewActivitiesResponseType stopAcceptingNewActivities(
 			StopAcceptingNewActivitiesType parameters) throws RemoteException
 	{
-		IResource resource = 
-			ResourceManager.getCurrentResource().dereference();
-		resource.setProperty(IBESResource.STORED_ACCEPTING_NEW_ACTIVITIES, 
+		_resource.setProperty(IBESResource.STORED_ACCEPTING_NEW_ACTIVITIES, 
 			Boolean.FALSE);
 		return new StopAcceptingNewActivitiesResponseType(null);
 	}

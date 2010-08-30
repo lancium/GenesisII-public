@@ -59,6 +59,7 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.RNSTopics;
 
 import edu.virginia.vcgr.genii.enhancedrns.*;
 
+import org.morgan.inject.MInject;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.container.Container;
@@ -73,8 +74,7 @@ import edu.virginia.vcgr.genii.container.invoker.timing.Timer;
 import edu.virginia.vcgr.genii.container.invoker.timing.TimingSink;
 
 import edu.virginia.vcgr.genii.container.resource.IResource;
-import edu.virginia.vcgr.genii.container.resource.ResourceKey;
-import edu.virginia.vcgr.genii.container.resource.ResourceManager;
+import edu.virginia.vcgr.genii.container.resource.ResourceLock;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.PublisherTopic;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.TopicSet;
@@ -83,6 +83,12 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 	implements EnhancedRNSPortType, RNSTopics
 {	
 	static private Log _logger = LogFactory.getLog(EnhancedRNSServiceImpl.class);
+	
+	@MInject(lazy = true)
+	private IRNSResource _resource;
+	
+	@MInject
+	private ResourceLock _resourceLock;
 	
 	public EnhancedRNSServiceImpl() throws RemoteException
 	{
@@ -121,14 +127,12 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 			RNSEntryNotDirectoryFaultType, RNSFaultType
 	{
 		String filename = createFile.getFilename();
-		IRNSResource resource = null;
-		ResourceKey rKey = ResourceManager.getCurrentResource();
 		
-		synchronized(rKey.getLockObject())
+		try
 		{
-			resource = (IRNSResource)rKey.dereference();
-			Collection<String> entries = resource.listEntries(filename);
-			resource.commit();
+			_resourceLock.lock();
+			Collection<String> entries = _resource.listEntries(filename);
+			_resource.commit();
 			
 			if (entries.contains(filename))
 				throw FaultManipulator.fillInFault(
@@ -138,21 +142,16 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 			EndpointReferenceType entryReference = 
 				new RandomByteIOServiceImpl().CreateEPR(null,Container.getServiceURL("RandomByteIOPortType"));
 		
-	
-/*		
-			RandomByteIOPortType byteio = ClientUtils.createProxy(
-				RandomByteIOPortType.class,
-				EPRUtils.makeEPR(Container.getServiceURL("RandomByteIOPortType")));
-			EndpointReferenceType entryReference = 
-				byteio.vcgrCreate(new VcgrCreate(null)).getEndpoint();
-*/		
-			
 			/* if entry has a resolver, set address to unbound */
 			EndpointReferenceType eprToStore = prepareEPRToStore(entryReference);
-			resource.addEntry(new InternalEntry(filename, eprToStore, 
+			_resource.addEntry(new InternalEntry(filename, eprToStore, 
 				attributes));
-			resource.commit();
+			_resource.commit();
 			return new CreateFileResponse(entryReference);
+		}
+		finally
+		{
+			_resourceLock.unlock();
 		}
 	}
 	
@@ -162,11 +161,8 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 			ResourceUnknownFaultType, 
 			RNSEntryNotDirectoryFaultType, RNSFaultType
 	{
-		ResourceKey rKey = ResourceManager.getCurrentResource();
 		EndpointReferenceType entryReference;
 		
-		IRNSResource resource = null;
-			
 		if (addRequest == null)
 		{
 			// Pure factory operation
@@ -181,11 +177,15 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 			entryReference = vcgrCreate(new VcgrCreate()).getEndpoint();
 		EndpointReferenceType eprToStore = prepareEPRToStore(entryReference);
 		
-		synchronized(rKey.getLockObject())
+		try
 		{
-			resource = (IRNSResource)rKey.dereference();
-			resource.addEntry(new InternalEntry(name, eprToStore, attrs));
-			resource.commit();
+			_resourceLock.lock();
+			_resource.addEntry(new InternalEntry(name, eprToStore, attrs));
+			_resource.commit();
+		}
+		finally
+		{
+			_resourceLock.unlock();
 		}
 		
 		fireRNSEntryAdded(name, entryReference);
@@ -199,15 +199,17 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
     {
 		_logger.debug("Entered list method.");
     	
-    	IRNSResource resource = null;
     	Collection<InternalEntry> entries;
     	
-    	ResourceKey rKey = ResourceManager.getCurrentResource();
-    	synchronized(rKey.getLockObject())
+    	try
     	{
-	    	resource = (IRNSResource)rKey.dereference();
-		    entries = resource.retrieveEntries(list.getEntryName());
-		    resource.commit();
+    		_resourceLock.lock();
+	    	entries = _resource.retrieveEntries(list.getEntryName());
+		    _resource.commit();
+    	}
+    	finally
+    	{
+    		_resourceLock.unlock();
     	}
     	
     	EntryType []ret = new EntryType[entries.size()];
@@ -248,17 +250,19 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
     {
 		_logger.debug("Entered iterate list method.");
     	TimingSink tSink = TimingSink.sink();
-    	IRNSResource resource = null;
     	Collection<InternalEntry> entries;
     	
-    	ResourceKey rKey = ResourceManager.getCurrentResource();
-    	synchronized (rKey.getLockObject())
+    	try
     	{
-    		resource = (IRNSResource)rKey.dereference();
+    		_resourceLock.lock();
     		Timer rTimer = tSink.getTimer("Retrieve Entries");
-    		entries = resource.retrieveEntries(null);
+    		entries = _resource.retrieveEntries(null);
     		rTimer.noteTime();
-    		resource.commit();
+    		_resource.commit();
+    	}
+    	finally
+    	{
+    		_resourceLock.unlock();
     	}
 
     	AttributesPreFetcherFactory factory = 
@@ -329,15 +333,17 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
     		RNSDirectoryNotEmptyFaultType, RNSFaultType
     {
     	String []ret;
-    	IRNSResource resource = null;
     	Collection<String> removed;
     	
-    	ResourceKey rKey = ResourceManager.getCurrentResource();
-    	synchronized(rKey.getLockObject())
+    	try
     	{
-	    	resource = (IRNSResource)rKey.dereference();
-		    removed = resource.removeEntries(remove.getEntryName());
-		    resource.commit();
+    		_resourceLock.lock();
+	    	removed = _resource.removeEntries(remove.getEntryName());
+		    _resource.commit();
+    	}
+    	finally
+    	{
+    		_resourceLock.unlock();
     	}
     	
 	    ret = new String[removed.size()];

@@ -19,8 +19,13 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
-import java.text.*;
-import java.util.*;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.TimeZone;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
@@ -57,13 +62,29 @@ import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.*;
+import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
+import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
 import edu.virginia.vcgr.genii.client.security.credentials.TransientCredentials;
-import edu.virginia.vcgr.genii.client.security.credentials.assertions.*;
+import edu.virginia.vcgr.genii.client.security.credentials.assertions.BasicConstraints;
+import edu.virginia.vcgr.genii.client.security.credentials.assertions.DelegatedAssertion;
+import edu.virginia.vcgr.genii.client.security.credentials.assertions.DelegatedAttribute;
+import edu.virginia.vcgr.genii.client.security.credentials.assertions.IdentityAttribute;
+import edu.virginia.vcgr.genii.client.security.credentials.assertions.SignedAssertion;
+import edu.virginia.vcgr.genii.client.security.credentials.assertions.SignedAttributeAssertion;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.X509Identity;
+import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.client.security.SecurityConstants;
 import edu.virginia.vcgr.genii.client.security.WSSecurityUtils;
 
+import org.oasis_open.docs.ws_sx.ws_trust._200512.DelegateToType;
+import org.oasis_open.docs.ws_sx.ws_trust._200512.LifetimeType;
+import org.oasis_open.docs.ws_sx.ws_trust._200512.RequestSecurityTokenResponseType;
+import org.oasis_open.docs.ws_sx.ws_trust._200512.RequestSecurityTokenType;
+import org.oasis_open.docs.ws_sx.ws_trust._200512.RequestTypeEnum;
+import org.oasis_open.docs.ws_sx.ws_trust._200512.RequestTypeOpenEnum;
+import org.oasis_open.docs.ws_sx.ws_trust._200512.RequestedProofTokenType;
+import org.oasis_open.docs.ws_sx.ws_trust._200512.RequestedSecurityTokenType;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
@@ -74,7 +95,6 @@ import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rns.IRNSResource;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
-import edu.virginia.vcgr.genii.client.security.*;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
@@ -82,24 +102,26 @@ import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.container.Container;
+import edu.virginia.vcgr.genii.x509authn.X509AuthnPortType;
 
-import edu.virginia.vcgr.genii.x509authn.*;
 
-import org.oasis_open.docs.ws_sx.ws_trust._200512.*;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
 import org.apache.axis.AxisFault;
 
+import org.morgan.inject.MInject;
 import org.morgan.util.configuration.ConfigurationException;
 
-public class X509AuthnServiceImpl extends GenesisIIBase implements
-		X509AuthnPortType
+public class X509AuthnServiceImpl extends GenesisIIBase
+	implements X509AuthnPortType
 {
-
 	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(X509AuthnServiceImpl.class);
 
+	@MInject(lazy = true)
+	private IRNSResource _resource;
+	
 	public X509AuthnServiceImpl() throws RemoteException
 	{
 		this(WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE.getQName()
@@ -282,20 +304,16 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 	}
 
 	protected RequestSecurityTokenResponseType delegateCredential(
-			X509Certificate[] delegateToChain, Date created, Date expiry)
+		X509Certificate[] delegateToChain, Date created, Date expiry)
 			throws GeneralSecurityException, SOAPException,
 			ConfigurationException, RemoteException
 	{
 
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		IRNSResource resource = (IRNSResource) rKey.dereference();
-		GIICredential credential =
-				(GIICredential) resource
-						.getProperty(SecurityConstants.IDP_DELEGATED_CREDENTIAL_QNAME
-								.getLocalPart());
+		GIICredential credential = (GIICredential)_resource.getProperty(
+			SecurityConstants.IDP_DELEGATED_CREDENTIAL_QNAME.getLocalPart());
 
 		if ((credential instanceof SignedAssertion)
-				&& (delegateToChain != null))
+			&& (delegateToChain != null))
 		{
 			// do delegation if necessary
 
@@ -332,39 +350,34 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 		response.set_any(elements);
 
 		// Add TokenType element
-		elements[0] =
-				new MessageElement(new QName(
-						"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
-						"TokenType"), credential.getTokenType());
+		elements[0] = new MessageElement(new QName(
+			"http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "TokenType"),
+			credential.getTokenType());
 		elements[0].setType(new QName("http://www.w3.org/2001/XMLSchema",
-				"anyURI"));
+			"anyURI"));
 
 		MessageElement wseTokenRef = credential.toMessageElement();
 
 		elements[1] =
-				new MessageElement(new QName(
-						"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
-						"RequestedSecurityToken"),
-						new RequestedSecurityTokenType(
-								new MessageElement[] { wseTokenRef }));
+			new MessageElement(new QName(
+				"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
+				"RequestedSecurityToken"), new RequestedSecurityTokenType(
+					new MessageElement[] { wseTokenRef }));
 		elements[1].setType(RequestedProofTokenType.getTypeDesc().getXmlType());
 
 		return response;
 	}
 
 	protected ArrayList<RequestSecurityTokenResponseType> aggregateBaggageTokens(
-			RequestSecurityTokenType request) throws java.rmi.RemoteException
+		RequestSecurityTokenType request) throws java.rmi.RemoteException
 	{
 
 		ArrayList<RequestSecurityTokenResponseType> gatheredResponses =
 				new ArrayList<RequestSecurityTokenResponseType>();
 
-		IRNSResource resource = null;
 		Collection<InternalEntry> entries;
 
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		resource = (IRNSResource) rKey.dereference();
-		entries = resource.retrieveEntries(null);
+		entries = _resource.retrieveEntries(null);
 
 		for (InternalEntry entry : entries)
 		{
@@ -451,9 +464,8 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 				DelegateToType dt = null;
 				try
 				{
-					dt =
-							(DelegateToType) element
-									.getObjectValue(DelegateToType.class);
+					dt = (DelegateToType)element.getObjectValue(
+						DelegateToType.class);
 				}
 				catch (Exception e)
 				{
@@ -462,30 +474,24 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 				{
 					for (MessageElement subElement : dt.get_any())
 					{
-						if (subElement
-								.getQName()
-								.equals(
-										new QName(
-												org.apache.ws.security.WSConstants.WSSE11_NS,
-												"SecurityTokenReference")))
+						if (subElement.getQName().equals(new QName(
+							org.apache.ws.security.WSConstants.WSSE11_NS,
+							"SecurityTokenReference")))
 						{
-							subElement =
-									subElement
-											.getChildElement(new QName(
-													org.apache.ws.security.WSConstants.WSSE11_NS,
-													"Embedded"));
+							subElement = subElement.getChildElement(new QName(
+								org.apache.ws.security.WSConstants.WSSE11_NS,
+								"Embedded"));
 							if (subElement != null)
 							{
-								subElement =
-										subElement
-												.getChildElement(BinarySecurity.TOKEN_BST);
+								subElement = subElement.getChildElement(
+									BinarySecurity.TOKEN_BST);
 								if (subElement != null)
 								{
 									try
 									{
 										if (subElement.getAttributeValue(
-												"ValueType").equals(
-												X509Security.getType()))
+											"ValueType").equals(
+											X509Security.getType()))
 										{
 											X509Security bstToken =
 													new X509Security(subElement);
@@ -502,21 +508,20 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 											PKIPathSecurity bstToken =
 													new PKIPathSecurity(element);
 											delegateToChain =
-													bstToken
-															.getX509Certificates(
-																	false,
-																	new edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto());
+												bstToken.getX509Certificates(
+													false, 
+													new GIIBouncyCrypto());
 										}
 										else
 										{
 											if (delegateToChain == null)
 											{
 												throw new AxisFault(
-														new QName(
-																"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
-																"BadRequest"),
-														"Missing or unsupported DelegateTo security ValueType",
-														null, null);
+													new QName(
+															"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
+															"BadRequest"),
+													"Missing or unsupported DelegateTo security ValueType",
+													null, null);
 											}
 										}
 									}
@@ -560,8 +565,8 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 
 		// check request type
 		if ((requestType == null)
-				|| !requestType.getRequestTypeEnumValue().toString().equals(
-						RequestTypeEnum._value1.toString()))
+			|| !requestType.getRequestTypeEnumValue().toString().equals(
+				RequestTypeEnum._value1.toString()))
 		{
 			throw new AxisFault(new QName(
 					"http://docs.oasis-open.org/ws-sx/ws-trust/200512/",
@@ -643,39 +648,27 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 			RNSEntryNotDirectoryFaultType, RNSFaultType
 	{
 
-		IRNSResource resource = null;
 		EndpointReferenceType entryReference;
 
 		if (addRequest == null)
-		{
 			throw new RemoteException("Incomplete add request.");
-		}
 
 		String name = addRequest.getEntry_name();
 		entryReference = addRequest.getEntry_reference();
 		MessageElement[] attrs = addRequest.get_any();
 
 		if (entryReference == null)
-		{
 			throw new RemoteException("Incomplete add request.");
-		}
 
 		TypeInformation type = new TypeInformation(entryReference);
 		if (!type.isIDP())
-		{
 			throw new RemoteException("Entry is not an IDP.");
-		}
 
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		resource = (IRNSResource) rKey.dereference();
-
-		if (resource.isServiceResource())
-		{
+		if (_resource.isServiceResource())
 			throw new RemoteException("Cannot add entries to this service.");
-		}
 
-		resource.addEntry(new InternalEntry(name, entryReference, attrs));
-		resource.commit();
+		_resource.addEntry(new InternalEntry(name, entryReference, attrs));
+		_resource.commit();
 
 		return new AddResponse(entryReference);
 	}
@@ -685,22 +678,15 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType,
 			RNSFaultType
 	{
-
-		IRNSResource resource = null;
 		Collection<InternalEntry> entries;
 
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		resource = (IRNSResource) rKey.dereference();
-		entries = resource.retrieveEntries(list.getEntryName());
+		entries = _resource.retrieveEntries(list.getEntryName());
 
 		EntryType[] ret = new EntryType[entries.size()];
 		int lcv = 0;
 		for (InternalEntry entry : entries)
-		{
-			ret[lcv++] =
-					new EntryType(entry.getName(), entry.getAttributes(), entry
-							.getEntryReference());
-		}
+			ret[lcv++] = new EntryType(entry.getName(), entry.getAttributes(),
+				entry.getEntryReference());
 
 		return new ListResponse(ret);
 	}
@@ -724,18 +710,12 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 			ResourceUnknownFaultType, RNSDirectoryNotEmptyFaultType,
 			RNSFaultType
 	{
-
 		String[] ret;
-		IRNSResource resource = null;
-
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		resource = (IRNSResource) rKey.dereference();
-		Collection<String> removed =
-				resource.removeEntries(remove.getEntryName());
+		Collection<String> removed = _resource.removeEntries(
+			remove.getEntryName());
 		ret = new String[removed.size()];
 		removed.toArray(ret);
-		resource.commit();
-
+		
 		return ret;
 	}
 
@@ -776,5 +756,4 @@ public class X509AuthnServiceImpl extends GenesisIIBase implements
 					"getTransferMechsAttr");
 		}
 	}
-
 }

@@ -23,6 +23,7 @@ import org.ggf.rns.RNSEntryExistsFaultType;
 import org.ggf.rns.RNSEntryNotDirectoryFaultType;
 import org.ggf.rns.RNSFaultType;
 import org.ggf.rns.Remove;
+import org.morgan.inject.MInject;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.ws.addressing.EndpointReferenceType;
@@ -38,7 +39,6 @@ import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
-import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.iterator.IterateRequestType;
 import edu.virginia.vcgr.genii.iterator.IteratorMemberType;
 import edu.virginia.vcgr.genii.iterator.IteratorPortType;
@@ -49,6 +49,9 @@ public class IteratorServiceImpl extends GenesisIIBase implements
 {
 	/* Lifetime of 1 hour */
 	static private final long ITERATOR_LIFETIME = 1000L * 60 * 60;
+	
+	@MInject(lazy = true)
+	private IteratorResource _resource;
 	
 	@Override
 	protected void postCreate(ResourceKey key, EndpointReferenceType newEPR,
@@ -108,9 +111,7 @@ public class IteratorServiceImpl extends GenesisIIBase implements
 	public IteratorMemberType[] iterate(IterateRequestType iterateRequest)
 			throws RemoteException
 	{
-		IteratorResource resource = 
-			(IteratorResource)ResourceManager.getCurrentResource().dereference();
-		return resource.get(
+		return _resource.get(
 			iterateRequest.getStartElement().longValue(), 
 			iterateRequest.getMaxLength().intValue());
 	}

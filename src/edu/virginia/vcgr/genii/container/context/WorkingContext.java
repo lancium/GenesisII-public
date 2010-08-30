@@ -2,7 +2,10 @@ package edu.virginia.vcgr.genii.container.context;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.Stack;
 
 import org.apache.axis.AxisFault;
@@ -162,8 +165,10 @@ public class WorkingContext implements Closeable, Cloneable
 		
 		_closed = true;
 		
-		for (Object obj : _properties.values())
+		for (Map.Entry<String, Object> entry : _properties.entrySet())
 		{
+			Object obj = entry.getValue();
+			
 			try
 			{
 				if (obj instanceof ResourceKey)
@@ -199,7 +204,16 @@ public class WorkingContext implements Closeable, Cloneable
 	{
 		WorkingContext c = new WorkingContext();
 		c._properties = (HashMap<String, Object>)_properties.clone();
-		c._properties.remove(CURRENT_RESOURCE_KEY);
+		Collection<String> removeSet = new LinkedList<String>();
+		for (Map.Entry<String, Object> entry : c._properties.entrySet())
+		{
+			if (entry.getValue() instanceof ResourceKey)
+				removeSet.add(entry.getKey());
+		}
+		
+		for (String key : removeSet)
+			c._properties.remove(key);
+		
 		return c;
 	}
 }

@@ -27,6 +27,7 @@ import org.ggf.sbyteio.SeekReadResponse;
 import org.ggf.sbyteio.SeekWrite;
 import org.ggf.sbyteio.SeekWriteResponse;
 import org.ggf.sbyteio.StreamableByteIOPortType;
+import org.morgan.inject.MInject;
 import org.morgan.util.io.StreamUtils;
 import org.oasis_open.wsn.base.Subscribe;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
@@ -49,7 +50,7 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
-import edu.virginia.vcgr.genii.container.resource.ResourceManager;
+import edu.virginia.vcgr.genii.container.resource.ResourceLock;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.PublisherTopic;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.TopicSet;
@@ -61,6 +62,12 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase
 	static private final long SBYTEIO_LIFETIME = 1000L * 60 * 60;
 	
 	static private Log _logger = LogFactory.getLog(RandomByteIOServiceImpl.class);
+	
+	@MInject(lazy = true)
+	private ISByteIOResource _resource;
+	
+	@MInject
+	private ResourceLock _resourceLock;
 	
 	protected Object translateConstructionParameter(MessageElement property)
 		throws Exception
@@ -200,52 +207,47 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase
 		byte []data = new byte[numBytes];
 		File myFile = null;
 		RandomAccessFile raf = null;
-		ISByteIOResource resource = null;
 		
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		resource = (ISByteIOResource)rKey.dereference();
-		myFile = resource.getCurrentFile();
-		synchronized(rKey.getLockObject())
+		myFile = _resource.getCurrentFile();
+		try
 		{
-			try
-			{
-				raf = new RandomAccessFile(myFile, "r");
+			_resourceLock.lock();
+			raf = new RandomAccessFile(myFile, "r");
+			
+			long offset = ((Long)_resource.getProperty(
+				ISByteIOResource.POSITION_PROPERTY)).longValue();
+			offset = seek(offset, uri, seekOffset, raf);
 				
-				long offset = ((Long)resource.getProperty(
-					ISByteIOResource.POSITION_PROPERTY)).longValue();
-				offset = seek(offset, uri, seekOffset, raf);
-					
-				int bytesRead = readFully(raf, data, 0, numBytes);
-				
-				if (bytesRead < numBytes)
-				{
-					byte []tmp = data;
-					data = new byte[bytesRead];
-					System.arraycopy(tmp, 0, data, 0, bytesRead);
-				}
-				
-				resource.setProperty(ISByteIOResource.POSITION_PROPERTY,
-					new Long(offset + bytesRead));
-				TransferAgent.sendData(data, transType);
-			}
-			catch(ResourceUnknownFaultType ruft){
-				throw FaultManipulator.fillInFault(ruft);
-			}
-			catch (IOException ioe)
+			int bytesRead = readFully(raf, data, 0, numBytes);
+			
+			if (bytesRead < numBytes)
 			{
-				throw FaultManipulator.fillInFault(
-					new CustomFaultType(null, null, null, null,
-						new BaseFaultTypeDescription[] {
-							new BaseFaultTypeDescription(ioe.toString())
-					}, null));
+				byte []tmp = data;
+				data = new byte[bytesRead];
+				System.arraycopy(tmp, 0, data, 0, bytesRead);
 			}
-			finally
-			{
-				StreamUtils.close(raf);
-			}
+			
+			_resource.setProperty(ISByteIOResource.POSITION_PROPERTY,
+				new Long(offset + bytesRead));
+			TransferAgent.sendData(data, transType);
+		}
+		catch(ResourceUnknownFaultType ruft){
+			throw FaultManipulator.fillInFault(ruft);
+		}
+		catch (IOException ioe)
+		{
+			throw FaultManipulator.fillInFault(
+				new CustomFaultType(null, null, null, null,
+					new BaseFaultTypeDescription[] {
+						new BaseFaultTypeDescription(ioe.toString())
+				}, null));
+		}
+		finally
+		{
+			StreamUtils.close(raf);
+			_resourceLock.unlock();
 		}
 		
-		resource.commit();
 		return new SeekReadResponse(transType);
 	}
 
@@ -262,40 +264,35 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase
 			transType);
 		File myFile = null;
 		RandomAccessFile raf = null;
-		ISByteIOResource resource = null;
 		
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		resource = (ISByteIOResource)rKey.dereference();
-		myFile = resource.getCurrentFile();
-		synchronized(rKey.getLockObject())
+		myFile = _resource.getCurrentFile();
+		try
 		{
-			try
-			{
-				raf = new RandomAccessFile(myFile, "rw");
+			_resourceLock.lock();
+			raf = new RandomAccessFile(myFile, "rw");
+			
+			long offset = ((Long)_resource.getProperty(
+				ISByteIOResource.POSITION_PROPERTY)).longValue();
+			offset = seek(offset, uri, seekOffset, raf);
 				
-				long offset = ((Long)resource.getProperty(
-					ISByteIOResource.POSITION_PROPERTY)).longValue();
-				offset = seek(offset, uri, seekOffset, raf);
-					
-				raf.write(data);
-				resource.setProperty(ISByteIOResource.POSITION_PROPERTY,
-					new Long(offset + data.length));
-			}
-			catch (IOException ioe)
-			{
-				throw FaultManipulator.fillInFault(
-					new CustomFaultType(null, null, null, null,
-						new BaseFaultTypeDescription[] {
-							new BaseFaultTypeDescription(ioe.toString())
-					}, null));
-			}
-			finally
-			{
-				StreamUtils.close(raf);
-			}
+			raf.write(data);
+			_resource.setProperty(ISByteIOResource.POSITION_PROPERTY,
+				new Long(offset + data.length));
+		}
+		catch (IOException ioe)
+		{
+			throw FaultManipulator.fillInFault(
+				new CustomFaultType(null, null, null, null,
+					new BaseFaultTypeDescription[] {
+						new BaseFaultTypeDescription(ioe.toString())
+				}, null));
+		}
+		finally
+		{
+			StreamUtils.close(raf);
+			_resourceLock.unlock();
 		}
 		
-		resource.commit();
 		return new SeekWriteResponse(new TransferInformationType(null,
 				transType.getTransferMechanism()));
 	}

@@ -29,14 +29,18 @@ import javax.xml.namespace.QName;
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.morgan.inject.MInject;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.certGenerator.CertificateChainType;
 import edu.virginia.vcgr.genii.certGenerator.GenerateX509V3CertificateChainRequestType;
 import edu.virginia.vcgr.genii.certGenerator.CertGeneratorPortType;
 import edu.virginia.vcgr.genii.certGenerator.GenerateX509V3CertificateChainResponseType;
 import edu.virginia.vcgr.genii.certGenerator.InvalidCertificateRequestFaultType;
+import edu.virginia.vcgr.genii.certGenerator.PublicKeyType;
+import edu.virginia.vcgr.genii.certGenerator.X509NameType;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.PortType;
@@ -46,9 +50,7 @@ import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.security.SecurityUtils;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
-import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
-import edu.virginia.vcgr.genii.certGenerator.*;
 import edu.virginia.vcgr.genii.client.security.x509.CertGeneratorUtils;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
@@ -56,6 +58,9 @@ import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 public class CertGeneratorServiceImpl extends GenesisIIBase implements CertGeneratorPortType
 {	
 	static private Log _logger = LogFactory.getLog(CertGeneratorServiceImpl.class);
+	
+	@MInject(lazy = true)
+	private ICertGeneratorResource _resource;
 	
 	public CertGeneratorServiceImpl() throws RemoteException
 	{
@@ -82,22 +87,17 @@ public class CertGeneratorServiceImpl extends GenesisIIBase implements CertGener
 			edu.virginia.vcgr.genii.certGenerator.InvalidCertificateRequestFaultType, 
 			ResourceUnknownFaultType
 	{
-		ICertGeneratorResource resource = null;
 		GenerateX509V3CertificateChainResponseType response = null;
 		
 		if (request == null)
-		{
 			throw FaultManipulator.fillInFault(
 				new InvalidCertificateRequestFaultType());
-		}
 		
 		PublicKeyType pkt = request.getPublicKey();
 		X509NameType x509Name = request.getX509Name();
 		if (x509Name == null)
-		{
 			throw FaultManipulator.fillInFault(
 				new InvalidCertificateRequestFaultType());
-		}
 
 		PublicKey pk = null;
 		try
@@ -111,13 +111,10 @@ public class CertGeneratorServiceImpl extends GenesisIIBase implements CertGener
 				new InvalidCertificateRequestFaultType());
 		}
 
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		resource = (ICertGeneratorResource)rKey.dereference();
-		
 		// get CA certificate from resource state.
-		long defaultDuration = resource.getDefaultValidity();
-		X509Certificate[] issuerChain = resource.getIssuerChain();
-		PrivateKey issuerPrivateKey = resource.getIssuerPrivateKey();
+		long defaultDuration = _resource.getDefaultValidity();
+		X509Certificate[] issuerChain = _resource.getIssuerChain();
+		PrivateKey issuerPrivateKey = _resource.getIssuerPrivateKey();
 
 		try
 		{

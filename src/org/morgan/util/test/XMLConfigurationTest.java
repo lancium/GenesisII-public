@@ -81,14 +81,14 @@ public class XMLConfigurationTest extends TestCase
 	@SuppressWarnings("unchecked")
 	public void testClassHandler()
 	{
-		HashMap<String, Class> classes = (HashMap<String, Class>)_conf.retrieveSection(
+		HashMap<String, Class<?>> classes = (HashMap<String, Class<?>>)_conf.retrieveSection(
 			new QName("http://www.mark-morgan.net/org/morgan/util/test",
 				"test-classes"));
 		
 		TestCase.assertNotNull(classes);
 		
-		Class alpha = classes.get("alpha");
-		Class beta = classes.get("beta");
+		Class<?> alpha = classes.get("alpha");
+		Class<?> beta = classes.get("beta");
 		
 		TestCase.assertNotNull(alpha);
 		TestCase.assertNotNull(beta);

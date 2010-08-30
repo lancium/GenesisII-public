@@ -98,7 +98,7 @@ public class JNILibraryLauncher
 			int DesiredAccess, boolean isDirectory){
 		String myClass = JNI_IO_PACKAGE + ".JNIOpen";
 		String myMethod = "open";
-		Class[] argTypes = new Class[] {String.class, Integer.class, 
+		Class<?>[] argTypes = new Class<?>[] {String.class, Integer.class, 
 				Integer.class, Boolean.class};
 		Object[] args = new Object[] {fileName, new Integer(requestedDeposition), 
 				new Integer(DesiredAccess), new Boolean(isDirectory)};
@@ -176,7 +176,7 @@ public class JNILibraryLauncher
 	public static Object[] getDirectoryListing(int handle, String target){		
 		String myClass = JNI_IO_PACKAGE + ".JNIDirectoryListing";
 		String myMethod = "getDirectoryListing";
-		Class[] argTypes = new Class[] {Integer.class, String.class};
+		Class<?>[] argTypes = new Class[] {Integer.class, String.class};
 		Object[] args = new Object[] {new Integer(handle), target};
 						
 		ArrayList<String> toReturn = (ArrayList<String>)

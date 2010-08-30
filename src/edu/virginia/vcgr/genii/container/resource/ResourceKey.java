@@ -4,7 +4,9 @@ import java.io.Closeable;
 import java.io.IOException;
 import org.apache.axis.types.URI;
 import java.security.GeneralSecurityException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 import javax.xml.namespace.QName;
 
@@ -204,11 +206,11 @@ public class ResourceKey implements Closeable
 	 * 
 	 * @return An object which can be locked on.
 	 */
-	public Object getLockObject()
+	final public ResourceLock getResourceLock()
 	{
 		synchronized(_lockTable)
 		{
-			return _lockTable.get(_cachedResource.getLockKey());
+			return _lockTable.get(_cachedResource.getLockKey()).lock();
 		}
 	}
 	
@@ -244,18 +246,24 @@ public class ResourceKey implements Closeable
 	static private class ReferenceCounter
 	{
 		private int _count;
+		private ResourceLock _lock = new ResourceLockImpl();
 		
 		public ReferenceCounter()
 		{
 			_count = 0;
 		}
 		
-		public void increment()
+		final public ResourceLock lock()
+		{
+			return _lock;
+		}
+		
+		final public void increment()
 		{
 			_count++;
 		}
 		
-		public int decrement()
+		final public int decrement()
 		{
 			return --_count;
 		}

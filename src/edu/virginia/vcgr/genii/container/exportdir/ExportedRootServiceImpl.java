@@ -15,6 +15,7 @@ import org.ggf.rns.AddResponse;
 import org.ggf.rns.RNSEntryExistsFaultType;
 import org.ggf.rns.RNSEntryNotDirectoryFaultType;
 import org.ggf.rns.RNSFaultType;
+import org.morgan.inject.MInject;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
@@ -37,7 +38,6 @@ import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
-import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.exportdir.ExportedDirPortType;
 import edu.virginia.vcgr.genii.exportdir.ExportedRootPortType;
@@ -48,6 +48,9 @@ public class ExportedRootServiceImpl extends ExportedDirServiceImpl implements
 		ExportedRootPortType
 {
 	static private Log _logger = LogFactory.getLog(ExportedRootServiceImpl.class);
+	
+	@MInject(lazy = true)
+	private IExportedRootResource _resource;
 	
 	public ExportedRootServiceImpl() throws RemoteException
 	{
@@ -114,11 +117,8 @@ public class ExportedRootServiceImpl extends ExportedDirServiceImpl implements
 	@RWXMapping(RWXCategory.EXECUTE)
 	public QuitExportResponse quitExport(QuitExport quitExportRequest) throws RemoteException, ResourceUnknownFaultType
 	{
-		IExportedRootResource resource = 
-			(IExportedRootResource)ResourceManager.getCurrentResource().dereference();
-		
-		resource.destroy(false);
-		resource.commit();
+		_resource.destroy(false);
+		_resource.commit();
 		
 		return new QuitExportResponse(true);
 	}
@@ -167,20 +167,3 @@ public class ExportedRootServiceImpl extends ExportedDirServiceImpl implements
 		}
 	}
 }
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
