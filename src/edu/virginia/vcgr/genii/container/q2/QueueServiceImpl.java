@@ -87,8 +87,8 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	static public QName _JOBID_QNAME =
 		new QName(GenesisIIConstants.GENESISII_NS, "job-id");
 	
-	@MInject
-	private StringResourceIdentifier _resourceID;
+	@MInject(injectionFactory = QueueManagerInjectionFactory.class)
+	private QueueManager _queueMgr;
 	
 	public QueueServiceImpl() throws RemoteException
 	{
@@ -125,8 +125,7 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	{
 		try
 		{
-			QueueManager mgr = QueueManager.getManager(_resourceID.key());
-			mgr.completeJobs(completeRequest);
+			_queueMgr.completeJobs(completeRequest);
 			return null;
 		}
 		catch (SQLException sqe)
@@ -141,8 +140,7 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	{
 		try
 		{
-			QueueManager mgr = QueueManager.getManager(_resourceID.key());
-			mgr.rescheduleJobs(jobs);
+			_queueMgr.rescheduleJobs(jobs);
 			return null;
 		}
 		catch (SQLException sqe)
@@ -158,8 +156,7 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	{
 		try
 		{
-			QueueManager mgr = QueueManager.getManager(_resourceID.key());
-			mgr.configureBES(configureRequest.getQueueResource(), 
+			_queueMgr.configureBES(configureRequest.getQueueResource(), 
 				configureRequest.getNumSlots().intValue());
 			return null;
 		}
@@ -176,8 +173,7 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		
 		try
 		{
-			QueueManager mgr = QueueManager.getManager(_resourceID.key());
-			jobs = mgr.getJobStatus(getStatusRequest);
+			jobs = _queueMgr.getJobStatus(getStatusRequest);
 			return jobs.toArray(new JobInformationType[0]);
 		}
 		catch (SQLException sqe)
@@ -214,8 +210,7 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	{
 		try
 		{
-			QueueManager mgr = QueueManager.getManager(_resourceID.key());
-			return mgr.queryErrorInformation(arg0.getJobTicket());
+			return _queueMgr.queryErrorInformation(arg0.getJobTicket());
 		}
 		catch (SQLException sqe)
 		{
@@ -230,8 +225,7 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	{
 		try
 		{
-			QueueManager mgr = QueueManager.getManager(_resourceID.key());
-			return mgr.getJobLog(arg0.getJobTicket());
+			return _queueMgr.getJobLog(arg0.getJobTicket());
 		}
 		catch (SQLException sqe)
 		{
@@ -245,8 +239,7 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	{
 		try
 		{
-			QueueManager mgr = QueueManager.getManager(_resourceID.key());
-			mgr.killJobs(killRequest);
+			_queueMgr.killJobs(killRequest);
 			return null;
 		}
 		catch (SQLException sqe)
@@ -262,8 +255,7 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		
 		try
 		{
-			QueueManager mgr = QueueManager.getManager(_resourceID.key());
-			jobs = mgr.listJobs(null);
+			jobs = _queueMgr.listJobs(null);
 			return jobs.toArray(new ReducedJobInformationType[0]);
 		}
 		catch (SQLException sqe)
@@ -305,8 +297,6 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		
 		try
 		{
-			QueueManager mgr = QueueManager.getManager(_resourceID.key());
-			
 			JobDefinition jobDefinition = JSDLUtils.convert(
 				submitJobRequest.getJobDefinition());
 			if (jobDefinition.parameterSweeps().size() > 0)
@@ -314,12 +304,12 @@ public class QueueServiceImpl extends ResourceForkBaseService
 				SweepToken token;
 				token = SweepUtility.performSweep(jobDefinition, 
 					listener = new SweepListenerImpl(
-						mgr, submitJobRequest.getPriority()));
+						_queueMgr, submitJobRequest.getPriority()));
 				token.join();
 				ticket = listener.firstTicket();
 			} else
 			{
-				ticket = mgr.submitJob(submitJobRequest.getPriority(), 
+				ticket = _queueMgr.submitJob(submitJobRequest.getPriority(), 
 					submitJobRequest.getJobDefinition());
 			}
 			
@@ -392,12 +382,7 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		
 		try
 		{
-			QueueManager mgr = QueueManager.getManager(_resourceID.key());
-			mgr.close();
-		}
-		catch (SQLException sqe)
-		{
-			throw new ResourceException("Unable to pre-destroy queue.", sqe);
+			_queueMgr.close();
 		}
 		catch (IOException ioe)
 		{
@@ -441,10 +426,7 @@ public class QueueServiceImpl extends ResourceForkBaseService
 			long jobid = userData.jobID();
 			ActivityState state = contents.activityState();
 			if (state.isFinalState())
-			{
-				QueueManager mgr = QueueManager.getManager(_resourceID.key());
-				mgr.checkJobStatus(jobid);
-			}
+				_queueMgr.checkJobStatus(jobid);
 		}
 	}
 	
