@@ -3,6 +3,15 @@
 	xmlns:genii="http://vcgr.cs.virginia.edu/construction-parameters"
 	human-name="PBS-Centurion BES">
 
+	<bes:pre-execution-delay
+		xmlns:bes="http://vcgr.cs.virginia.edu/construction-parameters/bes">
+		4 seconds
+	</bes:pre-execution-delay>
+	<bes:post-execution-delay
+		xmlns:bes="http://vcgr.cs.virginia.edu/construction-parameters/bes">
+		35 seconds
+	</bes:post-execution-delay>
+
 	<bes:resource-overrides
 		xmlns:bes="http://vcgr.cs.virginia.edu/construction-parameters/bes">
 		<bes:operating-system-name>LINUX</bes:operating-system-name>

@@ -675,6 +675,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 				}
 				catch (Exception e)
 				{
+					_logger.warn("Error while trying to createEPR.", e);
 					throw FaultManipulator.fillInFault(
 						new ResourceCreationFaultType(null, null, null, null,
 							new BaseFaultTypeDescription[] {

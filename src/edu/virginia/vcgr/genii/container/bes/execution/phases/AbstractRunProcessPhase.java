@@ -8,14 +8,48 @@ import java.util.Map;
 
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
+import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
+import edu.virginia.vcgr.genii.client.utils.units.Duration;
+import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 
 abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 {
 	static final long serialVersionUID = 0L;
 	
-	public AbstractRunProcessPhase(ActivityState phaseState)
+	protected BESConstructionParameters _constructionParameters;
+	
+	protected void preDelay() throws InterruptedException
+	{
+		if (_constructionParameters != null)
+		{
+			Duration preDelay = _constructionParameters.preExecutionDelay();
+			if (preDelay != null)
+			{
+				Thread.sleep(
+					(long)preDelay.as(DurationUnits.Milliseconds));
+			}
+		}
+	}
+	
+	protected void postDelay() throws InterruptedException
+	{
+		if (_constructionParameters != null)
+		{
+			Duration postDelay = _constructionParameters.postExecutionDelay();
+			if (postDelay != null)
+			{
+				Thread.sleep(
+					(long)postDelay.as(DurationUnits.Milliseconds));
+			}
+		}
+	}
+	
+	public AbstractRunProcessPhase(ActivityState phaseState,
+		BESConstructionParameters constructionParameters)
 	{
 		super(phaseState);
+		
+		_constructionParameters = constructionParameters;
 	}
 	
 	static protected Map<String, String> overloadEnvironment(

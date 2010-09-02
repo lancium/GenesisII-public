@@ -797,12 +797,13 @@ public class BESActivity implements Closeable
 		
 		private boolean _suspended = false;
 		
-		private Object _phaseLock = new Object();
+		private Object _phaseLock;
 		private ExecutionPhase _currentPhase = null;
 		
 		public ActivityRunner(boolean suspendRequested, 
 			boolean terminateRequested)
 		{
+			_phaseLock = BESActivity.this;
 			_terminateRequested = terminateRequested;
 			_suspendRequested = suspendRequested;
 		}

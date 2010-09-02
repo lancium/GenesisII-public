@@ -62,7 +62,6 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 	private File _stdout;
 	private File _stderr;
 	private Map<String, String> _environment;
-	private BESConstructionParameters _constructionParameters;
 	
 	private ResourceConstraints _resourceConstraints;
 	
@@ -77,7 +76,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 		ResourceConstraints resourceConstraints)
 	{
 		super(new ActivityState(
-			ActivityStateEnumeration.Running, "Enqueing", false));
+			ActivityStateEnumeration.Running, "Enqueing", false),
+			constructionParameters);
 	
 		_spmdVariation = spmdVariation;
 		_numProcesses = numProcesses;
@@ -85,7 +85,6 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 		_executable = executable;
 		_arguments = arguments;
 		_environment = environment;
-		_constructionParameters = constructionParameters;
 		_stdin = stdin;
 		_stdout = stdout;
 		_stderr = stderr;
@@ -156,6 +155,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 					"Asking batch system (%s) to submit the job.", queue));
 				resourceUsageFile = new ResourceUsageDirectory(_workingDirectory.getWorkingDirectory(
 					)).getNewResourceUsageFile();
+				preDelay();
 				_jobToken = queue.submit(new ApplicationDescription(
 					_spmdVariation, _numProcesses, _numProcessesPerHost, _executable.getAbsolutePath(),
 					_arguments,
@@ -177,6 +177,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 				_phaseShiftLock.wait(DEFAULT_LOOP_CYCLE);
 			}
 			context.setProperty(JOB_TOKEN_PROPERTY, null);
+			postDelay();
 			
 			int exitCode = queue.getExitCode(_jobToken);
 			if (resourceUsageFile != null)

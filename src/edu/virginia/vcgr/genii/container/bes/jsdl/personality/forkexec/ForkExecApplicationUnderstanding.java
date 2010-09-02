@@ -89,7 +89,7 @@ class ForkExecApplicationUnderstanding extends PosixLikeApplicationUnderstanding
 			executionPlan.add(new RunProcessPhase(
 				BESActivityServiceImpl.getCommonDirectory(creationProperties),
 				fsManager.lookup(getExecutable()), stringArgs.toArray(new String[0]),
-				stringEnv, redirection));
+				stringEnv, redirection, creationProperties));
 		} else
 		{
 			stringEnv.put("BES_HOME", "/home/bes-job");
@@ -105,7 +105,7 @@ class ForkExecApplicationUnderstanding extends PosixLikeApplicationUnderstanding
 			executionPlan.add(new RunProcessPhase(
 				BESActivityServiceImpl.getCommonDirectory(creationProperties),
 				shim, args.toArray(new String[0]), stringEnv,
-				redirection));
+				redirection, creationProperties));
 		}
 	}
 }

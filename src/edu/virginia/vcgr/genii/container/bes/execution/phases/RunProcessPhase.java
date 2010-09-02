@@ -12,6 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStateEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
+import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.pwrapper.ExitResults;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperFactory;
@@ -51,10 +52,11 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 	public RunProcessPhase(File commonDirectory,
 		File executable, String []arguments, 
 		Map<String, String> environment,
-		PassiveStreamRedirectionDescription redirects)
+		PassiveStreamRedirectionDescription redirects,
+		BESConstructionParameters constructionParameters)
 	{
 		super(new ActivityState(ActivityStateEnumeration.Running,
-			EXECUTING_STAGE, false));
+			EXECUTING_STAGE, false), constructionParameters);
 		
 		_commonDirectory = commonDirectory;
 		
@@ -131,15 +133,16 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 			String []arguments = new String[command.size() - 1];
 			for (int lcv = 1; lcv < command.size(); lcv++)
 				arguments[lcv - 1] = command.get(lcv);
+			preDelay();
 			token = wrapper.execute(_environment, workingDirectory, 
 				_redirects.stdinSource(), _redirects.stdoutSink(), 
 				_redirects.stderrSink(), command.get(0), arguments);
-			
 		}
 		
 		try
 		{
 			token.join();
+			postDelay();
 			ExitResults results = token.results();
 			
 			if (_hardTerminate != null && _hardTerminate.booleanValue())
