@@ -1,0 +1,7 @@
+#
+# You can have comments in here
+#
+application/jsdl	jsdl JSDL
+application/gjp		gjp GJP
+
+text/xml			xml XML

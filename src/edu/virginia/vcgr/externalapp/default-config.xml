@@ -1,0 +1,41 @@
+<external-applications>
+	<mime-type name="application/gjp">
+		<application-registration type="Common" 
+			factory-class="edu.virginia.vcgr.externalapp.GridJobToolApplicationFactory"/>
+	</mime-type>
+	
+	<default-mime-type>
+		<application-registration type="Windows" 
+			factory-class="edu.virginia.vcgr.externalapp.DefaultExternalApplicationFactory">
+			<configuration name="Notepad">
+				<argument>notepad.exe</argument>
+				<argument>%s</argument>
+			</configuration>
+		</application-registration>
+		
+		<application-registration type="MacOSX"
+			factory-class="edu.virginia.vcgr.externalapp.DefaultExternalApplicationFactory">
+			<configuration name="TextEdit">
+				<argument>open</argument>
+				<argument>-W</argument>
+				<argument>-n</argument>
+				<argument>%s</argument>
+			</configuration>
+		</application-registration>
+		
+		<application-registration type="Linux" 
+			factory-class="edu.virginia.vcgr.externalapp.DefaultExternalApplicationFactory">
+			<configuration name="${EDITOR}">
+				<argument>xterm</argument>
+				<argument>-fn</argument>
+				<argument>10x20</argument>
+				<argument>-bg</argument>
+				<argument>wheat</argument>
+				<argument>-fg</argument>
+				<argument>black</argument>
+				<argument>-e</argument>
+				<argument>${EDITOR} "%s"</argument>
+			</configuration>
+		</application-registration>
+	</default-mime-type>
+</external-applications>

@@ -30,6 +30,7 @@ public class ACLEntryWrapper
 		return _entry.equals(other._entry);
 	}
 	
+	@SuppressWarnings("unused")
 	@Override
 	public boolean equals(Object other)
 	{

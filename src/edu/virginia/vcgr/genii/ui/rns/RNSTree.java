@@ -5,6 +5,9 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -52,6 +55,8 @@ public class RNSTree extends JTree implements EndpointRetriever
 	
 	static final public Dimension DESIRED_BROWSER_SIZE = new Dimension(
 		300, 300);
+	
+	private Collection<RNSTreeListener> _listeners = new LinkedList<RNSTreeListener>();
 	
 	private void setupInputMap(InputMap iMap)
 	{
@@ -117,6 +122,8 @@ public class RNSTree extends JTree implements EndpointRetriever
 	{
 		super(model);
 		
+		addRNSTreeListener(new DefaultDoubleClickListener());
+		
 		DefaultTreeSelectionModel selectionModel =
 			new DefaultTreeSelectionModel();
 		selectionModel.setSelectionMode(
@@ -140,6 +147,75 @@ public class RNSTree extends JTree implements EndpointRetriever
 		setDropMode(DropMode.ON_OR_INSERT);
 		
 		addAncestorListener(new AncestorListenerImpl());
+		
+		addMouseListener(new MouseAdapter()
+		{
+			@Override
+			public void mouseClicked(MouseEvent e)
+			{
+				int selRow = getRowForLocation(e.getX(), e.getY());
+				TreePath selPath = getPathForLocation(e.getX(), e.getY());
+				if(selRow != -1)
+				{
+					if(e.getClickCount() == 1)
+						fireRNSTreePathClicked(selRow, selPath);
+					else if(e.getClickCount() == 2)
+						fireRNSTreePathDoubleClicked(selRow, selPath);
+				}
+			}
+		});
+	}
+	
+	private void fireRNSTreePathClicked(RNSFilledInTreeObject fObj)
+	{
+		RNSTreeModel model = (RNSTreeModel)getModel();
+		
+		Collection<RNSTreeListener> listeners;
+		
+		synchronized(_listeners)
+		{
+			listeners = new ArrayList<RNSTreeListener>(_listeners);
+		}
+		
+		for (RNSTreeListener listener : listeners)
+			listener.pathClicked(this, model.uiContext(), fObj);
+	}
+	
+	private void fireRNSTreePathDoubleClicked(RNSFilledInTreeObject fObj)
+	{
+		RNSTreeModel model = (RNSTreeModel)getModel();
+		
+		Collection<RNSTreeListener> listeners;
+		
+		synchronized(_listeners)
+		{
+			listeners = new ArrayList<RNSTreeListener>(_listeners);
+		}
+		
+		for (RNSTreeListener listener : listeners)
+			listener.pathDoubleClicked(this, model.uiContext(), fObj);
+	}
+	
+	private void fireRNSTreePathClicked(int row, TreePath path)
+	{
+		RNSTreeNode node = (RNSTreeNode)(path.getLastPathComponent());
+		RNSTreeObject obj = (RNSTreeObject)node.getUserObject();
+		if (obj.objectType() == RNSTreeObjectType.ENDPOINT_OBJECT)
+		{
+			RNSFilledInTreeObject fObj = (RNSFilledInTreeObject)obj;
+			fireRNSTreePathClicked(fObj);
+		}
+	}
+	
+	private void fireRNSTreePathDoubleClicked(int row, TreePath path)
+	{
+		RNSTreeNode node = (RNSTreeNode)(path.getLastPathComponent());
+		RNSTreeObject obj = (RNSTreeObject)node.getUserObject();
+		if (obj.objectType() == RNSTreeObjectType.ENDPOINT_OBJECT)
+		{
+			RNSFilledInTreeObject fObj = (RNSFilledInTreeObject)obj;
+			fireRNSTreePathDoubleClicked(fObj);
+		}
 	}
 	
 	private RNSTree(RNSTree original)
@@ -155,6 +231,22 @@ public class RNSTree extends JTree implements EndpointRetriever
 		UIContext uiContext) throws RNSPathDoesNotExistException
 	{
 		this(new RNSTreeModel(appContext, uiContext));
+	}
+	
+	public void addRNSTreeListener(RNSTreeListener listener)
+	{
+		synchronized(_listeners)
+		{
+			_listeners.add(listener);
+		}
+	}
+	
+	public void removeRNSTreeListener(RNSTreeListener listener)
+	{
+		synchronized(_listeners)
+		{
+			_listeners.remove(listener);
+		}
 	}
 	
 	public TearoffHandler createTearoffHandler(ApplicationContext appContext)

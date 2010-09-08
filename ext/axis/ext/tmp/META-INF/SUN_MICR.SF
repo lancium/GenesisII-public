@@ -1,0 +1,118 @@
+Signature-Version: 1.0
+SHA1-Digest-Manifest: xp7dXq9ykA1hHIxVIUfDH/ObMNI=
+Created-By: 1.3.1_04 (Sun Microsystems Inc.)
+
+Name: javax/activation/MimeTypeParseException.class
+SHA1-Digest: vih2jcj+I5tPJH0anJAUn0A0+ug=
+
+Name: javax/activation/CommandInfo.class
+SHA1-Digest: zZp/w0184oy0YqGcMwyxqcNpB0M=
+
+Name: com/sun/activation/viewers/ImageViewer.class
+SHA1-Digest: fOYTcWGb39WV6ktKcqVzUus/P+k=
+
+Name: javax/activation/MimeTypeParameterList.class
+SHA1-Digest: 50xYM/R+vJP5hr7mtOPv/MsWX0c=
+
+Name: javax/activation/DataContentHandlerFactory.class
+SHA1-Digest: H8MFHeTgXFyAdQvsx9bhF05FNJM=
+
+Name: javax/activation/DataSourceDataContentHandler.class
+SHA1-Digest: XuyCXM+oVpBbVyJfxjEdrs1h9j4=
+
+Name: javax/activation/DataSource.class
+SHA1-Digest: xcuV/kSNoHUEKL9pMihuvbqPeXY=
+
+Name: com/sun/activation/registries/MimeTypeFile.class
+SHA1-Digest: PQqg4U9GuEcFbSZ+gWbVarTXi+g=
+
+Name: com/sun/activation/viewers/TextViewer.class
+SHA1-Digest: 57FDHGBqRZAQ2dcUxSjZOeBC5XI=
+
+Name: com/sun/activation/viewers/TextEditor.class
+SHA1-Digest: dYhyVWnsPAe7NR8F/GaLW0/xLJ0=
+
+Name: com/sun/activation/registries/LineTokenizer.class
+SHA1-Digest: /Xe34kThgoHQk7oH3MZrMfMy2uA=
+
+Name: javax/activation/DataContentHandler.class
+SHA1-Digest: hiYywpsCF80301NG9+CDDk8c6tw=
+
+Name: javax/activation/MimeType.class
+SHA1-Digest: jooFTZRbp40niAPlzw/QHTa+WQ4=
+
+Name: javax/activation/FileDataSource.class
+SHA1-Digest: L2STihEbdvJg9QmjWj5LR0nZtjY=
+
+Name: javax/activation/SecuritySupport.class
+SHA1-Digest: wBaymSeCOHVtnFaYKB+A9PvdW4w=
+
+Name: javax/activation/MailcapCommandMap.class
+SHA1-Digest: EMKraUwy7eEeqb6HmEAeRNPe1NA=
+
+Name: javax/activation/DataHandler$1.class
+SHA1-Digest: J4axz8nTzRp9V9WeuykjR1iJ0hQ=
+
+Name: javax/activation/DataHandler.class
+SHA1-Digest: 0bwYF0eRwVdINGqiIypW50r5Je0=
+
+Name: javax/activation/SecuritySupport$1.class
+SHA1-Digest: opca6nF4ci+UfZ6TkRXTf8mbqnw=
+
+Name: com/sun/activation/registries/MimeTypeEntry.class
+SHA1-Digest: 7altwHwTmlYpGNX7xXK/XT4q/Fs=
+
+Name: javax/activation/SecuritySupport$3.class
+SHA1-Digest: SFvk0KtyuVhqwdwcZr28KtOt8t0=
+
+Name: javax/activation/SecuritySupport$5.class
+SHA1-Digest: VsoLt4fqtPg8BTWNHCXiwJ+GFM8=
+
+Name: javax/activation/SecuritySupport$2.class
+SHA1-Digest: nwqmirX/dhRwq3SIzmEv4bAjtX8=
+
+Name: javax/activation/SecuritySupport$4.class
+SHA1-Digest: TtMPPaM9ltc0kguhHxKkEnjAIEo=
+
+Name: javax/activation/MimetypesFileTypeMap.class
+SHA1-Digest: TNb+wfSMtIX1tGzVT9neOMJxWk0=
+
+Name: javax/activation/FileTypeMap.class
+SHA1-Digest: Q2JBCQPgL0lK/aZSLpzTF/cQZVw=
+
+Name: javax/activation/CommandObject.class
+SHA1-Digest: FM9PWvMNNkGNzANrAmseoag6Egg=
+
+Name: javax/activation/DataHandlerDataSource.class
+SHA1-Digest: QFcgsaf5J66HObacESUSTl1K4iI=
+
+Name: com/sun/activation/registries/MailcapTokenizer.class
+SHA1-Digest: tUbcxXZXR8F7Bq/3qUV7WDeBpnI=
+
+Name: javax/activation/ActivationDataFlavor.class
+SHA1-Digest: Pp/ynYF+iUzuS8WWx5aDsLqrvq4=
+
+Name: com/sun/activation/registries/MailcapFile.class
+SHA1-Digest: njaLRqp+5QHtksc0CabA9K8+3QM=
+
+Name: com/sun/activation/registries/MailcapParseException.class
+SHA1-Digest: 4knWwyWh13g60HW3hzUDYaXcrb0=
+
+Name: javax/activation/ObjectDataContentHandler.class
+SHA1-Digest: LAGTcvI9nhHz5XdWXfwvdk33HBI=
+
+Name: javax/activation/URLDataSource.class
+SHA1-Digest: 0AllPU8cfi3sKK9wP+YkDKeXoK4=
+
+Name: javax/activation/UnsupportedDataTypeException.class
+SHA1-Digest: AhFtR0+nA2dEMXhGeYSeP0zp3Go=
+
+Name: javax/activation/CommandMap.class
+SHA1-Digest: ZJbb0qAn3P8XkEdJ3tu3/MHM4dA=
+
+Name: com/sun/activation/viewers/ImageViewerCanvas.class
+SHA1-Digest: pVtv4hhmFObqEb6/z8/tC8hXcRo=
+
+Name: com/sun/activation/registries/LogSupport.class
+SHA1-Digest: P9pX+A4CUBsoUuFFdXGqUQSnTRQ=
+

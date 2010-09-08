@@ -74,7 +74,7 @@ public class JSDLToolPlugin extends AbstractCombinedUIMenusPlugin
 			Collection<RNSPath> paths = 
 				context.endpointRetriever().getTargetEndpoints();
 			JobTool.launch(null, new JobDefinitionListenerImpl(
-					context.uiContext().callingContext(), paths.iterator().next()));
+					context.uiContext().callingContext(), paths.iterator().next()), null);
 		}
 		catch (IOException ioe)
 		{

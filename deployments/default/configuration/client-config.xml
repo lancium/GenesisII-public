@@ -257,6 +257,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.HistoryTool</mconf:class>
 		<mconf:class name="wsn-subscribe"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.WSNSubscribeTool</mconf:class>
+		<mconf:class name="edit"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.EditTool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

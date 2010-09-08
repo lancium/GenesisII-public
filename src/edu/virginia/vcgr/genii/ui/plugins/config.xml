@@ -1,4 +1,10 @@
 <plugins>
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.EditPlugin">
+		<top-menu menu-name="Edit" group="Basic File" item-name="Edit"/>
+		
+		<popup-menu group="Basic File" item-name="Edit"/>
+	</plugin>
+	
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.matchparam.MatchingParametersPlugin">
 		<popup-menu menu-name="Basic Resource" item-name="Matching Parameters"/>
 	</plugin>
