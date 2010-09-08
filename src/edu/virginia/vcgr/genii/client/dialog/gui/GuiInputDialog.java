@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.InputVerifier;
@@ -17,8 +19,10 @@ import javax.swing.SwingUtilities;
 import edu.virginia.vcgr.genii.client.dialog.InputDialog;
 import edu.virginia.vcgr.genii.client.dialog.InputValidator;
 
-public class GuiInputDialog extends AbstractGuiDialog implements InputDialog
+public class GuiInputDialog extends AbstractGuiDialog implements InputDialog, ActionListener
 {
+	
+	static private final String _OK_ACTION = "OK";
 	@Override
 	protected void okCalled()
 	{
@@ -55,6 +59,9 @@ public class GuiInputDialog extends AbstractGuiDialog implements InputDialog
 		dim = field.getPreferredSize();
 		dim.width = 100;
 		field.setPreferredSize(dim);
+		
+		field.setActionCommand(_OK_ACTION);
+		field.addActionListener(this);	
 		
 		return field;
 	}
@@ -138,6 +145,13 @@ public class GuiInputDialog extends AbstractGuiDialog implements InputDialog
 	{
 		_validator = validator;
 	}
+	
+	
+	public void actionPerformed(ActionEvent arg0)
+	{
+				super._okAction.actionPerformed(arg0);	
+	}
+	
 	
 	private class InternalInputVerifier extends InputVerifier
 	{

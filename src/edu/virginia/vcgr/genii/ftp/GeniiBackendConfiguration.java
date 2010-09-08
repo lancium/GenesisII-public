@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import edu.virginia.vcgr.genii.client.cmd.tools.GamlLoginTool;
+import edu.virginia.vcgr.genii.client.cmd.tools.LoginTool;
 import edu.virginia.vcgr.genii.client.cmd.tools.LogoutTool;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
@@ -50,7 +50,9 @@ public class GeniiBackendConfiguration implements Cloneable
 			logout.setAll();
 			logout.run(stdout, stderr, stdin);
 			
-			GamlLoginTool login = new GamlLoginTool();
+			
+			//Assume normal user/pass -> idp login
+			LoginTool login = new LoginTool();
 			login.run(stdout, stderr, stdin);
 			_callingContext = newResolver.load();
 		}

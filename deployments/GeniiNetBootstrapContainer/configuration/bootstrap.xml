@@ -23,11 +23,12 @@
 	
 	<gsh:echo
 		message="Logging in as ${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/admin.pfx."/>
-	<geniix:login>
+	<geniix:keystoreLogin>
 		<gsh:param>--no-gui</gsh:param>
 		<gsh:param>--pattern=Admin</gsh:param>
-		<gsh:param>${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/admin.pfx</gsh:param>
-	</geniix:login>
+		<gsh:param>--storetype=PKCS12</gsh:param>
+		<gsh:param>local:${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/admin.pfx</gsh:param>
+	</geniix:keystoreLogin>
 	
 	<gsh:echo
 		message="Creating Root of RNS space."/>

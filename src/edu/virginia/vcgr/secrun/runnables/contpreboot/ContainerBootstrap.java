@@ -27,7 +27,7 @@ import edu.virginia.vcgr.genii.client.cmd.GetHostName;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.CertGeneratorTool;
 import edu.virginia.vcgr.genii.client.cmd.tools.DownloadCertificateTool;
-import edu.virginia.vcgr.genii.client.cmd.tools.GamlLoginTool;
+import edu.virginia.vcgr.genii.client.cmd.tools.KeystoreLoginTool;
 import edu.virginia.vcgr.genii.client.cmd.tools.LogoutTool;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
@@ -175,7 +175,8 @@ public class ContainerBootstrap implements SecureRunnable
 			outTool.setNo_gui();
 			outTool.run(out, err, in);
 			
-			GamlLoginTool tool = new GamlLoginTool();
+			//Assume Certificate Login
+			KeystoreLoginTool tool = new KeystoreLoginTool();
 			tool.setNo_gui();
 			tool.addArgument(Installation.getDeployment(
 				new DeploymentName()).security().getSecurityFile(

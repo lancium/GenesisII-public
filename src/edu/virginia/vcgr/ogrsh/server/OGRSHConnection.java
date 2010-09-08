@@ -14,7 +14,7 @@ import org.morgan.util.GUID;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
-import edu.virginia.vcgr.genii.client.cmd.tools.GamlLoginTool;
+import edu.virginia.vcgr.genii.client.cmd.tools.KeystoreLoginTool;
 import edu.virginia.vcgr.genii.client.context.ContextStreamUtils;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.ogrsh.server.comm.CommUtils;
@@ -312,8 +312,9 @@ public class OGRSHConnection implements Runnable
 	public int loginSession(String file, String password, String patternOrUsername)
 		throws OGRSHException
 	{
-		GamlLoginTool tool = new GamlLoginTool();
-		
+		//GamlLoginTool tool = new GamlLoginTool();
+		//Assuming certificate based login
+		KeystoreLoginTool tool = new KeystoreLoginTool();
 		try
 		{
 			if (file.startsWith("rns:"))

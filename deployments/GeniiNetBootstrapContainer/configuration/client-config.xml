@@ -136,7 +136,13 @@
 		<mconf:class name="pwd"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.PwdTool</mconf:class>
 		<mconf:class name="login"
-			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.GamlLoginTool</mconf:class>
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.LoginTool</mconf:class>
+		<mconf:class name="passwordLogin"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.PasswordLoginTool</mconf:class>
+	    <mconf:class name="IDPLogin"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.IDPLoginTool</mconf:class>
+		<mconf:class name="keystoreLogin"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.KeystoreLoginTool</mconf:class>
 		<mconf:class name="whoami"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.WhoamiTool</mconf:class>
 		<mconf:class name="chmod"

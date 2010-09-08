@@ -15,7 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
-import edu.virginia.vcgr.genii.client.cmd.tools.GamlLoginTool;
+import edu.virginia.vcgr.genii.client.cmd.tools.KeystoreLoginTool;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -48,7 +48,7 @@ public abstract class AbstractGamlLoginHandler implements CallbackHandler {
 
 		if (storeType == null) {
 			// try PKCS12
-			storeType = GamlLoginTool.PKCS12;
+			storeType = KeystoreLoginTool.PKCS12;
 		}
 
 		if (password != null) {
@@ -104,7 +104,7 @@ public abstract class AbstractGamlLoginHandler implements CallbackHandler {
 			throws GeneralSecurityException, IOException {
 		ArrayList<CertEntry> list = new ArrayList<CertEntry>();
 
-		if ((storeType != null) && storeType.equals(GamlLoginTool.WINDOWS)) {
+		if ((storeType != null) && storeType.equals(KeystoreLoginTool.WINDOWS)) {
 			addEntriesFromWindows(list);
 		} else {
 			addEntriesFromFile(list, storeInput, storeType, password);

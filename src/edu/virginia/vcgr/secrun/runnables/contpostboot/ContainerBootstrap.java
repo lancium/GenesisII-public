@@ -17,7 +17,9 @@ import org.morgan.util.configuration.ConfigurationException;
 import edu.virginia.vcgr.genii.client.cmd.GetHostName;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.AttachHostTool;
-import edu.virginia.vcgr.genii.client.cmd.tools.GamlLoginTool;
+import edu.virginia.vcgr.genii.client.cmd.tools.BaseLoginTool;
+import edu.virginia.vcgr.genii.client.cmd.tools.KeystoreLoginTool;
+import edu.virginia.vcgr.genii.client.cmd.tools.LoginTool;
 import edu.virginia.vcgr.genii.client.cmd.tools.LogoutTool;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
@@ -148,7 +150,9 @@ public class ContainerBootstrap implements SecureRunnable
 			outTool.setNo_gui();
 			outTool.run(out, err, in);
 			
-			GamlLoginTool tool = new GamlLoginTool();
+			BaseLoginTool tool = new KeystoreLoginTool();
+			
+			//Assume certificate based
 			tool.setNo_gui();
 			tool.addArgument(Installation.getDeployment(
 				new DeploymentName()).security().getSecurityFile(
@@ -160,7 +164,8 @@ public class ContainerBootstrap implements SecureRunnable
 			if (tool.run(out, err, in) != 0)
 				throw new ToolException("Unable to log in as installer.");
 			
-			tool = new GamlLoginTool();
+			//Assume certificate based
+			tool = new KeystoreLoginTool();
 			tool.setNo_gui();
 			tool.addArgument(Installation.getDeployment(
 				new DeploymentName()).security().getSecurityFile(
@@ -172,7 +177,8 @@ public class ContainerBootstrap implements SecureRunnable
 			if (tool.run(out, err, in) != 0)
 				throw new ToolException("Unable to log in as container.");
 			
-			tool = new GamlLoginTool();
+			//Assume IDP?
+			tool = new LoginTool();
 			tool.setNo_gui();
 			tool.addArgument(String.format(
 				"rns:%s", ownerInfo.getUserPath()));
