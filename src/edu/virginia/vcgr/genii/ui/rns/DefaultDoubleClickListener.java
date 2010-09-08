@@ -23,8 +23,6 @@ class DefaultDoubleClickListener implements RNSTreeListener
 	{
 		TypeInformation typeInfo = fObj.typeInformation();
 		if (typeInfo.isByteIO())
-		{
 			EditPlugin.performEdit(tree, context, fObj.path());
-		}
 	}
 }

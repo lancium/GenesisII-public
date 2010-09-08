@@ -13,13 +13,18 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 
 import org.morgan.util.io.StreamUtils;
+import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.externalapp.ApplicationDatabase;
 import edu.virginia.vcgr.externalapp.ExternalApplication;
 import edu.virginia.vcgr.externalapp.ExternalApplicationCallback;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
+import edu.virginia.vcgr.genii.client.byteio.RandomByteIORP;
+import edu.virginia.vcgr.genii.client.byteio.StreamableByteIORP;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
+import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.genii.ui.UIContext;
 import edu.virginia.vcgr.genii.ui.errors.ErrorHandler;
 import edu.virginia.vcgr.genii.ui.plugins.AbstractCombinedUIMenusPlugin;
@@ -94,6 +99,29 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 					if (wasCancelled())
 						return null;
 				}
+				
+				EndpointReferenceType epr = _sourcePath.getEndpoint();
+				TypeInformation typeInfo = new TypeInformation(epr);
+				boolean isReadOnly = false;
+				
+				if (typeInfo.isRByteIO())
+				{
+					RandomByteIORP rp = (RandomByteIORP)ResourcePropertyManager.createRPInterface(
+						epr, RandomByteIORP.class);
+					Boolean val = rp.getWriteable();
+					if (val != null)
+						isReadOnly = (!val);
+				} else
+				{
+					StreamableByteIORP rp = (StreamableByteIORP)ResourcePropertyManager.createRPInterface(
+						epr, StreamableByteIORP.class);
+					Boolean val = rp.getWriteable();
+					if (val != null)
+						isReadOnly = (!val);
+				}
+				
+				if (isReadOnly)
+					tmpFile.setReadOnly();
 				
 				toEdit = tmpFile;
 				tmpFile = null;

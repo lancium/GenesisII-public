@@ -9,16 +9,21 @@ import java.io.OutputStream;
 import javax.activation.MimetypesFileTypeMap;
 
 import org.morgan.util.io.StreamUtils;
+import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.externalapp.ApplicationDatabase;
 import edu.virginia.vcgr.externalapp.ExternalApplication;
 import edu.virginia.vcgr.externalapp.ExternalApplicationToken;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
+import edu.virginia.vcgr.genii.client.byteio.RandomByteIORP;
+import edu.virginia.vcgr.genii.client.byteio.StreamableByteIORP;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
+import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 
 public class EditTool extends BaseGridTool
 {
@@ -113,6 +118,29 @@ public class EditTool extends BaseGridTool
 				in = null;
 				out.close();
 				out = null;
+				
+				EndpointReferenceType epr = gridPath.getEndpoint();
+				TypeInformation typeInfo = new TypeInformation(epr);
+				boolean isReadOnly = false;
+				
+				if (typeInfo.isRByteIO())
+				{
+					RandomByteIORP rp = (RandomByteIORP)ResourcePropertyManager.createRPInterface(
+						epr, RandomByteIORP.class);
+					Boolean val = rp.getWriteable();
+					if (val != null)
+						isReadOnly = (!val);
+				} else
+				{
+					StreamableByteIORP rp = (StreamableByteIORP)ResourcePropertyManager.createRPInterface(
+						epr, StreamableByteIORP.class);
+					Boolean val = rp.getWriteable();
+					if (val != null)
+						isReadOnly = (!val);
+				}
+				
+				if (isReadOnly)
+					tmpFile.setReadOnly();
 			}
 			
 			ExternalApplicationToken token;
