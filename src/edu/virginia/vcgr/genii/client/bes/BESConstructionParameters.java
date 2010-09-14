@@ -6,6 +6,8 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
+import edu.virginia.vcgr.genii.client.bes.envvarexp.EnvironmentExport;
+import edu.virginia.vcgr.genii.client.bes.envvarexp.EnvironmentVariableExportConstants;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
@@ -23,6 +25,10 @@ public class BESConstructionParameters
 	private NativeQueueConfiguration _nativeQueueConf = null;
 	private Duration _preExecutionDelay = null;
 	private Duration _postExecutionDelay = null;
+	
+	@XmlElement(namespace = EnvironmentVariableExportConstants.NAMESPACE,
+		name = "environment-export", nillable = true, required = false)
+	private EnvironmentExport _environmentExport = null;
 	
 	@SuppressWarnings("unused")
 	@XmlElement(namespace = BES_CONS_PARMS_NS, name = "pre-execution-delay",
@@ -111,5 +117,10 @@ public class BESConstructionParameters
 	final public Duration postExecutionDelay()
 	{
 		return _postExecutionDelay;
+	}
+	
+	final public EnvironmentExport environmentExport()
+	{
+		return _environmentExport;
 	}
 }

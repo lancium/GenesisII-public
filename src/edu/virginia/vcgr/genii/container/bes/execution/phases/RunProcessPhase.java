@@ -107,6 +107,8 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 			if (_environment == null)
 				_environment = new HashMap<String, String>();
 			
+			setExportedEnvironment(_environment);
+			
 			if (_environment != null)
 			{
 				String ogrshConfig = _environment.get("OGRSH_CONFIG");

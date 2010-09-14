@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.container.bes.execution.phases;
 import java.io.File;
 import java.net.URI;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
@@ -125,6 +126,11 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 	public void execute(ExecutionContext context) throws Throwable
 	{
 		File resourceUsageFile = null;
+		
+		if (_environment == null)
+			_environment = new HashMap<String, String>();
+		
+		setExportedEnvironment(_environment);
 		
 		synchronized(_phaseShiftLock)
 		{

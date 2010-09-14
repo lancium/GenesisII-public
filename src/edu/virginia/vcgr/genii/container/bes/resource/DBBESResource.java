@@ -30,11 +30,15 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
+import edu.virginia.vcgr.genii.client.bes.envvarexp.EnvironmentExport;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.common.MatchingParameter;
 import edu.virginia.vcgr.genii.container.bes.BES;
 import edu.virginia.vcgr.genii.container.bes.BESPolicy;
 import edu.virginia.vcgr.genii.container.bes.BESPolicyActions;
+import edu.virginia.vcgr.genii.container.bes.GeniiBESServiceImpl;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -203,5 +207,21 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 			IBESResource.THRESHOLD_DB_PROPERTY_NAME);
 		
 		return getBES().isAcceptingActivites(threshold);
+	}
+
+	@Override
+	public Collection<MatchingParameter> getMatchingParameters()
+			throws ResourceException
+	{
+		Collection<MatchingParameter> ret = super.getMatchingParameters();
+		
+		EnvironmentExport exp = EnvironmentExport.besExport(
+			(BESConstructionParameters)(constructionParameters(GeniiBESServiceImpl.class)));
+		for (String key : exp.keySet())
+			ret.add(new MatchingParameter(
+				"supports:environment-variable",
+				key));
+		
+		return ret;
 	}
 }

@@ -89,11 +89,29 @@
 		</jsdl:DataStaging>
 
 		<jsdl:DataStaging>
+			<jsdl:FileName>stdout</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Target>
+				<jsdl:URI>rns:stdout.txt</jsdl:URI>
+			</jsdl:Target>
+		</jsdl:DataStaging>
+
+		<jsdl:DataStaging>
 			<jsdl:FileName>stderr</jsdl:FileName>
 			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
 			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
 			<jsdl:Target>
 				<jsdl:URI>mailto:mmm2a@cs.virginia.edu?subject=jobOutput&amp;X-AttachmentFilename=stderr.txt</jsdl:URI>
+			</jsdl:Target>
+		</jsdl:DataStaging>
+
+		<jsdl:DataStaging>
+			<jsdl:FileName>stderr</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination>
+			<jsdl:Target>
+				<jsdl:URI>rns:stderr.txt</jsdl:URI>
 			</jsdl:Target>
 		</jsdl:DataStaging>
 	</jsdl:JobDescription>

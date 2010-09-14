@@ -6,15 +6,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
+import edu.virginia.vcgr.genii.client.bes.envvarexp.EnvironmentExport;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 
 abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 {
 	static final long serialVersionUID = 0L;
+
+	static private Log _logger = LogFactory.getLog(AbstractRunProcessPhase.class);
 	
 	protected BESConstructionParameters _constructionParameters;
 	
@@ -41,6 +47,31 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 				Thread.sleep(
 					(long)postDelay.as(DurationUnits.Milliseconds));
 			}
+		}
+	}
+	
+	final protected void setExportedEnvironment(Map<String, String> environmentMap)
+	{
+		try
+		{
+			EnvironmentExport exp = EnvironmentExport.besExport(_constructionParameters);
+			for (String key : exp.keySet())
+			{
+				try
+				{
+					environmentMap.put(key, exp.value(key));
+				}
+				catch (Throwable t2)
+				{
+					_logger.warn(String.format(
+						"Unable to set environment variable %s.", key), t2);
+				}
+			}
+		}
+		catch (Throwable t1)
+		{
+			_logger.warn("Unable to override exported environment values.",
+				t1);
 		}
 	}
 	
