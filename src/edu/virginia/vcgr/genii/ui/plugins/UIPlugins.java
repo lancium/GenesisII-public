@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.ui.plugins;
 
+import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -271,5 +272,23 @@ public class UIPlugins
 					_context));
 			}
 		}
+	}
+	
+	public void fireMenuAction(
+		Class<? extends UIMenuPlugin> pluginType)
+	{
+		UIMenuPluginAction<? extends UIMenuPlugin> action = null;
+		
+		for (UIMenuPluginAction<? extends UIMenuPlugin> a : _allActions)
+		{
+			if (pluginType.equals(a.pluginClass()))
+				action = a;
+		}
+		
+		if (action == null)
+			throw new IllegalArgumentException(String.format(
+				"Couldn't find plugin type %s.", pluginType));
+		
+		action.actionPerformed(new ActionEvent(this, 0, null));
 	}
 }

@@ -66,7 +66,7 @@ public abstract class UnitableValue<U extends Enum<U>>
 	
 	final public U units()
 	{
-		return _units;
+		return (_units == null) ? defaultUnits() : _units;
 	}
 	
 	@Override

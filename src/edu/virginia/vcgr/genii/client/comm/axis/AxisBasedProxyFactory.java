@@ -54,15 +54,15 @@ public class AxisBasedProxyFactory implements IProxyFactory
 	{
 		XMLConfiguration conf = 
 			ConfigurationManager.getCurrentConfiguration().getClientConfiguration();
-		HashMap<String, Class> _locators;
+		HashMap<String, Class<?>> _locators;
 		
 		synchronized(conf)
 		{
-			_locators = (HashMap<String, Class>)conf.retrieveSection(
+			_locators = (HashMap<String, Class<?>>)conf.retrieveSection(
 				LOCATOR_REGISTRY_QNAME);
 		}
 		
-		Class []locators = new Class[1];
+		Class<?> []locators = new Class[1];
 		
 		locators[0] = _locators.get(iface.getName());
 		if (locators[0] == null)

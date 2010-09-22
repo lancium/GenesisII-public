@@ -7,7 +7,7 @@ import java.util.Properties;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
-import org.morgan.util.MacroUtils;
+import org.morgan.util.macro.MacroUtils;
 
 import edu.virginia.vcgr.genii.container.cservices.ContainerService;
 

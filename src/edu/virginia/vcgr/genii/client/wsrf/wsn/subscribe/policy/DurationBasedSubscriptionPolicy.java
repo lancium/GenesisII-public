@@ -12,6 +12,13 @@ public abstract class DurationBasedSubscriptionPolicy
 	@XmlAttribute(name = "duration", required = true)
 	private Duration _duration;
 	
+	private DurationBasedSubscriptionPolicy()
+	{
+		super(null);
+		
+		_duration = null;
+	}
+	
 	protected DurationBasedSubscriptionPolicy(
 		SubscriptionPolicyTypes policyType, Duration duration)
 	{

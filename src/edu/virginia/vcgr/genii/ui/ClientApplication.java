@@ -29,6 +29,7 @@ import edu.virginia.vcgr.genii.ui.plugins.EndpointDescription;
 import edu.virginia.vcgr.genii.ui.plugins.LazilyLoadedTab;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginContext;
 import edu.virginia.vcgr.genii.ui.plugins.UIPlugins;
+import edu.virginia.vcgr.genii.ui.plugins.shell.GridShellPlugin;
 import edu.virginia.vcgr.genii.ui.rns.RNSFilledInTreeObject;
 import edu.virginia.vcgr.genii.ui.rns.RNSTree;
 import edu.virginia.vcgr.genii.ui.rns.RNSTreeNode;
@@ -67,10 +68,12 @@ public class ClientApplication extends UIFrame
 		return true;
 	}
 	
-	public ClientApplication() throws FileNotFoundException, IOException, RNSPathDoesNotExistException
+	public ClientApplication(boolean launchShell)
+		throws FileNotFoundException, IOException, RNSPathDoesNotExistException
 	{
 		super(new ApplicationContext(), new UIContext(),
 			"Genesis II Client Application");
+		
 		_context.setApplicationEventListener(
 			new ApplicationEventListenerImpl());
 		
@@ -123,6 +126,9 @@ public class ClientApplication extends UIFrame
 		getMenuFactory().addHelpMenu(_uiContext, getJMenuBar());
 		
 		_browserTree.addMouseListener(new RNSTreePopupListener(plugins));
+		
+		if (launchShell)
+			plugins.fireMenuAction(GridShellPlugin.class);
 		
 		/*
 		try

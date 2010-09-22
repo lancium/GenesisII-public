@@ -207,6 +207,7 @@ public class EPRUtils
 		return null;
 	}
 
+	@SuppressWarnings("unused")
 	static public MessageLevelSecurityRequirements extractMinMessageSecurity(
 			EndpointReferenceType epr) throws GeneralSecurityException
 	{

@@ -15,12 +15,17 @@ public class TitledPanel extends JPanel
 	
 	public TitledPanel(String title, Component contents)
 	{
-		super(new GridBagLayout());
+		this(title);
 		
 		add(contents, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(5, 5, 5, 5), 5, 5));
-		
+	}
+	
+	public TitledPanel(String title)
+	{
+		super(new GridBagLayout());
+
 		setBorder(BorderFactory.createTitledBorder(
 			BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
 			title));

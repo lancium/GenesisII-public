@@ -9,10 +9,10 @@
 -->
 
 	<environment-variable name="JAVA_HOME">
-		<dynamic-value class="edu.virginia.vcgr.genii.container.bes.envvarexp.JavaHomeProvider"/>
+		<dynamic-value class="edu.virginia.vcgr.genii.client.bes.envvarexp.JavaHomeProvider"/>
 	</environment-variable>
 
 	<environment-variable name="GENII_INSTALL_DIR">
-		<dynamic-value class="edu.virginia.vcgr.genii.container.bes.envvarexp.GeniiInstallDirProvider"/>
+		<dynamic-value class="edu.virginia.vcgr.genii.client.bes.envvarexp.GeniiInstallDirProvider"/>
 	</environment-variable>
 </environment-export>

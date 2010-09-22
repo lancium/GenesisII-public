@@ -27,15 +27,16 @@ public class Security
 	
 	static private boolean _loadedAdministrator = false;
 	static private Identity _administrator = null;
-	private File _securityDirectory;
+	private HierarchicalDirectory _securityDirectory;
 	private File _securityPropertiesFile;
 	private Properties _securityProperties;
 	
-	Security(File deploymentDirectory, File configurationDirectory)
+	Security(HierarchicalDirectory deploymentDirectory,
+		HierarchicalDirectory configurationDirectory)
 	{
-		_securityDirectory = new File(deploymentDirectory, 
+		_securityDirectory = deploymentDirectory.lookupDirectory(
 			SECURITY_DIRECTORY_NAME);
-		_securityPropertiesFile = new File(configurationDirectory, 
+		_securityPropertiesFile = configurationDirectory.lookupFile(
 			SECURITY_PROPERTIES_FILE_NAME);
 		_securityProperties = new Properties();
 		
@@ -69,7 +70,7 @@ public class Security
 	
 	public File getSecurityFile(String filename)
 	{
-		return new File(_securityDirectory, filename);
+		return _securityDirectory.lookupFile(filename);
 	}
 	
 	public String getProperty(String propertyName)

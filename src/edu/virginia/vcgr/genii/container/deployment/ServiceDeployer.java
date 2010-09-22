@@ -35,6 +35,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import edu.virginia.vcgr.genii.client.configuration.HierarchicalDirectory;
 import edu.virginia.vcgr.genii.client.utils.barrier.BarrieredWorkQueue;
 import edu.virginia.vcgr.genii.container.IContainerManaged;
 import edu.virginia.vcgr.genii.container.PostStartupRunnable;
@@ -53,7 +54,7 @@ public class ServiceDeployer extends Thread
 	
 	private AxisEngine _axisEngine;
 	private BarrieredWorkQueue _postStartupQueue;
-	private File _watchDirectory;
+	private HierarchicalDirectory _watchDirectory;
 	private HashMap<String, DeploymentInformation> _deploymentInformation;
 	
 	static private class PatternFilenameFilter implements FileFilter
@@ -91,7 +92,8 @@ public class ServiceDeployer extends Thread
 	}
 	
 	static public void startServiceDeployer(AxisEngine axisEngine, 
-		BarrieredWorkQueue postStartupQueue, File watchDirectory)
+		BarrieredWorkQueue postStartupQueue,
+		HierarchicalDirectory watchDirectory)
 	{
 		ServiceDeployer sd = new ServiceDeployer(axisEngine, postStartupQueue,
 			watchDirectory);
@@ -116,7 +118,7 @@ public class ServiceDeployer extends Thread
 	}
 	
 	private ServiceDeployer(AxisEngine axisEngine, 
-			BarrieredWorkQueue postStartupQueue, File watchDir)
+		BarrieredWorkQueue postStartupQueue, HierarchicalDirectory watchDir)
 	{
 		_postStartupQueue = postStartupQueue;
 		_axisEngine = axisEngine;
@@ -150,7 +152,7 @@ public class ServiceDeployer extends Thread
 			if (info._loader != null)
 				continue;
 
-			File file = new File(_watchDirectory, filename);
+			File file = _watchDirectory.lookupFile(filename);
 			if (info._attempts == -1)
 			{
 				// We've already given up on this deployment item

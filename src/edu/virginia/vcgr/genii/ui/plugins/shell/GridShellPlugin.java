@@ -40,6 +40,7 @@ public class GridShellPlugin extends AbstractUITopMenuPlugin
 		frame.pack();
 		GUIUtils.centerWindow(frame);
 		frame.setVisible(true);
+		frame.toFront();
 	}
 
 	@Override

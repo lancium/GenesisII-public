@@ -22,6 +22,7 @@ import org.oasis_open.wsn.base.Subscribe;
 import org.oasis_open.wsn.base.SubscriptionPolicyType;
 import org.oasis_open.wsn.base.TopicNotSupportedFaultType;
 import org.oasis_open.wsn.base.UnrecognizedPolicyRequestFaultType;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -82,7 +83,8 @@ public class SubscribeRequest
 		{
 			DOMResult result = new DOMResult();
 			m.marshal(policy, result);
-			any[lcv++] = new MessageElement((Element)result.getNode());
+			any[lcv++] = new MessageElement(
+				((Document)result.getNode()).getDocumentElement());
 		}
 		
 		return new SubscriptionPolicyType(any);

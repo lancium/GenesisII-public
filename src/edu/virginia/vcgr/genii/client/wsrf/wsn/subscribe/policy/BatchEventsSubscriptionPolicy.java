@@ -10,6 +10,11 @@ public class BatchEventsSubscriptionPolicy extends DurationBasedSubscriptionPoli
 {
 	static final long serialVersionUID = 0L;
 	
+	private BatchEventsSubscriptionPolicy()
+	{
+		super(SubscriptionPolicyTypes.BatchEvents, null);
+	}
+	
 	public BatchEventsSubscriptionPolicy(Duration batchDuration)
 	{
 		super(SubscriptionPolicyTypes.BatchEvents, batchDuration);

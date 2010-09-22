@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.genii.ui.prefs.general;
+package edu.virginia.vcgr.genii.ui.prefs.shell;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;

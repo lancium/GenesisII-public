@@ -118,14 +118,7 @@ public class ProcessWrapperFactory
 		}
 		
 		if (pwrapperPath == null)
-		{
 			pwrapperPath = new File(binDir, "pwrapper.sh");
-		}
-		
-		if (pwrapperPath == null)
-			throw new ProcessWrapperException(String.format(
-				"Don't know how to wrap processes on %s running on a/an %s!\n",
-				desiredOSName, desiredArch));
 		
 		try
 		{

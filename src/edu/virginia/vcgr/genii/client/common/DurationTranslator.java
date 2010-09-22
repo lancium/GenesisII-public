@@ -37,6 +37,7 @@ public class DurationTranslator
 		}
 	}
 
+	@SuppressWarnings("unused")
 	@Override
 	public MessageElement serialize(QName name, Object obj)
 			throws ResourcePropertyException

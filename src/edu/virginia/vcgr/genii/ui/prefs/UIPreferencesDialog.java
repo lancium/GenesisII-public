@@ -25,7 +25,7 @@ class UIPreferencesDialog extends JDialog
 	static final long serialVersionUID = 0L;
 	
 	static private final Dimension MINIMUM_SIZE =
-		new Dimension(300, 300);
+		new Dimension(600, 350);
 	
 	private Map<UIPreferenceSet, JPanel> _editors =
 		new HashMap<UIPreferenceSet, JPanel>();

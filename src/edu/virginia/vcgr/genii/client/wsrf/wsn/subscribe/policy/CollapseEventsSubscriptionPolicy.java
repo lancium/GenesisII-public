@@ -11,6 +11,11 @@ public class CollapseEventsSubscriptionPolicy
 {
 	static final long serialVersionUID = 0L;
 	
+	private CollapseEventsSubscriptionPolicy()
+	{
+		super(SubscriptionPolicyTypes.CollapseEvents, null);
+	}
+	
 	public CollapseEventsSubscriptionPolicy(Duration duration)
 	{
 		super(SubscriptionPolicyTypes.CollapseEvents, duration);

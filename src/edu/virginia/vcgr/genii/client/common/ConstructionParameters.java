@@ -212,7 +212,7 @@ public class ConstructionParameters implements Serializable
 		return _anyAttributes;
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	final public MessageElement serializeToMessageElement()
 		throws RemoteException
 	{
@@ -235,12 +235,13 @@ public class ConstructionParameters implements Serializable
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	final public void serialize(OutputStream sink)
 		throws JAXBException
 	{
 		JAXBContext context = getContext(getClass());
 		Marshaller m = context.createMarshaller();
+		m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
 		JAXBElement jbe = new JAXBElement(
 			ConstructionParameters.CONSTRUCTION_PARAMTERS_QNAME,
 			getClass(), this);

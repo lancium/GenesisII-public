@@ -8,7 +8,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
-import org.morgan.util.MacroUtils;
+import org.morgan.util.macro.MacroUtils;
 
 class FilesystemConfiguration extends FilesystemSandboxContainerConfiguration
 {

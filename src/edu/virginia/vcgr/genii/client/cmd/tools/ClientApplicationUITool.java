@@ -9,7 +9,7 @@ import edu.virginia.vcgr.genii.ui.ClientApplication;
 public class ClientApplicationUITool extends BaseGridTool
 {
 	static private final String DESCRIPTION = "The large Genesis II Client GUI Application";
-	static private final String USAGE = "client-ui";
+	static private final String USAGE = "client-ui [--shell]";
 	
 	static private void setupMacOSProperties()
 	{
@@ -20,6 +20,14 @@ public class ClientApplicationUITool extends BaseGridTool
 		System.setProperty("com.apple.mrj.application.live-resize", "true");
 		System.setProperty("com.apple.macos.smallTabs", "true");
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
+	}
+	
+	private boolean _launchShell = false;
+	
+	@Option("shell")
+	public void setShell()
+	{
+		_launchShell = true;
 	}
 	
 	public ClientApplicationUITool()
@@ -33,10 +41,15 @@ public class ClientApplicationUITool extends BaseGridTool
 		if (OperatingSystemType.getCurrent() == OperatingSystemType.MACOS)
 			setupMacOSProperties();
 		
-		ClientApplication ca = new ClientApplication();
-		ca.pack();
-		GuiUtils.centerComponent(ca);
-		ca.setVisible(true);
+		ClientApplication ca = new ClientApplication(_launchShell);
+		if (!_launchShell)
+		{
+			ca.pack();
+			GuiUtils.centerComponent(ca);
+			ca.setVisible(true);
+		} else
+			ca.dispose();
+		
 		ca.join();
 		
 		return 0;

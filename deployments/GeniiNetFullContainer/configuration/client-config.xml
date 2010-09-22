@@ -265,6 +265,10 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.WSNSubscribeTool</mconf:class>
 		<mconf:class name="edit"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.EditTool</mconf:class>
+		<mconf:class name="job-tool"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.JobTool</mconf:class>
+		<mconf:class name="grid-tester"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.GridTesterTool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

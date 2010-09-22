@@ -35,6 +35,7 @@ public class PermissionsStringTranslator implements
 		}
 	}
 
+	@SuppressWarnings("unused")
 	@Override
 	public MessageElement serialize(QName name, Object obj)
 			throws ResourcePropertyException

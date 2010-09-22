@@ -3,7 +3,7 @@ package edu.virginia.vcgr.genii.client.filesystems;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 
-import org.morgan.util.MacroUtils;
+import org.morgan.util.macro.MacroUtils;
 
 class FilesystemSandboxConfiguration
 {

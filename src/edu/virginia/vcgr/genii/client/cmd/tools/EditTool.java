@@ -1,36 +1,31 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.FileReader;
+import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import javax.activation.MimetypesFileTypeMap;
 
 import org.morgan.util.io.StreamUtils;
-import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.externalapp.ApplicationDatabase;
+import edu.virginia.vcgr.externalapp.EditableFile;
 import edu.virginia.vcgr.externalapp.ExternalApplication;
 import edu.virginia.vcgr.externalapp.ExternalApplicationToken;
-import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
-import edu.virginia.vcgr.genii.client.byteio.RandomByteIORP;
-import edu.virginia.vcgr.genii.client.byteio.StreamableByteIORP;
+import edu.virginia.vcgr.genii.client.cmd.CommandLineFormer;
+import edu.virginia.vcgr.genii.client.cmd.CommandLineRunner;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
-import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
-import edu.virginia.vcgr.genii.client.resource.TypeInformation;
-import edu.virginia.vcgr.genii.client.rns.RNSPath;
-import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 
 public class EditTool extends BaseGridTool
 {
 	static final private String DESCRIPTION =
 		"Edits a file with a registered editor.";
 	static final private String USAGE =
-		"edit <path-to-file>";
+		"edit { <path-to-file> | !<command-number> | !! }";
 	
 	@Override
 	final protected void verify() throws ToolException
@@ -43,13 +38,35 @@ public class EditTool extends BaseGridTool
 	@Override
 	final protected int runCommand() throws Throwable
 	{
-		GeniiPath path = new GeniiPath(getArgument(0));
-		if (path.pathType() == GeniiPathType.Local)
-			return editLocalFile(new File(path.path()));
-		else
+		String arg = getArgument(0);
+		
+		if (arg.startsWith("!"))
 		{
-			return editGridFile(RNSPath.getCurrent().lookup(
-				path.path()));
+			String []cLine;
+			
+			ArrayList<String[]> history = CommandLineRunner.history();
+			if (history == null || history.size() == 0)
+				throw new ToolException("No command line history to edit!");
+			
+			arg = arg.substring(1);
+			
+			if (arg.equals("!"))
+			{
+				if (history.size() == 1)
+					throw new ToolException("No last command to edit!");
+				
+				cLine = history.get(history.size() - 2);
+			} else
+			{
+				int index = Integer.parseInt(arg);
+				cLine = history.get(index);
+			}
+			
+			return editCommand(cLine);
+		} else
+		{
+			GeniiPath path = new GeniiPath(getArgument(0));
+			return editFile(path);
 		}
 	}
 	
@@ -58,90 +75,77 @@ public class EditTool extends BaseGridTool
 		super(DESCRIPTION, USAGE, false);
 	}
 	
-	final public int editLocalFile(File file) throws Throwable
+	final public int editFile(GeniiPath path) throws Throwable
 	{
-		String mimeType = 
-			MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(file);
+		String mimeType =
+			MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(
+				new File(path.path()));
+		
 		ExternalApplication app = 
 			ApplicationDatabase.database().getExternalApplication(mimeType);
 		if (app == null)
 		{
 			stderr.format(
 				"Unable to find registered application for file [%s] %s.\n",
-				mimeType, file);
+				mimeType, path);
 			return 1;
 		}
 		
-		ExternalApplicationToken token = app.launch(file);
-		token.getResult();
+		EditableFile file = null;
+		try
+		{
+			file = EditableFile.createEditableFile(path);
+			ExternalApplicationToken token = app.launch(file.file());
+			token.getResult();
+		}
+		finally
+		{
+			file.close();
+		}
+		
 		return 0;
 	}
 	
-	final public int editGridFile(RNSPath gridPath) throws Throwable
+	final public int editCommand(String []cLine) throws Throwable
 	{
-		InputStream in = null;
-		OutputStream out = null;
-		
 		String mimeType =
 			MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(
-				gridPath.getName());
+				"gridedit.txt");
 		ExternalApplication app =
 			ApplicationDatabase.database().getExternalApplication(mimeType);
 		if (app == null)
 		{
-			stderr.format(
-				"Unable to find registered application for file [%s] %s.\n",
-				mimeType, gridPath);
+			stderr.println(
+				"Unable to find registered application for for text files.");
 			return 1;
 		}
 		
-		String gridPathExtension = gridPath.getName();
-		int index = gridPathExtension.lastIndexOf('.');
-		if (index > 0)
-			gridPathExtension = gridPathExtension.substring(index);
-		
+		boolean first = true;
 		File tmpFile = File.createTempFile(
-			"gridedit", gridPathExtension);
+			"gridedit", ".txt");
 		tmpFile.deleteOnExit();
+		
+		PrintWriter writer = null;
+		BufferedReader reader = null;
+		FileReader fReader = null;
 		
 		try
 		{
-			if (gridPath.exists())
+			writer = new PrintWriter(tmpFile);
+			for (String item : cLine)
 			{
-				stdout.format("Downloading grid file \"%s\" for editing.\n",
-					gridPath);
+				if (!first)
+					writer.print(' ');
+				first = false;
 				
-				in = ByteIOStreamFactory.createInputStream(gridPath);
-				out = new FileOutputStream(tmpFile);
-				StreamUtils.copyStream(in, out);
-				in.close();
-				in = null;
-				out.close();
-				out = null;
-				
-				EndpointReferenceType epr = gridPath.getEndpoint();
-				TypeInformation typeInfo = new TypeInformation(epr);
-				boolean isReadOnly = false;
-				
-				if (typeInfo.isRByteIO())
-				{
-					RandomByteIORP rp = (RandomByteIORP)ResourcePropertyManager.createRPInterface(
-						epr, RandomByteIORP.class);
-					Boolean val = rp.getWriteable();
-					if (val != null)
-						isReadOnly = (!val);
-				} else
-				{
-					StreamableByteIORP rp = (StreamableByteIORP)ResourcePropertyManager.createRPInterface(
-						epr, StreamableByteIORP.class);
-					Boolean val = rp.getWriteable();
-					if (val != null)
-						isReadOnly = (!val);
-				}
-				
-				if (isReadOnly)
-					tmpFile.setReadOnly();
+				if (item.matches("^.*\\s.*$"))
+					writer.format("\"%s\"", item);
+				else
+					writer.print(item);
 			}
+			
+			writer.close();
+			writer = null;
 			
 			ExternalApplicationToken token;
 			token = app.launch(tmpFile);
@@ -149,24 +153,29 @@ public class EditTool extends BaseGridTool
 			
 			if (result != null)
 			{
-				stdout.format("Uploading grid file \"%s\".\n",
-					gridPath);
-				in = new FileInputStream(result);
-				out = ByteIOStreamFactory.createOutputStream(gridPath);
-				StreamUtils.copyStream(in, out);
-				in.close();
-				in = null;
-				out.close();
-				out = null;
+				reader = new BufferedReader(fReader = new FileReader(result));
+				String line;
+				StringBuilder builder = new StringBuilder();
+				while ( (line = reader.readLine()) != null)
+				{
+					if (builder.length() > 0)
+						builder.append(' ');
+					builder.append(line);
+				}
+				
+				stdout.format("Running:  %s\n", builder);
+				String []newCLine = CommandLineFormer.formCommandLine(builder.toString());
+				CommandLineRunner runner = new CommandLineRunner();
+				return runner.runCommand(newCLine, stdout, stderr, stdin);
 			}
-			
-			return 0;
 		}
 		finally
 		{
+			StreamUtils.close(writer);
+			StreamUtils.close(fReader);
 			tmpFile.delete();
-			StreamUtils.close(in);
-			StreamUtils.close(out);
 		}
+		
+		return 0;
 	}
 }

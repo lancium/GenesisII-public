@@ -168,10 +168,11 @@ public class CommandLineRunner
 		
 		for(Object oToolMap : tools)
 		{
-			HashMap<String, Class> toolMap = (HashMap<String, Class>)oToolMap;
+			HashMap<String, Class<?>> toolMap = (HashMap<String, Class<?>>)oToolMap;
 			for (String toolName : toolMap.keySet())
 			{
-				Class<? extends ITool> toolClass = toolMap.get(toolName);
+				Class<? extends ITool> toolClass = 
+					(Class<? extends ITool>)toolMap.get(toolName);
 				ret.put(toolName, new ToolDescription(toolClass, toolName));
 			}
 		}

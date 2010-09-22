@@ -7,12 +7,14 @@ import edu.virginia.vcgr.genii.client.cmd.IExceptionHandler;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.SimpleExceptionHandler;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.configuration.ShellPrompt;
 import edu.virginia.vcgr.genii.client.configuration.UserPreferences;
 import edu.virginia.vcgr.genii.client.dialog.ComboBoxDialog;
 import edu.virginia.vcgr.genii.client.dialog.DialogException;
 import edu.virginia.vcgr.genii.client.dialog.DialogFactory;
 import edu.virginia.vcgr.genii.client.dialog.DialogProvider;
 import edu.virginia.vcgr.genii.client.dialog.InformationDialog;
+import edu.virginia.vcgr.genii.client.dialog.InputDialog;
 import edu.virginia.vcgr.genii.client.dialog.MenuItem;
 import edu.virginia.vcgr.genii.client.dialog.RunnableMenuItem;
 import edu.virginia.vcgr.genii.client.dialog.SimpleMenuItem;
@@ -45,6 +47,8 @@ public class UserPreferencesTool extends BaseGridTool
 			"E", new ChangeExceptionHandler());
 		MenuItem changeGUIPreferencesItem = new SimpleMenuItem(
 			"G", new ChangeGUIPreferencesHandler());
+		MenuItem changeShellPromptItem = new SimpleMenuItem(
+			"S", new ChangeShellPromptHandler());
 		MenuItem quitItem = new SimpleMenuItem(
 			"Q", "Quit Preferences Tool");
 		
@@ -54,6 +58,7 @@ public class UserPreferencesTool extends BaseGridTool
 			viewCurrentUserPreferencesItem,
 			changeExceptionHandlerItem,
 			changeGUIPreferencesItem,
+			changeShellPromptItem,
 			quitItem);
 		
 		while (true)
@@ -103,11 +108,14 @@ public class UserPreferencesTool extends BaseGridTool
 			boolean preferGUI =
 				UserPreferences.preferences().preferGUI();
 			
+			ShellPrompt shellPrompt = UserPreferences.preferences().shellPrompt();
+			
 			InformationDialog dialog = provider.createInformationDialog(
 				"Current User Preferences",
 				new TextContent(
 					String.format("Exception Handler:  %s", handlerString),
-					String.format("Prefer GUI?  %s", preferGUI ? "Yes" : "No")));
+					String.format("Prefer GUI?  %s", preferGUI ? "Yes" : "No"),
+					String.format("Shell Prompt Template:  %s", shellPrompt.describe())));
 			dialog.showDialog();
 		}
 		
@@ -185,6 +193,35 @@ public class UserPreferencesTool extends BaseGridTool
 		public String toString()
 		{
 			return "Change GUI Preferences";
+		}
+	}
+	
+	static private class ChangeShellPromptHandler implements RunnableMenuItem
+	{
+		public void run(DialogProvider provider)
+			throws DialogException, UserCancelException
+		{
+			InputDialog dialog = provider.createInputDialog(
+				"Shell Prompt",
+				"What would you like to use for your shell prompt?");
+			dialog.setDefaultAnswer(UserPreferences.preferences().shellPrompt().describe());
+			dialog.showDialog();
+			
+			try
+			{
+				UserPreferences.preferences().shellPromptTemplate(dialog.getAnswer());
+			}
+			catch (BackingStoreException bse)
+			{
+				bse.printStackTrace(System.err);
+				throw new RuntimeException(
+					"Unable to store user preferences.", bse);
+			}
+		}
+		
+		public String toString()
+		{
+			return "Change Shell Prompt";
 		}
 	}
 }

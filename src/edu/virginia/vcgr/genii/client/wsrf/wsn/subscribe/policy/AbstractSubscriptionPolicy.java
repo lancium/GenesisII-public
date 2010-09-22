@@ -8,6 +8,12 @@ class AbstractSubscriptionPolicy implements SubscriptionPolicy, Serializable
 	
 	private SubscriptionPolicyTypes _policyType;
 	
+	@SuppressWarnings("unused")
+	private AbstractSubscriptionPolicy()
+	{
+		_policyType = null;
+	}
+	
 	protected AbstractSubscriptionPolicy(SubscriptionPolicyTypes policyType)
 	{
 		_policyType = policyType;

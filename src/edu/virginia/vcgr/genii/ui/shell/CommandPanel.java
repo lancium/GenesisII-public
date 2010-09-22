@@ -11,6 +11,7 @@ import javax.swing.JScrollPane;
 
 import org.morgan.utils.gui.GUIUtils;
 
+import edu.virginia.vcgr.genii.client.configuration.UserPreferences;
 import edu.virginia.vcgr.genii.ui.UIContext;
 import edu.virginia.vcgr.genii.ui.shell.grid.GridExecutionContext;
 
@@ -19,14 +20,15 @@ public class CommandPanel extends JPanel
 	static final long serialVersionUID = 0L;
 	
 	static final private Dimension OUTPUT_SIZE = new Dimension(
-		300, 300);
+		500, 500);
 	
 	public CommandPanel(UIContext uiContext)
 	{
 		super(new GridBagLayout());
 		
-		CommandDisplay display = new CommandDisplay();
-		JLabel label = new JLabel("Command");
+		CommandDisplay display = new CommandDisplay(uiContext);
+		JLabel label = new JLabel(
+			UserPreferences.preferences().shellPrompt().toString());
 		label.setMinimumSize(label.getMinimumSize());
 		label.setPreferredSize(label.getPreferredSize());
 		label.setMaximumSize(label.getMaximumSize());

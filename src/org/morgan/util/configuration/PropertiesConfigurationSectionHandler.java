@@ -19,7 +19,7 @@ import java.util.Properties;
 
 import javax.xml.namespace.QName;
 
-import org.morgan.util.MacroUtils;
+import org.morgan.util.macro.MacroUtils;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

@@ -50,6 +50,7 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.GridEnvironment;
+import edu.virginia.vcgr.genii.client.configuration.HierarchicalDirectory;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.Security;
@@ -629,9 +630,9 @@ public class Container extends ApplicationBase
 	
 	static private void loadDynamicPages(Server server)
 	{
-		File dynPagesDir = Installation.getDeployment(
+		HierarchicalDirectory dynPagesDir = Installation.getDeployment(
 			new DeploymentName()).getDynamicPagesDirectory();
-		if (!dynPagesDir.exists() || !dynPagesDir.isDirectory())
+		if (!dynPagesDir.exists())
 			return;
 		
 		try

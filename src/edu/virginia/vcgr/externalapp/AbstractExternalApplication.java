@@ -1,7 +1,6 @@
 package edu.virginia.vcgr.externalapp;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.commons.logging.Log;
@@ -21,17 +20,16 @@ public abstract class AbstractExternalApplication
 	
 	protected File launch(File content) throws Throwable
 	{
-		if (!content.exists())
-			throw new FileNotFoundException(String.format(
-				"Couldn't find file \"%s\".", content));
-		
-		if (!content.canRead())
-			throw new IOException(String.format(
-				"Unable to read file \"%s\".", content));
-		
-		if (!content.canWrite())
-			throw new IOException(String.format(
-				"Unable to modify file \"%s\".", content));
+		if (content.exists())
+		{
+			if (!content.canRead())
+				throw new IOException(String.format(
+					"Unable to read file \"%s\".", content));
+			
+			if (!content.canWrite())
+				throw new IOException(String.format(
+					"Unable to modify file \"%s\".", content));
+		}
 		
 		long lastModified = content.lastModified();
 		doRun(content);

@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.ui.shell;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -14,6 +15,9 @@ import javax.swing.text.StyledDocument;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import edu.virginia.vcgr.genii.ui.UIContext;
+import edu.virginia.vcgr.genii.ui.prefs.shell.ShellUIPreferenceSet;
 
 public class CommandDisplay extends JTextPane
 {	
@@ -79,13 +83,17 @@ public class CommandDisplay extends JTextPane
 		}
 	}
 	
-	public CommandDisplay()
+	public CommandDisplay(UIContext uiContext)
 	{
 		super();
 		
 		StyledDocument doc = getStyledDocument();
 		
 		_plainStyle = doc.addStyle("Plain", null);
+		Font font = uiContext.preferences().preferenceSet(
+			ShellUIPreferenceSet.class).shellFont();
+		StyleConstants.setFontFamily(_plainStyle, font.getFamily());
+		StyleConstants.setFontSize(_plainStyle, font.getSize());
 		int size = StyleConstants.getFontSize(_plainStyle);
 		
 		_headerStyle = doc.addStyle("Header", _plainStyle);

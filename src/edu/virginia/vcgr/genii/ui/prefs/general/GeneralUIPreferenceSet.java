@@ -12,8 +12,6 @@ import edu.virginia.vcgr.genii.client.install.ContainerInformation;
 import edu.virginia.vcgr.genii.client.install.InstallationState;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 import edu.virginia.vcgr.genii.ui.prefs.AbstractUIPreferenceSet;
-import edu.virginia.vcgr.genii.ui.shell.InputBindings;
-import edu.virginia.vcgr.genii.ui.shell.InputBindingsType;
 
 public class GeneralUIPreferenceSet extends AbstractUIPreferenceSet
 {
@@ -21,10 +19,8 @@ public class GeneralUIPreferenceSet extends AbstractUIPreferenceSet
 	
 	static final private String PREFERENCE_NODE_NAME = "general";
 	
-	static final private String BINDINGS_KEY = "bindings";
 	static final private String LOCAL_CONTAINER_KEY = "local-container";
 	
-	private InputBindingsType _bindings;
 	private boolean _localChecked = false;
 	private Object _localCheckedLock = new Object();
 	private String _localContainerName;
@@ -38,34 +34,18 @@ public class GeneralUIPreferenceSet extends AbstractUIPreferenceSet
 	@Override
 	protected void loadImpl(Preferences prefNode)
 	{
-		String bindingsName = prefNode.get(
-			BINDINGS_KEY, InputBindingsType.defaultBindings().name());
-		_bindings = InputBindingsType.valueOf(bindingsName);
 		_localContainerName = prefNode.get(LOCAL_CONTAINER_KEY, null);
 	}
 
 	@Override
 	protected void storeImpl(Preferences prefNode)
 	{
-		prefNode.put(BINDINGS_KEY, _bindings.name());
 		prefNode.put(LOCAL_CONTAINER_KEY, _localContainerName);
-	}
-	
-	final InputBindingsType bindingsType()
-	{
-		return _bindings;
 	}
 	
 	public GeneralUIPreferenceSet()
 	{
 		super(PREFERENCE_SET_TITLE);
-		
-		_bindings = InputBindingsType.defaultBindings();
-	}
-	
-	final public InputBindings createBindings()
-	{
-		return _bindings.createBindings();
 	}
 	
 	final public String localContainerName()
@@ -118,8 +98,6 @@ public class GeneralUIPreferenceSet extends AbstractUIPreferenceSet
 	@Override
 	final public void load(JPanel editor)
 	{
-		_bindings = 
-			((GeneralUIPreferenceSetEditor)editor).selectedBindingsType();
 		_localContainerName =
 			((GeneralUIPreferenceSetEditor)editor).selectedContainer();
 	}

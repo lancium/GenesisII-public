@@ -1,6 +1,8 @@
 package edu.virginia.vcgr.genii.ui.shell;
 
 import java.awt.Toolkit;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -10,8 +12,9 @@ import javax.swing.text.Caret;
 import org.morgan.util.Pair;
 import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.genii.client.configuration.UserPreferences;
 import edu.virginia.vcgr.genii.ui.UIContext;
-import edu.virginia.vcgr.genii.ui.prefs.general.GeneralUIPreferenceSet;
+import edu.virginia.vcgr.genii.ui.prefs.shell.ShellUIPreferenceSet;
 import edu.virginia.vcgr.genii.ui.progress.AbstractTask;
 import edu.virginia.vcgr.genii.ui.progress.Task;
 import edu.virginia.vcgr.genii.ui.progress.TaskCompletionListener;
@@ -116,13 +119,29 @@ public class CommandField extends JTextField
 		_executionContext = executionContext;
 		
 		InputBindings inputBindings = uiContext.preferences().preferenceSet(
-			GeneralUIPreferenceSet.class).createBindings();
+			ShellUIPreferenceSet.class).createBindings();
 		
 		setDragEnabled(true);
 		
 		setFocusTraversalKeysEnabled(false);
 		addKeyListener(inputBindings);
 		inputBindings.addBindingActionListener(new FieldActioner());
+		
+		addFocusListener(new FocusListener()
+		{
+			@Override
+			public void focusLost(FocusEvent e)
+			{
+				// Nothing to do
+			}
+			
+			@Override
+			public void focusGained(FocusEvent e)
+			{
+				int position = getCaretPosition();
+				setCaretPosition(position);
+			}
+		});
 	}
 	
 	public CommandField(UIContext uiContext, JLabel label,
@@ -525,7 +544,7 @@ public class CommandField extends JTextField
 		public void taskCancelled(Task<String[]> task)
 		{
 			setEnabled(true);
-			grabFocus();
+			requestFocusInWindow();
 			_display.output().println("Completions cancelled.");
 			setText(_originalLeft + _right);
 			getCaret().setDot(_originalLeft.length());
@@ -536,44 +555,49 @@ public class CommandField extends JTextField
 		{
 			String newWord;
 			
-			setEnabled(true);
-			grabFocus();
-			
-			if (completions == null || completions.length == 0)
+			try
 			{
-				setText(_originalLeft + _right);
-				getCaret().setDot(_originalLeft.length());
-				Toolkit.getDefaultToolkit().beep();
-			} else
-			{
-				if (completions.length == 1)
-					newWord = insertEscapesOrQuotes(
-						_lastWord.startsWith("\""), completions[0]);
-				else
+				if (completions == null || completions.length == 0)
 				{
-					_display.start();
-					_display.header().println("Completions:\n");
+					setText(_originalLeft + _right);
+					getCaret().setDot(_originalLeft.length());
+					Toolkit.getDefaultToolkit().beep();
+				} else
+				{
+					if (completions.length == 1)
+						newWord = insertEscapesOrQuotes(
+							_lastWord.startsWith("\""), completions[0]);
+					else
+					{
+						_display.start();
+						_display.header().println("Completions:\n");
+						
+						for (String completion : completions)
+							_display.output().format("\t%s\n", completion);
+						
+						newWord = insertEscapesOrQuotes(
+							_lastWord.startsWith("\""),
+							findCommonStart(completions));
+					}
 					
-					for (String completion : completions)
-						_display.output().format("\t%s\n", completion);
-					
-					newWord = insertEscapesOrQuotes(
-						_lastWord.startsWith("\""),
-						findCommonStart(completions));
+					StringBuilder builder = new StringBuilder();
+					for (int lcv = 0; lcv < _words.length - 1; lcv++)
+						builder.append(_words[lcv].token());
+					if (newWord.endsWith("\"") && _right.startsWith("\""))
+						_right = _right.substring(1);
+					builder.append(newWord);
+					int position = builder.length();
+					if (newWord.endsWith("\""))
+						position--;
+					builder.append(_right);
+					setText(builder.toString());
+					getCaret().setDot(position);
 				}
-				
-				StringBuilder builder = new StringBuilder();
-				for (int lcv = 0; lcv < _words.length - 1; lcv++)
-					builder.append(_words[lcv].token());
-				if (newWord.endsWith("\"") && _right.startsWith("\""))
-					_right = _right.substring(1);
-				builder.append(newWord);
-				int position = builder.length();
-				if (newWord.endsWith("\""))
-					position--;
-				builder.append(_right);
-				setText(builder.toString());
-				getCaret().setDot(position);
+			}
+			finally
+			{
+				setEnabled(true);
+				requestFocusInWindow();
 			}
 		}
 
@@ -581,7 +605,7 @@ public class CommandField extends JTextField
 		public void taskExcepted(Task<String[]> task, Throwable cause)
 		{
 			setEnabled(true);
-			grabFocus();
+			requestFocusInWindow();
 			_display.error().println(
 				"Unable to generate completions.");
 			setText(_originalLeft + _right);
@@ -620,9 +644,10 @@ public class CommandField extends JTextField
 	{
 		private void finishCommand()
 		{
-			_label.setText("Command");
+			_label.setText(
+				UserPreferences.preferences().shellPrompt().toString());
 			_reader = null;
-			CommandField.this.grabFocus();
+			CommandField.this.requestFocusInWindow();
 		}
 		
 		@Override

@@ -19,6 +19,12 @@ public abstract class UIMenuPluginAction<Type extends UIMenuPlugin> extends Abst
 		_context = context;
 	}
 	
+	@SuppressWarnings("unchecked")
+	final Class<Type> pluginClass()
+	{
+		return (Class<Type>)_plugin.getClass();
+	}
+	
 	final public void updateStatus(Collection<EndpointDescription> descriptions)
 	{
 		setEnabled(_plugin.isEnabled(descriptions));

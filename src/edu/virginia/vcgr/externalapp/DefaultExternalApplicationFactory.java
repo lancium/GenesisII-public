@@ -9,8 +9,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.morgan.util.MacroUtils;
 import org.morgan.util.configuration.ConfigurationException;
+import org.morgan.util.macro.MacroUtils;
+
 import org.w3c.dom.Element;
 
 @XmlRootElement(name = "configuration")

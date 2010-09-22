@@ -14,6 +14,8 @@ import edu.virginia.vcgr.genii.client.ApplicationBase;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.GridEnvironment;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
+import edu.virginia.vcgr.genii.client.configuration.ShellPrompt;
+import edu.virginia.vcgr.genii.client.configuration.UserPreferences;
 import edu.virginia.vcgr.secrun.SecureRunnableHooks;
 import edu.virginia.vcgr.secrun.SecureRunnerManager;
 
@@ -77,19 +79,13 @@ public class Driver extends ApplicationBase
 	static private void doShell(BufferedReader in) throws ReloadShellException
 	{
 		CommandLineRunner runner = new CommandLineRunner();
+		ShellPrompt prompt = UserPreferences.preferences().shellPrompt();
 		
 		while (true)
 		{
 			try
 			{
-				// get the current username (if available)
-				String username = null;
-	
-				if (username != null) {
-					System.out.print(username + "@vcgr:$>");
-				} else {
-					System.out.print("vcgr:$>");
-				}
+				System.out.format("%s ", prompt);
 				System.out.flush();
 				
 				String line = null;

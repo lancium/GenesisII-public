@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.morgan.util.MacroUtils;
+import org.morgan.util.macro.MacroUtils;
 import org.morgan.util.io.StreamUtils;
 
 public class DefaultExternalApplication extends AbstractExternalApplication

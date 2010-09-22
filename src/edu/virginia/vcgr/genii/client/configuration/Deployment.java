@@ -34,12 +34,12 @@ public class Deployment
 	static private Map<String, Deployment> _knownDeployments =
 		new HashMap<String, Deployment>(4);
 	
-	private File _deploymentDirectory;
-	private File _configurationDirectory;
+	private HierarchicalDirectory _deploymentDirectory;
+	private HierarchicalDirectory _configurationDirectory;
 	private File _secureRunnableDirectory;
 	private Security _security;
-	private File _servicesDirectory;
-	private File _dynamicPagesDirectory;
+	private HierarchicalDirectory _servicesDirectory;
+	private HierarchicalDirectory _dynamicPagesDirectory;
 	private Properties _webContainerProperties;
 	private Properties _uriManagerProperties;
 	private Properties _rejuvenationProperties;
@@ -47,9 +47,13 @@ public class Deployment
 	
 	private Deployment(File deploymentDirectory)
 	{
-		_deploymentDirectory = deploymentDirectory;
-		_configurationDirectory = new File(_deploymentDirectory, 
-			CONFIGURATION_DIRECTORY_NAME);
+		_deploymentDirectory = 
+			HierarchicalDirectory.openRootHierarchicalDirectory(
+				deploymentDirectory);
+		
+		_configurationDirectory = _deploymentDirectory.lookupDirectory(
+				CONFIGURATION_DIRECTORY_NAME);
+		
 		if (!_configurationDirectory.exists())
 			throw new InvalidDeploymentException(_deploymentDirectory.getName(),
 				"Does not contain a " +
@@ -58,14 +62,15 @@ public class Deployment
 		_security = new Security(_deploymentDirectory,
 			_configurationDirectory);
 		
-		_servicesDirectory = new File(_deploymentDirectory,
+		_servicesDirectory = _deploymentDirectory.lookupDirectory(
 			SERVICES_DIRECTORY_NAME);
+		
 		if (!_servicesDirectory.exists())
 			throw new InvalidDeploymentException(_deploymentDirectory.getName(),
 				"Does not contain a " +
 				SERVICES_DIRECTORY_NAME + " directory.");
 		
-		_dynamicPagesDirectory = new File(_deploymentDirectory,
+		_dynamicPagesDirectory = _deploymentDirectory.lookupDirectory(
 			DYNAMIC_PAGES_DIRECTORY_NAME);
 		
 		_webContainerProperties = loadWebContainerProperties(
@@ -76,7 +81,7 @@ public class Deployment
 		_rejuvenationProperties = loadRejuvenationProperties(
 			_deploymentDirectory.getName(), _configurationDirectory);
 		
-		_secureRunnableDirectory = new File(_deploymentDirectory, 
+		_secureRunnableDirectory = new File(deploymentDirectory, 
 			SECURE_RUNNABLE_DIRECTORY_NAME);
 	}
 	
@@ -109,14 +114,14 @@ public class Deployment
 	}
 	
 	static private Properties loadURIManagerProperties(
-		String deploymentName, File configurationDirectory)
+		String deploymentName, HierarchicalDirectory configurationDirectory)
 	{
 		FileInputStream fin = null;
 		Properties ret = new Properties();
 		
 		try
 		{
-			fin = new FileInputStream(new File(configurationDirectory, 
+			fin = new FileInputStream(configurationDirectory.lookupFile( 
 				URI_PROPERTIES_FILENAME));
 			ret.load(fin);
 			return ret;
@@ -133,14 +138,14 @@ public class Deployment
 	}
 	
 	static private Properties loadWebContainerProperties(
-		String deploymentName, File configurationDirectory)
+		String deploymentName, HierarchicalDirectory configurationDirectory)
 	{
 		FileInputStream fin = null;
 		Properties ret = new Properties();
 		
 		try
 		{
-			fin = new FileInputStream(new File(configurationDirectory, 
+			fin = new FileInputStream(configurationDirectory.lookupFile(
 				WEB_CONTAINER_PROPERTIES_FILENAME));
 			ret.load(fin);
 			return ret;
@@ -158,14 +163,14 @@ public class Deployment
 	}
 	
 	static private Properties loadRejuvenationProperties(
-		String deploymentName, File configurationDirectory)
+		String deploymentName, HierarchicalDirectory configurationDirectory)
 	{
 		FileInputStream fin = null;
 		Properties ret = new Properties();
 		
 		try
 		{
-			fin = new FileInputStream(new File(configurationDirectory, 
+			fin = new FileInputStream(configurationDirectory.lookupFile(
 				REJUVENATION_PROPERTYIES_FILENAME));
 			ret.load(fin);
 			return ret;
@@ -190,7 +195,7 @@ public class Deployment
 	
 	public File getConfigurationFile(String configurationFilename)
 	{
-		return new File(_configurationDirectory, configurationFilename);
+		return _configurationDirectory.lookupFile(configurationFilename);
 	}
 	
 	public Security security()
@@ -198,12 +203,12 @@ public class Deployment
 		return _security;
 	}
 	
-	public File getServicesDirectory()
+	public HierarchicalDirectory getServicesDirectory()
 	{
 		return _servicesDirectory;
 	}
 	
-	public File getDynamicPagesDirectory()
+	public HierarchicalDirectory getDynamicPagesDirectory()
 	{
 		return _dynamicPagesDirectory;
 	}

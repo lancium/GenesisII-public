@@ -133,7 +133,7 @@ public class ClientMessageSecuritySender extends WSDoAllSender implements
 		super.invoke(msgContext);
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void decodeSignatureParameter(RequestData reqData)
 			throws WSSecurityException
 	{
