@@ -193,6 +193,11 @@ public class Deployment
 		return _secureRunnableDirectory;
 	}
 	
+	public HierarchicalDirectory getConfigurationDirectory()
+	{
+		return _configurationDirectory;
+	}
+	
 	public File getConfigurationFile(String configurationFilename)
 	{
 		return _configurationDirectory.lookupFile(configurationFilename);

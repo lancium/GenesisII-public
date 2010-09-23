@@ -18,8 +18,11 @@ import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
 import edu.virginia.vcgr.genii.common.notification.GeniiPullPointPortType;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
+import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
+@GeniiServiceConfiguration(
+	resourceProvider=DBPullPointResourceProvider.class)
 public class GeniiPullPointServiceImpl extends GenesisIIBase
 	implements GeniiPullPointPortType
 {

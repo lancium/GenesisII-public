@@ -56,6 +56,7 @@ import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.common.GeniiNoOutCalls;
+import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.invoker.timing.Timer;
 import edu.virginia.vcgr.genii.container.invoker.timing.TimingSink;
@@ -67,8 +68,10 @@ import edu.virginia.vcgr.genii.exportdir.ExportedDirPortType;
 import edu.virginia.vcgr.genii.enhancedrns.IterateListRequestType;
 import edu.virginia.vcgr.genii.enhancedrns.IterateListResponseType;
 
+@GeniiServiceConfiguration(
+	resourceProvider=ExportedDirDBResourceProvider.class)
 public class ExportedDirServiceImpl extends GenesisIIBase implements
-		ExportedDirPortType, GeniiNoOutCalls
+	ExportedDirPortType, GeniiNoOutCalls
 {
 	static private Log _logger = LogFactory.getLog(ExportedDirServiceImpl.class);
 	

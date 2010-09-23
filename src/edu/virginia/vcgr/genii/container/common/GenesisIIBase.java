@@ -21,7 +21,6 @@ import java.util.Vector;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Properties;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
@@ -36,7 +35,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 import org.morgan.inject.InjectionException;
 import org.morgan.util.GUID;
-import org.morgan.util.configuration.XMLConfiguration;
 import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnavailableFaultType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
@@ -98,12 +96,10 @@ import org.ws.addressing.AttributedURIType;
 import org.ws.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
 
-import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.comm.ClientConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
-import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.iterator.IteratorConstructionParameters;
@@ -133,7 +129,9 @@ import edu.virginia.vcgr.genii.container.attrs.AttributePreFetcher;
 import edu.virginia.vcgr.genii.container.attrs.IAttributeManipulator;
 import edu.virginia.vcgr.genii.container.common.notification.GeniiSubscriptionServiceImpl;
 import edu.virginia.vcgr.genii.container.common.notification.SubscriptionConstructionParameters;
-import edu.virginia.vcgr.genii.container.configuration.ServiceDescription;
+import edu.virginia.vcgr.genii.container.configuration.GenesisIIServiceConfiguration;
+import edu.virginia.vcgr.genii.container.configuration.GenesisIIServiceConfigurationFactory;
+import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.invoker.BaseFaultFixer;
@@ -153,7 +151,9 @@ import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
+import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceProvider;
 import edu.virginia.vcgr.genii.container.resource.db.query.ResourceSummary;
+import edu.virginia.vcgr.genii.container.security.authz.providers.GamlAclAuthZProvider;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.PublisherTopic;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.TopicSet;
@@ -181,14 +181,14 @@ import edu.virginia.vcgr.genii.iterator.IteratorMemberType;
 	DebugInvoker.class, ScheduledTerminationInvoker.class, 
 	MInjectionInvoker.class, TimingHandler.class})
 @ConstructionParametersType(ConstructionParameters.class)
+@GeniiServiceConfiguration(
+	resourceProvider=BasicDBResourceProvider.class,
+	defaultAuthZProvider=GamlAclAuthZProvider.class)
 public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 	GenesisIIBaseTopics
 {
 	static private Log _logger = LogFactory.getLog(GenesisIIBase.class);
 
-	static private QName _SERVICES_QNAME = new QName(
-			GenesisIIConstants.GENESISII_NS, "services");
-	
 	static private EndpointReferenceType _iteratorServiceEPR = null;
 	
 	static private class ServiceBasedSubscriptionFactory
@@ -207,8 +207,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 		new ArrayList<PortType>();
 	private AttributePackage _attributePackage = new AttributePackage();
 	
-	private Properties _defaultResolverFactoryProperties = null;
-	private Class<? extends IResolverFactoryProxy> _defaultResolverFactoryProxyClass = null;
+	private IResolverFactoryProxy _defaultResolverFactoryProxy = null;
 	
 	public abstract PortType getFinalWSResourceInterface();
 	
@@ -910,28 +909,20 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 		/* parse config info for service to see if there is a default resolver service */
 		try
 		{
-			Class<? extends IResolverFactoryProxy> resolverFactoryProxyClass = getDefaultResolverFactoryProxyClass();
+			IResolverFactoryProxy resolverFactoryProxy = 
+				getDefaultResolverFactoryProxy();
 		
-			if (resolverFactoryProxyClass != null)
+			if (resolverFactoryProxy != null)
 			{
-				Properties resolverFactoryProps = getDefaultResolverFactoryProperties();
-				
-				IResolverFactoryProxy resolverFactoryProxy = 
-					(IResolverFactoryProxy) resolverFactoryProxyClass.newInstance();
-				if (resolverFactoryProxy != null)
-				{
-					Resolution newResolution = resolverFactoryProxy.createResolver(
-							newEPR,
-							resolverFactoryProps,
-							resolverCreationParamsArray);
-					if (newResolution != null){
-						_logger.debug("Setup new resolver for instance of service \"" + _serviceName);
-						resolveEPR = newResolution.getResolvedTargetEPR();
-					}
-					else{
-						_logger.debug("No resolver setup for instance of service \"" + _serviceName);
-						resolveEPR = newEPR;
-					}
+				Resolution newResolution = resolverFactoryProxy.createResolver(
+					newEPR, null, resolverCreationParamsArray);
+				if (newResolution != null){
+					_logger.debug("Setup new resolver for instance of service \"" + _serviceName);
+					resolveEPR = newResolution.getResolvedTargetEPR();
+				}
+				else{
+					_logger.debug("No resolver setup for instance of service \"" + _serviceName);
+					resolveEPR = newEPR;
 				}
 			}
 		}
@@ -1020,10 +1011,10 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 	static private Long _serviceCertificateLifetime = null;
 	static private Long _resourceCertificateLifetime = null;
 	
-	@SuppressWarnings("unchecked")
 	private void setLifetimes()
 	{
-		if (_serviceCertificateLifetime == null)		
+		if (_serviceCertificateLifetime == null)
+		{
 			synchronized(GenesisIIBase.class)
 			/* ASG, August 10, 2008. The current code may over synchronize, 
 			 * and depending on the cost of synchronization, may take 
@@ -1038,26 +1029,14 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 			{
 				if (_serviceCertificateLifetime == null)
 				{
-					XMLConfiguration conf = 
-						ConfigurationManager.getCurrentConfiguration().getContainerConfiguration();
-					ArrayList<Object> sections;
-					sections = conf.retrieveSections(_SERVICES_QNAME);
-					for (Object obj : sections)
-					{
-						HashMap<String, ServiceDescription> services =
-							(HashMap<String, ServiceDescription>)obj;
-						ServiceDescription desc = services.get(_serviceName);
-
-						if (desc != null)
-						{
-							_resourceCertificateLifetime =
-								new Long(desc.getResourceCertificateLifetime());
-							_serviceCertificateLifetime = 
-								new Long(desc.getServiceCertificateLifetime());
-						}
-					}
+					GenesisIIServiceConfiguration conf =
+						GenesisIIServiceConfigurationFactory.configurationFor(
+							getClass());
+					_resourceCertificateLifetime = conf.defaultResourceCertificateLifetime();
+					_serviceCertificateLifetime = conf.defaultServiceCertificateLifetime();
 				}
 			}
+		}
 	}
 	
 	protected long getServiceCertificateLifetime()
@@ -1206,45 +1185,24 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 			rKey, myAddress, implementedPortTypes);
 	}
 	
-	@SuppressWarnings("unchecked")
 	private void setDefaultResolverFactoryDescription()
 	{
 		synchronized(GenesisIIBase.class)
 		{
-			if (_defaultResolverFactoryProperties == null || _defaultResolverFactoryProxyClass == null)
+			if (_defaultResolverFactoryProxy == null)
 			{
-				XMLConfiguration conf = 
-					ConfigurationManager.getCurrentConfiguration().getContainerConfiguration();
-				ArrayList<Object> sections;
-				sections = conf.retrieveSections(_SERVICES_QNAME);
-				for (Object obj : sections)
-				{
-					HashMap<String, ServiceDescription> services =
-						(HashMap<String, ServiceDescription>)obj;
-					ServiceDescription desc = services.get(_serviceName);
-					if (desc != null)
-					{
-						_defaultResolverFactoryProperties = 
-							new Properties(desc.getDefaultResolverFactoryProperties());
-						_defaultResolverFactoryProxyClass =
-							desc.getDefaultResolverFactoryProxyClass();
-					}
-				}
+				GenesisIIServiceConfiguration conf =
+					GenesisIIServiceConfigurationFactory.configurationFor(
+						getClass());
+				_defaultResolverFactoryProxy = conf.defaultResolverFactoryProxy();
 			}
 		}
 	}
 
-	protected Properties getDefaultResolverFactoryProperties()
+	protected IResolverFactoryProxy getDefaultResolverFactoryProxy()
 	{
 		setDefaultResolverFactoryDescription();
-		return _defaultResolverFactoryProperties;
-	}
-
-	
-	protected Class<? extends IResolverFactoryProxy> getDefaultResolverFactoryProxyClass()
-	{
-		setDefaultResolverFactoryDescription();
-		return _defaultResolverFactoryProxyClass;
+		return _defaultResolverFactoryProxy;
 	}
 
 	@Override

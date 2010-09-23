@@ -38,12 +38,15 @@ import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
+import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.iterator.IterateRequestType;
 import edu.virginia.vcgr.genii.iterator.IteratorMemberType;
 import edu.virginia.vcgr.genii.iterator.IteratorPortType;
 
 @ConstructionParametersType(IteratorConstructionParameters.class)
+@GeniiServiceConfiguration(
+	resourceProvider=IteratorDBResourceProvider.class)
 public class IteratorServiceImpl extends GenesisIIBase implements
 		IteratorPortType
 {

@@ -1,7 +1,6 @@
 package edu.virginia.vcgr.genii.container.resource.db;
 
 import java.sql.SQLException;
-import java.util.Properties;
 
 import org.morgan.util.configuration.ConfigurationException;
 
@@ -14,21 +13,10 @@ import edu.virginia.vcgr.genii.container.resource.IResourceProvider;
 
 public class BasicDBResourceProvider implements IResourceProvider, Initializable
 {
-	static private final String _CONNECTION_POOL_NAME = 
-		"edu.virginia.vcgr.genii.db.connection-pool";
-	
-	private String _connectionPoolName = null;
 	private IResourceFactory _factory = null;
 	
-	public BasicDBResourceProvider(Properties properties)
-		throws SQLException
+	public BasicDBResourceProvider()
 	{	
-		_connectionPoolName = properties.getProperty(
-			_CONNECTION_POOL_NAME);
-		if (_connectionPoolName == null)
-			throw new ConfigurationException(
-				"Can't create a BasicDBResourceProvider without a connection pool name (\"" 
-					+ _CONNECTION_POOL_NAME + "\".");
 	}
 	
 	private DatabaseConnectionPool createConnectionPool()
@@ -36,15 +24,15 @@ public class BasicDBResourceProvider implements IResourceProvider, Initializable
 	{
 		DatabaseConnectionPool pool = null;
 		
-		Object obj = NamedInstances.getServerInstances().lookup(_connectionPoolName);
+		Object obj = NamedInstances.getServerInstances().lookup("connection-pool");
 		if (obj != null)
 		{
 			pool = (DatabaseConnectionPool)obj;
 			return pool;
 		}
 		
-		throw new ConfigurationException("Couldn't find connection pool \"" +
-			_connectionPoolName + "\".");
+		throw new ConfigurationException(
+			"Couldn't find connection pool.");
 	}
 	
 	synchronized public IResourceFactory getFactory()

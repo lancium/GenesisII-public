@@ -62,11 +62,13 @@ import edu.virginia.vcgr.genii.container.bes.BES;
 import edu.virginia.vcgr.genii.container.bes.BESUtilities;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivityUtils.BESActivityInitInfo;
 import edu.virginia.vcgr.genii.container.bes.activity.forks.RootRNSFork;
+import edu.virginia.vcgr.genii.container.bes.activity.resource.BESActivityDBResourceProvider;
 import edu.virginia.vcgr.genii.container.bes.activity.resource.IBESActivityResource;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.CommonExecutionUnderstanding;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.forkexec.ForkExecPersonalityProvider;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.qsub.QSubPersonalityProvider;
+import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
@@ -75,6 +77,8 @@ import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
 @ForkRoot(RootRNSFork.class)
 @ConstructionParametersType(BESConstructionParameters.class)
+@GeniiServiceConfiguration(
+	resourceProvider=BESActivityDBResourceProvider.class)
 public class BESActivityServiceImpl extends ResourceForkBaseService implements
 	BESActivityPortType, BESActivityConstants, BESActivityTopics
 {

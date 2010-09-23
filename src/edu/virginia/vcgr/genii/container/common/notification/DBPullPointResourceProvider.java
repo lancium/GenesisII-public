@@ -1,7 +1,6 @@
 package edu.virginia.vcgr.genii.container.common.notification;
 
 import java.sql.SQLException;
-import java.util.Properties;
 
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResourceFactory;
@@ -14,11 +13,5 @@ public class DBPullPointResourceProvider extends BasicDBResourceProvider
 		throws SQLException
 	{
 		return new DBPullPointResourceFactory(pool);
-	}
-	
-	public DBPullPointResourceProvider(Properties properties)
-		throws SQLException
-	{
-		super(properties);
 	}
 }

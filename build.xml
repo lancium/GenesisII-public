@@ -128,12 +128,6 @@
 		<copy todir="${deployments.dir}/default/services">
 			<fileset dir="${basedir}/services" includes="**/*.wsdd"/>
 		</copy>
-		<copy todir="${deployments.dir}/GeniiNetBootstrapContainer/services">
-			<fileset dir="${basedir}/services" includes="**/*.wsdd"/>
-		</copy>
-		<copy todir="${deployments.dir}/GeniiNetFullContainer/services">
-			<fileset dir="${basedir}/services" includes="**/*.wsdd"/>
-		</copy>
 	</target>
 
 	<target name="genii.tests.jar"
@@ -313,6 +307,7 @@
 			<src path="${src.dir}"/>
 			<classpath refid="junit.classpath"/>
 			<classpath refid="log4j.classpath"/>
+			<classpath refid="MorganU.classpath"/>
 			<include name="org/morgan/**/*.java"/>
 		</javac>
 		<copy todir="${obj.dir}">
@@ -368,8 +363,6 @@
 		<delete dir="${generated.obj.dir}"/>
 		<delete dir="${obj.dir}"/>
 		<delete dir="${deployments.dir}/default/services" quiet="true"/>
-		<delete dir="${deployments.dir}/GeniiNetFullContainer/services" quiet="true"/>
-		<delete dir="${deployments.dir}/GeniiNetBootstrapContainer/services" quiet="true"/>
 		<delete quiet="true">
 			<fileset dir="${lib.dir}" includes="**/*.jar"/>
 		</delete>

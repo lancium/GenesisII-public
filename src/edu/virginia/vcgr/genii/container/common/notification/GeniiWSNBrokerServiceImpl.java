@@ -28,12 +28,15 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
 import edu.virginia.vcgr.genii.common.notification.GeniiWSNBrokerPortType;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
+import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.cservices.wsn.WSNotificationContainerService;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
+@GeniiServiceConfiguration(
+	resourceProvider=DBBrokerResourceProvider.class)
 public class GeniiWSNBrokerServiceImpl extends GenesisIIBase
 	implements GeniiWSNBrokerPortType
 {

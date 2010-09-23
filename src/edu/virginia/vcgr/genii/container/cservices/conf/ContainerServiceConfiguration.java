@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Element;
 
+import edu.virginia.vcgr.genii.client.configuration.HierarchicalDirectory;
 import edu.virginia.vcgr.genii.client.utils.file.ExtensionFileFilter;
 import edu.virginia.vcgr.genii.container.cservices.ContainerService;
 
@@ -153,7 +154,7 @@ public class ContainerServiceConfiguration
 	}
 	
 	static public Collection<ContainerServiceConfiguration> loadConfigurations(
-		File sourceDirectory) throws IOException
+		HierarchicalDirectory sourceDirectory) throws IOException
 	{
 		Collection<ContainerServiceConfiguration> ret =
 			new LinkedList<ContainerServiceConfiguration>();

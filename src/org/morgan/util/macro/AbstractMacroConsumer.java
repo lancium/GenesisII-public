@@ -17,6 +17,13 @@ abstract class AbstractMacroConsumer implements MacroConsumer, MacroResolver
 	@Override
 	final public String lookup(String key)
 	{
-		return _resolver.lookup(key);
+		try
+		{
+			return _resolver.lookup(key);
+		}
+		catch (Throwable cause)
+		{
+			return "";
+		}
 	}
 }

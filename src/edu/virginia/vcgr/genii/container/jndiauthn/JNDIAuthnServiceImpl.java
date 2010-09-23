@@ -63,6 +63,7 @@ import edu.virginia.vcgr.genii.enhancedrns.IterateListResponseType;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
+import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -95,6 +96,9 @@ import org.apache.axis.AxisFault;
 
 import org.morgan.util.configuration.ConfigurationException;
 
+@GeniiServiceConfiguration(
+	resourceProvider=JNDIResourceProvider.class,
+	defaultAuthZProvider=JNDIAuthZProvider.class)
 public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		JNDIAuthnPortType, EnhancedRNSPortType
 {

@@ -17,7 +17,6 @@
 package edu.virginia.vcgr.genii.container.security.authz.providers;
 
 import java.security.cert.X509Certificate;
-import java.security.cert.CertificateFactory;
 import java.security.GeneralSecurityException;
 
 import java.util.*;
@@ -29,8 +28,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.configuration.ConfigurationException;
 
-import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
-import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.context.*;
 import edu.virginia.vcgr.genii.client.security.MessageLevelSecurityRequirements;
@@ -81,38 +78,10 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 
 	X509Certificate _defaultInitialResourceOwner = null;
 
-	public GamlAclAuthZProvider(Properties properties)
-			throws GeneralSecurityException, IOException
+	public GamlAclAuthZProvider()
+		throws GeneralSecurityException, IOException
 	{
-		// read in the certificate that is to serve as default owner
-		String defaultOwnerCertPath =
-				properties.getProperty(GAML_DEFAULT_OWNER_CERT_PATH);
-
-		if (defaultOwnerCertPath != null)
-		{
-			synchronized (_defaultCertCache)
-			{
-				_defaultInitialResourceOwner =
-						_defaultCertCache.get(defaultOwnerCertPath);
-				if (_defaultInitialResourceOwner == null)
-				{
-					CertificateFactory cf =
-						CertificateFactory.getInstance("X.509");
-					_defaultInitialResourceOwner =
-						(X509Certificate) cf.generateCertificate(
-							new FileInputStream(Installation.getDeployment(
-								new DeploymentName()
-								).security().getSecurityFile(defaultOwnerCertPath)));
-					_defaultCertCache.put(defaultOwnerCertPath,
-							_defaultInitialResourceOwner);
-
-				}
-			}
-		}
-		else
-		{
-			_defaultInitialResourceOwner = Container.getContainerCertChain()[0];
-		}
+		_defaultInitialResourceOwner = Container.getContainerCertChain()[0];
 	}
 
 	/**

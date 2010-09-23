@@ -1,6 +1,5 @@
 package edu.virginia.vcgr.genii.container.cservices;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -17,27 +16,23 @@ import org.morgan.util.configuration.ConfigurationException;
 
 import edu.virginia.vcgr.genii.client.configuration.Deployment;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
+import edu.virginia.vcgr.genii.client.configuration.HierarchicalDirectory;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.NamedInstances;
 import edu.virginia.vcgr.genii.container.cservices.conf.ContainerServiceConfiguration;
-import edu.virginia.vcgr.genii.container.cservices.ver1.Version1Upgrader;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 
 public class ContainerServices
 {
-static private Log _logger = LogFactory.getLog(ContainerServices.class);
-	
-	static final private String _CONTAINER_SERVICES_FILENAME = 
-		"container-services.xml";
+	static private Log _logger = LogFactory.getLog(ContainerServices.class);
 	
 	static private Map<Class<? extends ContainerService>, ContainerService> _services = null;
 	
-	static private Collection<ContainerService> getServices(File configFile)
+	static private Collection<ContainerService> getServices(HierarchicalDirectory configDirectory)
 		throws IOException
 	{
-		File configurationDirectory = new File(configFile.getParentFile(),
+		HierarchicalDirectory configurationDirectory = configDirectory.lookupDirectory(
 			"cservices");
-		Version1Upgrader.upgrade(configFile, configurationDirectory);
 		Collection<ContainerServiceConfiguration> configs =
 			ContainerServiceConfiguration.loadConfigurations(
 				configurationDirectory);
@@ -109,39 +104,35 @@ static private Log _logger = LogFactory.getLog(ContainerServices.class);
 		
 		Deployment deployment = Installation.getDeployment(
 			new DeploymentName());
-		File configFile = deployment.getConfigurationFile(
-			_CONTAINER_SERVICES_FILENAME);
-		if (configFile != null)
+		try
 		{
-			try
+			Collection<ContainerService> services = getServices(
+				deployment.getConfigurationDirectory());
+			if (services != null)
 			{
-				Collection<ContainerService> services = getServices(configFile);
-				if (services != null)
+				for (ContainerService service : services)
 				{
-					for (ContainerService service : services)
+					_services.put(service.getClass(), service);
+					try
 					{
-						_services.put(service.getClass(), service);
-						try
-						{
-							service.load(executor, connectionPool, properties);
-						}
-						catch (Throwable cause)
-						{
-							_logger.error(String.format(
-								"Unable to load service \"%s\".", 
-								service.serviceName()), cause);
-							toRemove.add(service.serviceName());
-						}
+						service.load(executor, connectionPool, properties);
 					}
-					
-					for (String remove : toRemove)
-						_services.remove(remove);
+					catch (Throwable cause)
+					{
+						_logger.error(String.format(
+							"Unable to load service \"%s\".", 
+							service.serviceName()), cause);
+						toRemove.add(service.serviceName());
+					}
 				}
+				
+				for (String remove : toRemove)
+					_services.remove(remove);
 			}
-			catch (IOException ioe)
-			{
-				_logger.error("Unable to load any container services.", ioe);
-			}
+		}
+		catch (IOException ioe)
+		{
+			_logger.error("Unable to load any container services.", ioe);
 		}
 	}
 	

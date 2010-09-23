@@ -31,6 +31,7 @@ import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
+import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.replicatedExport.resolver.RExportResolverFactoryPortType;
 import edu.virginia.vcgr.genii.resolver.simple.CreateResolverRequestType;
 import edu.virginia.vcgr.genii.resolver.simple.CreateResolverResponseType;
@@ -39,7 +40,10 @@ import edu.virginia.vcgr.genii.replicatedExport.resolver.RExportResolverPortType
 import edu.virginia.vcgr.genii.replicatedExport.resolver.UpdateRequestType;
 import edu.virginia.vcgr.genii.replicatedExport.resolver.CreateRootReplicaRequest;
 
-public class RExportResolverFactoryServiceImpl extends GenesisIIBase implements RExportResolverFactoryPortType
+@GeniiServiceConfiguration(
+	resourceProvider=RExportResolverFactoryDBResourceProvider.class)
+public class RExportResolverFactoryServiceImpl
+	extends GenesisIIBase implements RExportResolverFactoryPortType
 {
 	static private Log _logger = LogFactory.getLog(RExportResolverFactoryServiceImpl.class);
 	

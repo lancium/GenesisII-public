@@ -66,6 +66,7 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
 
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
+import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
@@ -74,7 +75,10 @@ import edu.virginia.vcgr.genii.resolver.simple.SimpleResolverPortType;
 import edu.virginia.vcgr.genii.resolver.simple.UpdateRequestType;
 import edu.virginia.vcgr.genii.resolver.simple.UpdateResponseType;
 
-public class SimpleResolverServiceImpl extends GenesisIIBase implements SimpleResolverPortType
+@GeniiServiceConfiguration(
+	resourceProvider=SimpleResolverDBResourceProvider.class)
+public class SimpleResolverServiceImpl extends GenesisIIBase
+	implements SimpleResolverPortType
 {	
 	static private Log _logger = LogFactory.getLog(SimpleResolverServiceImpl.class);
 	static public QName SIMPLE_RESOLVER_TARGET_CONSTRUCTION_PARAMETER =

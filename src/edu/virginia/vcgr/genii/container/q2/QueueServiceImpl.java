@@ -44,11 +44,13 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.BESActivityTopics
 
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 
+import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.forks.RootRNSFork;
 import edu.virginia.vcgr.genii.container.q2.resource.IQueueResource;
 import edu.virginia.vcgr.genii.container.q2.resource.QueueDBResourceFactory;
+import edu.virginia.vcgr.genii.container.q2.resource.QueueDBResourceProvider;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.resource.StringResourceIdentifier;
@@ -78,6 +80,8 @@ import edu.virginia.vcgr.jsdl.sweep.SweepUtility;
  * @author mmm2a
  */
 @ForkRoot(RootRNSFork.class)
+@GeniiServiceConfiguration(
+	resourceProvider=QueueDBResourceProvider.class)
 public class QueueServiceImpl extends ResourceForkBaseService
 	implements QueuePortType
 {

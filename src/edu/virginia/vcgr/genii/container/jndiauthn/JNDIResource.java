@@ -8,15 +8,10 @@ import javax.xml.namespace.QName;
 
 import org.ggf.rns.RNSEntryExistsFaultType;
 
-import org.morgan.util.configuration.ConfigurationException;
-import org.morgan.util.configuration.XMLConfiguration;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
-import edu.virginia.vcgr.genii.client.GenesisIIConstants;
-import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.SecurityConstants;
-import edu.virginia.vcgr.genii.container.configuration.ServiceDescription;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -25,11 +20,6 @@ import edu.virginia.vcgr.genii.container.rns.RNSDBResource;
 
 public class JNDIResource extends RNSDBResource implements IJNDIResource
 {
-
-	// used for pulling out the credential duration
-	static private final QName _SERVICES_QNAME =
-			new QName(GenesisIIConstants.GENESISII_NS, "services");
-	static protected Long _resourceCertificateLifetime = null;
 
 	// transient properties for the resource
 	transient protected HashMap<String, Object> _properties =
@@ -104,41 +94,6 @@ public class JNDIResource extends RNSDBResource implements IJNDIResource
 		String epiStr = type + ":" + _resourceKey + ":IDP:" + childName;
 
 		return new URI(epiStr);
-	}
-
-	@SuppressWarnings("unchecked")
-	protected long getResourceCertLifetime() throws ResourceException,
-			ConfigurationException
-	{
-		synchronized (this.getClass())
-		{
-
-			if (_resourceCertificateLifetime != null)
-			{
-				return _resourceCertificateLifetime.longValue();
-			}
-
-			XMLConfiguration conf =
-					ConfigurationManager.getCurrentConfiguration()
-							.getContainerConfiguration();
-			ArrayList<Object> sections;
-			sections = conf.retrieveSections(_SERVICES_QNAME);
-			for (Object obj : sections)
-			{
-				HashMap<String, ServiceDescription> services =
-						(HashMap<String, ServiceDescription>) obj;
-				ServiceDescription desc =
-						services.get(this.getParentResourceKey()
-								.getServiceName());
-				if (desc != null)
-				{
-					_resourceCertificateLifetime =
-							new Long(desc.getResourceCertificateLifetime());
-					break;
-				}
-			}
-			return _resourceCertificateLifetime.longValue();
-		}
 	}
 
 	@Override

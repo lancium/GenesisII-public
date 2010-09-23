@@ -89,11 +89,13 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
+import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rns.IRNSResource;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
+import edu.virginia.vcgr.genii.container.rns.RNSDBResourceProvider;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto;
@@ -113,6 +115,8 @@ import org.apache.axis.AxisFault;
 import org.morgan.inject.MInject;
 import org.morgan.util.configuration.ConfigurationException;
 
+@GeniiServiceConfiguration(
+	resourceProvider=RNSDBResourceProvider.class)
 public class X509AuthnServiceImpl extends GenesisIIBase
 	implements X509AuthnPortType
 {

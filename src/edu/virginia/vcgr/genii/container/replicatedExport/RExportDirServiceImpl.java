@@ -45,11 +45,14 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
 import edu.virginia.vcgr.genii.container.byteio.RandomByteIOAttributeHandlers;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
+import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.replicatedExport.RExportDirPortType;
 import edu.virginia.vcgr.genii.replicatedExport.PopulateDirRequestType;
 
+@GeniiServiceConfiguration(
+	resourceProvider=RExportDBResourceProvider.class)
 public class RExportDirServiceImpl extends GenesisIIBase 
 	implements RExportDirPortType
 {

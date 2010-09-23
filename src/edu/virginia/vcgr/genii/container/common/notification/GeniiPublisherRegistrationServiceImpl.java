@@ -15,9 +15,12 @@ import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
 import edu.virginia.vcgr.genii.common.notification.GeniiPublisherRegistrationPortType;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
+import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 
+@GeniiServiceConfiguration(
+	resourceProvider=DBPublisherRegistrationResourceProvider.class)
 public class GeniiPublisherRegistrationServiceImpl extends GenesisIIBase
-		implements GeniiPublisherRegistrationPortType
+	implements GeniiPublisherRegistrationPortType
 {
 	public GeniiPublisherRegistrationServiceImpl()
 		throws RemoteException

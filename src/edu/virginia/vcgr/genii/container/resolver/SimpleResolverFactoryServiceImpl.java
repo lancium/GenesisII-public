@@ -39,6 +39,7 @@ import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
+import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.resolver.simple.CreateResolverRequestType;
 import edu.virginia.vcgr.genii.resolver.simple.CreateResolverResponseType;
@@ -46,7 +47,10 @@ import edu.virginia.vcgr.genii.resolver.simple.InvalidWSNameFaultType;
 import edu.virginia.vcgr.genii.resolver.simple.SimpleResolverFactoryPortType;
 import edu.virginia.vcgr.genii.resolver.simple.SimpleResolverPortType;
 
-public class SimpleResolverFactoryServiceImpl extends GenesisIIBase implements SimpleResolverFactoryPortType
+@GeniiServiceConfiguration(
+	resourceProvider=SimpleResolverFactoryDBResourceProvider.class)
+public class SimpleResolverFactoryServiceImpl extends GenesisIIBase
+	implements SimpleResolverFactoryPortType
 {	
 	static private Log _logger = LogFactory.getLog(SimpleResolverFactoryServiceImpl.class);
 	static private String _simpleResolverServiceURL = null;

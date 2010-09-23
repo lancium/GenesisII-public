@@ -429,6 +429,24 @@ public class Container extends ApplicationBase
 		return (JavaServiceDesc)ss.getServiceDescription(); 
 	}
 	
+	static public Class<?> classForService(String serviceName)
+	{
+		try
+		{
+			JavaServiceDesc desc = findService(serviceName);
+			if (desc != null)
+				return desc.getImplClass();
+		}
+		catch (AxisFault fault)
+		{
+			_logger.error(String.format(
+				"Error find service description for service %s.",
+				serviceName), fault);
+		}
+		
+		return null;
+	}
+	
 	static public ArrayList<JavaServiceDesc> getInstalledServices()
 	{
 		ArrayList<JavaServiceDesc> installedServices = 

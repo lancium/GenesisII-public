@@ -63,10 +63,10 @@ public class JNDIAuthZProvider implements IAuthZProvider
 	static private Log _logger = LogFactory.getLog(JNDIAuthZProvider.class);
 	static private GamlAclAuthZProvider _gamlAclProvider = null;
 
-	public JNDIAuthZProvider(Properties properties)
-			throws GeneralSecurityException, IOException
+	public JNDIAuthZProvider()
+		throws GeneralSecurityException, IOException
 	{
-		_gamlAclProvider = new GamlAclAuthZProvider(properties);
+		_gamlAclProvider = new GamlAclAuthZProvider();
 	}
 
 	/**

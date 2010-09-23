@@ -41,11 +41,14 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.policy.SubscriptionPoli
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.policy.SubscriptionPolicyTypes;
 import edu.virginia.vcgr.genii.common.notification.GeniiSubscriptionPortType;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
+import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
 @ConstructionParametersType(SubscriptionConstructionParameters.class)
+@GeniiServiceConfiguration(
+	resourceProvider=DBSubscriptionResourceProvider.class)
 public class GeniiSubscriptionServiceImpl extends GenesisIIBase
 	implements GeniiSubscriptionPortType
 {

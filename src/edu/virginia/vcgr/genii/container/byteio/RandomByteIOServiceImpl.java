@@ -62,6 +62,7 @@ import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.common.GeniiNoOutCalls;
+import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceLock;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
@@ -70,6 +71,8 @@ import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.TopicSet;
 
 import org.apache.axis.message.MessageElement;
 
+@GeniiServiceConfiguration(
+	resourceProvider=RByteIOResourceProvider.class)
 public class RandomByteIOServiceImpl extends GenesisIIBase
 	implements RandomByteIOPortType, GeniiNoOutCalls, ByteIOTopics
 {

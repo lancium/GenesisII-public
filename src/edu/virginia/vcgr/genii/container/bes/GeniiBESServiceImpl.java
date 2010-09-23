@@ -70,8 +70,10 @@ import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivityServiceImpl;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivityUtils;
 import edu.virginia.vcgr.genii.container.bes.forks.BESRootRNSFork;
+import edu.virginia.vcgr.genii.container.bes.resource.BESDBResourceProvider;
 import edu.virginia.vcgr.genii.container.bes.resource.DBBESResourceFactory;
 import edu.virginia.vcgr.genii.container.bes.resource.IBESResource;
+import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -82,6 +84,8 @@ import edu.virginia.vcgr.jsdl.JobDefinition;
 
 @ForkRoot(BESRootRNSFork.class)
 @ConstructionParametersType(BESConstructionParameters.class)
+@GeniiServiceConfiguration(
+	resourceProvider=BESDBResourceProvider.class)
 public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 	GeniiBESPortType, BESConstants
 {

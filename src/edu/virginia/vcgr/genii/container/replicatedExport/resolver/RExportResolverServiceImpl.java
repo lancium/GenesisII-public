@@ -66,6 +66,7 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.GenesisIIBaseTopi
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ResourceTerminationContents;
 
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
+import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 
@@ -84,6 +85,8 @@ import edu.virginia.vcgr.genii.replicatedExport.resolver.CreateRootReplicaRespon
 import edu.virginia.vcgr.genii.replicatedExport.resolver.EPRRequestResponse;
 import edu.virginia.vcgr.genii.replicatedExport.resolver.ServiceEPRRequest;
 
+@GeniiServiceConfiguration(
+	resourceProvider=RExportResolverDBResourceProvider.class)
 public class RExportResolverServiceImpl extends GenesisIIBase 
 	implements RExportResolverPortType
 {

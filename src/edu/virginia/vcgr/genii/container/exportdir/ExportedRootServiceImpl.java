@@ -36,7 +36,9 @@ import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.container.Container;
+import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
+import edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverFactoryProxy;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.exportdir.ExportedDirPortType;
@@ -44,8 +46,11 @@ import edu.virginia.vcgr.genii.exportdir.ExportedRootPortType;
 import edu.virginia.vcgr.genii.exportdir.QuitExport;
 import edu.virginia.vcgr.genii.exportdir.QuitExportResponse;
 
-public class ExportedRootServiceImpl extends ExportedDirServiceImpl implements
-		ExportedRootPortType
+@GeniiServiceConfiguration(
+	resourceProvider=ExportedRootDBResourceProvider.class,
+	defaultResolverFactoryProxy=RExportResolverFactoryProxy.class)
+public class ExportedRootServiceImpl extends ExportedDirServiceImpl
+	implements ExportedRootPortType
 {
 	static private Log _logger = LogFactory.getLog(ExportedRootServiceImpl.class);
 	

@@ -48,6 +48,7 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.SByteIOTopics;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
+import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceLock;
@@ -55,6 +56,8 @@ import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.PublisherTopic;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.TopicSet;
 
+@GeniiServiceConfiguration(
+	resourceProvider=SByteIOResourceProvider.class)
 public class StreamableByteIOServiceImpl extends GenesisIIBase 
 	implements StreamableByteIOPortType, ByteIOTopics, SByteIOTopics
 {

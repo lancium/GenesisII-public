@@ -49,12 +49,15 @@ import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.security.SecurityUtils;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
+import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.client.security.x509.CertGeneratorUtils;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 
+@GeniiServiceConfiguration(
+	resourceProvider=CertGeneratorDBResourceProvider.class)
 public class CertGeneratorServiceImpl extends GenesisIIBase implements CertGeneratorPortType
 {	
 	static private Log _logger = LogFactory.getLog(CertGeneratorServiceImpl.class);
