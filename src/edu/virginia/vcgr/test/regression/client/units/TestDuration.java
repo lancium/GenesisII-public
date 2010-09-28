@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.client.units;
+package edu.virginia.vcgr.test.regression.client.units;
 
 import org.junit.Assert;
 import org.junit.Test;

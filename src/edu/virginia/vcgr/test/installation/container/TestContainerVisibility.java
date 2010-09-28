@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.genii.container;
+package edu.virginia.vcgr.test.installation.container;
 
 import java.io.IOException;
 import java.net.Inet4Address;

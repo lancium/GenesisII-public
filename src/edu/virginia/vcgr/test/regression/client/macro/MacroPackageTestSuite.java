@@ -1,11 +1,11 @@
-package edu.virginia.vcgr.client;
+package edu.virginia.vcgr.test.regression.client.macro;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses(TestNetVisibility.class)
-public class ClientPackageTestSuite
+@SuiteClasses(TestMacros.class)
+public class MacroPackageTestSuite
 {
 }

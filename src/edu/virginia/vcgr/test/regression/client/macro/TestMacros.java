@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.client.macro;
+package edu.virginia.vcgr.test.regression.client.macro;
 
 import java.util.Properties;
 

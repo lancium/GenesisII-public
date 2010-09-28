@@ -122,32 +122,12 @@
 	<!-- Build Targets -->
 	<target name="build" depends="jars,scripts,deployments"/>
 
-	<target name="jars" depends="genii.container.jar,genii.client.jar,ogrsh.jar,genii.ws.jar,genii.wsdl.jar,morgan.utilities.jar,genii.dpages.jars,genii.tests.jar"/>
+	<target name="jars" depends="genii.container.jar,genii.client.jar,ogrsh.jar,genii.ws.jar,genii.wsdl.jar,morgan.utilities.jar,genii.dpages.jars"/>
 
 	<target name="deployments" depends="generate.ws.source">
 		<copy todir="${deployments.dir}/default/services">
 			<fileset dir="${basedir}/services" includes="**/*.wsdd"/>
 		</copy>
-	</target>
-
-	<target name="genii.tests.jar"
-		depends="genii.regression-test.jar,genii.installation-test.jar"/>
-
-	<target name="genii.regression-test.jar" depends="regression-test.compile">
-		<jar destfile="${lib.dir}/GenesisII-regression-test.jar">
-			<fileset dir="${regression-test-obj.dir}">
-				<include name="**/*"/>
-			</fileset>
-		</jar>
-	</target>
-
-	<target name="genii.installation-test.jar"
-		depends="installation-test.compile">
-		<jar destfile="${lib.dir}/GenesisII-installation-test.jar">
-			<fileset dir="${installation-test-obj.dir}">
-				<include name="**/*"/>
-			</fileset>
-		</jar>
 	</target>
 
 	<target name="genii.container.jar" depends="genii.compile">
@@ -175,6 +155,7 @@
 	<target name="genii.client.jar" depends="genii.compile">
 		<jar destfile="${lib.dir}/GenesisII-client.jar">
 			<fileset dir="${obj.dir}">
+				<include name="edu/virginia/vcgr/test/**/*"/>
 				<include name="edu/virginia/vcgr/fsii/**/*"/>
 				<include name="edu/virginia/vcgr/genii/client/**/*"/>
 				<include name="edu/virginia/vcgr/genii/ui/**/*"/>
@@ -327,32 +308,6 @@
 		</javac>
 		<copy todir="${obj.dir}">
 			<fileset dir="${src.dir}"
-				includes="${default.compile.copy.includes}"/>
-		</copy>
-	</target>
-
-	<target name="regression-test.compile" depends="init,genii.compile">
-		<javac debug="${debug.on}" destdir="${regression-test-obj.dir}">
-			<src path="${regression-test-src.dir}"/>
-			<classpath refid="project.classpath"/>
-			<classpath refid="genii.ws.classpath"/>
-			<include name="**/*.java"/>
-		</javac>
-		<copy todir="${regression-test-obj.dir}">
-			<fileset dir="${regression-test-src.dir}"
-				includes="${default.compile.copy.includes}"/>
-		</copy>
-	</target>
-
-	<target name="installation-test.compile" depends="init,genii.compile">
-		<javac debug="${debug.on}" destdir="${installation-test-obj.dir}">
-			<src path="${installation-test-src.dir}"/>
-			<classpath refid="project.classpath"/>
-			<classpath refid="genii.ws.classpath"/>
-			<include name="**/*.java"/>
-		</javac>
-		<copy todir="${installation-test-obj.dir}">
-			<fileset dir="${installation-test-src.dir}"
 				includes="${default.compile.copy.includes}"/>
 		</copy>
 	</target>

@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry excluding="edu/virginia/vcgr/genii/container/factory/GeniiFactoryServiceImpl.java" kind="src" path="src"/>
-	<classpathentry kind="src" output="regression-test-bin" path="regression-test"/>
-	<classpathentry kind="src" output="installation-test-bin" path="installation-test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="ext/axis/ext/activation.jar"/>
 	<classpathentry kind="lib" path="ext/axis/ext/mail.jar"/>

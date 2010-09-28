@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.client;
+package edu.virginia.vcgr.test.installation.client;
 
 import java.io.StringReader;
 import java.io.StringWriter;

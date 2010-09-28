@@ -1,7 +1,7 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
-import edu.virginia.vcgr.RootInstallationTestSuite;
-import edu.virginia.vcgr.RootRegressionTestSuite;
+import edu.virginia.vcgr.test.installation.RootInstallationTestSuite;
+import edu.virginia.vcgr.test.regression.RootRegressionTestSuite;
 
 public enum JUnitTestTypes
 {
