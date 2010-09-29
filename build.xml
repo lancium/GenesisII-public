@@ -253,8 +253,6 @@
 	<target name="genii.compile" depends="init,genii.ws">
 		<javac debug="${debug.on}" destdir="${obj.dir}">
 			<src path="${src.dir}"/>
-			<src path="${basedir}/regression-test"/>
-			<src path="${basedir}/installation-test"/>
 			<classpath refid="project.classpath"/>
 			<classpath refid="genii.ws.classpath"/>
 			<include name="**/*.java"/>
