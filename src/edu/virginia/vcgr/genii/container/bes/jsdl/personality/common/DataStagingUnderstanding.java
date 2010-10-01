@@ -52,6 +52,10 @@ public class DataStagingUnderstanding
 		this._filename = _filename;
 	}
 	
+	public String getFilename(){
+		return this._filename;
+	}
+	
 	public URI getSourceURI()
 	{
 		return _sourceURI;

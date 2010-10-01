@@ -123,6 +123,8 @@
 	<genii:tools>
 		<mconf:class name="touch"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.TouchTool</mconf:class>
+		<mconf:class name="runJSDL"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.RunJSDL</mconf:class>
 		<mconf:class name="idp"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.IdpTool</mconf:class>
 		<mconf:class name="authz"

@@ -43,7 +43,7 @@ public class CopyTool extends BaseGridTool
 		StreamUtils.copyStream(in, out);
 	}
 	
-	public void copy(String sourcePath, String targetPath)
+	public static void copy(String sourcePath, String targetPath)
 		throws FileNotFoundException, IOException
 	{
 		String sourceName = null;
