@@ -264,6 +264,8 @@ public class Container extends ApplicationBase
 			Installation.getDeployment(
 				new DeploymentName()).getServicesDirectory());
 		
+		Collection<IContainerManaged> containerServiceObjects =
+			new ArrayList<IContainerManaged>(containerServices.size());
 		for (Class<? extends IContainerManaged> service : containerServices)
 		{
 			try
@@ -271,9 +273,34 @@ public class Container extends ApplicationBase
 				Constructor<?> cons = service.getConstructor(new Class[0]);
 				IContainerManaged base =
 					(IContainerManaged)cons.newInstance(new Object[0]);
-				base.startup();
+				containerServiceObjects.add(base);
+				
+				try
+				{
+					base.cleanupHook();
+				}
+				catch (Throwable cause)
+				{
+					_logger.warn(String.format(
+						"Unable to run clean up hook on %s.", service), cause);
+				}
+				
+				containerServiceObjects.add(base);
+			}
+			catch (Throwable cause)
+			{
+				_logger.warn(String.format(
+					"Unable to configure service:  %s.", service), cause);
+			}
+		}
+		
+		for (IContainerManaged service : containerServiceObjects)
+		{
+			try
+			{
+				service.startup();
 				_postStartupWorkQueue.enqueue(
-					new PostStartupRunnable(base));
+					new PostStartupRunnable(service));
 			}
 			catch (Throwable cause)
 			{

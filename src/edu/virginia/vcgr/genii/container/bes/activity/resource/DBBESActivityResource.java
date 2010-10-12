@@ -22,7 +22,6 @@ import org.ggf.bes.factory.UnknownActivityIdentifierFaultType;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 
-import edu.virginia.vcgr.genii.client.io.FileSystemUtils;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.bes.BES;
@@ -69,18 +68,20 @@ public class DBBESActivityResource extends BasicDBResource implements
 			{
 				if (BESUtilities.isDeletable(dir.getWorkingDirectory())
 					|| dir.mustDelete())
-					FileSystemUtils.recursiveDelete(dir.getWorkingDirectory(), false);				
+						PersistentDelete.persistentDelete(
+							dir.getWorkingDirectory());				
 			}
 		} else
 		{
 			if (BESUtilities.isDeletable(dir.getWorkingDirectory()) 
 				|| dir.mustDelete())
-				FileSystemUtils.recursiveDelete(dir.getWorkingDirectory(), false);			
+					PersistentDelete.persistentDelete(
+						dir.getWorkingDirectory());			
 		}
 		
 		try
 		{
-			bes.deleteActivity(_resourceKey);
+			bes.deleteActivity(getConnection(), _resourceKey);
 		}
 		catch (UnknownActivityIdentifierFaultType uaift)
 		{

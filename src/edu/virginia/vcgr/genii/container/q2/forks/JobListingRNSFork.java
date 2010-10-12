@@ -107,12 +107,13 @@ public class JobListingRNSFork extends AbstractRNSResourceFork
 			{
 				if (entryName != null)
 				{
-					if (!job.getJobTicket().equals(entryName))
-						continue;
-					else
+					if (job.getJobTicket().equals(entryName) ||
+						((job.getJobTicket() + ".activity").equals(entryName) && showEPR))
 						_logger.debug(String.format(
 							"Found the entry name \"%s\" in the JobListingRNSFork.",
 							entryName));
+					else
+						continue;
 				}
 				
 				boolean passes = false;
@@ -135,10 +136,12 @@ public class JobListingRNSFork extends AbstractRNSResourceFork
 				if (!passes)
 					continue;
 				
-				ret.add(createInternalEntry(exemplarEPR, job.getJobTicket(),
-					new JobInformationFork(getService(), 
-						formForkPath(job.getJobTicket())).describe()));
-				if (mineOnly && showEPR)
+				if (entryName == null || !entryName.endsWith(".activity"))
+					ret.add(createInternalEntry(exemplarEPR, job.getJobTicket(),
+						new JobInformationFork(getService(), 
+							formForkPath(job.getJobTicket())).describe()));
+				if (mineOnly && showEPR && 
+					(entryName == null || entryName.endsWith(".activity")))
 				{
 					try
 					{

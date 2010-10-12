@@ -65,7 +65,19 @@ class PersistentOutcallEntry
 		@Override
 		public int compare(PersistentOutcallEntry o1, PersistentOutcallEntry o2)
 		{
-			return o1._nextAttempt.compareTo(o2._nextAttempt);
+			int ret = o1._nextAttempt.compareTo(o2._nextAttempt);
+			if (ret == 0)
+			{
+				long val = o1.entryID() - o2.entryID();
+				if (val == 0L)
+					return 0;
+				else if (val < 0L)
+					return -1;
+				else
+					return 1;
+			}
+			
+			return ret;
 		}
 	}
 	

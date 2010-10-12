@@ -54,7 +54,7 @@ public class QueueInformation extends GenesisIIStyledPage
 		ps.println("</TD>");
 		ps.println("<TD>");
 		ps.format("<IMG SRC=\"queue-resources.png?queueID=%1$s&width=%2$d&height=%3$d\" " +
-			"ALT=\"*\" width\"%2$d\" height=\"%3$d\"/>",
+			"ALT=\"*\" width=\"%2$d\" height=\"%3$d\"/>",
 			_queueID, QueueResources.WIDTH, QueueResources.HEIGHT);
 		ps.println("</TD>");
 		ps.println("</TR>");

@@ -242,10 +242,9 @@ public class BES implements Closeable
 		}
 	}
 	
-	synchronized static public void deleteBES(String besid)
-		throws SQLException
+	synchronized static public void deleteBES(Connection connection, 
+		String besid) throws SQLException
 	{
-		Connection connection = null;
 		PreparedStatement stmt = null;
 		
 		BES bes = _knownInstances.get(besid);
@@ -254,23 +253,20 @@ public class BES implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire(false);
 			stmt = connection.prepareStatement(
 				"DELETE FROM bespolicytable WHERE besid = ?");
 			stmt.setString(1, besid);
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException(
 					"Unable to update database table for bes deletion.");
-			connection.commit();
 			
 			_knownInstances.remove(besid);
-			bes.delete();
+			bes.delete(connection);
 			StreamUtils.close(bes);
 		}
 		finally
 		{
 			StreamUtils.close(stmt);
-			_connectionPool.release(connection);
 		}
 	}
 	
@@ -313,13 +309,13 @@ public class BES implements Closeable
 			_containedActivities.values());
 	}
 	
-	synchronized private void delete() throws SQLException
+	synchronized private void delete(Connection connection) throws SQLException
 	{
 		for (String activity : _containedActivities.keySet())
 		{
 			try
 			{
-				deleteActivity(activity);
+				deleteActivity(connection, activity);
 			}
 			catch (UnknownActivityIdentifierFaultType uaift)
 			{
@@ -368,7 +364,7 @@ public class BES implements Closeable
 	}
 	
 	synchronized public BESActivity createActivity(
-		String activityid,
+		Connection parentConnection, String activityid,
 		JobDefinition_Type jsdl, Collection<Identity> owners,
 		ICallingContext callingContext, BESWorkingDirectory activityCWD,
 		Vector<ExecutionPhase> executionPlan, 
@@ -385,7 +381,11 @@ public class BES implements Closeable
 		
 		try
 		{
-			connection = _connectionPool.acquire(false);
+			if (parentConnection != null)
+				connection = parentConnection;
+			else
+				connection = _connectionPool.acquire(false);
+			
 			stmt = connection.prepareStatement(
 				"INSERT INTO besactivitiestable " +
 					"(activityid, besid, jsdl, owners, callingcontext, " +
@@ -430,7 +430,9 @@ public class BES implements Closeable
 		finally
 		{
 			StreamUtils.close(stmt);
-			_connectionPool.release(connection);
+			
+			if (parentConnection == null)
+				_connectionPool.release(connection);
 		}
 	}
 	
@@ -439,8 +441,9 @@ public class BES implements Closeable
 		return _containedActivities.get(activityid);
 	}
 	
-	synchronized public void deleteActivity(String activityid)
-		throws UnknownActivityIdentifierFaultType, SQLException
+	synchronized public void deleteActivity(Connection connection,
+		String activityid) throws UnknownActivityIdentifierFaultType, 
+			SQLException
 	{
 		UnknownActivityIdentifierFaultType fault = null;
 		
@@ -451,12 +454,10 @@ public class BES implements Closeable
 		else
 			StreamUtils.close(activity);
 		
-		Connection connection = null;
 		PreparedStatement stmt = null;
 		
 		try
 		{
-			connection = _connectionPool.acquire(false);
 			stmt = connection.prepareStatement(
 				"DELETE FROM besactivitiestable WHERE activityid = ?");
 			stmt.setString(1, activityid);
@@ -473,7 +474,6 @@ public class BES implements Closeable
 				"DELETE FROM besactivityfaultstable WHERE besactivityid = ?");
 			stmt.setString(1, activityid);
 			stmt.executeUpdate();
-			connection.commit();
 			
 			_containedActivities.remove(activityid);
 			removeActivityToBESMapping(activityid);
@@ -484,7 +484,6 @@ public class BES implements Closeable
 		finally
 		{
 			StreamUtils.close(stmt);
-			_connectionPool.release(connection);
 		}
 	}
 	

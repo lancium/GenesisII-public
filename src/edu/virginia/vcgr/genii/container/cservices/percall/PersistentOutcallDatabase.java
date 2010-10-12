@@ -17,6 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.Triple;
 import org.morgan.util.io.StreamUtils;
+import org.ws.addressing.AttributedURIType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.context.ContextManager;
@@ -175,6 +176,11 @@ class PersistentOutcallDatabase
 			throw new SQLException(
 				"Unable to get current working context.", ioe);
 		}
+		
+		if (target == null)
+			target = new EndpointReferenceType(
+				new AttributedURIType("http://tempuri.org"),
+				null, null, null);
 		
 		try
 		{

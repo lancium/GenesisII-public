@@ -15,6 +15,8 @@
  */
 package edu.virginia.vcgr.genii.container.bes.activity.resource;
 
+import java.sql.Connection;
+
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
@@ -30,4 +32,6 @@ public interface IBESActivityResource extends IResource
 	
 	public BESActivity findActivity()
 		throws ResourceUnknownFaultType;
+	
+	public Connection getConnection();
 }

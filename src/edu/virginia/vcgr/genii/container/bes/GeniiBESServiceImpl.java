@@ -129,9 +129,13 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 					isGood = true;
 					try
 					{
-						Calendar createTime = _resource.createTime();
-						isGood = (System.currentTimeMillis() - createTime.getTimeInMillis()) <
-							(1000L * 60 * 60 * 24 * 28);
+						Calendar createTime = 
+							ResourceManager.getCurrentResource().dereference().createTime();
+						if (createTime == null)
+							isGood = false;
+						else
+							isGood = (System.currentTimeMillis() - createTime.getTimeInMillis()) <
+								(1000L * 60 * 60 * 24 * 28);
 					}
 					catch (Throwable cause)
 					{

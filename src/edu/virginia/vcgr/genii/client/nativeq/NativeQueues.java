@@ -7,7 +7,7 @@ public class NativeQueues
 	static private ServiceLoader<NativeQueue> _queues =
 		ServiceLoader.load(NativeQueue.class);
 	
-	static public NativeQueue getNativeQueue(String providerName)
+	synchronized static public NativeQueue getNativeQueue(String providerName)
 		throws NativeQueueException
 	{
 		for (NativeQueue queue : _queues)

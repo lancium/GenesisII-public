@@ -72,7 +72,7 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 	{
 		try
 		{
-			BES.deleteBES(_resourceKey);
+			BES.deleteBES(getConnection(), _resourceKey);
 		}
 		catch (SQLException sqe)
 		{

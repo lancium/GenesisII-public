@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="4.2.8" transformSequenceNumber="2">
   <directoryPresets config="../../scripts/XCG.plist" />
-  <application name="Genesis II" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" keepModificationTimes="false" missingFilesStrategy="warn" shortName="genii" publisher="Global Bio Grid" publisherWeb="http://vcgr.cs.virginia.edu" version="2.0.12" allPathsRelative="true" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.6">
+  <application name="Genesis II" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" keepModificationTimes="false" missingFilesStrategy="warn" shortName="genii" publisher="Global Bio Grid" publisherWeb="http://vcgr.cs.virginia.edu" version="2.0.13" allPathsRelative="true" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.6">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -15,7 +15,7 @@
       <variable name="genii.patch-url" value="http://vcgr.cs.virginia.edu/GenesisII/2.0/patches/ReleaseBranch-2.0" />
       <variable name="genii.connection-url" value="http://vcgr.cs.virginia.edu/XCG/2.0/root.xml" />
       <variable name="genii.deployment" value="GeniiNetFullContainer" />
-      <variable name="genii.build-number" value="2086" />
+      <variable name="genii.build-number" value="2091" />
       <variable name="genii.xcg-port" value="18443" />
       <variable name="genii.container-memory.fraction" value="0.25" />
       <variable name="genii.container-memory.upper-limit" value="2048" />
@@ -432,7 +432,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.appwatcher.update-frequency=604800000&quot; &quot;-Dlog4j.configuration=production.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ApplicationWatcher/genii-client-application.properties&quot; -Xmx512m" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=XCG&quot; &quot;-Dedu.virginia.vcgr.appwatcher.update-frequency=604800000&quot; &quot;-Dlog4j.configuration=production.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ApplicationWatcher/genii-client-application.properties&quot; -Xmx512m" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
         <classPath>
           <directory location="lib" failOnError="false" />
           <archive location="ApplicationWatcher/app-manager.jar" failOnError="false" />

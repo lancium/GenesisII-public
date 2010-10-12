@@ -773,8 +773,6 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 					"Unable to inject instance.", e);
 			}
 			
-			// allow subclasses to do creation work
-			postCreate(rKey, epr, cParams, constructionParameters, resolverCreationParams);
 			IResource resource = rKey.dereference();
 			if (resource instanceof BasicDBResource)
 			{
@@ -792,6 +790,10 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 					_logger.warn("Unable to note creation of resource.", cause);
 				}
 			}
+			
+			// allow subclasses to do creation work
+			postCreate(rKey, epr, cParams, constructionParameters, resolverCreationParams);
+			
 			
 			return epr;
 		}
@@ -894,13 +896,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 		//collection to hold creation parameters for default resolvers
 		Collection<MessageElement> resolverCreationParams = new Vector<MessageElement>();
 		
-		// allow subclasses to do creation work
-		postCreate(rKey, epr, cParams, constructionParameters, resolverCreationParams);
-	
 		IResource resource = rKey.dereference();
-		resource.commit();
-		_logger.debug("Created resource \"" + rKey.getResourceKey() + 
-			"\" for service \"" + rKey.getServiceName() + "\".");
 		EndpointReferenceType resolveEPR = addResolvers(rKey, epr, resolverCreationParams);
 		if (resource instanceof BasicDBResource)
 		{
@@ -919,6 +915,12 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 				_logger.warn("Unable to note creation of resource.", cause);
 			}
 		}
+		
+		// allow subclasses to do creation work
+		postCreate(rKey, epr, cParams, constructionParameters, resolverCreationParams);
+	
+		_logger.debug("Created resource \"" + rKey.getResourceKey() + 
+			"\" for service \"" + rKey.getServiceName() + "\".");
 				
 		resource.commit();
 		return new VcgrCreateResponse(resolveEPR);
@@ -971,6 +973,11 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 		}
 		
 		return resolveEPR;
+	}
+	
+	public void cleanupHook()
+	{
+		// By default, nothing needs to be done.
 	}
 	
 	/**

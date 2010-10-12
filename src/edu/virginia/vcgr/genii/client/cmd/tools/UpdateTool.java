@@ -30,9 +30,14 @@ public class UpdateTool extends BaseGridTool
 		
 		return 0;
 */
-		stderr.println("This functionallity is not supported yet.  " +
-			"It will be supported in version 2.0.");
-		return 1;
+		stdout.println(
+	"This functionallity is not supported through the normal command line\n" +
+	"client.  Instead, if you want to manually update the grid client, you\n" +
+	"need to exit this grid client (and any other grid software that you\n" +
+	"might have running on your local machine) and instead issue the\n" +
+	"separate \"grid-update\" program.");
+
+		return 0;
 	}
 
 	@Override

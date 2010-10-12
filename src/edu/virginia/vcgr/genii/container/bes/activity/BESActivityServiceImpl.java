@@ -46,6 +46,7 @@ import edu.virginia.vcgr.genii.client.context.*;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLInterpreter;
+import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -173,7 +174,22 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements
 								initInfo.getContainerID() + "\".")
 					}, null));
 			
-			bes.createActivity(
+			try
+			{
+				WSName wsname = new WSName(activityEPR);
+				if (wsname.isValidWSName())
+					_logger.info(String.format(
+						"The EPI %s corresponds to activity id %s.",
+						wsname.getEndpointIdentifier(),
+						_resource.getKey()));
+			}
+			catch (Throwable cause)
+			{
+				// This shouldn't fail, but I can't test it now and it's just
+				// for a print statement.
+			}
+			
+			bes.createActivity(_resource.getConnection(),
 				_resource.getKey().toString(), jsdl,	owners, 
 				ContextManager.getCurrentContext(), 
 				workingDirectory,

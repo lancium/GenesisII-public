@@ -168,43 +168,43 @@ public class DatabaseConnectionPool
 		if (conn == null)
 			return;
 		
-		try
+		synchronized(_connPool)
 		{
 			try
 			{
-				conn.rollback();
-				synchronized(_connPool)
+				try
 				{
+					conn.rollback();
 					if (_connPool.size() < _poolSize)
 					{
 						_connPool.addLast(conn);
 						return;
 					}
 				}
+				catch (SQLException sqe)
+				{
+					needRejuvenation = true;
+					_logger.error("Exception releasing connection.", sqe);
+				}
+		
+				try 
+				{ 
+					((ConnectionInterceptor)Proxy.getInvocationHandler(
+						conn)).getConnection().close();
+				}
+				catch (Throwable t) 
+				{ 
+					needRejuvenation = true;
+					_logger.error("Error closing the connection.", t); 
+				}
 			}
-			catch (SQLException sqe)
+			finally
 			{
-				needRejuvenation = true;
-				_logger.error("Exception releasing connection.", sqe);
-			}
-	
-			try 
-			{ 
+				_lock.readLock().unlock();
+		
 				((ConnectionInterceptor)Proxy.getInvocationHandler(
-					conn)).getConnection().close();
+					conn)).setReleased();
 			}
-			catch (Throwable t) 
-			{ 
-				needRejuvenation = true;
-				_logger.error("Error closing the connection.", t); 
-			}
-		}
-		finally
-		{
-			_lock.readLock().unlock();
-	
-			((ConnectionInterceptor)Proxy.getInvocationHandler(
-				conn)).setReleased();
 		}
 		
 		if (needRejuvenation)
