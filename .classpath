@@ -35,7 +35,6 @@
 	<classpathentry kind="lib" path="ext/GeniiJSDL/GeniiJSDL.jar" sourcepath="/GeniiJSDL/src"/>
 	<classpathentry kind="lib" path="ext/mysql/mysql-connector-java-5.1.7-bin.jar"/>
 	<classpathentry kind="lib" path="ext/MorganU/MNaming.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="ext/derby/derby.jar"/>
 	<classpathentry kind="lib" path="ext/xmldb/db.jar"/>
 	<classpathentry kind="lib" path="ext/xmldb/dbxml.jar"/>
@@ -45,6 +44,7 @@
 	<classpathentry kind="lib" path="ext/jetty/lib/jetty-6.1.17.jar"/>
 	<classpathentry kind="lib" path="ext/jetty/lib/jetty-util-6.1.17.jar"/>
 	<classpathentry kind="lib" path="ext/jsch/jsch-0.1.42.jar"/>
+	<classpathentry kind="lib" path="ext/junit/junit-4.8.2.jar"/>
 	<classpathentry kind="lib" path="lib/GenesisII-ws.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

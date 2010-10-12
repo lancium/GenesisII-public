@@ -25,6 +25,14 @@ public class ApplicationContext
 		_localContainerID = ContainerIDFile.containerID();
 	}
 	
+	final public boolean isInitialized()
+	{
+		synchronized (this)
+		{
+			return _applicationEventListener != null;
+		}
+	}
+	
 	public void addQuitListener(QuitListener listener)
 	{
 		synchronized(_quitListeners)

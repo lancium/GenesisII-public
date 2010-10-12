@@ -270,7 +270,7 @@ public class QueueManipulator
 		}
 	}
 	
-	static private class JobInformationIterator 
+	static public class JobInformationIterator 
 		implements Iterator<JobInformation>
 	{
 		private Iterator<JobInformationType> _jit;

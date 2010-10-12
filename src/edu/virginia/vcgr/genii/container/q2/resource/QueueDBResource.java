@@ -8,6 +8,8 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContainerService;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
@@ -63,6 +65,17 @@ public class QueueDBResource extends BasicDBResource implements IQueueResource
 			stmt = _connection.prepareStatement("DELETE FROM q2joblogtargets WHERE queueid = ?");
 			stmt.setString(1, _resourceKey);
 			stmt.executeUpdate();
+			
+			stmt.close();
+			stmt = null;
+			stmt = _connection.prepareStatement("DELETE FROM q2jobhistorytokens WHERE queueid = ?");
+			stmt.setString(1, _resourceKey);
+			stmt.executeUpdate();
+			
+			HistoryContainerService service = ContainerServices.findService(
+				HistoryContainerService.class);
+			service.deleteRecordsLike(_connection, String.format(
+				"q2:%s:%%", _resourceKey));
 		}
 		catch (SQLException sqe)
 		{

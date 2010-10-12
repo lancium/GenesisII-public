@@ -57,6 +57,16 @@
 		location="./resource-authz.wsdl"/>
 
 <!-- Messages -->
+	<wsdl:message name="iterateHistoryEventsRequest">
+		<wsdl:part name="iterateHistoryEventsRequest"
+			element="genii-common:IterateHistoryEventsRequest"/>
+	</wsdl:message>
+
+	<wsdl:message name="iterateHistoryEventsResponse">
+		<wsdl:part name="iterateHistoryEventsResponse"
+			element="genii-common:IterateHistoryEventsResponse"/>
+	</wsdl:message>
+
 	<wsdl:message name="AddMatchingParameterRequest">
 		<wsdl:part name="AddMatchingParameterRequest"
 			element="genii-common:AddMatchingParameterRequestType"/>
@@ -95,6 +105,11 @@
 		<genii-ext:extend portType="rpw-2:QueryResourceProperties"/>
 		<genii-ext:extend portType="wsntw:NotificationConsumer"/>
 		<genii-ext:extend portType="wsntw:NotificationProducer"/>
+
+		<wsdl:operation name="iterateHistoryEvents">
+			<wsdl:input message="genii-common:iterateHistoryEventsRequest"/>
+			<wsdl:output message="genii-common:iterateHistoryEventsResponse"/>
+		</wsdl:operation>
 
 		<wsdl:operation name="addMatchingParameter">
 			<wsdl:input message="genii-common:AddMatchingParameterRequest"/>

@@ -1,6 +1,9 @@
 package edu.virginia.vcgr.genii.container.bes.execution.phases;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +11,8 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.morgan.util.GUID;
+import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
@@ -15,12 +20,14 @@ import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.bes.envvarexp.EnvironmentExport;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 
 abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 {
 	static final long serialVersionUID = 0L;
 
 	static private Log _logger = LogFactory.getLog(AbstractRunProcessPhase.class);
+	static final private int STDERR_SIZE_CAP = 1024;
 	
 	protected BESConstructionParameters _constructionParameters;
 	
@@ -210,11 +217,76 @@ abstract class AbstractRunProcessPhase extends AbstractExecutionPhase
 		return null;
 	}
 	
-	static protected String fileToPath(File file)
+	static protected String fileToPath(File file, File workingDirectory)
 	{
 		if (file == null)
-			return null;
+		{
+			if (workingDirectory == null)
+				return null;
+			
+			return new File(workingDirectory, String.format("%s.stder",
+				new GUID())).getAbsolutePath();
+		}
 		
 		return file.getAbsolutePath();
+	}
+	
+	static protected void appendStandardError(HistoryContext history,
+		File stderr)
+	{
+		if (stderr != null)
+		{
+			if (!stderr.exists())
+			{
+				history.createDebugWriter("No Standard Error").format(
+					"Standard error path %s does not exist", stderr).close();
+			} else if (stderr.length() == 0)
+			{
+				history.createDebugWriter("Standard Error Empty").format(
+					"Standard error file %s appears empty.", stderr).close();
+			} else
+			{
+				if (stderr.length() > STDERR_SIZE_CAP)
+					history.createDebugWriter("Standard Error Truncated").format(
+						"Standard error file %s is too big -- truncating for log.",
+						stderr).close();
+				
+				PrintWriter writer = history.createDebugWriter(
+					"Standard Error for Job");
+				FileReader reader = null;
+				
+				try
+				{
+					reader = new FileReader(stderr);
+					char []data = new char[STDERR_SIZE_CAP];
+					int toRead = STDERR_SIZE_CAP;
+					int read;
+					
+					while (toRead > 0 && 
+						(read = reader.read(data, 0, toRead)) > 0)
+					{
+						writer.write(data, 0, read);
+						toRead -= read;
+					}
+				}
+				catch (IOException ioe)
+				{
+					writer.format(
+						"\nError reading from standard error:  %s.", 
+						ioe);
+				}
+				finally
+				{
+					StreamUtils.close(reader);
+					StreamUtils.close(writer);
+				}
+			}
+		}
+	}
+	static protected void appendStandardError(HistoryContext history,
+		String stderrPath)
+	{
+		if (stderrPath != null)
+			appendStandardError(history, new File(stderrPath));
 	}
 }

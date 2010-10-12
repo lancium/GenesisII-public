@@ -14,4 +14,9 @@ public interface QueueConstants
 	
 	static public QName RESOURCE_SLOTS_QNAME =
 		new QName(QUEUE_NS, "total-slots");
+	
+	static final public String ATTEMPT_NUMBER_HISTORY_PROPERTY =
+		"Attempt Number";
+	static final public String QUEUE_STARTED_HISTORY_PROPERTY =
+		"Queue Started";
 }

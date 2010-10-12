@@ -4,11 +4,13 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import edu.virginia.vcgr.test.regression.client.history.HistoryTestSuite;
 import edu.virginia.vcgr.test.regression.client.macro.MacroPackageTestSuite;
 import edu.virginia.vcgr.test.regression.client.units.UnitsPackageTestSuite;
 
 @RunWith(Suite.class)
-@SuiteClasses({MacroPackageTestSuite.class, UnitsPackageTestSuite.class})
+@SuiteClasses({MacroPackageTestSuite.class, UnitsPackageTestSuite.class,
+	HistoryTestSuite.class})
 public class RootRegressionTestSuite
 {
 }

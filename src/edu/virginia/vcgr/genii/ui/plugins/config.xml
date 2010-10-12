@@ -15,6 +15,11 @@
 		<popup-menu group="Basic File" item-name="Make Directory"/>
 	</plugin>
 	
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.queue.QueueManagerPlugin">
+		<top-menu menu-name="Jobs" group="Queue" item-name="Queue Manager"/>
+		<popup-menu group="Queue" item-name="Queue Manager"/>
+	</plugin>
+	
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.MakeFilePlugin">
 		<top-menu menu-name="File" group="Basic File" item-name="Create New File"/>
 		
@@ -67,9 +72,9 @@
 	-->
 	
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.jsdltool.JSDLToolPlugin">
-		<top-menu menu-name="Jobs" group="JSDL" item-name="Create Job"/>
+		<top-menu menu-name="Jobs" group="Queue" item-name="Create Job"/>
 		
-		<popup-menu group="JSDL" item-name="Create Job"/>
+		<popup-menu group="Queue" item-name="Create Job"/>
 	</plugin>
 	
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.shell.GridShellPlugin">

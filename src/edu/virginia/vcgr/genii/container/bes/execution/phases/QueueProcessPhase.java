@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.container.bes.execution.phases;
 
 import java.io.File;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import edu.virginia.vcgr.genii.client.bes.ExitCondition;
 import edu.virginia.vcgr.genii.client.bes.NormalExit;
 import edu.virginia.vcgr.genii.client.bes.SignaledExit;
 import edu.virginia.vcgr.genii.client.bes.Signals;
+import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.nativeq.ApplicationDescription;
 import edu.virginia.vcgr.genii.client.nativeq.JobToken;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
@@ -35,6 +37,8 @@ import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingD
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.ResourceConstraints;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.cservices.accounting.AccountingService;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
 
@@ -96,6 +100,13 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 	public void terminate(boolean countAsFailedAttempt)
 		throws ExecutionException
 	{
+		HistoryContext history = HistoryContextFactory.createContext(
+			HistoryEventCategory.Terminating);
+		
+		history.createTraceWriter("BES Terminating Job").format(
+			"The BES was asked to terminate the job (countAsFailedAttempt = %s)",
+			countAsFailedAttempt).close();
+		
 		try
 		{
 			synchronized(_phaseShiftLock)
@@ -108,6 +119,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 				
 				NativeQueueConnection queue = connectQueue(
 					_workingDirectory.getWorkingDirectory());
+				history.trace("Asking Batch System (%s) to Cancel", queue);
 				_logger.info(String.format(
 					"Asking batch system (%s) to cancel the job.", queue));
 				queue.cancel(_jobToken);
@@ -117,6 +129,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 		}
 		catch (NativeQueueException nqe)
 		{
+			history.error(nqe, "Unable to Cancel Job");
 			throw new ExecutionException("Unable to cancel job in queue.", 
 				nqe);
 		}
@@ -125,17 +138,26 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 	@Override
 	public void execute(ExecutionContext context) throws Throwable
 	{
+		String stderrPath = null;
 		File resourceUsageFile = null;
+		
+		HistoryContext history = HistoryContextFactory.createContext(
+			HistoryEventCategory.CreatingActivity);
 		
 		if (_environment == null)
 			_environment = new HashMap<String, String>();
 		
 		setExportedEnvironment(_environment);
+		history.createDebugWriter("Activity Environment Set").format(
+			"Activity environment set to %s", _environment).close();
 		
 		synchronized(_phaseShiftLock)
 		{
 			if (_terminate != null && _terminate.booleanValue())
+			{
+				history.debug("Activity Terminate Early");
 				return;
+			}
 			
 			_workingDirectory = context.getCurrentWorkingDirectory();
 			NativeQueueConnection queue = connectQueue(
@@ -159,14 +181,25 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 				
 				_logger.info(String.format(
 					"Asking batch system (%s) to submit the job.", queue));
+				history.trace("Batch System (%s) Starting Activity", queue);
 				resourceUsageFile = new ResourceUsageDirectory(_workingDirectory.getWorkingDirectory(
 					)).getNewResourceUsageFile();
 				preDelay();
+				stderrPath = fileToPath(_stderr,
+					_workingDirectory.getWorkingDirectory());
+				PrintWriter hWriter = history.createInfoWriter(
+					"Queue BES Submitting Activity").format(
+						"BES submitting job to batch system:  ");
+				hWriter.print(_executable.getAbsolutePath());
+				for (String arg : _arguments)
+					hWriter.format(" %s", arg);
+				hWriter.close();
+				
 				_jobToken = queue.submit(new ApplicationDescription(
 					_spmdVariation, _numProcesses, _numProcessesPerHost, _executable.getAbsolutePath(),
 					_arguments,
-					_environment, fileToPath(_stdin),
-					fileToPath(_stdout), fileToPath(_stderr), _resourceConstraints,
+					_environment, fileToPath(_stdin, null),
+					fileToPath(_stdout, null), stderrPath, _resourceConstraints,
 					resourceUsageFile));
 				context.setProperty(JOB_TOKEN_PROPERTY, _jobToken);
 			}
@@ -177,6 +210,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 				context.updateState(new ActivityState(
 					ActivityStateEnumeration.Running, 
 					_state.toString(), false));
+				history.trace("Batch System State:  %s", _state);
 				if (_state.isFinalState())
 					break;
 				
@@ -186,6 +220,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 			postDelay();
 			
 			int exitCode = queue.getExitCode(_jobToken);
+			history.info("Job Exited with Exit Code %d", exitCode);
+			
 			if (resourceUsageFile != null)
 			{
 				try
@@ -193,6 +229,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 					ExitResults eResults = ProcessWrapper.readResults(
 						resourceUsageFile);
 					exitCode = eResults.exitCode();
+					
 					AccountingService acctService =
 						ContainerServices.findService(AccountingService.class);
 					if (acctService != null)
@@ -218,6 +255,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 				}
 				catch (ProcessWrapperException pwe)
 				{
+					history.warn(pwe, "Error Acquiring Accounting Info");
 					throw new IgnoreableFault(
 						"Error trying to read resource usage information.",
 						pwe);
@@ -233,6 +271,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 				throw new IgnoreableFault(
 					"Queue process exited with signal.");
 		}
+		
+		appendStandardError(history, stderrPath);
 	}
 	
 	static private ExitCondition interpretExitCode(int exitCode)

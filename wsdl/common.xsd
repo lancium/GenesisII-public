@@ -2,12 +2,25 @@
 <xsd:schema
 	xmlns="http://vcgr.cs.virginia.edu/genii/2006/12/common"
 	xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+	xmlns:iterator="http://vcgr.cs.virginia.edu/genii/iterator"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://vcgr.cs.virginia.edu/genii/2006/12/common"
 	elementFormDefault="qualified"
 	attributeFormDefault="unqualified">
 
+	<xsd:import namespace="http://vcgr.cs.virginia.edu/genii/iterator"
+		schemaLocation="./iterator.xsd"/>
+
 <!-- Types -->
+	<xsd:complexType name="HistoryEventBundleType">
+		<xsd:sequence>
+			<xsd:element name="data" type="xsd:base64Binary"
+				minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="HistoryEventBundle"
+		type="genii-common:HistoryEventBundleType"/>
+
 	<xsd:complexType name="MatchingParameter">
 		<xsd:attribute name="name" type="xsd:string" use="required"/>
 		<xsd:attribute name="value" type="xsd:string" use="required"/>
@@ -37,6 +50,25 @@
 	</xsd:complexType>
 
 <!-- Message Types -->
+	<xsd:complexType name="IterateHistoryEventsRequestType">
+		<xsd:sequence>
+			<xsd:element name="resource-hint" minOccurs="0"
+				maxOccurs="1" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="IterateHistoryEventsRequest"
+		type="genii-common:IterateHistoryEventsRequestType"/>
+
+	<xsd:complexType name="IterateHistoryEventsResponseType">
+		<xsd:sequence>
+			<xsd:element name="result"
+				type="iterator:IteratorInitializationType"
+				minOccurs="1" maxOccurs="1" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="IterateHistoryEventsResponse"
+		type="genii-common:IterateHistoryEventsResponseType"/>
+
 	<xsd:complexType name="AddMatchingParameterRequestType">
 		<xsd:sequence>
 			<xsd:element name="matching-parameter"

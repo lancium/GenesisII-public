@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.container.bes.execution.phases;
 
 import java.io.File;
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +14,7 @@ import org.ggf.bes.factory.ActivityStateEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
+import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.pwrapper.ExitResults;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperFactory;
@@ -23,6 +25,8 @@ import edu.virginia.vcgr.genii.container.bes.execution.ExecutionException;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.cservices.accounting.AccountingService;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
 
 public class RunProcessPhase extends AbstractRunProcessPhase 
 	implements TerminateableExecutionPhase, Serializable
@@ -89,8 +93,12 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 	@Override
 	public void execute(ExecutionContext context) throws Throwable
 	{
+		File stderrFile = null;
 		List<String> command;
 		ProcessWrapperToken token;
+		HistoryContext history = HistoryContextFactory.createContext(
+			HistoryEventCategory.CreatingActivity);
+		
 		synchronized(_processLock)
 		{
 			command = new Vector<String>();
@@ -108,6 +116,8 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 				_environment = new HashMap<String, String>();
 			
 			setExportedEnvironment(_environment);
+			history.createDebugWriter("Activity Environment Set").format(
+				"Activity environment set to %s", _environment).close();
 			
 			if (_environment != null)
 			{
@@ -136,9 +146,18 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 			for (int lcv = 1; lcv < command.size(); lcv++)
 				arguments[lcv - 1] = command.get(lcv);
 			preDelay();
+			stderrFile = _redirects.stderrSink(workingDirectory);
+			
+			PrintWriter hWriter = history.createInfoWriter(
+				"BES Starting Activity").format(
+					"BES starting activity: ");
+			for (String arg : command)
+				hWriter.format(" %s", arg);
+			hWriter.close();
+			
 			token = wrapper.execute(_environment, workingDirectory, 
 				_redirects.stdinSource(), _redirects.stdoutSink(), 
-				_redirects.stderrSink(), command.get(0), arguments);
+				stderrFile, command.get(0), arguments);
 		}
 		
 		try
@@ -150,16 +169,23 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 			if (_hardTerminate != null && _hardTerminate.booleanValue())
 			{
 				if (_countAsFailedAttempt)
+				{
+					history.warn("Process Forcably Killed");
 					throw new ContinuableExecutionException(
 						"The process was forcably killed.");
+				}
 				
 				return;
 			}
 			
 			if (results == null)
-				_logger.error("Somehow we got an exit with no exit results.");
-			else
 			{
+				_logger.error("Somehow we got an exit with no exit results.");
+				history.debug("Job Exited with No Resulst");
+			} else
+			{
+				history.trace("Job Exited with Exit Code %d", results.exitCode());
+				
 				_logger.info(String.format("Process exited with exit-code %d.",
 					results.exitCode()));
 				
@@ -175,11 +201,14 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 						results.wallclockTime(), results.maximumRSS());
 				}
 			}
+			
+			appendStandardError(history, stderrFile);
 		}
 		catch (InterruptedException ie)
 		{
 			synchronized(_processLock)
 			{
+				history.debug("Process Interrupted - Killing");
 				destroyProcess(_process);
 				_process = null;
 			}
@@ -197,6 +226,11 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 	public void terminate(boolean countAsFailedAttempt) 
 		throws ExecutionException
 	{
+		HistoryContext history = HistoryContextFactory.createContext(
+			HistoryEventCategory.Terminating);
+		
+		history.info("Terminating Activity Per Request");
+		
 		synchronized(_processLock)
 		{
 			_hardTerminate = Boolean.TRUE;

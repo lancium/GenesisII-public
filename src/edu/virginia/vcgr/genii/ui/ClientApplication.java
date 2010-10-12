@@ -69,16 +69,25 @@ public class ClientApplication extends UIFrame
 	}
 	
 	public ClientApplication(boolean launchShell)
+		throws FileNotFoundException, RNSPathDoesNotExistException, IOException
+	{
+		this(new UIContext(new ApplicationContext()), launchShell);
+	}
+	
+	public ClientApplication(UIContext context, boolean launchShell)
 		throws FileNotFoundException, IOException, RNSPathDoesNotExistException
 	{
-		super(new ApplicationContext(), new UIContext(),
+		super(context,
 			"Genesis II Client Application");
 		
-		_context.setApplicationEventListener(
-			new ApplicationEventListenerImpl());
-		
-		if (_context.isMacOS())
-			setupMacApplication();
+		if (!_context.isInitialized())
+		{
+			_context.setApplicationEventListener(
+				new ApplicationEventListenerImpl());
+			
+			if (_context.isMacOS())
+				setupMacApplication();
+		}
 		
 		_tabbedPane.setMinimumSize(TABBED_PANE_SIZE);
 		_tabbedPane.setPreferredSize(TABBED_PANE_SIZE);
@@ -119,7 +128,7 @@ public class ClientApplication extends UIFrame
 				new Insets(5, 5, 5, 5), 5, 5));
 		
 		UIPlugins plugins = new UIPlugins(
-			new UIPluginContext(_context, _uiContext, _browserTree, _browserTree));
+			new UIPluginContext(_uiContext, _browserTree, _browserTree));
 		plugins.addTopLevelMenus(getJMenuBar());
 		_browserTree.addTreeSelectionListener(new RNSSelectionListener(plugins));
 		

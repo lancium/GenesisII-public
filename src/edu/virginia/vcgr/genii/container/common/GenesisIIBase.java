@@ -102,6 +102,7 @@ import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextException;
+import edu.virginia.vcgr.genii.client.history.HistoryEvent;
 import edu.virginia.vcgr.genii.client.iterator.IteratorConstructionParameters;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
@@ -113,6 +114,8 @@ import edu.virginia.vcgr.genii.client.security.x509.CertCreationSpec;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.common.AddMatchingParameterResponseType;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
+import edu.virginia.vcgr.genii.common.IterateHistoryEventsRequestType;
+import edu.virginia.vcgr.genii.common.IterateHistoryEventsResponseType;
 import edu.virginia.vcgr.genii.common.MatchingParameter;
 import edu.virginia.vcgr.genii.common.RemoveMatchingParameterResponseType;
 
@@ -133,6 +136,9 @@ import edu.virginia.vcgr.genii.container.configuration.GenesisIIServiceConfigura
 import edu.virginia.vcgr.genii.container.configuration.GenesisIIServiceConfigurationFactory;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
+import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
+import edu.virginia.vcgr.genii.container.cservices.history.CloseableIterator;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContainerService;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.invoker.BaseFaultFixer;
 import edu.virginia.vcgr.genii.container.invoker.DatabaseHandler;
@@ -504,6 +510,38 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 	public void notify(Notify msg) throws RemoteException
 	{
 		NotificationHelper.notify(msg, notificationMultiplexer());
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.READ)
+	public IterateHistoryEventsResponseType iterateHistoryEvents(
+		IterateHistoryEventsRequestType arg0) throws RemoteException
+	{
+		HistoryContainerService service = ContainerServices.findService(
+			HistoryContainerService.class);
+		CloseableIterator<HistoryEvent> iter = null;
+		
+		try
+		{
+			if (arg0 != null && arg0.getResourceHint() != null)
+				iter = service.iterateEvents(arg0.getResourceHint());
+			else
+				iter = service.iterateEvents(
+					ResourceManager.getCurrentResource().getResourceKey());
+			
+			return new IterateHistoryEventsResponseType(
+				createWSIterator(new CloseableIteratorHistoryEventWrapper(
+					iter), 25));
+		}
+		catch (SQLException sqe)
+		{
+			throw new RemoteException(String.format(
+				"Unable to retrieve history events."), sqe);
+		}
+		finally
+		{
+			StreamUtils.close(iter);
+		}
 	}
 
 	protected SubscribeResponse subscribe(String resourceKey, Subscribe arg)
@@ -1172,7 +1210,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 		}
 	}
 	
-	protected EndpointReferenceType getMyEPR(boolean withPortTypes) 
+	public EndpointReferenceType getMyEPR(boolean withPortTypes) 
 		throws ResourceUnknownFaultType, ResourceException
 	{
 		String myAddress = Container.getServiceURL(_serviceName);

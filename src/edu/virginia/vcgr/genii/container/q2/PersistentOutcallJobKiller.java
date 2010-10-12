@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryEventToken;
 import edu.virginia.vcgr.genii.container.cservices.percall.AttemptScheduler;
 import edu.virginia.vcgr.genii.container.cservices.percall.BESActivityTerminatorActor;
 import edu.virginia.vcgr.genii.container.cservices.percall.ExponentialBackoffScheduler;
@@ -32,11 +33,13 @@ class PersistentOutcallJobKiller
 			BACKOFF_JITTER_BASE, BACKOFF_JITTER_BASE_UNITS);
 	}
 	
-	static boolean killJob(EndpointReferenceType bes,
+	static boolean killJob(String besName, EndpointReferenceType bes,
+		String historyKey, HistoryEventToken historyToken,
 		EndpointReferenceType activity, ICallingContext context)
 	{
 		return PersistentOutcallContainerService.schedulePersistentOutcall(
-			new BESActivityTerminatorActor(activity),
+			new BESActivityTerminatorActor(
+				historyKey, historyToken, besName, activity),
 			SCHEDULER(), bes, context);
 	}
 }

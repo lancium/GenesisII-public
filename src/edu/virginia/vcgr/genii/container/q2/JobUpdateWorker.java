@@ -18,7 +18,9 @@ import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.BESFaultManager;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 
 /**
@@ -79,9 +81,13 @@ public class JobUpdateWorker implements OutcallHandler
 	{
 		Connection connection = null;
 		long besID = -1L;
+		HistoryContext history = _data.history(HistoryEventCategory.Checking);
 		
 		try
 		{
+			history.createDebugWriter("Job Update Worker Running").format(
+				"Job Update worker running to check status of job.").close();
+			
 			_logger.debug("Checking status of job " + _data);
 	
 			/* Get a connection from the connection pool and then ask the 
@@ -100,6 +106,10 @@ public class JobUpdateWorker implements OutcallHandler
 			
 			if (jobEndpoint == null)
 			{
+				history.createDebugWriter("Job No Longer Running").format(
+					"Job is no longer marked as running " +
+					"(anticipated asynchronous behavior).").close();
+				
 				// Another thread has removed this from the database.
 				_logger.debug(String.format(
 					"Asked to check status on job %s which is " +
@@ -112,6 +122,7 @@ public class JobUpdateWorker implements OutcallHandler
 			String oldAction = _data.setJobAction("Checking");
 			if (oldAction != null)
 			{
+				history.debug("Job Busy Doing %s", oldAction);
 				_logger.error(String.format(
 					"Attempting to check job status for %s, found that " +
 					"we are in the process of doing action:  " + oldAction,
@@ -123,6 +134,8 @@ public class JobUpdateWorker implements OutcallHandler
 			GetActivityStatusResponseType []activityStatuses;
 			try
 			{
+				history.debug("Making Job Status Outcall");
+				
 				_logger.debug(String.format(
 					"Making grid outcall to check status of job %s", _data));
 				/* call the BES container to get the activity's status. */
@@ -134,6 +147,10 @@ public class JobUpdateWorker implements OutcallHandler
 			}
 			catch (GenesisIISecurityException gse)
 			{
+				history.createErrorWriter(gse, "Job Status Checked Failed").format(
+					"Security exception while checking job status --" +
+					" marking jobs as failed.").close();
+				
 				_logger.debug(String.format(
 					"There was a security exception checking on status of job %s.",
 					_data), gse);
@@ -153,10 +170,13 @@ public class JobUpdateWorker implements OutcallHandler
 			 * a weird internal error. */
 			if (activityStatuses == null || activityStatuses.length != 1)
 			{
+				history.createWarnWriter("Job Status Check Failed").format(
+					"BES didn't return the expected information for the job.").close();
 				_logger.error("Unable to get activity status for job " 
 					+ _data);
 			} else
 			{
+				history.trace("Job Status Check Succeeded");
 				_logger.debug(String.format(
 					"Successfully got status of job %s.", _data));
 				List<String> faults = null;
@@ -167,12 +187,17 @@ public class JobUpdateWorker implements OutcallHandler
 					{
 						Fault fault = activityStatuses[0].getFault();
 						if (fault != null)
+						{
 							faults = BESFaultManager.getFaultDetail(
 								fault);
+							history.createErrorWriter("Job Faulted").format(
+								"Job through fault:  %s", fault).close();
+						}
 					}
 				}
 				catch (Throwable cause)
 				{
+					history.error(cause, "Unable to Get Job Fault");
 					_logger.error(String.format(
 						"Error trying to get fault detail for job %s.", _data), cause);
 				}
@@ -191,6 +216,9 @@ public class JobUpdateWorker implements OutcallHandler
 				
 				if (wasSecurityException)
 				{
+					history.createDebugWriter("Certificate Expired").format(
+						"It looks like the certificate for the job might have expired.");
+					
 					Collection<String> messages = new Vector<String>();
 					messages.add("The certificates for this job have expired.");
 					_jobManager.addJobErrorInformation(connection, _jobInfo.getJobID(), _data.getRunAttempts(), messages);
@@ -204,6 +232,7 @@ public class JobUpdateWorker implements OutcallHandler
 					activityStatuses[0].getActivityStatus());
 				_logger.debug(String.format(
 					"Job %s has activity status %s.", _data, state));
+				history.trace("Job Status on BES:  %s", state);
 				if (state.isFailedState())
 				{
 					/* If the job failed in the BES, fail it in the queue */
@@ -223,6 +252,7 @@ public class JobUpdateWorker implements OutcallHandler
 		}
 		catch (Throwable cause)
 		{
+			history.warn(cause, "Error Updating Job State");
 			_logger.warn("Unable to update job status for job " 
 				+ _data, cause);
 			try

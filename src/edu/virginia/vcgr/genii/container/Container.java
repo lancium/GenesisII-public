@@ -426,6 +426,9 @@ public class Container extends ApplicationBase
 			pathOrName = pathOrName.substring(index + 1);
 		
 		SOAPService ss = _axisServer.getService(pathOrName);
+		if (ss == null)
+			return null;
+		
 		return (JavaServiceDesc)ss.getServiceDescription(); 
 	}
 	

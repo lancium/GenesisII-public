@@ -71,13 +71,13 @@ public class UIFrame extends JFrame
 		initializeUIFrame(context, uiContext);
 	}
 
-	public UIFrame(ApplicationContext context, UIContext uiContext,
+	public UIFrame(UIContext uiContext,
 		String title)
 		throws HeadlessException
 	{
 		super(title);
 
-		initializeUIFrame(context, uiContext);
+		initializeUIFrame(uiContext.applicationContext(), uiContext);
 	}
 	
 	@Override

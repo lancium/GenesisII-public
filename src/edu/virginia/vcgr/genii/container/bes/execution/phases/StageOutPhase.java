@@ -7,10 +7,13 @@ import java.net.URI;
 import org.ggf.bes.factory.ActivityStateEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
+import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.io.URIManager;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.container.bes.execution.ContinuableExecutionException;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
 
 public class StageOutPhase extends AbstractExecutionPhase
 	implements Serializable
@@ -44,10 +47,22 @@ public class StageOutPhase extends AbstractExecutionPhase
 	@Override
 	public void execute(ExecutionContext context) throws Throwable
 	{
+		HistoryContext history = HistoryContextFactory.createContext(
+			HistoryEventCategory.StageOut);
+		
+		history.createInfoWriter("Staging %s out.", _source.getName()).format(
+			"Staging %s out to %s.", _source, _target).close();
+		
 		if (!_source.exists())
+		{
+			history.createErrorWriter(
+				"Can't stage %s out.", _source.getName()).format(
+				"Source file (%s) does not seem to exist.", _source).close();
+			
 			throw new ContinuableExecutionException(
 				"Unable to locate source file \"" +
 				_source.getName() + "\" for staging-out -- skipping it.");
+		}
 		
 		try
 		{
@@ -56,6 +71,9 @@ public class StageOutPhase extends AbstractExecutionPhase
 		}
 		catch (Throwable cause)
 		{
+			history.error(cause, "Can't stage %s out.", 
+				_source.getName());
+			
 			throw new ContinuableExecutionException(
 				"A continuable exception has occurred while " +
 					"running a BES activity.", cause);

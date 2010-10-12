@@ -16,7 +16,7 @@ class ACLTearoffWindow extends UIFrame
 	ACLTearoffWindow(ApplicationContext applicationContext,
 		UIContext uiContext, ACLPanel newPanel)
 	{
-		super(applicationContext, uiContext, 
+		super(uiContext, 
 			String.format("ACLs for %s", newPanel.targetPath().pwd()));
 		
 		Container content = getContentPane();

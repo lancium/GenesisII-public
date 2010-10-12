@@ -4,6 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.security.GeneralSecurityException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -42,13 +43,26 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
+import edu.virginia.vcgr.genii.client.history.SequenceNumber;
+import edu.virginia.vcgr.genii.client.queue.QueueConstants;
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.client.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.client.security.authz.AuthZSecurityException;
+import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.AbstractSubscriptionFactory;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.BESActivityTopics;
+import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContainerService;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryEventToken;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryEventWriter;
+import edu.virginia.vcgr.genii.container.cservices.history.InMemoryHistoryEventSink;
+import edu.virginia.vcgr.genii.container.cservices.history.NullHistoryContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.summary.SlotSummary;
 import edu.virginia.vcgr.genii.queue.JobErrorPacket;
@@ -274,13 +288,28 @@ public class JobManager implements Closeable
 		{
 			if (isPermanent)
 			{
+				job.history(HistoryEventCategory.Terminating).createErrorWriter(
+					"Permanently Failing Job").format(
+						"We have determined that a job failure is permanent and " +
+						"are boosting the attempt number up to the max to reflect this.").close();
+				
 				job.incrementRunAttempts(
 					MAX_RUN_ATTEMPTS - job.getRunAttempts());
 			} else
 			{
+
+				job.history(HistoryEventCategory.Terminating).createInfoWriter(
+					"Attempt %d Failed",
+					job.getRunAttempts()).close();
+				
 				job.incrementRunAttempts();
 			}
+			
 			job.setNextValidRunTime(new Date());
+		} else
+		{
+			job.history(HistoryEventCategory.ReQueing).info(
+				"Retrying Attempt %d", job.getRunAttempts());
 		}
 		
 		short attempts = job.getRunAttempts();
@@ -289,6 +318,9 @@ public class JobManager implements Closeable
 		/* If' he's already been started too many times, we fail him permanently */
 		if (attempts >= MAX_RUN_ATTEMPTS)
 		{
+			job.history(HistoryEventCategory.Terminating).error(
+				"Maximum Attempts Reached");
+			
 			// We can't run this job any more.
 			_logger.debug(String.format(
 				"Moving job %s to ERROR state because we exceeded the maximum retry attempts.",
@@ -296,6 +328,12 @@ public class JobManager implements Closeable
 			newState = QueueStates.ERROR;
 		} else
 		{
+			job.history(HistoryEventCategory.ReQueing).createInfoWriter(
+				"Re-queuing Job").format(
+					"Re-queuing Job.  The job will " +
+					"be removed from the runnable list until %ty.",
+					job.getNextCanRun()).close();
+			
 			/* Otherwise, we'll just requeue him */
 			_logger.debug(String.format(
 				"Requeueing job %s because we has more attempts left.",
@@ -331,7 +369,15 @@ public class JobManager implements Closeable
 		 * (if that's where he's destined for) when the database has been 
 		 * updated and the outcall has been made).
 		 */
-		_outcallThreadPool.enqueue(new JobKiller(job, newState, false, attemptKill, null));
+		String besName = null;
+		Long besID = job.getBESID();
+		if (besID != null)
+			besName = _besManager.getBESName(besID);
+		
+		job.history(HistoryEventCategory.Terminating).debug(
+			"Finishing Job with JobKiller");
+		_outcallThreadPool.enqueue(new JobKiller(job, newState, false, attemptKill, 
+			besName, null));
 		return ret;
 	}
 	
@@ -392,7 +438,15 @@ public class JobManager implements Closeable
 		 */
 		_logger.debug(String.format(
 			"Creating a JobKiller for finished job %s.", job));
-		_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED, false, true, null));
+		
+		String besName = null;
+		Long besID = job.getBESID();
+		if (besID != null)
+			besName = _besManager.getBESName(besID);
+		
+		job.history(HistoryEventCategory.Terminating).debug(
+			"Finishing Job with JobKiller");
+		_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED, false, true, besName, null));
 	}
 	
 	synchronized public void killJob(Connection connection, long jobID)
@@ -435,7 +489,11 @@ public class JobManager implements Closeable
 		_logger.debug("Moving job \"" + job.getJobTicket()
 			+ "\" to the " + QueueStates.FINISHED + " state.");
 	
-		_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED, true, true, besID));
+		String besName = null;
+		if (besID != null)
+			besName = _besManager.getBESName(besID);
+		
+		_outcallThreadPool.enqueue(new JobKiller(job, QueueStates.FINISHED, true, true, besName, besID));
 		
 		_schedulingEvent.notifySchedulingEvent();
 	}
@@ -487,13 +545,21 @@ public class JobManager implements Closeable
 			 * time as it's submit time. */
 			QueueStates state = QueueStates.QUEUED;
 			Date submitTime = new Date();
-			
+		
+			HistoryContext history = HistoryContextFactory.createContext(
+				HistoryEventCategory.Default, _database.historyKey(ticket));
+				
+					
 			/* Submit the job information into the queue (and get a new 
 			 * jobID from the database for it). */
 			long jobID = _database.submitJob(
 				connection, ticket, priority, jsdl, callingContext, identities, 
 				state, submitTime);
 			connection.commit();
+			
+			history.createInfoWriter("Queue Accepted Job").format(
+				"Queue accepted job with ticket %s (job-id = %d).",
+				ticket, jobID).close();
 			
 			/* The data has been committed into the database so we can reload
 			 * to this point from here on out.
@@ -505,7 +571,9 @@ public class JobManager implements Closeable
 			 * put it into the in-memory lists.
 			 */
 			JobData job = new JobData(
-				jobID, ticket, priority, state, submitTime, (short)0);
+				jobID, ticket, priority, state, submitTime, (short)0,
+				history);
+			
 			_jobsByID.put(new Long(jobID), job);
 			_jobsByTicket.put(ticket, job);
 			_queuedJobs.put(new SortableJobKey(jobID, priority, submitTime),
@@ -939,6 +1007,11 @@ public class JobManager implements Closeable
 				_queuedJobs.remove(new SortableJobKey(
 					data));
 				_runningJobs.remove(jobID);
+				
+				HistoryContainerService service = ContainerServices.findService(
+					HistoryContainerService.class);
+				service.deleteRecords(
+					_database.historyKey(data.getJobTicket()));
 			}
 		}
 	}
@@ -1135,6 +1208,12 @@ public class JobManager implements Closeable
 		if (job == null || job.getBESID() == null)
 			return;
 		
+		HistoryContext history = job.history(HistoryEventCategory.Checking);
+		
+		history.createTraceWriter("Checking Running Job Status").format(
+			"Checking job status as the result of a received" +
+			" asynchronous notification.").close();
+		
 		/* For convenience, we bundle together the id's of the
 		 * job to check, and the bes container on which it is
 		 * running.
@@ -1243,6 +1322,10 @@ public class JobManager implements Closeable
 					"Starting process of checking status of running job %s",
 					job));
 			}
+			
+			HistoryContext history = job.history(HistoryEventCategory.Checking);
+			
+			history.trace("Checking Running Job Status");
 			
 			/* For convenience, we bundle together the id's of the
 			 * job to check, and the bes container on which it is
@@ -1527,6 +1610,12 @@ public class JobManager implements Closeable
 			if (data == null)
 				throw new ResourceException("Job \"" + jobTicket 
 					+ "\" does not exist.");
+			
+			
+			data.history(HistoryEventCategory.Terminating).createInfoWriter(
+				"Job Termination Requested").format(
+					"Request to terminate job from outside the queue").close();
+			
 			jobsToKill.add(new Long(data.getJobID()));
 		}
 		
@@ -1543,9 +1632,15 @@ public class JobManager implements Closeable
 			/* If the caller doesn't own the job, it's 
 			 * a security exception */
 			if (!QueueSecurity.isOwner(pji.getOwners()))
-				throw new GenesisIISecurityException(
+			{
+				GenesisIISecurityException t = new GenesisIISecurityException(
 					"Don't have permission to kill job \"" + 
 						jobData.getJobTicket() + "\".");
+				jobData.history(HistoryEventCategory.Terminating).createWarnWriter(
+					"Termination Request Denied").format(
+						"Denying termination request.  Caller not authorized.").close();
+				throw t;
+			}
 			
 			/* If the job is starting, we mark it as being killed.  Starting
 			 * implies that another thread is about to try and start the thing
@@ -1647,6 +1742,7 @@ public class JobManager implements Closeable
 			EntryType entryType;
 			HashMap<Long, EntryType> entries = new HashMap<Long, EntryType>();
 			JobData data = null;
+			HistoryContext history = new NullHistoryContext();
 			
 			try
 			{
@@ -1660,12 +1756,33 @@ public class JobManager implements Closeable
 					connection, _jobID);
 				connection.commit();
 				
+				synchronized(_manager)
+				{
+					/* Get the in-memory information for the job */
+					data = _jobsByID.get(new Long(_jobID));
+					if (data == null)
+					{
+						_logger.warn("Job " + _jobID + 
+							" dissappeared before it could be started.");
+						return;
+					}
+				}
+				
+				history = data.history(HistoryEventCategory.CreatingJob);
+				
 				SecurityUpdateResults checkResults = new SecurityUpdateResults();
 				ClientUtils.checkAndRenewCredentials(startInfo.getCallingContext(),
 					new Date(System.currentTimeMillis() + 1000l * 60 * 10),
 					checkResults);
 				if (checkResults.removedCredentials().size() > 0)
 				{
+					PrintWriter hWriter = history.createErrorWriter(
+						"Job Credentials Expired");
+					hWriter.println("The following credentials expired:");
+					for (GIICredential cred : checkResults.removedCredentials())
+						hWriter.format("\t%s\n", cred.describe(VerbosityLevel.OFF));
+					hWriter.close();
+					
 					isPermanent = true;
 					throw new GeneralSecurityException(
 						"A job's credentials expired so we can't make " +
@@ -1693,6 +1810,8 @@ public class JobManager implements Closeable
 					 *  start it.  Instead, we will finish it early. */
 					if (data.killed())
 					{
+						history.debug("Job Terminated Before Create");
+						
 						finishJob(_jobID);
 						return;
 					}
@@ -1708,15 +1827,36 @@ public class JobManager implements Closeable
 				}
 				
 				CreateActivityResponseType resp;
+				
 				try
 				{
 					/* We need to start the job, so go ahead and create a proxy to
 					 * call the container and then call it.
 					 */
 					startCtxt = startInfo.getCallingContext();
+					
+					history.setProperty(
+						QueueConstants.ATTEMPT_NUMBER_HISTORY_PROPERTY,
+						Integer.toString(data.getRunAttempts()));
+					history.setProperty(
+						QueueConstants.QUEUE_STARTED_HISTORY_PROPERTY, "true");
+					
+					history.category(HistoryEventCategory.CreatingJob);
+					
+					HistoryEventToken historyToken = history.info(
+						"Creating Activity on %s",
+						_besManager.getBESName(_besID));
+					
+					data.historyToken(historyToken);
+					_database.historyToken(connection, _jobID, historyToken);
+					connection.commit();
+					
+					startCtxt = history.setContextProperties(startCtxt);
+					
 					GeniiBESPortType bes = ClientUtils.createProxy(GeniiBESPortType.class, 
 						entryType.getEntry_reference(), 
 						startCtxt);
+					
 					ClientUtils.setTimeout(bes, 120 * 1000);
 					ActivityDocumentType adt = new ActivityDocumentType(
 						startInfo.getJSDL(), null);
@@ -1728,8 +1868,30 @@ public class JobManager implements Closeable
 								queueEPR,
 								BESActivityTopics.ACTIVITY_STATE_CHANGED_TO_FINAL_TOPIC.asConcreteQueryExpression(),
 								null, new JobCompletedAdditionUserData(_jobID)));
+					
+					HistoryEventWriter hWriter = history.createDebugWriter(
+						"Making CreateActivity Outcall");
+					
+					hWriter.format(
+						"Making outcall to resource %s.", 
+						_besManager.getBESName(_besID)).close();
+					historyToken = hWriter.getToken();
+						
 					resp = bes.createActivity(
 						new CreateActivityType(adt, null));
+					
+					history.debug(
+						"CreateActivity Outcall Succeeded");
+					
+					SequenceNumber parentNumber = historyToken.retrieve();
+					historyToken = InMemoryHistoryEventSink.wrapEvents(
+						parentNumber, _besManager.getBESName(_besID),
+						null, _database.historyKey(data.getJobTicket()),
+						resp == null ? null : resp.get_any());
+					
+					data.historyToken(historyToken);
+					_database.historyToken(connection, _jobID, historyToken);
+					connection.commit();
 				}
 				finally
 				{
@@ -1761,6 +1923,9 @@ public class JobManager implements Closeable
 			}
 			catch (Throwable cause)
 			{
+				history.error(cause, 
+					"Exception Thrown During Create Activity");
+				
 				_logger.warn(String.format(
 					"Unable to start job %d.  Exception class is %s.", 
 					_jobID, cause.getClass().getName()), cause);
@@ -1807,7 +1972,18 @@ public class JobManager implements Closeable
 				}
 				
 				if (data != null && countAgainstJob)
+				{
 					data.setNextValidRunTime(new Date());
+					history.createInfoWriter("Job Being Re-queued").format(
+						"An attempt to run the job failed.  The job will " +
+						"be removed from the runnable list until %ty.",
+						data.getNextCanRun()).close();		
+				} else
+				{
+					history.createInfoWriter("Job Being Re-queued").format(
+						"The job failed, but it wasn't deemed the job's fault." +
+						"The job will be availble for immediate re-scheduling.").close();
+				}
 				
 				try 
 				{
@@ -1841,15 +2017,18 @@ public class JobManager implements Closeable
 		private boolean _attemptKill;
 		private JobData _jobData;
 		private QueueStates _newState;
+		private String _besName;
 		private Long _besID;
 		
 		public JobKiller(JobData jobData, QueueStates newState,
-			boolean outcallOnly, boolean attemptKill, Long besID)
+			boolean outcallOnly, boolean attemptKill,
+			String besName, Long besID)
 		{
 			_outcallOnly = outcallOnly;
 			_jobData = jobData;
 			_newState = newState;
 			_attemptKill = attemptKill;
+			_besName = besName;
 			_besID = besID;
 		}
 		
@@ -1888,6 +2067,8 @@ public class JobManager implements Closeable
 		private ICallingContext terminateActivity(Connection connection)
 			throws SQLException, ResourceException
 		{
+			HistoryContext history = _jobData.history(HistoryEventCategory.Terminating);
+			
 			_logger.debug(String.format(
 				"JobKiller in \"terminateActivity\" for %s.",
 				_jobData));
@@ -1910,6 +2091,10 @@ public class JobManager implements Closeable
 			
 			try
 			{
+				history.category(HistoryEventCategory.Terminating);
+				history.createInfoWriter("Killing BES Activity").format(
+					"Making a persistent outcall to kill BES activity.").close();
+				
 				ICallingContext ctxt = killInfo.getCallingContext();
 				
 				if (_attemptKill)
@@ -1917,9 +2102,19 @@ public class JobManager implements Closeable
 					_logger.debug(String.format(
 						"JobKiller::terminateActivity making the kill request for %s a persistent outcall.",
 						_jobData));
+					
 					PersistentOutcallJobKiller.killJob(
-						killInfo.getBESEndpoint(), killInfo.getJobEndpoint(),
+						_besName,
+						killInfo.getBESEndpoint(),
+						_database.historyKey(_jobData.getJobTicket()),
+						_jobData.historyToken(),
+						killInfo.getJobEndpoint(),
 						killInfo.getCallingContext());
+					
+					_jobData.historyToken(null);
+					_database.historyToken(connection, _jobData.getJobID(), 
+						null);
+					connection.commit();
 				}
 
 				return ctxt;
@@ -1928,7 +2123,7 @@ public class JobManager implements Closeable
 			{
 				_logger.warn(String.format(
 					"Exception occurred while killing activity %s.",
-					_jobData));
+					_jobData), cause);
 				return null;
 			}
 			finally
@@ -1939,6 +2134,8 @@ public class JobManager implements Closeable
 		
 		public void run()
 		{
+			HistoryContext history = _jobData.history(HistoryEventCategory.Terminating);
+			
 			_logger.debug(String.format(
 				"JobKiller running for job %s", _jobData));
 			
@@ -1992,6 +2189,11 @@ public class JobManager implements Closeable
 				 * the queued jobs list. */
 				if (_newState.equals(QueueStates.REQUEUED))
 				{
+					history.category(HistoryEventCategory.ReQueing);
+					history.createInfoWriter("Re-queing Job").format(
+						"Next available run time is %tc.",
+						_jobData.getNextCanRun()).close();
+					
 					_logger.debug("Re-queing job " + _jobData.getJobTicket());
 					synchronized (JobManager.this)
 					{
@@ -2014,6 +2216,7 @@ public class JobManager implements Closeable
 			}
 			catch (Throwable cause)
 			{
+				history.error(cause, "Error Killing Job");
 				_logger.error("Error killing job " + _jobData, cause);
 			}
 			finally

@@ -5,8 +5,11 @@ import java.util.Date;
 
 import org.ggf.jsdl.JobDefinition_Type;
 
+import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryEventToken;
 import edu.virginia.vcgr.genii.container.q2.matching.JobResourceRequirements;
 
 /**
@@ -18,6 +21,10 @@ import edu.virginia.vcgr.genii.container.q2.matching.JobResourceRequirements;
 public class JobData
 {
 	static private final long BACKOFF = 60 * 1000L;
+	
+	private HistoryContext _history;
+	private HistoryEventToken _historyToken = null;
+	
 	/**
 	 * This variable is used internally by the queue to maintain the current
 	 * "active" state of a job.  Is it in the process of being created or
@@ -88,7 +95,8 @@ public class JobData
 	private JobResourceRequirements _resourceRequirements = null;
 	
 	public JobData(long jobID, String jobTicket, short priority,
-		QueueStates jobState, Date submitTime, short runAttempts, Long besID)
+		QueueStates jobState, Date submitTime, short runAttempts, Long besID,
+		HistoryContext history)
 	{
 		_killed = false;
 		_jobID = jobID;
@@ -98,13 +106,33 @@ public class JobData
 		_submitTime = submitTime;
 		_besID = besID;
 		_runAttempts = runAttempts;
+		_history = history;
 	}
 	
 	public JobData(long jobID, String jobTicket, short priority,
-		QueueStates jobState, Date submitTime, short runAttempts)
+		QueueStates jobState, Date submitTime, short runAttempts,
+		HistoryContext history)
 	{
 		this(jobID, jobTicket, priority, jobState, submitTime, 
-			runAttempts, null);
+			runAttempts, null, history);
+	}
+	
+	final public HistoryContext history(HistoryEventCategory category)
+	{
+		HistoryContext ret = (HistoryContext)_history.clone();
+		
+		ret.category(category);
+		return ret;
+	}
+	
+	final public HistoryEventToken historyToken()
+	{
+		return _historyToken;
+	}
+	
+	final public void historyToken(HistoryEventToken historyToken)
+	{
+		_historyToken = historyToken;
 	}
 	
 	public boolean killed()

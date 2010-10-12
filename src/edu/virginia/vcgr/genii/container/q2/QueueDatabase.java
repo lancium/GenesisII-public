@@ -24,11 +24,14 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryEventToken;
 import edu.virginia.vcgr.genii.container.q2.resource.IQueueResource;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 
@@ -315,19 +318,38 @@ public class QueueDatabase
 		try
 		{
 			stmt = connection.prepareStatement(
-				"SELECT jobid, jobticket, priority, state, submittime, " +
-					"runattempts, resourceid FROM q2jobs WHERE queueid = ?");
+				"SELECT a.jobid, a.jobticket, a.priority, a.state, a.submittime, " +
+					"a.runattempts, a.resourceid, b.historytoken, a.callingcontext " +
+				"FROM q2jobs AS a LEFT OUTER JOIN q2jobhistorytokens AS b " +
+					"ON a.jobid = b.jobid WHERE a.queueid = ?");
 			stmt.setString(1, _queueID);
 			rs = stmt.executeQuery();
 			
 			while (rs.next())
 			{
 				long jobid = rs.getLong(1);
-				allJobs.add(new JobData(
-					jobid, rs.getString(2), rs.getShort(3),
+				String jobTicket = rs.getString(2);
+				
+				JobData data = new JobData(
+					jobid, jobTicket, rs.getShort(3),
 					QueueStates.valueOf(rs.getString(4)),
 					new Date(rs.getTimestamp(5).getTime()),
-					rs.getShort(6), (Long)rs.getObject(7)));
+					rs.getShort(6), (Long)rs.getObject(7),
+					HistoryContextFactory.createContext(
+						HistoryEventCategory.Default,
+						DBSerializer.fromBlob(rs.getBlob(9)),
+						historyKey(jobTicket)));
+				
+				Blob blob = rs.getBlob(8);
+				if (blob != null)
+				{
+					HistoryEventToken token = 
+						(HistoryEventToken)DBSerializer.fromBlob(blob);
+					if (token != null)
+						data.historyToken(token);
+				}
+				
+				allJobs.add(data);
 			}
 			
 			return allJobs;
@@ -392,6 +414,66 @@ public class QueueDatabase
 		}
 		finally
 		{
+			StreamUtils.close(stmt);
+		}
+	}
+	
+	public void historyToken(Connection connection, long jobID,
+		HistoryEventToken newToken) throws SQLException
+	{
+		PreparedStatement stmt = null;
+		
+		try
+		{
+			stmt = connection.prepareStatement(
+				"DELETE FROM q2jobhistorytokens WHERE jobid = ?");
+			stmt.setLong(1, jobID);
+			stmt.executeUpdate();
+			
+			stmt.close();
+			stmt = null;
+			
+			if (newToken != null)
+			{
+				stmt = connection.prepareStatement(
+					"INSERT INTO " +
+						"q2jobhistorytokens (jobid, queueid, historytoken) " +
+						"VALUES (?, ?, ?)");
+				stmt.setLong(1, jobID);
+				stmt.setString(2, _queueID);
+				stmt.setBlob(3, DBSerializer.toBlob(
+					newToken, "q2jobhistorytokens", "historytoken"));
+				
+				stmt.executeUpdate();
+			}
+		}
+		finally
+		{
+			StreamUtils.close(stmt);
+		}
+	}
+	
+	public HistoryEventToken historyToken(Connection connection, long jobID)
+		throws SQLException
+	{
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try
+		{
+			stmt = connection.prepareStatement(
+				"SELECT historytoken FROM q2jobhistorytokens WHERE jobid = ?");
+			stmt.setLong(1, jobID);
+			rs = stmt.executeQuery();
+			
+			if (!rs.next())
+				return null;
+			
+			return (HistoryEventToken)DBSerializer.fromBlob(rs.getBlob(1));
+		}
+		finally
+		{
+			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
 		}
 	}
@@ -811,6 +893,7 @@ public class QueueDatabase
 		PreparedStatement stmt3 = null;
 		PreparedStatement stmt4 = null;
 		PreparedStatement stmt5 = null;
+		PreparedStatement stmt6 = null;
 		
 		try
 		{
@@ -824,6 +907,8 @@ public class QueueDatabase
 				"DELETE FROM q2logs WHERE jobid = ?");
 			stmt5 = connection.prepareStatement(
 				"DELETE FROM q2joblogtargets WHERE jobid = ?");
+			stmt6 = connection.prepareStatement(
+				"DELETE FROM q2jobhistorytokens WHERE jobid = ?");
 			
 			for (Long jobID : jobIDs)
 			{
@@ -841,6 +926,9 @@ public class QueueDatabase
 				
 				stmt5.setLong(1, jobID.longValue());
 				stmt5.addBatch();
+				
+				stmt6.setLong(1, jobID.longValue());
+				stmt6.addBatch();
 			}
 			
 			stmt1.executeBatch();
@@ -848,6 +936,7 @@ public class QueueDatabase
 			stmt3.executeBatch();
 			stmt4.executeBatch();
 			stmt5.executeBatch();
+			stmt6.executeBatch();
 		}
 		finally
 		{
@@ -856,6 +945,7 @@ public class QueueDatabase
 			StreamUtils.close(stmt3);
 			StreamUtils.close(stmt4);
 			StreamUtils.close(stmt5);
+			StreamUtils.close(stmt6);
 		}
 	}
 	
@@ -1132,5 +1222,11 @@ public class QueueDatabase
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
 		}
+	}
+	
+	final public String historyKey(String jobTicket)
+	{
+		return String.format("q2:%s:%s",
+			_queueID, jobTicket);
 	}
 }

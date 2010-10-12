@@ -49,13 +49,23 @@
 	</presetdef>
 
 	<condition property="gen.common.uptodate">
-		<common.source.files.uptodate
-			targetfile="${temporary.codegen.dir}/wsdl/common.flag"/>
+		<and>
+			<common.source.files.uptodate
+				targetfile="${temporary.codegen.dir}/wsdl/common.flag"/>
+			<uptodate targetfile="${temporary.codegen.dir}/wsdl/common.flag">
+				<srcfiles dir="${wsdl.dir}/iterator">
+					<include name="iterator.xsd"/>
+				</srcfiles>
+			</uptodate>
+		</and>
 	</condition>
 
 	<target name="gen.common" unless="gen.common.uptodate">
 		<copy todir="${temporary.codegen.dir}/wsdl">
 			<filelist refid="common.source.files"/>
+			<fileset dir="${wsdl.dir}/iterator">
+				<include name="iterator.xsd"/>
+			</fileset>
 		</copy>
 
 		<echo message="Normalizing gwsdl."/>

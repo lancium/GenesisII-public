@@ -27,7 +27,7 @@ class RNSBrowserTearoffWindow extends UIFrame
 	RNSBrowserTearoffWindow(ApplicationContext applicationContext,
 		UIContext uiContext, RNSTree tree)
 	{
-		super(applicationContext, uiContext, "Browser");
+		super(uiContext, "Browser");
 		
 		Container content = getContentPane();
 		content.setLayout(new GridBagLayout());
@@ -41,7 +41,7 @@ class RNSBrowserTearoffWindow extends UIFrame
 			new Insets(5, 5, 5, 5), 5, 5));
 		
 		UIPlugins plugins = new UIPlugins(
-			new UIPluginContext(_context, _uiContext, tree, tree));
+			new UIPluginContext(_uiContext, tree, tree));
 		plugins.addTopLevelMenus(getJMenuBar());
 		tree.addTreeSelectionListener(new RNSSelectionListener(plugins, tree));
 		

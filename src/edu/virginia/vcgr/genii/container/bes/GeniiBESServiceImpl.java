@@ -57,6 +57,7 @@ import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
+import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.PortType;
@@ -75,6 +76,9 @@ import edu.virginia.vcgr.genii.container.bes.resource.DBBESResourceFactory;
 import edu.virginia.vcgr.genii.container.bes.resource.IBESResource;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
+import edu.virginia.vcgr.genii.container.cservices.history.InMemoryHistoryEventSink;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
@@ -250,14 +254,25 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 			NotAcceptingNewActivitiesFaultType, InvalidRequestMessageFaultType,
 			UnsupportedFeatureFaultType, NotAuthorizedFaultType
 	{
+		InMemoryHistoryEventSink historySink = new InMemoryHistoryEventSink();
+		HistoryContext history = HistoryContextFactory.createContext(
+			HistoryEventCategory.CreatingActivity, historySink);
+		
 		ActivityDocumentType adt = parameters.getActivityDocument();
 		JobDefinition_Type jdt = adt.getJobDefinition();
+		
+		history.info("BES analyzing JSDL.");
 		
 		try
 		{
 			JobDefinition jaxbType = JSDLUtils.convert(jdt);
 			if (jaxbType.parameterSweeps().size() > 0)
 			{
+				history.createErrorWriter(
+					"Parameter Sweep Unsupported.").format(
+						"This type of BES container does not " +
+						"support Parameter Sweeps.").close();
+				
 				throw new UnsupportedFeatureFaultType(new String[] {
 						"This BES container does not support JSDL parameter sweeps."
 					}, null);
@@ -265,7 +280,9 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 		}
 		catch (JAXBException je)
 		{
+			history.warn(je, "JAXB Error parsing JSDL");
 			_logger.warn("Unable to parse using JAXB.", je);
+			
 			// Ignore and hope that it still works out.
 		}
 		
@@ -287,7 +304,9 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 		
 		if (!_resource.isAcceptingNewActivities())
 		{
+			history.warn("BES No Longer Accepting Jobs");
 			_logger.info("BES container not currently accepting new activities.");
+			
 			throw new NotAcceptingNewActivitiesFaultType(null);
 		}
 	
@@ -304,6 +323,8 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 			_resource.getKey()));
 		
 		/* ASG August 28,2008, replaced RPC with direct call to CreateEPR */
+		history.info("BES Creating Activity Instance");
+		
 		EndpointReferenceType entryReference = 
 			new BESActivityServiceImpl().CreateEPR(BESActivityUtils.createCreationProperties(
 				jdt, _resource.getKey(),
@@ -311,22 +332,8 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 				subscribe),
 				Container.getServiceURL("BESActivityPortType"));
 
-/*		
-		BESActivityPortType activity = ClientUtils.createProxy(
-		BESActivityPortType.class,
-		_localActivityServiceEPR);
-		
-		VcgrCreateResponse resp = activity.vcgrCreate(
-			new VcgrCreate(
-				BESActivityUtils.createCreationProperties(
-					jdt, (String)resource.getKey(), 
-					(Properties)resource.getProperty(
-						GeniiBESConstants.NATIVEQ_PROVIDER_PROPERTY))));
-		System.err.println("Time to create activity " + (System.currentTimeMillis() - start));
-		return new CreateActivityResponseType(resp.getEndpoint(), adt, null);
-	*/	
-
-		return new CreateActivityResponseType(entryReference, adt, null);
+		return new CreateActivityResponseType(entryReference, adt,
+			historySink.eventMessages());
 
 	}
 	

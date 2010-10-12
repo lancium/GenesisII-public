@@ -15,7 +15,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.Counter;
 
+import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.matching.JobResourceRequirements;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
@@ -263,6 +265,11 @@ public class Scheduler implements Closeable
 					 * to our list. */
 					if (match != null)
 					{
+						HistoryContext history = queuedJob.history(HistoryEventCategory.Scheduling);
+						history.createDebugWriter(
+							"Job Matched to Resource").format(
+								"Job matched to resource %s.",
+								_besManager.getBESName(match.getBESID())).close();
 						matches.add(match);
 					} else
 					{

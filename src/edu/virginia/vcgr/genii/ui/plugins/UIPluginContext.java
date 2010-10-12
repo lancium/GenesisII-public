@@ -8,15 +8,13 @@ import edu.virginia.vcgr.genii.ui.UIContext;
 final public class UIPluginContext
 {
 	private EndpointRetriever _endpointRetriever;
-	private ApplicationContext _applicationContext;
 	private UIContext _uiContext;
 	private JComponent _ownerComponent;
 	
-	public UIPluginContext(ApplicationContext applicationContext,
+	public UIPluginContext(
 		UIContext uiContext, JComponent ownerComponent,
 		EndpointRetriever endpointRetriever)
 	{
-		_applicationContext = applicationContext;
 		_uiContext = uiContext;
 		_ownerComponent = ownerComponent;
 		_endpointRetriever = endpointRetriever;
@@ -24,7 +22,7 @@ final public class UIPluginContext
 	
 	final public ApplicationContext applicationContext()
 	{
-		return _applicationContext;
+		return _uiContext.applicationContext();
 	}
 	
 	final public UIContext uiContext()

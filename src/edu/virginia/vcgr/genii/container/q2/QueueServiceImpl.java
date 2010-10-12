@@ -44,6 +44,8 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.BESActivityTopics
 
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 
+import edu.virginia.vcgr.genii.common.IterateHistoryEventsRequestType;
+import edu.virginia.vcgr.genii.common.IterateHistoryEventsResponseType;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
@@ -53,7 +55,6 @@ import edu.virginia.vcgr.genii.container.q2.resource.QueueDBResourceFactory;
 import edu.virginia.vcgr.genii.container.q2.resource.QueueDBResourceProvider;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
-import edu.virginia.vcgr.genii.container.resource.StringResourceIdentifier;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkBaseService;
 import edu.virginia.vcgr.genii.queue.ConfigureRequestType;
@@ -291,6 +292,21 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		}
 	}
 
+	@Override
+	@RWXMapping(RWXCategory.READ)
+	public IterateHistoryEventsResponseType iterateHistoryEvents(
+		IterateHistoryEventsRequestType arg0) throws RemoteException
+	{
+		ResourceKey rKey = ResourceManager.getCurrentResource();
+		
+		if (arg0 != null && arg0.getResourceHint() != null)
+			arg0.setResourceHint(new QueueDatabase(
+				rKey.getResourceKey()).historyKey(
+					arg0.getResourceHint()));
+		
+		return super.iterateHistoryEvents(arg0);
+	}
+	
 	@Override
 	@RWXMapping(RWXCategory.EXECUTE)
 	public SubmitJobResponseType submitJob(SubmitJobRequestType submitJobRequest)

@@ -29,6 +29,8 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
 import edu.virginia.vcgr.genii.common.MatchingParameter;
 import edu.virginia.vcgr.genii.container.common.notification.SubscriptionsDatabase;
+import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContainerService;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -307,6 +309,10 @@ public class BasicDBResource implements IResource
 
 			SubscriptionsDatabase.destroyMySubscriptions(
 				_connection, _resourceKey);
+			
+			HistoryContainerService service =
+				ContainerServices.findService(HistoryContainerService.class);
+			service.deleteRecords(_resourceKey);
 		}
 		catch (SQLException sqe)
 		{

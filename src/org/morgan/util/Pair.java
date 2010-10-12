@@ -1,7 +1,11 @@
 package org.morgan.util;
 
-public class Pair<Type1, Type2>
+import java.io.Serializable;
+
+public class Pair<Type1, Type2> implements Serializable
 {
+	static final long serialVersionUID = 0L;
+	
 	private Type1 _first;
 	private Type2 _second;
 	

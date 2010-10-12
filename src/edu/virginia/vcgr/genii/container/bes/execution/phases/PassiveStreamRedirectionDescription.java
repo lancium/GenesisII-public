@@ -3,6 +3,8 @@ package edu.virginia.vcgr.genii.container.bes.execution.phases;
 import java.io.File;
 import java.io.Serializable;
 
+import org.morgan.util.GUID;
+
 public class PassiveStreamRedirectionDescription
 	implements Serializable
 {
@@ -30,8 +32,17 @@ public class PassiveStreamRedirectionDescription
 		return _stdoutSink;
 	}
 	
-	final public File stderrSink()
+	final public File stderrSink(File workingDirectory)
 	{
-		return _stderrSink;
+		if (_stderrSink != null)
+			return _stderrSink;
+		else
+		{
+			if (workingDirectory != null)
+				return new File(workingDirectory, String.format("%s.stderr",
+					new GUID()));
+		}
+		
+		return null;
 	}
 }

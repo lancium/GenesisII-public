@@ -75,7 +75,7 @@ public class TrashDialog extends UIFrame
 	private TrashDialog(TrashCanWidget widget, 
 		ApplicationContext appContext, UIContext uiContext)
 	{
-		super(appContext, uiContext, "Trash Bin");
+		super(uiContext, "Trash Bin");
 		_widget = widget;
 		
 		_popup.add(_undeleteAction);
