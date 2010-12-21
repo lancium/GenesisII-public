@@ -84,6 +84,10 @@ public class WellKnownPortTypes
 		PortType.get(new QName("http://vcgr.cs.virginia.edu/rns/2006/08/exported-root",
 			"ExportedRootPortType"));
 	
+	static public PortType EXPORTED_FSPROXY_ROOT_SERVICE_PORT_TYPE =
+		PortType.get(new QName("http://vcgr.cs.virginia.edu/rns/2010/12/fsproxy",
+			"FSProxyPortType"));
+	
 	static public PortType EXPORTED_LIGHTWEIGHT_ROOT_SERVICE_PORT_TYPE =
 		PortType.get(new QName("http://vcgr.cs.virginia.edu/export/2009/05/light-export",
 			"LightWeightExportPortType"));

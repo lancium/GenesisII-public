@@ -178,7 +178,7 @@ public class ContainerBootstrap implements SecureRunnable
 			//Assume Certificate Login
 			KeystoreLoginTool tool = new KeystoreLoginTool();
 			tool.setNo_gui();
-			tool.addArgument(Installation.getDeployment(
+			tool.addArgument("local:" + Installation.getDeployment(
 				new DeploymentName()).security().getSecurityFile(
 					certStore).getAbsolutePath());
 			tool.setStoretype(certStoreType);

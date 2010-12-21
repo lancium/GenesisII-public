@@ -37,7 +37,7 @@ class FilterPanel extends JPanel
 		
 		EnumComboBox<HistoryEventLevel> levelBox = 
 			new EnumComboBox<HistoryEventLevel>(HistoryEventLevel.class, 
-				EnumComboSort.ByOrdinal, false);
+				EnumComboSort.ByOrdinal, false, LevelIcon.ICON_MAP);
 		levelBox.setSelectedItem(filter.levelFilter());
 		levelBox.addItemListener(new LevelSelectionListener());
 		

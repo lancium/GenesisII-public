@@ -64,6 +64,8 @@
 					<xsd:element name="scheduled-on" type="xsd:string"
 						minOccurs="0" maxOccurs="1" nillable="true"/>
 				</xsd:sequence>
+				<xsd:attribute name="job-name" type="xsd:string"
+					use="optional"/>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -138,6 +140,16 @@
 	<xsd:element name="CompleteRequestType"
 		type="queue:CompleteRequestType"/>
 	<xsd:element name="CompleteResponse"/>
+
+	<xsd:complexType name="ForceUpdateRequestType">
+		<xsd:sequence>
+			<xsd:element name="resource-name" type="xsd:string"
+				minOccurs="1" maxOccurs="unbounded" nillable="false"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="ForceUpdateRequestType"
+		type="queue:ForceUpdateRequestType"/>
+	<xsd:element name="ForceUpdateResponse"/>
 
 	<xsd:complexType name="RescheduleJobsRequestType">
 		<xsd:sequence>

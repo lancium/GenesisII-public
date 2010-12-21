@@ -11,6 +11,9 @@ class DefaultMacroConsumer extends AbstractEscapingMacroConsumer
 			if (!escaped && c == '$')
 				return new PossibleMacroStartMacroConsumer(resolver());
 			
+			if (escaped)
+				builder.append('\\');
+			
 			builder.append(c);
 		}
 		

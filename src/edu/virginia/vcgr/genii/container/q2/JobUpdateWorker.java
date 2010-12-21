@@ -1,9 +1,12 @@
 package edu.virginia.vcgr.genii.container.q2;
 
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
+
+import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -11,6 +14,7 @@ import org.ggf.bes.factory.ActivityStateEnumeration;
 import org.ggf.bes.factory.ActivityStatusType;
 import org.ggf.bes.factory.GetActivityStatusResponseType;
 import org.ggf.bes.factory.GetActivityStatusesType;
+import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 import org.xmlsoap.schemas.soap.envelope.Fault;
 
@@ -20,6 +24,7 @@ import edu.virginia.vcgr.genii.client.bes.BESFaultManager;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 
@@ -85,8 +90,11 @@ public class JobUpdateWorker implements OutcallHandler
 		
 		try
 		{
+			/* MOOCH:  For now, we're going to comment this out -- it was
+			 * taking up too much space in the database.
 			history.createDebugWriter("Job Update Worker Running").format(
 				"Job Update worker running to check status of job.").close();
+			*/
 			
 			_logger.debug("Checking status of job " + _data);
 	
@@ -134,7 +142,10 @@ public class JobUpdateWorker implements OutcallHandler
 			GetActivityStatusResponseType []activityStatuses;
 			try
 			{
+				/* MOOCH:  For now, we're going to comment this out as it 
+				 * takes too much space in the database.
 				history.debug("Making Job Status Outcall");
+				*/
 				
 				_logger.debug(String.format(
 					"Making grid outcall to check status of job %s", _data));
@@ -176,7 +187,10 @@ public class JobUpdateWorker implements OutcallHandler
 					+ _data);
 			} else
 			{
+				/* MOOCH:  For now, we're going to comment this out as it takes
+				 * too much space in the database.
 				history.trace("Job Status Check Succeeded");
+				*/
 				_logger.debug(String.format(
 					"Successfully got status of job %s.", _data));
 				List<String> faults = null;
@@ -190,8 +204,22 @@ public class JobUpdateWorker implements OutcallHandler
 						{
 							faults = BESFaultManager.getFaultDetail(
 								fault);
-							history.createErrorWriter("Job Faulted").format(
-								"Job through fault:  %s", fault).close();
+							PrintWriter faultWriter = history.createErrorWriter(
+									"Job Faulted").format(
+										"Job threw fault:\n");
+							try
+							{
+								ObjectSerializer.serialize(faultWriter, fault, 
+									new QName("http://tempuri.org", "Fault"));
+							}
+							catch (Throwable cause)
+							{
+								faultWriter.format("\n\nUnable to show fault.");
+							}
+							finally
+							{
+								StreamUtils.close(faultWriter);
+							}
 						}
 					}
 				}

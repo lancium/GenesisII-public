@@ -151,7 +151,8 @@ public class JobInformationFork
 						throw new RuntimeException("Unable to deserialize owner identities.", e);
 					}
 					
-					jInfo = new JobInformation(ticket, identities,
+					jInfo = new JobInformation(ticket, jit.getJobName(),
+						identities,
 						QueueStates.fromQueueStateType(jit.getJobStatus()),
 						(int)jit.getPriority(), jit.getSubmitTime(),
 						jit.getStartTime(), jit.getFinishTime(),

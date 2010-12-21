@@ -278,9 +278,9 @@ public class RNSTree extends JTree implements EndpointRetriever
 			}
 		}
 		
-		model.uiContext().progressMonitorFactory().monitor(
+		model.uiContext().progressMonitorFactory().createMonitor(
 			this, "Delete Entries", "Deleting entries",
-			1000L, new DeleteTask(model.uiContext(), pathList), null);
+			1000L, new DeleteTask(model.uiContext(), pathList), null).start();
 	}
 	
 	private class TearoffHandlerImpl implements TearoffHandler

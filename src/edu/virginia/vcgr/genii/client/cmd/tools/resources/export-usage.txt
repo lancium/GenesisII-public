@@ -3,6 +3,7 @@ export
 	OR
 	
 export --create { --url <export-service-url> | <export-service-hint> } 
+	[--svn-user=<svn-username>] [--svn-pass=<svn-pass>] [--svn-revision=<svn-revision>]
 	<local-path> [new-rns-path]
 	
 	OR

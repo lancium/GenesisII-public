@@ -134,10 +134,10 @@ public class TrashDialog extends UIFrame
 		public void actionPerformed(ActionEvent e)
 		{
 			dispose();
-			_uiContext.progressMonitorFactory().monitor(_widget,
+			_uiContext.progressMonitorFactory().createMonitor(_widget,
 				"Emptying Trash", "Emptying trash", 1000L,
 				new TrashCanEnactorTask(),
-				new TrashCanEnactorCompleter());
+				new TrashCanEnactorCompleter()).start();
 		}
 	}
 	
@@ -263,9 +263,9 @@ public class TrashDialog extends UIFrame
 				wrappers.add(wrapper);
 			}
 			
-			_uiContext.progressMonitorFactory().monitor(_unsortedList,
+			_uiContext.progressMonitorFactory().createMonitor(_unsortedList,
 				"Undelete", "Undeleting entries.", 1000L, 
-				new UndeleteTask(wrappers), new UndeleteTaskCompleter());
+				new UndeleteTask(wrappers), new UndeleteTaskCompleter()).start();
 		}
 
 		@Override

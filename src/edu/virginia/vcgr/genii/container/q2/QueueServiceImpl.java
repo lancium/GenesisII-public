@@ -300,9 +300,21 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		ResourceKey rKey = ResourceManager.getCurrentResource();
 		
 		if (arg0 != null && arg0.getResourceHint() != null)
+		{
+			try
+			{
+				_queueMgr.getJobStatus(new String[] { arg0.getResourceHint() });
+			}
+			catch (SQLException sqe)
+			{
+				throw new RemoteException(
+					"Unable to check that job exists.", sqe);
+			}
+			
 			arg0.setResourceHint(new QueueDatabase(
 				rKey.getResourceKey()).historyKey(
 					arg0.getResourceHint()));
+		}
 		
 		return super.iterateHistoryEvents(arg0);
 	}
@@ -496,6 +508,7 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	
 	private class SweepListenerImpl implements SweepListener
 	{
+		private WorkingContext _workingContext;
 		private ICallingContext _callingContext;
 		private QueueManager _queueManager;
 		private Collection<String> _tickets;
@@ -520,6 +533,8 @@ public class QueueServiceImpl extends ResourceForkBaseService
 			_tickets = new LinkedList<String>();
 			_prioroity = priority;
 			_callingContext = ContextManager.getCurrentContext();
+			_workingContext = 
+				(WorkingContext)WorkingContext.getCurrentWorkingContext().clone();
 		}
 		
 		@Override
@@ -530,6 +545,7 @@ public class QueueServiceImpl extends ResourceForkBaseService
 			
 			try
 			{
+				WorkingContext.setCurrentWorkingContext(_workingContext);
 				token = ContextManager.temporarilyAssumeContext(_callingContext);
 				synchronized(_tickets)
 				{
@@ -560,7 +576,27 @@ public class QueueServiceImpl extends ResourceForkBaseService
 			finally
 			{
 				StreamUtils.close(token);
+				WorkingContext.setCurrentWorkingContext(null);
 			}
 		}
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.WRITE)
+	public Object forceUpdate(String[] arg0) throws RemoteException
+	{
+		for (String arg : arg0)
+		{
+			try
+			{
+				_queueMgr.forceBESUpdate(arg);
+			} catch (SQLException e)
+			{
+				_logger.error(String.format(
+					"Unable to force update for resource %s.", arg), e);
+			}
+		}
+		
+		return null;
 	}
 }

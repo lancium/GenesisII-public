@@ -64,7 +64,7 @@ class CredentialDialog extends JDialog
 		EnumComboBox<AccountingCredentialTypes> box =
 			new EnumComboBox<AccountingCredentialTypes>(
 				AccountingCredentialTypes.class, EnumComboSort.Alphabetically, 
-				true);
+				true, null);
 		
 		c.setCellEditor(new DefaultCellEditor(box));
 	}

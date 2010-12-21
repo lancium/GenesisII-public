@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.ui.shell;
 import java.awt.Toolkit;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.io.Closeable;
 
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -13,6 +14,7 @@ import org.morgan.util.Pair;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.configuration.UserPreferences;
+import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.ui.UIContext;
 import edu.virginia.vcgr.genii.ui.prefs.shell.ShellUIPreferenceSet;
 import edu.virginia.vcgr.genii.ui.progress.AbstractTask;
@@ -326,10 +328,10 @@ public class CommandField extends JTextField
 				_display.start();
 				_display.header().format("Command:  ");
 				_display.command().println(line);
-				_uiContext.progressMonitorFactory().monitor(CommandField.this, 
+				_uiContext.progressMonitorFactory().createMonitor(CommandField.this, 
 					"Executing Command", "Executing command.", 1000L,
 					new CommandExecutionTask(line, reader),
-					new CommandCompletionListener());
+					new CommandCompletionListener()).start();
 			} else
 			{
 				reader.addLine(line);
@@ -455,11 +457,11 @@ public class CommandField extends JTextField
 			{
 				setText("forming completions...");
 				setEnabled(false);
-				_uiContext.progressMonitorFactory().monitor(
+				_uiContext.progressMonitorFactory().createMonitor(
 					CommandField.this, "Forming Completions",
 					"Forming completions.", 1000L,
 					new CompleterTask(completer, partial),
-					new CompletionFinisher(lastWord, right, words, left));
+					new CompletionFinisher(lastWord, right, words, left)).start();
 			}
 			
 			_historyIterator = null;
@@ -644,10 +646,21 @@ public class CommandField extends JTextField
 	{
 		private void finishCommand()
 		{
-			_label.setText(
-				UserPreferences.preferences().shellPrompt().toString());
-			_reader = null;
-			CommandField.this.requestFocusInWindow();
+			Closeable token = null;
+			
+			try
+			{
+				token = ContextManager.temporarilyAssumeContext(
+					_uiContext.callingContext());
+				_label.setText(
+					UserPreferences.preferences().shellPrompt().toString());
+				_reader = null;
+				CommandField.this.requestFocusInWindow();
+			}
+			finally
+			{
+				StreamUtils.close(token);
+			}
 		}
 		
 		@Override

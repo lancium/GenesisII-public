@@ -2,10 +2,7 @@ package edu.virginia.vcgr.genii.container.q2;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
@@ -24,29 +21,6 @@ import edu.virginia.vcgr.genii.client.ser.DBSerializer;
  */
 public class QueueSecurity
 {
-	static final private Pattern HAS_GROUP_TOKEN_PATTERN =
-		Pattern.compile("^.*(?<![a-z])cn=[^,]*group.*$", Pattern.CASE_INSENSITIVE);
-	
-	static public boolean isGroupIdentity(Identity identity)
-	{
-		Matcher matcher = HAS_GROUP_TOKEN_PATTERN.matcher(identity.toString());
-		return matcher.matches();
-	}
-	
-	static private Collection<Identity> filterOutGroups(
-		Collection<Identity> in)
-	{
-		Collection<Identity> ret = new ArrayList<Identity>(in.size());
-		
-		for (Identity test : in)
-		{
-			if (!isGroupIdentity(test))
-				ret.add(test);
-		}
-		
-		return ret;
-	}
-	
 	/**
 	 * Retrieve the list of identities associated with the current calling
 	 * context.  The queue will associate these identities with being the
@@ -66,8 +40,9 @@ public class QueueSecurity
 				ContextManager.getCurrentContext(false);
 			
 			if (filterOutGroups)
-				return filterOutGroups(
-					SecurityUtils.getCallerIdentities(callingContext));
+				return SecurityUtils.filterCredentials(
+					SecurityUtils.getCallerIdentities(callingContext),
+					SecurityUtils.GROUP_TOKEN_PATTERN);
 			else
 				return SecurityUtils.getCallerIdentities(callingContext);
 		}

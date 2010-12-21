@@ -727,7 +727,7 @@ public class ExportedDirDBResource extends BasicDBResource implements
 						serviceEPR = _dirServiceEPR;
 						entryType = ExportedDirEntry._DIR_TYPE;
 						creationProperties = ExportedDirUtils.createCreationProperties(null,
-							newPath, childrenParentIds, getReplicationState());
+							newPath, null, null, null, childrenParentIds, getReplicationState());
 					}
 					catch (RemoteException re)
 					{

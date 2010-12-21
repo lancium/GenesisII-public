@@ -42,9 +42,9 @@ public class RNSTreeMover extends RNSTreeOperator
 	public boolean performOperation()
 	{
 		_logger.debug("RNSTreeMover called.");
-		_uiContext.progressMonitorFactory().monitor(
+		_uiContext.progressMonitorFactory().createMonitor(
 			_targetTree, "Moving Endpoints", "Moving endpoints.",
-			1000L, new MoverTask(), null);
+			1000L, new MoverTask(), null).start();
 		return true;
 	}
 	

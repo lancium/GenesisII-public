@@ -7,14 +7,18 @@ import java.awt.Insets;
 import java.util.Collection;
 
 import javax.swing.JFrame;
+import javax.swing.JTabbedPane;
 
 import org.morgan.utils.gui.GUIUtils;
 
 import edu.virginia.vcgr.genii.ui.plugins.AbstractCombinedUIMenusPlugin;
 import edu.virginia.vcgr.genii.ui.plugins.EndpointDescription;
+import edu.virginia.vcgr.genii.ui.plugins.LazilyLoadedTab;
 import edu.virginia.vcgr.genii.ui.plugins.MenuType;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginContext;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginException;
+import edu.virginia.vcgr.genii.ui.plugins.queue.jobs.QueueManagerPanel;
+import edu.virginia.vcgr.genii.ui.plugins.queue.resources.ResourcesPanel;
 
 public class QueueManagerPlugin extends AbstractCombinedUIMenusPlugin
 {
@@ -27,11 +31,16 @@ public class QueueManagerPlugin extends AbstractCombinedUIMenusPlugin
 			JFrame frame = new JFrame("Queue Manager");
 			
 			QueueManagerPanel qPanel = new QueueManagerPanel(context);
+			ResourcesPanel rPanel = new ResourcesPanel(context);
+			
+			JTabbedPane tabbed = new JTabbedPane();
+			tabbed.addTab("Job Manager", new LazilyLoadedTab(qPanel, qPanel));
+			tabbed.addTab("Resource Manager", new LazilyLoadedTab(rPanel, rPanel));
 			
 			Container container = frame.getContentPane();
 			container.setLayout(new GridBagLayout());
 			
-			container.add(qPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
+			container.add(tabbed, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(5, 5, 5, 5), 5, 5));
 			

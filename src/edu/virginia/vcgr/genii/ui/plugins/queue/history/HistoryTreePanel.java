@@ -12,9 +12,9 @@ import javax.swing.JTree;
 
 import edu.virginia.vcgr.genii.client.history.HistoryEvent;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
-import edu.virginia.vcgr.genii.client.history.HistoryEventLevel;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.ui.UIContext;
+import edu.virginia.vcgr.genii.ui.prefs.history.HistoryUIPreferenceSet;
 
 class HistoryTreePanel extends JPanel
 {
@@ -26,8 +26,11 @@ class HistoryTreePanel extends JPanel
 	{
 		super(new GridBagLayout());
 		
+		HistoryUIPreferenceSet pref = 
+			context.preferences().preferenceSet(HistoryUIPreferenceSet.class);
+		
 		HistoryEventFilter filter = new HistoryEventFilter(
-			HistoryEventLevel.Information,
+			pref.preferredLevel(),
 			EnumSet.allOf(HistoryEventCategory.class));
 		
 		JTree tree = new HistoryEventTree(context,

@@ -15,6 +15,7 @@ import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.GuaranteedDirectory;
 
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
+import edu.virginia.vcgr.genii.client.io.DataTransferStatistics;
 import edu.virginia.vcgr.genii.client.io.URIManager;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.container.cservices.AbstractContainerService;
@@ -125,12 +126,13 @@ public class DownloadManagerContainerService extends AbstractContainerService
 		_logger.info("Starting DownloadManager Constainer Service.");
 	}
 	
-	public void download(URI source, File target,
+	public DataTransferStatistics download(URI source, File target,
 		UsernamePasswordIdentity credential) throws IOException
 	{
 		target = target.getAbsoluteFile();
 		InProgressLock lock;
 		boolean iAmResponsible = false;
+		DataTransferStatistics ret = DataTransferStatistics.startTransfer();
 		
 		_logger.info(String.format(
 			"(Download Manager) -- About to check for %s", target));
@@ -143,7 +145,7 @@ public class DownloadManagerContainerService extends AbstractContainerService
 				{
 					_logger.info(String.format(
 						"(Download Manager) -- %s already exists.", target));
-					return;
+					return ret.finishTransfer();
 				}
 				
 				_logger.info(String.format(
@@ -164,7 +166,7 @@ public class DownloadManagerContainerService extends AbstractContainerService
 				"(Download Manager) -- The other thread signaled me that %s is done.",
 				target));
 			lock.checkException();
-			return;
+			return ret.finishTransfer();
 		}
 		
 		IOException exception = null;
@@ -173,7 +175,7 @@ public class DownloadManagerContainerService extends AbstractContainerService
 		{
 			_logger.info(String.format(
 				"(Download Manager) -- Copy %s from source.", target));
-			doDownload(source, target, credential);
+			ret.transfer(doDownload(source, target, credential));
 		}
 		catch (IOException ioe)
 		{
@@ -207,12 +209,15 @@ public class DownloadManagerContainerService extends AbstractContainerService
 		
 		if (exception != null)
 			throw exception;
+		
+		return ret.finishTransfer();
 	}
 	
-	private void doDownload(URI source, File realTarget,
+	private long doDownload(URI source, File realTarget,
 		UsernamePasswordIdentity credential) throws IOException
 	{
 		File tmpTarget;
+		DataTransferStatistics ret;
 		
 		synchronized(_lockObject)
 		{
@@ -220,8 +225,9 @@ public class DownloadManagerContainerService extends AbstractContainerService
 				"dload", ".tmp", _downloadDirectory);
 		}
 		
-		URIManager.get(source, tmpTarget, credential);
+		ret = URIManager.get(source, tmpTarget, credential);
 		tmpTarget.renameTo(realTarget);
+		return ret.bytesTransferred();
 	}
 	
 	private class PropertyChangeListener 

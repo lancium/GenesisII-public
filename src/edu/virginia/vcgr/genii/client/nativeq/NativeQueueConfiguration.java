@@ -125,12 +125,17 @@ public class NativeQueueConfiguration implements Serializable, NativeQConstants
 		throw new StreamCorruptedException();
 	}
 
+	final public NativeQueue nativeQueue() throws NativeQueueException
+	{
+		return NativeQueues.getNativeQueue(_providerName);
+	}
+	
 	final public NativeQueueConnection connect(
 		ResourceOverrides resourceOverrides, 
 			File workingDirectory)
 				throws NativeQueueException
 	{
-		NativeQueue queue = NativeQueues.getNativeQueue(_providerName);
+		NativeQueue queue = nativeQueue();
 		return queue.connect(resourceOverrides, workingDirectory,
 			this, _providerConfiguration);
 	}

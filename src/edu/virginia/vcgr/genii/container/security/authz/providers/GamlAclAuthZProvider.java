@@ -160,17 +160,19 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 		Collection<AclEntry> trustList = null;
 		switch (category)
 		{
-		case READ:
-			trustList = acl.readAcl;
-			break;
-		case WRITE:
-			trustList = acl.writeAcl;
-			break;
-		case EXECUTE:
-			trustList = acl.executeAcl;
-			break;
-		case OPEN:
-			return true;
+			case READ:
+				trustList = acl.readAcl;
+				break;
+			case WRITE:
+				trustList = acl.writeAcl;
+				break;
+			case EXECUTE:
+				trustList = acl.executeAcl;
+				break;
+			case OPEN:
+				return true;
+			case CLOSED:
+				return false;
 		}
 
 		if (trustList == null)

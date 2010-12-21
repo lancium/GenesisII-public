@@ -5,3 +5,5 @@ application/jsdl	jsdl JSDL
 application/gjp		gjp GJP
 
 text/xml			xml XML
+
+image/x-portable-pixmap			ppm PPM

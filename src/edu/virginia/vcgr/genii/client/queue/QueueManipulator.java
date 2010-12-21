@@ -302,7 +302,8 @@ public class QueueManipulator
 				throw new RuntimeException("Unable to deserialize owner identities.", e);
 			}
 			
-			return new JobInformation(ticket, identities,
+			return new JobInformation(ticket, jobInfo.getJobName(),
+					identities,
 					QueueStates.fromQueueStateType(jobInfo.getJobStatus()),
 					(int)jobInfo.getPriority(), jobInfo.getSubmitTime(),
 					jobInfo.getStartTime(), jobInfo.getFinishTime(),

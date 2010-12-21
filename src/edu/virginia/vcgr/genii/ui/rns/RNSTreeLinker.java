@@ -44,9 +44,9 @@ public class RNSTreeLinker extends RNSTreeOperator
 	{
 		_logger.debug("RNSTreeLinker called.");
 		
-		_uiContext.progressMonitorFactory().monitor(
+		_uiContext.progressMonitorFactory().createMonitor(
 			_targetTree, "Linking Endpoints", "Linking endpoints.",
-			1000L, new LinkerTask(), null);
+			1000L, new LinkerTask(), null).start();
 		return true;
 	}
 	

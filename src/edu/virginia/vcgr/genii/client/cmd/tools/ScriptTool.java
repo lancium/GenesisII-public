@@ -15,12 +15,12 @@ import java.util.Properties;
 import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
+import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import org.morgan.util.io.StreamUtils;
 
-import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.xscript.jsr.Grid;
 import edu.virginia.vcgr.genii.client.configuration.GridEnvironment;
@@ -34,10 +34,66 @@ public class ScriptTool extends BaseGridTool
 		"Executes a script.";
 	
 	static final private String _USAGE =
-		"script [--global-properties=<properties-file>] [var=val ...] <script-file>";
+		"script [--global-properties=<properties-file>] [var=val ...] [--language=<language>] [<script-file>]";
+	
+	@Option("language")
+	private String _language = null;
 	
 	private Collection<String> _globalPropertiesPaths =
 		new LinkedList<String>();
+	
+	private ScriptEngine scriptEngine(GeniiPath path)
+	{
+		ScriptEngineManager manager = new ScriptEngineManager();
+		ScriptEngine engine = null;
+		
+		if (path == null || _language != null)
+		{
+			if (_language == null)
+				stderr.format("Must supply either a language, or a script!\n");
+			else
+			{
+				for (ScriptEngineFactory factory : manager.getEngineFactories())
+				{
+					if (factory.getLanguageName().equals(_language))
+					{
+						engine = factory.getScriptEngine();
+						engine.setBindings(manager.getBindings(),
+							ScriptContext.GLOBAL_SCOPE);
+						break;
+					}
+				}
+				
+				if (engine == null)
+				{
+					stderr.format(
+						"No scripting engine registered for language %s!\n", 
+						_language);
+					stderr.format("Valid languages include:  ");
+					boolean first = true;
+					for (ScriptEngineFactory factory : manager.getEngineFactories())
+					{
+						if (!first)
+							stderr.format(", ");
+						first = false;
+						
+						stderr.print(factory.getLanguageName());
+					}
+					stderr.println();
+				}
+			}
+		} else
+		{
+			String extension = getExtension(path.path());
+			engine = manager.getEngineByExtension(extension);
+			
+			if (engine == null)
+				stderr.format("No scripting engine registered for extension %s!\n",
+					extension);
+		}
+
+		return engine;
+	}
 	
 	public void setGlobal_properties(String propertiesPath)
 	{
@@ -85,6 +141,7 @@ public class ScriptTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{	
+		Reader reader = null;
 		int lcv;
 		Properties initialProperties = new Properties();
 		
@@ -121,49 +178,56 @@ public class ScriptTool extends BaseGridTool
 			initialProperties.put(arg.substring(0, index), arg.substring(index + 1));
 		}
 		
-		GeniiPath scriptFilePath = new GeniiPath(getArgument(lcv));
-		if (scriptFilePath.pathType() == GeniiPathType.Local)
-		{
-			File scriptFile = PathVariable.lookupVariable(System.getProperties(), 
-				GridEnvironment.GRID_PATH_ENV_VARIABLE).find(
-					scriptFilePath.path(),
-					PathVariable.FindTypes.FILE);
-			if (scriptFile == null)
-				throw new FileNotFoundException(String.format(
-					"Unable to locate script file %s.", scriptFilePath));
-			scriptFilePath = new GeniiPath(
-				"local:" + scriptFile.getAbsolutePath());
-		}
-		
-		String []cArgs = new String[args.size() - lcv];
-		int start = lcv;
-		for (;lcv < args.size(); lcv++)
-			cArgs[lcv - start] = args.get(lcv);
-		
-		String extension = getExtension(scriptFilePath.path());
-		ScriptEngineManager manager = new ScriptEngineManager();
-		ScriptEngine engine = manager.getEngineByExtension(extension);
-		
-		if (engine == null)
-		{
-			stderr.format("No scripting engine registered for extension %s!\n",
-				extension);
-			return -1;
-		}
-		
-		engine.put("grid", new Grid(
-			initialProperties, stdin, stdout, stderr));
-		Bindings b = engine.getBindings(ScriptContext.GLOBAL_SCOPE);
-		b.put("ARGV", cArgs);
-		for (Object property : initialProperties.keySet())
-			b.put((String)property, 
-				initialProperties.get(property));
-			
-		Reader reader = null;
 		try
-		{	
-			reader = openReader(scriptFilePath);
-			engine.eval(reader);
+		{
+			ScriptEngine engine;
+			if (lcv >= args.size())
+			{
+				// Read from stdin
+				engine = scriptEngine(null);
+				if (engine == null)
+					return -1;
+			} else
+			{
+				GeniiPath scriptFilePath = new GeniiPath(getArgument(lcv));
+				if (scriptFilePath.pathType() == GeniiPathType.Local)
+				{
+					File scriptFile = PathVariable.lookupVariable(System.getProperties(), 
+						GridEnvironment.GRID_PATH_ENV_VARIABLE).find(
+							scriptFilePath.path(),
+							PathVariable.FindTypes.FILE);
+					if (scriptFile == null)
+						throw new FileNotFoundException(String.format(
+							"Unable to locate script file %s.", scriptFilePath));
+					scriptFilePath = new GeniiPath(
+						"local:" + scriptFile.getAbsolutePath());
+				}
+				
+				engine = scriptEngine(scriptFilePath);
+				if (engine == null)
+					return -1;
+				
+				reader = openReader(scriptFilePath);
+			}
+				
+			String []cArgs = new String[args.size() - lcv];
+			int start = lcv;
+			for (;lcv < args.size(); lcv++)
+				cArgs[lcv - start] = args.get(lcv);	
+			
+			engine.put("grid", new Grid(
+				initialProperties, stdin, stdout, stderr));
+			Bindings b = engine.getBindings(ScriptContext.GLOBAL_SCOPE);
+			b.put("ARGV", cArgs);
+	
+			for (Object property : initialProperties.keySet())
+				b.put((String)property, 
+					initialProperties.get(property));
+					
+			if (reader != null)
+				engine.eval(reader);
+			else
+				engine.eval(stdin);
 			
 			return 0;
 		}
@@ -184,7 +248,5 @@ public class ScriptTool extends BaseGridTool
 	@Override
 	protected void verify() throws ToolException
 	{
-		if (numArguments() < 1)
-			throw new InvalidToolUsageException();
 	}
 }

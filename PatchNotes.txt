@@ -1,0 +1,7 @@
+
+	* Had to update the pwrapper binaries for linux and Mac to fix a bug.
+		-- Because of this patch, machines where Karp has manually twiddled the
+			pwrapper binary will need to be manually twiddled again.
+
+Genesis II 2.1.0 Build 2101
+	* This is where we started making notes

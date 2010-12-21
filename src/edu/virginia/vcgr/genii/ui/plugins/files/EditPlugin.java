@@ -213,11 +213,11 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 		{
 			if (contentFile != null)
 			{
-				_context.progressMonitorFactory().monitor(
+				_context.progressMonitorFactory().createMonitor(
 					_ownerComponent, "Uploading File", "Uploading edited file.",
 					1L, new UploadTask(_context, contentFile, _source),
 					new UploadCompletionListener(_context, _ownerComponent, 
-						contentFile));
+						contentFile)).start();
 			}
 		}
 	}
@@ -325,12 +325,12 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 				return;
 			}
 			
-			factory.monitor(ownerComponent,
+			factory.createMonitor(ownerComponent,
 				"Edit",
 				"Downloading grid file for edit.",
 				1L, new DownloadTask(context, path),
 				new DownloadTaskCompletionListener(
-					ownerComponent, context, path, externalApplication));
+					ownerComponent, context, path, externalApplication)).start();
 				
 		}
 		catch (Throwable cause)

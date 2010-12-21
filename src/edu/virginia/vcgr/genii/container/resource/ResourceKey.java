@@ -140,7 +140,7 @@ public class ResourceKey implements Closeable
 	 * a resource which can't be found.
 	 * @throws ResourceException If anything else goes wrong.
 	 */
-	ResourceKey(String serviceName, AddressingParameters addrParams)
+	public ResourceKey(String serviceName, AddressingParameters addrParams)
 		throws ResourceUnknownFaultType, ResourceException
 	{
 		boolean noExceptions = false;

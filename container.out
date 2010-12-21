@@ -1,0 +1,248 @@
+[2010-12-10 10:48:57,850:INFO] Deployment name is default.
+
+[2010-12-10 10:48:59,379:INFO] Setting max acceptor threads to 16
+
+2010-12-10 10:48:59.394::INFO:  Logging to STDERR via org.mortbay.log.StdErrLog
+2010-12-10 10:48:59.481::INFO:  jetty-6.1.17
+2010-12-10 10:48:59.621::INFO:  NO JSP Support for /, did not find org.apache.jasper.servlet.JspServlet
+2010-12-10 10:49:00.499::INFO:  Started TrustAllSslSocketConnector@0.0.0.0:18080
+2010-12-10 10:49:00.500::INFO:  jetty-6.1.17
+2010-12-10 10:49:00.504::INFO:  Started SocketConnector@0.0.0.0:18081
+[2010-12-10 10:49:02,368:INFO] Container ID:  F0EFCBBF-19AC-D105-22F7-CBE557E3850F
+[2010-12-10 10:49:02,368:INFO] Starting container services.
+[2010-12-10 10:49:02,480:INFO] Loading History Service.
+[2010-12-10 10:49:02,538:INFO] Loading DownloadManager Constainer Service.
+[2010-12-10 10:49:02,549:INFO] Execution Manager Service being loaded.
+[2010-12-10 10:49:02,549:INFO] Loading SwapFSManager Constainer Service.
+[2010-12-10 10:49:02,657:INFO] Loading Persistent Outcall Container Service.
+[2010-12-10 10:49:02,709:INFO] Successfully loaded 0/0 entries from the persistent outcall database.
+[2010-12-10 10:49:02,710:INFO] Loading Accounting Service.
+[2010-12-10 10:49:02,814:INFO] Loading WS Notification Service.
+[2010-12-10 10:49:02,815:INFO] Starting Information Container Service with 8 threads in the pool.
+[2010-12-10 10:49:02,815:INFO] Starting SwapFSManager Constainer Service.
+[2010-12-10 10:49:02,864:INFO] Execution Manager Service being started.
+[2010-12-10 10:49:02,864:INFO] Starting History Service.
+[2010-12-10 10:49:02,867:INFO] Starting WS Notification Service.
+[2010-12-10 10:49:02,867:INFO] Starting DownloadManager Constainer Service.
+[2010-12-10 10:49:02,867:INFO] Starting Persistent Outcall Container Service.
+[2010-12-10 10:49:03,731:INFO] Deployed "edu.virginia.vcgr.genii.container.exportdir.ExportedFileServiceImpl".
+[2010-12-10 10:49:03,765:INFO] Initializing "edu.virginia.vcgr.genii.container.exportdir.ExportedFileServiceImpl" service implementation.
+[2010-12-10 10:49:04,441:INFO] Deployed "edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverFactoryServiceImpl".
+[2010-12-10 10:49:04,442:INFO] Initializing "edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverFactoryServiceImpl" service implementation.
+[2010-12-10 10:49:04,792:INFO] Deployed "edu.virginia.vcgr.genii.container.rns.EnhancedRNSServiceImpl".
+[2010-12-10 10:49:04,795:INFO] Initializing "edu.virginia.vcgr.genii.container.rns.EnhancedRNSServiceImpl" service implementation.
+[2010-12-10 10:49:05,147:INFO] Deployed "edu.virginia.vcgr.genii.container.jndiauthn.JNDIAuthnServiceImpl".
+[2010-12-10 10:49:05,152:INFO] Initializing "edu.virginia.vcgr.genii.container.jndiauthn.JNDIAuthnServiceImpl" service implementation.
+[2010-12-10 10:49:05,453:INFO] Deployed "edu.virginia.vcgr.genii.container.replicatedExport.RExportFileServiceImpl".
+[2010-12-10 10:49:05,457:INFO] Initializing "edu.virginia.vcgr.genii.container.replicatedExport.RExportFileServiceImpl" service implementation.
+[2010-12-10 10:49:05,624:INFO] Deployed "edu.virginia.vcgr.genii.container.exportdir.ExportedRootServiceImpl".
+[2010-12-10 10:49:05,628:INFO] Initializing "edu.virginia.vcgr.genii.container.exportdir.ExportedRootServiceImpl" service implementation.
+[2010-12-10 10:49:05,808:INFO] Deployed "edu.virginia.vcgr.genii.container.replicatedExport.RExportDirServiceImpl".
+[2010-12-10 10:49:05,810:INFO] Initializing "edu.virginia.vcgr.genii.container.replicatedExport.RExportDirServiceImpl" service implementation.
+[2010-12-10 10:49:06,091:INFO] Deployed "edu.virginia.vcgr.genii.container.exportdir.ExportedDirServiceImpl".
+[2010-12-10 10:49:06,091:INFO] Initializing "edu.virginia.vcgr.genii.container.exportdir.ExportedDirServiceImpl" service implementation.
+[2010-12-10 10:49:06,525:INFO] Deployed "edu.virginia.vcgr.genii.container.bes.GeniiBESServiceImpl".
+[2010-12-10 10:49:06,577:INFO] Initializing "edu.virginia.vcgr.genii.container.bes.GeniiBESServiceImpl" service implementation.
+[2010-12-10 10:49:06,946:INFO] Deployed "edu.virginia.vcgr.genii.container.common.notification.GeniiPullPointServiceImpl".
+[2010-12-10 10:49:06,949:INFO] Initializing "edu.virginia.vcgr.genii.container.common.notification.GeniiPullPointServiceImpl" service implementation.
+[2010-12-10 10:49:07,028:INFO] Deployed "edu.virginia.vcgr.genii.container.certGenerator.CertGeneratorServiceImpl".
+[2010-12-10 10:49:07,041:INFO] Initializing "edu.virginia.vcgr.genii.container.certGenerator.CertGeneratorServiceImpl" service implementation.
+[2010-12-10 10:49:07,276:INFO] Deployed "edu.virginia.vcgr.genii.container.q2.QueueServiceImpl".
+[2010-12-10 10:49:07,321:INFO] Initializing "edu.virginia.vcgr.genii.container.q2.QueueServiceImpl" service implementation.
+[2010-12-10 10:49:07,845:DEBUG] Restarting all BES Managers.
+[2010-12-10 10:49:07,892:INFO] Deployed "edu.virginia.vcgr.genii.container.exportdir.lightweight.LightWeightExportServiceImpl".
+[2010-12-10 10:49:07,894:INFO] Initializing "edu.virginia.vcgr.genii.container.exportdir.lightweight.LightWeightExportServiceImpl" service implementation.
+[2010-12-10 10:49:08,019:INFO] Deployed "edu.virginia.vcgr.genii.container.common.notification.GeniiWSNBrokerServiceImpl".
+[2010-12-10 10:49:08,021:INFO] Initializing "edu.virginia.vcgr.genii.container.common.notification.GeniiWSNBrokerServiceImpl" service implementation.
+[2010-12-10 10:49:08,134:INFO] Deployed "edu.virginia.vcgr.genii.container.container.VCGRContainerServiceImpl".
+[2010-12-10 10:49:08,140:INFO] Initializing "edu.virginia.vcgr.genii.container.container.VCGRContainerServiceImpl" service implementation.
+[2010-12-10 10:49:08,282:INFO] Deployed "edu.virginia.vcgr.genii.container.byteio.RandomByteIOServiceImpl".
+[2010-12-10 10:49:08,282:INFO] Initializing "edu.virginia.vcgr.genii.container.byteio.RandomByteIOServiceImpl" service implementation.
+[2010-12-10 10:49:08,389:INFO] Deployed "edu.virginia.vcgr.genii.container.resolver.SimpleResolverFactoryServiceImpl".
+[2010-12-10 10:49:08,391:INFO] Initializing "edu.virginia.vcgr.genii.container.resolver.SimpleResolverFactoryServiceImpl" service implementation.
+[2010-12-10 10:49:08,491:INFO] Deployed "edu.virginia.vcgr.genii.container.bes.activity.BESActivityServiceImpl".
+[2010-12-10 10:49:08,495:INFO] Initializing "edu.virginia.vcgr.genii.container.bes.activity.BESActivityServiceImpl" service implementation.
+[2010-12-10 10:49:08,717:INFO] Deployed "edu.virginia.vcgr.genii.container.deployer.ApplicationDeployerServiceImpl".
+[2010-12-10 10:49:08,720:INFO] Initializing "edu.virginia.vcgr.genii.container.deployer.ApplicationDeployerServiceImpl" service implementation.
+[2010-12-10 10:49:08,857:INFO] Deployed "edu.virginia.vcgr.genii.container.common.notification.GeniiPublisherRegistrationServiceImpl".
+[2010-12-10 10:49:08,858:INFO] Initializing "edu.virginia.vcgr.genii.container.common.notification.GeniiPublisherRegistrationServiceImpl" service implementation.
+[2010-12-10 10:49:08,986:INFO] Deployed "edu.virginia.vcgr.genii.container.appdesc.ApplicationDescriptionServiceImpl".
+[2010-12-10 10:49:08,989:INFO] Initializing "edu.virginia.vcgr.genii.container.appdesc.ApplicationDescriptionServiceImpl" service implementation.
+[2010-12-10 10:49:09,110:INFO] Deployed "edu.virginia.vcgr.genii.container.iterator.IteratorServiceImpl".
+[2010-12-10 10:49:09,112:INFO] Initializing "edu.virginia.vcgr.genii.container.iterator.IteratorServiceImpl" service implementation.
+[2010-12-10 10:49:09,298:INFO] Deployed "edu.virginia.vcgr.genii.container.common.notification.GeniiSubscriptionServiceImpl".
+[2010-12-10 10:49:09,300:INFO] Initializing "edu.virginia.vcgr.genii.container.common.notification.GeniiSubscriptionServiceImpl" service implementation.
+[2010-12-10 10:49:09,454:INFO] Deployed "edu.virginia.vcgr.genii.container.resolver.SimpleResolverServiceImpl".
+[2010-12-10 10:49:09,456:INFO] Initializing "edu.virginia.vcgr.genii.container.resolver.SimpleResolverServiceImpl" service implementation.
+[2010-12-10 10:49:09,560:INFO] Deployed "edu.virginia.vcgr.genii.container.byteio.StreamableByteIOServiceImpl".
+[2010-12-10 10:49:09,564:INFO] Initializing "edu.virginia.vcgr.genii.container.byteio.StreamableByteIOServiceImpl" service implementation.
+[2010-12-10 10:49:09,694:INFO] Deployed "edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverServiceImpl".
+[2010-12-10 10:49:09,696:INFO] Initializing "edu.virginia.vcgr.genii.container.replicatedExport.resolver.RExportResolverServiceImpl" service implementation.
+[2010-12-10 10:49:09,829:INFO] Deployed "edu.virginia.vcgr.genii.container.x509authn.X509AuthnServiceImpl".
+[2010-12-10 10:49:09,833:INFO] Initializing "edu.virginia.vcgr.genii.container.x509authn.X509AuthnServiceImpl" service implementation.
+[2010-12-10 10:49:09,926:INFO] Deployed "edu.virginia.vcgr.genii.container.tty.TTYServiceImpl".
+[2010-12-10 10:49:09,928:INFO] Initializing "edu.virginia.vcgr.genii.container.tty.TTYServiceImpl" service implementation.
+Container Started
+[2010-12-10 10:49:33,502:DEBUG] Created resource "E23C441A-DAB4-5A70-7915-7493E60ADCE9" for service "EnhancedRNSPortType".
+[2010-12-10 10:49:33,913:DEBUG] Created resource "1460454D-F6E7-DD5F-894A-3D63E08FDA4A" for service "EnhancedRNSPortType".
+[2010-12-10 10:49:34,149:DEBUG] Created resource "64FA092C-8360-8BD5-C691-1680C3D75E0C" for service "EnhancedRNSPortType".
+[2010-12-10 10:49:35,224:DEBUG] Created resource "B84ADE37-0B1D-05C3-291A-CEFCBC797F47" for service "EnhancedRNSPortType".
+[2010-12-10 10:49:35,400:DEBUG] Created resource "4C5F3A22-2427-D7F5-CBEB-76729FA5DFDF" for service "EnhancedRNSPortType".
+[2010-12-10 10:49:35,539:DEBUG] Created resource "EE4DB589-03C3-3058-AE8D-20D7035A3C3F" for service "EnhancedRNSPortType".
+[2010-12-10 10:49:35,707:DEBUG] Created resource "14867D46-4DB6-47AB-0FD3-9FE7459268E1" for service "EnhancedRNSPortType".
+[2010-12-10 10:49:35,830:DEBUG] Created resource "D9C94DCF-F154-15E1-DAF3-E9C64B8273C2" for service "EnhancedRNSPortType".
+[2010-12-10 10:49:37,090:DEBUG] Created resource "6D14A7C7-BE7F-7920-D73A-C14ABA5DF7CA" for service "X509AuthnPortType".
+[2010-12-10 10:49:45,946:DEBUG] Starting to reload jobs from the database.
+[2010-12-10 10:49:45,960:DEBUG] Finished reloading jobs from the database.
+[2010-12-10 10:49:45,961:DEBUG] Failing 0 jobs that were marked as starting when the container went down.
+[2010-12-10 10:49:45,962:DEBUG] Just finished enqueing a bunch of jobs into the thread pool and the thread pool size grew from 0 jobs to 0 jobs.
+[2010-12-10 10:49:45,965:DEBUG] It took 0 milliseconds to run the scheduling loop.
+[2010-12-10 10:49:50,873:DEBUG] Created resource "58592CB7-CDBB-3738-46E1-E59368354D42" for service "GeniiBESPortType".
+[2010-12-10 10:49:51,587:DEBUG] Created resource "C306BB13-CFFB-CC49-EDD4-7F10FACC712F" for service "CertGeneratorPortType".
+[2010-12-10 10:50:50,220:DEBUG] Created resource "13A1DA1C-8C9C-A17F-0BE7-73CF4F623123" for service "QueuePortType".
+[2010-12-10 10:50:59,452:DEBUG] Starting to reload jobs from the database.
+[2010-12-10 10:50:59,452:DEBUG] Finished reloading jobs from the database.
+[2010-12-10 10:50:59,452:DEBUG] Failing 0 jobs that were marked as starting when the container went down.
+[2010-12-10 10:50:59,455:DEBUG] Just finished enqueing a bunch of jobs into the thread pool and the thread pool size grew from 0 jobs to 0 jobs.
+[2010-12-10 10:50:59,457:DEBUG] It took 2 milliseconds to run the scheduling loop.
+[2010-12-10 10:50:59,587:INFO] Marking BES container "boot" as un-responsive.  Startup Procedure..
+[2010-12-10 10:50:59,590:DEBUG] Added new bes container "boot" into queue as resource 1
+[2010-12-10 10:51:00,123:DEBUG] Received update information about [1] boot@13A1DA1C-8C9C-A17F-0BE7-73CF4F623123 -- Last Updated:  Fri Dec 10 10:51:00 EST 2010
+Information?  MACOS Version 10.5.8 on x86_64
+4.294967296E9 bytes of physical memory available
+0 activites contained; accepting new ones?  true
+supports:environment-variable = JAVA_HOME
+supports:environment-variable = GENII_INSTALL_DIR
+
+
+.
+[2010-12-10 10:51:00,123:INFO] Marking BES container "boot" as available.
+[2010-12-10 10:51:00,125:DEBUG] It took 2 milliseconds to run the scheduling loop.
+[2010-12-10 10:51:47,020:DEBUG] Created resource "50FB5AAE-3BE4-855B-D171-20F98FD24D68" for service "GeniiBESPortType".
+[2010-12-10 10:51:49,701:INFO] Container ID "F0EFCBBF-19AC-D105-22F7-CBE557E3850F".
+
+[2010-12-10 10:52:02,439:INFO] Marking BES container "morgan" as un-responsive.  Startup Procedure..
+[2010-12-10 10:52:02,440:DEBUG] Added new bes container "morgan" into queue as resource 2
+[2010-12-10 10:52:02,519:ERROR] An error occurred while trying to handler server-side, receiver security.
+AxisFault
+ faultCode: {http://schemas.xmlsoap.org/soap/envelope/}Server.generalException
+ faultSubcode: 
+ faultString: Access denied for method getFactoryAttributesDocument.; nested exception is: 
+	Access denied for method getFactoryAttributesDocument.
+ faultActor: 
+ faultNode: 
+ faultDetail: 
+	{http://xml.apache.org/axis/}hostname:mark-imac.cs.Virginia.EDU
+
+Access denied for method getFactoryAttributesDocument.; nested exception is: 
+	Access denied for method getFactoryAttributesDocument.
+	at edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver.performAuthz(ServerWSDoAllReceiver.java:550)
+	at edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver.invoke(ServerWSDoAllReceiver.java:147)
+	at org.apache.axis.strategies.InvocationStrategy.visit(InvocationStrategy.java:32)
+	at org.apache.axis.SimpleChain.doVisiting(SimpleChain.java:118)
+	at org.apache.axis.SimpleChain.invoke(SimpleChain.java:83)
+	at org.apache.axis.strategies.InvocationStrategy.visit(InvocationStrategy.java:32)
+	at org.apache.axis.SimpleChain.doVisiting(SimpleChain.java:118)
+	at org.apache.axis.SimpleChain.invoke(SimpleChain.java:83)
+	at org.apache.axis.server.AxisServer.invoke(AxisServer.java:249)
+	at org.apache.axis.transport.http.AxisServlet.doPost(AxisServlet.java:699)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:727)
+	at org.apache.axis.transport.http.AxisServletBase.service(AxisServletBase.java:327)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:820)
+	at org.mortbay.jetty.servlet.ServletHolder.handle(ServletHolder.java:502)
+	at org.mortbay.jetty.servlet.ServletHandler.handle(ServletHandler.java:389)
+	at org.mortbay.jetty.security.SecurityHandler.handle(SecurityHandler.java:216)
+	at org.mortbay.jetty.servlet.SessionHandler.handle(SessionHandler.java:181)
+	at org.mortbay.jetty.handler.ContextHandler.handle(ContextHandler.java:765)
+	at org.mortbay.jetty.webapp.WebAppContext.handle(WebAppContext.java:417)
+	at org.mortbay.jetty.handler.ContextHandler.handle(ContextHandler.java:765)
+	at org.mortbay.jetty.handler.HandlerCollection.handle(HandlerCollection.java:114)
+	at org.mortbay.jetty.handler.HandlerWrapper.handle(HandlerWrapper.java:152)
+	at org.mortbay.jetty.Server.handle(Server.java:326)
+	at org.mortbay.jetty.HttpConnection.handleRequest(HttpConnection.java:534)
+	at org.mortbay.jetty.HttpConnection$RequestHandler.content(HttpConnection.java:879)
+	at org.mortbay.jetty.HttpParser.parseNext(HttpParser.java:747)
+	at org.mortbay.jetty.HttpParser.parseAvailable(HttpParser.java:212)
+	at org.mortbay.jetty.HttpConnection.handle(HttpConnection.java:404)
+	at org.mortbay.jetty.bio.SocketConnector$Connection.run(SocketConnector.java:228)
+	at org.mortbay.jetty.security.SslSocketConnector$SslConnection.run(SslSocketConnector.java:636)
+	at org.mortbay.thread.QueuedThreadPool$PoolThread.run(QueuedThreadPool.java:520)
+Caused by: Access denied for method getFactoryAttributesDocument.
+	at edu.virginia.vcgr.genii.container.security.authz.providers.GamlAclAuthZProvider.checkAccess(GamlAclAuthZProvider.java:264)
+	at edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver.performAuthz(ServerWSDoAllReceiver.java:540)
+	... 30 more
+[2010-12-10 10:52:02,529:DEBUG] AxisFault:
+AxisFault
+ faultCode: {http://schemas.xmlsoap.org/soap/envelope/}Server.generalException
+ faultSubcode: 
+ faultString: Exception thrown while retrieving security headers.; nested exception is: 
+	Access denied for method getFactoryAttributesDocument.; nested exception is: 
+	Access denied for method getFactoryAttributesDocument.
+ faultActor: 
+ faultNode: 
+ faultDetail: 
+	{http://xml.apache.org/axis/}hostname:mark-imac.cs.Virginia.EDU
+
+Exception thrown while retrieving security headers.; nested exception is: 
+	Access denied for method getFactoryAttributesDocument.; nested exception is: 
+	Access denied for method getFactoryAttributesDocument.
+	at edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver.invoke(ServerWSDoAllReceiver.java:159)
+	at org.apache.axis.strategies.InvocationStrategy.visit(InvocationStrategy.java:32)
+	at org.apache.axis.SimpleChain.doVisiting(SimpleChain.java:118)
+	at org.apache.axis.SimpleChain.invoke(SimpleChain.java:83)
+	at org.apache.axis.strategies.InvocationStrategy.visit(InvocationStrategy.java:32)
+	at org.apache.axis.SimpleChain.doVisiting(SimpleChain.java:118)
+	at org.apache.axis.SimpleChain.invoke(SimpleChain.java:83)
+	at org.apache.axis.server.AxisServer.invoke(AxisServer.java:249)
+	at org.apache.axis.transport.http.AxisServlet.doPost(AxisServlet.java:699)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:727)
+	at org.apache.axis.transport.http.AxisServletBase.service(AxisServletBase.java:327)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:820)
+	at org.mortbay.jetty.servlet.ServletHolder.handle(ServletHolder.java:502)
+	at org.mortbay.jetty.servlet.ServletHandler.handle(ServletHandler.java:389)
+	at org.mortbay.jetty.security.SecurityHandler.handle(SecurityHandler.java:216)
+	at org.mortbay.jetty.servlet.SessionHandler.handle(SessionHandler.java:181)
+	at org.mortbay.jetty.handler.ContextHandler.handle(ContextHandler.java:765)
+	at org.mortbay.jetty.webapp.WebAppContext.handle(WebAppContext.java:417)
+	at org.mortbay.jetty.handler.ContextHandler.handle(ContextHandler.java:765)
+	at org.mortbay.jetty.handler.HandlerCollection.handle(HandlerCollection.java:114)
+	at org.mortbay.jetty.handler.HandlerWrapper.handle(HandlerWrapper.java:152)
+	at org.mortbay.jetty.Server.handle(Server.java:326)
+	at org.mortbay.jetty.HttpConnection.handleRequest(HttpConnection.java:534)
+	at org.mortbay.jetty.HttpConnection$RequestHandler.content(HttpConnection.java:879)
+	at org.mortbay.jetty.HttpParser.parseNext(HttpParser.java:747)
+	at org.mortbay.jetty.HttpParser.parseAvailable(HttpParser.java:212)
+	at org.mortbay.jetty.HttpConnection.handle(HttpConnection.java:404)
+	at org.mortbay.jetty.bio.SocketConnector$Connection.run(SocketConnector.java:228)
+	at org.mortbay.jetty.security.SslSocketConnector$SslConnection.run(SslSocketConnector.java:636)
+	at org.mortbay.thread.QueuedThreadPool$PoolThread.run(QueuedThreadPool.java:520)
+Caused by: Access denied for method getFactoryAttributesDocument.; nested exception is: 
+	Access denied for method getFactoryAttributesDocument.
+	at edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver.performAuthz(ServerWSDoAllReceiver.java:550)
+	at edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver.invoke(ServerWSDoAllReceiver.java:147)
+	... 29 more
+Caused by: Access denied for method getFactoryAttributesDocument.
+	at edu.virginia.vcgr.genii.container.security.authz.providers.GamlAclAuthZProvider.checkAccess(GamlAclAuthZProvider.java:264)
+	at edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver.performAuthz(ServerWSDoAllReceiver.java:540)
+	... 30 more
+[2010-12-10 10:52:02,538:DEBUG] Received update information about [2] morgan@13A1DA1C-8C9C-A17F-0BE7-73CF4F623123 -- [(org.apache.axis.AxisFault) Exception thrown while retrieving security headers.; nested exception is: 
+	Access denied for method getFactoryAttributesDocument.; nested exception is: 
+	Access denied for method getFactoryAttributesDocument.] Last Updated:  Fri Dec 10 10:52:02 EST 2010
+Information?  null
+.
+[2010-12-10 10:52:02,540:INFO] Marking BES container "morgan" as un-responsive.  Exception during communication org.apache.axis.AxisFault(Exception thrown while retrieving security headers.; nested exception is: 
+	Access denied for method getFactoryAttributesDocument.; nested exception is: 
+	Access denied for method getFactoryAttributesDocument.).
+[2010-12-10 10:53:08,317:DEBUG] Updating morgan(2).
+[2010-12-10 10:53:08,318:INFO] Marking BES container "morgan" as un-responsive.  Startup Procedure..
+[2010-12-10 10:53:08,382:DEBUG] Received update information about [2] morgan@13A1DA1C-8C9C-A17F-0BE7-73CF4F623123 -- Last Updated:  Fri Dec 10 10:53:08 EST 2010
+Information?  MACOS Version 10.5.8 on x86_64
+4.294967296E9 bytes of physical memory available
+0 activites contained; accepting new ones?  true
+supports:environment-variable = JAVA_HOME
+supports:environment-variable = GENII_INSTALL_DIR
+
+
+.
+[2010-12-10 10:53:08,382:INFO] Marking BES container "morgan" as available.
+[2010-12-10 10:53:08,382:DEBUG] It took 0 milliseconds to run the scheduling loop.

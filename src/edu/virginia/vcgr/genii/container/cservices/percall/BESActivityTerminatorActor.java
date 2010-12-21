@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.container.cservices.percall;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -16,6 +17,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.history.HistoryEvent;
 import edu.virginia.vcgr.genii.client.history.HistoryEventSource;
@@ -55,94 +57,106 @@ public class BESActivityTerminatorActor implements OutcallActor
 	
 	@Override
 	public boolean enactOutcall(ICallingContext callingContext,
-			EndpointReferenceType target) throws Throwable
+		EndpointReferenceType target) throws Throwable
 	{
 		_logger.debug(
 			"Persistent Outcall Actor attempting to kill a bes activity.");
 		
-		GeniiCommon common = ClientUtils.createProxy(
-			GeniiCommon.class, _activityEPR, callingContext);
+		Closeable token = null;
 		
-		GeniiBESPortType bes = ClientUtils.createProxy(
-			GeniiBESPortType.class, target, callingContext);
-		
-		// First, attmept to get the history log
-		if (_historyToken != null && _historyKey != null)
+		try
 		{
-			WSIterable<HistoryEventBundleType> iter = null;
-			SequenceNumber parentNumber;
+			token = ContextManager.temporarilyAssumeContext(callingContext);
 			
-			try
+			GeniiCommon common = ClientUtils.createProxy(
+				GeniiCommon.class, _activityEPR, callingContext);
+			
+			GeniiBESPortType bes = ClientUtils.createProxy(
+				GeniiBESPortType.class, target, callingContext);
+			
+			// First, attmept to get the history log
+			if (_historyToken != null && _historyKey != null)
 			{
-				parentNumber = _historyToken.retrieve();
-				if (parentNumber != null)
+				WSIterable<HistoryEventBundleType> iter = null;
+				SequenceNumber parentNumber;
+				
+				try
 				{
-					HistoryContainerService service = 
-						ContainerServices.findService(
-							HistoryContainerService.class);
-					
-					IterateHistoryEventsResponseType resp = 
-						common.iterateHistoryEvents(
-							new IterateHistoryEventsRequestType());
-					if (resp != null)
+					parentNumber = _historyToken.retrieve();
+					if (parentNumber != null)
 					{
-						iter = 
-							new WSIterable<HistoryEventBundleType>(
-								HistoryEventBundleType.class, resp.getResult(),
-								25, true);
-						for (HistoryEventBundleType bundle : iter)
+						HistoryContainerService service = 
+							ContainerServices.findService(
+								HistoryContainerService.class);
+						
+						IterateHistoryEventsResponseType resp = 
+							common.iterateHistoryEvents(
+								new IterateHistoryEventsRequestType());
+						if (resp != null)
 						{
-							HistoryEvent event = 
-								(HistoryEvent)DBSerializer.deserialize(
-									bundle.getData());
-							
-							HistoryEventSource source = event.eventSource();
-							if (_besName != null)
-								source = new SimpleStringHistoryEventSource(
-									String.format("BES Resource %s", _besName),
-									null, source);
-							
-							service.addRecord(
-								_historyKey, 
-								event.eventNumber().wrapWith(parentNumber), 
-								event.eventCategory(), event.eventLevel(), 
-								event.eventProperties(), source, 
-								event.eventData(), null);
+							iter = 
+								new WSIterable<HistoryEventBundleType>(
+									HistoryEventBundleType.class, resp.getResult(),
+									25, true);
+							for (HistoryEventBundleType bundle : iter)
+							{
+								HistoryEvent event = 
+									(HistoryEvent)DBSerializer.deserialize(
+										bundle.getData());
+								
+								HistoryEventSource source = event.eventSource();
+								if (_besName != null)
+									source = new SimpleStringHistoryEventSource(
+										String.format("BES Resource %s", _besName),
+										null, source);
+								
+								service.addRecord(
+									_historyKey, 
+									event.eventNumber().wrapWith(parentNumber),
+									event.eventTimestamp(),
+									event.eventCategory(), event.eventLevel(), 
+									event.eventProperties(), source, 
+									event.eventData(), null);
+							}
 						}
 					}
 				}
+				catch (Throwable cause)
+				{
+					_logger.debug("Error trying to get history events for activity.", 
+						cause);
+				}
+				finally
+				{
+					StreamUtils.close(iter);
+				}
 			}
-			catch (Throwable cause)
+			
+			// Now, go ahead and kill it.
+			ClientUtils.setTimeout(bes, 8 * 1000);
+			TerminateActivitiesResponseType resp = 
+				bes.terminateActivities(new TerminateActivitiesType(
+					new EndpointReferenceType[] { _activityEPR }, null));
+			if (resp != null)
 			{
-				_logger.debug("Error trying to get history events for activity.", 
-					cause);
+				TerminateActivityResponseType []resps = resp.getResponse();
+				if (resps != null && resps.length == 1)
+				{
+					if (resps[0].isTerminated())
+						return true;
+					_logger.warn(
+						"Response says that we didn't terminate the activity:  "+ 
+						resps[0].getFault());
+				}
 			}
-			finally
-			{
-				StreamUtils.close(iter);
-			}
+			
+			_logger.warn("Tried to kill activity, but didn't get right number of response values back.");
+			return false;
 		}
-		
-		// Now, go ahead and kill it.
-		ClientUtils.setTimeout(bes, 8 * 1000);
-		TerminateActivitiesResponseType resp = 
-			bes.terminateActivities(new TerminateActivitiesType(
-				new EndpointReferenceType[] { _activityEPR }, null));
-		if (resp != null)
+		finally
 		{
-			TerminateActivityResponseType []resps = resp.getResponse();
-			if (resps != null && resps.length == 1)
-			{
-				if (resps[0].isTerminated())
-					return true;
-				_logger.warn(
-					"Response says that we didn't terminate the activity:  "+ 
-					resps[0].getFault());
-			}
+			StreamUtils.close(token);
 		}
-		
-		_logger.warn("Tried to kill activity, but didn't get right number of response values back.");
-		return false;
 	}
 	
 	private void writeObject(ObjectOutputStream out)

@@ -12,6 +12,8 @@ import java.security.cert.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.net.ssl.CertPathTrustManagerParameters;
 import javax.net.ssl.ManagerFactoryParameters;
@@ -360,5 +362,36 @@ public class SecurityUtils
 		throws AuthZSecurityException, IOException, GeneralSecurityException
 	{
 		return getCallerIdentities(ContextManager.getCurrentContext());
+	}
+	
+	static final public Pattern GROUP_TOKEN_PATTERN =
+		Pattern.compile("^.*(?<![a-z])cn=[^,]*group.*$", Pattern.CASE_INSENSITIVE);
+	static final public Pattern CLIENT_IDENTITY_PATTERN =
+		Pattern.compile("^.*(?<![a-z])cn=[^,]*Client.*$", Pattern.CASE_INSENSITIVE);
+	
+	static private boolean matches(Identity identity, Pattern []patterns)
+	{
+		for (Pattern pattern : patterns)
+		{
+			Matcher matcher = pattern.matcher(identity.toString());
+			if (matcher.matches())
+				return true;
+		}
+		
+		return false;
+	}
+	
+	static public Collection<Identity> filterCredentials(
+		Collection<Identity> in, Pattern...patterns)
+	{
+		Collection<Identity> ret = new ArrayList<Identity>(in.size());
+		
+		for (Identity test : in)
+		{
+			if (!matches(test, patterns))
+				ret.add(test);
+		}
+		
+		return ret;
 	}
 }

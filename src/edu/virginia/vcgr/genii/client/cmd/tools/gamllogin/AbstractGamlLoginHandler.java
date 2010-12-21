@@ -156,7 +156,10 @@ public abstract class AbstractGamlLoginHandler implements CallbackHandler {
 				entry = selectedEntry;
 			}
 		} else {
-			entry = selectCert(entries);
+			if (entries.size() == 1)
+				entry = entries.iterator().next();
+			else
+				entry = selectCert(entries);
 		}
 
 		if (entry == null)

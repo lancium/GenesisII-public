@@ -121,9 +121,9 @@ class ACLPanel extends JPanel implements LazyLoadTabHandler
 	@Override
 	public void load()
 	{
-		_uiContext.progressMonitorFactory().monitor(this, 
+		_uiContext.progressMonitorFactory().createMonitor(this, 
 			"Retrieving ACL Information", "Retrieving ACLs", 1000L, 
-			new ACLGetTask(), new AuthZConfigReceiver());
+			new ACLGetTask(), new AuthZConfigReceiver()).start();
 	}
 	
 	public TearoffHandler createTearoffHandler()
@@ -147,9 +147,9 @@ class ACLPanel extends JPanel implements LazyLoadTabHandler
 		_writeList.setEnabled(false);
 		_executeList.setEnabled(false);
 		
-		_uiContext.progressMonitorFactory().monitor(this, "Updating ACLs",
+		_uiContext.progressMonitorFactory().createMonitor(this, "Updating ACLs",
 			"Updating ACLs", 1000L, new ACLSetTask(acl), 
-			new AuthZConfigReceiver());
+			new AuthZConfigReceiver()).start();
 	}
 	
 	private void add(ACLList target,
@@ -179,10 +179,10 @@ class ACLPanel extends JPanel implements LazyLoadTabHandler
 		for (Pair<RNSTreeNode, RNSPath> path : paths)
 			targets.add(path.second());
 		
-		_uiContext.progressMonitorFactory().monitor(
+		_uiContext.progressMonitorFactory().createMonitor(
 			this, "Read Grid Identities", "Read grid identities.", 1000L,
 			new RemoteIdentityLookupTask(targets), 
-			new RemoteIdentityCompletionListener(target));
+			new RemoteIdentityCompletionListener(target)).start();
 	}
 	
 	private X509Identity readIdentity(File file)

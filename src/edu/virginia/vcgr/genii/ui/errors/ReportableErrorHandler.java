@@ -150,7 +150,7 @@ public class ReportableErrorHandler extends JDialog
 		ReportableErrorHandler eh = new ReportableErrorHandler(responsibleComponent == null ? null :
 			SwingUtilities.getWindowAncestor(responsibleComponent), cause);
 		eh.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		eh.setResizable(false);
+		eh.setResizable(true);
 		eh.pack();
 		eh.setLocationRelativeTo(responsibleComponent);
 		eh.setModalityType(ModalityType.DOCUMENT_MODAL);

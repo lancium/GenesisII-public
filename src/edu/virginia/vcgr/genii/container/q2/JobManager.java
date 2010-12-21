@@ -328,10 +328,10 @@ public class JobManager implements Closeable
 			newState = QueueStates.ERROR;
 		} else
 		{
-			job.history(HistoryEventCategory.ReQueing).createInfoWriter(
+			job.history(HistoryEventCategory.ReQueing).createTraceWriter(
 				"Re-queuing Job").format(
 					"Re-queuing Job.  The job will " +
-					"be removed from the runnable list until %ty.",
+					"be removed from the runnable list until %tc.",
 					job.getNextCanRun()).close();
 			
 			/* Otherwise, we'll just requeue him */
@@ -571,8 +571,8 @@ public class JobManager implements Closeable
 			 * put it into the in-memory lists.
 			 */
 			JobData job = new JobData(
-				jobID, ticket, priority, state, submitTime, (short)0,
-				history);
+				jobID, QueueUtils.getJobName(jsdl), ticket, priority, state, 
+				submitTime, (short)0, history);
 			
 			_jobsByID.put(new Long(jobID), job);
 			_jobsByTicket.put(ticket, job);
@@ -793,7 +793,7 @@ public class JobManager implements Closeable
 						QueueUtils.convert(pji.getStartTime()),
 						QueueUtils.convert(pji.getFinishTime()),
 						new UnsignedShort(jobData.getRunAttempts()),
-						scheduledOn));
+						scheduledOn, jobData.jobName()));
 				}
 			}
 			catch (IOException ioe)
@@ -890,7 +890,7 @@ public class JobManager implements Closeable
 						QueueUtils.convert(pji.getStartTime()),
 						QueueUtils.convert(pji.getFinishTime()),
 						new UnsignedShort(jobData.getRunAttempts()),
-						scheduledOn));
+						scheduledOn, jobData.jobName()));
 				} else
 				{
 					/* If the caller did not own a job, then we throw a
@@ -1870,7 +1870,8 @@ public class JobManager implements Closeable
 								null, new JobCompletedAdditionUserData(_jobID)));
 					
 					HistoryEventWriter hWriter = history.createDebugWriter(
-						"Making CreateActivity Outcall");
+						"Making CreateActivity Outcall on %s",
+						_besManager.getBESName(_besID));
 					
 					hWriter.format(
 						"Making outcall to resource %s.", 

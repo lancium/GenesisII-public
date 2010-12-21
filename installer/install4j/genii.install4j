@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="4.2.8" transformSequenceNumber="2">
-  <directoryPresets config="../../scripts/XCG.plist" />
-  <application name="Genesis II" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" keepModificationTimes="false" missingFilesStrategy="warn" shortName="genii" publisher="Global Bio Grid" publisherWeb="http://vcgr.cs.virginia.edu" version="2.0.13" allPathsRelative="true" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.6">
+  <directoryPresets config="../../deployments" />
+  <application name="Genesis II" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" keepModificationTimes="false" missingFilesStrategy="warn" shortName="genii" publisher="Global Bio Grid" publisherWeb="http://vcgr.cs.virginia.edu" version="2.1.0" allPathsRelative="true" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.6">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -15,7 +15,7 @@
       <variable name="genii.patch-url" value="http://vcgr.cs.virginia.edu/GenesisII/2.0/patches/ReleaseBranch-2.0" />
       <variable name="genii.connection-url" value="http://vcgr.cs.virginia.edu/XCG/2.0/root.xml" />
       <variable name="genii.deployment" value="GeniiNetFullContainer" />
-      <variable name="genii.build-number" value="2091" />
+      <variable name="genii.build-number" value="2120" />
       <variable name="genii.xcg-port" value="18443" />
       <variable name="genii.container-memory.fraction" value="0.25" />
       <variable name="genii.container-memory.upper-limit" value="2048" />
@@ -48,6 +48,7 @@
       <mountPoint id="502" root="" location="deployments" mode="755" />
       <mountPoint id="503" root="" location="deployments/GeniiNetFullContainer" mode="755" />
       <mountPoint id="504" root="" location="deployments/GeniiNetFullContainer/secure-runnable" mode="755" />
+      <mountPoint id="1606" root="" location="deployments/default" mode="755" />
       <mountPoint id="34" root="" location="" mode="755" />
       <mountPoint id="35" root="20" location="jni-lib" mode="755" />
       <mountPoint id="36" root="20" location="jni-lib/IFS" mode="755" />
@@ -68,6 +69,19 @@
       <fileEntry mountPoint="356" file="../../scripts/current-version.txt" overwrite="4" shared="false" mode="644" uninstallMode="0" />
       <fileEntry mountPoint="504" file="../../secrun.scratch/ContainerPostBootSecRun.jar" overwrite="4" shared="false" mode="644" uninstallMode="0" />
       <fileEntry mountPoint="504" file="../../secrun.scratch/ContainerPreBootSecRun.jar" overwrite="4" shared="false" mode="644" uninstallMode="0" />
+      <dirEntry mountPoint="1606" file="../../deployments/default" overwrite="4" shared="false" mode="644" uninstallMode="0" excludeSuffixes="" dirMode="755">
+        <exclude>
+          <entry location=".svn" fileType="regular" />
+          <entry location="configuration/.svn" fileType="regular" />
+          <entry location="configuration/bootstrap-nosec.xml" fileType="regular" />
+          <entry location="configuration/bootstrap.xml" fileType="regular" />
+          <entry location="configuration/cservices/.svn" fileType="regular" />
+          <entry location="security/.svn" fileType="regular" />
+          <entry location="security/keys.pfx" fileType="regular" />
+          <entry location="security/root.pfx" fileType="regular" />
+          <entry location="security/skynet.cer" fileType="regular" />
+        </exclude>
+      </dirEntry>
       <dirEntry mountPoint="34" file="../.." overwrite="4" shared="false" mode="644" uninstallMode="0" excludeSuffixes=".svn, derby.log, context.xml" dirMode="755">
         <exclude>
           <entry location=".classpath" fileType="regular" />
@@ -330,22 +344,24 @@
       <component name="Genesis II Core" id="28" displayDescription="true" selected="true" mandatory="true" downloadable="true">
         <description>The core set of libraries and files necessary to run Genesis II clients and servers.</description>
         <include all="false">
-          <entry location="RELEASE" fileType="regular" />
-          <entry location="webapps" fileType="regular" />
           <entry location="ApplicationWatcher/genii-base-application.properties" fileType="regular" />
           <entry location="ApplicationWatcher/genii-client-application.properties" fileType="regular" />
           <entry location="ApplicationWatcher/genii-update-application.properties" fileType="regular" />
           <entry location="ApplicationWatcher/app-manager.jar" fileType="regular" />
-          <entry location="updates" fileType="regular" />
-          <entry location="License.txt" fileType="regular" />
-          <entry location="deployments/GeniiNetFullContainer/security" fileType="regular" />
-          <entry location="deployments/GeniiNetFullContainer/services" fileType="regular" />
+          <entry location="deployments/default" fileType="regular" />
           <entry location="deployments/GeniiNetFullContainer/configuration" fileType="regular" />
+          <entry location="deployments/GeniiNetFullContainer/deployment-conf.xml" fileType="regular" />
+          <entry location="deployments/GeniiNetFullContainer/security" fileType="regular" />
           <entry location="ext" fileType="regular" />
           <entry location="lib" fileType="regular" />
+          <entry location="License.txt" fileType="regular" />
+          <entry location="RELEASE" fileType="regular" />
+          <entry location="updates" fileType="regular" />
+          <entry location="webapps" fileType="regular" />
           <entry location="jar-desc.xml" fileType="regular" />
           <entry location="grid" fileType="launcher" />
           <entry location="grid-update" fileType="launcher" />
+          <entry location="client-ui" fileType="launcher" />
           <entry location=".i4j_external_20/jni-lib/CToGenesisCalls.dll" fileType="regular" />
           <entry location=".i4j_external_20/jni-lib/GeniiProcessMgmt.dll" fileType="regular" />
           <entry location=".i4j_external_20/jni-lib/libdb_java45.dll" fileType="regular" />
@@ -509,6 +525,31 @@
         </text>
       </splashScreen>
       <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dlog4j.configuration=production.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ApplicationWatcher/genii-container-application.properties&quot; -Xmx1024m" arguments="" allowVMPassthroughParameters="true" preferredVM="server" bundleRuntime="true">
+        <classPath>
+          <directory location="lib" failOnError="false" />
+          <archive location="ApplicationWatcher/app-manager.jar" failOnError="false" />
+        </classPath>
+        <nativeLibraryDirectories>
+          <directory name="jni-lib" />
+        </nativeLibraryDirectories>
+      </java>
+      <includedFiles />
+      <unextractableFiles />
+      <customScript mode="1" file="">
+        <scriptLines />
+      </customScript>
+    </launcher>
+    <launcher name="client-ui" id="1773" external="false" excludeFromMenu="false" menuName="" icnsFile="" pngIcon16File="" pngIcon32File="" macServiceDependencies="" swtApp="false" fileset="">
+      <executable name="client-ui" type="1" iconSet="false" iconFile="" executableDir="." redirectStderr="true" stderrFile="error.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false">
+        <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
+      </executable>
+      <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="" java6SplashScreen="false">
+        <text>
+          <statusLine x="20" y="20" text="" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
+          <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
+        </text>
+      </splashScreen>
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=XCG&quot; &quot;-Dedu.virginia.vcgr.appwatcher.update-frequency=604800000&quot; &quot;-Dlog4j.configuration=production.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ApplicationWatcher/genii-client-application.properties&quot; -Xmx512m" arguments="client-ui" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
         <classPath>
           <directory location="lib" failOnError="false" />
           <archive location="ApplicationWatcher/app-manager.jar" failOnError="false" />

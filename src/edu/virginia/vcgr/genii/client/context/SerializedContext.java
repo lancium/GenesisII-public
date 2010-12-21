@@ -36,7 +36,10 @@ public class SerializedContext implements Serializable
 			{
 				byte []sData = DBSerializer.serialize(
 					transientProperties.get(key), Long.MAX_VALUE);
-				builder.append("\t" + key + ": " + sData.length + "\n");
+				if (sData != null)
+					builder.append("\t" + key + ": " + sData.length + "\n");
+				else
+					builder.append("\t" + key + ": <null>\n");
 			}
 			catch (Throwable cause)
 			{

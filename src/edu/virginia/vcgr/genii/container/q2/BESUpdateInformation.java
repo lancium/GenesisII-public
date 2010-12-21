@@ -91,11 +91,15 @@ public class BESUpdateInformation
 		return responsive && _available;
 	}
 	
-	private Date nextUpdate(Date now)
+	public Date nextUpdate()
 	{
+		if (_available || (_lastUpdated == null))
+			return null;
+		
+		Date lastUpdated = _lastUpdated;
 		long timeToWait = (_updateCycle << _misses);
 		
-		return new Date(now.getTime() + timeToWait);
+		return new Date(lastUpdated.getTime() + timeToWait);
 	}
 	
 	/**
@@ -126,11 +130,15 @@ public class BESUpdateInformation
 		return (now.getTime() - _lastUpdated.getTime() >= timeToWait);
 	}
 	
+	final public Date lastUpdated()
+	{
+		return _lastUpdated;
+	}
+	
 	@Override
 	public String toString()
 	{
-		Date now = new Date();
-		Date nextUpdate = nextUpdate(now);
+		Date nextUpdate = nextUpdate();
 		
 		String responsiveString = "available";
 		if (!_available)
@@ -138,9 +146,14 @@ public class BESUpdateInformation
 		else if (!isAvailable())
 			responsiveString = "not responsive";
 		
-		return String.format("%s (misses = %d, last-updated = %3$tT %3$tD, \n" +
-			"\tlast-responsive = %4$tT %4$tD, next-update = %5$tT %5$tD)",
-			responsiveString, _misses, _lastUpdated, _lastResponsive,
-			nextUpdate);
+		if (nextUpdate == null)	
+			return String.format("%s (misses = %d, last-updated = %3$tT %3$tD, \n" +
+				"\tlast-responsive = %4$tT %4$tD, next-update = none scheduled)",
+				responsiveString, _misses, _lastUpdated, _lastResponsive);
+		else
+			return String.format("%s (misses = %d, last-updated = %3$tT %3$tD, \n" +
+				"\tlast-responsive = %4$tT %4$tD, next-update = %5$tT %5$tD)",
+				responsiveString, _misses, _lastUpdated, _lastResponsive,
+				nextUpdate);
 	}
 }

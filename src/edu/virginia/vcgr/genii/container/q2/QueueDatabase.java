@@ -319,7 +319,8 @@ public class QueueDatabase
 		{
 			stmt = connection.prepareStatement(
 				"SELECT a.jobid, a.jobticket, a.priority, a.state, a.submittime, " +
-					"a.runattempts, a.resourceid, b.historytoken, a.callingcontext " +
+					"a.runattempts, a.resourceid, b.historytoken, a.callingcontext," +
+					"a.jsdl " +
 				"FROM q2jobs AS a LEFT OUTER JOIN q2jobhistorytokens AS b " +
 					"ON a.jobid = b.jobid WHERE a.queueid = ?");
 			stmt.setString(1, _queueID);
@@ -330,8 +331,21 @@ public class QueueDatabase
 				long jobid = rs.getLong(1);
 				String jobTicket = rs.getString(2);
 				
+				JobDefinition_Type jsdl = null;
+				
+				try
+				{
+					jsdl = DBSerializer.xmlFromBlob(
+						JobDefinition_Type.class, rs.getBlob(10));
+				}
+				catch (Throwable cause)
+				{
+					_logger.warn("Error getting JSDL for job.", cause);
+				}
+				
 				JobData data = new JobData(
-					jobid, jobTicket, rs.getShort(3),
+					jobid, QueueUtils.getJobName(jsdl), jobTicket, 
+					rs.getShort(3),
 					QueueStates.valueOf(rs.getString(4)),
 					new Date(rs.getTimestamp(5).getTime()),
 					rs.getShort(6), (Long)rs.getObject(7),

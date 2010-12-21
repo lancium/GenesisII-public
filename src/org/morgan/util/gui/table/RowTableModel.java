@@ -36,6 +36,21 @@ public abstract class RowTableModel<RowType> extends AbstractTableModel
 	}
 	
 	@Override
+	final public void setValueAt(Object aValue, int rowIndex, int columnIndex)
+	{
+		RowType row = row(rowIndex);
+		columnDefinitions()[columnIndex].modify(row, aValue);
+	}
+	
+	
+	@Override
+	public int getRowCount()
+	{
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+	@Override
 	final public Class<?> getColumnClass(int columnIndex)
 	{
 		return columnDefinitions()[columnIndex].columnType();

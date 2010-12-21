@@ -53,8 +53,7 @@ class PublisherTopicImpl implements PublisherTopic
 		catch (ResourceException e)
 		{
 			_logger.warn(
-				"Ignoring publish request because publisher doesn't exist.", 
-				e);
+				"Ignoring publish request because publisher doesn't exist.");
 		}
 	}
 	
@@ -76,14 +75,12 @@ class PublisherTopicImpl implements PublisherTopic
 		catch (ResourceUnknownFaultType e)
 		{
 			_logger.warn(
-				"Ignoring publish request because publisher doesn't exist.", 
-				e);
+				"Ignoring publish request because publisher doesn't exist.");
 		}
 		catch (ResourceException e)
 		{
 			_logger.warn(
-				"Ignoring publish request because publisher doesn't exist.", 
-				e);
+				"Ignoring publish request because publisher doesn't exist.");
 		}
 	}
 	

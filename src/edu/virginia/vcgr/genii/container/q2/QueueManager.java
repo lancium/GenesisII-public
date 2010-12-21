@@ -8,18 +8,28 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.transform.dom.DOMResult;
+
+import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.rns.EntryType;
 import org.morgan.util.io.StreamUtils;
+import org.w3c.dom.Document;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.bes.ResourceManagerType;
+import edu.virginia.vcgr.genii.client.queue.CurrentResourceInformation;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.utils.Duration;
@@ -37,6 +47,8 @@ import edu.virginia.vcgr.genii.queue.GetJobLogResponse;
 import edu.virginia.vcgr.genii.queue.JobErrorPacket;
 import edu.virginia.vcgr.genii.queue.JobInformationType;
 import edu.virginia.vcgr.genii.queue.ReducedJobInformationType;
+import edu.virginia.vcgr.jsdl.OperatingSystemNames;
+import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
 
 /**
  * This class is called directly from the queue service.  Mostly, it acts
@@ -226,6 +238,78 @@ public class QueueManager implements Closeable
 	private QueueDatabase _database;
 	private SchedulingEvent _schedulingEvent;
 	
+	private CurrentResourceInformation getCurrentResourceInformation(
+		String entryName) throws ResourceException
+	{
+		BESData data = _besManager.getBESData(entryName);
+		BESInformation info = _besManager.getBESInformation(data.getID());
+		BESUpdateInformation updateInfo = _besManager.getUpdateInformation(
+			data.getID());
+		
+		boolean isAccepting = (info == null) ? false : info.isAcceptingNewActivities();
+		ProcessorArchitecture arch = (info == null) ? ProcessorArchitecture.other :
+			ProcessorArchitecture.valueOf(info.getProcessorArchitecture().toString());
+		OperatingSystemNames osName = (info == null) ? OperatingSystemNames.Unknown :
+			OperatingSystemNames.valueOf(info.getOperatingSystemType().toString());
+		String osVersion = (info == null) ? null : info.getOperatingSystemVersion();
+		Double physicalMemory = (info == null) ? null : info.getPhysicalMemory();
+		ResourceManagerType mgrType = (info == null) ? ResourceManagerType.Unknown :
+			ResourceManagerType.fromURI(info.resourceManagerType());
+		
+		boolean isAvailable = (updateInfo == null) ?
+			false : updateInfo.isAvailable();
+		Date lastUpdated = (updateInfo == null) ? null :
+			updateInfo.lastUpdated();
+		Date nextUpdate = (updateInfo == null) ? null :
+			updateInfo.nextUpdate();
+		
+		HashMap<Long, SlotSummary> slots = new HashMap<Long, SlotSummary>();
+		slots.put(new Long(data.getID()), new SlotSummary(data.getTotalSlots(), 0));
+		_jobManager.recordUsedSlots(slots);
+		return new CurrentResourceInformation(data.getTotalSlots(),
+			(int)(slots.get(data.getID()).slotsUsed()),
+			isAccepting, arch, osName, osVersion, physicalMemory,
+			mgrType, isAvailable, lastUpdated, nextUpdate);
+	}
+	
+	private Collection<EntryType> addInCurrentResourceInformation(
+		Collection<EntryType> entries) throws JAXBException
+	{
+		JAXBContext context = JAXBContext.newInstance(
+			CurrentResourceInformation.class);
+		Marshaller m = context.createMarshaller();
+		
+		for (EntryType entry : entries)
+		{
+			try
+			{
+				MessageElement []any = entry.get_any();
+				if (any != null && any.length > 0)
+				{
+					MessageElement []tmp = new MessageElement[any.length + 1];
+					System.arraycopy(any, 0, tmp, 0, any.length);
+					any = tmp;
+				} else
+					any = new MessageElement[1];
+				
+				CurrentResourceInformation cri = getCurrentResourceInformation(
+					entry.getEntry_name());
+				DOMResult result = new DOMResult();
+				m.marshal(cri, result);
+				any[any.length - 1] = new MessageElement(
+					((Document)result.getNode()).getDocumentElement());
+				entry.set_any(any);
+			}
+			catch (Throwable cause)
+			{
+				_logger.warn(String.format(
+					"Unable to marshall current resource information for %s.", 
+					entry.getEntry_name()), cause);
+			}
+		}
+		
+		return entries;
+	}
 	
 	/**
 	 * Private constructor used to create a new active queue manager.  This
@@ -366,16 +450,26 @@ public class QueueManager implements Closeable
 		throws SQLException, ResourceException
 	{
 		Connection connection = null;
+		Collection<EntryType> ret = null;
 		
 		try
 		{
 			connection = _connectionPool.acquire(true);
-			return _besManager.listBESs(connection, entryName);
+			ret = _besManager.listBESs(
+				connection, entryName);
+			addInCurrentResourceInformation(ret);
+		}
+		catch (JAXBException e)
+		{
+			_logger.warn(
+				"Error trying to add in current resource information.", e);
 		}
 		finally
 		{
 			_connectionPool.release(connection);
 		}
+		
+		return ret;
 	}
 	
 	public Collection<String> removeBESs(String entryName) throws SQLException

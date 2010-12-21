@@ -41,6 +41,17 @@ public class CreateWorkingDirectoryPhase extends AbstractExecutionPhase
 			"Creating job working directory:  %s", _workingDirectory).close();
 		
 		_logger.info(String.format("Creating job working directory \"%s\".", _workingDirectory));
-		new GuaranteedDirectory(_workingDirectory);
+		try
+		{
+			new GuaranteedDirectory(_workingDirectory);
+		}
+		catch (Throwable cause)
+		{
+			history.createErrorWriter(cause,
+				"Unable to create directory.").format(
+					"Unable to create working directory %s.", 
+					_workingDirectory).close();
+			throw cause;
+		}
 	}
 }

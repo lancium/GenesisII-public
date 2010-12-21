@@ -9,6 +9,11 @@ public abstract class AbstractRowTableColumnDefinition<RowType, ColumnType>
 	private Class<ColumnType> _columnType;
 	private int _preferredWidth;
 	
+	protected void modifyImpl(RowType row, ColumnType column)
+	{
+		// Do nothing
+	}
+	
 	protected AbstractRowTableColumnDefinition(String columnName, 
 		Class<ColumnType> columnType, int preferredWidth)
 	{
@@ -38,10 +43,11 @@ public abstract class AbstractRowTableColumnDefinition<RowType, ColumnType>
 		return _columnType;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public void modify(RowType row, ColumnType column)
+	final public void modify(RowType row, Object column)
 	{
-		// Do nothing
+		modifyImpl(row, (ColumnType)column);
 	}
 
 	@Override

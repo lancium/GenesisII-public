@@ -339,4 +339,9 @@
 		<description>GeniiPublisherRegistrationManager</description>
 	</portType>
 	
+	<portType name="{http://vcgr.cs.virginia.edu/rns/2010/12/fsproxy}FSProxyPortType">
+		<display-rank>100</display-rank>
+		<description>FSProxy</description>
+	</portType>
+	
 </known-porttypes>

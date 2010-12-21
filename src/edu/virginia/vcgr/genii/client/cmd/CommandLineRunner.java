@@ -88,7 +88,15 @@ public class CommandLineRunner
 				arg = arg.substring(1);
 			}
 			
-			int index = Integer.parseInt(arg);
+			int index;
+			
+			if (arg.equals("!"))
+			{
+				index = _history.size() - 1;
+			} else
+			{
+				index = Integer.parseInt(arg);
+			}
 
 			try
 			{

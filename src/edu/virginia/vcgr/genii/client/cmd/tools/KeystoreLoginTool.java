@@ -1,15 +1,9 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
-import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.gamllogin.AbstractGamlLoginHandler;
@@ -20,11 +14,7 @@ import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
-import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
-import edu.virginia.vcgr.genii.client.resource.TypeInformation;
-import edu.virginia.vcgr.genii.client.rns.RNSPath;
-import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
 import edu.virginia.vcgr.genii.client.security.credentials.TransientCredentials;
 import edu.virginia.vcgr.genii.client.security.credentials.assertions.BasicConstraints;
@@ -34,16 +24,13 @@ import edu.virginia.vcgr.genii.client.security.credentials.assertions.RenewableC
 import edu.virginia.vcgr.genii.client.security.credentials.assertions.RenewableClientAttribute;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.X509Identity;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
-import edu.virginia.vcgr.genii.client.utils.PathUtils;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 import edu.virginia.vcgr.genii.context.ContextType;
 
 
-public class KeystoreLoginTool extends BaseLoginTool{
-
-
-
+public class KeystoreLoginTool extends BaseLoginTool
+{
 	static private final String _DESCRIPTION = "Inserts authentication information into the user's context.";
 	static private final String _USAGE_RESOURCE = 
 		"login --storetype=<PKCS12|JKS|WIN> [--password=<keystore-password>] [--alias] [--validDuration=<duration-string>] [--toolIdentity] [--pattern=<certificate/token pattern>] [<keystore URL>] ";
@@ -156,64 +143,45 @@ public class KeystoreLoginTool extends BaseLoginTool{
 	@Override
 	protected int runCommand() throws Throwable
 	{
-
+		if (_storeType == null)
+			_storeType = "PKCS12";
+		
 		_authnUri = getArgument(0);
-		GeniiPath gPath = new GeniiPath(_authnUri);
-		URI authnSource = PathUtils.pathToURI(_authnUri);
+		GeniiPath gPath = null;
+		
+		if (_authnUri != null)
+			gPath = new GeniiPath(_authnUri);
 
 		// get the local identity's key material (or create one if necessary)
 		ICallingContext callContext = ContextManager.getCurrentContext(false);
-		if (callContext == null) {
+		if (callContext == null)
 			callContext = new CallingContextImpl(new ContextType());
-		}
 
-
-		TransientCredentials transientCredentials = TransientCredentials
-		.getTransientCredentials(callContext);
+		TransientCredentials transientCredentials = 
+			TransientCredentials.getTransientCredentials(callContext);
 		ArrayList<GIICredential> signedAssertions = null;
 
-
-
-		if (authnSource == null) {
+		if (gPath == null)
 			// login to keystore built into the user's OS
 			signedAssertions = doKeystoreLogin(null, callContext, null);
-		}
-
-		
-		else if (gPath.pathType() == GeniiPathType.Grid){
-			RNSPath authnPath = callContext.getCurrentPath().lookup(
-					authnSource.getSchemeSpecificPart(),
-					RNSPathQueryFlags.MUST_EXIST);
-			EndpointReferenceType epr = authnPath.getEndpoint();
-			TypeInformation type = new TypeInformation(epr);
-
-			if (type.isByteIO()) {
-				// log into keystore from rns path to keystore file
-				InputStream in = ByteIOStreamFactory.createInputStream(epr);
-				try {
-					signedAssertions = doKeystoreLogin(in, callContext, null);
-				} finally {
+		else
+		{
+			InputStream in = null;
+			
+			try
+			{
+				in = gPath.openInputStream();
+				signedAssertions = doKeystoreLogin(in, callContext, null);
+			}
+			finally
+			{
+				if (in != null)
 					in.close();
-				}
-			}
-			else{
-				throw new IOException("Not a supported identity provider");
-			}
-		}
-		else{
-			// log into keystore from a specific file
-			BufferedInputStream fis = new BufferedInputStream(
-					new FileInputStream(authnSource.getSchemeSpecificPart()));
-			try {
-				signedAssertions = doKeystoreLogin(fis, callContext, null);
-			} finally {
-				fis.close();
 			}
 		}
 
-		if (signedAssertions == null) {
+		if (signedAssertions == null)
 			return 0;
-		}
 
 		// insert the assertion into the calling context's transient creds
 		transientCredentials._credentials.addAll(signedAssertions);
@@ -226,7 +194,7 @@ public class KeystoreLoginTool extends BaseLoginTool{
 	protected void verify() throws ToolException 
 	{
 		int numArgs = numArguments();
-		if (numArgs > 1 || _storeType == null) 
+		if (numArgs > 1) 
 			throw new InvalidToolUsageException();
 
 		if (_durationString != null)
@@ -242,5 +210,4 @@ public class KeystoreLoginTool extends BaseLoginTool{
 			}
 		}
 	}
-
 }

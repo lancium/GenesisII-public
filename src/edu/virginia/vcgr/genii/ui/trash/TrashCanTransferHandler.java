@@ -94,11 +94,11 @@ class TrashCanTransferHandler extends TransferHandler
 				 
 				RNSListTransferData data = (RNSListTransferData)t.getTransferData(
 					RNSListTransferable.RNS_PATH_LIST_FLAVOR);
-				_uiContext.progressMonitorFactory().monitor(
+				_uiContext.progressMonitorFactory().createMonitor(
 					comp, "Moving Entries to Trash",
 					"Moving entries to trash.", 1000L,
 					new RNSUnlinkedTask(data),
-					new RNSUnlinkedCompletionListener(data.tree()));
+					new RNSUnlinkedCompletionListener(data.tree())).start();
 				return true;
 			}
 		}

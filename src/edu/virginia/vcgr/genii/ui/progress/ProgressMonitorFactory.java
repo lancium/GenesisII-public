@@ -21,7 +21,7 @@ public class ProgressMonitorFactory
 		_executor = executor;
 	}
 	
-	public <ResultType> void monitor(Component parentComponent,
+	public <ResultType> ProgressMonitor createMonitor(Component parentComponent,
 		String dialogTitle, String dialogSubTitle, long dialogDelay,
 		Task<ResultType> task,
 		TaskCompletionListener<ResultType> completionListener)
@@ -31,10 +31,11 @@ public class ProgressMonitorFactory
 				SwingUtilities.getWindowAncestor(parentComponent),
 				dialogTitle, dialogSubTitle, dialogDelay, task,
 				completionListener);
-		_executor.submit(worker);
+		return worker;
 	}
 	
-	private class ProgressMonitorWorker<ResultType> implements Runnable
+	private class ProgressMonitorWorker<ResultType> extends AbstractTaskProgressMonitor
+		implements Runnable
 	{
 		private Window _owner;
 		private String _title;
@@ -81,6 +82,7 @@ public class ProgressMonitorFactory
 		@Override
 		public void run()
 		{	
+			fireTaskStarted();
 			ProgressMonitorDialog dialog = null;
 			ProgressListenerPipe pipe = new ProgressListenerPipe();
 			
@@ -102,7 +104,7 @@ public class ProgressMonitorFactory
 						{
 							_result = future.get();
 							if (_completionListener != null)
-								new TaskCompletedWorker<ResultType>(
+								new TaskCompletedWorker<ResultType>(this,
 									_completionListener, _task, _result).run();
 							return;
 						}
@@ -114,20 +116,20 @@ public class ProgressMonitorFactory
 				} else
 				{
 					if (_completionListener != null)
-						new TaskCompletedWorker<ResultType>(
+						new TaskCompletedWorker<ResultType>(this,
 							_completionListener, _task, _result).run();
 				}
 			}
 			catch (ExecutionException ee)
 			{
 				if (_completionListener != null)
-					new TaskExceptedWorker<ResultType>(
+					new TaskExceptedWorker<ResultType>(this,
 						_completionListener, _task, ee.getCause()).run();
 			}
 			catch (CancellationException cause)
 			{
 				if (_completionListener != null)
-					new TaskCancelledWorker<ResultType>(
+					new TaskCancelledWorker<ResultType>(this,
 						_completionListener, _task).run();
 			}
 			finally
@@ -138,6 +140,12 @@ public class ProgressMonitorFactory
 					dialog.dispose();
 				}
 			}
+		}
+
+		@Override
+		final public void start()
+		{
+			_executor.submit(this);
 		}
 	}
 	
@@ -163,14 +171,17 @@ public class ProgressMonitorFactory
 	
 	private class TaskCompletedWorker<ResultType> implements Runnable
 	{
+		private AbstractTaskProgressMonitor _monitor;
 		private TaskCompletionListener<ResultType> _listener;
 		private Task<ResultType> _task;
 		private ResultType _result;
 		
-		private TaskCompletedWorker(TaskCompletionListener<ResultType> listener,
+		private TaskCompletedWorker(AbstractTaskProgressMonitor monitor,
+			TaskCompletionListener<ResultType> listener,
 			Task<ResultType> task,
 			ResultType result)
 		{
+			_monitor = monitor;
 			_listener = listener;
 			_task = task;
 			_result = result;
@@ -186,18 +197,22 @@ public class ProgressMonitorFactory
 			}
 			
 			_listener.taskCompleted(_task, _result);
+			_monitor.fireTaskCompleted();
 		}
 	}
 	
 	private class TaskCancelledWorker<ResultType> implements Runnable
 	{
+		private AbstractTaskProgressMonitor _monitor;
 		private TaskCompletionListener<ResultType> _listener;
 		private Task<ResultType> _task;
 		
 		private TaskCancelledWorker(
+			AbstractTaskProgressMonitor monitor,
 			TaskCompletionListener<ResultType> listener,
 			Task<ResultType> task)
 		{
+			_monitor = monitor;
 			_listener = listener;
 			_task = task;
 		}
@@ -212,19 +227,23 @@ public class ProgressMonitorFactory
 			}
 			
 			_listener.taskCancelled(_task);
+			_monitor.fireTaskCompleted();
 		}
 	}
 	
 	private class TaskExceptedWorker<ResultType> implements Runnable
 	{
+		private AbstractTaskProgressMonitor _monitor;
 		private TaskCompletionListener<ResultType> _listener;
 		private Task<ResultType> _task;
 		private Throwable _exception;
 		
-		private TaskExceptedWorker(TaskCompletionListener<ResultType> listener,
+		private TaskExceptedWorker(AbstractTaskProgressMonitor monitor,
+			TaskCompletionListener<ResultType> listener,
 			Task<ResultType> task,
 			Throwable exception)
 		{
+			_monitor = monitor;
 			_listener = listener;
 			_task = task;
 			_exception = exception;
@@ -240,6 +259,7 @@ public class ProgressMonitorFactory
 			}
 			
 			_listener.taskExcepted(_task, _exception);
+			_monitor.fireTaskCompleted();
 		}
 	}
 	

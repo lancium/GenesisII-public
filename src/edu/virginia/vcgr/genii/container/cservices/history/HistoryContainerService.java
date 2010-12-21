@@ -168,7 +168,20 @@ public class HistoryContainerService extends AbstractContainerService
 	}
 	
 	final public HistoryEventToken addRecord(
+			String resourceID, SequenceNumber number,
+			HistoryEventCategory category,
+			HistoryEventLevel level, Map<String, String> properties,
+			HistoryEventSource eventSource, HistoryEventData eventData,
+			Calendar expirationTime)
+	{
+		return addRecord(
+			resourceID, number, null, category, level, properties,
+			eventSource, eventData, expirationTime);
+	}
+	
+	final public HistoryEventToken addRecord(
 		String resourceID, SequenceNumber number,
+		Calendar createTimestamp,
 		HistoryEventCategory category,
 		HistoryEventLevel level, Map<String, String> properties,
 		HistoryEventSource eventSource, HistoryEventData eventData,
@@ -184,8 +197,8 @@ public class HistoryContainerService extends AbstractContainerService
 				number = nextSequenceNumber(connection, resourceID);
 			
 			long ret = HistoryDatabase.addRecord(connection, resourceID, 
-				number, category, level, properties, eventSource, eventData,
-				expirationTime);
+				number, createTimestamp, category, level, properties, 
+				eventSource, eventData, expirationTime);
 			connection.commit();
 			return new HistoryEventTokenImpl(ret);
 		}
@@ -212,7 +225,7 @@ public class HistoryContainerService extends AbstractContainerService
 		try
 		{
 			connection = getConnectionPool().acquire(false);
-			HistoryDatabase.deleteRecords(connection, resourceID);
+			deleteRecords(connection, resourceID);
 			connection.commit();
 		}
 		catch (SQLException sqe)
@@ -225,6 +238,12 @@ public class HistoryContainerService extends AbstractContainerService
 		{
 			getConnectionPool().release(connection);
 		}
+	}
+	
+	final public void deleteRecords(Connection connection, String resourceID)
+		throws SQLException
+	{
+		HistoryDatabase.deleteRecords(connection, resourceID);
 	}
 	
 	final public void deleteRecordsLike(Connection connection, 

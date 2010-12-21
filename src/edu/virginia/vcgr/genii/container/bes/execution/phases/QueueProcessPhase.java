@@ -204,13 +204,19 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 				context.setProperty(JOB_TOKEN_PROPERTY, _jobToken);
 			}
 			
+			String lastState = null;
 			while (true)
 			{
 				_state = queue.getStatus(_jobToken);
 				context.updateState(new ActivityState(
 					ActivityStateEnumeration.Running, 
 					_state.toString(), false));
-				history.trace("Batch System State:  %s", _state);
+				if (lastState == null || !lastState.equals(_state.toString()))
+				{
+					history.trace("Batch System State:  %s", _state);
+					lastState = _state.toString();
+				}
+				
 				if (_state.isFinalState())
 					break;
 				

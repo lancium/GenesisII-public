@@ -19,6 +19,10 @@
 		<fileset dir="${appmanager.home}" includes="**/app-manager.jar"/>
 	</path>
 
+	<path id="fsview.classpath">
+		<fileset dir="${fsview.home}" includes="**/*.jar"/>
+	</path>
+
 	<path id="gpm.classpath">
 		<fileset dir="${gpm.home}" includes="**/*.jar"/>
 	</path>
@@ -27,12 +31,8 @@
 		<fileset dir="${axis.home}" includes="**/log4j*.jar"/>
 	</path>
 
-	<path id="jsch.classpath">
-		<fileset dir="${jsch.home}" includes="**/*.jar"/>
-	</path>
-
 	<path id="ant.classpath">
-		<fileset dir="${ant.home}" includes="**/*.jar"/>
+		<fileset dir="${ant.home.override}" includes="**/*.jar"/>
 	</path>
 
 	<path id="jfreechart.classpath">
@@ -49,6 +49,14 @@
 
 	<path id="macosxswing.classpath">
 		<fileset dir="${macosxswing.home}" includes="**/*.jar"/>
+	</path>
+
+	<path id="jai.classpath">
+		<fileset dir="${jai.home}" includes="**/*.jar"/>
+	</path>
+
+	<path id="svnkit.classpath">
+		<fileset dir="${svnkit.home}" includes="**/*.jar"/>
 	</path>
 
 	<path id="dpage.classpath">
@@ -92,14 +100,16 @@
 	</path>
 
 	<path id="project.classpath">
-		<pathelement location="${obj-dir}"/>
-		<pathelement location="${gennedobj-dir}"/>
-		<path refid="jsch.classpath"/>
+		<pathelement location="${obj.dir}"/>
+		<pathelement location="${generated.obj.dir}"/>
 		<path refid="ant.classpath"/>
 		<path refid="jfreechart.classpath"/>
 		<path refid="gridjobtool.classpath"/>
 		<path refid="geniijsdl.classpath"/>
+		<path refid="fsview.classpath"/>
 		<path refid="macosxswing.classpath"/>
+		<path refid="jai.classpath"/>
+		<path refid="svnkit.classpath"/>
 		<path refid="dpage.classpath"/>
 		<path refid="axis.classpath"/>
 		<path refid="jetty.classpath"/>
@@ -159,6 +169,7 @@
 				<include name="edu/virginia/vcgr/fsii/**/*"/>
 				<include name="edu/virginia/vcgr/genii/client/**/*"/>
 				<include name="edu/virginia/vcgr/genii/ui/**/*"/>
+				<include name="edu/virginia/vcgr/externalapp/**/*"/>
 				<include name="edu/virginia/vcgr/fuse/**/*"/>
 				<include name="edu/virginia/vcgr/secrun/**/*"/>
 				<include name="edu/virginia/vcgr/xscript/**/*"/>
@@ -222,6 +233,7 @@
 		<ant antfile="${wsdl.dir}/rfork/rfork.build.xml"/>
 		<ant antfile="${wsdl.dir}/container/container.build.xml"/>
 		<ant antfile="${wsdl.dir}/exported/light-export.build.xml"/>
+		<ant antfile="${wsdl.dir}/exported/fsproxy.build.xml"/>
 		<ant antfile="${wsdl.dir}/bes/bes-activity.build.xml"/>
 		<ant antfile="${wsdl.dir}/bes/bes.build.xml"/>
 		<ant antfile="${wsdl.dir}/naming.build.xml"/>
@@ -251,7 +263,8 @@
 	</target>
 
 	<target name="genii.compile" depends="init,genii.ws">
-		<javac debug="${debug.on}" destdir="${obj.dir}">
+		<javac debug="${debug.on}" destdir="${obj.dir}"
+			includeAntRuntime="${include.ant.runtime}">
 			<src path="${src.dir}"/>
 			<classpath refid="project.classpath"/>
 			<classpath refid="genii.ws.classpath"/>
@@ -265,14 +278,16 @@
 	</target>
 
 	<target name="genii.ws.compile" depends="generate.ws.source">
-		<javac debug="${debug.on}" destdir="${generated.obj.dir}">
+		<javac debug="${debug.on}" destdir="${generated.obj.dir}"
+			includeAntRuntime="${include.ant.runtime}">
 			<src path="${generated.source.dir}"/>
 			<classpath refid="project.classpath"/>
 		</javac>
 	</target>
 
 	<target name="genii.wsdl.tools.compile" depends="init">
-		<javac debug="${debug.on}" destdir="${obj.dir}">
+		<javac debug="${debug.on}" destdir="${obj.dir}"
+			includeAntRuntime="${include.ant.runtime}">
 			<src path="${src.dir}"/>
 			<classpath refid="junit.classpath"/>
 			<include name="edu/virginia/vcgr/genii/wsdl/**/*.java"/>
@@ -284,7 +299,8 @@
 	</target>
 
 	<target name="morgan.compile" depends="init">
-		<javac debug="${debug.on}" destdir="${obj.dir}">
+		<javac debug="${debug.on}" destdir="${obj.dir}"
+			includeAntRuntime="${include.ant.runtime}">
 			<src path="${src.dir}"/>
 			<classpath refid="junit.classpath"/>
 			<classpath refid="log4j.classpath"/>
@@ -298,7 +314,8 @@
 	</target>
 
 	<target name="ogrsh.compile.java" depends="init">
-		<javac debug="${debug.on}" destdir="${obj.dir}">
+		<javac debug="${debug.on}" destdir="${obj.dir}"
+			includeAntRuntime="${include.ant.runtime}">
 			<src path="${src.dir}"/>
 			<classpath refid="junit.classpath"/>
 			<classpath refid="log4j.classpath"/>

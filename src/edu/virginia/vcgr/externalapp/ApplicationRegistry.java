@@ -37,10 +37,22 @@ class ApplicationRegistry
 		_registeredApplications.put(null, registration.createApplicationMap());
 	}
 	
+	private String rootMimeType(String mimeType)
+	{
+		int index = mimeType.indexOf('/');
+		if (index > 0)
+			return mimeType.substring(0, index);
+		
+		return mimeType;
+	}
+	
 	ExternalApplication getApplication(String mimeType, boolean allowDefault)
 	{
 		Map<ApplicationRegistrationTypes, ExternalApplication> apps =
 			_registeredApplications.get(mimeType);
+		if (apps == null)
+			apps = _registeredApplications.get(rootMimeType(mimeType) + "/*");
+		
 		if (apps == null && allowDefault)
 			apps = _registeredApplications.get(null);
 		if (apps == null)

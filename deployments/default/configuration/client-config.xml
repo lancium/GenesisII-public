@@ -273,6 +273,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.GridTesterTool</mconf:class>
 		<mconf:class name="resource-history"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ResourceHistoryTool</mconf:class>
+		<mconf:class name="mv"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.MoveTool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

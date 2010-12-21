@@ -70,6 +70,7 @@ public class RNSTransferHandler extends TransferHandler
 			
 			RNSPath targetParent =
 				((RNSFilledInTreeObject)node.getUserObject()).path();
+			
 			TypeInformation tInfo;
 			
 			try
@@ -90,6 +91,30 @@ public class RNSTransferHandler extends TransferHandler
 			if (support.isDataFlavorSupported(
 				RNSListTransferable.RNS_PATH_LIST_FLAVOR))
 			{
+				try
+				{
+					Collection<Pair<RNSTreeNode, RNSPath>> paths = null;	
+					Transferable t = support.getTransferable();
+					
+					RNSListTransferData data = 
+						(RNSListTransferData)t.getTransferData(
+							RNSListTransferable.RNS_PATH_LIST_FLAVOR);
+					paths = data.paths();
+					
+					for (Pair<RNSTreeNode, RNSPath> path : paths)
+					{
+						if (path.second().equals(targetParent))
+							return false;
+						
+						if (path.second().getParent().equals(targetParent))
+							return false;
+					}
+				}
+				catch (Exception e)
+				{
+					// Do nothing
+				}
+				
 				if (support.getDropAction() == COPY)
 					return true;
 				

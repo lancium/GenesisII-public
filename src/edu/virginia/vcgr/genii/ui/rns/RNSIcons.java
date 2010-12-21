@@ -125,4 +125,9 @@ public class RNSIcons extends Icons
 	{
 		return _errorIcon;
 	}
+	
+	static public Icon getSecurityIcon()
+	{
+		return _endpointIcons.get(EndpointType.USER).first();
+	}
 }

@@ -36,7 +36,7 @@ public abstract class AbstractURIHandler implements IURIHandler
 	}
 	
 	@Override
-	final public void get(URI source, File target, 
+	final public DataTransferStatistics get(URI source, File target, 
 		UsernamePasswordIdentity credential) throws IOException
 	{
 		IOException lastException = null;
@@ -47,9 +47,7 @@ public abstract class AbstractURIHandler implements IURIHandler
 		{
 			try
 			{
-				getInternal(source, target, credential);
-				
-				return;
+				return getInternal(source, target, credential);
 			}
 			catch (FileNotFoundException fnfe)
 			{
@@ -69,7 +67,7 @@ public abstract class AbstractURIHandler implements IURIHandler
 	}
 	
 	@Override
-	final public void put(File source, URI target, 
+	final public DataTransferStatistics put(File source, URI target, 
 		UsernamePasswordIdentity credential) throws IOException
 	{
 		IOException lastException = null;
@@ -80,9 +78,7 @@ public abstract class AbstractURIHandler implements IURIHandler
 		{
 			try
 			{
-				putInternal(source, target, credential);
-				
-				return;
+				return putInternal(source, target, credential);
 			}
 			catch (IOException ioe)
 			{
@@ -96,7 +92,7 @@ public abstract class AbstractURIHandler implements IURIHandler
 		throw lastException;
 	}
 	
-	protected void getInternal(URI source, File target, 
+	protected DataTransferStatistics getInternal(URI source, File target, 
 		UsernamePasswordIdentity credential) throws IOException
 	{
 		FileOutputStream fos = null;
@@ -106,7 +102,7 @@ public abstract class AbstractURIHandler implements IURIHandler
 		{
 			fos = new FileOutputStream(target);
 			in = openInputStream(source, credential);
-			StreamUtils.copyStream(in, fos);
+			return StreamUtils.copyStream(in, fos);
 		}
 		finally
 		{
@@ -115,7 +111,7 @@ public abstract class AbstractURIHandler implements IURIHandler
 		}
 	}
 
-	protected void putInternal(File source, URI target,
+	protected DataTransferStatistics putInternal(File source, URI target,
 		UsernamePasswordIdentity credential) throws IOException
 	{
 		FileInputStream fin = null;
@@ -125,7 +121,7 @@ public abstract class AbstractURIHandler implements IURIHandler
 		{
 			fin = new FileInputStream(source);
 			out = openOutputStream(target, credential);
-			StreamUtils.copyStream(fin, out);
+			return StreamUtils.copyStream(fin, out);
 		}
 		finally
 		{

@@ -154,7 +154,7 @@ public class ContainerBootstrap implements SecureRunnable
 			
 			//Assume certificate based
 			tool.setNo_gui();
-			tool.addArgument(Installation.getDeployment(
+			tool.addArgument("local:" + Installation.getDeployment(
 				new DeploymentName()).security().getSecurityFile(
 					certStore).getAbsolutePath());
 			tool.setStoretype(certStoreType);
@@ -167,7 +167,7 @@ public class ContainerBootstrap implements SecureRunnable
 			//Assume certificate based
 			tool = new KeystoreLoginTool();
 			tool.setNo_gui();
-			tool.addArgument(Installation.getDeployment(
+			tool.addArgument("local:" + Installation.getDeployment(
 				new DeploymentName()).security().getSecurityFile(
 					cProperties.getCertGeneratorOutputStoreName()).getAbsolutePath());
 			tool.setStoretype("PKCS12");

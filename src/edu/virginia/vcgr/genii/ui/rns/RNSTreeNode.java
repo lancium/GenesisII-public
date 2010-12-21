@@ -99,10 +99,10 @@ public class RNSTreeNode extends DefaultMutableTreeNode
 		model.reload(RNSTreeNode.this);
 		
 		RNSFilledInTreeObject object = (RNSFilledInTreeObject)getUserObject();
-		model.uiContext().progressMonitorFactory().monitor(tree, null, null,
+		model.uiContext().progressMonitorFactory().createMonitor(tree, null, null,
 			1000L * 1000, new ExpansionTask(
 				model.uiContext().callingContext(), object.path()), 
-				new ExpansionCompletionListener(tree, model.uiContext()));
+				new ExpansionCompletionListener(tree, model.uiContext())).start();
 	}
 	
 	public void refresh(RNSTree tree)

@@ -25,6 +25,7 @@ import org.morgan.utils.gui.GUIUtils;
 import org.morgan.utils.gui.tearoff.TearoffPanel;
 
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
+import edu.virginia.vcgr.genii.ui.login.CredentialManagementButton;
 import edu.virginia.vcgr.genii.ui.plugins.EndpointDescription;
 import edu.virginia.vcgr.genii.ui.plugins.LazilyLoadedTab;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginContext;
@@ -122,8 +123,12 @@ public class ClientApplication extends UIFrame
 			new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0, 
 				GridBagConstraints.CENTER,
 				GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+		content.add(new CredentialManagementButton(_uiContext), 
+			new GridBagConstraints(
+				0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.WEST,
+				GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
 		content.add(new TrashCanWidget(_context, _uiContext),
-			new GridBagConstraints(0, 1, 2, 1, 1.0, 0.0,
+			new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0,
 				GridBagConstraints.EAST, GridBagConstraints.NONE,
 				new Insets(5, 5, 5, 5), 5, 5));
 		

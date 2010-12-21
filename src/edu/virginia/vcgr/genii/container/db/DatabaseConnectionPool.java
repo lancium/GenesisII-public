@@ -23,6 +23,7 @@ import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
 import edu.virginia.vcgr.genii.client.stats.DBConnectionDataPoint;
 import edu.virginia.vcgr.genii.client.stats.DatabaseHistogramStatistics;
 import edu.virginia.vcgr.genii.container.Container;
+import edu.virginia.vcgr.genii.container.cleanup.CleanupManager;
 
 public class DatabaseConnectionPool
 {
@@ -101,6 +102,22 @@ public class DatabaseConnectionPool
 		t.setDaemon(true);
 		t.setName("DB Rejuvenator Thread");
 		t.start();
+		
+		Connection connection = null;
+		try
+		{
+			connection = acquire(false);
+			CleanupManager.doCleanups(connection);
+		}
+		catch (Throwable cause)
+		{
+			_logger.error(
+				"Unable to create connection for cleanup handlers.", cause);
+		}
+		finally
+		{
+			release(connection);
+		}
 	}
 	
 	private Connection acquire() throws SQLException

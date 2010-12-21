@@ -45,8 +45,8 @@ public interface IURIHandler
 	 */
 	public boolean canWrite(String uriScheme);
 	
-	public void get(URI source, File target,
+	public DataTransferStatistics get(URI source, File target,
 		UsernamePasswordIdentity credential) throws IOException;
-	public void put(File source, URI target,
+	public DataTransferStatistics put(File source, URI target,
 		UsernamePasswordIdentity credential) throws IOException;
 }

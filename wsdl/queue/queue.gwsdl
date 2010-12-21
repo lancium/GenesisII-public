@@ -148,6 +148,16 @@
 		<wsdl:part name="CompleteResponse"
 			element="queue:CompleteResponse"/>
 	</wsdl:message>
+
+	<wsdl:message name="ForceUpdateRequest">
+		<wsdl:part name="ForceUpdateRequest"
+			element="queue:ForceUpdateRequestType"/>
+	</wsdl:message>
+
+	<wsdl:message name="ForceUpdateResponse">
+		<wsdl:part name="ForceUpdateResponse"
+			element="queue:ForceUpdateResponse"/>
+	</wsdl:message>
 	
 	<wsdl:message name="RescheduleJobsRequest">
 		<wsdl:part name="RescheduleJobsRequest"
@@ -215,6 +225,11 @@
 		<wsdl:operation name="completeJobs">
 			<wsdl:input message="queue:CompleteRequest"/>
 			<wsdl:output message="queue:CompleteResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="forceUpdate">
+			<wsdl:input message="queue:ForceUpdateRequest"/>
+			<wsdl:output message="queue:ForceUpdateResponse"/>
 		</wsdl:operation>
 		
 		<wsdl:operation name="rescheduleJobs">

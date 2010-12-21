@@ -33,7 +33,7 @@ public class SFtpURIHandler extends AbstractURIHandler
 	}
 
 	@Override
-	protected void getInternal(
+	protected DataTransferStatistics getInternal(
 		URI source, File target, UsernamePasswordIdentity credential)
 			throws IOException
 	{
@@ -75,11 +75,11 @@ public class SFtpURIHandler extends AbstractURIHandler
 			port = 22;
 		
 		target.createNewFile();
-		ScpUtility.get(target, user, password, host, port, remotePath, true);
+		return ScpUtility.get(target, user, password, host, port, remotePath, true);
 	}
 
 	@Override
-	protected void putInternal(
+	protected DataTransferStatistics putInternal(
 		File source, URI target, UsernamePasswordIdentity credential)
 			throws IOException
 	{
@@ -120,7 +120,7 @@ public class SFtpURIHandler extends AbstractURIHandler
 		if (port < 0)
 			port = 22;
 		
-		ScpUtility.put(source, user, password, host, port, remotePath, true);
+		return ScpUtility.put(source, user, password, host, port, remotePath, true);
 	}
 
 	@Override

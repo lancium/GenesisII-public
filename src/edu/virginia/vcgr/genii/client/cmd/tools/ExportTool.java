@@ -49,6 +49,9 @@ public class ExportTool extends BaseGridTool
 	private boolean _quit = false;
 	private boolean _url = false;
 	private boolean _replicate = false;
+	private String _svnUser = null;
+	private String _svnPass = null;
+	private Long _svnRevision = null;
 	
 	public ExportTool()
 	{
@@ -77,6 +80,24 @@ public class ExportTool extends BaseGridTool
 	public void setReplicate()
 	{
 		_replicate = true;
+	}
+	
+	@Option("svn-user")
+	public void setSVNUser(String user)
+	{
+		_svnUser = user;
+	}
+	
+	@Option("svn-pass")
+	public void setSVNPass(String pass)
+	{
+		_svnPass = pass;
+	}
+	
+	@Option("svn-revision")
+	public void setSVNRevision(String revision)
+	{
+		_svnRevision = Long.valueOf(revision);
 	}
 	
 	@Override
@@ -112,13 +133,11 @@ public class ExportTool extends BaseGridTool
 			}
 
 			/* get local directory path to be exported */
-			GeniiPath gPath = new GeniiPath(getArgument(1));
-			if (gPath.pathType() != GeniiPathType.Local)
-				throw new InvalidToolUsageException("<local-path> must be a local path beginning with 'local:' ");
-			String localPath = gPath.path();
+			String localPath = getArgument(1);
 			
 			EndpointReferenceType epr = createExportedRoot(targetRNSName,
-				exportServiceEPR, localPath, targetRNSName, _replicate);
+				exportServiceEPR, localPath, _svnUser, _svnPass, _svnRevision,
+				targetRNSName, _replicate);
 
 			if (targetRNSName == null)
 			{
@@ -245,7 +264,8 @@ public class ExportTool extends BaseGridTool
 	
 	static public EndpointReferenceType createExportedRoot(
 		String humanName, EndpointReferenceType exportServiceEPR, 
-		String localPath, String RNSPath, boolean isReplicated) 
+		String localPath, String svnUser, String svnPass, Long svnRevision,
+		String RNSPath, boolean isReplicated) 
 		throws ResourceException,
 			ResourceCreationFaultType, RemoteException, RNSException,
 			CreationException, IOException, InvalidToolUsageException
@@ -256,8 +276,14 @@ public class ExportTool extends BaseGridTool
 		if (isReplicated)
 			replicationIndicator = "true";
 		
+		if (localPath.startsWith("local:"))
+			localPath = localPath.substring(6);
+		else if (localPath.startsWith("file:"))
+			localPath = localPath.substring(5);
+		
 		MessageElement[] createProps = ExportedDirUtils.createCreationProperties(
-			humanName, localPath, "", replicationIndicator);
+			humanName, localPath, svnUser, svnPass, svnRevision,
+			"", replicationIndicator);
 		
 		ICallingContext origContext = ContextManager.getCurrentContext();
 		ICallingContext createContext = origContext.deriveNewContext();

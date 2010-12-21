@@ -8,6 +8,7 @@ import org.ggf.bes.factory.ActivityStateEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
+import edu.virginia.vcgr.genii.client.io.DataTransferStatistics;
 import edu.virginia.vcgr.genii.client.io.URIManager;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.container.bes.execution.ContinuableExecutionException;
@@ -53,6 +54,8 @@ public class StageOutPhase extends AbstractExecutionPhase
 		history.createInfoWriter("Staging %s out.", _source.getName()).format(
 			"Staging %s out to %s.", _source, _target).close();
 		
+		DataTransferStatistics stats;
+		
 		if (!_source.exists())
 		{
 			history.createErrorWriter(
@@ -66,8 +69,13 @@ public class StageOutPhase extends AbstractExecutionPhase
 		
 		try
 		{
-			URIManager.put(_source,
+			stats = URIManager.put(_source,
 				_target, _credential);
+			history.createTraceWriter("%s: %d Bytes Transferred",
+				_source.getName(), stats.bytesTransferred()).format(
+					"%d bytes were transferred in %d ms.",
+					stats.bytesTransferred(),
+					stats.transferTime()).close();
 		}
 		catch (Throwable cause)
 		{

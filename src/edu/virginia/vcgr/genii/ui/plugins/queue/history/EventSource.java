@@ -207,7 +207,7 @@ class EventSource extends JLabel
 			try
 			{
 				UIContext context = (UIContext)_context.clone();
-				_context.callingContext().setCurrentPath(_rnsRoot);
+				context.callingContext().setCurrentPath(_rnsRoot);
 				ClientApplication app = new ClientApplication(context, false);
 				app.pack();
 				GUIUtils.centerComponent(app);

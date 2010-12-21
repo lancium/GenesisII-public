@@ -27,7 +27,7 @@ import edu.virginia.vcgr.genii.exportdir.lightweight.LightWeightExportPortType;
 
 @ForkRoot(LightWeightExportDirFork.class)
 public class LightWeightExportServiceImpl extends ResourceForkBaseService
-		implements LightWeightExportPortType
+	implements LightWeightExportPortType
 {
 	static private Log _logger = LogFactory.getLog(
 		LightWeightExportServiceImpl.class);
@@ -41,34 +41,29 @@ public class LightWeightExportServiceImpl extends ResourceForkBaseService
 		ExportedDirUtils.ExportedDirInitInfo initInfo = 
 			ExportedDirUtils.extractCreationProperties(creationParameters);
 		
-		//ensure that local dir to be exported is readable
-		//if so, proceed with export creation
-		/*
-		try
-		{
-			if (!ExportedDirUtils.dirReadable(initInfo.getPath()))
-			{
-				throw FaultManipulator.fillInFault(
-					new ResourceCreationFaultType(null, null, null, null, 
-						new BaseFaultTypeDescription[] {
-							new BaseFaultTypeDescription("Target directory " + 
-								initInfo.getPath() + 
-								" does not exist or is not readable.  " +
-								"Cannot create export from this path.")	
-				}, null));
-			}
-		}
-		catch (IOException ioe)
-		{
-			throw new ResourceException(
-					"Could not determine if export localpath is readable.", ioe);
-		}	
-*/
-		
 		ResourceKey key = super.createResource(creationParameters);
 		key.dereference().setProperty(
 			LightWeightExportConstants.ROOT_DIRECTORY_PROPERTY_NAME,
 			initInfo.getPath());
+		
+		String svnUser = initInfo.svnUser();
+		String svnPass = initInfo.svnPass();
+		Long svnRevision = initInfo.svnRevision();
+		
+		if (svnUser != null)
+			key.dereference().setProperty(
+				LightWeightExportConstants.SVN_USER_PROPERTY_NAME,
+				svnUser);
+		
+		if (svnPass != null)
+			key.dereference().setProperty(
+				LightWeightExportConstants.SVN_PASS_PROPERTY_NAME,
+				svnPass);
+		
+		if (svnRevision != null)
+			key.dereference().setProperty(
+				LightWeightExportConstants.SVN_REVISION_PROPERTY_NAME,
+				svnRevision);
 		
 		return key;
 	}

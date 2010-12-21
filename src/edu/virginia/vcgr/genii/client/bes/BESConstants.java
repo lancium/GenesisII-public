@@ -49,8 +49,15 @@ public interface BESConstants
 	static public final String NAMING_PROFILE_WS_NAMING =
 		"http://www.ogf.org/naming/2006/08/naming-uwsep-pf";
 	
+	static public final String LOCAL_RESOURCE_MANAGER_TYPE_BASE =
+		"http://vcgr.cs.virginia.edu/2008/03/resource-manager-type/";
+	
 	static public final String LOCAL_RESOURCE_MANAGER_TYPE_SIMPLE =
-		"http://vcgr.cs.virginia.edu/2008/03/resource-manager-type/simple";
+		LOCAL_RESOURCE_MANAGER_TYPE_BASE + "simple";
+	static public final String LOCAL_RESOURCE_MANAGER_TYPE_PBS =
+		LOCAL_RESOURCE_MANAGER_TYPE_BASE + "pbs";
+	static public final String LOCAL_RESOURCE_MANAGER_TYPE_SGE =
+		LOCAL_RESOURCE_MANAGER_TYPE_BASE + "sge";
 	
 	static public final String CONFIG_PROPERTY_WORKER_DIR =
 		"edu.virginia.vcgr.genii.container.bes.worker-dir";

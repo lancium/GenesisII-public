@@ -42,6 +42,9 @@ public class ExportedDirUtils
 	static final protected String _REXPORT_RESOLVER_EPR = "rexport-resolver-service-epr";
 	static final public String _PARENT_ID_BEGIN_DELIMITER = ":";
 	static final public String _PARENT_ID_END_DELIMITER = ":";
+	static final public String _SVN_USERNAME = "svn-user";
+	static final public String _SVN_PASSWORD = "svn-pass";
+	static final public String _SVN_REVISION = "svn-revision";
 	
 	@SuppressWarnings("unused")
 	static private Log _logger = LogFactory.getLog(ExportedDirUtils.class);
@@ -53,6 +56,9 @@ public class ExportedDirUtils
 		private String _isReplicated = null;
 		private Long _lastModified = null;
 		private EndpointReferenceType _resolverServiceEPR = null;
+		private String _svnUser = null;
+		private String _svnPass = null;
+		private Long _svnRevision = null;
 	
 		/*public ExportedDirInitInfo(String path, String parentIds, String isReplicated)
 		{
@@ -62,13 +68,17 @@ public class ExportedDirUtils
 		}
 		*/
 		public ExportedDirInitInfo(String path, String parentIds, String isReplicated,
-				Long lastModified, EndpointReferenceType resolverServiceEPR)
+			Long lastModified, EndpointReferenceType resolverServiceEPR,
+			String svnUser, String svnPass, Long svnRevision)
 		{
 			_path = path;
 			_parentIds = parentIds;
 			_isReplicated = isReplicated;
 			_lastModified = lastModified;
 			_resolverServiceEPR = resolverServiceEPR;
+			_svnUser = svnUser;
+			_svnPass = svnPass;
+			_svnRevision = svnRevision;
 		}
 		
 		public String getPath()
@@ -94,10 +104,26 @@ public class ExportedDirUtils
 		{
 			return _resolverServiceEPR;
 		}
+		
+		public String svnUser()
+		{
+			return _svnUser;
+		}
+		
+		public String svnPass()
+		{
+			return _svnPass;
+		}
+		
+		public Long svnRevision()
+		{
+			return _svnRevision;
+		}
 	}
 	
 	static public MessageElement[] createCreationProperties(String humanName,
-		String path, String parentIds, String isReplicated) throws RemoteException
+		String path, String svnUser, String svnPass, Long svnRevision,
+		String parentIds, String isReplicated) throws RemoteException
 	{
 		Collection<MessageElement> any = new Vector<MessageElement>(6);
 		any.add(new MessageElement(new QName(
@@ -112,6 +138,16 @@ public class ExportedDirUtils
 		any.add(new MessageElement(new QName(
 			GenesisIIConstants.GENESISII_NS, _REXPORT_RESOLVER_EPR),
 			null));
+		any.add(new MessageElement(new QName(
+			GenesisIIConstants.GENESISII_NS, _SVN_USERNAME),
+			svnUser));
+		any.add(new MessageElement(new QName(
+			GenesisIIConstants.GENESISII_NS, _SVN_PASSWORD),
+			svnPass));
+		any.add(new MessageElement(new QName(
+			GenesisIIConstants.GENESISII_NS, _SVN_REVISION),
+			svnRevision));
+		
 		if (humanName != null)
 		{
 			ConstructionParameters cParams = new ConstructionParameters();
@@ -170,6 +206,9 @@ public class ExportedDirUtils
 		String isReplicated = null;
 		Long lastModified = null;
 		EndpointReferenceType resolverServiceEPR = null;
+		String svnUser = null;
+		String svnPass = null;
+		Long svnRevision = null;
 		
 		if (properties == null)
 			throw new IllegalArgumentException(
@@ -194,7 +233,35 @@ public class ExportedDirUtils
 		parentIds = parentIDSElement.getValue();
 		if (parentIds == null)
 			parentIds = "";
-	
+		
+		// get svn user
+		MessageElement svnUserElement =
+			(MessageElement)properties.get(new QName(
+				GenesisIIConstants.GENESISII_NS, _SVN_USERNAME));
+		if (svnUserElement != null)
+			svnUser = svnUserElement.getValue();
+
+		// get svn pass
+		MessageElement svnPassElement =
+			(MessageElement)properties.get(new QName(
+				GenesisIIConstants.GENESISII_NS, _SVN_PASSWORD));
+		if (svnPassElement != null)
+			svnPass = svnPassElement.getValue();
+		
+		// get svn revision
+		MessageElement svnRevisionElement =
+			(MessageElement)properties.get(new QName(
+				GenesisIIConstants.GENESISII_NS, _SVN_REVISION));
+		try
+		{
+			if (svnRevisionElement != null)
+				svnRevision = (Long)svnRevisionElement.getObjectValue(Long.class);
+		}
+		catch (Exception e)
+		{
+			throw new ResourceException("Unable to extract svn revision.", e);
+		}
+		
 		//get replication state
 		MessageElement replicationElement = 
 			(MessageElement)properties.get(new QName(
@@ -236,7 +303,8 @@ public class ExportedDirUtils
 		lastModified = getLastModifiedTime(path);
 		
 		return new ExportedDirInitInfo(path, parentIds, 
-				isReplicated, lastModified, resolverServiceEPR);
+				isReplicated, lastModified, resolverServiceEPR,
+				svnUser, svnPass, svnRevision);
 	}
 	
 	static public String createParentIdsString(String ancestorIdString, String parentId)

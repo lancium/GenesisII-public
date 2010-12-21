@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.disk.DiskExportRoot;
+import edu.virginia.vcgr.genii.container.exportdir.lightweight.svn.SVNExportRoot;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.zipjar.ZipJarExportRoot;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -34,12 +35,32 @@ class LightWeightExportUtils
 				}
 				
 				VExportRoot vroot = null;
-				File root = new File(rootDirString);
-				if (root.isDirectory())
-					return new DiskExportRoot(root);
-				else if (root.getName().endsWith(".jar") || 
-					root.getName().endsWith(".zip"))
-					vroot = new ZipJarExportRoot(root);
+				
+				if (rootDirString.matches("^.+:.*$"))
+				{
+					// Handle SVN
+					Long revision = (Long)resource.getProperty(
+							LightWeightExportConstants.SVN_REVISION_PROPERTY_NAME);
+							
+					vroot = new SVNExportRoot(rootDirString,
+						(String)resource.getProperty(
+							LightWeightExportConstants.SVN_USER_PROPERTY_NAME),
+						(String)resource.getProperty(
+							LightWeightExportConstants.SVN_PASS_PROPERTY_NAME),
+						revision);
+					/* TODO:  MOOCH
+					if (revision == null)
+						return vroot;
+					*/
+				} else
+				{
+					File root = new File(rootDirString);
+					if (root.isDirectory())
+						return new DiskExportRoot(root);
+					else if (root.getName().endsWith(".jar") || 
+						root.getName().endsWith(".zip"))
+						vroot = new ZipJarExportRoot(root);
+				}
 				
 				synchronized(LightWeightExportUtils.class)
 				{

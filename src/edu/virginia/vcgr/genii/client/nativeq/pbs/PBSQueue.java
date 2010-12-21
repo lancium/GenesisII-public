@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.client.nativeq.pbs;
 import java.io.File;
 import java.io.FileNotFoundException;
 
+import edu.virginia.vcgr.genii.client.bes.ResourceManagerType;
 import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
 import edu.virginia.vcgr.genii.client.nativeq.AbstractNativeQueue;
 import edu.virginia.vcgr.genii.client.nativeq.JobStateCache;
@@ -51,5 +52,11 @@ public class PBSQueue extends AbstractNativeQueue<PBSQueueConfiguration>
 			throw new NativeQueueException(
 				"Unable to find queue binaries.", fnfe);
 		}
+	}
+
+	@Override
+	final public ResourceManagerType resourceManagerType()
+	{
+		return ResourceManagerType.PBS;
 	}
 }

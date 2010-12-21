@@ -8,6 +8,10 @@ public interface QueueConstants
 {
 	static final public String QUEUE_NS = "http://vcgr.cs.virginia.edu/genii/queue";
 	static final public String QUEUE_PORT_TYPE_NAME = "QueuePortType";
+	static final public String CURRENT_RESOURCE_INFORMATION_NAME = "current-resource-information";
+	
+	static final public QName CURRENT_RESOURCE_INFORMATION_QNAME = new QName(
+		QUEUE_NS, CURRENT_RESOURCE_INFORMATION_NAME);
 	
 	static final public PortType QUEUE_PORT_TYPE =
 		PortType.get(new QName(QUEUE_NS, QUEUE_PORT_TYPE_NAME));

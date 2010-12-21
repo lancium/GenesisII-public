@@ -26,6 +26,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
+import edu.virginia.vcgr.genii.client.io.DataTransferStatistics;
+
 /**
  * @author Mark Morgan (mark@mark-morgan.org)
  */
@@ -47,9 +49,12 @@ public class StreamUtils
 		writer.flush();
 	}
 	
-	static public void copyStream(InputStream in, OutputStream out, boolean autoflush)
-		throws IOException
+	static public DataTransferStatistics copyStream(
+		InputStream in, OutputStream out, boolean autoflush)
+			throws IOException
 	{
+		DataTransferStatistics stats = DataTransferStatistics.startTransfer();
+		
 		byte []data = new byte[_DEFAULT_BUFFER_SIZE];
 		int read;
 		
@@ -60,17 +65,20 @@ public class StreamUtils
 				out.write(data, 0, read);
 				if (autoflush)
 					out.flush();
+				stats.transfer(read);
 			}
 		}
 		
 		if (out != null)
 			out.flush();
+		
+		return stats.finishTransfer();
 	}
 	
-	static public void copyStream(InputStream in, OutputStream out)
-		throws IOException
+	static public DataTransferStatistics copyStream(
+		InputStream in, OutputStream out) throws IOException
 	{
-		copyStream(in, out, false);
+		return copyStream(in, out, false);
 	}
 	
 	static public void close(Closeable item)

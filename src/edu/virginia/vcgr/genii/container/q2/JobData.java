@@ -25,6 +25,8 @@ public class JobData
 	private HistoryContext _history;
 	private HistoryEventToken _historyToken = null;
 	
+	private String _jobName = null;
+	
 	/**
 	 * This variable is used internally by the queue to maintain the current
 	 * "active" state of a job.  Is it in the process of being created or
@@ -94,10 +96,12 @@ public class JobData
 	
 	private JobResourceRequirements _resourceRequirements = null;
 	
-	public JobData(long jobID, String jobTicket, short priority,
+	public JobData(long jobID, String jobName,
+		String jobTicket, short priority,
 		QueueStates jobState, Date submitTime, short runAttempts, Long besID,
 		HistoryContext history)
 	{
+		_jobName = jobName;
 		_killed = false;
 		_jobID = jobID;
 		_jobTicket = jobTicket;
@@ -109,12 +113,17 @@ public class JobData
 		_history = history;
 	}
 	
-	public JobData(long jobID, String jobTicket, short priority,
+	public JobData(long jobID, String jobName, String jobTicket, short priority,
 		QueueStates jobState, Date submitTime, short runAttempts,
 		HistoryContext history)
 	{
-		this(jobID, jobTicket, priority, jobState, submitTime, 
+		this(jobID, jobName, jobTicket, priority, jobState, submitTime, 
 			runAttempts, null, history);
+	}
+	
+	final public String jobName()
+	{
+		return _jobName;
 	}
 	
 	final public HistoryContext history(HistoryEventCategory category)

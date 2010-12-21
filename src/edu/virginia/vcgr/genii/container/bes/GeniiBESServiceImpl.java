@@ -60,6 +60,8 @@ import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.nativeq.NativeQueue;
+import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
@@ -445,7 +447,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 	@Override
 	@RWXMapping(RWXCategory.READ)
 	public GetFactoryAttributesDocumentResponseType getFactoryAttributesDocument(
-			GetFactoryAttributesDocumentType parameters) throws RemoteException
+		GetFactoryAttributesDocumentType parameters) throws RemoteException
 	{
 		Collection<MessageElement> any = new ArrayList<MessageElement>(4);
 		String resourceName = Hostname.getLocalHostname().toString();
@@ -461,8 +463,28 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 					new URI(BESConstants.NAMING_PROFILE_WS_NAMING)
 				};
 			besExtensions = new URI[0];
-			localResourceManagerType = new URI(
-				BESConstants.LOCAL_RESOURCE_MANAGER_TYPE_SIMPLE);
+			
+			BESConstructionParameters consParms = 
+				(BESConstructionParameters)_resource.constructionParameters(
+					getClass());
+			if (consParms != null)
+			{
+				NativeQueueConfiguration nqconf = 
+					consParms.getNativeQueueConfiguration();
+				if (nqconf != null)
+				{
+					NativeQueue nq = nqconf.nativeQueue();
+					if (nq != null)
+					{
+						localResourceManagerType = 
+							nq.resourceManagerType().toApacheAxisURI();
+					}
+				}
+			}
+			
+			if (localResourceManagerType == null)
+				localResourceManagerType = new URI(
+					BESConstants.LOCAL_RESOURCE_MANAGER_TYPE_SIMPLE);
 		}
 		catch (Throwable cause)
 		{

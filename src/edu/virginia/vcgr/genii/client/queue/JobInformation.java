@@ -13,8 +13,10 @@ public class JobInformation extends ReducedJobInformation
 	private Calendar _finishTime;
 	private int _failedAttempts;
 	private String _scheduledOn;
+	private String _jobName;
 	
 	public JobInformation(JobTicket ticket,
+		String jobName,
 		Collection<Identity> owners, QueueStates state,
 		int prioity, Calendar submitTime,
 		Calendar startTime, Calendar finishTime,
@@ -28,6 +30,12 @@ public class JobInformation extends ReducedJobInformation
 		_finishTime = finishTime;
 		_failedAttempts = failedAttempts;
 		_scheduledOn = scheduledOn;
+		_jobName = jobName;
+	}
+	
+	final public String jobName()
+	{
+		return _jobName;
 	}
 	
 	public int getPriority()

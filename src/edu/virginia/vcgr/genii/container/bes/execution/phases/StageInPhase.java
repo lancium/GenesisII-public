@@ -9,6 +9,7 @@ import org.ggf.jsdl.CreationFlagEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
+import edu.virginia.vcgr.genii.client.io.DataTransferStatistics;
 import edu.virginia.vcgr.genii.client.io.URIManager;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
@@ -59,6 +60,7 @@ public class StageInPhase extends AbstractExecutionPhase
 		history.createInfoWriter("Staging in to %s",
 			_target.getName()).format("Staging in from %s to %s.",
 			_source, _target).close();
+		DataTransferStatistics stats;
 		
 		try
 		{
@@ -68,9 +70,16 @@ public class StageInPhase extends AbstractExecutionPhase
 				DownloadManagerContainerService service =
 					ContainerServices.findService(
 						DownloadManagerContainerService.class);
-				service.download(_source, target, _credential);
+				stats = service.download(_source, target, _credential);
 			} else
-				URIManager.get(_source, target, _credential);
+				stats = URIManager.get(_source, target, _credential);
+			
+			history.createTraceWriter("%s: %d Bytes Transferred",
+				_target.getName(), stats.bytesTransferred()).format(
+					"%d bytes were transferred in %d ms.",
+					stats.bytesTransferred(),
+					stats.transferTime()).close();
+				
 		}
 		catch (Throwable cause)
 		{

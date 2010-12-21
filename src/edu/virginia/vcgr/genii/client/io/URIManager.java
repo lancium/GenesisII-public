@@ -102,7 +102,7 @@ public class URIManager
 		return ((handler != null) && handler.canWrite(scheme));
 	}
 	
-	static public void get(URI source, File target, 
+	static public DataTransferStatistics get(URI source, File target, 
 		UsernamePasswordIdentity credential) throws IOException
 	{
 		_logger.info(String.format(
@@ -120,7 +120,7 @@ public class URIManager
 		{
 			_connectionSemaphore.acquireUninterruptibly();
 			Thread.interrupted();
-			handler.get(source, target, credential);
+			return handler.get(source, target, credential);
 		}
 		finally
 		{
@@ -128,7 +128,7 @@ public class URIManager
 		}
 	}
 	
-	static public void put(File source, URI target,
+	static public DataTransferStatistics put(File source, URI target,
 		UsernamePasswordIdentity credential) throws IOException
 	{
 		_logger.info(String.format(
@@ -147,7 +147,7 @@ public class URIManager
 		{
 			_connectionSemaphore.acquireUninterruptibly();
 			Thread.interrupted();
-			handler.put(source, target, credential);
+			return handler.put(source, target, credential);
 		}
 		finally
 		{

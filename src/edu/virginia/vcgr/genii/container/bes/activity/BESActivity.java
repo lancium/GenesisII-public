@@ -24,6 +24,7 @@ import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
@@ -43,6 +44,8 @@ import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingD
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
+import edu.virginia.vcgr.genii.container.resource.ResourceKey;
+import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.PublisherTopic;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.TopicSet;
 
@@ -452,6 +455,9 @@ public class BESActivity implements Closeable
 		
 		try
 		{
+			ctxt.setProperty(WorkingContext.CURRENT_RESOURCE_KEY,
+				new ResourceKey(_activityServiceName,
+					new AddressingParameters(_activityid, null, null)));
 			WorkingContext.setCurrentWorkingContext(ctxt);
 			phase.execute(getExecutionContext());
 		}

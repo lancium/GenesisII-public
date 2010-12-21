@@ -38,7 +38,9 @@ public class HistoryEventTreeCellRenderer extends DefaultTreeCellRenderer
 		if (event.eventData().eventException() != null)
 			icon = new ExceptionIcon(icon);
 		
-		setIcon(new BoxedIcon(node.branchLevel(), icon));
+		icon = new CompositeIcon(2, 
+			LevelIcon.iconForLevel(node.branchLevel()), icon);
+		setIcon(icon);
 		
 		return this;
 	}

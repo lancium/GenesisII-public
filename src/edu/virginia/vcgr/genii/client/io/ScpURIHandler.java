@@ -33,7 +33,7 @@ public class ScpURIHandler extends AbstractURIHandler
 	}
 
 	@Override
-	protected void getInternal(
+	protected DataTransferStatistics getInternal(
 		URI source, File target, UsernamePasswordIdentity credential)
 			throws IOException
 	{
@@ -74,11 +74,11 @@ public class ScpURIHandler extends AbstractURIHandler
 		if (port < 0)
 			port = 22;
 		
-		ScpUtility.get(target, user, password, host, port, remotePath, false);
+		return ScpUtility.get(target, user, password, host, port, remotePath, false);
 	}
 
 	@Override
-	protected void putInternal(
+	protected DataTransferStatistics putInternal(
 		File source, URI target, UsernamePasswordIdentity credential)
 			throws IOException
 	{
@@ -119,7 +119,7 @@ public class ScpURIHandler extends AbstractURIHandler
 		if (port < 0)
 			port = 22;
 		
-		ScpUtility.put(source, user, password, host, port, remotePath, false);
+		return ScpUtility.put(source, user, password, host, port, remotePath, false);
 	}
 
 	@Override

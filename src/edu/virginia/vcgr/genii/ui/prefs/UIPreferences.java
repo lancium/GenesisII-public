@@ -9,6 +9,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import edu.virginia.vcgr.genii.ui.prefs.general.GeneralUIPreferenceSet;
+import edu.virginia.vcgr.genii.ui.prefs.history.HistoryUIPreferenceSet;
 import edu.virginia.vcgr.genii.ui.prefs.security.SecurityUIPreferenceSet;
 import edu.virginia.vcgr.genii.ui.prefs.shell.ShellUIPreferenceSet;
 import edu.virginia.vcgr.genii.ui.prefs.xml.XMLUIPreferenceSet;
@@ -34,6 +35,8 @@ public class UIPreferences
 			new ShellUIPreferenceSet());
 		_preferenceSets.put(SecurityUIPreferenceSet.class, 
 			new SecurityUIPreferenceSet());
+		_preferenceSets.put(HistoryUIPreferenceSet.class,
+			new HistoryUIPreferenceSet());
 		_preferenceSets.put(XMLUIPreferenceSet.class,
 			new XMLUIPreferenceSet());
 		

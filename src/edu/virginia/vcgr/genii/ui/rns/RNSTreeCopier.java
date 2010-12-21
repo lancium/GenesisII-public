@@ -155,9 +155,9 @@ public class RNSTreeCopier extends RNSTreeOperator
 	public boolean performOperation()
 	{
 		_logger.debug("RNSTreeCopier called.");
-		_uiContext.progressMonitorFactory().monitor(
+		_uiContext.progressMonitorFactory().createMonitor(
 			_targetTree, "Copying Endpoints", "Copying endpoints.",
-			1000L, new CopierTask(), null);
+			1000L, new CopierTask(), null).start();
 		return true;
 	}
 	

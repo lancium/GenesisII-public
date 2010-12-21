@@ -156,6 +156,7 @@ public class HistoryDatabase
 	
 	static long addRecord(Connection connection,
 		String resourceID, SequenceNumber number,
+		Calendar createTimestamp,
 		HistoryEventCategory category, 
 		HistoryEventLevel level, Map<String, String> properties,
 		HistoryEventSource eventSource, HistoryEventData eventData,
@@ -169,6 +170,9 @@ public class HistoryDatabase
 		if (category == null)
 			category = HistoryEventCategory.Default;
 		
+		if (createTimestamp == null)
+			createTimestamp = Calendar.getInstance();
+		
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		
@@ -177,8 +181,9 @@ public class HistoryDatabase
 			stmt = connection.prepareStatement(
 				"INSERT INTO historyrecords" +
 					"(resourceid, sequencenumber, level, category, " +
-					"properties, eventsource, eventdata, expirationtime) " +
-				"VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
+					"properties, eventsource, eventdata, expirationtime," +
+					" createtimestamp) " +
+				"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
 				Statement.RETURN_GENERATED_KEYS);
 			
 			stmt.setString(1, resourceID);
@@ -197,6 +202,9 @@ public class HistoryDatabase
 			else
 				stmt.setTimestamp(8,
 					new Timestamp(expirationTime.getTimeInMillis()));
+			
+			stmt.setTimestamp(9,
+				new Timestamp(createTimestamp.getTimeInMillis()));
 			
 			stmt.executeUpdate();
 			rs = stmt.getGeneratedKeys();

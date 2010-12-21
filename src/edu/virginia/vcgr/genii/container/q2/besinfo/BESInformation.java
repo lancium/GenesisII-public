@@ -6,6 +6,7 @@ import java.io.StringWriter;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.BasicResourceAttributesDocumentType;
@@ -34,6 +35,7 @@ public class BESInformation
 	private OperatingSystemTypeEnumeration _operatingSystemType;
 	private String _operatingSystemVerison;
 	private Double _physicalMemory;
+	private URI _resourceManagerType = null;
 	
 	private boolean _isAcceptingNewActivites;
 	private long _numContainedActivities;
@@ -49,6 +51,8 @@ public class BESInformation
 			attrs.getFactoryResourceAttributesDocument();
 		if (d1 != null)
 		{
+			_resourceManagerType = d1.getLocalResourceManagerType();
+			
 			_numContainedActivities = d1.getTotalNumberOfActivities();
 			_isAcceptingNewActivites = d1.isIsAcceptingNewActivities();
 			
@@ -164,5 +168,10 @@ public class BESInformation
 	final public long getNumberOfContainedResources()
 	{
 		return _numContainedActivities;
+	}
+	
+	final public URI resourceManagerType()
+	{
+		return _resourceManagerType;
 	}
 }

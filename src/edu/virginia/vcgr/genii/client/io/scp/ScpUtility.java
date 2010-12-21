@@ -9,14 +9,18 @@ import java.util.regex.Pattern;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.optional.ssh.Scp;
 
+import edu.virginia.vcgr.genii.client.io.DataTransferStatistics;
+
 public class ScpUtility
 {
-	static public void put(File localFile, 
+	static public DataTransferStatistics put(File localFile, 
 		String user, String password,
 		String host, int port, String remotePath,
 		boolean useSFTP)
 		throws IOException
 	{
+		DataTransferStatistics stats = DataTransferStatistics.startTransfer();
+		
 		Scp copier = new Scp();
 		copier.setPort(port);
 		copier.setLocalFile(localFile.getAbsolutePath());
@@ -27,12 +31,15 @@ public class ScpUtility
 		copier.setTrust(true);
 		copier.setProject(new Project());
 		copier.execute();
+
+		stats.transfer(localFile.length());
+		return stats.finishTransfer();
 	}
 	
 	static private Pattern FNF_PATTERN = Pattern.compile(
 		"scp: .*: No such file or directory");
 	
-	static public void get(File localFile,
+	static public DataTransferStatistics get(File localFile,
 		String user, String password,
 		String host, int port, String remotePath,
 		boolean useSFTP)
@@ -40,6 +47,8 @@ public class ScpUtility
 	{
 		try
 		{
+			DataTransferStatistics stats = DataTransferStatistics.startTransfer();
+			
 			Scp copier = new Scp();
 			copier.setPort(port);
 			copier.setRemoteFile(String.format("%s@%s:%s",
@@ -50,6 +59,9 @@ public class ScpUtility
 			copier.setTrust(true);
 			copier.setProject(new Project());
 			copier.execute();
+
+			stats.transfer(localFile.length());
+			return stats.finishTransfer();
 		}
 		catch (Throwable cause)
 		{

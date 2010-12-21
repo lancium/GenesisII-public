@@ -26,6 +26,12 @@
 		<popup-menu group="Basic File" item-name="Create New File"/>
 	</plugin>
 	
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.groups.CreateGroupPlugin">
+		<top-menu menu-name="Security" group="Security" item-name="Create Security Group"/>
+		
+		<popup-menu group="Security" item-name="Create Security Group"/>
+	</plugin>
+	
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.acct.AccountingUserManagerPlugin">
 		<popup-menu group="Accounting" item-name="Accounting User Management"/>
 	</plugin>

@@ -4,6 +4,11 @@
 			factory-class="edu.virginia.vcgr.externalapp.GridJobToolApplicationFactory"/>
 	</mime-type>
 	
+	<mime-type name="image/*">
+		<application-registration type="Common"
+			factory-class="edu.virginia.vcgr.externalapp.PictureViewerFactory"/>
+	</mime-type>
+	
 	<default-mime-type>
 		<application-registration type="Windows" 
 			factory-class="edu.virginia.vcgr.externalapp.DefaultExternalApplicationFactory">
