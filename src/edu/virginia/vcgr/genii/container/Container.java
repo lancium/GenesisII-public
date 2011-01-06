@@ -56,6 +56,7 @@ import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.configuration.SecurityConstants;
 import edu.virginia.vcgr.genii.client.container.ContainerIDFile;
+import edu.virginia.vcgr.genii.client.comm.axis.security.VcgrSslSocketFactory;
 import edu.virginia.vcgr.genii.client.comm.jetty.TrustAllSslSocketConnector;
 import edu.virginia.vcgr.genii.client.install.InstallationState;
 import edu.virginia.vcgr.genii.client.mem.LowMemoryExitHandler;
@@ -100,6 +101,9 @@ public class Container extends ApplicationBase
 	
 	static public void main(String []args)
 	{	
+		
+		
+		
 		if (args.length > 1)
 		{
 			usage();
@@ -113,7 +117,13 @@ public class Container extends ApplicationBase
 		if (args.length == 1)
 			System.setProperty(DeploymentName.DEPLOYMENT_NAME_PROPERTY, args[0]);
 		
+	
+			
 		prepareServerApplication();
+		
+		//Set Trust Store Provider
+		java.security.Security.setProperty("ssl.SocketFactory.provider", 
+				VcgrSslSocketFactory.class.getName());
 		
 		LowMemoryWarning.INSTANCE.addLowMemoryListener(
 			new LowMemoryExitHandler(7));
@@ -126,6 +136,8 @@ public class Container extends ApplicationBase
 		Properties secRunProperties = new Properties();
 		_secRunManager.run(SecureRunnableHooks.CONTAINER_PRE_STARTUP, 
 			secRunProperties);
+		
+
 		
 		try
 		{

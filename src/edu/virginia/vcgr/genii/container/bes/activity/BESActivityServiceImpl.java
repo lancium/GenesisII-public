@@ -21,6 +21,7 @@ import java.rmi.RemoteException;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Vector;
 import java.sql.SQLException;
 
 import javax.xml.namespace.QName;
@@ -47,6 +48,7 @@ import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLInterpreter;
 import edu.virginia.vcgr.genii.client.naming.WSName;
+import edu.virginia.vcgr.genii.client.jsdl.personality.PersonalityProvider;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -55,6 +57,8 @@ import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.BESActivityTopics;
+import edu.virginia.vcgr.genii.cloud.CloudConfiguration;
+import edu.virginia.vcgr.genii.cloud.CloudJobWrapper;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
@@ -66,10 +70,13 @@ import edu.virginia.vcgr.genii.container.bes.activity.forks.RootRNSFork;
 import edu.virginia.vcgr.genii.container.bes.activity.resource.BESActivityDBResourceProvider;
 import edu.virginia.vcgr.genii.container.bes.activity.resource.IBESActivityResource;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
-import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.CommonExecutionUnderstanding;
+import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
+import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.ExecutionUnderstanding;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.forkexec.ForkExecPersonalityProvider;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.qsub.QSubPersonalityProvider;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
+import edu.virginia.vcgr.genii.container.jsdl.JobRequest;
+import edu.virginia.vcgr.genii.container.jsdl.parser.ExecutionProvider;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
@@ -136,30 +143,60 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements
 		try
 		{
 			JobDefinition_Type jsdl = initInfo.getJobDefinition();
-			CommonExecutionUnderstanding executionUnderstanding;
-			
-			NativeQueueConfiguration qConf = 
-				((BESConstructionParameters)cParams).getNativeQueueConfiguration();
-			
-			if (qConf != null)
-			{
-				Object understanding = JSDLInterpreter.interpretJSDL(
-					new QSubPersonalityProvider(fsManager, workingDirectory), jsdl);
-				executionUnderstanding = 
-					(CommonExecutionUnderstanding)understanding;
-			} else
-			{
-				Object understanding = JSDLInterpreter.interpretJSDL(
-					new ForkExecPersonalityProvider(fsManager, workingDirectory), jsdl);
-				executionUnderstanding = 
-					(CommonExecutionUnderstanding)understanding;
+			String fuseMountDirectory, jobName;
+			Vector<ExecutionPhase> executionPlan;
+		
+			CloudConfiguration cConfig = 
+				((BESConstructionParameters)cParams).getCloudConfiguration();
+		
+			if ( cConfig != null){
+				PersonalityProvider provider = new ExecutionProvider();
+				JobRequest tJob = 
+					(JobRequest)JSDLInterpreter.interpretJSDL(provider, jsdl);
+				executionPlan = 
+					CloudJobWrapper.createExecutionPlan(
+							_resource.getKey().toString(),
+							initInfo.getContainerID(),
+							cConfig.getLocalScratchDir(),
+							cConfig.getRemoteClientDir(), tJob);
+				jobName = tJob.getJobName();
+				fuseMountDirectory = null;
 			}
-			
+			else{
+				
+				NativeQueueConfiguration qConf = 
+					((BESConstructionParameters)cParams).getNativeQueueConfiguration();
+				ExecutionUnderstanding executionUnderstanding;
+				
+				if (qConf != null)
+				{
+					Object understanding = JSDLInterpreter.interpretJSDL(
+						new QSubPersonalityProvider(fsManager,
+								workingDirectory), jsdl);
+					executionUnderstanding = 
+						(ExecutionUnderstanding)understanding;
+				} 
+				else	
+				{
+					Object understanding = JSDLInterpreter.interpretJSDL(
+						new ForkExecPersonalityProvider(fsManager,
+								workingDirectory), jsdl);
+					executionUnderstanding = 
+						(ExecutionUnderstanding)understanding;
+				}
+				
+				fuseMountDirectory = 
+					executionUnderstanding.getFuseMountDirectory();
+				executionPlan = 
+					executionUnderstanding.createExecutionPlan(
+							(BESConstructionParameters)cParams);
+				jobName = executionUnderstanding.getJobName();
+				
+			}
+		
 			_resource.setProperty(IBESActivityResource.FILESYSTEM_MANAGER, 
 				fsManager);
-			
-			String fuseMountDirectory = 
-				executionUnderstanding.getFuseMountDirectory();
+		
 			
 			if (fuseMountDirectory != null)
 				_resource.setProperty(IBESActivityResource.FUSE_MOUNT_PROPERTY,
@@ -193,9 +230,9 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements
 				_resource.getKey().toString(), jsdl,	owners, 
 				ContextManager.getCurrentContext(), 
 				workingDirectory,
-				executionUnderstanding.createExecutionPlan(
-					(BESConstructionParameters)cParams),
-				activityEPR, activityServiceName, executionUnderstanding.getJobName());
+				executionPlan,
+				activityEPR, activityServiceName, jobName);
+				
 			Calendar future = Calendar.getInstance();
 			future.setTimeInMillis(System.currentTimeMillis() +
 				BES_ACTIVITY_LIFETIME);

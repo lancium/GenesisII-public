@@ -11,6 +11,7 @@ import edu.virginia.vcgr.genii.client.bes.envvarexp.EnvironmentVariableExportCon
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
+import edu.virginia.vcgr.genii.cloud.CloudConfiguration;
 
 @XmlAccessorType(XmlAccessType.NONE)
 public class BESConstructionParameters
@@ -25,7 +26,10 @@ public class BESConstructionParameters
 	private NativeQueueConfiguration _nativeQueueConf = null;
 	private Duration _preExecutionDelay = null;
 	private Duration _postExecutionDelay = null;
+	private CloudConfiguration _cloudBES = null;
 	
+
+
 	@XmlElement(namespace = EnvironmentVariableExportConstants.NAMESPACE,
 		name = "environment-export", nillable = true, required = false)
 	private EnvironmentExport _environmentExport = null;
@@ -107,6 +111,18 @@ public class BESConstructionParameters
 	final public void setNativeQueueConfiguration(NativeQueueConfiguration nativeQueueConf)
 	{
 		_nativeQueueConf = nativeQueueConf;
+	}
+	
+	@XmlElement(namespace = BES_CONS_PARMS_NS, name = "cloudbes",
+			required = false, nillable = false)
+	final public CloudConfiguration getCloudConfiguration()
+	{
+		return _cloudBES;
+	}
+	
+	final public void setCloudConfiguration(CloudConfiguration cloudConf)
+	{
+		_cloudBES = cloudConf;
 	}
 	
 	final public Duration preExecutionDelay()

@@ -275,6 +275,14 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ResourceHistoryTool</mconf:class>
 		<mconf:class name="mv"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.MoveTool</mconf:class>
+		<mconf:class name="cloudTool"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CloudTool</mconf:class>
+		<mconf:class name="parseJSDL"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ParseJSDLTool</mconf:class>
+		<mconf:class name="stageData"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.StageDataTool</mconf:class>
+	
+	
 	</genii:tools>
 	
 	<genii:client-pipeline>

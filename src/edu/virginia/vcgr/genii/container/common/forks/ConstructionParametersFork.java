@@ -41,7 +41,7 @@ public class ConstructionParametersFork extends AbstractStreamableByteIOFactoryR
 	}
 
 	@Override
-	@RWXMapping(RWXCategory.READ)
+	@RWXMapping(RWXCategory.WRITE)
 	public void snapshotState(OutputStream sink) throws IOException
 	{
 		try

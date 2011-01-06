@@ -66,6 +66,9 @@ import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
+import edu.virginia.vcgr.genii.cloud.CloudAttributesHandler;
+import edu.virginia.vcgr.genii.cloud.CloudDBResourceFactory;
+import edu.virginia.vcgr.genii.cloud.CloudMonitor;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.MatchingParameter;
 import edu.virginia.vcgr.genii.container.Container;
@@ -197,7 +200,15 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 				(DBBESResourceFactory)ResourceManager.getServiceResource(_serviceName
 					).getProvider().getFactory()).getConnectionPool();
 			
+			
+			//Set cloud connection DB pool
+			CloudMonitor.setConnectionPool(
+					(new CloudDBResourceFactory(connectionPool).getConnectionPool()));
+			
 			BES.loadAllInstances(connectionPool);
+			
+			//Load cloud activities table
+			CloudMonitor.loadCloudActivities();
 		}
 		catch (Exception e)
 		{
@@ -223,6 +234,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 	{
 		super.setAttributeHandlers();
 
+		new CloudAttributesHandler(getAttributePackage());
 		new BESAttributesHandler(getAttributePackage());
 	}
 	

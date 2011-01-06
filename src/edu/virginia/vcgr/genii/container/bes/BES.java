@@ -43,6 +43,8 @@ import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingD
 import edu.virginia.vcgr.genii.container.bes.resource.DBBESResource;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
+import edu.virginia.vcgr.genii.cloud.CloudMonitor;
+
 
 public class BES implements Closeable
 {
@@ -188,6 +190,19 @@ public class BES implements Closeable
 				
 				BES bes = new BES(connection, besid, policy);
 				_knownInstances.put(besid, bes);
+				
+				//Load CloudMangaer if BES is a cloudBES	
+				BESConstructionParameters cParam = (BESConstructionParameters)DBBESResource.constructionParameters(
+						connection, GeniiBESServiceImpl.class, besid);
+				if (cParam.getCloudConfiguration() != null){
+					try {
+						CloudMonitor.loadCloudInstance(besid, cParam.getCloudConfiguration());
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+				
+				
 				bes.reloadAllActivities(connection);
 				
 				connection.commit();
@@ -210,7 +225,7 @@ public class BES implements Closeable
 	}
 	
 	synchronized static public BES createBES(String besid,
-		BESPolicy initialPolicy) throws SQLException
+		BESPolicy initialPolicy, ConstructionParameters params) throws SQLException
 	{
 		Connection connection = null;
 		PreparedStatement stmt = null;
@@ -232,6 +247,17 @@ public class BES implements Closeable
 			connection.commit();
 			
 			BES bes;
+			
+			if (((BESConstructionParameters)params).getCloudConfiguration() != null){
+				try {
+					CloudMonitor.loadCloudInstance(besid, ((BESConstructionParameters)params).getCloudConfiguration());
+				} catch (Exception e) {
+					_logger.error(e);
+				}
+			}
+			
+			
+			
 			_knownInstances.put(besid, bes = new BES(null, besid, initialPolicy));
 			return bes;
 		}

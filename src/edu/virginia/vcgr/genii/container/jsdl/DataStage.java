@@ -67,7 +67,7 @@ public class DataStage implements Serializable
 		return _targetURI;
 	}
 	
-	final UsernamePasswordIdentity getCredentials()
+	final public UsernamePasswordIdentity getCredentials()
 	{
 		return _credentials;
 	}

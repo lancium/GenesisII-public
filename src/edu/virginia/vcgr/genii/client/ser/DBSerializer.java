@@ -107,6 +107,7 @@ public class DBSerializer
 		}
 		catch (IOException ioe)
 		{
+			System.out.println(ioe.toString());
 			throw new SQLException("Unable to serialize to blob.", ioe);
 		}
 	}

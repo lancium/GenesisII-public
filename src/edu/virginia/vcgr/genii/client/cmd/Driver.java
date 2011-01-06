@@ -11,6 +11,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.ApplicationBase;
+import edu.virginia.vcgr.genii.client.comm.axis.security.VcgrSslSocketFactory;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.GridEnvironment;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
@@ -45,6 +46,11 @@ public class Driver extends ApplicationBase
 		}
 		
 		prepareClientApplication();
+		
+		//Set Trust Store Provider
+		java.security.Security.setProperty("ssl.SocketFactory.provider", 
+				VcgrSslSocketFactory.class.getName());
+		
 		_secRunManager = SecureRunnerManager.createSecureRunnerManager(
 			Driver.class.getClassLoader(),
 			Installation.getDeployment(new DeploymentName()));

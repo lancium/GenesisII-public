@@ -130,8 +130,12 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	static {
 		// configure the JVM to use the SSL socket factory that obtains
 		// trust material from our own trust store
-		java.security.Security.setProperty("ssl.SocketFactory.provider", 
-				VcgrSslSocketFactory.class.getName());
+		
+		//Moved to main class (container.Container) (client.Driver)
+		//java.security.Security.setProperty("ssl.SocketFactory.provider", 
+		//		VcgrSslSocketFactory.class.getName());
+		
+		
 		ConfigurationManager.addConfigurationUnloadListener(new ConfigUnloadListener());
 	}
 	public static class ConfigUnloadListener implements ConfigurationUnloadedListener {

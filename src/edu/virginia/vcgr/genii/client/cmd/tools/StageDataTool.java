@@ -2,11 +2,10 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.io.OutputStream;
+import java.net.URI;
 
 import org.ggf.jsdl.JobDefinition_Type;
 import org.xml.sax.InputSource;
@@ -17,29 +16,39 @@ import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.io.URIManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLInterpreter;
 import edu.virginia.vcgr.genii.client.jsdl.personality.PersonalityProvider;
+import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
-import edu.virginia.vcgr.genii.cloud.CloudJobWrapper;
+import edu.virginia.vcgr.genii.container.jsdl.DataStage;
 import edu.virginia.vcgr.genii.container.jsdl.JobRequest;
 import edu.virginia.vcgr.genii.container.jsdl.parser.ExecutionProvider;
 import edu.virginia.vcgr.genii.context.ContextType;
 
-public class RunJSDL extends BaseGridTool{
+public class StageDataTool extends BaseGridTool{
 
 	private String _type = "jsdl";
-	
+	private String _direction = "in";
+
 	static private final String _DESCRIPTION =
-		"Runs a grid job locally, will not run if working directory exists";
+		"Takes a serialized job request or JSDL file and" + 
+		" performs stage in actions";
 	static private final String _USAGE =
-		"runJSDL <workingDir> <JobFile> [--type=<jsdl|binary>]";
+		"parseJSDL <scratchDir> <jobFile>" + 
+		" [--type=<jsdl|binary>] [--direction=<in|out>]";
 
 	@Option({"type"})
 	public void setType(String type) {
 		_type = type;
 	}
-	
-	public RunJSDL()
+
+	@Option({"direction"})
+	public void setDirection(String direction) {
+		_direction = direction;
+	}
+
+	public StageDataTool()
 	{
 		super(_DESCRIPTION, _USAGE, false);
 	}
@@ -47,13 +56,14 @@ public class RunJSDL extends BaseGridTool{
 	@Override
 	protected int runCommand() throws Throwable
 	{
+
+
 		// get the local identity's key material (or create one if necessary)
 		ICallingContext callContext = ContextManager.getCurrentContext(false);
 		if (callContext == null) {
 			callContext = new CallingContextImpl(new ContextType());
 		}
 
-	
 		InputStream in = null;
 
 		File wDir = new File(getArgument(0));
@@ -87,53 +97,61 @@ public class RunJSDL extends BaseGridTool{
 			stdout.println("Invalid input type");
 			return 0;
 		}
-		
-		
-		StageDataTool stageTool;
-		//Create Working directory, 
-		//will only run if working directory does not exist
-		if(wDir.mkdir()){
 
-			//Generate bash script
-			stdout.println("Generating Pwrapper Script");
-			File resourceUsage = new File(getArgument(0) + "/resourceusage.xml");
-			
-			File submitScript = 
-				File.createTempFile("exec", ".sh", wDir);
-			OutputStream ps = new FileOutputStream(submitScript);
-			
-			CloudJobWrapper.generateWrapperScript(
-					ps, wDir, resourceUsage, tJob, wDir);
-			ps.close();
-
-			//Stage in
-			stdout.println("Staging in");
-			stageTool = new StageDataTool();
-			stageTool.addArgument(getArgument(0));
-			stageTool.addArgument(getArgument(1));
-			stageTool.setDirection("in");
-			stageTool.run(stdout, stderr, stdin);
-			
-			//Execute
-			stdout.println("Executing");
-			submitScript.setExecutable(true, true);
-			new File(wDir.getAbsolutePath() + "/" + 
-					tJob.getExecutable().getTarget()).setExecutable(true, true);
-			Runtime.getRuntime().exec(submitScript.getAbsolutePath()).waitFor();
-
-			//Stage Out
-			stdout.println("Staging Out");
-			stageTool.setDirection("out");
-			stageTool.run(stdout, stderr, stdin);
-			
-			
-			//Complete
-			stdout.println("Job Executed");
-			
+		if (tJob !=  null){
+			if(_direction.equals("in")){
+				for (DataStage tStage : tJob.getStageIns()){
+					stageIN(wDir.getAbsolutePath() + "/" + tStage.getFileName(),
+							new URI(tStage.getSourceURI()),
+							tStage.getCredentials());
+				}
+			}
+			else if (_direction.equals("out")){
+				for (DataStage tStage : tJob.getStageOuts()){
+					stageOUT(wDir.getAbsolutePath() + "/" + tStage.getFileName(),
+							new URI(tStage.getTargetURI()),
+							tStage.getCredentials());
+				}
+			}
+			else{
+				stdout.println("Invalid direction");
+				return 0;
+			}
 		}
+		else
+			stdout.println("Error");
+
 		return 0;
 	}
 
+
+	private void stageIN(String target, URI source,
+			UsernamePasswordIdentity credential){
+		File fTarget = new File(target);
+		try {
+			URIManager.get(source, fTarget, credential);
+		} catch (IOException e) {
+			stdout.println("Unable to stage in file");
+			return;
+		}
+	}
+
+	private void stageOUT(String source, URI target,
+			UsernamePasswordIdentity credential){
+		File fSource = new File(source);
+		if (!fSource.exists()){
+			stdout.println("Unable to locate source");
+			return;
+		}
+
+		try{
+			URIManager.put(fSource,target, credential);
+		}
+		catch (Throwable cause){
+			stdout.println("Unable to stage out data");
+			return;
+		}
+	}
 
 
 	@Override
@@ -142,5 +160,6 @@ public class RunJSDL extends BaseGridTool{
 		if (numArguments() != 2)
 			throw new InvalidToolUsageException();
 	}
+
 
 }

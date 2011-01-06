@@ -1,12 +1,16 @@
 package edu.virginia.vcgr.genii.container.jsdl;
 
+import java.io.Serializable;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.OperatingSystemTypeEnumeration;
 import org.ggf.jsdl.ProcessorArchitectureEnumeration;
 
-public class Restrictions
+public class Restrictions implements Serializable
 {
+	static final long serialVersionUID = 0L;
+	
 	static private Log _logger = LogFactory.getLog(Restrictions.class);
 	
 	private ProcessorArchitectureEnumeration _arch = null;

@@ -99,6 +99,18 @@
 		<fileset dir="${fuse.home}" includes="**/*.jar"/>
 	</path>
 
+	<path id="commonscodec.classpath">
+			<fileset dir="${commonscodec.home}" includes="**/*.jar"/>
+		</path>
+	
+	<path id="typica.classpath">
+			<fileset dir="${typica.home}" includes="**/*.jar"/>
+	</path>
+	
+	<path id="http.classpath">
+			<fileset dir="${http.home}" includes="**/*.jar"/>
+	</path>
+	
 	<path id="project.classpath">
 		<pathelement location="${obj.dir}"/>
 		<pathelement location="${generated.obj.dir}"/>
@@ -122,6 +134,9 @@
 		<path refid="wss4j.classpath"/>
 		<path refid="xmldb.classpath"/>
 		<path refid="fuse.classpath"/>
+		<path refid="commonscodec.classpath"/>
+		<path refid="typica.classpath"/>
+		<path refid="http.classpath"/>
 	</path>
 			
 	<!-- Imports -->	
@@ -168,6 +183,7 @@
 				<include name="edu/virginia/vcgr/test/**/*"/>
 				<include name="edu/virginia/vcgr/fsii/**/*"/>
 				<include name="edu/virginia/vcgr/genii/client/**/*"/>
+				<include name="edu/virginia/vcgr/genii/cloud/**/*"/>
 				<include name="edu/virginia/vcgr/genii/ui/**/*"/>
 				<include name="edu/virginia/vcgr/externalapp/**/*"/>
 				<include name="edu/virginia/vcgr/fuse/**/*"/>

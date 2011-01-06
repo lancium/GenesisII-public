@@ -1,0 +1,4 @@
+
+cloudTool [--shrink=<count>] <path-to-cloud-bes>
+cloudTool [--spawn=<count>] <path-to-cloud-bes>
+cloudTool <path-to-cloud-bes>

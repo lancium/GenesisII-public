@@ -39,6 +39,8 @@ public class BESInformationResolver
 			if (timeoutValue > MAX_TIMEOUT)
 				timeoutValue = MAX_TIMEOUT;
 			ClientUtils.setTimeout(bes, (int)timeoutValue);
+			
+			
 			return new BESInformation(bes.getFactoryAttributesDocument(
 				new GetFactoryAttributesDocumentType()));
 		}

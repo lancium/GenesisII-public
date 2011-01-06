@@ -32,6 +32,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.bes.envvarexp.EnvironmentExport;
+import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.common.MatchingParameter;
@@ -53,12 +54,16 @@ public class DBBESResource extends BasicDBResource implements IBESResource
 	{
 		super.initialize(constructionParams);
 		
+		ConstructionParameters cParams = 
+			(ConstructionParameters)constructionParams.get(
+				ConstructionParameters.CONSTRUCTION_PARAMTERS_QNAME);
+		
 		try
 		{
 			if (!isServiceResource())
 				BES.createBES(_resourceKey,
 					new BESPolicy(BESPolicyActions.NOACTION, 
-						BESPolicyActions.NOACTION));
+						BESPolicyActions.NOACTION), cParams);
 		}
 		catch (SQLException sqe)
 		{

@@ -7,8 +7,6 @@ import java.util.LinkedList;
 import java.util.Vector;
 
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
-import edu.virginia.vcgr.genii.client.jsdl.BaseJob;
-import edu.virginia.vcgr.genii.client.jsdl.DataStage;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
@@ -22,7 +20,7 @@ import edu.virginia.vcgr.genii.container.bes.execution.phases.StageOutPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.StoreContextPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.TeardownFUSEPhase;
 
-public class CommonExecutionUnderstanding
+public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 {
 	private FilesystemManager _fsManager;
 	
@@ -43,30 +41,6 @@ public class CommonExecutionUnderstanding
 	private Double _wallclockTimeLimit = null;
 	
 	private ApplicationUnderstanding _application = null;
-	
-	
-	public BaseJob generateBaseJob(){
-		BaseJob tJob = new BaseJob();
-		
-		//Add Stage ins
-		for (DataStagingUnderstanding tStage : _stageIns){
-			tJob.addStageIn(new DataStage(tStage.getSourceURI().toString(), tStage.getFilename(), null, false));
-		}
-		
-		//Add Stage outs
-		for (DataStagingUnderstanding tStage : _stageOuts){
-			tJob.addStageOut(new DataStage(tStage.getTargetURI().toString(), tStage.getFilename(), null, false));
-	
-		}
-		//Set executable
-		PosixLikeApplicationUnderstanding tApp = (PosixLikeApplicationUnderstanding)_application;
-		tJob.set_exec(tApp.getExecutable().getString());
-		return tJob;
-	}
-	
-	public ApplicationUnderstanding getApplicationUnderstanding(){
-		return _application;
-	}
 	
 	public CommonExecutionUnderstanding(FilesystemManager fsManager)
 	{
