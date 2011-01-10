@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.ui.plugins.queue.jobs;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -13,6 +14,7 @@ import java.util.LinkedList;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -21,6 +23,7 @@ import javax.swing.KeyStroke;
 import javax.swing.RowSorter;
 import javax.swing.table.TableModel;
 
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
@@ -101,6 +104,38 @@ public class QueueManagerPanel extends JPanel implements LazyLoadTabHandler
 		}
 	}
 	
+	private class DumpJobHistoryAction extends AbstractAction
+	{
+		static final long serialVersionUID = 0L;
+		
+		private DumpJobHistoryAction(int []selectedRows)
+		{
+			super("Dump Job History");
+			
+			setEnabled(selectedRows.length == 1);
+		}
+		
+		@Override
+		final public void actionPerformed(ActionEvent e)
+		{
+			RowSorter<? extends TableModel> sorter =
+				_table.getRowSorter();
+			
+			Collection<String> jobTickets = new LinkedList<String>();
+			for (int row : _table.getSelectedRows())
+				jobTickets.add(_model.row(sorter == null ? row :
+					sorter.convertRowIndexToModel(row)).getTicket().toString());
+			
+			String answer = JOptionPane.showInputDialog((Component)e.getSource(), 
+				"Where would you like to store the history dump?");
+			if (answer == null)
+				return;
+			
+			QueueManipulation.dumpJobHistory(_context, _table, _model,
+				jobTickets, new GeniiPath(answer));
+		}
+	}
+	
 	private class JobKillerAction extends AbstractAction
 	{
 		static final long serialVersionUID = 0L;
@@ -164,6 +199,7 @@ public class QueueManagerPanel extends JPanel implements LazyLoadTabHandler
 		
 		JPopupMenu popup = new JPopupMenu("Queue Manager Popup");
 		popup.add(new JobHistoryAction(rows));
+		popup.add(new DumpJobHistoryAction(rows));
 		popup.addSeparator();
 		popup.add(new JobKillerAction(rows));
 		popup.add(new JobCompleterAction(rows));

@@ -17,6 +17,8 @@ import edu.virginia.g3.fsview.FSViewRandomAccessFileEntry;
 import edu.virginia.g3.fsview.FSViewSession;
 import edu.virginia.g3.fsview.FSViewStreamableAccessFileEntry;
 import edu.virginia.vcgr.genii.client.exportdir.FSProxyConstructionParameters;
+import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
+import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.AbstractRandomByteIOResourceFork;
@@ -215,6 +217,7 @@ public class FSProxyFileFork extends AbstractRandomByteIOResourceFork
 	}
 
 	@Override
+	@RWXMapping(RWXCategory.READ)
 	public void read(long offset, ByteBuffer dest) throws IOException
 	{
 		FSViewSession session = null;
@@ -243,7 +246,8 @@ public class FSProxyFileFork extends AbstractRandomByteIOResourceFork
 						in.skip(offset);
 						byte []data = new byte[dest.remaining()];
 						int read = in.read(data);
-						dest.put(data, 0, read);
+						if (read > 0)
+							dest.put(data, 0, read);
 					}
 					finally
 					{
@@ -259,6 +263,7 @@ public class FSProxyFileFork extends AbstractRandomByteIOResourceFork
 	}
 
 	@Override
+	@RWXMapping(RWXCategory.WRITE)
 	public void write(long offset, ByteBuffer source) throws IOException
 	{
 		FSViewSession session = null;
@@ -289,6 +294,7 @@ public class FSProxyFileFork extends AbstractRandomByteIOResourceFork
 	}
 
 	@Override
+	@RWXMapping(RWXCategory.WRITE)
 	public void truncAppend(long offset, ByteBuffer source) throws IOException
 	{
 		FSViewSession session = null;

@@ -5,6 +5,14 @@
 		<popup-menu group="Basic File" item-name="Edit"/>
 	</plugin>
 	
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.fsproxy.CreateFSProxyPlugin">
+		<popup-menu menu-name="FSProxy" item-name="Create Filesystem Proxy"/>
+	</plugin>
+	
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.fsproxy.QuitFSProxyPlugin">
+		<popup-menu menu-name="FSProxy" item-name="Quit Filesystem Proxy"/>
+	</plugin>
+	
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.matchparam.MatchingParametersPlugin">
 		<popup-menu menu-name="Basic Resource" item-name="Matching Parameters"/>
 	</plugin>
@@ -13,6 +21,11 @@
 		<top-menu menu-name="File" group="Basic File" item-name="Make Directory"/>
 		
 		<popup-menu group="Basic File" item-name="Make Directory"/>
+	</plugin>
+	
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.jobs.JobHistoryPlugin">
+		<top-menu menu-name="Jobs" group="Job History" item-name="View Job History"/>
+		<popup-menu group="Job History" item-name="View Job History"/>
 	</plugin>
 	
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.queue.QueueManagerPlugin">

@@ -1,5 +1,7 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,7 +27,9 @@ public class ResourceHistoryTool extends BaseGridTool
 	static final private String DESCRIPTION =
 		"Retrieves the history event list for q given resource.";
 	static final private String USAGE =
-		"resource-history <resource-path> [resource-hint]";
+		"resource-history --dump=<path> <resource-path> [resource-hint]";
+	
+	private GeniiPath _store = null;
 	
 	@Override
 	protected void verify() throws ToolException
@@ -44,6 +48,7 @@ public class ResourceHistoryTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
+		OutputStream out = null;
 		List<HistoryEvent> events = new LinkedList<HistoryEvent>();
 		
 		RNSPath path = RNSPath.getCurrent().lookup(getArgument(0));
@@ -77,8 +82,24 @@ public class ResourceHistoryTool extends BaseGridTool
 		
 		Collections.sort(events, HistoryEvent.SEQUENCE_NUMBER_COMPARATOR);
 		
-		for (HistoryEvent event : events)
-			stdout.println(event);
+		try
+		{
+			if (_store != null)
+			{
+				out = _store.openOutputStream();
+				ObjectOutputStream oos = new ObjectOutputStream(out);
+				oos.writeInt(events.size());
+				for (HistoryEvent event : events)
+					oos.writeObject(event);
+				oos.close();
+			} else
+				for (HistoryEvent event : events)
+					stdout.println(event);
+		}
+		finally
+		{
+			StreamUtils.close(out);
+		}
 		
 		return 0;
 	}
@@ -86,5 +107,11 @@ public class ResourceHistoryTool extends BaseGridTool
 	public ResourceHistoryTool()
 	{
 		super(DESCRIPTION, USAGE, false);
+	}
+	
+	@Option("dump")
+	public void store(String path)
+	{
+		_store = new GeniiPath(path);
 	}
 }

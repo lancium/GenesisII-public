@@ -29,7 +29,6 @@ public class FSProxyServiceImpl extends ResourceForkBaseService
 	{
 		super(SERVICE_NAME);
 
-		addImplementedPortType(WellKnownPortTypes.EXPORTED_ROOT_SERVICE_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.EXPORTED_FSPROXY_ROOT_SERVICE_PORT_TYPE);
 	}
 

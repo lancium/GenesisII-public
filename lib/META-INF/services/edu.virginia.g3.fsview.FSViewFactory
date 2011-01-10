@@ -1,0 +1,4 @@
+edu.virginia.g3.fsview.file.FileFSViewFactory
+edu.virginia.g3.fsview.cifs.CifsFSViewFactory
+edu.virginia.g3.fsview.ssh.SSHFSViewFactory
+edu.virginia.g3.fsview.http.HTTPFSViewFactory

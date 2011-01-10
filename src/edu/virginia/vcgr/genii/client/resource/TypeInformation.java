@@ -167,6 +167,11 @@ public class TypeInformation
 		return hasPortType(WellKnownPortTypes.EXPORTED_ROOT_SERVICE_PORT_TYPE);
 	}
 	
+	public boolean isFSProxy()
+	{
+		return hasPortType(WellKnownPortTypes.EXPORTED_FSPROXY_ROOT_SERVICE_PORT_TYPE);
+	}
+	
 	public boolean isQueue()
 	{
 		return hasPortType(QueueConstants.QUEUE_PORT_TYPE);

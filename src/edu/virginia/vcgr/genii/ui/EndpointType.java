@@ -40,6 +40,8 @@ public enum EndpointType
 			return LIGHT_EXPORT;
 		else if (typeInfo.isExport())
 			return HEAVY_EXPORT;
+		else if (typeInfo.isFSProxy())
+			return LIGHT_EXPORT;
 		else if (typeInfo.isEnhancedRNS())
 			return DIRECTORY;
 		else if (typeInfo.isRNS())

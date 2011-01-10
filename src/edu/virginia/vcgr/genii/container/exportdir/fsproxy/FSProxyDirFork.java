@@ -65,8 +65,20 @@ public class FSProxyDirFork extends AbstractRNSResourceFork
 			session = session();
 			FSViewEntry entry = session.lookup(getForkPath());
 			if (entry.entryType() != FSViewEntryType.Directory)
-				throw new IOException(String.format(
-					"FSViewEntry %s is not a directory!", entry));
+			{
+				// If we are listed as a directory, but we aren't, then its
+				// because we are a file mounted as the root
+				
+				if (entryName == null || entryName.equals("root"))
+				{
+					ret.add(createInternalEntry(exemplarEPR, "root",
+						new FSProxyFileFork(getService(),
+							formForkPath("")).describe()));
+				} 
+
+				return ret;
+			}
+			
 			for (FSViewEntry child : ((FSViewDirectoryEntry)entry).listEntries())
 			{
 				String dName = child.entryName();

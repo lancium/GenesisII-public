@@ -16,6 +16,16 @@ public class FSProxyConstructionParameters extends ConstructionParameters
 		name = "connection-information", required = true, nillable = false)
 	private FSViewConnectionInformation _connectionInformation;
 	
+	public FSProxyConstructionParameters(FSViewConnectionInformation connectionInformation)
+	{
+		_connectionInformation = connectionInformation;
+	}
+	
+	public FSProxyConstructionParameters()
+	{
+		this(null);
+	}
+	
 	public FSViewConnectionInformation connectionInformation()
 	{
 		return _connectionInformation;

@@ -792,7 +792,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 		}
 		catch (IOException ioe)
 		{
-			throw new RemoteException("Unable to append data.");
+			throw new RemoteException("Unable to append data.", ioe);
 		}
 	}
 
@@ -841,7 +841,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 		}
 		catch (IOException ioe)
 		{
-			throw new RemoteException("Unable to read data.");
+			throw new RemoteException("Unable to read data.", ioe);
 		}
 	}
 	
@@ -869,7 +869,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 		}
 		catch (IOException ioe)
 		{
-			throw new RemoteException("Unable to truncAppend data.");
+			throw new RemoteException("Unable to truncAppend data.", ioe);
 		}
 	}
 
@@ -912,7 +912,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 		}
 		catch (IOException ioe)
 		{
-			throw new RemoteException("Unable to write data.");
+			throw new RemoteException("Unable to write data.", ioe);
 		}
 	}
 

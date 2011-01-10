@@ -1,6 +1,8 @@
 package edu.virginia.vcgr.genii.ui.plugins.queue.jobs;
 
 import java.awt.Component;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -11,6 +13,7 @@ import org.morgan.util.io.StreamUtils;
 import org.morgan.utils.gui.GUIUtils;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.history.HistoryEvent;
 import edu.virginia.vcgr.genii.client.iterator.WSIterable;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -90,6 +93,26 @@ class QueueManipulation
 		}
 	}
 	
+	static private class OpenJobHistoryDumpTargetTask extends TypicalTask<OutputStream>
+	{
+		private GeniiPath _dumpPath;
+		
+		private OpenJobHistoryDumpTargetTask(UIPluginContext context,
+			Collection<String> jobTickets, GeniiPath dumpPath)
+		{
+			super(context, jobTickets);
+			
+			_dumpPath = dumpPath;
+		}
+
+		@Override
+		final public OutputStream execute(TaskProgressListener progressListener)
+			throws Exception
+		{
+			return _dumpPath.openOutputStream();
+		}
+	}
+	
 	static private class JobHistoryTask extends TypicalTask<Collection<HistoryEvent>>
 	{
 		private JobHistoryTask(UIPluginContext context,
@@ -150,7 +173,7 @@ class QueueManipulation
 			_model = model;
 		}
 		
-		final public void taskExcepted(Task<Type> task, Throwable cause)
+		public void taskExcepted(Task<Type> task, Throwable cause)
 		{
 			ErrorHandler.handleError(_context.uiContext(),
 				(JComponent)_ownerComponent, cause);
@@ -211,33 +234,104 @@ class QueueManipulation
 		extends TypicalTaskCompletionListener<Collection<HistoryEvent>>
 	{
 		private String _ticket;
+		private OutputStream _dumpTarget;
+		
+		private JobHistoryCompletionListener(Component ownerComponent,
+			UIPluginContext context, String ticket, 
+			QueueManagerTableModel model, OutputStream dumpTarget)
+		{
+			super(ownerComponent, context, model);
+			
+			_ticket = ticket;
+			_dumpTarget = dumpTarget;
+		}
 		
 		private JobHistoryCompletionListener(Component ownerComponent,
 			UIPluginContext context, String ticket, 
 			QueueManagerTableModel model)
 		{
-			super(ownerComponent, context, model);
-			
-			_ticket = ticket;
+			this(ownerComponent, context, ticket, model, null);
 		}
 
 		@Override
 		public void taskCancelled(Task<Collection<HistoryEvent>> task)
 		{
-			// Don't really need to do anything.
+			StreamUtils.close(_dumpTarget);
 		}
 
 		@Override
 		public void taskCompleted(Task<Collection<HistoryEvent>> task,
 			Collection<HistoryEvent> result)
 		{
-			JobHistoryFrame frame = new JobHistoryFrame(
-				_context.uiContext(),
-				_context.endpointRetriever().getTargetEndpoints().iterator().next(),
-				_ticket, result);
-			frame.pack();
-			GUIUtils.centerWindow(frame);
-			frame.setVisible(true);
+			try
+			{
+				if (_dumpTarget != null)
+				{
+					ObjectOutputStream oos = new ObjectOutputStream(_dumpTarget);
+					oos.writeInt(result.size());
+					for (HistoryEvent e : result)
+						oos.writeObject(e);
+					oos.close();
+				} else
+				{
+					JobHistoryFrame frame = new JobHistoryFrame(
+						_context.uiContext(),
+						_context.endpointRetriever().getTargetEndpoints().iterator().next(),
+						_ticket, result);
+					frame.pack();
+					GUIUtils.centerWindow(frame);
+					frame.setVisible(true);
+				}
+			}
+			catch (Throwable cause)
+			{
+				ErrorHandler.handleError(
+					_context.uiContext(), (JComponent)_ownerComponent,
+					cause);
+			}
+			finally
+			{
+				StreamUtils.close(_dumpTarget);
+			}
+		}
+		
+		@Override
+		public void taskExcepted(Task<Collection<HistoryEvent>> task,
+			Throwable cause)
+		{
+			StreamUtils.close(_dumpTarget);
+			super.taskExcepted(task, cause);
+		}
+	}
+	
+	static private class OpenJobHistoryDumpTargetCompletionListener 
+		extends TypicalTaskCompletionListener<OutputStream>
+	{
+		private Collection<String> _jobTickets;
+		
+		private OpenJobHistoryDumpTargetCompletionListener(
+			Component ownerComponent, UIPluginContext context, 
+			Collection<String> jobTickets, QueueManagerTableModel model)
+		{
+			super(ownerComponent, context, model);
+			
+			_jobTickets = jobTickets;
+		}
+
+		@Override
+		public void taskCompleted(Task<OutputStream> task, OutputStream result)
+		{
+			_context.uiContext().progressMonitorFactory().createMonitor(
+				_ownerComponent, "Getting Job History", "Getting job history events",
+				1000L, new JobHistoryTask(_context, _jobTickets),
+				new JobHistoryCompletionListener(_ownerComponent, _context, 
+					_jobTickets.iterator().next(), _model, result)).start();
+		}
+
+		@Override
+		public void taskCancelled(Task<OutputStream> task)
+		{
+			// Nothing to do
 		}
 	}
 	
@@ -267,5 +361,16 @@ class QueueManipulation
 			1000L, new JobHistoryTask(context, jobTickets),
 			new JobHistoryCompletionListener(ownerComponent, context, 
 				jobTickets.iterator().next(), model)).start();
+	}
+	
+	static void dumpJobHistory(UIPluginContext context,
+		Component ownerComponent, QueueManagerTableModel model,
+		Collection<String> jobTickets, GeniiPath dumpPath)
+	{
+		context.uiContext().progressMonitorFactory().createMonitor(
+			ownerComponent, "Opening Job History Dump Target", "Opening Target",
+			1000L, new OpenJobHistoryDumpTargetTask(context, jobTickets, dumpPath),
+			new OpenJobHistoryDumpTargetCompletionListener(
+				ownerComponent, context, jobTickets, model)).start();
 	}
 }
