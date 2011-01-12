@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.ui.plugins;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.Collection;
@@ -263,15 +264,26 @@ public class UIPlugins
 	public void setTabPanes(JTabbedPane tabbedPane, 
 		Collection<EndpointDescription> targets)
 	{
+		int selectedIndex = tabbedPane.getSelectedIndex();
+		String selectedTitle = (selectedIndex < 0) ? 
+			null : tabbedPane.getTitleAt(selectedIndex);
+		
 		tabbedPane.removeAll();
+		int index = 0;
 		for (Pair<String, UITabPlugin> pair : _tabs)
 		{
 			if (pair.second().isEnabled(targets))
 			{
+				if (selectedTitle != null && pair.first().equals(selectedTitle))
+					selectedIndex = index;
+				index++;
 				tabbedPane.addTab(pair.first(), pair.second().getComponent(
 					_context));
 			}
 		}
+		
+		if (selectedTitle != null)
+			tabbedPane.setSelectedIndex(selectedIndex);
 	}
 	
 	public void fireMenuAction(

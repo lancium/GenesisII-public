@@ -243,7 +243,6 @@ public class ClientApplication extends UIFrame
 			}
 			
 			_plugins.updateStatuses(descriptions);
-			_tabbedPane.removeAll();
 			_plugins.setTabPanes(_tabbedPane, descriptions);
 		}
 	}
