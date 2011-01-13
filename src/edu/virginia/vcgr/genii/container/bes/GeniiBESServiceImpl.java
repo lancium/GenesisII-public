@@ -185,8 +185,12 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 	@Override
 	public boolean startup()
 	{
-		boolean ret = super.startup();
-		
+		return super.startup();
+	}
+	
+	@Override
+	public void postStartup()
+	{
 		try
 		{
 			/* In order to make out calls, we have to have a working context
@@ -218,13 +222,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 		{
 			WorkingContext.setCurrentWorkingContext(null);
 		}
-
-		return ret;
-	}
-	
-	@Override
-	public void postStartup()
-	{
+		
 		cleanupBadActivities();
 	}
 	
