@@ -311,8 +311,7 @@ public class Container extends ApplicationBase
 			try
 			{
 				service.startup();
-				_postStartupWorkQueue.enqueue(
-					new PostStartupRunnable(service));
+				_postStartupWorkQueue.enqueue(service);
 			}
 			catch (Throwable cause)
 			{

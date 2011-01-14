@@ -89,12 +89,14 @@ import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkBaseService;
+import edu.virginia.vcgr.genii.graph.GridDependency;
 import edu.virginia.vcgr.jsdl.JobDefinition;
 
 @ForkRoot(BESRootRNSFork.class)
 @ConstructionParametersType(BESConstructionParameters.class)
 @GeniiServiceConfiguration(
 	resourceProvider=BESDBResourceProvider.class)
+@GridDependency(BESActivityServiceImpl.class)
 public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 	GeniiBESPortType, BESConstants
 {

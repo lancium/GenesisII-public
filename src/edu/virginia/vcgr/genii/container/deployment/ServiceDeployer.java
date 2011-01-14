@@ -38,7 +38,6 @@ import org.xml.sax.SAXException;
 import edu.virginia.vcgr.genii.client.configuration.HierarchicalDirectory;
 import edu.virginia.vcgr.genii.client.utils.barrier.BarrieredWorkQueue;
 import edu.virginia.vcgr.genii.container.IContainerManaged;
-import edu.virginia.vcgr.genii.container.PostStartupRunnable;
 
 public class ServiceDeployer extends Thread
 {
@@ -248,7 +247,7 @@ public class ServiceDeployer extends Thread
 	        			IContainerManaged base = 
 	        				(IContainerManaged)cons.newInstance(new Object[0]);
 	        			base.startup();
-	        			_postStartupQueue.enqueue(new PostStartupRunnable(base));
+	        			_postStartupQueue.enqueue(base);
 	        		}
 				}
 				catch (NoSuchMethodException nsme)

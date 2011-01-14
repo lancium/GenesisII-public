@@ -46,6 +46,7 @@ import org.oasis_open.wsrf.basefaults.BaseFaultType;
 
 import edu.virginia.vcgr.genii.common.IterateHistoryEventsRequestType;
 import edu.virginia.vcgr.genii.common.IterateHistoryEventsResponseType;
+import edu.virginia.vcgr.genii.container.bes.GeniiBESServiceImpl;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
@@ -57,6 +58,7 @@ import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkBaseService;
+import edu.virginia.vcgr.genii.graph.GridDependency;
 import edu.virginia.vcgr.genii.queue.ConfigureRequestType;
 import edu.virginia.vcgr.genii.queue.GetJobLogRequest;
 import edu.virginia.vcgr.genii.queue.GetJobLogResponse;
@@ -83,6 +85,7 @@ import edu.virginia.vcgr.jsdl.sweep.SweepUtility;
 @ForkRoot(RootRNSFork.class)
 @GeniiServiceConfiguration(
 	resourceProvider=QueueDBResourceProvider.class)
+@GridDependency(GeniiBESServiceImpl.class)
 public class QueueServiceImpl extends ResourceForkBaseService
 	implements QueuePortType
 {
@@ -379,6 +382,12 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	{
 		boolean serviceCreated = super.startup();
 		
+		return serviceCreated;
+	}
+	
+	@Override
+	public void postStartup()
+	{
 		try
 		{
 			/* In order to make out calls, we have to have a working context
@@ -403,10 +412,8 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		{
 			WorkingContext.setCurrentWorkingContext(null);
 		}
-		
-		return serviceCreated;
 	}
-	
+
 	@Override
 	protected void preDestroy() throws RemoteException, ResourceException
 	{
