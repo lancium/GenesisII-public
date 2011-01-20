@@ -13,6 +13,7 @@ import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperFactory;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
+import edu.virginia.vcgr.genii.container.bes.execution.phases.cloud.CloudCheckStatusPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.cloud.CloudCopyDirectoryPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.cloud.CloudExecutePhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.cloud.CloudGenerateJobFilePhase;
@@ -74,6 +75,8 @@ public class CloudJobWrapper {
 				ps.format("\"%s\"", element);
 			}
 			ps.println();
+			//Generate complete file
+			ps.println("touch executePhase.complete");
 			ps.flush();
 		}
 		catch (Exception e)
@@ -117,18 +120,31 @@ public class CloudJobWrapper {
 		
 		//Generate runScript
 		ret.add(new CloudGenerateRunScriptPhase(scratchDir, runScript,
-				remoteDir, "resourceFile", job));
-
+				remoteDir, "resourceFile", job, "stageIn.sh", "stageOut.sh",
+				genState, jobFile, genDir));
+	
 		//Move local scratch to remote scratch
 		ret.add(new CloudCopyDirectoryPhase(scratchDir, remoteDir,
 				activityID, besid));
-
-		//Stage In Phase
-		ret.add(new CloudStageInPhase(activityID, besid, remoteDir,
-				genDir, genState, jobFile));
 		
 		//Create List of files to be set to executable
 		ArrayList<String> permList = new ArrayList<String>();
+		permList.add(remoteDir + "stageIn.sh");
+		permList.add(remoteDir + "stageOut.sh");
+
+		//Set permissions phase
+		ret.add(new CloudSetPermissionsPhase(besid, activityID, permList));
+
+		//Stage In Phase
+		ret.add(new CloudStageInPhase(activityID, besid, remoteDir,
+				"stageIn.sh"));
+		
+		//Stage In phase Poller
+		ret.add(new CloudCheckStatusPhase(activityID, besid, remoteDir,
+				"stageInPhase.complete", "Stage In"));
+		
+		//Create List of files to be set to executable
+		permList = new ArrayList<String>();
 		permList.add(remoteDir + runScript);
 		permList.add(remoteDir + job.getExecutable().getTarget());
 		permList.add(remoteDir + "pwrapper-linux-32"); //Fix to get name
@@ -140,18 +156,24 @@ public class CloudJobWrapper {
 		ret.add(new CloudExecutePhase(activityID, besid,
 				remoteDir, runScript));
 
-		//Stage Out Phase
-		ret.add(new CloudStageOutPhase(activityID, besid,
-				remoteDir, genDir, genState, jobFile));
+		//Execution phase Poller
+		ret.add(new CloudCheckStatusPhase(activityID, besid, remoteDir,
+				"executePhase.complete", "Execution"));
 		
-		//Release Resource
+		//Stage Out Phase
+		ret.add(new CloudStageOutPhase(activityID, besid, remoteDir,
+				"stageOut.sh"));
+		
+		//Stage Out phase Poller
+		ret.add(new CloudCheckStatusPhase(activityID, besid, remoteDir,
+				"stageOutPhase.complete", "Stage Out"));
+		
+		//Get Accounting Back (Phase 5)
+		
+		//Release Resource (add cle
 		ret.add(new CloudReleaseResourcePhase(activityID, besid));
 
-
-		//Get Accounting Back (Phase 5)
-
-		//Cleanup (Currently vm's are not long lived so no cleanup)
-
+		
 		ret.addAll(cleanups);
 		return ret;
 	}

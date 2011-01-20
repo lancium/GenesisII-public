@@ -9,7 +9,7 @@
 	<classpathentry kind="lib" path="ext/axis/ext/xml-apis.jar"/>
 	<classpathentry kind="lib" path="ext/axis/ext/xmlParserAPIs.jar"/>
 	<classpathentry kind="lib" path="ext/axis/ext/xmlsec-1.4.Beta2.jar"/>
-	<classpathentry kind="lib" path="ext/axis/lib/axis.jar" sourcepath="/Axis 1.4/src"/>
+	<classpathentry kind="lib" path="ext/axis/lib/axis.jar" sourcepath="/home/tuser/Desktop/source/axis-1_4"/>
 	<classpathentry kind="lib" path="ext/axis/lib/axis-ant.jar"/>
 	<classpathentry kind="lib" path="ext/axis/lib/commons-discovery-0.2.jar"/>
 	<classpathentry kind="lib" path="ext/axis/lib/commons-logging-1.0.4.jar"/>

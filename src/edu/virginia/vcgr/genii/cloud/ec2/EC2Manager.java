@@ -252,6 +252,22 @@ public class EC2Manager implements CloudManager{
 		}
 		return false;
 	}
+	
+	@Override
+	public boolean checkFile(String resourceID, String path) throws Exception {
+		
+		
+		VMStat tStat = this.getResource(resourceID);
+
+		if (tStat != null){
+			synchronized(tStat){
+				ResourceController tCont = this.getVMController(tStat);
+				if (tCont != null)
+					return tCont.fileExists(path);
+			}
+		}
+		return false;
+	}
 
 	@Override
 	public boolean recieveFileFrom(String resourceID, String localPath,
@@ -546,6 +562,8 @@ public class EC2Manager implements CloudManager{
 
 	@Override
 	public boolean releaseResource(String activityID) throws SQLException {
+		//Add vm cleanup code (terminate processes, wipe working directories)
+		
 		String resourceID = CloudMonitor.getResourceID(activityID);
 		if (resourceID != null){
 			this.freeResource(resourceID);
@@ -560,7 +578,7 @@ public class EC2Manager implements CloudManager{
 		//Puts thread to sleep if resource unavialable
 		String resourceID = CloudMonitor.getResourceID(activityID);
 		if (resourceID != null){
-			_logger.info("Activity " + activityID + 
+			_logger.info("CloudBES: Activity " + activityID + 
 					" aquired resource " + resourceID);
 			return resourceID;
 		}

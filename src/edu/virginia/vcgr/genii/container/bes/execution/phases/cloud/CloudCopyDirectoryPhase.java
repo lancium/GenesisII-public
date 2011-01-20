@@ -4,24 +4,30 @@ import java.io.File;
 import java.io.OutputStream;
 import java.io.Serializable;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStateEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.cloud.CloudManager;
 import edu.virginia.vcgr.genii.cloud.CloudMonitor;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
-import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 
-public class CloudCopyDirectoryPhase implements ExecutionPhase, Serializable{
+
+public class CloudCopyDirectoryPhase extends AbstractCloudExecutionPhase
+	implements Serializable{
 
 	static final long serialVersionUID = 0L;
 
-	private String _localDir, _remoteDir, _activityID, _besid;
+	private String _localDir;
 
+
+	static private Log _logger = LogFactory.getLog(CloudCopyDirectoryPhase.class);
+	
 	public CloudCopyDirectoryPhase(String localDir, String remoteDir,
 			String activityID, String besid){
 		_localDir = localDir;
-		_remoteDir = remoteDir;
+		_workingDir = remoteDir;
 		_activityID = activityID;
 		_besid = besid;
 	}
@@ -38,13 +44,12 @@ public class CloudCopyDirectoryPhase implements ExecutionPhase, Serializable{
 		CloudManager tManage = CloudMonitor.getManager(_besid);
 		String resourceID = tManage.aquireResource(_activityID);
 
-		//first create directories on remote system
-		tManage.sendCommand(resourceID,
-				"mkdir " + _remoteDir , System.out, System.err); 
+		tryExecuteCommand(resourceID,
+				"mkdir " + _workingDir , System.out, System.err, tManage); 
 
-		copyDirectory(tManage, new File(_remoteDir), lDir,
+		copyDirectory(tManage, new File(_workingDir), lDir,
 				resourceID, System.out, System.err); 
-		
+
 	}
 	
 	private void copyDirectory(CloudManager tManage, File root, File dir,
@@ -55,17 +60,28 @@ public class CloudCopyDirectoryPhase implements ExecutionPhase, Serializable{
 		for (int i=0; i<fileList.length; i++){
 			if (fileList[i].isDirectory()){
 				//first create directory then copy it
-				tManage.sendCommand(resourceID,
-						"mkdir " + _remoteDir + fileList[i].getName(), out, err);
+				tryExecuteCommand(resourceID,
+						"mkdir " + _workingDir + fileList[i].getName(), out, err, tManage);
 				copyDirectory(tManage, new File(
 						root.getAbsolutePath() + "/" + fileList[i].getName()),
 						fileList[i], resourceID, out, err);
 			}
 			else
-				tManage.sendFileTo(resourceID, fileList[i].getPath(),
-						root.getAbsolutePath() + "/" + fileList[i].getName());	
+				trySendFile(resourceID, fileList[i].getPath(),
+						root.getAbsolutePath() + "/" + fileList[i].getName(), tManage);	
 		}
 	}
+
+	@Override
+	protected Log getLog() {
+		return _logger;
+	}
+
+	@Override
+	protected String getPhase() {
+		return "Copy Directory";
+	}
+	
 
 
 

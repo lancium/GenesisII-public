@@ -68,6 +68,8 @@ public interface CloudManager {
 	public int sendCommand(
 			String resourceID, String command,
 			OutputStream out, OutputStream err) throws Exception;
+
+	boolean checkFile(String resourceID, String path) throws Exception;
 	
 
 }

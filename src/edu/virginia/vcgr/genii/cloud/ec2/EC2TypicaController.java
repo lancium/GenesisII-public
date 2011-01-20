@@ -29,6 +29,7 @@ public class EC2TypicaController implements CloudController{
 	private String _imageID;
 	private InstanceType _type = InstanceType.DEFAULT;
 	private String _keyPair;
+	private int _backoff = 20;
 
 
 
@@ -68,7 +69,28 @@ public class EC2TypicaController implements CloudController{
 		tConfig.setKeyName(_keyPair);
 		ReservationDescription tDesc;
 		tDesc = _ec2.runInstances(tConfig);
-		return this.updateState(tDesc);
+	
+		int retries = 0;
+		
+		//Ensure can update state, if api call is lagging try several times
+		//then send terminate instances command to ensure no orphans
+		while (true){
+			try{
+			return this.updateState(tDesc);
+			}catch(EC2Exception e){
+				if (retries < 3){
+					retries++;
+					long sleep = (long) ((_backoff * 1000) *
+							Math.exp(.5 * retries));
+					Thread.sleep(sleep);
+				}
+				else{
+					//Need to ensure this succeeds
+					this.killResources(tDesc);
+					throw e;
+				}
+			}
+		}
 	}
 
 	private Collection<VMStat> updateState(
@@ -128,6 +150,21 @@ public class EC2TypicaController implements CloudController{
 		List<String> idList = new ArrayList<String>();
 		for (VMStat tStat : vms){
 			idList.add(tStat.getID());
+		}
+
+		try{
+			_ec2.terminateInstances(idList);
+		}catch(Exception ex){
+			return true;
+		}
+
+		return false;
+	}
+	
+	private boolean killResources(ReservationDescription tDesc) throws Exception{
+		List<String> idList = new ArrayList<String>();
+		for (Instance t : tDesc.getInstances()){
+			idList.add(t.getInstanceId());
 		}
 
 		try{

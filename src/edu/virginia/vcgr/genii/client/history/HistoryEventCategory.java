@@ -31,7 +31,10 @@ public enum HistoryEventCategory
 			"resources/cleanup.png"))),
 	Terminating(new DefaultHistoryCategoryInformation("Terminating",
 		DefaultIconProvider.createIconProvider(HistoryEventCategory.class,
-			"resources/terminating.png")));
+			"resources/terminating.png"))),
+	CloudStage(new DefaultHistoryCategoryInformation("Cloud",
+			DefaultIconProvider.createIconProvider(HistoryEventCategory.class,
+				"resources/checking.png")));
 	
 	private HistoryCategoryInformation _info;
 	

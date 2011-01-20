@@ -23,10 +23,10 @@ public class CloudConfiguration implements Serializable{
 	private String _authFile;
 	
 	@XmlAttribute(name = "maxResources", required = false)
-	private int _maxResources;
+	private int _maxResources = 10;
 	
 	@XmlAttribute(name = "workPerVM", required = false)
-	private int _workPerVM;
+	private int _workPerVM = 1;
 	
 	@XmlAttribute(name = "publicKey", required = false)
 	private String _publicKey;
@@ -201,7 +201,10 @@ public class CloudConfiguration implements Serializable{
 	}
 
 	public void setWorkPerVM(int _workPerVM) {
-		this._workPerVM = _workPerVM;
+		//this._workPerVM = _workPerVM;
+		//Currently do not support multiple jobs per vm, 
+		//Ignore config file and force to be 1
+		this._workPerVM = 1;
 	}
 
 	public String getPublicKey() {
