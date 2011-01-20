@@ -282,8 +282,9 @@ public class UIPlugins
 			}
 		}
 		
-		if (selectedTitle != null)
-			tabbedPane.setSelectedIndex(selectedIndex);
+		if (selectedTitle != null && 
+			(selectedIndex >= 0 && selectedIndex < tabbedPane.getTabCount()))
+				tabbedPane.setSelectedIndex(selectedIndex);
 	}
 	
 	public void fireMenuAction(
