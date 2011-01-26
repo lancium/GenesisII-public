@@ -50,7 +50,7 @@ public class CloudGetResourcePhase implements ExecutionPhase, Serializable{
 			_logger.info("CloudBES: Activity " + _activityID + 
 					" aquired resource " + resourceID);
 			history.createInfoWriter("Activity " + _activityID +
-					" aquired resource " + resourceID);
+					" aquired resource " + resourceID).close();
 		}
 	}
 
