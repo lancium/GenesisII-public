@@ -2,6 +2,8 @@ package edu.virginia.vcgr.genii.container.bes.execution.phases.cloud;
 
 import java.io.Serializable;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStateEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
@@ -20,6 +22,8 @@ public class CloudGetResourcePhase implements ExecutionPhase, Serializable{
 	private String _activityID;
 	private String _besid;
 
+	static private Log _logger = LogFactory.getLog(CloudGetResourcePhase.class);
+	
 	public CloudGetResourcePhase(String activityID, String besid){
 		_activityID = activityID;
 		_besid = besid;
@@ -33,13 +37,21 @@ public class CloudGetResourcePhase implements ExecutionPhase, Serializable{
 	@Override
 	public void execute(ExecutionContext context) throws Throwable {
 		HistoryContext history = HistoryContextFactory.createContext(
-				HistoryEventCategory.CloudStage);
+				HistoryEventCategory.Scheduling);
 
-		history.createTraceWriter("Aquiring Cloud Resources").close();
+		history.createInfoWriter("Requesting Cloud Resource").close();
 
 		CloudManager tManage = CloudMonitor.getManager(_besid);
+		String resourceID = null;
 		if (tManage != null)
-			tManage.aquireResource(_activityID);
+			resourceID = tManage.aquireResource(_activityID);
+		
+		if (resourceID != null){
+			_logger.info("CloudBES: Activity " + _activityID + 
+					" aquired resource " + resourceID);
+			history.createInfoWriter("Activity " + _activityID +
+					" aquired resource " + resourceID);
+		}
 	}
 
 }

@@ -1,7 +1,12 @@
 package edu.virginia.vcgr.genii.cloud;
 
 import java.sql.SQLException;
+import java.util.Iterator;
 
+import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
+
+import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -41,6 +46,17 @@ public class VMStat {
 		if (setup == 1)
 			_prepared = true;
 
+	}
+	
+	private VMStat(String id, String besid, VMState state,
+			String host, int load, boolean prepared){
+		_id = id;
+		_besid = besid;
+		_state = state;
+		_host = host;
+		_load = load;
+		_prepared = prepared;
+		_port = -1;
 	}
 
 	public void setPrepared(){
@@ -111,6 +127,99 @@ public class VMStat {
 			_logger.error(e);
 		}
 
+	}
+	
+	
+	public MessageElement toMessageElement(QName elementName)
+	{
+		String tState = "";
+		if (_state != null){
+			tState = _state.toString();
+		}
+		
+		MessageElement ret = new MessageElement(elementName);
+
+		MessageElement id = new MessageElement(
+				new QName(CloudConstants.GENII_CLOUDBES_NS,
+						"id"), _id);
+		MessageElement besid = new MessageElement(
+				new QName(CloudConstants.GENII_CLOUDBES_NS,
+						"besid"), _besid);
+		MessageElement state = new MessageElement(
+				new QName(CloudConstants.GENII_CLOUDBES_NS,
+						"state"), tState);
+		MessageElement host = new MessageElement(
+				new QName(CloudConstants.GENII_CLOUDBES_NS,
+						"host"), _host);
+		MessageElement load = new MessageElement(
+				new QName(CloudConstants.GENII_CLOUDBES_NS,
+						"load"), _load);
+		MessageElement prepared = new MessageElement(
+				new QName(CloudConstants.GENII_CLOUDBES_NS,
+						"prepared"), _prepared);
+		
+
+		try
+		{
+			ret.addChild(id);
+			ret.addChild(besid);
+			ret.addChild(state);
+			ret.addChild(host);
+			ret.addChild(load);
+			ret.addChild(prepared);
+
+		}
+		catch (SOAPException se)
+		{
+			throw new RuntimeException(
+			"Unexpected exception thrown while packageing policy.");
+		}
+
+		return ret;
+	}
+
+	static public VMStat fromMessageElement(MessageElement element)
+	{
+
+		String id = "";
+		String besid = "";
+		VMState state = null;
+		String host = "";
+		int load = 0;
+		boolean prepared = false;
+
+		Iterator<?> iter = element.getChildElements();
+		while (iter.hasNext())
+		{
+			MessageElement child = (MessageElement)iter.next();
+			QName childName = child.getQName();
+	
+			if (childName.equals(
+					new QName(CloudConstants.GENII_CLOUDBES_NS, "id")))
+				id = child.getValue();
+			else if (childName.equals(
+					new QName(CloudConstants.GENII_CLOUDBES_NS, "besid")))
+				besid = child.getValue();
+			else if (childName.equals(
+					new QName(CloudConstants.GENII_CLOUDBES_NS, "state"))){
+				if (child.getValue() != null)
+					state = VMState.valueOf(child.getValue());
+			}
+			else if (childName.equals(
+					new QName(CloudConstants.GENII_CLOUDBES_NS, "host")))
+				host = child.getValue();
+			else if (childName.equals(
+					new QName(CloudConstants.GENII_CLOUDBES_NS, "load")))
+				load = Integer.parseInt(child.getValue());
+			else if (childName.equals(
+					new QName(CloudConstants.GENII_CLOUDBES_NS, "prepared")))
+				prepared = Boolean.getBoolean(child.getValue());
+	
+
+		}
+
+		return new VMStat(id, besid, state, host, load, prepared);
+		
 	}
 
 }

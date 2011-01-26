@@ -75,7 +75,9 @@ public class CloudGenerateRunScriptPhase  implements ExecutionPhase, Serializabl
 			ps.format("#!%s\n\n", "/bin/bash");
 			//Generate App Body
 			ps.println("export GENII_USER_DIR=" + _workingDir + _genState);
-			ps.println(_genDir + "grid stageData --direction=\"in\" --type=\"binary\" " + _workingDir + " local:" + _workingDir + _jobFile);
+			ps.println(_genDir + "grid stageData --direction=\"in\" " + 
+					"--type=\"binary\" " + _workingDir + " local:" +
+					_workingDir + _jobFile);
 			ps.println("touch " + _workingDir + "stageInPhase.complete");
 			ps.close();
 			tStream.close();
@@ -88,7 +90,9 @@ public class CloudGenerateRunScriptPhase  implements ExecutionPhase, Serializabl
 			ps.format("#!%s\n\n", "/bin/bash");
 			//Generate App Body
 			ps.println("export GENII_USER_DIR=" + _workingDir + _genState);
-			ps.println(_genDir + "grid stageData --direction=\"out\" --type=\"binary\" " + _workingDir + " local:" + _workingDir + _jobFile);
+			ps.println(_genDir + "grid stageData --direction=\"out\" " + 
+					"--type=\"binary\" " + _workingDir +
+					" local:" + _workingDir + _jobFile);
 			ps.println("touch " + _workingDir + "stageOutPhase.complete");
 			ps.close();
 			tStream.close();

@@ -96,7 +96,8 @@ public class RunJSDL extends BaseGridTool{
 
 			//Generate bash script
 			stdout.println("Generating Pwrapper Script");
-			File resourceUsage = new File(getArgument(0) + "/resourceusage.xml");
+			File resourceUsage = 
+				new File(getArgument(0) + "/resourceusage.xml");
 			
 			File submitScript = 
 				File.createTempFile("exec", ".sh", wDir);

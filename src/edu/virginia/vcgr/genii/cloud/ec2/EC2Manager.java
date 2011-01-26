@@ -567,19 +567,37 @@ public class EC2Manager implements CloudManager{
 		String resourceID = CloudMonitor.getResourceID(activityID);
 		if (resourceID != null){
 			this.freeResource(resourceID);
+			sendKillCommands(activityID);
 			CloudMonitor.removeActivity(activityID);
 		}
 		return false;
 	}
+	
+	private void sendKillCommands(String activityID){
+		try {
+			String resourceID = aquireResource(activityID);
+			//Kill Job processes, (modify once no longer running as root to killall -9 -1	
+			//Change to make persistent in future?
+			sendCommand(resourceID,
+					"killall -9 -g runScript.sh", System.out, System.err);
+			sendCommand(resourceID,
+					"killall -9 -g grid", System.out, System.err);
+		} catch (Exception e) {
+			_logger.debug(e);
+		}	
+		
+
+	}
+	
 
 	@Override
 	public String aquireResource(
 			String activityID) throws InterruptedException {
-		//Puts thread to sleep if resource unavialable
+		//Puts thread to sleep if resource unavailable
 		String resourceID = CloudMonitor.getResourceID(activityID);
 		if (resourceID != null){
-			_logger.info("CloudBES: Activity " + activityID + 
-					" aquired resource " + resourceID);
+			//_logger.debug("CloudBES: Activity " + activityID + 
+			//		" aquired resource " + resourceID);
 			return resourceID;
 		}
 		while (resourceID == null){
@@ -597,6 +615,57 @@ public class EC2Manager implements CloudManager{
 
 		return null;
 
+	}
+
+
+	@Override
+	public boolean freeResources() throws Exception {
+		vmLock.lock();
+		boolean result = false;
+		ArrayList<VMStat> killList = new ArrayList<VMStat>();
+		killList.addAll(_vms.values());
+
+		
+		result = _controller.killResources(killList);
+		
+		for (VMStat tStat : killList){
+			CloudMonitor.deleteResource(tStat.getID(), _besid);
+			_vms.remove(tStat.getID());
+		}
+
+		vmLock.unlock();
+		return result;
+	}
+
+
+	@Override
+	public Collection<VMStat> getResourceStatus() throws Exception {
+		return _vms.values();
+	}
+
+
+	@Override
+	public boolean killResource(String id) throws Exception {
+		vmLock.lock();
+		boolean result = false;
+		
+		VMStat tStat = _vms.get(id);
+		_logger.debug("CloudBES: Attempting to force kill " + id);
+	
+		if (tStat != null){
+			ArrayList<VMStat> killList = new ArrayList<VMStat>();
+			killList.add(tStat);
+			result = _controller.killResources(killList);
+		}
+		if (result = true){
+			CloudMonitor.deleteResource(tStat.getID(), _besid);
+			_vms.remove(tStat.getID());
+			_logger.info("CloudBES: Killed " + id);
+		}
+
+
+		vmLock.unlock();
+		return result;
 	}
 
 }

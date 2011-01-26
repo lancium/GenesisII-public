@@ -6,13 +6,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStateEnumeration;
 
-import com.jcraft.jsch.JSchException;
-
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
+import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.cloud.CloudManager;
 import edu.virginia.vcgr.genii.cloud.CloudMonitor;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
-import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
 
 public class CloudExecutePhase  extends AbstractCloudExecutionPhase 
 implements Serializable{
@@ -42,11 +42,18 @@ implements Serializable{
 		CloudManager tManage = CloudMonitor.getManager(_besid);
 		String resourceID  = tManage.aquireResource(_activityID);
 
+		HistoryContext history = HistoryContextFactory.createContext(
+				HistoryEventCategory.Default);
 
+		history.createInfoWriter("Sending Execute Command").close();
+		
 		//Build Command (nohup and set to background)
-		String command = "nohup " + _workingDir + _runScript + " &> /dev/null &";
-		tryExecuteCommand(resourceID, command, System.out, System.err, tManage);
-		_logger.info("CloudBES: Activity " + _activityID + " Sent Execution Command");
+		String command =
+			"nohup " + _workingDir + _runScript + " &> /dev/null &";
+		tryExecuteCommand(resourceID, command,
+				System.out, System.err, tManage);
+		_logger.info("CloudBES: Activity " + _activityID +
+				" Sent Execution Command");
 
 	}
 

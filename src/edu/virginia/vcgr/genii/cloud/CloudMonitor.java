@@ -34,7 +34,8 @@ public class CloudMonitor {
 
 
 	public static void setConnectionPool(
-			DatabaseConnectionPool connectionPool) throws SQLException, IOException{
+			DatabaseConnectionPool connectionPool) 
+	throws SQLException, IOException{
 
 		if (connectionPool == null)
 			throw new IllegalArgumentException(
@@ -297,6 +298,32 @@ public class CloudMonitor {
 			StreamUtils.close(stmt);
 			_connectionPool.release(connection);
 		}
+	}
+	
+	//Determines if cloud activity, if it is free it
+	//Does not fail or block if not cloud Activity
+	synchronized static public void freeActivity(String activityID, String besid) throws SQLException{
+		if (_activities.containsKey(activityID)){
+			CloudManager tManage = getManager(besid);	
+			
+			if (tManage == null)
+				return; //Throw exception, log
+				
+			tManage.releaseResource(activityID);
+		
+		}
+	}
+	
+	synchronized static public void deleteCloudBES(String besid) throws Exception{
+		//Kill all vms (Activities already killed by BES)
+		CloudManager tManage = getManager(besid);
+		
+		if (tManage == null)
+			return; //Throw exception, log
+		
+		//Free resources associated with BES
+		tManage.freeResources();
+		
 	}
 
 

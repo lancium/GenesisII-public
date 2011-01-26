@@ -42,9 +42,9 @@ public class CloudStageOutPhase extends AbstractCloudExecutionPhase
 	public void execute(ExecutionContext context) throws Throwable {
 		
 		HistoryContext history = HistoryContextFactory.createContext(
-				HistoryEventCategory.CloudStage);
+				HistoryEventCategory.StageOut);
 
-		history.createTraceWriter("Aquiring Cloud Resources").close();
+		history.createInfoWriter("Sending Stage out command").close();
 		
 		CloudManager tManage = CloudMonitor.getManager(_besid);
 		String resourceID  = tManage.aquireResource(_activityID);

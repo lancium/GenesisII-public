@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.cloud;
 
 import java.io.OutputStream;
 import java.sql.SQLException;
+import java.util.Collection;
 
 //Warning: It is expected that any implementor of this interface is thread safe
 
@@ -25,6 +26,11 @@ public interface CloudManager {
 	//Will not kill resources that are not idle
 	//if fails will not kill any resources
 	public boolean killResources(int count) throws Exception;
+	
+	//Forces kill of a resource (even if running job)
+	//Does not fail activity
+	public boolean killResource(String id) throws Exception;
+	
 	
 	//Returns number of resources being held by cloud controller
 	//Includes available, idle, busy, pending
@@ -70,6 +76,10 @@ public interface CloudManager {
 			OutputStream out, OutputStream err) throws Exception;
 
 	boolean checkFile(String resourceID, String path) throws Exception;
+	
+	public boolean freeResources() throws Exception;
+	
+	public Collection<VMStat> getResourceStatus() throws Exception;
 	
 
 }

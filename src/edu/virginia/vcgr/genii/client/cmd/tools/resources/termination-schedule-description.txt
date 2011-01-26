@@ -1,3 +1,3 @@
-Sets a shceduled termination timer for one or more resources.  Once set, 
+Sets a scheduled termination timer for one or more resources.  Once set, 
 the resources will automatically be terminated at the given time by the 
 container.

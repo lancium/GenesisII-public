@@ -40,9 +40,9 @@ public class CloudStageInPhase extends AbstractCloudExecutionPhase
 	@Override
 	public void execute(ExecutionContext context) throws Throwable {
 		HistoryContext history = HistoryContextFactory.createContext(
-				HistoryEventCategory.CloudStage);
+				HistoryEventCategory.StageIn);
 
-		history.createTraceWriter("Aquiring Cloud Resources").close();
+		history.createInfoWriter("Sending Stage in command").close();
 		
 		CloudManager tManage = CloudMonitor.getManager(_besid);
 		String resourceID  = tManage.aquireResource(_activityID);
@@ -51,6 +51,7 @@ public class CloudStageInPhase extends AbstractCloudExecutionPhase
 		String command = "nohup " + _workingDir + _stageScript + " &> /dev/null &";
 
 		tryExecuteCommand(resourceID, command, System.out, System.err, tManage);
+		
 		_logger.info("CloudBES: Activity " + _activityID + " Sent Stage In Command");
 
 	}

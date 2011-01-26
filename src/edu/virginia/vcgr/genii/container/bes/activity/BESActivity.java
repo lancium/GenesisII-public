@@ -31,6 +31,7 @@ import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.BESActivityStateChangedContents;
+import edu.virginia.vcgr.genii.cloud.CloudMonitor;
 import edu.virginia.vcgr.genii.container.bes.BES;
 import edu.virginia.vcgr.genii.container.bes.BESPolicyListener;
 import edu.virginia.vcgr.genii.container.bes.execution.ContinuableExecutionException;
@@ -901,6 +902,9 @@ public class BESActivity implements Closeable
 						{
 							updateState(_executionPlan.size(), new ActivityState(
 								ActivityStateEnumeration.Cancelled, null, false));
+							
+							//Ensure Cloud Resources Cleaned up
+							CloudMonitor.freeActivity(_activityid, _bes.getBESID());
 							break;
 						}
 	
@@ -922,6 +926,9 @@ public class BESActivity implements Closeable
 						{
 							updateState(_executionPlan.size(), new ActivityState(
 								ActivityStateEnumeration.Cancelled, null, false));
+							
+							//Ensure Cloud Resource cleaned up
+							CloudMonitor.freeActivity(_activityid, _bes.getBESID());
 							break;
 						}
 						
@@ -953,10 +960,14 @@ public class BESActivity implements Closeable
 				}
 				catch (Throwable cause)
 				{
-					_logger.error("BES Activity Unrecoverably Faulted.", cause);
+					
+				    _logger.error("BES Activity Unrecoverably Faulted.", cause);
 					addFault(cause, 3);
 					try
 					{
+						//Ensure Cloud Resource cleaned up
+						CloudMonitor.freeActivity(_activityid, _bes.getBESID());
+						
 						updateState(_executionPlan.size(),
 							new ActivityState(ActivityStateEnumeration.Failed, 
 								null, false));

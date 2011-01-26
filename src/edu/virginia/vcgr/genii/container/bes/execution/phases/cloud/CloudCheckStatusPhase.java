@@ -9,12 +9,15 @@ import org.ggf.bes.factory.ActivityStateEnumeration;
 import com.jcraft.jsch.JSchException;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
+import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.cloud.CloudManager;
 import edu.virginia.vcgr.genii.cloud.CloudMonitor;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionException;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
 
 public class CloudCheckStatusPhase implements ExecutionPhase,
 	Serializable, TerminateableExecutionPhase{
@@ -55,6 +58,11 @@ public class CloudCheckStatusPhase implements ExecutionPhase,
 		CloudManager tManage = CloudMonitor.getManager(_besid);
 		String resourceID  = tManage.aquireResource(_activityID);
 
+		HistoryContext history = HistoryContextFactory.createContext(
+				HistoryEventCategory.Checking);
+
+		history.createInfoWriter("Polling for completion of " + _checkPhase + " Phase").close();
+		
 		while(true){
 			
 			if (_tries > 9)
@@ -65,7 +73,7 @@ public class CloudCheckStatusPhase implements ExecutionPhase,
 						_checkPhase + " phase terminated early");
 				return;
 			}
-			
+
 			try {
 				//Exponential Backoff
 				if (_failed){
@@ -78,14 +86,16 @@ public class CloudCheckStatusPhase implements ExecutionPhase,
 				}
 
 				_tries++;
-				//Poll until complete
-				while(!tManage.checkFile(resourceID, _workingDir + _completeFileName)){
+				
+				//Poll
+				if (tManage.checkFile(resourceID, _workingDir + _completeFileName)){
+					break;
+				}
+				else{
 					_logger.info("CloudBES: Activity " + _activityID + " waiting on " +
 							_checkPhase + " phase");
 					Thread.sleep(20000);
-
-				}	
-				break;
+				}
 
 			} catch (JSchException e){
 				_logger.error(e);
@@ -94,7 +104,7 @@ public class CloudCheckStatusPhase implements ExecutionPhase,
 		}
 
 
-
+		history.createInfoWriter("Completed " + _checkPhase + " Phase").close();
 		_logger.info("CloudBES: Activity " + _activityID + " " + _checkPhase + " phase complete");
 
 	}

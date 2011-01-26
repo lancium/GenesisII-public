@@ -9,9 +9,12 @@ import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStateEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
+import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.cloud.CloudManager;
 import edu.virginia.vcgr.genii.cloud.CloudMonitor;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
+import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
 
 
 public class CloudCopyDirectoryPhase extends AbstractCloudExecutionPhase
@@ -44,12 +47,20 @@ public class CloudCopyDirectoryPhase extends AbstractCloudExecutionPhase
 		CloudManager tManage = CloudMonitor.getManager(_besid);
 		String resourceID = tManage.aquireResource(_activityID);
 
+		
+		HistoryContext history = HistoryContextFactory.createContext(
+				HistoryEventCategory.CloudSetup);
+
+		history.createInfoWriter("Setting up working directory").close();
+		
+		
 		tryExecuteCommand(resourceID,
 				"mkdir " + _workingDir , System.out, System.err, tManage); 
 
 		copyDirectory(tManage, new File(_workingDir), lDir,
 				resourceID, System.out, System.err); 
 
+		history.createInfoWriter("Working directory set up").close();
 	}
 	
 	private void copyDirectory(CloudManager tManage, File root, File dir,

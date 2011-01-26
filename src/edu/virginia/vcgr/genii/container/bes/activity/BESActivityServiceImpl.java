@@ -157,8 +157,7 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements
 					CloudJobWrapper.createExecutionPlan(
 							_resource.getKey().toString(),
 							initInfo.getContainerID(),
-							cConfig.getLocalScratchDir(),
-							cConfig.getRemoteClientDir(), tJob);
+							tJob, ((BESConstructionParameters)cParams));
 				jobName = tJob.getJobName();
 				fuseMountDirectory = null;
 			}

@@ -9,29 +9,45 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.genii.cloud.CloudRP;
 import edu.virginia.vcgr.genii.cloud.CloudStat;
+import edu.virginia.vcgr.genii.cloud.VMStat;
+import edu.virginia.vcgr.genii.cloud.VMStats;
 
 
 public class CloudTool extends BaseGridTool{
 	
 	static private final String _DESCRIPTION =
-		"Tool to control Cloud BES.";
+		"Tool to control CloudBES resources.";
 		
 	static private final String _USAGE_RESOURCE =
 		"edu/virginia/vcgr/genii/client/cmd/tools/resources/cloud-tool-usage.txt";
 
 	private int _shrink = -1;
 	private int _spawn = -1;
+	private String _kill = null;
 	private int _count = 0;
+	private boolean _vmstatus = false;
 
 	@Option({"shrink"})
-	public void setStoretype(String count) {
+	public void setShrink(String count) {
 		_shrink = Integer.parseInt(count);
+		_count++;
+	}
+	
+	@Option({"kill"})
+	public void setKill(String id) {
+		_kill = id;
 		_count++;
 	}
 
 	@Option({"spawn"})
 	public void setSpawn(String count) {
 		_spawn = Integer.parseInt(count);
+		_count++;
+	}
+	
+	@Option({"vmstatus"})
+	public void setVMStatus() {
+		_vmstatus = true;
 		_count++;
 	}
 
@@ -48,7 +64,8 @@ public class CloudTool extends BaseGridTool{
 
 		RNSPath bes = lookup(new GeniiPath(getArgument(0)), 
 				RNSPathQueryFlags.MUST_EXIST);
-		CloudRP rp = (CloudRP)ResourcePropertyManager.createRPInterface(bes.getEndpoint(), CloudRP.class);
+		CloudRP rp = (CloudRP)ResourcePropertyManager.
+			createRPInterface(bes.getEndpoint(), CloudRP.class);
 
 
 		if (_spawn != -1){
@@ -60,7 +77,20 @@ public class CloudTool extends BaseGridTool{
 			stdout.println("Attempting to kill " + _shrink + " resources");
 			rp.shrinkResources(_shrink); 
 		}
+		
+		if(_kill != null){
+			stdout.println("Attempting to kill " + _kill);
+			rp.killResource(_kill); 
+		}
 
+		if(_vmstatus){
+			stdout.println("Resources");
+			VMStats tStats = rp.getVMStatus();
+			for (VMStat tStat : tStats.getResources()){
+				stdout.println(tStat.getID() + " " + tStat.getLoad() +
+						" " + tStat.getState() + " " + tStat.getHost());
+			}
+		}
 		if(_count == 0){
 			CloudStat tStat = rp.getStatus();
 			stdout.println(tStat.toString());

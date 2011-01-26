@@ -9,12 +9,9 @@ import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStateEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
-import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.cloud.CloudManager;
 import edu.virginia.vcgr.genii.cloud.CloudMonitor;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
-import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
-import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
 
 public class CloudSetPermissionsPhase extends AbstractCloudExecutionPhase 
 	implements Serializable{
@@ -41,11 +38,7 @@ public class CloudSetPermissionsPhase extends AbstractCloudExecutionPhase
 
 	@Override
 	public void execute(ExecutionContext context) throws Throwable {
-		HistoryContext history = HistoryContextFactory.createContext(
-				HistoryEventCategory.CloudStage);
 
-		history.createTraceWriter("Aquiring Cloud Resources").close();
-		
 		CloudManager tManage = CloudMonitor.getManager(_besid);
 		String resourceID  = tManage.aquireResource(_activityID);
 
@@ -57,7 +50,8 @@ public class CloudSetPermissionsPhase extends AbstractCloudExecutionPhase
 
 
 		tryExecuteCommand(resourceID, command, System.out, System.err, tManage);
-		_logger.info("CloudBES: Activity " + _activityID + " Set Permissions in VM");
+		_logger.info("CloudBES: Activity " + _activityID +
+				" Set Permissions in VM");
 
 	}
 

@@ -9,6 +9,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 @XmlAccessorType(XmlAccessType.NONE)
 public class CloudConfiguration implements Serializable{
 
+	
+
 	static final long serialVersionUID = 0L;
 	static final public String NS =
 		"http://vcgr.cs.virginia.edu/cloudbes";
@@ -58,6 +60,9 @@ public class CloudConfiguration implements Serializable{
 	@XmlAttribute(name = "remoteSetupDir", required = false)
 	private String _remoteSetupDir;
 	
+	@XmlAttribute(name = "remoteScratchDir", required = false)
+	private String _remoteScratchDir;
+	
 	@XmlAttribute(name = "keyPair", required = false)
 	private String _keyPair;
 	
@@ -74,7 +79,13 @@ public class CloudConfiguration implements Serializable{
 	private String _description;
 	
 	
-	
+	public String getRemoteScratchDir() {
+		return _remoteScratchDir;
+	}
+
+	public void setRemoteScratchDir(String remoteScratchDir) {
+		_remoteScratchDir = remoteScratchDir;
+	}
 
 	public String getType() {
 		return _type;

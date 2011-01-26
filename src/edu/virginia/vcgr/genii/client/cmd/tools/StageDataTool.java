@@ -33,7 +33,7 @@ public class StageDataTool extends BaseGridTool{
 
 	static private final String _DESCRIPTION =
 		"Takes a serialized job request or JSDL file and" + 
-		" performs stage in actions";
+		" performs stageing actions";
 	static private final String _USAGE =
 		"parseJSDL <scratchDir> <jobFile>" + 
 		" [--type=<jsdl|binary>] [--direction=<in|out>]";

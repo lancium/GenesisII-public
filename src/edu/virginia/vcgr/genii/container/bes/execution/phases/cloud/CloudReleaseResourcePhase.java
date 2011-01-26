@@ -34,9 +34,9 @@ public class CloudReleaseResourcePhase implements ExecutionPhase, Serializable{
 	@Override
 	public void execute(ExecutionContext context) throws Throwable {
 		HistoryContext history = HistoryContextFactory.createContext(
-				HistoryEventCategory.CloudStage);
+				HistoryEventCategory.Cleanup);
 
-		history.createTraceWriter("Aquiring Cloud Resources").close();
+		history.createInfoWriter("Releasing Cloud Resources").close();
 		
 		CloudManager tManage = CloudMonitor.getManager(_besid);
 		if (tManage != null)

@@ -1,6 +1,5 @@
 package edu.virginia.vcgr.genii.cloud;
 
-
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,12 +25,11 @@ implements CloudConstants{
 
 	@Override
 	protected void registerHandlers() throws NoSuchMethodException {
-		// TODO Auto-generated method stub
-		//Sets size of resources, returns count
 		addHandler(SPAWN_RESOURCES_ATTR, "getStatus", "spawnResources");  
 		addHandler(SHRINK_RESOURCES_ATTR, "getStatus", "shrinkResources");
+		addHandler(RESOURCE_KILL_ATTR, "getStatus", "killResource");
 		addHandler(STATUS_ATTR, "getStatus");
-
+		addHandler(VM_INFO_ATTR, "getVMInfo");
 	}
 
 
@@ -48,6 +46,24 @@ implements CloudConstants{
 			try {
 				int count = (Integer)(element.getObjectValue(Integer.class));
 				tManage.spawnResources(count);
+			} catch (Exception e) {
+				_logger.error(e);
+			}
+		}
+	}
+	
+	public void killResource(MessageElement element)
+	throws ResourceException, ResourceUnknownFaultType
+	{
+		IBESResource resource = null;
+		resource =
+			(IBESResource)ResourceManager.getCurrentResource().dereference();
+		String besid = resource.getKey();
+		CloudManager tManage = CloudMonitor.getManager(besid);
+
+		if (tManage != null){
+			try {
+				tManage.killResource(element.getValue());
 			} catch (Exception e) {
 				_logger.error(e);
 			}
@@ -74,6 +90,23 @@ implements CloudConstants{
 		}
 	}
 
+	public MessageElement getVMInfo() throws Exception
+	{
+
+		IBESResource resource = null;
+		resource = 
+			(IBESResource)ResourceManager.getCurrentResource().dereference();
+		String besid = resource.getKey();
+		CloudManager tManage = CloudMonitor.getManager(besid);
+		if (tManage != null){
+			VMStats tStat = new VMStats(tManage.getResourceStatus());
+			return tStat.toMessageElement(VM_INFO_ATTR);
+		}
+		else
+			return null;
+
+	}
+	
 	public MessageElement getStatus() throws Exception
 	{
 

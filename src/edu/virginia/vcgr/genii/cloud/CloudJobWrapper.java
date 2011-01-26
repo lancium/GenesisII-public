@@ -9,6 +9,7 @@ import java.util.Vector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperFactory;
@@ -19,6 +20,7 @@ import edu.virginia.vcgr.genii.container.bes.execution.phases.cloud.CloudExecute
 import edu.virginia.vcgr.genii.container.bes.execution.phases.cloud.CloudGenerateJobFilePhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.cloud.CloudGenerateRunScriptPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.cloud.CloudGetResourcePhase;
+import edu.virginia.vcgr.genii.container.bes.execution.phases.cloud.CloudProcessAccountingPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.cloud.CloudReleaseResourcePhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.cloud.CloudSetPermissionsPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.cloud.CloudSetupContextDirectoryPhase;
@@ -95,19 +97,23 @@ public class CloudJobWrapper {
 
 
 	public static Vector<ExecutionPhase> createExecutionPlan(
-			String activityID, String besid, String scratch,
-			String genDir, JobRequest job){
+			String activityID, String besid,
+			JobRequest job, BESConstructionParameters constructionParameters){
 		
 		
 		Vector<ExecutionPhase> ret = new Vector<ExecutionPhase>();
 		Vector<ExecutionPhase> cleanups = new Vector<ExecutionPhase>();
 
+		CloudConfiguration cConfig = 
+			constructionParameters.getCloudConfiguration();
+		
 		//Config
-		String scratchDir = scratch + activityID + "/" ;
+		String scratchDir = cConfig.getLocalScratchDir() + activityID + "/" ;
 		String genState = ".genState";
-		String remoteDir = "/mnt/scratch/" + activityID + "/";
+		String remoteDir = cConfig.getRemoteScratchDir() + activityID + "/";
 		String jobFile = "jobFile";
 		String runScript = "runScript.sh";
+		String resourceFile = "resourceFile";
 
 		//Create state files
 		ret.add(new CloudSetupContextDirectoryPhase(scratchDir + genState));
@@ -120,8 +126,8 @@ public class CloudJobWrapper {
 		
 		//Generate runScript
 		ret.add(new CloudGenerateRunScriptPhase(scratchDir, runScript,
-				remoteDir, "resourceFile", job, "stageIn.sh", "stageOut.sh",
-				genState, jobFile, genDir));
+				remoteDir, resourceFile, job, "stageIn.sh", "stageOut.sh",
+				genState, jobFile, cConfig.getRemoteClientDir()));
 	
 		//Move local scratch to remote scratch
 		ret.add(new CloudCopyDirectoryPhase(scratchDir, remoteDir,
@@ -169,8 +175,13 @@ public class CloudJobWrapper {
 				"stageOutPhase.complete", "Stage Out"));
 		
 		//Get Accounting Back (Phase 5)
+		ArrayList<String> commandLine = new ArrayList<String>();
+		ret.add(new CloudProcessAccountingPhase(activityID, besid,
+				remoteDir + resourceFile, scratchDir + resourceFile, commandLine,
+				constructionParameters));
 		
-		//Release Resource (add cle
+		
+		//Release Resource 
 		ret.add(new CloudReleaseResourcePhase(activityID, besid));
 
 		

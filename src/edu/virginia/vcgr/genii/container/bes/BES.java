@@ -314,6 +314,9 @@ public class BES implements Closeable
 			_besEPI = null;
 	}
 	
+	public String getBESID(){
+		return _besid; 
+	}
 	protected void finalize() throws Throwable
 	{
 		close();
@@ -350,6 +353,19 @@ public class BES implements Closeable
 					uaift);
 			}
 		}
+		
+		//Cleanup CloudBES
+		BESConstructionParameters cParam = (BESConstructionParameters)DBBESResource.constructionParameters(
+				connection, GeniiBESServiceImpl.class, _besid);
+		if (cParam.getCloudConfiguration() != null){
+			try {
+				CloudMonitor.deleteCloudBES(_besid);
+			} catch (Exception e) {
+				_logger.debug(e);
+			}
+		}
+			
+		
 	}
 	
 	synchronized private String findJobName(String suggestedJobName)
