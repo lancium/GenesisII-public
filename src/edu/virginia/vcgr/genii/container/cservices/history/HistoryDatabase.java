@@ -418,7 +418,7 @@ public class HistoryDatabase
 		{
 			stmt = connection.createStatement();
 			stmt.executeUpdate(String.format(
-				"DELETE FROM historyrecords WHERE resourceID LIKE %s",
+				"DELETE FROM historyrecords WHERE resourceID LIKE '%s'",
 				likeConstant));
 		}
 		finally
