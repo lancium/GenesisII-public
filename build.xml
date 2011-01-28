@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="build" name="GenesisII">
 
-
-
 	<!-- Properties -->
 	<property environment="env"/>
 	<property file="${basedir}/build.properties"/>
@@ -185,6 +183,7 @@
 				<include name="edu/virginia/vcgr/genii/client/**/*"/>
 				<include name="edu/virginia/vcgr/genii/cloud/**/*"/>
 				<include name="edu/virginia/vcgr/genii/ui/**/*"/>
+				<include name="edu/virginia/vcgr/genii/graph/**/*"/>
 				<include name="edu/virginia/vcgr/externalapp/**/*"/>
 				<include name="edu/virginia/vcgr/fuse/**/*"/>
 				<include name="edu/virginia/vcgr/secrun/**/*"/>
