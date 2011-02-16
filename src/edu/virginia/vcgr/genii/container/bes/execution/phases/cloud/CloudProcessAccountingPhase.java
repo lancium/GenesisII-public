@@ -82,6 +82,7 @@ implements Serializable{
 					resourceUsageFile);
 				exitCode = eResults.exitCode();
 				
+				_logger.info("Processing Accounting Data");
 				history.createInfoWriter("Job exited with exit code " + exitCode).close();
 				AccountingService acctService =
 					ContainerServices.findService(AccountingService.class);
@@ -114,7 +115,7 @@ implements Serializable{
 		
 		
 
-		_logger.info("Processd Accounting Data");
+		_logger.info("Processed Accounting Data");
 		
 
 	}

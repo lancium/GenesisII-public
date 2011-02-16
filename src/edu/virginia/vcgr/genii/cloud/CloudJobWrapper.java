@@ -56,6 +56,10 @@ public class CloudJobWrapper {
 
 			boolean first = true;
 
+			String execName = job.getExecutable().getTarget();
+			if (!execName.contains("/"))
+				execName = String.format("./%s", execName);
+			
 			for (String element : wrapper.formCommandLine(
 					null, //app.getEnvironment()
 					workingDir,
@@ -63,7 +67,7 @@ public class CloudJobWrapper {
 					getRedirect(job.getStdoutRedirect(), workingDir),
 					getRedirect(job.getStderrRedirect(), workingDir),
 					resourceUsage,
-					"./" + job.getExecutable().getTarget(),
+					execName,
 					job.getArguments().toArray(
 							new String[job.getArguments().size()])))
 			{
