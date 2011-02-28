@@ -108,7 +108,11 @@
 	<path id="http.classpath">
 			<fileset dir="${http.home}" includes="**/*.jar"/>
 	</path>
-	
+
+	<path id="cmdlineManipulator.classpath">
+		<fileset dir="${cmdlineManipulator.home}" includes="**/*.jar"/>
+	</path>
+
 	<path id="project.classpath">
 		<pathelement location="${obj.dir}"/>
 		<pathelement location="${generated.obj.dir}"/>
@@ -135,6 +139,7 @@
 		<path refid="commonscodec.classpath"/>
 		<path refid="typica.classpath"/>
 		<path refid="http.classpath"/>
+		<path refid="cmdlineManipulator.classpath"/>
 	</path>
 			
 	<!-- Imports -->	

@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.morgan.util.Pair;
 
 import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
 import edu.virginia.vcgr.genii.client.nativeq.ApplicationDescription;
@@ -27,6 +28,7 @@ import edu.virginia.vcgr.genii.client.nativeq.NativeQueueException;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueState;
 import edu.virginia.vcgr.genii.client.nativeq.ScriptBasedQueueConnection;
 import edu.virginia.vcgr.genii.client.nativeq.execution.ParsingExecutionEngine;
+import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfiguration;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.ResourceConstraints;
 
 public class SGEQueueConnection extends ScriptBasedQueueConnection<SGEQueueConfiguration>
@@ -64,6 +66,7 @@ public class SGEQueueConnection extends ScriptBasedQueueConnection<SGEQueueConfi
 	private List<String> _qdelStart;
 	
 	SGEQueueConnection(ResourceOverrides resourceOverrides,
+		CmdLineManipulatorConfiguration cmdLineManipulatorConf,
 		File workingDirectory,
 		NativeQueueConfiguration nativeQueueConfig,
 		SGEQueueConfiguration sgeConfig, String queueName,
@@ -71,7 +74,8 @@ public class SGEQueueConnection extends ScriptBasedQueueConnection<SGEQueueConfi
 		JobStateCache statusCache)
 			throws NativeQueueException
 	{
-		super(workingDirectory, resourceOverrides, nativeQueueConfig, sgeConfig);
+		super(workingDirectory, resourceOverrides, 
+				cmdLineManipulatorConf, nativeQueueConfig, sgeConfig);
 		
 		_statusCache = statusCache;
 		
@@ -179,7 +183,7 @@ public class SGEQueueConnection extends ScriptBasedQueueConnection<SGEQueueConfi
 	}
 
 	@Override
-	protected void generateApplicationBody(PrintStream script,
+	protected List<String> generateApplicationBody(PrintStream script,
 			File workingDirectory, ApplicationDescription application)
 			throws NativeQueueException, IOException
 	{
@@ -188,7 +192,7 @@ public class SGEQueueConnection extends ScriptBasedQueueConnection<SGEQueueConfi
 		{
 			throw new NativeQueueException("SPMD not supported in SGE at the moment.");
 		} else
-			super.generateApplicationBody(script, workingDirectory, application);
+			return super.generateApplicationBody(script, workingDirectory, application);
 	}
 
 	static final private Pattern JOB_TOKEN_PATTERN = Pattern.compile(
@@ -198,7 +202,8 @@ public class SGEQueueConnection extends ScriptBasedQueueConnection<SGEQueueConfi
 	public JobToken submit(ApplicationDescription application) 
 		throws NativeQueueException
 	{
-		File submitScript = generateSubmitScript(getWorkingDirectory(), application);
+		Pair<File, List<String>> submissionReturn = 
+			generateSubmitScript(getWorkingDirectory(), application);
 		
 		List<String> command = new LinkedList<String>();
 		
@@ -219,7 +224,7 @@ public class SGEQueueConnection extends ScriptBasedQueueConnection<SGEQueueConfi
 		command.add("-wd");
 		command.add(getWorkingDirectory().getAbsolutePath());
 		
-		command.add(submitScript.getAbsolutePath());
+		command.add(submissionReturn.first().getAbsolutePath());
 		
 		ProcessBuilder builder = new ProcessBuilder(command);
 		builder.directory(getWorkingDirectory());

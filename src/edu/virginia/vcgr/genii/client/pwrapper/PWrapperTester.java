@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.client.pwrapper;
 
 import java.io.File;
+import java.util.List;
 
 public class PWrapperTester
 {
@@ -23,7 +24,18 @@ public class PWrapperTester
 			}
 		});
 		
-		wrapper.execute(null, new File("/Users/morgan"), null, 
-			new File("/Users/morgan/pwd.out"), null, "/bin/pwd");
+		File workingDirectory = new File("/Users/morgan");
+		File stdOutRedirect = new File("/Users/morgan/pwd.out"); 
+		
+		File resourceUsageFile = new ResourceUsageDirectory(
+				workingDirectory).getNewResourceUsageFile();
+		
+		List<String> command = wrapper.formCommandLine(
+				null, workingDirectory, null, 
+				stdOutRedirect, null, 
+				resourceUsageFile, null, "/bin/pwd");
+		
+		wrapper.execute(null, workingDirectory, null, 
+			resourceUsageFile, command);
 	}
 }

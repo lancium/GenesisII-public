@@ -30,6 +30,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
+import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfiguration;
 
 @XmlAccessorType(XmlAccessType.NONE)
 public class NativeQueueConfiguration implements Serializable, NativeQConstants
@@ -132,12 +133,13 @@ public class NativeQueueConfiguration implements Serializable, NativeQConstants
 	
 	final public NativeQueueConnection connect(
 		ResourceOverrides resourceOverrides, 
+		CmdLineManipulatorConfiguration cmdLineManipulatorCon,
 			File workingDirectory)
 				throws NativeQueueException
 	{
 		NativeQueue queue = nativeQueue();
-		return queue.connect(resourceOverrides, workingDirectory,
-			this, _providerConfiguration);
+		return queue.connect(resourceOverrides, cmdLineManipulatorCon, 
+			workingDirectory, this, _providerConfiguration);
 	}
 	
 	final public void providerName(String providerName)

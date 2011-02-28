@@ -10,6 +10,7 @@ import edu.virginia.vcgr.genii.client.nativeq.JobStateCache;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConnection;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueException;
+import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfiguration;
 
 public class PBSQueue extends AbstractNativeQueue<PBSQueueConfiguration>
 {
@@ -25,6 +26,7 @@ public class PBSQueue extends AbstractNativeQueue<PBSQueueConfiguration>
 	@Override
 	public NativeQueueConnection connect(
 		ResourceOverrides resourceOverrides,
+		CmdLineManipulatorConfiguration cmdLineManipulatorConf,
 		File workingDirectory,
 		NativeQueueConfiguration nativeQueueConfiguration,
 		Object providerConfiguration) throws NativeQueueException
@@ -37,12 +39,15 @@ public class PBSQueue extends AbstractNativeQueue<PBSQueueConfiguration>
 		if (pbsConfig == null)
 			pbsConfig = new PBSQueueConfiguration();
 		
+		if (cmdLineManipulatorConf == null)
+			cmdLineManipulatorConf = new CmdLineManipulatorConfiguration();
+		
 		String qname = pbsConfig.queueName();
 		
 		try
 		{
 			return new PBSQueueConnection(resourceOverrides,
-				workingDirectory,
+				cmdLineManipulatorConf, workingDirectory,
 				nativeQueueConfiguration, pbsConfig, qname, 
 				pbsConfig.startQSub(), pbsConfig.startQStat(),
 				pbsConfig.startQDel(), _statusCache);

@@ -9,7 +9,7 @@
 	<classpathentry kind="lib" path="ext/axis/ext/xml-apis.jar"/>
 	<classpathentry kind="lib" path="ext/axis/ext/xmlParserAPIs.jar"/>
 	<classpathentry kind="lib" path="ext/axis/ext/xmlsec-1.4.Beta2.jar"/>
-	<classpathentry kind="lib" path="ext/axis/lib/axis.jar" sourcepath="/home/tuser/Desktop/source/axis-1_4"/>
+	<classpathentry kind="lib" path="ext/axis/lib/axis.jar" sourcepath="/Axis 1.4/src"/>
 	<classpathentry kind="lib" path="ext/axis/lib/axis-ant.jar"/>
 	<classpathentry kind="lib" path="ext/axis/lib/commons-discovery-0.2.jar"/>
 	<classpathentry kind="lib" path="ext/axis/lib/commons-logging-1.0.4.jar"/>
@@ -56,5 +56,6 @@
 	<classpathentry kind="lib" path="ext/http/httpclient-4.0.3.jar" sourcepath="/home/tuser/Desktop/source/httpcomponents-client-4.0.3"/>
 	<classpathentry kind="lib" path="ext/http/httpcore-4.0.1.jar" sourcepath="/home/tuser/Desktop/source/httpcomponents-core-4.1"/>
 	<classpathentry kind="lib" path="ext/commonscodec/commons-codec-1.4.jar"/>
+	<classpathentry kind="lib" path="ext/cmdLineManipulator/CmdLineManipulator.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

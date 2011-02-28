@@ -87,6 +87,8 @@ class ForkExecApplicationUnderstanding extends PosixLikeApplicationUnderstanding
 		if (ogrshVersion == null)
 		{
 			executionPlan.add(new RunProcessPhase(
+				getSPMDVariation(), getNumProcesses(), 
+				getNumProcessesPerHost(),
 				BESActivityServiceImpl.getCommonDirectory(creationProperties),
 				fsManager.lookup(getExecutable()), stringArgs.toArray(new String[0]),
 				stringEnv, redirection, creationProperties));
@@ -103,6 +105,8 @@ class ForkExecApplicationUnderstanding extends PosixLikeApplicationUnderstanding
 			File shim = Installation.getOGRSH(
 				).getInstalledVersions().get(ogrshVersion).shimScript();
 			executionPlan.add(new RunProcessPhase(
+				getSPMDVariation(), getNumProcesses(), 
+				getNumProcessesPerHost(),
 				BESActivityServiceImpl.getCommonDirectory(creationProperties),
 				shim, args.toArray(new String[0]), stringEnv,
 				redirection, creationProperties));

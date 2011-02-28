@@ -79,48 +79,14 @@ public class BES implements Closeable
 		}
 	}
 	
-	static private void upgradeNativeQPropsToCreationParams(
+	static private void supplementCreationParamsWithTweakerConfig(
 		String besid, Connection connection) throws SQLException, IOException
 	{
 		ConstructionParameters cParams = DBBESResource.constructionParameters(
 			connection, GeniiBESServiceImpl.class, besid);
 		
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		
-		try
-		{
-			stmt = connection.prepareStatement(
-				"SELECT propertyname, propertyvalue " +
-					"FROM persistedproperties " +
-				"WHERE resourceid = ? AND category = ?");
-			stmt.setString(1, besid);
-			stmt.setString(2, GeniiBESConstants.NATIVE_QUEUE_CONF_CATEGORY);
-			rs = stmt.executeQuery();
-			Properties props = new Properties();
-			while (rs.next())
-				props.setProperty(rs.getString(1), rs.getString(2));
-			
-			if (Version1Upgrader.upgrade(
-				(BESConstructionParameters)cParams, props))
-				DBBESResource.constructionParameters(
-					connection, besid, cParams);
-			
-			stmt.close();
-			stmt = null;
-			
-			stmt = connection.prepareStatement(
-				"DELETE FROM persistedproperties " +
-				"WHERE resourceid = ? AND category = ?");
-			stmt.setString(1, besid);
-			stmt.setString(2, GeniiBESConstants.NATIVE_QUEUE_CONF_CATEGORY);
-			stmt.executeUpdate();
-		}
-		finally
-		{
-			StreamUtils.close(rs);
-			StreamUtils.close(stmt);
-		}
+		if (CmdLineManipulatorUpgrader.upgrade((BESConstructionParameters)cParams))
+			DBBESResource.constructionParameters(connection, besid, cParams);
 	}
 	
 	static public Collection<String> listBESs()
@@ -186,7 +152,8 @@ public class BES implements Closeable
 					BESPolicyActions.valueOf(rs.getString(2)),
 					BESPolicyActions.valueOf(rs.getString(3)));
 				
-				upgradeNativeQPropsToCreationParams(besid, connection);
+				_logger.info(String.format("Loading BES with id: %s", besid));
+				supplementCreationParamsWithTweakerConfig(besid, connection);
 				
 				BES bes = new BES(connection, besid, policy);
 				_knownInstances.put(besid, bes);
@@ -207,6 +174,7 @@ public class BES implements Closeable
 				
 				connection.commit();
 			}
+			
 		}
 		finally
 		{

@@ -3,6 +3,9 @@ package edu.virginia.vcgr.genii.container.bes.execution.phases;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,10 +18,12 @@ import org.ggf.bes.factory.ActivityStateEnumeration;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
+import edu.virginia.vcgr.genii.client.cmdLineManipulator.CmdLineManipulatorUtils;
 import edu.virginia.vcgr.genii.client.pwrapper.ExitResults;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperFactory;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperToken;
+import edu.virginia.vcgr.genii.client.pwrapper.ResourceUsageDirectory;
 import edu.virginia.vcgr.genii.container.bes.execution.ContinuableExecutionException;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionException;
@@ -37,6 +42,9 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 	
 	static private Log _logger = LogFactory.getLog(RunProcessPhase.class);
 	
+	private URI _spmdVariation;
+	private Integer _numProcesses;
+	private Integer _numProcessesPerHost;
 	private File _commonDirectory;
 	private File _executable;
 	private String []_arguments;
@@ -53,15 +61,19 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 		process.cancel();
 	}
 	
-	public RunProcessPhase(File commonDirectory,
-		File executable, String []arguments, 
-		Map<String, String> environment,
+	public RunProcessPhase(URI spmdVariation, 
+		Integer numProcesses, Integer numProcessesPerHost, 
+		File commonDirectory, File executable, 
+		String []arguments, Map<String, String> environment,
 		PassiveStreamRedirectionDescription redirects,
 		BESConstructionParameters constructionParameters)
 	{
 		super(new ActivityState(ActivityStateEnumeration.Running,
 			EXECUTING_STAGE, false), constructionParameters);
 		
+		_spmdVariation = spmdVariation;
+		_numProcesses = numProcesses;
+		_numProcessesPerHost = numProcessesPerHost;
 		_commonDirectory = commonDirectory;
 		
 		if (executable == null)
@@ -94,7 +106,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 	public void execute(ExecutionContext context) throws Throwable
 	{
 		File stderrFile = null;
-		List<String> command;
+		List<String> command, newCmdLine;
 		ProcessWrapperToken token;
 		HistoryContext history = HistoryContextFactory.createContext(
 			HistoryEventCategory.CreatingActivity);
@@ -139,25 +151,59 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 				
 				_environment = overloadEnvironment(_environment);
 			}
-			resetCommand(command, workingDirectory, _environment);
-			
-			_logger.info("Trying to start a new process on machine using fork/exec or spawn.");
-			String []arguments = new String[command.size() - 1];
-			for (int lcv = 1; lcv < command.size(); lcv++)
-				arguments[lcv - 1] = command.get(lcv);
-			preDelay();
+
 			stderrFile = _redirects.stderrSink(workingDirectory);
+						
+			//assemble job properties for cmdline manipulators
+			Collection<String> args = new ArrayList<String>(_arguments.length);
+			for (String s : _arguments)
+				args.add(s);
+						
+			File resourceUsageFile = new ResourceUsageDirectory(
+					workingDirectory).getNewResourceUsageFile();
+			
+			HashMap<String, Object> jobProperties = new HashMap<String, Object>();
+			CmdLineManipulatorUtils.addBasicJobProperties(jobProperties, 
+					_executable.getAbsolutePath(), args);
+			CmdLineManipulatorUtils.addEnvProperties(jobProperties, _environment, 
+					workingDirectory, _redirects.stdinSource(), 
+					_redirects.stdoutSink(), stderrFile, 
+					resourceUsageFile, wrapper.getPathToWrapper());
+			CmdLineManipulatorUtils.addSPMDJobProperties(jobProperties, 
+					_spmdVariation, _numProcesses, _numProcessesPerHost);	
+				
+			newCmdLine = new Vector<String>();
+			_logger.debug("Trying to call cmdLine manipulators.");
+			newCmdLine = CmdLineManipulatorUtils.callCmdLineManipulators(jobProperties, 
+					_constructionParameters.getCmdLineManipulatorConfiguration());
+			
+				//for testing only - use default cmdLine format to compare to transform
+				String []arguments = new String[command.size() - 1];
+				for (int lcv = 1; lcv < command.size(); lcv++)
+					arguments[lcv - 1] = command.get(lcv);
+				
+				Vector<String> testCmdLine = wrapper.formCommandLine(
+						_environment, workingDirectory, _redirects.stdinSource(), 
+						_redirects.stdoutSink(), stderrFile, 
+						resourceUsageFile, command.get(0), arguments);
+				_logger.debug(String.format("Pervious cmdLine format with pwrapper only:\n %s", 
+						testCmdLine.toString()));
+				
+			_logger.debug(
+				"Trying to start a new process on machine using fork/exec or spawn.");
+			preDelay();
+			
+			
 			
 			PrintWriter hWriter = history.createInfoWriter(
 				"BES Starting Activity").format(
 					"BES starting activity: ");
-			for (String arg : command)
+			for (String arg : newCmdLine)
 				hWriter.format(" %s", arg);
 			hWriter.close();
 			
 			token = wrapper.execute(_environment, workingDirectory, 
-				_redirects.stdinSource(), _redirects.stdoutSink(), 
-				stderrFile, command.get(0), arguments);
+				_redirects.stdinSource(), resourceUsageFile, newCmdLine);
 		}
 		
 		try
@@ -195,7 +241,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 				{
 					acctService.addAccountingRecord(
 						context.getCallingContext(), context.getBESEPI(),
-						null, null, null, command,
+						null, null, null, newCmdLine,
 						results.exitCode(),
 						results.userTime(), results.kernelTime(),
 						results.wallclockTime(), results.maximumRSS());

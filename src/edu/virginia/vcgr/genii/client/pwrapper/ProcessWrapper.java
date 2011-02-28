@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Vector;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import javax.xml.bind.JAXBContext;
@@ -68,6 +69,10 @@ public class ProcessWrapper
 	
 	private ExecutorService _threadPool;
 	private File _pathToWrapper;
+	
+	public File getPathToWrapper(){
+		return _pathToWrapper;
+	}
 	
 	protected void fireProcessCompleted(ProcessWrapperToken token)
 	{
@@ -155,8 +160,8 @@ public class ProcessWrapper
 	final public ProcessWrapperToken execute(
 		Map<String, String> environmentOverload,
 		File workingDirectory, File stdinRedirect,
-		File stdoutRedirect, File stderrRedirect,
-		String executable, String...arguments) throws ProcessWrapperException
+		File resourceUsageFile, List<String> command) 
+		throws ProcessWrapperException
 	{
 		if (!_pathToWrapper.exists())
 			throw new ProcessWrapperException(String.format(
@@ -193,15 +198,9 @@ public class ProcessWrapper
 					"Stdin source file %s is not a file!",
 					stdinRedirect));
 		}
-		
-		File resourceUsageFile = new ResourceUsageDirectory(
-			workingDirectory).getNewResourceUsageFile();
-		
-		Vector<String> commandLine = formCommandLine(
-			environmentOverload, workingDirectory, stdinRedirect,
-			stdoutRedirect, stderrRedirect, resourceUsageFile,
-			executable, arguments);
-		ProcessBuilder builder = new ProcessBuilder(commandLine);
+				
+		ProcessBuilder builder = new ProcessBuilder(
+				new Vector<String>(command));
 		ProcessWrapperWorker worker = new ProcessWrapperWorker(
 			resourceUsageFile, builder);
 		_threadPool.execute(worker);

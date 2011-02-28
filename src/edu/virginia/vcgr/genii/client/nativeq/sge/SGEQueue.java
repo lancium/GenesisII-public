@@ -10,6 +10,7 @@ import edu.virginia.vcgr.genii.client.nativeq.JobStateCache;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConnection;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueException;
+import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfiguration;
 
 public class SGEQueue extends AbstractNativeQueue<SGEQueueConfiguration>
 {
@@ -25,6 +26,7 @@ public class SGEQueue extends AbstractNativeQueue<SGEQueueConfiguration>
 	@Override
 	public NativeQueueConnection connect(
 		ResourceOverrides resourceOverrides,
+		CmdLineManipulatorConfiguration cmdLineManipulatorConf,
 		File workingDirectory,
 		NativeQueueConfiguration nativeQueueConfiguration,
 		Object providerConfiguration) throws NativeQueueException
@@ -34,6 +36,9 @@ public class SGEQueue extends AbstractNativeQueue<SGEQueueConfiguration>
 		if (nativeQueueConfiguration == null)
 			nativeQueueConfiguration = new NativeQueueConfiguration();
 		
+		if (cmdLineManipulatorConf == null)
+			cmdLineManipulatorConf = new CmdLineManipulatorConfiguration();
+		
 		if (sgeConfig == null)
 			sgeConfig = new SGEQueueConfiguration();
 		
@@ -42,7 +47,7 @@ public class SGEQueue extends AbstractNativeQueue<SGEQueueConfiguration>
 		try
 		{
 			return new SGEQueueConnection(resourceOverrides,
-				workingDirectory,
+				cmdLineManipulatorConf, workingDirectory,
 				nativeQueueConfiguration, sgeConfig, qname, 
 				sgeConfig.startQSub(), sgeConfig.startQStat(),
 				sgeConfig.startQDel(), _statusCache);

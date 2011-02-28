@@ -1,10 +1,8 @@
 package edu.virginia.vcgr.genii.client.nativeq.sge;
 
-import java.io.Serializable;
+import edu.virginia.vcgr.genii.client.nativeq.AbstractJobToken;
 
-import edu.virginia.vcgr.genii.client.nativeq.JobToken;
-
-public class SGEJobToken implements JobToken, Serializable
+public class SGEJobToken extends AbstractJobToken
 {
 	static final long serialVersionUID = 0L;
 	

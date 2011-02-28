@@ -201,6 +201,9 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 					_environment, fileToPath(_stdin, null),
 					fileToPath(_stdout, null), stderrPath, _resourceConstraints,
 					resourceUsageFile));
+				
+				_logger.debug(String.format("CommandLine used by job: \n %s", _jobToken.getCmdLine()));
+				
 				context.setProperty(JOB_TOKEN_PROPERTY, _jobToken);
 			}
 			
@@ -253,7 +256,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 						command.add(0, _executable.getAbsolutePath());
 						acctService.addAccountingRecord(
 							context.getCallingContext(), context.getBESEPI(),
-							arch, osName, null, command, exitCode,
+							arch, osName, null, _jobToken.getCmdLine(), exitCode,
 							eResults.userTime(), eResults.kernelTime(),
 							eResults.wallclockTime(), eResults.maximumRSS());
 					}
@@ -323,6 +326,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 			
 			return conf.connect(
 				_constructionParameters.getResourceOverrides(),
+				_constructionParameters.getCmdLineManipulatorConfiguration(),
 				workingDirectory);
 		}
 		catch (NativeQueueException nqe)

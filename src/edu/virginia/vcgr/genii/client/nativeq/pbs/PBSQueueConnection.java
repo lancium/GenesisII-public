@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.morgan.util.Pair;
 
 import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
 import edu.virginia.vcgr.genii.client.nativeq.ApplicationDescription;
@@ -27,6 +28,7 @@ import edu.virginia.vcgr.genii.client.nativeq.NativeQueueException;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueState;
 import edu.virginia.vcgr.genii.client.nativeq.ScriptBasedQueueConnection;
 import edu.virginia.vcgr.genii.client.nativeq.ScriptLineParser;
+import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfiguration;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.ResourceConstraints;
 
 public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfiguration>
@@ -64,6 +66,7 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 	private List<String> _qdelStart;
 	
 	PBSQueueConnection(ResourceOverrides resourceOverrides,
+		CmdLineManipulatorConfiguration cmdLineManipulatorConf,
 		File workingDirectory,
 		NativeQueueConfiguration nativeQueueConfig,
 		PBSQueueConfiguration pbsConfig, String queueName,
@@ -71,7 +74,8 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 		JobStateCache statusCache)
 			throws NativeQueueException
 	{
-		super(workingDirectory, resourceOverrides, nativeQueueConfig, pbsConfig);
+		super(workingDirectory, resourceOverrides, 
+				cmdLineManipulatorConf, nativeQueueConfig, pbsConfig);
 		
 		_statusCache = statusCache;
 		
@@ -244,7 +248,8 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 	public JobToken submit(ApplicationDescription application) 
 		throws NativeQueueException
 	{
-		File submitScript = generateSubmitScript(getWorkingDirectory(), application);
+		Pair<File, List<String>> submissionReturn = 
+			generateSubmitScript(getWorkingDirectory(), application);
 		
 		List<String> command = new LinkedList<String>();
 		
@@ -261,13 +266,14 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 
 			command.add(builder.toString());
 		}
-		
-		command.add(submitScript.getAbsolutePath());
+	
+		command.add(submissionReturn.first().getAbsolutePath());
 		
 		ProcessBuilder builder = new ProcessBuilder(command);
 		builder.directory(getWorkingDirectory());
+		
 		return new PBSJobToken(
-			execute(builder).trim());
+				execute(builder).trim(), submissionReturn.second());
 	}
 
 	@Override

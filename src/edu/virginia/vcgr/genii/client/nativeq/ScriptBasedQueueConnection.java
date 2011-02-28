@@ -8,20 +8,29 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.util.Collection;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Set;
+import java.util.List;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
+import org.morgan.util.Pair;
 
+import edu.virginia.vcgr.genii.client.cmdLineManipulator.CmdLineManipulatorUtils;
 import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperException;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperFactory;
+import edu.virginia.vcgr.genii.cmdLineManipulator.CmdLineManipulatorException;
+import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfiguration;
 
-public abstract class ScriptBasedQueueConnection<ProviderConfigType extends ScriptBasedQueueConfiguration>
+public abstract class ScriptBasedQueueConnection<ProviderConfigType 
+	extends ScriptBasedQueueConfiguration>
 	extends AbstractNativeQueueConnection<ProviderConfigType>
 {
 	static private Log _logger = LogFactory.getLog(
@@ -32,11 +41,13 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 	
 	protected ScriptBasedQueueConnection(File workingDirectory,
 		ResourceOverrides resourceOverrides,
+		CmdLineManipulatorConfiguration cmdLineManipulatorConf,
 		NativeQueueConfiguration queueConfig,
 		ProviderConfigType providerConfig)
 			throws NativeQueueException
 	{
-		super(workingDirectory, resourceOverrides, queueConfig, providerConfig);
+		super(workingDirectory, resourceOverrides, 
+				cmdLineManipulatorConf, queueConfig, providerConfig);
 	}
 	
 	@Override
@@ -74,12 +85,12 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			new File("/bin/bash"));
 	}
 	
-	final protected File generateSubmitScript(File workingDirectory,
+	final protected Pair<File,List<String>> generateSubmitScript(File workingDirectory,
 		ApplicationDescription application)
 			throws NativeQueueException
 	{
 		PrintStream ps = null;
-		
+		List<String> finalCmdLine;
 		try
 		{
 			File submitScript = getSubmitScript(workingDirectory);
@@ -88,12 +99,12 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			generateScriptHeader(ps, workingDirectory, application);
 			generateQueueHeaders(ps, workingDirectory, application);
 			generateQueueApplicationHeader(ps, workingDirectory, application);
-			generateApplicationBody(ps, workingDirectory, application);
+			finalCmdLine = generateApplicationBody(ps, workingDirectory, application);
 			generateQueueApplicationFooter(ps, workingDirectory, application);
 			generateScriptFooter(ps, workingDirectory, application);
 			
 			submitScript.setExecutable(true, true);
-			return submitScript;
+			return new Pair<File, List<String>>(submitScript, finalCmdLine);
 		}
 		catch (IOException ioe)
 		{
@@ -161,11 +172,12 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			script.format("\nexport QUEUE_SCRIPT_RESULT=$?\n");
 	}
 	
-	protected void generateApplicationBody(PrintStream script,
+	protected List<String> generateApplicationBody(PrintStream script,
 		File workingDirectory, ApplicationDescription application)
 			throws NativeQueueException, IOException
 	{
 		Set<UnixSignals> signals = queueConfiguration().trapSignals();
+		List<String> newCmdLine = new Vector<String>();
 		
 		script.format("cd \"%s\"\n", workingDirectory.getAbsolutePath());
 		
@@ -183,15 +195,46 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 				getCommonDirectory(), overrides.operatingSystemName(),
 				overrides.cpuArchitecture());
 			
-			boolean first = true;
-			for (String element : wrapper.formCommandLine(
-					application.getEnvironment(), workingDirectory,
+			//assemble job properties for cmdLineManipulators
+			Map<String, Object> jobProperties = new HashMap<String, Object>();
+			CmdLineManipulatorUtils.addBasicJobProperties(jobProperties, 
+					execName, application.getArguments());
+			CmdLineManipulatorUtils.addEnvProperties(jobProperties, 
+					application.getEnvironment(), workingDirectory, 
 					application.getStdinRedirect(workingDirectory), 
 					application.getStdoutRedirect(workingDirectory),
-					application.getStderrRedirect(workingDirectory),
+					application.getStderrRedirect(workingDirectory), 
 					application.getResourceUsagePath(),
-					execName, application.getArguments().toArray(
-						new String[application.getArguments().size()])))
+					wrapper.getPathToWrapper());
+			CmdLineManipulatorUtils.addSPMDJobProperties(jobProperties, 
+					application.getSPMDVariation(), 
+					application.getNumProcesses(), 
+					application.getNumProcessesPerHost());			
+				
+			_logger.debug("Trying to call cmdLine manipulators.");
+			try{
+				newCmdLine = CmdLineManipulatorUtils.callCmdLineManipulators(
+					jobProperties, cmdLineManipulatorConf());
+			}
+			catch(CmdLineManipulatorException execption){
+				throw new NativeQueueException(String.format("CmdLine Manipulators failed: %s", 
+						execption.getMessage()));
+			}
+			
+				//for testing only -  default cmdLine format to compare to transform
+				Vector<String> testCmdLine = wrapper.formCommandLine(
+						application.getEnvironment(), workingDirectory,
+						application.getStdinRedirect(workingDirectory), 
+						application.getStdoutRedirect(workingDirectory),
+						application.getStderrRedirect(workingDirectory),
+						application.getResourceUsagePath(),
+						execName, application.getArguments().toArray(
+							new String[application.getArguments().size()]));
+				_logger.debug(String.format("Pervious cmdLine format with pwrapper only:\n %s", 
+						testCmdLine.toString()));
+				
+			boolean first = true;
+			for (String element : newCmdLine)
 			{
 				if (!first)
 					script.format(" ");
@@ -209,6 +252,7 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType extends Scri
 			script.print(" &");
 		
 		script.println();
+		return newCmdLine;
 	}
 	
 	protected void generateScriptFooter(PrintStream script,

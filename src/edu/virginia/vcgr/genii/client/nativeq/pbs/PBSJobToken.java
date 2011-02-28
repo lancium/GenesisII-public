@@ -1,10 +1,10 @@
 package edu.virginia.vcgr.genii.client.nativeq.pbs;
 
-import java.io.Serializable;
+import java.util.List;
 
-import edu.virginia.vcgr.genii.client.nativeq.JobToken;
+import edu.virginia.vcgr.genii.client.nativeq.AbstractJobToken;
 
-public class PBSJobToken implements JobToken, Serializable
+public class PBSJobToken extends AbstractJobToken
 {
 	static final long serialVersionUID = 0L;
 	
@@ -17,6 +17,16 @@ public class PBSJobToken implements JobToken, Serializable
 				"Token parameter cannot be null.");
 		
 		_token = token;
+	}
+	
+	public PBSJobToken(String token, List<String> cmdLine)
+	{
+		if (token == null)
+			throw new IllegalArgumentException(
+				"Token parameter cannot be null.");
+		
+		_token = token;
+		_cmdLine = cmdLine;
 	}
 	
 	public String toString()

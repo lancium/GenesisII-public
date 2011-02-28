@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
+import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfiguration;
 
 public abstract class AbstractNativeQueueConnection<ProviderConfigType>
 	implements NativeQueueConnection
@@ -11,18 +12,21 @@ public abstract class AbstractNativeQueueConnection<ProviderConfigType>
 	transient private boolean _closed = false;
 	private File _workingDirectory = null;
 	private ResourceOverrides _resourceOverrides;
+	private CmdLineManipulatorConfiguration _manipulatorConfiguration;
 	private NativeQueueConfiguration _queueConfiguration;
 	private ProviderConfigType _providerConfiguration;
 	
 	protected AbstractNativeQueueConnection(
 		File workingDirectory, 
 		ResourceOverrides resourceOverrides,
+		CmdLineManipulatorConfiguration cmdLineManipulatorConf,
 		NativeQueueConfiguration queueConfig,
 		ProviderConfigType providerConfig) 
 			throws NativeQueueException
 	{
 		_workingDirectory = workingDirectory;
 		_resourceOverrides = resourceOverrides;
+		_manipulatorConfiguration = cmdLineManipulatorConf;
 		_queueConfiguration = queueConfig;
 		_providerConfiguration = providerConfig;
 		
@@ -32,6 +36,11 @@ public abstract class AbstractNativeQueueConnection<ProviderConfigType>
 	protected ResourceOverrides resourceOverrides()
 	{
 		return _resourceOverrides;
+	}
+	
+	protected CmdLineManipulatorConfiguration cmdLineManipulatorConf()
+	{
+		return _manipulatorConfiguration;
 	}
 	
 	protected NativeQueueConfiguration queueConfiguration()
