@@ -1,8 +1,11 @@
 package edu.virginia.vcgr.genii.client.configuration;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -66,6 +69,33 @@ public class Security
 		{
 			StreamUtils.close(fin);
 		}
+	}
+	
+	public Collection<File> getDefaultOwnerFiles()
+	{
+		Collection<File> ret = new LinkedList<File>();
+		
+		HierarchicalDirectory ownersDir = _securityDirectory.lookupDirectory(
+			"default-owners");
+		if (ownersDir.exists())
+		{
+			File []files = ownersDir.listFiles(new FileFilter()
+			{	
+				@Override
+				public boolean accept(File pathname)
+				{
+					return pathname.getName().endsWith(".cer");
+				}
+			});
+			
+			if (files != null && files.length > 0)
+			{
+				for (File file : files)
+					ret.add(file);
+			}
+		}
+		
+		return ret;
 	}
 	
 	public File getSecurityFile(String filename)

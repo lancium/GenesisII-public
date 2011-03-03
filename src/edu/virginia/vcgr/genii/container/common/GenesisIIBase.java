@@ -1322,7 +1322,13 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 		ArrayList<MessageElement> elements = new ArrayList<MessageElement>();
 		for (IAttributeManipulator manipulator : manipulators)
 		{
-			elements.addAll(manipulator.getAttributeValues());
+			Collection<MessageElement> values = manipulator.getAttributeValues();
+			if (values != null)
+			{
+				for (MessageElement value : values)
+					if (value != null)
+						elements.add(value);
+			}
 		}
 		
 		MessageElement []elementsArray = new MessageElement[elements.size()];

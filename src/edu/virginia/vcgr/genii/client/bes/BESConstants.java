@@ -93,6 +93,9 @@ public interface BESConstants
 	static public final QName OGRSH_VERSIONS_ATTR = new QName(
 		GENII_BES_NS, "OGRSHVersion");
 	
+	static public final QName BES_WALLCLOCK_TIMELIMIT_ATTR = new QName(
+		GENII_BES_NS, "WallclockTimeLimit");
+	
 	static public final QName SPMD_PROVIDER_ATTR = new QName(
 		GENII_BES_NS, "SPMDProvider");
 	

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="4.2.8" transformSequenceNumber="2">
   <directoryPresets config="../../deployments" />
-  <application name="Genesis II" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" keepModificationTimes="false" missingFilesStrategy="warn" shortName="genii" publisher="Global Bio Grid" publisherWeb="http://vcgr.cs.virginia.edu" version="2.1.0" allPathsRelative="true" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.6">
+  <application name="Genesis II" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" keepModificationTimes="false" missingFilesStrategy="warn" shortName="genii" publisher="Global Bio Grid" publisherWeb="http://vcgr.cs.virginia.edu" version="2.1.1" allPathsRelative="true" backupOnSave="false" autoSave="false" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.6">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -15,7 +15,7 @@
       <variable name="genii.patch-url" value="http://vcgr.cs.virginia.edu/GenesisII/2.0/patches/ReleaseBranch-2.0" />
       <variable name="genii.connection-url" value="http://vcgr.cs.virginia.edu/XCG/2.0/root.xml" />
       <variable name="genii.deployment" value="GeniiNetFullContainer" />
-      <variable name="genii.build-number" value="2120" />
+      <variable name="genii.build-number" value="2131" />
       <variable name="genii.xcg-port" value="18443" />
       <variable name="genii.container-memory.fraction" value="0.25" />
       <variable name="genii.container-memory.upper-limit" value="2048" />
@@ -108,6 +108,7 @@
           <entry location="deployments/GeniiNetBootstrapContainer" fileType="regular" />
           <entry location="dpages" fileType="regular" />
           <entry location="example-dep" fileType="regular" />
+          <entry location="example-fsproxy" fileType="regular" />
           <entry location="genned-obj" fileType="regular" />
           <entry location="genned-src" fileType="regular" />
           <entry location="grid" fileType="regular" />
@@ -1487,6 +1488,25 @@ ${installer:genii.user-password}</string>
     context.getVariable("sys.installationDir"),
     context.getCompilerVariable("genii.deployment")));
 return ownerCer.exists();</condition>
+                          </action>
+                          <action name="" id="1915" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="">
+                            <serializedBean>
+                              <java class="java.beans.XMLDecoder">
+                                <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
+                                  <void property="destinationFile">
+                                    <object class="java.io.File">
+                                      <string>${installer:sys.installationDir}/deployments/GeniiNetFullContainer/security/default-owners/owner.cer</string>
+                                    </object>
+                                  </void>
+                                  <void property="sourceFile">
+                                    <object class="java.io.File">
+                                      <string>${installer:sys.installationDir}/deployments/GeniiNetFullContainer/security/owner.cer</string>
+                                    </object>
+                                  </void>
+                                </object>
+                              </java>
+                            </serializedBean>
+                            <condition />
                           </action>
                         </actions>
                         <formComponents>

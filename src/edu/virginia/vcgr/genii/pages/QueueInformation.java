@@ -35,7 +35,7 @@ public class QueueInformation extends GenesisIIStyledPage
 	{
 		ps.format("<H2>Total Resources Available:  %d</H2><BR/>", queue.totalSlots());
 		ps.format("<H2>Total Jobs Finished Since 14 August 2009:  %d</H2><BR/>",
-			queue.totalFinishedAllTime());
+			(669378L + queue.totalFinishedAllTime()));
 		ps.println("<TABLE border=\"0\" cellpadding=\"50\">");
 		ps.println("<TR>");
 		ps.println("<TD>");

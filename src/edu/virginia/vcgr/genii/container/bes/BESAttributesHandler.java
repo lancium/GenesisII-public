@@ -44,6 +44,8 @@ import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.spmd.SPMDTranslatorFactories;
 import edu.virginia.vcgr.genii.client.utils.units.ClockSpeed;
 import edu.virginia.vcgr.genii.client.utils.units.ClockSpeedUnits;
+import edu.virginia.vcgr.genii.client.utils.units.Duration;
+import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 import edu.virginia.vcgr.genii.client.utils.units.Size;
 import edu.virginia.vcgr.genii.client.utils.units.SizeUnits;
 
@@ -93,6 +95,7 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		addHandler(BESConstants.DEPLOYER_EPR_ATTR, 
 			"getDeployersAttr", "setDeployersAttr");
 		addHandler(OGRSH_VERSIONS_ATTR, "getOGRSHVersionsAttr");
+		addHandler(BES_WALLCLOCK_TIMELIMIT_ATTR, "getWallclockTimeLimitAttr");
 	}
 	
 	static public String getName()
@@ -233,6 +236,21 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 			return (long)cs.as(ClockSpeedUnits.Hertz);
 		
 		return SystemInfoUtils.getIndividualCPUSpeed();
+	}
+	
+	static public Long getWallclockTimeLimit() throws ResourceUnknownFaultType, ResourceException
+	{
+		IBESResource resource = null;
+		resource = (IBESResource)ResourceManager.getCurrentResource().dereference();
+		ConstructionParameters cParams = resource.constructionParameters(
+			GeniiBESServiceImpl.class);
+		BESConstructionParameters besParams = (BESConstructionParameters)cParams;
+		
+		Duration duration = besParams.getResourceOverrides().wallclockTimeLimit();
+		if (duration != null)
+			return (long)duration.as(DurationUnits.Seconds);
+
+		return null;
 	}
 	
 	static public long getPhysicalMemory() throws RemoteException
@@ -453,6 +471,16 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 	{
 		return new MessageElement(CPU_SPEED_ATTR,
 			getCPUSpeed());
+	}
+	
+	static public MessageElement getWallclockTimeLimitAttr() throws ResourceUnknownFaultType, ResourceException
+	{
+		Long value = getWallclockTimeLimit();
+		if (value != null)
+			return new MessageElement(BES_WALLCLOCK_TIMELIMIT_ATTR,
+				value);
+		
+		return null;
 	}
 	
 	public MessageElement getPhysicalMemoryAttr() throws RemoteException

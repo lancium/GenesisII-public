@@ -5,6 +5,7 @@ import java.io.Serializable;
 import javax.xml.bind.annotation.XmlElement;
 
 import edu.virginia.vcgr.genii.client.utils.units.ClockSpeed;
+import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.utils.units.Size;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
@@ -40,6 +41,10 @@ public class ResourceOverrides implements Serializable
 	@XmlElement(namespace = BESConstructionParameters.BES_CONS_PARMS_NS,
 		name = "virtual-memory", required = false)
 	private Size _virtualMemory = null;
+	
+	@XmlElement(namespace = BESConstructionParameters.BES_CONS_PARMS_NS,
+		name = "wallclock-time-limit", required = false)
+	private String _wallclockTimeLimit = null;
 	
 	final public OperatingSystemNames operatingSystemName()
 	{
@@ -109,5 +114,18 @@ public class ResourceOverrides implements Serializable
 	final public void virtualMemory(Size mem)
 	{
 		_virtualMemory = mem;
+	}
+	
+	final public Duration wallclockTimeLimit()
+	{
+		if (_wallclockTimeLimit == null)
+			return null;
+		
+		return new Duration(_wallclockTimeLimit);
+	}
+	
+	final public void wallclockTimeLimit(Duration newValue)
+	{
+		_wallclockTimeLimit = newValue == null ? null : newValue.toString();
 	}
 }

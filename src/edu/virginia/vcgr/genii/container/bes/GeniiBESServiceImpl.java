@@ -509,6 +509,12 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 		
 		try
 		{
+			MessageElement []resourceAny = null;
+			MessageElement wallclockAttr =
+				BESAttributesHandler.getWallclockTimeLimitAttr();
+			if (wallclockAttr != null)
+				resourceAny = new MessageElement[] { wallclockAttr };
+			
 			return new GetFactoryAttributesDocumentResponseType(
 				new FactoryResourceAttributesDocumentType(
 					new BasicResourceAttributesDocumentType(
@@ -520,7 +526,7 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 							(double)BESAttributesHandler.getCPUSpeed()),
 						new Double((double)BESAttributesHandler.getPhysicalMemory()),
 						new Double((double)BESAttributesHandler.getVirtualMemory()),
-						null),
+						resourceAny),
 					BESAttributesHandler.getIsAcceptingNewActivities(),
 					BESAttributesHandler.getName(),
 					BESAttributesHandler.getDescription(),

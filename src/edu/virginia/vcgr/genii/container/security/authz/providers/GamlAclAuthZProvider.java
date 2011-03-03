@@ -16,6 +16,7 @@
 
 package edu.virginia.vcgr.genii.container.security.authz.providers;
 
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.GeneralSecurityException;
 
@@ -27,7 +28,10 @@ import java.util.HashSet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.configuration.ConfigurationException;
+import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
+import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.context.*;
 import edu.virginia.vcgr.genii.client.security.MessageLevelSecurityRequirements;
@@ -76,12 +80,57 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 
 	static private Log _logger = LogFactory.getLog(GamlAclAuthZProvider.class);
 
-	X509Certificate _defaultInitialResourceOwner = null;
+	X509Certificate []_defaultInitialResourceOwners = null;
 
 	public GamlAclAuthZProvider()
 		throws GeneralSecurityException, IOException
 	{
-		_defaultInitialResourceOwner = Container.getContainerCertChain()[0];
+		Collection<File> ownerFiles = Installation.getDeployment(
+			new DeploymentName()).security().getDefaultOwnerFiles();
+		
+		// read in the certificates that are to serve as default owner
+		if (ownerFiles != null && ownerFiles.size() > 0)
+		{
+			synchronized (_defaultCertCache)
+			{
+				Collection<X509Certificate> ownerCerts = 
+					new ArrayList<X509Certificate>(ownerFiles.size());
+				
+				for (File ownerFile : ownerFiles)
+				{
+					X509Certificate ownerCert = _defaultCertCache.get(
+						ownerFile.getName());
+					if (ownerCert == null)
+					{
+						CertificateFactory cf =
+							CertificateFactory.getInstance("X.509");
+						FileInputStream fin = null;
+						try
+						{
+							ownerCert = (X509Certificate)cf.generateCertificate(
+								fin = new FileInputStream(ownerFile));
+							_defaultCertCache.put(ownerFile.getName(), ownerCert);
+						}
+						finally
+						{
+							StreamUtils.close(fin);
+						}
+					}
+					ownerCerts.add(ownerCert);
+				}
+				
+
+				
+				_defaultInitialResourceOwners = ownerCerts.toArray(
+					new X509Certificate[ownerCerts.size()]);
+			}
+		}
+		else
+		{
+			_defaultInitialResourceOwners = new X509Certificate[] {
+					Container.getContainerCertChain()[0]
+			};
+		}
 	}
 
 	/**
@@ -127,10 +176,13 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 		// by the container
 		if (defaultOwners.isEmpty())
 		{
-			X509Certificate[] defaultOwner = { _defaultInitialResourceOwner };
-			if (_defaultInitialResourceOwner != null)
+			if (_defaultInitialResourceOwners != null)
 			{
-				defaultOwners.add(new X509Identity(defaultOwner));
+				for (X509Certificate cert : _defaultInitialResourceOwners)
+				{
+					defaultOwners.add(new X509Identity(
+						new X509Certificate[] { cert }));
+				}
 			}
 		}
 

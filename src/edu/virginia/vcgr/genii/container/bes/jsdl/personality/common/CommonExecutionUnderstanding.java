@@ -7,8 +7,14 @@ import java.util.LinkedList;
 import java.util.Vector;
 
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
+import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
+import edu.virginia.vcgr.genii.client.jsdl.JSDLMatchException;
+import edu.virginia.vcgr.genii.client.utils.units.Duration;
+import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
+import edu.virginia.vcgr.genii.client.utils.units.Size;
+import edu.virginia.vcgr.genii.client.utils.units.SizeUnits;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.CleanupPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.CreateWorkingDirectoryPhase;
@@ -200,6 +206,37 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		ResourceConstraints resourceConstraints = new ResourceConstraints();
 		resourceConstraints.setTotalPhysicalMemory(getTotalPhysicalMemory());
 		resourceConstraints.setWallclockTimeLimit(getWallclockTimeLimit());
+		
+		// Check wallclock time and memory constraint
+		if (creationProperties != null)
+		{			
+			ResourceOverrides overrides = creationProperties.getResourceOverrides();
+			if (overrides != null)
+			{
+				// check memory
+				Size besUpperLimit = overrides.physicalMemory();
+				Double requestedSize = resourceConstraints.getTotalPhysicalMemory();
+				if (besUpperLimit != null && requestedSize != null)
+				{
+					if (requestedSize > besUpperLimit.as(SizeUnits.Bytes))
+						throw new JSDLMatchException(String.format(
+							"Job requested %f bytes, but BES limits to %s.",
+							requestedSize, besUpperLimit));
+				}
+				
+				// Wallclock
+				Duration besUpperWall = overrides.wallclockTimeLimit();
+				Double requestedWall = resourceConstraints.getWallclockTimeLimit();
+				if (besUpperWall != null && requestedWall != null)
+				{
+					if (requestedWall > besUpperWall.as(DurationUnits.Seconds))
+						throw new JSDLMatchException(String.format(
+							"Job requested %f seconds, but BES limits to %s.",
+							requestedWall, besUpperWall));
+				}
+			}
+		}
+		
 		JobUnderstandingContext jobContext = new JobUnderstandingContext(
 			_requiredOGRSHVersion, resourceConstraints);
 		

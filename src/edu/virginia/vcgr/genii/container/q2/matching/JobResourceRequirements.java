@@ -1,5 +1,8 @@
 package edu.virginia.vcgr.genii.container.q2.matching;
 
+import javax.xml.namespace.QName;
+
+import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.Boundary_Type;
@@ -13,6 +16,7 @@ import org.ggf.jsdl.ProcessorArchitectureEnumeration;
 import org.ggf.jsdl.RangeValue_Type;
 import org.ggf.jsdl.Resources_Type;
 
+import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.container.q2.besinfo.BESInformation;
 
 public class JobResourceRequirements
@@ -42,6 +46,7 @@ public class JobResourceRequirements
 	private OperatingSystemTypeEnumeration _osType = null;
 	private String _osVersion = null;
 	private Double _memoryRequirement = null;
+	private Double _wallclockTimeLimit = null;
 	private MatchingParameters _matchingParameters = null;
 	
 	private void fillInArchInformation(CPUArchitecture_Type arch)
@@ -72,6 +77,13 @@ public class JobResourceRequirements
 		Boundary_Type memUpperBound = memRange.getUpperBoundedRange();
 		if (memUpperBound != null)
 			_memoryRequirement = new Double(memUpperBound.get_value());
+	}
+	
+	private void fillInWallclockInformation(RangeValue_Type wallRange)
+	{
+		Boundary_Type wallUpperBound = wallRange.getUpperBoundedRange();
+		if (wallUpperBound != null)
+			_wallclockTimeLimit = new Double(wallUpperBound.get_value());
 	}
 	
 	public JobResourceRequirements()
@@ -105,6 +117,26 @@ public class JobResourceRequirements
 		RangeValue_Type memoryRange = resources.getTotalPhysicalMemory();
 		if (memoryRange != null)
 			fillInMemoryInformation(memoryRange);
+		
+		MessageElement []resourcesAny = resources.get_any();
+		if (resourcesAny != null)
+		{
+			for (MessageElement a : resourcesAny)
+			{
+				if (a.getQName().equals(new QName("http://vcgr.cs.virginia.edu/jsdl/genii", "WallclockTime")))
+				{
+					try
+					{
+						RangeValue_Type rType = ObjectDeserializer.toObject(a, RangeValue_Type.class);
+						fillInWallclockInformation(rType);
+					}
+					catch (Throwable cause)
+					{
+						throw new RuntimeException("Unable to parse wallclock time.", cause);
+					}
+				}
+			}
+		}
 		
 		_matchingParameters = new MatchingParameters(MatchingParameter.matchingParameters(
 			resources.get_any(), true));
@@ -166,6 +198,9 @@ public class JobResourceRequirements
 			return false;
 		
 		if (!equalsWithNulls(_memoryRequirement, other._memoryRequirement))
+			return false;
+		
+		if (!equalsWithNulls(_wallclockTimeLimit, other._wallclockTimeLimit))
 			return false;
 		
 		if (_matchingParameters == null && other._matchingParameters == null)
@@ -267,6 +302,16 @@ public class JobResourceRequirements
 			
 			if (_memoryRequirement.doubleValue() > bMemory.doubleValue())
 				return false;
+		}
+		
+		if (_wallclockTimeLimit != null)
+		{
+			Double wall = besInfo.getWallclockTimeLimit();
+			if (wall != null)
+			{
+				if (_wallclockTimeLimit.doubleValue() > wall.doubleValue())
+					return false;
+			}
 		}
 		
 		

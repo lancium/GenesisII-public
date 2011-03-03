@@ -19,6 +19,7 @@ import org.ggf.jsdl.OperatingSystem_Type;
 import org.ggf.jsdl.ProcessorArchitectureEnumeration;
 import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.common.MatchingParameter;
@@ -35,6 +36,7 @@ public class BESInformation
 	private OperatingSystemTypeEnumeration _operatingSystemType;
 	private String _operatingSystemVerison;
 	private Double _physicalMemory;
+	private Double _wallclockTimeLimit;
 	private URI _resourceManagerType = null;
 	
 	private boolean _isAcceptingNewActivites;
@@ -78,6 +80,29 @@ public class BESInformation
 				if (d6 != null)
 				{
 					_physicalMemory = d6;
+				}
+				
+				MessageElement []resourceAny = d2.get_any();
+				if (resourceAny != null)
+				{
+					for (MessageElement anyE : resourceAny)
+					{
+						if (anyE.getQName().equals(
+							BESConstants.BES_WALLCLOCK_TIMELIMIT_ATTR))
+						{
+							try
+							{
+								_wallclockTimeLimit = (Double)ObjectDeserializer.toObject(
+									anyE, Double.class);
+							}
+							catch (Throwable cause)
+							{
+								_logger.warn(
+									"Unable to parse wallclock time limit " +
+									"from BES information.");
+							}
+						}
+					}
 				}
 			}
 			
@@ -158,6 +183,11 @@ public class BESInformation
 	final public Double getPhysicalMemory()
 	{
 		return _physicalMemory;
+	}
+	
+	final public Double getWallclockTimeLimit()
+	{
+		return _wallclockTimeLimit;
 	}
 	
 	final public boolean isAcceptingNewActivities()

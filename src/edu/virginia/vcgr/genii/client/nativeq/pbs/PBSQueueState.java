@@ -42,6 +42,7 @@ public class PBSQueueState implements NativeQueueState
 					return new PBSQueueState("Executing", false, false);
 				case 'E' :
 				case 'X' :
+				case 'C' :
 					return new PBSQueueState("Exiting", true, false);
 				case 'Q' :
 					return new PBSQueueState("Queued", false, false);
