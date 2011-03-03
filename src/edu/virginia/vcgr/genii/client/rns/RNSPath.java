@@ -276,11 +276,27 @@ public class RNSPath implements Serializable, Cloneable
 		return parent + "/" + _nameFromParent;
 	}
 	
+	/**
+	 * Test to see if two RNS paths are equal.  This comparison is for String
+	 * path representation only (no comparison of EPRs or other metadata is
+	 * done).
+	 * 
+	 * @param other The other path to compare against.
+	 * @return True if the two paths are equal, false otherwise.
+	 */
 	public boolean equals(RNSPath other)
 	{
 		return pwd().equals(other.pwd());
 	}
 	
+	/**
+	 * Test to see if two RNS paths are equal.  This comparison is for String
+	 * path representation only (no comparison of EPRs or other metadata is
+	 * done).
+	 * 
+	 * @param other The other path to compare against.
+	 * @return True if the two paths are equal, false otherwise.
+	 */
 	@Override
 	public boolean equals(Object other)
 	{
@@ -290,6 +306,9 @@ public class RNSPath implements Serializable, Cloneable
 		return false;
 	}
 	
+	/**
+	 * Calculate a hashcode for the path represented by this RNS path.
+	 */
 	@Override
 	public int hashCode()
 	{
@@ -491,6 +510,11 @@ public class RNSPath implements Serializable, Cloneable
 		return builder.toString();
 	}
 	
+	/**
+	 * Forcibly remove a cached path from the lookup cache.
+	 * 
+	 * @param fullPath The full path to remove from the lookup cache.
+	 */
 	static public void clearCacheEntry(String fullPath)
 	{
 		_lookupCache.remove(fullPath);
