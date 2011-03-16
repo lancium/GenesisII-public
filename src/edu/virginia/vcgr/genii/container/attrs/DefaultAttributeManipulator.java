@@ -72,6 +72,9 @@ public class DefaultAttributeManipulator implements IAttributeManipulator
 			ret = _getMethod.invoke(
 				_target, new Object[0]);
 			
+			if (ret == null)
+				return new ArrayList<MessageElement>();
+			
 			if (ret instanceof MessageElement)
 			{
 				ArrayList<MessageElement> tmp =
@@ -204,5 +207,12 @@ public class DefaultAttributeManipulator implements IAttributeManipulator
 		
 		return new DefaultAttributeManipulator(target,
 			attributeName, getter, setter, isSingleSet);
+	}
+	
+	@Override
+	final public String toString()
+	{
+		return String.format("[%s] %s/%s",
+			_attrQName, _getMethod, _setMethod);
 	}
 }

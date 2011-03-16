@@ -154,7 +154,8 @@ implements IRExportResolverResource
 		
 		//assuming first resolver is the correct one
 		//what if no resolvers?
-		if (resolverEPRs == null){
+		if (resolverEPRs.isEmpty())
+		{
 			_logger.info("No resolvers found in table for this resource query");
 			return null;
 		}

@@ -6,9 +6,8 @@ import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 
-public interface ExecutionUnderstanding {
-
-	public String getFuseMountDirectory();
+public interface ExecutionUnderstanding 
+{
 	public Vector<ExecutionPhase> createExecutionPlan(BESConstructionParameters creationProperties) throws JSDLException;
 	public String getJobName();
 }

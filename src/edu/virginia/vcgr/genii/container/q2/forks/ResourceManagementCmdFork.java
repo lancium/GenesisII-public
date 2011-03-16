@@ -93,6 +93,8 @@ public class ResourceManagementCmdFork
 					ps.format("\tMatching Parameters:\n");
 					
 					ps.println(matching);
+					ps.println();
+					ps.format("Supported Filesystems:  %s\n", besInfo.supportedFilesystems());
 					
 					BESUpdateInformation updateInfo = besMgr.getUpdateInformation(
 						data.getID());

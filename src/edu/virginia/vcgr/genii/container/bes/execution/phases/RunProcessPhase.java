@@ -45,6 +45,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 	private URI _spmdVariation;
 	private Integer _numProcesses;
 	private Integer _numProcessesPerHost;
+	private File _fuseMountPoint;
 	private File _commonDirectory;
 	private File _executable;
 	private String []_arguments;
@@ -61,7 +62,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 		process.cancel();
 	}
 	
-	public RunProcessPhase(URI spmdVariation, 
+	public RunProcessPhase(File fuseMountPoint, URI spmdVariation, 
 		Integer numProcesses, Integer numProcessesPerHost, 
 		File commonDirectory, File executable, 
 		String []arguments, Map<String, String> environment,
@@ -74,6 +75,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 		_spmdVariation = spmdVariation;
 		_numProcesses = numProcesses;
 		_numProcessesPerHost = numProcessesPerHost;
+		_fuseMountPoint = fuseMountPoint;
 		_commonDirectory = commonDirectory;
 		
 		if (executable == null)
@@ -165,7 +167,8 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 			HashMap<String, Object> jobProperties = new HashMap<String, Object>();
 			CmdLineManipulatorUtils.addBasicJobProperties(jobProperties, 
 					_executable.getAbsolutePath(), args);
-			CmdLineManipulatorUtils.addEnvProperties(jobProperties, _environment, 
+			CmdLineManipulatorUtils.addEnvProperties(jobProperties, _fuseMountPoint,
+					_environment, 
 					workingDirectory, _redirects.stdinSource(), 
 					_redirects.stdoutSink(), stderrFile, 
 					resourceUsageFile, wrapper.getPathToWrapper());
@@ -182,7 +185,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 				for (int lcv = 1; lcv < command.size(); lcv++)
 					arguments[lcv - 1] = command.get(lcv);
 				
-				Vector<String> testCmdLine = wrapper.formCommandLine(
+				Vector<String> testCmdLine = wrapper.formCommandLine(_fuseMountPoint,
 						_environment, workingDirectory, _redirects.stdinSource(), 
 						_redirects.stdoutSink(), stderrFile, 
 						resourceUsageFile, command.get(0), arguments);
@@ -202,7 +205,8 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 				hWriter.format(" %s", arg);
 			hWriter.close();
 			
-			token = wrapper.execute(_environment, workingDirectory, 
+			token = wrapper.execute(_fuseMountPoint,
+				_environment, workingDirectory, 
 				_redirects.stdinSource(), resourceUsageFile, newCmdLine);
 		}
 		

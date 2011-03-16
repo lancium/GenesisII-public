@@ -362,7 +362,7 @@ public class SimpleResolverServiceImpl extends GenesisIIBase
 
 		/* grab targetEPR construction parameter and initialize resource with its information */
 		URI factoryEPI = (URI) constructionParameters.get(SIMPLE_RESOLVER_FACTORY_EPI_CONSTRUCTION_PARAMETER);
-		if (targetEPR == null)
+		if (factoryEPI == null)
 			throw new ResourceException("Invalid construction parameters for SimpleResolverDBResource.inisitialize()");
 
 		URI myEPI = null;

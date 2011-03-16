@@ -2,6 +2,9 @@ package edu.virginia.vcgr.genii.container.q2.besinfo;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
@@ -41,6 +44,8 @@ public class BESInformation
 	
 	private boolean _isAcceptingNewActivites;
 	private long _numContainedActivities;
+	
+	private Set<String> _supportedFilesystems = new HashSet<String>();
 	
 	public BESInformation(GetFactoryAttributesDocumentResponseType attrs)
 	{
@@ -132,6 +137,11 @@ public class BESInformation
 								"Unable to parse matching parameters " +
 								"from BES information.");
 						}
+					} else if (elementName.equals(BESConstants.FILESYSTEM_SUPPORT_ATTR))
+					{
+						String fs = a.getValue();
+						if (fs != null && fs.length() > 0)
+							_supportedFilesystems.add(fs);
 					}
 				}
 			}
@@ -155,6 +165,8 @@ public class BESInformation
 		
 		pw.println(_matchingParameters);
 			
+		pw.println();
+		pw.format("Supported Filesystems:  %s\n", _supportedFilesystems);
 		pw.close();
 		StreamUtils.close(writer);
 		return writer.toString();
@@ -203,5 +215,15 @@ public class BESInformation
 	final public URI resourceManagerType()
 	{
 		return _resourceManagerType;
+	}
+	
+	final public boolean supportsFilesystems(String fs)
+	{
+		return _supportedFilesystems.contains(fs);
+	}
+	
+	final public Set<String> supportedFilesystems()
+	{
+		return Collections.unmodifiableSet(_supportedFilesystems);
 	}
 }

@@ -11,7 +11,6 @@ import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.configuration.Deployment;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
-import edu.virginia.vcgr.genii.client.configuration.OGRSHVersion;
 import edu.virginia.vcgr.genii.client.jsdl.FilesystemManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
@@ -21,7 +20,6 @@ import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingD
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.JobUnderstandingContext;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.PosixLikeApplicationUnderstanding;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.StringOrPath;
-
 
 class QSubApplicationUnderstanding 
 	extends PosixLikeApplicationUnderstanding
@@ -38,7 +36,7 @@ class QSubApplicationUnderstanding
 		Vector<ExecutionPhase> cleanupPhases, JobUnderstandingContext jobContext)
 		throws JSDLException
 	{
-		String ogrshVersion = jobContext.getRequiredOGRSHVersion();
+		File fuseMountPoint = jobContext.getFuseMountPoint();
 		
 		Deployment deployment = Installation.getDeployment(
 			new DeploymentName());
@@ -67,41 +65,16 @@ class QSubApplicationUnderstanding
 			stringArgs.add(sop.toString(fsManager));
 		}
 		
-		if (ogrshVersion == null)
-		{
-			executionPlan.add(new QueueProcessPhase(
-				getSPMDVariation(), getNumProcesses(), 
-				getNumProcessesPerHost(),
-				fsManager.lookup(getExecutable()),
-				stringArgs, stringEnv,
-				fsManager.lookup(getStdinRedirect()),
-				fsManager.lookup(getStdoutRedirect()),
-				fsManager.lookup(getStderrRedirect()),
-				creationProperties,
-				jobContext.getResourceConstraints()));
-		} else
-		{
-			stringEnv.put("BES_HOME", "/home/bes-job");
-			stringEnv.put("OGRSH_CONFIG", "./ogrsh-config.xml");
-			stringEnv.put("GENII_USER_DIR", ".");
-			
-			Vector<String> args = new Vector<String>();
-			args.add(fsManager.lookup(getExecutable()).getAbsolutePath());
-			args.addAll(stringArgs);
-			
-			OGRSHVersion oVersion = Installation.getOGRSH(
-				).getInstalledVersions().get(ogrshVersion);
-			File shim = oVersion.shimScript();
-			
-			executionPlan.add(new QueueProcessPhase(
-				getSPMDVariation(), getNumProcesses(),
-				getNumProcessesPerHost(),
-				shim, args, stringEnv,
-				fsManager.lookup(getStdinRedirect()),
-				fsManager.lookup(getStdoutRedirect()),
-				fsManager.lookup(getStderrRedirect()),
-				creationProperties,
-				jobContext.getResourceConstraints()));
-		}
+		executionPlan.add(new QueueProcessPhase(
+			fuseMountPoint,
+			getSPMDVariation(), getNumProcesses(), 
+			getNumProcessesPerHost(),
+			fsManager.lookup(getExecutable()),
+			stringArgs, stringEnv,
+			fsManager.lookup(getStdinRedirect()),
+			fsManager.lookup(getStdoutRedirect()),
+			fsManager.lookup(getStderrRedirect()),
+			creationProperties,
+			jobContext.getResourceConstraints()));
 	}
 }

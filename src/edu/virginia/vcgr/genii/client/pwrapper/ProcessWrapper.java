@@ -113,6 +113,7 @@ public class ProcessWrapper
 	}
 	
 	final public Vector<String> formCommandLine(
+		File fuseMountPoint,
 		Map<String, String> environmentOverload,
 		File workingDirectory, File stdinRedirect,
 		File stdoutRedirect, File stderrRedirect,
@@ -143,6 +144,10 @@ public class ProcessWrapper
 			ret.add(String.format("-U%s",
 				resourceUsagePath.getAbsolutePath()));
 		
+		if (fuseMountPoint != null)
+			ret.add(String.format("-g%s",
+				fuseMountPoint.getAbsolutePath()));
+		
 		if (stdinRedirect != null)
 			ret.add(String.format("-i%s", stdinRedirect.getAbsolutePath()));
 		if (stdoutRedirect != null)
@@ -158,6 +163,7 @@ public class ProcessWrapper
 	}
 	
 	final public ProcessWrapperToken execute(
+		File fuseMountPoint,
 		Map<String, String> environmentOverload,
 		File workingDirectory, File stdinRedirect,
 		File resourceUsageFile, List<String> command) 
@@ -201,6 +207,7 @@ public class ProcessWrapper
 				
 		ProcessBuilder builder = new ProcessBuilder(
 				new Vector<String>(command));
+
 		ProcessWrapperWorker worker = new ProcessWrapperWorker(
 			resourceUsageFile, builder);
 		_threadPool.execute(worker);

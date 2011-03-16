@@ -509,11 +509,13 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 		
 		try
 		{
-			MessageElement []resourceAny = null;
 			MessageElement wallclockAttr =
 				BESAttributesHandler.getWallclockTimeLimitAttr();
 			if (wallclockAttr != null)
-				resourceAny = new MessageElement[] { wallclockAttr };
+				any.add(wallclockAttr);
+			any.addAll(BESAttributesHandler.getSupportedFilesystemsAttr());
+			MessageElement []resourceAny = any.toArray(
+				new MessageElement[any.size()]);
 			
 			return new GetFactoryAttributesDocumentResponseType(
 				new FactoryResourceAttributesDocumentType(

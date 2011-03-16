@@ -184,7 +184,8 @@ public class BESManager implements Closeable
 			_containersByID.put(new Long(bes.getID()), bes);
 			_containersByName.put(bes.getName(), bes);
 			_updateInformation.put(new Long(bes.getID()), 
-				new BESUpdateInformation(bes.getID(), _BES_UPDATE_CYCLE, _MISS_CAP));
+				new BESUpdateInformation(bes.getID(), 
+					_BES_UPDATE_CYCLE, _MISS_CAP));
 		}
 		
 		/* Go ahead and update the bes containers right now at the beginning to

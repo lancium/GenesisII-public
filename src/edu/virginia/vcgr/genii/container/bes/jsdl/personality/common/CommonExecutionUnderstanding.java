@@ -15,6 +15,7 @@ import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 import edu.virginia.vcgr.genii.client.utils.units.Size;
 import edu.virginia.vcgr.genii.client.utils.units.SizeUnits;
+import edu.virginia.vcgr.genii.client.jsdl.JSDLFileSystem;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.CleanupPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.CreateWorkingDirectoryPhase;
@@ -108,9 +109,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		} else if (understanding.isGridFileSystem())
 		{
 			_fsManager.addFilesystem(understanding.getFileSystemName(),
-				understanding.createGridFilesystem(
-					new File(getWorkingDirectory().getWorkingDirectory(), 
-						"grid-mnt")));
+				understanding.createGridFilesystem());
 		}
 	}
 	
@@ -157,7 +156,7 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 		_wallclockTimeLimit = wallclockTimeLimit;
 	}
 	
-	public Vector<ExecutionPhase> createExecutionPlan(
+	final public Vector<ExecutionPhase> createExecutionPlan(
 		BESConstructionParameters creationProperties) throws JSDLException
 	{
 		Vector<ExecutionPhase> ret = new Vector<ExecutionPhase>();
@@ -237,8 +236,13 @@ public class CommonExecutionUnderstanding implements ExecutionUnderstanding
 			}
 		}
 		
+		File fuseMountPoint = null;
+		JSDLFileSystem gridFs = _fsManager.getGridFilesystem();
+		if (gridFs != null)
+			fuseMountPoint = gridFs.getMountPoint();
+		
 		JobUnderstandingContext jobContext = new JobUnderstandingContext(
-			_requiredOGRSHVersion, resourceConstraints);
+			fuseMountPoint, resourceConstraints);
 		
 		if (_application != null)
 			_application.addExecutionPhases(

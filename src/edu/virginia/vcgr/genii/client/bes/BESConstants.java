@@ -92,6 +92,8 @@ public interface BESConstants
 		GENII_BES_NS, THRESHOLD_RESOURCE_PROPERTY_NAME);
 	static public final QName OGRSH_VERSIONS_ATTR = new QName(
 		GENII_BES_NS, "OGRSHVersion");
+	static public final QName SUPPORTS_FUSE_ATTR = new QName(
+		GENII_BES_NS, "SupportsFuse");
 	
 	static public final QName BES_WALLCLOCK_TIMELIMIT_ATTR = new QName(
 		GENII_BES_NS, "WallclockTimeLimit");
@@ -110,4 +112,7 @@ public interface BESConstants
 		"IsAcceptingNewActivities";
 	static public final QName IS_ACCEPTING_NEW_ACTIVITIES_ATTR = new QName(
 		GENII_BES_NS, IS_ACCEPTING_NEW_ACTIVITIES_NAME);
+	
+	static public final QName FILESYSTEM_SUPPORT_ATTR =
+		new QName(GENII_BES_NS, "supported-filesystem");
 }

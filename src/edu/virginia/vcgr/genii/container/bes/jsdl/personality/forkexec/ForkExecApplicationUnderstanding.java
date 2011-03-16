@@ -41,7 +41,7 @@ class ForkExecApplicationUnderstanding extends PosixLikeApplicationUnderstanding
 			Vector<ExecutionPhase> cleanupPhases, JobUnderstandingContext jobContext)
 			throws JSDLException
 	{
-		String ogrshVersion = jobContext.getRequiredOGRSHVersion();
+		File fuseMountPoint = jobContext.getFuseMountPoint();
 		
 		PassiveStreamRedirectionDescription redirection = 
 			getStreamRedirectionDescription();
@@ -84,32 +84,11 @@ class ForkExecApplicationUnderstanding extends PosixLikeApplicationUnderstanding
 			stringArgs.add(sop.toString(fsManager));
 		}
 		
-		if (ogrshVersion == null)
-		{
-			executionPlan.add(new RunProcessPhase(
-				getSPMDVariation(), getNumProcesses(), 
-				getNumProcessesPerHost(),
-				BESActivityServiceImpl.getCommonDirectory(creationProperties),
-				fsManager.lookup(getExecutable()), stringArgs.toArray(new String[0]),
-				stringEnv, redirection, creationProperties));
-		} else
-		{
-			stringEnv.put("BES_HOME", "/home/bes-job");
-			stringEnv.put("OGRSH_CONFIG", "./ogrsh-config.xml");
-			stringEnv.put("GENII_USER_DIR", ".");
-			
-			Vector<String> args = new Vector<String>();
-			args.add(fsManager.lookup(getExecutable()).getAbsolutePath());
-			args.addAll(stringArgs);
-			
-			File shim = Installation.getOGRSH(
-				).getInstalledVersions().get(ogrshVersion).shimScript();
-			executionPlan.add(new RunProcessPhase(
-				getSPMDVariation(), getNumProcesses(), 
-				getNumProcessesPerHost(),
-				BESActivityServiceImpl.getCommonDirectory(creationProperties),
-				shim, args.toArray(new String[0]), stringEnv,
-				redirection, creationProperties));
-		}
+		executionPlan.add(new RunProcessPhase(fuseMountPoint,
+			getSPMDVariation(), getNumProcesses(), 
+			getNumProcessesPerHost(),
+			BESActivityServiceImpl.getCommonDirectory(creationProperties),
+			fsManager.lookup(getExecutable()), stringArgs.toArray(new String[0]),
+			stringEnv, redirection, creationProperties));
 	}
 }

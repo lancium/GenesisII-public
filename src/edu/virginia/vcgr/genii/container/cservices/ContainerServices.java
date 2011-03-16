@@ -88,6 +88,11 @@ public class ContainerServices
 		return ret;
 	}
 	
+	static public boolean hasService(Class<?> serviceType)
+	{
+		return _services.containsKey(serviceType);
+	}
+	
 	synchronized static public void loadAll()
 	{
 		if (_services != null)

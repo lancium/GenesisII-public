@@ -3,10 +3,14 @@ package edu.virginia.vcgr.genii.container.q2.matching;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.Boundary_Type;
 import org.ggf.jsdl.CPUArchitecture_Type;
+import org.ggf.jsdl.FileSystem_Type;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.jsdl.JobDescription_Type;
 import org.ggf.jsdl.OperatingSystemTypeEnumeration;
@@ -48,6 +52,7 @@ public class JobResourceRequirements
 	private Double _memoryRequirement = null;
 	private Double _wallclockTimeLimit = null;
 	private MatchingParameters _matchingParameters = null;
+	private Set<String> _requestedFilesystems = new HashSet<String>();
 	
 	private void fillInArchInformation(CPUArchitecture_Type arch)
 	{
@@ -140,6 +145,15 @@ public class JobResourceRequirements
 		
 		_matchingParameters = new MatchingParameters(MatchingParameter.matchingParameters(
 			resources.get_any(), true));
+		
+		FileSystem_Type []fss = resources.getFileSystem();
+		if (fss != null)
+		{
+			for (FileSystem_Type fs : fss)
+			{
+				_requestedFilesystems.add(fs.getName().toString());
+			}
+		}
 	}
 	
 	/*
@@ -172,6 +186,8 @@ public class JobResourceRequirements
 			for (MatchingParameter param : _matchingParameters.getParameters())
 				ret ^= param.hashCode();
 		}
+		
+		ret ^= _requestedFilesystems.hashCode();
 		
 		return ret;
 	}
@@ -224,7 +240,7 @@ public class JobResourceRequirements
 				return false;
 		}
 		
-		return true;
+		return equalsWithNulls(_requestedFilesystems, other._requestedFilesystems);
 	}
 	
 	@Override
@@ -314,8 +330,16 @@ public class JobResourceRequirements
 			}
 		}
 		
+		if (!MatchingParameter.matches(besInfo.getMatchingParameters(), _matchingParameters))
+			return false;
 		
-		return MatchingParameter.matches(besInfo.getMatchingParameters(), _matchingParameters);
+		for (String reqFs : _requestedFilesystems)
+		{
+			if (!besInfo.supportsFilesystems(reqFs))
+				return false;
+		}
+		
+		return true;
 	}
 	
 	@Override
@@ -331,6 +355,8 @@ public class JobResourceRequirements
 			for (MatchingParameter parameter : _matchingParameters.getParameters())
 				appendParameter(parameters, parameter);
 		}
+		
+		appendParameter(parameters, "Requested Filesystems", _requestedFilesystems);
 		
 		return String.format("Job Resource Requirements(%s)", parameters);
 	}

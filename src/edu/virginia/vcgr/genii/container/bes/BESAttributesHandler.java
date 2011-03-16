@@ -20,6 +20,7 @@ import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
@@ -96,6 +97,7 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 			"getDeployersAttr", "setDeployersAttr");
 		addHandler(OGRSH_VERSIONS_ATTR, "getOGRSHVersionsAttr");
 		addHandler(BES_WALLCLOCK_TIMELIMIT_ATTR, "getWallclockTimeLimitAttr");
+		addHandler(FILESYSTEM_SUPPORT_ATTR, "getSupportedFilesystemsAttr");
 	}
 	
 	static public String getName()
@@ -140,6 +142,13 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		*/
 		
 		return new EndpointReferenceType[0];
+	}
+	
+	static public String[] getSupportedFilesystems()
+	{
+		Set<String> ret = 
+			FilesystemSupportDetection.supportedFilesystemTypes();
+		return ret.toArray(new String[ret.size()]);
 	}
 	
 	static public String getDescription()
@@ -523,5 +532,16 @@ public class BESAttributesHandler extends AbstractAttributeHandler
 		}
 		
 		setDeployers(deployerEPRs);
+	}
+	
+	static public ArrayList<MessageElement> getSupportedFilesystemsAttr()
+	{
+		String []supported = getSupportedFilesystems();
+		ArrayList<MessageElement> ret = new ArrayList<MessageElement>(
+			supported.length);
+		for (String sup : supported)
+			ret.add(new MessageElement(FILESYSTEM_SUPPORT_ATTR, sup));
+		
+		return ret;
 	}
 }

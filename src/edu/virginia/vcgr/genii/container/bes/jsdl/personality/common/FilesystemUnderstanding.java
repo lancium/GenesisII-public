@@ -1,21 +1,21 @@
 package edu.virginia.vcgr.genii.container.bes.jsdl.personality.common;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.ggf.jsdl.FileSystemTypeEnumeration;
 import org.morgan.util.GUID;
 
-import edu.virginia.vcgr.genii.client.jsdl.GridFileSystem;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLFileSystem;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
+import edu.virginia.vcgr.genii.container.cservices.fuse.FuseFilesystemService;
 import edu.virginia.vcgr.genii.container.cservices.scratchmgr.ScratchFSManagerContainerService;
 
 public class FilesystemUnderstanding
 {
 	private FileSystemTypeEnumeration _fsType = null;
 	private String _fsName = null;
+	@SuppressWarnings("unused")
 	private String _fsSource = null;
 	private String _uniqueID = null;
 	
@@ -59,9 +59,8 @@ public class FilesystemUnderstanding
 				(_fsType == null) ||
 				(_fsType == FileSystemTypeEnumeration.normal))
 			&&
-			(
-				(_fsSource != null) &&
-				(_fsSource.startsWith("rns:")));
+			
+				((_fsName != null) && (_fsName.equals("GRID")));
 	}
 	
 	public JSDLFileSystem createScratchFilesystem(String jobAnnotation)
@@ -95,19 +94,28 @@ public class FilesystemUnderstanding
 		}
 	}
 	
-	public JSDLFileSystem createGridFilesystem(File mountPoint)
+	public JSDLFileSystem createGridFilesystem()
 		throws JSDLException
 	{
 		if (!isGridFileSystem())
 			throw new JSDLException(String.format(
 				"Don't know how to handle file system \"%s\".",
 				_fsName));
-		
-		return new GridFileSystem(mountPoint,
-			getSandboxFromSource(_fsSource));
+	
+		try
+		{
+			FuseFilesystemService ffs = ContainerServices.findService(
+				FuseFilesystemService.class);
+			return ffs.reserveFuseFilesystem();
+		}
+		catch (Exception e)
+		{
+			throw new JSDLException("Unable to create fuse mount for job.",
+				e);
+		}
 	}
 	
-	static private String getSandboxFromSource(String source)
+	static protected String getSandboxFromSource(String source)
 	{
 		return source.substring(4);
 	}

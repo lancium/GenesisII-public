@@ -143,7 +143,7 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements
 		try
 		{
 			JobDefinition_Type jsdl = initInfo.getJobDefinition();
-			String fuseMountDirectory, jobName;
+			String jobName;
 			Vector<ExecutionPhase> executionPlan;
 		
 			CloudConfiguration cConfig = 
@@ -159,7 +159,6 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements
 							initInfo.getContainerID(),
 							tJob, ((BESConstructionParameters)cParams));
 				jobName = tJob.getJobName();
-				fuseMountDirectory = null;
 			}
 			else{
 				
@@ -184,8 +183,6 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements
 						(ExecutionUnderstanding)understanding;
 				}
 				
-				fuseMountDirectory = 
-					executionUnderstanding.getFuseMountDirectory();
 				executionPlan = 
 					executionUnderstanding.createExecutionPlan(
 							(BESConstructionParameters)cParams);
@@ -196,10 +193,6 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements
 			_resource.setProperty(IBESActivityResource.FILESYSTEM_MANAGER, 
 				fsManager);
 		
-			
-			if (fuseMountDirectory != null)
-				_resource.setProperty(IBESActivityResource.FUSE_MOUNT_PROPERTY,
-					fuseMountDirectory);	
 			
 			BES bes = BES.getBES(initInfo.getContainerID());
 			if (bes == null)

@@ -33,4 +33,10 @@ public class DirectoryBasedFileSystem extends AbstractJSDLFileSystem
 		if (shouldDestroy())
 			FileSystemUtils.recursiveDelete(_directory, false);
 	}
+
+	@Override
+	final public File getMountPoint()
+	{
+		return _directory;
+	}
 }

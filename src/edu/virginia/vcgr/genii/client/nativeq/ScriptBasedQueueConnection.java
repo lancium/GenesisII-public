@@ -199,7 +199,8 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType
 			Map<String, Object> jobProperties = new HashMap<String, Object>();
 			CmdLineManipulatorUtils.addBasicJobProperties(jobProperties, 
 					execName, application.getArguments());
-			CmdLineManipulatorUtils.addEnvProperties(jobProperties, 
+			CmdLineManipulatorUtils.addEnvProperties(jobProperties,
+					application.getFuseMountPoint(),
 					application.getEnvironment(), workingDirectory, 
 					application.getStdinRedirect(workingDirectory), 
 					application.getStdoutRedirect(workingDirectory),
@@ -223,6 +224,7 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType
 			
 				//for testing only -  default cmdLine format to compare to transform
 				Vector<String> testCmdLine = wrapper.formCommandLine(
+						application.getFuseMountPoint(),
 						application.getEnvironment(), workingDirectory,
 						application.getStdinRedirect(workingDirectory), 
 						application.getStdoutRedirect(workingDirectory),

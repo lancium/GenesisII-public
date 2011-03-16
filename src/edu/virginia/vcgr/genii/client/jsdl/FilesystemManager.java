@@ -37,6 +37,11 @@ public class FilesystemManager implements Serializable
 		return _filesystems.values();
 	}
 	
+	public JSDLFileSystem getGridFilesystem()
+	{
+		return _filesystems.get("GRID");
+	}
+	
 	public File lookup(FilesystemRelativePath path)
 		throws JSDLException
 	{

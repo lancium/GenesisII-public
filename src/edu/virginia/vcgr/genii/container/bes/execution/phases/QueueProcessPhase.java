@@ -58,6 +58,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 	transient private NativeQueueState _state = null;
 	transient private BESWorkingDirectory _workingDirectory = null;
 	
+	private File _fuseMountPoint;
 	private URI _spmdVariation;
 	private Integer _numProcesses;
 	private Integer _numProcessesPerHost;
@@ -73,7 +74,8 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 	transient private JobToken _jobToken = null;
 	transient private Boolean _terminate = null;
 	
-	public QueueProcessPhase(URI spmdVariation, Integer numProcesses,
+	public QueueProcessPhase(File fuseMountPoint,
+		URI spmdVariation, Integer numProcesses,
 		Integer numProcessesPerHost, File executable, 
 		Collection<String> arguments, Map<String, String> environment,
 		File stdin, File stdout, File stderr, 
@@ -84,6 +86,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 			ActivityStateEnumeration.Running, "Enqueing", false),
 			constructionParameters);
 	
+		_fuseMountPoint = fuseMountPoint;
 		_spmdVariation = spmdVariation;
 		_numProcesses = numProcesses;
 		_numProcessesPerHost = numProcessesPerHost;
@@ -195,7 +198,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 					hWriter.format(" %s", arg);
 				hWriter.close();
 				
-				_jobToken = queue.submit(new ApplicationDescription(
+				_jobToken = queue.submit(new ApplicationDescription(_fuseMountPoint,
 					_spmdVariation, _numProcesses, _numProcessesPerHost, _executable.getAbsolutePath(),
 					_arguments,
 					_environment, fileToPath(_stdin, null),

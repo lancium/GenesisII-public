@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.bes;
 
+import java.io.File;
 import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -24,17 +25,22 @@ public class BESConstructionParameters
 {
 	static final long serialVersionUID = 0L;
 	
-	static private Log _logger = LogFactory.getLog(
-			BESConstructionParameters.class);
-	
 	static final public String BES_CONS_PARMS_NS =
 		"http://vcgr.cs.virginia.edu/construction-parameters/bes";
+	
+	static private Log _logger = LogFactory.getLog(
+		BESConstructionParameters.class);
 	
 	private ResourceOverrides _resourceOverrides = new ResourceOverrides();
 	private NativeQueueConfiguration _nativeQueueConf = null;
 	private CmdLineManipulatorConfiguration _cmdLineManipulatorConf = null; 
 	private Duration _preExecutionDelay = null;
 	private Duration _postExecutionDelay = null;
+	
+	@XmlElement(namespace = BES_CONS_PARMS_NS, name = "fuse-directory",
+		required = false, nillable = true)
+	private String _fuseDirectory = null;
+	
 	private CloudConfiguration _cloudBES = null;
 	
 	@XmlElement(namespace = EnvironmentVariableExportConstants.NAMESPACE,
@@ -167,5 +173,29 @@ public class BESConstructionParameters
 	final public EnvironmentExport environmentExport()
 	{
 		return _environmentExport;
+	}
+	
+	final public File fuseDirectory()
+	{
+		if (_fuseDirectory == null)
+			return null;
+		
+		File ret = new File(_fuseDirectory);
+		if (!ret.exists())
+			ret.mkdirs();
+		
+		if (!ret.exists() || !ret.isDirectory())
+		{
+			_logger.warn(String.format(
+				"Unable to prepare fuse directory %s.", _fuseDirectory));
+			return null;
+		} else if (!ret.canWrite())
+		{
+			_logger.warn(String.format(
+				"Not permitted to write into fuse directory %s.", _fuseDirectory));
+			return null;
+		}
+		
+		return ret;
 	}
 }

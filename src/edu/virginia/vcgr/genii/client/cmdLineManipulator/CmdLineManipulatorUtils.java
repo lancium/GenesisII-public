@@ -1,7 +1,6 @@
 package edu.virginia.vcgr.genii.client.cmdLineManipulator;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
@@ -49,11 +48,15 @@ public class CmdLineManipulatorUtils
 	}
 		
 	static public void addEnvProperties(Map<String, Object> jobProperties,
+			File fuseMountPoint,
 			Map<String, String> environment, File workingDirectory, 
 			File stdinRedirect, File stdoutRedirect, File stderrRedirect, 
 			File resourceUsagePath,	File pathToWrapper)
 	{
-			
+		if (fuseMountPoint != null)
+			jobProperties.put(CmdLineManipulatorConstants.FUSE_MOUNT_POINT,
+				fuseMountPoint);
+		
 		jobProperties.put(CmdLineManipulatorConstants.ENVIRONMENT,
 				environment);
 		jobProperties.put(CmdLineManipulatorConstants.WORKING_DIRECTORY,

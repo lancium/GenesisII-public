@@ -60,6 +60,10 @@ do
 #			PWRAPPER_VALUE="${1/*=/}"
 			export "${1:2}"
 			;;
+		-g*)
+			echo "Mounting grid file systems not supported for this OS." >&2
+			exit 1
+			;;
 		-U*)
 			USAGE_FILENAME="${1:2}"
 			;;

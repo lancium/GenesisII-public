@@ -11,6 +11,7 @@ import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.ResourceCon
 
 public class ApplicationDescription
 {
+	private File _fuseMountPoint;
 	private URI _spmdVariation;
 	private Integer _numProcesses;
 	private Integer _numProcessesPerHost;
@@ -23,13 +24,14 @@ public class ApplicationDescription
 	private ResourceConstraints _resourceConstraints;
 	private File _resourceUsagePath;
 	
-	public ApplicationDescription(
+	public ApplicationDescription(File fuseMountPoint,
 		URI spmdVariation, Integer numProcesses, Integer numProcessesPerHost,
 		String executableName, Collection<String> arguments,
 		Map<String, String> environment,
 		String stdinRedirect, String stdoutRedirect, String stderrRedirect,
 		ResourceConstraints resourceConstraints, File resourceUsagePath)
 	{
+		_fuseMountPoint = fuseMountPoint;
 		_spmdVariation = spmdVariation;
 		_numProcesses = numProcesses;
 		_numProcessesPerHost = numProcessesPerHost;
@@ -72,6 +74,11 @@ public class ApplicationDescription
 	public String getExecutableName()
 	{
 		return _executableName;
+	}
+	
+	public File getFuseMountPoint()
+	{
+		return _fuseMountPoint;
 	}
 
 	public Collection<String> getArguments()

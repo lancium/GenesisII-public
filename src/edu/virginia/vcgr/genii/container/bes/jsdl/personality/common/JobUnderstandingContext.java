@@ -1,22 +1,24 @@
 package edu.virginia.vcgr.genii.container.bes.jsdl.personality.common;
 
+import java.io.File;
+
 public class JobUnderstandingContext
 {
-	private String _requiredOGRSHVersion;
+	private File _fuseMountPoint;
 	
 	private ResourceConstraints _resourceConstraints;
 	
-	public JobUnderstandingContext(String requiredOGRSHVersion,
+	public JobUnderstandingContext(File fuseMountPoint,
 		ResourceConstraints resourceConstraints)
 	{
-		_requiredOGRSHVersion = requiredOGRSHVersion; 
+		_fuseMountPoint = fuseMountPoint; 
 
 		_resourceConstraints = resourceConstraints;
 	}
 	
-	final public String getRequiredOGRSHVersion()
+	final public File getFuseMountPoint()
 	{
-		return _requiredOGRSHVersion;
+		return _fuseMountPoint;
 	}
 	
 	final public ResourceConstraints getResourceConstraints()

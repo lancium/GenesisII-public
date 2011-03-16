@@ -20,11 +20,6 @@ public class GridFileSystem extends DirectoryBasedFileSystem
 		return false;
 	}
 	
-	public File getMountPoint()
-	{
-		return _directory;
-	}
-	
 	public String getSandbox() 
 	{
 		return _sandbox;
