@@ -132,6 +132,9 @@ public class RunJSDL extends BaseGridTool{
 			stdout.println("Job Executed");
 			
 		}
+		else
+			stdout.println("Working directory must not already exist");
+		
 		return 0;
 	}
 

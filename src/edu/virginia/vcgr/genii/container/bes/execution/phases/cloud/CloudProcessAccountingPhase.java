@@ -54,7 +54,7 @@ implements Serializable{
 	@Override
 	public ActivityState getPhaseState() {
 		return new ActivityState(ActivityStateEnumeration.Running,
-				"Processing Accounting Data", false);
+				"processing-accounting-data", false);
 	}
 
 	@Override

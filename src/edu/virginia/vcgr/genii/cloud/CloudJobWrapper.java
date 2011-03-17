@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import org.apache.commons.logging.Log;
@@ -35,7 +36,7 @@ public class CloudJobWrapper {
 	static private Log _logger = LogFactory.getLog(CloudJobWrapper.class);
 	
 	public static void generateWrapperScript(OutputStream tStream,
-			File workingDir, File resourceUsage, JobRequest job, File tmpDir){
+			File workingDir, File resourceUsage, JobRequest job, File tmpDir) throws Exception{
 		try
 		{
 
@@ -68,8 +69,9 @@ public class CloudJobWrapper {
 					getRedirect(job.getStderrRedirect(), workingDir),
 					resourceUsage,
 					execName,
-					job.getArguments().toArray(
-							new String[job.getArguments().size()])))
+					getArguments(new String[job.getArguments().size()],
+							job.getArguments())))
+					
 			{
 				if (!first)
 					ps.format(" ");
@@ -88,6 +90,7 @@ public class CloudJobWrapper {
 		catch (Exception e)
 		{
 			_logger.error(e);
+			throw e;
 		}
 	}
 	
@@ -118,6 +121,8 @@ public class CloudJobWrapper {
 		String jobFile = "jobFile";
 		String runScript = "runScript.sh";
 		String resourceFile = "resourceFile";
+		String stageInFile = "stageIn.sh";
+		String stageOutFile = "stageOut.sh";
 
 		//Create state files
 		ret.add(new CloudSetupContextDirectoryPhase(scratchDir + genState));
@@ -130,7 +135,7 @@ public class CloudJobWrapper {
 		
 		//Generate runScript
 		ret.add(new CloudGenerateRunScriptPhase(scratchDir, runScript,
-				remoteDir, resourceFile, job, "stageIn.sh", "stageOut.sh",
+				remoteDir, resourceFile, job, stageInFile, stageOutFile,
 				genState, jobFile, cConfig.getRemoteClientDir()));
 	
 		//Move local scratch to remote scratch
@@ -139,19 +144,19 @@ public class CloudJobWrapper {
 		
 		//Create List of files to be set to executable
 		ArrayList<String> permList = new ArrayList<String>();
-		permList.add(remoteDir + "stageIn.sh");
-		permList.add(remoteDir + "stageOut.sh");
+		permList.add(remoteDir + stageInFile);
+		permList.add(remoteDir + stageOutFile);
 
 		//Set permissions phase
 		ret.add(new CloudSetPermissionsPhase(besid, activityID, permList));
 
 		//Stage In Phase
 		ret.add(new CloudStageInPhase(activityID, besid, remoteDir,
-				"stageIn.sh"));
+				stageInFile));
 		
 		//Stage In phase Poller
 		ret.add(new CloudCheckStatusPhase(activityID, besid, remoteDir,
-				"stageInPhase.complete", "Stage In"));
+				"stageInPhase.complete", "stage-in"));
 		
 		//Create List of files to be set to executable
 		permList = new ArrayList<String>();
@@ -168,7 +173,7 @@ public class CloudJobWrapper {
 
 		//Execution phase Poller
 		ret.add(new CloudCheckStatusPhase(activityID, besid, remoteDir,
-				"executePhase.complete", "Execution"));
+				"executePhase.complete", "execution"));
 		
 		//Stage Out Phase
 		ret.add(new CloudStageOutPhase(activityID, besid, remoteDir,
@@ -176,7 +181,7 @@ public class CloudJobWrapper {
 		
 		//Stage Out phase Poller
 		ret.add(new CloudCheckStatusPhase(activityID, besid, remoteDir,
-				"stageOutPhase.complete", "Stage Out"));
+				"stageOutPhase.complete", "stage-out"));
 		
 		//Get Accounting Back (Phase 5)
 		ArrayList<String> commandLine = new ArrayList<String>();
@@ -191,6 +196,15 @@ public class CloudJobWrapper {
 		
 		ret.addAll(cleanups);
 		return ret;
+	}
+	
+	private static String[] getArguments(String[] args,  List<FilesystemRelative<String>> tArgs){
+		int i = 0;
+		for (FilesystemRelative<String> tArg : tArgs){
+			args[i] =  tArg.getTarget();
+			i++;
+		}
+		return args;
 	}
 	
 }

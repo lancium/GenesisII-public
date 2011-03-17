@@ -34,7 +34,7 @@ implements Serializable{
 	@Override
 	public ActivityState getPhaseState() {
 		return new ActivityState(ActivityStateEnumeration.Running,
-				"Sending Execution Command", false);
+				"sending-execution-command", false);
 	}
 
 	@Override

@@ -13,14 +13,12 @@ import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.cloud.CloudManager;
 import edu.virginia.vcgr.genii.cloud.CloudMonitor;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
-import edu.virginia.vcgr.genii.container.bes.execution.ExecutionException;
-import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.TerminateableExecutionPhase;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory;
 
-public class CloudCheckStatusPhase implements ExecutionPhase,
-	Serializable, TerminateableExecutionPhase{
+public class CloudCheckStatusPhase extends AbstractCloudExecutionPhase
+	implements Serializable, TerminateableExecutionPhase{
 
 	static final long serialVersionUID = 0L;
 
@@ -50,7 +48,7 @@ public class CloudCheckStatusPhase implements ExecutionPhase,
 	@Override
 	public ActivityState getPhaseState() {
 		return new ActivityState(ActivityStateEnumeration.Running,
-				"Polling Status of " + _checkPhase + " Phase", false);
+				"polling-status-" + _checkPhase, false);
 	}
 
 	@Override
@@ -83,9 +81,10 @@ public class CloudCheckStatusPhase implements ExecutionPhase,
 							" sleeping for " + sleep/1000 + " seconds");
 					Thread.sleep(sleep);
 					_failed = false;
+					_tries++; 
 				}
 
-				_tries++;
+				
 				
 				//Poll
 				if (tManage.checkFile(resourceID, _workingDir + _completeFileName)){
@@ -109,35 +108,15 @@ public class CloudCheckStatusPhase implements ExecutionPhase,
 
 	}
 
+
 	@Override
-	public void terminate(boolean countAsFailedAttempt) throws ExecutionException {
+	protected Log getLog() {
+		return _logger;
+	}
 
-		CloudManager tManage = CloudMonitor.getManager(_besid);
-
-		if (tManage != null){
-			try {
-
-				_logger.info("CloudBES: Terminating " + _checkPhase + " Phase");
-				String resourceID  = tManage.aquireResource(_activityID);	
-				//Kill Job processes, (modify once no longer running as root to killall -9 -1
-				tManage.sendCommand(resourceID,
-						"killall -9 -g runScript.sh", System.out, System.err);
-				tManage.sendCommand(resourceID,
-						"killall -9 -g grid", System.out, System.err);
-
-				//Wipe working directory
-				tManage.sendCommand(resourceID, "rm -rf " + _workingDir +
-						"/*", System.out, System.err);
-
-				//Release resource
-				tManage.releaseResource(_activityID);
-
-				_terminate = true;
-
-			} catch (Exception e) {
-				_logger.error(e);
-			}
-		}
+	@Override
+	protected String getPhase() {
+		return "Polling " + _checkPhase;
 	}
 
 }

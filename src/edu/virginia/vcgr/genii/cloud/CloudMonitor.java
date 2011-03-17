@@ -325,6 +325,16 @@ public class CloudMonitor {
 		tManage.freeResources();
 		
 	}
+	
+	static public boolean isCloudBES(String besid){
+		
+		CloudManager tManage = getManager(besid);
+		
+		if (tManage == null)
+			return false;
+		
+		return true;
+	}
 
 
 }

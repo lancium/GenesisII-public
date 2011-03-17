@@ -43,6 +43,7 @@ import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingD
 import edu.virginia.vcgr.genii.container.bes.resource.DBBESResource;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
+import edu.virginia.vcgr.genii.cloud.CloudManager;
 import edu.virginia.vcgr.genii.cloud.CloudMonitor;
 
 
@@ -297,6 +298,15 @@ public class BES implements Closeable
 			if (_containedActivities.size() >= threshold.intValue())
 				return false;
 		
+		
+		//Check if cloud with no available resources
+		if (CloudMonitor.isCloudBES(getBESID())){
+			//get Manager
+			CloudManager tManage = CloudMonitor.getManager(getBESID());
+			if (tManage.available() <= 0)
+				return false;
+		}
+			
 		return !_enactor.getCurrentAction().equals(BESPolicyActions.KILL);
 	}
 	
@@ -322,12 +332,9 @@ public class BES implements Closeable
 			}
 		}
 		
-		//Cleanup CloudBES
-		BESConstructionParameters cParam = (BESConstructionParameters)DBBESResource.constructionParameters(
-				connection, GeniiBESServiceImpl.class, _besid);
-		if (cParam.getCloudConfiguration() != null){
+		if (CloudMonitor.isCloudBES(getBESID())){
 			try {
-				CloudMonitor.deleteCloudBES(_besid);
+				CloudMonitor.deleteCloudBES(getBESID());
 			} catch (Exception e) {
 				_logger.debug(e);
 			}
