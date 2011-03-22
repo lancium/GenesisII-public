@@ -254,7 +254,7 @@ public class ExportedDirUtils
 				GenesisIIConstants.GENESISII_NS, _SVN_REVISION));
 		try
 		{
-			if (svnRevisionElement != null)
+			if (svnRevisionElement != null && svnRevisionElement.getValue() != null)
 				svnRevision = (Long)svnRevisionElement.getObjectValue(Long.class);
 		}
 		catch (Exception e)
