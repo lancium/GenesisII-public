@@ -10,7 +10,9 @@ import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStateEnumeration;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
+import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.cloud.CloudJobWrapper;
+import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfiguration;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 import edu.virginia.vcgr.genii.container.jsdl.JobRequest;
@@ -29,6 +31,7 @@ public class CloudGenerateRunScriptPhase  implements ExecutionPhase, Serializabl
 	private String _genState;
 	private String _jobFile;
 	private String _genDir;
+	private CmdLineManipulatorConfiguration _manipulatorConfiguration;
 	
 	static private Log _logger = 
 		LogFactory.getLog(CloudGenerateRunScriptPhase.class);
@@ -41,7 +44,8 @@ public class CloudGenerateRunScriptPhase  implements ExecutionPhase, Serializabl
 	
 	public CloudGenerateRunScriptPhase(String scratchDir, String runScript,
 			String workingDir, String resourceFile, JobRequest job,
-			String stageInScript, String stageOutScript, String genState, String jobFile, String genDir){
+			String stageInScript, String stageOutScript, String genState, String jobFile, String genDir,
+			CmdLineManipulatorConfiguration manipulatorConfiguration){
 		_scratchDir = scratchDir;
 		_runScript = runScript;
 		_workingDir = workingDir;
@@ -52,6 +56,7 @@ public class CloudGenerateRunScriptPhase  implements ExecutionPhase, Serializabl
 		_genState = genState;
 		_jobFile = jobFile;
 		_genDir = genDir;
+		_manipulatorConfiguration = manipulatorConfiguration;
 	}
 
 	@Override
@@ -64,7 +69,7 @@ public class CloudGenerateRunScriptPhase  implements ExecutionPhase, Serializabl
 			CloudJobWrapper.generateWrapperScript(tStream,
 					new File(_workingDir),
 					new File(_workingDir + _resourceFile),
-					_job, new File(_scratchDir));
+					_job, new File(_scratchDir), _manipulatorConfiguration);
 			tStream.close();
 			
 			//Generate Stage in and out scripts

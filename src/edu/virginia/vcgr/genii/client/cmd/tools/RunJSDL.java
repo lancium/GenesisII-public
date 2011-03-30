@@ -7,10 +7,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.List;
 
 import org.ggf.jsdl.JobDefinition_Type;
 import org.xml.sax.InputSource;
 
+import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
@@ -19,8 +22,10 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLInterpreter;
 import edu.virginia.vcgr.genii.client.jsdl.personality.PersonalityProvider;
+import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
+import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperFactory;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
-import edu.virginia.vcgr.genii.cloud.CloudJobWrapper;
+import edu.virginia.vcgr.genii.container.jsdl.FilesystemRelative;
 import edu.virginia.vcgr.genii.container.jsdl.JobRequest;
 import edu.virginia.vcgr.genii.container.jsdl.parser.ExecutionProvider;
 import edu.virginia.vcgr.genii.context.ContextType;
@@ -103,7 +108,7 @@ public class RunJSDL extends BaseGridTool{
 				File.createTempFile("exec", ".sh", wDir);
 			OutputStream ps = new FileOutputStream(submitScript);
 			
-			CloudJobWrapper.generateWrapperScript(
+			generateWrapperScript(
 					ps, wDir, resourceUsage, tJob, wDir);
 			ps.close();
 
@@ -145,6 +150,81 @@ public class RunJSDL extends BaseGridTool{
 	{
 		if (numArguments() != 2)
 			throw new InvalidToolUsageException();
+	}
+	
+	private static void generateWrapperScript(OutputStream tStream,
+			File workingDir, File resourceUsage, JobRequest job, File tmpDir) throws Exception{
+		try
+		{
+
+			PrintStream ps = new PrintStream(tStream);
+
+			//Generate Header
+			ps.format("#!%s\n\n", "/bin/bash");
+
+			//Generate App Body
+			ps.format("cd \"%s\"\n", workingDir.getAbsolutePath());
+
+
+			ResourceOverrides overrides = new ResourceOverrides();
+
+			ProcessWrapper wrapper = ProcessWrapperFactory.createWrapper(
+					tmpDir, overrides.operatingSystemName(),
+					overrides.cpuArchitecture());
+
+			boolean first = true;
+
+			String execName = job.getExecutable().getTarget();
+			if (!execName.contains("/"))
+				execName = String.format("./%s", execName);
+			
+			for (String element : wrapper.formCommandLine(null,
+					null, //app.getEnvironment()
+					workingDir,
+					getRedirect(job.getStdinRedirect(), workingDir), 
+					getRedirect(job.getStdoutRedirect(), workingDir),
+					getRedirect(job.getStderrRedirect(), workingDir),
+					resourceUsage,
+					execName,
+					getArguments(new String[job.getArguments().size()],
+							job.getArguments())))
+					
+			{
+				if (!first)
+					ps.format(" ");
+				first = false;
+				if (element.contains(tmpDir.getAbsolutePath())){
+					element = workingDir.getAbsolutePath() +
+					element.substring(element.lastIndexOf("/"));
+				}
+				ps.format("\"%s\"", element);
+			}
+			ps.println();
+			//Generate complete file
+			ps.println("touch executePhase.complete");
+			ps.flush();
+		}
+		catch (Exception e)
+		{
+			throw e;
+		}
+	}
+	
+	private static File getRedirect(FilesystemRelative<String> tPath,
+			File workingDir){
+		if (tPath == null)
+			return null;
+		return new File(workingDir.toString() +
+				"/" + tPath.getTarget());
+	}
+
+	private static String[] getArguments(String[] args,  List<FilesystemRelative<String>> tArgs){
+		int i = 0;
+		for (FilesystemRelative<String> tArg : tArgs){
+			args[i] =  tArg.getTarget();
+			i++;
+		}
+		return args;
 	}
 
 }

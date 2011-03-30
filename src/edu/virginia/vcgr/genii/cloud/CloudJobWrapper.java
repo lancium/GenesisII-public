@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import org.apache.commons.logging.Log;
@@ -12,8 +15,12 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
+import edu.virginia.vcgr.genii.client.cmdLineManipulator.CmdLineManipulatorUtils;
+import edu.virginia.vcgr.genii.client.nativeq.NativeQueueException;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperFactory;
+import edu.virginia.vcgr.genii.cmdLineManipulator.CmdLineManipulatorException;
+import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfiguration;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.cloud.CloudCheckStatusPhase;
 import edu.virginia.vcgr.genii.container.bes.execution.phases.cloud.CloudCopyDirectoryPhase;
@@ -36,7 +43,8 @@ public class CloudJobWrapper {
 	static private Log _logger = LogFactory.getLog(CloudJobWrapper.class);
 	
 	public static void generateWrapperScript(OutputStream tStream,
-			File workingDir, File resourceUsage, JobRequest job, File tmpDir) throws Exception{
+			File workingDir, File resourceUsage, JobRequest job, File tmpDir,
+			CmdLineManipulatorConfiguration manipulatorConfiguration) throws Exception{
 		try
 		{
 
@@ -51,37 +59,63 @@ public class CloudJobWrapper {
 
 			ResourceOverrides overrides = new ResourceOverrides();
 
+			
+			
 			ProcessWrapper wrapper = ProcessWrapperFactory.createWrapper(
 					tmpDir, overrides.operatingSystemName(),
 					overrides.cpuArchitecture());
-
 			boolean first = true;
 
 			String execName = job.getExecutable().getTarget();
 			if (!execName.contains("/"))
 				execName = String.format("./%s", execName);
 			
-			for (String element : wrapper.formCommandLine(null,
-					null, //app.getEnvironment()
-					workingDir,
-					getRedirect(job.getStdinRedirect(), workingDir), 
-					getRedirect(job.getStdoutRedirect(), workingDir),
-					getRedirect(job.getStderrRedirect(), workingDir),
-					resourceUsage,
-					execName,
-					getArguments(new String[job.getArguments().size()],
-							job.getArguments())))
-					
-			{
-				if (!first)
-					ps.format(" ");
-				first = false;
-				if (element.contains(tmpDir.getAbsolutePath())){
-					element = workingDir.getAbsolutePath() +
-					element.substring(element.lastIndexOf("/"));
+				
+				//assemble job properties for cmdLineManipulators
+				Map<String, Object> jobProperties = new HashMap<String, Object>();
+				CmdLineManipulatorUtils.addBasicJobProperties(jobProperties, 
+						execName, getArguments(getArguments(new String[job.getArguments().size()],
+								job.getArguments())));
+				CmdLineManipulatorUtils.addEnvProperties(jobProperties,
+						null,
+						null, workingDir, 
+						getRedirect(job.getStdinRedirect(), workingDir), 
+						getRedirect(job.getStdoutRedirect(), workingDir),
+						getRedirect(job.getStderrRedirect(), workingDir), 
+						resourceUsage,
+						wrapper.getPathToWrapper());
+			/*
+			 * 	//Add for MPI, taken from JSDL
+				CmdLineManipulatorUtils.addSPMDJobProperties(jobProperties, 
+						application.getSPMDVariation(), 
+						application.getNumProcesses(), 
+						application.getNumProcessesPerHost());		
+			*/
+			
+				List<String> newCmdLine = new Vector<String>();
+				_logger.debug("Trying to call cmdLine manipulators.");
+				try{
+					newCmdLine = CmdLineManipulatorUtils.callCmdLineManipulators(
+						jobProperties, manipulatorConfiguration);
 				}
-				ps.format("\"%s\"", element);
-			}
+				catch(CmdLineManipulatorException execption){
+					throw new NativeQueueException(String.format("CmdLine Manipulators failed: %s", 
+							execption.getMessage()));
+				}
+				
+				for (String element : newCmdLine)
+				{
+					if (!first)
+						ps.format(" ");
+					first = false;
+					if (element.contains(tmpDir.getAbsolutePath())){
+						element = workingDir.getAbsolutePath() +
+						element.substring(element.lastIndexOf("/"));
+					}
+					ps.format("\"%s\"", element);
+				}
+		
+	
 			ps.println();
 			//Generate complete file
 			ps.println("touch executePhase.complete");
@@ -136,7 +170,8 @@ public class CloudJobWrapper {
 		//Generate runScript
 		ret.add(new CloudGenerateRunScriptPhase(scratchDir, runScript,
 				remoteDir, resourceFile, job, stageInFile, stageOutFile,
-				genState, jobFile, cConfig.getRemoteClientDir()));
+				genState, jobFile, cConfig.getRemoteClientDir(),
+				constructionParameters.getCmdLineManipulatorConfiguration()));
 	
 		//Move local scratch to remote scratch
 		ret.add(new CloudCopyDirectoryPhase(scratchDir, remoteDir,
@@ -205,6 +240,15 @@ public class CloudJobWrapper {
 			i++;
 		}
 		return args;
+	}
+	
+	private static Collection<String> getArguments(String [] tArgs){
+		Collection<String> tStrings = new ArrayList<String>();
+		for (String tArg : tArgs){
+			tStrings.add(tArg);
+		}
+		
+		return tStrings;
 	}
 	
 }
