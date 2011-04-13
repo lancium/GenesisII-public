@@ -198,6 +198,7 @@ public class ExportedDirUtils
 				initInfo.getResolverFactoryEPR()));
 	}
 	
+	@SuppressWarnings("unused")
 	static public ExportedDirInitInfo extractCreationProperties(
 		HashMap<QName, Object> properties) throws ResourceException
 	{

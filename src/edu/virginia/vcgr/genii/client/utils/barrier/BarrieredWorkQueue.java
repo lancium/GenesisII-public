@@ -2,7 +2,6 @@ package edu.virginia.vcgr.genii.client.utils.barrier;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;

@@ -167,7 +167,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		performAuthz();		
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	protected boolean checkReceiverResults(Vector wsResult, Vector actions)
 	{
 

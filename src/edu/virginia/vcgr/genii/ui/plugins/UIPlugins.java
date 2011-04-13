@@ -1,6 +1,5 @@
 package edu.virginia.vcgr.genii.ui.plugins;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.Collection;

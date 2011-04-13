@@ -80,7 +80,7 @@ public class TestingDerbyTimestamps
 		props.setProperty("edu.virginia.vcgr.genii.container.db.db-class-name",
 			"org.apache.derby.jdbc.EmbeddedDriver");
 		props.setProperty("edu.virginia.vcgr.genii.container.db.db-connect-string",
-			"jdbc:derby:C:\\marks-database\\database;create=true");
+			"jdbc:derby:/Users/morgan/test-database;create=true");
 		props.setProperty("edu.virginia.vcgr.genii.container.db.db-user", "sa");
 		props.setProperty("edu.virginia.vcgr.genii.container.db.db-password", "");
 		props.setProperty("edu.virginia.vcgr.genii.container.db.pool-size", "8");
@@ -117,7 +117,7 @@ public class TestingDerbyTimestamps
 		{
 			conn = _pool.acquire(false);
 			stmt = conn.createStatement();
-			stmt.executeUpdate("DROP TABLE test1 CASCADE");
+			stmt.executeUpdate("DROP TABLE test1");
 			conn.commit();
 		}
 		finally

@@ -135,8 +135,7 @@ public class ObjectDeserializer {
      *
      * @see #toObject(SOAPElement, Class)
      */
-    @SuppressWarnings("unchecked")
-	public static Object[] toObject(SOAPElement [] elements, Class javaClass)
+    public static Object[] toObject(SOAPElement [] elements, Class<?> javaClass)
         throws ResourceException {
         if (elements == null) {
             return null;

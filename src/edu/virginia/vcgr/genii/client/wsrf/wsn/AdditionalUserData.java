@@ -42,7 +42,7 @@ public class AdditionalUserData implements Serializable
 		return _attributes;
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	static public <Type extends AdditionalUserData>
 		MessageElement toMessageElement(Type value) throws JAXBException
 	{

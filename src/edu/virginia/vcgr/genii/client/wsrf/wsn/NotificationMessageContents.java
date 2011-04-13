@@ -94,7 +94,7 @@ public class NotificationMessageContents implements Cloneable, Serializable
 			AdditionalUserData.toMessageElement(data);
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	final public MessageElement toAxisType() throws JAXBException
 	{
 		JAXBContext context = JAXBContext.newInstance(getClass());

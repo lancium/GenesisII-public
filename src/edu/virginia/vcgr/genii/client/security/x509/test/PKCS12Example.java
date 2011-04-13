@@ -127,7 +127,6 @@ public class PKCS12Example
 	/**
 	 * we generate an intermediate certificate signed by our CA
 	 */
-	@SuppressWarnings("unchecked")
 	public static Certificate createIntermediateCert(PublicKey pubKey,
 			PrivateKey caPrivKey, X509Certificate caCert, String cn)
 			throws Exception
@@ -135,8 +134,8 @@ public class PKCS12Example
 		//
 		// subject name table.
 		//
-		Hashtable attrs = new Hashtable();
-		Vector order = new Vector();
+		Hashtable<Object, Object> attrs = new Hashtable<Object, Object>();
+		Vector<Object> order = new Vector<Object>();
 
 		attrs.put(X509Principal.CN, cn);
 		attrs.put(X509Principal.C, "AU");
@@ -203,15 +202,14 @@ public class PKCS12Example
 	/**
 	 * we generate a certificate signed by our CA's intermediate certficate
 	 */
-	@SuppressWarnings("unchecked")
 	public static Certificate createCert(PublicKey pubKey,
 			PrivateKey caPrivKey, PublicKey caPubKey) throws Exception
 	{
 		//
 		// signers name table.
 		//
-		Hashtable sAttrs = new Hashtable();
-		Vector sOrder = new Vector();
+		Hashtable<Object, Object> sAttrs = new Hashtable<Object, Object>();
+		Vector<Object> sOrder = new Vector<Object>();
 
 		sAttrs.put(X509Principal.C, "AU");
 		sAttrs.put(X509Principal.O, "The Legion of the Bouncy Castle");
@@ -227,8 +225,8 @@ public class PKCS12Example
 		//
 		// subjects name table.
 		//
-		Hashtable attrs = new Hashtable();
-		Vector order = new Vector();
+		Hashtable<Object, Object> attrs = new Hashtable<Object, Object>();
+		Vector<Object> order = new Vector<Object>();
 
 		attrs.put(X509Principal.C, "AU");
 		attrs.put(X509Principal.O, "The Legion of the Bouncy Castle");
@@ -290,7 +288,7 @@ public class PKCS12Example
 		return cert;
 	}
 
-	@SuppressWarnings( { "unused", "unchecked" })
+	@SuppressWarnings( { "unused" })
 	public static void main(String[] args) throws Exception
 	{
 		Security.addProvider(new BouncyCastleProvider());
@@ -456,7 +454,7 @@ public class PKCS12Example
 
 		// validating path
 		String provider = "BC";
-		List certchain = new ArrayList();
+		List<X509Certificate> certchain = new ArrayList<X509Certificate>();
 		for (int i = 0; i < chain.length - 1; i++)
 		{
 			certchain.add(chain[i]);
@@ -464,7 +462,7 @@ public class PKCS12Example
 		CertPath cp =
 				CertificateFactory.getInstance("X.509", provider)
 						.generateCertPath(certchain);
-		Set trust = new HashSet();
+		Set<TrustAnchor> trust = new HashSet<TrustAnchor>();
 		trust.add(new TrustAnchor(chain[chain.length - 1], null));
 
 		CertPathValidator cpv = CertPathValidator.getInstance("PKIX", provider);

@@ -44,8 +44,7 @@ public class WinCryptoLib extends JNIClientBaseClass
 	 * @param certStore
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
-	private native ArrayList getByteArrayAliases(String certStore)
+	private native ArrayList<?> getByteArrayAliases(String certStore)
 			throws WinCryptoException;
 
 	private native RSAPrivateCrtKeySpec getPrivateKeySpec(String certStore,
@@ -57,8 +56,7 @@ public class WinCryptoLib extends JNIClientBaseClass
 	private native byte[] getCertFromByteAlias(String certStore, byte[] alias)
 			throws WinCryptoException;
 
-	@SuppressWarnings("unchecked")
-	private native ArrayList getCertChain(String certStore, byte[] alias)
+	private native ArrayList<byte[]> getCertChain(String certStore, byte[] alias)
 			throws WinCryptoException, WinCryptoChainInvalidException;
 
 	private native void isCertTrusted(byte[] certBlob)
@@ -159,7 +157,6 @@ public class WinCryptoLib extends JNIClientBaseClass
 		return cert;
 	}
 
-	@SuppressWarnings("unchecked")
 	public X509Certificate[] getCertificateChain(String certStore, String alias)
 			throws WinCryptoChainInvalidException, WinCryptoException,
 			CertificateException

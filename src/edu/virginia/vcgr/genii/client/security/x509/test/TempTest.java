@@ -86,7 +86,6 @@ public class TempTest
 	/**
 	 * we generate a certificate signed by our CA's intermediate certficate
 	 */
-	@SuppressWarnings("unchecked")
 	public static X509Certificate createClientCert(PublicKey pubKey,
 			PrivateKey caPrivKey, PublicKey caPubKey) throws Exception
 	{
@@ -99,8 +98,8 @@ public class TempTest
 		//
 		// subjects name table.
 		//
-		Hashtable attrs = new Hashtable();
-		Vector order = new Vector();
+		Hashtable<Object, Object> attrs = new Hashtable<Object, Object>();
+		Vector<Object> order = new Vector<Object>();
 
 		attrs.put(X509Principal.C, "AU");
 		attrs.put(X509Principal.O, "The Legion of the Bouncy Castle");
@@ -116,11 +115,11 @@ public class TempTest
 		order.addElement(X509Principal.EmailAddress);
 		X509Principal subject = new X509Principal(order, attrs);
 
-		Vector oids = subject.getOIDs();
-		Vector values = subject.getValues();
+		Vector<?> oids = subject.getOIDs();
+		Vector<?> values = subject.getValues();
 
-		java.util.Iterator itr = oids.iterator();
-		java.util.Iterator itr2 = values.iterator();
+		java.util.Iterator<?> itr = oids.iterator();
+		java.util.Iterator<?> itr2 = values.iterator();
 		while (itr.hasNext())
 		{
 			DERObjectIdentifier next = (DERObjectIdentifier) itr.next();

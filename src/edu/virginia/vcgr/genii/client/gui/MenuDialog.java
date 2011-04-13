@@ -34,13 +34,12 @@ static final long serialVersionUID = 0L;
 	static String title = "";
 	static String prompt = "";
 	
-	@SuppressWarnings("unchecked")
-	static Collection entries;
+	static Collection<?> entries;
 	
 	static SynchronousQueue<Object> waitingQueue = new SynchronousQueue<Object>();
 	
 	private Object[] createListContents(
-		Collection<? extends EntryType> entries)
+		Collection<?> entries)
 	{
 		Object []ret = new Object[entries.size()];
 		entries.toArray(ret);
@@ -49,7 +48,7 @@ static final long serialVersionUID = 0L;
 	}
 	
 	private MenuDialog(String title, String prompt, 
-		Collection<? extends EntryType> entries)
+		Collection<?> entries)
 	{
 		super();
 		
@@ -120,7 +119,7 @@ static final long serialVersionUID = 0L;
         	
            public void run() {
             	MenuDialog<EntryType> mDialog = new MenuDialog<EntryType>(
-            			title, prompt, entries);
+        			title, prompt, entries);
         		mDialog.pack();
         		GuiUtils.centerComponent(mDialog);
         		mDialog.setAlwaysOnTop(true);
