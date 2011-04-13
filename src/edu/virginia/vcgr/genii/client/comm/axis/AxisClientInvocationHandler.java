@@ -50,6 +50,7 @@ import javax.xml.soap.SOAPException;
 
 import org.apache.axis.SimpleChain;
 
+import edu.virginia.cs.vcgr.genii._2006._12.resource_simple.TryAgainFaultType;
 import edu.virginia.vcgr.appmgr.version.Version;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cache.LRUCache;
@@ -495,8 +496,22 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 					try
 					{
 						startCommunicate = System.currentTimeMillis();
-						return handler.doInvoke(
-							calledMethod, arguments, timeout);
+						while (true)
+						{
+							try
+							{
+								return handler.doInvoke(
+									calledMethod, arguments, timeout);
+							}
+							catch (InvocationTargetException ite)
+							{
+								Throwable cause = ite.getCause();
+								if (!(cause instanceof TryAgainFaultType))
+									throw ite;
+								
+								_logger.debug("Caugh TryAgainException.");
+							}
+						}
 					}
 					catch(Throwable t)
 					{

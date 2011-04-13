@@ -51,9 +51,10 @@ public class CatTool extends BaseGridTool
 			reader = new InputStreamReader(in);
 			
 			while ( (read = reader.read(data, 0, data.length)) > 0)
+			{
 				stdout.write(data, 0, read);
-			
-			stdout.flush();
+				stdout.flush();
+			}
 		}
 		finally
 		{

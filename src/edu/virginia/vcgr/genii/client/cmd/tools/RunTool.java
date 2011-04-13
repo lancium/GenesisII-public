@@ -507,9 +507,11 @@ public class RunTool extends BaseGridTool
 		
 		CreateActivityType createActivityRequest = new CreateActivityType(
 			adt, null);
+		
 		CreateActivityResponseType response = 
 			bes.createActivity(createActivityRequest);
 		return response.getActivityIdentifier();
+		
 	}
 	
 	static private EndpointReferenceType getBESContainer(RNSPath besOrSchedPath)

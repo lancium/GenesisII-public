@@ -344,4 +344,9 @@
 		<description>FSProxy</description>
 	</portType>
 	
+	<portType name="{http://vcgr.cs.virginia.edu/pipe/2011/03/pipe}PipePortType">
+		<display-rank>100</display-rank>
+		<description>Pipe</description>
+	</portType>
+	
 </known-porttypes>

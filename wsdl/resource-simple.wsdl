@@ -3,6 +3,7 @@
 	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
     xmlns:genii-rsimple="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple"
     targetNamespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple">
 
@@ -18,7 +19,18 @@
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
 
+			<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"
+				schemaLocation="./wsrf/basefaults.xsd"/>
+
 <!-- Message Helper Types -->
+			<xsd:element name="TryAgainFaultType">
+				<xsd:complexType name="TryAgainFaultType">
+					<xsd:complexContent>
+						<xsd:extension base="wsbf:BaseFaultType"/>
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+
 			<xsd:element name="ping" type="xsd:string">
 			</xsd:element>
 
