@@ -48,7 +48,7 @@ class LightWeightExportUtils
 						(String)resource.getProperty(
 							LightWeightExportConstants.SVN_PASS_PROPERTY_NAME),
 						revision);
-					/* TODO:  MOOCH
+					/* TODO:
 					if (revision == null)
 						return vroot;
 					*/

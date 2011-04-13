@@ -10,7 +10,6 @@ public class ServicesConfigurationHandler
 	@Override
 	final public Object parse(Node n) throws ConfigurationException
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 }

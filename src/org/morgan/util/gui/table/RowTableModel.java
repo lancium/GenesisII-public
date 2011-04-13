@@ -46,7 +46,6 @@ public abstract class RowTableModel<RowType> extends AbstractTableModel
 	@Override
 	public int getRowCount()
 	{
-		// TODO Auto-generated method stub
 		return 0;
 	}
 	

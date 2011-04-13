@@ -90,12 +90,6 @@ public class JobUpdateWorker implements OutcallHandler
 		
 		try
 		{
-			/* MOOCH:  For now, we're going to comment this out -- it was
-			 * taking up too much space in the database.
-			history.createDebugWriter("Job Update Worker Running").format(
-				"Job Update worker running to check status of job.").close();
-			*/
-			
 			_logger.debug("Checking status of job " + _data);
 	
 			/* Get a connection from the connection pool and then ask the 
@@ -142,11 +136,6 @@ public class JobUpdateWorker implements OutcallHandler
 			GetActivityStatusResponseType []activityStatuses;
 			try
 			{
-				/* MOOCH:  For now, we're going to comment this out as it 
-				 * takes too much space in the database.
-				history.debug("Making Job Status Outcall");
-				*/
-				
 				_logger.debug(String.format(
 					"Making grid outcall to check status of job %s", _data));
 				/* call the BES container to get the activity's status. */
@@ -187,10 +176,6 @@ public class JobUpdateWorker implements OutcallHandler
 					+ _data);
 			} else
 			{
-				/* MOOCH:  For now, we're going to comment this out as it takes
-				 * too much space in the database.
-				history.trace("Job Status Check Succeeded");
-				*/
 				_logger.debug(String.format(
 					"Successfully got status of job %s.", _data));
 				List<String> faults = null;
