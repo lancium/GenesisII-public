@@ -1,30 +1,23 @@
 package edu.virginia.vcgr.genii.container.replicatedExport;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.ggf.rns.Add;
-import org.ggf.rns.AddResponse;
-import org.ggf.rns.CreateFile;
-import org.ggf.rns.CreateFileResponse;
-import org.ggf.rns.EntryType;
-import org.ggf.rns.List;
-import org.ggf.rns.ListResponse;
-import org.ggf.rns.Move;
-import org.ggf.rns.MoveResponse;
-import org.ggf.rns.Query;
-import org.ggf.rns.QueryResponse;
-import org.ggf.rns.RNSDirectoryNotEmptyFaultType;
+import org.ggf.rns.LookupResponseType;
+import org.ggf.rns.MetadataMappingType;
+import org.ggf.rns.NameMappingType;
 import org.ggf.rns.RNSEntryExistsFaultType;
-import org.ggf.rns.RNSEntryNotDirectoryFaultType;
-import org.ggf.rns.RNSFaultType;
-import org.ggf.rns.Remove;
+import org.ggf.rns.RNSEntryResponseType;
+import org.ggf.rns.RNSEntryType;
+import org.ggf.rns.WriteNotPermittedFaultType;
 import org.morgan.util.GUID;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.ws.addressing.EndpointReferenceType;
@@ -33,6 +26,7 @@ import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
+import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.AbstractNotificationHandler;
@@ -48,6 +42,9 @@ import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
+import edu.virginia.vcgr.genii.container.rns.RNSContainerUtilities;
+import edu.virginia.vcgr.genii.enhancedrns.CreateFileRequestType;
+import edu.virginia.vcgr.genii.enhancedrns.CreateFileResponseType;
 import edu.virginia.vcgr.genii.replicatedExport.RExportDirPortType;
 import edu.virginia.vcgr.genii.replicatedExport.PopulateDirRequestType;
 
@@ -143,18 +140,18 @@ public class RExportDirServiceImpl extends GenesisIIBase
 			new LegacyResourceTerminatedNotificationHandler());
 	}
 	
+	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public AddResponse add(Add addRequest) 
-		throws RemoteException, RNSEntryExistsFaultType, 
-			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType, RNSFaultType
+	public RNSEntryResponseType[] add(RNSEntryType[] addRequest)
+			throws RemoteException, WriteNotPermittedFaultType
 	{
 		throw new RemoteException("add operation not supported in RExportDir.");
 	}
 
 	@RWXMapping(RWXCategory.WRITE)
-	public CreateFileResponse createFile(CreateFile createFileRequest) 
+	public CreateFileResponseType createFile(CreateFileRequestType createFileRequest) 
 		throws RemoteException, RNSEntryExistsFaultType, 
-			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType, RNSFaultType
+			ResourceUnknownFaultType
 	{
 		throw new RemoteException("createFile operation not supported in RExportDir.");
 	}
@@ -162,31 +159,41 @@ public class RExportDirServiceImpl extends GenesisIIBase
 	/**
 	 * Lists entries in db for this rexport dir resource.
 	 */
+	@Override
 	@RWXMapping(RWXCategory.READ)
-	public ListResponse list(List listRequest) 
-		throws RemoteException, ResourceUnknownFaultType, 
-			RNSEntryNotDirectoryFaultType, RNSFaultType
+	public LookupResponseType lookup(String []lookupRequest) 
+		throws RemoteException, ResourceUnknownFaultType
 	{
+		Collection<RExportEntry> entries = new LinkedList<RExportEntry>();
+		
 		//get current resource
 		IRExportResource resource = 
 			(IRExportResource)ResourceManager.getCurrentResource().dereference();
 		
-		//retrieve entries associated with resource 
-		Collection<RExportEntry>  entries = resource.retrieveEntries(
-			listRequest.getEntryName());
+		//retrieve entries associated with resource
+		if (lookupRequest == null || lookupRequest.length == 0)
+			lookupRequest = new String[] { null };
+		
+		for (String entryName : lookupRequest)
+			entries.addAll(resource.retrieveEntries(entryName));
 		
 		if (entries.size() == 0)
 			_logger.info("empty RExportDir lookup results");
 		
 		//create EntryType list of found entries for response
-		EntryType []ret = new EntryType[entries.size()];
-		int listIter = 0;
-		for (RExportEntry entry : entries){
-			ret[listIter++] = new EntryType(
-				entry.getName(), entry.getAttributes(), entry.getEntryReference());
+		Collection<RNSEntryResponseType> result = 
+			new ArrayList<RNSEntryResponseType>(entries.size());
+		for (RExportEntry entry : entries)
+		{
+			result.add(new RNSEntryResponseType(
+				entry.getEntryReference(), 
+				RNSUtilities.createMetadata(entry.getEntryReference(), entry.getAttributes()), null, 
+				entry.getName()));
 		}
 		
-		return new ListResponse(ret);
+		return RNSContainerUtilities.translate(
+    		result, iteratorBuilder(
+    			RNSEntryResponseType.getTypeDesc().getXmlType()));
 	}
 	
 	/*
@@ -224,23 +231,18 @@ public class RExportDirServiceImpl extends GenesisIIBase
 		dirResource.commit();
 	}
 
+	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public MoveResponse move(Move moveRequest) 
-		throws RemoteException, ResourceUnknownFaultType, RNSFaultType
+	public RNSEntryResponseType[] rename(NameMappingType[] renameRequest)
+		throws RemoteException, WriteNotPermittedFaultType
 	{
-		throw new RemoteException("Move operation not supported in RExportDir.");
-	}
-	@RWXMapping(RWXCategory.READ)
-	public QueryResponse query(Query queryRequest) 
-		throws RemoteException, ResourceUnknownFaultType, RNSFaultType
-	{	
-		throw new RemoteException("Query operation not supported in RExportDir.");
+		throw new RemoteException("Rename operation not supported in RExportDir.");
 	}
 	
+	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public String[] remove(Remove removeRequest) 
-		throws RemoteException, ResourceUnknownFaultType, 
-			RNSDirectoryNotEmptyFaultType, RNSFaultType
+	public RNSEntryResponseType[] remove(String[] removeRequest)
+		throws RemoteException, WriteNotPermittedFaultType
 	{
 		throw new RemoteException("Remove operation not supported in RExportDir.");
 	}
@@ -262,5 +264,14 @@ public class RExportDirServiceImpl extends GenesisIIBase
 		
 		return super.createResource(constructionParameters);
 	}
-	
+
+	@Override
+	@RWXMapping(RWXCategory.WRITE)
+	public RNSEntryResponseType[] setMetadata(
+		MetadataMappingType[] setMetadataRequest) throws RemoteException,
+			WriteNotPermittedFaultType
+	{
+		throw new RemoteException(
+			"SetMetadata operation not supported in RExportDir!");
+	}
 }

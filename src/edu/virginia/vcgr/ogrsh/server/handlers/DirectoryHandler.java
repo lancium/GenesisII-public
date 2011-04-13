@@ -12,10 +12,7 @@ import javax.xml.namespace.QName;
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.ggf.rns.EntryType;
-import org.ggf.rns.List;
-import org.ggf.rns.ListResponse;
-import org.ggf.rns.RNSPortType;
+import org.ggf.rns.RNSEntryResponseType;
 import org.morgan.util.GUID;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.oasis_open.docs.wsrf.rp_2.UpdateResourceProperties;
@@ -28,9 +25,12 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
+import edu.virginia.vcgr.genii.client.rns.RNSIterable;
+import edu.virginia.vcgr.genii.client.rns.RNSLegacyProxy;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
+import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
 import edu.virginia.vcgr.ogrsh.server.comm.OGRSHOperation;
 import edu.virginia.vcgr.ogrsh.server.dir.StatBuffer;
 import edu.virginia.vcgr.ogrsh.server.dir.TimeValStructure;
@@ -148,14 +148,15 @@ public class DirectoryHandler
 		{
 			RNSPath currentPath = RNSPath.getCurrent();
 			RNSPath full = currentPath.lookup(fullpath, RNSPathQueryFlags.MUST_EXIST);
-			RNSPortType dirPT = ClientUtils.createProxy(
-				RNSPortType.class, full.getEndpoint());
-			ListResponse resp = dirPT.list(new List(null));
+			EnhancedRNSPortType dirPT = ClientUtils.createProxy(
+				EnhancedRNSPortType.class, full.getEndpoint());
+			RNSIterable iterable = new RNSIterable(
+				dirPT.lookup(null), null, 100);
 			LinkedList<DirectoryEntry> entries = new LinkedList<DirectoryEntry>();
-			for (EntryType et : resp.getEntryList())
+			for (RNSEntryResponseType et : iterable)
 			{
-				String entryName = et.getEntry_name();
-				TypeInformation ti = new TypeInformation(et.getEntry_reference());
+				String entryName = et.getEntryName();
+				TypeInformation ti = new TypeInformation(et.getEndpoint());
 				long st_ino = StatUtils.generateInodeNumber(ti.getEndpoint());
 				if (ti.isRNS())
 				{
@@ -382,11 +383,10 @@ public class DirectoryHandler
 			RNSPath currentPath = RNSPath.getCurrent();
 			RNSPath full = currentPath.lookup(fullpath,
 				RNSPathQueryFlags.MUST_EXIST);
-			RNSPortType dirPT = ClientUtils.createProxy(
-				RNSPortType.class, full.getEndpoint());
-			ListResponse resp = dirPT.list(
-				new List(null));
-			if (resp.getEntryList().length != 0)
+			EnhancedRNSPortType dirPT = ClientUtils.createProxy(
+				EnhancedRNSPortType.class, full.getEndpoint());
+			RNSLegacyProxy proxy = new RNSLegacyProxy(dirPT);
+			if (proxy.lookup().length != 0)
 				throw new OGRSHException(OGRSHException.DIRECTORY_NOT_EMPTY,
 					"Directory \"" + fullpath + "\" is not empty.");
 			full.delete();

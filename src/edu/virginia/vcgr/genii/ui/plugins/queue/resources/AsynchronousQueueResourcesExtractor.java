@@ -2,11 +2,11 @@ package edu.virginia.vcgr.genii.ui.plugins.queue.resources;
 
 import java.util.concurrent.Callable;
 
-import org.ggf.rns.List;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.rfork.ResourceForkUtils;
+import edu.virginia.vcgr.genii.client.rns.RNSLegacyProxy;
 import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginContext;
 
@@ -31,8 +31,10 @@ class AsynchronousQueueResourcesExtractor
 		EnhancedRNSPortType rpt = ClientUtils.createProxy(
 			EnhancedRNSPortType.class, queueEPR,
 			_uiContext.uiContext().callingContext());
-		EndpointReferenceType resourcesEPR = rpt.list(
-			new List("resources")).getEntryList()[0].getEntry_reference();
+		RNSLegacyProxy proxy = new RNSLegacyProxy(rpt, 
+			_uiContext.uiContext().callingContext());
+		EndpointReferenceType resourcesEPR = proxy.lookup(
+			"resources")[0].getEndpoint();
 		return ClientUtils.createProxy(EnhancedRNSPortType.class,
 			resourcesEPR, _uiContext.uiContext().callingContext());
 	}

@@ -13,13 +13,8 @@ import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.ggf.rns.Add;
-import org.ggf.rns.AddResponse;
-import org.ggf.rns.CreateFile;
-import org.ggf.rns.CreateFileResponse;
-import org.ggf.rns.RNSEntryExistsFaultType;
-import org.ggf.rns.RNSEntryNotDirectoryFaultType;
-import org.ggf.rns.RNSFaultType;
+import org.ggf.rns.RNSEntryResponseType;
+import org.ggf.rns.RNSEntryType;
 import org.morgan.util.io.StreamUtils;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
@@ -55,6 +50,8 @@ import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.rns.EnhancedRNSServiceImpl;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
+import edu.virginia.vcgr.genii.enhancedrns.CreateFileRequestType;
+import edu.virginia.vcgr.genii.enhancedrns.CreateFileResponseType;
 
 public class ApplicationDescriptionServiceImpl 
 	extends EnhancedRNSServiceImpl implements ApplicationDescriptionPortType
@@ -130,19 +127,19 @@ public class ApplicationDescriptionServiceImpl
 		SupportDocumentType supportDoc = new SupportDocumentType(
 			platformDesc, null, deploymentType);
 		
-		CreateFile createFile = new CreateFile(name);
+		CreateFileRequestType createFile = new CreateFileRequestType(name);
 		EndpointReferenceType newFile = null;
 		OutputStream bos = null;
 		OutputStreamWriter writer = null;
 		
 		try
 		{
-			CreateFileResponse response = null;
+			CreateFileResponseType response = null;
 			response = super.createFile(createFile, 
 				new MessageElement[] { new MessageElement(
 					ApplicationDescriptionConstants.SUPPORT_DOCUMENT_ATTR_QNAME,
 					supportDoc) });
-			newFile = response.getEntry_reference();
+			newFile = response.getEndpoint();
 			bos = ByteIOStreamFactory.createOutputStream(newFile);
 			writer = new OutputStreamWriter(bos);
 			ObjectSerializer.serialize(writer, deployDoc, new QName(
@@ -179,36 +176,21 @@ public class ApplicationDescriptionServiceImpl
 		}
 	}
 	
-	@RWXMapping(RWXCategory.INHERITED)
-	public AddResponse add(Add addRequest) throws RemoteException,
-			RNSEntryExistsFaultType, ResourceUnknownFaultType,
-			RNSEntryNotDirectoryFaultType, RNSFaultType
+	@Override
+	protected RNSEntryResponseType add(RNSEntryType entry)
+		throws RemoteException
 	{
-		if (addRequest == null || addRequest.getEntry_name() == null ||
-			addRequest.getEntry_reference() == null)
+		if (entry == null || entry.getEndpoint() == null || 
+			entry.getEntryName() == null)
 		{
-			throw FaultManipulator.fillInFault(new RNSFaultType(
+			throw FaultManipulator.fillInFault(new BaseFaultType(
 				null, null, null, null, new BaseFaultTypeDescription[] {
 					new BaseFaultTypeDescription(
 						"The \"add\" operation is only limitedly supported for this service.")
-				}, null, null));
+				}, null));
 		}
 		
-		return super.add(addRequest);
-	}
-
-	@RWXMapping(RWXCategory.INHERITED)
-	public CreateFileResponse createFile(CreateFile createFileRequest)
-			throws RemoteException, RNSEntryExistsFaultType,
-			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType,
-			RNSFaultType
-	{
-		throw FaultManipulator.fillInFault(new BaseFaultType(
-			null, null, null, null,
-			new BaseFaultTypeDescription[] {
-				new BaseFaultTypeDescription(
-					"Operation \"createFile\" is not supported on this service.")
-		    }, null));
+		return super.add(entry);
 	}
 
 	@RWXMapping(RWXCategory.READ)

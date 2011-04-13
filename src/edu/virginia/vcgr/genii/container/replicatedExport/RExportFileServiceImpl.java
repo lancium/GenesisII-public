@@ -11,21 +11,12 @@ import org.ggf.byteio.ReadNotPermittedFaultType;
 import org.ggf.byteio.UnsupportedTransferFaultType;
 import org.ggf.rbyteio.Write;
 import org.ggf.rbyteio.WriteResponse;
-import org.ggf.rns.Add;
-import org.ggf.rns.AddResponse;
-import org.ggf.rns.CreateFile;
-import org.ggf.rns.CreateFileResponse;
-import org.ggf.rns.List;
-import org.ggf.rns.ListResponse;
-import org.ggf.rns.Move;
-import org.ggf.rns.MoveResponse;
-import org.ggf.rns.Query;
-import org.ggf.rns.QueryResponse;
-import org.ggf.rns.RNSDirectoryNotEmptyFaultType;
-import org.ggf.rns.RNSEntryExistsFaultType;
-import org.ggf.rns.RNSEntryNotDirectoryFaultType;
-import org.ggf.rns.RNSFaultType;
-import org.ggf.rns.Remove;
+import org.ggf.rns.LookupResponseType;
+import org.ggf.rns.MetadataMappingType;
+import org.ggf.rns.NameMappingType;
+import org.ggf.rns.RNSEntryResponseType;
+import org.ggf.rns.RNSEntryType;
+import org.ggf.rns.WriteNotPermittedFaultType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -124,50 +115,44 @@ public class RExportFileServiceImpl extends RandomByteIOServiceImpl
 			new LegacyResourceTerminatedNotificationHandler());
 	}
 	
+	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public AddResponse add(Add addRequest) 
-		throws RemoteException, RNSEntryExistsFaultType, 
-			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType, RNSFaultType
+	public RNSEntryResponseType[] remove(String[] removeRequest)
+			throws RemoteException, WriteNotPermittedFaultType
+	{
+		throw new RemoteException("remove operation not supported in replicated export");
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.WRITE)
+	public RNSEntryResponseType[] rename(NameMappingType[] renameRequest)
+			throws RemoteException, WriteNotPermittedFaultType
+	{
+		throw new RemoteException("rename operation not supported in replicated export");
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.WRITE)
+	public RNSEntryResponseType[] setMetadata(
+			MetadataMappingType[] setMetadataRequest) throws RemoteException,
+			WriteNotPermittedFaultType
+	{
+		throw new RemoteException("setMetadata operation not supported in replicated export");
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.WRITE)
+	public RNSEntryResponseType[] add(RNSEntryType[] addRequest)
+			throws RemoteException, WriteNotPermittedFaultType
 	{
 		throw new RemoteException("add operation not supported in replicated export");
 	}
 
-	@RWXMapping(RWXCategory.WRITE)
-	public CreateFileResponse createFile(CreateFile createFileRequest) 
-		throws RemoteException, RNSEntryExistsFaultType, 
-			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType, RNSFaultType
+	@Override
+	public LookupResponseType lookup(String[] lookupRequest)
+			throws RemoteException, org.ggf.rns.ReadNotPermittedFaultType
 	{
-		throw new RemoteException("createFile operation not supported in replicated export");
-	}
-
-	@RWXMapping(RWXCategory.READ)
-	public ListResponse list(List listRequest) 
-		throws RemoteException, ResourceUnknownFaultType, 
-			RNSEntryNotDirectoryFaultType, RNSFaultType
-	{
-		throw new RemoteException("list operation not supported in replicated export");
-	}
-
-	@RWXMapping(RWXCategory.WRITE)
-	public MoveResponse move(Move moveRequest) 
-		throws RemoteException, ResourceUnknownFaultType, RNSFaultType
-	{
-		throw new RemoteException("Move operation not supported in replicated export");
-	}
-
-	@RWXMapping(RWXCategory.READ)
-	public QueryResponse query(Query queryRequest) 
-		throws RemoteException, ResourceUnknownFaultType, RNSFaultType
-	{
-		throw new RemoteException("Query operation not supported in replicated export");
-	}
-	
-	@RWXMapping(RWXCategory.WRITE)
-	public String[] remove(Remove removeRequest) 
-		throws RemoteException, ResourceUnknownFaultType, 
-			RNSDirectoryNotEmptyFaultType, RNSFaultType
-	{
-		throw new RemoteException("remove operation not supported in replicated export");
+		throw new RemoteException("lookup operation not supported in replicated export");
 	}
 	
 	protected Object translateConstructionParameter(MessageElement parameter)

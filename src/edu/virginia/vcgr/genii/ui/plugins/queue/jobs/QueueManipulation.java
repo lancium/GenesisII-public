@@ -134,8 +134,8 @@ class QueueManipulation
 				IterateHistoryEventsResponseType resp = queue.iterateHistoryEvents(
 					new IterateHistoryEventsRequestType(
 						_jobTickets.iterator().next()));
-				iterable = new WSIterable<HistoryEventBundleType>(
-					HistoryEventBundleType.class, resp.getResult(), 25, true);
+				iterable = WSIterable.axisIterable(
+					HistoryEventBundleType.class, resp.getResult(), 25);
 				if (wasCancelled())
 					return null;
 				progressListener.updateSubTitle("Iterating through events.");

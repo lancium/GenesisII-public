@@ -9,9 +9,9 @@ import javax.xml.namespace.QName;
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.ggf.rns.RNSFaultType;
 import org.ggf.sbyteio.StreamableByteIOPortType;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
@@ -663,8 +663,7 @@ public class RExportResolverUtils
 	}
 	
 	static public EndpointReferenceType getResolverServiceEPR(
-			EndpointReferenceType resolverEPR)
-		throws RNSFaultType 
+			EndpointReferenceType resolverEPR) throws BaseFaultType
 	{
 		EndpointReferenceType resolverServiceEPR = null;
 		
@@ -678,10 +677,10 @@ public class RExportResolverUtils
 					new ServiceEPRRequest(resolverEPR)).getResolverServiceEPR();
 		}
 		catch (Exception ce){
-			throw FaultManipulator.fillInFault(new RNSFaultType(null, null, null, null,
+			throw FaultManipulator.fillInFault(new BaseFaultType(null, null, null, null,
 				new BaseFaultTypeDescription[] {
 					new BaseFaultTypeDescription(ce.getLocalizedMessage())
-			}, null, null));
+			}, null));
 		}
 		
 		return resolverServiceEPR;	

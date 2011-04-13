@@ -31,7 +31,6 @@ import org.ggf.bes.factory.NotAcceptingNewActivitiesFaultType;
 import org.ggf.bes.factory.NotAuthorizedFaultType;
 import org.ggf.bes.factory.UnsupportedFeatureFaultType;
 import org.ggf.jsdl.JobDefinition_Type;
-import org.ggf.rns.EntryType;
 import org.morgan.util.GUID;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
@@ -65,6 +64,7 @@ import edu.virginia.vcgr.genii.container.cservices.history.InMemoryHistoryEventS
 import edu.virginia.vcgr.genii.container.cservices.history.NullHistoryContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.summary.SlotSummary;
+import edu.virginia.vcgr.genii.container.rns.LegacyEntryType;
 import edu.virginia.vcgr.genii.queue.JobErrorPacket;
 import edu.virginia.vcgr.genii.queue.JobInformationType;
 import edu.virginia.vcgr.genii.queue.JobStateEnumerationType;
@@ -1739,8 +1739,9 @@ public class JobManager implements Closeable
 			boolean isPermanent = false;
 			ICallingContext startCtxt = null;
 			Connection connection = null;
-			EntryType entryType;
-			HashMap<Long, EntryType> entries = new HashMap<Long, EntryType>();
+			LegacyEntryType entryType;
+			HashMap<Long, LegacyEntryType> entries = 
+				new HashMap<Long, LegacyEntryType>();
 			JobData data = null;
 			HistoryContext history = new NullHistoryContext();
 			
@@ -1792,7 +1793,7 @@ public class JobManager implements Closeable
 				/* Use the database's fillInBESEPRs function to get the EPR of
 				 * the BES container that we are going to launch on.
 				 */
-				entries.put(new Long(_besID), entryType = new EntryType());
+				entries.put(new Long(_besID), entryType = new LegacyEntryType());
 				_database.fillInBESEPRs(connection, entries);
 				
 				synchronized(_manager)

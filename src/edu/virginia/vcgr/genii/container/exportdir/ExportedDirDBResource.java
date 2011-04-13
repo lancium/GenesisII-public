@@ -539,7 +539,7 @@ public class ExportedDirDBResource extends BasicDBResource implements
 			{
 				// Uniqueness problem
 				RNSEntryExistsFaultType fault = new RNSEntryExistsFaultType();
-				fault.setPath(entryName);
+				fault.setEntryName(entryName);
 				throw FaultManipulator.fillInFault(fault);
 			}
 			else

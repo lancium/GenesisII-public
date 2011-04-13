@@ -44,7 +44,7 @@ class ResourceProviders
 		if (serviceClass == null)
 		{
 			throw new ResourceException(String.format(
-				"Unable to find service class for service.", serviceName));
+				"Unable to find service class for service %s.", serviceName));
 		}
 		
 		GenesisIIServiceConfiguration conf =

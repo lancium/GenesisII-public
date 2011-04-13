@@ -6,7 +6,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -32,22 +31,13 @@ import org.ggf.rbyteio.TruncAppendResponse;
 import org.ggf.rbyteio.TruncateNotPermittedFaultType;
 import org.ggf.rbyteio.Write;
 import org.ggf.rbyteio.WriteResponse;
-import org.ggf.rns.Add;
-import org.ggf.rns.AddResponse;
-import org.ggf.rns.CreateFile;
-import org.ggf.rns.CreateFileResponse;
-import org.ggf.rns.EntryType;
-import org.ggf.rns.List;
-import org.ggf.rns.ListResponse;
-import org.ggf.rns.Move;
-import org.ggf.rns.MoveResponse;
-import org.ggf.rns.Query;
-import org.ggf.rns.QueryResponse;
-import org.ggf.rns.RNSDirectoryNotEmptyFaultType;
+import org.ggf.rns.LookupResponseType;
+import org.ggf.rns.MetadataMappingType;
+import org.ggf.rns.NameMappingType;
+import org.ggf.rns.RNSEntryDoesNotExistFaultType;
 import org.ggf.rns.RNSEntryExistsFaultType;
-import org.ggf.rns.RNSEntryNotDirectoryFaultType;
-import org.ggf.rns.RNSFaultType;
-import org.ggf.rns.Remove;
+import org.ggf.rns.RNSEntryResponseType;
+import org.ggf.rns.RNSEntryType;
 import org.ggf.sbyteio.SeekNotPermittedFaultType;
 import org.ggf.sbyteio.SeekRead;
 import org.ggf.sbyteio.SeekReadResponse;
@@ -61,6 +51,8 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.oasis_open.docs.wsrf.rl_2.DestroyResponse;
 import org.oasis_open.docs.wsrf.rl_2.ResourceNotDestroyedFaultType;
+import org.oasis_open.wsrf.basefaults.BaseFaultType;
+import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.AttributedURIType;
 import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.MetadataType;
@@ -76,8 +68,9 @@ import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
+import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.*;
-import edu.virginia.vcgr.genii.client.ser.AnyHelper;
+import edu.virginia.vcgr.genii.client.utils.IterableIterable;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.container.Container;
@@ -97,9 +90,10 @@ import edu.virginia.vcgr.genii.container.rfork.cmd.CommandChannelManager;
 import edu.virginia.vcgr.genii.container.rfork.sd.SimpleStateResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.sd.StateDescription;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
+import edu.virginia.vcgr.genii.container.rns.RNSContainerUtilities;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
-import edu.virginia.vcgr.genii.enhancedrns.IterateListRequestType;
-import edu.virginia.vcgr.genii.enhancedrns.IterateListResponseType;
+import edu.virginia.vcgr.genii.enhancedrns.CreateFileRequestType;
+import edu.virginia.vcgr.genii.enhancedrns.CreateFileResponseType;
 import edu.virginia.vcgr.genii.rfork.ResourceForkPortType;
 
 public abstract class ResourceForkBaseService extends GenesisIIBase 
@@ -574,12 +568,8 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 	}
 
 	/* RNS Operations */
-	@Override
-	@RWXMappingResolver(ForkMappingResolver.class)
-	@MappingRedirect(methodName = "add")
-	final public AddResponse add(Add arg0) throws RemoteException,
-			RNSEntryExistsFaultType, RNSFaultType, ResourceUnknownFaultType,
-			RNSEntryNotDirectoryFaultType
+	protected RNSEntryResponseType add(RNSEntryType entryType)
+		throws RemoteException
 	{
 		ResourceFork tFork = getResourceFork();
 		if (!(tFork instanceof RNSResourceFork))
@@ -587,17 +577,18 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 				"Target fork does not implement RNS interface.");
 		
 		RNSResourceFork fork = (RNSResourceFork)tFork;
-		String entryName = arg0.getEntry_name();
-		EndpointReferenceType target = arg0.getEntry_reference();
+		String entryName = entryType.getEntryName();
+		EndpointReferenceType target = entryType.getEndpoint();
 		try
 		{
 			if (target == null)
-				return new AddResponse(
-					fork.mkdir(getExemplarEPR(), entryName));
+				return new RNSEntryResponseType(
+					fork.mkdir(getExemplarEPR(), entryName),
+					entryType.getMetadata(), null, entryName);
 			else
-				return new AddResponse(
-					fork.add(getExemplarEPR(), arg0.getEntry_name(),
-					target));
+				return new RNSEntryResponseType(
+					fork.add(getExemplarEPR(), entryName, 
+					target), entryType.getMetadata(), null, entryName);
 		}
 		catch (IOException ioe)
 		{
@@ -607,13 +598,45 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 	
 	@Override
 	@RWXMappingResolver(ForkMappingResolver.class)
+	@MappingRedirect(methodName = "add")
+	final public RNSEntryResponseType[] add(RNSEntryType[] addRequest)
+		throws RemoteException, org.ggf.rns.WriteNotPermittedFaultType
+	{
+		RNSEntryResponseType []ret = new RNSEntryResponseType[addRequest.length];
+		for (int lcv = 0; lcv < ret.length; lcv++)
+		{
+			try
+			{
+				ret[lcv] = add(addRequest[lcv]);
+			}
+			catch (BaseFaultType bft)
+			{
+				ret[lcv] = new RNSEntryResponseType(null, null,
+					bft, addRequest[lcv].getEntryName());
+			}
+			catch (Throwable cause)
+			{
+				ret[lcv] = new RNSEntryResponseType(null, null,
+					FaultManipulator.fillInFault(
+						new BaseFaultType(null, null, null, null, 
+							new BaseFaultTypeDescription[] { 
+								new BaseFaultTypeDescription("Unable to add entry!") 
+							}, null)), addRequest[lcv].getEntryName());
+			}
+		}
+		
+		return ret;
+	}
+
+	@Override
+	@RWXMappingResolver(ForkMappingResolver.class)
 	@MappingRedirect(methodName = "list")
-	final public IterateListResponseType iterateList(IterateListRequestType arg0)
-			throws RemoteException
+	final public LookupResponseType lookup(String[] lookupRequest)
+			throws RemoteException, org.ggf.rns.ReadNotPermittedFaultType
 	{
 		TimingSink tSink = TimingSink.sink();
 		Timer timer = null;
-		
+		Iterable<InternalEntry> entries;
 		ResourceFork tFork = getResourceFork();
 		if (!(tFork instanceof RNSResourceFork))
 			throw new RemoteException(
@@ -625,33 +648,41 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 		
 		try
 		{
-			timer = tSink.getTimer("Retrieve Entries");
-			Iterable<InternalEntry> entries =
-				fork.list(getExemplarEPR(), null);
-			timer.noteTime();
+			if (lookupRequest == null || lookupRequest.length == 0)
+			{
+				timer = tSink.getTimer("Retrieve Entries");
+				entries = fork.list(getExemplarEPR(), null);
+				timer.noteTime();
+			} else
+			{
+				IterableIterable<InternalEntry> entryConglomerate =
+					new IterableIterable<InternalEntry>();
+				timer = tSink.getTimer("Retrieve Entries");
+				for (String request : lookupRequest)
+					entryConglomerate.add(
+						fork.list(getExemplarEPR(), request));
+				timer.noteTime();
+				entries = entryConglomerate;
+			}
 			
-			Collection<MessageElement> col = new LinkedList<MessageElement>();
+			Collection<RNSEntryResponseType> resultEntries = 
+				new LinkedList<RNSEntryResponseType>();
 			timer = tSink.getTimer("Prepare Entries");
 	    	for (InternalEntry internalEntry : entries)
 	    	{
 	    		EndpointReferenceType epr = internalEntry.getEntryReference();
-	    
-	    		EntryType entry = new EntryType(
-    				internalEntry.getName(), 
-    				preFetch(epr, internalEntry.getAttributes(), factory),
-    				epr);
-
-	    		col.add(AnyHelper.toAny(entry));
+	    		RNSEntryResponseType entry = new RNSEntryResponseType(
+	    			epr, RNSUtilities.createMetadata(epr, 
+	    				preFetch(epr, internalEntry.getAttributes(), factory)),
+	    			null, internalEntry.getName());
+	    		resultEntries.add(entry);
 	    	}
 	    	timer.noteTime();
 			
 	    	timer = tSink.getTimer("Create Iterator");
-			return new IterateListResponseType(
-				super.createWSIterator(col.iterator(), 100));
-		}
-		catch (SQLException sqe)
-		{
-			throw new RemoteException("Unable to create iterator.", sqe);
+	    	return RNSContainerUtilities.translate(
+	    		resultEntries, iteratorBuilder(
+	    			RNSEntryResponseType.getTypeDesc().getXmlType()));
 		}
 		catch (IOException ioe)
 		{
@@ -666,59 +697,18 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 
 	@Override
 	@RWXMappingResolver(ForkMappingResolver.class)
-	@MappingRedirect(methodName = "list")
-	final public ListResponse list(List arg0) throws RemoteException, RNSFaultType,
-			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType
+	final public RNSEntryResponseType[] rename(NameMappingType[] renameRequest)
+		throws RemoteException, org.ggf.rns.WriteNotPermittedFaultType
 	{
-		ResourceFork tFork = getResourceFork();
-		if (!(tFork instanceof RNSResourceFork))
-			throw new RemoteException(
-				"Target fork does not implement RNS interface.");
-		
-		RNSResourceFork fork = (RNSResourceFork)tFork;
-		try
-		{
-			Iterable<InternalEntry> entries = fork.list(getExemplarEPR(),
-				arg0.getEntryName());
-			
-			Collection<EntryType> ret = new LinkedList<EntryType>();
-	    	for (InternalEntry entry : entries)
-	    	{
-	    		ret.add(new EntryType(
-	    			entry.getName(), entry.getAttributes(), 
-	    			entry.getEntryReference()));
-	    	}
-	    	
-	    	if (arg0.getEntryName() != null && (ret.size() > 1))
-	    	{
-	    		throw new RemoteException(String.format(
-	    			"User asked to lookup a specific entry, but fork " +
-	    			"(%s) returned more then one.", 
-	    			fork.getClass().getName()));
-	    	}
-	    	
-	    	return new ListResponse(ret.toArray(new EntryType[ret.size()]));
-		}
-		catch (IOException ioe)
-		{
-			throw new RemoteException("Unable to list contents.", ioe);
-		}
+		throw new UnsupportedOperationException(
+			"Rename not supported in Resource forks!");
 	}
 
 	@Override
 	@RWXMappingResolver(ForkMappingResolver.class)
-	final public MoveResponse move(Move arg0) throws RemoteException, RNSFaultType,
-			ResourceUnknownFaultType
-	{
-		throw FaultManipulator.fillInFault(new RNSFaultType());
-	}
-	
-	@Override
-	@RWXMappingResolver(ForkMappingResolver.class)
 	@MappingRedirect(methodName = "createFile")
-	final public CreateFileResponse createFile(CreateFile arg0)
-			throws RemoteException, RNSEntryExistsFaultType, RNSFaultType,
-			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType
+	final public CreateFileResponseType createFile(CreateFileRequestType request)
+		throws RemoteException, RNSEntryExistsFaultType, ResourceUnknownFaultType
 	{
 		ResourceFork tFork = getResourceFork();
 		if (!(tFork instanceof RNSResourceFork))
@@ -728,8 +718,8 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 		RNSResourceFork fork = (RNSResourceFork)tFork;
 		try
 		{
-			return new CreateFileResponse(
-				fork.createFile(getExemplarEPR(), arg0.getFilename()));
+			return new CreateFileResponseType(
+				fork.createFile(getExemplarEPR(), request.getFilename()));
 		}
 		catch (IOException ioe)
 		{
@@ -740,36 +730,64 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 	@Override
 	@RWXMappingResolver(ForkMappingResolver.class)
 	@MappingRedirect(methodName = "remove")
-	final public String[] remove(Remove arg0) throws RemoteException, RNSFaultType,
-			ResourceUnknownFaultType, RNSDirectoryNotEmptyFaultType
+	final public RNSEntryResponseType[] remove(String[] removeRequest)
+		throws RemoteException, org.ggf.rns.WriteNotPermittedFaultType
 	{
+		RNSEntryResponseType []ret = 
+			new RNSEntryResponseType[removeRequest.length];
+		
 		ResourceFork tFork = getResourceFork();
 		if (!(tFork instanceof RNSResourceFork))
 			throw new RemoteException(
 				"Target fork does not implement RNS interface.");
 		
 		RNSResourceFork fork = (RNSResourceFork)tFork;
-		try
+		for (int lcv = 0; lcv < ret.length; lcv++)
 		{
-			if (fork.remove(arg0.getEntryName()))
-				return new String[] { arg0.getEntryName() };
-			return new String[0];
+			try
+			{
+				if (fork.remove(removeRequest[lcv]))
+					ret[lcv] = new RNSEntryResponseType(
+						null, null, null, removeRequest[lcv]);
+				else
+					ret[lcv] = new RNSEntryResponseType(
+						null, null, FaultManipulator.fillInFault(
+							new RNSEntryDoesNotExistFaultType(
+								null, null, null, null, new BaseFaultTypeDescription[] {
+									new BaseFaultTypeDescription(
+										String.format("Entry %s does not exist!", removeRequest[lcv]))
+								}, null, removeRequest[lcv])), removeRequest[lcv]);
+			}
+			catch (BaseFaultType bft)
+			{
+				ret[lcv] = new RNSEntryResponseType(null, null,
+					bft, removeRequest[lcv]);
+			}
+			catch (Throwable cause)
+			{
+				ret[lcv] = new RNSEntryResponseType(null, null,
+					FaultManipulator.fillInFault(
+						new BaseFaultType(null, null, null, null, 
+							new BaseFaultTypeDescription[] { 
+								new BaseFaultTypeDescription("Unable to remove entry!") 
+							}, null)), removeRequest[lcv]);
+			}
 		}
-		catch (IOException ioe)
-		{
-			throw new RemoteException("Unable to remove entry.", ioe);
-		}
+		
+		return ret;
 	}
 
 	@Override
-	@RWXMappingResolver(ForkMappingResolver.class)
-	final public QueryResponse query(Query arg0) throws RemoteException,
-			RNSFaultType, ResourceUnknownFaultType
+	@RWXMapping(RWXCategory.WRITE)
+	final public RNSEntryResponseType[] setMetadata(
+		MetadataMappingType[] setMetadataRequest) throws RemoteException,
+			org.ggf.rns.WriteNotPermittedFaultType
 	{
-		throw FaultManipulator.fillInFault(new RNSFaultType());
+		throw new UnsupportedOperationException(
+			"setMetadata operation not supported!");
 	}
-	
-/* Random ByteIO Operations */
+
+	/* Random ByteIO Operations */
 	@Override
 	@RWXMappingResolver(ForkMappingResolver.class)
 	@MappingRedirect(methodName = "truncAppend")

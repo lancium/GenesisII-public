@@ -107,9 +107,9 @@ public class QueueManipulator
 		WSIterable<JobInformationType> iterable = null;
 		try
 		{
-			iterable = new WSIterable<JobInformationType>(
+			iterable = WSIterable.axisIterable(
 				JobInformationType.class, 
-				queue.iterateStatus(jobTickets).getResult(), 200, true);
+				queue.iterateStatus(jobTickets).getResult(), 200);
 			return new JobInformationIterator(iterable.iterator());
 		}
 		finally
@@ -126,9 +126,9 @@ public class QueueManipulator
 		WSIterable<ReducedJobInformationType> iterable = null;
 		try
 		{
-			iterable = new WSIterable<ReducedJobInformationType>(
+			iterable = WSIterable.axisIterable(
 				ReducedJobInformationType.class, 
-				queue.iterateListJobs(null).getResult(), 200, true);
+				queue.iterateListJobs(null).getResult(), 200);
 			return new ReducedJobInformationIterator(iterable.iterator());
 		}
 		finally

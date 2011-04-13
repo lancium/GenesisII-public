@@ -95,8 +95,9 @@
 			locator-type="edu.virginia.vcgr.genii.deployer.ApplicationDeployerServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.queue.QueuePortType"
 			locator-type="edu.virginia.vcgr.genii.queue.QueueServiceLocator"/>
-		<locator interface="edu.virginia.vcgr.genii.iterator.IteratorPortType"
-			locator-type="edu.virginia.vcgr.genii.iterator.IteratorServiceLocator"/>
+
+		<locator interface="edu.virginia.vcgr.genii.iterator.WSIteratorPortType"
+			locator-type="edu.virginia.vcgr.genii.iterator.WSIteratorServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.x509authn.X509AuthnPortType"
 			locator-type="edu.virginia.vcgr.genii.x509authn.X509AuthnServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.jndiauthn.JNDIAuthnPortType"
@@ -112,9 +113,6 @@
 		<mconf:instance name="context-resolver" 
 			type="edu.virginia.vcgr.genii.client.context.ClientContextResolver"
 			base="edu.virginia.vcgr.genii.client.context.IContextResolver"/>		
-		<mconf:instance name="debug-list-handler"
-			type="edu.virginia.vcgr.genii.client.invoke.handlers.DebugListHandler"
-			base="java.lang.Object"/>
 		<mconf:instance name="attribute-cache"
 			type="edu.virginia.vcgr.genii.client.invoke.handlers.AttributeCacheHandler"
 			base="java.lang.Object"/>
@@ -225,8 +223,6 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.UserPreferencesTool</mconf:class>
 		<mconf:class name="fuse"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.FuseTool</mconf:class>
-		<mconf:class name="rns"
-			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.RNSInteropTool</mconf:class>
 		<mconf:class name="byteioperf"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ByteIOPerformanceTool</mconf:class>
 		<mconf:class name="matching-params"
@@ -245,8 +241,6 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.EchoCommand</mconf:class>
 		<mconf:class name="manage-windows-container-service"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ManageWindowsContainerServiceTool</mconf:class>
-		<mconf:class name="patch-ip"
-			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.PatchIPTool</mconf:class>
 		<mconf:class name="download-certificate"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.DownloadCertificateTool</mconf:class>
 		<mconf:class name="bes-manager"
@@ -281,6 +275,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ParseJSDLTool</mconf:class>
 		<mconf:class name="stageData"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.StageDataTool</mconf:class>
+		<mconf:class name="set-resource-properties"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.SetResourcePropertiesTool</mconf:class>
 	
 	
 	</genii:tools>

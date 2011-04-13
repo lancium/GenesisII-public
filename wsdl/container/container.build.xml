@@ -24,7 +24,7 @@
 					<include name="rns.gwsdl"/>
 				</srcfiles>
 				<srcfiles dir="${wsdl.dir}/iterator">
-					<include name="iterator.xsd"/>
+					<include name="iterator-factory.xsd"/>
 				</srcfiles>
 			</uptodate>
 		</and>
@@ -38,7 +38,7 @@
 				<include name="container.xsd"/>
 			</fileset>
 			<fileset dir="${wsdl.dir}/iterator">
-				<include name="iterator.xsd"/>
+				<include name="iterator-factory.xsd"/>
 			</fileset>
 		</copy>
 

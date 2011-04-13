@@ -25,7 +25,7 @@
 				</srcfiles>
 
 				<srcfiles dir="${wsdl.dir}/iterator">
-					<include name="iterator.xsd"/>
+					<include name="iterator-factory.xsd"/>
 				</srcfiles>
 			</uptodate>
 		</and>
@@ -41,7 +41,7 @@
 				<include name="enhanced-rns.gwsdl"/>
 			</fileset>
 			<fileset dir="${wsdl.dir}/iterator">
-				<include name="iterator.xsd"/>
+				<include name="iterator-factory.xsd"/>
 			</fileset>
 		</copy>
 
@@ -53,11 +53,11 @@
 		<genii-service-generator
 			source="${temporary.codegen.dir}/wsdl/rns.wsdl"
 			target="${temporary.codegen.dir}/wsdl/rns-service.wsdl"
-			portType="{http://schemas.ggf.org/rns/2006/05/rns}RNSPortType"/>
+			portType="{http://schemas.ogf.org/rns/2009/12/rns}RNSPortType"/>
 		<genii-service-generator
 			source="${temporary.codegen.dir}/wsdl/enhanced-rns-generated.wsdl"
 			target="${temporary.codegen.dir}/wsdl/enhanced-rns-service.wsdl"
-			portType="{http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns}EnhancedRNSPortType"/>
+			portType="{http://vcgr.cs.virginia.edu/container/2011/04/enhanced-rns}EnhancedRNSPortType"/>
 
 		<antcall target="gen.stub-generation">
 			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/rns"/>

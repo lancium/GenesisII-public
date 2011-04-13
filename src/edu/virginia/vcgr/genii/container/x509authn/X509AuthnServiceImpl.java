@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.TimeZone;
 
 import javax.xml.namespace.QName;
@@ -39,22 +40,14 @@ import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.X509Security;
 
-import org.ggf.rns.Add;
-import org.ggf.rns.AddResponse;
-import org.ggf.rns.CreateFile;
-import org.ggf.rns.CreateFileResponse;
-import org.ggf.rns.EntryType;
-import org.ggf.rns.List;
-import org.ggf.rns.ListResponse;
-import org.ggf.rns.Move;
-import org.ggf.rns.MoveResponse;
-import org.ggf.rns.Query;
-import org.ggf.rns.QueryResponse;
-import org.ggf.rns.RNSDirectoryNotEmptyFaultType;
+import org.ggf.rns.LookupResponseType;
+import org.ggf.rns.MetadataMappingType;
+import org.ggf.rns.NameMappingType;
 import org.ggf.rns.RNSEntryExistsFaultType;
-import org.ggf.rns.RNSEntryNotDirectoryFaultType;
-import org.ggf.rns.RNSFaultType;
-import org.ggf.rns.Remove;
+import org.ggf.rns.RNSEntryResponseType;
+import org.ggf.rns.RNSEntryType;
+import org.ggf.rns.RNSMetadataType;
+import org.ggf.rns.WriteNotPermittedFaultType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
@@ -62,6 +55,7 @@ import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
+import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
@@ -95,6 +89,7 @@ import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rns.IRNSResource;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
+import edu.virginia.vcgr.genii.container.rns.RNSContainerUtilities;
 import edu.virginia.vcgr.genii.container.rns.RNSDBResourceProvider;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
@@ -108,6 +103,7 @@ import edu.virginia.vcgr.genii.x509authn.X509AuthnPortType;
 
 
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
+import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 
 import org.apache.axis.AxisFault;
@@ -637,29 +633,52 @@ public class X509AuthnServiceImpl extends GenesisIIBase
 						.size()]);
 	}
 
-	@RWXMapping(RWXCategory.EXECUTE)
-	public CreateFileResponse createFile(CreateFile createFile)
-			throws RemoteException, RNSEntryExistsFaultType,
-			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType,
-			RNSFaultType
-	{
-		throw new RemoteException("\"createFile\" not applicable.");
-	}
-
+	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public AddResponse add(Add addRequest) throws RemoteException,
-			RNSEntryExistsFaultType, ResourceUnknownFaultType,
-			RNSEntryNotDirectoryFaultType, RNSFaultType
+	public RNSEntryResponseType[] add(RNSEntryType []addRequest) throws RemoteException,
+			RNSEntryExistsFaultType, ResourceUnknownFaultType
 	{
-
+		if (addRequest == null || addRequest.length == 0)
+			addRequest = new RNSEntryType[] { null };
+		
+		RNSEntryResponseType []ret = new RNSEntryResponseType[addRequest.length];
+		for (int lcv = 0; lcv < ret.length; lcv++)
+		{
+			try
+			{
+				ret[lcv] = add(addRequest[lcv]);
+			}
+			catch (BaseFaultType bft)
+			{
+				ret[lcv] = new RNSEntryResponseType(null, null,
+					bft, addRequest[lcv].getEntryName());
+			}
+			catch (Throwable cause)
+			{
+				ret[lcv] = new RNSEntryResponseType(null, null,
+					FaultManipulator.fillInFault(
+						new BaseFaultType(null, null, null, null, 
+							new BaseFaultTypeDescription[] { 
+								new BaseFaultTypeDescription("Unable to add entry!") 
+							}, null)), addRequest[lcv].getEntryName());
+			}
+		}
+		
+		return ret;
+	}
+	
+	protected RNSEntryResponseType add(RNSEntryType addRequest) 
+		throws RemoteException, ResourceException, RNSEntryExistsFaultType
+	{
 		EndpointReferenceType entryReference;
 
 		if (addRequest == null)
 			throw new RemoteException("Incomplete add request.");
 
-		String name = addRequest.getEntry_name();
-		entryReference = addRequest.getEntry_reference();
-		MessageElement[] attrs = addRequest.get_any();
+		String name = addRequest.getEntryName();
+		entryReference = addRequest.getEndpoint();
+		RNSMetadataType mdt = addRequest.getMetadata();
+		MessageElement[] attrs = (mdt == null) ? null : mdt.get_any();
 
 		if (entryReference == null)
 			throw new RemoteException("Incomplete add request.");
@@ -674,53 +693,67 @@ public class X509AuthnServiceImpl extends GenesisIIBase
 		_resource.addEntry(new InternalEntry(name, entryReference, attrs));
 		_resource.commit();
 
-		return new AddResponse(entryReference);
+		return new RNSEntryResponseType(entryReference, mdt, null, name);
 	}
 
+	@Override
 	@RWXMapping(RWXCategory.READ)
-	public ListResponse list(List list) throws RemoteException,
-			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType,
-			RNSFaultType
+	public LookupResponseType lookup(String []lookupRequest) throws RemoteException,
+		ResourceUnknownFaultType
 	{
-		Collection<InternalEntry> entries;
+		Collection<InternalEntry> entries = new LinkedList<InternalEntry>();
 
-		entries = _resource.retrieveEntries(list.getEntryName());
-
-		EntryType[] ret = new EntryType[entries.size()];
-		int lcv = 0;
-		for (InternalEntry entry : entries)
-			ret[lcv++] = new EntryType(entry.getName(), entry.getAttributes(),
-				entry.getEntryReference());
-
-		return new ListResponse(ret);
-	}
-
-	@RWXMapping(RWXCategory.WRITE)
-	public MoveResponse move(Move move) throws RemoteException,
-			ResourceUnknownFaultType, RNSFaultType
-	{
-		throw new RemoteException("\"move\" not applicable.");
-	}
-
-	@RWXMapping(RWXCategory.READ)
-	public QueryResponse query(Query q) throws RemoteException,
-			ResourceUnknownFaultType, RNSFaultType
-	{
-		throw new RemoteException("\"query\" not applicable.");
-	}
-
-	@RWXMapping(RWXCategory.WRITE)
-	public String[] remove(Remove remove) throws RemoteException,
-			ResourceUnknownFaultType, RNSDirectoryNotEmptyFaultType,
-			RNSFaultType
-	{
-		String[] ret;
-		Collection<String> removed = _resource.removeEntries(
-			remove.getEntryName());
-		ret = new String[removed.size()];
-		removed.toArray(ret);
+		if (lookupRequest == null || lookupRequest.length == 0)
+			lookupRequest = new String[] { null };
 		
+		for (String request : lookupRequest)
+		{
+			entries.addAll(_resource.retrieveEntries(request));
+		}
+
+		Collection<RNSEntryResponseType> ret = new LinkedList<RNSEntryResponseType>();
+		for (InternalEntry entry : entries)
+			ret.add(new RNSEntryResponseType(
+				entry.getEntryReference(), RNSUtilities.createMetadata(entry.getEntryReference(),
+					entry.getAttributes()), null, entry.getName()));
+		
+		return RNSContainerUtilities.translate(ret, iteratorBuilder(
+			RNSEntryResponseType.getTypeDesc().getXmlType()));
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.WRITE)
+	public RNSEntryResponseType[] remove(String[] removeRequest)
+		throws RemoteException, WriteNotPermittedFaultType
+	{
+		RNSEntryResponseType []ret = 
+			new RNSEntryResponseType[removeRequest.length];
+		
+		for (int lcv = 0; lcv < removeRequest.length; lcv++)
+		{
+			_resource.removeEntries(removeRequest[lcv]);
+			ret[lcv] = new RNSEntryResponseType(
+				null, null, null, removeRequest[lcv]);
+		}
+
 		return ret;
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.WRITE)
+	public RNSEntryResponseType[] rename(NameMappingType[] renameRequest)
+		throws RemoteException, WriteNotPermittedFaultType
+	{
+		throw new RemoteException("\"rename\" not applicable.");
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.WRITE)
+	public RNSEntryResponseType[] setMetadata(
+		MetadataMappingType[] setMetadataRequest) throws RemoteException,
+			WriteNotPermittedFaultType
+	{
+		throw new RemoteException("\"setMetadata\" not applicable.");
 	}
 
 	static public class X509AuthnAttributeHandlers extends

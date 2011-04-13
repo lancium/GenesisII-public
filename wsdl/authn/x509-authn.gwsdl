@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <wsdl:definitions name="X509Authn"
 	targetNamespace="http://vcgr.cs.virginia.edu/container/2007/11/x509-authn"
-	xmlns:rns="http://schemas.ggf.org/rns/2006/05/rns"
-	xmlns:enhanced-rns="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
+	xmlns:rns="http://schemas.ogf.org/rns/2009/12/rns"
+	xmlns:enhanced-rns="http://vcgr.cs.virginia.edu/container/2011/04/enhanced-rns"
 	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
 	xmlns:wst="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
 	xmlns:x509authn="http://vcgr.cs.virginia.edu/container/2007/11/x509-authn"
@@ -17,11 +17,11 @@
 		location="./ws-trust-1.3.wsdl"/>
 
     <wsdl:import
-        namespace="http://schemas.ggf.org/rns/2006/05/rns"
+        namespace="http://schemas.ogf.org/rns/2009/12/rns"
         location="./rns.wsdl"/>
 
     <wsdl:import
-        namespace="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
+        namespace="http://vcgr.cs.virginia.edu/container/2011/04/enhanced-rns"
         location="./enhanced-rns-generated.wsdl"/>
 
 	<wsdl:import

@@ -3,20 +3,20 @@ package edu.virginia.vcgr.genii.client.gfs;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.ggf.rns.EntryType;
+import org.ggf.rns.RNSEntryResponseType;
 
 import edu.virginia.vcgr.fsii.DirectoryHandle;
 import edu.virginia.vcgr.fsii.FilesystemStatStructure;
 import edu.virginia.vcgr.fsii.exceptions.FSRuntimeException;
-import edu.virginia.vcgr.genii.client.iterator.WSIterable;
+import edu.virginia.vcgr.genii.client.rns.RNSIterable;
 
 public class EnhancedRNSHandle implements DirectoryHandle
 {
 	private GenesisIIFilesystem _fs;
-	private WSIterable<EntryType> _entries;
+	private RNSIterable _entries;
 	
 	public EnhancedRNSHandle(GenesisIIFilesystem fs, 
-		WSIterable<EntryType> entries)
+		RNSIterable entries)
 	{
 		_fs = fs;
 		_entries = entries;
@@ -31,15 +31,14 @@ public class EnhancedRNSHandle implements DirectoryHandle
 	@Override
 	public void close() throws IOException
 	{
-		_entries.close();
 	}
 	
 	private class EnhancedRNSIterator 
 		implements Iterator<FilesystemStatStructure>
 	{
-		private Iterator<EntryType> _entries;
+		private Iterator<RNSEntryResponseType> _entries;
 		
-		public EnhancedRNSIterator(Iterator<EntryType> entries)
+		public EnhancedRNSIterator(Iterator<RNSEntryResponseType> entries)
 		{
 			_entries = entries;
 		}
@@ -53,14 +52,14 @@ public class EnhancedRNSHandle implements DirectoryHandle
 		@Override
 		public FilesystemStatStructure next()
 		{
-			EntryType next = _entries.next();
+			RNSEntryResponseType next = _entries.next();
 			if (next == null)
 				return null;
 			
 			try
 			{
-				return _fs.stat(next.getEntry_name(), 
-					next.getEntry_reference());
+				return _fs.stat(next.getEntryName(), 
+					next.getEndpoint());
 			}
 			catch (Exception e)
 			{

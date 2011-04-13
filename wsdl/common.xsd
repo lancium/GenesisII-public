@@ -2,14 +2,14 @@
 <xsd:schema
 	xmlns="http://vcgr.cs.virginia.edu/genii/2006/12/common"
 	xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common"
-	xmlns:iterator="http://vcgr.cs.virginia.edu/genii/iterator"
+	xmlns:ifactory="http://vcgr.cs.virginia.edu/genii/iterator-factory"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://vcgr.cs.virginia.edu/genii/2006/12/common"
 	elementFormDefault="qualified"
 	attributeFormDefault="unqualified">
 
-	<xsd:import namespace="http://vcgr.cs.virginia.edu/genii/iterator"
-		schemaLocation="./iterator.xsd"/>
+	<xsd:import namespace="http://vcgr.cs.virginia.edu/genii/iterator-factory"
+		schemaLocation="./iterator-factory.xsd"/>
 
 <!-- Types -->
 	<xsd:complexType name="HistoryEventBundleType">
@@ -62,7 +62,7 @@
 	<xsd:complexType name="IterateHistoryEventsResponseType">
 		<xsd:sequence>
 			<xsd:element name="result"
-				type="iterator:IteratorInitializationType"
+				type="ifactory:IteratorInitializationType"
 				minOccurs="1" maxOccurs="1" nillable="false"/>
 		</xsd:sequence>
 	</xsd:complexType>

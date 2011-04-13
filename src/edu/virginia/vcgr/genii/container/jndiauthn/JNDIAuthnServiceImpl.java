@@ -19,17 +19,13 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
-import java.sql.SQLException;
 import java.text.*;
 import java.util.*;
-import java.util.regex.Pattern;
 import org.apache.axis.types.URI;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import javax.naming.Context;
-import javax.naming.NameClassPair;
-import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.Attributes;
@@ -43,13 +39,9 @@ import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.X509Security;
 
-import org.ws.addressing.AttributedURIType;
-
 import org.ggf.rns.*;
-import org.ggf.rns.List;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
-import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
@@ -57,8 +49,9 @@ import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.security.credentials.assertions.*;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.*;
+import edu.virginia.vcgr.genii.enhancedrns.CreateFileRequestType;
+import edu.virginia.vcgr.genii.enhancedrns.CreateFileResponseType;
 import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
-import edu.virginia.vcgr.genii.enhancedrns.IterateListResponseType;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
@@ -68,22 +61,17 @@ import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
-import edu.virginia.vcgr.genii.container.rns.IRNSResource;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.client.security.*;
 import edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
-import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.x509.CertCreationSpec;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
-import edu.virginia.vcgr.genii.client.ser.AnyHelper;
-import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.container.Container;
-import edu.virginia.vcgr.genii.enhancedrns.*;
 
 import edu.virginia.vcgr.genii.jndiauthn.*;
 
@@ -618,6 +606,8 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 						.size()]);
 	}
 
+	/* Deprecated by Mark Morgan during transition to RNS 1.1 */
+	/*
 	@RWXMapping(RWXCategory.READ)
 	public ListResponse list(List list) throws RemoteException,
 			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType,
@@ -715,16 +705,14 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 
 			try
 			{
-				return new IterateListResponseType(super.createWSIterator(col
-						.iterator(), 100));
+				IteratorBuilder<MessageElement> builder = iteratorBuilder();
+				builder.preferredBatchSize(100);
+				builder.addElements(col);
+				return new IterateListResponseType(builder.create());
 			}
 			catch (ConfigurationException ce)
 			{
 				throw new RemoteException("Unable to create iterator.", ce);
-			}
-			catch (SQLException sqe)
-			{
-				throw new RemoteException("Unable to create iterator.", sqe);
 			}
 		}
 
@@ -733,9 +721,10 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		try
 		{
 			EntryIterator iterator = new EntryIterator(myResource, null);
-
-			return new IterateListResponseType(super.createWSIterator(iterator,
-					100));
+			IteratorBuilder<MessageElement> builder = iteratorBuilder();
+			builder.preferredBatchSize(100);
+			builder.addElements(iterator);
+			return new IterateListResponseType(builder.create());
 
 		}
 		catch (java.io.IOException e)
@@ -746,171 +735,8 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		{
 			throw new RemoteException("Unable to create iterator.", e);
 		}
-		catch (SQLException sqe)
-		{
-			throw new RemoteException("Unable to create iterator.", sqe);
-		}
 	}
-
-	protected X509Certificate[] createCertChainForListing(
-			IJNDIResource idpResource, IJNDIResource stsResource)
-			throws RemoteException, GeneralSecurityException
-	{
-
-		try
-		{
-
-			// the expensive part: we finally generate a certificate for this
-			// guy
-			X509Certificate[] containerChain =
-					Container.getContainerCertChain();
-
-			if (containerChain == null)
-			{
-				return null;
-			}
-
-			String epiString = (String) idpResource.getKey();
-			String userName = idpResource.getIdpName();
-
-			CertCreationSpec certSpec =
-					new CertCreationSpec(containerChain[0].getPublicKey(),
-							containerChain, Container.getContainerPrivateKey(),
-							getResourceCertificateLifetime());
-
-			Properties jndiEnv = new Properties();
-			String providerUrl = null;
-			String queryUri = null;
-
-			switch (stsResource.getStsType())
-			{
-			case NIS:
-
-				jndiEnv.setProperty(Context.INITIAL_CONTEXT_FACTORY,
-						"com.sun.jndi.nis.NISCtxFactory");
-				providerUrl =
-						"nis://"
-								+ stsResource
-										.getProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME
-												.getLocalPart())
-								+ "/"
-								+ stsResource
-										.getProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME
-												.getLocalPart());
-				jndiEnv.setProperty(Context.PROVIDER_URL, providerUrl);
-
-				InitialDirContext initialContext =
-						new InitialDirContext(jndiEnv);
-				queryUri = providerUrl + "/system/passwd/" + userName;
-				String[] attrIDs = { "gecos", "uidnumber" };
-				Attributes attrs =
-						initialContext.getAttributes(queryUri, attrIDs);
-				initialContext.close();
-
-				// get CNs for cert (gecos common string)
-				ArrayList<String> cnList = new ArrayList<String>();
-				cnList.add(idpResource.getParentResourceKey().getServiceName());
-				if (attrs.get("gecos") != null)
-				{
-					cnList.add((String) attrs.get("gecos").get());
-				}
-
-				// get UID for cert
-				String uid =
-						(attrs.get("uidnumber") == null) ? null
-								: (String) attrs.get("uidnumber").get();
-
-				return CertTool.createResourceCertChain(epiString, cnList, uid,
-						certSpec);
-
-			case LDAP:
-				jndiEnv.setProperty(Context.INITIAL_CONTEXT_FACTORY,
-						"com.sun.jndi.ldap.LdapCtxFactory");
-
-				throw new RemoteException(
-						"\"LDAP not implemented\" not applicable.");
-
-			default:
-
-				throw new RemoteException("Unknown STS type.");
-			}
-
-		}
-		catch (ResourceException e)
-		{
-			throw new GeneralSecurityException(e.getMessage(), e);
-		}
-		catch (NamingException e)
-		{
-			throw new GeneralSecurityException(e.getMessage(), e);
-		}
-		catch (ConfigurationException e)
-		{
-			throw new GeneralSecurityException(e.getMessage(), e);
-		}
-	}
-
-	/* EndpointIdentifierResolver port type. */
-	@RWXMapping(RWXCategory.OPEN)
-	public EndpointReferenceType resolveEPI(org.apache.axis.types.URI resolveEPI)
-			throws RemoteException, ResourceUnknownFaultType,
-			ResolveFailedFaultType
-	{
-		_logger.debug("Entered resolveEPI method.");
-
-		EndpointReferenceType myEPR =
-				(EndpointReferenceType) WorkingContext
-						.getCurrentWorkingContext().getProperty(
-								WorkingContext.EPR_PROPERTY_NAME);
-
-		ResourceKey stsKey = ResourceManager.getCurrentResource();
-		IJNDIResource stsResource = (IJNDIResource) stsKey.dereference();
-		if (stsResource.isServiceResource() || stsResource.isIdpResource())
-		{
-			throw new RemoteException("\"resolveEPI\" not applicable.");
-		}
-
-		HashMap<QName, Object> creationParameters =
-				new HashMap<QName, Object>();
-		try
-		{
-			creationParameters.put(
-					IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM, new URI(
-							resolveEPI.toString()));
-
-			creationParameters.put(
-					IJNDIResource.IS_IDP_RESOURCE_CONSTRUCTION_PARAM,
-					Boolean.TRUE);
-
-			ResourceKey idpKey = createResource(creationParameters);
-			IJNDIResource idpResource = (IJNDIResource) idpKey.dereference();
-
-			X509Certificate[] resourceCertChain =
-					createCertChainForListing(idpResource, stsResource);
-			idpResource.setProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME,
-					resourceCertChain);
-
-			PortType[] implementedPortTypes =
-					{ WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE,
-							WellKnownPortTypes.STS_SERVICE_PORT_TYPE };
-			EndpointReferenceType retval =
-					ResourceManager.createEPR(idpKey, myEPR.getAddress()
-							.toString(), implementedPortTypes);
-
-			return retval;
-
-		}
-		catch (GeneralSecurityException e)
-		{
-			throw new ResourceException(e.getMessage(), e);
-		}
-		catch (URI.MalformedURIException e)
-		{
-			throw new ResourceException(e.getMessage(), e);
-		}
-
-	}
-
+	
 	@RWXMapping(RWXCategory.WRITE)
 	public String[] remove(Remove remove) throws RemoteException,
 			ResourceUnknownFaultType, RNSDirectoryNotEmptyFaultType,
@@ -972,7 +798,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 	{
 		throw new RemoteException("\"query\" not applicable.");
 	}
-
+	
 	public class EntryIterator implements Iterator<MessageElement>
 	{
 
@@ -1152,4 +978,243 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		}
 	}
 
+	*/
+
+	protected X509Certificate[] createCertChainForListing(
+			IJNDIResource idpResource, IJNDIResource stsResource)
+			throws RemoteException, GeneralSecurityException
+	{
+
+		try
+		{
+
+			// the expensive part: we finally generate a certificate for this
+			// guy
+			X509Certificate[] containerChain =
+					Container.getContainerCertChain();
+
+			if (containerChain == null)
+			{
+				return null;
+			}
+
+			String epiString = (String) idpResource.getKey();
+			String userName = idpResource.getIdpName();
+
+			CertCreationSpec certSpec =
+					new CertCreationSpec(containerChain[0].getPublicKey(),
+							containerChain, Container.getContainerPrivateKey(),
+							getResourceCertificateLifetime());
+
+			Properties jndiEnv = new Properties();
+			String providerUrl = null;
+			String queryUri = null;
+
+			switch (stsResource.getStsType())
+			{
+			case NIS:
+
+				jndiEnv.setProperty(Context.INITIAL_CONTEXT_FACTORY,
+						"com.sun.jndi.nis.NISCtxFactory");
+				providerUrl =
+						"nis://"
+								+ stsResource
+										.getProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME
+												.getLocalPart())
+								+ "/"
+								+ stsResource
+										.getProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME
+												.getLocalPart());
+				jndiEnv.setProperty(Context.PROVIDER_URL, providerUrl);
+
+				InitialDirContext initialContext =
+						new InitialDirContext(jndiEnv);
+				queryUri = providerUrl + "/system/passwd/" + userName;
+				String[] attrIDs = { "gecos", "uidnumber" };
+				Attributes attrs =
+						initialContext.getAttributes(queryUri, attrIDs);
+				initialContext.close();
+
+				// get CNs for cert (gecos common string)
+				ArrayList<String> cnList = new ArrayList<String>();
+				cnList.add(idpResource.getParentResourceKey().getServiceName());
+				if (attrs.get("gecos") != null)
+				{
+					cnList.add((String) attrs.get("gecos").get());
+				}
+
+				// get UID for cert
+				String uid =
+						(attrs.get("uidnumber") == null) ? null
+								: (String) attrs.get("uidnumber").get();
+
+				return CertTool.createResourceCertChain(epiString, cnList, uid,
+						certSpec);
+
+			case LDAP:
+				jndiEnv.setProperty(Context.INITIAL_CONTEXT_FACTORY,
+						"com.sun.jndi.ldap.LdapCtxFactory");
+
+				throw new RemoteException(
+						"\"LDAP not implemented\" not applicable.");
+
+			default:
+
+				throw new RemoteException("Unknown STS type.");
+			}
+
+		}
+		catch (ResourceException e)
+		{
+			throw new GeneralSecurityException(e.getMessage(), e);
+		}
+		catch (NamingException e)
+		{
+			throw new GeneralSecurityException(e.getMessage(), e);
+		}
+		catch (ConfigurationException e)
+		{
+			throw new GeneralSecurityException(e.getMessage(), e);
+		}
+	}
+
+	/* EndpointIdentifierResolver port type. */
+	@RWXMapping(RWXCategory.OPEN)
+	public EndpointReferenceType resolveEPI(org.apache.axis.types.URI resolveEPI)
+			throws RemoteException, ResourceUnknownFaultType,
+			ResolveFailedFaultType
+	{
+		_logger.debug("Entered resolveEPI method.");
+
+		EndpointReferenceType myEPR =
+				(EndpointReferenceType) WorkingContext
+						.getCurrentWorkingContext().getProperty(
+								WorkingContext.EPR_PROPERTY_NAME);
+
+		ResourceKey stsKey = ResourceManager.getCurrentResource();
+		IJNDIResource stsResource = (IJNDIResource) stsKey.dereference();
+		if (stsResource.isServiceResource() || stsResource.isIdpResource())
+		{
+			throw new RemoteException("\"resolveEPI\" not applicable.");
+		}
+
+		HashMap<QName, Object> creationParameters =
+				new HashMap<QName, Object>();
+		try
+		{
+			creationParameters.put(
+					IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM, new URI(
+							resolveEPI.toString()));
+
+			creationParameters.put(
+					IJNDIResource.IS_IDP_RESOURCE_CONSTRUCTION_PARAM,
+					Boolean.TRUE);
+
+			ResourceKey idpKey = createResource(creationParameters);
+			IJNDIResource idpResource = (IJNDIResource) idpKey.dereference();
+
+			X509Certificate[] resourceCertChain =
+					createCertChainForListing(idpResource, stsResource);
+			idpResource.setProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME,
+					resourceCertChain);
+
+			PortType[] implementedPortTypes =
+					{ WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE,
+							WellKnownPortTypes.STS_SERVICE_PORT_TYPE };
+			EndpointReferenceType retval =
+					ResourceManager.createEPR(idpKey, myEPR.getAddress()
+							.toString(), implementedPortTypes);
+
+			return retval;
+
+		}
+		catch (GeneralSecurityException e)
+		{
+			throw new ResourceException(e.getMessage(), e);
+		}
+		catch (URI.MalformedURIException e)
+		{
+			throw new ResourceException(e.getMessage(), e);
+		}
+
+	}
+
+	@Override
+	public RNSEntryResponseType[] remove(String[] removeRequest)
+			throws RemoteException, WriteNotPermittedFaultType
+	{
+		// In reality, this service is deprecated and needs to be re-written
+		// using resource forks.  In the meantime, merely to have the system
+		// compile, I have included the correct function interfaces for
+		// RNS 1.1, but am not upgrading this service to work with it.
+		//
+		// Mark Morgan, 11 April 2011
+		return null;
+	}
+
+	@Override
+	public RNSEntryResponseType[] rename(NameMappingType[] renameRequest)
+			throws RemoteException, WriteNotPermittedFaultType
+	{
+		// In reality, this service is deprecated and needs to be re-written
+		// using resource forks.  In the meantime, merely to have the system
+		// compile, I have included the correct function interfaces for
+		// RNS 1.1, but am not upgrading this service to work with it.
+		//
+		// Mark Morgan, 11 April 2011
+		return null;
+	}
+
+	@Override
+	public CreateFileResponseType createFile(
+			CreateFileRequestType createFileRequest) throws RemoteException
+	{
+		// In reality, this service is deprecated and needs to be re-written
+		// using resource forks.  In the meantime, merely to have the system
+		// compile, I have included the correct function interfaces for
+		// RNS 1.1, but am not upgrading this service to work with it.
+		//
+		// Mark Morgan, 11 April 2011
+		return null;
+	}
+
+	@Override
+	public RNSEntryResponseType[] setMetadata(
+			MetadataMappingType[] setMetadataRequest) throws RemoteException,
+			WriteNotPermittedFaultType
+	{
+		// In reality, this service is deprecated and needs to be re-written
+		// using resource forks.  In the meantime, merely to have the system
+		// compile, I have included the correct function interfaces for
+		// RNS 1.1, but am not upgrading this service to work with it.
+		//
+		// Mark Morgan, 11 April 2011
+		return null;
+	}
+
+	@Override
+	public RNSEntryResponseType[] add(RNSEntryType[] addRequest)
+			throws RemoteException, WriteNotPermittedFaultType
+	{
+		// In reality, this service is deprecated and needs to be re-written
+		// using resource forks.  In the meantime, merely to have the system
+		// compile, I have included the correct function interfaces for
+		// RNS 1.1, but am not upgrading this service to work with it.
+		//
+		// Mark Morgan, 11 April 2011
+		return null;
+	}
+
+	@Override
+	public LookupResponseType lookup(String[] lookupRequest)
+			throws RemoteException, ReadNotPermittedFaultType
+	{
+		// In reality, this service is deprecated and needs to be re-written
+		// using resource forks.  In the meantime, merely to have the system
+		// compile, I have included the correct function interfaces for
+		// RNS 1.1, but am not upgrading this service to work with it.
+		//
+		// Mark Morgan, 11 April 2011
+		return null;
+	}
 }

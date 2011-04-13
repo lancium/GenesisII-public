@@ -50,6 +50,7 @@ import edu.virginia.vcgr.genii.container.bes.GeniiBESServiceImpl;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.iterator.IteratorBuilder;
 import edu.virginia.vcgr.genii.container.q2.forks.RootRNSFork;
 import edu.virginia.vcgr.genii.container.q2.resource.IQueueResource;
 import edu.virginia.vcgr.genii.container.q2.resource.QueueDBResourceFactory;
@@ -200,15 +201,10 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		for (JobInformationType jit : getStatus(iterateStatusRequest))
 			col.add(AnyHelper.toAny(jit));
 		
-		try
-		{
-			return new IterateStatusResponseType(super.createWSIterator(
-				col.iterator(), 100));
-		}
-		catch (SQLException sqe)
-		{
-			throw new RemoteException("Unable to create iterator.", sqe);
-		}
+		IteratorBuilder<MessageElement> builder = iteratorBuilder();
+		builder.preferredBatchSize(100);
+		builder.addElements(col);
+		return new IterateStatusResponseType(builder.create());
 	}
 	
 	@Override
@@ -280,19 +276,12 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		Collection<MessageElement> col = new LinkedList<MessageElement>();
 		
 		for (ReducedJobInformationType rjit : listJobs(iterateListRequest))
-		{
 			col.add(AnyHelper.toAny(rjit));
-		}
 		
-		try
-		{
-			return new IterateListResponseType(
-				super.createWSIterator(col.iterator(), 100));
-		}
-		catch (SQLException sqe)
-		{
-			throw new RemoteException("Unable to create iterator.", sqe);
-		}
+		IteratorBuilder<MessageElement> builder = iteratorBuilder();
+		builder.preferredBatchSize(100);
+		builder.addElements(col);
+		return new IterateListResponseType(builder.create());
 	}
 
 	@Override

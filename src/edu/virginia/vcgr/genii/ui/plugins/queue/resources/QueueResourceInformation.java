@@ -7,7 +7,8 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
-import org.ggf.rns.EntryType;
+import org.ggf.rns.RNSEntryResponseType;
+import org.ggf.rns.RNSMetadataType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.queue.CurrentResourceInformation;
@@ -40,13 +41,14 @@ class QueueResourceInformation
 	private CurrentResourceInformation _resourceInfo = null;
 	
 	QueueResourceInformation(UIPluginContext uiContext,
-		EntryType entry) throws JAXBException
+		RNSEntryResponseType entry) throws JAXBException
 	{
 		_uiContext = uiContext;
-		_resourceName = entry.getEntry_name();
-		_resourceEPR = entry.getEntry_reference();
+		_resourceName = entry.getEntryName();
+		_resourceEPR = entry.getEndpoint();
 		
-		MessageElement []any = entry.get_any();
+		RNSMetadataType mdt = entry.getMetadata();
+		MessageElement []any = (mdt == null) ? null : mdt.get_any();
 		if (any != null)
 		{
 			for (MessageElement e : any)

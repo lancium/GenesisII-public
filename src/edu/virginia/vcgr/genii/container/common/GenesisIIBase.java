@@ -10,31 +10,32 @@ import java.lang.reflect.Method;
 import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.Map;
 import java.util.Vector;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
+import javax.xml.transform.dom.DOMResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
-import org.apache.axis.types.UnsignedInt;
+import org.apache.axis.types.UnsignedLong;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 import org.morgan.inject.InjectionException;
-import org.morgan.util.GUID;
 import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnavailableFaultType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
@@ -92,6 +93,7 @@ import org.oasis_open.wsn.base.UnrecognizedPolicyRequestFaultType;
 import org.oasis_open.wsn.base.UnsupportedPolicyRequestFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
+import org.w3c.dom.Document;
 import org.ws.addressing.AttributedURIType;
 import org.ws.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
@@ -103,17 +105,17 @@ import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextException;
 import edu.virginia.vcgr.genii.client.history.HistoryEvent;
-import edu.virginia.vcgr.genii.client.iterator.IteratorConstructionParameters;
+import edu.virginia.vcgr.genii.client.iterator.WSIteratorConstructionParameters;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.x509.CertCreationSpec;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.common.AddMatchingParameterResponseType;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
+import edu.virginia.vcgr.genii.common.HistoryEventBundleType;
 import edu.virginia.vcgr.genii.common.IterateHistoryEventsRequestType;
 import edu.virginia.vcgr.genii.common.IterateHistoryEventsResponseType;
 import edu.virginia.vcgr.genii.common.MatchingParameter;
@@ -139,7 +141,6 @@ import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.cservices.history.CloseableIterator;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContainerService;
-import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.invoker.BaseFaultFixer;
 import edu.virginia.vcgr.genii.container.invoker.DatabaseHandler;
 import edu.virginia.vcgr.genii.container.invoker.DebugInvoker;
@@ -149,14 +150,15 @@ import edu.virginia.vcgr.genii.container.invoker.ServiceInitializationLocker;
 import edu.virginia.vcgr.genii.container.invoker.SoapHeaderHandler;
 import edu.virginia.vcgr.genii.container.invoker.inject.MInjectionInvoker;
 import edu.virginia.vcgr.genii.container.invoker.timing.TimingHandler;
-import edu.virginia.vcgr.genii.container.iterator.IteratorServiceImpl;
+import edu.virginia.vcgr.genii.container.iterator.AbstractIteratorBuilder;
+import edu.virginia.vcgr.genii.container.iterator.IteratorBuilder;
+import edu.virginia.vcgr.genii.container.iterator.WSIteratorServiceImpl;
 import edu.virginia.vcgr.genii.container.resolver.IResolverFactoryProxy;
 import edu.virginia.vcgr.genii.container.resolver.Resolution;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
-import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceProvider;
 import edu.virginia.vcgr.genii.container.resource.db.query.ResourceSummary;
 import edu.virginia.vcgr.genii.container.security.authz.providers.GamlAclAuthZProvider;
@@ -179,8 +181,8 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscriptionFactory;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.TerminationTimeType;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.GenesisIIBaseTopics;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ResourceTerminationContents;
+import edu.virginia.vcgr.genii.iterator.IterableElementType;
 import edu.virginia.vcgr.genii.iterator.IteratorInitializationType;
-import edu.virginia.vcgr.genii.iterator.IteratorMemberType;
 
 @GAroundInvoke({ServiceInitializationLocker.class, BaseFaultFixer.class, 
 	SoapHeaderHandler.class, DatabaseHandler.class, 
@@ -194,8 +196,6 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 	GenesisIIBaseTopics
 {
 	static private Log _logger = LogFactory.getLog(GenesisIIBase.class);
-
-	static private EndpointReferenceType _iteratorServiceEPR = null;
 	
 	static private class ServiceBasedSubscriptionFactory
 		extends DefaultSubscriptionFactory
@@ -529,9 +529,23 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 				iter = service.iterateEvents(
 					ResourceManager.getCurrentResource().getResourceKey());
 			
-			return new IterateHistoryEventsResponseType(
-				createWSIterator(new CloseableIteratorHistoryEventWrapper(
-					iter), 25));
+			IteratorBuilder<HistoryEvent> builder = 
+				new GenesisIIBaseAbstractIteratorBuilder<HistoryEvent>()
+				{
+					@Override
+					protected MessageElement serialize(HistoryEvent item)
+						throws IOException
+					{
+						byte []data = DBSerializer.serialize(item, -1L);
+						return new MessageElement(
+							new QName("http://tempuri.org", "data"),
+							new HistoryEventBundleType(data));
+					}
+				};
+			builder.preferredBatchSize(25);
+			builder.addElements(iter);
+				
+			return new IterateHistoryEventsResponseType(builder.create());
 		}
 		catch (SQLException sqe)
 		{
@@ -625,6 +639,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 			ResourceUnavailableFaultType, ResourceUnknownFaultType
 	{
 		ArrayList<MessageElement> document = new ArrayList<MessageElement>();
+		Map<QName, Collection<MessageElement>> unknowns = null;
 		
 		for (QName name : getMultipleResourcePropertiesRequest)
 		{
@@ -633,16 +648,27 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 				
 			if (manipulator == null)
 			{
-				_logger.error("The resource property \"" + name + "\" is unknown.");
-				throw FaultManipulator.fillInFault(
-					new InvalidResourcePropertyQNameFaultType(
-						null, null, null, null, new BaseFaultTypeDescription[] {
-							new BaseFaultTypeDescription("The resource property " +
-								name + " is unknown.") },
-						null));
-			}
+				if (unknowns == null)
+					unknowns = _attributePackage.getUnknownAttributes(ResourceManager.getCurrentResource().dereference());
 				
-			document.addAll(manipulator.getAttributeValues());
+				Collection<MessageElement> values = unknowns.get(name);
+				if (values == null && unknowns.containsKey(name))
+					values = new ArrayList<MessageElement>(0);
+				
+				if (values == null)
+				{
+					_logger.error("The resource property \"" + name + "\" is unknown.");
+					throw FaultManipulator.fillInFault(
+						new InvalidResourcePropertyQNameFaultType(
+							null, null, null, null, new BaseFaultTypeDescription[] {
+								new BaseFaultTypeDescription("The resource property " +
+									name + " is unknown.") },
+							null));
+				}
+				
+				document.addAll(values);
+			} else
+				document.addAll(manipulator.getAttributeValues());
 		}
 		
 		MessageElement []ret = new MessageElement[document.size()];
@@ -662,14 +688,22 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 			_attributePackage.getManipulator(getResourcePropertyRequest);
 			
 		if (manipulator == null)
-			throw FaultManipulator.fillInFault(
-				new InvalidResourcePropertyQNameFaultType(
-					null, null, null, null, new BaseFaultTypeDescription[] {
-						new BaseFaultTypeDescription("The resource property " +
-							getResourcePropertyRequest + " is unknown.") },
-					null));
+		{
+			Map<QName, Collection<MessageElement>> unknowns =
+				_attributePackage.getUnknownAttributes(
+					ResourceManager.getCurrentResource().dereference());
 			
-		document.addAll(manipulator.getAttributeValues());
+			if (!unknowns.containsKey(getResourcePropertyRequest))
+				throw FaultManipulator.fillInFault(
+					new InvalidResourcePropertyQNameFaultType(
+						null, null, null, null, new BaseFaultTypeDescription[] {
+							new BaseFaultTypeDescription("The resource property " +
+								getResourcePropertyRequest + " is unknown.") },
+						null));
+			
+			document.addAll(unknowns.get(getResourcePropertyRequest));
+		} else
+			document.addAll(manipulator.getAttributeValues());
 		
 		MessageElement []ret = new MessageElement[document.size()];
 		document.toArray(ret);
@@ -1124,97 +1158,25 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 		return new SByteIOFactory(Container.getServiceURL("StreamableByteIOPortType"));
 	}
 	
-	protected IteratorInitializationType createWSIterator(
-		Iterator<MessageElement> contents, int defaultBatchSize) 
-			throws ResourceException, ResourceUnknownFaultType,
-				SQLException, GenesisIISecurityException, RemoteException
+	final protected IteratorBuilder<MessageElement> iteratorBuilder()
 	{
-		Collection<IteratorMemberType> initMembers = 
-			new LinkedList<IteratorMemberType>();
-		int lcv;
-		for ( lcv = 0; lcv < defaultBatchSize; lcv++)
-		{
-			if (!contents.hasNext())
-				break;
-			initMembers.add(new IteratorMemberType(
-				new MessageElement[] { contents.next() }, 
-				new UnsignedInt((long)lcv)));
-		}
-
-		if (!contents.hasNext())
-			return new IteratorInitializationType(
-				null, initMembers.toArray(new IteratorMemberType[0]));
-		
-		String id = (new GUID()).toString();
-		DatabaseConnectionPool pool =
-			((BasicDBResourceFactory)ResourceManager.getCurrentResource(
-				).getProvider().getFactory()).getConnectionPool();
-		Connection connection = null;
-		PreparedStatement stmt = null;
-		long count = defaultBatchSize;
-		boolean needsExecute = false;
-		
-		try
-		{
-			connection = pool.acquire(false);
-			stmt = connection.prepareStatement(
-				"INSERT INTO iterators (iteratorid, elementindex, contents) " +
-				"VALUES(?, ?, ?)");
-			while (contents.hasNext())
-			{
-				MessageElement any = contents.next();
-				IteratorMemberType member = new IteratorMemberType(
-					new MessageElement[] { any }, new UnsignedInt(count));
-				stmt.setString(1, id);
-				stmt.setLong(2, count);
-				stmt.setBlob(3, DBSerializer.xmlToBlob(member,
-					"iterators", "contents"));
-				
-				stmt.addBatch();
-				needsExecute = true;
-				count++;
-				
-				if (count % 16 == 0)
-				{
-					stmt.executeBatch();
-					needsExecute = false;
-				}
-			}
-			
-			if (needsExecute)
-				stmt.executeBatch();
-			
-			EndpointReferenceType epr;
-
-			ConstructionParameters cParams =
-				new IteratorConstructionParameters(id);
-			cParams.timeToLive(1000L * 60 * 60);
-
-			if (_iteratorServiceEPR == null)
-				_iteratorServiceEPR = EPRUtils.makeEPR(
-					Container.getServiceURL("IteratorPortType"));
-/*			
-			IteratorPortType iter = ClientUtils.createProxy(
-				IteratorPortType.class, _iteratorServiceEPR);
-			epr = iter.vcgrCreate(
-					new VcgrCreate(createRequest)).getEndpoint();
-*/							
-			//long start = System.currentTimeMillis();
-			// ASG Here is where we need to directly create in the current container */
-			epr = new IteratorServiceImpl().CreateEPR(
-				new MessageElement[] { cParams.serializeToMessageElement() },
-				Container.getServiceURL("IteratorPortType"));
-			//System.err.println("createWSIterator: time to createEPR " + (System.currentTimeMillis()-start));
-
-			connection.commit();
-			return new IteratorInitializationType(epr, 
-				initMembers.toArray(new IteratorMemberType[0]));
-		}
-		finally
-		{
-			StreamUtils.close(stmt);
-			pool.release(connection);
-		}
+		return new MessageElementIteratorBuilder();
+	}
+	
+	final protected IteratorBuilder<Object> iteratorBuilder(Marshaller jaxbMarshaller)
+	{
+		return new JaxbIteratorBuilder(jaxbMarshaller, null);
+	}
+	
+	final protected IteratorBuilder<Object> iteratorBuilder(Marshaller jaxbMarshaller,
+		QName elementName)
+	{
+		return new JaxbIteratorBuilder(jaxbMarshaller, elementName); 
+	}
+	
+	final protected IteratorBuilder<Object> iteratorBuilder(QName axisElementName)
+	{
+		return new AxisSerializationIteratorBuilder(axisElementName);
 	}
 	
 	public EndpointReferenceType getMyEPR(boolean withPortTypes) 
@@ -1330,6 +1292,9 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 						elements.add(value);
 			}
 		}
+		for (Collection<MessageElement> values :
+			_attributePackage.getUnknownAttributes(ResourceManager.getCurrentResource().dereference()).values())
+			elements.addAll(values);
 		
 		MessageElement []elementsArray = new MessageElement[elements.size()];
 		elements.toArray(elementsArray);
@@ -1453,13 +1418,11 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 				_attributePackage.getManipulator(rp);
 				
 			if (manipulator == null)
-				FaultManipulator.fillInFault(
-					new InvalidResourcePropertyQNameFaultType(
-						null, null, null, null, new BaseFaultTypeDescription[] {
-							new BaseFaultTypeDescription("The resource property " + rp + " is unknown.")
-						}, null));
-				
-			manipulator.setAttributeValues(new ArrayList<MessageElement>());
+			{
+				_attributePackage.deleteUnknownAttributes(
+					ResourceManager.getCurrentResource().dereference(), rp);
+			} else 
+				manipulator.setAttributeValues(new ArrayList<MessageElement>());
 		}
 	}
 	
@@ -1480,24 +1443,31 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 				list.add(elem);
 			}
 			
+			Map<QName, Collection<MessageElement>> unknowns = null;
+			
 			for (QName attrName : map.keySet())
 			{
 				Collection<MessageElement> newAttrs = map.get(attrName);
-				
 				IAttributeManipulator manip = getAttributePackage().getManipulator(attrName);
 				if (manip == null)
 				{
-					FaultManipulator.fillInFault(
-						new InvalidResourcePropertyQNameFaultType(
-							null, null, null, null, new BaseFaultTypeDescription[] {
-								new BaseFaultTypeDescription("The resource property " + attrName + " is unknown.")
-							}, null));
+					if (unknowns == null)
+						unknowns = _attributePackage.getUnknownAttributes(
+							ResourceManager.getCurrentResource().dereference());
+					
+					Collection<MessageElement> oldValues = unknowns.get(attrName);
+					if (oldValues == null)
+						oldValues = new ArrayList<MessageElement>();
+					oldValues.addAll(newAttrs);
+					_attributePackage.setUnknownAttributes(
+						ResourceManager.getCurrentResource().dereference(), oldValues);
+				} else
+				{
+					Collection<MessageElement> oldValues = new ArrayList<MessageElement>(
+						manip.getAttributeValues());
+					oldValues.addAll(newAttrs);
+					manip.setAttributeValues(oldValues);
 				}
-				
-				Collection<MessageElement> oldValues = new ArrayList<MessageElement>(
-					manip.getAttributeValues());
-				oldValues.addAll(newAttrs);
-				manip.setAttributeValues(oldValues);
 			}
 		}
 	}
@@ -1527,14 +1497,11 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 				IAttributeManipulator manip = getAttributePackage().getManipulator(attrName);
 				if (manip == null)
 				{
-					throw FaultManipulator.fillInFault(
-						new InvalidResourcePropertyQNameFaultType(
-							null, null, null, null, new BaseFaultTypeDescription[] {
-								new BaseFaultTypeDescription("The resource property " + attrName + " is unknown.")
-							}, null));
-				}
-				
-				manip.setAttributeValues(newAttrs);
+					_attributePackage.setUnknownAttributes(
+						ResourceManager.getCurrentResource().dereference(),
+						newAttrs);
+				} else
+					manip.setAttributeValues(newAttrs);
 			}
 		}
 	}
@@ -1623,5 +1590,115 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 		}
 		
 		return existingAttributes;
+	}
+	
+	private abstract class GenesisIIBaseAbstractIteratorBuilder<SourceType>
+		extends AbstractIteratorBuilder<SourceType>
+	{
+		@Override
+		final public IteratorInitializationType create() throws RemoteException
+		{
+			IterableElementType []batchElements = null;
+			EndpointReferenceType iteratorEndpoint = null;
+			
+			WSIteratorConstructionParameters consParms = 
+				new WSIteratorConstructionParameters(iterator(), 
+					preferredBatchSize());
+			
+			try
+			{
+				MessageElement []firstBlock = consParms.firstBlock();
+				
+				if (firstBlock != null)
+				{
+					batchElements = new IterableElementType[firstBlock.length];
+					for (int lcv = 0; lcv < firstBlock.length; lcv++)
+						batchElements[lcv] = new IterableElementType(
+							new MessageElement[] { firstBlock[lcv] },
+							new UnsignedLong(lcv));
+				}
+				
+				if (consParms.remainingContents() != null)
+					iteratorEndpoint = new WSIteratorServiceImpl().CreateEPR(
+						new MessageElement[] { consParms.serializeToMessageElement() },
+						Container.getServiceURL("WSIteratorPortType"));
+				
+				return new IteratorInitializationType(iteratorEndpoint,
+					batchElements);
+			}
+			finally
+			{
+				StreamUtils.close(consParms);
+			}
+		}
+	}
+	
+	final private class MessageElementIteratorBuilder
+		extends GenesisIIBaseAbstractIteratorBuilder<MessageElement>
+	{
+		@Override
+		final protected MessageElement serialize(MessageElement item)
+		{
+			return item;
+		}
+	}
+	
+	final private class JaxbIteratorBuilder
+		extends GenesisIIBaseAbstractIteratorBuilder<Object>
+	{
+		private Marshaller _marshaller;
+		private QName _name;
+		
+		private JaxbIteratorBuilder(Marshaller marshaller, QName name)
+		{
+			_marshaller = marshaller;
+			_name = name;
+		}
+		
+		@Override
+		final protected MessageElement serialize(Object item)
+			throws IOException
+		{
+			DOMResult result = new DOMResult();
+			
+			try
+			{
+				if (item instanceof JAXBElement<?> || _name == null)
+				{
+					_marshaller.marshal(item, result);
+				} else
+				{
+					@SuppressWarnings({ "rawtypes", "unchecked" })
+					JAXBElement<?> e = new JAXBElement(
+						_name, item.getClass(), item);
+					_marshaller.marshal(e, result);
+				}
+				
+				return new MessageElement(
+					((Document)result.getNode()).getDocumentElement());
+			}
+			catch (JAXBException e)
+			{
+				throw new IOException(String.format(
+					"Unable to JAXB serialize %s!", item), e);
+			}
+		}
+	}
+		
+	final private class AxisSerializationIteratorBuilder
+		extends GenesisIIBaseAbstractIteratorBuilder<Object>
+	{
+		private QName _name;
+		
+		private AxisSerializationIteratorBuilder(QName name)
+		{
+			_name = name;
+		}
+		
+		@Override
+		final protected MessageElement serialize(Object item)
+		{
+			return new MessageElement(_name, item);
+		}
 	}
 }

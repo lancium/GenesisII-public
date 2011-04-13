@@ -23,7 +23,6 @@ import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.JobDefinition_Type;
-import org.ggf.rns.EntryType;
 import org.morgan.util.io.StreamUtils;
 import org.w3c.dom.Document;
 import org.ws.addressing.EndpointReferenceType;
@@ -43,6 +42,7 @@ import edu.virginia.vcgr.genii.container.q2.besinfo.BESInformationResolver;
 import edu.virginia.vcgr.genii.container.q2.summary.HostDescription;
 import edu.virginia.vcgr.genii.container.q2.summary.ResourceSummary;
 import edu.virginia.vcgr.genii.container.q2.summary.SlotSummary;
+import edu.virginia.vcgr.genii.container.rns.LegacyEntryType;
 import edu.virginia.vcgr.genii.queue.GetJobLogResponse;
 import edu.virginia.vcgr.genii.queue.JobErrorPacket;
 import edu.virginia.vcgr.genii.queue.JobInformationType;
@@ -272,14 +272,14 @@ public class QueueManager implements Closeable
 			mgrType, isAvailable, lastUpdated, nextUpdate);
 	}
 	
-	private Collection<EntryType> addInCurrentResourceInformation(
-		Collection<EntryType> entries) throws JAXBException
+	private Collection<LegacyEntryType> addInCurrentResourceInformation(
+		Collection<LegacyEntryType> entries) throws JAXBException
 	{
 		JAXBContext context = JAXBContext.newInstance(
 			CurrentResourceInformation.class);
 		Marshaller m = context.createMarshaller();
 		
-		for (EntryType entry : entries)
+		for (LegacyEntryType entry : entries)
 		{
 			try
 			{
@@ -446,11 +446,11 @@ public class QueueManager implements Closeable
 		_jobManager.printLog(jobTicket, out);
 	}
 	
-	public Collection<EntryType> listBESs(String entryName)
+	public Collection<LegacyEntryType> listBESs(String entryName)
 		throws SQLException, ResourceException
 	{
 		Connection connection = null;
-		Collection<EntryType> ret = null;
+		Collection<LegacyEntryType> ret = null;
 		
 		try
 		{

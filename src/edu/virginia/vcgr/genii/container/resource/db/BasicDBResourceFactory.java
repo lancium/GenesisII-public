@@ -18,6 +18,10 @@ public class BasicDBResourceFactory implements IResourceFactory
 {
 	static private Log _logger = LogFactory.getLog(BasicDBResourceFactory.class);
 	
+	static private final String _CREATE_UNKNOWN_ATTRS_TABLE_STMT =
+		"CREATE TABLE unknownattrs (resourceid VARCHAR(128) PRIMARY KEY," +
+			"attrname VARCHAR(256) NOT NULL," +
+			"attrvalues BLOB(2G) NOT NULL)";
 	static private final String _CREATE_KEY_TABLE_STMT =
 		"CREATE TABLE resources (resourceid VARCHAR(128) PRIMARY KEY," +
 			"createtime TIMESTAMP)";
@@ -76,6 +80,7 @@ public class BasicDBResourceFactory implements IResourceFactory
 		{
 			conn = _pool.acquire(false);
 			DatabaseTableUtils.createTables(conn, false,
+				_CREATE_UNKNOWN_ATTRS_TABLE_STMT,
 				_CREATE_KEY_TABLE_STMT,
 				_CREATE_PROPERTY_TABLE_STMT,
 				_CREATE_MATCHING_PARAMS_STMT,

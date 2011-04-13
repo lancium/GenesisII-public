@@ -45,7 +45,7 @@
 	<classpathentry kind="lib" path="ext/jetty/lib/jetty-util-6.1.17.jar"/>
 	<classpathentry kind="lib" path="ext/jsch/jsch-0.1.42.jar"/>
 	<classpathentry kind="lib" path="ext/junit/junit-4.8.2.jar"/>
-	<classpathentry kind="lib" path="lib/GenesisII-ws.jar"/>
+	<classpathentry kind="lib" path="lib/GenesisII-ws.jar" sourcepath="genned-src"/>
 	<classpathentry kind="lib" path="ext/jai/jai_imageio.jar"/>
 	<classpathentry kind="lib" path="ext/svnkit/svnkit.jar"/>
 	<classpathentry kind="lib" path="ext/fsview/ext/commons-net-2.2.jar"/>

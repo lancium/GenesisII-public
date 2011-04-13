@@ -78,7 +78,6 @@ public class DBSerializer
 		}
 	}
 */
-	
 	static public Blob toBlob(Object obj, String tableName, String columnName)
 			throws SQLException
 	{

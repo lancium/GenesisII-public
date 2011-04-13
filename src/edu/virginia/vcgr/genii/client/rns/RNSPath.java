@@ -28,22 +28,14 @@ import java.util.LinkedList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.ggf.rns.Add;
-import org.ggf.rns.CreateFile;
-import org.ggf.rns.EntryType;
-import org.ggf.rns.List;
-import org.ggf.rns.ListResponse;
-import org.ggf.rns.RNSPortType;
-import org.ggf.rns.Remove;
+import org.ggf.rns.RNSEntryResponseType;
 import org.morgan.util.configuration.ConfigurationException;
-import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
-import edu.virginia.vcgr.genii.client.iterator.WSIterable;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
@@ -54,7 +46,6 @@ import edu.virginia.vcgr.genii.client.rns.filters.RNSFilter;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
-import edu.virginia.vcgr.genii.enhancedrns.IterateListRequestType;
 
 /**
  * The RNSPath class is the main client side interface between developers and
@@ -140,14 +131,12 @@ public class RNSPath implements Serializable, Cloneable
 				EndpointReferenceType parent = _parent.resolveOptional();
 				if (parent != null)
 				{
-					RNSPortType rpt = createProxy(parent, RNSPortType.class);
-					ListResponse resp = rpt.list(new List(_nameFromParent));
-					EntryType []entries = resp.getEntryList();
+					RNSLegacyProxy proxy = new RNSLegacyProxy(
+						createProxy(parent, EnhancedRNSPortType.class));
+					RNSEntryResponseType []entries = proxy.lookup(
+						_nameFromParent);
 					if (entries != null && entries.length == 1)
-					{
-						EntryType entry = entries[0];
-						_cachedEPR = entry.getEntry_reference();
-					}
+						_cachedEPR = entries[0].getEndpoint();
 				}
 			}
 		}
@@ -384,11 +373,11 @@ public class RNSPath implements Serializable, Cloneable
 		
 		EndpointReferenceType parentEndpoint = _parent.resolveRequired();
 		
-		RNSPortType rpt = createProxy(parentEndpoint, RNSPortType.class);
+		RNSLegacyProxy proxy = new RNSLegacyProxy(
+			createProxy(parentEndpoint, EnhancedRNSPortType.class));
 		try
 		{
-			_cachedEPR = rpt.add(new Add(
-				_nameFromParent, null, null)).getEntry_reference();
+			_cachedEPR = proxy.add(_nameFromParent);
 			_attemptedResolve = true;
 		}
 		catch (RemoteException re)
@@ -448,11 +437,11 @@ public class RNSPath implements Serializable, Cloneable
 		
 		EndpointReferenceType parentEPR = _parent.resolveRequired();
 		
-		RNSPortType rpt = createProxy(parentEPR, RNSPortType.class);
+		RNSLegacyProxy proxy = new RNSLegacyProxy(createProxy(parentEPR,
+			EnhancedRNSPortType.class));
 		try
 		{
-			_cachedEPR = rpt.createFile(
-				new CreateFile(_nameFromParent)).getEntry_reference();
+			_cachedEPR = proxy.createFile(_nameFromParent);
 			_attemptedResolve = true;
 			
 			return _cachedEPR;
@@ -781,68 +770,33 @@ public class RNSPath implements Serializable, Cloneable
 		throws RNSPathDoesNotExistException, RNSException
 	{
 		EndpointReferenceType me = resolveRequired();
-		TypeInformation typeInfo = new TypeInformation(me);
-		if (typeInfo.isEnhancedRNS())
+		EnhancedRNSPortType rpt = createProxy(
+			me, EnhancedRNSPortType.class);
+		RNSLegacyProxy proxy = new RNSLegacyProxy(rpt);
+		RNSIterable entries = null;
+		
+		try
 		{
-			// We have an iterator
-			EnhancedRNSPortType rpt = createProxy(
-				me, EnhancedRNSPortType.class);
-			WSIterable<EntryType> entries = null;
-			
-			try
-			{
-				entries = new WSIterable<EntryType>(
-					EntryType.class, rpt.iterateList(
-						new IterateListRequestType()).getResult(),
-						100, true);
-				LinkedList<RNSPath> ret = new LinkedList<RNSPath>();
-				for (EntryType entry : entries)
-				{
-					RNSPath newEntry = new RNSPath(this, entry.getEntry_name(),
-						entry.getEntry_reference(), true);
-					_lookupCache.put(newEntry.pwd(), newEntry);
-					ret.add(newEntry);
-				}
-				
-				return ret;
-			}
-			catch (GenesisIISecurityException gse)
-			{
-				throw new RNSException("Unable to list contents -- " +
-					"security exception.", gse);
-			}
-			catch (RemoteException re)
-			{
-				throw new RNSException("Unable to list contents.", re);
-			}
-			finally
-			{
-				StreamUtils.close(entries);
-			}
-				
-		} else
-		{
-			// We don't have an iterator -- do it the old fashioned way.
-			RNSPortType rpt = createProxy(me, RNSPortType.class);
+			entries = proxy.iterateList();
 			LinkedList<RNSPath> ret = new LinkedList<RNSPath>();
+			for (RNSEntryResponseType entry : entries)
+			{
+				RNSPath newEntry = new RNSPath(this, entry.getEntryName(),
+					entry.getEndpoint(), true);
+				_lookupCache.put(newEntry.pwd(), newEntry);
+				ret.add(newEntry);
+			}
 			
-			try
-			{
-				for (EntryType entry : rpt.list(new List(null)).getEntryList())
-				{
-					RNSPath newEntry = new RNSPath(this, entry.getEntry_name(),
-						entry.getEntry_reference(), true);
-
-					_lookupCache.put(newEntry.pwd(), newEntry);
-					ret.add(newEntry);
-				}
-				
-				return ret;
-			}
-			catch (RemoteException re)
-			{
-				throw new RNSException("Unable to list contents.", re);
-			}
+			return ret;
+		}
+		catch (GenesisIISecurityException gse)
+		{
+			throw new RNSException("Unable to list contents -- " +
+				"security exception.", gse);
+		}
+		catch (RemoteException re)
+		{
+			throw new RNSException("Unable to list contents.", re);
 		}
 	}
 	
@@ -870,11 +824,11 @@ public class RNSPath implements Serializable, Cloneable
 		
 		EndpointReferenceType parentEPR = _parent.resolveRequired();
 		
-		RNSPortType rpt = createProxy(parentEPR, RNSPortType.class);
+		RNSLegacyProxy proxy = new RNSLegacyProxy(
+			createProxy(parentEPR, EnhancedRNSPortType.class));
 		try
 		{
-			_cachedEPR = rpt.add(new Add(
-				_nameFromParent, epr, null)).getEntry_reference();
+			_cachedEPR = proxy.add(_nameFromParent, epr);
 			_attemptedResolve = true;
 		}
 		catch (RemoteException re)
@@ -902,10 +856,11 @@ public class RNSPath implements Serializable, Cloneable
 		
 		EndpointReferenceType parentEPR = _parent.resolveRequired();
 		
-		RNSPortType rpt = createProxy(parentEPR, RNSPortType.class);
+		EnhancedRNSPortType rpt = createProxy(parentEPR, EnhancedRNSPortType.class);
+		RNSLegacyProxy proxy = new RNSLegacyProxy(rpt);
 		try
 		{
-			rpt.remove(new Remove(_nameFromParent));
+			proxy.remove(_nameFromParent);
 			_cachedEPR = null;
 			_attemptedResolve = true;
 		}
@@ -940,8 +895,10 @@ public class RNSPath implements Serializable, Cloneable
 				common.destroy(new Destroy());
 			}
 			
-			RNSPortType rpt = createProxy(parentEPR, RNSPortType.class);
-			rpt.remove(new Remove(_nameFromParent));
+			EnhancedRNSPortType rpt = createProxy(
+				parentEPR, EnhancedRNSPortType.class);
+			RNSLegacyProxy proxy = new RNSLegacyProxy(rpt);
+			proxy.remove(_nameFromParent);
 			_cachedEPR = null;
 			_attemptedResolve = true;
 		}

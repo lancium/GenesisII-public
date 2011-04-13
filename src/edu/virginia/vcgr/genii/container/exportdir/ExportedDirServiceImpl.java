@@ -6,30 +6,20 @@ import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.sql.SQLException;
 
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.ggf.rns.Add;
-import org.ggf.rns.AddResponse;
-import org.ggf.rns.CreateFile;
-import org.ggf.rns.CreateFileResponse;
-import org.ggf.rns.EntryPropertiesType;
-import org.ggf.rns.EntryType;
-import org.ggf.rns.List;
-import org.ggf.rns.ListResponse;
-import org.ggf.rns.Move;
-import org.ggf.rns.MoveResponse;
-import org.ggf.rns.Query;
-import org.ggf.rns.QueryResponse;
-import org.ggf.rns.RNSDirectoryNotEmptyFaultType;
+import org.ggf.rns.LookupResponseType;
+import org.ggf.rns.MetadataMappingType;
+import org.ggf.rns.NameMappingType;
 import org.ggf.rns.RNSEntryExistsFaultType;
-import org.ggf.rns.RNSEntryNotDirectoryFaultType;
-import org.ggf.rns.RNSFaultType;
-import org.ggf.rns.Remove;
+import org.ggf.rns.RNSEntryResponseType;
+import org.ggf.rns.RNSEntryType;
+import org.ggf.rns.RNSMetadataType;
+import org.ggf.rns.WriteNotPermittedFaultType;
 import org.morgan.inject.MInject;
 import org.morgan.util.GUID;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
@@ -43,9 +33,9 @@ import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
+import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
-import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
@@ -63,10 +53,11 @@ import edu.virginia.vcgr.genii.container.invoker.timing.TimingSink;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceLock;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
+import edu.virginia.vcgr.genii.container.rns.RNSContainerUtilities;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
+import edu.virginia.vcgr.genii.enhancedrns.CreateFileRequestType;
+import edu.virginia.vcgr.genii.enhancedrns.CreateFileResponseType;
 import edu.virginia.vcgr.genii.exportdir.ExportedDirPortType;
-import edu.virginia.vcgr.genii.enhancedrns.IterateListRequestType;
-import edu.virginia.vcgr.genii.enhancedrns.IterateListResponseType;
 
 @GeniiServiceConfiguration(
 	resourceProvider=ExportedDirDBResourceProvider.class)
@@ -151,10 +142,10 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 	*/
 
 	@RWXMapping(RWXCategory.EXECUTE)
-	public CreateFileResponse createFile(CreateFile createFileRequest)
+	public CreateFileResponseType createFile(
+		CreateFileRequestType createFileRequest)
 			throws RemoteException, RNSEntryExistsFaultType,
-			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType,
-			RNSFaultType
+				ResourceUnknownFaultType
 	{
 		String filename = null;
 		EndpointReferenceType entryReference = null;
@@ -239,39 +230,37 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 			_resourceLock.unlock();
 		}
 		
-		return new CreateFileResponse(entryReference);
+		return new CreateFileResponseType(entryReference);
 	}
 	
-	@RWXMapping(RWXCategory.WRITE)
-	public AddResponse add(Add addRequest) throws RemoteException,
-		RNSEntryExistsFaultType, ResourceUnknownFaultType,
-		RNSEntryNotDirectoryFaultType, RNSFaultType
+	protected RNSEntryResponseType add(RNSEntryType addRequest) throws RemoteException
 	{
 		//add request missing
 		if (addRequest == null)
 		{
 			// Pure factory operation
-			throw FaultManipulator.fillInFault(new RNSFaultType(
+			throw FaultManipulator.fillInFault(new BaseFaultType(
 				null, null, null, null, new BaseFaultTypeDescription[] {
 					new BaseFaultTypeDescription(
 						"Pure factory version of add not allowed in export dir.")
-				}, null, null));
+				}, null));
 		}
 		
 		//decipher add request
 		//get name of file
-		String name = addRequest.getEntry_name();
-		EndpointReferenceType entryReference = addRequest.getEntry_reference();
-		MessageElement []attrs = addRequest.get_any();
+		String name = addRequest.getEntryName();
+		EndpointReferenceType entryReference = addRequest.getEndpoint();
+		RNSMetadataType mdt = addRequest.getMetadata();
+		MessageElement []attrs = (mdt == null) ? null : mdt.get_any();
 		
 		if (entryReference != null)
 		{
-			throw FaultManipulator.fillInFault(new RNSFaultType(
+			throw FaultManipulator.fillInFault(new BaseFaultType(
 				null, null, null, null, new BaseFaultTypeDescription[] {
 					new BaseFaultTypeDescription(
 						"Add not allowed in ExportDirs (unless you are creating " +
 						"a new directory.")
-				}, null, null));
+				}, null));
 		}
 		
 		_logger.debug("ExportDir asked to add \"" + name + "\".");
@@ -308,25 +297,64 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 		IExportedDirResource newResource = (IExportedDirResource)newRefKey.dereference();
 		newResource.getAndSetModifyTime();
 		
-		return new AddResponse(newRef);
+		return new RNSEntryResponseType(
+			newRef, mdt, null, name);
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.WRITE)
+	public RNSEntryResponseType[] add(RNSEntryType[] addRequest)
+		throws RemoteException, org.ggf.rns.WriteNotPermittedFaultType
+	{
+		if (addRequest == null || addRequest.length == 0)
+			addRequest = new RNSEntryType[] { null };
+		
+		RNSEntryResponseType []ret = new RNSEntryResponseType[addRequest.length];
+		for (int lcv = 0; lcv < ret.length; lcv++)
+		{
+			try
+			{
+				ret[lcv] = add(addRequest[lcv]);
+			}
+			catch (BaseFaultType bft)
+			{
+				ret[lcv] = new RNSEntryResponseType(null, null,
+					bft, addRequest[lcv].getEntryName());
+			}
+			catch (Throwable cause)
+			{
+				ret[lcv] = new RNSEntryResponseType(null, null,
+					FaultManipulator.fillInFault(
+						new BaseFaultType(null, null, null, null, 
+							new BaseFaultTypeDescription[] { 
+								new BaseFaultTypeDescription("Unable to add entry!") 
+							}, null)), addRequest[lcv].getEntryName());
+			}
+		}
+		
+		return ret;
 	}
 
 	@RWXMapping(RWXCategory.READ)
-    public IterateListResponseType iterateList(IterateListRequestType list) 
-    	throws RemoteException, ResourceUnknownFaultType, 
-    		RNSEntryNotDirectoryFaultType, RNSFaultType
+    public LookupResponseType lookup(String[] lookupRequest)
+		throws RemoteException, org.ggf.rns.ReadNotPermittedFaultType
     {
 		TimingSink tSink = TimingSink.sink();
 		Timer timer = null;
-		Collection<MessageElement> entryCollection;
-		Collection<ExportedDirEntry> entries = null;
+		Collection<RNSEntryResponseType> entryCollection;
+		Collection<ExportedDirEntry> entries = 
+			new LinkedList<ExportedDirEntry>();
+		
+		if (lookupRequest == null || lookupRequest.length == 0)
+			lookupRequest = new String[] { null };
 		
 		try
 		{
 			_resourceLock.lock();
 			
 			timer = tSink.getTimer("Retrieve Entries");
-			entries = _resource.retrieveEntries(null);
+			for (String request : lookupRequest)
+				entries.addAll(_resource.retrieveEntries(request));
 			timer.noteTime();
 		}
 		finally
@@ -335,103 +363,59 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 		}
 		
 		//create collection of MessageElement entries
-		entryCollection = new LinkedList<MessageElement>();
+		entryCollection = new LinkedList<RNSEntryResponseType>();
 		timer = tSink.getTimer("Prepare Entries");
-    	for (ExportedDirEntry exportDirEntry : entries){
-    		EntryType entry = new EntryType(
-    				exportDirEntry.getName(), 
-    				exportDirEntry.getAttributes(), 
-    				exportDirEntry.getEntryReference());
+    	for (ExportedDirEntry exportDirEntry : entries)
+    	{
+    		RNSEntryResponseType entry = new RNSEntryResponseType(
+    			exportDirEntry.getEntryReference(), 
+    			RNSUtilities.createMetadata(exportDirEntry.getEntryReference(),
+    				exportDirEntry.getAttributes()),
+    			null, exportDirEntry.getName());
 
-    		entryCollection.add(AnyHelper.toAny(entry));
+    		entryCollection.add(entry);
     	}
     	timer.noteTime();
 		
-		try{
+		try
+		{
 			timer = tSink.getTimer("Create Iterator");
-			return new IterateListResponseType(super.createWSIterator(
-					entryCollection.iterator(), 100));
+			return RNSContainerUtilities.translate(
+	    		entryCollection, iteratorBuilder(
+	    			RNSEntryResponseType.getTypeDesc().getXmlType()));
 		}
-		catch (SQLException sqe){
-			throw new RemoteException("Unable to create iterator for exportDir lookup.", sqe);
-		} 
 		finally
 		{
 			if (timer != null)
 				timer.noteTime();
 		}
     }	
-	
-	@RWXMapping(RWXCategory.READ)
-	public ListResponse list(List listRequest) throws RemoteException,
-			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType,
-			RNSFaultType
+
+	@RWXMapping(RWXCategory.WRITE)
+	public RNSEntryResponseType[] rename(NameMappingType[] renameRequest)
+		throws RemoteException, org.ggf.rns.WriteNotPermittedFaultType
 	{
-		Collection<ExportedDirEntry> entries;
+		throw new UnsupportedOperationException(
+			"Rename not supported in Resource forks!");
+	}
+
+	@RWXMapping(RWXCategory.WRITE)
+	public RNSEntryResponseType[] remove(String[] removeRequest)
+		throws RemoteException, org.ggf.rns.WriteNotPermittedFaultType
+	{
+		RNSEntryResponseType []ret = 
+			new RNSEntryResponseType[removeRequest.length]; 
+		
 		try
 		{
 			_resourceLock.lock();
+			for (int lcv = 0; lcv < removeRequest.length; lcv++)
+			{
+				_resource.removeEntries(removeRequest[lcv], true);
+				ret[lcv] = new RNSEntryResponseType(null, null, null,
+					removeRequest[lcv]);
+			}
 			
-			entries = _resource.retrieveEntries(listRequest.getEntryName());
-		}
-		finally
-		{
-			_resourceLock.unlock();
-		}
-		
-		EntryType []ret = new EntryType[entries.size()];
-		int lcv = 0;
-		for (ExportedDirEntry entry : entries)
-		{
-			ret[lcv++] = new EntryType(
-				entry.getName(), entry.getAttributes(), entry.getEntryReference());
-		}
-		return new ListResponse(ret);
-	}
-
-	@RWXMapping(RWXCategory.WRITE)
-	public MoveResponse move(Move moveRequest) throws RemoteException,
-			ResourceUnknownFaultType, RNSFaultType
-	{
-		throw FaultManipulator.fillInFault(new RNSFaultType(
-			null, null, null, null, new BaseFaultTypeDescription[] {
-				new BaseFaultTypeDescription("RNS.move not supported in export dir.")
-			}, null, null));
-	}
-
-	@RWXMapping(RWXCategory.READ)
-	public QueryResponse query(Query queryRequest) throws RemoteException,
-			ResourceUnknownFaultType, RNSFaultType
-	{
-		String entryPattern = queryRequest.getEntryPattern();
-		EntryType []tmp = list(new List(entryPattern)).getEntryList();
-		EntryPropertiesType []ret = new EntryPropertiesType[tmp.length];
-		EndpointReferenceType myEPR = 
-			(EndpointReferenceType)WorkingContext.getCurrentWorkingContext().getProperty(
-				WorkingContext.EPR_PROPERTY_NAME);
-		
-		for (int lcv = 0; lcv < tmp.length; lcv++)
-		{
-			ret[lcv] = new EntryPropertiesType(myEPR,
-				tmp[lcv].getEntry_name(), tmp[lcv].get_any(),
-				tmp[lcv].getEntry_reference());
-		}
-		
-		return new QueryResponse(ret[0]);
-	}
-
-	@RWXMapping(RWXCategory.WRITE)
-	public String[] remove(Remove removeRequest) throws RemoteException,
-			ResourceUnknownFaultType, RNSDirectoryNotEmptyFaultType,
-			RNSFaultType
-	{
-		String []ret;
-		Collection<String> removed; 
-		
-		try
-		{
-			_resourceLock.lock();
-			removed = _resource.removeEntries(removeRequest.getEntryName(), true);
 			_resource.commit();
 		}
 		finally
@@ -439,9 +423,14 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 			_resourceLock.unlock();
 		}
 		
-		ret = new String[removed.size()];
-		removed.toArray(ret);
-		
 		return ret;
+	}
+
+	@Override
+	public RNSEntryResponseType[] setMetadata(
+		MetadataMappingType[] setMetadataRequest) throws RemoteException,
+			WriteNotPermittedFaultType
+	{
+		throw new UnsupportedOperationException("setMetadata not supported!");
 	}
 }

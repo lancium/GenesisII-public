@@ -17,32 +17,22 @@ package edu.virginia.vcgr.genii.container.resolver;
 
 import org.apache.axis.types.URI;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.ggf.rns.Add;
-import org.ggf.rns.AddResponse;
-import org.ggf.rns.CreateFile;
-import org.ggf.rns.CreateFileResponse;
-import org.ggf.rns.EntryType;
-import org.ggf.rns.List;
-import org.ggf.rns.ListResponse;
-import org.ggf.rns.Move;
-import org.ggf.rns.MoveResponse;
-import org.ggf.rns.Query;
-import org.ggf.rns.QueryResponse;
-import org.ggf.rns.RNSDirectoryNotEmptyFaultType;
-import org.ggf.rns.RNSEntryExistsFaultType;
-import org.ggf.rns.RNSEntryNotDirectoryFaultType;
-import org.ggf.rns.RNSFaultType;
-import org.ggf.rns.Remove;
+import org.ggf.rns.LookupResponseType;
+import org.ggf.rns.MetadataMappingType;
+import org.ggf.rns.NameMappingType;
+import org.ggf.rns.RNSEntryResponseType;
+import org.ggf.rns.RNSEntryType;
+import org.ggf.rns.WriteNotPermittedFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.ogf.schemas.naming._2006._08.naming.ResolveFailedFaultType;
 import org.ws.addressing.EndpointReferenceType;
@@ -70,6 +60,7 @@ import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
+import edu.virginia.vcgr.genii.container.rns.RNSContainerUtilities;
 import edu.virginia.vcgr.genii.resolver.simple.InvalidWSNameFaultType;
 import edu.virginia.vcgr.genii.resolver.simple.SimpleResolverPortType;
 import edu.virginia.vcgr.genii.resolver.simple.UpdateRequestType;
@@ -199,30 +190,23 @@ public class SimpleResolverServiceImpl extends GenesisIIBase
 	}
 
 	/* RNS port type */
+	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public AddResponse add(Add addRequest) throws RemoteException,
-		RNSEntryExistsFaultType, ResourceUnknownFaultType,
-		RNSEntryNotDirectoryFaultType, RNSFaultType
+	public RNSEntryResponseType[] add(RNSEntryType []request) throws RemoteException
 	{
 		throw new RemoteException("\"add\" not applicable.");
 	}
 
-	@RWXMapping(RWXCategory.EXECUTE)
-	public CreateFileResponse createFile(CreateFile createFileRequest)
-		throws RemoteException, RNSEntryExistsFaultType,
-			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType,
-			RNSFaultType
-	{
-		throw new RemoteException("\"createFile\" not applicable.");
-	}
-
+	@Override
 	@RWXMapping(RWXCategory.READ)
-	public ListResponse list(List listRequest) throws RemoteException,
-		ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType,
-		RNSFaultType
+	public LookupResponseType lookup(String []lookupRequest)
+		throws RemoteException, ResourceException
     {
-		String entryQuery = listRequest.getEntryName();
-		EntryType []entryList = null;
+		if (lookupRequest == null || lookupRequest.length == 0)
+			lookupRequest = new String[] { null };
+		
+		Collection<RNSEntryResponseType> result =
+			new LinkedList<RNSEntryResponseType>();
 		
 		ISimpleResolverResource resource = null;
 		
@@ -233,7 +217,6 @@ public class SimpleResolverServiceImpl extends GenesisIIBase
 		if (resource.getKey() == null)
 		{
 			HashMap<String, EndpointReferenceType> resolvers = resource.listAllResolvers();
-			ArrayList<EntryType> entryArray = new ArrayList<EntryType>();
 			
 			if (resolvers != null && resolvers.size() > 0)
 			{
@@ -242,61 +225,49 @@ public class SimpleResolverServiceImpl extends GenesisIIBase
 				while (epiIter.hasNext())
 				{
 					String nextEPI = epiIter.next();
-					if (entryQuery == null || entryQuery.equals(nextEPI))
+					for (String request : lookupRequest)
 					{
-						EndpointReferenceType nextEPR = resolvers.get(nextEPI);
-						entryArray.add(new EntryType(nextEPI, null, nextEPR));
+						if (request == null || request.equals(nextEPI))
+						{
+							EndpointReferenceType nextEPR = resolvers.get(nextEPI);
+							result.add(new RNSEntryResponseType(
+								nextEPR, null, null, nextEPI));
+							break;
+						}
 					}
 				}
 			}
-			if (entryArray.size() > 0)
-			{
-				entryList = new EntryType[entryArray.size()];
-				for (int i = 0; i < entryArray.size(); i++)
-				{
-					entryList[i] = entryArray.get(i);
-				}
-			}
-			else
-				entryList = new EntryType[0];
-			//throw new RNSEntryNotDirectoryFaultType();
-		}
-		else
+		} else
 		{
 			// if resolver instance, return entry with name=EPI and value=OriginalEPR 
-	
 			SimpleResolverEntry entry = resource.getEntry();
 		
-			if (entryQuery == null || entryQuery.equals(entry.getTargetEPI().toString()))
+			for (String request : lookupRequest)
 			{
-				entryList = new EntryType[1];
-				entryList[0] = new EntryType(entry.getTargetEPI().toString(), null, entry.getTargetEPR());
+				if (request == null || request.equals(entry.getTargetEPI().toString()))
+					result.add(new RNSEntryResponseType(
+						entry.getTargetEPR(), null, null, entry.getTargetEPI().toString()));
 			}
-			else
-				entryList = new EntryType[0];
 		}
-		ListResponse resp = new ListResponse(entryList);
-		return resp;
+
+		return RNSContainerUtilities.translate(
+    		result, iteratorBuilder(
+    			RNSEntryResponseType.getTypeDesc().getXmlType()));
     }
 
+	
+	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public MoveResponse move(Move moveRequest) throws RemoteException,
-		ResourceUnknownFaultType, RNSFaultType
+	public RNSEntryResponseType[] rename(NameMappingType[] renameRequest)
+		throws RemoteException, WriteNotPermittedFaultType
 	{
-		throw new RemoteException("\"move\" not applicable.");
+		throw new RemoteException("\"rename\" not applicable.");
 	}
 
-	@RWXMapping(RWXCategory.READ)
-	public QueryResponse query(Query queryRequest) throws RemoteException,
-		ResourceUnknownFaultType, RNSFaultType
-    {
-		throw new RemoteException("\"query\" not applicable.");
-    }
-
+	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public String[] remove(Remove removeRequest) throws RemoteException,
-		ResourceUnknownFaultType, RNSDirectoryNotEmptyFaultType,
-		RNSFaultType
+	public RNSEntryResponseType[] remove(String[] removeRequest)
+		throws RemoteException, WriteNotPermittedFaultType
 	{
 		throw new RemoteException("\"remove\" not applicable.");
 	}
@@ -391,5 +362,13 @@ public class SimpleResolverServiceImpl extends GenesisIIBase
 		else
 			return super.translateConstructionParameter(parameter);
 	}
-	
+
+	@Override
+	@RWXMapping(RWXCategory.WRITE)
+	public RNSEntryResponseType[] setMetadata(
+		MetadataMappingType[] setMetadataRequest) throws RemoteException,
+			WriteNotPermittedFaultType
+	{
+		throw new RemoteException("setMetadata operation not supported!");
+	}
 }

@@ -18,30 +18,22 @@ package edu.virginia.vcgr.genii.container.rns;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.ggf.rns.Add;
-import org.ggf.rns.AddResponse;
-import org.ggf.rns.CreateFile;
-import org.ggf.rns.CreateFileResponse;
-import org.ggf.rns.EntryPropertiesType;
-import org.ggf.rns.EntryType;
-import org.ggf.rns.List;
-import org.ggf.rns.ListResponse;
-import org.ggf.rns.Move;
-import org.ggf.rns.MoveResponse;
-import org.ggf.rns.Query;
-import org.ggf.rns.QueryResponse;
-import org.ggf.rns.RNSDirectoryNotEmptyFaultType;
+import org.ggf.rns.LookupResponseType;
+import org.ggf.rns.MetadataMappingType;
+import org.ggf.rns.NameMappingType;
+import org.ggf.rns.RNSEntryDoesNotExistFaultType;
 import org.ggf.rns.RNSEntryExistsFaultType;
-import org.ggf.rns.RNSEntryNotDirectoryFaultType;
-import org.ggf.rns.RNSFaultType;
-import org.ggf.rns.Remove;
+import org.ggf.rns.RNSEntryResponseType;
+import org.ggf.rns.RNSEntryType;
+import org.ggf.rns.RNSMetadataType;
+import org.ggf.rns.WriteNotPermittedFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.context.ContextManager;
@@ -51,9 +43,9 @@ import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
+import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
-import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.RNSEntryAddedContents;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.RNSTopics;
 
@@ -61,6 +53,9 @@ import edu.virginia.vcgr.genii.enhancedrns.*;
 
 import org.morgan.inject.MInject;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+import org.oasis_open.wsrf.basefaults.BaseFaultType;
+import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
+
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.attrs.AttributePreFetcher;
@@ -70,7 +65,6 @@ import edu.virginia.vcgr.genii.container.common.AttributesPreFetcherFactory;
 import edu.virginia.vcgr.genii.container.common.DefaultGenesisIIAttributesPreFetcher;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
-import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.invoker.timing.Timer;
 import edu.virginia.vcgr.genii.container.invoker.timing.TimingSink;
 
@@ -115,19 +109,20 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 	}
 	
 	@RWXMapping(RWXCategory.EXECUTE)
-	public CreateFileResponse createFile(CreateFile createFile)
+	public CreateFileResponseType createFile(CreateFileRequestType createFile)
 		throws RemoteException, RNSEntryExistsFaultType, 
-			ResourceUnknownFaultType, 
-			RNSEntryNotDirectoryFaultType, RNSFaultType
+			ResourceUnknownFaultType
 	{
+		_logger.trace(String.format("createFile(%s)",
+			(createFile == null) ? "null" : createFile.getFilename()));
+		
 		return createFile(createFile, null);
 	}
 	
-	protected CreateFileResponse createFile(
-		CreateFile createFile, MessageElement []attributes) 
+	protected CreateFileResponseType createFile(
+		CreateFileRequestType createFile, MessageElement []attributes) 
 		throws RemoteException, RNSEntryExistsFaultType, 
-			ResourceUnknownFaultType, 
-			RNSEntryNotDirectoryFaultType, RNSFaultType
+			ResourceUnknownFaultType
 	{
 		String filename = createFile.getFilename();
 		
@@ -150,7 +145,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 			_resource.addEntry(new InternalEntry(filename, eprToStore, 
 				attributes));
 			_resource.commit();
-			return new CreateFileResponse(entryReference);
+			return new CreateFileResponseType(entryReference);
 		}
 		finally
 		{
@@ -158,23 +153,81 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 		}
 	}
 	
+	static private String toString(RNSEntryType entry)
+	{
+		return String.format("RNSEntry[name=%s, epr=%s,...]",
+			entry.getEntryName(), (entry.getEndpoint() == null) ? "no" : "yes");
+	}
+	
+	static private String toString(RNSEntryType []entries)
+	{
+		StringBuilder builder = new StringBuilder();
+		if (entries == null)
+			return "null";
+		
+		for (int lcv = 0; lcv < entries.length; lcv++)
+		{
+			if (lcv != 0)
+				builder.append(", ");
+			builder.append(toString(entries[lcv]));
+		}
+		
+		return builder.toString();
+	}
+	
+	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public AddResponse add(Add addRequest) 
-		throws RemoteException, RNSEntryExistsFaultType, 
-			ResourceUnknownFaultType, 
-			RNSEntryNotDirectoryFaultType, RNSFaultType
+	public RNSEntryResponseType[] add(RNSEntryType[] addRequest)
+		throws RemoteException, org.ggf.rns.WriteNotPermittedFaultType
+	{
+		_logger.trace(String.format("add(%s)", toString(addRequest)));
+		
+		if (addRequest == null || addRequest.length == 0)
+			addRequest = new RNSEntryType[] { null };
+		
+		RNSEntryResponseType []ret = new RNSEntryResponseType[addRequest.length];
+		for (int lcv = 0; lcv < ret.length; lcv++)
+		{
+			try
+			{
+				ret[lcv] = add(addRequest[lcv]);
+			}
+			catch (BaseFaultType bft)
+			{
+				ret[lcv] = new RNSEntryResponseType(null, null,
+					bft, addRequest[lcv].getEntryName());
+			}
+			catch (Throwable cause)
+			{
+				ret[lcv] = new RNSEntryResponseType(null, null,
+					FaultManipulator.fillInFault(
+						new BaseFaultType(null, null, null, null, 
+							new BaseFaultTypeDescription[] { 
+								new BaseFaultTypeDescription("Unable to add entry!") 
+							}, null)), addRequest[lcv].getEntryName());
+			}
+		}
+		
+		return ret;
+	}
+	
+	protected RNSEntryResponseType add(RNSEntryType entry)
+		throws RemoteException
 	{
 		EndpointReferenceType entryReference;
 		
-		if (addRequest == null)
+		if (entry == null || entry.getEntryName() == null)
 		{
 			// Pure factory operation
-			return new AddResponse(vcgrCreate(new VcgrCreate()).getEndpoint());
+			return new RNSEntryResponseType(
+				vcgrCreate(new VcgrCreate()).getEndpoint(), 
+				null, null, "/");
 		}
 		
-		String name = addRequest.getEntry_name();
-		entryReference = addRequest.getEntry_reference();
-		MessageElement []attrs = addRequest.get_any();
+		String name = entry.getEntryName();
+		entryReference = entry.getEndpoint();
+		RNSMetadataType mdt = entry.getMetadata();
+		MessageElement []attrs = (mdt == null) ? null : mdt.get_any();
 		
 		if (entryReference == null)
 			entryReference = vcgrCreate(new VcgrCreate()).getEndpoint();
@@ -192,39 +245,9 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 		}
 		
 		fireRNSEntryAdded(name, entryReference);
-		return new AddResponse(entryReference);
+		return new RNSEntryResponseType(
+			entryReference, mdt, null, name);
 	}
-	
-	@RWXMapping(RWXCategory.READ)
-    public ListResponse list(List list) 
-    	throws RemoteException, ResourceUnknownFaultType, 
-    		RNSEntryNotDirectoryFaultType, RNSFaultType
-    {
-		_logger.debug("Entered list method.");
-    	
-    	Collection<InternalEntry> entries;
-    	
-    	try
-    	{
-    		_resourceLock.lock();
-	    	entries = _resource.retrieveEntries(list.getEntryName());
-		    _resource.commit();
-    	}
-    	finally
-    	{
-    		_resourceLock.unlock();
-    	}
-    	
-    	EntryType []ret = new EntryType[entries.size()];
-    	int lcv = 0;
-    	for (InternalEntry entry : entries)
-    	{
-    		ret[lcv++] = new EntryType(
-    			entry.getName(), entry.getAttributes(), entry.getEntryReference());
-    	}
-    	
-    	return new ListResponse(ret);
-    }
 	
 	static private class AttributesPreFetcherFactoryImpl 
 		implements AttributesPreFetcherFactory
@@ -247,19 +270,23 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 	}
 	
 	@RWXMapping(RWXCategory.READ)
-    public IterateListResponseType iterateList(IterateListRequestType list) 
-    	throws RemoteException, ResourceUnknownFaultType, 
-    		RNSEntryNotDirectoryFaultType, RNSFaultType
+    public LookupResponseType lookup(String[] lookupRequest)
+		throws RemoteException, org.ggf.rns.ReadNotPermittedFaultType
     {
-		_logger.debug("Entered iterate list method.");
+		_logger.trace(String.format("lookup(%s)", Arrays.toString(lookupRequest)));
+		
     	TimingSink tSink = TimingSink.sink();
-    	Collection<InternalEntry> entries;
+    	Collection<InternalEntry> entries = new LinkedList<InternalEntry>();
+    	
+    	if (lookupRequest == null || lookupRequest.length == 0)
+			lookupRequest = new String[] { null };
     	
     	try
     	{
     		_resourceLock.lock();
     		Timer rTimer = tSink.getTimer("Retrieve Entries");
-    		entries = _resource.retrieveEntries(null);
+    		for (String request : lookupRequest)
+    			entries.addAll(_resource.retrieveEntries(request));
     		rTimer.noteTime();
     		_resource.commit();
     	}
@@ -271,30 +298,26 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
     	AttributesPreFetcherFactory factory = 
     		new AttributesPreFetcherFactoryImpl();
     	
-    	Timer prepTimer = tSink.getTimer("Prepare Entries");
-		Collection<MessageElement> col = new LinkedList<MessageElement>();
-    	for (InternalEntry internalEntry : entries)
+    	Collection<RNSEntryResponseType> resultEntries = 
+			new LinkedList<RNSEntryResponseType>();
+		Timer prepTimer = tSink.getTimer("Prepare Entries");
+		for (InternalEntry internalEntry : entries)
     	{
     		EndpointReferenceType epr = internalEntry.getEntryReference();
-    		
-    		EntryType entry = new EntryType(
-				internalEntry.getName(), 
-				preFetch(epr, internalEntry.getAttributes(), factory),
-				epr);
-
-    		col.add(AnyHelper.toAny(entry));
+    		RNSEntryResponseType entry = new RNSEntryResponseType(
+    			epr, RNSUtilities.createMetadata(epr, 
+    				preFetch(epr, internalEntry.getAttributes(), factory)),
+    			null, internalEntry.getName());
+    		resultEntries.add(entry);
     	}
     	prepTimer.noteTime();
 		
     	Timer createTimer = tSink.getTimer("Create Iterator");
 		try
 		{
-			return new IterateListResponseType(
-				super.createWSIterator(col.iterator(), 100));
-		}
-		catch (SQLException sqe)
-		{
-			throw new RemoteException("Unable to create iterator.", sqe);
+			return RNSContainerUtilities.translate(
+	    		resultEntries, iteratorBuilder(
+	    			RNSEntryResponseType.getTypeDesc().getXmlType()));
 		}
 		finally
 		{
@@ -302,46 +325,33 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 		}
     }	
     
+	@Override
 	@RWXMapping(RWXCategory.WRITE)
-    public MoveResponse move(Move move) 
-    	throws RemoteException, ResourceUnknownFaultType, RNSFaultType
-    {
-    	throw FaultManipulator.fillInFault(new RNSFaultType());
-    }
-    
-	@RWXMapping(RWXCategory.READ)
-    public QueryResponse query(Query query) 
-    	throws RemoteException, ResourceUnknownFaultType, RNSFaultType
-    {
-    	String entryPattern = query.getEntryPattern();
-    	EntryType []tmp = list(new List(entryPattern)).getEntryList();
-    	EntryPropertiesType []ret = new EntryPropertiesType[tmp.length];
-    	EndpointReferenceType myEPR = 
-    		(EndpointReferenceType)WorkingContext.getCurrentWorkingContext().getProperty(
-    				WorkingContext.EPR_PROPERTY_NAME);
-    	
-    	for (int lcv = 0; lcv < tmp.length; lcv++)
-    	{
-    		ret[lcv] = new EntryPropertiesType(myEPR,
-    			tmp[lcv].getEntry_name(), tmp[lcv].get_any(), 
-    			tmp[lcv].getEntry_reference());
-    	}
-    	
-    	return new QueryResponse(ret[0]);
-    }
+	final public RNSEntryResponseType[] rename(NameMappingType[] renameRequest)
+		throws RemoteException, org.ggf.rns.WriteNotPermittedFaultType
+	{
+		throw new UnsupportedOperationException(
+			"Rename not supported in Resource forks!");
+	}
     
 	@RWXMapping(RWXCategory.WRITE)
-    public String[] remove(Remove remove) 
-    	throws RemoteException, ResourceUnknownFaultType, 
-    		RNSDirectoryNotEmptyFaultType, RNSFaultType
+    public RNSEntryResponseType[] remove(String[] removeRequest)
+		throws RemoteException, org.ggf.rns.WriteNotPermittedFaultType
     {
-    	String []ret;
-    	Collection<String> removed;
+		_logger.trace(String.format("remove(%s)", Arrays.toString(removeRequest)));
+		
+    	Collection<RNSEntryResponseType> ret = 
+    		new LinkedList<RNSEntryResponseType>();
     	
     	try
     	{
     		_resourceLock.lock();
-	    	removed = _resource.removeEntries(remove.getEntryName());
+    		for (String request : removeRequest)
+    		{
+    			_resource.removeEntries(request);
+    			ret.add(new RNSEntryResponseType(
+    				null, null, null, request));
+    		}
 		    _resource.commit();
     	}
     	finally
@@ -349,12 +359,19 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
     		_resourceLock.unlock();
     	}
     	
-	    ret = new String[removed.size()];
-	    removed.toArray(ret);
-    
-	    return ret;
+	    return ret.toArray(new RNSEntryResponseType[ret.size()]);
     }
     
+	@Override
+	@RWXMapping(RWXCategory.WRITE)
+	final public RNSEntryResponseType[] setMetadata(
+		MetadataMappingType[] setMetadataRequest) throws RemoteException,
+			org.ggf.rns.WriteNotPermittedFaultType
+	{
+		throw new UnsupportedOperationException(
+			"setMetadata operation not supported!");
+	}
+
     private void fireRNSEntryAdded(String name, EndpointReferenceType entry)
     	throws ResourceUnknownFaultType, ResourceException
     {
@@ -365,7 +382,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
     }
     
 	static EndpointReferenceType prepareEPRToStore(EndpointReferenceType origEPR)
-		throws RNSFaultType
+		throws WriteNotPermittedFaultType, RNSEntryDoesNotExistFaultType
 	{
 		String resolvedEntryUnboundProperty = null;
 		
@@ -381,12 +398,13 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 		catch(FileNotFoundException fe)
 		{
     		_logger.warn(fe.getLocalizedMessage(), fe);
-			throw FaultManipulator.fillInFault(new RNSFaultType());
+			throw FaultManipulator.fillInFault(
+				new RNSEntryDoesNotExistFaultType());
 		}
 		catch(IOException ie)
 		{
     		_logger.warn(ie.getLocalizedMessage(), ie);
-			throw FaultManipulator.fillInFault(new RNSFaultType());
+			throw FaultManipulator.fillInFault(new WriteNotPermittedFaultType());
 		}
 		
 		if (resolvedEntryUnboundProperty != null && resolvedEntryUnboundProperty.equals(RNSConstants.RESOLVED_ENTRY_UNBOUND_FALSE))

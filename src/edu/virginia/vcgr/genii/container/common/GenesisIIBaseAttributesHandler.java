@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
@@ -243,13 +245,19 @@ public class GenesisIIBaseAttributesHandler
 	}
 	
 	public MessageElement getResourcePropertyNames()
-		throws SOAPException
+		throws SOAPException, ResourceUnknownFaultType, ResourceException
 	{
-		Collection<QName> propertyNames = new ArrayList<QName>();
+		Set<QName> propertyNames = new HashSet<QName>();
 		for (IAttributeManipulator manipulator : 
 			_baseService.getAttributePackage().getManipulators())
 		{
 			propertyNames.add(manipulator.getAttributeQName());
+		}
+		
+		for (QName e : _baseService.getAttributePackage().getUnknownAttributes(
+			ResourceManager.getCurrentResource().dereference()).keySet())
+		{
+			propertyNames.add(e);
 		}
 		
 		OGSAQNameList list = new OGSAQNameList(propertyNames);

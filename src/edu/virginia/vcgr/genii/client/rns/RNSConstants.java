@@ -23,4 +23,6 @@ public interface RNSConstants
 	static public PortType ENHANCED_RNS_PORT_TYPE =
 		PortType.get(new QName(GENII_RNS_NS,
 		"EnhancedRNSPortType"));
+	
+	static final public int PREFERRED_BATCH_SIZE = 100;
 }

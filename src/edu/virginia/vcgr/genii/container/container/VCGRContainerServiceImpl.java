@@ -42,6 +42,7 @@ import edu.virginia.vcgr.genii.container.VCGRContainerPortType;
 import edu.virginia.vcgr.genii.container.container.forks.RootRNSFork;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.cservices.accounting.AccountingService;
+import edu.virginia.vcgr.genii.container.iterator.IteratorBuilder;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkBaseService;
 
@@ -128,8 +129,11 @@ public class VCGRContainerServiceImpl extends ResourceForkBaseService
 					col.add(AnyHelper.toAny(art));
 			}
 			
+			IteratorBuilder<MessageElement> builder = iteratorBuilder();
+			builder.preferredBatchSize(100);
+			builder.addElements(col);
 			return new IterateAccountingRecordsResponseType(
-				super.createWSIterator(col.iterator(), 100));
+				builder.create());
 		}
 		catch (IOException ioe)
 		{

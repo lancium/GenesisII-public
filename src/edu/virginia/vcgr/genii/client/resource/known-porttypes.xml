@@ -349,4 +349,9 @@
 		<description>Pipe</description>
 	</portType>
 	
+	<portType name="{http://schemas.ogf.org/ws-iterator/2008/06/iterator}WSIteratorPortType">
+		<display-rank>100</display-rank>
+		<description>Iterator</description>
+	</portType>
+	
 </known-porttypes>

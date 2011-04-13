@@ -345,7 +345,7 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 			{
 				// Uniqueness problem
 				RNSEntryExistsFaultType fault = new RNSEntryExistsFaultType();
-				fault.setPath(entryName);
+				fault.setEntryName(entryName);
 				throw FaultManipulator.fillInFault(fault);
 			}
 			else

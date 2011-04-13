@@ -18,8 +18,8 @@
 				targetfile="${temporary.codegen.dir}/wsdl/iterator.flag"/>
 			<uptodate targetfile="${temporary.codegen.dir}/wsdl/iterator.flag">
 				<srcfiles dir="${wsdl.dir}/iterator">
-					<include name="iterator.xsd"/>
-					<include name="iterator.gwsdl"/>
+					<include name="ws-iterator.xsd"/>
+					<include name="ws-iterator.gwsdl"/>
 				</srcfiles>
 			</uptodate>
 		</and>
@@ -29,34 +29,34 @@
 		<copy todir="${temporary.codegen.dir}/wsdl">
 			<filelist refid="common.source.files"/>
 			<fileset dir="${wsdl.dir}/iterator">
-				<include name="iterator.gwsdl"/>
-				<include name="iterator.xsd"/>
+				<include name="ws-iterator.gwsdl"/>
+				<include name="ws-iterator.xsd"/>
 				<include name="jsdl.xsd"/>
 			</fileset>
 		</copy>
 
 		<echo message="Normalizing gwsdl."/>
-		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/iterator.gwsdl"
-			target="${temporary.codegen.dir}/wsdl/iterator-generated.wsdl"/>
+		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/ws-iterator.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/ws-iterator-generated.wsdl"/>
 
 		<echo message="Generating Service gwsdl."/>
 		<genii-service-generator
-			source="${temporary.codegen.dir}/wsdl/iterator-generated.wsdl"
-			target="${temporary.codegen.dir}/wsdl/iterator-service.wsdl"
-			portType="{http://vcgr.cs.virginia.edu/genii/iterator}IteratorPortType"/>
+			source="${temporary.codegen.dir}/wsdl/ws-iterator-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/ws-iterator-service.wsdl"
+			portType="{http://schemas.ogf.org/ws-iterator/2008/06/iterator}WSIteratorPortType"/>
 
 		<antcall target="gen.stub-generation">
 			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/iterator"/>
 			<param name="stub.gen.source-wsdl"
-				value="${temporary.codegen.dir}/wsdl/iterator-service.wsdl"/>
+				value="${temporary.codegen.dir}/wsdl/ws-iterator-service.wsdl"/>
 			<param name="stub.gen.target-flag-file"
 				value="${temporary.codegen.dir}/wsdl/iterator.flag"/>
 		</antcall>
 		<move file="${temporary.codegen.dir}/iterator/edu/virginia/vcgr/genii/iterator/deploy.wsdd"
 			tofile="${wsdd.dir}/iterator.deploy.wsdd"/>
 		<replace file="${wsdd.dir}/iterator.deploy.wsdd"
-			token="edu.virginia.vcgr.genii.iterator.IteratorSOAPBindingImpl"
-			value="edu.virginia.vcgr.genii.container.iterator.IteratorServiceImpl"
+			token="edu.virginia.vcgr.genii.iterator.WSIteratorSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.iterator.WSIteratorServiceImpl"
 			summary="yes"/>
 		<copy file="${wsdd.dir}/iterator.deploy.wsdd"
 			todir="${services.dir}"/>

@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.genii.container.iterator;
+package edu.virginia.vcgr.genii.container.iterator.resource;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -9,15 +9,14 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
-import edu.virginia.vcgr.genii.container.q2.resource.QueueDBResourceFactory;
-import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
-public class IteratorDBResourceFactory extends BasicDBResourceFactory
+public class WSIteratorDBResourceFactory extends BasicDBResourceFactory
 {
 	@SuppressWarnings("unused")
-	static private Log _logger = LogFactory.getLog(QueueDBResourceFactory.class);
+	static private Log _logger = LogFactory.getLog(
+		WSIteratorDBResourceFactory.class);
 	
 	static private final String []_CREATE_STMTS = new String[] {
 		"CREATE TABLE iterators (" +
@@ -28,18 +27,18 @@ public class IteratorDBResourceFactory extends BasicDBResourceFactory
 			"CONSTRAINT iteratorsuniqueconstraint UNIQUE (iteratorid, elementindex))"
 	};
 	
-	public IteratorDBResourceFactory(
-			DatabaseConnectionPool pool)
-		throws SQLException
+	public WSIteratorDBResourceFactory(DatabaseConnectionPool pool)
+			throws SQLException
 	{
 		super(pool);
 	}
 	
-	public IResource instantiate(ResourceKey parentKey) throws ResourceException
+	@Override
+	public WSIteratorResource instantiate(ResourceKey parentKey) throws ResourceException
 	{
 		try
 		{
-			return new IteratorDBResource(parentKey, _pool);
+			return new WSIteratorDBResource(parentKey, _pool);
 		}
 		catch (SQLException sqe)
 		{

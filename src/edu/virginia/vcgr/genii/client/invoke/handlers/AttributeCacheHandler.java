@@ -8,10 +8,9 @@ import javax.xml.namespace.QName;
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.ggf.rns.EntryType;
-import org.ggf.rns.List;
-import org.ggf.rns.ListResponse;
-import org.ggf.rns.RNSPortType;
+import org.ggf.rns.LookupResponseType;
+import org.ggf.rns.RNSEntryResponseType;
+import org.ggf.rns.RNSMetadataType;
 import org.oasis_open.docs.wsrf.rp_2.DeleteResourceProperties;
 import org.oasis_open.docs.wsrf.rp_2.DeleteResourcePropertiesResponse;
 import org.oasis_open.docs.wsrf.rp_2.GetMultipleResourcePropertiesResponse;
@@ -37,12 +36,10 @@ import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
-import edu.virginia.vcgr.genii.enhancedrns.IterateListRequestType;
-import edu.virginia.vcgr.genii.enhancedrns.IterateListResponseType;
+import edu.virginia.vcgr.genii.iterator.IterableElementType;
 import edu.virginia.vcgr.genii.iterator.IterateRequestType;
-import edu.virginia.vcgr.genii.iterator.IteratorInitializationType;
-import edu.virginia.vcgr.genii.iterator.IteratorMemberType;
-import edu.virginia.vcgr.genii.iterator.IteratorPortType;
+import edu.virginia.vcgr.genii.iterator.IterateResponseType;
+import edu.virginia.vcgr.genii.iterator.WSIteratorPortType;
 
 public class AttributeCacheHandler
 {
@@ -351,47 +348,56 @@ public class AttributeCacheHandler
 		return new GetResourcePropertyResponse(ret.toArray(new MessageElement[0]));
 	}
 
-	@PipelineProcessor(portType = RNSPortType.class)
-	public ListResponse list(InvocationContext ctxt,
-		List listRequest) throws Throwable
+	@PipelineProcessor(portType = EnhancedRNSPortType.class)
+	public LookupResponseType lookup(InvocationContext ctxt, 
+		String []names) throws Throwable
 	{
-		_logger.debug("Doing an RNS listing so we can cache attribute data.");
+		_logger.debug("Doing an RNS iterator listing so we can cache attribute data.");
 		
 		// We're going to let the list proceed, and then see if any meta data came back with it.
-		ListResponse resp = (ListResponse)ctxt.proceed();
+		LookupResponseType resp = (LookupResponseType)ctxt.proceed();
 		
-		for (EntryType entry : resp.getEntryList())
+		RNSEntryResponseType []initMembers = resp.getEntryResponse();
+		if (initMembers != null)
 		{
-			WSName name = new WSName(entry.getEntry_reference());
-			if (name.isValidWSName())
+			for (RNSEntryResponseType member : initMembers)
 			{
-				MessageElement []any = entry.get_any();
-				if (any != null)
+				RNSMetadataType mdt = member.getMetadata();
+				MessageElement []any = (mdt == null) ? null : mdt.get_any();
+				if (any != null && any.length == 1)
 				{
-					ArrayList<MessageElement> cachedAttrs = new ArrayList<MessageElement>();
-					for (MessageElement elem : any)
+					RNSEntryResponseType entry = member;
+					WSName name = new WSName(entry.getEndpoint());
+					if (name.isValidWSName())
 					{
-						QName elemName = elem.getQName();
-						if (elemName.equals(rxferMechs) || elemName.equals(rsize) ||
-							elemName.equals(raccessTime) || elemName.equals(rmodTime) ||
-							elemName.equals(rcreatTime) ||
-							elemName.equals(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME) ||
-							elemName.equals(sxferMechs) || elemName.equals(ssize) ||
-							elemName.equals(saccessTime) || elemName.equals(smodTime) ||
-							elemName.equals(screatTime))
+						if (any != null)
 						{
-							_logger.debug("Adding " + elemName + " to " + name);
-							cachedAttrs.add(elem);
-						} else
-						{
-							_logger.debug("NOT Adding " + elemName + " to " + name);
+							ArrayList<MessageElement> cachedAttrs = new ArrayList<MessageElement>();
+							for (MessageElement elem : any)
+							{
+								QName elemName = elem.getQName();
+								if (elemName.equals(rxferMechs) || elemName.equals(rsize) ||
+									elemName.equals(raccessTime) || elemName.equals(rmodTime) ||
+									elemName.equals(rcreatTime) ||
+									elemName.equals(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME) ||
+									elemName.equals(sxferMechs) || elemName.equals(ssize) ||
+									elemName.equals(saccessTime) || elemName.equals(smodTime) ||
+									elemName.equals(screatTime))
+								{
+									_logger.debug("Adding " + elemName + " to " + name);
+									cachedAttrs.add(elem);
+								} else
+								{
+									_logger.debug("NOT Adding " + elemName + " to " + name);
+								}
+							}
+							
+							CachedAttributeData data = new CachedAttributeData(cachedAttrs);
+							synchronized(_attrCache)
+							{
+								_attrCache.put(name, data);
+							}
 						}
-					}
-					
-					CachedAttributeData data = new CachedAttributeData(cachedAttrs);
-					synchronized(_attrCache)
-					{
-						_attrCache.put(name, data);
 					}
 				}
 			}
@@ -400,32 +406,31 @@ public class AttributeCacheHandler
 		return resp;
 	}
 	
-	@PipelineProcessor(portType = EnhancedRNSPortType.class)
-	public IterateListResponseType iterateList(InvocationContext ctxt, 
-		IterateListRequestType list) throws Throwable
+	@PipelineProcessor(portType = WSIteratorPortType.class)
+	public IterateResponseType iterate(InvocationContext ctxt,
+		IterateRequestType iterateRequest) throws Throwable
 	{
-		_logger.debug("Doing an RNS iterator listing so we can cache attribute data.");
+		_logger.debug("Doing an iterator iterate so we can cache attribute data.");
 		
-		// We're going to let the list proceed, and then see if any meta data came back with it.
-		IterateListResponseType resp = (IterateListResponseType)ctxt.proceed();
-		
-		IteratorInitializationType result = resp.getResult();
-		if (result != null)
+		// We're going to let the iterate proceed, and then see if any meta data came back with it.
+		IterateResponseType resp = (IterateResponseType)ctxt.proceed();
+		if (resp.getIterableElement() != null)
 		{
-			IteratorMemberType []initMembers = result.getBatchElement();
-			if (initMembers != null)
+			for (IterableElementType member : resp.getIterableElement())
 			{
-				for (IteratorMemberType member : initMembers)
+				MessageElement []any = member.get_any();
+				if (any != null && any.length == 1)
 				{
-					MessageElement []any = member.get_any();
-					if (any != null && any.length == 1)
+					QName type = any[0].getType();
+					if (type != null && type.equals(RNSEntryResponseType.getTypeDesc().getXmlType()))
 					{
-						EntryType entry = ObjectDeserializer.toObject(any[0], 
-							EntryType.class);
-						WSName name = new WSName(entry.getEntry_reference());
+						RNSEntryResponseType entry = ObjectDeserializer.toObject(any[0], 
+							RNSEntryResponseType.class);
+						WSName name = new WSName(entry.getEndpoint());
 						if (name.isValidWSName())
 						{
-							any = entry.get_any();
+							RNSMetadataType mdt = entry.getMetadata();
+							any = (mdt == null) ? null : mdt.get_any();
 							if (any != null)
 							{
 								ArrayList<MessageElement> cachedAttrs = new ArrayList<MessageElement>();
@@ -453,65 +458,6 @@ public class AttributeCacheHandler
 								{
 									_attrCache.put(name, data);
 								}
-							}
-						}
-					}
-				}
-			}
-		}
-		
-		return resp;
-	}
-	
-	@PipelineProcessor(portType = IteratorPortType.class)
-	public IteratorMemberType[] iterate(InvocationContext ctxt,
-		IterateRequestType iterateRequest) throws Throwable
-	{
-		_logger.debug("Doing an iterator iterate so we can cache attribute data.");
-		
-		// We're going to let the iterate proceed, and then see if any meta data came back with it.
-		IteratorMemberType []resp = (IteratorMemberType[])ctxt.proceed();
-		
-		for (IteratorMemberType member : resp)
-		{
-			MessageElement []any = member.get_any();
-			if (any != null && any.length == 1)
-			{
-				QName type = any[0].getType();
-				if (type != null && type.equals(EntryType.getTypeDesc().getXmlType()))
-				{
-					EntryType entry = ObjectDeserializer.toObject(any[0], 
-						EntryType.class);
-					WSName name = new WSName(entry.getEntry_reference());
-					if (name.isValidWSName())
-					{
-						any = entry.get_any();
-						if (any != null)
-						{
-							ArrayList<MessageElement> cachedAttrs = new ArrayList<MessageElement>();
-							for (MessageElement elem : any)
-							{
-								QName elemName = elem.getQName();
-								if (elemName.equals(rxferMechs) || elemName.equals(rsize) ||
-									elemName.equals(raccessTime) || elemName.equals(rmodTime) ||
-									elemName.equals(rcreatTime) ||
-									elemName.equals(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME) ||
-									elemName.equals(sxferMechs) || elemName.equals(ssize) ||
-									elemName.equals(saccessTime) || elemName.equals(smodTime) ||
-									elemName.equals(screatTime))
-								{
-									_logger.debug("Adding " + elemName + " to " + name);
-									cachedAttrs.add(elem);
-								} else
-								{
-									_logger.debug("NOT Adding " + elemName + " to " + name);
-								}
-							}
-							
-							CachedAttributeData data = new CachedAttributeData(cachedAttrs);
-							synchronized(_attrCache)
-							{
-								_attrCache.put(name, data);
 							}
 						}
 					}

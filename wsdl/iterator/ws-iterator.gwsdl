@@ -1,23 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <wsdl:definitions
-	name="Iterator"
-	xmlns="http://vcgr.cs.virginia.edu/genii/iterator"
+	name="WSIterator"
+	xmlns="http://schemas.ogf.org/ws-iterator/2008/06/iterator"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	xmlns:wsa="http://www.w3.org/2005/08/addressing"
-	xmlns:iterator="http://vcgr.cs.virginia.edu/genii/iterator"
+	xmlns:iterator="http://schemas.ogf.org/ws-iterator/2008/06/iterator"
 	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
-	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-	xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap"
 	xmlns:rpw-2="http://docs.oasis-open.org/wsrf/rpw-2"
-    xmlns:rw-2="http://docs.oasis-open.org/wsrf/rw-2"
+	xmlns:rw-2="http://docs.oasis-open.org/wsrf/rw-2"
+	xmlns:wsrp="http://docs.oasis-open.org/wsrf/rp-2"
+	xmlns:wsrpw="http://docs.oasis-open.org/wsrf/rpw-2"
 	xmlns:wsrf-r="http://docs.oasis-open.org/wsrf/r-2"
-	xmlns:wsrf-rw="http://docs.oasis-open.org/wsrf/rw-2" 
-    xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
+	xmlns:wsrf-rw="http://docs.oasis-open.org/wsrf/rw-2"
 	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-	xmlns:rns="http://schemas.ggf.org/rns/2006/05/rns"
-	xmlns:enhanced-rns="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
-	targetNamespace="http://vcgr.cs.virginia.edu/genii/iterator">
+    xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
+	xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common"
+	targetNamespace="http://schemas.ogf.org/ws-iterator/2008/06/iterator">
 
 	<wsdl:import
 		namespace="http://docs.oasis-open.org/wsrf/rw-2"
@@ -27,17 +25,9 @@
 		namespace="http://docs.oasis-open.org/wsrf/rpw-2"
 		location="./wsrf/wsResourceProperties.wsdl"/>
 
-    <wsdl:import
-        namespace="http://schemas.ggf.org/rns/2006/05/rns"
-        location="./rns.wsdl"/>
-
-    <wsdl:import
-        namespace="http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns"
-        location="./enhanced-rns-generated.wsdl"/>
-
 	<wsdl:import
-		namespace="http://docs.oasis-open.org/wsrf/rw-2"
-		location="wsrf/wsResourceFaults.wsdl"/>
+		namespace="http://docs.oasis-open.org/wsrf/rlw-2"
+		location="wsrf/wsResourceLifetime.wsdl"/>
 
 	<wsdl:import
 		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-simple"
@@ -46,10 +36,6 @@
 	<wsdl:import
 		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-factory"
 		location="./resource-factory.wsdl"/>
-
-	<wsdl:import
-		namespace="http://docs.oasis-open.org/wsrf/rlw-2"
-		location="wsrf/wsResourceLifetime.wsdl"/>
 
 	<wsdl:import
 		namespace="http://docs.oasis-open.org/wsn/bw-2"
@@ -68,11 +54,25 @@
 			xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 			attributeFormDefault="unqualified"
 			elementFormDefault="qualified"
-			targetNamespace="http://vcgr.cs.virginia.edu/genii/iterator">
-
+			targetNamespace="http://schemas.ogf.org/ws-iterator/2008/06/iterator">
+			
 			<xsd:import
-				namespace="http://vcgr.cs.virginia.edu/genii/iterator"
-				schemaLocation="./iterator.xsd"/>
+				namespace="http://schemas.ogf.org/ws-iterator/2008/06/iterator"
+				schemaLocation="./ws-iterator.xsd"/>
+
+<!-- == Resource Property Related === -->
+			<xsd:element name="WSIteratorRP">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:any namespace="##other" minOccurs="0"
+							maxOccurs="unbounded"/>
+						<xsd:element ref="iterator:elementCount"
+							minOccurs="1" maxOccurs="1"/>
+						<xsd:element ref="iterator:preferredBlockSize"
+							minOccurs="0" maxOccurs="1"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
 
 		</xsd:schema>
 	</wsdl:types>
@@ -86,17 +86,16 @@
 		<wsdl:part name="IterateResponse"
 			element="iterator:IterateResponseType"/>
 	</wsdl:message>
-	
-	<wsdl:portType name="IteratorPortType">
+
+	<wsdl:portType name="WSIteratorPortType"
+		wsrp:ResourceProperties="iterator:WSIteratorRP">
 		<genii-ext:extend portType="genii-common:GeniiCommon"/>
 		<genii-ext:extend portType="rpw-2:GetResourceProperty"/>
 		<genii-ext:extend portType="rpw-2:GetMultipleResourceProperties"/>
-		<genii-ext:extend portType="rns:RNSPortType"/>
 
 		<wsdl:operation name="iterate">
 			<wsdl:input message="iterator:IterateRequest"/>
 			<wsdl:output message="iterator:IterateResponse"/>
 		</wsdl:operation>
 	</wsdl:portType>
-
 </wsdl:definitions>

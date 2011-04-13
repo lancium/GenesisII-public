@@ -18,7 +18,6 @@ import java.util.Vector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.jsdl.JobDefinition_Type;
-import org.ggf.rns.EntryType;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -34,6 +33,7 @@ import edu.virginia.vcgr.genii.container.cservices.history.HistoryContextFactory
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryEventToken;
 import edu.virginia.vcgr.genii.container.q2.resource.IQueueResource;
 import edu.virginia.vcgr.genii.container.resource.IResource;
+import edu.virginia.vcgr.genii.container.rns.LegacyEntryType;
 
 /**
  * This class is a conduit for accessing all information from the database.
@@ -223,7 +223,7 @@ public class QueueDatabase
 	 * @throws ResourceException
 	 */
 	public void fillInBESEPRs(Connection connection, 
-		HashMap<Long, EntryType> entries) 
+		HashMap<Long, LegacyEntryType> entries) 
 		throws SQLException, ResourceException
 	{
 		PreparedStatement stmt = null;
@@ -237,7 +237,7 @@ public class QueueDatabase
 			
 			for (Long key : entries.keySet())
 			{
-				EntryType entry = entries.get(key);
+				LegacyEntryType entry = entries.get(key);
 				
 				stmt.setLong(1, key.longValue());
 				rs = stmt.executeQuery();
@@ -999,8 +999,8 @@ public class QueueDatabase
 				EndpointReferenceType bes = EPRUtils.fromBlob(rs.getBlob(3));
 				if (bes == null && besID != null)
 				{
-					HashMap<Long, EntryType> entryMap = new HashMap<Long, EntryType>();
-					entryMap.put(besID, new EntryType());
+					HashMap<Long, LegacyEntryType> entryMap = new HashMap<Long, LegacyEntryType>();
+					entryMap.put(besID, new LegacyEntryType());
 					fillInBESEPRs(connection, entryMap);
 					bes = entryMap.get(besID).getEntry_reference();
 				}

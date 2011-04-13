@@ -10,11 +10,8 @@ import javax.xml.namespace.QName;
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.ggf.rns.Add;
-import org.ggf.rns.AddResponse;
-import org.ggf.rns.RNSEntryExistsFaultType;
-import org.ggf.rns.RNSEntryNotDirectoryFaultType;
-import org.ggf.rns.RNSFaultType;
+import org.ggf.rns.RNSEntryResponseType;
+import org.ggf.rns.RNSEntryType;
 import org.morgan.inject.MInject;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
@@ -104,9 +101,8 @@ public class ExportedRootServiceImpl extends ExportedDirServiceImpl
 	}
 	
 	@RWXMapping(RWXCategory.INHERITED)
-	public AddResponse add(Add addRequest) throws RemoteException,
-		RNSEntryExistsFaultType, ResourceUnknownFaultType,
-		RNSEntryNotDirectoryFaultType, RNSFaultType
+	public RNSEntryResponseType[] add(RNSEntryType[] addRequest)
+		throws RemoteException, org.ggf.rns.WriteNotPermittedFaultType
 	{
 		_logger.debug("ADDING Exported Root");
 		

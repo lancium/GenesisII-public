@@ -24,9 +24,8 @@ import org.ggf.bes.factory.GetActivityStatusesType;
 import org.ggf.jsdl.Application_Type;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.jsdl.JobIdentification_Type;
-import org.ggf.rns.EntryType;
-import org.ggf.rns.List;
-import org.ggf.rns.ListResponse;
+import org.ggf.rns.RNSEntryResponseType;
+import org.ggf.rns.RNSMetadataType;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
@@ -48,6 +47,7 @@ import edu.virginia.vcgr.genii.client.deployer.AppDeployerConstants;
 import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
+import edu.virginia.vcgr.genii.client.rns.RNSIterable;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
@@ -647,19 +647,20 @@ public class RunTool extends BaseGridTool
 		EndpointReferenceType applicationDescription)
 		throws RemoteException
 	{
-		ArrayList<EntryType> _acceptableChoices = 
-			new ArrayList<EntryType>();
+		ArrayList<RNSEntryResponseType> _acceptableChoices = 
+			new ArrayList<RNSEntryResponseType>();
 		
 		SupportDocumentType []have = determineSupport(deployer);
 		
 		ApplicationDescriptionPortType application =
 			ClientUtils.createProxy(ApplicationDescriptionPortType.class,
 				applicationDescription);
-		ListResponse resp = application.list(new List(
-			null));
-		for (EntryType entry : resp.getEntryList())
+		RNSIterable iterable = new RNSIterable(
+			application.lookup(null), null, 100);
+		for (RNSEntryResponseType entry : iterable)
 		{
-			for (MessageElement element : entry.get_any())
+			RNSMetadataType mdt = entry.getMetadata();
+			for (MessageElement element : mdt.get_any())
 			{
 				SupportDocumentType doc = ObjectDeserializer.toObject(
 					element, SupportDocumentType.class);
@@ -672,7 +673,7 @@ public class RunTool extends BaseGridTool
 			return null;
 		
 		return _acceptableChoices.get(_generator.nextInt(
-			_acceptableChoices.size())).getEntry_reference();
+			_acceptableChoices.size())).getEndpoint();
 	}
 	
 	static private SupportDocumentType[] determineSupport(

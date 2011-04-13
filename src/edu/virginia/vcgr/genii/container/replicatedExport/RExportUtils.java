@@ -13,8 +13,6 @@ import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.RNSEntryExistsFaultType;
-import org.ggf.rns.RNSEntryNotDirectoryFaultType;
-import org.ggf.rns.RNSFaultType;
 
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
@@ -65,8 +63,7 @@ public class RExportUtils
 			String replicaName,
 			String entryType,
 			EndpointReferenceType dataStreamEPR) 
-		throws RemoteException, RNSEntryExistsFaultType, ResourceUnknownFaultType,
-		RNSEntryNotDirectoryFaultType, RNSFaultType
+		throws RemoteException, RNSEntryExistsFaultType, ResourceUnknownFaultType
 	{
 		
 		/*create creation params for replica*/

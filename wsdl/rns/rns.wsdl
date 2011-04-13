@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <wsdl:definitions
 	name="RNS"
-	targetNamespace="http://schemas.ggf.org/rns/2006/05/rns"
+	xmlns="http://schemas.xmlsoap.org/wsdl/"
+	targetNamespace="http://schemas.ogf.org/rns/2009/12/rns"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-	xmlns:rns="http://schemas.ggf.org/rns/2006/05/rns"
+	xmlns:rns="http://schemas.ogf.org/rns/2009/12/rns"
 	xmlns:wsa="http://www.w3.org/2005/08/addressing"
 	xmlns:genii-common="http://vcgr.cs.virginia.edu/genii/2006/12/common"
-	xmlns:rpw-2="http://docs.oasis-open.org/wsrf/rpw-2"
+	xmlns:wsrp="http://docs.oasis-open.org/wsrf/rp-2"
+	xmlns:wsrpw="http://docs.oasis-open.org/wsrf/rpw-2"
     xmlns:rw-2="http://docs.oasis-open.org/wsrf/rw-2"
 	xmlns:wsrf-r="http://docs.oasis-open.org/wsrf/r-2"
-	xmlns:wsrf-rw="http://docs.oasis-open.org/wsrf/rw-2" 
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
     xmlns:genii-ext="http://vcgr.cs.virginia.edu/genii/2006/12/wsdl-extensions"
 	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
 
@@ -18,287 +21,157 @@
 		namespace="http://docs.oasis-open.org/wsrf/rw-2"
 		location="./wsrf/wsResourceFaults.wsdl"/>
 
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rpw-2"
+		location="./wsrf/wsResourceProperties.wsdl"/>
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsrf/rlw-2"
+		location="./wsrf/wsResourceLifetime.wsdl"/>
+
 	<wsdl:types>
 		<xsd:schema
 			xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 			attributeFormDefault="unqualified"
 			elementFormDefault="qualified"
-			targetNamespace="http://schemas.ggf.org/rns/2006/05/rns">
+			targetNamespace="http://schemas.ogf.org/rns/2009/12/rns">
 
             <xsd:import
-        		namespace="http://schemas.ggf.org/rns/2006/05/rns"
+        		namespace="http://schemas.ogf.org/rns/2009/12/rns"
             	schemaLocation="./rns.xsd"/>
 
-			<xsd:element name="list">
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element
-							name="entry-name"
-							type="xsd:string"
-							minOccurs="0" maxOccurs="1"
-							nillable="true"/>
-					</xsd:sequence>
-				</xsd:complexType>
-			</xsd:element>
+			<xsd:import
+				namespace="http://docs.oasis-open.org/wsrf/bf-2"
+				schemaLocation="./wsrf/basefaults.xsd"/>
+	
+			<xsd:import
+				namespace="http://docs.oasis-open.org/wsrf/rp-2"
+				schemaLocation="./wsrf/wsResourceProperties.xsd"/>
 
-			<xsd:element name="listResponse">
+			<xsd:import
+				namespace="http://docs.oasis-open.org/wsrf/rl-2"
+				schemaLocation="./wsrf/wsResourceLifetime.xsd"/>
+
+			<!-- == Resource Property Related === -->
+			<xsd:element name="RNSRP">
 				<xsd:complexType>
 					<xsd:sequence>
-						<xsd:element
-							name="EntryList" type="rns:EntryListType"
+						<xsd:any namespace="##other" minOccurs="0"
+							maxOccurs="unbounded"/>
+						<xsd:element ref="rns:elementCount"
 							minOccurs="1" maxOccurs="1"/>
-					</xsd:sequence>
-				</xsd:complexType>
-			</xsd:element>
-
-			<xsd:element name="createFile">
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element name="filename" type="xsd:string"
-							minOccurs="1" maxOccurs="1" nillable="false"/>
-					</xsd:sequence>
-				</xsd:complexType>
-			</xsd:element>
-
-			<xsd:element name="createFileResponse">
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element
-							name="entry_reference"
-							type="wsa:EndpointReferenceType"
-							minOccurs="1" maxOccurs="1"/>
-					</xsd:sequence>
-				</xsd:complexType>
-			</xsd:element>
-
-			<xsd:element name="add">
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element
-							name="entry_name" type="xsd:string"
-							minOccurs="1" maxOccurs="1"/>
-						<xsd:element
-							name="entry_reference"
-							type="wsa:EndpointReferenceType"
-							minOccurs="0" maxOccurs="1"
-							nillable="true"/>
-                        <xsd:any namespace="##any" processContents="lax" 
-                        	minOccurs="0" maxOccurs="unbounded"/>
-					</xsd:sequence>
-				</xsd:complexType>
-			</xsd:element>
-
-			<xsd:element name="addResponse">
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element
-							name="entry_reference"
-							type="wsa:EndpointReferenceType"
-							minOccurs="1" maxOccurs="1"/>
-					</xsd:sequence>
-				</xsd:complexType>
-			</xsd:element>
-
-			<xsd:element name="move">
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element
-							name="entry_parent"
-							type="wsa:EndpointReferenceType"
+						<xsd:element ref="rns:createTime"
 							minOccurs="0" maxOccurs="1"/>
-						<xsd:element
-							name="entry_name"
-							type="xsd:string"
+						<xsd:element ref="rns:accessTime"
 							minOccurs="0" maxOccurs="1"/>
-					</xsd:sequence>
-				</xsd:complexType>
-			</xsd:element>
-
-			<xsd:element name="moveResponse">
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element
-							name="entry_reference"
-							type="wsa:EndpointReferenceType"
+						<xsd:element ref="rns:modificationTime"
+							minOccurs="0" maxOccurs="1"/>
+						<xsd:element ref="rns:readable"
+							minOccurs="1" maxOccurs="1"/>
+						<xsd:element ref="rns:writable"
 							minOccurs="1" maxOccurs="1"/>
 					</xsd:sequence>
 				</xsd:complexType>
 			</xsd:element>
-
-			<xsd:element name="query">
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element name="entry-pattern"
-							type="xsd:string"
-							minOccurs="1" maxOccurs="1"/>
-					</xsd:sequence>
-				</xsd:complexType>
-			</xsd:element>
-
-			<xsd:element name="queryResponse">
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element
-							name="EntryProperties"
-							type="rns:EntryPropertiesType"
-							minOccurs="1" maxOccurs="1"/>
-					</xsd:sequence>
-				</xsd:complexType>
-			</xsd:element>
-
-			<xsd:element name="remove">
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element
-							name="entry-name"
-							type="xsd:string"
-							minOccurs="0" maxOccurs="1"
-							nillable="true"/>
-					</xsd:sequence>
-				</xsd:complexType>
-			</xsd:element>
-
-			<xsd:element name="removeResponse">
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element
-							name="entry_name" type="xsd:string"
-							minOccurs="0" maxOccurs="unbounded"/>
-					</xsd:sequence>
-				</xsd:complexType>
-			</xsd:element>
-
 		</xsd:schema>
 	</wsdl:types>
 
-	<wsdl:message name="createFileRequest">
-		<wsdl:part name="createFileRequest" element="rns:createFile"/>
+	<wsdl:message name="AddRequest">
+		<wsdl:part name="AddRequest"
+			element="rns:AddRequest"/>
 	</wsdl:message>
 
-	<wsdl:message name="createFileResponse">
-		<wsdl:part name="createFileResponse" 
-			element="rns:createFileResponse"/>
-	</wsdl:message>
-	
-	<wsdl:message name="addRequest">
-		<wsdl:part name="addRequest" element="rns:add"/>
-	</wsdl:message>
-	<wsdl:message name="addResponse">
-		<wsdl:part name="addResponse" element="rns:addResponse"/>
+	<wsdl:message name="AddResponse">
+		<wsdl:part name="Add"
+			element="rns:AddResponse"/>
 	</wsdl:message>
 
-	<wsdl:message name="listRequest">
-		<wsdl:part name="listRequest" element="rns:list"/>
-	</wsdl:message>
-	<wsdl:message name="listResponse">
-		<wsdl:part name="listResponse" element="rns:listResponse"/>
+	<wsdl:message name="LookupRequest">
+		<wsdl:part name="LookupRequest"
+			element="rns:LookupRequest"/>
 	</wsdl:message>
 
-	<wsdl:message name="moveRequest">
-		<wsdl:part name="moveRequest" element="rns:move"/>
-	</wsdl:message>
-	<wsdl:message name="moveResponse">
-		<wsdl:part name="moveResponse" element="rns:moveResponse"/>
+	<wsdl:message name="LookupResponse">
+		<wsdl:part name="LookupResponse"
+			element="rns:LookupResponse"/>
 	</wsdl:message>
 
-	<wsdl:message name="queryRequest">
-		<wsdl:part name="queryRequest" element="rns:query"/>
-	</wsdl:message>
-	<wsdl:message name="queryResponse">
-		<wsdl:part name="queryResponse" element="rns:queryResponse"/>
+	<wsdl:message name="RemoveRequest">
+		<wsdl:part name="RemoveRequest"
+			element="rns:RemoveRequest"/>
 	</wsdl:message>
 
-	<wsdl:message name="removeRequest">
-		<wsdl:part name="removeRequest" element="rns:remove"/>
-	</wsdl:message>
-	<wsdl:message name="removeResponse">
-		<wsdl:part name="removeResponse" element="rns:removeResponse"/>
+	<wsdl:message name="RemoveResponse">
+		<wsdl:part name="RemoveResponse"
+			element="rns:RemoveResponse"/>
 	</wsdl:message>
 
-    <wsdl:message name="RNSFault">
-        <wsdl:part name="RNSFault" element="rns:RNSFaultType"/>
-    </wsdl:message>
-    <wsdl:message name="RNSDirectoryNotEmptyFault">
-        <wsdl:part name="RNSDirectoryNotEmptyFault"
-			element="rns:RNSDirectoryNotEmptyFaultType"/>
-    </wsdl:message>
-    <wsdl:message name="RNSEntryExistsFault">
-        <wsdl:part name="RNSEntryExistsFault"
-			element="rns:RNSEntryExistsFaultType"/>
-    </wsdl:message>
-    <wsdl:message name="RNSEntryNotDirectoryFault">
-        <wsdl:part name="RNSEntryNotDirectoryFault"
-			element="rns:RNSEntryNotDirectoryFaultType"/>
-    </wsdl:message>
+	<wsdl:message name="RenameRequest">
+		<wsdl:part name="RenameRequest"
+			element="rns:RenameRequest"/>
+	</wsdl:message>
 
+	<wsdl:message name="RenameResponse">
+		<wsdl:part name="RenameResponse"
+			element="rns:RenameResponse"/>
+	</wsdl:message>
 
-	<wsdl:portType name="RNSPortType">
+	<wsdl:message name="SetMetadataRequest">
+		<wsdl:part name="SetMetadataRequest"
+			element="rns:SetMetadataRequest"/>
+	</wsdl:message>
 
-		<wsdl:operation name="createFile">
-			<wsdl:input message="rns:createFileRequest"/>
-			<wsdl:output message="rns:createFileResponse"/>
-			<wsdl:fault name="RNSFault"
-				message="rns:RNSFault"/>
-			<wsdl:fault name="RNSEntryExistsFault"
-				message="rns:RNSEntryExistsFault"/>
-			<wsdl:fault name="RNSEntryNotDirectoryFault"
-				message="rns:RNSEntryNotDirectoryFault"/>
-			<wsdl:fault name="ResourceUnknownFault"
-				message="wsrf-rw:ResourceUnknownFault"/>
-		</wsdl:operation>
-	
+	<wsdl:message name="SetMetadataResponse">
+		<wsdl:part name="SetMetadataResponse"
+			element="rns:SetMetadataResponse"/>
+	</wsdl:message>
+
+	<wsdl:message name="ReadNotPermittedFault">
+		<wsdl:part name="ReadNotPermittedFault"
+			element="rns:ReadNotPermittedFault"/>
+	</wsdl:message>
+
+	<wsdl:message name="WriteNotPermittedFault">
+		<wsdl:part name="WriteNotPermittedFault"
+			element="rns:WriteNotPermittedFault"/>
+	</wsdl:message>
+
+	<wsdl:portType name="RNSPortType"
+		wsrp:ResourceProperties="rns:RNSRP">
+
 		<wsdl:operation name="add">
-			<wsdl:input message="rns:addRequest"/>
-			<wsdl:output message="rns:addResponse"/>
-			<wsdl:fault name="RNSFault"
-				message="rns:RNSFault"/>
-			<wsdl:fault name="RNSEntryExistsFault"
-				message="rns:RNSEntryExistsFault"/>
-			<wsdl:fault name="RNSEntryNotDirectoryFault"
-				message="rns:RNSEntryNotDirectoryFault"/>
-			<wsdl:fault name="ResourceUnknownFault"
-				message="wsrf-rw:ResourceUnknownFault"/>
+			<wsdl:input message="rns:AddRequest"/>
+			<wsdl:output message="rns:AddResponse"/>
+			<wsdl:fault name="WriteNotPermittedFault"
+				message="rns:WriteNotPermittedFault"/>
 		</wsdl:operation>
 
-		<wsdl:operation name="list">
-			<wsdl:input message="rns:listRequest"/>
-			<wsdl:output message="rns:listResponse"/>
-			<wsdl:fault name="RNSFault"
-				message="rns:RNSFault"/>
-			<wsdl:fault name="RNSEntryNotDirectoryFault"
-				message="rns:RNSEntryNotDirectoryFault"/>
-			<wsdl:fault name="ResourceUnknownFault"
-				message="wsrf-rw:ResourceUnknownFault"/>
+		<wsdl:operation name="lookup">
+			<wsdl:input message="rns:LookupRequest"/>
+			<wsdl:output message="rns:LookupResponse"/>
+			<wsdl:fault name="ReadNotPermittedFault"
+				message="rns:ReadNotPermittedFault"/>
 		</wsdl:operation>
 
-		<wsdl:operation name="move">
-			<wsdl:input message="rns:moveRequest"/>
-			<wsdl:output message="rns:moveResponse"/>
-			<wsdl:fault name="RNSFault"
-				message="rns:RNSFault"/>
-			<wsdl:fault name="ResourceUnknownFault"
-				message="wsrf-rw:ResourceUnknownFault"/>
-		</wsdl:operation>
-	
-		<wsdl:operation name="query">
-			<wsdl:input message="rns:queryRequest"/>
-			<wsdl:output message="rns:queryResponse"/>
-			<wsdl:fault name="RNSFault"
-				message="rns:RNSFault"/>
-			<wsdl:fault name="ResourceUnknownFault"
-				message="wsrf-rw:ResourceUnknownFault"/>
+		<wsdl:operation name="rename">
+			<wsdl:input message="rns:RenameRequest"/>
+			<wsdl:output message="rns:RenameResponse"/>
+			<wsdl:fault name="WriteNotPermittedFault"
+				message="rns:WriteNotPermittedFault"/>
 		</wsdl:operation>
 
 		<wsdl:operation name="remove">
-			<wsdl:input message="rns:removeRequest"/>
-			<wsdl:output message="rns:removeResponse"/>
-			<wsdl:fault name="RNSFault"
-				message="rns:RNSFault"/>
-			<wsdl:fault name="RNSDirectoryNotEmptyFault"
-				message="rns:RNSDirectoryNotEmptyFault"/>
-			<wsdl:fault name="ResourceUnknownFault"
-				message="wsrf-rw:ResourceUnknownFault"/>
+			<wsdl:input message="rns:RemoveRequest"/>
+			<wsdl:output message="rns:RemoveResponse"/>
+			<wsdl:fault name="WriteNotPermittedFault"
+				message="rns:WriteNotPermittedFault"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="setMetadata">
+			<wsdl:input message="rns:SetMetadataRequest"/>
+			<wsdl:output message="rns:SetMetadataResponse"/>
+			<wsdl:fault name="WriteNotPermittedFault"
+				message="rns:WriteNotPermittedFault"/>
 		</wsdl:operation>
 	</wsdl:portType>
-
 </wsdl:definitions>

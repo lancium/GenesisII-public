@@ -95,9 +95,9 @@ public class BESActivityTerminatorActor implements OutcallActor
 						if (resp != null)
 						{
 							iter = 
-								new WSIterable<HistoryEventBundleType>(
+								WSIterable.axisIterable(
 									HistoryEventBundleType.class, resp.getResult(),
-									25, true);
+									25);
 							for (HistoryEventBundleType bundle : iter)
 							{
 								HistoryEvent event = 

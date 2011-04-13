@@ -67,7 +67,7 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 			{
 				// Uniqueness problem
 				RNSEntryExistsFaultType fault = new RNSEntryExistsFaultType();
-				fault.setPath(entry.getName());
+				fault.setEntryName(entry.getName());
 				throw FaultManipulator.fillInFault(fault);
 			} else
 				throw new ResourceException(sqe.getLocalizedMessage(), sqe);

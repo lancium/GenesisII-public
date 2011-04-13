@@ -15,15 +15,12 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.io.StringWriter;
 
 import org.apache.axis.Constants;
 import org.apache.axis.message.MessageElement;
 
 import org.morgan.util.io.StreamUtils;
 import org.w3c.dom.Element;
-
-import org.xml.sax.InputSource;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPElement;
@@ -191,19 +188,6 @@ public class ObjectSerializer {
             throw new ResourceException("Generic Serialization Error.", e);
         }
     }
-
-    public static Object clone(Object obj)
-        throws ResourceException {
-        StringWriter writer = new StringWriter();
-        ObjectSerializer.serialize(writer, obj, CLONE_QNAME);
-        writer.flush();
-        StringBufferReader reader = new StringBufferReader(writer.getBuffer());
-        InputSource input = new InputSource(reader);
-        return ObjectDeserializer.deserialize(input, obj.getClass());
-    }
-
-    private static final QName CLONE_QNAME = 
-        new QName("http://globus.org", "cloneElement");
 
     static public <Type> byte[] toBytes(Type obj, QName name)
 		throws ResourceException

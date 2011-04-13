@@ -2,6 +2,12 @@ package edu.virginia.vcgr.genii.client.rns;
 
 import java.io.FileNotFoundException;
 
+import org.apache.axis.message.MessageElement;
+import org.ggf.rns.RNSMetadataType;
+import org.ggf.rns.RNSSupportType;
+import org.ggf.rns.SupportsRNSType;
+import org.ws.addressing.EndpointReferenceType;
+
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 
@@ -146,5 +152,23 @@ public class RNSUtilities
 		{
 			recursiveDelete(contained);
 		}
+	}
+	
+	static public RNSMetadataType createMetadata(EndpointReferenceType target,
+		MessageElement []any)
+	{
+		RNSSupportType supportType = RNSSupportType.value3;
+		
+		if (target != null)
+		{
+			TypeInformation typeInfo = new TypeInformation(target);
+			if (typeInfo.isRNS())
+				supportType = RNSSupportType.value1;
+			else if (!typeInfo.isUnknown())
+				supportType = RNSSupportType.value2;
+		}
+		SupportsRNSType supportsRNS = new SupportsRNSType(supportType);
+		
+		return new RNSMetadataType(supportsRNS, any);
 	}
 }

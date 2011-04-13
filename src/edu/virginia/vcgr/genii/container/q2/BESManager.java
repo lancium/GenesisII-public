@@ -15,7 +15,6 @@ import java.util.Map;
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.ggf.rns.EntryType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
@@ -32,6 +31,7 @@ import edu.virginia.vcgr.genii.container.cservices.infomgr.InformationResult;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.besinfo.BESEndpoint;
 import edu.virginia.vcgr.genii.container.q2.besinfo.BESInformation;
+import edu.virginia.vcgr.genii.container.rns.LegacyEntryType;
 
 /**
  * The BESManager is the main class for keeping track of and manipulating 
@@ -295,11 +295,11 @@ public class BESManager implements Closeable
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
-	synchronized public Collection<EntryType> listBESs(
+	synchronized public Collection<LegacyEntryType> listBESs(
 		Connection connection, String entryName) 
 		throws SQLException, ResourceException
 	{
-		HashMap<Long, EntryType> ret = new HashMap<Long, EntryType>();
+		HashMap<Long, LegacyEntryType> ret = new HashMap<Long, LegacyEntryType>();
 		
 		/* Go through all bes containers in the queue, looking for 
 		 * the right ones. */
@@ -311,7 +311,7 @@ public class BESManager implements Closeable
 				/* If so, add it's entry information (but leave the EPR 
 				 * blank, we'll back-fill that in a second. */
 				ret.put(new Long(data.getID()),
-					new EntryType(data.getName(), 
+					new LegacyEntryType(data.getName(), 
 						new BESAttributePrefetcher().preFetch().toArray(
 							new MessageElement[0]), null));
 			}
@@ -734,8 +734,8 @@ public class BESManager implements Closeable
 			 * instances (used by the list method).  We'll just re-use
 			 * that operation by creating a faux entry type.
 			 */
-			EntryType entry = new EntryType();
-			HashMap<Long, EntryType> entries = new HashMap<Long, EntryType>();
+			LegacyEntryType entry = new LegacyEntryType();
+			HashMap<Long, LegacyEntryType> entries = new HashMap<Long, LegacyEntryType>();
 			entries.put(new Long(besID), entry);
 			_database.fillInBESEPRs(connection, entries);
 			

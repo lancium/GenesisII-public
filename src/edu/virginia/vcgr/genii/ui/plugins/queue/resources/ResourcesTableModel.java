@@ -11,19 +11,17 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 
 import org.apache.axis.types.UnsignedInt;
-import org.ggf.rns.EntryType;
+import org.ggf.rns.RNSEntryResponseType;
 import org.morgan.util.gui.table.AbstractRowTableColumnDefinition;
 import org.morgan.util.gui.table.RowTableColumnDefinition;
 import org.morgan.util.gui.table.RowTableModel;
-import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
-import edu.virginia.vcgr.genii.client.iterator.WSIterable;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.rns.RNSIterable;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
-import edu.virginia.vcgr.genii.enhancedrns.IterateListRequestType;
 import edu.virginia.vcgr.genii.queue.ConfigureRequestType;
 import edu.virginia.vcgr.genii.queue.QueuePortType;
 import edu.virginia.vcgr.genii.ui.errors.ErrorHandler;
@@ -148,26 +146,13 @@ class ResourcesTableModel extends RowTableModel<QueueResourceInformation>
 		{
 			Collection<QueueResourceInformation> resourceInfo = 
 				new LinkedList<QueueResourceInformation>();
-			
-			WSIterable<EntryType> iterable = null;
-			try
-			{
-				iterable = new WSIterable<EntryType>(
-					EntryType.class, 
-					_rnsFuture.get().iterateList(
-						new IterateListRequestType()).getResult(), 100, true);
+			RNSIterable iterable = new RNSIterable(
+				_rnsFuture.get().lookup(null), 
+				_uiContext.uiContext().callingContext(), 100);
+			for (RNSEntryResponseType entry : iterable)
+				resourceInfo.add(new QueueResourceInformation(_uiContext, entry));
 				
-				for (EntryType entry : iterable)
-				{
-					resourceInfo.add(new QueueResourceInformation(_uiContext, entry));
-				}
-				
-				return resourceInfo;
-			}
-			finally
-			{
-				StreamUtils.close(iterable);
-			}
+			return resourceInfo;
 		}	
 	}
 	

@@ -69,8 +69,8 @@ public class ResourceHistoryTool extends BaseGridTool
 		
 		try
 		{
-			iter = new WSIterable<HistoryEventBundleType>(
-				HistoryEventBundleType.class, resp.getResult(), 25, true);
+			iter = WSIterable.axisIterable(
+				HistoryEventBundleType.class, resp.getResult(), 25);
 			for (HistoryEventBundleType bundle : iter)
 				events.add(
 					(HistoryEvent)DBSerializer.deserialize(bundle.getData()));

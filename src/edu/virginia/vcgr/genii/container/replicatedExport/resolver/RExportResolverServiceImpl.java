@@ -25,21 +25,13 @@ import javax.xml.namespace.QName;
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.ggf.rns.Add;
-import org.ggf.rns.AddResponse;
-import org.ggf.rns.CreateFile;
-import org.ggf.rns.CreateFileResponse;
-import org.ggf.rns.List;
-import org.ggf.rns.ListResponse;
-import org.ggf.rns.Move;
-import org.ggf.rns.MoveResponse;
-import org.ggf.rns.Query;
-import org.ggf.rns.QueryResponse;
-import org.ggf.rns.RNSDirectoryNotEmptyFaultType;
+import org.ggf.rns.LookupResponseType;
+import org.ggf.rns.MetadataMappingType;
+import org.ggf.rns.NameMappingType;
 import org.ggf.rns.RNSEntryExistsFaultType;
-import org.ggf.rns.RNSEntryNotDirectoryFaultType;
-import org.ggf.rns.RNSFaultType;
-import org.ggf.rns.Remove;
+import org.ggf.rns.RNSEntryResponseType;
+import org.ggf.rns.RNSEntryType;
+import org.ggf.rns.WriteNotPermittedFaultType;
 import org.ogf.schemas.naming._2006._08.naming.ResolveFailedFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -436,10 +428,10 @@ public class RExportResolverServiceImpl extends GenesisIIBase
 	static public QName REPLICA_NAME = new QName(
 			GenesisIIConstants.GENESISII_NS, "replicaName");
 	
+	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public AddResponse add(Add addRequest) 
-		throws RemoteException, RNSEntryExistsFaultType,
-			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType, RNSFaultType
+	public RNSEntryResponseType[] add(RNSEntryType[] addRequest)
+		throws RemoteException, WriteNotPermittedFaultType
 	{
 		throw new RemoteException("add operation not supported in rexport resolver.");
 	}
@@ -500,10 +492,10 @@ public class RExportResolverServiceImpl extends GenesisIIBase
 		return new ResolverQueryResponse(resource.queryForResourceResolver(resourceEPI));
 	}
 
+	@Override
 	@RWXMapping(RWXCategory.READ)
-	public ListResponse list(List listRequest) 
-		throws RemoteException, ResourceUnknownFaultType, 
-			RNSEntryNotDirectoryFaultType, RNSFaultType
+	public LookupResponseType lookup(String []lookupRequest) 
+		throws RemoteException, ResourceUnknownFaultType
 	{
 		throw new RemoteException("list operation not supported in rexport resolver.");
 	}
@@ -536,21 +528,13 @@ public class RExportResolverServiceImpl extends GenesisIIBase
 				primaryEPR, null, replicaName, RExportResolverUtils._DIR_TYPE));		
 	}
 	
-	@RWXMapping(RWXCategory.WRITE)
-	public CreateFileResponse createFile(CreateFile createFileRequest) 
-		throws RemoteException, RNSEntryExistsFaultType, 
-			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType, RNSFaultType
-	{
-		throw new RemoteException("createFile operation not supported in rexport resolver.");
-	}
-	
 	/**
 	 * Return resolverServiceEPR stored in current resolver entry 
 	 */
 	@RWXMapping(RWXCategory.WRITE)
 	public EPRRequestResponse getResolverServiceEPR(ServiceEPRRequest request) 
 		throws RemoteException, RNSEntryExistsFaultType, 
-			ResourceUnknownFaultType, RNSEntryNotDirectoryFaultType, RNSFaultType
+			ResourceUnknownFaultType
 	{
 		//get db entry associated with current resource
 		IRExportResolverResource resource = null;
@@ -561,40 +545,33 @@ public class RExportResolverServiceImpl extends GenesisIIBase
 		return new EPRRequestResponse(myEntry.getResolverServiceEPR());
 	}
 	
+	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public MoveResponse move(Move moveRequest) 
-		throws RemoteException, ResourceUnknownFaultType, RNSFaultType
+	public RNSEntryResponseType[] rename(NameMappingType[] renameRequest)
+		throws RemoteException, WriteNotPermittedFaultType
 	{
-		//throw new RemoteException("move operation not supported in rexport resolver.");
-		//extract EPI of resource from request
-		String resourceEPI = moveRequest.getEntry_name();
-		
-		//get db entry associated with current resource
-		IRExportResolverResource resource = null;
-		ResourceKey rKey = ResourceManager.getCurrentResource();
-		resource = (IRExportResolverResource)rKey.dereference();
-		
-		//return resolverEPR associated with resource via query
-		return new MoveResponse(resource.queryForResourceResolver(resourceEPI));
+		throw new UnsupportedOperationException(
+			"Rename not supported!");
 	
 	}
 	
-	@RWXMapping(RWXCategory.READ)
-	public QueryResponse query(Query queryRequest) 
-		throws RemoteException, ResourceUnknownFaultType, RNSFaultType
-	{
-		throw new RemoteException("query operation not supported in rexport resolver.");
-	}
-	
+	@Override
 	@RWXMapping(RWXCategory.WRITE)
-	public String[] remove(Remove removeRequest) 
-		throws RemoteException, ResourceUnknownFaultType, 
-			RNSDirectoryNotEmptyFaultType, RNSFaultType
+	public RNSEntryResponseType[] remove(String[] removeRequest)
+		throws RemoteException, WriteNotPermittedFaultType
 	{
-		
 		throw new RemoteException("remove operation not supported in rexport resolver.");
 	}
-	
+
+	@Override
+	@RWXMapping(RWXCategory.WRITE)
+	public RNSEntryResponseType[] setMetadata(
+		MetadataMappingType[] setMetadataRequest) throws RemoteException,
+			WriteNotPermittedFaultType
+	{
+		throw new RemoteException("setMetadata operation not supported in rexport resolver.");
+	}
+
 	protected Object translateConstructionParameter(MessageElement parameter)
 	throws Exception
 {

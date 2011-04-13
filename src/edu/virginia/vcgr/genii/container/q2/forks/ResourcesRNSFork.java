@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.ggf.rns.EntryType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
@@ -15,6 +14,7 @@ import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.rfork.AbstractRNSResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
+import edu.virginia.vcgr.genii.container.rns.LegacyEntryType;
 
 public class ResourcesRNSFork extends AbstractRNSResourceFork
 {
@@ -56,7 +56,7 @@ public class ResourcesRNSFork extends AbstractRNSResourceFork
 			String entryName) throws IOException
 	{
 		ResourceKey rKey = getService().getResourceKey();
-		Collection<EntryType> entries;
+		Collection<LegacyEntryType> entries;
 		Collection<InternalEntry> ret;
 		
 		try
@@ -64,7 +64,7 @@ public class ResourcesRNSFork extends AbstractRNSResourceFork
 			QueueManager mgr = QueueManager.getManager(rKey.getResourceKey());
 			entries = mgr.listBESs(entryName);
 			ret = new ArrayList<InternalEntry>(entries.size());
-			for (EntryType entry : entries)
+			for (LegacyEntryType entry : entries)
 			{
 				ret.add(new InternalEntry(entry.getEntry_name(), 
 					entry.getEntry_reference(), entry.get_any()));

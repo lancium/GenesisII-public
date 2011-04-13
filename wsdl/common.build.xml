@@ -54,7 +54,8 @@
 				targetfile="${temporary.codegen.dir}/wsdl/common.flag"/>
 			<uptodate targetfile="${temporary.codegen.dir}/wsdl/common.flag">
 				<srcfiles dir="${wsdl.dir}/iterator">
-					<include name="iterator.xsd"/>
+					<include name="iterator-factory.xsd"/>
+					<include name="ws-iterator.xsd"/>
 				</srcfiles>
 			</uptodate>
 		</and>
@@ -64,7 +65,8 @@
 		<copy todir="${temporary.codegen.dir}/wsdl">
 			<filelist refid="common.source.files"/>
 			<fileset dir="${wsdl.dir}/iterator">
-				<include name="iterator.xsd"/>
+				<include name="iterator-factory.xsd"/>
+				<include name="ws-iterator.xsd"/>
 			</fileset>
 		</copy>
 

@@ -4,6 +4,8 @@ import java.io.Closeable;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
@@ -11,6 +13,7 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
+import org.apache.axis.message.MessageElement;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
 import edu.virginia.vcgr.genii.common.MatchingParameter;
@@ -149,4 +152,12 @@ public interface IResource extends Closeable
 		throws ResourceException;
 	
 	public Calendar createTime() throws ResourceException;
+	
+	public Collection<MessageElement> getUnknownAttributes()
+		throws ResourceException;
+	public void setUnknownAttributes(
+		Map<QName, Collection<MessageElement>> newAttrs)
+			throws ResourceException;
+	public void deleteUnknownAttributes(Set<QName> names) 
+		throws ResourceException;
 }

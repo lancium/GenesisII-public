@@ -455,10 +455,10 @@ public class AccountingTool extends BaseGridTool
 		try
 		{
 			ClientUtils.setTimeout(container, 1000 * 60 * 20);
-			iterable = new WSIterable<AccountingRecordType>(
+			iterable = WSIterable.axisIterable(
 				AccountingRecordType.class, 
 				container.iterateAccountingRecords(null).getResult(), 
-				100, true);
+				100);
 			
 			sBundle = new StatementBundle(targetConnection);
 			

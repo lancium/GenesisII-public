@@ -53,9 +53,9 @@ public class QueueManagerTableModel extends RowTableModel<JobInformation>
 			WSIterable<JobInformationType> iterable = null;
 			try
 			{
-				iterable = new WSIterable<JobInformationType>(
+				iterable = WSIterable.axisIterable(
 					JobInformationType.class, 
-					_queue.iterateStatus(null).getResult(), 200, true);
+					_queue.iterateStatus(null).getResult(), 200);
 				JobInformationIterator iter = new JobInformationIterator(
 					iterable.iterator());
 				while (iter.hasNext())

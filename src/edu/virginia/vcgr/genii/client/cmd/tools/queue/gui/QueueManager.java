@@ -5,7 +5,8 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
-import org.ggf.rns.EntryType;
+import org.ggf.rns.RNSEntryResponseType;
+import org.ggf.rns.RNSMetadataType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
@@ -13,14 +14,13 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
-import edu.virginia.vcgr.genii.client.iterator.WSIterable;
 import edu.virginia.vcgr.genii.client.queue.CurrentResourceInformation;
 import edu.virginia.vcgr.genii.client.queue.QueueConstants;
 import edu.virginia.vcgr.genii.client.rfork.ResourceForkUtils;
+import edu.virginia.vcgr.genii.client.rns.RNSConstants;
+import edu.virginia.vcgr.genii.client.rns.RNSIterable;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
-import edu.virginia.vcgr.genii.enhancedrns.IterateListRequestType;
-import edu.virginia.vcgr.genii.enhancedrns.IterateListResponseType;
 
 public class QueueManager extends BaseGridTool
 {
@@ -56,13 +56,12 @@ public class QueueManager extends BaseGridTool
 		
 		EnhancedRNSPortType rns = ClientUtils.createProxy(
 			EnhancedRNSPortType.class, resources.getEndpoint());
-		IterateListResponseType resp = rns.iterateList(
-			new IterateListRequestType());
-		WSIterable<EntryType> iterable = new WSIterable<EntryType>(EntryType.class, resp.getResult(),
-			100, true);
-		for (EntryType entry : iterable)
+		RNSIterable iterable = new RNSIterable(
+			rns.lookup(null), null, RNSConstants.PREFERRED_BATCH_SIZE);
+		for (RNSEntryResponseType entry : iterable)
 		{
-			MessageElement []any = entry.get_any();
+			RNSMetadataType mdt = entry.getMetadata();
+			MessageElement []any = (mdt == null) ? null : mdt.get_any();
 			if (any != null)
 			{
 				for (MessageElement e : any)
@@ -73,13 +72,13 @@ public class QueueManager extends BaseGridTool
 					{
 						CurrentResourceInformation cri = u.unmarshal(
 							e, CurrentResourceInformation.class).getValue();
-						stdout.format("%s:  %s\n", entry.getEntry_name(), cri);
+						stdout.format("%s:  %s\n", entry.getEntryName(), cri);
 						break;
 					}
 				}
 			} else
 			{
-				stdout.format("%s\n", entry.getEntry_name());
+				stdout.format("%s\n", entry.getEntryName());
 			}
 		}
 		

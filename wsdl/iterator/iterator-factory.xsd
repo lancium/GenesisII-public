@@ -3,15 +3,12 @@
 	xmlns="http://vcgr.cs.virginia.edu/genii/iterator-factory"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:iterator="http://schemas.ogf.org/ws-iterator/2008/06/iterator"
 	xmlns:ifactory="http://vcgr.cs.virginia.edu/genii/iterator-factory"
-	xmlns:iterator="http://vcgr.cs.virginia.edu/genii/iterator"
 	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
 	targetNamespace="http://vcgr.cs.virginia.edu/genii/iterator-factory"
 	elementFormDefault="qualified"
 	attributeFormDefault="unqualified">
-
-	<xsd:import namespace="http://vcgr.cs.virginia.edu/genii/iterator"
-		schemaLocation="./iterator/iterator.xsd"/>
 
 	<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"
 		schemaLocation="./wsrf/basefaults.xsd"/>
@@ -19,7 +16,22 @@
 	<xsd:import
 		namespace="http://www.w3.org/2005/08/addressing"
 		schemaLocation="./ws-addr.xsd"/>
-	
+
+	<xsd:import
+		namespace="http://schemas.ogf.org/ws-iterator/2008/06/iterator"
+		schemaLocation="./ws-iterator.xsd"/>
+
+	<xsd:complexType name="IteratorInitializationType">
+		<xsd:sequence>
+			<xsd:element name="iterator-endpoint"
+				type="wsa:EndpointReferenceType"
+				minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="batch-element"
+				type="iterator:IterableElementType"
+				minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
 <!-- Message Types -->
 	<xsd:complexType name="CreateIteratorRequestType">
 		<xsd:sequence>
@@ -35,7 +47,7 @@
 	<xsd:complexType name="CreateIteratorResponseType">
 		<xsd:sequence>
 			<xsd:element name="result"
-				type="iterator:IteratorInitializationType"
+				type="ifactory:IteratorInitializationType"
 				minOccurs="1" maxOccurs="1"/>
 		</xsd:sequence>
 	</xsd:complexType>

@@ -12,7 +12,6 @@ import javax.xml.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.rbyteio.RandomByteIOPortType;
-import org.ggf.rns.EntryType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.fsii.DirectoryHandle;
@@ -41,11 +40,12 @@ import edu.virginia.vcgr.genii.client.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import edu.virginia.vcgr.genii.client.iterator.WSIterable;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
+import edu.virginia.vcgr.genii.client.rns.RNSConstants;
+import edu.virginia.vcgr.genii.client.rns.RNSIterable;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
@@ -54,8 +54,6 @@ import edu.virginia.vcgr.genii.client.security.SecurityUtils;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
-import edu.virginia.vcgr.genii.enhancedrns.IterateListRequestType;
-import edu.virginia.vcgr.genii.enhancedrns.IterateListResponseType;
 
 public class GenesisIIFilesystem implements FSFilesystem
 {
@@ -368,11 +366,8 @@ public class GenesisIIFilesystem implements FSFilesystem
 			{
 				EnhancedRNSPortType pt = ClientUtils.createProxy(
 					EnhancedRNSPortType.class, target.getEndpoint());
-				IterateListResponseType response = pt.iterateList(
-					new IterateListRequestType());
-				WSIterable<EntryType> entries = new WSIterable<EntryType>(
-					EntryType.class, response.getResult(),
-						100, true);
+				RNSIterable entries = new RNSIterable(
+					pt.lookup(null), null, RNSConstants.PREFERRED_BATCH_SIZE);
 				return new EnhancedRNSHandle(this, entries);
 			} else if (info.isRNS())
 			{

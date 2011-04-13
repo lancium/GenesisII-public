@@ -12,9 +12,13 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
 
+import javax.sql.rowset.serial.SerialBlob;
 import javax.xml.namespace.QName;
 
+import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.GUID;
@@ -24,6 +28,8 @@ import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
+import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
+import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
@@ -639,5 +645,115 @@ public class BasicDBResource implements IResource
 		setProperty(
 			ConstructionParameters.CONSTRUCTION_PARAMTERS_QNAME.toString(),
 			parameters);
+	}
+
+	@Override
+	public Collection<MessageElement> getUnknownAttributes()
+			throws ResourceException
+	{
+		Collection<MessageElement> ret = new LinkedList<MessageElement>();
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try
+		{
+			stmt = _connection.prepareStatement(
+				"SELECT attrvalues FROM unknownattrs WHERE resourceid = ?");
+			stmt.setString(1, getKey());
+			rs = stmt.executeQuery();
+			while (rs.next())
+			{
+				Blob blob = rs.getBlob(1);
+				long blobLength = blob.length();
+				MessageElement []any = ObjectDeserializer.anyFromBytes(
+					blob.getBytes(1L, (int)blobLength));
+				if (any != null)
+				{
+					for (MessageElement value : any)
+						ret.add(value);
+				}
+			}
+			
+			return ret;
+		}
+		catch (SQLException e)
+		{
+			throw new ResourceException("Unable to retrieve unknown attributes!", e);
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+	}
+
+	@Override
+	public void setUnknownAttributes(
+		Map<QName, Collection<MessageElement>> newAttrs)
+			throws ResourceException
+	{
+		PreparedStatement stmt = null;
+		deleteUnknownAttributes(newAttrs.keySet());
+		
+		try
+		{
+			stmt = _connection.prepareStatement(
+				"INSERT INTO unknownattrs(resourceid, attrname, attrvalues) VALUES (?, ?, ?)");
+			
+			for (Map.Entry<QName, Collection<MessageElement>> entry :
+				newAttrs.entrySet())
+			{
+				stmt.setString(1, _resourceKey);
+				stmt.setString(2, entry.getKey().toString());
+				
+				Collection<MessageElement> any = entry.getValue();
+				stmt.setBlob(3, new SerialBlob(ObjectSerializer.anyToBytes(
+					any.toArray(new MessageElement[any.size()]))));
+				
+				stmt.addBatch();
+			}
+			
+			stmt.executeBatch();
+		}
+		catch (SQLException e)
+		{
+			throw new ResourceException(
+				"Unable to serialize unknown attributes into database!", e);
+		}
+		finally
+		{
+			StreamUtils.close(stmt);
+		}
+	}
+
+	@Override
+	public void deleteUnknownAttributes(Set<QName> names)
+		throws ResourceException
+	{
+		PreparedStatement stmt = null;
+		
+		try
+		{
+			stmt = _connection.prepareStatement(
+				"DELETE FROM unknownattrs WHERE resourceid = ? AND attrname = ?");
+			
+			for (QName name : names)
+			{
+				stmt.setString(1, _resourceKey);
+				stmt.setString(2, name.toString());
+				stmt.addBatch();
+			}
+			
+			stmt.executeBatch();
+		}
+		catch (SQLException e)
+		{
+			throw new ResourceException(
+				"Unable to delete unknown attributes into database!", e);
+		}
+		finally
+		{
+			StreamUtils.close(stmt);
+		}
 	}
 }

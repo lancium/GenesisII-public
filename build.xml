@@ -265,7 +265,7 @@
 		<ant antfile="${wsdl.dir}/certGenerator/certGenerator.build.xml"/>
 		<ant antfile="${wsdl.dir}/tty/tty.build.xml"/>
 		<ant antfile="${wsdl.dir}/pipe/pipe.build.xml"/>
-		<ant antfile="${wsdl.dir}/iterator/iterator.build.xml"/>
+		<ant antfile="${wsdl.dir}/iterator/ws-iterator.build.xml"/>
 		<ant antfile="${wsdl.dir}/replicatedExport/rexport-file.build.xml"/>
 		<ant antfile="${wsdl.dir}/replicatedExport/rexport-dir.build.xml"/>
 		<ant antfile="${wsdl.dir}/replicatedExport/rexport-resolver.build.xml"/>

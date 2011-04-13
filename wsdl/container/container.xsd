@@ -4,12 +4,12 @@
 	targetNamespace="http://vcgr.cs.virginia.edu/container/2006/07/container"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	xmlns:container="http://vcgr.cs.virginia.edu/container/2006/07/container"
-	xmlns:iterator="http://vcgr.cs.virginia.edu/genii/iterator"
+	xmlns:ifactory="http://vcgr.cs.virginia.edu/genii/iterator-factory"
 	elementFormDefault="qualified"
 	attributeFormDefault="unqualified">
 
-	<xsd:import namespace="http://vcgr.cs.virginia.edu/genii/iterator"
-		schemaLocation="./iterator.xsd"/>
+	<xsd:import namespace="http://vcgr.cs.virginia.edu/genii/iterator-factory"
+		schemaLocation="./iterator-factory.xsd"/>
 
 	<xsd:complexType name="ContainerStatisticsResultType">
 		<xsd:sequence>
@@ -62,7 +62,7 @@
 	<xsd:complexType name="IterateAccountingRecordsResponseType">
 		<xsd:sequence>
 			<xsd:element name="result"
-				type="iterator:IteratorInitializationType"
+				type="ifactory:IteratorInitializationType"
 				minOccurs="1" maxOccurs="1" nillable="false"/>
 		</xsd:sequence>
 	</xsd:complexType>
