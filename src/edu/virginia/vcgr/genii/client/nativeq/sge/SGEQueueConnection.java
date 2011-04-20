@@ -239,7 +239,8 @@ public class SGEQueueConnection extends ScriptBasedQueueConnection<SGEQueueConfi
 			throw new NativeQueueException(
 				"qsub resulted in multiple job ticket numbers being output.");
 		
-		return new SGEJobToken(matchers.get(0).group(1).trim());
+		return new SGEJobToken(
+				matchers.get(0).group(1).trim(), submissionReturn.second());
 	}
 
 	@Override

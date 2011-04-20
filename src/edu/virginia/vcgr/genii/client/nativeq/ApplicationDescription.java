@@ -102,7 +102,7 @@ public class ApplicationDescription
 		
 		return new File(workingDirectory, _stdinRedirect);
 	}
-
+	
 	public File getStdoutRedirect(File workingDirectory)
 	{
 		if (_stdoutRedirect == null)
@@ -113,6 +113,12 @@ public class ApplicationDescription
 			return stdout;
 		
 		return new File(workingDirectory, _stdoutRedirect);
+	}
+	
+
+	public void setStdoutRedirect(String stdoutRedirect)
+	{
+		_stdoutRedirect = stdoutRedirect;
 	}
 
 	public File getStderrRedirect(File workingDirectory)
@@ -125,6 +131,11 @@ public class ApplicationDescription
 			return stderr;
 		
 		return new File(workingDirectory, _stderrRedirect);
+	}
+	
+	public void setStderrRedirect(String stderrRedirect)
+	{
+		_stderrRedirect = stderrRedirect;
 	}
 	
 	public ResourceConstraints getResourceConstraints()

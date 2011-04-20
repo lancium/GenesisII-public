@@ -1,5 +1,7 @@
 package edu.virginia.vcgr.genii.client.nativeq.sge;
 
+import java.util.List;
+
 import edu.virginia.vcgr.genii.client.nativeq.AbstractJobToken;
 
 public class SGEJobToken extends AbstractJobToken
@@ -15,6 +17,16 @@ public class SGEJobToken extends AbstractJobToken
 				"Token parameter cannot be null.");
 		
 		_token = token;
+	}
+	
+	public SGEJobToken(String token,  List<String> cmdLine)
+	{
+		if (token == null)
+			throw new IllegalArgumentException(
+				"Token parameter cannot be null.");
+		
+		_token = token;
+		_cmdLine = cmdLine;
 	}
 	
 	public String toString()

@@ -210,6 +210,11 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 		
 		if (application.getSPMDVariation() != null)
 		{
+			//add directives for specifying stdout and stderr redirects
+			script.format("#PBS -o %s\n", application.getStdoutRedirect(workingDirectory));
+			script.format("#PBS -e %s\n", application.getStderrRedirect(workingDirectory));
+			
+			//add directive for specifying multiple processors
 			Integer numProcs = application.getNumProcesses();
 			Integer numProcsPerHost = application.getNumProcessesPerHost();
 						
@@ -242,6 +247,35 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 			if (wallclockTime != null && !wallclockTime.equals(Double.NaN))
 				script.format("#PBS -l walltime=%s\n", toWallTimeFormat(wallclockTime));
 		}
+	}
+	
+	@Override
+	protected List<String> generateApplicationBody(PrintStream script,
+			File workingDirectory, ApplicationDescription application)
+			throws NativeQueueException, IOException
+	{
+		URI variation = application.getSPMDVariation();
+		if (variation != null){
+			//temporarily set std redirects to null; these are written as pbs directives
+			File stdoutRedirect = application.getStdoutRedirect(workingDirectory);
+			File stderrRedirect = application.getStderrRedirect(workingDirectory);
+			
+			application.setStdoutRedirect(null);
+			application.setStderrRedirect(null);
+			
+			//proceed as usual
+			List<String> finalCmdLine = 
+				super.generateApplicationBody(script, workingDirectory, application);
+			
+			//reset std redirects in application description
+			if (stdoutRedirect != null)
+				application.setStdoutRedirect(stdoutRedirect.toString());
+			if (stderrRedirect != null)
+				application.setStderrRedirect(stderrRedirect.toString());
+						
+			return finalCmdLine;
+		} else
+			return super.generateApplicationBody(script, workingDirectory, application);
 	}
 
 	@Override

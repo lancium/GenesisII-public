@@ -51,6 +51,12 @@ public class Pair<Type1, Type2> implements Serializable
 	}
 	
 	@Override
+	final public int hashCode()
+	{
+		return _first.hashCode() ^ _second.hashCode();
+	}
+	
+	@Override
 	public String toString()
 	{
 		return String.format("{%s, %s}", _first, _second);

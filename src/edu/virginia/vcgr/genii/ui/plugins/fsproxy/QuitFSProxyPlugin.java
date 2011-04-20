@@ -48,9 +48,9 @@ public class QuitFSProxyPlugin extends AbstractCombinedUIMenusPlugin
 						GeniiCommon common = ClientUtils.createProxy(
 							GeniiCommon.class, targetAddress);
 						common.destroy(new Destroy());
-						
-						target.unlink();
 					}
+
+					target.unlink();
 				}
 				catch (Throwable cause)
 				{

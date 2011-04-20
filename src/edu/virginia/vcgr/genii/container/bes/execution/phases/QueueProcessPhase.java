@@ -205,7 +205,12 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 					fileToPath(_stdout, null), stderrPath, _resourceConstraints,
 					resourceUsageFile));
 				
-				_logger.debug(String.format("CommandLine used by job: \n %s", _jobToken.getCmdLine()));
+				_logger.info(String.format(
+					"Queue submitted job %s using command line:\n\t%s", 
+					_jobToken, _jobToken.getCmdLine()));
+				history.createTraceWriter("Job Queued into Batch System").format(
+					"BES submitted job %s using command line:\n\t%s",
+					_jobToken, _jobToken.getCmdLine()).close();
 				
 				context.setProperty(JOB_TOKEN_PROPERTY, _jobToken);
 			}
