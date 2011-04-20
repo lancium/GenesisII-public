@@ -17,4 +17,7 @@ public interface IQueueResource extends IResource
 	
 	public void setEPR(EndpointReferenceType epr)
 		throws ResourceException;
+	
+	public boolean isAcceptingNewActivites() throws ResourceException;
+	public void isAcceptingNewActivites(boolean isAccepting) throws ResourceException;
 }

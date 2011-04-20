@@ -38,7 +38,10 @@ public class BESInformation
 	private ProcessorArchitectureEnumeration _processorArchitecture;
 	private OperatingSystemTypeEnumeration _operatingSystemType;
 	private String _operatingSystemVerison;
+	private Double _cpuCount = null;
+	private Double _cpuSpeed = null;
 	private Double _physicalMemory;
+	private Double _virtualMemory;
 	private Double _wallclockTimeLimit;
 	private URI _resourceManagerType = null;
 	
@@ -67,6 +70,9 @@ public class BESInformation
 				d1.getBasicResourceAttributesDocument();
 			if (d2 != null)
 			{
+				_cpuCount = d2.getCPUCount();
+				_cpuSpeed = d2.getCPUSpeed();
+				
 				CPUArchitecture_Type d3 = d2.getCPUArchitecture();
 				if (d3 != null)
 					_processorArchitecture = d3.getCPUArchitectureName();
@@ -85,6 +91,12 @@ public class BESInformation
 				if (d6 != null)
 				{
 					_physicalMemory = d6;
+				}
+				
+				Double d7 = d2.getVirtualMemory();
+				if (d7 == null)
+				{
+					_virtualMemory = d7;
 				}
 				
 				MessageElement []resourceAny = d2.get_any();
@@ -192,9 +204,24 @@ public class BESInformation
 		return _operatingSystemVerison;
 	}
 	
+	final public Double getCPUCount()
+	{
+		return _cpuCount;
+	}
+	
+	final public Double getCPUSpeed()
+	{
+		return _cpuSpeed;
+	}
+	
 	final public Double getPhysicalMemory()
 	{
 		return _physicalMemory;
+	}
+	
+	final public Double getVirtualMemory()
+	{
+		return _virtualMemory;
 	}
 	
 	final public Double getWallclockTimeLimit()

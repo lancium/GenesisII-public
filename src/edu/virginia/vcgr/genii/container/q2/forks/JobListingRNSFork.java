@@ -54,7 +54,6 @@ public class JobListingRNSFork extends AbstractRNSResourceFork
 			String entryName) throws IOException
 	{
 		boolean mineOnly = false;
-		boolean showEPR = false;
 		String forkPath = getForkPath();
 		String []acceptableStatuses = null;
 
@@ -78,7 +77,6 @@ public class JobListingRNSFork extends AbstractRNSResourceFork
 				JobStateEnumerationType._RUNNING,
 				JobStateEnumerationType._STARTING
 			};
-			showEPR = true;
 		} else if (forkPath.endsWith("/finished"))
 			acceptableStatuses = new String[] {
 				JobStateEnumerationType._ERROR,
@@ -105,25 +103,12 @@ public class JobListingRNSFork extends AbstractRNSResourceFork
 				entryName));
 			for (ReducedJobInformationType job : jobs)
 			{
-				if (entryName != null)
-				{
-					if (job.getJobTicket().equals(entryName) ||
-						((job.getJobTicket() + ".activity").equals(entryName) && showEPR))
-						_logger.debug(String.format(
-							"Found the entry name \"%s\" in the JobListingRNSFork.",
-							entryName));
-					else
-						continue;
-				}
-				
+				if (entryName != null && !entryName.equals(job.getJobTicket()))
+					continue;
+
 				boolean passes = false;
 				JobStateEnumerationType status = job.getJobStatus();
 				
-				if (entryName != null)
-				{
-					_logger.debug(String.format(
-						"Checking that a job status of %s is acceptable for entryName %s.", status, entryName));
-				}
 				for (String acc : acceptableStatuses)
 				{
 					if (acc.equals(status.getValue()))
@@ -136,27 +121,16 @@ public class JobListingRNSFork extends AbstractRNSResourceFork
 				if (!passes)
 					continue;
 				
-				if (entryName == null || !entryName.endsWith(".activity"))
+				if (mineOnly)
+				{
+					ret.add(createInternalEntry(exemplarEPR,
+						job.getJobTicket(), new JobFork(getService(),
+							formForkPath(job.getJobTicket())).describe()));
+				} else
+				{
 					ret.add(createInternalEntry(exemplarEPR, job.getJobTicket(),
 						new JobInformationFork(getService(), 
 							formForkPath(job.getJobTicket())).describe()));
-				if (mineOnly && showEPR && 
-					(entryName == null || entryName.endsWith(".activity")))
-				{
-					try
-					{
-						EndpointReferenceType epr = mgr.getActivityEPR(job.getJobTicket());
-						if (epr != null)
-							ret.add(new InternalEntry(
-								job.getJobTicket() + ".activity",
-								epr));
-					}
-					catch (Throwable cause)
-					{
-						_logger.warn(String.format(
-							"Unable to get job EPR for job %s.",
-							job.getJobTicket()));
-					}
 				}
 			}
 			

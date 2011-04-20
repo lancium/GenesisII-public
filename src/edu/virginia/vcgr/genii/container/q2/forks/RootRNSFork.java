@@ -2,11 +2,11 @@ package edu.virginia.vcgr.genii.container.q2.forks;
 
 import java.util.Map;
 
+import edu.virginia.vcgr.genii.container.common.forks.CommonRootRNSFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkInformation;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
-import edu.virginia.vcgr.genii.container.rfork.sfd.StaticRNSResourceFork;
 
-public class RootRNSFork extends StaticRNSResourceFork
+public class RootRNSFork extends CommonRootRNSFork
 {
 	public RootRNSFork(ResourceForkService service, String forkPath)
 	{
@@ -16,6 +16,8 @@ public class RootRNSFork extends StaticRNSResourceFork
 	@Override
 	protected void addEntries(Map<String, ResourceForkInformation> entries)
 	{
+		super.addEntries(entries);
+		
 		addDefaultEntry("resources", ResourcesRNSFork.class);
 		addDefaultEntry("resource-management", ResourceManagementRNSFork.class);
 		addDefaultEntry("jobs", JobsRNSFork.class);

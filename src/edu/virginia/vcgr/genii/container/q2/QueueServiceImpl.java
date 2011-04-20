@@ -16,20 +16,47 @@ import javax.xml.namespace.QName;
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.ggf.bes.factory.ActivityStatusType;
+import org.ggf.bes.factory.CreateActivityResponseType;
+import org.ggf.bes.factory.CreateActivityType;
+import org.ggf.bes.factory.GetActivityDocumentResponseType;
+import org.ggf.bes.factory.GetActivityDocumentsResponseType;
+import org.ggf.bes.factory.GetActivityDocumentsType;
+import org.ggf.bes.factory.GetActivityStatusResponseType;
+import org.ggf.bes.factory.GetActivityStatusesResponseType;
+import org.ggf.bes.factory.GetActivityStatusesType;
+import org.ggf.bes.factory.GetFactoryAttributesDocumentResponseType;
+import org.ggf.bes.factory.GetFactoryAttributesDocumentType;
+import org.ggf.bes.factory.InvalidRequestMessageFaultType;
+import org.ggf.bes.factory.NotAcceptingNewActivitiesFaultType;
+import org.ggf.bes.factory.NotAuthorizedFaultType;
+import org.ggf.bes.factory.TerminateActivitiesResponseType;
+import org.ggf.bes.factory.TerminateActivitiesType;
+import org.ggf.bes.factory.TerminateActivityResponseType;
+import org.ggf.bes.factory.UnknownActivityIdentifierFaultType;
+import org.ggf.bes.factory.UnsupportedFeatureFaultType;
+import org.ggf.bes.management.StartAcceptingNewActivitiesResponseType;
+import org.ggf.bes.management.StartAcceptingNewActivitiesType;
+import org.ggf.bes.management.StopAcceptingNewActivitiesResponseType;
+import org.ggf.bes.management.StopAcceptingNewActivitiesType;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.ggf.jsdl.JobMultiDefinition_Type;
 import org.morgan.inject.MInject;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
+import org.xmlsoap.schemas.soap.envelope.Fault;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
+import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
 import edu.virginia.vcgr.genii.client.queue.QueueConstants;
+import edu.virginia.vcgr.genii.client.queue.QueueConstructionParameters;
+import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
@@ -51,6 +78,8 @@ import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.iterator.IteratorBuilder;
+import edu.virginia.vcgr.genii.container.q2.forks.JobFork;
+import edu.virginia.vcgr.genii.container.q2.forks.JobInformationFork;
 import edu.virginia.vcgr.genii.container.q2.forks.RootRNSFork;
 import edu.virginia.vcgr.genii.container.q2.resource.IQueueResource;
 import edu.virginia.vcgr.genii.container.q2.resource.QueueDBResourceFactory;
@@ -59,6 +88,7 @@ import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkBaseService;
+import edu.virginia.vcgr.genii.container.rfork.ResourceForkInformation;
 import edu.virginia.vcgr.genii.graph.GridDependency;
 import edu.virginia.vcgr.genii.queue.ConfigureRequestType;
 import edu.virginia.vcgr.genii.queue.GetJobLogRequest;
@@ -86,6 +116,7 @@ import edu.virginia.vcgr.jsdl.sweep.SweepUtility;
 @ForkRoot(RootRNSFork.class)
 @GeniiServiceConfiguration(
 	resourceProvider=QueueDBResourceProvider.class)
+@ConstructionParametersType(QueueConstructionParameters.class)
 @GridDependency(GeniiBESServiceImpl.class)
 public class QueueServiceImpl extends ResourceForkBaseService
 	implements QueuePortType
@@ -95,6 +126,9 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	//static private final long _DEFAULT_TIME_TO_LIVE = 1000L * 60 * 60;
 	static public QName _JOBID_QNAME =
 		new QName(GenesisIIConstants.GENESISII_NS, "job-id");
+	
+	@MInject(lazy = true)
+	private IQueueResource _resource;
 	
 	@MInject(injectionFactory = QueueManagerInjectionFactory.class)
 	private QueueManager _queueMgr;
@@ -321,6 +355,10 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		
 		try
 		{
+			if (!_resource.isAcceptingNewActivites())
+				throw new RemoteException(
+					"Queue is not accepting activities at the moment!");
+			
 			JobDefinition jobDefinition = JSDLUtils.convert(
 				submitJobRequest.getJobDefinition());
 			if (jobDefinition.parameterSweeps().size() > 0)
@@ -594,5 +632,197 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		}
 		
 		return null;
+	}
+
+	static private String getJobTicketFromActivityEPR(
+		EndpointReferenceType activityEPR) throws RemoteException
+	{
+		AddressingParameters addressingParameters = new AddressingParameters(
+			activityEPR.getReferenceParameters());
+		ResourceForkInformation rForkInfo = 
+			(ResourceForkInformation)addressingParameters.getResourceForkInformation();
+		if (rForkInfo != null)
+		{
+			String forkPath = rForkInfo.forkPath();
+			String jobTicket = 
+				JobInformationFork.determineJobTicketFromForkPath(forkPath);
+			return jobTicket;
+		}
+		
+		throw new RemoteException("Unable to find job ticket in activity EPR!");
+	}
+	
+	private GetActivityStatusResponseType getActivityStatus(
+		EndpointReferenceType activity)
+	{
+		ActivityStatusType activityStatus = null;
+		Fault fault = null;
+		
+		try
+		{
+			String jobTicket = getJobTicketFromActivityEPR(activity);
+			activityStatus = _queueMgr.getBESActivityStatus(jobTicket);
+		}
+		catch (Throwable cause)
+		{
+			fault = new Fault(new QName("http://tempuri.org", "fault"), 
+				cause.getLocalizedMessage(), null, null);
+		}
+		
+		return new GetActivityStatusResponseType(
+			activity, activityStatus, fault, null);
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.READ)
+	public GetActivityStatusesResponseType getActivityStatuses(
+		GetActivityStatusesType parameters) throws RemoteException,
+			UnknownActivityIdentifierFaultType
+	{
+		GetActivityStatusResponseType []responses;
+		EndpointReferenceType []activities = parameters.getActivityIdentifier();
+		responses = new GetActivityStatusResponseType[activities.length];
+		
+		for (int lcv = 0; lcv < activities.length; lcv++)
+			responses[lcv] = getActivityStatus(activities[lcv]);
+
+		return new GetActivityStatusesResponseType(responses, null);
+	}
+	
+	private TerminateActivityResponseType terminateActivity(
+		EndpointReferenceType activity)
+	{
+		boolean terminated = false;
+		Fault fault = null;
+		
+		try
+		{
+			String jobTicket = getJobTicketFromActivityEPR(activity);
+			killJobs(new String[] { jobTicket} );
+			completeJobs(new String[] { jobTicket });
+			terminated = true;
+		}
+		catch (Throwable cause)
+		{
+			fault = new Fault(new QName("http://tempuri.org", "fault"), 
+				cause.getLocalizedMessage(), null, null);
+		}
+		
+		return new TerminateActivityResponseType(
+			activity, terminated, fault, null);
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public TerminateActivitiesResponseType terminateActivities(
+		TerminateActivitiesType parameters) throws RemoteException,
+			UnknownActivityIdentifierFaultType
+	{
+		TerminateActivityResponseType []responses;
+		EndpointReferenceType []activities = parameters.getAcitivityIdentifier();
+		responses = new TerminateActivityResponseType[activities.length];
+		
+		for (int lcv = 0; lcv < activities.length; lcv++)
+			responses[lcv] = terminateActivity(activities[lcv]);
+		
+		return new TerminateActivitiesResponseType(responses, null);
+	}
+
+	private GetActivityDocumentResponseType getActivityDocument(
+		EndpointReferenceType activity)
+	{
+		JobDefinition_Type jobDef = null;
+		Fault fault = null;
+		
+		try
+		{
+			String jobTicket = getJobTicketFromActivityEPR(activity);
+			jobDef = _queueMgr.getJobDefinition(jobTicket);
+		}
+		catch (Throwable cause)
+		{
+			fault = new Fault(new QName("http://tempuri.org", "fault"), 
+				cause.getLocalizedMessage(), null, null);
+		}
+		
+		return new GetActivityDocumentResponseType(
+			activity, jobDef, fault, null);
+	}
+	
+	@Override
+	@RWXMapping(RWXCategory.READ)
+	public GetActivityDocumentsResponseType getActivityDocuments(
+		GetActivityDocumentsType parameters) throws RemoteException,
+			UnknownActivityIdentifierFaultType
+	{
+		GetActivityDocumentResponseType []responses;
+		EndpointReferenceType []activities = parameters.getActivityIdentifier();
+		responses = new GetActivityDocumentResponseType[activities.length];
+		
+		for (int lcv = 0; lcv < activities.length; lcv++)
+			responses[lcv] = getActivityDocument(activities[lcv]);
+		
+		return new GetActivityDocumentsResponseType(responses, null);
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.READ)
+	public GetFactoryAttributesDocumentResponseType getFactoryAttributesDocument(
+		GetFactoryAttributesDocumentType parameters) throws RemoteException
+	{
+		ConstructionParameters baseCP =
+			_resource.constructionParameters(QueueConstructionParameters.class);
+		
+		if (baseCP == null || !(baseCP instanceof QueueConstructionParameters))
+		{
+			// Default
+			throw new RemoteException("The construction parameters for " +
+				"this Queue have not been overridden.  It therefor " +
+				"cannot currently be used as a BES!");
+		}
+		
+		QueueAsBESFactoryAttributesUtilities utils = new QueueAsBESFactoryAttributesUtilities(
+			_queueMgr.getBESManager().allBESInformation(),
+			(QueueConstructionParameters)baseCP);
+		boolean isAcceptingNewActivities = _resource.isAcceptingNewActivites();
+		long totalNumberOfActivities = _queueMgr.getJobCount();
+		return new GetFactoryAttributesDocumentResponseType(
+			utils.factoryResourceAttributes(
+				isAcceptingNewActivities, totalNumberOfActivities), null);
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.EXECUTE)
+	public CreateActivityResponseType createActivity(
+		CreateActivityType parameters) throws RemoteException,
+			NotAcceptingNewActivitiesFaultType, InvalidRequestMessageFaultType,
+			UnsupportedFeatureFaultType, NotAuthorizedFaultType
+	{
+		SubmitJobResponseType resp = submitJob(new SubmitJobRequestType(
+			parameters.getActivityDocument().getJobDefinition(), (byte)0));
+		String jobTicket = resp.getJobTicket();
+		String forkPath = String.format("/jobs/mine/all/%s", jobTicket);
+		EndpointReferenceType target =
+			createForkEPR(forkPath, new JobFork(this, forkPath).describe());
+		return new CreateActivityResponseType(target,
+			parameters.getActivityDocument(), null);
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.WRITE)
+	public StopAcceptingNewActivitiesResponseType stopAcceptingNewActivities(
+		StopAcceptingNewActivitiesType parameters) throws RemoteException
+	{
+		_resource.isAcceptingNewActivites(false);
+		return new StopAcceptingNewActivitiesResponseType();
+	}
+
+	@Override
+	@RWXMapping(RWXCategory.WRITE)
+	public StartAcceptingNewActivitiesResponseType startAcceptingNewActivities(
+			StartAcceptingNewActivitiesType parameters) throws RemoteException
+	{
+		_resource.isAcceptingNewActivites(true);
+		return new StartAcceptingNewActivitiesResponseType();
 	}
 }

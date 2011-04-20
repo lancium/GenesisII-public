@@ -138,4 +138,11 @@ public class DefaultMatchingParameter extends MatchingParameter
 		return false;
 		
 	}
+
+	@Override
+	public edu.virginia.vcgr.genii.common.MatchingParameter toAxisType()
+	{
+		return new edu.virginia.vcgr.genii.common.MatchingParameter(
+			String.format("%s:%s", _paramType, _property), _value);
+	}
 }

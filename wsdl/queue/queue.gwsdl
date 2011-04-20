@@ -5,6 +5,8 @@
 	xmlns="http://vcgr.cs.virginia.edu/genii/queue"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	xmlns:rfork="http://vcgr.cs.virginia.edu/genii/resource-fork"
+	xmlns:bes-mgmt="http://schemas.ggf.org/bes/2006/08/bes-management"
+	xmlns:bes-factory="http://schemas.ggf.org/bes/2006/08/bes-factory"
 	xmlns:wsa="http://www.w3.org/2005/08/addressing"
 	xmlns:queue="http://vcgr.cs.virginia.edu/genii/queue"
 	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
@@ -53,6 +55,12 @@
 		namespace="http://vcgr.cs.virginia.edu/sbyteio/2006/11/factory"
 		location="./sbyteio-factory.wsdl"/>
 
+	<wsdl:import namespace="http://schemas.ggf.org/bes/2006/08/bes-factory"
+		location="./bes-factory.wsdl"/>
+
+    <wsdl:import namespace="http://schemas.ggf.org/bes/2006/08/bes-management"
+		location="./bes-management.wsdl"/>
+
 	<wsdl:import
 		namespace="http://vcgr.cs.virginia.edu/genii/resource-fork"
 		location="./rfork-generated.wsdl"/>
@@ -96,6 +104,21 @@
 				namespace="http://vcgr.cs.virginia.edu/genii/queue"
 				schemaLocation="./queue.xsd"/>
 
+			<xsd:import
+				namespace="http://schemas.ggf.org/jsdl/2005/11/jsdl"
+				schemaLocation="./jsdl.xsd"/>
+
+            <xsd:import
+				namespace="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"
+				schemaLocation="./jsdl-posix.xsd"/>
+
+            <xsd:import
+				namespace="http://schemas.ogf.org/jsdl/2007/02/jsdl-spmd"
+				schemaLocation="./jsdl-spmd.xsd"/>
+
+			<xsd:import
+                namespace="http://schemas.ggf.org/jsdl/2006/07/jsdl-hpcp"
+				schemaLocation="./jsdl-hpcp.xsd"/>
 		</xsd:schema>
 	</wsdl:types>
 
@@ -201,6 +224,8 @@
 	
 	<wsdl:portType name="QueuePortType">
 		<genii-ext:extend portType="rfork:ResourceForkPortType"/>
+		<genii-ext:extend portType="bes-factory:BESFactoryPortType"/>
+		<genii-ext:extend portType="bes-mgmt:BESManagementPortType"/>
 
 		<wsdl:operation name="submitJob">
 			<wsdl:input message="queue:SubmitJobRequest"/>

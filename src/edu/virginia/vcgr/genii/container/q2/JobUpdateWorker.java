@@ -180,6 +180,8 @@ public class JobUpdateWorker implements OutcallHandler
 					"Successfully got status of job %s.", _data));
 				List<String> faults = null;
 				
+				_data.setBESActivityStatus(
+					activityStatuses[0].getActivityStatus());
 				try
 				{
 					if (activityStatuses[0] != null)

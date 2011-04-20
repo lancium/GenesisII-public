@@ -140,6 +140,18 @@ public class BESManager implements Closeable
 		}
 	}
 	
+	Collection<BESInformation> allBESInformation()
+	{
+		Collection<BESInformation> ret;
+		
+		synchronized(_besInformation)
+		{
+			ret = new ArrayList<BESInformation>(_besInformation.values());
+		}
+		
+		return ret;
+	}
+	
 	protected void finalize() throws Throwable
 	{
 		close();

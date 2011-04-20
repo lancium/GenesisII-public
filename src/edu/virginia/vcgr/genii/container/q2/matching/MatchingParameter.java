@@ -16,6 +16,7 @@ public abstract class MatchingParameter
 	abstract boolean matches(Collection<MatchingParameter> params);
 	abstract boolean matches(MatchingParameter param);
 	abstract boolean isRequired();
+	public abstract edu.virginia.vcgr.genii.common.MatchingParameter toAxisType();
 	
 	static public boolean matches(MatchingParameters besParam, 
 		MatchingParameters jobParam)

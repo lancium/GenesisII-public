@@ -46,6 +46,7 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.deployer.AppDeployerConstants;
 import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSIterable;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
@@ -698,10 +699,17 @@ public class RunTool extends BaseGridTool
 	static private Throwable getError(EndpointReferenceType activity)
 		throws RemoteException, IOException, ClassNotFoundException
 	{
-		BESActivityPortType act = ClientUtils.createProxy(BESActivityPortType.class, activity);
-		byte []serializedFault = act.getError(null).getSerializedFault();
-		if (serializedFault == null)
-			throw new IOException("BES Activity in unknown state.");
-		return (Throwable)DBSerializer.deserialize(serializedFault);
+		TypeInformation typeInfo = new TypeInformation(activity);
+		if (typeInfo.isBESActivity())
+		{
+			BESActivityPortType act = ClientUtils.createProxy(BESActivityPortType.class, activity);
+			byte []serializedFault = act.getError(null).getSerializedFault();
+			if (serializedFault == null)
+				throw new IOException("BES Activity in unknown state.");
+			return (Throwable)DBSerializer.deserialize(serializedFault);
+		} else
+		{
+			return new IOException("Activity not a standard Genesis II activity -- Error information unavailable!");
+		}
 	}
 }

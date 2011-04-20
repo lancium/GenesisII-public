@@ -87,4 +87,10 @@ public class DefaultStreamableByteIOResourceForkInformation
 		throw new StreamCorruptedException(
 			"Unable to deserialize resource fork information.");
 	}
+
+	@Override
+	public String forkPath()
+	{
+		return _forkPath;
+	}
 }

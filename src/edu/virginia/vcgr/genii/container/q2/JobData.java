@@ -1,13 +1,21 @@
 package edu.virginia.vcgr.genii.container.q2;
 
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.Date;
 
+import javax.xml.namespace.QName;
+
+import org.ggf.bes.factory.ActivityStatusType;
 import org.ggf.jsdl.JobDefinition_Type;
+import org.xml.sax.InputSource;
 
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
+import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryEventToken;
 import edu.virginia.vcgr.genii.container.q2.matching.JobResourceRequirements;
@@ -95,6 +103,8 @@ public class JobData
 	private Date _nextValidRunTime = null;
 	
 	private JobResourceRequirements _resourceRequirements = null;
+	
+	private ActivityStatusType _besActivityStatus = null;
 	
 	public JobData(long jobID, String jobName,
 		String jobTicket, short priority,
@@ -189,12 +199,43 @@ public class JobData
 		_besID = new Long(besID);
 	}
 	
+	public void setBESActivityStatus(ActivityStatusType ast)
+	{
+		// We go through all this rigamoral because we want to keep the status
+		// in memory rather than in the DB, but if you aren't careful with
+		// data structure pulled in from the wire, you can accidentally
+		// keep live references to the entire SOAP message from whence they
+		// came, inadvertently consuming too much memory.  By serializing and
+		// deserializing it, we guarantee that the SOAP message that this
+		// came from is not referenced by the copy.
+		try
+		{
+			QName tmp = new QName("http://tempuri.org", "tmp");
+			StringWriter writer = new StringWriter();
+			ObjectSerializer.serialize(writer, ast, tmp);
+			StringReader reader = new StringReader(writer.toString());
+			_besActivityStatus = 
+				(ActivityStatusType)ObjectDeserializer.deserialize(
+					new InputSource(reader), ActivityStatusType.class);
+		}
+		catch (Throwable cause)
+		{
+			_besActivityStatus = null;
+		}
+	}
+	
+	public ActivityStatusType getBESActivityStatus()
+	{
+		return _besActivityStatus;
+	}
+	
 	/**
 	 * Clear any associate with a BES container.
 	 */
 	public void clearBESID()
 	{
 		_besID = null;
+		_besActivityStatus = null;
 	}
 	
 	public Long getBESID()

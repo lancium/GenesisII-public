@@ -22,6 +22,7 @@ import javax.xml.transform.dom.DOMResult;
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.ggf.bes.factory.ActivityStatusType;
 import org.ggf.jsdl.JobDefinition_Type;
 import org.morgan.util.io.StreamUtils;
 import org.w3c.dom.Document;
@@ -369,6 +370,11 @@ public class QueueManager implements Closeable
 		StreamUtils.close(_outcallThreadPool);
 	}
 		
+	public long getJobCount()
+	{
+		return _jobManager.getJobCount();
+	}
+	
 	/************************************************************************/
 	/* The remainder of the methods in this class correspond exactly to     */
 	/* methods in the various managers (BESManager and JobManager) with the */
@@ -557,6 +563,11 @@ public class QueueManager implements Closeable
 		}
 	}
 	
+	public ActivityStatusType getBESActivityStatus(String ticket)
+	{
+		return _jobManager.getBESActivityStatus(ticket);
+	}
+	
 	public JobErrorPacket[] queryErrorInformation(String job)
 		throws SQLException, ResourceException, GenesisIISecurityException
 	{
@@ -690,6 +701,12 @@ public class QueueManager implements Closeable
 			if (connection != null)
 				_connectionPool.release(connection);
 		}
+	}
+	
+	public JobDefinition_Type getJobDefinition(String jobTicket)
+		throws ResourceException, SQLException
+	{
+		return _jobManager.getJSDL(jobTicket);
 	}
 	
 	public ResourceSummary summarize()

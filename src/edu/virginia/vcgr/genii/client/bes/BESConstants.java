@@ -58,6 +58,8 @@ public interface BESConstants
 		LOCAL_RESOURCE_MANAGER_TYPE_BASE + "pbs";
 	static public final String LOCAL_RESOURCE_MANAGER_TYPE_SGE =
 		LOCAL_RESOURCE_MANAGER_TYPE_BASE + "sge";
+	static public final String LOCAL_RESOURCE_MANAGER_TYPE_GRID_QUEUE =
+		LOCAL_RESOURCE_MANAGER_TYPE_BASE + "grid-queue";
 	
 	static public final String CONFIG_PROPERTY_WORKER_DIR =
 		"edu.virginia.vcgr.genii.container.bes.worker-dir";

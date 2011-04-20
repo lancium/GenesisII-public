@@ -9,7 +9,8 @@ public enum ResourceManagerType
 	Unknown("http://tempuri.org/unknown"),
 	Simple(BESConstants.LOCAL_RESOURCE_MANAGER_TYPE_SIMPLE),
 	PBS(BESConstants.LOCAL_RESOURCE_MANAGER_TYPE_PBS),
-	SGE(BESConstants.LOCAL_RESOURCE_MANAGER_TYPE_SGE);
+	SGE(BESConstants.LOCAL_RESOURCE_MANAGER_TYPE_SGE),
+	GridQueue(BESConstants.LOCAL_RESOURCE_MANAGER_TYPE_GRID_QUEUE);
 	
 	private URI _uri;
 	

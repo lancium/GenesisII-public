@@ -308,6 +308,7 @@ public class QueueManipulator
 					(int)jobInfo.getPriority(), jobInfo.getSubmitTime(),
 					jobInfo.getStartTime(), jobInfo.getFinishTime(),
 					jobInfo.getAttempts().intValue(),
+					jobInfo.getBesStatus(),
 					jobInfo.getScheduledOn());	
 		}
 

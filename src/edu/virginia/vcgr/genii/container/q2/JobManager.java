@@ -24,6 +24,8 @@ import org.apache.axis.types.UnsignedShort;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityDocumentType;
+import org.ggf.bes.factory.ActivityStateEnumeration;
+import org.ggf.bes.factory.ActivityStatusType;
 import org.ggf.bes.factory.CreateActivityResponseType;
 import org.ggf.bes.factory.CreateActivityType;
 import org.ggf.bes.factory.InvalidRequestMessageFaultType;
@@ -793,7 +795,8 @@ public class JobManager implements Closeable
 						QueueUtils.convert(pji.getStartTime()),
 						QueueUtils.convert(pji.getFinishTime()),
 						new UnsignedShort(jobData.getRunAttempts()),
-						scheduledOn, jobData.jobName()));
+						scheduledOn, jobData.getBESActivityStatus(),
+						jobData.jobName()));
 				}
 			}
 			catch (IOException ioe)
@@ -802,6 +805,54 @@ public class JobManager implements Closeable
 					"Unable to get job status for job \"" +
 					jobData.getJobTicket() + "\".", ioe);
 					
+			}
+		}
+		
+		return ret;
+	}
+	
+	public ActivityStatusType getBESActivityStatus(String ticket)
+	{
+		JobData data = _jobsByTicket.get(ticket);
+		if (data == null)
+			return null;
+		
+		ActivityStatusType ret = data.getBESActivityStatus();
+		if (ret == null)
+		{
+			QueueStates state = data.getJobState();
+			switch (state)
+			{
+				case ERROR :
+					ret = new ActivityStatusType(
+						null, ActivityStateEnumeration.Failed);
+					break;
+					
+				case FINISHED :
+					ret = new ActivityStatusType(
+						null, ActivityStateEnumeration.Finished);
+					break;
+					
+				case QUEUED :
+					ret = new ActivityStatusType(
+							null, ActivityStateEnumeration.Pending);
+						break;
+						
+				case REQUEUED : 
+					ret = new ActivityStatusType(
+							null, ActivityStateEnumeration.Pending);
+						break;
+						
+				case RUNNING :
+					ret = new ActivityStatusType(
+							null, ActivityStateEnumeration.Running);
+						break;
+						
+				case STARTING :
+					ret = new ActivityStatusType(
+							null, ActivityStateEnumeration.Pending);
+						break;
+						
 			}
 		}
 		
@@ -890,7 +941,8 @@ public class JobManager implements Closeable
 						QueueUtils.convert(pji.getStartTime()),
 						QueueUtils.convert(pji.getFinishTime()),
 						new UnsignedShort(jobData.getRunAttempts()),
-						scheduledOn, jobData.jobName()));
+						scheduledOn, jobData.getBESActivityStatus(),
+						jobData.jobName()));
 				} else
 				{
 					/* If the caller did not own a job, then we throw a
@@ -1280,6 +1332,11 @@ public class JobManager implements Closeable
 		ret.put("Finished", finished);
 		
 		return ret;
+	}
+	
+	public long getJobCount()
+	{
+		return _jobsByID.size();
 	}
 	
 	/**

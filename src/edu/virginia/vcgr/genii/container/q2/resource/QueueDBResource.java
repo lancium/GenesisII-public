@@ -16,6 +16,9 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 
 public class QueueDBResource extends BasicDBResource implements IQueueResource
 {
+	static final public String IS_ACCEPTING_NEW_ACTIVITIES_PROPERTY_NAME =
+		"edu.virginia.vcgr.genii.container.q2.resource.is-accepting-new-activities";
+	
 	public QueueDBResource(
 			ResourceKey parentKey, 
 			DatabaseConnectionPool connectionPool)
@@ -112,5 +115,24 @@ public class QueueDBResource extends BasicDBResource implements IQueueResource
 		{
 			StreamUtils.close(stmt);
 		}
+	}
+
+	@Override
+	public boolean isAcceptingNewActivites() throws ResourceException
+	{
+		Boolean value = (Boolean)getProperty(
+			IS_ACCEPTING_NEW_ACTIVITIES_PROPERTY_NAME);
+		if (value == null)
+			value = Boolean.TRUE;
+		
+		return value;
+	}
+
+	@Override
+	public void isAcceptingNewActivites(boolean isAccepting)
+		throws ResourceException
+	{
+		setProperty(IS_ACCEPTING_NEW_ACTIVITIES_PROPERTY_NAME,
+			Boolean.valueOf(isAccepting));
 	}
 }

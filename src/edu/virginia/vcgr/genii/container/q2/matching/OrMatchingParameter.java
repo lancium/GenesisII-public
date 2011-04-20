@@ -102,4 +102,10 @@ class OrMatchingParameter extends MatchingParameter
 		return false;
 	}
 
+	@Override
+	public edu.virginia.vcgr.genii.common.MatchingParameter toAxisType()
+	{
+		throw new UnsupportedOperationException(
+			"Or parameters not supported for axis type!");
+	}
 }

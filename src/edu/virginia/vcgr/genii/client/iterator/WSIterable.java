@@ -183,6 +183,12 @@ final public class WSIterable<Type> implements Iterable<Type>, Closeable
 						_currentBlock, 0, _currentBlock.length);
 				} else
 				{
+					if (_iterator == null)
+					{
+						StreamUtils.close(this);
+						return;
+					}
+					
 					IterateResponseType resp = _iterator.iterate(nextStart, _blockSize);
 					if (resp == null)
 					{

@@ -6,6 +6,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 
 public interface ResourceForkInformation extends Serializable
 {
+	public String forkPath();
 	public ResourceFork instantiateFork(ResourceForkService forkService)
 		throws ResourceException;
 	

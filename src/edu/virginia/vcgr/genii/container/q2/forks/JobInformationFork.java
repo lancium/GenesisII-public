@@ -10,6 +10,8 @@ import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
 
@@ -43,6 +45,20 @@ public class JobInformationFork
 {
 	static private final String _FORMAT =
 		"%1$-36s   %2$tH:%2$tM %2$tZ %2$td %2$tb %2$tY   %3$-4d   %4$s";
+	
+	static private Pattern JOB_FORK_PATH_PATTERN = Pattern.compile(
+		"\\p{XDigit}{8}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{12}");
+	
+	static public String determineJobTicketFromForkPath(String forkPath) 
+		throws RemoteException
+	{
+		Matcher matcher = JOB_FORK_PATH_PATTERN.matcher(forkPath);
+		if (!matcher.find())
+			throw new RemoteException(String.format(
+				"Can't find job ticket in fork path \"%s\"!", forkPath));
+		
+		return matcher.group();
+	}
 	
 	static private void printJobInfo(PrintStream out,
 		JobInformation jobInfo)
@@ -124,7 +140,7 @@ public class JobInformationFork
 	public void snapshotState(OutputStream sink) throws IOException
 	{
 		boolean isMine = false;
-		String jobTicket = getForkName();
+		String jobTicket = determineJobTicketFromForkPath(getForkPath());
 		
 		ReducedJobInformation jInfo = null;
 		ResourceKey rKey = getService().getResourceKey();
@@ -157,7 +173,7 @@ public class JobInformationFork
 						(int)jit.getPriority(), jit.getSubmitTime(),
 						jit.getStartTime(), jit.getFinishTime(),
 						jit.getAttempts().intValue(),
-						jit.getScheduledOn());	
+						jit.getBesStatus(), jit.getScheduledOn());	
 				}
 			} else
 			{

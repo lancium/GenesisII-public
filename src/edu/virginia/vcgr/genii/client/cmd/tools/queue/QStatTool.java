@@ -5,9 +5,13 @@ import java.util.Calendar;
 import java.util.Iterator;
 import java.util.TimeZone;
 
+import org.apache.axis.message.MessageElement;
+import org.ggf.bes.factory.ActivityStatusType;
+
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
+import edu.virginia.vcgr.genii.client.cmd.tools.Option;
 import edu.virginia.vcgr.genii.client.queue.JobInformation;
 import edu.virginia.vcgr.genii.client.queue.JobTicket;
 import edu.virginia.vcgr.genii.client.queue.QueueManipulator;
@@ -18,11 +22,19 @@ public class QStatTool extends BaseGridTool
 	static private final String _DESCRIPTION = 
 		"Shows the status of a given job or jobs in the queue.";
 	static private final String _USAGE =
-		"qstat <queue-path> [<job-ticket0>...<job-ticketn>]";
+		"qstat [--full|-f] <queue-path> [<job-ticket0>...<job-ticketn>]";
+	
+	private boolean _full = false;
 	
 	public QStatTool()
 	{
 		super(_DESCRIPTION, _USAGE, false);
+	}
+	
+	@Option({"f", "full"})
+	public void setFull()
+	{
+		_full = true;
 	}
 	
 	@Override
@@ -86,5 +98,23 @@ public class QStatTool extends BaseGridTool
 		stdout.println(String.format(
 			_FORMAT, jobInfo.getTicket(), submitTime,
 			jobInfo.getFailedAttempts(), stateString));
+		ActivityStatusType ast = jobInfo.besActivityStatus();
+		if (_full)
+		{
+			stdout.format("\tJob Name:  %s\n", jobInfo.jobName());
+			if (ast != null)
+			{
+				stdout.format("\tBES Status:  %s\n", ast.getState().getValue());
+				MessageElement []any = ast.get_any();
+				if (any != null)
+				{
+					for (MessageElement e : any)
+					{
+						stdout.format("\t%s\n", e);
+					}
+				}
+			}
+		}
+		stdout.println();
 	}
 }

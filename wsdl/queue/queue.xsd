@@ -4,6 +4,7 @@
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	xmlns:wsa="http://www.w3.org/2005/08/addressing"
 	xmlns:queue="http://vcgr.cs.virginia.edu/genii/queue"
+	xmlns:bes="http://schemas.ggf.org/bes/2006/08/bes-factory"
 	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
 	xmlns:ifactory="http://vcgr.cs.virginia.edu/genii/iterator-factory"
 	xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
@@ -24,6 +25,10 @@
 	<xsd:import
       namespace="http://schemas.ggf.org/jsdl/2005/11/jsdl"
 	  schemaLocation="./jsdl.xsd"/>
+
+	<xsd:import
+		namespace="http://schemas.ggf.org/bes/2006/08/bes-factory"
+		schemaLocation="./bes-factory.xsd"/>
 
 	<xsd:simpleType name="JobStateEnumerationType">
 		<xsd:restriction base="xsd:string">
@@ -63,6 +68,9 @@
 						minOccurs="1" maxOccurs="1" nillable="false"/>
 					<xsd:element name="scheduled-on" type="xsd:string"
 						minOccurs="0" maxOccurs="1" nillable="true"/>
+					<xsd:element name="bes-status"
+						type="bes:ActivityStatusType" minOccurs="0"
+						maxOccurs="1" nillable="false"/>
 				</xsd:sequence>
 				<xsd:attribute name="job-name" type="xsd:string"
 					use="optional"/>

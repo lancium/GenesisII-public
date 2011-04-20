@@ -24,6 +24,12 @@
 				<srcfiles dir="${wsdl.dir}/iterator">
 					<include name="iterator-factory.xsd"/>
 				</srcfiles>
+				<srcfiles dir="${wsdl.dir}/bes">
+					<include name="bes-management.xsd"/>
+					<include name="bes-factory.xsd"/>
+					<include name="bes-management.wsdl"/>
+					<include name="bes-factory.wsdl"/>
+				</srcfiles>
 			</uptodate>
 		</and>
 	</condition>
@@ -35,6 +41,12 @@
 				<include name="queue.gwsdl"/>
 				<include name="queue.xsd"/>
 				<include name="jsdl.xsd"/>
+			</fileset>
+			<fileset dir="${wsdl.dir}/bes">
+				<include name="bes-management.xsd"/>
+				<include name="bes-factory.xsd"/>
+				<include name="bes-management.wsdl"/>
+				<include name="bes-factory.wsdl"/>
 			</fileset>
 			<fileset dir="${wsdl.dir}/iterator">
 				<include name="iterator-factory.xsd"/>
