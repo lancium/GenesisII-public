@@ -18,11 +18,6 @@ public class LRUCache<KeyType, DataType> extends LinkedHashMap<KeyType, DataType
 
         super(maxElements, (float) 0.75, true);
 
-        if (maxElements <= 0) {
-            throw new IllegalArgumentException("Illegal LRU cache capacity: " +
-            		maxElements);
-        }
-
         _maxElements = maxElements;
 	}	
 	

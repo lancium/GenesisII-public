@@ -16,20 +16,27 @@
 
 package edu.virginia.vcgr.genii.client.comm.axis.security;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 
 import javax.net.SocketFactory;
 
 import java.security.*;
+import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.Properties;
 
 import javax.net.ssl.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.morgan.util.io.StreamUtils;
 
+import edu.virginia.vcgr.genii.client.cache.LRUCache;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.comm.socket.SocketConfigurer;
@@ -56,8 +63,94 @@ public class VcgrSslSocketFactory
 {
 	static private Log _logger = LogFactory.getLog(VcgrSslSocketFactory.class);
 	
+	static private class KeyAndCertMaterialCacheKey
+	{
+		private X509Certificate _cert;
+		
+		private KeyAndCertMaterialCacheKey(KeyAndCertMaterial material)
+		{
+			if (material._clientCertChain == null || 
+					material._clientCertChain.length == 0)
+				_cert = null;
+			else
+				_cert = material._clientCertChain[0];
+		}
+		
+		@Override
+		final public int hashCode()
+		{
+			return (_cert == null) ? 0 : _cert.hashCode();
+		}
+		
+		@Override
+		final public boolean equals(Object tmpOther)
+		{
+			if (tmpOther instanceof KeyAndCertMaterialCacheKey)
+			{
+				KeyAndCertMaterialCacheKey other = 
+					(KeyAndCertMaterialCacheKey)tmpOther;
+				if (_cert == null)
+				{
+					if (other._cert == null)
+						return true;
+					else
+						return false;
+				} else
+				{
+					if (other._cert == null)
+						return false;
+				}
+				
+				return _cert.equals(other._cert);
+			}
+			
+			return false;
+		}
+	}
+	
+	static final private String CACHE_SIZE_PROPERTY_NAME =
+		"edu.virginia.vcgr.genii.client.comm.axis.security.VcgrSslSocketFactory.max-cache-size";
+	static final private int DEFAULT_MAX_CACHE_ELEMENTS = 1024;
 	static public InheritableThreadLocal<ICallingContext> threadCallingContext =
 		new InheritableThreadLocal<ICallingContext>();
+	
+	static private LRUCache<KeyAndCertMaterialCacheKey, SSLSocketFactory> 
+		_sslSessionCache = null;
+	
+	static
+	{
+		InputStream in = null;
+		int maxCacheElements = DEFAULT_MAX_CACHE_ELEMENTS;
+		
+		try
+		{
+			File sslCachePropertiesFile = Installation.getDeployment(
+				new DeploymentName()).getConfigurationDirectory().lookupFile(
+					"ssl-cache.properties");
+			in = new FileInputStream(sslCachePropertiesFile);
+			Properties props = new Properties();
+			props.load(in);
+			String value = props.getProperty(CACHE_SIZE_PROPERTY_NAME);
+			if (value != null)
+			{
+				maxCacheElements = Integer.parseInt(value);
+				if (maxCacheElements < 0)
+					maxCacheElements = 0;
+			}
+		}
+		catch (Throwable cause)
+		{
+			_logger.warn("Unable to lookup ssl-cache.properties " +
+				"configuration file.  Using default values!", cause);
+		}
+		finally
+		{
+			StreamUtils.close(in);
+		}
+		
+		_sslSessionCache = new LRUCache<KeyAndCertMaterialCacheKey, SSLSocketFactory>(
+			maxCacheElements);
+	}
 	
     protected TrustManager[] _trustManagers;
     protected SecureRandom _random = null;
@@ -114,6 +207,8 @@ public class VcgrSslSocketFactory
 	{
 		// Use the current calling context's X.509 identity for 
 		// SSL handshake
+		SSLSocketFactory factory = null;
+		KeyAndCertMaterialCacheKey cacheKey = null;
 		
 		try {
 			
@@ -127,7 +222,16 @@ public class VcgrSslSocketFactory
 			KeyAndCertMaterial clientKeyMaterial = 
 				ClientUtils.checkAndRenewCredentials(callingContext, 
 				new Date(), new SecurityUpdateResults());
-
+			cacheKey = new KeyAndCertMaterialCacheKey(clientKeyMaterial);
+			synchronized(_sslSessionCache)
+			{
+				factory = _sslSessionCache.get(cacheKey);
+				if (factory != null)
+					return factory;
+			}
+			
+			System.err.println("Cache miss!");
+			
 			KeyManager[] kms = new KeyManager[1];
 			kms[0] = new SingleSSLX509KeyManager(clientKeyMaterial);
 			
@@ -159,7 +263,12 @@ public class VcgrSslSocketFactory
 				}
 			}
 			
-			return (SSLSocketFactory) sslcontext.getSocketFactory();
+			factory = (SSLSocketFactory) sslcontext.getSocketFactory();
+			synchronized(_sslSessionCache)
+			{
+				_sslSessionCache.put(cacheKey, factory);
+			}
+			return factory;
 	
 		} catch (GeneralSecurityException e) {
 			throw new IOException(e.getMessage(), e);
