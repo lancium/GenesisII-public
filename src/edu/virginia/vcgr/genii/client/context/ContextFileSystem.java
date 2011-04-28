@@ -17,12 +17,19 @@ package edu.virginia.vcgr.genii.client.context;
 
 import java.io.*;
 import java.nio.channels.FileLock;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 
 import org.morgan.util.io.StreamUtils;
+import org.xml.sax.InputSource;
 
 import edu.virginia.vcgr.genii.client.io.RAFInputStream;
 import edu.virginia.vcgr.genii.client.io.RAFOutputStream;
+import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
 import edu.virginia.vcgr.genii.client.security.credentials.TransientCredentials;
+import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
+import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
+import edu.virginia.vcgr.genii.context.ContextType;
 
 public class ContextFileSystem
 {
@@ -46,6 +53,51 @@ public class ContextFileSystem
 	}
 	
 	static private FileContextPair []_cache = new FileContextPair[_DEFAULT_CACHE_SIZE];
+	
+	static public ICallingContext load(File combinedFile)
+		throws FileNotFoundException, IOException
+	{
+		InputStream fin = null;
+		
+		try
+		{
+			fin = new FileInputStream(combinedFile);
+			ContextType ct = (ContextType) ObjectDeserializer.deserialize(
+				new InputSource(fin), ContextType.class);
+			ICallingContext callContext =
+				CallingContextUtilities.setupCallingContextAfterCombinedExtraction(
+					new CallingContextImpl(ct));
+			
+			KeyAndCertMaterial keyAndCert = 
+				UnicoreContextWorkAround.loadUnicoreContextDelegateeInformation();
+			
+			callContext.setActiveKeyAndCertMaterial(keyAndCert);
+			
+			// Retrieve and authenticate other accumulated 
+			// message-level credentials (e.g., GII delegated assertions, etc.)
+			@SuppressWarnings("unchecked")
+			ArrayList<GIICredential> bearerCredentials =
+				(ArrayList<GIICredential>) callContext
+						.getTransientProperty(GIICredential.CALLER_CREDENTIALS_PROPERTY);			
+			
+			// Finally add all of our callerIds to the calling-context's 
+			// outgoing credentials 
+			TransientCredentials transientCredentials = 
+				TransientCredentials.getTransientCredentials(callContext); 
+			transientCredentials._credentials.addAll(bearerCredentials);
+			
+			return callContext;
+		}
+		catch (GeneralSecurityException e)
+		{
+			throw new IOException("Unable to generate key and cert material!", 
+				e);
+		}
+		finally
+		{
+			StreamUtils.close(fin);
+		}
+	}
 	
 	static public ICallingContext load(File filename, File transientFilename) 
 		throws FileNotFoundException, IOException

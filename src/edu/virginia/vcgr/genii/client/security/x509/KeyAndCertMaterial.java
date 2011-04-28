@@ -28,7 +28,7 @@ public class KeyAndCertMaterial implements Serializable
 	public PrivateKey _clientPrivateKey = null;
 
 	public KeyAndCertMaterial(X509Certificate[] clientCertChain,
-			PrivateKey clientPrivateKey)
+		PrivateKey clientPrivateKey)
 	{
 		_clientCertChain = clientCertChain;
 		_clientPrivateKey = clientPrivateKey;

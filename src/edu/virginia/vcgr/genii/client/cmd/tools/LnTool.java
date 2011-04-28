@@ -60,7 +60,7 @@ public class LnTool extends BaseGridTool
 		if (numArguments() == 1)
 		{
 			if (_eprFile != null)
-				link(new GeniiPath(_eprFile),
+				linkFromEPRFile(new GeniiPath(_eprFile),
 					new GeniiPath(getArgument(0)));
 			else if (_serviceURL != null)
 				link(EPRUtils.makeEPR(_serviceURL, !_noLookup),

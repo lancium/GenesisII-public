@@ -20,12 +20,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.Serializable;
 import java.security.GeneralSecurityException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 
 import javax.xml.namespace.QName;
@@ -42,11 +39,11 @@ import org.xml.sax.InputSource;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
+import edu.virginia.vcgr.genii.client.context.CallingContextUtilities;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.IContextResolver;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.*;
-import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.container.resource.IResource;
@@ -56,6 +53,33 @@ import edu.virginia.vcgr.genii.container.Container;
 
 public class AxisBasedContextResolver implements IContextResolver
 {
+	static private void storeToFile(Element em) throws IOException
+	{
+		/* For debugging only */
+		/*
+		File dir = new File("/Users/morgan/all-contexts");
+		dir.mkdirs();
+		for (int lcv = 0; true; lcv++)
+		{
+			File file = new File(dir, String.format("context.%d", lcv));
+			if (file.createNewFile())
+			{
+				PrintWriter writer = new PrintWriter(file);
+				MessageElement me = new MessageElement(em);
+				try
+				{
+					writer.println(me.getAsString());
+				} catch (Exception e)
+				{
+					throw new IOException("Unable to serialize!", e);
+				}
+				writer.close();
+				return;
+			}
+		}
+		*/
+	}
+	
 	@SuppressWarnings("unchecked")
 	public ICallingContext load() throws ResourceException, IOException,
 			FileNotFoundException
@@ -80,8 +104,10 @@ public class AxisBasedContextResolver implements IContextResolver
 				while (iter.hasNext()) {
 					SOAPHeaderElement he = (SOAPHeaderElement) iter.next();
 					QName heName = new QName(he.getNamespaceURI(), he.getLocalName());
-					if (heName.equals(GenesisIIConstants.CONTEXT_INFORMATION_QNAME)) {
+					if (heName.equals(GenesisIIConstants.CONTEXT_INFORMATION_QNAME))
+					{
 						Element em = ((MessageElement) he).getRealElement();
+						storeToFile(em);
 						ByteArrayOutputStream baos = new ByteArrayOutputStream();
 						PrintStream ps = new PrintStream(baos);
 						ps.println(em);
@@ -111,30 +137,14 @@ public class AxisBasedContextResolver implements IContextResolver
 			retval = resourceContext.deriveNewContext(ct);
 		}
 		
-		// Remove any serialized caller-credentials from the message header 
-		Collection<Serializable> signedAssertions = 
-			retval.getProperty(GIICredential.ENCODED_GAML_CREDENTIALS_PROPERTY);
-		retval.removeProperty(GIICredential.ENCODED_GAML_CREDENTIALS_PROPERTY);
-
-		// Deserialize the encoded caller-credentials and add them 
-		// to a "caller-only" cred-set: they will be added to the transient 
-		// cred-set later (along with any other creds conveyed outside the 
-		// calling-context) during security-processing.
-		ArrayList<GIICredential> callerCredentials = new ArrayList<GIICredential>();
-		if (signedAssertions != null) {
-			Iterator<Serializable> itr = signedAssertions.iterator();
-			while (itr.hasNext()) {
-				GIICredential signedAssertion = (GIICredential) itr.next();
-				callerCredentials.add(signedAssertion);
-			}
-		}
-		retval.setTransientProperty(
-				GIICredential.CALLER_CREDENTIALS_PROPERTY, 
-				callerCredentials);
+		retval = 
+			CallingContextUtilities.setupCallingContextAfterCombinedExtraction(
+				retval);
 		
 		// place the resource's key material in the transient calling context
 		// so that it may be properly used for outgoing messages
-		try {
+		try
+		{
 			Certificate[] targetCertChain = (Certificate[]) resource
 					.getProperty(IResource.CERTIFICATE_CHAIN_PROPERTY_NAME);
 			if ((targetCertChain != null) && (targetCertChain.length > 0)) {
@@ -142,15 +152,13 @@ public class AxisBasedContextResolver implements IContextResolver
 						new KeyAndCertMaterial((X509Certificate[]) targetCertChain, 
 								Container.getContainerPrivateKey()));
 			}
-		} catch (GeneralSecurityException e) {
+		} catch (GeneralSecurityException e) 
+		{
 			throw new AuthZSecurityException(e.getMessage(), e);
 		}
 		
-		
-		
 		workingContext.setProperty(WorkingContext.CURRENT_CONTEXT_KEY, retval);
-
-		
+	
 		return retval;
 	}
 

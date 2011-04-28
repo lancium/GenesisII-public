@@ -28,7 +28,7 @@ public class TransientCredentials implements Serializable
 
 	public ArrayList<GIICredential> _credentials =
 			new ArrayList<GIICredential>();
-
+	
 	/**
 	 * Retrieves the credentials from the calling context. Guaranteed to not be
 	 * null (may be empty, however)

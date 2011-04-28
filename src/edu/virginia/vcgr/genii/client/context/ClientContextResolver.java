@@ -27,6 +27,8 @@ public class ClientContextResolver implements IContextResolver
 		"user-context.xml";
 	static final public String USER_TRANSIENT_FILENAME =
 		"user-transient.dat";
+	static final public String COMBINED_FILENAME =
+		"user-combined.xml";
 	
 	public File getContextFile() throws IOException
 	{
@@ -40,16 +42,30 @@ public class ClientContextResolver implements IContextResolver
 			USER_TRANSIENT_FILENAME);
 	}
 	
+	public File getCombinedFile() throws IOException
+	{
+		return new File(ConfigurationManager.getCurrentConfiguration().getUserDirectory(),
+			COMBINED_FILENAME);
+	}
+	
+	@Override
 	public ICallingContext load() 
 		throws FileNotFoundException, IOException
 	{
 		File contextFile = getContextFile();
-		if (contextFile == null || contextFile.length() == 0)
-			return null;
-		
-		return ContextFileSystem.load(getContextFile(), getContextTransientFile());
+		if (contextFile == null || !contextFile.exists() ||
+			contextFile.length() == 0)
+		{
+			File combinedFile = getCombinedFile();
+			if (combinedFile == null || combinedFile.length() == 0)
+				return null;
+			
+			return ContextFileSystem.load(combinedFile);
+		} else
+			return ContextFileSystem.load(contextFile, getContextTransientFile());
 	}
 
+	@Override
 	public void store(ICallingContext ctxt) throws FileNotFoundException, IOException
 	{
 		ContextFileSystem.store(getContextFile(), getContextTransientFile(), ctxt);
