@@ -1,0 +1,15 @@
+mint-epr [options] <address-uri>
+
+WHERE options are:
+	--output=<output-file> [0, 1] | --link=<link-path>
+	--reference-parameters=<ref-params-xml-file> [0, inf)
+	--port-type=<port-type-qname> [0, inf)
+	--epi=<epi>
+	--epi-resolver=<epi-resolver-epr-file>
+	--reference-resolver=<reference-resolver-epr-file>
+	--container-id=<container-id>
+	--certificate-chain=<.cer file>
+	--add-username-password-policy=<is-optional>
+	--require-encryption
+	--include-server-tls
+	--require-message-signing

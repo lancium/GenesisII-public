@@ -277,8 +277,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.StageDataTool</mconf:class>
 		<mconf:class name="set-resource-properties"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.SetResourcePropertiesTool</mconf:class>
-	
-	
+		<mconf:class name="mint-epr"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.MintEprTool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

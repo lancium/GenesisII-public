@@ -187,6 +187,12 @@ public class PortType
 		return _portTypeName.hashCode();
 	}
 	
+	static public boolean isKnown(QName portType)
+	{
+		PortType pt = _knownPortTypes.get(portType);
+		return pt != null;
+	}
+	
 	static public PortType get(QName portType)
 	{
 		PortType pt = _knownPortTypes.get(portType);

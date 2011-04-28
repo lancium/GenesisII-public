@@ -230,8 +230,6 @@ public class VcgrSslSocketFactory
 					return factory;
 			}
 			
-			System.err.println("Cache miss!");
-			
 			KeyManager[] kms = new KeyManager[1];
 			kms[0] = new SingleSSLX509KeyManager(clientKeyMaterial);
 			
