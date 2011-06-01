@@ -50,6 +50,8 @@ public class HistoryDatabase
 	static private class CloseableIteratorImpl
 		implements CloseableIterator<HistoryEvent>
 	{
+		private LinkedList<HistoryEvent> _stagingArea = 
+			new LinkedList<HistoryEvent>();
 		private DatabaseConnectionPool _connectionPool;
 		private Connection _connection;
 		private Statement _stmt;
@@ -85,9 +87,15 @@ public class HistoryDatabase
 		@Override
 		final public boolean hasNext()
 		{
+			if (!_stagingArea.isEmpty())
+				return true;
+			
 			try
 			{
-				return _rs.next();
+				if (!_rs.next())
+					return false;
+				_stagingArea.addLast(historyEventFromStandardResultSet(_rs));
+				return true;
 			}
 			catch (SQLException e)
 			{
@@ -99,15 +107,9 @@ public class HistoryDatabase
 		@Override
 		final public HistoryEvent next()
 		{
-			try
-			{
-				return historyEventFromStandardResultSet(_rs);
-			}
-			catch (SQLException e)
-			{
-				throw new RuntimeException(
-					"Unable to read result set.", e);
-			}
+			if (_stagingArea.isEmpty())
+				hasNext();
+			return _stagingArea.removeFirst();
 		}
 
 		@Override

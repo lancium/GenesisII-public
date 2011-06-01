@@ -60,6 +60,7 @@ final public class WSIterable<Type> implements Iterable<Type>, Closeable
 	
 	private Object []_initialBlock = null;
 	private int _blockSize;
+	private boolean _closed = false;
 	
 	private Type extractType(MessageElement []any)
 	{
@@ -143,10 +144,10 @@ final public class WSIterable<Type> implements Iterable<Type>, Closeable
 	@Override
 	synchronized final public void close() throws IOException
 	{
-		if (_iterator != null)
+		if (!_closed)
 			_iterator.release();
 		
-		_iterator = null;
+		_closed = true;
 	}
 
 	@Override

@@ -542,7 +542,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 							new HistoryEventBundleType(data));
 					}
 				};
-			builder.preferredBatchSize(25);
+			builder.preferredBatchSize(100);
 			builder.addElements(iter);
 				
 			return new IterateHistoryEventsResponseType(builder.create());

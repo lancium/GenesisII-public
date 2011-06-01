@@ -190,4 +190,29 @@ public class WSIteratorDBResource extends BasicDBResource
 			StreamUtils.close(stmt);
 		}
 	}
+
+	@Override
+	public void destroy() throws ResourceException
+	{
+		super.destroy();
+		
+		PreparedStatement stmt = null;
+		
+		try
+		{
+			stmt = getConnection().prepareStatement(
+				"DELETE FROM iterators WHERE iteratorid = ?");
+			stmt.setString(1, _resourceKey);
+			stmt.executeUpdate();
+		}
+		catch (SQLException e)
+		{
+			throw new ResourceException(
+				"Error cleaning up an iterator!", e);
+		}
+		finally
+		{
+			StreamUtils.close(stmt);
+		}
+	}
 }

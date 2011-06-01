@@ -82,7 +82,6 @@ public class InstanceConfigurationSectionHandler
 				}
 				catch (Exception e)
 				{
-					throw new ConfigurationException(e);
 				}
 			}
 		}
