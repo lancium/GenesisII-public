@@ -1,0 +1,16 @@
+Definitions:
+
+<source-path> 
+	This is the path to the source JSDL-format job file which needs to be serialized. It can be in the grid namespace or local file-systems namespace. While dealing with the local file-system namespace, make sure to begin the pathname with 'local:'. 
+
+<target-path>
+	This is the path to the target serialized (binary)format job file. It can be in the grid namespace or local file-systems namespace. While dealing with the local file-system namespace, make sure to begin the pathname with 'local:'. 
+
+
+Description:
+	This command takes in a JSDL format job-file and outputs a serialized (binary) version of it. 
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.ParseJSDLTool

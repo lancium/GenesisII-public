@@ -1,0 +1,5 @@
+history <Positive-Integer>
+
+	OR
+	
+history {--clear | -c}

@@ -1,0 +1,19 @@
+Definitions:
+
+watch 
+    A token that indicates that the user wishes to watch a TTY object for streamed output. 
+
+TTY Object 
+    A TTY object is a resource, created using the create-resource tool, that can receive streams of output from BES containers and which can be watched for that output. 
+
+unwatch 
+    A token that indicates that the user wishes to cease watching for output streaming through a TTY. 
+
+Description:
+
+TTY Objects can received output from various sources and forward that information on to watchers. The buffer that it uses to do this is limited in size and must be read relatively frequently or information will be lost. Any jobs the user submits to a BES container (directly or through a queue) will have their output forward back through the TTY object.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.TTYTool 

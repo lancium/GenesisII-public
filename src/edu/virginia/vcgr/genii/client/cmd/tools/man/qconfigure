@@ -1,0 +1,23 @@
+Definitions
+
+queue-path 
+    The queue path is the RNS path to an existing queue which the user wishes to configure a resource for. 
+
+resource-name 
+    The resource name is the human readable name of the resource inside the queue which the users wants to configure slots for. NOTE that the resource cannot be indicated by full RNS path. See notes below. 
+
+num-slots 
+    The number of slots to allocated to the resource. This number represents the maximum number of jobs that the queue can assign to that resource at any one time. 
+
+Description:
+
+Users indicate resources that the queue can schedule jobs on by linking those resources (BES containers) into the queue's RNS space. Similarly, users can always see the list of existing resources in the queue by performing a grid ls inside the queue's namespace. The configure command allows the user to alter the number of slots available on a specific resource inside the queue, effectively limiting the number of simultaneous jobs that the queue can allocate to that resource. The default slot count for a resource (when first added to the queue) is 1.
+
+Notes:
+
+It is important to note that one cannot specify a resource by RNS path alone. I.e. you can't say qconfigure /MyQueue/MyResource 8 to allocate 8 slots to the MyResource resource inside of the MyQueue queue. Instead, you MUST specify the queue and resource seperately (as in qconfigure /MyQueue MyResource 8). The reason for this is due to an unfortunate complication arising from WS-Addressing's explicitly stated restrictions on comparing EPRs and the fact that we cannot assume that other venders will choose to implement WS-Naming as part of their BES implementations. Because of these issues, it isn't possible to uniquely identify (in persistent storage) a resource by it's EPR alone. Instead, the queue identifies resources in the database using the resource name given it when linked in).
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.queue.QConfigureTool 

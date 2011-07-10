@@ -31,7 +31,10 @@ public abstract class BaseGridTool implements ITool
 	
 	private String _description;
 	private String _usage;
+	private String _manPage = null;
+	
 	private boolean _isHidden;
+	private ToolCategory _category = ToolCategory.MISC;
 	
 	private boolean _useGui = true;
 	protected List<String> _arguments = new ArrayList<String>();
@@ -71,18 +74,25 @@ public abstract class BaseGridTool implements ITool
 		return lookup(RNSPath.getCurrent(), path, queryFlags);
 	}
 	
-	protected BaseGridTool(String description, String usage, boolean isHidden)
+	protected void addManPage(FileResource manPage){
+		_manPage = readResource(manPage);
+	}
+	
+	private BaseGridTool(String description, String usage, boolean isHidden)
 	{
 		_description = description;
 		_usage = usage;
 		_isHidden = isHidden;
 	}
 	
-	protected BaseGridTool(String description, FileResource usageResource,
-		boolean isHidden)
-	{
-		this(description, readResource(usageResource), isHidden);
-	}
+	
+	protected BaseGridTool(FileResource descriptionResource,
+			FileResource usageResource, boolean isHidden, ToolCategory cat)
+		{
+			this(readResource(descriptionResource),
+				readResource(usageResource), isHidden);
+			_category = cat;
+		}
 	
 	protected BaseGridTool(FileResource descriptionResource,
 		FileResource usageResource, boolean isHidden)
@@ -94,6 +104,10 @@ public abstract class BaseGridTool implements ITool
 	protected boolean useGui()
 	{
 		return _useGui;
+	}
+	
+	protected void overrideCategory(ToolCategory cat){
+		_category = cat;
 	}
 	
 	protected PrintWriter stdout;
@@ -192,10 +206,14 @@ public abstract class BaseGridTool implements ITool
 	
 	static private String readResource(FileResource resource)
 	{
+		
+		if (resource == null){
+			return "";
+		}
+		
 		StringBuilder builder = new StringBuilder();
 		BufferedReader reader = null;
 		String line;
-		
 		try
 		{
 			reader = new BufferedReader(new InputStreamReader(
@@ -214,6 +232,11 @@ public abstract class BaseGridTool implements ITool
 			throw new RuntimeException(
 				"Unable to read resource \"" + resource.toString() 
 				+ "\".", ioe);
+		}
+		catch(Exception e){
+			throw new RuntimeException(
+					"Unable to read resource \"" + resource.toString() 
+					+ "\".", e);
 		}
 		finally
 		{
@@ -299,5 +322,16 @@ public abstract class BaseGridTool implements ITool
 			throw new InvalidToolUsageException(
 				"Path expanded to too many entries.");
 		}
+	}
+	
+	public ToolCategory getCategory(){
+		return _category;
+	}
+	
+	public String getManPage(){
+		if (_manPage == null)
+			return null;
+		else
+			return _manPage;
 	}
 }

@@ -19,13 +19,16 @@ import edu.virginia.vcgr.genii.client.cmd.CommandLineRunner;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class EditTool extends BaseGridTool
 {
 	static final private String DESCRIPTION =
-		"Edits a file with a registered editor.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dedit";
 	static final private String USAGE =
-		"edit { <path-to-file> | !<command-number> | !! }";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uedit";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/edit";
 	
 	@Override
 	final protected void verify() throws ToolException
@@ -72,7 +75,10 @@ public class EditTool extends BaseGridTool
 	
 	public EditTool()
 	{
-		super(DESCRIPTION, USAGE, false);
+		super(new FileResource(DESCRIPTION), new FileResource(USAGE), false,
+				ToolCategory.DATA);
+		addManPage(new FileResource(_MANPAGE));
+		
 	}
 	
 	final public int editFile(GeniiPath path) throws Throwable

@@ -1,0 +1,31 @@
+Definitions:
+
+storetype 
+    The store type indicates the type of keystore from which to load the source certificate that will be delegated to the new IDP instance. If this value is the string WIN then the certificate will be acquired from the local machine's Windows Certificate Store. Otherwise, the certificate will be loaded from a propertly formatted keystore of the type specified. If the local machine is NOT a windows machine, then it is an error to specify the WIN keystore type. Further, if the WIN keystore type is specified, then the credential URI cannot be given (otherwise, it MUST be given). The default keystore type is PKCS12. 
+
+credential-uri 
+    If the keystore type is not WIN, then the credential-uri argument MUST be given and indicates the path to a validly formatted keystore source (either local file system path, or URI describing the source of the keystore). 
+
+rns-path-to-idp-service 
+    This argument allows the user to specify the IDP service inside of which to create the new user instance. This is a properly specified service identification hint. 
+
+new-user 
+    This argument gives the new IDP service instance name to use. All IDP service instances are automatically created inside the IDP service (which implements the RNS interface). 
+
+login-name 
+    The login-name option allows the user to specify the login username that will be required to authenticate to the new IDP instance. 
+
+login-password 
+    Similar to login-name, this option allows the user to specify the login password that will be required to authenticate to the new IDP instance. 
+
+validDuration 
+    A valid duration string describing the duration of time for which the IDP instance is valid. 
+
+Description:
+
+The create-user-delegate tool is a user-friendly front end to the idp tool which assumes many default values for creating users based off of existing certificates (i.e., delegating to them). The tool will query the user for values to any options or arguments that are not given on the command line (except validDuration which is optional).
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.CreateUserDelegateTool 

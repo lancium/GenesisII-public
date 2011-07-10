@@ -10,17 +10,22 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class CopyTool extends BaseGridTool
 {
 	static private final String _DESCRIPTION =
-		"Copies files around RNS space.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dcp";
 	static private final String _USAGE =
-		"cp <source-path> <target-path>";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/ucp";
+	static private final String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/cp";
 
 	public CopyTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), 
+				false, ToolCategory.DATA);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

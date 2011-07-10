@@ -1,0 +1,14 @@
+Definitions:
+
+<container-path>
+	The RNS path of the container whose usage statistics is needed.
+
+Description:
+	Displays the usage statistics of a particular container. The statistics displayed include the container start-time, database-access statistics and  method-access statistics. Both the  method-access statistics and the database-access statistics are categorized into three time-frames - statistics for the last 30 seconds, 1 minute and 5 minutes. The database statistics give the following information : Number of database connections opened, closed and the average time-duration of a connection for each time-frame. The method statistics give information about the total number of calls started, succeeded, failed and the average duration of a call. Additionally, there is also a class-wise break up of the total method-information.
+
+
+Code:
+
+Implementing Class
+	edu.virginia.vcgr.genii.client.cmd.tools.ContainerStatsTool
+	

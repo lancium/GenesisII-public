@@ -1,0 +1,18 @@
+Description:
+
+Similar to the mkdir tool in UNIX, the grid mkdir tool allows the user to create a directory relative to the current directory (or the absolute path). To indicate a local path, make sure to begin the pathname with 'local:'.
+
+The following options are available:
+
+-p|--parents
+
+Indicates to create all necessary parent directories as well
+
+--rns-services
+
+Gives the path of an RNS service to use for creation
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.MkDirTool 

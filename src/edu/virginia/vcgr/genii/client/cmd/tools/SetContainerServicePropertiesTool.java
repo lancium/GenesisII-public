@@ -23,16 +23,19 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 public class SetContainerServicePropertiesTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION =
-		"Sets various container services properties.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dset-container-service-properties";
 	static final private FileResource _USAGE =
-		new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/resources/set-cservices-props-usage.txt");
-
+		new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/usage/uset-container-service-properties");
+	static final private FileResource _MANPAGE = new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/man/set-container-service-properties");
+	
 	private String _downloadMgrTmpDir = null;
 	private String _scratchSpaceDir = null;
 	
 	public SetContainerServicePropertiesTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), _USAGE, false,
+				ToolCategory.ADMINISTRATION);
+		addManPage(_MANPAGE);
 	}
 	
 	@Option({"download-mgr-tmpdir"})

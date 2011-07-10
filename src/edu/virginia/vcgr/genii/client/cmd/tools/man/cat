@@ -1,0 +1,13 @@
+Definitions:
+
+target-byteio 
+	The path to any resource that implements one of the ByteIO port types or the path to a local file. To indicate a local path, make sure to begin the pathname with 'local:'. 
+
+Description:
+
+The cat command, similar to cat in UNIX, reads the contents of specified ByteIO service resources and local files and displays their contents to the standard output stream.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.CatTool 

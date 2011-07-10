@@ -18,9 +18,11 @@ import edu.virginia.vcgr.genii.container.q2.matching.MatchingParamEnum;
 public class MatchingParamsTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION =
-		"Allows a user to manipulate a target's matching parameters.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dmatching-params";
 	static final private FileResource _USAGE =
-		new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/resources/matchp-tool-usage.txt");
+		new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/usage/umatching-params");
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/matching-params";
 	
 	static private final Pattern ADD_REMOVE_PATTERN = Pattern.compile(
 		"^\\s*((?:add)|(?:remove))\\s*\\(([^),]+),([^)]+)\\)\\s*$");
@@ -49,7 +51,9 @@ public class MatchingParamsTool extends BaseGridTool
 	
 	public MatchingParamsTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), _USAGE, false,
+				ToolCategory.ADMINISTRATION);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

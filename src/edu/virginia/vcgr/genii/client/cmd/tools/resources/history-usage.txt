@@ -1,5 +1,0 @@
-history [max-entries=<max-entries>]
-
-	OR
-	
-history {--clear | -c}

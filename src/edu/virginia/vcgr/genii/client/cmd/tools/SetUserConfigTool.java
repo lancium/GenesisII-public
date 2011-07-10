@@ -5,17 +5,22 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.UserConfig;
 import edu.virginia.vcgr.genii.client.configuration.UserConfigUtils;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class SetUserConfigTool extends BaseGridTool
 {
 	static private final String _DESCRIPTION =
-		"Sets up the user's current configuration information (and stores it in user's directory).";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dset-user-config";
 	static private final String _USAGE =
-		"set-user-config <deployment name>";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uset-user-config";
+	static private final String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/set-user-config";
 	
 	public SetUserConfigTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), 
+				false, ToolCategory.GENERAL);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

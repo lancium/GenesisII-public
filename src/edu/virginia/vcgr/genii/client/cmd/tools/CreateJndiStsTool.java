@@ -48,9 +48,9 @@ public class CreateJndiStsTool extends BaseGridTool
 	 */
 	public CreateJndiStsTool()
 	{
-		super("Creates a new IDP instance based off of an existing credential.",
-			new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/resources/create-jndi-sts-usage.txt"),
-			false);
+		super(new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/description/dcreate-jndi-sts"),
+			new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/usage/ucreate-jndi-sts-usage"),
+			false, ToolCategory.ANTIQUATED);
 	}
 	
 	@Option({"jnditype"})
@@ -188,7 +188,7 @@ public class CreateJndiStsTool extends BaseGridTool
 		InputDialog input = wp.createInputDialog(
 			"IDP Service Path", "IDP service to use?");
 		input.setHelp(new TextContent(new FileResource(
-			"edu/virginia/vcgr/genii/client/cmd/tools/resources/create-user-idp-path-help.txt")));
+			"edu/virginia/vcgr/genii/client/cmd/tools/usage/ucreate-user-idp-path-help")));
 		input.setDefaultAnswer("");
 		
 		while (true)

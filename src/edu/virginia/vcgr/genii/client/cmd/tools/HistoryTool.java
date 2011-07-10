@@ -5,13 +5,16 @@ import java.util.ArrayList;
 import edu.virginia.vcgr.genii.client.cmd.CommandLineRunner;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class HistoryTool extends BaseGridTool
 {
 	static private final String _DESCRIPTION =
-		"Display the list of up to 500 previous commands with line numbers.";
-	static private final String _USAGE_RESOURCE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/resources/history-usage.txt";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dhistory";
+	static private final String _USAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uhistory";
+	static private final String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/history";
 	
 	private boolean _clear = false;
 	private int _max = 500;
@@ -24,7 +27,9 @@ public class HistoryTool extends BaseGridTool
 	
 	public HistoryTool()
 	{
-		super(_DESCRIPTION, _USAGE_RESOURCE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), false,
+				ToolCategory.GENERAL);
+		addManPage(new FileResource(_MANPAGE));
 	}
 
 	@Override

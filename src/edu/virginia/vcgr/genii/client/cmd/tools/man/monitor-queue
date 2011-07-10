@@ -1,0 +1,15 @@
+Definitions:
+
+<queue-path>
+	The path to the grid-queue where jobs have to be monitored.
+
+<sleep-interval-seconds>
+	The time-interval between two polling requests to the queue. The polling requests continue as long as all jobs which the callee owns has not completed.
+
+Description:
+	This command is used to monitor jobs in the queue until all jobs which belong to the caller have completed. The frequency of polling to check if jobs have completed is denoted by the sleep-inteval. A completed job denotes that the job has moved to the Final State. The job can be in a Final state either due to successful completion of a job or due to an error.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.MonitorQueue

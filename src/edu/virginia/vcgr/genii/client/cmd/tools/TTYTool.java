@@ -22,16 +22,20 @@ import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 public class TTYTool extends BaseGridTool
 {
 	static private final String _DESCRIPTION = 
-		"Creates, manipulates, and destroys grid tty objects.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dtty";
 	static private final FileResource _USAGE_RESOURCE =	new FileResource(
-		"edu/virginia/vcgr/genii/client/cmd/tools/resources/tty-usage.txt");
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/utty");
+	static private final String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/tty";
 
 	static public final String WATCH_TOKEN = "watch";
 	static public final String UNWATCH_TOKEN = "unwatch";
 	
 	public TTYTool()
 	{
-		super(_DESCRIPTION, _USAGE_RESOURCE, false);
+		super(new FileResource(_DESCRIPTION), _USAGE_RESOURCE, 
+				false, ToolCategory.MISC);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

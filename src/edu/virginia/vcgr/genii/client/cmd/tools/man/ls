@@ -1,0 +1,30 @@
+Description:
+
+Similar to the ls tool in UNIX, the grid ls tool allows the user to list entries in both local and RNS directories.
+
+The following options are available:
+
+-l | --long
+
+Long format
+
+-a | --all
+
+Shows all types of entries
+
+-e | --epr
+
+Shows the EPR's of all RNS entries
+
+-d
+
+The current directory
+
+<target> *
+
+A regular expression for the entries you want returned. To indicate a local path, make sure to begin the pathname with 'local:'.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.LsTool 

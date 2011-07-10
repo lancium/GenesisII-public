@@ -4,6 +4,7 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 import java.text.ParseException;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 
 public abstract class BaseLoginTool extends BaseGridTool{
@@ -24,11 +25,14 @@ public abstract class BaseLoginTool extends BaseGridTool{
 	protected String _authnUri = null;
 
 	protected BaseLoginTool(String description, String usage, boolean isHidden) {
-		super(description, usage, isHidden);
+		super(new FileResource(description), new FileResource(usage), isHidden,
+				ToolCategory.INTERNAL);
 	}
 	
+	
+	
 	public BaseLoginTool() {
-		super("", "", false);
+		super(null, null, false);
 	}
 
 	@Option({"storetype"})

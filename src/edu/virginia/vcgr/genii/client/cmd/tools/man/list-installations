@@ -1,0 +1,12 @@
+Definitions:
+
+No arguments
+
+
+Description:
+	Displays the present installation-state - i.e the list of containers run by that user. Each container is denoted by the deployment-name and its URL.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.InstallationTool

@@ -30,6 +30,13 @@ import edu.virginia.vcgr.genii.client.utils.units.Duration;
  */
 public class CreateUserDelegateTool extends CreateUserTool
 {
+	static final private String _DESCRIPTION = 
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dcreate-user-delegate";
+	static final private String _USAGE= 
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/ucreate-user-delegate";
+	static final private String _MANPAGE= 
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/create-user-delegate";
+	
 	protected String _storeType = null;
 	
 	/**
@@ -37,9 +44,8 @@ public class CreateUserDelegateTool extends CreateUserTool
 	 */
 	public CreateUserDelegateTool()
 	{
-		super("Creates a new IDP instance based off of an existing credential.",
-			new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/resources/create-user-delegate-usage.txt"),
-			false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE),false);
+		
 	}
 	
 	/**

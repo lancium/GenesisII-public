@@ -10,6 +10,7 @@ import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.GridUserEnvironment;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
@@ -19,13 +20,18 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 public class CdTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION =
-		"Changes the current directory to the one indicated.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dcd";
 	static final private String _USAGE =
-		"cd [<target-dir>]";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/ucd";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/cd";
+		
 	
 	public CdTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), 
+				new FileResource(_USAGE), false, ToolCategory.DATA);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

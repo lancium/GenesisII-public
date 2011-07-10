@@ -1,0 +1,13 @@
+Definitions:
+
+--pattern=<certificate/token pattern> | --all 
+    This optional flag determines the logout that will be performed. The default value is --all which means that a total logout will be performed (all certificates or token patterns will be removed). There is also an option allowing you to choose which exactly pattern you would like to remove. 
+
+Description:
+
+The logout command is used to remove authentication information from the user's context.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.LogoutTool 

@@ -1,0 +1,13 @@
+Definitions:
+
+target 
+    The RNS path to a BES container whose attributes document you would like to retrieve. 
+
+Description:
+
+The get-bes-attributes command, is used to retrieve and print the attributes document of a BES container.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.GetBESFactoryAttributesTool 

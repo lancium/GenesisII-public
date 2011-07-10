@@ -5,23 +5,27 @@ import java.io.File;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
+import edu.virginia.vcgr.genii.client.cmd.tools.ToolCategory;
 import edu.virginia.vcgr.genii.client.queue.JobTicket;
 import edu.virginia.vcgr.genii.client.queue.QueueManipulator;
 import edu.virginia.vcgr.genii.client.gpath.*;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.cmd.tools.Option;
 
 public class QSubTool extends BaseGridTool
 {
 	static private final String _DESCRIPTION =
-		"Submits a new job to a given Queue.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dqsub";
 	static private final String _USAGE =
-		"qsub <queue-path> [--priority=<priority>] <jsdl-file>";
-	
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uqsub";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/qsub";
 	private int _priority = 0;
 	
 	public QSubTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), false, ToolCategory.EXECUTION);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Option({"priority"})

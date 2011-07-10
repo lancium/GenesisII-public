@@ -16,6 +16,7 @@ import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.io.URIManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLInterpreter;
 import edu.virginia.vcgr.genii.client.jsdl.personality.PersonalityProvider;
@@ -32,11 +33,14 @@ public class StageDataTool extends BaseGridTool{
 	private String _direction = "in";
 
 	static private final String _DESCRIPTION =
-		"Takes a serialized job request or JSDL file and" + 
-		" performs stageing actions";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dstageData";
+	
 	static private final String _USAGE =
-		"parseJSDL <scratchDir> <jobFile>" + 
-		" [--type=<jsdl|binary>] [--direction=<in|out>]";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/ustageData";
+	
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/stageData";
+		
 
 	@Option({"type"})
 	public void setType(String type) {
@@ -50,7 +54,10 @@ public class StageDataTool extends BaseGridTool{
 
 	public StageDataTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), 
+				new FileResource(_USAGE), true,
+				ToolCategory.DATA);
+		addManPage(new FileResource(_MANPAGE));
 	}
 
 	@Override
@@ -69,6 +76,7 @@ public class StageDataTool extends BaseGridTool{
 		File wDir = new File(getArgument(0));
 		GeniiPath source = new GeniiPath(getArgument(1));
 
+		
 		if (!source.exists())
 			throw new FileNotFoundException(String.format(
 					"Unable to find source file %s!", source));
@@ -139,6 +147,7 @@ public class StageDataTool extends BaseGridTool{
 	private void stageOUT(String source, URI target,
 			UsernamePasswordIdentity credential){
 		File fSource = new File(source);
+		
 		if (!fSource.exists()){
 			stdout.println("Unable to locate source");
 			return;

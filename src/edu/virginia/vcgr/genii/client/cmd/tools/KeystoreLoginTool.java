@@ -31,9 +31,9 @@ import edu.virginia.vcgr.genii.context.ContextType;
 
 public class KeystoreLoginTool extends BaseLoginTool
 {
-	static private final String _DESCRIPTION = "Inserts authentication information into the user's context.";
+	static private final String _DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/dkeystoreLogin";
 	static private final String _USAGE_RESOURCE = 
-		"login --storetype=<PKCS12|JKS|WIN> [--password=<keystore-password>] [--alias] [--validDuration=<duration-string>] [--toolIdentity] [--pattern=<certificate/token pattern>] [<keystore URL>] ";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/ukeystoreLogin";
 
 
 	protected KeystoreLoginTool(String description, String usage, boolean isHidden) {
@@ -42,6 +42,7 @@ public class KeystoreLoginTool extends BaseLoginTool
 
 	public KeystoreLoginTool() {
 		super(_DESCRIPTION, _USAGE_RESOURCE, false);
+		overrideCategory(ToolCategory.SECURITY);
 	}
 
 

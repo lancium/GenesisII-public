@@ -1,0 +1,25 @@
+Definitions:
+
+rns-path-to-idp-service 
+    This optional argument allows the user to specify the IDP service inside of which to create the new user instance. This is a properly specified service identification hint. 
+
+new-user 
+    This optional argument gives the new IDP service instance name to use. All IDP service instances are automatically created inside the IDP service (which implements the RNS interface). 
+
+login-name 
+    The optional login-name argument allows the user to specify the login username that will be required to authenticate to the new IDP instance. 
+
+login-password
+    Similar to login-name, this optional argument allows the user to specify the login password that will be required to authenticate to the new IDP instance. 
+
+validDuration 
+    An optional duration string describing the duration of time for which the IDP instance is valid. 
+
+Description:
+
+The create-user tool is a user-friendly front end to the idp tool which assumes many default values for creating brand new users from scratch. The tool will query the user for values to any options or arguments that are not given on the command line (except validDuration which is optional).
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.CreateUserTool 

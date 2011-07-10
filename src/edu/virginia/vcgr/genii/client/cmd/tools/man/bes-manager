@@ -1,0 +1,14 @@
+Definitions:
+
+[rns-path-to-bes]
+	This is an optional argument. If present, this is the RNS path to the BES which is to be managed. If absent, this GUI-tool provides the list of BES' created using the BES-manager tool. No argument needs to be provided when a BES has to be created or removed using the BES Manager.
+
+
+Description:
+	The bes-manager tool provides a convenient (GUI) way for creating BES' on the container	deployed on the same machine as the client. The BES can be linked into the grid name-space. This permits CPU cycle-sharing. The BES-Manager tool provides options for choosing whether to continue ( or suspend or kill) running jobs on a particular BES (created using the BES-Manager tool), when the screen-saver is inactive or when a user is logged-in. The screen-saver inactive action and user logged in action for a BES, can also be set and queried using the bes-policy command.
+
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.BESManager

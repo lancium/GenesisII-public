@@ -16,6 +16,7 @@ import edu.virginia.vcgr.genii.client.exec.install.windows.GenesisIIContainerSer
 import edu.virginia.vcgr.genii.client.exec.install.windows.WindowsFirewall;
 import edu.virginia.vcgr.genii.client.exec.install.windows.WindowsRights;
 import edu.virginia.vcgr.genii.client.exec.install.windows.WindowsServices;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class ManageWindowsContainerServiceTool extends BaseGridTool
 {
@@ -23,13 +24,9 @@ public class ManageWindowsContainerServiceTool extends BaseGridTool
 		ManageWindowsContainerServiceTool.class);
 	
 	static final private String USAGE =
-		"manage-windows-container-service { -u | -i } [--service-name=<service-name>]\n" +
-		"\t[--account=<account>] [--password=<password>]\n\n" +
-		"\t\tIf the <account> string has the token $MACHINENAME in it,\n" +
-		"\t\tthat token will be replaced with the short name of the\n" +
-		"\t\tlocal machine.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/umanage-windows-container-service";
 	static final private String DESCRIPTION =
-		"Installs or uninstalls a container as a windows service.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dmanage-windows-container-service";
 	
 	private boolean _install = false;
 	private boolean _uninstall = false;
@@ -39,7 +36,8 @@ public class ManageWindowsContainerServiceTool extends BaseGridTool
 	
 	public ManageWindowsContainerServiceTool()
 	{
-		super(DESCRIPTION, USAGE, true);
+		super(new FileResource(DESCRIPTION), new FileResource(USAGE), true,
+				ToolCategory.ADMINISTRATION);
 	}
 	
 	@Option({"service-name"})

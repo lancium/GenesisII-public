@@ -1,0 +1,24 @@
+Definitions:
+
+source-path 
+    The source path is a source RNS path identifying an existing grid resource. 
+
+target-path 
+    The target path is a target RNS path that identifies a name (currently not existing) which the user wishes to give the new link. 
+
+epr-file 
+    When the epr-file option is given, the user is identifying a local file-system file, rather than an RNS path, to use for the source of the link. Because RNS space links human readable names to EPRs, it is possible using this command option to link in a completely new (to the given RNS space) grid resource based off of that resource's EPR. The file indicated by this option should be a properly formatted XML document containing a WS-Addressing EndpointReferenceType element. 
+
+service-url 
+    When the service-url option is given, the user indicates the URL of a grid service that he or she wishes to link into the RNS space. This is done by forming the degenerate WS-Addressing EndpointReferenceType indicated by this URL (i.e., by creating an EPR whose address field is the given URL, and for whom all other fields are empty or null). 
+
+Description:
+
+Similar to the ln tool in UNIX, the grid ln tool allows the user to make links to grid resources in the current session's RNS space. This can be done either from existing RNS paths, or from EPRs or degenerate EPRs (URLs). As with the UNIX ln tool, in the case where the link is made from an existing RNS path to a new one, the new path need not be given. In this case, the tool will assume that the user wishes to create a link from the source path to a similarly named entry in the user's current working RNS path.
+
+It is important to note that unlike UNIX, RNS links behave neither like UNIX hard-links, nor like UNIX soft-links. In fact, their behavior lies somewhere between those two UNIX concepts. Links in the grid are hard-links in the sense that each link directly specifies an EPR to reference (just has hard links in UNIX directly indicate an inode). However, unlike hard-links in UNIX, grid links do not perform any reference counting, thus giving a behavior similar to UNIX soft-links whereby a resource can be removed or terminated leaving danging entries elsewhere in the namespace (or in other namespaces).
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.LnTool 

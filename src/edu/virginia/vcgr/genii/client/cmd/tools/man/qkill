@@ -1,0 +1,20 @@
+Definitions:
+
+queue-path 
+    The queue path is the RNS path to an existing queue on which the user wishes to terminate an existing job 
+
+job-ticket 
+    THe string job ticket returned by a successful qsub command. 
+
+Description:
+
+The qkill command allows grid users to terminate any managed job (not already in a final state) that they previously submitted. The qkill command will fail if any of the jobs indicated by the job-ticket list is already in a final state (hence, a slight race condition occurs in that a job may move from a non-final state to a final one between the user issuing the command and the command actually reaching the remote queue). Further, the qkill command will fail if any of the tickets specified are not owned by the caller.
+
+Notes:
+
+qkill moves managed jobs into a final state, but it does not remove them from the queue. In order to garbage collect queue jobs, a user must issue the qcomplete command.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.queue.QKillTool 

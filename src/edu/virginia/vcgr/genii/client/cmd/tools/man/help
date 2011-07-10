@@ -1,0 +1,16 @@
+Definitions:
+
+[command...]
+	The name of the command(s) whose description and usage is required. It is an optional argument.
+
+[-v | --verbose ]
+	Verbose-mode. If used with the command-name argument, the usage and man-page of that command is printed-out.
+
+Description:
+	If a command-name is provided (without verbosity), it prints-out the description and usage of that command. If the verbose argument is used, then the usage and man-page of the command is printed. If no command-name is provided, it lists the set of commands available.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.HelpTool
+

@@ -20,13 +20,14 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class DownloadCertificateTool extends BaseGridTool
 {
 	static private final String USAGE =
-		"download-certificate <rns-path-to-idp> <target-local-file>";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/udownload-certificate";
 	static private final String DESCRIPTION =
-		"Downloads the public certificate from a remote IDP instance.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/ddownload-certificate";
 	
 	static private void writeFile(InputStream in, File outputFile)
 		throws IOException
@@ -46,7 +47,8 @@ public class DownloadCertificateTool extends BaseGridTool
 	
 	public DownloadCertificateTool()
 	{
-		super(DESCRIPTION, USAGE, true);
+		super(new FileResource(DESCRIPTION), new FileResource(USAGE), true,
+				ToolCategory.SECURITY);
 	}
 	
 	@Override

@@ -5,20 +5,25 @@ import java.util.ArrayList;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
+import edu.virginia.vcgr.genii.client.cmd.tools.ToolCategory;
 import edu.virginia.vcgr.genii.client.queue.JobTicket;
 import edu.virginia.vcgr.genii.client.queue.QueueManipulator;
 import edu.virginia.vcgr.genii.client.gpath.*;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class QKillTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION = 
-		"Kills a job already in the queue.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dqkill";
 	static final private String _USAGE =
-		"qkill <queue-path> <ticket0>...<ticketn>";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uqkill";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/qkill";
 	
 	public QKillTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), false, ToolCategory.EXECUTION);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

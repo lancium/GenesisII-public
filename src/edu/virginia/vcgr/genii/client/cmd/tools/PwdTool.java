@@ -2,17 +2,24 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 
 public class PwdTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION =
-		"Prints the current directory.";
-	static final private String _USAGE = "pwd";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dpwd";
+	static final private String _USAGE = 
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/upwd";	
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/pwd";
+	
 	
 	public PwdTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), 
+				false, ToolCategory.GENERAL);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

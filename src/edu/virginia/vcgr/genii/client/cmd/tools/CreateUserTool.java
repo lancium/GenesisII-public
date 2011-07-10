@@ -36,15 +36,17 @@ public class CreateUserTool extends BaseGridTool
 	protected String _durationString = null;
 	protected Duration _duration = null;
 	
+	static final private String _DESCRIPTION = 
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dcreate-user";
+	static final private String _USAGE= 
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/ucreate-user";
+	
 	/**
 	 * Construct a new create-user tool
 	 */
 	public CreateUserTool()
 	{
-		this("Creates a new user using the IDP authentication service.",
-			new FileResource(
-				"edu/virginia/vcgr/genii/client/cmd/tools/resources/create-user-usage.txt"), 
-			false);
+		this(new FileResource(_DESCRIPTION), new FileResource(_USAGE), false);
 	}
 	
 	/**
@@ -54,24 +56,13 @@ public class CreateUserTool extends BaseGridTool
 	 * @param usageResource The resource that contains the usage for this tool.
 	 * @param isHidden Whether or not this tool should be hidden from users.
 	 */
-	protected CreateUserTool(String description, FileResource usageResource, 
+	protected CreateUserTool(FileResource description, FileResource usageResource, 
 		boolean isHidden)
 	{
-		super(description, usageResource, isHidden);
+		super(description, usageResource, isHidden,
+				ToolCategory.SECURITY);
 	}
 	
-	/**
-	 * Construct a new create-user tool.
-	 * 
-	 * @param description The description to give this tool
-	 * @param usage The usage for this tool.
-	 * @param isHidden Whether or not this tool should be hidden from users.
-	 */
-	protected CreateUserTool(String description, String usage, 
-		boolean isHidden)
-	{
-		super(description, usage, isHidden);
-	}
 	
 	/**
 	 * Set the login name for the new IDP service instance.
@@ -246,7 +237,7 @@ public class CreateUserTool extends BaseGridTool
 		InputDialog input = wp.createInputDialog("IDP Service Path", "IDP service to use?");
 		input.setDefaultAnswer("");
 		input.setHelp(new TextContent(new FileResource(
-			"edu/virginia/vcgr/genii/client/cmd/tools/resources/create-user-idp-path-help.txt")));
+			"edu/virginia/vcgr/genii/client/cmd/tools/usage/ucreate-user-idp-path-help")));
 		
 		while (true)
 		{

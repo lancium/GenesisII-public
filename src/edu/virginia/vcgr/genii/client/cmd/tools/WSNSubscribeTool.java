@@ -26,10 +26,9 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicQueryExpression;
 public class WSNSubscribeTool extends BaseGridTool
 {
 	static private final String _DESCRIPTION =
-		"Can either subscribe one service to another, " +
-		"OR can subscribe itself to an endpoint and then listen.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dwsn-subscribe";
 	static private final String _USAGE_RESOURCE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/resources/subscribe-usage.txt";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uwsn-subscribe";
 
 	private class NotificationHandlerImpl
 		extends AbstractNotificationHandler<NotificationMessageContents>
@@ -162,7 +161,8 @@ public class WSNSubscribeTool extends BaseGridTool
 	
 	public WSNSubscribeTool()
 	{
-		super(_DESCRIPTION, new FileResource(_USAGE_RESOURCE), true);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE_RESOURCE),
+				true, ToolCategory.INTERNAL);
 	}
 	
 	@Override

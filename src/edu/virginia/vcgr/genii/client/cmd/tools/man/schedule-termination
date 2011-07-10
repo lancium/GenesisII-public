@@ -1,0 +1,19 @@
+Definitions:
+
+target-path 
+    Target path is any valid RNS path that indicates an existing Genesis II resource. All Genesis II resources support the scheduled termination time mechanism. 
+
+calendar-value 
+    Calendar value is a string which indicates the time at which the users wishes for a resource to be terminated automatically. This string can either be a valid Java parseable date string, or a + sign followed by a valid duration strings (+number[ms|s|m|h|d]). It is highly recommended that users use the duration strings version of this tool as the date strings that the native Java parser understands (See http://java.sun.com/javase/6/docs/api/java/text/DateFormat.html) is highly dependent not only on locale, but also Java version. 
+
+Description:
+
+Sets a schedule for when the indicated resources will automatically be terminated from the server.
+Notes
+
+Currently, the Genesis II system performs lazy deletion of resources scheduled to terminate. This means that the resources can expire without actually being garbage collected. Resources terminated on a schedule are not garbage collected until an attempt is made to access them (after their termination time).
+
+Code:
+
+Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.TerminationScheduleTool 

@@ -1,0 +1,17 @@
+Definitions:
+
+<target>
+	The RNS path to the target resource whose resource-properties need to be set.
+
+<rp-file>
+	The path to the resource-properties file to be used. This can be in the grid namespace or local file-system namespace.
+
+
+Description:
+	This command is used to set resource-properties of a given target-resource based on the given file. The resource-properties can be viewed using get-attributes command.
+
+	
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.SetResourcePropertiesTool

@@ -47,9 +47,10 @@ import edu.virginia.vcgr.genii.certGenerator.GenerateX509V3CertificateChainRespo
 public class CertGeneratorTool extends BaseGridTool 
 {
 	static private final String _DESCRIPTION =
-		"Creates and uses CertGenerator services.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dcert-generator";
 	static private final String _USAGE_RESOURCE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/resources/cert-generator-usage.txt";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/ucert-generator";
+	
 	static private final String _LOCAL_MACHINE_NAME_CN = "LOCAL_MACHINE_NAME";
 	static private final String _LOCAL_MACHINE_IP_CN = "LOCAL_MACHINE_IP";
 
@@ -75,7 +76,8 @@ public class CertGeneratorTool extends BaseGridTool
 
 	public CertGeneratorTool()
 	{
-		super(_DESCRIPTION, new FileResource(_USAGE_RESOURCE), false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE_RESOURCE), false,
+				ToolCategory.SECURITY);
 	}
 	
 	@Option({"create-generator"})

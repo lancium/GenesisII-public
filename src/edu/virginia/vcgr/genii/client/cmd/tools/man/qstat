@@ -1,0 +1,16 @@
+Definitions:
+
+queue-path 
+    The queue path is the RNS path to an existing queue for which the user wishes to stat managed jobs. 
+
+ticket 
+    The job tickets are the string ticket identifiers returned by qsub when a job is submitted. 
+
+Description:
+
+The qstat command gives the status information for jobs currently managed by the queue and owned by the caller. If no tickets are provided, the qstat tool will stat all jobs owned by the current caller. If any tickets are given, only the jobs specified will be stat'ed. If the caller attempts to stat a job which he or she does not own, then the qstat call will fail. This tool is similar to qlist except that it only stats jobs owned by the caller and returns both public and private information about the jobs.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.queue.QStatTool 

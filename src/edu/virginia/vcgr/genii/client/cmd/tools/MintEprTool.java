@@ -42,9 +42,9 @@ import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 final public class MintEprTool extends BaseGridTool
 {
 	static final private String DESCRIPTION = 
-		"Mints eprs from component pieces.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dmint-epr";
 	static final private FileResource USAGE =
-		new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/resources/mint-epr-usage.txt");
+		new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/usage/umint-epr");
 	
 	static private EndpointReferenceType readEPRFromFile(GeniiPath path)
 		throws IOException
@@ -222,7 +222,8 @@ final public class MintEprTool extends BaseGridTool
 	
 	public MintEprTool()
 	{
-		super(DESCRIPTION, USAGE, false);
+		super(new FileResource(DESCRIPTION), USAGE, false,
+				ToolCategory.ADMINISTRATION);
 	}
 	
 	@Option("output")

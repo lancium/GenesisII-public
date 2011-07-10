@@ -1,0 +1,16 @@
+Definitions:
+
+var-name 
+    Any number of variable names and their values can be specified on the command line. These variable/value pairs will be availble to the script while it executes as correspondingly defined macros. 
+
+script-file 
+    The local or RNS path to a validly formatted Genesis II XML script (called XScript). To indicate a local path, make sure to begin the pathname with 'local:'. 
+
+Description:
+
+The script command allows a user to run an  Xscript program on the grid. The XML scripting language is a very simple scripting language which allows users to issue any Genesis II command. It also provides mechanisms for simple control flow as well as simple macro management. This tool is available to all users, but intended primarily for Genesis II developers. JavaScript scripts can also be executed. Filename extensions are used to determine the correct language to use when running scripts. Thus, to run a JavaScript script, one would indicate a file whose filename ended in the .js extension. Similarly, to run an XScript script file, the filename must end with the .xml filename extension.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.ScriptTool 

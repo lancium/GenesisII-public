@@ -1,0 +1,13 @@
+Definitions
+
+target 
+    The RNS path to any resource whose attribute (resource-property) document you would like to retrieve. 
+
+Description:
+
+The get-attributes command, retrieves and prints the attribute (resource-property) document for a target.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.GetAttributesDocumentTool 

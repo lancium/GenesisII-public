@@ -6,17 +6,21 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.install.ContainerInformation;
 import edu.virginia.vcgr.genii.client.install.InstallationState;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class InstallationTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION =
-		"Lists current installation state.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dlist-installations";
 	static final private String _USAGE =
-		"list-installations";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/ulist-installations";
+	static final private FileResource _MANPAGE = new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/man/list-installations");
 	
 	public InstallationTool()
 	{
-		super(_DESCRIPTION, _USAGE, true);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), true,
+				ToolCategory.INTERNAL);
+		addManPage(_MANPAGE);
 	}
 	
 	@Override

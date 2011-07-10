@@ -1,0 +1,25 @@
+Definitions:
+
+target-bes 
+    The BES resource which you wish to query or adjust the policy for. 
+
+query 
+    This flag indicates that you wish to query, or list the current policy being enforced by the target BES container. 
+
+set-user-logged-in 
+    This option indicates that action that you wish for the target BES container to take when a person logs in to the machine on which that BES container is running. 
+
+set-screensaver-inactive 
+    This option indicates that action that you wish for the target BES container to take when the screensaver becomes inactive on a target machine (note that this value has no meaning on a Linux server). 
+
+policy-action 
+    The policy action is one of the four tokens NOACTION, SUSPEND, SUSPENDORKILL, or KILL and indicates what should be done to running activities when a policy rule is met. Because it is not always possible to suspend a process (some platforms don't support this), the SUSPENDORKILL token indicates that the BES container should try to suspend the process first, and if this doesn't work, it should then kill it. 
+
+Description:
+
+BES Policies are rules or conditions that, when met, trigger some action to be taken with activities currently managed by a given BES container. Usually the rules have to do with an idle resource no longer being idle (i.e., now in use by a person). Actions range from doing nothing, to suspending, or even killing the activities on that container.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.BESPolicyTool 

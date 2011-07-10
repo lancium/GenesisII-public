@@ -1,17 +1,22 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class EchoCommand extends BaseGridTool
 {
 	static final private String _DESCRIPTION =
-		"Echos the contents of the command line.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/decho";
 	static final private String _USAGE =
-		"echo [arg1...argn]";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uecho";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/echo";
 	
 	public EchoCommand()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), 
+				new FileResource(_USAGE), false);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

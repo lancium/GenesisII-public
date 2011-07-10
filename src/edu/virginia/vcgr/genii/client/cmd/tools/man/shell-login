@@ -1,0 +1,12 @@
+Definitions:
+
+<home-dir>
+	The RNS path to the directory where the user should "login". A script in the format .glogin.xml or .glogin.js should exist there.
+
+Description:
+	This tool allows a user to "login" to a particular directory, and then executes the .glogin.xml or .glogin.js script here. If both .glogin.xml and .glogin.js exist, then both scripts are executed.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.ShellLoginTool

@@ -1,0 +1,20 @@
+Definitions:
+
+<workingDir>
+	This is the path to the working-directory, into and out of which the staging operations will occur. This path is in the local file-system namespace, but need NOT be prefixed with "local:". The working-directory must NOT already exist.
+
+<JobFile>
+	This is the path to the job-file. The job-file can be in jsdl or binary format. It can be in the grid namespace or local file-system namespace. Paths in the local file-system namespace should be prefixed by "local:".
+
+[--type=<jsdl|binary>]
+	Indicates the type of job-file. The job-file can be in JSDL format or in a serialized (binary) format. The binary format for a given JSDL format file can be generated using the parseJSDL tool.
+
+
+Description:
+
+	This command is used to execute a job "locally" - i.e in the client-machine. The job is described in terms of a job-file which is either in JSDL or binary format. The staging operations occur into (and out of) the working directory.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.RunJSDL

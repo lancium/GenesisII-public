@@ -1,0 +1,4 @@
+Usage:
+
+qconfigure <queue-path> <resource-name> <num-slots>
+

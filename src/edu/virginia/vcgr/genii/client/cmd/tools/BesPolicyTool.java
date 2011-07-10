@@ -22,9 +22,11 @@ import edu.virginia.vcgr.genii.container.bes.BESPolicyActions;
 public class BesPolicyTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION =
-		"Gets and sets the bes process policy.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dbespolicy";
 	static final private FileResource _USAGE =
-		new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/resources/bes-policy-usage.txt");
+		new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/usage/ubes-policy");
+	static final private String _MANPAGE = 
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/bes-policy";
 	
 	private BESPolicyActions _userLoggedInAction = null;
 	private BESPolicyActions _screenSaverInactiveAction = null;
@@ -32,7 +34,9 @@ public class BesPolicyTool extends BaseGridTool
 	
 	public BesPolicyTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), _USAGE, false,
+				ToolCategory.ADMINISTRATION);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Option({"set-user-logged-in"})

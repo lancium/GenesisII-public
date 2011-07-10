@@ -1,0 +1,13 @@
+Definitions:
+
+deployment-dir 
+    Path to a GenesisII deployment directory within the local filesystem. To indicate a local path, make sure to begin the pathname with 'local:'. 
+
+Description:
+
+Updates the local GenesisII installation to use specified deployment directory.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.SetUserConfigTool 

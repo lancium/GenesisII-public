@@ -1,0 +1,15 @@
+Definitions:
+
+[ -c | --clear ] 
+	Clears history. It is an optional argument.
+	
+<Positive-Integer n>
+	Displays the last n issued commands(including the current one).  
+
+Description:
+	Display the list of up to five-hundred recently issued commands with line numbers.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.HistoryTool

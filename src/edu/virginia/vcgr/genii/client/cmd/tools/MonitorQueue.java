@@ -7,17 +7,22 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.queue.JobInformation;
 import edu.virginia.vcgr.genii.client.queue.QueueManipulator;
 import edu.virginia.vcgr.genii.client.gpath.*;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class MonitorQueue extends BaseGridTool
 {
 	static private final String DESCRIPTION =
-		"Monitors jobs in a queue until all are complete.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dmonitor-queue";
 	static private final String USAGE =
-		"monitor-queue <queue-path> <sleep-interval-seconds>";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/umonitor-queue";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/monitor-queue";
 	
 	public MonitorQueue()
 	{
-		super(DESCRIPTION, USAGE, true);
+		super(new FileResource(DESCRIPTION), new FileResource(USAGE), true,
+				ToolCategory.INTERNAL);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

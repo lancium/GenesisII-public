@@ -28,17 +28,10 @@ import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 
 public class IdpTool extends BaseLoginTool {
 
-	static private final String _DESCRIPTION = "Creates a proxy authentication object to delegate an X.509 identity";
-	static private final String _USAGE_RESOURCE = "idp "
-		+ "[--storetype=<PKCS12|JKS|WIN>] "
-		+ "[--password=<keystore-password>] " 
-		+ "[--alias] "
-		+ "[--pattern=<certificate/token pattern>] "
-		+ "[--validMillis=<valid milliseconds>] " 
-		+ "[<authentication source URL>] "
-		+ "<IDP service path> "
-		+ "<new IDP name>";
-
+	static private final String _DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/didp";
+	static private final String _USAGE_RESOURCE = "edu/virginia/vcgr/genii/client/cmd/tools/usage/uidp";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/idp";
 
 	protected IdpTool(String description, String usage, boolean isHidden) {
 		super(description, usage, isHidden);

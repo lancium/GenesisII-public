@@ -15,17 +15,21 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.utils.urls.URLUtilities;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class ConnectTool extends BaseGridTool
 {
 	static private final String _DESCRIPTION =
-		"Connects to an existing net.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dconnect";
 	static private final String _USAGE =
-		"connect <connect-url|connect-path> [<deployment name>]";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uconnect";
+	static private final String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/connect";
 	
 	public ConnectTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), false);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

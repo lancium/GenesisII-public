@@ -1,0 +1,19 @@
+Definitions:
+
+queue-path 
+    The queue path is the RNS path to an existing queue which the user wishes to complete jobs on. 
+
+all 
+    The all flag indicates that the user wishes to complete all jobs on the target queue which are both owned by him or her, and in a final state. 
+
+ticket# 
+    Tickets are string identifiers (GUIDs), returned from qsub, which indicate a specific job in the queue. If any tickets are specified, the user is assumed to be indicating the exact list of jobs that he or she wants to complete. If any of these tickets are either not owned by him or her, or not in a final state, the qcomplete command will fail. 
+
+Description:
+
+The queue manages all jobs that are submitted to it from the time that they are submitted until the time that the users completes them. Even jobs in a final state such as FINISHED, CANCELLED, or FAILED are managed by the queue until they are completed. Completing a job simply means that the users wishes to garbage collect, or remove the job, from the queue.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.queue.QCompleteTool 

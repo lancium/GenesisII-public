@@ -1,0 +1,31 @@
+Definitions:
+
+<path-to-cloud-bes>
+	The RNS path to the cloud BES.
+
+[--spawn=<count>]
+	The number of VMs to be spawned on the given cloudBES. It is an optional argument.
+
+[--shrink=<count>]
+	The number of VMs to be terminated on the given cloudBES. It is an optional argument.
+
+[--kill=<id>]
+	The id of the VM instance to be terminated on the given cloudBES. It is an optional argument.
+
+[--vmstatus]
+	Obtains the status of all the VM Resources on the given cloudBES. For each resource, the ID, the load on the resource, the state of the resource and the host where it is running, are displayed. It is an optional argument.
+
+If none of the above optional arguments are used, then the status of the cloudBES is obtained. This prints out the number of available, busy, pending, and preparing VMs.
+
+
+Description:
+	
+This tool is used for interacting with a cloudBES resource. The options can be used for spawning VMs, shrinking VMs, killing a particular VM instance, querying the status of the VMs.
+
+
+Code:
+
+Implementing Class
+	edu/virginia/vcgr/genii/client/cmd/tools/CloudTool
+
+

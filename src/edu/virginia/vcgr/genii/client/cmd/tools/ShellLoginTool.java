@@ -9,17 +9,22 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.rns.filters.RNSFilter;
 import edu.virginia.vcgr.genii.client.gpath.*;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class ShellLoginTool extends BaseGridTool
 {
 	static private final String DESCRIPTION =
-		"Log's the user into his home directory (looks for a script called .glogin.<extension> there.).";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dshell-login";
 	static private final String USAGE =
-		"shell-login <home-dir>.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/ushell-login";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/shell-login";
 	
 	public ShellLoginTool()
 	{
-		super(DESCRIPTION, USAGE, false);
+		super(new FileResource(DESCRIPTION), new FileResource(USAGE), false,
+				ToolCategory.SECURITY);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	static private Pattern LOGIN_FILENAME_PATTERN = Pattern.compile(

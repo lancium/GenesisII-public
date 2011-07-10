@@ -3,20 +3,24 @@ package edu.virginia.vcgr.genii.client.cmd.tools.queue;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
+import edu.virginia.vcgr.genii.client.cmd.tools.ToolCategory;
 import edu.virginia.vcgr.genii.client.queue.QueueManipulator;
 import edu.virginia.vcgr.genii.client.gpath.*;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class QConfigureTool extends BaseGridTool
 {
 	static private final String _DESCRIPTION = 
-		"Configures a given resource contained within a queue to have " +
-		"a different number of slots then it currently does.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dqconfigure";
 	static private final String _USAGE =
-		"qconfigure <queue-path> <resource-name> <num-slots>";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uqconfigure";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/qconfigure";
 	
 	public QConfigureTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), false, ToolCategory.EXECUTION);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

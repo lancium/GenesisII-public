@@ -3,19 +3,23 @@ package edu.virginia.vcgr.genii.client.cmd.tools.queue;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
+import edu.virginia.vcgr.genii.client.cmd.tools.ToolCategory;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.queue.QueueManipulator;
 
 public class QRescheduleTool extends BaseGridTool {
 
 	static private final String _DESCRIPTION = 
-		"Returns a running job to the queue and ensures it is not rescheduled on same bes " +
-		" Warning: Must manually reset slot count for this resource later.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dqreschedule";
 	static private final String _USAGE =
-		"qreschedule <queue-path> <ticket0>...<ticketn>";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uqreschedule";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/qreschedule";
 	
 	public QRescheduleTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), false, ToolCategory.EXECUTION);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

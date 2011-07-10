@@ -23,14 +23,17 @@ import edu.virginia.vcgr.genii.client.gpath.*;
 public class TerminationScheduleTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION_RESOURCE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/resources/termination-schedule-description.txt";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dschedule-termination";
 	static final private String _USAGE_RESOURCE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/resources/termination-schedule-usage.txt";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uschedule-termination";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/schedule-termination";
 	
 	public TerminationScheduleTool()
 	{
 		super(new FileResource(_DESCRIPTION_RESOURCE),
-			new FileResource(_USAGE_RESOURCE), false);
+			new FileResource(_USAGE_RESOURCE), false, ToolCategory.GENERAL);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

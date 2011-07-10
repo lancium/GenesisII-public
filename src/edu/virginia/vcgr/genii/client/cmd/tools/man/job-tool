@@ -1,0 +1,12 @@
+Definitions:
+
+<project-file>+
+	The list of grid-project files which are opened (if existing) or created (if new). It is an optional argument. The path to the grid-project files can be either a local path or a grid path.
+
+Description:
+	Launches Grid Job Tool which is used to create JSDL files. If a grid project-file list is provided then those files in the list which already exist are opened, while those that do not exist are created.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.JobTool

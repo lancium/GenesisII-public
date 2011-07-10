@@ -1,17 +1,22 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class UpdateTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION =
-		"Performs an update of this Genesis II installation.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dupdate";
 	static final private String _USAGE =
-		"update";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uupdate";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/update";
 	
 	public UpdateTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION),new FileResource(_USAGE), false,
+				ToolCategory.GENERAL);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

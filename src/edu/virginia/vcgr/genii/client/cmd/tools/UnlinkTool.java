@@ -11,17 +11,22 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class UnlinkTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION =
-		"Unlinks (without descroying) the target paths.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dunlink";
 	static final private String _USAGE =
-		"unlink <target-path> ...";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uunlink";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/unlink";
 	
 	public UnlinkTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), 
+				false, ToolCategory.DATA);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

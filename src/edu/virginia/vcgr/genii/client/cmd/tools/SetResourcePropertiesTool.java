@@ -16,6 +16,7 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
@@ -23,13 +24,16 @@ import edu.virginia.vcgr.genii.common.GeniiCommon;
 public class SetResourcePropertiesTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION =
-		"Set a collection of resource properties.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dset-resource-properties";
 	static final private String _USAGE =
-		"set-resource-properties <target> <rp-file>";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uset-resource-properties";
+	static final private FileResource _MANPAGE = new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/man/set-resource-properties");
 	
 	public SetResourcePropertiesTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), false,
+				ToolCategory.GENERAL);
+		addManPage(_MANPAGE);
 	}
 	
 	@Override

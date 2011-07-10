@@ -1,0 +1,141 @@
+Definitions:
+
+name 
+    allows the naming of a job, this must be specified when running an executable because there is no JSDL file providing the name 
+
+async-name 
+    when used, this will tell the run command not to poll the job to see when it finishes executing. The user must remove the job when it is finished manually, but normally the run tool will take care of this with polling. 
+
+bes-container 
+    this specifies what BES container should be used within the grid to run the job 
+
+scheduler 
+    this specifies that the job should be submitted to a scheduler, instead of a specific BES container (the user may not know what containers are appropriate) 
+
+run-options 
+    One or more of the following: 
+
+    * stdout - what file to send stdout to (must then specify stage-out)
+    * stderr - what file to send stderr to (must then specify stage-out)
+    * stdin - what file to use as input for stdin (must then specify stage-
+	in)
+    * stage-in=<filename>/<stage-in-uri> : This will allow a user to specify 		a URI, or filename, to take input from.
+    * stage-out=<filename>/<stage-out-uri> : This will allow a user to 		specify a URI, or filename, to send out put to.
+    * D<env-var>=<env-value> 
+
+executable 
+    executable that is desired to run. To indicate a local path, make sure to begin the pathname with 'local:'. 
+
+program-args 
+    arguments passed to the executable 
+
+jsdl 
+    JSDL file to run on a container or through a scheduler 
+
+check-status 
+    this will check on the status of a job 
+
+job-name 
+    the name that the job should be given 
+
+rns-path 
+    a path within the grid 
+
+jsdl-file 
+    a file describing the job, including options, name and other information. To indicate a local path, make sure to begin the pathname with 'local:'. 
+
+check-status 
+    this allows the user to check the status of a job running asynchronously; normally the run tool would poll and send updates to stdout 
+
+Description:
+
+This command will run a specified JSDL file on a target BES container, or through a scheduler. It can be used to start jobs, and to check on their status. It can also run executables, and allows arguments to be passed to those executables.
+
+Notes:
+
+There are essentially three modes of operation, one of which must be specified at the command line:
+
+    * --check-status
+    * --jsdl
+    * --name 
+
+
+JSDL Examples:
+
+
+Example Stage-In from URI:
+
+        <jsdl:DataStaging> 
+
+            <jsdl:FileName>adder.sh</jsdl:FileName> 
+
+            <jsdl:CreationFlag>overwrite</jsdl:CreationFlag> 
+
+            <jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination> 
+
+            <jsdl:Source> 
+
+                <jsdl:URI>http://www.cs.virginia.edu/~mmm2a/test/adder.sh</jsdl:URI> 
+
+            </jsdl:Source> 
+
+        </jsdl:DataStaging> 
+
+Example Stage-Out to FTP:
+
+        <jsdl:DataStaging> 
+
+            <jsdl:FileName>sum.dat</jsdl:FileName> 
+
+            <jsdl:CreationFlag>overwrite</jsdl:CreationFlag> 
+
+            <jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination> 
+
+            <jsdl:Target> 
+
+                <jsdl:URI>ftp://user:password@ftp.edu.com:8021/sum.dat</jsdl:URI> 
+
+            </jsdl:Target> 
+
+        </jsdl:DataStaging> 
+
+Example Stage-Out to Email:
+
+        <jsdl:DataStaging> 
+
+            <jsdl:FileName>stdout</jsdl:FileName> 
+
+            <jsdl:CreationFlag>overwrite</jsdl:CreationFlag> 
+
+            <jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination> 
+
+            <jsdl:Target> 
+
+                <jsdl:URI>mailto:test@test.virginia.edu?subject=jobOutput&X-AttachmentFilename=stdout.txt</jsdl:URI> 
+
+            </jsdl:Target> 
+
+        </jsdl:DataStaging> 
+
+Example Stage-Out to RNS path in the grid:
+
+        <jsdl:DataStaging> 
+
+            <jsdl:FileName>sum.dat</jsdl:FileName> 
+
+            <jsdl:CreationFlag>overwrite</jsdl:CreationFlag> 
+
+            <jsdl:DeleteOnTermination>true</jsdl:DeleteOnTermination> 
+
+            <jsdl:Target> 
+
+                <jsdl:URI>rns:sum.dat</jsdl:URI> 
+
+            </jsdl:Target> 
+
+        </jsdl:DataStaging> 
+
+Code
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.RunTool 

@@ -1,0 +1,6 @@
+create-user-delegate
+	[ { --storetype={PKCS12|JKS} <credential-uri> } | --storetype=WIN ]
+	[rns-path-to-idp-service] [new-user]
+	[--login-name=<login-name>] [--login-password=<login-password>]
+	[--validDuration=<duration-string>]
+

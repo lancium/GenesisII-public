@@ -1,0 +1,52 @@
+Definitions
+
+import 
+    Indicates that the tool shall load a certificate and optionally import it into another keystore 
+
+gen 
+    Indicates that the tool shall create a new certificate and corrosponding keypair. 
+
+base64-cert-file 
+    Path to an encoded X.509 digital certificate file 
+
+dn 
+    Distinguished name string to use in certificate "gen" mode 
+
+validity
+    Validity duration (in days) for the newly generated certificate and keypair. Defaults to 12 years. 
+
+input-keystore 
+    Path to an keystore from which to retrieve a certificate. In "gen" mode, this certificate and keypair is used to sign the newly generated certificate and keypair. If not supplied in "gen" mode, the new certificate and keypair will be self-signed. 
+
+input-keystore-pass 
+    Password required to access the input-keystore 
+
+input-storetype 
+    Type of keystore implemented by input-keystore. Defaults to PKCS12. 
+
+input-alias 
+    A keystore alias indicating the certificate (and any generated keys) to load from the input-keystore. 
+
+output-keystore 
+    Path to an keystore in which the certificate (and any generated keys) are to be written 
+
+output-keystore-pass 
+    Password required to access the output-keystore 
+
+output-storetype 
+    Type of keystore implemented by output-keystore. Defaults to PKCS12. 
+
+output-alias 
+    A keystore alias with which to associate the certificate (and any generated keys) within the output-keystore. 
+
+output-entry-pass 
+    Password string to protect the generated keypair 
+
+Description:
+
+A separate commandline tool that allows users to create or import certificates and/or keypairs within keystore files. If output-store is not specified, then the certificate and keys will be displayed to the console. If no input keystore for the certificate-creation "gen" mode, then the generated certificate is self-signed.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.security.x509.CertTool 

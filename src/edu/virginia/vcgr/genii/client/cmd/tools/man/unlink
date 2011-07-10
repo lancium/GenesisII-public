@@ -1,0 +1,13 @@
+Definitions:
+
+target-path 
+    The RNS path of an entry in RNS space that the user wishes to unlink, or a local path that the user wishes to remove. To indicate a local path, make sure to begin the pathname with 'local:'. 
+
+Description:
+
+The unlink tool is a simple grid tool which allows a user to unlink an entry from RNS space. This essentially means that the RNS mapping from that name to the indicated resource will be removed. Because links are not reference counted in the grid, this tool has no effect on the resource itself. In other words, unlink does not destroy target resources, it merely removes there names from RNS space. To destroy a target resource, use the rm command. When a local path is provided, this tool works the same as a regular removal.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.UnlinkTool 

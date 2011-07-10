@@ -1,0 +1,23 @@
+Definitions:
+
+<source-byteio>
+	The RNS path to the byteIO resource against which the performance test is to be performed. 
+
+<block-size>
+	The number of bytes in a single-block that the client wishes to read with a single-thread in a single out-call.
+
+<num-threads>
+	The number of threads to be spawned.
+
+
+Description:
+	This tool is a performance test against a byteIO resource. It aids in measuring the time taken to read from a byteIO resource as a function of the block-size and the number of threads. It helps inferring how much of the bandwidth is actually being utilized.
+
+
+Example:
+	byteioperf test.xml 1024 2 : This spawns two threads each reading 1024 bytes of data at a time from the byteIO resource test.xml .
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.ByteIOPerformanceTool

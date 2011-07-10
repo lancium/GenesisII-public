@@ -1,0 +1,2 @@
+logout [--pattern=<certificate/token pattern> | --all]
+

@@ -1,0 +1,31 @@
+Definitions:
+
+<scratchDir>
+	This is the path to the scratch-space directory, into/out-of which the staging should occur. It is in the local file-system namespace, but need NOT be prefixed by "local:".
+
+<jobFile>
+	This is the path to the job-file. The job-file can be in jsdl or binary format. It can be in the grid namespace or local file-system namespace. Paths in the local file-system namespace should be prefixed by "local:".
+
+[--type=<jsdl|binary>]
+	Indicates the type of job-file. The job-file can be in JSDL format or in a serialized (binary) format. The binary format for a given JSDL format file can be generated using the parseJSDL tool.
+
+[--direction=<in|out>]
+	Indicates if the staging operation is a stage-in or a stage-out.
+
+
+Description:
+	This command is used to stage-in (or stage-out) based on the job file into (or out-of) the given scratch-space directory. The job file can be in JSDL or binary format.  
+
+Example:
+	stageData /home/ak3ka/scratch test.xml --type=jsdl --direction=in
+	stageData /home/ak3ka/scratch test.xml.bin --type=binary --direction=in
+	stageData /home/ak3ka/scratch test.xml --type=jsdl --direction=out
+	stageData /home/ak3ka/scratch test.xml.bin --type=binary --direction=out
+
+The scratch-directory /home/ak3ka/scratch should exist during stage-in and stage-out.
+
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.StageDataTool

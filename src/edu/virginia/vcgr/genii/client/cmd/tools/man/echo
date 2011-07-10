@@ -1,0 +1,17 @@
+Definitions:
+
+argn    
+	String of characters to be printed to the terminal. 
+
+Description:
+
+Similar to echo in the UNIX operating system, the grid echo command outputs String arguments to the terminal. Extra spaces may be enclosed in double quotes. Environment variables wrapped in ${} are automatically substituted.
+
+Example :
+Genesis II:\$> echo ${foo}.txt
+foo.out.txt
+
+Code
+
+Implementing Class: 
+    edu.virginia.vcgr.genii.client.cmd.tools.EchoCommand 

@@ -16,10 +16,13 @@ import edu.virginia.vcgr.genii.cloud.VMStats;
 public class CloudTool extends BaseGridTool{
 	
 	static private final String _DESCRIPTION =
-		"Tool to control CloudBES resources.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dcloudTool";
 		
 	static private final String _USAGE_RESOURCE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/resources/cloud-tool-usage.txt";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/ucloudTool";
+	
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/cloudTool";
 
 	private int _shrink = -1;
 	private int _spawn = -1;
@@ -54,7 +57,9 @@ public class CloudTool extends BaseGridTool{
 
 	public CloudTool()
 	{
-		super(_DESCRIPTION, new FileResource(_USAGE_RESOURCE), false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE_RESOURCE), false,
+				ToolCategory.INTERNAL);
+		addManPage(new FileResource(_MANPAGE));
 	}
 
 	@Override

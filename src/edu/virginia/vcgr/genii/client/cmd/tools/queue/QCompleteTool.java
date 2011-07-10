@@ -5,23 +5,27 @@ import java.util.ArrayList;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
+import edu.virginia.vcgr.genii.client.cmd.tools.ToolCategory;
 import edu.virginia.vcgr.genii.client.queue.JobTicket;
 import edu.virginia.vcgr.genii.client.queue.QueueManipulator;
 import edu.virginia.vcgr.genii.client.gpath.*;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.cmd.tools.Option;
 
 public class QCompleteTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION =
-		"Completes a job already in the queue (this job MUST be in a terminal state).";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dqcomplete";
 	static final private String _USAGE =
-		"qcomplete <queue-path> { --all | <ticket0>...<ticketn>}";
-	
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uqcomplete";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/qcomplete";
 	private boolean _all = false;
 	
 	public QCompleteTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), false, ToolCategory.EXECUTION);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Option({"all"})

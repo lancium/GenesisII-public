@@ -1,0 +1,15 @@
+To add/remove an X.509 identity:
+
+chmod <target-path> ( <[<+|->r][<+|->w][<+|->x]> | <octal-mode> ) <cert-file-path>
+
+To add/remove a Identity Provider identity:
+
+chmod <target-path> ( <[<+|->r][<+|->w][<+|->x]> | <octal-mode> ) <identity-provider-path>
+
+To add/remove a username/password token identity:
+
+chmod <target-path> ( <[<+|->r][<+|->w][<+|->x]> | <octal-mode> ) --username=<username> --password=<password> 
+
+To add/remove the catch-all "everyone"/"world" identity:
+
+chmod <target-path> ( <[<+|->r][<+|->w][<+|->x]> | <octal-mode> ) --everyone

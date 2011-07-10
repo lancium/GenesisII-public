@@ -1,0 +1,18 @@
+Definitions:
+
+<path-to-file>
+	An absolute or relative path to the file which needs to be edited. The path could be local or grid path. If the file does not already exist, it will be created. Paths in the local file system name space needs to be preceded by "local:".
+
+!<command-number>
+	The command-number (as denoted in history) which is to be editted and executed.
+
+!!
+	The last executed command can be editted and executed.
+
+Description:
+	Used to edit a file. If the file does not already exist, it will be created. In the grid-namespace this file will be created on the same container as its parent directory. The created file is a RandomByteIO resource.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.EditTool

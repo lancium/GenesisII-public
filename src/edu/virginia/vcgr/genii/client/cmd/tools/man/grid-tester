@@ -1,0 +1,12 @@
+Definitions:
+
+{ Regression | Installation }:
+	The type of test to be performed. The Regression test suite does a Macro-substitution test, a Duration-class test and a SequenceNumber-class test. The Installation test suite performs a Container test and a Client test.
+
+--show-stack-traces:
+	This option is used to show the stack-trace of the failure, when any of the tests failed.
+
+Description:
+	The Installation test suite contains both a container test suite and a client test suite. The container test suite performs an address quality and a self-visibility check on the container's address. The container's address is taken as the most global-address of the (client) machine. The order of choosing the most global-address is as follows (from least-preferred to most preferred) : Loopback, Multicast, LinkLocal, SiteLocal and none of these(most prefered). IPv6 and wildcard addresses are not considered during the global-address selection. The address quality check tests whether the container's address is none of the following - wildcard address, loopback address, link-local unicast address, site-local address or a multicast address. The visibility check asserts whether the address of the container can be reached. The container-test suite's tests do not require the container to be running. The client test suite tests whether the root ("/") can be pinged. This test makes use of the ping tool. 
+
+	The Regression test suite contains a Macro test-suite, Units test suite and a History test suite. The Macro test suite tests whether single and multiple substitution(s) of ${key}=value pairs, and escape characters work. It is a test of the MacroUtils class. The Units test suite performs a test on the Durations class for a non-unit (default) Duration parse. The default unit is milliseconds. The Durations class has the ability to parse duration descriptions from strings, and convert them to double. Durations are typically long-values denoting a particular duration in milliseconds. This test checks whether the ability to parse duration from Strings and the String to double conversion falls within a threshold of 0.001 from the actual double value ( i.e the double value equivalent to the string). The history test suite tests the SequenceNumber class. 

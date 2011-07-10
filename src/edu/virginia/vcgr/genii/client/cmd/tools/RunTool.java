@@ -81,9 +81,12 @@ public class RunTool extends BaseGridTool
 	"([^\\/]+)\\/(.+)$");
 	
 	static private final String _DESCRIPTION =
-		"Runs the indicated JSDL file at the target BES container.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/drun";
 	static private final String _USAGE_RESOURCE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/resources/run-usage.txt";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/urun";
+	static private final String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/run";
+	
 	private Object _stateLock = new Object();
 	private ActivityState _state = null;
 	
@@ -125,7 +128,9 @@ public class RunTool extends BaseGridTool
 	
 	public RunTool()
 	{
-		super(_DESCRIPTION, new FileResource(_USAGE_RESOURCE), false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE_RESOURCE),
+				false,ToolCategory.EXECUTION);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Option({"name"})

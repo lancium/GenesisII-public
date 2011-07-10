@@ -1,0 +1,11 @@
+export
+
+export --create { --url <export-service-url> | <export-service-hint> } 
+	[--svn-user=<svn-username>] [--svn-pass=<svn-pass>] [--svn-revision=<svn-revision>]
+	<local-path> [new-rns-path]
+
+export --quit { --url <export-root-url> | <export-root-rns-path> }
+
+export --replicate { --url <primary-machine-url> <resolver-machine-url> |
+       <primary-container-name> <resolver-container-name> }
+       <primary-local-path> [new-rns-path]

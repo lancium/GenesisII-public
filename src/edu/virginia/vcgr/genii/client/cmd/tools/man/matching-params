@@ -1,0 +1,21 @@
+Definitions:
+
+<target> 
+	The RNS path to the target resource whose matching-parameters need to be added or removed.
+
+{ <add|remove>(property-identifier, value) } *
+	add : A matching parameter is being added to that resource.
+	remove : A matching parameter is being removed from that resource.
+	property-identifier : Denotes a property name with an optional "requirement" indicator - (supports or requires). 
+	value : Denotes the corresponding value for the property-name.
+
+Description:
+	This command is used to add/remove matching-parameters to a resource. This command is particularly useful when dealing with BES resources. If the "requires" property-identifier is used, then only jobs whose requirements match with those (required) properties of the BES, are scheduled onto that BES. In other words, each of the (required)BES property must be a requirement for the job too. If the "supports" or no requirement is used, then those BES properties need not be a requirement for the job. The matching-parameters for a BES resource can be retrieved using the  get-bes-attributes command.
+
+Example:
+matching-params /home/ak3ka/bes7 "add(supports-mpi, true)"
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.MatchingParamsTool

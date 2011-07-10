@@ -1,0 +1,16 @@
+Definitions:
+
+<queue-path> 
+	The queue path is the RNS path to an existing queue, which the user wishes to query.
+
+<ticket>
+	 The string job ticket (GUIDs) returned by a successful qsub command. The ticket identifies the job in the queue whose error information the user wishes to retrieve.
+
+
+Description:
+	The qquery command is used to obtain error information associated with a particular job in a particular queue.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.queue.QQueryTool

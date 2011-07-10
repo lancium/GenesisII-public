@@ -41,9 +41,11 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
 public class ExportTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION =
-		"Creates a new exported root directory or quits an existing one.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dexport";
 	static final private String _USAGE_RESOURCE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/resources/export-usage.txt";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uexport";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/export";
 	
 	private boolean _create = false;
 	private boolean _quit = false;
@@ -55,7 +57,9 @@ public class ExportTool extends BaseGridTool
 	
 	public ExportTool()
 	{
-		super(_DESCRIPTION, new FileResource(_USAGE_RESOURCE), false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE_RESOURCE),
+				false, ToolCategory.DATA);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Option({"create"})

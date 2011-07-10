@@ -29,9 +29,11 @@ import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 public class CreateResourceTool extends BaseGridTool
 {
 	static private final String _DESCRIPTION =
-		"Creates a new resource using generic creation mechanisms.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dcreate-resource";
 	static private final String _USAGE_RESOURCE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/resources/create-resource-usage.txt";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/ucreate-resource";
+	static private final String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/create-resource";
 
 	private boolean _url = false;
 	private GeniiPath _constructionProperties = null;
@@ -39,7 +41,9 @@ public class CreateResourceTool extends BaseGridTool
 	
 	public CreateResourceTool()
 	{
-		super(_DESCRIPTION, new FileResource(_USAGE_RESOURCE), false);
+		super(new FileResource(_DESCRIPTION), 
+				new FileResource(_USAGE_RESOURCE), false);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Option({"url"})

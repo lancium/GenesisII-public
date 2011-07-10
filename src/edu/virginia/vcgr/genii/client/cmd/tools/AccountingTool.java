@@ -52,11 +52,11 @@ public class AccountingTool extends BaseGridTool
 	static private Log _logger = LogFactory.getLog(AccountingTool.class);
 	
 	static final private String ACCOUNTING_TOOL_DESCRIPTION =
-		"Tool to manage accounting database.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/daccounting";
 	
 	static private final String USAGE_RESOURCE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/resources/accounting-usage.txt";
-	
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uaccounting";
+		
 	static private class StatementBundle implements Closeable
 	{
 		private PreparedStatement _lookupCID = null;
@@ -67,6 +67,8 @@ public class AccountingTool extends BaseGridTool
 		private PreparedStatement _insertAccountingRecord = null;
 		private PreparedStatement _insertMapping = null;
 		private PreparedStatement _insertCommandLineElement = null;
+		
+		
 		
 		private StatementBundle(Connection connection) throws SQLException
 		{
@@ -377,8 +379,9 @@ public class AccountingTool extends BaseGridTool
 	
 	public AccountingTool()
 	{
-		super(ACCOUNTING_TOOL_DESCRIPTION, 
-			new FileResource(USAGE_RESOURCE), true);
+		super(new FileResource(ACCOUNTING_TOOL_DESCRIPTION), 
+			new FileResource(USAGE_RESOURCE), true,
+			ToolCategory.INTERNAL);
 	}
 	
 	@Option({"collect"})

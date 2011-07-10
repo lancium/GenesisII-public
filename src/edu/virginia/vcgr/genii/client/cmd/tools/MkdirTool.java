@@ -29,16 +29,20 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
 public class MkdirTool extends BaseGridTool
 {
 	static private final String _DESCRIPTION =
-		"Creates the directory(s) indicated.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dmkdir";
 	static private final String _USAGE_RESOURCE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/resources/mkdir-usage.txt";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/umkdir";
+	static private final String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/mkdir";
 	
 	private boolean _parents = false;
 	private String _rnsService = null;
 	
 	public MkdirTool()
 	{
-		super(_DESCRIPTION, new FileResource(_USAGE_RESOURCE), false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE_RESOURCE),
+				false, ToolCategory.DATA);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Option({"parents", "p"})

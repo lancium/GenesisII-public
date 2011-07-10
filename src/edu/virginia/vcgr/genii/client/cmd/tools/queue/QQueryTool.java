@@ -6,21 +6,27 @@ import java.util.List;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
+import edu.virginia.vcgr.genii.client.cmd.tools.ToolCategory;
 import edu.virginia.vcgr.genii.client.queue.JobTicket;
 import edu.virginia.vcgr.genii.client.queue.QueueManipulator;
 import edu.virginia.vcgr.genii.client.gpath.*;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 
 public class QQueryTool extends BaseGridTool
 {
-	static final private String _DESCRIPTION =
-		"Retrieves any error information associated with a job in a queue.";
+	
+	static final private String _DESCRIPTION = 
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dqquery";
 	static final private String _USAGE =
-		"qquery <queue-path> <ticket>";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uqquery";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/qquery";
 	
 	public QQueryTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), false, ToolCategory.EXECUTION);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

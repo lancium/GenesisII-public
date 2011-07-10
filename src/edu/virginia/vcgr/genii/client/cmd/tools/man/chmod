@@ -1,0 +1,39 @@
+Definitions:
+
+target-path 
+    The RNS path of the resource whose authorization policies are to be inspected/updated 
+
+cert-file-path
+    The path to the encoded X.509 certificate file representing the identity to be added/removed from the access control list(s). To indicate a local path, make sure to begin the pathname with 'local:'. 
+
+identity-provider-path
+    The RNS path to the Identity Provider resource (i.e., a WS-Trust Security Token Service) to be added/removed from the access control list(s). 
+
+username
+    The username portion of the username-token identity to be added/removed from the access control list(s). 
+
+password
+    The password portion of the username-token identity to be added/removed from the access control list(s). 
+
+everyone
+    The catch-all "everyone"/"world" idenity to be added/removed from the access control list(s). 
+
+octal-mode
+    A single octal digit representing a 3-bit characteristic bit vector indicating the proper r/w/x membership for the specified identity. The Read, Write, and Execute lists correspond to the bits in this three-bit vector from most-significant to least-significant, respectively. 
+
+Description:
+
+The chmod tool gives users the ability to modify the authorization policy for a GenesisII grid resource. Authorization policies for GenesisII resources are represented as access control lists (ACLs). Operations upon a grid resource fall into one of three categories: Read, Write, and Execute (r/w/x). GenesisII resources manage three separate "allow" ACLs, one for each r/w/x category. The authz tool allows users to add and remove identities from these R/W/X ACLs.
+
+Examples:
+
+chmod hello.txt +r --everyone
+chmod hello.txt -r-w-x /users/merrill
+chmod hello.txt 4 local:merrill.cer
+
+Code:
+
+Implementing Classes 
+
+    * edu.virginia.vcgr.genii.client.cmd.tools.GamlChmodTool
+    * edu.virginia.vcgr.genii.client.security.gamlauthz.GamlClientTool 

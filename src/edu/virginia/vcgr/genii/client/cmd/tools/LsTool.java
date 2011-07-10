@@ -23,14 +23,16 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class LsTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION =
-		"Lists elements in context space.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dls";
 	static final private String _USAGE =
-		"ls [-ldae] [--long] [--all] [--directory] [--epr] [--cert-chain] [<target> *]\n" +
-		"\tWHERE -e means to show the EPR.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uls";
+	static final private String _MANPAGE = 
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/ls";
 
 	private boolean _long = false;
 	private boolean _all = false;
@@ -40,7 +42,9 @@ public class LsTool extends BaseGridTool
 	
 	public LsTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), false,
+				ToolCategory.DATA);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Option({"long", "l"})

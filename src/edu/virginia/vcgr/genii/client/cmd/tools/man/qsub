@@ -1,0 +1,19 @@
+Definitions:
+
+queue-path 
+    The queue path is the RNS path to an existing queue into which the user wishes to submit a new job. 
+
+priority 
+    This option allows the user to specify a custom priority for the jobs that he or she is submitting. Priorities are integers in the range [-10, 10] and for which a lower number indicates a higher priority (i.e., that the jobs will run earlier then lower priority jobs). 
+
+jsdl-file 
+    Jobs are specified by JSDL (Job Service Description Language) documents. The jsdl-file argument specified the RNS or local path of a valid jsdl XML file describing the job that the user wishes to submit to the queue. To indicate a local path, make sure to begin the pathname with 'local:'. 
+
+Description:
+
+The qsub command is used when a user wishes to submit or add a new job to a queue for that queue to manage.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.queue.QSubTool 

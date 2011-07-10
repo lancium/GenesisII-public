@@ -1,0 +1,23 @@
+Definitions:
+
+Berkeley DB query 
+    The XQuery sent to the XML database to retrieve data about the BES Attributes Documents. 
+
+informationService-service-path 
+    The RNS path to the Information Service whose XML collection you would like to query. 
+
+Description:
+
+The xmldb-query command is used to query the Berkley XML Database where you have stored the Attributes Documents of the BES containers you are currently watching in your Information Service.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.InfoSQueryTool 
+
+Example:
+
+xmldb-query "" /MyIS
+
+
+This query will return all the documents stored in the collection created for the Information Service resource MyIS 

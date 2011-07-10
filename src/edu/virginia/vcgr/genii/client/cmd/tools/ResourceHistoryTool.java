@@ -14,6 +14,7 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 import edu.virginia.vcgr.genii.client.history.HistoryEvent;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.iterator.WSIterable;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
@@ -25,9 +26,11 @@ import edu.virginia.vcgr.genii.common.IterateHistoryEventsResponseType;
 public class ResourceHistoryTool extends BaseGridTool
 {
 	static final private String DESCRIPTION =
-		"Retrieves the history event list for q given resource.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dresource-history";
 	static final private String USAGE =
-		"resource-history --dump=<path> <resource-path> [resource-hint]";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uresource-history";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/resource-history";
 	
 	private GeniiPath _store = null;
 	
@@ -52,6 +55,7 @@ public class ResourceHistoryTool extends BaseGridTool
 		List<HistoryEvent> events = new LinkedList<HistoryEvent>();
 		
 		RNSPath path = RNSPath.getCurrent().lookup(getArgument(0));
+	
 		GeniiCommon common = ClientUtils.createProxy(
 			GeniiCommon.class, path.getEndpoint());
 		
@@ -82,6 +86,7 @@ public class ResourceHistoryTool extends BaseGridTool
 		
 		Collections.sort(events, HistoryEvent.SEQUENCE_NUMBER_COMPARATOR);
 		
+		
 		try
 		{
 			if (_store != null)
@@ -106,7 +111,9 @@ public class ResourceHistoryTool extends BaseGridTool
 
 	public ResourceHistoryTool()
 	{
-		super(DESCRIPTION, USAGE, false);
+		super(new FileResource(DESCRIPTION), new FileResource(USAGE), false,
+				ToolCategory.EXECUTION);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Option("dump")

@@ -17,6 +17,7 @@ import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLInterpreter;
 import edu.virginia.vcgr.genii.client.jsdl.personality.PersonalityProvider;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
@@ -28,13 +29,17 @@ import edu.virginia.vcgr.genii.context.ContextType;
 public class ParseJSDLTool extends BaseGridTool{
 
 	static private final String _DESCRIPTION =
-		"Parses JSDL and outputs a serialized Job Request";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dparseJSDL";
 	static private final String _USAGE =
-		"parseJSDL <source-path> <target-path>";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uparseJSDL";
+	static private final String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/parseJSDL";
 
 	public ParseJSDLTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE),
+				false,ToolCategory.EXECUTION);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

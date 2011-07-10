@@ -23,9 +23,11 @@ import edu.virginia.vcgr.genii.common.GeniiCommon;
 public class ByteIOPerformanceTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION =
-		"Run a test to determine the create-file time for exports.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dbyteioperf";
 	static final private FileResource _USAGE =
-		new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/resources/byteioperf-usage.txt");
+		new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/usage/ubyteioperf");
+	
+	static final private FileResource _MANPAGE = new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/man/byteioperf");
 	
 	static private class WorkRequest
 	{
@@ -91,6 +93,7 @@ public class ByteIOPerformanceTool extends BaseGridTool
 					
 					_block.rewind();
 					_source.read(wr._startByte, _block);
+				
 					if (_block.remaining() > 0)
 					{
 						_block.flip();
@@ -146,7 +149,9 @@ public class ByteIOPerformanceTool extends BaseGridTool
 	
 	public ByteIOPerformanceTool()
 	{
-		super(_DESCRIPTION, _USAGE, true);
+		super(new FileResource(_DESCRIPTION), _USAGE, true,
+				ToolCategory.INTERNAL);
+		addManPage(_MANPAGE);
 	}
 
 	@Override

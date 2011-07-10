@@ -1,0 +1,9 @@
+idp
+		+ [--storetype=<PKCS12|JKS|WIN>] 
+		+ [--password=<keystore-password>]  
+		+ [--alias] 
+		+ [--pattern=<certificate/token pattern>] 
+		+ [--validMillis=<valid milliseconds>]  
+		+ [<authentication source URL>] 
+		+ <IDP service path> 
+		+ <new IDP name>

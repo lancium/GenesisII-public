@@ -1,0 +1,22 @@
+Definitions:
+
+target-rns-path 
+    The RNS path of the resource whose authorization policies are to be inspected/updated 
+
+Description:
+
+The interactive authz tool gives users the ability to inspect and modify the authorization policy for a grid resource. Once invoked, the authz tool retrieves the authorization policy of the indicated resource and displays it to the user. The user is then given interactive menu options for:
+
+    * Toggling the message-level-encryption requirement for the resource (disabled by default). Enabling this instructs the resource to only accept and respond with messages that have been encrypted as per SOAP XML Encryption (http://www.w3.org/TR/xmlenc-core/).
+    * Modifying portions of the retrieved policy.
+    * Committing the (updated) policy back to the resource. Modifications to policy will not take effect until the updated policy has been committed to the resource. 
+
+
+Authorization policies for GenesisII resources are represented as access control lists (ACLs). Operations upon a grid resource fall into one of three categories: Read, Write, and Execute (R/W/X). GenesisII resources manage three separate "allow" ACLs, one for each R/W/X category. The authz tool allows users to inspect, add, and remove identities from these R/W/X ACLs using the chmod tool syntax.
+
+Code:
+
+Implementing Classes 
+
+    * edu.virginia.vcgr.genii.client.cmd.tools.AuthZTool
+    * edu.virginia.vcgr.genii.client.security.gamlauthz.GamlClientTool 

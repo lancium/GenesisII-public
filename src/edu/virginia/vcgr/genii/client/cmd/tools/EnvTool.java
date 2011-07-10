@@ -7,16 +7,20 @@ import java.util.Set;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.context.GridUserEnvironment;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class EnvTool extends BaseGridTool
 {
-	static public final String USAGE = "env";
+	static public final String USAGE = "edu/virginia/vcgr/genii/client/cmd/tools/usage/uenv";
 	static public final String DESCRIPTION = 
-		"Prints the contents of the user's environment.";
-	
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/denv";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/env";
 	public EnvTool()
 	{
-		super(DESCRIPTION, USAGE, true);
+		super(new FileResource(DESCRIPTION), new FileResource(USAGE), true,
+				ToolCategory.INTERNAL);
+		addManPage(new FileResource(_MANPAGE));
 	}
 
 	@Override

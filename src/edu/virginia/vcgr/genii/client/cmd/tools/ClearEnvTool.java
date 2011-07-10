@@ -4,17 +4,21 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.GridUserEnvironment;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class ClearEnvTool extends BaseGridTool
 {
-	static final private String DESCRIPTION =
-		"Clears the current environment variables.";
-	static final private String USAGE =
-		"clearenv";
+	static public final String USAGE = "edu/virginia/vcgr/genii/client/cmd/tools/usage/uclearenv";
+	static public final String DESCRIPTION = 
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dclearenv";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/clearenv";
 	
 	public ClearEnvTool()
 	{
-		super(DESCRIPTION, USAGE, true);
+		super(new FileResource(DESCRIPTION), new FileResource(USAGE), true,
+				ToolCategory.INTERNAL);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

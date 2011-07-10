@@ -22,17 +22,22 @@ import edu.virginia.vcgr.genii.client.dialog.TextContent;
 import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.dialog.YesNoDialog;
 import edu.virginia.vcgr.genii.client.dialog.YesNoSelection;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class UserPreferencesTool extends BaseGridTool
 {
 	static private final String _DESCRIPTION = 
-		"Manipulates global user preferences for this machine.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/duser-preferences";
 	static private final String _USAGE =
-		"user-preferences"; 
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uuser-preferences"; 
+	static final private String _MANPAGE = 
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/user-preferences";
 	
 	public UserPreferencesTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), false, 
+				ToolCategory.GENERAL);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

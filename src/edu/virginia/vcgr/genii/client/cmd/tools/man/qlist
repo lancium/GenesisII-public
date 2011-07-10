@@ -1,0 +1,13 @@
+Definitions:
+
+queue-path 
+    The queue path is the RNS path to an existing queue for which the user wishes to list jobs. 
+
+Description:
+
+The qlist command lists all of the jobs currently managed by a given queue. This command returns a reduced set of information (information assumed to be publicly available) for all jobs currently in the queue. For a more detailed list of information, users should use the qstat command which only works with jobs that the caller owns, but returns both public, and private information.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.queue.QListTool  

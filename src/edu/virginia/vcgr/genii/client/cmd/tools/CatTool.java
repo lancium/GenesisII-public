@@ -9,17 +9,22 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class CatTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION =
-		"Cats the indicated files to the stdout stream.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dcat";
 	static final private String _USAGE =
-		"cat <target-file0> ...";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/ucat";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/cat";
 	
 	public CatTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), 
+				false, ToolCategory.DATA);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

@@ -1,0 +1,25 @@
+Definitions:
+
+--mount | --unmount
+	This required flag determines whether the user is trying to mount the GenesisII grid namespace into the local UNIX environment or trying to unmount the namespace.
+
+mount-point
+	local path in the filesystem where the grid namespace will be mounted, or will be unmounted from. The path must be prefixed with "local:", which should be followed by the full path to the intended local mount point.
+
+--uid=<uid>
+	This optional attribute allows to use different user id for all file ownership mappings of the resources in GenesisII grid namespace. When it is not specified, the current UNIX user id is used for all mappings by default.
+
+--daemon
+	This optional flag is only being used during mounting. It frees the current GenesisII grid console after the mount operation so that the user can do other things on the grid shell if he wants to. If this flag is not been used during mounting then the user has to use UNIX "fusermount -u <mount-point>" or "umount <mount-point>" to unmount the grid namespace; the "local:" prefix should be avoided in both cases.        
+
+Description:
+The fuse tool is used to mount the GenesisII grid namespace directly into the local UNIX environment. The mounted file system works just like any other mount on the UNIX system. In addition to normal file and directory operations, the users can submit jobs into the grid by copying JSDL documents into BES containers or GenesisII Queue resources.  
+
+Notes:
+The fuse tool uses a Java FUSE driver, which is quite verbose and tends to litter the console where the driver run with significant output. On occasions, this output will contain Java stack traces. However, this should not be taken as alarming. Most often, these are caused by lookup issued by the UNIX kernel for nonexistent files and directories in response to mkdir, cp, etc operations. 
+
+Code:
+
+Implementing Class
+	edu.virginia.vcgr.genii.client.cmd.tools.FuseTool
+

@@ -1,0 +1,40 @@
+Definitions:
+
+create 
+    The create flag indicates that the export tool is being used to create a brand new export. 
+
+url 
+    The URL flag indicates that the following path will actually be the URL of a service or resource rather than the RNS path of one. Normally users should not use this flag. 
+
+export-service-url 
+    The URL of the export root service to use when creating a new export. 
+
+export-service-path 
+    The RNS path of the export root service to use when creating a new export. 
+
+local-path 
+    A path in the local machine's file system which refers to a directory (and subsequent directory tree) that the user wishes to export into the grid. This path must begin with 'local:'. 
+
+new-rns-path 
+    A path in the connected grid's RNS namespace that the user wishes to export the data as (i.e., the location in RNS space where the export will be located once complete). This path must terminate in an RNS entry which does not yet exist. 
+
+quit 
+    The quit flag indicates that the export tool is being used to quit or terminate an existing export. This flag does not cause the underlying exported file system to remove any files or directory, but merely disconnects the exported data from the grid. 
+
+export-root-url 
+    The URL of an existing export root resource (one that has already been created) that the user wishes to terminate. 
+
+export-root-rns-path 
+    The RNS path of an existing export root resource (one that has already been created) that the user wishes to terminate. 
+
+Description:
+
+The export tool gives users the ability to create and terminate grid exports of existing data (please reference exporting for more information on exports in the grid). If no command line values are given, then export launches a graphical dialog to help maintain local exports. Note that the dialog only allows users to manipulate exports created through the dialog (in other words, one cannot create an export on the command line, and then terminate it through the dialog) and only works in environments where a container has been started (i.e., you cannot use the export dialog to create exports on a remote machine).
+
+Notes:
+
+It is important to understand that when exporting a local-path into the grid, the local-path is always relative to the container on which the ExportedRootPortType service exists. If a file system exists which is not directly accessible from any given container in a net, then there is no way to directly export that file system into the grid.
+Code
+
+Implementing Class: 
+    edu.virginia.vcgr.genii.client.cmd.tools.ExportTool 

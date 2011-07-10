@@ -1,0 +1,18 @@
+Description:
+
+Similar to the rm tool in UNIX, the grid rm tool allows the user to delete/remove resources on the Grid or local file-system relative to the current path or an absolute path. To indicate a local path, make sure to begin the pathname with 'local:'.
+
+The following options are available:
+
+-r | --recursive
+
+If the target path is a directory, removes all entries recursively from that directory and so on.
+
+-f | --force
+
+Forces entries to be deleted (no prompting)
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.RmTool 

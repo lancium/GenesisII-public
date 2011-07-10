@@ -1,0 +1,19 @@
+Definitions:
+
+attempts 
+    The number of iterations for which the query message is to be sent to the specified resource. (Defaults to 1.) 
+
+target-path
+    The RNS path to the GenesisII resource to be "pinged". 
+
+query
+    The character string to be echoed by the specified resource. 
+
+Description:
+
+The ping diagnostic tool sends a query-string to the specifed resource. If the user is authorized and the resource is available, the resource will echo the query-string back to the user. The round-trip exchange is attempted the specified number of times.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.PingTool 

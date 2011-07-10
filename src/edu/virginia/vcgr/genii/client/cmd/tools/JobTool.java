@@ -9,15 +9,18 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.externalapp.EditableFile;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.gjt.BlockingJobToolListener;
 
 public class JobTool extends BaseGridTool
 {
 	static final private String USAGE =
-		"job-tool [<project-file>+]";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/ujob-tool";
 	static final private String DESCRIPTION =
-		"Creates a new (or opens an existing) grid project file";
-
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/djob-tool";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/job-tool";
+	
 	@Override
 	protected void verify() throws ToolException
 	{
@@ -47,6 +50,9 @@ public class JobTool extends BaseGridTool
 
 	public JobTool()
 	{
-		super(DESCRIPTION, USAGE, false);
+
+		super(new FileResource(DESCRIPTION), new FileResource(USAGE),
+				false,ToolCategory.EXECUTION);
+		addManPage(new FileResource(_MANPAGE));
 	}
 }

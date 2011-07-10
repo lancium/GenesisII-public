@@ -1,0 +1,15 @@
+Definitions:
+
+<queue-path> 
+	The queue path is the RNS path to an existing queue, in which the user wishes to reschedule his job.
+
+<ticket0>...<ticketn>
+	The job tickets are the string ticket identifiers returned by qsub when a job is submitted. These are the tickets of the jobs to be rescheduled.
+
+Description:
+	This command is used to return an already-running job back to the queue and ensures it is not rescheduled on same bes. WARNING: The slot count for this resource must be manually reset later. This command is useful when the Queue consists of BES' which interface to a queuing system like PBS. So, a job may be in the Running state on the grid, but on a Queued state on the back-end PBS. Such jobs, can be moved to an alternate BES where it can be executed immediately.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.queue.QRescheduleTool

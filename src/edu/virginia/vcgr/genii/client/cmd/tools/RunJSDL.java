@@ -20,6 +20,7 @@ import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLInterpreter;
 import edu.virginia.vcgr.genii.client.jsdl.personality.PersonalityProvider;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapper;
@@ -35,10 +36,12 @@ public class RunJSDL extends BaseGridTool{
 	private String _type = "jsdl";
 	
 	static private final String _DESCRIPTION =
-		"Runs a grid job locally, will not run if working directory exists";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/drunJSDL";
 	static private final String _USAGE =
-		"runJSDL <workingDir> <JobFile> [--type=<jsdl|binary>]";
-
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/urunJSDL";
+	static private final String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/runJSDL";
+	
 	@Option({"type"})
 	public void setType(String type) {
 		_type = type;
@@ -46,7 +49,9 @@ public class RunJSDL extends BaseGridTool{
 	
 	public RunJSDL()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE),
+				false,ToolCategory.EXECUTION);
+		addManPage(new FileResource(_MANPAGE));
 	}
 
 	@Override

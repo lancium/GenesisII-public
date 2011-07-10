@@ -6,6 +6,7 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.ogsa.OGSARP;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
@@ -15,13 +16,17 @@ import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 public class AttachHostTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION =
-		"Attachs the indicated container into the griven hosting envrionment.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dattachhost";
 	static final private String _USAGE =
-		"attach-host <container-url> <rns-path>";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uattach-host";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/attach-host";
 	
 	public AttachHostTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), 
+				new FileResource(_USAGE), false,ToolCategory.ADMINISTRATION);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

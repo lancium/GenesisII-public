@@ -21,9 +21,9 @@ import edu.virginia.vcgr.genii.client.rns.RNSSpace;
 public class CreateRNSRootTool extends BaseGridTool
 {
 	static private final String _DESCRIPTION =
-		"Creates a new root RNS.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dcreate-root-rns";
 	static private final String _USAGE_RESOURCE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/resources/create-rns-root-usage.txt";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/ucreate-rns-root";
 	
 	private String _protocol = "https";
 	private String _host = "localhost";
@@ -32,7 +32,8 @@ public class CreateRNSRootTool extends BaseGridTool
 	
 	public CreateRNSRootTool()
 	{
-		super(_DESCRIPTION, new FileResource(_USAGE_RESOURCE), true);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE_RESOURCE), true,
+				ToolCategory.DATA);
 	}
 	
 	@Option({"protocol"})

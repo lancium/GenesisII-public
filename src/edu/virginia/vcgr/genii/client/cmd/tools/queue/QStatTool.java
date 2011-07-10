@@ -12,23 +12,28 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
 import edu.virginia.vcgr.genii.client.cmd.tools.Option;
+import edu.virginia.vcgr.genii.client.cmd.tools.ToolCategory;
 import edu.virginia.vcgr.genii.client.queue.JobInformation;
 import edu.virginia.vcgr.genii.client.queue.JobTicket;
 import edu.virginia.vcgr.genii.client.queue.QueueManipulator;
 import edu.virginia.vcgr.genii.client.gpath.*;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class QStatTool extends BaseGridTool
 {
-	static private final String _DESCRIPTION = 
-		"Shows the status of a given job or jobs in the queue.";
-	static private final String _USAGE =
-		"qstat [--full|-f] <queue-path> [<job-ticket0>...<job-ticketn>]";
+	static final private String _DESCRIPTION = 
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dqstat";
+	static final private String _USAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uqstat";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/qstat";
 	
 	private boolean _full = false;
 	
 	public QStatTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), false, ToolCategory.EXECUTION);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Option({"f", "full"})

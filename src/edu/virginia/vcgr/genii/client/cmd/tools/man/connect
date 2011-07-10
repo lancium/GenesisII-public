@@ -1,0 +1,19 @@
+Definitions:
+
+connect-url 
+    A properly formatted URL which identifies an input stream containing information about the root context of an RNS namespace. 
+
+connect-path 
+    The same as a connect-url except that this value is a valid local file-system path rather than a URL. To indicate a local path, make sure to begin the pathname with 'local:'. 
+
+deployment-name 
+    The relative, or absolute path to the deployment directory that should be used for configuration, service, and security settings. 
+
+Description:
+
+The connect tool allows a user to manually connect to a given remote net. Normally users shouldn't have to use this tool. By specifying the location of an input stream which contains information about the root RNS of a namespace, the client essentially identifies the exact root that he or she wishes to communicate with. The optional deployment directory parameter allows the user to further specify configuration information necessary to communicate with that net. By default, the deployment directory chosen will be deployments/default.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.ConnectTool 

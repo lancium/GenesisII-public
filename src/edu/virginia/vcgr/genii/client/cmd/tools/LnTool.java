@@ -23,9 +23,11 @@ import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 public class LnTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION =
-		"Links eprs into RNS space.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dln";
 	static final private String _USAGE_RESOURCE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/resources/ln-usage.txt";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uln";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/ln";
 	
 	private String _eprFile = null;
 	private String _serviceURL = null;
@@ -33,7 +35,9 @@ public class LnTool extends BaseGridTool
 	
 	public LnTool()
 	{
-		super(_DESCRIPTION, new FileResource(_USAGE_RESOURCE), false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE_RESOURCE),
+				false, ToolCategory.DATA);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Option({"epr-file"})

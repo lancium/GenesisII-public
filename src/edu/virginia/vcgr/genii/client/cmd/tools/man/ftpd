@@ -1,0 +1,22 @@
+Description:
+
+The ftpd tool allows the user to create an ftp daemon that listens on a specified port on the client. It can be used to access the Grid namespace and resources via the FTP protocol.
+
+The following options are available:
+
+--idle-timeout=<secs>
+
+--data-connection-timeout=<secs>
+
+--max-auth-attempts=<number>
+
+--sandbox=<path>
+
+stop
+
+Stops the ftp daemon on the client.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.FtpdTool 

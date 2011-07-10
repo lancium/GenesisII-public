@@ -8,15 +8,18 @@ import edu.virginia.vcgr.genii.client.cmd.tools.besmgr.BESManagerDialog;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.client.gui.bes.BESSelectorDialog;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 
 public class BESManager extends BaseGridTool
 {
 	static final private String DESCRIPTION =
-		"A GUI tool to manage various aspects of a BES container.";
-	static final private String USAGE =
-		"bes-manager [rns-path-to-bes]";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dbes-manager";		
+	static final private String USAGE = 
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/ubes-manager";		
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/bes-manager";
 	
 	private EndpointReferenceType getLocalBESContainer()
 	{
@@ -25,7 +28,9 @@ public class BESManager extends BaseGridTool
 	
 	public BESManager()
 	{
-		super(DESCRIPTION, USAGE, false);
+		super(new FileResource(DESCRIPTION), new FileResource(USAGE), false,
+				ToolCategory.ADMINISTRATION);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

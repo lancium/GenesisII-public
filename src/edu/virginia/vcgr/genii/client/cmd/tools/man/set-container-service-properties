@@ -1,0 +1,21 @@
+Definitions:
+
+<container>...<container>
+	The RNS path of all containers whose download-manager-temporary directory and scratch-space directory have to be changed.
+
+[--download-mgr-tmpdir=<download-manager-temporary-directory-path>]
+	The path to which the download-manager-temporary-directory-path needs to be changed to. It is in the local file-system namespace. The default location is the download-tmp directory in the GenesisII state directory.
+
+[--scratch-space-dir=<scratch-space-directory-path>]
+	The path to which the scratch-space-directory-path needs to be changed to. It is in the local file-system namespace. The default location is the scratch-space directory in the GenesisII state directory.
+
+
+Description:
+	This command is used to set container services properties like download-manager temporary directory and the scratch space directory paths.
+
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.SetContainerServicePropertiesTool
+

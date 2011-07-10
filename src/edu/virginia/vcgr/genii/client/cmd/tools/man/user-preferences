@@ -1,0 +1,11 @@
+Definitions:
+
+No arguments
+
+Description:
+	This command is used to modify and view the current user-preference. The options include to change the shell-prompt name, set the exception handler level to Simple/Debug, and also set the prefered mode to GUI or a shell-mode. The Debug exception handler provides a detailed stack-trace for the exception, while the Simple Exception Handler provides a brief description of the exception.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.UserPreferencesTool 

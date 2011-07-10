@@ -1,0 +1,17 @@
+Definitions:
+
+source-path 
+	The source-path can be in the grid RNS namespace or in the local file-system namespace. It is an absolute or relative path referring to a resource in the currently connected grid RNS namespace, or referring to a file path in the local file-system namespace. While dealing with the local file-system namespace, make sure to begin the pathname with 'local:'. 
+
+target-path 
+	An absolute or relative path to a (non-existant) resource in the currently connected grid RNS namespace or to a (non-existing/existing)file in the local file-system namespace. To indicate a local path, make sure to begin the pathname with 'local:'.
+
+Description:
+
+Similar to mv in the UNIX operating system, the grid mv command moves(renames) a resource. The source and the target must both be local paths, or they must both be grid paths. Moving from local to grid namespace or from grid to the local namespace is not permitted. During grid path to grid path move, the target path should not already exist. The renamed resource is in the same-container as the "source" resource. In, a local path to local path move, an already existing target-path causes a replacement of the existing file. 
+
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.MoveTool

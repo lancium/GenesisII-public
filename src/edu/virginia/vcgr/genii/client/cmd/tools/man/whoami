@@ -1,0 +1,8 @@
+Description:
+
+The command whoami prints out the credentials of the currently logged in user.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.WhoamiTool 

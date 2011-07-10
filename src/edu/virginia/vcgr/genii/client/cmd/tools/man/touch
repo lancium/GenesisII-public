@@ -1,0 +1,16 @@
+Definitions:
+
+[rns-path1 ... rns-pathn]
+	A list of absolute or relative RNS-paths to ByteIO resource(s) whose modification-time needs to be updated to the current time.
+
+Description:
+	Sets the modification time of the ByteIO resource(s) to the current time.
+
+Example:
+touch file_1.txt
+touch file_1.txt /home/ak3ka/file_2.txt
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.TouchTool

@@ -8,6 +8,7 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.client.security.credentials.*;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.X509Identity;
@@ -16,9 +17,11 @@ import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 public class WhoamiTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION =
-		"Prints out the credentials of the currently logged in user.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dwhoami";
 	static final private String _USAGE =
-		"whoami [--verbosity={OFF|LOW|MEDIUM|HIGH}]";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uwhoami";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/whoami";
 	
 	private VerbosityLevel _verbosity = VerbosityLevel.OFF;
 	
@@ -33,7 +36,9 @@ public class WhoamiTool extends BaseGridTool
 	
 	public WhoamiTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), 
+				false, ToolCategory.SECURITY);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

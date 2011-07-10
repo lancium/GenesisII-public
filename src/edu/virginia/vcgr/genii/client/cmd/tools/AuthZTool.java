@@ -5,6 +5,7 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
@@ -13,13 +14,17 @@ import edu.virginia.vcgr.genii.client.security.authz.acl.AclAuthZClientTool;
 public class AuthZTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION =
-		"Configures various aspects of security for specified target.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dauthz";
 	static final private String _USAGE =
-		"authz <target>";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uauthz";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/authz";
 	
 	public AuthZTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), 
+				new FileResource(_USAGE), false, ToolCategory.SECURITY);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

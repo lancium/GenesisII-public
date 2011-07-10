@@ -11,6 +11,7 @@ import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.security.credentials.TransientCredentials;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.context.ContextType;
@@ -18,17 +19,24 @@ import edu.virginia.vcgr.genii.context.ContextType;
 
 public class PasswordLoginTool extends BaseLoginTool {
 
-	static private final String _DESCRIPTION = "Authenticates with username/password.";
+	static private final String _DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/dpasswordLogin";
 	static private final String _USAGE_RESOURCE = 
-		"login --username=<username> [--password=<password>]";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/upasswordLogin";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/passwordLogin";
+
 
 
 	protected PasswordLoginTool(String description, String usage, boolean isHidden) {
 		super(description, usage, isHidden);
+		overrideCategory(ToolCategory.SECURITY);
+		addManPage(new FileResource(_MANPAGE));
 	}
 
 	public PasswordLoginTool() {
-		super(_DESCRIPTION, _USAGE_RESOURCE, false);
+		super(_DESCRIPTION, _USAGE_RESOURCE, false);	
+		overrideCategory(ToolCategory.SECURITY);
+		addManPage(new FileResource(_MANPAGE));
 	}
 
 
@@ -78,9 +86,8 @@ public class PasswordLoginTool extends BaseLoginTool {
 			TransientCredentials transientCredentials = TransientCredentials
 			.getTransientCredentials(callContext);
 			transientCredentials._credentials.add(utCredential);
-
 		}
-
+		
 		ContextManager.storeCurrentContext(callContext);
 
 		return 0;

@@ -1,0 +1,1 @@
+Log's the user into his home directory (looks for a script called .glogin.<extension> there.).

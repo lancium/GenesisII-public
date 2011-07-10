@@ -1,0 +1,18 @@
+Definitions:
+
+--dump=<path>
+	The path in the local file-system namespace or grid namespace where a serialized copy of the history needs to be stored. Paths in the local file system's namespace should be prefixed by "local:". If absent, the job-history is displayed without serialization.
+
+<resource-path>
+	The RNS path to the Queue resource. This is the path to the Queue where the job whose history is required, was submitted.	
+
+[resource-hint]
+	The job-ticket of the job whose job-history is required. 
+
+Description:
+	This command is used to display the job-history of a particular job. The job-history is displayed as a series of chronological events. Events are categorized as Default, CreatingJob, CreatingActivity, Scheduling, StageIn, StageOut, ReQueing, Checking, Cleanup, Terminating, CloudSetup. The job-history can be serialized and written to a file or displayed on the console without serialization. This tool has a minimum event-level of "Trace". The available event-levels are Trace, Debug, Information, Warning and Error. To set a minimum event-level while viewing job-history, the GUI QueueManager tool needs to be used. 
+
+Code:
+
+Implementing Class 
+	edu.virginia.vcgr.genii.client.cmd.tools.ResourceHistoryTool

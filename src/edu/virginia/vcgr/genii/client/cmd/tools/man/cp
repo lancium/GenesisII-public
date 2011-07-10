@@ -1,0 +1,16 @@
+Definitions:
+
+source-path 
+	An absolute or relative path in the currently connected grid RNS namespace (unless a local path is provided) which is assumed to reference a ByteIO resource (or file system file). To indicate a local path, make sure to begin the pathname with 'local:'. 
+
+target-path 
+	An absolute or relative path in the currently connected grid RNS namespace (unless a local path is provided) which is assumed to reference a ByteIO resource (or file system file), or non-existant resource (a path for which the final element of the path or basename of the path does not yet exist). To indicate a local path, make sure to begin the pathname with 'local:'. 
+
+Description:
+
+Similar to cp in the UNIX operating system, the grid cp command copies the contents of one source file or ByteIO into another target file or ByteIO. If the target path specified does not exist, a new file or ByteIO resource is created. If a new ByteIO resource needs to be created in the grid environment, then the default ByteIO service on the default container is used to create it. Currently, there is no way to override this behavior without using the create-resource tool.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.CpTool 

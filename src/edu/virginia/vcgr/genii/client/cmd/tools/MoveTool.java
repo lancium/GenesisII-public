@@ -8,6 +8,7 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
@@ -15,9 +16,11 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 public class MoveTool extends BaseGridTool
 {
 	static final private String DESCRIPTION =
-		"Moves a grid resource from one place in the RNS space, to another.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dmv";
 	static final private String USAGE =
-		"mv <source-path> <target-path>";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/umv";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/mv";
 	
 	static private int moveLocal(String source, String target)
 		throws IOException
@@ -87,6 +90,8 @@ public class MoveTool extends BaseGridTool
 	
 	public MoveTool()
 	{
-		super(DESCRIPTION, USAGE, false);
+		super(new FileResource(DESCRIPTION), new FileResource(USAGE), false,
+				ToolCategory.DATA);
+		addManPage(new FileResource(_MANPAGE));
 	}
 }

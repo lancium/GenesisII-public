@@ -1,0 +1,6 @@
+This tool has been deprecated.  To access the queue manager GUI, please use the client-ui tool.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.queue.gui.QueueManager

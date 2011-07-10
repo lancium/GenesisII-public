@@ -27,14 +27,18 @@ import edu.virginia.vcgr.genii.client.configuration.GridEnvironment;
 import edu.virginia.vcgr.genii.client.configuration.PathVariable;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class ScriptTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION =
-		"Executes a script.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dscript";
 	
 	static final private String _USAGE =
-		"script [--global-properties=<properties-file>] [var=val ...] [--language=<language>] [<script-file>]";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uscript";
+	
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/script";
 	
 	@Option("language")
 	private String _language = null;
@@ -102,7 +106,9 @@ public class ScriptTool extends BaseGridTool
 	
 	public ScriptTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), 
+				false, ToolCategory.GENERAL);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	static private String getExtension(String filename)

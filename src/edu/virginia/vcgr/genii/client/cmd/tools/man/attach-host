@@ -1,0 +1,16 @@
+Definitions:
+
+container-url 
+    A properly formatted URL which identifies the machine on which the to be attached container is running. The URL should end in '/axis/services/VCGRContainerPortType'. 
+
+hosting-environment-rns-path 
+    A valid local file-system path which specifies the name the attached container is to be called in the new hosting environment. This path should start with '/containers/'. 
+
+Description:
+
+The attach-host tool allows a user to attach a container into a different hosting environment. The container is specified by the container-url. The name of the container in the new hosting environment is specified by hosting-environment-rns-path.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.AttachHostTool 

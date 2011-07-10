@@ -1,0 +1,22 @@
+Definitions:
+
+<variable>
+	Denotes the name of the grid user-environment-variable which is to be changed or created.
+<value>
+	Denotes the value of the created(or modified) grid user-environment variable
+
+Description:
+	Used to add or change a grid user-environment variable. If the environment variable does not exist, then it is set. If the environment variable already exists, then it is set to the new value. The environment variable can be used by wrapping ${} around the variable. Multiple environment variables can be used in the same command.
+
+Example:
+	To set an environment variable : set testDir=/home/ak3ka/dbTest
+					 set sampleFile=foo.txt
+	To use an environment variable : cd ${testDir}
+					 cat ${testDir}/${sampleFile}
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.SetTool
+
+

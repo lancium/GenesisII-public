@@ -8,6 +8,7 @@ import edu.virginia.vcgr.genii.common.security.*;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.io.ReducedCommandLine;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
@@ -18,15 +19,19 @@ import edu.virginia.vcgr.genii.client.gpath.*;
 public class GamlChmodTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION =
-		"Sets read/write/execute GAML authZ permissions for a target.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dchmod";
 	static final private String _USAGE =
-		"chmod <target> " + AclAuthZClientTool.CHMOD_SYNTAX;
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uchmod";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/chmod";
 	
 	protected ArrayList<String> commandLine = new ArrayList<String>();
 	
 	public GamlChmodTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), 
+				false, ToolCategory.SECURITY);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

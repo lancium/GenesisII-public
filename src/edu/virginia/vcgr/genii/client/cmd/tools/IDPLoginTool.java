@@ -45,9 +45,9 @@ import edu.virginia.vcgr.genii.x509authn.X509AuthnPortType;
 public class IDPLoginTool extends BaseLoginTool{
 
 
-	static private final String _DESCRIPTION = "Authenticates against IDP.";
+	static private final String _DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/dIDPLogin";
 	static private final String _USAGE_RESOURCE = 
-		"login [--validDuration=<duration-string>] rns:<identity provider path>";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uIDPLogin";
 
 	protected IDPLoginTool(String description, String usage, boolean isHidden) {
 		super(description, usage, isHidden);

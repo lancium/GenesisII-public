@@ -57,8 +57,8 @@
 		<popup-menu group="Resource Forks" item-name="Set Resource Fork Value"/>
 	</plugin>
 	
-	<plugin class="edu.virginia.vcgr.genii.ui.plugins.epr.EPRDisplayPlugin">
-		<tab name="EPR Display"/>
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.acls.ACLPlugin">
+		<tab name="Security"/>
 	</plugin>
 	
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.FileDisplayPlugin">
@@ -69,9 +69,11 @@
 		<tab name="Resource Properties"/>
 	</plugin>
 	
-	<plugin class="edu.virginia.vcgr.genii.ui.plugins.acls.ACLPlugin">
-		<tab name="Security"/>
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.epr.EPRDisplayPlugin">
+		<tab name="EPR Display"/>
 	</plugin>
+	
+
 	
 	<!--
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.debug.DebugPlugin">

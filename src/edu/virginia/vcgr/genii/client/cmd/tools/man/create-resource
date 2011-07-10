@@ -1,0 +1,19 @@
+Definitions:
+
+[--rns | --url] 
+    This optional flag allows the user to specify the next parameter. The default value is --rns meaning that the next parameter is an RNS path. If, however, --url is used, this indicates that then next parameter is a URL. 
+
+service-path-or-url: 
+    The RNS path or the URL to the port you would like to use for the creation of your resource. 
+
+new-rns-path:
+    This optional attribute allows the user to specify the name of the new resource and the RNS path to it. If it is missing, a description of the newly created resource's endpoint reference (EPR) is printed out. 
+
+Description:
+
+The create-resource command, creates a new resource using generic creation mechanisms.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.CreateResourceTool 

@@ -1,0 +1,50 @@
+Definitions:
+
+storetype 
+    The storetype option allows the user to specify the type of keystore from which the user is obtaining an X.509 identity to construct the new IDP resource . If this value is the string WIN, then the store type is assumed to be the local machine's Windows Certificate Store and no path/URI to a keystore file is needed. The default storetype is PKCS12. 
+
+password 
+    The password option allows the user to specify on the command line the password used to access the credential or keystore indicated. 
+
+alias 
+    If the alias flag is given, then the subsequent pattern string refers to a keystore alias rather than a certificate common name. If this flag is absent, then the pattern given us assumed to be a value of the certificates CN. 
+
+pattern 
+    The pattern option allows the user to specify a substring of either an alias, or CN for the desired certificate. If this option is given, then the keystore indicated will be searched for a certificate whose CN, or alias, matches the pattern (contains the pattern as a substring). If this option is not given, then the command will list all certificates available and prompt the user to pick one. 
+
+validMillis
+    This option allows the user to specify, in milliseconds, the duration of time for which the new identity provider resource will be valid. The default value is 180 days. 
+
+keystore URL 
+    The keystore URL argument is a valid URI which describes the path to the keystore to use for loading the source credential. This URI can be any valid URI that describes a file to be read in, or it can be simply a local file system path. If the URI has a protocol of rns:, then RNS space is used to located the keystore. Further, if the path given is an RNS path, then the target indicated may either be a ByteIO compliant file whose contents are an appropriately formatted keystore, or the target resource can be an existing IDP resource. 
+
+IDP-service-path
+    The RNS path to the IDP web-service (and thus which GenesisII container) within which the new IDP resource is to be placed. 
+
+new-IDP-name
+    The string name of the new IDP resource to be created. 
+
+Description:
+
+The IDP-creation tool allows you to create an identity-provider resource (IDP) from which users can obtain credentials (i.e., login to). There are generally two different scenarios for creating new IDP resources:
+
+    * As a token issuer of an existing X.509 identity that has been delegated to it for an extended period of time. (Similar to MyProxy.)
+    * As a token issuer of a new identity (corresponding to the X.509 identity of the newly-created IDP service) 
+
+When obtaining credentials from a keystore to construct a new IDP resource from, the --pattern option allows the user to indicate which credential should be retrieved (otherwise you will be prompted to make a selection). If the keystore uses aliases to organize keys, the --alias option should be used in conjunction with the --pattern option.
+
+The newly created IDP resource is linked inside the <IDP-service-path> with the name <new-IDP-name>, and can be further linked elsewhere into rns-space for convenience.
+
+Notes:
+
+After using the IDP tool to create your new IDP resource, you may want to configure it to accept a username-password for its login operation (also known as the "issue" operation). For example, to add a username-password challenge to an IDP resource, use:
+
+chmod "/containers/<container>/Services/X509AuthnPortType/<new-IDP-name>"
+	+x --username=<username-challenge> [--password=<password-challenge>]
+
+You can add the identity that is brokered by an IDP resource into the ACLs for other resources by using the chmod tool on those resources.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.IdpTool 

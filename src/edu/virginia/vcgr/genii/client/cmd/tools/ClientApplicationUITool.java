@@ -4,13 +4,15 @@ import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.ui.ClientApplication;
 
 public class ClientApplicationUITool extends BaseGridTool
 {
-	static private final String DESCRIPTION = "The large Genesis II Client GUI Application";
-	static private final String USAGE = "client-ui [--shell]";
-	
+	static private final String DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/dclient-ui";
+	static private final String USAGE = "edu/virginia/vcgr/genii/client/cmd/tools/usage/uclient-ui";
+	static private final String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/client-ui";
 	static private void setupMacOSProperties()
 	{
 		System.setProperty("com.apple.mrj.application.apple.menu.about.name",
@@ -32,7 +34,9 @@ public class ClientApplicationUITool extends BaseGridTool
 	
 	public ClientApplicationUITool()
 	{
-		super(DESCRIPTION, USAGE, true);
+		super(new FileResource(DESCRIPTION), new FileResource(USAGE), false,
+				ToolCategory.GENERAL);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

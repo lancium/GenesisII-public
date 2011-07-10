@@ -1,0 +1,12 @@
+Definitions:
+
+[command]
+	The command whose manual(help)-page is needed.
+
+Description:
+	The manual-page contains an elaborate description of the command. Typically each man-page contains of the following sections: Usage (how the command is used), definitions (what each argument to the command stands for), description(what the command does) and code (which class implements this command).
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.ManTool

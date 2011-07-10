@@ -1,0 +1,16 @@
+Definitions:
+
+No arguments
+
+Description:
+	Displays the list of grid user-environment variables in sorted-order. These environment variables are set using the setenv command. The environment variable can be used by wrapping ${} around the variable. Multiple environment variables can be used in the same command.
+
+Example:
+
+To use an environment variable : cd ${testDir}
+				 cat ${testDir}/${sampleFile}
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.EnvTool

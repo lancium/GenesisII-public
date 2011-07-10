@@ -20,6 +20,7 @@ import edu.virginia.vcgr.genii.client.cmd.ITool;
 import edu.virginia.vcgr.genii.client.cmd.ToolDescription;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.HelpTool;
+import edu.virginia.vcgr.genii.client.cmd.tools.ManTool;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
@@ -186,8 +187,15 @@ public class CommandLineRunner
 		}
 		
 		ret.put("help", new ToolDescription(HelpTool.class, "help"));
+		ret.put("man", new ToolDescription(ManTool.class, "man"));
 		
 		return ret;
+	}
+	
+	static public ToolDescription getToolDescription(String tool){
+		Map<String, ToolDescription> _tools = CommandLineRunner.getToolList(
+				ConfigurationManager.getCurrentConfiguration().getClientConfiguration());
+		return _tools.get(tool);
 	}
 	
 	public static ArrayList<String[]> history()

@@ -1,5 +1,0 @@
-schedule-termination <target>+ <calendar-value>
-
-WHERE
-	<calendar-value> is either a Java parseable date string or it is a delta
-		of the form +number[ms|s|m|h|d]

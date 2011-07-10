@@ -1,0 +1,2 @@
+ls [-ldae] [--long] [--all] [--directory] [--epr] [<target> *]
+

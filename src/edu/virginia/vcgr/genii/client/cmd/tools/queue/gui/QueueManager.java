@@ -12,8 +12,10 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.cmd.tools.BaseGridTool;
+import edu.virginia.vcgr.genii.client.cmd.tools.ToolCategory;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.queue.CurrentResourceInformation;
 import edu.virginia.vcgr.genii.client.queue.QueueConstants;
 import edu.virginia.vcgr.genii.client.rfork.ResourceForkUtils;
@@ -25,13 +27,16 @@ import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
 public class QueueManager extends BaseGridTool
 {
 	static private final String _DESCRIPTION = 
-		"Manage jobs in a queue from a graphical interface.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dqmgr";
 	static private final String _USAGE =
-		"qmgr <queue-path>";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uqmgr";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/qmgr";
 	
 	public QueueManager()
 	{
-		super(_DESCRIPTION, _USAGE, true);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), true, ToolCategory.MISC);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

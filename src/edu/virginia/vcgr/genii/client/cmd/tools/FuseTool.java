@@ -18,9 +18,11 @@ public class FuseTool extends BaseGridTool
 	static private Log _logger = LogFactory.getLog(FuseTool.class);
 	
 	static final private String _DESCRIPTION =
-		"Mounts and unmounts a FUSE file system.";
-	static final private FileResource _USAGE =
-		new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/resources/fuse-usage.txt");
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dfuse";
+	static final private String _USAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/ufuse";
+	static private final String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/fuse";
 	
 	private boolean _isMount = false;
 	private boolean _isUnmount = false;
@@ -30,7 +32,9 @@ public class FuseTool extends BaseGridTool
 	
 	public FuseTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), false,
+				ToolCategory.DATA);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Option({"daemon"})

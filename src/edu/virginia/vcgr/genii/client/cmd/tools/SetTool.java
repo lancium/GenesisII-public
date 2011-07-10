@@ -6,15 +6,22 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.GridUserEnvironment;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class SetTool extends BaseGridTool
 {
-	static final private String USAGE = "set <variable>=<value>";
-	static final private String DESCRIPTION = "Set grid environment variables.";
+	static private final String DESCRIPTION =
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dset";
+	static private final String USAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uset";
+	static private final String MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/set";
 	
 	public SetTool()
 	{
-		super(DESCRIPTION, USAGE, true);
+		super(new FileResource(DESCRIPTION), new FileResource(USAGE), false,
+				ToolCategory.GENERAL);
+		addManPage(new FileResource(MANPAGE));
 	}
 	
 	@Override

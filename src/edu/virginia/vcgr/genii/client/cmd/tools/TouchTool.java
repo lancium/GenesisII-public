@@ -10,19 +10,27 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.genii.client.gpath.*;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 
 public class TouchTool extends BaseGridTool
 {
 	static private final String _DESCRIPTION =
-		"Update the modification time on a set of target ByteIO instances.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dtouch";
 	
 	static private final String _USAGE =
-		"touch [rns-path1 ... rns-pathn]";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/utouch";
+	
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/touch";
 
 	public TouchTool()
 	{
-		super(_DESCRIPTION, _USAGE, true);
+		
+		super(new FileResource(_DESCRIPTION), 
+				new FileResource(_USAGE), true,
+				ToolCategory.DATA);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

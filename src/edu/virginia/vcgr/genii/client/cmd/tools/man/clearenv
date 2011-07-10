@@ -1,0 +1,11 @@
+Definitions:
+
+No arguments
+
+Description:
+	Clears the current list of grid user-environment variables. These environment variables are set using the setenv command.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.ClearEnvTool

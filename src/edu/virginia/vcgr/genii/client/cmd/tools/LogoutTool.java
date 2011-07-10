@@ -9,6 +9,7 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.security.credentials.*;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.*;
 import edu.virginia.vcgr.genii.client.security.credentials.assertions.*;
@@ -16,17 +17,20 @@ import edu.virginia.vcgr.genii.client.security.credentials.assertions.*;
 public class LogoutTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION =
-		"Removes any authentication information from the user's context.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dlogout";
 	static final private String _USAGE =
-		"logout " 
-		+ "[--pattern=<certificate/token pattern> | --all]";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/ulogout";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/logout";
 	
 	protected String _pattern = null;
 	protected boolean _all = false;
 
 	public LogoutTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), false,
+				ToolCategory.SECURITY);
+		addManPage(new FileResource(_MANPAGE));
 	}
 
 	@Option({"pattern"})

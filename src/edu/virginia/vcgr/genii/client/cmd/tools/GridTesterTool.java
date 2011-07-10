@@ -8,6 +8,7 @@ import org.junit.runner.notification.RunListener;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class GridTesterTool extends BaseGridTool
 {
@@ -21,8 +22,8 @@ public class GridTesterTool extends BaseGridTool
 		"grid-tester { %s }";
 	
 	static final private String DESCRIPTION =
-		"Runs either the JUnit regression test suite, " +
-		"or the JUnit installation test suite.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dgrid-tester";
+	static final private FileResource _MANPAGE = new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/man/grid-tester");
 	
 	static private String formatUsage(String pattern)
 	{
@@ -174,6 +175,12 @@ public class GridTesterTool extends BaseGridTool
 
 	public GridTesterTool()
 	{
-		super(DESCRIPTION, formatUsage(USAGE_PATTERN), true);
+		/*
+		super(new FileResource(DESCRIPTION), formatUsage(USAGE_PATTERN), true,
+				ToolCategory.INTERNAL); */
+		super(new FileResource(DESCRIPTION), null, true,
+				ToolCategory.INTERNAL);
+		
+		addManPage(_MANPAGE);
 	}
 }

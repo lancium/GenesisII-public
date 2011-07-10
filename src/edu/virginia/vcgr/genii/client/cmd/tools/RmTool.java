@@ -10,12 +10,15 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 public class RmTool extends BaseGridTool
 {
 	static private final String _DESCRIPTION =
-		"Removes the target paths.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/drm";
 	static private final String _USAGE =
-		"rm [-rf | --recursive --force] <target-path> ...";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/urm";
+	static private final String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/rm";
 	
 	private boolean _recursive = false;
 	private boolean _force = false;
@@ -34,7 +37,9 @@ public class RmTool extends BaseGridTool
 
 	public RmTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), 
+				false, ToolCategory.DATA);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Override

@@ -13,9 +13,11 @@ import edu.virginia.vcgr.genii.ftp.GeniiBackendFactory;
 public class FtpdTool extends BaseGridTool
 {
 	static private final String _DESCRIPTION =
-		"Runs an FTP daemon on the given port.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dftpd";
 	static private final String _USAGE_RESOURCE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/resources/ftpd-usage.txt";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uftpd";
+	static private final String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/ftpd";
 
 	private boolean _block = false;	
 	private int _idleTimeout = -1;
@@ -27,7 +29,9 @@ public class FtpdTool extends BaseGridTool
 	
 	public FtpdTool()
 	{
-		super(_DESCRIPTION, new FileResource(_USAGE_RESOURCE), false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE_RESOURCE),
+				true, ToolCategory.ANTIQUATED);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	@Option({"block"})

@@ -2,7 +2,9 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedList;
 
 
 
@@ -17,6 +19,7 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.dialog.DialogFactory;
 import edu.virginia.vcgr.genii.client.dialog.DialogProvider;
 import edu.virginia.vcgr.genii.client.dialog.InputDialog;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
@@ -32,19 +35,32 @@ import edu.virginia.vcgr.genii.context.ContextType;
 public class LoginTool  extends BaseLoginTool {
 
 
-	static private final String _DESCRIPTION = "Inserts authentication information into the user's context.";
+	static private final String _DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/dlogin";
 	static private final String _USAGE_RESOURCE = 
-		"login [--username=<username>] [--password=<password>] [--validDuration=<duration-string>] [rns:<identity provider path>]";
-
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/ulogin";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/login";
+	
 	protected LoginTool(String description, String usage, boolean isHidden) {
 		super(description, usage, isHidden);
 	}
 
 	public LoginTool() {
 		super(_DESCRIPTION, _USAGE_RESOURCE, false);
+		addManPage(new FileResource(_MANPAGE));
 	}
 
-
+	
+	private static Collection<String> getDefaultIDPPaths(String username){
+		LinkedList<String> idpList = new LinkedList<String>();
+	
+		//Checks this lists of idp paths, in order
+		//If one is not passed on the command line
+		idpList.add("rns:/users/" + username);
+		idpList.add("rns:/users/demo/" + username);
+		return idpList;
+	}
+	
 	@Override
 	protected int runCommand() throws Throwable
 	{
@@ -68,36 +84,43 @@ public class LoginTool  extends BaseLoginTool {
 			_username = usernameDialog.getAnswer();
 		}
 
+		
 
-		//Look for IDP path
-		if (numArguments() == 0){
-			//Assume in /users/userid
-			_authnUri = "rns:/users/" + _username;
+				
+
+		//Determine IDP path
+		if (numArguments() == 1){
+			//If Specified
+			_authnUri = getArgument(0);
+			URI authnSource = PathUtils.pathToURI(_authnUri);
+			
+			if (!callContext.getCurrentPath().lookup(authnSource.getSchemeSpecificPart()).exists())
+				throw new ToolException("Invalid IDP path specified.");
+		
 		}
 		else{
-			_authnUri = getArgument(0);	 
+			//Check default paths
+			_authnUri = null;
+			
+			for (String authURI : getDefaultIDPPaths(_username)){
+				URI authnSource = PathUtils.pathToURI(authURI);
+				if (callContext.getCurrentPath().lookup(authnSource.getSchemeSpecificPart()).exists()){
+					_authnUri = authURI;
+					break;
+				}
+			}
+			
+			if(_authnUri == null)
+				throw new ToolException("Could not authenticate to login service, ensure your username is correct or manually specify IDP path");
 		}
 		
+
 	
-
-		URI authnSource = PathUtils.pathToURI(_authnUri);
-
-		//Check if idp exists else prompt for it
-		if (!callContext.getCurrentPath().lookup(authnSource.getSchemeSpecificPart()).exists()){
-			InputDialog IDPDialog = provider.createInputDialog(
-					"IDP", 
-			"Please enter rns path to your IDP.");
-			IDPDialog.showDialog();
-			_authnUri = IDPDialog.getAnswer();
-			authnSource = PathUtils.pathToURI(_authnUri);
-		}
 		
-		
-
-
 		//Do password Login
 		UsernamePasswordIdentity utCredential = new PasswordLoginTool().doPasswordLogin(_username, _password);
 
+		
 		if (utCredential != null){	
 
 			TransientCredentials transientCredentials = TransientCredentials
@@ -109,6 +132,7 @@ public class LoginTool  extends BaseLoginTool {
 			
 			// we're going to use the WS-TRUST token-issue operation
 			// to log in to a security tokens service
+			URI authnSource = PathUtils.pathToURI(_authnUri);
 			KeyAndCertMaterial clientKeyMaterial = 
 				ClientUtils.checkAndRenewCredentials(callContext, 
 						new Date(), new SecurityUpdateResults());

@@ -6,6 +6,7 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
@@ -19,13 +20,18 @@ import edu.virginia.vcgr.genii.container.VCGRContainerPortType;
 public class ContainerStatsTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION =
-		"Collects usage statistics from a remote container.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dcontainer-stats";
 	static final private String _USAGE =
-		"container-stats <container-path>";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/ucontainer-stats";
+	static final private String _MANPAGE = 
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/container-stats";
 	
 	public ContainerStatsTool()
 	{
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), false,
+				ToolCategory.INTERNAL);
+		addManPage(new FileResource(_MANPAGE));
+		
 	}
 	
 	@SuppressWarnings("unchecked")

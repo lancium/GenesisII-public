@@ -1,0 +1,13 @@
+Definitions:
+
+target-rns 
+	The RNS path of a resource which implements the RNS port type. 
+
+Description:
+
+Genesis II grid clients maintain a notion of current working RNS. This is the path from a root with EPRS of a namespace implemented with RNS that functions similarly to a file system. The cd tool allows a user to explicitly change his or her location inside that namespace.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.CdTool 

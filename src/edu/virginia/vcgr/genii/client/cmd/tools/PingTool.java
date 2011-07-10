@@ -10,18 +10,23 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 public class PingTool extends BaseGridTool
 {
 	static final private String _DEFAULT_MESSAGE = "Hello, World!";
 	
 	static final private String _DESCRIPTION =
-		"Pings a target.";
+		"edu/virginia/vcgr/genii/client/cmd/tools/description/dping";
 	static final private String _USAGE =
-		"ping [--attempts=<number>] <target> [<query>]";
+		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uping";
+	static final private String _MANPAGE =
+		"edu/virginia/vcgr/genii/client/cmd/tools/man/ping";
 	
 	public PingTool() {
-		super(_DESCRIPTION, _USAGE, false);
+		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), 
+				false, ToolCategory.GENERAL);
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	private int _attempts = 1;

@@ -1,0 +1,13 @@
+Definitions:
+
+[ --shell ]
+	Starts the GUI version of the grid-shell, which has support for features like tab-completion. It is an optional argument.
+	
+
+Description:
+	Launches the GUI version of the GenesisII client.
+
+Code:
+
+Implementing Class 
+    edu.virginia.vcgr.genii.client.cmd.tools.ClientApplicationUITool
