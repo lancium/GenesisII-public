@@ -51,10 +51,12 @@ public class IDPLoginTool extends BaseLoginTool{
 
 	protected IDPLoginTool(String description, String usage, boolean isHidden) {
 		super(description, usage, isHidden);
+		overrideCategory(ToolCategory.SECURITY);
 	}
 
 	public IDPLoginTool() {
 		super(_DESCRIPTION, _USAGE_RESOURCE, false);
+		overrideCategory(ToolCategory.SECURITY);
 	}
 
 	public static GIICredential extractAssertion(RequestSecurityTokenResponseType reponseMessage) 

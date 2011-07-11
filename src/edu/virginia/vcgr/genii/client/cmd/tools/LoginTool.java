@@ -43,10 +43,12 @@ public class LoginTool  extends BaseLoginTool {
 	
 	protected LoginTool(String description, String usage, boolean isHidden) {
 		super(description, usage, isHidden);
+		overrideCategory(ToolCategory.SECURITY);
 	}
 
 	public LoginTool() {
 		super(_DESCRIPTION, _USAGE_RESOURCE, false);
+		overrideCategory(ToolCategory.SECURITY);
 		addManPage(new FileResource(_MANPAGE));
 	}
 
