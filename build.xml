@@ -293,8 +293,12 @@
 			<exclude name="**/edu/virginia/vcgr/genii/container/factory/**/*.java"/>
 		</javac>
 		<copy todir="${obj.dir}">
-			<fileset dir="${src.dir}"
-				includes="${default.compile.copy.includes}"/>
+			<fileset dir="${src.dir}">
+				<include name="${default.compile.copy.includes}"/>
+				<include name="edu/virginia/vcgr/genii/client/cmd/tools/description/*"/>
+				<include name="edu/virginia/vcgr/genii/client/cmd/tools/man/*"/>
+				<include name="edu/virginia/vcgr/genii/client/cmd/tools/usage/*"/>
+			</fileset>
 		</copy>
 	</target>
 
