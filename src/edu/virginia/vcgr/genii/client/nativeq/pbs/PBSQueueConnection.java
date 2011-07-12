@@ -196,7 +196,7 @@ public class PBSQueueConnection extends ScriptBasedQueueConnection<PBSQueueConfi
 		NativeQueueState state = _statusCache.get(
 			token, new BulkPBSStatusFetcher(), DEFAULT_CACHE_WINDOW);
 		if (state == null)
-			state = PBSQueueState.fromStateSymbol("E");
+			state = PBSQueueState.fromStateSymbol("C");
 		
 		return state;
 	}

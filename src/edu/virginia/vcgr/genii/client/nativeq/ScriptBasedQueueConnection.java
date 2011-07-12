@@ -199,6 +199,8 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType
 			Map<String, Object> jobProperties = new HashMap<String, Object>();
 			CmdLineManipulatorUtils.addBasicJobProperties(jobProperties, 
 					execName, application.getArguments());
+			
+			
 			CmdLineManipulatorUtils.addEnvProperties(jobProperties,
 					application.getFuseMountPoint(),
 					application.getEnvironment(), workingDirectory, 

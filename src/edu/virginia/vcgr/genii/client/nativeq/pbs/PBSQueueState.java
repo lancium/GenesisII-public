@@ -38,7 +38,7 @@ public class PBSQueueState implements NativeQueueState
 		{
 			switch (symbol.charAt(lcv))
 			{
-			 	case 'R' :
+				case 'R' :
 				case 'E' :
 					return new PBSQueueState("Executing", false, false);
 				case 'X' :
