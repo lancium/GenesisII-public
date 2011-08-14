@@ -36,7 +36,10 @@ class LightWeightExportUtils
 				
 				VExportRoot vroot = null;
 				
-				if (rootDirString.matches("^.+:.*$"))
+				
+				//Temporarily disabled
+				if (false)
+				//if (rootDirString.matches("^.+:.*$"))
 				{
 					// Handle SVN
 					Long revision = (Long)resource.getProperty(

@@ -348,60 +348,67 @@ public class AttributeCacheHandler
 		return new GetResourcePropertyResponse(ret.toArray(new MessageElement[0]));
 	}
 
-	@PipelineProcessor(portType = EnhancedRNSPortType.class)
-	public LookupResponseType lookup(InvocationContext ctxt, 
-		String []names) throws Throwable
-	{
-		_logger.debug("Doing an RNS iterator listing so we can cache attribute data.");
-		
-		// We're going to let the list proceed, and then see if any meta data came back with it.
-		LookupResponseType resp = (LookupResponseType)ctxt.proceed();
-		
-		RNSEntryResponseType []initMembers = resp.getEntryResponse();
-		if (initMembers != null)
+	private void cacheResponse(RNSEntryResponseType member){
+		RNSMetadataType mdt = member.getMetadata();
+		MessageElement []any = (mdt == null) ? null : mdt.get_any();
+		if (any != null)
 		{
-			for (RNSEntryResponseType member : initMembers)
+			RNSEntryResponseType entry = member;
+			WSName name = new WSName(entry.getEndpoint());
+			if (name.isValidWSName())
 			{
-				RNSMetadataType mdt = member.getMetadata();
-				MessageElement []any = (mdt == null) ? null : mdt.get_any();
-				if (any != null && any.length == 1)
+				if (any != null)
 				{
-					RNSEntryResponseType entry = member;
-					WSName name = new WSName(entry.getEndpoint());
-					if (name.isValidWSName())
+					ArrayList<MessageElement> cachedAttrs = new ArrayList<MessageElement>();
+					for (MessageElement elem : any)
 					{
-						if (any != null)
+						QName elemName = elem.getQName();
+						if (elemName.equals(rxferMechs) || elemName.equals(rsize) ||
+								elemName.equals(raccessTime) || elemName.equals(rmodTime) ||
+								elemName.equals(rcreatTime) ||
+								elemName.equals(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME) ||
+								elemName.equals(sxferMechs) || elemName.equals(ssize) ||
+								elemName.equals(saccessTime) || elemName.equals(smodTime) ||
+								elemName.equals(screatTime))
 						{
-							ArrayList<MessageElement> cachedAttrs = new ArrayList<MessageElement>();
-							for (MessageElement elem : any)
-							{
-								QName elemName = elem.getQName();
-								if (elemName.equals(rxferMechs) || elemName.equals(rsize) ||
-									elemName.equals(raccessTime) || elemName.equals(rmodTime) ||
-									elemName.equals(rcreatTime) ||
-									elemName.equals(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME) ||
-									elemName.equals(sxferMechs) || elemName.equals(ssize) ||
-									elemName.equals(saccessTime) || elemName.equals(smodTime) ||
-									elemName.equals(screatTime))
-								{
-									_logger.debug("Adding " + elemName + " to " + name);
-									cachedAttrs.add(elem);
-								} else
-								{
-									_logger.debug("NOT Adding " + elemName + " to " + name);
-								}
-							}
-							
-							CachedAttributeData data = new CachedAttributeData(cachedAttrs);
-							synchronized(_attrCache)
-							{
-								_attrCache.put(name, data);
-							}
+							_logger.debug("Adding " + elemName + " to " + name);
+							cachedAttrs.add(elem);
+						} else
+						{
+							_logger.debug("NOT Adding " + elemName + " to " + name);
 						}
+					}
+
+					CachedAttributeData data = new CachedAttributeData(cachedAttrs);
+					synchronized(_attrCache)
+					{
+						_attrCache.put(name, data);
 					}
 				}
 			}
+		}	
+	}
+	
+	
+	
+	@PipelineProcessor(portType = EnhancedRNSPortType.class)
+	public LookupResponseType lookup(InvocationContext ctxt, 
+			String []names) throws Throwable
+			{
+		_logger.debug("Doing an RNS iterator listing so we can cache attribute data.");
+
+		// We're going to let the list proceed, and then see if any meta data came back with it.
+		LookupResponseType resp = (LookupResponseType)ctxt.proceed();
+		RNSEntryResponseType []initMembers = resp.getEntryResponse();
+
+		//Fill metadata cache
+		if (initMembers != null){
+			for (RNSEntryResponseType member : initMembers)
+			{
+				cacheResponse(member);
+			}
 		}
+		
 		
 		return resp;
 	}
@@ -426,40 +433,9 @@ public class AttributeCacheHandler
 					{
 						RNSEntryResponseType entry = ObjectDeserializer.toObject(any[0], 
 							RNSEntryResponseType.class);
-						WSName name = new WSName(entry.getEndpoint());
-						if (name.isValidWSName())
-						{
-							RNSMetadataType mdt = entry.getMetadata();
-							any = (mdt == null) ? null : mdt.get_any();
-							if (any != null)
-							{
-								ArrayList<MessageElement> cachedAttrs = new ArrayList<MessageElement>();
-								for (MessageElement elem : any)
-								{
-									QName elemName = elem.getQName();
-									if (elemName.equals(rxferMechs) || elemName.equals(rsize) ||
-										elemName.equals(raccessTime) || elemName.equals(rmodTime) ||
-										elemName.equals(rcreatTime) ||
-										elemName.equals(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME) ||
-										elemName.equals(sxferMechs) || elemName.equals(ssize) ||
-										elemName.equals(saccessTime) || elemName.equals(smodTime) ||
-										elemName.equals(screatTime))
-									{
-										_logger.debug("Adding " + elemName + " to " + name);
-										cachedAttrs.add(elem);
-									} else
-									{
-										_logger.debug("NOT Adding " + elemName + " to " + name);
-									}
-								}
-								
-								CachedAttributeData data = new CachedAttributeData(cachedAttrs);
-								synchronized(_attrCache)
-								{
-									_attrCache.put(name, data);
-								}
-							}
-						}
+						//Fill metadata cache
+						cacheResponse(entry);
+					
 					}
 				}
 			}
