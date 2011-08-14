@@ -28,6 +28,7 @@ import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperException;
 import edu.virginia.vcgr.genii.client.pwrapper.ProcessWrapperFactory;
 import edu.virginia.vcgr.genii.cmdLineManipulator.CmdLineManipulatorException;
 import edu.virginia.vcgr.genii.cmdLineManipulator.config.CmdLineManipulatorConfiguration;
+import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 
 public abstract class ScriptBasedQueueConnection<ProviderConfigType 
 	extends ScriptBasedQueueConfiguration>
@@ -35,6 +36,8 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType
 {
 	static private Log _logger = LogFactory.getLog(
 		ScriptBasedQueueConnection.class);
+
+	static public final String PATH_TO_DEV_NULL = "/dev/null";
 	
 	static public final String QUEUE_SCRIPT_RESULT_FILENAME = 
 		"queue.script.result";
@@ -200,13 +203,26 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType
 			CmdLineManipulatorUtils.addBasicJobProperties(jobProperties, 
 					execName, application.getArguments());
 			
+			OperatingSystemNames desiredOperatingSystemType = overrides.operatingSystemName();
+			OperatingSystemNames operatingSystemType = (desiredOperatingSystemType != null) 
+					? desiredOperatingSystemType 
+					: OperatingSystemNames.getCurrentOperatingSystem();
 			
+			File stdoutRedirect = application.getStdoutRedirect(workingDirectory);
+			if (stdoutRedirect == null && operatingSystemType == OperatingSystemNames.LINUX) {
+				stdoutRedirect = new File(PATH_TO_DEV_NULL);
+			}
+			File stderrRedirect = application.getStderrRedirect(workingDirectory);
+			if (stderrRedirect == null && operatingSystemType == OperatingSystemNames.LINUX) {
+				stderrRedirect = new File(PATH_TO_DEV_NULL);	
+			}
+
 			CmdLineManipulatorUtils.addEnvProperties(jobProperties,
 					application.getFuseMountPoint(),
 					application.getEnvironment(), workingDirectory, 
 					application.getStdinRedirect(workingDirectory), 
-					application.getStdoutRedirect(workingDirectory),
-					application.getStderrRedirect(workingDirectory), 
+					stdoutRedirect,
+					stderrRedirect, 
 					application.getResourceUsagePath(),
 					wrapper.getPathToWrapper());
 			CmdLineManipulatorUtils.addSPMDJobProperties(jobProperties, 
@@ -229,8 +245,8 @@ public abstract class ScriptBasedQueueConnection<ProviderConfigType
 						application.getFuseMountPoint(),
 						application.getEnvironment(), workingDirectory,
 						application.getStdinRedirect(workingDirectory), 
-						application.getStdoutRedirect(workingDirectory),
-						application.getStderrRedirect(workingDirectory),
+						stdoutRedirect,
+						stderrRedirect,
 						application.getResourceUsagePath(),
 						execName, application.getArguments().toArray(
 							new String[application.getArguments().size()]));

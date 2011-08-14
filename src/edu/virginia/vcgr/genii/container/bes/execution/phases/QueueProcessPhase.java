@@ -188,8 +188,7 @@ public class QueueProcessPhase extends AbstractRunProcessPhase
 				resourceUsageFile = new ResourceUsageDirectory(_workingDirectory.getWorkingDirectory(
 					)).getNewResourceUsageFile();
 				preDelay();
-				stderrPath = fileToPath(_stderr,
-					_workingDirectory.getWorkingDirectory());
+				stderrPath = fileToPath(_stderr, null);
 				PrintWriter hWriter = history.createInfoWriter(
 					"Queue BES Submitting Activity").format(
 						"BES submitting job to batch system:  ");
