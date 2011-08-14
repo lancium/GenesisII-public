@@ -95,6 +95,28 @@ public class QueueSecurity
 		return false;
 	}
 	
+	
+	static public boolean isOwner(Collection<Identity> jobOwners, Collection<Identity> callers) 
+	throws AuthZSecurityException
+{
+	
+	
+	/* If the job has no owners, then we automatically match */
+	if (jobOwners == null || jobOwners.size() == 0)
+		return true;
+	
+	/* For each identity that owns the job...*/
+	for (Identity jobOwner : jobOwners)
+	{
+		/* Check to see if the caller has a matching identity. */
+		if (isOwner(callers, jobOwner))
+			return true;
+	}
+	
+	return false;
+}
+	
+	
 	/**
 	 * Check to see if any of the caller's identities match the
 	 * identity of the job given.

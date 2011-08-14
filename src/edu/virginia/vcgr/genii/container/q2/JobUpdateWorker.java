@@ -217,11 +217,11 @@ public class JobUpdateWorker implements OutcallHandler
 						"Error trying to get fault detail for job %s.", _data), cause);
 				}
 				
-				if (faults == null)
+/*				if (faults == null)
 					faults = new Vector<String>(1);
 				faults.add(0, String.format("Job ran on BES resource %s.",
 					besName == null ? "<unknown>" : besName));
-				
+*/				
 				if (faults != null && faults.size() > 0)
 				{
 					_jobManager.addJobErrorInformation(

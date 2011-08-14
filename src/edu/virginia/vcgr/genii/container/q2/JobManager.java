@@ -42,6 +42,7 @@ import edu.virginia.vcgr.genii.client.bes.BESUtils;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
+import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
@@ -151,6 +152,9 @@ public class JobManager implements Closeable
 		
 		loadFromDatabase(connection);
 		
+	ContainerServices.findService(
+			HistoryContainerService.class).loadQueue(connection);
+		 
 		_statusChecker = new JobStatusChecker(connectionPool, this, _STATUS_CHECK_FREQUENCY);
 	}
 	
@@ -753,63 +757,85 @@ public class JobManager implements Closeable
 	 * @throws ResourceException
 	 */
 	synchronized public Collection<JobInformationType> getJobStatus(
-		Connection connection) throws SQLException, ResourceException
-	{
-		Collection<JobInformationType> ret = new LinkedList<JobInformationType>();
-		HashMap<Long, PartialJobInfo> ownerMap;
-	
-		/* We need to get a few pieces of information that only the database
-		 * has, such as job owner.
-		 */
-		ownerMap = _database.getPartialJobInfos(connection, 
-			_jobsByID.keySet());
-		
-		/* Look through all the jobs managed by this queue looking for the
-		 * right ones.
-		 */
-		for (Long jobID : ownerMap.keySet())
+			Connection connection) throws SQLException, ResourceException, GenesisIISecurityException
 		{
-			/* Get the in-memory information for this job */
-			String scheduledOn = null;
-			JobData jobData = _jobsByID.get(jobID);
-			BESData besData = _besManager.findBES(jobData.getBESID());
-			if (besData != null)
-				scheduledOn = besData.getName();
+			Collection<JobInformationType> ret = new LinkedList<JobInformationType>();
+			HashMap<Long, PartialJobInfo> ownerMap;
+		
+			/* We need to get a few pieces of information that only the database
+			 * has, such as job owner.
+			 */
+			ownerMap = _database.getPartialJobInfos(connection, 
+				_jobsByID.keySet());
 			
-			try
+			/* Look through all the jobs managed by this queue looking for the
+			 * right ones.
+			 */
+			boolean isAdmin = Security.isAdministrator();
+			Collection<Identity> callers = QueueSecurity.getCallerIdentities(true);
+			
+			for (Long jobID : ownerMap.keySet())
 			{
-				/* Get the database information for this job */
-				PartialJobInfo pji = ownerMap.get(jobID);
+				/* Get the in-memory information for this job */
+				String scheduledOn = null;
+				JobData jobData = _jobsByID.get(jobID);
+				BESData besData = _besManager.findBES(jobData.getBESID());
+				if (besData != null)
+					scheduledOn = besData.getName();
 				
-				/* If the caller owns this jobs, then add the status 
-				 * information for the job to the result list. */
-				if (QueueSecurity.isOwner(pji.getOwners()))
+				try
 				{
-					ret.add(new JobInformationType(
-						jobData.getJobTicket(),
-						QueueSecurity.convert(pji.getOwners()),
-						JobStateEnumerationType.fromString(
-							jobData.getJobState().name()),
-						(byte)jobData.getPriority(),
-						QueueUtils.convert(jobData.getSubmitTime()),
-						QueueUtils.convert(pji.getStartTime()),
-						QueueUtils.convert(pji.getFinishTime()),
-						new UnsignedShort(jobData.getRunAttempts()),
-						scheduledOn, jobData.getBESActivityStatus(),
-						jobData.jobName()));
+					/* Get the database information for this job */
+					PartialJobInfo pji = ownerMap.get(jobID);
+					
+					if(isAdmin)
+					{
+						ret.add(new JobInformationType(
+								jobData.getJobTicket(),
+								QueueSecurity.convert(pji.getOwners()),
+								JobStateEnumerationType.fromString(
+									jobData.getJobState().name()),
+								(byte)jobData.getPriority(),
+								QueueUtils.convert(jobData.getSubmitTime()),
+								QueueUtils.convert(pji.getStartTime()),
+								QueueUtils.convert(pji.getFinishTime()),
+								new UnsignedShort(jobData.getRunAttempts()),
+								scheduledOn, jobData.getBESActivityStatus(),
+								jobData.jobName()));
+					}
+					
+					/* If the caller owns this jobs, then add the status 
+					 * information for the job to the result list. */
+					else 
+					{
+						if (QueueSecurity.isOwner(pji.getOwners(), callers))
+						{
+							ret.add(new JobInformationType(
+									jobData.getJobTicket(),
+									QueueSecurity.convert(pji.getOwners()),
+									JobStateEnumerationType.fromString(
+									jobData.getJobState().name()),
+									(byte)jobData.getPriority(),
+									QueueUtils.convert(jobData.getSubmitTime()),
+									QueueUtils.convert(pji.getStartTime()),
+									QueueUtils.convert(pji.getFinishTime()),
+									new UnsignedShort(jobData.getRunAttempts()),
+									scheduledOn, jobData.getBESActivityStatus(),
+									jobData.jobName()));
+						}
+					}
+				}
+				catch (IOException ioe)
+				{
+					throw new ResourceException(
+						"Unable to get job status for job \"" +
+						jobData.getJobTicket() + "\".", ioe);
+						
 				}
 			}
-			catch (IOException ioe)
-			{
-				throw new ResourceException(
-					"Unable to get job status for job \"" +
-					jobData.getJobTicket() + "\".", ioe);
-					
-			}
+			
+			return ret;
 		}
-		
-		return ret;
-	}
 	
 	public ActivityStatusType getBESActivityStatus(String ticket)
 	{
@@ -913,6 +939,9 @@ public class JobManager implements Closeable
 		
 		try
 		{
+			boolean isAdmin = Security.isAdministrator();
+			Collection<Identity> callers = QueueSecurity.getCallerIdentities(true);
+			
 			/* Loop through the jobs checking to make sure that they are
 			 * all owned by the caller.
 			 */
@@ -929,9 +958,28 @@ public class JobManager implements Closeable
 				/* If the job is owned by the caller, add the job's
 				 * status information to the result list.
 				 */
-				if (QueueSecurity.isOwner(pji.getOwners()))
+				
+				if(isAdmin)
 				{
 					ret.add(new JobInformationType(
+							jobData.getJobTicket(),
+							QueueSecurity.convert(pji.getOwners()),
+							JobStateEnumerationType.fromString(
+								jobData.getJobState().name()),
+							(byte)jobData.getPriority(),
+							QueueUtils.convert(jobData.getSubmitTime()),
+							QueueUtils.convert(pji.getStartTime()),
+							QueueUtils.convert(pji.getFinishTime()),
+							new UnsignedShort(jobData.getRunAttempts()),
+							scheduledOn, jobData.getBESActivityStatus(),
+							jobData.jobName()));
+				}
+				else 
+				{
+				
+					if (QueueSecurity.isOwner(pji.getOwners(), callers))
+					{
+						ret.add(new JobInformationType(
 						jobData.getJobTicket(),
 						QueueSecurity.convert(pji.getOwners()),
 						JobStateEnumerationType.fromString(
@@ -943,17 +991,19 @@ public class JobManager implements Closeable
 						new UnsignedShort(jobData.getRunAttempts()),
 						scheduledOn, jobData.getBESActivityStatus(),
 						jobData.jobName()));
-				} else
-				{
-					/* If the caller did not own a job, then we throw a
-					 * security exception.
-					 */
-					throw new GenesisIISecurityException(
+					} 
+					
+					else
+					{
+						/* If the caller did not own a job, then we throw a
+						 * security exception.
+						 */
+						throw new GenesisIISecurityException(
 						"Not permitted to get status of job \"" 
 						+ jobData.getJobTicket() + "\".");
+					}
 				}
 			}
-			
 			return ret;
 		}
 		catch (GenesisIISecurityException gse)
@@ -1062,8 +1112,7 @@ public class JobManager implements Closeable
 				
 				HistoryContainerService service = ContainerServices.findService(
 					HistoryContainerService.class);
-				service.deleteRecords(
-					_database.historyKey(data.getJobTicket()));
+				service.enqueue(_database.historyKey(data.getJobTicket()),  connection);
 			}
 		}
 	}
@@ -1095,9 +1144,10 @@ public class JobManager implements Closeable
 	 * 
 	 * @throws SQLException
 	 * @throws ResourceException
+	 * @throws GenesisIISecurityException 
 	 */
 	synchronized public void completeJobs(Connection connection)
-		throws SQLException, ResourceException
+		throws SQLException, ResourceException, GenesisIISecurityException
 	{
 		Collection<Long> jobsToComplete = new LinkedList<Long>();
 		HashMap<Long, PartialJobInfo> ownerMap;
@@ -1108,6 +1158,9 @@ public class JobManager implements Closeable
 		/* Find all jobs that are owend by the caller and that are in a
 		 * final state.
 		 */
+		boolean isAdmin = Security.isAdministrator();
+		Collection<Identity> callers = QueueSecurity.getCallerIdentities(true);
+		
 		for (Long jobID : ownerMap.keySet())
 		{
 			JobData jobData = _jobsByID.get(jobID);
@@ -1116,10 +1169,18 @@ public class JobManager implements Closeable
 			try
 			{
 				if (jobData.getJobState().isFinalState() && 
-					QueueSecurity.isOwner(pji.getOwners()))
-				{
-					jobsToComplete.add(jobID);
-				}
+						isAdmin)
+					{
+						jobsToComplete.add(jobID);
+					}
+				else
+				{	
+					if (jobData.getJobState().isFinalState() && 
+							QueueSecurity.isOwner(pji.getOwners(), callers ))
+					{
+						jobsToComplete.add(jobID);
+					}
+				}	
 			}
 			catch (AuthZSecurityException azse)
 			{
@@ -1178,6 +1239,10 @@ public class JobManager implements Closeable
 		 */
 		ownerMap = _database.getPartialJobInfos(connection, jobsToComplete);
 		
+		boolean isAdmin = Security.isAdministrator();
+		Collection<Identity> callers = QueueSecurity.getCallerIdentities(true);
+
+		
 		/* Check that every job indicated is owned by the caller and is
 		 * in a final state.
 		 */
@@ -1192,10 +1257,13 @@ public class JobManager implements Closeable
 					+ "\" is not in a final state.");
 			
 			/* If the job isn't owned by the caller, throw an exception. */
-			if (!QueueSecurity.isOwner(pji.getOwners()))
-				throw new GenesisIISecurityException(
-					"Don't have permission to complete job \"" + 
-						jobData.getJobTicket() + "\".");
+			if(!isAdmin)
+			{
+					if (!QueueSecurity.isOwner(pji.getOwners(), callers ))
+					throw new GenesisIISecurityException(
+						"Don't have permission to complete job \"" + 
+							jobData.getJobTicket() + "\".");
+			}
 		}	
 		
 		// Go ahead and complete them

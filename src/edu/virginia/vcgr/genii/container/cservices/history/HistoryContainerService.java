@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,6 +34,10 @@ public class HistoryContainerService extends AbstractContainerService
 	
 	static final public String SERVICE_NAME = "History Service";
 	
+	static final private Queue<String> queue = new LinkedList<String>();
+	
+	static final private Object lock = new Object();
+	
 	private class CleanupAlarmHandler implements AlarmHandler
 	{
 		@Override
@@ -41,9 +47,24 @@ public class HistoryContainerService extends AbstractContainerService
 			
 			try
 			{
-				connection = getConnectionPool().acquire(false);
-				HistoryDatabase.cleanupDeadEvents(connection);
-				connection.commit();
+				connection = getConnectionPool().acquire(false);								
+				HistoryDatabase.cleanupDeadEvents(connection);	
+				String resourceId=new String();
+				
+				synchronized(lock)
+				{
+					resourceId = queue.poll();
+				}
+				
+				if(resourceId != null)
+				{
+					deleteRecords(connection, resourceId);	
+					HistoryDatabase.removeStaleRecord(resourceId, connection);
+					_logger.info(String.format("Deleting history for resource %s", resourceId));							
+				}
+				
+				connection.commit();	//  commits combined to 1 for performance
+				
 			}
 			catch (SQLException sqe)
 			{
@@ -303,5 +324,27 @@ public class HistoryContainerService extends AbstractContainerService
 			if (connection != null)
 				getConnectionPool().release(connection);
 		}
+	}
+	
+	public void enqueue(String resourceID, Connection conn) throws SQLException
+	{		
+		HistoryDatabase.addStaleRecord(resourceID, conn);
+		conn.commit();
+		
+		synchronized(lock)
+		{
+			queue.add(resourceID);
+			
+		}
+	}
+	
+	public void loadQueue(Connection connection) throws SQLException
+	{
+		
+		synchronized(lock)
+		{
+			HistoryDatabase.loadStaleHistory(connection,queue);			
+		}		
+		
 	}
 }

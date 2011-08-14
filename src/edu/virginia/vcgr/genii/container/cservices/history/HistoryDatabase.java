@@ -12,7 +12,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
@@ -44,7 +43,9 @@ public class HistoryDatabase
 			"eventdata BLOB(2G) NOT NULL," +
 			"expirationtime TIMESTAMP," +
 			"CONSTRAINT sequniqconstraint UNIQUE(resourceid, sequencenumber))",
-		"CREATE INDEX historyrecordsresourceididx ON historyrecords(resourceid)"
+		"CREATE INDEX historyrecordsresourceididx ON historyrecords(resourceid)",
+		"CREATE INDEX historyrecordsexpirationtimeidx ON historyrecords(expirationtime)",
+		"CREATE TABLE historystale ( resourceID VARCHAR(128) NOT NULL PRIMARY KEY )"
 	};
 	
 	static private class CloseableIteratorImpl
@@ -428,4 +429,63 @@ public class HistoryDatabase
 			StreamUtils.close(stmt);
 		}
 	}
+	
+	static void loadStaleHistory(Connection connection, Collection<String> buffer) throws SQLException
+	{
+		Statement stmt = null;	
+		ResultSet rs = null;
+		
+		try
+		{
+			stmt = connection.createStatement();
+			rs = stmt.executeQuery("select resourceid from historystale");
+			
+			while (rs.next())
+				buffer.add(rs.getString(1));						
+			
+		}
+		finally
+		{
+			StreamUtils.close(stmt);
+		}
+	}
+	
+	static void addStaleRecord(String resourceID, Connection conn) throws SQLException
+	{
+		PreparedStatement st=null;
+		try
+		{
+			st = conn.prepareStatement(
+					"INSERT INTO historystale " +
+						"(resourceid) " +
+					"VALUES(?)");
+				
+			st.setString(1, resourceID);
+			st.executeUpdate();
+			
+		}
+		finally
+		{
+			StreamUtils.close(st);
+		}
+
+	}
+	
+	static void removeStaleRecord(String resourceID, Connection conn) throws SQLException
+	{
+		PreparedStatement st=null;
+		try
+		{
+			st = conn.prepareStatement(
+					"DELETE from historystale WHERE resourceID = ?");
+			st.setString(1, resourceID);
+			st.executeUpdate();			
+		}
+		finally
+		{
+			StreamUtils.close(st);
+		}
+
+	}
+	
 }
