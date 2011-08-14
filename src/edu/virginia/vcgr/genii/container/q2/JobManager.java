@@ -42,7 +42,6 @@ import edu.virginia.vcgr.genii.client.bes.BESUtils;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
-import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
@@ -101,7 +100,7 @@ public class JobManager implements Closeable
 	 * The maximum number of times that we will allow a job to be started and 
 	 * failed before giving up.
 	 */
-	static final public short MAX_RUN_ATTEMPTS = 10;
+	static final public short MAX_RUN_ATTEMPTS = 5;
 	
 	volatile private boolean _closed = false;
 	
@@ -752,10 +751,14 @@ public class JobManager implements Closeable
 	 * @param connection The database connection to use.
 	 * 
 	 * @return The list of statuses for all jobs owned by the caller.
+	 * @throws GenesisIISecurityException 
 	 * 
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
+	
+
+	
 	synchronized public Collection<JobInformationType> getJobStatus(
 			Connection connection) throws SQLException, ResourceException, GenesisIISecurityException
 		{
@@ -771,8 +774,12 @@ public class JobManager implements Closeable
 			/* Look through all the jobs managed by this queue looking for the
 			 * right ones.
 			 */
-			boolean isAdmin = Security.isAdministrator();
+			
+			
+			//Determine administrators of queue
 			Collection<Identity> callers = QueueSecurity.getCallerIdentities(true);
+			boolean isAdmin = QueueSecurity.isQueueAdmin();
+						
 			
 			for (Long jobID : ownerMap.keySet())
 			{
@@ -939,7 +946,7 @@ public class JobManager implements Closeable
 		
 		try
 		{
-			boolean isAdmin = Security.isAdministrator();
+			boolean isAdmin = QueueSecurity.isQueueAdmin();
 			Collection<Identity> callers = QueueSecurity.getCallerIdentities(true);
 			
 			/* Loop through the jobs checking to make sure that they are
@@ -1158,7 +1165,7 @@ public class JobManager implements Closeable
 		/* Find all jobs that are owend by the caller and that are in a
 		 * final state.
 		 */
-		boolean isAdmin = Security.isAdministrator();
+		boolean isAdmin = QueueSecurity.isQueueAdmin();
 		Collection<Identity> callers = QueueSecurity.getCallerIdentities(true);
 		
 		for (Long jobID : ownerMap.keySet())
@@ -1239,7 +1246,7 @@ public class JobManager implements Closeable
 		 */
 		ownerMap = _database.getPartialJobInfos(connection, jobsToComplete);
 		
-		boolean isAdmin = Security.isAdministrator();
+		boolean isAdmin = QueueSecurity.isQueueAdmin();
 		Collection<Identity> callers = QueueSecurity.getCallerIdentities(true);
 
 		
@@ -2352,4 +2359,7 @@ public class JobManager implements Closeable
 			}
 		}
 	}
+	
+	
+	
 }

@@ -9,8 +9,15 @@ import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.SecurityUtils;
 import edu.virginia.vcgr.genii.client.security.authz.AuthZSecurityException;
+import edu.virginia.vcgr.genii.client.security.authz.acl.Acl;
+import edu.virginia.vcgr.genii.client.security.authz.acl.AclEntry;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
+import edu.virginia.vcgr.genii.common.security.AuthZConfig;
+import edu.virginia.vcgr.genii.container.resource.ResourceKey;
+import edu.virginia.vcgr.genii.container.resource.ResourceManager;
+import edu.virginia.vcgr.genii.container.security.authz.providers.AuthZProviders;
+import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider;
 
 /**
  * This class is a collection of utilities that the queue uses to manipulate
@@ -74,7 +81,7 @@ public class QueueSecurity
 	static public boolean isOwner(Collection<Identity> jobOwners) 
 		throws AuthZSecurityException
 	{
-		if (Security.isAdministrator())
+		if (isQueueAdmin())
 			return true;
 		
 		/* If the job has no owners, then we automatically match */
@@ -165,4 +172,35 @@ public class QueueSecurity
 		
 		return ret;
 	}
+	
+		//Determines if caller is admin of this queue
+		//User is a queue admin if they are admin of container
+		//Or in the write acl of the queue
+		public static boolean isQueueAdmin() throws AuthZSecurityException{
+			if (Security.isAdministrator())
+				return true;
+			try {
+				Collection<Identity> callers = QueueSecurity.getCallerIdentities(true);
+
+				ResourceKey rKey = ResourceManager.getCurrentResource();
+				IAuthZProvider authZHandler = AuthZProviders.getProvider(
+						rKey.getServiceName());
+				AuthZConfig config = null;
+				if (authZHandler != null){
+					config = authZHandler.getAuthZConfig(rKey.dereference());
+					Acl resourceAcls = Acl.decodeAcl(config);
+					for (AclEntry entry : resourceAcls.writeAcl){
+						for (Identity caller : callers){
+							if (entry.isPermitted(caller))
+								return true;
+						}
+					}
+				}
+			} catch (Exception e) {
+				throw new 
+					AuthZSecurityException("Unable to load queue Administrators", e);
+
+			}
+			return false;
+		}
 }
