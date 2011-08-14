@@ -165,7 +165,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 		long stride = read.getStride();
 		TransferInformationType transferInformation = read.getTransferInformation();
 		
-		byte []data = new byte[bytesPerBlock * numBlocks];
+		
 		int off = 0;
 		int r;
 		File myFile = null;
@@ -176,6 +176,8 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 		try
 		{
 			_resourceLock.lock();
+			
+			byte []data = new byte[bytesPerBlock * numBlocks];
 			raf = new RandomAccessFile(myFile, "r");
 			
 			for (int block = 0; block < numBlocks; block++)

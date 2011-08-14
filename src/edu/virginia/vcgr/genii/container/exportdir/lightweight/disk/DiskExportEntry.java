@@ -47,13 +47,14 @@ public class DiskExportEntry extends AbstractVExportEntry
 	public Collection<VExportEntry> list(String name) throws IOException
 	{
 		Collection<VExportEntry> entries = new LinkedList<VExportEntry>();
-		
+
 		for (File entry : _target.listFiles())
 		{
 			if (name == null || name.equals(entry.getName()))
-				entries.add(new DiskExportEntry(entry));
+				if (!isLink(_target))
+					entries.add(new DiskExportEntry(entry));
 		}
-		
+
 		return entries;
 	}
 
@@ -195,4 +196,19 @@ public class DiskExportEntry extends AbstractVExportEntry
 				lock.release();
 		}
 	}
+	
+	public static boolean isLink(File target) throws IOException{
+		if (target == null)
+		    throw new NullPointerException("File must not be null");
+		  File canon;
+		  if (target.getParent() == null) {
+		    canon = target;
+		  } else {
+		    File canonDir = target.getParentFile().getCanonicalFile();
+		    canon = new File(canonDir, target.getName());
+		  }
+		  return !canon.getCanonicalFile().equals(canon.getAbsoluteFile());
+	}
+	
+	
 }
