@@ -54,7 +54,7 @@
 			
 			<xsd:complexType name="TerminateActivitiesType">
 				<xsd:sequence>
-					<xsd:element name="AcitivityIdentifier" type="wsa:EndpointReferenceType"
+					<xsd:element name="ActivityIdentifier" type="wsa:EndpointReferenceType"
 						minOccurs="0" maxOccurs="unbounded"/>
 					<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>

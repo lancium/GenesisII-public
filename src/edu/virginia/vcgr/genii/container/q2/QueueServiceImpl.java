@@ -719,7 +719,7 @@ public class QueueServiceImpl extends ResourceForkBaseService
 			UnknownActivityIdentifierFaultType
 	{
 		TerminateActivityResponseType []responses;
-		EndpointReferenceType []activities = parameters.getAcitivityIdentifier();
+		EndpointReferenceType []activities = parameters.getActivityIdentifier();
 		responses = new TerminateActivityResponseType[activities.length];
 		
 		for (int lcv = 0; lcv < activities.length; lcv++)

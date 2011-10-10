@@ -573,7 +573,8 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 		Collection<TerminateActivityResponseType> responses =
 			new LinkedList<TerminateActivityResponseType>();
 		
-		for (EndpointReferenceType aepr : parameters.getAcitivityIdentifier())
+		
+		for (EndpointReferenceType aepr : parameters.getActivityIdentifier())
 		{
 			responses.add(terminateActivity(aepr));
 		}
