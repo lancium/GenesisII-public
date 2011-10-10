@@ -72,6 +72,12 @@ public abstract class BaseLoginTool extends BaseGridTool{
 		_durationString = durationString;
 	}
 	
+	@Option({"validMillis"})
+	public void setValidMillis(long validMillis) 
+		throws ParseException
+	{
+		_validMillis = validMillis;
+	}
 	
 	//Copys t1's creds to t2
 	public static final void copyCreds(BaseLoginTool t1, BaseLoginTool t2){
