@@ -100,6 +100,8 @@
 			locator-type="edu.virginia.vcgr.genii.iterator.WSIteratorServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.x509authn.X509AuthnPortType"
 			locator-type="edu.virginia.vcgr.genii.x509authn.X509AuthnServiceLocator"/>
+		<locator interface="edu.virginia.vcgr.genii.kerbauthn.KerbAuthnPortType"
+			locator-type="edu.virginia.vcgr.genii.kerbauthn.KerbAuthnServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.jndiauthn.JNDIAuthnPortType"
 			locator-type="edu.virginia.vcgr.genii.jndiauthn.JNDIAuthnServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.tty.TTYPortType"

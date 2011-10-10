@@ -19,6 +19,7 @@
 {http://vcgr.cs.virginia.edu/container/2006/12/simple-resolver}SimpleResolverPortType
 {http://vcgr.cs.virginia.edu/container/2007/11/jndi-authn}JNDIAuthnPortType
 {http://vcgr.cs.virginia.edu/container/2007/11/x509-authn}X509AuthnPortType
+{http://vcgr.cs.virginia.edu/container/2007/11/kerb-authn}KerbAuthnPortType
 {http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns}EnhancedRNSPortType
 {http://vcgr.cs.virginia.edu/counter/2006/06/counter}CounterPortType
 {http://vcgr.cs.virginia.edu/Genesis-II}CounterPortType

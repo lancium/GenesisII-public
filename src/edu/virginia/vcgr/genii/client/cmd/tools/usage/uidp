@@ -1,3 +1,4 @@
+
 idp
 		+ [--storetype=<PKCS12|JKS|WIN>] 
 		+ [--password=<keystore-password>]  
@@ -7,3 +8,9 @@ idp
 		+ [<authentication source URL>] 
 		+ <IDP service path> 
 		+ <new IDP name>
+		
+idp
+		+ [--kerbRealm=<Kerberos realm>] 
+		+ [--kerbKdc=<Kerberos KDC>]  
+		+ <Kerberos IDP service path> 
+		+ <Kerberos Id>		

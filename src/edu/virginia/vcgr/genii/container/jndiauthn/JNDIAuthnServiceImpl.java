@@ -21,6 +21,7 @@ import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.text.*;
 import java.util.*;
+
 import org.apache.axis.types.URI;
 
 import javax.xml.namespace.QName;
@@ -81,6 +82,7 @@ import org.ogf.schemas.naming._2006._08.naming.ResolveFailedFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
 import org.apache.axis.AxisFault;
+import org.bouncycastle.asn1.DERObjectIdentifier;
 
 import org.morgan.util.configuration.ConfigurationException;
 
@@ -1048,8 +1050,10 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 						(attrs.get("uidnumber") == null) ? null
 								: (String) attrs.get("uidnumber").get();
 
-				return CertTool.createResourceCertChain(epiString, cnList, uid,
-						certSpec);
+				Map.Entry<List<DERObjectIdentifier>, List<String> > additionalFields = 
+					CertTool.constructCommonDnFields(epiString, null, cnList, uid); 							
+				
+				return CertTool.createResourceCertChain(certSpec, additionalFields);
 
 			case LDAP:
 				jndiEnv.setProperty(Context.INITIAL_CONTEXT_FACTORY,

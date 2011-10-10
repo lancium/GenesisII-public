@@ -104,6 +104,11 @@
 		<description>X509Auth</description>
 	</portType>
 
+	<portType name="{http://vcgr.cs.virginia.edu/container/2007/11/kerb-authn}KerbAuthnPortType">
+		<display-rank>100</display-rank>
+		<description>KerbAuth</description>
+	</portType>
+
 	<portType name="{http://vcgr.cs.virginia.edu/container/2008/04/enhanced-rns}EnhancedRNSPortType">
 		<display-rank>-100</display-rank>
 		<description>RNS</description>

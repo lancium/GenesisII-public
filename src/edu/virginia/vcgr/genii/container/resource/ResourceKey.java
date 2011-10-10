@@ -7,11 +7,14 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
@@ -286,6 +289,7 @@ public class ResourceKey implements Closeable
 		{	
 			try
 			{
+				// Add in any additional CNs specified
 				ArrayList<String> CNs = new ArrayList<String>();
 				String[] additionalCNs = (String[]) consParms.get(
 						IResource.ADDITIONAL_CNS_CONSTRUCTION_PARAM);
@@ -294,13 +298,24 @@ public class ResourceKey implements Closeable
 				}
 				CNs.add(serviceName);
 				
+				// Add in any additional orgnaizations specified
+				ArrayList<String> orgs = new ArrayList<String>();
+				String[] additionalOrgs = (String[]) consParms.get(
+						IResource.ADDITIONAL_ORGS_CONSTRUCTION_PARAM);
+				if (additionalOrgs != null) {
+					orgs.addAll(Arrays.asList(additionalOrgs));
+				}
+				
+				Map.Entry<List<DERObjectIdentifier>, List<String> > additionalFields = 
+					CertTool.constructCommonDnFields(
+							epi.toString(), 
+							orgs, 
+							CNs, 
+							null); 		// uid					
+				
 				consParms.put(
 						IResource.CERTIFICATE_CHAIN_CONSTRUCTION_PARAM,
-						CertTool.createResourceCertChain(
-								epi.toString(), 
-								CNs, 
-								null,
-								spec));
+						CertTool.createResourceCertChain(spec, additionalFields));
 			}
 			catch (GeneralSecurityException gse)
 			{

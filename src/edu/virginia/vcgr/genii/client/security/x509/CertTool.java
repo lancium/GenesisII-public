@@ -202,20 +202,58 @@ public class CertTool
 		return null;
 	}
 
-	public static X509Certificate[] createResourceCertChain(String epi,
-			String newCN, CertCreationSpec certSpec)
-			throws GeneralSecurityException
-	{
 
-		ArrayList<String> newCNs = new ArrayList<String>();
-		newCNs.add(newCN);
-		return createResourceCertChain(epi, newCNs, null, certSpec);
+	/**
+	 * Construct a structure-of-arrays of distinguished-name fields and 
+	 * paired values 
+	 */
+	@SuppressWarnings("unchecked")
+	public static Map.Entry<List<DERObjectIdentifier>, List<String> > constructCommonDnFields(
+			String epi,
+			ArrayList<String> newOrgs, 
+			ArrayList<String> newCNs, 
+			String uid) 
+				throws GeneralSecurityException
+	{
+		ArrayList<DERObjectIdentifier> fields = new ArrayList<DERObjectIdentifier>();
+		ArrayList<String> values = new ArrayList<String>();
+		
+		if (epi != null)
+		{
+			fields.add(X509Name.SN);
+			values.add(epi);
+		}
+		if (newOrgs != null)
+		{
+			for (String organization : newOrgs)
+			{
+				fields.add(X509Name.O);
+				values.add(organization);
+			}
+		}
+		if (uid != null)
+		{
+			fields.add(X509Name.UID);
+			values.add(uid);
+		}
+		if (newCNs != null)
+		{
+			for (String cn : newCNs)
+			{
+				fields.add(X509Name.CN);
+				values.add(cn);
+			}
+		}
+		
+		return new AbstractMap.SimpleEntry<List<DERObjectIdentifier>, List<String> >(fields, values);
 	}
 
+		
 	@SuppressWarnings("unchecked")
-	public static X509Certificate[] createResourceCertChain(String epi,
-			ArrayList<String> newCNs, String uid, CertCreationSpec certSpec)
-			throws GeneralSecurityException
+	public static X509Certificate[] createResourceCertChain(
+			CertCreationSpec certSpec,
+			Map.Entry<List<DERObjectIdentifier>, List<String> >  additional_fields)
+				throws GeneralSecurityException
 	{
 
 		// replace the SN and the old CNs, if necessary
@@ -244,25 +282,9 @@ public class CertTool
 			}
 		}
 
-		if (epi != null)
-		{
-			oids.add(X509Name.SN);
-			values.add(epi);
-		}
-		if (uid != null)
-		{
-			oids.add(X509Name.UID);
-			values.add(uid);
-		}
-		if (newCNs != null)
-		{
-			for (String cn : newCNs)
-			{
-				oids.add(X509Name.CN);
-				values.add(cn);
-			}
-		}
-
+		oids.addAll(additional_fields.getKey());	// additional oids
+		values.addAll(additional_fields.getValue());	// additional values
+		
 		dn = new X509Name(oids, values);
 
 		X509Certificate newCert =

@@ -33,6 +33,9 @@ public class IdpTool extends BaseLoginTool {
 	static final private String _MANPAGE =
 		"edu/virginia/vcgr/genii/client/cmd/tools/man/idp";
 
+	protected String _kerbRealm = null;
+	protected String _kerbKdc = null;
+
 	protected IdpTool(String description, String usage, boolean isHidden) {
 		super(description, usage, isHidden);
 	}
@@ -76,33 +79,37 @@ public class IdpTool extends BaseLoginTool {
 					+ "\" is not an IDP service.");
 		}
 
-		MessageElement[] constructionParms = null;
-		MessageElement newIdpNameParm = new MessageElement(
-				SecurityConstants.NEW_IDP_NAME_QNAME, newIdpName);
+		ArrayList<MessageElement> constructionParms = new ArrayList<MessageElement>();
+		constructionParms.add(new MessageElement(
+				SecurityConstants.NEW_IDP_NAME_QNAME, newIdpName));
 
 
 		if ((_authnUri == null) && (_storeType == null)) {
 
-			MessageElement validMillisParm = new MessageElement(
-					SecurityConstants.IDP_VALID_MILLIS_QNAME, _validMillis);
+			constructionParms.add(new MessageElement(
+					SecurityConstants.IDP_VALID_MILLIS_QNAME, _validMillis));
 
 			if ((_username != null) && (_password != null)) {
+				
 				// actually create a new idp that delegates a 
 				// usernametoken credential
 				UsernamePasswordIdentity ut = 
 					new UsernamePasswordIdentity(_username, _password);
+				
 				MessageElement delegatedIdentParm = new MessageElement(
 						SecurityConstants.IDP_DELEGATED_CREDENTIAL_QNAME);
 				delegatedIdentParm.addChild(ut.toMessageElement());
-				constructionParms = 
-					new MessageElement[] { delegatedIdentParm, newIdpNameParm, validMillisParm};
-			} else {
-
-				// we're creating a new-identity from scratch, not 
-				// delegating one into the grid
-
-				constructionParms = 
-					new MessageElement[] { validMillisParm, newIdpNameParm };
+				
+				constructionParms.add(delegatedIdentParm);
+			}
+			
+			if (_kerbRealm != null) {
+				constructionParms.add(new MessageElement(
+						SecurityConstants.NEW_KERB_IDP_REALM_QNAME, _kerbRealm));
+			}
+			if (_kerbKdc != null) {
+				constructionParms.add(new MessageElement(
+						SecurityConstants.NEW_KERB_IDP_KDC_QNAME, _kerbKdc));
 			}
 
 		} else {
@@ -170,16 +177,16 @@ public class IdpTool extends BaseLoginTool {
 			MessageElement delegatedIdentParm = new MessageElement(
 					SecurityConstants.IDP_DELEGATED_CREDENTIAL_QNAME);
 			delegatedIdentParm.addChild(assertions.get(0).toMessageElement());
-			constructionParms = 
-				new MessageElement[] { delegatedIdentParm, newIdpNameParm };
 
+			constructionParms.add(delegatedIdentParm);
 		}
 
 		// create the new idp resource and link it into context space
+		MessageElement parmsArray[] = new MessageElement[0];
 		CreateResourceTool.createInstance(
 				idpService.getEndpoint(),
 				null,						// no link needed 
-				constructionParms);
+				constructionParms.toArray(parmsArray));
 
 		return 0;
 	}
@@ -202,5 +209,23 @@ public class IdpTool extends BaseLoginTool {
 				throw new ToolException("Invalid duration string given.", pe);
 			}
 		}
+		
+		if (((_kerbRealm != null) || (_kerbKdc != null)) && ((_kerbRealm == null) || (_kerbKdc == null)))   
+		{
+			throw new ToolException("Insufficient Kerberos information given.");
+		}
 	}
+	
+	@Option({"kerbRealm"})
+	public void setKerbRealm(String kerbRealm) 
+	{
+		_kerbRealm = kerbRealm;
+	}
+
+	@Option({"kerbKdc"})
+	public void setKdc(String kerbKdc) 
+	{
+		_kerbKdc = kerbKdc;
+	}
+	
 }

@@ -113,6 +113,9 @@ public class WellKnownPortTypes
 	static public PortType JNDI_AUTHN_SERVICE_PORT_TYPE =
 		PortType.get(new QName("http://vcgr.cs.virginia.edu/container/2007/11/jndi-authn",
 			"JNDIAuthnPortType"));
+	static public PortType KERB_AUTHN_SERVICE_PORT_TYPE =
+		PortType.get(new QName("http://vcgr.cs.virginia.edu/container/2007/11/kerb-authn",
+			"KerbAuthnPortType"));
 
 	static public PortType ENDPOINT_IDENTIFIER_RESOLVER_SERVICE_PORT_TYPE =
 		PortType.get(new QName("http://schemas.ogf.org/naming/2006/08/naming/wsdl/EndpointIdentifierResolver",

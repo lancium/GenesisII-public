@@ -60,4 +60,16 @@ public class SecurityConstants
 					"http://vcgr.cs.virginia.edu/security/2007/11/jndi-authn",
 					"new-sts-nisdomain-param");
 
+	// --- KERB STS CONSTANTS ----------------------------------------------
+	
+	static public final QName NEW_KERB_IDP_REALM_QNAME =
+		new QName(
+				"http://vcgr.cs.virginia.edu/security/2007/11/kerb-authn",
+				"new-idp-realm-param");
+
+	static public final QName NEW_KERB_IDP_KDC_QNAME =
+		new QName(
+				"http://vcgr.cs.virginia.edu/security/2007/11/kerb-authn",
+				"new-idp-kdc-param");
+	
 }
