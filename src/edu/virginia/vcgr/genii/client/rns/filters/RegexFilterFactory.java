@@ -10,6 +10,11 @@ public class RegexFilterFactory implements FilterFactory
 		return new RegexFilter(Pattern.compile(pattern));
 	}
 	
+	@Override
+	public boolean isFilterNeeded(String pattern) {
+		return true;
+	}
+	
 	static protected class RegexFilter implements Filter
 	{
 		private Pattern _regex;
@@ -24,4 +29,6 @@ public class RegexFilterFactory implements FilterFactory
 			return _regex.matcher(text).matches();
 		}
 	}
+
+	
 }

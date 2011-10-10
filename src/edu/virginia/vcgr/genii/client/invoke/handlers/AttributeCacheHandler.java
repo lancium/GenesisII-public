@@ -428,7 +428,7 @@ public class AttributeCacheHandler
 				MessageElement []any = member.get_any();
 				if (any != null && any.length == 1)
 				{
-					QName type = any[0].getType();
+					QName type = any[0].getQName();
 					if (type != null && type.equals(RNSEntryResponseType.getTypeDesc().getXmlType()))
 					{
 						RNSEntryResponseType entry = ObjectDeserializer.toObject(any[0], 

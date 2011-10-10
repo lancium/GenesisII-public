@@ -7,8 +7,11 @@ import java.util.regex.Pattern;
 
 public class FilePattern
 {
+	static final private String FILE_PATTERN_STRING= "(\\\\?[?*+])";
+	
 	static final private Pattern FILE_PATTERN_PATTERN =
-		Pattern.compile("(\\\\?[?*+])");
+		Pattern.compile(FILE_PATTERN_STRING);
+	
 	
 	static public Pattern compile(String filePattern)
 	{
@@ -88,5 +91,18 @@ public class FilePattern
 	static public void main(String []args) throws Throwable
 	{
 		System.err.println("Pattern for file pattern * is:  \"" + compile("*") + "\".");
+	}
+
+	static public boolean isFilterNeeded(String pattern) 
+	{
+		
+		int len = FILE_PATTERN_STRING.length();	//loop-invariant
+		for(int lcv=0; lcv<len; ++lcv)
+		{
+			if(pattern.indexOf(new String(FILE_PATTERN_STRING.substring(lcv, lcv+1)))!=-1)
+				return true;
+		}
+		
+		return false;
 	}
 }

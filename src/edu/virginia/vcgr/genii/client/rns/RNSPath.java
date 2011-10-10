@@ -593,7 +593,8 @@ public class RNSPath implements Serializable, Cloneable
 			ret.add(parent);
 		else
 		{
-			Filter filter = filterType.createFilter(pathElements[nextElement]);
+			String element = pathElements[nextElement]; 
+			
 			try
 			{
 				TypeInformation typeInfo = new TypeInformation(
@@ -602,14 +603,39 @@ public class RNSPath implements Serializable, Cloneable
 				{
 					_logger.debug("Attempting to list contents of \"" + parent + "\".");
 					
-					for (RNSPath candidate : parent.listContents())
+					//we first check if we need to create a filter !
+					boolean isFilterReqd = filterType.isFilterNeeded(element);
+					
+					if(isFilterReqd)
 					{
-						if (filter.matches(candidate.getName()))
+						Filter filter = filterType.createFilter(element);
+						for (RNSPath candidate : parent.listContents())
 						{
-							tmp = expand(candidate, pathElements, 
-								nextElement + 1, filterType);
-							if (tmp != null)
-								ret.addAll(tmp);
+							if (filter.matches(candidate.getName()))
+							{
+								tmp = expand(candidate, pathElements, 
+										nextElement + 1, filterType);
+								if (tmp != null)
+									ret.addAll(tmp);
+							}
+						}
+					}
+					else
+					{
+						/* Even though this maybe just a single lookup-call with a single-element we should iterate.
+						   This is because the container can set its preferred-batch-size to 0 and also not return
+						   an initial-block, meaning we must do an iterate-call. 
+						*/
+						
+						for (RNSPath candidate : parent.listContents(element))
+						{
+							if (element.equals(candidate.getName()))
+							{
+								tmp = expand(candidate, pathElements, 
+										nextElement + 1, filterType);
+								if (tmp != null)
+									ret.addAll(tmp);
+							}
 						}
 					}
 				}
@@ -799,6 +825,42 @@ public class RNSPath implements Serializable, Cloneable
 			throw new RNSException("Unable to list contents.", re);
 		}
 	}
+	
+	//This method performs grouped/batch-mode operation on the RNS
+	public Collection<RNSPath> listContents(String...lookupPath)
+		throws RNSPathDoesNotExistException, RNSException
+	{
+		EndpointReferenceType me = resolveRequired();
+		EnhancedRNSPortType rpt = createProxy(
+				me, EnhancedRNSPortType.class);
+		RNSLegacyProxy proxy = new RNSLegacyProxy(rpt);
+		RNSIterable entries = null;
+	
+		try
+		{
+			entries = proxy.iterateList(lookupPath);
+			LinkedList<RNSPath> ret = new LinkedList<RNSPath>();
+			for (RNSEntryResponseType entry : entries)
+			{
+				RNSPath newEntry = new RNSPath(this, entry.getEntryName(),
+						entry.getEndpoint(), true);
+				_lookupCache.put(newEntry.pwd(), newEntry);
+				ret.add(newEntry);
+			}
+		
+			return ret;
+		}
+		catch (GenesisIISecurityException gse)
+		{
+			throw new RNSException("Unable to list contents -- " +
+					"security exception.", gse);
+		}
+		catch (RemoteException re)
+		{
+			throw new RNSException("Unable to list the contents.", re);
+		}
+	}
+	
 	
 	/**
 	 * Assuming that the indicated RNSPath entry does not yet exist (but that
