@@ -506,7 +506,7 @@ public class RNSPath implements Serializable, Cloneable
 	 */
 	static public void clearCacheEntry(String fullPath)
 	{
-		_lookupCache.remove(fullPath);
+			_lookupCache.remove(fullPath);
 	}
 	
 	/**
@@ -919,6 +919,7 @@ public class RNSPath implements Serializable, Cloneable
 		EndpointReferenceType parentEPR = _parent.resolveRequired();
 		
 		EnhancedRNSPortType rpt = createProxy(parentEPR, EnhancedRNSPortType.class);
+	        clearCacheEntry(pwd());
 		RNSLegacyProxy proxy = new RNSLegacyProxy(rpt);
 		try
 		{
@@ -948,6 +949,8 @@ public class RNSPath implements Serializable, Cloneable
 		if (_parent == null)
 			throw new RNSException("Attempt to unlink root not allowed.");
 		
+	    clearCacheEntry(pwd());
+
 		EndpointReferenceType parentEPR = _parent.resolveRequired();
 		try
 		{
