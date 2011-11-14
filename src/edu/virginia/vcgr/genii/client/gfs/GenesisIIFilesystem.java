@@ -305,6 +305,7 @@ public class GenesisIIFilesystem implements FSFilesystem
 			GenesisIIACLManager mgr = new GenesisIIACLManager(target.getEndpoint(),
 				_callerIdentities);
 			mgr.setPermissions(permissions);
+			flushAttributeCache(path);
 		}
 		catch (Throwable cause)
 		{
@@ -612,6 +613,7 @@ public class GenesisIIFilesystem implements FSFilesystem
 				rp.setAccessTime(toCalendar(accessTime));
 				rp.setModificationTime(toCalendar(modificationTime));
 			}
+			flushAttributeCache(path);
 		}
 		catch (Throwable cause)
 		{
@@ -673,3 +675,4 @@ public class GenesisIIFilesystem implements FSFilesystem
 		}
 	}
 }
+
