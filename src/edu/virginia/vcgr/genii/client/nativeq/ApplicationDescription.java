@@ -96,7 +96,7 @@ public class ApplicationDescription
 		if (_stdinRedirect == null)
 			return null;
 		
-		File stdin = new File(_stderrRedirect);
+		File stdin = new File(_stdinRedirect);
 		if (stdin.isAbsolute())
 			return stdin;
 		
