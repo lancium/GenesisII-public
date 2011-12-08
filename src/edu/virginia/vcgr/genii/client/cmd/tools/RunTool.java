@@ -230,7 +230,7 @@ public class RunTool extends BaseGridTool
 		GeniiPath gPath = new GeniiPath(_asyncName);
 		if(gPath.pathType() != GeniiPathType.Grid)
 			throw new InvalidToolUsageException("[async-name] must be a grid path. ");
-		String asyncPath = gPath.path();;
+		String asyncPath = gPath.path();
 		EndpointReferenceType activity = null;
 		GeniiPath gPath0 = new GeniiPath(getArgument(0));
 		if(gPath0.pathType() != GeniiPathType.Grid)
@@ -255,7 +255,7 @@ public class RunTool extends BaseGridTool
 		{
 			SubscribeRequest subscribeRequest = null;
 			
-			if (asyncPath.equals(""));
+			if (asyncPath.equals(""))
 			{
 				server = LightweightNotificationServer.createStandardServer();
 				server.start();
