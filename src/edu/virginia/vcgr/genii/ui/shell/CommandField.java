@@ -39,6 +39,7 @@ public class CommandField extends JTextField
 	private UIContext _uiContext;
 	private Display _display;
 	private JLabel _label;
+	private boolean _executing = false;
 	
 	private String stripEscapesAndQuotes(String word)
 	{
@@ -298,45 +299,54 @@ public class CommandField extends JTextField
 		@Override
 		public void enter()
 		{
+
+
+			setEditable(false);
+			
 			if (_historySearch != null)
 			{
 				setText(_historySearch.getActualLine());
 				getCaret().setDot(0);
 				_historySearch = null;
 			}
-			
+
 			String line = getText();
 			clear();
-			
+
 			LineBasedReader reader = _reader;
 			if (reader == null)
 			{
 				line = line.trim();
-				if (line.length() == 0)
+				if (line.length() == 0){
+					if (!_executing)
+						setEditable(true);
 					return;
-				
+				}
+					
+
 				if (line.equals("quit") || line.equals("exit"))
 				{
 					SwingUtilities.windowForComponent(CommandField.this).dispose();
 					return;
 				}
-				
+
 				_history.addLine(line);
-				
+
 				_label.setText("");
+				_executing = true;
 				_reader = reader = new LineBasedReader();
 				_display.start();
 				_display.header().format("Command:  ");
 				_display.command().println(line);
 				_uiContext.progressMonitorFactory().createMonitor(CommandField.this, 
-					"Executing Command", "Executing command.", 1000L,
-					new CommandExecutionTask(line, reader),
-					new CommandCompletionListener()).start();
+						"Executing Command", "Executing command.", 1000L,
+						new CommandExecutionTask(line, reader),
+						new CommandCompletionListener()).start();
 			} else
 			{
 				reader.addLine(line);
 			}
-			
+
 			_historyIterator = null;
 		}
 
@@ -656,6 +666,9 @@ public class CommandField extends JTextField
 					UserPreferences.preferences().shellPrompt().toString());
 				_reader = null;
 				CommandField.this.requestFocusInWindow();
+				CommandField.this.setEditable(true);
+				_executing = false;
+				
 			}
 			finally
 			{
