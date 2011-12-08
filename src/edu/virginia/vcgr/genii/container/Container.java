@@ -213,7 +213,15 @@ public class Container extends ApplicationBase
 		
 		if (_containerConfiguration.isSSL())
 		{
-			socketConnector = new TrustAllSslSocketConnector();
+			
+			//Determine if we should accept self signed certificates
+			if (_containerConfiguration.trustSelfSigned()){
+				socketConnector = new TrustAllSslSocketConnector();
+				_logger.info("Warning, accepting connections from self signed certificates");
+			}
+			else
+				socketConnector = new SslSocketConnector();
+			
 			socketConnector.setPort(_containerConfiguration.getListenPort());
 			_containerConfiguration.getSslInformation().configure(getConfigurationManager(),
 				(SslSocketConnector)socketConnector);

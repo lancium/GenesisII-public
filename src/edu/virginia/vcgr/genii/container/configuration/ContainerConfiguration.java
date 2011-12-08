@@ -26,6 +26,7 @@ public class ContainerConfiguration
 	private SslInformation _sslInformation = null;
 	private int _notificationPoolSize;
 	private Properties _globalProperties;
+	private boolean _trustSelfSigned = false;
 	
 	public ContainerConfiguration(ConfigurationManager manager)
 	{
@@ -45,6 +46,14 @@ public class ContainerConfiguration
 				new SslInformation(Installation.getDeployment(name).security());
 		else
 			_sslInformation = null;
+		
+		String trustSelfSigned =
+				Installation.getDeployment(name).webContainerProperties().getProperty(
+						WebContainerConstants.TRUST_SELF_SIGNED);
+		
+		if (trustSelfSigned != null && trustSelfSigned.equalsIgnoreCase("true"))
+			_trustSelfSigned = true;
+		
 	}
 	
 	public Properties getGlobalProperties()
@@ -75,6 +84,10 @@ public class ContainerConfiguration
 	public boolean isSSL()
 	{
 		return _sslInformation != null;
+	}
+	
+	public boolean trustSelfSigned(){
+		return _trustSelfSigned;
 	}
 	
 	public SslInformation getSslInformation()

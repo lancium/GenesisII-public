@@ -12,4 +12,7 @@ public interface WebContainerConstants
 	
 	static public final String USE_SSL_PROP =
 		"edu.virginia.vcgr.genii.container.listen-port.use-ssl";
+	
+	static public final String TRUST_SELF_SIGNED =
+			"edu.virginia.vcgr.genii.container.trust-self-signed";
 }
