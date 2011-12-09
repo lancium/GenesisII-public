@@ -95,16 +95,18 @@ public class Acl implements Serializable
 	 * @throws AuthZSecurityException
 	 */
 	static private AclEntryListType encodeIdentityList(
-			Collection<AclEntry> acl) throws AuthZSecurityException
+			Collection<AclEntry> acl, boolean sanitize) throws AuthZSecurityException
 	{
-
 		try
 		{
 			byte[][] identities = new byte[acl.size()][];
-
 			int i = 0;
 			for (AclEntry entry : acl) {
-				identities[i] = DBSerializer.serialize(entry, -1);
+				if (entry == null || !sanitize)
+					identities[i] = DBSerializer.serialize(entry, -1);	
+				else
+					identities[i] = DBSerializer.serialize(entry.sanitize(), -1);
+					
 				i++;
 			}
 
@@ -200,17 +202,22 @@ public class Acl implements Serializable
 	 * @return
 	 * @throws AuthZSecurityException
 	 */
-	static public AuthZConfig encodeAcl(Acl acl) throws AuthZSecurityException
+	static public AuthZConfig encodeAcl(Acl acl, boolean sanitize) throws AuthZSecurityException
 	{
 
 		AclType gacl = new AclType();
 		gacl.setRequireEncryption(new Boolean(acl.requireEncryption));
-		gacl.setReadAcl(encodeIdentityList(acl.readAcl));
-		gacl.setWriteAcl(encodeIdentityList(acl.writeAcl));
-		gacl.setExecuteAcl(encodeIdentityList(acl.executeAcl));
+		gacl.setReadAcl(encodeIdentityList(acl.readAcl, sanitize));
+		gacl.setWriteAcl(encodeIdentityList(acl.writeAcl, sanitize));
+		gacl.setExecuteAcl(encodeIdentityList(acl.executeAcl, sanitize));
 
 		MessageElement mel[] = { new MessageElement(AclType.getTypeDesc()
 				.getXmlType(), gacl) };
 		return new AuthZConfig(mel);
+	}
+	
+	static public AuthZConfig encodeAcl(Acl acl) throws AuthZSecurityException
+	{
+		return encodeAcl(acl, false);
 	}
 }

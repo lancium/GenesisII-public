@@ -231,6 +231,12 @@ public class JNDIAuthZProvider implements IAuthZProvider
 		return _gamlAclProvider.getAuthZConfig(resource);
 	}
 
+	public AuthZConfig getAuthZConfig(IResource resource, boolean sanitize)
+			throws AuthZSecurityException, ResourceException
+	{
+		return getAuthZConfig(resource);
+	}
+	
 	public void setAuthZConfig(AuthZConfig config, IResource resource)
 			throws AuthZSecurityException, ResourceException
 	{

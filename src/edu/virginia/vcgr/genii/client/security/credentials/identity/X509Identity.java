@@ -11,6 +11,7 @@ import java.util.*;
 
 import org.apache.axis.message.MessageElement;
 
+import edu.virginia.vcgr.genii.client.security.authz.acl.AclEntry;
 import edu.virginia.vcgr.genii.client.security.credentials.assertions.*;
 
 import edu.virginia.vcgr.genii.client.security.SecurityUtils;
@@ -228,6 +229,11 @@ public class X509Identity implements HolderOfKeyIdentity, SignedAssertion
 			throws GeneralSecurityException {
 
 		return this.equals(identity);
+	}
+
+	@Override
+	public AclEntry sanitize() {
+		return this;
 	}	
 
 }

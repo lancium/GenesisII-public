@@ -91,6 +91,12 @@ public class OpenAuthZProvider implements IAuthZProvider
 
 		return new AuthZConfig(null);
 	}
+	
+	public AuthZConfig getAuthZConfig(IResource resource, boolean sanitize)
+			throws AuthZSecurityException, ResourceException
+	{
+		return getAuthZConfig(resource);
+	}
 
 	public void setAuthZConfig(AuthZConfig config, IResource resource)
 			throws AuthZSecurityException, ResourceException

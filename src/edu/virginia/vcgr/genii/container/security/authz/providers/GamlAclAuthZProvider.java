@@ -371,6 +371,12 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 	public AuthZConfig getAuthZConfig(IResource resource)
 			throws AuthZSecurityException, ResourceException
 	{
+		return getAuthZConfig(resource, true);
+	}
+	
+	public AuthZConfig getAuthZConfig(IResource resource, boolean sanitize)
+			throws AuthZSecurityException, ResourceException
+	{
 
 		try
 		{
@@ -380,7 +386,7 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 
 			if (acl != null)
 			{
-				return Acl.encodeAcl(acl);
+				return Acl.encodeAcl(acl, true);
 			}
 
 			return new AuthZConfig(null);

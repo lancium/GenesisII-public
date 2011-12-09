@@ -72,9 +72,12 @@ public interface IAuthZProvider
 			ResourceException;
 
 	/**
-	 * Returns the entire AuthZ configuration for the resource
+	 * Returns the entire AuthZ configuration for the resource, by default sanitized
 	 */
 	public AuthZConfig getAuthZConfig(IResource resource)
+			throws AuthZSecurityException, ResourceException;
+
+	public AuthZConfig getAuthZConfig(IResource resource, boolean sanitize)
 			throws AuthZSecurityException, ResourceException;
 
 	/**

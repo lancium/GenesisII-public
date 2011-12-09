@@ -202,6 +202,11 @@ public class X509PatternAclEntry implements AclEntry, Serializable {
 					_userPattern, 
 					VerbosityLevel.HIGH) + 
 				" signed by " + _trustRoot.describe(verbosity);
+	}
+
+	@Override
+	public AclEntry sanitize() {
+		return this;
 	}	
 
 }

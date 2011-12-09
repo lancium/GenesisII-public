@@ -11,6 +11,7 @@ import org.apache.axis.message.MessageElement;
 
 import edu.virginia.vcgr.genii.client.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.client.security.WSSecurityUtils;
+import edu.virginia.vcgr.genii.client.security.authz.acl.AclEntry;
 import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
 import edu.virginia.vcgr.genii.client.security.credentials.assertions.AttributeInvalidException;
 
@@ -144,8 +145,17 @@ public class UsernamePasswordIdentity implements Identity, GIICredential
 	public boolean isPermitted(Identity identity)
 			throws GeneralSecurityException {
 
+		//Dont grant access to blank or null password
+		if (_password.equals("") || _password == null)
+			return false;
+		
 		return this.equals(identity);
 
+	}
+
+	@Override
+	public AclEntry sanitize() {
+		return new UsernamePasswordIdentity(_userName, "");
 	}
 
 }

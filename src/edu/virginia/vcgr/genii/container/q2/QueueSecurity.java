@@ -187,7 +187,7 @@ public class QueueSecurity
 						rKey.getServiceName());
 				AuthZConfig config = null;
 				if (authZHandler != null){
-					config = authZHandler.getAuthZConfig(rKey.dereference());
+					config = authZHandler.getAuthZConfig(rKey.dereference(), false);
 					Acl resourceAcls = Acl.decodeAcl(config);
 					for (AclEntry entry : resourceAcls.writeAcl){
 						for (Identity caller : callers){
