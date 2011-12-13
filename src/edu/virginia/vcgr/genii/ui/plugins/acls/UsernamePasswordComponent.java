@@ -102,7 +102,7 @@ class UsernamePasswordComponent extends JPanel
 				null, new ACLEntryWrapper(_uiContext,
 				new UsernamePasswordIdentity(
 					_username.getText(),
-					new String(_password.getPassword())))));
+					new String(_password.getPassword()), true))));
 		}
 
 		@Override

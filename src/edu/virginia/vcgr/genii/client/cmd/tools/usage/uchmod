@@ -10,6 +10,10 @@ To add/remove a username/password token identity:
 
 chmod <target-path> ( <[<+|->r][<+|->w][<+|->x]> | <octal-mode> ) --username=<username> --password=<password> 
 
+or
+
+chmod <target-path> ( <[<+|->r][<+|->w][<+|->x]> | <octal-mode> ) --username=<username> --hashedpass=<passwordhash> 
+
 To add/remove the catch-all "everyone"/"world" identity:
 
 chmod <target-path> ( <[<+|->r][<+|->w][<+|->x]> | <octal-mode> ) --everyone

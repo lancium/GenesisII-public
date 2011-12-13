@@ -14,6 +14,7 @@ import edu.virginia.vcgr.genii.client.security.WSSecurityUtils;
 import edu.virginia.vcgr.genii.client.security.authz.acl.AclEntry;
 import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
 import edu.virginia.vcgr.genii.client.security.credentials.assertions.AttributeInvalidException;
+import edu.virginia.vcgr.security.BCrypt;
 
 /**
  * An Identity data-structure for UsernameToken credentials
@@ -38,6 +39,17 @@ public class UsernamePasswordIdentity implements Identity, GIICredential
 	{
 		_userName = userName;
 		_password = password;
+	}
+	
+	public UsernamePasswordIdentity(String userName, String password, boolean hash){
+		_userName = userName;
+		//gensalt can be used to increase complexity
+		if(hash && password != null)
+			_password = BCrypt.hashpw(password, BCrypt.gensalt());
+		else
+			_password = password;
+			
+		
 	}
 
 	public UsernamePasswordIdentity(MessageElement secToken)
@@ -95,7 +107,9 @@ public class UsernamePasswordIdentity implements Identity, GIICredential
 		{
 			return false;
 		}
-		if (!_password.equals(((UsernamePasswordIdentity) other)._password))
+		if (!BCrypt.checkpw(
+				((UsernamePasswordIdentity) other)._password,
+						_password))
 		{
 			return false;
 		}
@@ -155,7 +169,10 @@ public class UsernamePasswordIdentity implements Identity, GIICredential
 
 	@Override
 	public AclEntry sanitize() {
-		return new UsernamePasswordIdentity(_userName, "");
+		//Temprorarily allow return of password until we change set/get acls to be
+		//out of resource properties.  Should return hash if passwords are set properly 
+		//(With our up to date client)
+		return new UsernamePasswordIdentity(_userName, _password);
 	}
 
 }

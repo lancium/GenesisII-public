@@ -374,7 +374,7 @@ public class AclAuthZClientTool implements AuthZSubTool
 		else if (cLine.hasOption("username"))
 		{
 			// make sure password also supplied
-			if (!cLine.hasOption("password"))
+			if (!(cLine.hasOption("password") || cLine.hasOption("hashedpass")))
 			{
 				return false;
 			}
@@ -424,9 +424,16 @@ public class AclAuthZClientTool implements AuthZSubTool
 		else if (cLine.hasOption("username")) 
 		{
 			// username password
+			String password = cLine.getOptionValue("password");
+			boolean hash = true;
+			if (password == null){
+				password = cLine.getOptionValue("hashedpass");
+				hash = false;
+			}
+
 			newEntry = new UsernamePasswordIdentity(
 					cLine.getOptionValue("username"), 
-					cLine.getOptionValue("password"));
+					password, hash);
 		}
 		else
 		{
