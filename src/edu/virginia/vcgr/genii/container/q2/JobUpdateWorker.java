@@ -90,6 +90,9 @@ public class JobUpdateWorker implements OutcallHandler
 		
 		try
 		{
+			
+			ActivityState oldState = null;
+			
 			_logger.debug("Checking status of job " + _data);
 	
 			/* Get a connection from the connection pool and then ask the 
@@ -180,6 +183,11 @@ public class JobUpdateWorker implements OutcallHandler
 					"Successfully got status of job %s.", _data));
 				List<String> faults = null;
 				
+					
+							
+				oldState = new ActivityState(_data.getBESActivityStatus());
+						
+				
 				_data.setBESActivityStatus(
 					activityStatuses[0].getActivityStatus());
 				try
@@ -245,9 +253,14 @@ public class JobUpdateWorker implements OutcallHandler
 				 */
 				ActivityState state = new ActivityState(
 					activityStatuses[0].getActivityStatus());
-				_logger.debug(String.format(
-					"Job %s has activity status %s.", _data, state));
-				history.trace("Job Status on BES:  %s", state);
+				
+				//Only add to log/history if status changed
+				if (!oldState.equals(state)){
+					_logger.debug(String.format(
+							"Job %s has activity status %s.", _data, state));
+					history.trace("Job Status on BES:  %s", state);
+				}
+				
 				if (state.isFailedState())
 				{
 					/* If the job failed in the BES, fail it in the queue */
