@@ -142,14 +142,14 @@ public class BESActivityTerminatorActor implements OutcallActor
 				TerminateActivityResponseType []resps = resp.getResponse();
 				if (resps != null && resps.length == 1)
 				{
-					if (resps[0].isTerminated())
+					if (resps[0].isTerminated() || (resps[0].getFault() != null))
 						return true;
 					_logger.warn(
-						"Response says that we didn't terminate the activity:  "+ 
-						resps[0].getFault());
+							"Response says that we didn't terminate the activity:  "+ 
+									resps[0].getFault());
 				}
 			}
-			
+
 			_logger.warn("Tried to kill activity, but didn't get right number of response values back.");
 			return false;
 		}
