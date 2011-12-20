@@ -357,15 +357,7 @@ public class RunTool extends BaseGridTool
 		{
 			if (numArguments() != 1)
 				throw new InvalidToolUsageException();
-			else if (_jsdl != null)
-			{
-				if (numArguments() != 1)
-					throw new InvalidToolUsageException();
-			} else
-			{
-				if (numArguments() < 2 || _name == null)
-					throw new InvalidToolUsageException();
-			}
+			
 		} else if (_jsdl != null)
 		{
 			if (numArguments() != 1)

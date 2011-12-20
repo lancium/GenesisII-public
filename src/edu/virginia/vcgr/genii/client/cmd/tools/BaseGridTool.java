@@ -197,7 +197,7 @@ public abstract class BaseGridTool implements ITool
 
 	public String usage()
 	{
-		return _usage;
+		return "\nUsage:\n"+_usage;
 	}
 	
 	protected abstract void verify() throws ToolException;

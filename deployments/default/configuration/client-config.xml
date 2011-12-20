@@ -177,6 +177,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.AttachHostTool</mconf:class>
 		<mconf:class name="run"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.RunTool</mconf:class>
+		<mconf:class name="terminate-activities"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.TerminateActivitiesTool</mconf:class>
 		<mconf:class name="create-resource"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.CreateResourceTool</mconf:class>
 		<mconf:class name="export"
