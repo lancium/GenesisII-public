@@ -157,8 +157,15 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 
 				if (cred instanceof Identity)
 				{
-
-					defaultOwners.add((Identity) cred);
+					if (cred instanceof UsernamePasswordIdentity){
+						//Store hashed password instead of plain text
+						defaultOwners.add(new UsernamePasswordIdentity(
+								((UsernamePasswordIdentity)cred).getUserName(),
+								((UsernamePasswordIdentity)cred).getPassword(),
+								true));
+					}
+					else
+						defaultOwners.add((Identity) cred);
 
 				}
 				else if ((cred instanceof SignedAssertion)

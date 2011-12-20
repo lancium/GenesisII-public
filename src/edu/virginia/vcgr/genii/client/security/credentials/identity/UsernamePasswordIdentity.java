@@ -44,7 +44,7 @@ public class UsernamePasswordIdentity implements Identity, GIICredential
 	public UsernamePasswordIdentity(String userName, String password, boolean hash){
 		_userName = userName;
 		//gensalt can be used to increase complexity
-		if(hash && password != null)
+		if(hash && (password != null))
 			_password = BCrypt.hashpw(password, BCrypt.gensalt());
 		else
 			_password = password;
@@ -107,16 +107,14 @@ public class UsernamePasswordIdentity implements Identity, GIICredential
 		{
 			return false;
 		}
-		if (!BCrypt.checkpw(
-				((UsernamePasswordIdentity) other)._password,
-						_password))
+		if (!_password.equals(((UsernamePasswordIdentity) other)._password))
 		{
 			return false;
 		}
 
 		return true;
 	}
-
+	
 	@Override
 	public int hashCode() 
 	{
@@ -159,17 +157,34 @@ public class UsernamePasswordIdentity implements Identity, GIICredential
 	public boolean isPermitted(Identity identity)
 			throws GeneralSecurityException {
 
-		//Dont grant access to blank or null password
+		//Dont grant access if current password is blank or null password
 		if (_password.equals("") || _password == null)
 			return false;
+
+		if (identity == null)
+			return false;
+	
+		if (!(identity instanceof UsernamePasswordIdentity))
+			return false;
+
+		if (!_userName.equals(((UsernamePasswordIdentity) identity)._userName))
+			return false;
 		
-		return this.equals(identity);
+		if (!BCrypt.checkpw(
+				((UsernamePasswordIdentity) identity)._password,
+				_password))
+		{
+			return false;
+		}
+
+		
+		return true;
 
 	}
 
 	@Override
 	public AclEntry sanitize() {
-		//Temprorarily allow return of password until we change set/get acls to be
+		//Temporarily allow return of password until we change set/get acls to be
 		//out of resource properties.  Should return hash if passwords are set properly 
 		//(With our up to date client)
 		return new UsernamePasswordIdentity(_userName, _password);
