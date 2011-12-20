@@ -4,11 +4,14 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.rmi.RemoteException;
+import java.util.concurrent.CountDownLatch;
 
 import org.apache.axis.types.URI;
 import org.ggf.rbyteio.RandomByteIOPortType;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.byteio.parallelByteIO.FastRead;
+import edu.virginia.vcgr.genii.client.byteio.parallelByteIO.FillerAndChecker;
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransfererFactory;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
@@ -21,11 +24,15 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
  */
 public class RandomByteIOInputStream extends InputStream
 {
-	/* The transferer being used by this stream. */
-	private RandomByteIOTransferer _transferer;
-	
+		
 	/* The current offset within the remote random byteio resource */
 	private long _offset = 0L;
+	
+	/* The following denotes the list of variables added for multiThreaded byteIO */
+	private boolean isMultiThreaded = true;	//denoting if we are doing parallel byteIO
+	private int numThreads = ByteIOConstants.numThreads; //Denotes the number of parallel-threads
+	private RandomByteIOTransferer[] transferer;  //Each transferer denotes a unique end-point
+	
 	
 	/**
 	 * Create a new RandomByteIO input stream for a given endpoint and
@@ -42,11 +49,37 @@ public class RandomByteIOInputStream extends InputStream
 		URI desiredTransferProtocol)
 			throws RemoteException, IOException
 	{
-		RandomByteIOPortType clientStub = ClientUtils.createProxy(
-			RandomByteIOPortType.class, source);
-		RandomByteIOTransfererFactory factory = 
-			new RandomByteIOTransfererFactory(clientStub);
-		_transferer = factory.createRandomByteIOTransferer(desiredTransferProtocol);
+			
+		if(numThreads <= 1)
+			isMultiThreaded = false;
+		
+		if(!isMultiThreaded)
+		{
+			RandomByteIOPortType clientStub = ClientUtils.createProxy(
+					RandomByteIOPortType.class, source);
+			RandomByteIOTransfererFactory factory = 
+					new RandomByteIOTransfererFactory(clientStub);
+			transferer = new RandomByteIOTransferer[1];
+			transferer[0] = factory.createRandomByteIOTransferer(desiredTransferProtocol);
+		}
+		
+		else
+		{
+			// The number of threads is >=2 (i.e) we will have parallelism
+			
+			RandomByteIOPortType[] clientStub = new RandomByteIOPortType[numThreads];
+			RandomByteIOTransfererFactory[] factory = new RandomByteIOTransfererFactory[numThreads];
+			transferer = new RandomByteIOTransferer[numThreads];
+			
+			for(int lcv=0; lcv<numThreads; lcv++)
+			{
+				clientStub[lcv] = ClientUtils.createProxy(
+						RandomByteIOPortType.class, source);
+				factory[lcv] = new RandomByteIOTransfererFactory(clientStub[lcv]);
+				transferer[lcv] = factory[lcv].createRandomByteIOTransferer(desiredTransferProtocol);
+			}
+			
+		}
 	}
 	
 	/**
@@ -75,10 +108,88 @@ public class RandomByteIOInputStream extends InputStream
 	 */
 	private byte[] read(int length) throws IOException
 	{
-		byte []data = _transferer.read(_offset, length, 1, 0);
-		_offset += data.length;
 		
-		return data;
+		if(!isMultiThreaded)
+		{
+			byte[] data = transferer[0].read(_offset, length, 1, 0);
+			_offset += data.length;
+			return data;
+		}
+		
+		else
+		{	
+			
+			int threadBlkReadSize=(length/numThreads);
+            //denotes block-size which each thread reads
+            
+			Thread[] thread = new Thread[numThreads];
+            FastRead[] fr = new FastRead[numThreads];
+            
+            CountDownLatch cdl = new CountDownLatch(numThreads);
+            FillerAndChecker fac = new FillerAndChecker(cdl, length);
+
+            int subLength = 0;
+            
+            for(int i=0;i<numThreads-1; ++i)
+            {
+            	fr[i] = new FastRead(transferer[i], _offset + subLength,
+            			threadBlkReadSize, fac, i, threadBlkReadSize);
+            	subLength += threadBlkReadSize;
+            	thread[i]= new Thread(fr[i]);
+            }
+
+            // Handles the case when length is not a perfect multiple of the number of threads
+            fr[numThreads-1] = new FastRead( transferer[numThreads-1], _offset + subLength,
+            					threadBlkReadSize + (length % numThreads), fac, numThreads-1, 
+            					threadBlkReadSize);
+            
+            thread[numThreads - 1] = new Thread(fr[numThreads - 1] );
+
+            for(int i=0; i<numThreads; ++i)
+              thread[i].start();
+			
+            try
+            {
+            	fac.await();
+            }
+            
+            catch (InterruptedException ie)
+            {
+            	throw new IOException(ie);
+            }
+            
+            
+            if(fac.isErrorFlag())
+                throw new IOException(fac.getThreadFailCause());
+            
+            int lastFilledBufferIndex = fac.getLastFilledBufferIndex();
+            
+            if(lastFilledBufferIndex != -1)	//I have fetched some data
+            {
+            
+            	if(lastFilledBufferIndex != (length -1 ))
+            		//I have fetched only a subset of the requested amount!
+                {
+            		byte[] temp_data = new byte[lastFilledBufferIndex+1];
+            		System.arraycopy(fac.getData() , 0, temp_data, 0, lastFilledBufferIndex+1);
+                    _offset +=temp_data.length;
+                    return temp_data;
+                }
+            	
+            	else	//I have fetched the requested amount !
+            	{
+            		_offset += fac.getData().length;
+                    return fac.getData();                    
+            	}              
+            }
+            
+            else  // Attempt to read 0 bytes
+            {
+            	  byte[] data = new byte[0];
+                  _offset += data.length;
+                  return data;
+            }                       
+		}
 	}
 	
 	/**
@@ -135,6 +246,8 @@ public class RandomByteIOInputStream extends InputStream
 	public BufferedInputStream createPreferredBufferedStream()
 	{
 		return new BufferedInputStream(
-			this, _transferer.getPreferredReadSize());
+			this, transferer[0].getPreferredReadSize());
 	}
+	
+
 }

@@ -220,6 +220,7 @@ public class EPRUtils
 			return null;
 
 		RequiredMessageSecurityType minSec = null;
+		
 		for (MessageElement element : elements)
 		{
 
@@ -242,12 +243,17 @@ public class EPRUtils
 					// get
 					// more specific at some point of SecAddr takes off
 					Policy metaPolicy = policyAttachment.getPolicy();
+					
+					//Added by ak3ka: Confirmed with Duane to be correct.
+					if (metaPolicy == null)
+						return null;
+					
 					MessageElement[] policyElements = metaPolicy.get_any();
 					if (policyElements == null || policyElements.length == 0)
 					{
 						return null;
 					}
-
+			
 					for (MessageElement attachmentElement : policyElements)
 					{
 						if (attachmentElement.getQName().equals(
@@ -255,7 +261,7 @@ public class EPRUtils
 										.getXmlType().getNamespaceURI(),
 										"PolicyReference")))
 						{
-
+							
 							PolicyReference policyReference =
 									(PolicyReference) attachmentElement
 											.getObjectValue(PolicyReference.class);

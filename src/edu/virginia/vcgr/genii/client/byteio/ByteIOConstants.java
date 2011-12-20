@@ -114,4 +114,7 @@ public class ByteIOConstants
 	
 	static public QName SBYTEIO_DESTROY_ON_CLOSE_FLAG =
 		new QName(STREAMABLE_BYTEIO_NS, "DestroyOnClose");
+	
+	static public int numThreads = 4;
+	 
 }

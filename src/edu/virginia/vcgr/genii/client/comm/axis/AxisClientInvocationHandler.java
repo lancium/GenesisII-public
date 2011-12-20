@@ -198,6 +198,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	static private LRUCache<X509Certificate, Boolean> validatedCerts = 
 		new LRUCache<X509Certificate, Boolean>(VALIDATED_CERT_CACHE_SIZE);
 	
+	static Object _lock = new Object();
+	
 	public AxisClientInvocationHandler(
 			Class<?> locator, 
 			EndpointReferenceType epr,
@@ -221,7 +223,13 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		
 		// determine the level of message security we need
 		MessageLevelSecurityRequirements minClientMessageSec = getMinClientMessageSec();
-		MessageLevelSecurityRequirements minResourceSec = EPRUtils.extractMinMessageSecurity(_epr);
+		MessageLevelSecurityRequirements minResourceSec = null;
+		
+		synchronized(_lock)
+		{
+			minResourceSec = EPRUtils.extractMinMessageSecurity(_epr);
+		}
+		
 		MessageLevelSecurityRequirements neededMsgSec = minClientMessageSec.computeUnion(minResourceSec); 
 		
 		// perform resource-AuthN as specified in the client config file
