@@ -379,6 +379,7 @@
 			<fileset dir="${basedir}/ApplicationWatcher"
 				includes="**/*.properties"/>
 		</delete>
+                <antcall target="clean-all-scripts" />
 	</target>
 	
 	<target name="wipestate">
