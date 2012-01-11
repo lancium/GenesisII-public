@@ -379,7 +379,7 @@
 			<fileset dir="${basedir}/ApplicationWatcher"
 				includes="**/*.properties"/>
 		</delete>
-                <antcall target="clean-all-scripts" />
+        <antcall target="clean-all-scripts" />
 	</target>
 	
 	<target name="wipestate">
@@ -486,5 +486,13 @@
 				<include name="edu/virginia/vcgr/genii/client/**/*.java"/>
 			</fileset>
 		</javadoc>
+	</target>
+	
+	<target name="clean-scripts">
+		<antcall target="clean-all-scripts" />
+	</target>
+	
+	<target name="build-scripts">
+		<antcall target="scripts" />
 	</target>
 </project>

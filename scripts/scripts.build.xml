@@ -9,6 +9,9 @@
 		<replace file="${basedir}/${win-script-base-name}.bat"
 			token="$LOG4JCONFIG" value="genesisII.log4j.properties"
 			summary="no"/>
+		<antcall target="set-jni">
+			<param name="build-target-file" value="${basedir}/${win-script-base-name}.bat"/>
+		</antcall>
 	</target>
 
 	<target name="build-script-unix" if="unix.scripts">
@@ -19,12 +22,50 @@
 		<replace file="${basedir}/${unix-script-base-name}"
 			token="%{LOG4JCONFIG}" value="genesisII.log4j.properties"
 			summary="no"/>
-		<replace file="${basedir}/${unix-script-base-name}"
-			token="%{GENII_JNI_PATH}" value="jni-lib"
-			summary="no"/>
+		 <antcall target="set-jni">
+		 	<param name="build-target-file" value="${basedir}/${unix-script-base-name}"/>
+		 </antcall>
 		<chmod file="${basedir}/${unix-script-base-name}" perm="755"/>
 	</target>
+	
+	<target name="set-jni">
+		<antcall target="jni-lin32" />
+		<antcall target="jni-lin64" />
+		<antcall target="jni-win32" />
+		<antcall target="jni-osx64" />
+	</target>
 
+	<target name="jni-lin32" if="linux.32">
+		<antcall target="set-jni-replace">
+			<param name="build-target-jni" value="jni-libs/lin32"/>
+		</antcall>
+	</target>
+	
+	<target name="jni-lin64" if="linux.64">
+		<antcall target="set-jni-replace">
+			<param name="build-target-jni" value="jni-libs/lin64"/>
+		</antcall>
+	</target>
+	
+	<target name="jni-win32" if="windows.scripts">
+		<antcall target="set-jni-replace">
+			<param name="build-target-jni" value="jni-libs/win32"/>
+		</antcall>
+	</target>
+	
+	<target name="jni-osx64" if="mac.scripts">
+		<antcall target="set-jni-replace">
+			<param name="build-target-jni" value="jni-libs/osx64"/>
+		</antcall>
+	</target>
+	
+	<target name="set-jni-replace">
+		<replace file="${build-target-file}"
+					token="%{GENII_JNI_PATH}" value="${build-target-jni}"
+					summary="no"/>
+	</target>
+		
+	
 	<target name="build-script">
 		<antcall target="build-script-win">
 			<param name="win-script-src-dir" value="${script-src-dir}"/>
@@ -60,10 +101,24 @@
 		<condition property="unix.scripts">
 			<os family="unix"/>
 		</condition>
+		<condition property="mac.scripts">
+					<os family="mac"/>
+		</condition>
 		<condition property="windows.scripts">
 			<os family="windows"/>
 		</condition>
-
+		
+		<condition property="linux.64">
+			<equals arg1="${build.targetArch}" arg2="64"/>
+		</condition>
+		
+		<condition property="linux.32">
+			<not>
+				<equals arg1="${build.targetArch}" arg2="64"/>
+			</not>
+    	</condition>
+		
+			
 		<copy file="${scripts.dir}/jar-desc.xml"
 			tofile="${basedir}/jar-desc.xml"/>
 		<replace file="${basedir}/jar-desc.xml"
