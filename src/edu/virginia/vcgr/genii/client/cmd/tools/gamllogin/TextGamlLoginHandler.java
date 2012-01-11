@@ -5,8 +5,7 @@ import java.io.PrintWriter;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 
-import edu.virginia.vcgr.genii.client.io.GetPassword;
-import edu.virginia.vcgr.genii.client.cmd.tools.gamllogin.CertEntry;
+import edu.virginia.vcgr.genii.client.io.GetPassword2;
 
 public class TextGamlLoginHandler extends AbstractGamlLoginHandler
 {
@@ -19,7 +18,7 @@ public class TextGamlLoginHandler extends AbstractGamlLoginHandler
 	@Override
 	public char[] getPassword(String title, String prompt)
 	{
-		return GetPassword.getPassword(prompt).toCharArray();
+		return GetPassword2.getPassword(prompt).toCharArray();
 	}
 
 	@Override

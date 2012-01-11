@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import edu.virginia.vcgr.genii.client.dialog.DialogException;
-import edu.virginia.vcgr.genii.client.io.GetPassword;
+import edu.virginia.vcgr.genii.client.io.GetPassword2;
 
 class ConsolePackage
 {
@@ -34,7 +34,7 @@ class ConsolePackage
 		{
 			if (hiddenInput)
 			{
-				return GetPassword.getPassword("");
+				return GetPassword2.getPassword("");
 			}
 			
 			return _stdin.readLine();
