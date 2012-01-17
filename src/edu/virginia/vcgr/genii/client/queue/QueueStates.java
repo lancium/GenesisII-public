@@ -1,6 +1,6 @@
 package edu.virginia.vcgr.genii.client.queue;
 
-import edu.virginia.vcgr.genii.queue.JobStateEnumerationType;
+import edu.virginia.cs.vcgr.genii.job_management.JobStateEnumerationType;
 
 public enum QueueStates
 {

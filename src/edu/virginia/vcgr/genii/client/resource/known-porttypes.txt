@@ -53,3 +53,4 @@
 {http://vcgr.cs.virginia.edu/genii/genesis_dair}SQLAccessCombinedPortType
 {http://vcgr.cs.virginia.edu/genii/genesis_dair}SQLResponseCombinedPortType
 {http://vcgr.cs.virginia.edu/genii/genesis_dair}SQLRowsetAccessPortType
+{http://vcgr.cs.virginia.edu/genii/job-management}JobManagementPortType

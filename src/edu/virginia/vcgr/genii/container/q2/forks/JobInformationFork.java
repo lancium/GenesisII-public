@@ -17,26 +17,26 @@ import javax.xml.namespace.QName;
 
 import org.ggf.jsdl.JobDefinition_Type;
 
+import edu.virginia.cs.vcgr.genii.job_management.JobInformationType;
+import edu.virginia.cs.vcgr.genii.job_management.JobStateEnumerationType;
+import edu.virginia.cs.vcgr.genii.job_management.ReducedJobInformationType;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.queue.JobInformation;
 import edu.virginia.vcgr.genii.client.queue.JobTicket;
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.queue.QueueUtils;
 import edu.virginia.vcgr.genii.client.queue.ReducedJobInformation;
+import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
-import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.q2.QueueManager;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.rfork.AbstractStreamableByteIOFactoryResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.AdvertisedSize;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.container.rfork.StreamableFactoryConfiguration;
-import edu.virginia.vcgr.genii.queue.JobInformationType;
-import edu.virginia.vcgr.genii.queue.JobStateEnumerationType;
-import edu.virginia.vcgr.genii.queue.ReducedJobInformationType;
 
 @StreamableFactoryConfiguration(notifyOnDestroy = false)
 @AdvertisedSize

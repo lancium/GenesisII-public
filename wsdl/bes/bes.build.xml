@@ -34,6 +34,10 @@
 					<include name="jsdl-posix.xsd"/>
 					<include name="jsdl-spmd.xsd"/>
 				</srcfiles>
+				<srcfiles dir="${wsdl.dir}">
+					<include name="job-management.xsd"/>
+					<include name="job-management.wsdl"/>
+				</srcfiles>
 			</uptodate>
 		</and>
 	</condition>
@@ -56,6 +60,10 @@
 			</fileset>
 			<fileset dir="${wsdl.dir}/rns">
 				<include name="rns.xsd"/>
+			</fileset>
+			<fileset dir="${wsdl.dir}">
+				<include name="job-management.xsd"/>
+				<include name="job-management.wsdl"/>
 			</fileset>
 		</copy>
 

@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.naming.ConfigurationException;
+
 import org.apache.axis.types.UnsignedShort;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,6 +39,10 @@ import org.morgan.util.GUID;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.cs.vcgr.genii.job_management.JobErrorPacket;
+import edu.virginia.cs.vcgr.genii.job_management.JobInformationType;
+import edu.virginia.cs.vcgr.genii.job_management.JobStateEnumerationType;
+import edu.virginia.cs.vcgr.genii.job_management.ReducedJobInformationType;
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.bes.BESUtils;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
@@ -67,10 +73,6 @@ import edu.virginia.vcgr.genii.container.cservices.history.NullHistoryContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.summary.SlotSummary;
 import edu.virginia.vcgr.genii.container.rns.LegacyEntryType;
-import edu.virginia.vcgr.genii.queue.JobErrorPacket;
-import edu.virginia.vcgr.genii.queue.JobInformationType;
-import edu.virginia.vcgr.genii.queue.JobStateEnumerationType;
-import edu.virginia.vcgr.genii.queue.ReducedJobInformationType;
 
 /**
  * The Job Manager class is the main class to handle adding/removing/managing

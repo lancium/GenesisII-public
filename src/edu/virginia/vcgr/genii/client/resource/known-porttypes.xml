@@ -359,4 +359,9 @@
 		<description>Iterator</description>
 	</portType>
 	
+	<portType name="{http://vcgr.cs.virginia.edu/genii/job-management}JobManagementPortType">
+		<display-rank>100</display-rank>
+		<description>JobManagement</description>
+	</portType>
+	
 </known-porttypes>

@@ -17,6 +17,14 @@ import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
 
+import edu.virginia.cs.vcgr.genii.job_management.ConfigureRequestType;
+import edu.virginia.cs.vcgr.genii.job_management.GetJobLogRequest;
+import edu.virginia.cs.vcgr.genii.job_management.JobErrorPacket;
+import edu.virginia.cs.vcgr.genii.job_management.JobInformationType;
+import edu.virginia.cs.vcgr.genii.job_management.JobStateEnumerationType;
+import edu.virginia.cs.vcgr.genii.job_management.QueryErrorRequest;
+import edu.virginia.cs.vcgr.genii.job_management.ReducedJobInformationType;
+import edu.virginia.cs.vcgr.genii.job_management.SubmitJobRequestType;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.iterator.WSIterable;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -25,15 +33,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
-import edu.virginia.vcgr.genii.queue.ConfigureRequestType;
-import edu.virginia.vcgr.genii.queue.GetJobLogRequest;
-import edu.virginia.vcgr.genii.queue.JobErrorPacket;
-import edu.virginia.vcgr.genii.queue.JobInformationType;
-import edu.virginia.vcgr.genii.queue.JobStateEnumerationType;
-import edu.virginia.vcgr.genii.queue.QueryErrorRequest;
 import edu.virginia.vcgr.genii.queue.QueuePortType;
-import edu.virginia.vcgr.genii.queue.ReducedJobInformationType;
-import edu.virginia.vcgr.genii.queue.SubmitJobRequestType;
 
 public class QueueManipulator
 {

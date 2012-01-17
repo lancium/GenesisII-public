@@ -177,4 +177,8 @@ public class WellKnownPortTypes
 		PortType.get(new QName(
 			"http://vcgr.cs.virginia.edu/genii/2010/08/notification/pull-point",
 			"GeniiPullPointPortType"));
+	
+	static public PortType JOB_MANAGEMENT_PORT_TYPE = 
+		PortType.get(new QName("http://vcgr.cs.virginia.edu/genii/job-management", 
+			"JobManagementPortType"));
 }

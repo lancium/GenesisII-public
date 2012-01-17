@@ -48,6 +48,15 @@ import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.cs.vcgr.genii.job_management.ConfigureRequestType;
+import edu.virginia.cs.vcgr.genii.job_management.GetJobLogRequest;
+import edu.virginia.cs.vcgr.genii.job_management.GetJobLogResponse;
+import edu.virginia.cs.vcgr.genii.job_management.IterateListResponseType;
+import edu.virginia.cs.vcgr.genii.job_management.IterateStatusResponseType;
+import edu.virginia.cs.vcgr.genii.job_management.JobErrorPacket;
+import edu.virginia.cs.vcgr.genii.job_management.QueryErrorRequest;
+import edu.virginia.cs.vcgr.genii.job_management.SubmitJobRequestType;
+import edu.virginia.cs.vcgr.genii.job_management.SubmitJobResponseType;
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.bes.BESConstants;
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
@@ -599,5 +608,73 @@ public class GeniiBESServiceImpl extends ResourceForkBaseService implements
 			return new TerminateActivityResponseType(activity, false, 
 				BESFaultManager.constructFault(cause), null);
 		}
+	}
+
+	@Override
+	public Object completeJobs(String[] completeRequest) throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object configureResource(ConfigureRequestType configureRequest)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object forceUpdate(String[] forceUpdateRequest)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public GetJobLogResponse getJobLog(GetJobLogRequest getJobLogRequest)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public IterateListResponseType iterateListJobs(Object iterateListRequest)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public IterateStatusResponseType iterateStatus(String[] iterateStatusRequest)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object killJobs(String[] killRequest) throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public JobErrorPacket[] queryErrorInformation(QueryErrorRequest arg0)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object rescheduleJobs(String[] rescheduleJobsRequest)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SubmitJobResponseType submitJob(SubmitJobRequestType submitJobRequest)
+			throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

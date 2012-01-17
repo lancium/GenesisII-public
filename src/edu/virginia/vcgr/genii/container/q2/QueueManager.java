@@ -28,6 +28,10 @@ import org.morgan.util.io.StreamUtils;
 import org.w3c.dom.Document;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.cs.vcgr.genii.job_management.GetJobLogResponse;
+import edu.virginia.cs.vcgr.genii.job_management.JobErrorPacket;
+import edu.virginia.cs.vcgr.genii.job_management.JobInformationType;
+import edu.virginia.cs.vcgr.genii.job_management.ReducedJobInformationType;
 import edu.virginia.vcgr.genii.client.bes.ResourceManagerType;
 import edu.virginia.vcgr.genii.client.queue.CurrentResourceInformation;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -44,10 +48,6 @@ import edu.virginia.vcgr.genii.container.q2.summary.HostDescription;
 import edu.virginia.vcgr.genii.container.q2.summary.ResourceSummary;
 import edu.virginia.vcgr.genii.container.q2.summary.SlotSummary;
 import edu.virginia.vcgr.genii.container.rns.LegacyEntryType;
-import edu.virginia.vcgr.genii.queue.GetJobLogResponse;
-import edu.virginia.vcgr.genii.queue.JobErrorPacket;
-import edu.virginia.vcgr.genii.queue.JobInformationType;
-import edu.virginia.vcgr.genii.queue.ReducedJobInformationType;
 import edu.virginia.vcgr.jsdl.OperatingSystemNames;
 import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
 

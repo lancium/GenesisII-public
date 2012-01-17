@@ -16,13 +16,13 @@ import org.morgan.util.gui.table.AbstractRowTableColumnDefinition;
 import org.morgan.util.gui.table.RowTableColumnDefinition;
 import org.morgan.util.gui.table.RowTableModel;
 
+import edu.virginia.cs.vcgr.genii.job_management.ConfigureRequestType;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSIterable;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
-import edu.virginia.vcgr.genii.queue.ConfigureRequestType;
 import edu.virginia.vcgr.genii.queue.QueuePortType;
 import edu.virginia.vcgr.genii.ui.errors.ErrorHandler;
 import edu.virginia.vcgr.genii.ui.plugins.UIPluginContext;
