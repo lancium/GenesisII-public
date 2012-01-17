@@ -19,7 +19,7 @@ import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
-import edu.virginia.vcgr.genii.client.security.SecurityConstants;
+import edu.virginia.vcgr.genii.security.SecurityConstants;
 
 
 /**

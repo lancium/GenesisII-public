@@ -13,7 +13,7 @@ import javax.swing.JRadioButton;
 
 import org.morgan.utils.gui.GUIUtils;
 
-import edu.virginia.vcgr.genii.client.security.VerbosityLevel;
+import edu.virginia.vcgr.genii.security.VerbosityLevel;
 
 public class SecurityUIPreferenceSetEditor extends JPanel
 {

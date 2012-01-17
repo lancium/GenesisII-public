@@ -13,8 +13,8 @@ import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.genii.client.security.authz.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.security.authz.acl.Acl;
 import edu.virginia.vcgr.genii.client.security.authz.acl.AclEntry;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
 import edu.virginia.vcgr.genii.common.security.AuthZConfig;
+import edu.virginia.vcgr.genii.security.credentials.identity.Identity;
 
 public class GenesisIIACLManager
 {

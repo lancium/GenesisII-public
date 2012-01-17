@@ -21,7 +21,7 @@ import org.w3.www.ns.ws_policy.Policy;
 import org.w3.www.ns.ws_policy.PolicyAttachment;
 import org.w3.www.ns.ws_policy.PolicyReference;
 
-import edu.virginia.vcgr.genii.client.security.SecurityConstants;
+import edu.virginia.vcgr.genii.security.SecurityConstants;
 
 public class SecurityPolicy
 {

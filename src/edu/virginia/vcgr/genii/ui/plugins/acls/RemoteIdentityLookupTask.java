@@ -18,7 +18,7 @@ import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.ResolverUtils;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.X509Identity;
+import edu.virginia.vcgr.genii.security.credentials.identity.X509Identity;
 import edu.virginia.vcgr.genii.ui.progress.AbstractTask;
 import edu.virginia.vcgr.genii.ui.progress.TaskProgressListener;
 

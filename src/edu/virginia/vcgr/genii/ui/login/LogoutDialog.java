@@ -21,8 +21,8 @@ import javax.swing.event.ListSelectionListener;
 import org.morgan.utils.gui.ButtonPanel;
 
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
-import edu.virginia.vcgr.genii.client.security.VerbosityLevel;
-import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
+import edu.virginia.vcgr.genii.security.VerbosityLevel;
+import edu.virginia.vcgr.genii.security.credentials.GIICredential;
 
 class LogoutDialog extends JDialog
 {

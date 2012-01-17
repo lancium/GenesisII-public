@@ -12,8 +12,8 @@ import javax.swing.JTextField;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
-import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
+import edu.virginia.vcgr.genii.security.credentials.GIICredential;
+import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.ui.UIContext;
 
 final class UsernamePasswordLoginPanel extends LoginPanel

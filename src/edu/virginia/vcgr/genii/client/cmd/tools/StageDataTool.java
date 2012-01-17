@@ -20,12 +20,12 @@ import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.io.URIManager;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLInterpreter;
 import edu.virginia.vcgr.genii.client.jsdl.personality.PersonalityProvider;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.container.jsdl.DataStage;
 import edu.virginia.vcgr.genii.container.jsdl.JobRequest;
 import edu.virginia.vcgr.genii.container.jsdl.parser.ExecutionProvider;
 import edu.virginia.vcgr.genii.context.ContextType;
+import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
 public class StageDataTool extends BaseGridTool{
 

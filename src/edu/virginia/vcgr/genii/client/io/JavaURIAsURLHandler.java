@@ -22,7 +22,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
+import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
 public class JavaURIAsURLHandler extends AbstractURIHandler
 	implements IURIHandler

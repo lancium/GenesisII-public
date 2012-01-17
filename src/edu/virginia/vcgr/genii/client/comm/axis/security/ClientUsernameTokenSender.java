@@ -25,8 +25,8 @@ import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.*;
-import edu.virginia.vcgr.genii.client.security.credentials.*;
+import edu.virginia.vcgr.genii.security.credentials.*;
+import edu.virginia.vcgr.genii.security.credentials.identity.*;
 
 import java.io.IOException;
 import java.util.ArrayList;

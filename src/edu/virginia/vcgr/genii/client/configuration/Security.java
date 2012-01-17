@@ -15,8 +15,8 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.SecurityUtils;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.*;
 import edu.virginia.vcgr.genii.client.security.authz.acl.AclAuthZClientTool;
+import edu.virginia.vcgr.genii.security.credentials.identity.*;
 
 public class Security
 {

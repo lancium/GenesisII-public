@@ -196,6 +196,7 @@
 				<include name="edu/virginia/vcgr/xscript/**/*"/>
 				<include name="edu/virginia/vcgr/genii/ftp/**/*"/>
 				<include name="edu/virginia/vcgr/genii/testing/**/*"/>
+				<include name="edu/virginia/vcgr/genii/security/**/*"/>
 				<exclude name="edu/virginia/vcgr/secrun/runnables/**/*"/>
 			</fileset>
 		</jar>

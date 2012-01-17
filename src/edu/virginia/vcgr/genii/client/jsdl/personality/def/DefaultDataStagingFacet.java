@@ -9,7 +9,7 @@ import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.UnsupportedJSDLElement;
 import edu.virginia.vcgr.genii.client.jsdl.hpc.HPCConstants;
 import edu.virginia.vcgr.genii.client.jsdl.personality.DataStagingFacet;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
+import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
 public class DefaultDataStagingFacet extends DefaultPersonalityFacet implements
 		DataStagingFacet

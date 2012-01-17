@@ -14,9 +14,9 @@ import java.util.regex.Pattern;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.security.SecurityUtils;
-import edu.virginia.vcgr.genii.client.security.VerbosityLevel;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
+import edu.virginia.vcgr.genii.security.VerbosityLevel;
+import edu.virginia.vcgr.genii.security.credentials.identity.Identity;
+import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
 class CredentialBundle implements Comparable<CredentialBundle>
 {

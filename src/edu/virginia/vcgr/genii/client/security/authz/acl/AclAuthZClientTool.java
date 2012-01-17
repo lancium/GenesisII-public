@@ -38,7 +38,7 @@ import edu.virginia.vcgr.genii.client.naming.ResolverUtils;
 
 import edu.virginia.vcgr.genii.client.security.authz.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.security.authz.AuthZSubTool;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.*;
+import edu.virginia.vcgr.genii.security.credentials.identity.*;
 
 import org.ws.addressing.EndpointReferenceType;
 

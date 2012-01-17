@@ -15,8 +15,6 @@ import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.security.*;
-import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
@@ -24,6 +22,10 @@ import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.*;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
+import edu.virginia.vcgr.genii.security.SecurityConstants;
+import edu.virginia.vcgr.genii.security.credentials.GIICredential;
+import edu.virginia.vcgr.genii.security.credentials.identity.IdentityType;
+import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
 
 public class IdpTool extends BaseLoginTool {
@@ -35,6 +37,7 @@ public class IdpTool extends BaseLoginTool {
 
 	protected String _kerbRealm = null;
 	protected String _kerbKdc = null;
+	protected IdentityType _type = null;
 
 	protected IdpTool(String description, String usage, boolean isHidden) {
 		super(description, usage, isHidden);
@@ -82,7 +85,12 @@ public class IdpTool extends BaseLoginTool {
 		ArrayList<MessageElement> constructionParms = new ArrayList<MessageElement>();
 		constructionParms.add(new MessageElement(
 				SecurityConstants.NEW_IDP_NAME_QNAME, newIdpName));
-
+		
+		if(_type == null)
+			_type = IdentityType.GROUP;
+		
+		constructionParms.add(new MessageElement(
+				SecurityConstants.NEW_IDP_TYPE_QNAME, _type.toString()));
 
 		if ((_authnUri == null) && (_storeType == null)) {
 
@@ -226,6 +234,12 @@ public class IdpTool extends BaseLoginTool {
 	public void setKdc(String kerbKdc) 
 	{
 		_kerbKdc = kerbKdc;
+	}
+	
+	@Option({"type"})
+	public void setCredentialType(String type)
+	{
+		_type = IdentityType.valueOf(type);
 	}
 	
 }

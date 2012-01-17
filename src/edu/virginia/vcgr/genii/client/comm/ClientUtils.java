@@ -44,12 +44,12 @@ import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
-import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
-import edu.virginia.vcgr.genii.client.security.credentials.TransientCredentials;
-import edu.virginia.vcgr.genii.client.security.credentials.assertions.*;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
+import edu.virginia.vcgr.genii.security.credentials.GIICredential;
+import edu.virginia.vcgr.genii.security.credentials.TransientCredentials;
+import edu.virginia.vcgr.genii.security.credentials.assertions.*;
 
 /**
  * A utility class which allows users to create dynamic, client side proxies for talking

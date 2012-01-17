@@ -9,10 +9,11 @@ import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.io.FileResource;
-import edu.virginia.vcgr.genii.client.security.VerbosityLevel;
-import edu.virginia.vcgr.genii.client.security.credentials.*;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.X509Identity;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
+import edu.virginia.vcgr.genii.security.VerbosityLevel;
+import edu.virginia.vcgr.genii.security.credentials.*;
+import edu.virginia.vcgr.genii.security.credentials.identity.IdentityType;
+import edu.virginia.vcgr.genii.security.credentials.identity.X509Identity;
 
 public class WhoamiTool extends BaseGridTool
 {
@@ -61,7 +62,7 @@ public class WhoamiTool extends BaseGridTool
 			TransientCredentials transientCredentials = 
 				TransientCredentials.getTransientCredentials(callingContext);
 			stdout.format("Client Tool Identity: \n\t%s\n\n", 
-					(new X509Identity(clientKeyMaterial._clientCertChain)).describe(_verbosity));
+					(new X509Identity(clientKeyMaterial._clientCertChain, IdentityType.CONNECTION)).describe(_verbosity));
 			if (!transientCredentials._credentials.isEmpty()) 
 			{
 				stdout.format("Additional Credentials: \n");

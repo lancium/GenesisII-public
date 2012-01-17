@@ -52,7 +52,6 @@ import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSocket;
 
 import edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto;
-import edu.virginia.vcgr.genii.client.security.MessageLevelSecurityRequirements;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.resource.IResource;
@@ -63,14 +62,15 @@ import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 
 import edu.virginia.vcgr.genii.client.security.authz.AuthZSecurityException;
-import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
-import edu.virginia.vcgr.genii.client.security.credentials.TransientCredentials;
-import edu.virginia.vcgr.genii.client.security.credentials.assertions.DelegatedAssertion;
-import edu.virginia.vcgr.genii.client.security.credentials.assertions.SignedAssertion;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.*;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.container.security.authz.providers.*;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.security.MessageLevelSecurityRequirements;
+import edu.virginia.vcgr.genii.security.credentials.GIICredential;
+import edu.virginia.vcgr.genii.security.credentials.TransientCredentials;
+import edu.virginia.vcgr.genii.security.credentials.assertions.DelegatedAssertion;
+import edu.virginia.vcgr.genii.security.credentials.assertions.SignedAssertion;
+import edu.virginia.vcgr.genii.security.credentials.identity.*;
 
 public class ServerWSDoAllReceiver extends WSDoAllReceiver
 {
@@ -368,7 +368,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		
 		// Add the authenticated certificate chains
 		for (X509Certificate[] certChain : authenticatedCertChains) {
-			retval.add(new X509Identity(certChain));
+			retval.add(new X509Identity(certChain, IdentityType.CONNECTION));
 		}
 		
 		// Corroborate the bearer credentials

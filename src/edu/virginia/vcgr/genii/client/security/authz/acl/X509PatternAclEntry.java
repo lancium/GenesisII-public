@@ -19,9 +19,9 @@ import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.PrincipalUtil;
 
-import edu.virginia.vcgr.genii.client.security.VerbosityLevel;
-import edu.virginia.vcgr.genii.client.security.X500PrincipalUtilities;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.*;
+import edu.virginia.vcgr.genii.security.VerbosityLevel;
+import edu.virginia.vcgr.genii.security.X500PrincipalUtilities;
+import edu.virginia.vcgr.genii.security.credentials.identity.*;
 
 /**
  * This ACL rule provides a chain of trust that callers must chain to, 

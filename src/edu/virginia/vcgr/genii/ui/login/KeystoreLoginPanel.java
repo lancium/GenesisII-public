@@ -22,11 +22,11 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cmd.tools.gamllogin.CertEntry;
 import edu.virginia.vcgr.genii.client.cmd.tools.gamllogin.GuiGamlLoginHandler;
-import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
-import edu.virginia.vcgr.genii.client.security.credentials.assertions.BasicConstraints;
-import edu.virginia.vcgr.genii.client.security.credentials.assertions.RenewableClientAssertion;
-import edu.virginia.vcgr.genii.client.security.credentials.assertions.RenewableClientAttribute;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.X509Identity;
+import edu.virginia.vcgr.genii.security.credentials.GIICredential;
+import edu.virginia.vcgr.genii.security.credentials.assertions.BasicConstraints;
+import edu.virginia.vcgr.genii.security.credentials.assertions.RenewableClientAssertion;
+import edu.virginia.vcgr.genii.security.credentials.assertions.RenewableClientAttribute;
+import edu.virginia.vcgr.genii.security.credentials.identity.X509Identity;
 import edu.virginia.vcgr.genii.ui.UIContext;
 
 final class KeystoreLoginPanel extends LoginPanel

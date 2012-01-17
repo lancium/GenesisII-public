@@ -3,7 +3,7 @@ package edu.virginia.vcgr.genii.client.comm;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
+import edu.virginia.vcgr.genii.security.credentials.GIICredential;
 
 public class SecurityUpdateResults
 {

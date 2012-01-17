@@ -29,16 +29,16 @@ import org.apache.axis.types.URI;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
-import edu.virginia.vcgr.genii.client.security.MessageLevelSecurityRequirements;
-import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
-import edu.virginia.vcgr.genii.client.security.credentials.TransientCredentials;
-import edu.virginia.vcgr.genii.client.security.credentials.assertions.BasicConstraints;
-import edu.virginia.vcgr.genii.client.security.credentials.assertions.DelegatedAttribute;
-import edu.virginia.vcgr.genii.client.security.credentials.assertions.SignedAssertion;
-import edu.virginia.vcgr.genii.client.security.credentials.assertions.SignedCredentialCache;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.X509Identity;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
+import edu.virginia.vcgr.genii.security.MessageLevelSecurityRequirements;
+import edu.virginia.vcgr.genii.security.credentials.GIICredential;
+import edu.virginia.vcgr.genii.security.credentials.TransientCredentials;
+import edu.virginia.vcgr.genii.security.credentials.assertions.BasicConstraints;
+import edu.virginia.vcgr.genii.security.credentials.assertions.DelegatedAttribute;
+import edu.virginia.vcgr.genii.security.credentials.assertions.SignedAssertion;
+import edu.virginia.vcgr.genii.security.credentials.assertions.SignedCredentialCache;
+import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
+import edu.virginia.vcgr.genii.security.credentials.identity.X509Identity;
 
 /**
  * Data-structure and utility methods for handling the details 
@@ -97,8 +97,11 @@ public class MessageSecurity
 		ArrayList<GIICredential> credentials = 
 			new ArrayList<GIICredential>(
 				TransientCredentials.getTransientCredentials(callingContext)._credentials);
-		if (clientKeyMaterial != null && clientKeyMaterial._clientCertChain != null) 
-			credentials.add(new X509Identity(clientKeyMaterial._clientCertChain));
+		
+		//Do not delegate transport cert, should not be necessary
+		//1/2012 Michael Saravo
+		//if (clientKeyMaterial != null && clientKeyMaterial._clientCertChain != null) 
+		//	credentials.add(new X509Identity(clientKeyMaterial._clientCertChain));
 
 		try
 		{

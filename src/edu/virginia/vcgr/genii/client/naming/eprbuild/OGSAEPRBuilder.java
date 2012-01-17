@@ -10,7 +10,7 @@ import org.apache.axis.message.MessageElement;
 import org.morgan.util.configuration.ConfigurationException;
 import org.w3c.dom.Element;
 
-import edu.virginia.vcgr.genii.client.security.WSSecurityUtils;
+import edu.virginia.vcgr.genii.security.WSSecurityUtils;
 
 public class OGSAEPRBuilder extends WSNamingEPRBuilder
 {

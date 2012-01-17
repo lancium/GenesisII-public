@@ -18,8 +18,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
-import edu.virginia.vcgr.genii.client.security.VerbosityLevel;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.X509Identity;
+import edu.virginia.vcgr.genii.security.VerbosityLevel;
+import edu.virginia.vcgr.genii.security.credentials.identity.X509Identity;
 import edu.virginia.vcgr.genii.ui.UIContext;
 
 class PatternDialog extends JDialog

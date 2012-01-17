@@ -18,10 +18,10 @@ import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.X509Identity;
 import edu.virginia.vcgr.genii.container.cleanup.CleanupContext;
 import edu.virginia.vcgr.genii.container.cleanup.basicresource.BasicResourceCleanupHandler;
+import edu.virginia.vcgr.genii.security.credentials.identity.Identity;
+import edu.virginia.vcgr.genii.security.credentials.identity.X509Identity;
 
 public class BESActivityCleanupHandler extends BasicResourceCleanupHandler
 {

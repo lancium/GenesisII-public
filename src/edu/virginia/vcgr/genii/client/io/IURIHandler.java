@@ -19,7 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
-import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
+import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
 public interface IURIHandler
 {

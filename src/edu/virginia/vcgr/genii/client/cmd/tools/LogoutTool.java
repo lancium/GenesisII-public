@@ -10,9 +10,9 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.io.FileResource;
-import edu.virginia.vcgr.genii.client.security.credentials.*;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.*;
-import edu.virginia.vcgr.genii.client.security.credentials.assertions.*;
+import edu.virginia.vcgr.genii.security.credentials.*;
+import edu.virginia.vcgr.genii.security.credentials.assertions.*;
+import edu.virginia.vcgr.genii.security.credentials.identity.*;
 
 public class LogoutTool extends BaseGridTool
 {

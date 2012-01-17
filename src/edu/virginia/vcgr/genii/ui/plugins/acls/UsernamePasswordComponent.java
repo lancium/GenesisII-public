@@ -15,7 +15,7 @@ import javax.swing.TransferHandler;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
-import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
+import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.ui.UIContext;
 
 class UsernamePasswordComponent extends JPanel

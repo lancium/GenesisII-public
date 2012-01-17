@@ -12,7 +12,7 @@ import java.util.Random;
 
 import org.morgan.util.io.StreamUtils;
 
-import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
+import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
 public abstract class AbstractURIHandler implements IURIHandler
 {

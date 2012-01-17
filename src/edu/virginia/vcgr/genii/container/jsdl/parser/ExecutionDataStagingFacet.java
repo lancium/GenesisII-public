@@ -8,10 +8,10 @@ import edu.virginia.vcgr.genii.client.jsdl.JSDLConstants;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLException;
 import edu.virginia.vcgr.genii.client.jsdl.UnsupportedJSDLElement;
 import edu.virginia.vcgr.genii.client.jsdl.personality.def.DefaultDataStagingFacet;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.container.jsdl.DataStage;
 import edu.virginia.vcgr.genii.container.jsdl.FilesystemRelative;
 import edu.virginia.vcgr.genii.container.jsdl.JobRequest;
+import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
 public class ExecutionDataStagingFacet extends DefaultDataStagingFacet
 {

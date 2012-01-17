@@ -44,15 +44,15 @@ import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
-import edu.virginia.vcgr.genii.client.security.MessageLevelSecurityRequirements;
-import edu.virginia.vcgr.genii.client.security.SecurityConstants;
-import edu.virginia.vcgr.genii.client.security.WSSecurityUtils;
 import edu.virginia.vcgr.genii.common.security.RequiredMessageSecurityType;
 import edu.virginia.vcgr.genii.common.security.RequiredMessageSecurityTypeMin;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.security.authz.providers.AuthZProviders;
 import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider;
+import edu.virginia.vcgr.genii.security.MessageLevelSecurityRequirements;
+import edu.virginia.vcgr.genii.security.SecurityConstants;
+import edu.virginia.vcgr.genii.security.WSSecurityUtils;
 
 public class ResourceManager
 {

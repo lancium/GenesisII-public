@@ -188,6 +188,10 @@ public class CreateUserTool extends BaseGridTool
 			idpTool.setStoretype(storeType);
 		if (sourcePath != null)
 			idpTool.addArgument(sourcePath);
+		
+		//Set as user type
+		idpTool.setCredentialType("OWNER");
+		
 		idpTool.addArgument(idpServicePath);
 		idpTool.addArgument(idpName);
 		if (_duration != null)

@@ -3,7 +3,7 @@ package edu.virginia.vcgr.genii.container.q2;
 import java.util.Collection;
 import java.util.Date;
 
-import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
+import edu.virginia.vcgr.genii.security.credentials.identity.Identity;
 
 /**
  * This class is poorly named because it doesn't serve a concise purpose.  

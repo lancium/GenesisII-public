@@ -48,8 +48,6 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
-import edu.virginia.vcgr.genii.client.security.credentials.assertions.*;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.*;
 import edu.virginia.vcgr.genii.enhancedrns.CreateFileRequestType;
 import edu.virginia.vcgr.genii.enhancedrns.CreateFileResponseType;
 import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
@@ -75,6 +73,10 @@ import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.container.Container;
 
 import edu.virginia.vcgr.genii.jndiauthn.*;
+import edu.virginia.vcgr.genii.security.SecurityConstants;
+import edu.virginia.vcgr.genii.security.WSSecurityUtils;
+import edu.virginia.vcgr.genii.security.credentials.assertions.*;
+import edu.virginia.vcgr.genii.security.credentials.identity.*;
 
 import org.oasis_open.docs.ws_sx.ws_trust._200512.*;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;

@@ -2,7 +2,7 @@ package edu.virginia.vcgr.genii.client.queue;
 
 import java.util.Collection;
 
-import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
+import edu.virginia.vcgr.genii.security.credentials.identity.Identity;
 
 public class ReducedJobInformation
 {

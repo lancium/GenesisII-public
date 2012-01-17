@@ -17,9 +17,9 @@ import org.morgan.util.io.GuaranteedDirectory;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.io.DataTransferStatistics;
 import edu.virginia.vcgr.genii.client.io.URIManager;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.UsernamePasswordIdentity;
 import edu.virginia.vcgr.genii.container.cservices.AbstractContainerService;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServicePropertyListener;
+import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
 
 public class DownloadManagerContainerService extends AbstractContainerService
 {

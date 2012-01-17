@@ -25,11 +25,11 @@ import org.xml.sax.InputSource;
 
 import edu.virginia.vcgr.genii.client.io.RAFInputStream;
 import edu.virginia.vcgr.genii.client.io.RAFOutputStream;
-import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
-import edu.virginia.vcgr.genii.client.security.credentials.TransientCredentials;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.context.ContextType;
+import edu.virginia.vcgr.genii.security.credentials.GIICredential;
+import edu.virginia.vcgr.genii.security.credentials.TransientCredentials;
 
 public class ContextFileSystem
 {

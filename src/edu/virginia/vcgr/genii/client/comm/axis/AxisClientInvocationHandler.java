@@ -65,7 +65,6 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
-import edu.virginia.vcgr.genii.client.security.MessageLevelSecurityRequirements;
 import edu.virginia.vcgr.genii.client.security.SecurityUtils;
 import edu.virginia.vcgr.genii.client.security.x509.*;
 import edu.virginia.vcgr.genii.client.invoke.IFinalInvoker;
@@ -80,6 +79,7 @@ import edu.virginia.vcgr.genii.client.comm.axis.security.*;
 
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.naming.*;
+import edu.virginia.vcgr.genii.security.MessageLevelSecurityRequirements;
 
 public class AxisClientInvocationHandler implements InvocationHandler, IFinalInvoker
 {

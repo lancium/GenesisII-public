@@ -7,7 +7,7 @@ import java.util.LinkedList;
 
 import javax.swing.JPanel;
 
-import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
+import edu.virginia.vcgr.genii.security.credentials.GIICredential;
 import edu.virginia.vcgr.genii.ui.UIContext;
 
 public abstract class LoginPanel extends JPanel

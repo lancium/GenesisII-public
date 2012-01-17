@@ -6,9 +6,9 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Vector;
 
-import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.container.AccountingRecordType;
+import edu.virginia.vcgr.genii.security.credentials.identity.Identity;
 
 class AccountingRecord
 {

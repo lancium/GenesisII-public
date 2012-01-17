@@ -58,18 +58,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
-import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
-import edu.virginia.vcgr.genii.client.security.credentials.TransientCredentials;
-import edu.virginia.vcgr.genii.client.security.credentials.assertions.BasicConstraints;
-import edu.virginia.vcgr.genii.client.security.credentials.assertions.DelegatedAssertion;
-import edu.virginia.vcgr.genii.client.security.credentials.assertions.DelegatedAttribute;
-import edu.virginia.vcgr.genii.client.security.credentials.assertions.IdentityAttribute;
-import edu.virginia.vcgr.genii.client.security.credentials.assertions.SignedAssertion;
-import edu.virginia.vcgr.genii.client.security.credentials.assertions.SignedAttributeAssertion;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.X509Identity;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
-import edu.virginia.vcgr.genii.client.security.SecurityConstants;
-import edu.virginia.vcgr.genii.client.security.WSSecurityUtils;
 
 import org.oasis_open.docs.ws_sx.ws_trust._200512.DelegateToType;
 import org.oasis_open.docs.ws_sx.ws_trust._200512.LifetimeType;
@@ -99,6 +88,18 @@ import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.container.Container;
+import edu.virginia.vcgr.genii.security.SecurityConstants;
+import edu.virginia.vcgr.genii.security.WSSecurityUtils;
+import edu.virginia.vcgr.genii.security.credentials.GIICredential;
+import edu.virginia.vcgr.genii.security.credentials.TransientCredentials;
+import edu.virginia.vcgr.genii.security.credentials.assertions.BasicConstraints;
+import edu.virginia.vcgr.genii.security.credentials.assertions.DelegatedAssertion;
+import edu.virginia.vcgr.genii.security.credentials.assertions.DelegatedAttribute;
+import edu.virginia.vcgr.genii.security.credentials.assertions.IdentityAttribute;
+import edu.virginia.vcgr.genii.security.credentials.assertions.SignedAssertion;
+import edu.virginia.vcgr.genii.security.credentials.assertions.SignedAttributeAssertion;
+import edu.virginia.vcgr.genii.security.credentials.identity.IdentityType;
+import edu.virginia.vcgr.genii.security.credentials.identity.X509Identity;
 import edu.virginia.vcgr.genii.x509authn.X509AuthnPortType;
 
 
@@ -156,6 +157,10 @@ public class X509AuthnServiceImpl extends GenesisIIBase
 		{
 			return Long.decode(property.getValue());
 		}
+		else if (name.equals(SecurityConstants.NEW_IDP_TYPE_QNAME))
+		{
+			return property.getValue();
+		}
 		else
 		{
 			return super.translateConstructionParameter(property);
@@ -209,6 +214,11 @@ public class X509AuthnServiceImpl extends GenesisIIBase
 		// store the name in the idp resource
 		resource.setProperty(SecurityConstants.NEW_IDP_NAME_QNAME
 				.getLocalPart(), newIdpName);
+		
+		//Get Identity type
+		String type = 
+				(String)constructionParameters
+				.get(SecurityConstants.NEW_IDP_TYPE_QNAME);
 
 		// determine the credential the idp will front
 		GIICredential credential = null;
@@ -231,6 +241,7 @@ public class X509AuthnServiceImpl extends GenesisIIBase
 				if (credential instanceof SignedAssertion)
 				{
 					// Delegate from the service to the resource
+					//Type not set in assertion, must have been set in original idenity
 					DelegatedAttribute delegatedAttribute =
 							new DelegatedAttribute(null,
 									(SignedAssertion) credential,
@@ -250,6 +261,9 @@ public class X509AuthnServiceImpl extends GenesisIIBase
 				// to give out
 
 				X509Identity identity = new X509Identity(resourceCertChain);
+				
+				//Set type
+				identity.setType(IdentityType.valueOf(type));
 
 				Long validMillis =
 						(Long) constructionParameters
@@ -280,6 +294,9 @@ public class X509AuthnServiceImpl extends GenesisIIBase
 			resource.setProperty(
 					SecurityConstants.IDP_DELEGATED_CREDENTIAL_QNAME
 							.getLocalPart(), credential);
+			
+			
+			
 
 		}
 		catch (IOException e)

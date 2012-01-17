@@ -34,20 +34,20 @@ import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.context.*;
-import edu.virginia.vcgr.genii.client.security.MessageLevelSecurityRequirements;
 import edu.virginia.vcgr.genii.common.security.*;
 import edu.virginia.vcgr.genii.client.security.authz.acl.Acl;
 import edu.virginia.vcgr.genii.client.security.authz.acl.AclEntry;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXManager;
 import edu.virginia.vcgr.genii.client.security.authz.*;
-import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
-import edu.virginia.vcgr.genii.client.security.credentials.TransientCredentials;
-import edu.virginia.vcgr.genii.client.security.credentials.assertions.*;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.*;
 import edu.virginia.vcgr.genii.container.resource.*;
 import edu.virginia.vcgr.genii.client.resource.*;
 import edu.virginia.vcgr.genii.container.Container;
+import edu.virginia.vcgr.genii.security.MessageLevelSecurityRequirements;
+import edu.virginia.vcgr.genii.security.credentials.GIICredential;
+import edu.virginia.vcgr.genii.security.credentials.TransientCredentials;
+import edu.virginia.vcgr.genii.security.credentials.assertions.*;
+import edu.virginia.vcgr.genii.security.credentials.identity.*;
 
 /**
  * AuthZ provider implementation of GII Acls: an access-control mechanism 
@@ -145,7 +145,7 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 
 		HashSet<Identity> defaultOwners = new HashSet<Identity>();
 
-		// Add all of the authorized identities from incoming GAML creds
+		// Add desired authorized identities from incoming GAML cred
 		if (callingContext != null)
 		{
 			TransientCredentials transientCredentials =
@@ -157,24 +157,21 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 
 				if (cred instanceof Identity)
 				{
-					if (cred instanceof UsernamePasswordIdentity){
-						//Store hashed password instead of plain text
-						defaultOwners.add(new UsernamePasswordIdentity(
-								((UsernamePasswordIdentity)cred).getUserName(),
-								((UsernamePasswordIdentity)cred).getPassword(),
-								true));
-					}
-					else
-						defaultOwners.add((Identity) cred);
-
+					if (((Identity)cred).placeInUMask())
+						defaultOwners.add((Identity)cred);
+					
 				}
+				
 				else if ((cred instanceof SignedAssertion)
 						&& (((SignedAssertion) cred).getAttribute() instanceof IdentityAttribute))
 				{
 
-					defaultOwners
-							.add(((IdentityAttribute) ((SignedAssertion) cred)
-									.getAttribute()).getIdentity());
+					Identity assertedIdentity = 
+						((IdentityAttribute) ((SignedAssertion) cred).getAttribute()).getIdentity();
+					
+					if (assertedIdentity.placeInUMask())
+						defaultOwners.add(assertedIdentity);
+					
 				}
 			}
 		}

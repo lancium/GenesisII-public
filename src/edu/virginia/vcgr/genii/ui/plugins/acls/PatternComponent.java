@@ -31,7 +31,7 @@ import org.morgan.util.io.StreamUtils;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.security.authz.acl.AclEntry;
 import edu.virginia.vcgr.genii.client.security.authz.acl.X509PatternAclEntry;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.X509Identity;
+import edu.virginia.vcgr.genii.security.credentials.identity.X509Identity;
 import edu.virginia.vcgr.genii.ui.UIContext;
 import edu.virginia.vcgr.genii.ui.errors.ErrorHandler;
 import edu.virginia.vcgr.genii.ui.progress.Task;

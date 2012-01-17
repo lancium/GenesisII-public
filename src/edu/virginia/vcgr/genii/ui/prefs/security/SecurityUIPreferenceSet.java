@@ -4,7 +4,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JPanel;
 
-import edu.virginia.vcgr.genii.client.security.VerbosityLevel;
+import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.ui.prefs.AbstractUIPreferenceSet;
 
 public class SecurityUIPreferenceSet extends AbstractUIPreferenceSet

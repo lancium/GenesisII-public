@@ -40,12 +40,12 @@ import edu.virginia.vcgr.genii.client.rns.filters.RNSFilter;
 import edu.virginia.vcgr.genii.client.rns.recursived.RNSRecursiveDescent;
 import edu.virginia.vcgr.genii.client.rns.recursived.RNSRecursiveDescentCallback;
 import edu.virginia.vcgr.genii.client.rns.recursived.RNSRecursiveDescentCallbackResult;
-import edu.virginia.vcgr.genii.client.security.VerbosityLevel;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
 import edu.virginia.vcgr.genii.container.AccountingRecordType;
 import edu.virginia.vcgr.genii.container.CommitAccountingRecordsRequestType;
 import edu.virginia.vcgr.genii.container.VCGRContainerPortType;
+import edu.virginia.vcgr.genii.security.VerbosityLevel;
+import edu.virginia.vcgr.genii.security.credentials.identity.Identity;
 
 public class AccountingTool extends BaseGridTool
 {

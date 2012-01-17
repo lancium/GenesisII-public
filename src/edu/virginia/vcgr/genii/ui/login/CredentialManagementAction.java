@@ -7,8 +7,8 @@ import java.util.Collection;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 
-import edu.virginia.vcgr.genii.client.security.VerbosityLevel;
-import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
+import edu.virginia.vcgr.genii.security.VerbosityLevel;
+import edu.virginia.vcgr.genii.security.credentials.GIICredential;
 import edu.virginia.vcgr.genii.ui.rns.RNSIcons;
 
 public abstract class CredentialManagementAction extends AbstractAction

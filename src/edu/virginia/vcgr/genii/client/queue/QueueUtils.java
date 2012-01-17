@@ -10,7 +10,7 @@ import java.util.Collection;
 
 import org.morgan.util.io.StreamUtils;
 
-import edu.virginia.vcgr.genii.client.security.credentials.identity.Identity;
+import edu.virginia.vcgr.genii.security.credentials.identity.Identity;
 
 public class QueueUtils
 {

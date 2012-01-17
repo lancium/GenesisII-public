@@ -11,12 +11,12 @@ import org.ggf.rns.RNSEntryExistsFaultType;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.SecurityConstants;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 import edu.virginia.vcgr.genii.container.rns.RNSDBResource;
+import edu.virginia.vcgr.genii.security.SecurityConstants;
 
 public class JNDIResource extends RNSDBResource implements IJNDIResource
 {

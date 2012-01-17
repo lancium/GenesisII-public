@@ -3,8 +3,8 @@ package edu.virginia.vcgr.genii.client.security.authz.acl;
 import java.io.Serializable;
 import java.security.GeneralSecurityException;
 
-import edu.virginia.vcgr.genii.client.security.Describable;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.*;
+import edu.virginia.vcgr.genii.security.Describable;
+import edu.virginia.vcgr.genii.security.credentials.identity.*;
 
 /**
  * An element in an ACL policy collection indicating a specific 

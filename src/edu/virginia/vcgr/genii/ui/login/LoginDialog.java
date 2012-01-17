@@ -17,7 +17,7 @@ import javax.swing.SwingUtilities;
 import org.morgan.utils.gui.ButtonPanel;
 
 import edu.virginia.vcgr.genii.client.gui.GuiUtils;
-import edu.virginia.vcgr.genii.client.security.credentials.GIICredential;
+import edu.virginia.vcgr.genii.security.credentials.GIICredential;
 import edu.virginia.vcgr.genii.ui.UIContext;
 import edu.virginia.vcgr.genii.ui.errors.ErrorHandler;
 

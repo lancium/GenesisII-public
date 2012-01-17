@@ -32,11 +32,11 @@ import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.configuration.SecurityConstants;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import edu.virginia.vcgr.genii.client.security.credentials.*;
-import edu.virginia.vcgr.genii.client.security.credentials.assertions.*;
-import edu.virginia.vcgr.genii.client.security.credentials.identity.*;
 import edu.virginia.vcgr.genii.client.security.authz.*;
 import edu.virginia.vcgr.genii.client.security.x509.CertTool;
+import edu.virginia.vcgr.genii.security.credentials.*;
+import edu.virginia.vcgr.genii.security.credentials.assertions.*;
+import edu.virginia.vcgr.genii.security.credentials.identity.*;
 
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
