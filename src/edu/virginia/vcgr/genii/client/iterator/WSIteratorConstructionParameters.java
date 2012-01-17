@@ -2,7 +2,6 @@ package edu.virginia.vcgr.genii.client.iterator;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -22,7 +21,7 @@ public class WSIteratorConstructionParameters extends ConstructionParameters imp
 		new HashMap<String, WSIteratorConstructionParameters>();
 	
 	transient private int _preferredBatchSize;
-	transient private MessageElement []_firstBlock;
+
 	transient private Iterator<MessageElement> _contentsIterator;
 	
 	transient private String _key;
@@ -50,7 +49,7 @@ public class WSIteratorConstructionParameters extends ConstructionParameters imp
 		if (original == null)
 			throw new IllegalStateException(
 				"Can't find original construction parameters!");
-		_firstBlock = original._firstBlock;
+		
 		_contentsIterator = original._contentsIterator;
 	}
 	
@@ -69,17 +68,10 @@ public class WSIteratorConstructionParameters extends ConstructionParameters imp
 			_originalConsParms.put(_key, this);
 		}
 		
-		ArrayList<MessageElement> firstBlock = new ArrayList<MessageElement>(
-			preferredBlockSize);
+		/*We don't need to fill the first block as we have to be disjoint with
+		 * what is returned
+		*/
 		
-		for (int lcv = 0; lcv < preferredBlockSize && contentsIterator.hasNext(); lcv++)
-		{
-			MessageElement item = contentsIterator.next();
-			
-			firstBlock.add(item);
-		}
-		
-		_firstBlock = firstBlock.toArray(new MessageElement[firstBlock.size()]);
 		if (contentsIterator.hasNext())
 			_contentsIterator = contentsIterator;
 		else
@@ -93,10 +85,7 @@ public class WSIteratorConstructionParameters extends ConstructionParameters imp
 		return _preferredBatchSize;
 	}
 	
-	final public MessageElement[] firstBlock()
-	{
-		return _firstBlock;
-	}
+	
 	
 	final public Iterator<MessageElement> remainingContents()
 	{

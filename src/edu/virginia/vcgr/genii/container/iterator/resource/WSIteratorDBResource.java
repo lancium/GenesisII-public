@@ -55,7 +55,7 @@ public class WSIteratorDBResource extends BasicDBResource
 			throw new ResourceException(
 				"Can't create a WS-iterator without construction parameters!");
 		
-		MessageElement []firstBlock = consParms.firstBlock();
+	
 		Iterator<MessageElement> rest = consParms.remainingContents();
 		int lcv = 0;
 		
@@ -70,23 +70,6 @@ public class WSIteratorDBResource extends BasicDBResource
 				"INSERT INTO iterators(" +
 					"iteratorid, elementindex, contents) " +
 					"VALUES (?, ?, ?)");
-			
-			if (firstBlock != null)
-			{
-				for (MessageElement next : firstBlock)
-				{
-					stmt.setString(1, getKey());
-					stmt.setLong(2, (long)lcv);
-					stmt.setBlob(3, 
-						DBSerializer.toBlob(
-							ObjectSerializer.anyToBytes(
-								new MessageElement[] { next }), 
-							"iterators", "contents"));
-				
-					stmt.addBatch();
-					lcv++;
-				}
-			}
 			
 			if (rest != null)
 			{

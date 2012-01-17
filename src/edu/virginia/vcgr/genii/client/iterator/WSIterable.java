@@ -190,7 +190,9 @@ final public class WSIterable<Type> implements Iterable<Type>, Closeable
 						return;
 					}
 					
-					IterateResponseType resp = _iterator.iterate(nextStart, _blockSize);
+					int initialLength = (_initialBlock == null)?0:_initialBlock.length;
+					
+					IterateResponseType resp = _iterator.iterate((nextStart - initialLength), _blockSize);
 					if (resp == null)
 					{
 						StreamUtils.close(this);
@@ -198,7 +200,8 @@ final public class WSIterable<Type> implements Iterable<Type>, Closeable
 					}
 					UnsignedLong ul = resp.getIteratorSize();
 					if (ul != null)
-						_lastIteratorSize = ul.intValue();
+						_lastIteratorSize = ul.intValue() + initialLength;
+					
 					IterableElementType []elements = resp.getIterableElement();
 					if (elements == null || elements.length == 0)
 					{
@@ -210,7 +213,7 @@ final public class WSIterable<Type> implements Iterable<Type>, Closeable
 						for (int lcv = 0; lcv < _currentBlock.length; lcv++)
 						{
 							int index = elements[lcv].getIndex(
-								).intValue() - nextStart;
+								).intValue() - nextStart + initialLength;
 							
 							_currentBlock[index] = extractType(elements[lcv].get_any());
 						}

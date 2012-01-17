@@ -1601,13 +1601,25 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 			IterableElementType []batchElements = null;
 			EndpointReferenceType iteratorEndpoint = null;
 			
+			int preferredBlockSize = preferredBatchSize();
+			
+			ArrayList<MessageElement> firstBlockList = new ArrayList<MessageElement>(
+					preferredBlockSize);
+				
+			for (int lcv = 0; lcv < preferredBlockSize && iterator().hasNext(); lcv++)
+			{
+				MessageElement item = iterator().next();
+				firstBlockList.add(item);
+			}
+				
 			WSIteratorConstructionParameters consParms = 
 				new WSIteratorConstructionParameters(iterator(), 
 					preferredBatchSize());
 			
 			try
 			{
-				MessageElement []firstBlock = consParms.firstBlock();
+				MessageElement []firstBlock = firstBlockList.toArray
+											(new MessageElement[firstBlockList.size()]);
 				
 				if (firstBlock != null)
 				{
