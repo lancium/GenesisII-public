@@ -1,20 +1,31 @@
 package edu.virginia.vcgr.genii.container.resource;
 
-import java.security.cert.X509Certificate;
+import java.io.IOException;
 import java.security.GeneralSecurityException;
-
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.io.IOException;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.message.MessageElement;
-
 import org.morgan.util.GUID;
 import org.morgan.util.configuration.ConfigurationException;
+import org.oasis_open.docs.ws_sx.ws_securitypolicy._200702.EmptyType;
+import org.oasis_open.docs.ws_sx.ws_securitypolicy._200702.IncludeTokenOpenType;
+import org.oasis_open.docs.ws_sx.ws_securitypolicy._200702.IncludeTokenType;
+import org.oasis_open.docs.ws_sx.ws_securitypolicy._200702.NestedPolicyType;
+import org.oasis_open.docs.ws_sx.ws_securitypolicy._200702.SePartsType;
+import org.oasis_open.docs.ws_sx.ws_securitypolicy._200702.TokenAssertionType;
+import org.oasis_open.docs.ws_sx.ws_trust._200512.ClaimsType;
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+import org.w3.www.ns.ws_policy.AppliesTo;
+import org.w3.www.ns.ws_policy.Policy;
+import org.w3.www.ns.ws_policy.PolicyAttachment;
+import org.w3.www.ns.ws_policy.PolicyReference;
+import org.w3.www.ns.ws_policy.URI;
 import org.ws.addressing.AttributedURIType;
 import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.MetadataType;
@@ -25,6 +36,7 @@ import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.container.ContainerConstants;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.naming.WSAddressingConstants;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
@@ -35,16 +47,12 @@ import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.MessageLevelSecurityRequirements;
 import edu.virginia.vcgr.genii.client.security.SecurityConstants;
 import edu.virginia.vcgr.genii.client.security.WSSecurityUtils;
-
-import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
-import org.oasis_open.docs.ws_sx.ws_securitypolicy._200702.*;
-import org.oasis_open.docs.ws_sx.ws_trust._200512.*;
-import org.w3.www.ns.ws_policy.*;
-
-import edu.virginia.vcgr.genii.container.context.WorkingContext;
-import edu.virginia.vcgr.genii.common.security.*;
+import edu.virginia.vcgr.genii.common.security.RequiredMessageSecurityType;
+import edu.virginia.vcgr.genii.common.security.RequiredMessageSecurityTypeMin;
 import edu.virginia.vcgr.genii.container.Container;
-import edu.virginia.vcgr.genii.container.security.authz.providers.*;
+import edu.virginia.vcgr.genii.container.context.WorkingContext;
+import edu.virginia.vcgr.genii.container.security.authz.providers.AuthZProviders;
+import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider;
 
 public class ResourceManager
 {
@@ -155,24 +163,25 @@ public class ResourceManager
 		return rKey;
 	}
 
+	
 	static public EndpointReferenceType createEPR(ResourceKey resource,
-		String targetServiceURL, PortType[] implementedPortTypes)
-			throws ResourceException
-	{
-		ReferenceParametersType refParams = null;
-		AttributedURIType address =
-				new AttributedURITypeSmart(targetServiceURL);
-		if (resource != null)
+			String targetServiceURL, PortType[] implementedPortTypes, String masterType)
+				throws ResourceException
 		{
-			AddressingParameters addrParams = 
-				resource.getAddressingParameters();
-			if (addrParams != null)
-				refParams = addrParams.toReferenceParameters();
-		}
+			ReferenceParametersType refParams = null;
+			AttributedURIType address =
+					new AttributedURITypeSmart(targetServiceURL);
+			if (resource != null)
+			{
+				AddressingParameters addrParams = 
+					resource.getAddressingParameters();
+				if (addrParams != null)
+					refParams = addrParams.toReferenceParameters();
+			}
 
-		return new EndpointReferenceType(address, refParams, 
-			createMetadata(implementedPortTypes, resource), null);
-	}
+			return new EndpointReferenceType(address, refParams, 
+				createMetadata(implementedPortTypes, resource, masterType), null);
+		}
 
 	static private void addSecureAddressingElements(
 			ArrayList<MessageElement> metaDataAny, IResource resource)
@@ -431,8 +440,10 @@ public class ResourceManager
 
 	}
 
+	
+	
 	static public MetadataType createMetadata(PortType[] portTypes,
-			ResourceKey resourceKey) throws ResourceException
+			ResourceKey resourceKey, String masterType) throws ResourceException
 	{
 		if (portTypes == null)
 			portTypes = new PortType[0];
@@ -442,9 +453,41 @@ public class ResourceManager
 		any.add(new MessageElement(
 				OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME, PortType
 						.translate(portTypes)));
-
+		
+		
 		if (resourceKey != null)
 		{
+			
+			if(portTypes.length == 0)
+			{
+				any.add(new MessageElement(new QName(WSAddressingConstants.WSA_NS,"PortType"),
+						new QName(GenesisIIConstants.GENESISII_NS, "NullPortType")));
+			}
+				
+			else
+			{	
+				if(masterType == null)	//handles the case for RootRNSForks !
+				{
+					if(resourceKey.getServiceName() == null)
+					{
+						throw new ResourceException(
+							"Couldn't locate target service name in the resource key");
+					}
+					else
+					{
+						any.add(new MessageElement(new QName(WSAddressingConstants.WSA_NS,"PortType"),
+							new QName(GenesisIIConstants.GENESISII_NS, resourceKey.getServiceName())));
+					}	
+				}	
+				
+				else
+				{
+					any.add(new MessageElement(new QName(WSAddressingConstants.WSA_NS,"PortType"),
+							new QName(GenesisIIConstants.GENESISII_NS, masterType)));
+				}	
+			}
+				
+			
 			IResource resource = resourceKey.dereference();
 
 			// add epi
@@ -486,4 +529,5 @@ public class ResourceManager
 		any.toArray(anyArray);
 		return new MetadataType(anyArray);
 	}
+	
 }

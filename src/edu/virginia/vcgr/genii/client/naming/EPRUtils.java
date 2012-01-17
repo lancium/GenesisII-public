@@ -619,4 +619,33 @@ public class EPRUtils
 		
 		return null;
 	}
+
+	public static String getMasterPortType(EndpointReferenceType epr) 
+	{
+		
+		if (epr == null)
+			return null;
+		
+		MetadataType md = epr.getMetadata();
+		
+		if (md == null)
+			return null;
+		
+		MessageElement []any = md.get_any();
+		if (any == null)
+			return null;
+		
+		for (MessageElement element : any)
+		{
+			QName name = element.getQName();
+			if (name.equals(new QName(WSAddressingConstants.WSA_NS,"PortType")))
+			{
+				String portTypeWithNameSpace = element.getValue();
+				int separator = portTypeWithNameSpace.lastIndexOf(':') + 1;
+				return portTypeWithNameSpace.substring(separator);
+			}
+		}
+		
+		return null;
+	}
 }

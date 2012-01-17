@@ -126,7 +126,7 @@ public class WorkingContextHandler extends BasicHandler
 			epr =
 					ResourceManager.createEPR(rKey, epr.getAddress()
 							.get_value().toString(), EPRUtils
-							.getImplementedPortTypes(epr));
+							.getImplementedPortTypes(epr), EPRUtils.getMasterPortType(epr));
 			newContext.setProperty(WorkingContext.EPR_PROPERTY_NAME, epr);
 		}
 		catch (Throwable t)

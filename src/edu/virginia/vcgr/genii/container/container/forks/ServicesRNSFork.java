@@ -58,6 +58,7 @@ public class ServicesRNSFork extends ReadOnlyRNSResourceFork
 		}
 	}
 	
+	
 	public ServicesRNSFork(ResourceForkService service, String forkPath)
 	{
 		super(service, forkPath);
@@ -83,7 +84,7 @@ public class ServicesRNSFork extends ReadOnlyRNSResourceFork
 						"%s%s?%s=%s", shortenedURL(), serviceName,
 						EPRUtils.GENII_CONTAINER_ID_PARAMETER,
 						Container.getContainerID()),
-						findImplementedPortTypes(desc.getImplClass()));
+						findImplementedPortTypes(desc.getImplClass()), serviceName);
 				ret.add(new InternalEntry(serviceName, targetEPR));
 			}
 		}

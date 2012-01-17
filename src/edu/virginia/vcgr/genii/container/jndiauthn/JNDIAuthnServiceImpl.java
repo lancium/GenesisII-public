@@ -107,6 +107,35 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 
 	}
 
+	
+	public String getMasterType(ResourceKey rKey)
+	throws ResourceException, ResourceUnknownFaultType
+	{
+		
+		if ((rKey == null) || (!(rKey.dereference() instanceof IJNDIResource)))
+		{
+			// JNDIAuthnPortType
+			return new String("JNDIAuthnPortType");
+		}
+
+		IJNDIResource serviceResource = (IJNDIResource) rKey.dereference();
+
+		if (serviceResource.isServiceResource())
+		{
+			// JNDIAuthnPortType
+			return new String("JNDIAuthnPortType");
+		}
+		else if (serviceResource.isIdpResource())
+		{
+			// individual IDP resource
+			return new String("IndividualIDPResource");
+		}
+
+		// STS for a JNDI directory resource
+		return new String("STSForJNDIAuthnPortType");
+				
+	}
+	
 	/**
 	 * Return different implemented port types depending on who we are
 	 */
@@ -1127,7 +1156,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 							WellKnownPortTypes.STS_SERVICE_PORT_TYPE };
 			EndpointReferenceType retval =
 					ResourceManager.createEPR(idpKey, myEPR.getAddress()
-							.toString(), implementedPortTypes);
+							.toString(), implementedPortTypes, new String("JNDIWithSTSPortType"));
 
 			return retval;
 

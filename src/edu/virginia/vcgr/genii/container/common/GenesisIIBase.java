@@ -768,7 +768,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 
 		ResourceKey rKey = createResource(constructionParameters);
 		EndpointReferenceType epr = ResourceManager.createEPR(rKey, 
-				targetServiceURL, getImplementedPortTypes(rKey));
+				targetServiceURL, getImplementedPortTypes(rKey), getMasterType(rKey));
 		
 		WorkingContext.temporarilyAssumeNewIdentity(epr);
 		WorkingContext.getCurrentWorkingContext().setProperty(
@@ -909,7 +909,8 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 		
 		EndpointReferenceType epr = ResourceManager.createEPR(rKey, 
 			targetAddress.toString(), 
-			getImplementedPortTypes(rKey));
+			getImplementedPortTypes(rKey), getMasterType(rKey));
+		
 		if (!(this instanceof GeniiNoOutCalls)){
 			try
 			{
@@ -1185,11 +1186,16 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 		String myAddress = Container.getServiceURL(_serviceName);
 		ResourceKey rKey = ResourceManager.getCurrentResource();
 		PortType []implementedPortTypes = null;
-		if (withPortTypes)
+		String masterPortType = null;
+		
+		if(withPortTypes)
+		{
 			implementedPortTypes = getImplementedPortTypes(rKey);
+			masterPortType = getMasterType(rKey);			
+		}
 		
 		return ResourceManager.createEPR(
-			rKey, myAddress, implementedPortTypes);
+			rKey, myAddress, implementedPortTypes, masterPortType);
 	}
 	
 	private void setDefaultResolverFactoryDescription()
@@ -1713,4 +1719,10 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 			return new MessageElement(_name, item);
 		}
 	}
+
+	public String getMasterType(ResourceKey rKey) throws ResourceException,
+			ResourceUnknownFaultType {
+		return _serviceName;
+		
+	}		
 }

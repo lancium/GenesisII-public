@@ -59,9 +59,11 @@ import org.ws.addressing.MetadataType;
 import org.ws.addressing.ReferenceParametersType;
 
 import edu.virginia.vcgr.genii.byteio.streamable.factory.OpenStreamResponse;
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.byteio.SeekOrigin;
+import edu.virginia.vcgr.genii.client.naming.WSAddressingConstants;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
@@ -219,8 +221,9 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 				for (MessageElement me : anyArray)
 				{
 					QName name = me.getQName();
-					if (!name.equals(
-						OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME))
+					if ((!name.equals(
+						OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME)) && (!name.equals(
+								new QName(WSAddressingConstants.WSA_NS,"PortType"))) )
 						any.add(me);
 				}
 				
@@ -441,6 +444,16 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 		return ret;
 	}
 	
+	@Override
+	public String getMasterType(ResourceKey rKey)
+	throws ResourceException, ResourceUnknownFaultType
+	{
+		if(getResourceForkInformation().forkPath().equalsIgnoreCase("/"))
+			return null;	//corresponds to the root !
+		
+		return(getResourceFork().describe().forkClass().getSimpleName());
+	}
+	
 	static final private Pattern EPI_PATTERN = Pattern.compile(
 		"^(.+):fork-path:.+$");
 	
@@ -488,7 +501,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 	}
 	
 	private EndpointReferenceType addPortTypes(EndpointReferenceType epr,
-		PortType[] superPortTypes, PortType []myPortTypes)
+		PortType[] superPortTypes, PortType []myPortTypes, ResourceForkInformation rif)
 	{
 		Collection<PortType> portTypes = new ArrayList<PortType>(
 			superPortTypes.length + 1);
@@ -514,6 +527,8 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 			OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME, 
 			PortType.translate(portTypes)));
 		
+		mdtList.add(new MessageElement(new QName(WSAddressingConstants.WSA_NS,"PortType"), new QName(GenesisIIConstants.GENESISII_NS, rif.forkClass().getSimpleName())));
+		
 		return new EndpointReferenceType(
 			epr.getAddress(), epr.getReferenceParameters(),
 			new MetadataType(mdtList.toArray(new MessageElement[0])),
@@ -527,7 +542,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 	{
 		EndpointReferenceType ret = getExemplarEPR();
 		ret = addPortTypes(ret, super.getImplementedPortTypes(getResourceKey()),
-			getPortType(rif));
+			getPortType(rif), rif);
 		ret = modifyEPI(ret, forkPath);
 		AddressingParameters ap = new AddressingParameters(
 			ret.getReferenceParameters());
