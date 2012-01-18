@@ -73,7 +73,6 @@ import edu.virginia.vcgr.genii.client.nativeq.NativeQueue;
 import edu.virginia.vcgr.genii.client.nativeq.NativeQueueConfiguration;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.cloud.CloudAttributesHandler;
 import edu.virginia.vcgr.genii.cloud.CloudDBResourceFactory;
@@ -99,6 +98,7 @@ import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.ForkRoot;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkBaseService;
 import edu.virginia.vcgr.genii.graph.GridDependency;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.jsdl.JobDefinition;
 
 @ForkRoot(BESRootRNSFork.class)

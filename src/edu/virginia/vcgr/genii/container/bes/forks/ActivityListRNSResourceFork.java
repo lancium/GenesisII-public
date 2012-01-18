@@ -10,7 +10,6 @@ import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.TerminateActivityResponseType;
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.container.bes.GeniiBESServiceImpl;
 import edu.virginia.vcgr.genii.container.bes.activity.BESActivity;
@@ -20,6 +19,7 @@ import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.AbstractRNSResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 
 public class ActivityListRNSResourceFork extends AbstractRNSResourceFork
 {

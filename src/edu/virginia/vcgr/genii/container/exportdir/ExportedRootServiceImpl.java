@@ -27,7 +27,6 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.recursived.RNSRecursiveDescent;
 import edu.virginia.vcgr.genii.client.rns.recursived.RNSRecursiveDescentCallback;
 import edu.virginia.vcgr.genii.client.rns.recursived.RNSRecursiveDescentCallbackResult;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
@@ -42,6 +41,7 @@ import edu.virginia.vcgr.genii.exportdir.ExportedDirPortType;
 import edu.virginia.vcgr.genii.exportdir.ExportedRootPortType;
 import edu.virginia.vcgr.genii.exportdir.QuitExport;
 import edu.virginia.vcgr.genii.exportdir.QuitExportResponse;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 
 @GeniiServiceConfiguration(
 	resourceProvider=ExportedRootDBResourceProvider.class,

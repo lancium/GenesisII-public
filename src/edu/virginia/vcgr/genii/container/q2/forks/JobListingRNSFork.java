@@ -13,13 +13,13 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.cs.vcgr.genii.job_management.JobStateEnumerationType;
 import edu.virginia.cs.vcgr.genii.job_management.ReducedJobInformationType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.container.q2.QueueManager;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.rfork.AbstractRNSResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 
 public class JobListingRNSFork extends AbstractRNSResourceFork
 {

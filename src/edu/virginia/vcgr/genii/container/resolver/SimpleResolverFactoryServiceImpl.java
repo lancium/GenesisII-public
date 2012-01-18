@@ -32,7 +32,6 @@ import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
@@ -46,6 +45,7 @@ import edu.virginia.vcgr.genii.resolver.simple.CreateResolverResponseType;
 import edu.virginia.vcgr.genii.resolver.simple.InvalidWSNameFaultType;
 import edu.virginia.vcgr.genii.resolver.simple.SimpleResolverFactoryPortType;
 import edu.virginia.vcgr.genii.resolver.simple.SimpleResolverPortType;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 
 @GeniiServiceConfiguration(
 	resourceProvider=SimpleResolverFactoryDBResourceProvider.class)

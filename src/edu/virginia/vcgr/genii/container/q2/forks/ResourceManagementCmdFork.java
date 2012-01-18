@@ -10,7 +10,6 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.container.q2.BESData;
 import edu.virginia.vcgr.genii.container.q2.BESManager;
@@ -24,6 +23,7 @@ import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.container.rfork.cmd.CommandChannelManager;
 import edu.virginia.vcgr.genii.container.rfork.cmd.CommandHandler;
 import edu.virginia.vcgr.genii.container.rfork.cmd.CommandParameter;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 
 public class ResourceManagementCmdFork 
 	extends AbstractStreamableByteIOFactoryResourceFork

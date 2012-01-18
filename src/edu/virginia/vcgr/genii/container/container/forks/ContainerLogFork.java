@@ -9,10 +9,10 @@ import java.util.Calendar;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.configuration.Installation;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.container.rfork.AbstractRandomByteIOResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 
 public class ContainerLogFork extends AbstractRandomByteIOResourceFork
 {

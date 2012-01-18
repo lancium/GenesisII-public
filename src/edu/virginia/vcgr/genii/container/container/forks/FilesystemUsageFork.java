@@ -9,11 +9,11 @@ import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.filesystems.Filesystem;
 import edu.virginia.vcgr.genii.client.filesystems.FilesystemManager;
 import edu.virginia.vcgr.genii.client.filesystems.FilesystemUsageInformation;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.utils.units.Size;
 import edu.virginia.vcgr.genii.container.rfork.AbstractStreamableByteIOFactoryResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 
 public class FilesystemUsageFork
 	extends AbstractStreamableByteIOFactoryResourceFork

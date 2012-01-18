@@ -1,9 +1,9 @@
 package edu.virginia.vcgr.genii.container.rfork;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 
 public abstract class AbstractResourceFork implements ResourceFork
 {

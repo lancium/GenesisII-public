@@ -13,7 +13,6 @@ import edu.virginia.vcgr.genii.client.iterator.IteratorConstants;
 import edu.virginia.vcgr.genii.client.iterator.WSIteratorConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
@@ -24,6 +23,7 @@ import edu.virginia.vcgr.genii.iterator.IterableElementType;
 import edu.virginia.vcgr.genii.iterator.IterateRequestType;
 import edu.virginia.vcgr.genii.iterator.IterateResponseType;
 import edu.virginia.vcgr.genii.iterator.WSIteratorPortType;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 
 @ConstructionParametersType(WSIteratorConstructionParameters.class)
 @GeniiServiceConfiguration(

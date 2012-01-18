@@ -12,9 +12,9 @@ import java.util.*;
 import org.apache.axis.message.MessageElement;
 
 import edu.virginia.vcgr.genii.client.security.authz.acl.AclEntry;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 
 import edu.virginia.vcgr.genii.client.security.SecurityUtils;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.WSSecurityUtils;
 import edu.virginia.vcgr.genii.security.X500PrincipalUtilities;

@@ -3,9 +3,9 @@ package edu.virginia.vcgr.genii.container.rfork.sd;
 import java.lang.reflect.Method;
 
 import edu.virginia.vcgr.genii.client.security.authz.rwx.MappingResolver;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXManager;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMappingException;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 
 public class SimpleStateRWXMappingResolver implements MappingResolver
 {

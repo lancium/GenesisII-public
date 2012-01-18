@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Calendar;
 
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.container.rfork.AbstractRandomByteIOResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.RandomByteIOResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 
 public class LightWeightExportFileFork extends AbstractRandomByteIOResourceFork
 		implements RandomByteIOResourceFork

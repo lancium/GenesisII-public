@@ -8,7 +8,6 @@ import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.exportdir.FSProxyConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.PortType;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
@@ -17,6 +16,7 @@ import edu.virginia.vcgr.genii.container.rfork.ResourceForkBaseService;
 import edu.virginia.vcgr.genii.exportdir.QuitExport;
 import edu.virginia.vcgr.genii.exportdir.QuitExportResponse;
 import edu.virginia.vcgr.genii.exportdir.fsproxy.FSProxyPortType;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 
 @ForkRoot(FSProxyDirFork.class)
 @ConstructionParametersType(FSProxyConstructionParameters.class)

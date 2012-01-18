@@ -5,6 +5,8 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.virginia.vcgr.genii.security.RWXCategory;
+
 public class RWXManager
 {
 	static private class ConstantMappingResolver implements MappingResolver

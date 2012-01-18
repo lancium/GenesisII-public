@@ -21,7 +21,7 @@ import java.security.cert.X509Certificate;
 import java.util.EnumSet;
 import java.io.*;
 
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.credentials.GIICredential;
 
 public interface SignedAssertion extends Externalizable, GIICredential

@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.container.q2.QueueManager;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -14,6 +13,7 @@ import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.container.rfork.sd.SimpleStateResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.sd.StateDescription;
 import edu.virginia.vcgr.genii.container.rfork.sd.TextStateTranslator;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 
 @StateDescription( { TextStateTranslator.class })
 public class IsSchedulingPropertyFork extends SimpleStateResourceFork<Boolean>

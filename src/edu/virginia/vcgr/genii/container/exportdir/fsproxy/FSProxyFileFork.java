@@ -17,13 +17,13 @@ import edu.virginia.g3.fsview.FSViewRandomAccessFileEntry;
 import edu.virginia.g3.fsview.FSViewSession;
 import edu.virginia.g3.fsview.FSViewStreamableAccessFileEntry;
 import edu.virginia.vcgr.genii.client.exportdir.FSProxyConstructionParameters;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.AbstractRandomByteIOResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.RandomByteIOResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 
 public class FSProxyFileFork extends AbstractRandomByteIOResourceFork
 	implements RandomByteIOResourceFork

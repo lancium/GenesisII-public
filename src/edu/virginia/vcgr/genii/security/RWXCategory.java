@@ -1,4 +1,4 @@
-package edu.virginia.vcgr.genii.client.security.authz.rwx;
+package edu.virginia.vcgr.genii.security;
 
 public enum RWXCategory
 {

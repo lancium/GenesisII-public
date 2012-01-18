@@ -20,13 +20,13 @@ import edu.virginia.vcgr.genii.client.io.MarkableFileInputStream;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.MappingResolver;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXManager;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMappingException;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMappingResolver;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 
 public class DefaultStreamableByteIOResourceFork 
 	extends AbstractStreamableByteIOResourceFork

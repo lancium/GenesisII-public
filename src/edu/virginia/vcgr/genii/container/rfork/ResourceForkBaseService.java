@@ -97,6 +97,7 @@ import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.enhancedrns.CreateFileRequestType;
 import edu.virginia.vcgr.genii.enhancedrns.CreateFileResponseType;
 import edu.virginia.vcgr.genii.rfork.ResourceForkPortType;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 
 public abstract class ResourceForkBaseService extends GenesisIIBase 
 	implements ResourceForkPortType, ResourceForkService

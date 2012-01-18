@@ -27,7 +27,6 @@ import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.queue.QueueUtils;
 import edu.virginia.vcgr.genii.client.queue.ReducedJobInformation;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.container.q2.QueueManager;
@@ -36,6 +35,7 @@ import edu.virginia.vcgr.genii.container.rfork.AbstractStreamableByteIOFactoryRe
 import edu.virginia.vcgr.genii.container.rfork.AdvertisedSize;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.container.rfork.StreamableFactoryConfiguration;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.credentials.identity.Identity;
 
 @StreamableFactoryConfiguration(notifyOnDestroy = false)

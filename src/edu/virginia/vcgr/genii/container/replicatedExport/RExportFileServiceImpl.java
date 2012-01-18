@@ -20,7 +20,6 @@ import org.ggf.rns.WriteNotPermittedFaultType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.AbstractNotificationHandler;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
@@ -35,6 +34,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.container.byteio.RandomByteIOAttributeHandlers;
 import edu.virginia.vcgr.genii.container.byteio.RandomByteIOServiceImpl;
 import edu.virginia.vcgr.genii.replicatedExport.RExportFilePortType;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 
 public class RExportFileServiceImpl extends RandomByteIOServiceImpl 
 	implements RExportFilePortType

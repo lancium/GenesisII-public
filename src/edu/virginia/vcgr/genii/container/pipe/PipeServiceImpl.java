@@ -27,7 +27,6 @@ import edu.virginia.vcgr.genii.client.pipe.PipeConstants;
 import edu.virginia.vcgr.genii.client.pipe.PipeConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.container.byteio.TransferAgent;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
@@ -36,6 +35,7 @@ import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.pipe.PipePortType;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 
 @ConstructionParametersType(PipeConstructionParameters.class)
 public class PipeServiceImpl extends GenesisIIBase implements PipePortType

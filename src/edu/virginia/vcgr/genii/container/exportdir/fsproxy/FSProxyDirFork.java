@@ -12,7 +12,6 @@ import edu.virginia.g3.fsview.FSViewEntry;
 import edu.virginia.g3.fsview.FSViewEntryType;
 import edu.virginia.g3.fsview.FSViewSession;
 import edu.virginia.vcgr.genii.client.exportdir.FSProxyConstructionParameters;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
@@ -21,6 +20,7 @@ import edu.virginia.vcgr.genii.container.rfork.RNSResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkInformation;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 
 public class FSProxyDirFork extends AbstractRNSResourceFork
 	implements RNSResourceFork

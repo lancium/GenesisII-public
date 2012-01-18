@@ -29,7 +29,6 @@ import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.sysinfo.SystemUtils;
@@ -47,6 +46,7 @@ import edu.virginia.vcgr.genii.deployer.CreateDeploymentRequestType;
 import edu.virginia.vcgr.genii.deployer.CreateDeploymentResponseType;
 import edu.virginia.vcgr.genii.deployer.ReifyJSDLRequestType;
 import edu.virginia.vcgr.genii.deployer.ReifyJSDLResponseType;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 
 public class ApplicationDeployerServiceImpl extends GenesisIIBase implements
 		ApplicationDeployerPortType

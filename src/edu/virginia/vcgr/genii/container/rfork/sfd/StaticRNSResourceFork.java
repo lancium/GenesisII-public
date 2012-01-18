@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.container.rfork.DefaultResourceForkInformation;
 import edu.virginia.vcgr.genii.container.rfork.ReadOnlyRNSResourceFork;
@@ -16,6 +15,7 @@ import edu.virginia.vcgr.genii.container.rfork.ResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkInformation;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 
 /**
  * StaticRNSResourceForks are forks that have static (in terms of contents)

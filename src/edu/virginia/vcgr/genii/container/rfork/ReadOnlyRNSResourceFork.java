@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 
 public abstract class ReadOnlyRNSResourceFork extends AbstractRNSResourceFork
 {
