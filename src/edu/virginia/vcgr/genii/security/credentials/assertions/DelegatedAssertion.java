@@ -251,6 +251,7 @@ public class DelegatedAssertion extends SignedAssertionBaseImpl
 	public void writeExternal(ObjectOutput out) throws IOException
 	{
 		out.writeObject(_delegatedAttribute);
+		out.writeObject(_mask);
 		out.writeInt(_delegatorSignature.length);
 		out.write(_delegatorSignature);
 	}
@@ -259,6 +260,7 @@ public class DelegatedAssertion extends SignedAssertionBaseImpl
 			ClassNotFoundException
 	{
 		_delegatedAttribute = (DelegatedAttribute) in.readObject();
+		_mask = (EnumSet<RWXCategory>) in.readObject();
 		int sigLen = in.readInt();
 		_delegatorSignature = new byte[sigLen];
 		in.readFully(_delegatorSignature);
