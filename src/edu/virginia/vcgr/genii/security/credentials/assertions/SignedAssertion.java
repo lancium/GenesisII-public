@@ -18,8 +18,10 @@ package edu.virginia.vcgr.genii.security.credentials.assertions;
 
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
+import java.util.EnumSet;
 import java.io.*;
 
+import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.security.credentials.GIICredential;
 
 public interface SignedAssertion extends Externalizable, GIICredential
@@ -41,5 +43,18 @@ public interface SignedAssertion extends Externalizable, GIICredential
 	 * authenticate the signed-in authorizing identities: an integrity-check.
 	 */
 	public void validateAssertion() throws GeneralSecurityException;
+	
+	/**
+	 * 
+	 * Checks if chain can perform specified rwx operation
+	 * @throws GeneralSecurityException
+	 */
+	public boolean checkAccess(RWXCategory category) throws GeneralSecurityException;
+	
+	/**
+	 * Sets mask of Assertion (gaml chain link)
+	 * @param perms
+	 */
+	public void setMask(EnumSet<RWXCategory> perms);
 
 }

@@ -26,6 +26,7 @@ import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.EnumSet;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
@@ -33,6 +34,7 @@ import javax.xml.soap.SOAPException;
 import org.apache.axis.message.MessageElement;
 import org.apache.ws.security.message.token.BinarySecurity;
 
+import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.WSSecurityUtils;
 
@@ -53,6 +55,9 @@ public class DelegatedAssertion extends SignedAssertionBaseImpl
 	// The signature of the above delegated attribute by its signed
 	// assertion's authorized identity
 	protected byte[] _delegatorSignature = null;
+	
+	protected EnumSet<RWXCategory> _mask = 
+			EnumSet.of(RWXCategory.READ, RWXCategory.WRITE, RWXCategory.EXECUTE);
 
 	// zero-arg contstructor for externalizable use only!
 	public DelegatedAssertion()
@@ -257,6 +262,30 @@ public class DelegatedAssertion extends SignedAssertionBaseImpl
 		int sigLen = in.readInt();
 		_delegatorSignature = new byte[sigLen];
 		in.readFully(_delegatorSignature);
+	}
+
+	@Override
+	public boolean checkAccess(RWXCategory category)
+			throws GeneralSecurityException {
+		
+		
+		Boolean retval = false;
+		//Check if my assertion can access this category
+		retval = _delegatedAttribute._assertion.checkAccess(category);
+		
+		//Check if I can
+		if (!_mask.contains(category))
+			throw new GeneralSecurityException(
+					"Credential does not have " + 
+			category.toString() + " access");
+		
+		return retval;
+		
+	}
+
+	@Override
+	public void setMask(EnumSet<RWXCategory> perms) {
+		_mask = perms;
 	}
 
 }

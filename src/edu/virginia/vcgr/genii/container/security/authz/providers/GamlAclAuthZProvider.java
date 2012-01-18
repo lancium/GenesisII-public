@@ -283,27 +283,41 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 				return;
 			}
 
+			
+			RWXCategory category = RWXManager.lookup(serviceClass, operation);
+			
+			
 			// try each identity in the caller's credentials
 			for (GIICredential cred : authenticatedCallerCredentials)
 			{
 				if (cred instanceof Identity)
 				{
-					// straight-up identity
-					if (checkAclAccess((Identity) cred, serviceClass, operation, acl))
+					
+					if (cred instanceof SignedAssertion){
+						if (((SignedAssertion)cred).checkAccess(category)){
+							if(checkAclAccess((Identity) cred, serviceClass, operation, acl))
+								return;
+						}
+					}
+					// straight-up identity (username/password)
+					else if(checkAclAccess((Identity) cred, serviceClass, operation, acl))
 					{
 						return;
 					}
 				}
 				else if (cred instanceof SignedAssertion) 
 				{
-					// possibly unwrap an identity from an IdentityAttribute
+					
 					SignedAssertion sa = (SignedAssertion) cred;
-					if (sa.getAttribute() instanceof IdentityAttribute) 
-					{
-						IdentityAttribute ia = (IdentityAttribute) sa.getAttribute();
-						if (checkAclAccess(ia.getIdentity(), serviceClass, operation, acl))
+					if(sa.checkAccess(category)){
+						// possibly unwrap an identity from an IdentityAttribute
+						if (sa.getAttribute() instanceof IdentityAttribute) 
 						{
-							return;
+							IdentityAttribute ia = (IdentityAttribute) sa.getAttribute();
+							if (checkAclAccess(ia.getIdentity(), serviceClass, operation, acl))
+							{
+								return;
+							}
 						}
 					}
 				}
@@ -334,6 +348,10 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 		{
 			throw new AuthZSecurityException(
 					"Error processing GAML credential.", e);
+		} catch (GeneralSecurityException e) {
+			throw new AuthZSecurityException(
+					"Credential not authorized for" +
+					" this type of operation.", e);
 		}
 	}
 

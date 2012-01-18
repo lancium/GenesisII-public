@@ -22,6 +22,7 @@ import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.EnumSet;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
@@ -29,6 +30,7 @@ import javax.xml.soap.SOAPException;
 import org.apache.axis.message.MessageElement;
 import org.apache.ws.security.message.token.BinarySecurity;
 
+import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.WSSecurityUtils;
 
@@ -49,6 +51,9 @@ public class SignedAttributeAssertion extends SignedAssertionBaseImpl
 	// The signature of the above attribute by the above
 	// asserting identity
 	protected byte[] _signature = null;
+	
+	private EnumSet<RWXCategory> _mask = 
+			EnumSet.of(RWXCategory.READ, RWXCategory.WRITE, RWXCategory.EXECUTE);
 
 	// zero-arg contstructor for externalizable use only!
 	public SignedAttributeAssertion()
@@ -241,6 +246,35 @@ public class SignedAttributeAssertion extends SignedAssertionBaseImpl
 		int sigLen = in.readInt();
 		_signature = new byte[sigLen];
 		in.readFully(_signature);
+	}
+
+	@Override
+	public boolean checkAccess(RWXCategory category)
+			throws GeneralSecurityException {
+		
+		Boolean retval = false;
+		
+		if (_attribute instanceof SignedAssertion){
+			SignedAssertion sa = (SignedAssertion) _attribute;
+			retval = sa.checkAccess(category);
+		}
+		else
+			retval = true;
+		
+		
+		//Check if I can
+		if (!_mask.contains(category))
+			throw new GeneralSecurityException(
+					"Credential does not have " + 
+			category.toString() + " access");
+		
+		return retval;		
+	}
+
+	@Override
+	public void setMask(EnumSet<RWXCategory> perms) {
+		_mask = perms;
+		
 	}
 
 }

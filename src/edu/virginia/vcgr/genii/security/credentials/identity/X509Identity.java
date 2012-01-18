@@ -12,6 +12,7 @@ import java.util.*;
 import org.apache.axis.message.MessageElement;
 
 import edu.virginia.vcgr.genii.client.security.authz.acl.AclEntry;
+import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXCategory;
 
 import edu.virginia.vcgr.genii.client.security.SecurityUtils;
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
@@ -32,6 +33,8 @@ public class X509Identity implements HolderOfKeyIdentity, SignedAssertion
 
 	protected X509Certificate[] _identity;
 	private IdentityType _type = IdentityType.OWNER;
+	private EnumSet<RWXCategory> _mask = 
+			EnumSet.of(RWXCategory.READ, RWXCategory.WRITE, RWXCategory.EXECUTE);
 
 	// zero-arg contstructor for externalizable use only!
 	public X509Identity()
@@ -194,6 +197,7 @@ public class X509Identity implements HolderOfKeyIdentity, SignedAssertion
 	{
 		out.writeInt(_identity.length);
 		out.writeObject(_type);
+		out.writeObject(_mask);
 		try
 		{
 			for (int i = 0; i < _identity.length; i++)
@@ -215,6 +219,7 @@ public class X509Identity implements HolderOfKeyIdentity, SignedAssertion
 	{
 		int numCerts = in.readInt();
 		_type = (IdentityType) in.readObject();
+		_mask = (EnumSet<RWXCategory>) in.readObject();
 		_identity = new X509Certificate[numCerts];
 		try
 		{
@@ -265,6 +270,22 @@ public class X509Identity implements HolderOfKeyIdentity, SignedAssertion
 	public void setType(IdentityType type) {
 	  _type = type;
 		
+	}
+
+	@Override
+	public boolean checkAccess(RWXCategory category)
+			throws GeneralSecurityException {
+		if (!_mask.contains(category))
+			throw new GeneralSecurityException(
+					"Credential does not have " + 
+			category.toString() + " access");
+		
+		return true;
+	}
+
+	@Override
+	public void setMask(EnumSet<RWXCategory> perms) {
+		_mask = perms;
 	}
 
 
