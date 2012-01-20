@@ -33,6 +33,7 @@ import org.morgan.util.configuration.ConfigurationException;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
@@ -62,6 +63,9 @@ public class RNSPath implements Serializable, Cloneable
 	static final long serialVersionUID = -5879165350773440573L;
 	
 	static private Log _logger = LogFactory.getLog(RNSPath.class);
+	
+	static private TimedOutLRUCache<String, RNSPath> _lookupCache =
+		new TimedOutLRUCache<String, RNSPath>(8, 1000L * 16);
 	
 	/**
 	 * Returns the current grid namespace path.  This is similar to getcwd
@@ -483,6 +487,18 @@ public class RNSPath implements Serializable, Cloneable
 		return null;
 	}
 	
+	static private String formPath(String []pathElements)
+	{
+		StringBuilder builder = new StringBuilder();
+		for (String element : pathElements)
+			builder.append(String.format("/%s", element));
+		
+		if (builder.length() == 0)
+			builder.append("/");
+		
+		return builder.toString();
+	}
+	
 	/**
 	 * Forcibly remove a cached path from the lookup cache.
 	 * 
@@ -490,7 +506,7 @@ public class RNSPath implements Serializable, Cloneable
 	 */
 	static public void clearCacheEntry(String fullPath)
 	{
-		RNSLookupCache.remove(fullPath);
+			_lookupCache.remove(fullPath);
 	}
 	
 	/**
@@ -515,8 +531,8 @@ public class RNSPath implements Serializable, Cloneable
 				"Cannot lookup a path which is null.");
 		
 		String[] pathElements = PathUtils.normalizePath(pwd(), path);
-		String fullPath = PathUtils.formPath(pathElements);
-		RNSPath ret = RNSLookupCache.get(fullPath);
+		String fullPath = formPath(pathElements);
+		RNSPath ret = _lookupCache.get(fullPath);
 		if (ret != null)
 		{
 			_logger.trace("Using cached RNS Path.");
@@ -542,7 +558,7 @@ public class RNSPath implements Serializable, Cloneable
 		{
 			// We completely matched a portion of the original path
 			ret = arrayRep.get(lcv);
-			RNSLookupCache.put(fullPath, ret);
+			_lookupCache.put(fullPath, ret);
 			return ret;
 		}
 		
@@ -556,14 +572,13 @@ public class RNSPath implements Serializable, Cloneable
 		{
 			if (!next.exists())
 				throw new RNSPathDoesNotExistException(next.pwd());
-		}
-		else if (queryFlag.equals(RNSPathQueryFlags.MUST_NOT_EXIST))
+		} else if (queryFlag.equals(RNSPathQueryFlags.MUST_NOT_EXIST))
 		{
 			if (next.exists())
 				throw new RNSPathAlreadyExistsException(next.pwd());
 		}
 		
-		RNSLookupCache.put(fullPath, next);
+		_lookupCache.put(fullPath, next);
 		return next;
 	}
 	
@@ -794,7 +809,7 @@ public class RNSPath implements Serializable, Cloneable
 			{
 				RNSPath newEntry = new RNSPath(this, entry.getEntryName(),
 					entry.getEndpoint(), true);
-				RNSLookupCache.put(newEntry.pwd(), newEntry);
+				_lookupCache.put(newEntry.pwd(), newEntry);
 				ret.add(newEntry);
 			}
 			
@@ -829,7 +844,7 @@ public class RNSPath implements Serializable, Cloneable
 			{
 				RNSPath newEntry = new RNSPath(this, entry.getEntryName(),
 						entry.getEndpoint(), true);
-				RNSLookupCache.put(newEntry.pwd(), newEntry);
+				_lookupCache.put(newEntry.pwd(), newEntry);
 				ret.add(newEntry);
 			}
 		

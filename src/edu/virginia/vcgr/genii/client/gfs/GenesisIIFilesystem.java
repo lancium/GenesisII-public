@@ -36,6 +36,7 @@ import edu.virginia.vcgr.genii.client.byteio.StreamableByteIORP;
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransfererFactory;
 import edu.virginia.vcgr.genii.client.cache.AttributeCache;
+import edu.virginia.vcgr.genii.client.cache.TimedOutLRUCache;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
@@ -61,6 +62,9 @@ public class GenesisIIFilesystem implements FSFilesystem
 	private RNSPath _root;
 	private RNSPath _lastPath;
 	private Collection<Identity> _callerIdentities;
+	
+	private TimedOutLRUCache<String, RNSPath> _lookupCache =
+		new TimedOutLRUCache<String, RNSPath>(128, 1000L * 48);
 	
 	private FileHandleTable<GeniiOpenFile> _fileTable =
 		new FileHandleTable<GeniiOpenFile>(256);
@@ -255,15 +259,38 @@ public class GenesisIIFilesystem implements FSFilesystem
 			pathComponents);	
 		
 		RNSPath entry;
-		synchronized(_lastPath)
+		
+		synchronized(_lookupCache)
 		{
-			entry = _lastPath.lookup(fullPath);
-			if (entry != null)
-				_lastPath = entry;
+			entry = _lookupCache.get(fullPath);
 		}
+		
+		if (entry == null)
+		{
+			synchronized(_lastPath)
+			{
+				entry = _lastPath.lookup(fullPath);
+				_lastPath = entry;
+			}
+			
+			synchronized(_lookupCache)
+			{
+				addToCache(entry);
+			}
+		}
+		
 		return entry;
 	}
-
+	
+	protected void addToCache(RNSPath entry)
+	{
+		synchronized(_lookupCache)
+		{
+			if (entry != null)
+				_lookupCache.put(entry.pwd(), entry);
+		}
+	}
+	
 	@Override
 	public void chmod(String[] path, Permissions permissions)
 			throws FSException
@@ -328,7 +355,6 @@ public class GenesisIIFilesystem implements FSFilesystem
 	@Override
 	public DirectoryHandle listDirectory(String[] path) throws FSException
 	{
-		String fullPath = UnixFilesystemPathRepresentation.INSTANCE.toString(path);
 		RNSPath target = lookup(path);
 		if (!target.exists())
 			throw new FSEntryNotFoundException(String.format(
@@ -341,7 +367,7 @@ public class GenesisIIFilesystem implements FSFilesystem
 			{
 				EnhancedRNSPortType pt = ClientUtils.createProxy(
 					EnhancedRNSPortType.class, target.getEndpoint());
-				RNSIterable entries = new RNSIterable(fullPath,
+				RNSIterable entries = new RNSIterable(
 					pt.lookup(null), null, RNSConstants.PREFERRED_BATCH_SIZE);
 				return new EnhancedRNSHandle(this, entries);
 			} else if (info.isRNS())
@@ -542,7 +568,17 @@ public class GenesisIIFilesystem implements FSFilesystem
 		try
 		{
 			target.delete();
+			
+			//Take it out of the attribute cache
 			flushAttributeCache(path);
+			
+			String fullPath = UnixFilesystemPathRepresentation.INSTANCE.toString(
+				path);	
+			
+			synchronized(_lookupCache)
+			{
+				_lookupCache.remove(fullPath);
+			}
 		}
 		catch (Throwable cause)
 		{
@@ -603,7 +639,16 @@ public class GenesisIIFilesystem implements FSFilesystem
 		{
 			to.link(from.getEndpoint());
 			from.unlink();
+			
+			//Take the from out of the attribute cache
 			flushAttributeCache(fromPath);
+			
+			String fullPath = UnixFilesystemPathRepresentation.INSTANCE.toString(
+				fromPath);	
+			synchronized(_lookupCache)
+			{
+				_lookupCache.remove(fullPath);
+			}
 		}
 		catch (Throwable cause)
 		{
@@ -611,27 +656,23 @@ public class GenesisIIFilesystem implements FSFilesystem
 				"Unable to rename %s to %s.", from.pwd(), to.pwd()), cause);
 		}
 	}
-	
-	/**
+	/*
 	 * flushAttributeCache takes in a path and if it exists in the
 	 * attribute cache will remove the entry corresponding to the that
 	 * path
 	 */
-	private void flushAttributeCache(String [] path) throws FSException
-	{
+	private void flushAttributeCache(String [] path) throws FSException {
 		RNSPath rnsPath = lookup(path);
-		try
-		{
+		try {
 			WSName wsName = new WSName(rnsPath.getEndpoint());
-			if (wsName.isValidWSName())
-			{
+			if(wsName.isValidWSName()) {				
 				AttributeCache.flush(wsName);
 			}
-		}
-		catch(RNSPathDoesNotExistException rpe)
-		{
-			_logger.debug(String.format("Path does not exist unexpected for %s",
-					UnixFilesystemPathRepresentation.INSTANCE.toString(path)));
+		} catch(RNSPathDoesNotExistException rpe){
+			_logger.debug(String.format("Path does not exist unexpected for "
+					+"%s", UnixFilesystemPathRepresentation.INSTANCE.toString(
+							path)));
 		}
 	}
 }
+

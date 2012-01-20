@@ -56,21 +56,6 @@ class PathUtils
 		return ret;
 	}
 	
-	static public String formPath(String []pathElements)
-	{
-		StringBuilder builder = new StringBuilder();
-		for (String element : pathElements)
-		{
-			builder.append('/');
-			builder.append(element);
-		}
-		if (builder.length() == 0)
-		{
-			builder.append('/');
-		}
-		return builder.toString();
-	}
-	
 	static private void print(String []path)
 	{
 		System.out.print("{");
