@@ -402,7 +402,7 @@ public class GenesisIIFilesystem implements FSFilesystem
 			{
 				GenesisIIACLManager mgr = new GenesisIIACLManager(
 					target.getEndpoint(), _callerIdentities);
-				mgr.setPermissions(initialPermissions);
+				mgr.setCreatePermissions(initialPermissions);
 			}
 		}
 		catch (Throwable cause)
@@ -470,7 +470,7 @@ public class GenesisIIFilesystem implements FSFilesystem
 				epr = target.createNewFile();
 				if (initialPermissions != null)
 					(new GenesisIIACLManager(
-						epr, _callerIdentities)).setPermissions(
+						epr, _callerIdentities)).setCreatePermissions(
 							initialPermissions);
 				
 				return open(path, true, target, epr, flags, mode);
