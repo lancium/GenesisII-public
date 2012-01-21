@@ -75,17 +75,17 @@ public class GenesisIIACLManager
 	{
 		if (callerIds == null)
 		{
-			if (isAllowed)
+			if (isAllowed && !acls.contains(null))
 				acls.add(null);
-			else
+			else if (!isAllowed && acls.contains(null))
 				acls.remove(null);
 		} else
 		{
 			for (Identity id : callerIds)
 			{
-				if (isAllowed)
+				if (isAllowed && !acls.contains(id))
 					acls.add(id);
-				else
+				else if (!isAllowed && acls.contains(id))
 					acls.remove(id);
 			}
 		}
