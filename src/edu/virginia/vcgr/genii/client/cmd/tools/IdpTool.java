@@ -237,9 +237,9 @@ public class IdpTool extends BaseLoginTool {
 	}
 	
 	@Option({"type"})
-	public void setCredentialType(String type)
+	public void setCredentialType(IdentityType type)
 	{
-		_type = IdentityType.valueOf(type);
+		_type = type;
 	}
 	
 }

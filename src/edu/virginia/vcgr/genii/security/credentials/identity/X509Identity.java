@@ -32,7 +32,7 @@ public class X509Identity implements HolderOfKeyIdentity, SignedAssertion
 	static public final long serialVersionUID = 0L;
 
 	protected X509Certificate[] _identity;
-	private IdentityType _type = IdentityType.OWNER;
+	private IdentityType _type = IdentityType.USER;
 	private EnumSet<RWXCategory> _mask = 
 			EnumSet.of(RWXCategory.READ, RWXCategory.WRITE, RWXCategory.EXECUTE);
 
@@ -255,7 +255,7 @@ public class X509Identity implements HolderOfKeyIdentity, SignedAssertion
 	@Override
 	public boolean placeInUMask() {
 		
-		if(_type.equals(IdentityType.OWNER))
+		if(_type.equals(IdentityType.USER))
 			return true;
 		
 		return false;

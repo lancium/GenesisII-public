@@ -1,5 +1,5 @@
 package edu.virginia.vcgr.genii.security.credentials.identity;
 
 public enum IdentityType {
-	OWNER, GROUP, CONNECTION, OTHER;
+	USER, GROUP, CONNECTION, OTHER;
 }

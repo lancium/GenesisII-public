@@ -199,7 +199,7 @@ public class UsernamePasswordIdentity implements Identity, GIICredential
 	@Override
 	public IdentityType getType() {
 		//Always return OWNER for username/password
-		return IdentityType.OWNER;
+		return IdentityType.USER;
 	}
 
 	@Override

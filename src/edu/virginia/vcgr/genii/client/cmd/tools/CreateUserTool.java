@@ -20,6 +20,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
+import edu.virginia.vcgr.genii.security.credentials.identity.IdentityType;
 
 /**
  * This is a rather complicated tool that acts as a front end to the idp tool.
@@ -190,7 +191,7 @@ public class CreateUserTool extends BaseGridTool
 			idpTool.addArgument(sourcePath);
 		
 		//Set as user type
-		idpTool.setCredentialType("OWNER");
+		idpTool.setCredentialType(IdentityType.USER);
 		
 		idpTool.addArgument(idpServicePath);
 		idpTool.addArgument(idpName);
