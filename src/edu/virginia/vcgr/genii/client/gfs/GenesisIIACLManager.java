@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.client.gfs;
 
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.ws.addressing.EndpointReferenceType;
@@ -15,6 +16,7 @@ import edu.virginia.vcgr.genii.client.security.authz.acl.Acl;
 import edu.virginia.vcgr.genii.client.security.authz.acl.AclEntry;
 import edu.virginia.vcgr.genii.common.security.AuthZConfig;
 import edu.virginia.vcgr.genii.security.credentials.identity.Identity;
+import edu.virginia.vcgr.genii.security.credentials.identity.IdentityType;
 
 public class GenesisIIACLManager
 {
@@ -120,23 +122,49 @@ public class GenesisIIACLManager
 	public void setPermissions(Permissions p) throws AuthZSecurityException
 	{
 		Acl acl = getRemoteACL();
+
+		//Separate Group and user credentials
+
+		Collection<Identity> _userIdentities = new ArrayList<Identity>();
+		Collection<Identity> _groupIdentities = new ArrayList<Identity>();
+
+		for (Identity id : _callerIdentities){
+			if (id.getType().equals(IdentityType.USER))
+				_userIdentities.add(id);
+			else if (id.getType().equals(IdentityType.GROUP))
+				_groupIdentities.add(id);
+
+			//currently do not add any other type of identity
+		}
+
+
 		setPermission(acl.readAcl, p.isSet(PermissionBits.OWNER_READ), 
-			_callerIdentities);
+				_userIdentities);
 		setPermission(acl.writeAcl, p.isSet(PermissionBits.OWNER_WRITE), 
-			_callerIdentities);
+				_userIdentities);
 		setPermission(acl.executeAcl, p.isSet(PermissionBits.OWNER_EXECUTE), 
-			_callerIdentities);
+				_userIdentities);
+
+
+		setPermission(acl.readAcl, p.isSet(PermissionBits.GROUP_READ), 
+				_groupIdentities);
+		setPermission(acl.writeAcl, p.isSet(PermissionBits.GROUP_WRITE), 
+				_groupIdentities);
+		setPermission(acl.executeAcl, p.isSet(PermissionBits.GROUP_EXECUTE), 
+				_groupIdentities);
+
+
 		setPermission(acl.readAcl, p.isSet(PermissionBits.EVERYONE_READ), 
-			null);
+				null);
 		setPermission(acl.writeAcl, p.isSet(PermissionBits.EVERYONE_WRITE), 
-			null);
+				null);
 		setPermission(acl.executeAcl, p.isSet(PermissionBits.EVERYONE_EXECUTE), 
-			null);
-		
+				null);
+
 		AuthZConfig config = Acl.encodeAcl(acl);
 		_rpStub.setAuthZConfig(config);
 	}
-	
+
 	
 	//This method gets the original acl after a resource is created (i.e 
 	//determines container side default acls), and then reduces the set based
@@ -161,7 +189,7 @@ public class GenesisIIACLManager
 		{
 			if (callerIds == null)
 			{
-				//Do not add wild card acl by default
+				//Do not add wild card acl on create resource
 			} else
 			{
 				for (Identity id : callerIds)

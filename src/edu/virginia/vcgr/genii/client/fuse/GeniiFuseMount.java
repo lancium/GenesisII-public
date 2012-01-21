@@ -43,11 +43,22 @@ public class GeniiFuseMount implements Filesystem
 	{
 		Permissions p = new Permissions();
 		
-		p.set(PermissionBits.OWNER_READ, (mode & FuseStat.OWNER_READ) > 0);
-		p.set(PermissionBits.OWNER_WRITE, (mode & FuseStat.OWNER_WRITE) > 0);
+		p.set(PermissionBits.OWNER_READ,
+				(mode & FuseStat.OWNER_READ) > 0);
+		p.set(PermissionBits.OWNER_WRITE,
+				(mode & FuseStat.OWNER_WRITE) > 0);
 		p.set(PermissionBits.OWNER_EXECUTE, 
 			(mode & FuseStat.OWNER_EXECUTE) > 0);
-		p.set(PermissionBits.EVERYONE_READ, (mode & FuseStat.OTHER_READ) > 0);
+		
+		p.set(PermissionBits.GROUP_READ,
+				(mode & FuseStat.GROUP_READ) > 0);
+		p.set(PermissionBits.GROUP_WRITE,
+				(mode & FuseStat.GROUP_WRITE) > 0);
+		p.set(PermissionBits.GROUP_EXECUTE, 
+			(mode & FuseStat.GROUP_EXECUTE) > 0);
+		
+		p.set(PermissionBits.EVERYONE_READ,
+				(mode & FuseStat.OTHER_READ) > 0);
 		p.set(PermissionBits.EVERYONE_WRITE, 
 			(mode & FuseStat.OTHER_WRITE) > 0);
 		p.set(PermissionBits.EVERYONE_EXECUTE, 
@@ -67,6 +78,14 @@ public class GeniiFuseMount implements Filesystem
 			mode |= FuseStat.OWNER_WRITE;
 		if (p.isSet(PermissionBits.OWNER_EXECUTE))
 			mode |= FuseStat.OWNER_EXECUTE;
+		
+		if (p.isSet(PermissionBits.GROUP_READ))
+			mode |= FuseStat.GROUP_READ;
+		if (p.isSet(PermissionBits.GROUP_WRITE))
+			mode |= FuseStat.GROUP_WRITE;
+		if (p.isSet(PermissionBits.GROUP_EXECUTE))
+			mode |= FuseStat.GROUP_EXECUTE;
+		
 		if (p.isSet(PermissionBits.EVERYONE_READ))
 			mode |= FuseStat.OTHER_READ;
 		if (p.isSet(PermissionBits.EVERYONE_WRITE))
