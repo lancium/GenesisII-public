@@ -189,7 +189,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 						_environment, workingDirectory, _redirects.stdinSource(), 
 						_redirects.stdoutSink(), stderrFile, 
 						resourceUsageFile, command.get(0), arguments);
-				_logger.debug(String.format("Pervious cmdLine format with pwrapper only:\n %s", 
+				_logger.debug(String.format("Previous cmdLine format with pwrapper only:\n %s", 
 						testCmdLine.toString()));
 				
 			_logger.debug(
