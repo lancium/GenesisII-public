@@ -25,9 +25,11 @@
 		<antcall target="set-jni">
 			<param name="build-target-file" value="${basedir}/${unix-script-base-name}"/>
 		</antcall>
+		
 		<antcall target="set-mac-java">
                         <param name="build-target-file" value="${basedir}/${unix-script-base-name}"/>
-                 </antcall>
+        </antcall>
+		
 		<chmod file="${basedir}/${unix-script-base-name}" perm="755"/>
 	</target>
 	
@@ -118,7 +120,7 @@
 		</condition>
 		<condition property="linux.scripts">
 			<and>
-			    <isset property="unix" />
+			    <isset property="unix.scripts" />
 			    <not>
 				<isset property="mac.scripts" />
 			    </not>
