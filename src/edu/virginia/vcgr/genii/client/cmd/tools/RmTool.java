@@ -132,8 +132,16 @@ public class RmTool extends BaseGridTool
 		{
 			if (recursive)
 				RNSUtilities.recursiveDelete(path);
-			else
+			else{
+				GeniiPath gPath = new GeniiPath(path.pwd());
+				if (gPath.isDirectory()){
+					if (path.listContents().size() > 0)
+						throw new RNSException("Unable to delete a non-empty directory");
+				}
+	
 				path.delete();
+			}
+				
 		}
 		catch (RNSException re)
 		{

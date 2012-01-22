@@ -152,7 +152,7 @@ public class GeniiPath implements Serializable
 				case Grid:
 					RNSPath gPath = lookup();
 					TypeInformation info = new TypeInformation(gPath.getEndpoint());
-					return info.isByteIO();
+					return info.isRNS();
 					
 				case Local:
 					File lPath = new File(_path);
