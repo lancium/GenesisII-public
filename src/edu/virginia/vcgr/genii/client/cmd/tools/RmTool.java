@@ -136,36 +136,42 @@ public class RmTool extends BaseGridTool
 	public void rm(RNSPath path, boolean recursive, 
 			boolean force) throws RNSException
 			{
-		try
-		{
-			
-			TypeInformation info = new TypeInformation(path.getEndpoint());
-			
-			if (recursive)
-				recursiveDelete(path);
-			else{
+
+
+		TypeInformation info = new TypeInformation(path.getEndpoint());
+
+		if (recursive)
+			recursiveDelete(path);
+		else{
+			try
+			{
+
 				if (info.isEnhancedRNS() && !info.isResourceFork()){
 					if (path.listContents().size() > 0)
 						throw new RNSException("Unable to delete a non-empty directory");
 				}
 				path.delete();
 			}
-
-		}
-		catch (RNSException re)
-		{
-			if (force)
+			catch (RNSException re)
 			{
-				stderr.println("Forcing removal after exception");
+				if (force)
+				{
+					stderr.println("Forcing removal after exception");
 
-				path.unlink();
-			} else
-				throw re;
-		}
+					path.unlink();
+				} else
+					throw re;
 			}
 
 
-	private void recursiveDelete(RNSPath path) {
+		}
+
+
+
+			}
+
+
+	private void recursiveDelete(RNSPath path) throws RNSException{
 
 		try{
 			WSName endpointName = new WSName(path.getEndpoint());
@@ -180,20 +186,24 @@ public class RmTool extends BaseGridTool
 					for (RNSPath tPath : contents){
 						recursiveDelete(tPath);
 					}
-					//Delete me, should now be empty
-					rm(path, false, _force);
+					//Delete me, only if empty
+					if (!(path.listContents().size() > 0))
+						rm(path, false, _force);
 				}
 				else if(info.isByteIO()){
 					//I am a bytio, delete
 					rm(path, false, _force);
 				}
+				else
+					stdout.println("Did not delete: " + path.toString());
+				
 			}
 			else{
 				stdout.println("Already visited " + path.toString());
 			}
 
 		}
-		catch (Exception e){
+		catch (RNSException e){
 			stdout.println("Failed to clean up: " + path.toString());
 		}
 	}
