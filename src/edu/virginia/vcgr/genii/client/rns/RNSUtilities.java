@@ -145,15 +145,6 @@ public class RNSUtilities
 		return result;
 	}
 	
-	static public void recursiveDelete(RNSPath path)
-		throws RNSException
-	{
-		for (RNSPath contained : path.listContents())
-		{
-			recursiveDelete(contained);
-		}
-	}
-	
 	static public RNSMetadataType createMetadata(EndpointReferenceType target,
 		MessageElement []any)
 	{
