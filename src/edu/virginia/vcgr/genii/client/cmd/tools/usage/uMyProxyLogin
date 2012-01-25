@@ -1,0 +1,1 @@
+login --storetype=<PKCS12|JKS|WIN> [--password=<keystore-password>] [--alias] [--validDuration=<duration-string>] [--toolIdentity] [--pattern=<certificate/token pattern>] [<keystore URL>]

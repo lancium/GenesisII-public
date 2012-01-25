@@ -105,6 +105,10 @@
 			<fileset dir="${typica.home}" includes="**/*.jar"/>
 	</path>
 	
+	<path id="myproxy.classpath">
+				<fileset dir="${myproxy.home}" includes="**/*.jar"/>
+	</path>
+	
 	<path id="http.classpath">
 			<fileset dir="${http.home}" includes="**/*.jar"/>
 	</path>
@@ -139,6 +143,7 @@
 		<path refid="commonscodec.classpath"/>
 		<path refid="typica.classpath"/>
 		<path refid="http.classpath"/>
+		<path refid="myproxy.classpath"/>
 		<path refid="cmdlineManipulator.classpath"/>
 	</path>
 			

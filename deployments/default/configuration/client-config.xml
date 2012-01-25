@@ -283,6 +283,10 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.SetResourcePropertiesTool</mconf:class>
 		<mconf:class name="mint-epr"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.MintEprTool</mconf:class>
+		<mconf:class name="myproxyLogin"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.MyProxyLoginTool</mconf:class>
+		<mconf:class name="xsedeLogin"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.XSEDELoginTool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

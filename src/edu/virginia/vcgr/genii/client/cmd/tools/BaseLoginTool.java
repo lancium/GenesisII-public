@@ -4,6 +4,17 @@ package edu.virginia.vcgr.genii.client.cmd.tools;
 import java.text.ParseException;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.cmd.ToolException;
+import edu.virginia.vcgr.genii.client.cmd.tools.gamllogin.AbstractGamlLoginHandler;
+import edu.virginia.vcgr.genii.client.cmd.tools.gamllogin.GuiGamlLoginHandler;
+import edu.virginia.vcgr.genii.client.cmd.tools.gamllogin.TextGamlLoginHandler;
+import edu.virginia.vcgr.genii.client.configuration.UserPreferences;
+import edu.virginia.vcgr.genii.client.dialog.DialogException;
+import edu.virginia.vcgr.genii.client.dialog.DialogFactory;
+import edu.virginia.vcgr.genii.client.dialog.DialogProvider;
+import edu.virginia.vcgr.genii.client.dialog.InputDialog;
+import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
+import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.client.io.FileResource;
 
 
@@ -90,6 +101,40 @@ public abstract class BaseLoginTool extends BaseGridTool{
 		t2._authnUri = t1._authnUri;
 		t2._validMillis = t1._validMillis;
 		t2._pattern = t1._pattern;
+	}
+	
+	protected final void aquireUsername() throws DialogException, UserCancelException{
+		DialogProvider provider = DialogFactory.getProvider(
+				stdout, stderr, stdin, useGui());
+
+
+		if (_username == null){
+			InputDialog usernameDialog = provider.createInputDialog(
+					"Username", 
+					"Please enter username.");
+			usernameDialog.showDialog();
+			_username = usernameDialog.getAnswer();
+		}
+	}
+	
+	protected final void aquirePassword() throws ToolException {
+		
+		if (_password == null){
+		AbstractGamlLoginHandler handler = null;
+		if (!useGui() || !GuiUtils.supportsGraphics() 
+				|| !UserPreferences.preferences().preferGUI()) 
+		{
+			handler = new TextGamlLoginHandler(stdout, stderr, stdin);
+		} else {
+			handler = new GuiGamlLoginHandler(stdout, stderr, stdin);
+		}
+		char []pword = handler.getPassword("Username/Password Login",
+				String.format("Password for %s:  ", _username));
+		if (pword == null)
+			throw new ToolException("Unable to aquire password");
+		_password = new String(pword);
+		}
+		
 	}
 	
 	

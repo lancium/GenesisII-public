@@ -16,9 +16,6 @@ import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import edu.virginia.vcgr.genii.client.dialog.DialogFactory;
-import edu.virginia.vcgr.genii.client.dialog.DialogProvider;
-import edu.virginia.vcgr.genii.client.dialog.InputDialog;
 import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
@@ -74,20 +71,8 @@ public class LoginTool  extends BaseLoginTool {
 			callContext = new CallingContextImpl(new ContextType());
 		}
 		
-		DialogProvider provider = DialogFactory.getProvider(
-				stdout, stderr, stdin, useGui());
-
-
-		if (_username == null){
-			InputDialog usernameDialog = provider.createInputDialog(
-					"Username", 
-			"Please enter username.");
-			usernameDialog.showDialog();
-			_username = usernameDialog.getAnswer();
-		}
-
 		
-
+		aquireUsername();
 				
 
 		//Determine IDP path

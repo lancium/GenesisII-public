@@ -57,5 +57,6 @@
 	<classpathentry kind="lib" path="ext/http/httpcore-4.0.1.jar" sourcepath="/home/tuser/Desktop/source/httpcomponents-core-4.1"/>
 	<classpathentry kind="lib" path="ext/commonscodec/commons-codec-1.4.jar"/>
 	<classpathentry kind="lib" path="ext/cmdLineManipulator/CmdLineManipulator.jar"/>
+	<classpathentry kind="lib" path="ext/myproxy/MyProxyLogon.jar" sourcepath="/home/gadmin/Desktop/MyProxyLogon/src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
