@@ -156,7 +156,7 @@ public class GeniiPath implements Serializable
 					
 				case Local:
 					File lPath = new File(_path);
-					return lPath.isFile();
+					return lPath.isDirectory();
 			}
 		}
 		catch (Throwable cause)
