@@ -17,12 +17,22 @@ import edu.virginia.vcgr.genii.iterator.IteratorInitializationType;
 
 final public class RNSIterable implements Iterable<RNSEntryResponseType>
 {
+	private String _path;
 	private WSIterable<RNSEntryResponseType> _iterable;
 	
 	public RNSIterable(LookupResponseType lookupResponse,
+			ICallingContext callContext, int blockSize)
+				throws ResourceException, GenesisIISecurityException
+	{
+		this(null, lookupResponse, callContext, blockSize);
+	}
+	
+	public RNSIterable(String path, LookupResponseType lookupResponse,
 		ICallingContext callContext, int blockSize)
 			throws ResourceException, GenesisIISecurityException
 	{
+		_path = path;
+		
 		RNSEntryResponseType []tmp = lookupResponse.getEntryResponse();
 		
 		_iterable = WSIterable.axisIterable(
@@ -58,15 +68,17 @@ final public class RNSIterable implements Iterable<RNSEntryResponseType>
 	@Override
 	final public Iterator<RNSEntryResponseType> iterator()
 	{
-		return new RNSIterator(_iterable.iterator());
+		return new RNSIterator(_path, _iterable.iterator());
 	}
 	
 	static private class RNSIterator implements Iterator<RNSEntryResponseType>
 	{
+		private String _path;
 		private Iterator<RNSEntryResponseType> _iter;
 		
-		private RNSIterator(Iterator<RNSEntryResponseType> iter)
+		private RNSIterator(String path, Iterator<RNSEntryResponseType> iter)
 		{
+			_path = path;
 			_iter = iter;
 		}
 
@@ -84,6 +96,10 @@ final public class RNSIterable implements Iterable<RNSEntryResponseType>
 				throw new RuntimeException(
 					"Fault encountered with RNS entry!", resp.getFault());
 			
+			if (_path != null)
+			{
+				RNSLookupCache.put(_path, resp.getEntryName(), resp.getEndpoint());
+			}
 			return resp;
 		}
 
