@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.container.iterator;
 
 import java.rmi.RemoteException;
 import java.util.Iterator;
+import java.util.List;
 
 import edu.virginia.vcgr.genii.iterator.IteratorInitializationType;
 
@@ -16,4 +17,5 @@ public interface IteratorBuilder<SourceType>
 	public void addElements(Iterator<?> iterator);
 	
 	public IteratorInitializationType create() throws RemoteException;
+	public IteratorInitializationType create(List<InMemoryIteratorEntry> indices) throws RemoteException;
 }

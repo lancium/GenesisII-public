@@ -14,6 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.RNSEntryResponseType;
 import org.morgan.util.GUID;
+import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.oasis_open.docs.wsrf.rp_2.UpdateResourceProperties;
 import org.oasis_open.docs.wsrf.rp_2.UpdateType;
@@ -176,6 +177,7 @@ public class DirectoryHandler
 			}
 			String key = new GUID().toString();
 			_openSessions.put(key, new DirectorySession(entries));
+			StreamUtils.close(iterable.getIterable());
 			return key;
 		}
 		catch (Throwable cause)

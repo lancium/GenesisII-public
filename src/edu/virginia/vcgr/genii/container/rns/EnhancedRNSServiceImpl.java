@@ -18,9 +18,11 @@ package edu.virginia.vcgr.genii.container.rns;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.sql.Connection;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
@@ -34,6 +36,10 @@ import org.ggf.rns.RNSEntryResponseType;
 import org.ggf.rns.RNSEntryType;
 import org.ggf.rns.RNSMetadataType;
 import org.ggf.rns.WriteNotPermittedFaultType;
+import org.morgan.inject.MInject;
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+import org.oasis_open.wsrf.basefaults.BaseFaultType;
+import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.context.ContextManager;
@@ -47,15 +53,6 @@ import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.RNSEntryAddedContents;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.RNSTopics;
-
-import edu.virginia.vcgr.genii.enhancedrns.*;
-import edu.virginia.vcgr.genii.security.RWXCategory;
-
-import org.morgan.inject.MInject;
-import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
-import org.oasis_open.wsrf.basefaults.BaseFaultType;
-import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
-
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.attrs.AttributePreFetcher;
@@ -67,12 +64,17 @@ import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.invoker.timing.Timer;
 import edu.virginia.vcgr.genii.container.invoker.timing.TimingSink;
-
+import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorEntry;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceLock;
+import edu.virginia.vcgr.genii.container.serializer.MessageElementSerializer;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.PublisherTopic;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.TopicSet;
+import edu.virginia.vcgr.genii.enhancedrns.CreateFileRequestType;
+import edu.virginia.vcgr.genii.enhancedrns.CreateFileResponseType;
+import edu.virginia.vcgr.genii.enhancedrns.EnhancedRNSPortType;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 
 @GeniiServiceConfiguration(
 	resourceProvider=RNSDBResourceProvider.class)
@@ -270,23 +272,69 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 	}
 	
 	@RWXMapping(RWXCategory.READ)
-    public LookupResponseType lookup(String[] lookupRequest)
+	public LookupResponseType lookup(String[] lookupRequest)
 		throws RemoteException, org.ggf.rns.ReadNotPermittedFaultType
     {
-		_logger.trace(String.format("lookup(%s)", Arrays.toString(lookupRequest)));
+		_logger.trace(String.format("fast lookup(%s)", Arrays.toString(lookupRequest)));
 		
     	TimingSink tSink = TimingSink.sink();
     	Collection<InternalEntry> entries = new LinkedList<InternalEntry>();
-    	
-    	if (lookupRequest == null || lookupRequest.length == 0)
-			lookupRequest = new String[] { null };
+    	List<InMemoryIteratorEntry> indices = new LinkedList<InMemoryIteratorEntry>();
+    	boolean isIndexedIterate = false;
+    	int batchLimit = RNSConstants.PREFERRED_BATCH_SIZE;	
     	
     	try
     	{
     		_resourceLock.lock();
     		Timer rTimer = tSink.getTimer("Retrieve Entries");
-    		for (String request : lookupRequest)
-    			entries.addAll(_resource.retrieveEntries(request));
+    		
+    		if (lookupRequest == null || lookupRequest.length == 0) //A batch lookup
+        	{
+    			lookupRequest = new String[] { null };
+    			if(_resource.retrieveOccurrenceCount() > batchLimit)	//we will be building an iterator as number of entries > threshold
+    				isIndexedIterate = true;       			   			
+        	}
+    		
+    		else
+    		{
+    			if(lookupRequest.length > batchLimit) //Identify the number of responses by looking at the number of requests. There is a 1-1 correspondance between the two
+    				isIndexedIterate = true;
+    		}
+    		
+    		if(isIndexedIterate)
+    		{
+    			for(String request : lookupRequest)
+    				indices.addAll(_resource.retrieveIdOfEntry(request));
+    			
+    			for(int lcv=0; lcv<batchLimit; ++lcv)
+    			{
+    				InMemoryIteratorEntry imie = indices.remove(0); 
+    				
+    				if(imie.isExistent())
+    				{
+    					InternalEntry ie = _resource.retrieveInternalEntryFromID(imie.getId());
+    					
+    					if(ie == null)
+    						entries.add(new InternalEntry(imie.getEntryName(), null, null, false)); //this shouldn't happen as isExists wouldn't have been set
+    					else
+    						entries.add(ie);
+    				}
+    				
+    				else
+    				{
+    					entries.add(new InternalEntry(imie.getEntryName(), null, null, false));
+    				}
+    				
+    			}
+    			
+    		}
+    		
+    		else
+    		{
+    			for (String request : lookupRequest)
+    				entries.addAll(_resource.retrieveEntries(request));
+    		}
+    		
     		rTimer.noteTime();
     		_resource.commit();
     	}
@@ -303,21 +351,40 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 		Timer prepTimer = tSink.getTimer("Prepare Entries");
 		for (InternalEntry internalEntry : entries)
     	{
-    		EndpointReferenceType epr = internalEntry.getEntryReference();
-    		RNSEntryResponseType entry = new RNSEntryResponseType(
-    			epr, RNSUtilities.createMetadata(epr, 
-    				preFetch(epr, internalEntry.getAttributes(), factory)),
-    			null, internalEntry.getName());
-    		resultEntries.add(entry);
-    	}
+			if(!internalEntry.isExistent()) //the looked-up entry does not exist . Only for non-batch
+			{
+				String name = internalEntry.getName();
+				RNSEntryResponseType entry = new RNSEntryResponseType(null, null, 
+						FaultManipulator.fillInFault(
+								new RNSEntryDoesNotExistFaultType(
+								null, null, null, null, 
+								new BaseFaultTypeDescription[] 
+								{
+										new BaseFaultTypeDescription(String.format("Entry" +
+										" %s does not exist!", name))
+							    },null, name)), name);
+				resultEntries.add(entry);
+			}
+			else
+			{
+				EndpointReferenceType epr = internalEntry.getEntryReference();
+				RNSEntryResponseType entry = new RNSEntryResponseType(
+		    			epr, RNSUtilities.createMetadata(epr, 
+		    				Prefetcher.preFetch(epr, internalEntry.getAttributes(), factory)),
+		    			null, internalEntry.getName());
+				resultEntries.add(entry);
+			}			
+		}
+    		
     	prepTimer.noteTime();
 		
     	Timer createTimer = tSink.getTimer("Create Iterator");
 		try
 		{
-			return RNSContainerUtilities.translate(
-	    		resultEntries, iteratorBuilder(
-	    			RNSEntryResponseType.getTypeDesc().getXmlType()));
+		
+			return RNSContainerUtilities.indexedTranslate(
+		    		resultEntries, iteratorBuilder(
+		    			RNSEntryResponseType.getTypeDesc().getXmlType()), indices);
 		}
 		finally
 		{
@@ -416,5 +483,59 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 			return origEPR;
 
 		return EPRUtils.makeUnboundEPR(origEPR);
+	}
+
+	public static MessageElement getIndexedContent(Connection connection,
+			InMemoryIteratorEntry entry) throws ResourceException
+	{
+	
+		RNSEntryResponseType resp = null;
+		
+		if(!entry.isExistent())
+		{
+			String name = entry.getEntryName();
+			resp = new RNSEntryResponseType(null, null, 
+					FaultManipulator.fillInFault(
+							new RNSEntryDoesNotExistFaultType(
+							null, null, null, null, 
+							new BaseFaultTypeDescription[] 
+							{
+									new BaseFaultTypeDescription(String.format("Entry" +
+									" %s does not exist!", name))
+						    },null, name)), name);
+		}
+		
+		else
+		{	
+			InternalEntry ie = RNSDBResource.retrieveByIndex(connection, entry.getId());
+		
+			if(ie==null)
+			{
+				String name = entry.getEntryName();
+				resp = new RNSEntryResponseType(null, null, 
+					FaultManipulator.fillInFault(
+							new RNSEntryDoesNotExistFaultType(
+							null, null, null, null, 
+							new BaseFaultTypeDescription[] 
+							{
+									new BaseFaultTypeDescription(String.format("Entry" +
+									" %s does not exist!", name))
+						    },null, name)), name);
+			}
+		
+			else
+			{
+				AttributesPreFetcherFactory factory = 
+					new AttributesPreFetcherFactoryImpl();
+			
+				EndpointReferenceType epr = ie.getEntryReference();
+				resp = new RNSEntryResponseType(
+						epr, RNSUtilities.createMetadata(epr, 
+	    				Prefetcher.preFetch(epr, ie.getAttributes(), factory)),
+	    				null, ie.getName());					
+			}
+		}
+		
+		return(MessageElementSerializer.serialize(RNSEntryResponseType.getTypeDesc().getXmlType(), resp));
 	}
 }

@@ -2,7 +2,6 @@ package edu.virginia.vcgr.genii.container.common;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.InvocationTargetException;
@@ -14,11 +13,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Map;
-import java.util.Vector;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -33,11 +33,12 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
 import org.apache.axis.types.UnsignedLong;
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.inject.InjectionException;
 import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnavailableFaultType;
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.oasis_open.docs.wsrf.rl_2.DestroyResponse;
 import org.oasis_open.docs.wsrf.rl_2.ResourceNotDestroyedFaultType;
@@ -111,8 +112,23 @@ import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.security.x509.CertCreationSpec;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
+import edu.virginia.vcgr.genii.client.ser.DBSerializer;
+import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
+import edu.virginia.vcgr.genii.client.utils.creation.CreationProperties;
+import edu.virginia.vcgr.genii.client.utils.units.Duration;
+import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.DefaultNotificationMultiplexer;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.notification.NotificationHelper;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.DefaultSubscriptionFactory;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscribeRequest;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscriptionFactory;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.TerminationTimeType;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.GenesisIIBaseTopics;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ResourceTerminationContents;
 import edu.virginia.vcgr.genii.common.AddMatchingParameterResponseType;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.HistoryEventBundleType;
@@ -120,8 +136,6 @@ import edu.virginia.vcgr.genii.common.IterateHistoryEventsRequestType;
 import edu.virginia.vcgr.genii.common.IterateHistoryEventsResponseType;
 import edu.virginia.vcgr.genii.common.MatchingParameter;
 import edu.virginia.vcgr.genii.common.RemoveMatchingParameterResponseType;
-
-import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
@@ -130,7 +144,6 @@ import edu.virginia.vcgr.genii.container.IContainerManaged;
 import edu.virginia.vcgr.genii.container.alarms.AlarmIdentifier;
 import edu.virginia.vcgr.genii.container.alarms.AlarmManager;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
-import edu.virginia.vcgr.genii.container.attrs.AttributePreFetcher;
 import edu.virginia.vcgr.genii.container.attrs.IAttributeManipulator;
 import edu.virginia.vcgr.genii.container.common.notification.GeniiSubscriptionServiceImpl;
 import edu.virginia.vcgr.genii.container.common.notification.SubscriptionConstructionParameters;
@@ -151,6 +164,7 @@ import edu.virginia.vcgr.genii.container.invoker.SoapHeaderHandler;
 import edu.virginia.vcgr.genii.container.invoker.inject.MInjectionInvoker;
 import edu.virginia.vcgr.genii.container.invoker.timing.TimingHandler;
 import edu.virginia.vcgr.genii.container.iterator.AbstractIteratorBuilder;
+import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorEntry;
 import edu.virginia.vcgr.genii.container.iterator.IteratorBuilder;
 import edu.virginia.vcgr.genii.container.iterator.WSIteratorServiceImpl;
 import edu.virginia.vcgr.genii.container.resolver.IResolverFactoryProxy;
@@ -162,24 +176,10 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceProvider;
 import edu.virginia.vcgr.genii.container.resource.db.query.ResourceSummary;
 import edu.virginia.vcgr.genii.container.security.authz.providers.GamlAclAuthZProvider;
+import edu.virginia.vcgr.genii.container.serializer.MessageElementSerializer;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.PublisherTopic;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.TopicSet;
-import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
-import edu.virginia.vcgr.genii.client.ser.DBSerializer;
-import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
-import edu.virginia.vcgr.genii.client.utils.creation.CreationProperties;
-import edu.virginia.vcgr.genii.client.utils.units.Duration;
-import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
-import edu.virginia.vcgr.genii.client.wsrf.wsn.DefaultNotificationMultiplexer;
-import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
-import edu.virginia.vcgr.genii.client.wsrf.wsn.notification.NotificationHelper;
-import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.DefaultSubscriptionFactory;
-import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscribeRequest;
-import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscriptionFactory;
-import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.TerminationTimeType;
-import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.GenesisIIBaseTopics;
-import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ResourceTerminationContents;
 import edu.virginia.vcgr.genii.iterator.IterableElementType;
 import edu.virginia.vcgr.genii.iterator.IteratorInitializationType;
 import edu.virginia.vcgr.genii.security.RWXCategory;
@@ -1562,47 +1562,19 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 		return new RemoveMatchingParameterResponseType();
 	}
 	
-	protected MessageElement[] preFetch(EndpointReferenceType target,
-		MessageElement []existingAttributes, 
-		AttributesPreFetcherFactory factory)
-	{
-		AttributePreFetcher preFetcher = null;
 		
-		try
-		{
-			preFetcher = factory.getPreFetcher(target);
-			if (preFetcher == null)
-				return existingAttributes;
-			Collection<MessageElement> attrs = preFetcher.preFetch();
-			if (attrs == null)
-				return existingAttributes;
-			
-			if (existingAttributes != null)
-			{
-				for (MessageElement element : existingAttributes)
-					attrs.add(element);
-			}
-			
-			return attrs.toArray(new MessageElement[attrs.size()]);
-		}
-		catch (Throwable cause)
-		{
-			_logger.warn("Unable to pre-fetch attributes.", cause);
-		}
-		finally
-		{
-			if (preFetcher != null && (preFetcher instanceof Closeable))
-				StreamUtils.close((Closeable)preFetcher);
-		}
-		
-		return existingAttributes;
-	}
-	
 	private abstract class GenesisIIBaseAbstractIteratorBuilder<SourceType>
 		extends AbstractIteratorBuilder<SourceType>
 	{
 		@Override
 		final public IteratorInitializationType create() throws RemoteException
+		{
+			
+			return create(null);
+		}
+		
+		@Override
+		final public IteratorInitializationType create(List<InMemoryIteratorEntry> indices) throws RemoteException
 		{
 			IterableElementType []batchElements = null;
 			EndpointReferenceType iteratorEndpoint = null;
@@ -1620,7 +1592,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 				
 			WSIteratorConstructionParameters consParms = 
 				new WSIteratorConstructionParameters(iterator(), 
-					preferredBatchSize());
+					preferredBatchSize(), indices);
 			
 			try
 			{
@@ -1636,7 +1608,9 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 							new UnsignedLong(lcv));
 				}
 				
-				if (consParms.remainingContents() != null)
+				Object tempObj = new Object();
+				
+				if (consParms.remainingContents(tempObj))	
 					iteratorEndpoint = new WSIteratorServiceImpl().CreateEPR(
 						new MessageElement[] { consParms.serializeToMessageElement() },
 						Container.getServiceURL("WSIteratorPortType"));
@@ -1716,7 +1690,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 		@Override
 		final protected MessageElement serialize(Object item)
 		{
-			return new MessageElement(_name, item);
+			return MessageElementSerializer.serialize(_name, item);
 		}
 	}
 

@@ -19,6 +19,9 @@ public class RNSDBResourceFactory extends BasicDBResourceFactory implements
 		"endpoint BLOB (2G), id VARCHAR(40), " +
 		"attrs VARCHAR (8192) FOR BIT DATA, " +
 		"CONSTRAINT contextsconstraint1 PRIMARY KEY (resourceid, name))";
+	static private String _CREATE_ENTRY_INDEX_STMT = "CREATE INDEX idx ON entries (id)";
+	
+	
 	
 	public RNSDBResourceFactory(
 			DatabaseConnectionPool pool)
@@ -49,6 +52,8 @@ public class RNSDBResourceFactory extends BasicDBResourceFactory implements
 			conn = _pool.acquire(false);
 			DatabaseTableUtils.createTables(conn, false, 
 				_CREATE_ENTRY_TABLE_STMT);
+			DatabaseTableUtils.createTables(conn, false, 
+					_CREATE_ENTRY_INDEX_STMT );
 			conn.commit();
 		}
 		finally

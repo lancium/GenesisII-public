@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.container.rns;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,6 +16,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorEntry;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
@@ -33,6 +35,14 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 		"SELECT name, endpoint, id, attrs FROM entries WHERE resourceid = ?";
 	static private final String _REMOVE_ENTRIES_STMT =
 		"DELETE FROM entries WHERE resourceid = ? AND name = ?";
+	static private String _RETRIEVE_COUNT_STMT =
+		"SELECT COUNT(*) FROM entries WHERE resourceid = ?";
+	static private String _RETRIEVE_PART_ENTRY_ONE_STMT =
+		"SELECT name, id FROM entries WHERE resourceid = ? AND name = ?";	
+	static private String _RETRIEVE_PART_ENTRY_ALL_STMT =
+		"SELECT name, id FROM entries WHERE resourceid = ? ";
+	static private String _RETRIEVE_ENTRY_FROM_ID =
+		"SELECT name, endpoint, id, attrs FROM entries WHERE id = ?";
 	
 	public RNSDBResource(
 			ResourceKey parentKey, 
@@ -150,6 +160,8 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		
+		boolean isBatch = true; //batch denotes entryName is null
+		
 		try
 		{
 			if (entryName == null)
@@ -158,21 +170,182 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 			{
 				stmt = _connection.prepareStatement(_RETRIEVE_ONE_STMT);
 				stmt.setString(2, entryName);
+				isBatch = false;
 			}
 			
 			stmt.setString(1, _resourceKey);
 			rs = stmt.executeQuery();
 			
-			while (rs.next())
+			if(isBatch)
 			{
-				InternalEntry entry = new InternalEntry(
-					rs.getString(1), EPRUtils.fromBlob(rs.getBlob(2)),
-					ObjectDeserializer.anyFromBytes(rs.getBytes(4)));
-				ret.add(entry);
+				while (rs.next())
+				{
+					InternalEntry entry = new InternalEntry(
+						rs.getString(1), EPRUtils.fromBlob(rs.getBlob(2)),
+						ObjectDeserializer.anyFromBytes(rs.getBytes(4)), true);
+					ret.add(entry);
+				}
+				
 			}
+			
+			else
+			{
+				if(rs.next())
+				{
+					InternalEntry entry = new InternalEntry(
+							rs.getString(1), EPRUtils.fromBlob(rs.getBlob(2)),
+							ObjectDeserializer.anyFromBytes(rs.getBytes(4)), true);
+						ret.add(entry);
+				}
+				
+				else
+				{
+					InternalEntry entry = new InternalEntry(entryName, null, null, false); //signifying that the entry name does not exist
+					ret.add(entry);
+				}
+			}
+			
 			
 			return ret;
 		}
+		catch (SQLException sqe)
+		{
+			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+	}
+
+	//This method gives the number of entries within this RNS resource
+	@Override
+	public int retrieveOccurrenceCount() throws ResourceException 
+	{
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		int count = 0;
+		
+		try
+		{
+			stmt = _connection.prepareStatement(_RETRIEVE_COUNT_STMT );
+			stmt.setString(1, _resourceKey);
+			rs = stmt.executeQuery();
+			
+			if(rs.next())
+				count = rs.getInt(1);
+			
+			return count;
+		}
+		
+		catch (SQLException sqe)
+		{
+			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+	
+	}
+
+	@Override
+	public Collection<InMemoryIteratorEntry> retrieveIdOfEntry(String request)
+			throws ResourceException 
+	{
+		ArrayList<InMemoryIteratorEntry> ret = new ArrayList<InMemoryIteratorEntry>();
+		
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		boolean isBatch = false;	//isBatch means : null is passed as argument
+		
+		try
+		{
+			if(request == null)
+			{
+				stmt = _connection.prepareStatement(_RETRIEVE_PART_ENTRY_ALL_STMT);
+				isBatch = true;
+			}
+			
+			else
+			{
+				stmt = _connection.prepareStatement(_RETRIEVE_PART_ENTRY_ONE_STMT);
+				stmt.setString(2, request);
+			}
+			
+			stmt.setString(1, _resourceKey);
+			rs = stmt.executeQuery();
+			
+			if(isBatch)
+			{
+				while(rs.next())
+				{
+					InMemoryIteratorEntry imie = new InMemoryIteratorEntry(rs.getString(1), rs.getString(2), true);	//entry exists
+					ret.add(imie);
+				}
+			}
+			
+			else
+			{
+				if(rs.next())
+				{
+					InMemoryIteratorEntry imie = new InMemoryIteratorEntry(rs.getString(1), rs.getString(2), true);	//entry exists
+					ret.add(imie);
+				}
+				
+				else
+				{
+					InMemoryIteratorEntry imie = new InMemoryIteratorEntry(rs.getString(1), new String(""), false);	//entry does not exist
+					ret.add(imie);
+				}
+				
+			}
+			return ret;
+		}
+		catch (SQLException sqe)
+		{
+			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+		
+	}
+
+	@Override
+	public InternalEntry retrieveInternalEntryFromID(String id)
+			throws ResourceException 
+	{
+		//returns null if the id doesn't exist
+		return retrieveByIndex(_connection, id);
+	}
+
+	public static InternalEntry retrieveByIndex(Connection connection, String id) throws ResourceException
+	{
+		//returns null if the id doesn't exist
+		InternalEntry ie = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try
+		{
+			stmt = connection.prepareStatement(_RETRIEVE_ENTRY_FROM_ID );
+		//	stmt.setString(1, _resourceKey);
+			stmt.setString(1,id);
+			rs = stmt.executeQuery();
+			
+			if(rs.next())
+				ie = new InternalEntry(rs.getString(1), EPRUtils.fromBlob(rs.getBlob(2)),
+						ObjectDeserializer.anyFromBytes(rs.getBytes(4)), true);
+			
+			return ie;
+		}
+		
 		catch (SQLException sqe)
 		{
 			throw new ResourceException(sqe.getLocalizedMessage(), sqe);

@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.ggf.rns.LookupResponseType;
 import org.ggf.rns.RNSEntryResponseType;
+import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.iterator.WSIterable;
@@ -19,6 +20,7 @@ final public class RNSIterable implements Iterable<RNSEntryResponseType>
 {
 	private String _path;
 	private WSIterable<RNSEntryResponseType> _iterable;
+	
 	
 	public RNSIterable(LookupResponseType lookupResponse,
 			ICallingContext callContext, int blockSize)
@@ -51,7 +53,14 @@ final public class RNSIterable implements Iterable<RNSEntryResponseType>
 		for (RNSEntryResponseType resp : this)
 			tmp.add(resp);
 		
-		return tmp.toArray(new RNSEntryResponseType[tmp.size()]);
+		RNSEntryResponseType[] respArray = tmp.toArray(new RNSEntryResponseType[tmp.size()]);
+		StreamUtils.close(_iterable);
+		return respArray;
+	}
+	
+	final public WSIterable<RNSEntryResponseType> getIterable()
+	{
+		return _iterable;
 	}
 	
 	final public Map<String, RNSEntryResponseType> toMap()
@@ -92,11 +101,11 @@ final public class RNSIterable implements Iterable<RNSEntryResponseType>
 		final public RNSEntryResponseType next()
 		{
 			RNSEntryResponseType resp = _iter.next();
-			if (resp.getFault() != null)
+		/*	if (resp.getFault() != null)
 				throw new RuntimeException(
 					"Fault encountered with RNS entry!", resp.getFault());
-			
-			if (_path != null)
+		*/	
+			if (_path != null && resp.getFault()==null)
 			{
 				RNSLookupCache.put(_path, resp.getEntryName(), resp.getEndpoint());
 			}

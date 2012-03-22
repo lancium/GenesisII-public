@@ -15,6 +15,7 @@ import org.ggf.rns.RNSEntryResponseType;
 import org.morgan.util.gui.table.AbstractRowTableColumnDefinition;
 import org.morgan.util.gui.table.RowTableColumnDefinition;
 import org.morgan.util.gui.table.RowTableModel;
+import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.cs.vcgr.genii.job_management.ConfigureRequestType;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
@@ -152,6 +153,7 @@ class ResourcesTableModel extends RowTableModel<QueueResourceInformation>
 			for (RNSEntryResponseType entry : iterable)
 				resourceInfo.add(new QueueResourceInformation(_uiContext, entry));
 				
+			StreamUtils.close(iterable.getIterable());
 			return resourceInfo;
 		}	
 	}

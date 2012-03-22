@@ -20,6 +20,7 @@ import java.util.Collection;
 import org.ggf.rns.RNSEntryExistsFaultType;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorEntry;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public interface IRNSResource extends IResource
@@ -31,4 +32,8 @@ public interface IRNSResource extends IResource
 		throws ResourceException;
 	public Collection<String> removeEntries(String entryName)
 		throws ResourceException;
+	public int retrieveOccurrenceCount() throws ResourceException;
+	public Collection<InMemoryIteratorEntry> retrieveIdOfEntry(
+			String request) throws ResourceException;
+	public InternalEntry retrieveInternalEntryFromID(String id) throws ResourceException;
 }

@@ -667,6 +667,8 @@ public class RunTool extends BaseGridTool
 			}
 		}
 
+		StreamUtils.close(iterable.getIterable());
+		
 		if (_acceptableChoices.size() == 0)
 			return null;
 		

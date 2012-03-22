@@ -30,6 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ggf.rns.RNSEntryResponseType;
 import org.morgan.util.configuration.ConfigurationException;
+import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -790,6 +791,7 @@ public class RNSPath implements Serializable, Cloneable
 		{
 			entries = proxy.iterateList();
 			LinkedList<RNSPath> ret = new LinkedList<RNSPath>();
+			
 			for (RNSEntryResponseType entry : entries)
 			{
 				RNSPath newEntry = new RNSPath(this, entry.getEntryName(),
@@ -808,6 +810,11 @@ public class RNSPath implements Serializable, Cloneable
 		catch (RemoteException re)
 		{
 			throw new RNSException("Unable to list contents.", re);
+		}
+		
+		finally
+		{
+			StreamUtils.close(entries.getIterable());
 		}
 	}
 	
@@ -843,6 +850,11 @@ public class RNSPath implements Serializable, Cloneable
 		catch (RemoteException re)
 		{
 			throw new RNSException("Unable to list the contents.", re);
+		}
+		
+		finally
+		{
+			StreamUtils.close(entries.getIterable());
 		}
 	}
 	

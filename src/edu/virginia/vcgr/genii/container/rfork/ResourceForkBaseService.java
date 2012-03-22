@@ -92,6 +92,7 @@ import edu.virginia.vcgr.genii.container.rfork.cmd.CommandChannelManager;
 import edu.virginia.vcgr.genii.container.rfork.sd.SimpleStateResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.sd.StateDescription;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
+import edu.virginia.vcgr.genii.container.rns.Prefetcher;
 import edu.virginia.vcgr.genii.container.rns.RNSContainerUtilities;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.enhancedrns.CreateFileRequestType;
@@ -689,7 +690,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 	    		EndpointReferenceType epr = internalEntry.getEntryReference();
 	    		RNSEntryResponseType entry = new RNSEntryResponseType(
 	    			epr, RNSUtilities.createMetadata(epr, 
-	    				preFetch(epr, internalEntry.getAttributes(), factory)),
+	    				Prefetcher.preFetch(epr, internalEntry.getAttributes(), factory)),
 	    			null, internalEntry.getName());
 	    		resultEntries.add(entry);
 	    	}

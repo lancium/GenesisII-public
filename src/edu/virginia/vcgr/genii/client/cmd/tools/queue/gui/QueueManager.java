@@ -7,6 +7,7 @@ import javax.xml.namespace.QName;
 import org.apache.axis.message.MessageElement;
 import org.ggf.rns.RNSEntryResponseType;
 import org.ggf.rns.RNSMetadataType;
+import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
@@ -87,6 +88,7 @@ public class QueueManager extends BaseGridTool
 			}
 		}
 		
+		StreamUtils.close(iterable.getIterable());
 		return 0;
 	}
 
