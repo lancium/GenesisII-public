@@ -27,7 +27,7 @@ date_string="$(date +"%Y_%b_%e_%H%M" | sed -e 's/ //g')"
 
 EXCLUDES=(--exclude=".svn" --exclude="*.class" --exclude="*.log" --exclude="*.log.*" )
 
-tar -czf "$storage_folder/GenesisII-build-${date_string}${additional_tag}.tar.gz" . ${EXCLUDES[*]}
+tar -czf "$storage_folder/GenesisII-build-${date_string}${additional_tag}.tar.gz" * ${EXCLUDES[*]}
 
 popd &>/dev/null
 
