@@ -282,8 +282,6 @@ public class TrashDialog extends UIFrame
 	
 	private class MouseClickListenerImpl extends MouseAdapter
 	{
-		static final long serialVersionUID = 0L;
-
 		@Override
 		public void mouseClicked(MouseEvent e)
 		{

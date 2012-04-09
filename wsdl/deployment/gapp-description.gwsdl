@@ -60,6 +60,10 @@
 		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-authz"
 		location="./resource-authz.wsdl"/>
 
+	<wsdl:import
+	    namespace="http://vcgr.cs.virginia.edu/genii/2010/08/notification/notification-consumer"
+		location="./geniiNotificationConsumer.wsdl"/>
+
     <wsdl:import
         namespace="http://vcgr.cs.virginia.edu/genii/2006/12/common"
         location="./common-generated.wsdl"/>

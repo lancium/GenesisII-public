@@ -103,7 +103,7 @@ public class JobUpdateWorker implements OutcallHandler
 			EndpointReferenceType jobEndpoint = _jobEndpointResolver.getJobEndpoint(
 				connection, _jobInfo.getJobID());
 			besID = _jobInfo.getBESID();
-			String besName = _clientStubResolver.getBESName(besID);
+			// String besName = _clientStubResolver.getBESName(besID);
 			GeniiBESPortType clientStub = _clientStubResolver.createClientStub(
 				connection, besID);
 			try { connection.commit(); } catch (Throwable c) {}

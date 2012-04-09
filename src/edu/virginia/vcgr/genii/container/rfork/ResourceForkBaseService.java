@@ -69,7 +69,6 @@ import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.*;
 import edu.virginia.vcgr.genii.client.utils.IterableIterable;
@@ -374,7 +373,7 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 			_forkLock = new Object();
 		
 		addImplementedPortType(WellKnownPortTypes.RESOURCE_FORK_PORT_TYPE);
-		addImplementedPortType(RNSConstants.ENHANCED_RNS_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.ENHANCED_RNS_PORT_TYPE);
 	}
 	
 	@Override
@@ -409,8 +408,8 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 		{
 			return new PortType []
 			{
-				RNSConstants.RNS_PORT_TYPE,
-				RNSConstants.ENHANCED_RNS_PORT_TYPE
+				WellKnownPortTypes.RNS_PORT_TYPE,
+				WellKnownPortTypes.ENHANCED_RNS_PORT_TYPE
 			};
 		} 
 		else if (fork instanceof RandomByteIOResourceFork)

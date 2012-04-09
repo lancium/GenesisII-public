@@ -45,7 +45,6 @@ import org.ggf.rns.*;
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.enhancedrns.CreateFileRequestType;
 import edu.virginia.vcgr.genii.enhancedrns.CreateFileResponseType;
@@ -148,9 +147,9 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		if ((rKey == null) || (!(rKey.dereference() instanceof IJNDIResource)))
 		{
 			// JNDIAuthnPortType
-			PortType[] response =
-					{ RNSConstants.RNS_PORT_TYPE,
-							WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE };
+			PortType[] response = {
+					WellKnownPortTypes.RNS_PORT_TYPE,
+					WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE };
 
 			return response;
 		}
@@ -160,9 +159,9 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		if (serviceResource.isServiceResource())
 		{
 			// JNDIAuthnPortType
-			PortType[] response =
-					{ RNSConstants.RNS_PORT_TYPE,
-							WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE };
+			PortType[] response = {
+					WellKnownPortTypes.RNS_PORT_TYPE,
+					WellKnownPortTypes.JNDI_AUTHN_SERVICE_PORT_TYPE };
 
 			return response;
 		}
@@ -175,10 +174,10 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 		}
 
 		// STS for a JNDI directory resource
-		PortType[] response =
-				{ WellKnownPortTypes.STS_SERVICE_PORT_TYPE,
-						RNSConstants.ENHANCED_RNS_PORT_TYPE,
-						RNSConstants.RNS_PORT_TYPE, };
+		PortType[] response = {
+				WellKnownPortTypes.STS_SERVICE_PORT_TYPE,
+				WellKnownPortTypes.ENHANCED_RNS_PORT_TYPE,
+				WellKnownPortTypes.RNS_PORT_TYPE, };
 
 		return response;
 	}

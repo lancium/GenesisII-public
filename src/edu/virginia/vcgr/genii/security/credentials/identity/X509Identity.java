@@ -214,6 +214,7 @@ public class X509Identity implements HolderOfKeyIdentity, SignedAssertion
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException
 	{

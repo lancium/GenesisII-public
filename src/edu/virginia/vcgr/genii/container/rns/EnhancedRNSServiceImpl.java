@@ -42,6 +42,7 @@ import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
@@ -93,21 +94,21 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 	{
 		super("EnhancedRNSPortType");
 		
-		addImplementedPortType(RNSConstants.RNS_PORT_TYPE);
-		addImplementedPortType(RNSConstants.ENHANCED_RNS_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.RNS_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.ENHANCED_RNS_PORT_TYPE);
 	}
 	
 	protected EnhancedRNSServiceImpl(String serviceName) throws RemoteException
 	{
 		super(serviceName);
 		
-		addImplementedPortType(RNSConstants.RNS_PORT_TYPE);
-		addImplementedPortType(RNSConstants.ENHANCED_RNS_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.RNS_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.ENHANCED_RNS_PORT_TYPE);
 	}
 	
 	public PortType getFinalWSResourceInterface()
 	{
-		return RNSConstants.ENHANCED_RNS_PORT_TYPE;
+		return WellKnownPortTypes.ENHANCED_RNS_PORT_TYPE;
 	}
 	
 	@RWXMapping(RWXCategory.EXECUTE)
@@ -474,7 +475,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 			throw FaultManipulator.fillInFault(new WriteNotPermittedFaultType());
 		}
 		
-		if (resolvedEntryUnboundProperty != null && resolvedEntryUnboundProperty.equals(RNSConstants.RESOLVED_ENTRY_UNBOUND_FALSE))
+		if (resolvedEntryUnboundProperty != null && resolvedEntryUnboundProperty.equals("FALSE"))
 			return origEPR;
 		
 		WSName wsName = new WSName(origEPR);

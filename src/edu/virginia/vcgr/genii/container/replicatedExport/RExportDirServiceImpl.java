@@ -23,9 +23,9 @@ import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
+import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.AbstractNotificationHandler;
@@ -72,7 +72,7 @@ public class RExportDirServiceImpl extends GenesisIIBase
 				WellKnownPortTypes.RBYTEIO_SERVICE_PORT_TYPE);
 
 		addImplementedPortType(
-			RNSConstants.RNS_PORT_TYPE);
+				WellKnownPortTypes.RNS_PORT_TYPE);
 		
 	}
 	
@@ -100,7 +100,7 @@ public class RExportDirServiceImpl extends GenesisIIBase
 		}
 
 		@Override
-		public void handleNotification(TopicPath topic,
+		public String handleNotification(TopicPath topic,
 			EndpointReferenceType producerReference,
 			EndpointReferenceType subscriptionReference,
 			ResourceTerminationContents contents) throws Exception
@@ -126,6 +126,7 @@ public class RExportDirServiceImpl extends GenesisIIBase
 				_logger.error("Termination notification user" +
 						" data does not match RExportDir resource.");
 			}
+			return NotificationConstants.OK;
 		}
 	}
 	

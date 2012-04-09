@@ -37,7 +37,7 @@ public class SubscriptionsDatabase
 			"topicquery BLOB(2G)," +
 			"policies BLOB(2G)," +
 			"additionaluserdata BLOB(2G)," +
-			"paused SMALLINT NOT NULL WITH DEFAULT 0)",
+			"paused SMALLINT NOT NULL DEFAULT 0)",
 		"CREATE INDEX wsnsubscriptionspubreskeyidx ON wsnsubscriptions(publisherresourcekey)"
 	};
 	

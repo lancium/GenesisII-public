@@ -17,6 +17,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.bes.GeniiBESPortType;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.history.HistoryEvent;
@@ -57,7 +58,7 @@ public class BESActivityTerminatorActor implements OutcallActor
 	
 	@Override
 	public boolean enactOutcall(ICallingContext callingContext,
-		EndpointReferenceType target) throws Throwable
+		EndpointReferenceType target, GeniiAttachment attachment) throws Throwable
 	{
 		_logger.debug(
 			"Persistent Outcall Actor attempting to kill a bes activity.");

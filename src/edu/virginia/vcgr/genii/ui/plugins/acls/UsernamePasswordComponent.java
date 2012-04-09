@@ -82,8 +82,6 @@ class UsernamePasswordComponent extends JPanel
 	
 	private class CaretListenerImpl implements CaretListener
 	{
-		static final long serialVersionUID = 0L;
-		
 		@Override
 		public void caretUpdate(CaretEvent e)
 		{

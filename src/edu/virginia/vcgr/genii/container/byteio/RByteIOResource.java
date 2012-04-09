@@ -20,14 +20,12 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Random;
 
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.morgan.util.io.GuaranteedDirectory;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -65,8 +63,6 @@ public class RByteIOResource extends BasicDBResource implements IRByteIOResource
 		throws ResourceException
 	{
 		File file = null;
-		File superDir = Container.getConfigurationManager().getUserDirectory();
-		
 		try
 		{
 			if (creationProperties != null)
@@ -74,7 +70,10 @@ public class RByteIOResource extends BasicDBResource implements IRByteIOResource
 				MessageElement any = (MessageElement)creationProperties.get(
 					FILE_PATH_PROPERTY);
 				if (any != null)
+				{
+					File superDir = Container.getConfigurationManager().getUserDirectory();
 					file = new File(superDir, any.getAsString());
+				}
 			}
 		}
 		catch (ResourceException re)
@@ -85,41 +84,21 @@ public class RByteIOResource extends BasicDBResource implements IRByteIOResource
 		{
 			throw new ResourceException(e.getLocalizedMessage(), e);
 		}
-		
 		try
 		{
 			if (file == null)
 			{
-				superDir = new GuaranteedDirectory(superDir, "rbyteio-data");
-				file = getNewFile(superDir, "rbyteio", ".dat");
+				file = ByteIOFileCreator.createFile();
 			}
 		}
 		catch (IOException ioe)
 		{
 			throw new ResourceException(ioe.getLocalizedMessage(), ioe);
 		}
-			
 		setProperty(_INTERNAL_FILE_PATH_PROP_NAME, file.getAbsolutePath());
 		return file;
 	}
-	
-	static private Random _directoryBalancer = new Random();
-	static private final int DISPERSION_LEVELS = 2;
-	static private final int DISPERSION_WIDTH = 32;
-	
-	synchronized static private File getNewFile(File superDir, 
-			String filePrefix, String fileSuffix) throws IOException
-	{
-		File baseDir = superDir;
-		for (int lcv = 0; lcv < DISPERSION_LEVELS; lcv++)
-		{
-			int value = _directoryBalancer.nextInt(DISPERSION_WIDTH);
-			baseDir = new GuaranteedDirectory(baseDir, String.format("dir.%d", value));
-		}
-		
-		return File.createTempFile(filePrefix, fileSuffix, baseDir);
-	}
-	
+
 	public File getCurrentFile() throws ResourceException
 	{
 		try

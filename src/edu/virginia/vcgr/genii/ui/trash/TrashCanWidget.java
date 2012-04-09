@@ -85,8 +85,6 @@ public class TrashCanWidget extends JComponent
 	
 	private class MouseClickListener extends MouseAdapter
 	{
-		static final long serialVersionUID = 0L;
-
 		@Override
 		public void mouseClicked(MouseEvent e)
 		{

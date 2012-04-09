@@ -44,9 +44,9 @@ import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOOperations;
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.naming.WSName;
+import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.AbstractNotificationHandler;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
@@ -106,7 +106,7 @@ public class RExportResolverServiceImpl extends GenesisIIBase
 		addImplementedPortType(WellKnownPortTypes.ENDPOINT_IDENTIFIER_RESOLVER_SERVICE_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.REFERENCE_RESOLVER_SERVICE_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.GENII_SIMPLE_RESOLVER_PORT_TYPE);
-		addImplementedPortType(RNSConstants.RNS_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.RNS_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.GENII_NOTIFICATION_CONSUMER_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.REXPORT_RESOLVER_PORT_TYPE);
 	}
@@ -349,7 +349,7 @@ public class RExportResolverServiceImpl extends GenesisIIBase
 		}
 
 		@Override
-		public void handleNotification(TopicPath topic,
+		public String handleNotification(TopicPath topic,
 			EndpointReferenceType producerReference,
 			EndpointReferenceType subscriptionReference,
 			ResourceTerminationContents contents) throws Exception
@@ -371,6 +371,8 @@ public class RExportResolverServiceImpl extends GenesisIIBase
 						+ thisEntry.getLocalPath());
 				destroy(new Destroy());
 			}
+			
+			return NotificationConstants.OK;
 		}
 	}
 	
@@ -383,7 +385,7 @@ public class RExportResolverServiceImpl extends GenesisIIBase
 		}
 
 		@Override
-		public void handleNotification(TopicPath topic,
+		public String handleNotification(TopicPath topic,
 			EndpointReferenceType producerReference,
 			EndpointReferenceType subscriptionReference,
 			ByteIOContentsChangedContents contents) throws Exception
@@ -420,6 +422,7 @@ public class RExportResolverServiceImpl extends GenesisIIBase
 				RExportUtils.unpackDataStream(thisEntry.getReplicaEPR(),
 						newDataStream);
 			}
+			return NotificationConstants.OK;
 		}
 	}
 	

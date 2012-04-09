@@ -43,6 +43,19 @@ import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 
 public class TransferAgent
 {
+	/**
+	 * Return an array of the transfer mechanisms supported by
+	 * receiveData() and sendData().
+	 */
+	static public URI[] getTransferMechs()
+	{
+		return new URI[]{
+				ByteIOConstants.TRANSFER_TYPE_SIMPLE_URI,
+				ByteIOConstants.TRANSFER_TYPE_DIME_URI,
+				ByteIOConstants.TRANSFER_TYPE_MTOM_URI
+		};
+	}
+	
 	static public byte[] receiveData(TransferInformationType transType)
 		throws RemoteException
 	{
@@ -149,5 +162,24 @@ public class TransferAgent
 		{
 			throw new GeniiAttachmentException(af);
 		}
+	}
+
+	/**
+	 * If a block of data was attached to the message in a self-identifying format
+	 * such as MTOM or DIME, then extract the data from the message.
+	 */
+	@SuppressWarnings("unchecked")
+	static public byte[] extractAttachmentData()
+		throws IOException, SOAPException
+	{
+		Message msg = MessageContext.getCurrentContext().getRequestMessage();
+		Attachments attachments = msg.getAttachmentsImpl();
+		if (attachments == null)
+			return null;
+		Collection<AttachmentPart> coll = (Collection<AttachmentPart>) attachments.getAttachments();
+		if (coll == null || coll.size() == 0)
+			return null;
+		AttachmentPart part = coll.iterator().next();
+		return GeniiAttachment.extractData(part);
 	}
 }

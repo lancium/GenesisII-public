@@ -292,8 +292,7 @@ public class ExportTool extends BaseGridTool
 		ICallingContext origContext = ContextManager.getCurrentContext();
 		ICallingContext createContext = origContext.deriveNewContext();
 		createContext.setSingleValueProperty(
-				RNSConstants.RESOLVED_ENTRY_UNBOUND_PROPERTY, 
-				RNSConstants.RESOLVED_ENTRY_UNBOUND_FALSE);
+				RNSConstants.RESOLVED_ENTRY_UNBOUND_PROPERTY, "FALSE");
 		try{
 			ContextManager.storeCurrentContext(createContext);
 			newEPR = createInstance(exportServiceEPR, RNSPath, createProps);
@@ -364,8 +363,7 @@ public class ExportTool extends BaseGridTool
 		ICallingContext origContext = ContextManager.getCurrentContext();
 		ICallingContext createContext = origContext.deriveNewContext();
 		createContext.setSingleValueProperty(
-				RNSConstants.RESOLVED_ENTRY_UNBOUND_PROPERTY, 
-				RNSConstants.RESOLVED_ENTRY_UNBOUND_FALSE);
+				RNSConstants.RESOLVED_ENTRY_UNBOUND_PROPERTY, "FALSE");
 		try{
 			ContextManager.storeCurrentContext(createContext);
 			newEPR = createInstance(exportServiceEPR, RNSPath, createProps);

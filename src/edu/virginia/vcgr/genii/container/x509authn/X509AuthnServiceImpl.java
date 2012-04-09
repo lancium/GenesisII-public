@@ -54,7 +54,6 @@ import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
-import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
@@ -135,7 +134,7 @@ public class X509AuthnServiceImpl extends GenesisIIBase
 
 		addImplementedPortType(WellKnownPortTypes.X509_AUTHN_SERVICE_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.STS_SERVICE_PORT_TYPE);
-		addImplementedPortType(RNSConstants.RNS_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.RNS_PORT_TYPE);
 	}
 
 	public PortType getFinalWSResourceInterface()

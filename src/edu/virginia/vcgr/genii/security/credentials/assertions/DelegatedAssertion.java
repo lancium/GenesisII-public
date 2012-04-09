@@ -256,6 +256,7 @@ public class DelegatedAssertion extends SignedAssertionBaseImpl
 		out.write(_delegatorSignature);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException
 	{

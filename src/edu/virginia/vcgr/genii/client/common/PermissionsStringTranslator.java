@@ -35,7 +35,6 @@ public class PermissionsStringTranslator implements
 		}
 	}
 
-	@SuppressWarnings("unused")
 	@Override
 	public MessageElement serialize(QName name, Object obj)
 			throws ResourcePropertyException
@@ -46,9 +45,6 @@ public class PermissionsStringTranslator implements
 				"Permissions resource properties.");
 		
 		Permissions perms = (Permissions)obj;
-		if (perms == null)
-			return null;
-		
 		return new MessageElement(name, perms.toString());
 	}
 }

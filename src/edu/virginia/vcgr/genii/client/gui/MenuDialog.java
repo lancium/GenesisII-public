@@ -154,8 +154,6 @@ static final long serialVersionUID = 0L;
 	
 	private class ActionJList extends MouseAdapter
 	{
-		static final long serialVersionUID = 0L;
-		
 		protected JList _list;
 				    
 		public ActionJList(JList l)

@@ -16,7 +16,6 @@ import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 import edu.virginia.vcgr.genii.client.io.FileResource;
-import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 
@@ -107,13 +106,12 @@ public class TerminateActivitiesTool extends BaseGridTool
 				Collection<RNSPath> children = path.listContents();
 				for(RNSPath child : children)
 				{
-					TypeInformation type = new TypeInformation(
-							path.getEndpoint());
-//					if(type.isBESActivity())
-//					{
+					// TypeInformation type = new TypeInformation(path.getEndpoint());
+					// if(type.isBESActivity())
+					{
 						activityPaths.add(child.pwd());
 						activityEprs.add(child.getEndpoint());
-//					}
+					}
 				}
 			}
 		}

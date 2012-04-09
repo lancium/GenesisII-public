@@ -82,6 +82,7 @@ import org.oasis_open.wsn.base.InvalidProducerPropertiesExpressionFaultType;
 import org.oasis_open.wsn.base.InvalidTopicExpressionFaultType;
 import org.oasis_open.wsn.base.MultipleTopicsSpecifiedFaultType;
 import org.oasis_open.wsn.base.NoCurrentMessageOnTopicFaultType;
+import org.oasis_open.wsn.base.NotificationMessageHolderType;
 import org.oasis_open.wsn.base.Notify;
 import org.oasis_open.wsn.base.NotifyMessageNotSupportedFaultType;
 import org.oasis_open.wsn.base.Subscribe;
@@ -109,6 +110,7 @@ import edu.virginia.vcgr.genii.client.history.HistoryEvent;
 import edu.virginia.vcgr.genii.client.iterator.WSIteratorConstructionParameters;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
+import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -136,6 +138,8 @@ import edu.virginia.vcgr.genii.common.IterateHistoryEventsRequestType;
 import edu.virginia.vcgr.genii.common.IterateHistoryEventsResponseType;
 import edu.virginia.vcgr.genii.common.MatchingParameter;
 import edu.virginia.vcgr.genii.common.RemoveMatchingParameterResponseType;
+
+import edu.virginia.vcgr.genii.common.notification.NotifyResponseType;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
@@ -167,8 +171,8 @@ import edu.virginia.vcgr.genii.container.iterator.AbstractIteratorBuilder;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorEntry;
 import edu.virginia.vcgr.genii.container.iterator.IteratorBuilder;
 import edu.virginia.vcgr.genii.container.iterator.WSIteratorServiceImpl;
-import edu.virginia.vcgr.genii.container.resolver.IResolverFactoryProxy;
 import edu.virginia.vcgr.genii.container.resolver.Resolution;
+import edu.virginia.vcgr.genii.container.resolver.IResolverFactoryProxy;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
@@ -558,7 +562,33 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 		}
 	}
 
-	protected SubscribeResponse subscribe(String resourceKey, Subscribe arg)
+	@Override
+	@RWXMapping(RWXCategory.OPEN)
+	public NotifyResponseType notifyWithResponse(Notify msg)
+		throws java.rmi.RemoteException
+	{
+		// A client may send multiple messages to the regular notify() function,
+		// but if the client wants a response, then it must send a single message.
+		NotificationMessageHolderType []msgs = msg.getNotificationMessage();
+		String status = null;
+		if ((msgs == null) || (msgs.length == 0))
+		{
+			_logger.debug("notifyWithResponse: received empty notification");
+			status = NotificationConstants.FAIL;
+		}
+		else
+		{
+			if (msgs.length > 1)
+			{
+				_logger.debug("notifyWithResponse: client sent " + msgs.length + " messages");
+			}
+			status = NotificationHelper.notifySingleMessage(msgs[0], notificationMultiplexer());
+		}
+		return new NotifyResponseType(NotificationConstants.toURI(status));
+	}
+	
+	public static SubscribeResponse processSubscribeRequest(
+			String resourceKey, SubscribeRequest request)
 		throws RemoteException,
 			TopicNotSupportedFaultType, TopicExpressionDialectUnknownFaultType,
 			InvalidFilterFaultType,
@@ -570,8 +600,6 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 			NotifyMessageNotSupportedFaultType,
 			InvalidProducerPropertiesExpressionFaultType
 	{
-		SubscribeRequest request = new SubscribeRequest(arg);
-
 		Calendar currentTime = Calendar.getInstance();
 		TerminationTimeType ttt = request.terminationTime();
 		Calendar terminationTime = (ttt == null) ? null :
@@ -609,7 +637,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 		InvalidProducerPropertiesExpressionFaultType
 	{
 		ResourceKey rKey = ResourceManager.getCurrentResource();
-		return subscribe(rKey.getResourceKey(), arg0);
+		return processSubscribeRequest(rKey.getResourceKey(), new SubscribeRequest(arg0));
 	}
 
 	@RWXMapping(RWXCategory.READ)

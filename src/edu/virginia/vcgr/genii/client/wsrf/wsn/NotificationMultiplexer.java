@@ -11,7 +11,7 @@ public interface NotificationMultiplexer
 	public <ContentsType extends NotificationMessageContents> NotificationRegistration registerNotificationHandler(
 		TopicQueryExpression topicFilter, NotificationHandler<ContentsType> handler);
 	
-	public void notify(TopicPath path,
+	public String notify(TopicPath path,
 		EndpointReferenceType producerReference,
 		EndpointReferenceType subscriptionReference,
 		Element messageContents);

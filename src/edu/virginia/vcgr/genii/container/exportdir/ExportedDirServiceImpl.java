@@ -32,7 +32,6 @@ import edu.virginia.vcgr.genii.client.exportdir.ExportedFileUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 
@@ -82,8 +81,8 @@ public class ExportedDirServiceImpl extends GenesisIIBase implements
 		super(serviceName);
 		
 		addImplementedPortType(WellKnownPortTypes.EXPORTED_DIR_SERVICE_PORT_TYPE);
-		addImplementedPortType(RNSConstants.RNS_PORT_TYPE);
-		addImplementedPortType(RNSConstants.ENHANCED_RNS_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.RNS_PORT_TYPE);
+		addImplementedPortType(WellKnownPortTypes.ENHANCED_RNS_PORT_TYPE);
 	}
 	
 	public PortType getFinalWSResourceInterface()

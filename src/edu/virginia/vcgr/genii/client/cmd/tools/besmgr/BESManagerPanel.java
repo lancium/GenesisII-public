@@ -348,8 +348,6 @@ public class BESManagerPanel extends JPanel
 	private class ChangeListener
 		implements ActionListener, CaretListener
 	{
-		static final long serialVersionUID = 0L;
-		
 		@Override
 		public void actionPerformed(ActionEvent event)
 		{

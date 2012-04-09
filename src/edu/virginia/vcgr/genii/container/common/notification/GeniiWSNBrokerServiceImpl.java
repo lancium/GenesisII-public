@@ -18,6 +18,8 @@ import org.oasis_open.wsn.base.UnacceptableInitialTerminationTimeFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
+import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
+import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
@@ -52,17 +54,21 @@ public class GeniiWSNBrokerServiceImpl extends GenesisIIBase
 		}
 
 		@Override
-		final public void handleNotification(TopicPath topic,
+		final public String handleNotification(TopicPath topic,
 			EndpointReferenceType producerReference,
 			EndpointReferenceType subscriptionReference,
 			NotificationMessageContents contents) throws Exception
 		{
+			// Should we broker attachments?
+			GeniiAttachment attachment = null;
+			
 			ResourceKey rKey = ResourceManager.getCurrentResource();
 			WSNotificationContainerService wsnService = ContainerServices.findService(
 				WSNotificationContainerService.class);
 			
 			wsnService.publishNotification(rKey.getResourceKey(),
-				producerReference, topic, contents);
+				producerReference, topic, contents, attachment);
+			return NotificationConstants.OK;
 		}
 	}
 	

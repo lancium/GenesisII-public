@@ -27,6 +27,7 @@ import edu.virginia.vcgr.genii.client.security.authz.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.security.authz.PermissionDeniedException;
 import edu.virginia.vcgr.genii.common.security.AuthZConfig;
 import edu.virginia.vcgr.genii.security.MessageLevelSecurityRequirements;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.credentials.GIICredential;
 
 /**
@@ -62,6 +63,16 @@ public interface IAuthZProvider
 			Class<?> serviceClass, 
 			Method operation)
 		throws PermissionDeniedException, AuthZSecurityException, ResourceException;
+	
+	/**
+	 * Checks whether or not the caller has read, write, or execute
+	 * permission on the given resource.
+	 */
+	public boolean checkAccess(
+			Collection<GIICredential> authenticatedCallerCredentials,
+			IResource resource, RWXCategory category)
+		throws AuthZSecurityException, ResourceException;
+
 
 	/**
 	 * Returns the minimum level of incoming message level security required for

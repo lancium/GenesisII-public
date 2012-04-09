@@ -45,6 +45,7 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.deployer.AppDeployerConstants;
 import edu.virginia.vcgr.genii.client.io.FileResource;
+import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
@@ -99,7 +100,7 @@ public class RunTool extends BaseGridTool
 		}
 
 		@Override
-		public void handleNotification(TopicPath topic,
+		public String handleNotification(TopicPath topic,
 			EndpointReferenceType producerReference,
 			EndpointReferenceType subscriptionReference,
 			BESActivityStateChangedContents contents) throws Exception
@@ -110,6 +111,7 @@ public class RunTool extends BaseGridTool
 				_state = state;
 				_stateLock.notify();
 			}
+			return NotificationConstants.OK;
 		}
 	}
 	

@@ -19,6 +19,7 @@ import org.ggf.rns.RNSEntryType;
 import org.ggf.rns.WriteNotPermittedFaultType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
+import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.AbstractNotificationHandler;
@@ -88,19 +89,17 @@ public class RExportFileServiceImpl extends RandomByteIOServiceImpl
 		}
 
 		@Override
-		public void handleNotification(TopicPath topic,
+		public String handleNotification(TopicPath topic,
 			EndpointReferenceType producerReference,
 			EndpointReferenceType subscriptionReference,
 			ResourceTerminationContents contents) throws Exception
 		{
 			RExportSubscriptionUserData notifyData = 
 				contents.additionalUserData(RExportSubscriptionUserData.class);
-			
 			String exportPath = notifyData.getPrimaryLocalPath();
-			
 			destroy(new Destroy());
-			
 			_logger.info("RExport replica " + exportPath + " terminated.");
+			return NotificationConstants.OK;
 		}
 	}
 

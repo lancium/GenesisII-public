@@ -325,8 +325,6 @@ public class RNSTree extends JTree implements EndpointRetriever
 	
 	private class TreeWillExpandListenerImpl implements TreeWillExpandListener
 	{
-		static final long serialVersionUID = 0L;
-		
 		@Override
 		public void treeWillCollapse(TreeExpansionEvent event)
 				throws ExpandVetoException

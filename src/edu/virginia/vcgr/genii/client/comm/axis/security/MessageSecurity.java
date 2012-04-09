@@ -38,7 +38,6 @@ import edu.virginia.vcgr.genii.security.credentials.assertions.DelegatedAttribut
 import edu.virginia.vcgr.genii.security.credentials.assertions.SignedAssertion;
 import edu.virginia.vcgr.genii.security.credentials.assertions.SignedCredentialCache;
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
-import edu.virginia.vcgr.genii.security.credentials.identity.X509Identity;
 
 /**
  * Data-structure and utility methods for handling the details 

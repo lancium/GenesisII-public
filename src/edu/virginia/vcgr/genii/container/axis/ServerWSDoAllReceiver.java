@@ -43,7 +43,9 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 
 import java.io.*;
 import java.lang.reflect.Method;
-import java.security.*;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.*;
@@ -66,6 +68,7 @@ import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.container.security.authz.providers.*;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.security.MessageLevelSecurityRequirements;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.credentials.GIICredential;
 import edu.virginia.vcgr.genii.security.credentials.TransientCredentials;
 import edu.virginia.vcgr.genii.security.credentials.assertions.DelegatedAssertion;
@@ -167,7 +170,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		performAuthz();		
 	}
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	protected boolean checkReceiverResults(Vector wsResult, Vector actions)
 	{
 
@@ -528,6 +531,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 				(serviceDescription instanceof JavaServiceDesc))
 					jDesc = (JavaServiceDesc)serviceDescription;
 			Method operation = desc.getMethod();			
+			_logger.debug(operation.getDeclaringClass().getName() + "." + operation.getName() + "()");
 
 			// Get the resource's authz handler
 			IResource resource =
@@ -659,4 +663,19 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		}
 	}
 
+	
+	/**
+	 * When an operation is open access, but it requires that the caller have read, write, or execute
+	 * permission to process certain parameters, the operation should call this method to verify that
+	 * the caller has the right.
+	 */
+	public static boolean checkAccess(IResource resource, RWXCategory category)
+		throws IOException
+	{
+		ICallingContext callContext = ContextManager.getCurrentContext();
+		TransientCredentials transientCredentials = TransientCredentials.getTransientCredentials(callContext); 
+		String serviceName = resource.getParentResourceKey().getServiceName();
+		IAuthZProvider authZHandler = AuthZProviders.getProvider(serviceName);
+		return authZHandler.checkAccess(transientCredentials._credentials, resource, category);
+	}
 }

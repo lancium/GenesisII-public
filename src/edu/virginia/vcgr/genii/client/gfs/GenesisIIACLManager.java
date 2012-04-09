@@ -102,20 +102,21 @@ public class GenesisIIACLManager
 		Acl acl, Collection<Identity> callerIdentities)
 	{
 		Permissions p = new Permissions();
-		
-		p.set(PermissionBits.OWNER_READ, hasPermission(
-			acl.readAcl, callerIdentities));
-		p.set(PermissionBits.OWNER_WRITE, hasPermission(
-			acl.writeAcl, callerIdentities));
-		p.set(PermissionBits.OWNER_EXECUTE, hasPermission(
-			acl.executeAcl, callerIdentities));
-		p.set(PermissionBits.EVERYONE_READ, hasPermission(
-			acl.readAcl, null));
-		p.set(PermissionBits.EVERYONE_WRITE, hasPermission(
-			acl.writeAcl, null));
-		p.set(PermissionBits.EVERYONE_EXECUTE, hasPermission(
-			acl.executeAcl, null));
-		
+		if (acl != null)
+		{
+			p.set(PermissionBits.OWNER_READ, hasPermission(
+					acl.readAcl, callerIdentities));
+			p.set(PermissionBits.OWNER_WRITE, hasPermission(
+					acl.writeAcl, callerIdentities));
+			p.set(PermissionBits.OWNER_EXECUTE, hasPermission(
+					acl.executeAcl, callerIdentities));
+			p.set(PermissionBits.EVERYONE_READ, hasPermission(
+					acl.readAcl, null));
+			p.set(PermissionBits.EVERYONE_WRITE, hasPermission(
+					acl.writeAcl, null));
+			p.set(PermissionBits.EVERYONE_EXECUTE, hasPermission(
+					acl.executeAcl, null));
+		}
 		return p;
 	}
 	

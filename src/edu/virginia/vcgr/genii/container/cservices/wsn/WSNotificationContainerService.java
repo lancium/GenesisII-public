@@ -17,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Element;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMessageContents;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.policy.SubscriptionPolicyTypes;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
@@ -79,7 +80,7 @@ public class WSNotificationContainerService extends AbstractContainerService
 	public <Type extends NotificationMessageContents> 
 		void publishNotification(String publisherKey,
 			EndpointReferenceType publisherEPR, TopicPath topic,
-			Type contents)
+			Type contents, GeniiAttachment attachment)
 	{
 		DatabaseConnectionPool pool = getConnectionPool();
 		Connection conn = null;
@@ -101,9 +102,14 @@ public class WSNotificationContainerService extends AbstractContainerService
 						topic, publisherEPR, contents,
 						subscription.additionalUserData()));
 				
-				if (subscription.policies().containsKey(
-					SubscriptionPolicyTypes.PersistentNotification))
+				boolean isPersistent= subscription.policies().containsKey(
+						SubscriptionPolicyTypes.PersistentNotification);
+				_logger.debug("WSNotificationContainerService: isPersistent=" + isPersistent +
+						" attachment=" + (attachment != null));
+				
+				if (isPersistent)
 				{
+					actor.setPersistent(true);
 					PersistentOutcallContainerService service = 
 						ContainerServices.findService(
 							PersistentOutcallContainerService.class);
@@ -111,11 +117,12 @@ public class WSNotificationContainerService extends AbstractContainerService
 						actor, new ExponentialBackoffScheduler(
 							7L, TimeUnit.DAYS, null, null,
 							1L, TimeUnit.MINUTES, 30L, TimeUnit.MILLISECONDS),
-						subscription.consumerReference(), null);
-				} else
+						subscription.consumerReference(), null, attachment);
+				}
+				else
 				{
 					_executor.submit(new NotificationWorker(
-						subscription.consumerReference(), actor));
+						subscription.consumerReference(), actor, attachment));
 				}
 			}
 		} 
@@ -142,13 +149,16 @@ public class WSNotificationContainerService extends AbstractContainerService
 	{
 		private NotificationOutcallActor _actor;
 		private EndpointReferenceType _target;
+		private GeniiAttachment _attachment;
 		
 		private NotificationWorker(
 			EndpointReferenceType target,
-			NotificationOutcallActor actor)
+			NotificationOutcallActor actor,
+			GeniiAttachment attachment)
 		{
 			_actor = actor;
 			_target = target;
+			_attachment = attachment;
 		}
 		
 		@Override
@@ -156,7 +166,7 @@ public class WSNotificationContainerService extends AbstractContainerService
 		{
 			try
 			{
-				_actor.enactOutcall(null, _target);
+				_actor.enactOutcall(null, _target, _attachment);
 			}
 			catch (Throwable cause)
 			{

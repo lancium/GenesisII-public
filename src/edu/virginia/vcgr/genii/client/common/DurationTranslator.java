@@ -37,7 +37,6 @@ public class DurationTranslator
 		}
 	}
 
-	@SuppressWarnings("unused")
 	@Override
 	public MessageElement serialize(QName name, Object obj)
 			throws ResourcePropertyException
@@ -49,9 +48,6 @@ public class DurationTranslator
 		
 		edu.virginia.vcgr.genii.client.utils.units.Duration gDur =
 			(edu.virginia.vcgr.genii.client.utils.units.Duration)obj;
-		if (gDur == null)
-			return null;
-		
 		return new MessageElement(name, gDur.toApacheDuration());
 	}
 }

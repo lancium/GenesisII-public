@@ -54,6 +54,7 @@ import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscribeRequest;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.BESActivityTopics;
 import edu.virginia.vcgr.genii.cloud.CloudConfiguration;
 import edu.virginia.vcgr.genii.cloud.CloudJobWrapper;
@@ -127,7 +128,7 @@ public class BESActivityServiceImpl extends ResourceForkBaseService implements
 		
 		Subscribe subscribe = initInfo.getSubscribeRequest();
 		if (subscribe != null)
-			subscribe((String)_resource.getKey(), subscribe);
+			processSubscribeRequest((String)_resource.getKey(), new SubscribeRequest(subscribe));
 		
 		String activityServiceName = "BESActivityPortType";
 		Collection<Identity> owners = QueueSecurity.getCallerIdentities(true);

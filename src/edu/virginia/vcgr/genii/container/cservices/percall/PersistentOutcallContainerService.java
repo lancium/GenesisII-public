@@ -2,14 +2,15 @@ package edu.virginia.vcgr.genii.container.cservices.percall;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.NavigableSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.morgan.util.Triple;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.container.cservices.AbstractContainerService;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
@@ -33,7 +34,8 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 	
 	final public boolean schedule(
 		OutcallActor actor, AttemptScheduler scheduler,
-		EndpointReferenceType target, ICallingContext callingContext)
+		EndpointReferenceType target, ICallingContext callingContext,
+		GeniiAttachment attachment)
 	{
 		Connection connection = null;
 		
@@ -41,7 +43,7 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 		{
 			connection = getConnectionPool().acquire(false);
 			PersistentOutcallEntry entry = PersistentOutcallDatabase.add(
-				connection, target, callingContext, actor, scheduler);
+				connection, target, callingContext, actor, scheduler, attachment);
 			connection.commit();
 			
 			synchronized(_entries)
@@ -96,7 +98,6 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 		th.start();
 	}
 	
-	
 	final private void reAdd(Connection connection, PersistentOutcallEntry entry)
 	{
 		try
@@ -120,6 +121,8 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 				PersistentOutcallDatabase.remove(connection, entry);
 			} else
 			{
+				_logger.debug("PersistentOutcall: Next attempt at " +
+					new SimpleDateFormat("HH:mm:ss").format(nextAttempt.getTime()));
 				entry.nextAttempt(nextAttempt);
 				PersistentOutcallDatabase.update(connection, entry);
 				synchronized(_entries)
@@ -145,12 +148,12 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 		try
 		{
 			connection = getConnectionPool().acquire(false);
-			Triple<EndpointReferenceType, ICallingContext, OutcallActor> commInfo = 
+			CommunicationInformation commInfo = 
 				PersistentOutcallDatabase.getCommunicationInformation(
 					connection, entry);
 			connection.commit();
-			if (commInfo.third().enactOutcall(
-				commInfo.second(), commInfo.first()))
+			if (commInfo.outcallActor.enactOutcall(
+				commInfo.callingContext, commInfo.targetEPR, commInfo.attachment))
 			{
 				_logger.debug("Successfully made persistent outcall -- forgetting it.");
 				
@@ -159,6 +162,7 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 				return;
 			}
 			
+			_logger.warn("PersistentOutcall: response was Try Again");
 			reAdd(connection ,entry);
 			connection.commit();
 		}
@@ -230,7 +234,7 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 			ContainerServices.findService(
 				PersistentOutcallContainerService.class);
 		if (service != null)
-			return service.schedule(actor, scheduler, target, callingContext);
+			return service.schedule(actor, scheduler, target, callingContext, null);
 		else
 			_logger.warn("Unable to find persistent oucall service.");
 		

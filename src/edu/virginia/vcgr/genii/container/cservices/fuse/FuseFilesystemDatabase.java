@@ -32,7 +32,7 @@ class FuseFilesystemDatabase
 			"parentdir VARCHAR(512) NOT NULL," +
 			"mountpoint VARCHAR(128) NOT NULL," +
 			"deathtime TIMESTAMP," +
-			"createtime TIMESTAMP NOT NULL WITH DEFAULT CURRENT_TIMESTAMP)",
+			"createtime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)",
 	};
 	
 	static void createTables(Connection connection)

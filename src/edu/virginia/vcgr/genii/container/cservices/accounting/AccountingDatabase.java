@@ -43,7 +43,7 @@ class AccountingDatabase
 			"kerneltimemicrosecs BIGINT NOT NULL," +
 			"wallclocktimemicrosecs BIGINT NOT NULL," +
 			"maxrssbytes BIGINT NOT NULL," +
-			"addtime TIMESTAMP NOT NULL WITH DEFAULT CURRENT_TIMESTAMP)",
+			"addtime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)",
 		"CREATE TABLE acctcommandlines(" +
 			"id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY," +
 			"arid BIGINT NOT NULL," +
@@ -53,7 +53,7 @@ class AccountingDatabase
 			"cid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY," +
 			"credentialhash INTEGER NOT NULL," +
 			"credential BLOB(2G) NOT NULL," +
-			"addtime TIMESTAMP NOT NULL WITH DEFAULT CURRENT_TIMESTAMP)",
+			"addtime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)",
 		"CREATE TABLE acctreccredmap(" +
 			"id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY," +
 			"arid BIGINT NOT NULL," +

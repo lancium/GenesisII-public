@@ -60,7 +60,7 @@ public class TopicSet
 			source = null;
 		}
 		
-		return new PublisherTopicImpl(source, topicPath);
+		return new PublisherTopic(source, topicPath);
 	}
 	
 	final public MessageElement describe(QName elementName)

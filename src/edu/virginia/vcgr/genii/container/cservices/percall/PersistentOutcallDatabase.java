@@ -1,5 +1,8 @@
 package edu.virginia.vcgr.genii.container.cservices.percall;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,16 +18,17 @@ import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.morgan.util.Triple;
 import org.morgan.util.io.StreamUtils;
 import org.ws.addressing.AttributedURIType;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
+import edu.virginia.vcgr.genii.container.byteio.ByteIOFileCreator;
 import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
 
 class PersistentOutcallDatabase
@@ -40,7 +44,8 @@ class PersistentOutcallDatabase
 			"nextattempt TIMESTAMP NOT NULL," +
 			"createtime TIMESTAMP NOT NULL," +
 			"attemptscheduler BLOB(2G) NOT NULL," +
-			"numattempts INTEGER NOT NULL)";
+			"numattempts INTEGER NOT NULL," +
+			"attachment VARCHAR(512))";
 	
 	static private Calendar convert(Timestamp ts)
 	{
@@ -155,7 +160,8 @@ class PersistentOutcallDatabase
 	
 	static PersistentOutcallEntry add(Connection connection,
 		EndpointReferenceType target, ICallingContext callingContext,
-		OutcallActor outcallActor, AttemptScheduler scheduler) 
+		OutcallActor outcallActor, AttemptScheduler scheduler,
+		GeniiAttachment attachment) 
 			throws SQLException
 	{
 		PreparedStatement stmt = null;
@@ -182,12 +188,23 @@ class PersistentOutcallDatabase
 				new AttributedURIType("http://tempuri.org"),
 				null, null, null);
 		
+		String attachmentPath;
+		try
+		{
+			attachmentPath = saveAttachment(attachment);
+		}
+		catch (IOException ioe)
+		{
+			throw new SQLException(
+				"Unable to save attachment.", ioe);
+		}
+
 		try
 		{
 			stmt = connection.prepareStatement(
 				"INSERT INTO persistentoutcalls(target, outcallhandler, " +
 				"callingcontext, nextattempt, createtime, attemptscheduler, " +
-				"numattempts) VALUES(?, ?, ?, ?, ?, ?, ?)");
+				"numattempts, attachment) VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
 			stmt.setBlob(1, EPRUtils.toBlob(
 				target, "persistentoutcalls", "target"));
 			stmt.setBlob(2, DBSerializer.toBlob(
@@ -199,6 +216,7 @@ class PersistentOutcallDatabase
 			stmt.setBlob(6, DBSerializer.toBlob(
 				scheduler, "persistentoutcalls", "attemptscheduler"));
 			stmt.setInt(7, numAttempts);
+			stmt.setString(8, attachmentPath);
 			if (stmt.executeUpdate() != 1)
 				throw new SQLException(
 					"Unable to add persisent outcall entry to db.");
@@ -221,30 +239,54 @@ class PersistentOutcallDatabase
 			StreamUtils.close(sstmt);
 		}
 	}
-
-	static Triple<EndpointReferenceType, ICallingContext, OutcallActor> 
-		getCommunicationInformation(Connection connection, 
+	
+	static private String saveAttachment(GeniiAttachment attachment)
+		throws IOException
+	{
+		if (attachment == null)
+			return null;
+		FileOutputStream ostream = null;
+		String attachmentPath = null;
+		try
+		{
+			File attachmentFile = ByteIOFileCreator.createFile();
+			attachmentPath = attachmentFile.getAbsolutePath();
+			ostream = new FileOutputStream(attachmentFile);
+			ostream.write(attachment.getData());
+		}
+		finally
+		{
+			StreamUtils.close(ostream);
+		}
+		return attachmentPath;
+	}
+	
+	static CommunicationInformation getCommunicationInformation(Connection connection, 
 			PersistentOutcallEntry entry) throws SQLException
 	{
+		CommunicationInformation info = new CommunicationInformation();
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
-		
 		try
 		{
 			stmt = connection.prepareStatement(
-				"SELECT target, callingcontext, outcallhandler " +
+				"SELECT target, callingcontext, outcallhandler, attachment " +
 				"FROM persistentoutcalls WHERE id = ?");
 			stmt.setLong(1, entry.entryID());
 			rs = stmt.executeQuery();
 			if (rs.next())
-				return new Triple<EndpointReferenceType, ICallingContext, OutcallActor>(
-					EPRUtils.fromBlob(rs.getBlob(1)),
-					(ICallingContext)DBSerializer.fromBlob(rs.getBlob(2)),
-					(OutcallActor)DBSerializer.fromBlob(rs.getBlob(3)));
+			{
+				info.targetEPR = EPRUtils.fromBlob(rs.getBlob(1));
+				info.callingContext = (ICallingContext)DBSerializer.fromBlob(rs.getBlob(2));
+				info.outcallActor = (OutcallActor)DBSerializer.fromBlob(rs.getBlob(3));
+				info.attachment = readAttachment(rs.getString(4));
+			}
 			else
+			{
 				throw new SQLException(String.format(
-					"Unable to find persistent outcall entry %d",
-					entry.entryID()));
+						"Unable to find persistent outcall entry %d",
+						entry.entryID()));
+			}
 		}
 		catch (ResourceException re)
 		{
@@ -252,13 +294,39 @@ class PersistentOutcallDatabase
 				"Error deserializing EPR from database for persisent outcall entry %d.",
 				entry.entryID()), re);
 		}
+		catch (IOException ioe)
+		{
+			throw new SQLException("Error reading attachment.", ioe);
+		}
 		finally
 		{
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
 		}
+		return info;
 	}
 	
+	static private GeniiAttachment readAttachment(String attachmentPath)
+		throws IOException
+	{
+		if (attachmentPath == null)
+			return null;
+		File file = new File(attachmentPath);
+		int length = (int) file.length();
+		byte[] data = new byte[length];
+		FileInputStream istream = null;
+		try
+		{
+			istream = new FileInputStream(file);
+			istream.read(data);
+		}
+		finally
+		{
+			StreamUtils.close(istream);
+		}
+		return new GeniiAttachment(data);
+	}
+
 	static void update(Connection connection, 
 		PersistentOutcallEntry entry)
 			throws SQLException
@@ -287,7 +355,28 @@ class PersistentOutcallDatabase
 		PersistentOutcallEntry entry) throws SQLException
 	{
 		PreparedStatement stmt = null;
-		
+		ResultSet rs = null;
+		try
+		{
+			stmt = connection.prepareStatement(
+				"SELECT attachment FROM persistentoutcalls WHERE id = ?");
+			stmt.setLong(1, entry.entryID());
+			rs = stmt.executeQuery();
+			if (rs.next())
+			{
+				String attachmentPath = rs.getString(1);
+				if (attachmentPath != null)
+				{
+					_logger.info("PersistentOutcallDatabase: delete " + attachmentPath);
+					new File(attachmentPath).delete();
+				}
+			}
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
 		try
 		{
 			stmt = connection.prepareStatement(

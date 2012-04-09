@@ -66,6 +66,7 @@ import edu.virginia.vcgr.genii.client.common.ConstructionParametersType;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.jsdl.JSDLUtils;
+import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.queue.QueueConstants;
 import edu.virginia.vcgr.genii.client.queue.QueueConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
@@ -474,7 +475,7 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		}
 
 		@Override
-		public void handleNotification(TopicPath topic,
+		public String handleNotification(TopicPath topic,
 				EndpointReferenceType producerReference,
 				EndpointReferenceType subscriptionReference,
 				BESActivityStateChangedContents contents) throws Exception
@@ -491,6 +492,7 @@ public class QueueServiceImpl extends ResourceForkBaseService
 			ActivityState state = contents.activityState();
 			if (state.isFinalState())
 				_queueMgr.checkJobStatus(jobid);
+			return NotificationConstants.OK;
 		}
 	}
 	

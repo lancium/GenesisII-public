@@ -34,12 +34,13 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.context.*;
 import edu.virginia.vcgr.genii.common.security.*;
+import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.*;
-import edu.virginia.vcgr.genii.container.resource.*;
-import edu.virginia.vcgr.genii.client.resource.*;
 
+import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.security.authz.providers.*;
 import edu.virginia.vcgr.genii.security.MessageLevelSecurityRequirements;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
 import edu.virginia.vcgr.genii.security.credentials.GIICredential;
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
@@ -86,24 +87,48 @@ public class JNDIAuthZProvider implements IAuthZProvider
 		}
 	}
 
-	@SuppressWarnings("unchecked")
+	/**
+	 * Check that the caller has access to the given operation.
+	 */
 	public void checkAccess(
 			Collection<GIICredential> authenticatedCallerCredentials,
-			IResource resource, 
-			Class<?> serviceClass, 
-			Method operation)
+			IResource resource, Class<?> serviceClass, Method operation)
 		throws PermissionDeniedException, AuthZSecurityException, ResourceException
 	{
-		
 		JNDIResource jndiResource = (JNDIResource) resource;
-
 		if (!jndiResource.isIdpResource())
 		{
 			_gamlAclProvider.checkAccess(authenticatedCallerCredentials,
 				resource, serviceClass, operation);
 			return;
 		}
+		if (!checkJndiAccess(jndiResource))
+		{
+			throw new PermissionDeniedException(operation.getName());
+		}
+	}
+	
+	/**
+	 * Check that the caller has a type of access to the given resource.
+	 */
+	public boolean checkAccess(
+			Collection<GIICredential> authenticatedCallerCredentials,
+			IResource resource, RWXCategory category)
+		throws AuthZSecurityException, ResourceException
+	{
+		JNDIResource jndiResource = (JNDIResource) resource;
+		if (!jndiResource.isIdpResource())
+		{
+			_gamlAclProvider.checkAccess(authenticatedCallerCredentials, resource, category);
+			return true;
+		}
+		return checkJndiAccess(jndiResource);
+	}
 
+	@SuppressWarnings("unchecked")
+	private boolean checkJndiAccess(JNDIResource jndiResource)
+		throws AuthZSecurityException, ResourceException
+	{
 		ICallingContext callingContext;
 		try 
 		{
@@ -121,10 +146,8 @@ public class JNDIAuthZProvider implements IAuthZProvider
 						.getTransientProperty(GIICredential.CALLER_CREDENTIALS_PROPERTY);
 		for (GIICredential cred : callerCredentials)
 		{
-
 			if (cred instanceof UsernamePasswordIdentity)
 			{
-
 				try
 				{
 					UsernamePasswordIdentity utIdentity =
@@ -143,11 +166,11 @@ public class JNDIAuthZProvider implements IAuthZProvider
 								"com.sun.jndi.nis.NISCtxFactory");
 						providerUrl =
 								"nis://"
-										+ resource
+										+ jndiResource
 												.getProperty(SecurityConstants.NEW_JNDI_STS_HOST_QNAME
 														.getLocalPart())
 										+ "/"
-										+ resource
+										+ jndiResource
 												.getProperty(SecurityConstants.NEW_JNDI_NISDOMAIN_QNAME
 														.getLocalPart());
 						jndiEnv.setProperty(Context.PROVIDER_URL, providerUrl);
@@ -171,7 +194,7 @@ public class JNDIAuthZProvider implements IAuthZProvider
 						if (org.mortbay.jetty.security.UnixCrypt.crypt(utPassword,
 								ypPassword).equals(ypPassword))
 						{
-							return;
+							return true;
 						}
 						break;
 
@@ -183,7 +206,6 @@ public class JNDIAuthZProvider implements IAuthZProvider
 								"\"LDAP not implemented\" not applicable.");
 
 					default:
-
 						throw new ResourceException("Unknown STS type.");
 					}
 
@@ -200,9 +222,8 @@ public class JNDIAuthZProvider implements IAuthZProvider
 				}
 			}
 		}
-
 		// Nobody appreciates us
-		throw new PermissionDeniedException(operation.getName());
+		return false;
 	}
 
 	public MessageLevelSecurityRequirements getMinIncomingMsgLevelSecurity(

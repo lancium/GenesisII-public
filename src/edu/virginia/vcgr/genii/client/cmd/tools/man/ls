@@ -10,15 +10,23 @@ Long format
 
 -a | --all
 
-Shows all types of entries
+Do not ignore entries starting with .
 
 -e | --epr
 
-Shows the EPR's of all RNS entries
+Show the EPR of each RNS entry
 
--d
+-d | --directory
 
-The current directory
+List directory entries instead of directory contents
+
+-r | --recursive
+
+List subdirectories recursively
+
+-m | --multiline
+
+Show a brief summary of the EPR of each RNS entry
 
 <target> *
 

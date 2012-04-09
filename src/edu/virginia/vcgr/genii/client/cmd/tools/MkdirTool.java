@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
@@ -14,7 +15,6 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
-import edu.virginia.vcgr.genii.client.rns.RNSConstants;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
@@ -77,7 +77,7 @@ public class MkdirTool extends BaseGridTool
 
 		return RNSUtilities.findService("/containers/BootstrapContainer",
 			"EnhancedRNSPortType", 
-			new PortType[] { RNSConstants.RNS_PORT_TYPE }, new GeniiPath(path).path()).getEndpoint();
+			new PortType[] { WellKnownPortTypes.RNS_PORT_TYPE }, new GeniiPath(path).path()).getEndpoint();
 	}
 	
 	private int runECatcher()

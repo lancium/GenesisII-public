@@ -72,8 +72,6 @@ public class AttributesDisplayPlugin extends AbstractUITabPlugin
 	
 	static private class TextLoadHandler implements LazyLoadTabHandler
 	{
-		static final long serialVersionUID = 0L;
-		
 		private UIPluginContext _context;
 		private XMLTextWidget _widget;
 		
@@ -153,8 +151,6 @@ public class AttributesDisplayPlugin extends AbstractUITabPlugin
 	
 	static private class XMLLoadHandler implements LazyLoadTabHandler
 	{
-		static final long serialVersionUID = 0L;
-		
 		private UIPluginContext _context;
 		private XMLTree _widget;
 		

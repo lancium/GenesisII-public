@@ -27,7 +27,7 @@ public class BasicDBResourceFactory implements IResourceFactory
 			"createtime TIMESTAMP)";
 	static private final String _CREATE_PROPERTY_TABLE_STMT =
 		"CREATE TABLE properties (resourceid VARCHAR(128), propname VARCHAR(256)," +
-			"propvalue BLOB (2G), CONSTRAINT propertiesconstraint1 " +
+			"propvalue BLOB(2G), CONSTRAINT propertiesconstraint1 " +
 			"PRIMARY KEY (resourceid, propname))";
 	static private final String _CREATE_MATCHING_PARAMS_STMT =
 		"CREATE TABLE matchingparams (" +

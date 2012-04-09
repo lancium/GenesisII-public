@@ -14,7 +14,6 @@ import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
-import edu.virginia.vcgr.genii.client.security.*;
 import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.utils.units.DurationUnits;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
@@ -26,6 +25,7 @@ import edu.virginia.vcgr.genii.security.SecurityConstants;
 import edu.virginia.vcgr.genii.security.credentials.GIICredential;
 import edu.virginia.vcgr.genii.security.credentials.identity.IdentityType;
 import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
+import edu.virginia.vcgr.genii.client.io.FileResource;
 
 
 public class IdpTool extends BaseLoginTool {
@@ -45,6 +45,7 @@ public class IdpTool extends BaseLoginTool {
 
 	public IdpTool() {
 		super(_DESCRIPTION, _USAGE_RESOURCE, false);
+		addManPage(new FileResource(_MANPAGE));
 		// set valid millis to 180 days
 		_validMillis = 1000L * 60 * 60 * 24 * 180;		
 	}

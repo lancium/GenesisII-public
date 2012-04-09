@@ -38,6 +38,7 @@
 		<file name="ogsa-wsrf-bp.xsd"/>
 		<file name="oasis-200401-wss-wssecurity-secext-1.0.xsd"/>
 		<file name="oasis-200401-wss-wssecurity-utility-1.0.xsd"/>
+		<file name="geniiNotificationConsumer.wsdl"/>
 	</filelist>
 
 	<presetdef name="common.source.files.uptodate">

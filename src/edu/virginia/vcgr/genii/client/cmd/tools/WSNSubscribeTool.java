@@ -7,6 +7,7 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 import edu.virginia.vcgr.genii.client.io.FileResource;
+import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathAlreadyExistsException;
@@ -39,7 +40,7 @@ public class WSNSubscribeTool extends BaseGridTool
 		}
 
 		@Override
-		public void handleNotification(TopicPath topic,
+		public String handleNotification(TopicPath topic,
 			EndpointReferenceType producerReference,
 			EndpointReferenceType subscriptionReference,
 			NotificationMessageContents contents) throws Exception
@@ -47,6 +48,7 @@ public class WSNSubscribeTool extends BaseGridTool
 			stdout.format(
 				"Received notification [%s]:  %s\n",
 				topic, contents);
+			return NotificationConstants.OK;
 		}
 	}
 	

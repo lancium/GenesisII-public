@@ -46,7 +46,6 @@ import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.genii.client.ser.BlobLimits;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
-import edu.virginia.vcgr.genii.client.security.*;
 import edu.virginia.vcgr.genii.security.MessageLevelSecurityRequirements;
 import edu.virginia.vcgr.genii.security.SecurityConstants;
 import edu.virginia.vcgr.genii.security.WSSecurityUtils;
@@ -210,7 +209,6 @@ public class EPRUtils
 		return null;
 	}
 
-	@SuppressWarnings("unused")
 	static public MessageLevelSecurityRequirements extractMinMessageSecurity(
 			EndpointReferenceType epr) throws GeneralSecurityException
 	{

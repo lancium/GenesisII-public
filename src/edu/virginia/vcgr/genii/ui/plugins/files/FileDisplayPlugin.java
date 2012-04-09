@@ -42,8 +42,6 @@ public class FileDisplayPlugin extends AbstractUITabPlugin
 	
 	static private class TextLoadHandler implements LazyLoadTabHandler
 	{
-		static final long serialVersionUID = 0L;
-		
 		private UIPluginContext _context;
 		private FileDisplayWidget _widget;
 		

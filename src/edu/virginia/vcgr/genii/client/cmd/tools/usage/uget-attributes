@@ -1,2 +1,1 @@
-get-attributes <target>
-
+get-attributes [-h] [-l] <target>

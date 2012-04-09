@@ -31,6 +31,7 @@ import edu.virginia.vcgr.genii.common.security.*;
 import edu.virginia.vcgr.genii.container.resource.*;
 import edu.virginia.vcgr.genii.client.resource.*;
 import edu.virginia.vcgr.genii.security.MessageLevelSecurityRequirements;
+import edu.virginia.vcgr.genii.security.RWXCategory;
 import edu.virginia.vcgr.genii.security.credentials.GIICredential;
 
 /**
@@ -66,6 +67,14 @@ public class OpenAuthZProvider implements IAuthZProvider
 			throws AuthZSecurityException, ResourceException
 	{
 
+	}
+	
+	public boolean checkAccess(
+			Collection<GIICredential> authenticatedCallerCredentials,
+			IResource resource, RWXCategory category)
+		throws AuthZSecurityException, ResourceException
+	{
+		return true;
 	}
 
 	public void checkAccess(

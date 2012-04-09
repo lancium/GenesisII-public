@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.io.FileSystemUtils;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
@@ -27,7 +28,7 @@ public class PersistentDelete
 		
 		@Override
 		final public boolean enactOutcall(ICallingContext callingContext,
-			EndpointReferenceType target) throws Throwable
+			EndpointReferenceType target, GeniiAttachment attachment) throws Throwable
 		{
 			if (!FileSystemUtils.recursiveDelete(_path, false))
 				return false;
@@ -48,6 +49,6 @@ public class PersistentDelete
 		service.schedule(new PersistentDeleteActor(dir), 
 			new ExponentialBackoffScheduler(
 				30L, TimeUnit.DAYS, null, 8, 1L, TimeUnit.MINUTES,
-				15L, TimeUnit.SECONDS), null, null);
+				15L, TimeUnit.SECONDS), null, null, null);
 	}
 }

@@ -8,7 +8,7 @@ public interface NotificationHandler<ContentsType extends NotificationMessageCon
 {
 	public Class<ContentsType> contentsType();
 	
-	public void handleNotification(
+	public String handleNotification(
 		TopicPath topic,
 		EndpointReferenceType producerReference,
 		EndpointReferenceType subscriptionReference,

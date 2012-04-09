@@ -37,7 +37,7 @@ public class HistoryDatabase
 			"sequencenumber VARCHAR(32) NOT NULL," +
 			"level VARCHAR(16) NOT NULL," +
 			"category VARCHAR(64) NOT NULL," +
-			"createtimestamp TIMESTAMP NOT NULL WITH DEFAULT CURRENT TIMESTAMP," +
+			"createtimestamp TIMESTAMP NOT NULL DEFAULT CURRENT TIMESTAMP," +
 			"properties BLOB(2G) NOT NULL," +
 			"eventsource BLOB(2G) NOT NULL," +
 			"eventdata BLOB(2G) NOT NULL," +

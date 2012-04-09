@@ -1,2 +1,1 @@
-cp <source-path> <target-path>
-
+cp [-r] [-v] <source-path> <target-path>

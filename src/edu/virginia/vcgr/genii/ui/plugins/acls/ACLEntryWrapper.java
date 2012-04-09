@@ -30,20 +30,19 @@ public class ACLEntryWrapper
 		return _entry.equals(other._entry);
 	}
 	
-	@SuppressWarnings("unused")
 	@Override
 	public boolean equals(Object other)
 	{
 		if (other instanceof AclEntry)
 		{
 			if (_entry == null)
-				return other == null;
-			if (other == null)
 				return false;
 			return _entry.equals(other);
-		} else if (other instanceof ACLEntryWrapper)
+		}
+		if (other instanceof ACLEntryWrapper)
+		{
 			return equals((ACLEntryWrapper)other);
-		
+		}
 		return false;
 	}
 	

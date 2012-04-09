@@ -29,7 +29,12 @@ public class DatabaseTableUtils
 				}
 				catch (SQLException sqe)
 				{
-					if (sqe.getSQLState().equals("X0Y32"))
+					// In the X/Open standard, 42S01 is "table exists" and 42S11 is "index exists".
+					// X0Y32 is a derby-specific error state.
+					// 42000 is "access denied", but MySQL returns it for "index exists".
+					if (sqe.getSQLState().equals("X0Y32") ||
+						sqe.getSQLState().equals("42S01") || sqe.getSQLState().equals("42S11") ||
+						(sqe.getSQLState().equals("42000") && tableStatement.toUpperCase().startsWith("CREATE INDEX ")))
 					{
 						// The table already exists.
 						if (failOnExists)

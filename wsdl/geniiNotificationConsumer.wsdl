@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions name="GeniiNotificationConsumer"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsntw="http://docs.oasis-open.org/wsn/bw-2"
+	xmlns:genii-nc="http://vcgr.cs.virginia.edu/genii/2010/08/notification/notification-consumer"
+	targetNamespace="http://vcgr.cs.virginia.edu/genii/2010/08/notification/notification-consumer">
+
+	<wsdl:import
+		namespace="http://docs.oasis-open.org/wsn/bw-2"
+		location="./wsrf/wsBaseNotification.wsdl"/>
+
+	<wsdl:types>
+		<xsd:schema
+			targetNamespace="http://vcgr.cs.virginia.edu/genii/2010/08/notification/notification-consumer"
+			elementFormDefault="qualified" attributeFormDefault="unqualified">
+			<xsd:element name="NotifyResponseType">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="status" type="xsd:anyURI"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="NotifyResponse">
+		<wsdl:part name="NotifyResponse" element="genii-nc:NotifyResponseType"/>
+	</wsdl:message>
+
+	<wsdl:portType name="GeniiNotificationConsumer">
+		<wsdl:operation name="notifyWithResponse">
+			<wsdl:input message="wsntw:Notify"/>
+			<wsdl:output message="genii-nc:NotifyResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+</wsdl:definitions>

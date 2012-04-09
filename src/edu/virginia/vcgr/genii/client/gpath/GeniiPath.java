@@ -65,6 +65,28 @@ public class GeniiPath implements Serializable
 		_pathType = DEFAULT_PATH_TYPE;
 	}
 	
+	public GeniiPath(RNSPath rnsPath)
+	{
+		_pathType = GeniiPathType.Grid;
+		_path = rnsPath.pwd();
+		_cachedLookup = rnsPath;
+	}
+	
+	public void reset()
+	{
+		_cachedLookup = null;
+	}
+
+	public RNSPath lookupRNS()
+	{
+		switch (_pathType)
+		{
+			case Grid:
+				return lookup();
+		}
+		return null;
+	}
+	
 	@Override
 	final public int hashCode()
 	{

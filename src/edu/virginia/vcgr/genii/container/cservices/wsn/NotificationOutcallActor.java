@@ -11,10 +11,14 @@ import org.oasis_open.wsn.base.Notify;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.comm.attachments.AttachmentType;
+import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.notification.NotificationMessageHolder;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
+import edu.virginia.vcgr.genii.common.notification.NotifyResponseType;
 import edu.virginia.vcgr.genii.container.cservices.percall.OutcallActor;
 
 public class NotificationOutcallActor implements OutcallActor
@@ -24,6 +28,7 @@ public class NotificationOutcallActor implements OutcallActor
 	private ICallingContext _callingContext;
 	private Collection<NotificationMessageOutcallContent> _contents =
 		new LinkedList<NotificationMessageOutcallContent>();
+	private boolean _persistent;
 	
 	public NotificationOutcallActor(
 		NotificationMessageOutcallContent...contents) 
@@ -40,9 +45,14 @@ public class NotificationOutcallActor implements OutcallActor
 		_contents.add(content);
 	}
 	
+	public void setPersistent(boolean persistent)
+	{
+		_persistent = persistent;
+	}
+	
 	@Override
 	public boolean enactOutcall(ICallingContext callingContext,
-		EndpointReferenceType target) throws Throwable
+		EndpointReferenceType target, GeniiAttachment attachment) throws Throwable
 	{
 		Collection<NotificationMessageHolderType> holders =
 			new ArrayList<NotificationMessageHolderType>(
@@ -62,7 +72,23 @@ public class NotificationOutcallActor implements OutcallActor
 		GeniiCommon common = ClientUtils.createProxy(
 			GeniiCommon.class, target,
 			(callingContext == null) ? _callingContext : callingContext);
-		common.notify(notify);
+		if (attachment != null)
+		{
+			Collection<GeniiAttachment> attachments = new LinkedList<GeniiAttachment>();
+			attachments.add(attachment);
+			ClientUtils.setAttachments(common, attachments, AttachmentType.MTOM);
+		}
+		if (_persistent)
+		{
+			NotifyResponseType response = common.notifyWithResponse(notify);
+			if ((response != null) && (response.getStatus() != null) &&
+				(response.getStatus().toString().equals(NotificationConstants.TRYAGAIN)))
+				return false;
+		}
+		else
+		{
+			common.notify(notify);
+		}
 		return true;
 	}
 }

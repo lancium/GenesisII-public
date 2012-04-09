@@ -208,11 +208,9 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 		resource.setProperty(GAML_ACL_PROPERTY_NAME, acl);
 	}
 
-	protected boolean checkAclAccess(Identity identity, Class<?> serviceClass,
-		Method operation, Acl acl) throws AuthZSecurityException
+	private boolean checkAclAccess(Identity identity, RWXCategory category, Acl acl)
+		throws AuthZSecurityException
 	{
-
-		RWXCategory category = RWXManager.lookup(serviceClass, operation);
 		Collection<AclEntry> trustList = null;
 		switch (category)
 		{
@@ -230,7 +228,6 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 			case CLOSED:
 				return false;
 		}
-
 		if (trustList == null)
 		{
 			// Empty ACL
@@ -254,69 +251,76 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 				}
 			}
 		}
-
 		return false;
 	}
 
-	
 
-	
-	
 	public void checkAccess(
-		Collection<GIICredential> authenticatedCallerCredentials,
-		IResource resource, 
-		Class<?> serviceClass, 
-		Method operation)
-			throws PermissionDeniedException, AuthZSecurityException, ResourceException
+			Collection<GIICredential> authenticatedCallerCredentials,
+			IResource resource, Class<?> serviceClass, Method operation)
+		throws PermissionDeniedException, AuthZSecurityException, ResourceException
 	{
-
+		RWXCategory category = RWXManager.lookup(serviceClass, operation);
+		if (!checkAccess(authenticatedCallerCredentials, resource, category))
+		{
+			throw new PermissionDeniedException(operation.getName());
+		}
+	}
+	
+	public boolean checkAccess(
+			Collection<GIICredential> authenticatedCallerCredentials,
+			IResource resource, RWXCategory category)
+		throws PermissionDeniedException, AuthZSecurityException, ResourceException
+	{
+		_logger.debug("GamlAclAuthZProvider.checkAccess(" + category + ")");
 		try
 		{
 			ICallingContext callContext = ContextManager.getCurrentContext(false);
-
-			// get ACL
 			Acl acl = (Acl) resource.getProperty(GAML_ACL_PROPERTY_NAME);
 
 			// pre-emptive check of the wildcard access
-			if ((acl == null) || checkAclAccess(null, serviceClass, operation, acl))
+			if ((acl == null) || checkAclAccess(null, category, acl))
 			{
-				return;
+				_logger.debug("access granted to everyone");
+				return true;
 			}
-
-			
-			RWXCategory category = RWXManager.lookup(serviceClass, operation);
-			
 			
 			// try each identity in the caller's credentials
 			for (GIICredential cred : authenticatedCallerCredentials)
 			{
 				if (cred instanceof Identity)
 				{
-					
-					if (cred instanceof SignedAssertion){
-						if (((SignedAssertion)cred).checkAccess(category)){
-							if(checkAclAccess((Identity) cred, serviceClass, operation, acl))
-								return;
+					if (cred instanceof SignedAssertion)
+					{
+						if (((SignedAssertion)cred).checkAccess(category))
+						{
+							if (checkAclAccess((Identity) cred, category, acl))
+							{
+								_logger.debug("access granted to signed assertion");
+								return true;
+							}
 						}
 					}
 					// straight-up identity (username/password)
-					else if(checkAclAccess((Identity) cred, serviceClass, operation, acl))
+					else if (checkAclAccess((Identity) cred, category, acl))
 					{
-						return;
+						_logger.debug("access granted to identity");
+						return true;
 					}
 				}
 				else if (cred instanceof SignedAssertion) 
 				{
-					
 					SignedAssertion sa = (SignedAssertion) cred;
-					if(sa.checkAccess(category)){
+					if (sa.checkAccess(category))
+					{
 						// possibly unwrap an identity from an IdentityAttribute
 						if (sa.getAttribute() instanceof IdentityAttribute) 
 						{
 							IdentityAttribute ia = (IdentityAttribute) sa.getAttribute();
-							if (checkAclAccess(ia.getIdentity(), serviceClass, operation, acl))
+							if (checkAclAccess(ia.getIdentity(), category, acl))
 							{
-								return;
+								_logger.debug("access granted to signed assertion");
+								return true;
 							}
 						}
 					}
@@ -327,11 +331,11 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 			if (Security.isAdministrator(callContext))
 			{
 				_logger.info("Method call made as admin.");
-				return;
+				return true;
 			}			
 
 			// Nobody appreciates us
-			throw new PermissionDeniedException(operation.getName());
+			return false;
 		}
 		catch (AuthZSecurityException ase)
 		{

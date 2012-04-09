@@ -14,6 +14,7 @@
     xmlns:rw-2="http://docs.oasis-open.org/wsrf/rw-2"
     xmlns:wsnt="http://docs.oasis-open.org/wsn/b-2"
     xmlns:wsntw="http://docs.oasis-open.org/wsn/bw-2"
+    xmlns:genii-nc="http://vcgr.cs.virginia.edu/genii/2010/08/notification/notification-consumer"
     targetNamespace="http://vcgr.cs.virginia.edu/genii/2006/12/common">
 
 	<xsd:import
@@ -55,6 +56,10 @@
 	<wsdl:import
 		namespace="http://vcgr.cs.virginia.edu/genii/2006/12/resource-authz"
 		location="./resource-authz.wsdl"/>
+
+	<wsdl:import
+	    namespace="http://vcgr.cs.virginia.edu/genii/2010/08/notification/notification-consumer"
+		location="./geniiNotificationConsumer.wsdl"/>
 
 <!-- Messages -->
 	<wsdl:message name="iterateHistoryEventsRequest">
@@ -105,6 +110,7 @@
 		<genii-ext:extend portType="rpw-2:QueryResourceProperties"/>
 		<genii-ext:extend portType="wsntw:NotificationConsumer"/>
 		<genii-ext:extend portType="wsntw:NotificationProducer"/>
+		<genii-ext:extend portType="genii-nc:GeniiNotificationConsumer"/>
 
 		<wsdl:operation name="iterateHistoryEvents">
 			<wsdl:input message="genii-common:iterateHistoryEventsRequest"/>

@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Element;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicQueryExpression;
 
@@ -62,10 +63,12 @@ public class DefaultNotificationMultiplexer implements NotificationMultiplexer
 	}
 
 	@Override
-	final public void notify(TopicPath path, EndpointReferenceType producerReference,
+	final public String notify(TopicPath path, EndpointReferenceType producerReference,
 		EndpointReferenceType subscriptionReference,
 		Element messageContents)
 	{
+		String status = NotificationConstants.UNPROCESSED;
+		
 		Collection<NotificationHandlerWrapper<? extends NotificationMessageContents>> handlers;
 		
 		synchronized(_handlers)
@@ -84,7 +87,10 @@ public class DefaultNotificationMultiplexer implements NotificationMultiplexer
 					JAXBElement<? extends NotificationMessageContents> jaxbe =
 						u.unmarshal(messageContents, handler.contentsType());
 					
-					handler.handleNotification(path, producerReference,
+					// What if a message is handled by multiple handlers?
+					// Should we combine the status so far with the new status?
+					// Should we abort the loop if the new status is "try again"?
+					status = handler.handleNotification(path, producerReference,
 						subscriptionReference, jaxbe.getValue());
 				}
 				catch (JAXBException e)
@@ -95,5 +101,6 @@ public class DefaultNotificationMultiplexer implements NotificationMultiplexer
 				}
 			}
 		}
+		return status;
 	}
 }

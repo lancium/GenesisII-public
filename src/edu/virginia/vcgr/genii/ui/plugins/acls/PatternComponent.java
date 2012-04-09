@@ -309,8 +309,6 @@ public class PatternComponent extends DraggableImageComponent
 	
 	private class MouseClickListener extends MouseAdapter
 	{
-		static final long serialVersionUID = 0L;
-
 		private void popup(MouseEvent e)
 		{
 			JPopupMenu menu = new JPopupMenu("Popup Menu");

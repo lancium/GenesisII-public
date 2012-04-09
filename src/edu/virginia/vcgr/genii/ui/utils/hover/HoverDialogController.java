@@ -99,8 +99,6 @@ public class HoverDialogController
 	private class MouseListenerImpl extends MouseAdapter
 		implements ActionListener, HierarchyListener, ChangeListener
 	{
-		static final long serialVersionUID = 0L;
-		
 		private Point _lastViewPosition = null;
 		private JDialog _dialog = null;
 		
@@ -236,8 +234,6 @@ public class HoverDialogController
 	
 	private class DialogDestroy implements WindowFocusListener
 	{
-		static final long serialVersionUID = 0L;
-		
 		private JDialog _dialog;
 		
 		private DialogDestroy(JDialog dialog)

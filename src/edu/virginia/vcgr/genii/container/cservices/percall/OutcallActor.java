@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 
 /**
@@ -26,5 +27,5 @@ public interface OutcallActor extends Serializable
 	 * @throws Throwable
 	 */
 	public boolean enactOutcall(ICallingContext callingContext,
-		EndpointReferenceType target) throws Throwable;
+		EndpointReferenceType target, GeniiAttachment attachment) throws Throwable;
 }

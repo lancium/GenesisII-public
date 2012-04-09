@@ -1,2 +1,1 @@
-ls [-ldae] [--long] [--all] [--directory] [--epr] [<target> *]
-
+ls [-laderm] [--long] [--all] [--directory] [--epr] [--recursive] [--multiline] [<target> *]

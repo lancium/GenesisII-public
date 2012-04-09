@@ -198,7 +198,6 @@ public class ExportedDirUtils
 				initInfo.getResolverFactoryEPR()));
 	}
 	
-	@SuppressWarnings("unused")
 	static public ExportedDirInitInfo extractCreationProperties(
 		HashMap<QName, Object> properties) throws ResourceException
 	{
@@ -293,9 +292,6 @@ public class ExportedDirUtils
 		if (path == null)
 			throw new IllegalArgumentException(
 				"Couldn't find path in export creation properties.");
-		if (parentIds == null)
-			throw new IllegalArgumentException(
-				"Couldn't find parent IDs in export creation properties.");
 		if (isReplicated == null)
 			throw new IllegalArgumentException(
 				"Couldn't find replication indicator in export creation properties.");

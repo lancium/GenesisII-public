@@ -207,7 +207,6 @@ public class CertTool
 	 * Construct a structure-of-arrays of distinguished-name fields and 
 	 * paired values 
 	 */
-	@SuppressWarnings("unchecked")
 	public static Map.Entry<List<DERObjectIdentifier>, List<String> > constructCommonDnFields(
 			String epi,
 			ArrayList<String> newOrgs, 

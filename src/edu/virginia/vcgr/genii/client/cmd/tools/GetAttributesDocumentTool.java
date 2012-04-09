@@ -1,5 +1,9 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 import javax.xml.namespace.QName;
 
 import org.apache.axis.message.MessageElement;
@@ -25,7 +29,9 @@ public class GetAttributesDocumentTool extends BaseGridTool
 		"edu/virginia/vcgr/genii/client/cmd/tools/usage/uget-attributes";
 	static final private String _MANPAGE =
 		"edu/virginia/vcgr/genii/client/cmd/tools/man/get-attributes";
-		
+	
+	private boolean _human = false;
+	private boolean _local = false;
 	
 	public GetAttributesDocumentTool()
 	{
@@ -34,6 +40,19 @@ public class GetAttributesDocumentTool extends BaseGridTool
 		addManPage(new FileResource(_MANPAGE));
 	}
 	
+	@Option({"human", "h"})
+	public void setHuman()
+	{
+		_human = true;
+	}
+	
+	@Option({"local", "l"})
+	public void setLocal()
+	{
+		_human = true;
+		_local = true;
+	}
+
 	@Override
 	protected int runCommand() throws Throwable
 	{
@@ -46,15 +65,29 @@ public class GetAttributesDocumentTool extends BaseGridTool
 			path.getEndpoint());
 		GetResourcePropertyDocumentResponse resp = common.getResourcePropertyDocument(
 			new GetResourcePropertyDocument());
-		MessageElement document = new MessageElement(
-			new QName(GenesisIIConstants.GENESISII_NS, "attributes"));
-		for (MessageElement child : resp.get_any())
+		if (_human)
 		{
-			document.addChild(child);
+			SortedMap<String, String> sortMap = new TreeMap<String, String>();
+			for (MessageElement child : resp.get_any())
+			{
+				String name = (_local ? child.getName() : child.getQName().toString());
+				sortMap.put(name, child.getValue());
+			}
+			for (Map.Entry<String, String> entry : sortMap.entrySet())
+			{
+				stdout.println(entry.getKey() + "=" + entry.getValue());
+			}
 		}
-		
-		stdout.println(document);
-		
+		else
+		{
+			MessageElement document = new MessageElement(
+					new QName(GenesisIIConstants.GENESISII_NS, "attributes"));
+			for (MessageElement child : resp.get_any())
+			{
+				document.addChild(child);
+			}
+			stdout.println(document);
+		}
 		return 0;
 	}
 

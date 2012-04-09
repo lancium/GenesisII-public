@@ -18,12 +18,12 @@ public class GridTesterTool extends BaseGridTool
 	static final private int MAX_DESCRIPTION_WIDTH = LINE_WIDTH - 
 		RESULT_WIDTH - MIN_DOT_WIDTH;
 	
-	static final private String USAGE_PATTERN = 
-		"grid-tester { %s }";
-	
 	static final private String DESCRIPTION =
 		"edu/virginia/vcgr/genii/client/cmd/tools/description/dgrid-tester";
 	static final private FileResource _MANPAGE = new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/man/grid-tester");
+	
+	/*
+	static final private String USAGE_PATTERN = "grid-tester { %s }";
 	
 	static private String formatUsage(String pattern)
 	{
@@ -37,9 +37,9 @@ public class GridTesterTool extends BaseGridTool
 				builder.append(testType);
 			}
 		}
-		
 		return String.format(pattern, builder);
 	}
+	*/
 	
 	private boolean _showStackTraces = false;
 	

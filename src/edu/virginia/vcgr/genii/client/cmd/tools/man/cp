@@ -1,14 +1,24 @@
 Definitions:
 
+-r | --recursive
+
+Copy directories recursively
+
+-v | --verbose
+
+Print the name of each resource as it's copied
+
 source-path 
-	An absolute or relative path in the currently connected grid RNS namespace (unless a local path is provided) which is assumed to reference a ByteIO resource (or file system file). To indicate a local path, make sure to begin the pathname with 'local:'. 
+
+An absolute or relative path in the currently connected grid RNS namespace (unless a local path is provided) which refers to a directory or file (i.e. an RNS or ByteIO resource). To indicate a local path, begin the pathname with 'local:'. 
 
 target-path 
-	An absolute or relative path in the currently connected grid RNS namespace (unless a local path is provided) which is assumed to reference a ByteIO resource (or file system file), or non-existant resource (a path for which the final element of the path or basename of the path does not yet exist). To indicate a local path, make sure to begin the pathname with 'local:'. 
+
+An absolute or relative path in the currently connected grid RNS namespace (unless a local path is provided) which refers to a directory or file, or a non-existant resource (a path for which the final element of the path does not yet exist). To indicate a local path, begin the pathname with 'local:'. 
 
 Description:
 
-Similar to cp in the UNIX operating system, the grid cp command copies the contents of one source file or ByteIO into another target file or ByteIO. If the target path specified does not exist, a new file or ByteIO resource is created. If a new ByteIO resource needs to be created in the grid environment, then the default ByteIO service on the default container is used to create it. Currently, there is no way to override this behavior without using the create-resource tool.
+Similar to cp in the UNIX operating system, the grid cp command copies the contents of one source file into another target file. If the target path specified does not exist, then a new file is created. If the -r option is specified, then copy directories and files. If a new ByteIO resource needs to be created in the grid environment, then the default ByteIO service on the default container is used to create it. Currently, there is no way to override this behavior without using the create-resource tool.
 
 Code:
 

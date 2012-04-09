@@ -45,7 +45,7 @@ public class CreateUserDelegateTool extends CreateUserTool
 	public CreateUserDelegateTool()
 	{
 		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE),false);
-		
+		addManPage(new FileResource(_MANPAGE));
 	}
 	
 	/**

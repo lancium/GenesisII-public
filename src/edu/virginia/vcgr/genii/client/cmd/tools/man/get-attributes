@@ -1,11 +1,14 @@
 Definitions
 
 target 
-    The RNS path to any resource whose attribute (resource-property) document you would like to retrieve. 
+
+The RNS path to any resource whose attribute (resource-property) document you would like to retrieve. 
 
 Description:
 
 The get-attributes command, retrieves and prints the attribute (resource-property) document for a target.
+
+If the -h option is specified, then output the attributes (including namespaces) in key=value format.  If the -l option is specified, then omit the namespaces.
 
 Code:
 

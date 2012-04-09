@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicQueryExpression;
 
@@ -32,13 +33,13 @@ class NotificationHandlerWrapper<ContentsType extends NotificationMessageContent
 		return _handler.contentsType();
 	}
 
-	final void handleNotification(TopicPath topic,
+	final String handleNotification(TopicPath topic,
 		EndpointReferenceType producerReference,
 		EndpointReferenceType subscriptionReference, Object contents)
 	{
 		try
 		{
-			_handler.handleNotification(
+			return _handler.handleNotification(
 				topic, producerReference, subscriptionReference,
 				_handler.contentsType().cast(contents));
 		}
@@ -47,6 +48,7 @@ class NotificationHandlerWrapper<ContentsType extends NotificationMessageContent
 			_logger.warn(
 				"A notification handler threw an exception while " +
 				"handling a notification.", e);
+			return NotificationConstants.FAIL;
 		}
 	}
 }

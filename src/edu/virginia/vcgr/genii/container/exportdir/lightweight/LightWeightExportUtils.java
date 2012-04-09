@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.disk.DiskExportRoot;
-import edu.virginia.vcgr.genii.container.exportdir.lightweight.svn.SVNExportRoot;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.zipjar.ZipJarExportRoot;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -38,8 +37,8 @@ class LightWeightExportUtils
 				
 				
 				//Temporarily disabled
-				if (false)
-				//if (rootDirString.matches("^.+:.*$"))
+				/*
+				if (rootDirString.matches("^.+:.*$"))
 				{
 					// Handle SVN
 					Long revision = (Long)resource.getProperty(
@@ -51,11 +50,11 @@ class LightWeightExportUtils
 						(String)resource.getProperty(
 							LightWeightExportConstants.SVN_PASS_PROPERTY_NAME),
 						revision);
-					/* TODO:
+					// TODO:
 					if (revision == null)
 						return vroot;
-					*/
 				} else
+				*/
 				{
 					File root = new File(rootDirString);
 					if (root.isDirectory())
