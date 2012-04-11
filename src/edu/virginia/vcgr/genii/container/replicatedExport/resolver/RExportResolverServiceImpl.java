@@ -105,7 +105,7 @@ public class RExportResolverServiceImpl extends GenesisIIBase
 
 		addImplementedPortType(WellKnownPortTypes.ENDPOINT_IDENTIFIER_RESOLVER_SERVICE_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.REFERENCE_RESOLVER_SERVICE_PORT_TYPE);
-		addImplementedPortType(WellKnownPortTypes.GENII_SIMPLE_RESOLVER_PORT_TYPE);
+		// addImplementedPortType(WellKnownPortTypes.GENII_RESOLVER_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.RNS_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.GENII_NOTIFICATION_CONSUMER_PORT_TYPE);
 		addImplementedPortType(WellKnownPortTypes.REXPORT_RESOLVER_PORT_TYPE);

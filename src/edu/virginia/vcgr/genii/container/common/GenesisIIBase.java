@@ -98,6 +98,7 @@ import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.w3c.dom.Document;
 import org.ws.addressing.AttributedURIType;
 import org.ws.addressing.EndpointReferenceType;
+import org.ws.addressing.MetadataType;
 import org.xml.sax.InputSource;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
@@ -111,6 +112,7 @@ import edu.virginia.vcgr.genii.client.iterator.WSIteratorConstructionParameters;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
+import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
 import edu.virginia.vcgr.genii.client.resource.AttributedURITypeSmart;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
@@ -171,7 +173,6 @@ import edu.virginia.vcgr.genii.container.iterator.AbstractIteratorBuilder;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorEntry;
 import edu.virginia.vcgr.genii.container.iterator.IteratorBuilder;
 import edu.virginia.vcgr.genii.container.iterator.WSIteratorServiceImpl;
-import edu.virginia.vcgr.genii.container.resolver.Resolution;
 import edu.virginia.vcgr.genii.container.resolver.IResolverFactoryProxy;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
@@ -405,8 +406,12 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 		{
 			return ConstructionParameters.deserializeConstructionParameters(
 				getClass(), property);
-		} else
+		} else if (name.equals(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM))
+		{
+			return property.getObjectValue(EndpointReferenceType.class);
+		} else {
 			return property;
+		}
 	}
 	
 	static private Method findAlarmMethod(
@@ -989,53 +994,45 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 		return new VcgrCreateResponse(resolveEPR);
 	}
 	
-	protected EndpointReferenceType addResolvers(ResourceKey rKey, 
+	private EndpointReferenceType addResolvers(ResourceKey rKey, 
 			EndpointReferenceType newEPR,
 			Collection<MessageElement> resolverCreationParams) 
-			throws ResourceException, BaseFaultType
 	{
-		EndpointReferenceType resolveEPR = newEPR;
-		
-		//convert collection to array of message elements
+		// Convert collection to array of message elements
 		MessageElement[] resolverCreationParamsArray = null;
-		if (!resolverCreationParams.isEmpty()){
+		if (!resolverCreationParams.isEmpty())
+		{
 			int paramCnt = resolverCreationParams.size();
-			int paramIter = 0;
 			resolverCreationParamsArray = new MessageElement[paramCnt];
-			Iterator<MessageElement>collectionIter = resolverCreationParams.iterator();
-			for(;paramIter < paramCnt; paramIter++){
-				resolverCreationParamsArray[paramIter]=
-					collectionIter.next();
+			Iterator<MessageElement> collectionIter = resolverCreationParams.iterator();
+			for (int idx = 0; idx < paramCnt; idx++)
+			{
+				resolverCreationParamsArray[idx] = collectionIter.next();
 			}
 		}		
 		
-		/* parse config info for service to see if there is a default resolver service */
+		// Parse config info for service to see if there is a default resolver service.
 		try
 		{
-			IResolverFactoryProxy resolverFactoryProxy = 
-				getDefaultResolverFactoryProxy();
-		
+			IResolverFactoryProxy resolverFactoryProxy = getDefaultResolverFactoryProxy();
 			if (resolverFactoryProxy != null)
 			{
-				Resolution newResolution = resolverFactoryProxy.createResolver(
-					newEPR, null, resolverCreationParamsArray);
-				if (newResolution != null){
-					_logger.debug("Setup new resolver for instance of service \"" + _serviceName);
-					resolveEPR = newResolution.getResolvedTargetEPR();
+				EndpointReferenceType resolvedEPR = resolverFactoryProxy.createResolver(
+						newEPR, null, resolverCreationParamsArray);
+				if (resolvedEPR == null)
+				{
+					_logger.debug("Resolver proxy failed for service " + _serviceName);
+					return newEPR;
 				}
-				else{
-					_logger.debug("No resolver setup for instance of service \"" + _serviceName);
-					resolveEPR = newEPR;
-				}
+				_logger.debug("Created new resolver for instance of service " + _serviceName);
+				return resolvedEPR;
 			}
 		}
-		catch(Throwable t)
+		catch (Throwable error)
 		{
-			_logger.error("Could not create resolver for new instance of service " + _serviceName, t);
-//			throw new ResourceException("Could not create resolver for new instance of service " + _serviceName, t);
+			_logger.error("Create resolver failed for service " + _serviceName, error);
 		}
-		
-		return resolveEPR;
+		return newEPR;
 	}
 	
 	public void cleanupHook()
@@ -1226,7 +1223,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 			rKey, myAddress, implementedPortTypes, masterPortType);
 	}
 	
-	private void setDefaultResolverFactoryDescription()
+	protected IResolverFactoryProxy getDefaultResolverFactoryProxy()
 	{
 		synchronized(GenesisIIBase.class)
 		{
@@ -1238,11 +1235,6 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 				_defaultResolverFactoryProxy = conf.defaultResolverFactoryProxy();
 			}
 		}
-	}
-
-	protected IResolverFactoryProxy getDefaultResolverFactoryProxy()
-	{
-		setDefaultResolverFactoryDescription();
 		return _defaultResolverFactoryProxy;
 	}
 
@@ -1252,6 +1244,9 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 			throws RemoteException, ResourceUnknownFaultType,
 			ResourceNotDestroyedFaultType, ResourceUnavailableFaultType
 	{
+		ResourceKey resource = ResourceManager.getCurrentResource();
+		_logger.debug("Destroy resource \"" + resource.getResourceKey() +
+				"\" for service \"" + resource.getServiceName() + "\".");
 		preDestroy();
 		
 		TopicSet space = TopicSet.forPublisher(getClass());
@@ -1259,7 +1254,6 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 			RESOURCE_TERMINATION_TOPIC);
 		topic.publish(new ResourceTerminationContents(Calendar.getInstance()));
 		
-    	ResourceKey resource = ResourceManager.getCurrentResource();
     	try
     	{
     		resource.destroy();
@@ -1591,6 +1585,46 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 	}
 	
 		
+	/**
+	 * See the comment in WorkingContextHandler.handleRequest().
+	 * 
+	 * The WorkingContext contains an EPR which does not contain the correct metadata,
+	 * because the client did not send the metadata.
+	 * We can use this incomplete EPR for most purposes, but we do not want to give the
+	 * incomplete EPR to the resolver for long-term storage.
+	 * 
+	 * This function puts the implemented port types in the metadata in the EPR in the
+	 * working context.  This should be called by the sync() method, which gives the EPR
+	 * to the resolver for long-term storage.
+	 */
+	protected void fixMetadataInWorkingContext()
+	{
+		EndpointReferenceType myEPR = null;
+		String resourceInterfaces = null;
+		try
+		{
+			WorkingContext ctxt = (WorkingContext) WorkingContext.getCurrentWorkingContext();
+			myEPR = (EndpointReferenceType) ctxt.getProperty(WorkingContext.EPR_PROPERTY_NAME);
+			ResourceKey rKey = ResourceManager.getCurrentResource();
+			resourceInterfaces = PortType.translate(getImplementedPortTypes(rKey));
+		}
+		catch (Throwable cause)
+		{
+			_logger.warn("Failed to get current EPR and resource.", cause);
+			return;
+		}
+		MetadataType metadata = myEPR.getMetadata();
+		MessageElement[] any = metadata.get_any();
+		for (MessageElement element: any)
+		{
+			if (element.getQName().equals(OGSAWSRFBPConstants.WS_RESOURCE_INTERFACES_ATTR_QNAME))
+			{
+				element.setValue(resourceInterfaces);
+				break;
+			}
+		}
+	}
+
 	private abstract class GenesisIIBaseAbstractIteratorBuilder<SourceType>
 		extends AbstractIteratorBuilder<SourceType>
 	{

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="gen.genii-resolver">
+
+	<fail message="wsdl.dir variable not set.">
+		<condition>
+			<not>
+				<isset property="wsdl.dir"/>
+			</not>
+		</condition>
+	</fail>
+
+	<import file="${wsdl.dir}/wsdl-build.xml"/>
+	<import file="${wsdl.dir}/common.build.xml"/>
+	<import file="${wsdl.dir}/naming.build.xml"/>
+
+	<presetdef name="genii-resolver.source.files.uptodate">
+		<uptodate targetfile="${flag.name}">
+			<srcfiles dir="${wsdl.dir}/resolver">
+				<include name="genii-resolver.xsd"/>
+				<include name="genii-resolver.gwsdl"/>
+			</srcfiles>
+		</uptodate>
+	</presetdef>
+
+	<condition property="gen.genii-resolver.uptodate">
+		<and>
+			<common.source.files.uptodate
+				targetfile="${temporary.codegen.dir}/wsdl/genii-resolver.flag"/>
+			<naming.source.files.uptodate
+				targetfile="${temporary.codegen.dir}/wsdl/genii-resolver.flag"/>
+			<genii-resolver.source.files.uptodate
+				targetfile="${temporary.codegen.dir}/wsdl/genii-resolver.flag"/>
+		</and>
+	</condition>
+
+	<target name="gen.genii-resolver" unless="gen.genii-resolver.uptodate">
+		<copy todir="${temporary.codegen.dir}/wsdl">
+			<filelist refid="common.source.files"/>
+			<fileset dir="${wsdl.dir}/resolver">
+				<include name="genii-resolver.gwsdl"/>
+				<include name="genii-resolver.xsd"/>
+			</fileset>
+		</copy>
+
+		<echo message="Normalizing gwsdl."/>
+		<genii-gwsdl-normalizer source="${temporary.codegen.dir}/wsdl/genii-resolver.gwsdl"
+			target="${temporary.codegen.dir}/wsdl/genii-resolver-generated.wsdl"/>
+
+		<echo message="Generating Service gwsdl."/>
+		<genii-service-generator
+			source="${temporary.codegen.dir}/wsdl/genii-resolver-generated.wsdl"
+			target="${temporary.codegen.dir}/wsdl/genii-resolver-service.wsdl"
+			portType="{http://vcgr.cs.virginia.edu/genii/genii-resolver}GeniiResolverPortType"/>
+
+		<antcall target="gen.stub-generation">
+			<param name="stub.gen.target-dir" value="${temporary.codegen.dir}/genii-resolver"/>
+			<param name="stub.gen.source-wsdl"
+				value="${temporary.codegen.dir}/wsdl/genii-resolver-service.wsdl"/>
+			<param name="stub.gen.target-flag-file"
+				value="${temporary.codegen.dir}/wsdl/genii-resolver.flag"/>
+		</antcall>
+		<move file="${temporary.codegen.dir}/genii-resolver/edu/virginia/vcgr/genii/resolver/deploy.wsdd"
+			tofile="${wsdd.dir}/genii-resolver.deploy.wsdd"/>
+		<replace file="${wsdd.dir}/genii-resolver.deploy.wsdd"
+			token="edu.virginia.vcgr.genii.resolver.GeniiResolverSOAPBindingImpl"
+			value="edu.virginia.vcgr.genii.container.resolver.GeniiResolverServiceImpl"
+			summary="yes"/>
+		<copy file="${wsdd.dir}/genii-resolver.deploy.wsdd"
+			todir="${services.dir}"/>
+	</target>
+
+</project>

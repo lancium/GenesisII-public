@@ -28,6 +28,12 @@ public class FaultManipulator
 	static public <FaultType extends BaseFaultType>
 		FaultType fillInFault(FaultType bft)
 	{
+		return fillInFault(bft, null);
+	}
+	
+	static public <FaultType extends BaseFaultType>
+		FaultType fillInFault(FaultType bft, String error)
+	{
 		if (bft.getTimestamp() == null)
 			bft.setTimestamp(Calendar.getInstance());
 		if (bft.getOriginator() == null)
@@ -43,10 +49,15 @@ public class FaultManipulator
 			{
 			}
 		}
-		if (bft.getDescription() == null)
-			bft.setDescription(new BaseFaultTypeDescription[] {
-				new BaseFaultTypeDescription(bft.getClass().getName() + ":  " + bft.toString())});
-				
+		if ((error == null) && (bft.getDescription() == null))
+		{
+			error = bft.getClass().getName() + ":  " + bft.toString();
+		}
+		if (error != null)
+		{
+			BaseFaultTypeDescription description = new BaseFaultTypeDescription(error);
+			bft.setDescription(new BaseFaultTypeDescription[] { description });
+		}
 		return bft;
 	}
 }

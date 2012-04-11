@@ -234,6 +234,11 @@ public class TypeInformation
 		return hasPortType(TTYConstants.TTY_PORT_TYPE);
 	}
 	
+	public boolean isEpiResolver()
+	{
+		return hasPortType(WellKnownPortTypes.ENDPOINT_IDENTIFIER_RESOLVER_SERVICE_PORT_TYPE);
+	}
+	
 	public boolean isUnknown()
 	{
 		return (_implementedPortTypes == null)	||
@@ -298,7 +303,7 @@ public class TypeInformation
 		}
 		catch (Throwable t)
 		{
-			t.printStackTrace(System.err);
+			// t.printStackTrace(System.err);
 			return -1L;
 		}
 	}
@@ -369,5 +374,26 @@ public class TypeInformation
 	public GUID getGenesisIIContainerID()
 	{
 		return _containerID;
+	}
+	
+	/**
+	 * Return the name of the GenesisII top-level port type that most closely matches the given resource.
+	 * (Note that the given resource is not necessarily a GenesisII resource.)
+	 * This function is a hack and it should be removed.
+	 * It is used by ReplicateTool and AutoReplicate.
+	 */
+	public String getBestMatchServiceName()
+	{
+		if (isEpiResolver())
+			return "GeniiResolverPortType";
+		if (isResourceFork() || isIDP())
+			return null;
+		if (isByteIO() && isRNS())
+			return null;
+		if (isByteIO())
+			return "RandomByteIOPortType";
+		if (isRNS())
+			return "EnhancedRNSPortType";
+		return null;
 	}
 }

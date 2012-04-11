@@ -1,0 +1,23 @@
+Description:
+
+The resolver tool is used to register a resource with a resolver.
+
+<source-path> is an RNS path to any resource.
+
+<resolver-path> is an RNS path to a resolver resource or to a container resource. If it is a container, then the tool creates a new resolver resource in the specified container.
+
+The tool tells the specified resolver that the source resource exists. Then, if you ask the resolver about the resource's EPI, the resolver can return the resource's EPR. The tool also updates the source's EPR in its parent directory. The updated EPR contains a reference to the resolver.
+
+The options are:
+
+-r | --recursive
+
+After registering the given RNS directory with the resolver, register every resource that's in the directory. Register subdirectories recursively.
+
+-p | --policy
+
+After registering the given RNS directory with the resolver, update the directory's policies. Set a policy that when a new file or subdirectory is created in the directory, the new resource must be registered with the resolver. This option works well with the --recursive option.
+
+-q | --query <source-path>
+
+Send a query request to the resolver that's specified in the source's EPR. This is a good way to find out if a resource is replicated.

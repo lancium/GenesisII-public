@@ -17,4 +17,30 @@
 		namespace="http://www.w3.org/2005/08/addressing"
 		schemaLocation="./ws-addr.xsd"/>
 
+	<xsd:complexType name="CreateResolverRequestType">
+		<xsd:sequence>
+			<xsd:element
+				name="target_EPR" type="wsa:EndpointReferenceType"
+				minOccurs="1" maxOccurs="1"/>
+			<xsd:any namespace="##other" processContents="lax" 
+				minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:anyAttribute namespace="##other" processContents="lax"/>
+	</xsd:complexType>
+	<xsd:element name="CreateResolverRequest"
+		type="rexport-resolver-factory:CreateResolverRequestType"/>
+
+	<xsd:complexType name="CreateResolverResponseType">
+		<xsd:sequence>
+			<xsd:element
+				name="resolution_EPR" type="wsa:EndpointReferenceType"
+				minOccurs="1" maxOccurs="1"/>
+			<xsd:element
+				name="resolver_EPR" type="wsa:EndpointReferenceType"
+				minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="CreateResolverResponse"
+		type="rexport-resolver-factory:CreateResolverResponseType"/>
+
 </xsd:schema>

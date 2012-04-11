@@ -34,43 +34,34 @@ public class AuthZTool extends BaseGridTool
 			RNSPathQueryFlags.MUST_EXIST);
 		
 		// get the authz config from the target's attributes
-		AuthZConfig config = null;
-		
 		GenesisIIBaseRP rp = (GenesisIIBaseRP)ResourcePropertyManager.createRPInterface(
 			path.getEndpoint(), GenesisIIBaseRP.class);
-		
-		
-		config = rp.getAuthZConfig();
-		
-		boolean done = false;
-		while (!done) {
+		AuthZConfig config = rp.getAuthZConfig();
 
+		boolean done = false;
+		while (!done)
+		{
 			// display retrieved authz config
 			stdout.println("Authorization configuration for " + getArgument(0) + ":\n");
-			
-			// Select authorization provider subtool depending on the 
-			// type of authz config we got back
-			AclAuthZClientTool subTool = new AclAuthZClientTool();
 
 			if ((config == null) || (config.get_any() == null)) {
 				stdout.println("No authorization module set.");
 			} else {
-				subTool.displayAuthZConfig(config, stdout, stderr, stdin);
+				AclAuthZClientTool.displayAuthZConfig(config, stdout, stderr, stdin);
 			}
-				
+
 			boolean chosen = false;
-			while (!chosen) {
+			while (!chosen)
+			{
 				stdout.println("\nOptions:");
 				stdout.println("  [1] Modify AuthZ config");
 				stdout.println("  [2] Submit AuthZ config");
 				stdout.println("  [3] Cancel");
 				stdout.print("Please make a selection: ");
 				stdout.flush();
-				
 				String input = stdin.readLine();
 				if (input == null)
 					return 0;
-				
 				stdout.println();
 				int choice = 0;					
 				try {
@@ -79,37 +70,27 @@ public class AuthZTool extends BaseGridTool
 					stdout.println("Invalid choice.");
 					continue;
 				}
-					
 				switch (choice) {
 				case 1: 
-					// use subtool to modify authz config
-					if (subTool == null) {
-						stdout.println("Invalid choice.");
-					} else {
-						config = subTool.modifyAuthZConfig(config, stdout, stderr, stdin);
-						if (config == null)
-							return 0;
-						chosen = true;
-					}
+					config = AclAuthZClientTool.modifyAuthZConfig(config, stdout, stderr, stdin);
+					if (config == null)
+						return 0;
+					chosen = true;
 					break;
 				case 2: 
 					rp.setAuthZConfig(config);
-					
 					chosen = true;
 					done = true;
 					break;
 				case 3:
-					// cancel
 					chosen = true;
 					done = true;
 					break;
 				default: 
 					stdout.println("Invalid choice.");
 				}
-					
 			}
 		}
-		
 		return 0;
 	}
 

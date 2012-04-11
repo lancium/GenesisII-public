@@ -345,7 +345,7 @@ class ACLPanel extends JPanel implements LazyLoadTabHandler
 					GenesisIIBaseRP.class);
 			AuthZConfig config = rp.getAuthZConfig();
 			if (config == null)
-				config = new AclAuthZClientTool().getEmptyAuthZConfig();
+				config = AclAuthZClientTool.getEmptyAuthZConfig();
 
 			return config;
 		}

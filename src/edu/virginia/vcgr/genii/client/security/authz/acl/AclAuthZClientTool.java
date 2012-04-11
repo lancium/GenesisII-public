@@ -23,24 +23,20 @@ import java.security.GeneralSecurityException;
 
 import javax.security.auth.x500.X500Principal;
 
-import org.morgan.util.cmdline.*;
+import org.morgan.util.cmdline.CommandLine;
+import org.morgan.util.cmdline.ICommandLine;
 import org.morgan.util.configuration.ConfigurationException;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.common.security.*;
-import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
-import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
-import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
+import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
-import edu.virginia.vcgr.genii.client.naming.ResolverUtils;
 
 import edu.virginia.vcgr.genii.client.security.authz.AuthZSecurityException;
-import edu.virginia.vcgr.genii.client.security.authz.AuthZSubTool;
-import edu.virginia.vcgr.genii.security.credentials.identity.*;
-
-import org.ws.addressing.EndpointReferenceType;
+import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIdentity;
+import edu.virginia.vcgr.genii.security.credentials.identity.X509Identity;
 
 /**
  * Implementation of the AuthZSubTool for the GII ACL authz provider.
@@ -48,9 +44,8 @@ import org.ws.addressing.EndpointReferenceType;
  * @author dgm4d
  *
  */
-public class AclAuthZClientTool implements AuthZSubTool
+public class AclAuthZClientTool
 {
-
 	static private final int NOT_READ = 32;
 	static private final int NOT_WRITE = 16;
 	static private final int NOT_EXECUTE = 8;
@@ -69,26 +64,31 @@ public class AclAuthZClientTool implements AuthZSubTool
 			"\n" + 
 			"\t and where <acl-entry> is one of:\n" + 
 			"\n" + 
-			"\t\t[--local-src] <cert-file> \n" + 
+			"\t\t<[local:]cert-file> \n" + 
 			"\n" + 
-			"\t\t[--local-src] <ca-cert-file> --pattern=<DN-pattern> \n" + 
+			"\t\t<[local:]ca-cert-file> --pattern=<DN-pattern> \n" + 
 			"\t\t\t where <DN-pattern> is a (possibly-empty) set of \n" + 
 			"\t\t\t comma-separated X.500 distinguished-name \n" + 
 			"\t\t\t <attribute>=<value> components \n" + 
 			"\n" + 
 			"\t\t--everyone \n" + 
 			"\n" + 
-			"\t\t--username=<username> --password=<password>";
-
-	public AuthZConfig getEmptyAuthZConfig() throws AuthZSecurityException
+			"\t\t--username=<username> --password=<password>\n";
+	
+	/**
+	 * Create a new empty ACL.
+	 */
+	public static AuthZConfig getEmptyAuthZConfig() throws AuthZSecurityException
 	{
 		return Acl.encodeAcl(new Acl());
 	}
 
-	public void displayAuthZConfig(AuthZConfig config, PrintWriter out,
+	/**
+	 * Output ACLs.  Non-interactive.  Used by AuthZTool.
+	 */
+	public static void displayAuthZConfig(AuthZConfig config, PrintWriter out,
 		PrintWriter err, BufferedReader in) throws AuthZSecurityException
 	{
-
 		if (config == null)
 		{
 			return;
@@ -145,15 +145,20 @@ public class AclAuthZClientTool implements AuthZSubTool
 		}
 	}
 
-	public static int parseMode(String modeString)
-			throws IllegalArgumentException
+	/**
+	 * If modeString is a number from 0 through 7, then it means:
+	 * add the identity to these ACLs, and remove it from all other ACLs.
+	 * 
+	 * Otherwise, modeString must contain one or more plus or minus signs.
+	 * Each plus or minus sign must be followed by one or more of "r", "w", and "x".
+	 */
+	private static int parseMode(String modeString)
+		throws IllegalArgumentException
 	{
-
 		try
 		{
-			// this is precicely what they want: everything is either on or off
-			return Integer.parseInt(modeString) | NOT_READ | NOT_WRITE
-					| NOT_EXECUTE;
+			// this is precisely what they want: everything is either on or off
+			return Integer.parseInt(modeString) | NOT_READ | NOT_WRITE| NOT_EXECUTE;
 		}
 		catch (NumberFormatException e)
 		{
@@ -218,21 +223,23 @@ public class AclAuthZClientTool implements AuthZSubTool
 		}
 		return retval;
 	}
-
-	public static X509Identity downloadIdentity(String sourcePath, boolean isLocalSource)
+	
+	/**
+	 * Read a certificate from a local file or a grid file,
+	 * or read the certificate from the metadata of a grid resource.
+	 */
+	public static X509Identity downloadIdentity(GeniiPath certificatePath)
 			throws ConfigurationException, FileNotFoundException, IOException,
 			RNSException, GeneralSecurityException
 	{
-
-		if (isLocalSource)
+		RNSPath certificateRNS = certificatePath.lookupRNS();
+		if ((certificateRNS == null) || certificatePath.isFile())
 		{
-			InputStream in = new FileInputStream(sourcePath);
-			;
+			InputStream in = certificatePath.openInputStream();
 			try
 			{
 				CertificateFactory cf = CertificateFactory.getInstance("X.509");
-				X509Certificate cert =
-						(X509Certificate) cf.generateCertificate(in);
+				X509Certificate cert = (X509Certificate) cf.generateCertificate(in);
 				X509Certificate[] chain = { cert };
 				return new X509Identity(chain);
 			}
@@ -240,54 +247,27 @@ public class AclAuthZClientTool implements AuthZSubTool
 			{
 				StreamUtils.close(in);
 			}
-		}
-
-		RNSPath current = RNSPath.getCurrent();
-		RNSPath path = current.lookup(sourcePath, RNSPathQueryFlags.MUST_EXIST);
-
-		if (new TypeInformation(path.getEndpoint()).isByteIO())
-		{
-			// read the file as an encoded X.509 .cer file
-			InputStream in = ByteIOStreamFactory.createInputStream(path);
-			try
-			{
-				CertificateFactory cf = CertificateFactory.getInstance("X.509");
-				X509Certificate cert =
-						(X509Certificate) cf.generateCertificate(in);
-				X509Certificate[] chain = { cert };
-				return new X509Identity(chain);
-			}
-			finally
-			{
-				StreamUtils.close(in);
-			}
-
 		}
 		else
 		{
-			// get the identity of the resource
-
-			// make sure it's not an unbound epr
-			EndpointReferenceType epr = path.getEndpoint();
-			if (EPRUtils.isUnboundEPR(epr))
-			{
-				epr = ResolverUtils.resolve(epr);
-			}
-
-			X509Certificate[] chain = EPRUtils.extractCertChain(epr);
+			// return the identity of the resource
+			X509Certificate[] chain = EPRUtils.extractCertChain(certificateRNS.getEndpoint());
 			return new X509Identity(chain);
 		}
-
 	}
 
-	public AuthZConfig modifyAuthZConfig(
+	/**
+	 * Interactive.
+	 * Allow the user to enter a "chmod" like command line to modify the given ACL. 
+	 * @return the modified ACL.
+	 */
+	public static AuthZConfig modifyAuthZConfig(
 			AuthZConfig config, 
 			PrintWriter out,
 			PrintWriter err, 
 			BufferedReader in) 
 		throws IOException,	AuthZSecurityException
 	{
-
 		boolean chosen = false;
 		while (!chosen)
 		{
@@ -297,12 +277,10 @@ public class AclAuthZClientTool implements AuthZSubTool
 			out.println("  [3] Cancel");
 			out.print("Please make a selection: ");
 			out.flush();
-
 			String input = in.readLine();
 			out.println();
 			if (input == null)
-				return null;
-			
+				return null;			
 			int choice = 0;
 			try
 			{
@@ -313,7 +291,6 @@ public class AclAuthZClientTool implements AuthZSubTool
 				out.println("Invalid choice.");
 				continue;
 			}
-
 			switch (choice)
 			{
 			case 1:
@@ -323,58 +300,49 @@ public class AclAuthZClientTool implements AuthZSubTool
 				chosen = true;
 				break;
 			case 2:
-				CommandLine cLine;
-				while (true)
+				CommandLine cLine = null;
+				while (cLine == null)
 				{
-					out.println("Modification syntax: " + CHMOD_SYNTAX + "\n");
+					out.print("Modification syntax: ");
+					out.println(CHMOD_SYNTAX);
 					out.print(">");
 					out.flush();
-
 					cLine = new CommandLine(in.readLine(), false);
 					if (!validateChmodSyntax(cLine))
 					{
 						out.println("Invalid syntax");
-						continue;
+						cLine = null;
 					}
-					break;
 				}
-				
-				if (cLine.isEmpty())
+				if (!cLine.isEmpty())
 				{
-					break;
+					config = chmod(cLine, config);
+					chosen = true;
 				}
-				
-				config = chmod(cLine, config);
-				
-				chosen = true;
 				break;
 			case 3:
 				chosen = true;
 			}
 		}
-
 		return config;
 	}
-
-	public boolean validateChmodSyntax(ICommandLine cLine)
+	
+	private static boolean validateChmodSyntax(ICommandLine cLine)
 	{
 		if (cLine.isEmpty()) 
 		{
 			return true;
 		}
-		
-		// make sure we have the new perms and the cert file
 		if (cLine.hasFlag("everyone"))
 		{
-			if ((cLine.numArguments() != 1) || (cLine.hasOption("local-src")))
+			if (cLine.numArguments() != 1)
 			{
 				return false;
 			}
 		}
 		else if (cLine.hasOption("username"))
 		{
-			// make sure password also supplied
-			if (!(cLine.hasOption("password") || cLine.hasOption("hashedpass")))
+			if (!cLine.hasOption("password"))
 			{
 				return false;
 			}
@@ -386,8 +354,6 @@ public class AclAuthZClientTool implements AuthZSubTool
 				return false;
 			}
 		}
-
-		// make sure the new perms parses
 		try
 		{
 			parseMode(cLine.getArgument(0));
@@ -396,7 +362,6 @@ public class AclAuthZClientTool implements AuthZSubTool
 		{
 			return false;
 		}
-
 		return true;
 	}
 
@@ -405,112 +370,68 @@ public class AclAuthZClientTool implements AuthZSubTool
 	 * the specified authz configuration. Assumes that the syntax is valid
 	 * (having been checked with validateChmodSyntax())
 	 */
-	public AuthZConfig chmod(
-			ICommandLine cLine,
-			AuthZConfig config)		
+	private static AuthZConfig chmod(ICommandLine cLine, AuthZConfig config)		
 		throws IOException, AuthZSecurityException
 	{
 		if (config.get_any() == null)
 		{
 			return config;
 		}
-
 		AclEntry newEntry = null;
-
 		if (cLine.hasFlag("everyone")) 
 		{
 			// everyone (null)
 		} 
 		else if (cLine.hasOption("username")) 
 		{
-			// username password
-			String password = cLine.getOptionValue("password");
-			boolean hash = true;
-			if (password == null){
-				password = cLine.getOptionValue("hashedpass");
-				hash = false;
-			}
-
 			newEntry = new UsernamePasswordIdentity(
 					cLine.getOptionValue("username"), 
-					password, hash);
+					cLine.getOptionValue("password"));
 		}
 		else
 		{
-			// X.509 explicit or pattern
+			X509Identity identity = null;
 			try
 			{
-				X509Identity identity = downloadIdentity(
-						cLine.getArgument(1),
-						cLine.hasFlag("local-src"));
-
-				if (cLine.hasOption("pattern")) 
+				GeniiPath x509Path = new GeniiPath(cLine.getArgument(1));
+				identity = downloadIdentity(x509Path);
+			}
+			catch (Exception exception)
+			{
+				throw new AuthZSecurityException(
+						"Could not load certificate file.", exception);
+			}
+			if (cLine.hasOption("pattern")) 
+			{
+				String pattern = cLine.getOptionValue("pattern");
+				if (pattern == null) 
 				{
-					// create a X509PatternAclEntry
-
-					String pattern = cLine.getOptionValue("pattern");
-					if (pattern == null) 
-					{
-						// handle case if pattern is empty
-						newEntry = new X509PatternAclEntry(
-								identity,
-								null);
-					} 
-					else 
-					{
-						newEntry = new X509PatternAclEntry(
-								identity,
-								new X500Principal(pattern));
-					}
+					newEntry = new X509PatternAclEntry(identity, null);
 				} 
 				else 
 				{
-					// simply use the X509Identity explicitly as the acl entry
-					
-					newEntry = identity;
+					newEntry = new X509PatternAclEntry(identity, new X500Principal(pattern));
 				}
-			}
-			catch (ConfigurationException e)
+			} 
+			else 
 			{
-				throw new AuthZSecurityException(
-						"Could not load certificate file.", e);
-			}
-			catch (FileNotFoundException e)
-			{
-				throw new AuthZSecurityException(
-						"Could not load certificate file.", e);
-			}
-			catch (RNSException e)
-			{
-				throw new AuthZSecurityException(
-						"Could not load certificate file.", e);
-			}
-			catch (GeneralSecurityException e)
-			{
-				throw new AuthZSecurityException(
-						"Could not load certificate file.", e);
+				// use the X509Identity explicitly as the acl entry
+				newEntry = identity;
 			}
 		}
-
-		return chmod(config, cLine.getArgument(0), newEntry);
+		Acl acl = Acl.decodeAcl(config);
+		chmod(acl, cLine.getArgument(0), newEntry);
+		return Acl.encodeAcl(acl);
 	}
 
-
 	/**
-	 * Parses the given command line and applies the indicated authz changes to
-	 * the specified authz configuration. Assumes that the syntax is valid
-	 * (having been checked with validateChmodSyntax())
+	 * Add or remove read, write, and/or execute permission for the given entry
+	 * in the given ACL as specified by the given mode.
 	 */
-	public AuthZConfig chmod(
-			AuthZConfig config, 		
-			String permission,
-			AclEntry newEntry) 
-		throws IOException, AuthZSecurityException
-	{			
-		Acl acl = Acl.decodeAcl(config);
-
-		int mode = parseMode(permission);
-
+	protected static void chmod(Acl acl, String modeString, AclEntry newEntry) 
+		throws AuthZSecurityException
+	{
+		int mode = parseMode(modeString);
 		if ((mode & READ) > 0)
 		{
 			if (!acl.readAcl.contains(newEntry))
@@ -540,7 +461,5 @@ public class AclAuthZClientTool implements AuthZSubTool
 		{
 			acl.executeAcl.remove(newEntry);
 		}
-
-		return Acl.encodeAcl(acl);
 	}
 }

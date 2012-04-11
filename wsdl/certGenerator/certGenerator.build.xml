@@ -12,7 +12,6 @@
 	<import file="${wsdl.dir}/wsdl-build.xml"/>
 	<import file="${wsdl.dir}/common.build.xml"/>
 	<import file="${wsdl.dir}/naming.build.xml"/>
-	<import file="${wsdl.dir}/resolver/simple-resolver.build.xml"/>
 
 	<presetdef name="certGenerator.source.files.uptodate">
 		<uptodate targetfile="${flag.name}">
@@ -28,8 +27,6 @@
 			<common.source.files.uptodate
 				targetfile="${temporary.codegen.dir}/wsdl/certGenerator.flag"/>
 			<naming.source.files.uptodate
-				targetfile="${temporary.codegen.dir}/wsdl/certGenerator.flag"/>
-			<simple-resolver.source.files.uptodate
 				targetfile="${temporary.codegen.dir}/wsdl/certGenerator.flag"/>
 		</and>
 	</condition>

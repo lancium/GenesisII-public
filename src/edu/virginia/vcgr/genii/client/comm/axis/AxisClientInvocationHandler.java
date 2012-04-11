@@ -15,6 +15,7 @@
  */
 package edu.virginia.vcgr.genii.client.comm.axis;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -24,31 +25,25 @@ import java.net.MalformedURLException;
 import java.net.SocketException;
 import java.net.URL;
 import java.rmi.RemoteException;
-import java.util.*;
+import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
+import java.util.*;
 
+import org.apache.axis.SimpleChain;
 import org.apache.axis.attachments.AttachmentPart;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Stub;
+import org.apache.axis.configuration.FileProvider;
+import org.apache.axis.message.SOAPHeaderElement;
+import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
-import org.apache.axis.configuration.FileProvider;
-
-import org.ogf.schemas.naming._2006._08.naming.ResolveFailedWithReferralFaultType;
-
-import java.io.IOException;
-
-import org.apache.axis.message.SOAPHeaderElement;
-import org.apache.axis.types.URI;
-import java.security.GeneralSecurityException;
 
 import javax.activation.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
-
-import org.apache.axis.SimpleChain;
 
 import edu.virginia.cs.vcgr.genii._2006._12.resource_simple.TryAgainFaultType;
 import edu.virginia.vcgr.appmgr.version.Version;
@@ -64,6 +59,7 @@ import edu.virginia.vcgr.genii.client.configuration.*;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.SecurityUtils;
 import edu.virginia.vcgr.genii.client.security.x509.*;
@@ -71,14 +67,12 @@ import edu.virginia.vcgr.genii.client.invoke.IFinalInvoker;
 import edu.virginia.vcgr.genii.client.invoke.InvocationInterceptorManager;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.NameResolutionFailedException;
-import edu.virginia.vcgr.genii.client.naming.ResolverDescription;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.comm.attachments.AttachmentType;
 import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
 import edu.virginia.vcgr.genii.client.comm.axis.security.*;
 
 import edu.virginia.vcgr.genii.context.ContextType;
-import edu.virginia.vcgr.genii.naming.*;
 import edu.virginia.vcgr.genii.security.MessageLevelSecurityRequirements;
 
 public class AxisClientInvocationHandler implements InvocationHandler, IFinalInvoker
@@ -475,9 +469,10 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		return false;
 	}
 	
-	static private Random _expBackoffTwitter = new Random();
-	// added resolution code - 1/07 - jfk3w
-	// revamped resolution code 4/11/07 - jfk3w.
+	/**
+	 * added resolution code - 1/07 - jfk3w
+	 * revamped resolution code 4/11/07 - jfk3w.
+	 */
 	public Object finalInvoke(Object obj, Method calledMethod, Object[] arguments)
 		throws Throwable 
 	{
@@ -486,114 +481,121 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		int baseDelay = 100;
 		int baseTwitter = 25;
 		int attempt = 0;
-		long startCommunicate = 0L;
-		long deltaCommunicate = 0L;
+		long startAttempt = 0L;
 		int timeout = (_timeout != null) ? _timeout.intValue() : _DEFAULT_TIMEOUT;
+		TypeInformation type = null;
 		
-		while(true)
+		while (true)
 		{
 			attempt++;
+			startAttempt = System.currentTimeMillis();
 			context = new ResolutionContext(origEPR, (_parentHandler == null));
 			_inAttachments = null;
-	
 			try
 			{
-				while (true)
-				{
-					AxisClientInvocationHandler handler = resolve(context);
-					try
-					{
-						startCommunicate = System.currentTimeMillis();
-						while (true)
-						{
-							try
-							{
-								return handler.doInvoke(
-									calledMethod, arguments, timeout);
-							}
-							catch (InvocationTargetException ite)
-							{
-								Throwable cause = ite.getCause();
-								if (!(cause instanceof TryAgainFaultType))
-									throw ite;
-								
-								_logger.debug("Caugh TryAgainException.");
-							}
-						}
-					}
-					catch(Throwable t)
-					{
-						// call failed
-						//  ...As per discussion with mmm2a, it is difficult to 
-						// determine which type of exceptions are "permanent" failures
-						// and which are not - all depends on the semantics of the 
-						// target and the resolver.  So, we punt and rebind on all 
-						// exceptions.
-						context.setErrorToReport(t);
-					}
-					finally
-					{
-						deltaCommunicate = System.currentTimeMillis() - startCommunicate;
-					}
-				}
+				return resolveAndInvoke(context, calledMethod, arguments, timeout);
 			}
-			catch (Throwable t)
+			catch (Throwable cause)
 			{
-				// report last non-resolution error if possible
-				if (context.getErrorToReport() == null)
-					context.setErrorToReport(t);
-				
-				// strip exception down to base error
-				while (!(context.getErrorToReport() instanceof RemoteException))
-				{
-					Throwable next = context.getErrorToReport().getCause();
-					if (next == null)
-						throw context.getErrorToReport();
-					context.setErrorToReport(next);
-				}
-	
-				Throwable cause = context.getErrorToReport();
-				if (attempt <= 5 && isConnectionException(cause))
-				{
-					if (deltaCommunicate > MAX_FAILURE_TIME_RETRY)
-					{
-						_logger.warn(
-							"Waited too long for a connection failure -- " +
-							"it's not worth retrying so we'll give up.");
-						_logger.debug("Unable to communicate with endpoint " +
-								"(not a retryable-exception).", cause);
-						throw cause;
-					} else
-					{
-						try
-						{
-							int sleepTime = baseDelay + (_expBackoffTwitter.nextInt(
-									baseTwitter) - (baseTwitter >> 1));
-							_logger.debug("Exponential backoff delay of " +
-								sleepTime + " for an exception.", cause);
-							Thread.sleep(sleepTime);
-						}
-						catch (InterruptedException ie)
-						{
-							Thread.currentThread().isInterrupted();
-							// Don't have to worry about it.
-						}
-						finally
-						{
-							baseDelay <<= 1;
-							baseTwitter <<= 1;
-						}
-					}
-				} else
+				if (!isConnectionException(cause))
 				{
 					_logger.debug("Unable to communicate with endpoint " +
-						"(not a retryable-exception).", cause);
+							"(not a retryable-exception).");
 					throw cause;
 				}
+				if (type == null)
+					type = new TypeInformation(_epr);
+				int maxAttempts = (type.isEpiResolver() ? 1 : 5);
+				if (attempt >= maxAttempts)
+				{
+					_logger.debug("Unable to communicate with endpoint " +
+							"after " + attempt + " attempts.");
+					throw cause;
+				}
+				// deltaCommunicate is the total amount of time spent on the attempt,
+				// including time spent talking to the resolver and each instance.
+				// If this single attempt took too long, then don't make another attempt.
+				long deltaCommunicate = System.currentTimeMillis() - startAttempt;
+				if (deltaCommunicate > MAX_FAILURE_TIME_RETRY)
+				{
+					_logger.debug("Unable to communicate with endpoint " +
+							"after " + deltaCommunicate + " millis");
+					throw cause;
+				}
+				try
+				{
+					// Sleep for a random period in the range of (-bt/2 ... +bt/2).
+					int twitter = (int)(Math.random() * baseTwitter) - (baseTwitter >> 1);
+					int sleepTime = baseDelay + twitter;
+					_logger.debug("Exponential backoff delay of " +
+							sleepTime + " for an exception.");
+					Thread.sleep(sleepTime);
+				}
+				catch (InterruptedException ie)
+				{
+					Thread.currentThread().isInterrupted();
+					// Don't have to worry about it.
+				}
+				baseDelay <<= 1;
+				baseTwitter <<= 1;
 			}
 			finally
 			{
 				_outAttachments = null;
+			}
+		}
+	}
+
+	/**
+	 * Send the message.  If it fails, then resolve a replica and try again.
+	 *
+	 * Possible sequence of events:
+	 * 1. Send message to first instance.  Catch exception.
+	 * 2. Ask resolver for second instance.
+	 * 3. Send message to second instance.  Catch exception.
+	 * 4. Ask resolver for next instance.
+	 * 5. There are no more instances, so resolve() throws an exception.  Catch it.
+	 * 6. Throw the failure that was reported by the first instance back in step 1.
+	 *    Discard the exceptions from resolve() and from all other instances.
+	 */
+	private Object resolveAndInvoke(ResolutionContext context, Method calledMethod, Object[] arguments, int timeout)
+		throws Throwable
+	{
+		AxisClientInvocationHandler handler = null;
+		boolean tryAgain = false;
+		Throwable firstException = null;
+		while (true)
+		{
+			try
+			{
+				if (!tryAgain)
+					handler = resolve(context);
+			}
+			catch (Throwable throwable)
+			{
+				if (firstException == null)
+					firstException = throwable;
+				throw firstException;
+			}
+			try
+			{
+				return handler.doInvoke(calledMethod, arguments, timeout);
+			}
+			catch (Throwable throwable)
+			{
+				if (throwable instanceof InvocationTargetException)
+					throwable = throwable.getCause();
+				_logger.debug("doInvoke failure: " + throwable);
+				if ((throwable instanceof TryAgainFaultType) && (!tryAgain))
+				{
+					tryAgain = true;
+				}
+				else
+				{
+					if (firstException == null)
+						firstException = throwable;
+					tryAgain = false;
+				}
 			}
 		}
 	}
@@ -734,68 +736,33 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	protected AxisClientInvocationHandler resolve(ResolutionContext context)
 		throws NameResolutionFailedException
 	{
-		EndpointReferenceType resolvedEPR = null;
-		AxisClientInvocationHandler newHandler = null;
-		Throwable errorToReport = null;
-		
-		if (!context.triedOriginalEPR() && context.getOriginalAddress() != null
-				&& !context.getOriginalAddress().get_value().toString()
-						.equals(WSName.UNBOUND_ADDRESS)) {
+		EndpointReferenceType originalEPR = context.getOriginalEPR();
+		if ((!context.triedOriginalEPR()) && (!EPRUtils.isUnboundEPR(originalEPR)))
+		{
 			context.setTriedOriginalEPR();
 			return this;
 		}
-
 		if (!context.rebindAllowed())
-			throw new NameResolutionFailedException();
-
-		/* check cache first */
-		// took out cache because of issues with multiple resources with same EPI
-		//		if (!context.triedCache())
-		/*
-		if(false)
 		{
-			URI epi = context.getEPI();
-			if (epi != null)
-			{
-				resolvedEPR = EPIResolutionCache.get(epi);
-				context.setTriedCache();
-				newHandler = makeNewHandler(resolvedEPR);
-				if (newHandler != null)
-					return newHandler;
-			}
+			throw new NameResolutionFailedException();
 		}
-		*/
-		
-		/* cache failed - need to try resolvers */
-		ListIterator<ResolverDescription> resolversIter = context.getResolversIter();
-		if (resolversIter == null)
-			throw new NameResolutionFailedException();
-
-		while (resolversIter.hasNext())
+		try
 		{
-			ResolverDescription nextResolver = resolversIter.next();
-			try
+			EndpointReferenceType resolvedEPR = context.resolve();
+			if (resolvedEPR != null)
 			{
-				resolvedEPR = callResolve(nextResolver);
-				if (resolvedEPR != null && resolvedEPR.getAddress() != null && !resolvedEPR.getAddress().toString().equals(WSName.UNBOUND_ADDRESS))
+				AxisClientInvocationHandler newHandler = makeNewHandler(resolvedEPR);
+				if (newHandler != null)
 				{
-					newHandler = makeNewHandler(resolvedEPR);
-					if (newHandler != null)
-					{
-						// took out cache because of issues with multiple resources with same EPI
-						//		EPIResolutionCache.put(epi, newHandler._epr);
-						return newHandler;
-					}
+					return newHandler;
 				}
 			}
-			catch(Throwable t)
-			{
-				_logger.debug("Call to resolve EPR failed.", t);
-				errorToReport = t;
-			}
 		}
-
-		throw new NameResolutionFailedException(errorToReport);
+		catch (RemoteException exception)
+		{
+			throw new NameResolutionFailedException(exception);
+		}
+		throw new NameResolutionFailedException();
 	}
 	
 	protected AxisClientInvocationHandler makeNewHandler(EndpointReferenceType resolvedEPR)
@@ -808,36 +775,6 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		{
 			_logger.debug("Attempt to create new AxisClientInvocationHandle failed.", t);
 			return null;
-		}
-	}
-	
-	protected EndpointReferenceType callResolve(ResolverDescription resolver)
-		throws NameResolutionFailedException, ResourceException, 
-			GenesisIISecurityException, RemoteException
-	{
-		try
-		{
-			if (resolver.getType() == ResolverDescription.ResolverType.EPI_RESOLVER)
-			{
-				EndpointIdentifierResolver resolverPT = ClientUtils.createProxy(EndpointIdentifierResolver.class, resolver.getEPR());
-				return resolverPT.resolveEPI(
-						new org.apache.axis.types.URI(resolver.getEPI().toString()));
-			}
-			else if (resolver.getType() == ResolverDescription.ResolverType.REFERENCE_RESOLVER)
-			{
-				ReferenceResolver resolverPT = ClientUtils.createProxy(ReferenceResolver.class, resolver.getEPR());
-				return resolverPT.resolve(null);
-			}
-			throw new NameResolutionFailedException();
-		}
-		catch(org.apache.axis.types.URI.MalformedURIException mfe)
-		{
-			throw new NameResolutionFailedException(mfe);
-		}
-		catch(ResolveFailedWithReferralFaultType rfe)
-		{
-			_logger.debug("Resolver threw ResolveFailedWithReferralFaultType.  We do not handle these yet.");
-			throw new NameResolutionFailedException();
 		}
 	}
 

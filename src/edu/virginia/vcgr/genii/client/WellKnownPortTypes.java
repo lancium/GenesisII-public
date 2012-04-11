@@ -129,13 +129,10 @@ public class WellKnownPortTypes
 	static public PortType REFERENCE_RESOLVER_SERVICE_PORT_TYPE =
 		PortType.get(new QName("http://schemas.ogf.org/naming/2006/08/naming/wsdl/ReferenceResolver",
 			"ReferenceResolverPortType"));
-	static public PortType GENII_SIMPLE_RESOLVER_PORT_TYPE =
-		PortType.get(new QName("http://vcgr.cs.virginia.edu/container/2006/12/simple-resolver",
-			"SimpleResolverPortType"));
-	static public PortType GENII_SIMPLE_RESOLVER_FACTORY_PORT_TYPE =
-		PortType.get(new QName("http://vcgr.cs.virginia.edu/container/2006/12/simple-resolver-factory",
-			"SimpleResolverFactoryPortType"));
-	
+	static public PortType GENII_RESOLVER_PORT_TYPE =
+		PortType.get(new QName("http://vcgr.cs.virginia.edu/genii/genii-resolver",
+			"GeniiResolverPortType"));
+
 	static public PortType REXPORT_RESOLVER_FACTORY_PORT_TYPE =
 		PortType.get(new QName("http://vcgr.cs.virginia.edu/rns/2007/08/replicatedExport/resolver-factory",
 			"RExportResolverFactoryPortType"));
@@ -145,7 +142,6 @@ public class WellKnownPortTypes
 	static public PortType REXPORT_DIR_PORT_TYPE =
 		PortType.get(new QName("http://vcgr.cs.virginia.edu/rns/2007/08/rexport-dir",
 			"RExportDirPortType"));
-	
 	
 	static public PortType GENII_FACTORY_PORT_TYPE =
 		PortType.get(new QName("http://vcgr.cs.virginia.edu/genii/2006/12/factory-pattern",
@@ -162,26 +158,21 @@ public class WellKnownPortTypes
 	static public PortType GENESIS_DAI_CORE_DATA_ACCESS_COMBINED_PORT_TYPE =
 		PortType.get(new QName("http://vcgr.cs.virginia.edu/genii/genesis_dai",
 			"CoreDataAccessCombinedPortType"));
-	
 	static public PortType GENESIS_DAI_WSRF_DATA_RESOURCE_PORT_TYPE =
 		PortType.get(new QName("http://vcgr.cs.virginia.edu/genii/genesis_dai",
 			"WSRFDataResourcePortType"));
-	
 	static public PortType GENESIS_DAIR_SQL_ACCESS_COMBINED_PORT_TYPE =
 		PortType.get(new QName("http://vcgr.cs.virginia.edu/genii/genesis_dair",
 			"SQLAccessCombinedPortType"));
-	
 	static public PortType GENESIS_DAIR_SQL_RESPONSE_COMBINED_PORT_TYPE =
 		PortType.get(new QName("http://vcgr.cs.virginia.edu/genii/genesis_dair",
 			"SQLResponseCombinedPortType"));
-	
 	static public PortType GENESIS_DAIR_SQL_ROWSET_ACCESS_PORT_TYPE =
 		PortType.get(new QName("http://vcgr.cs.virginia.edu/genii/genesis_dair",
 			"SQLRowsetAccessPortType"));
 	
 	static public PortType GENII_PULL_POINT_PORT =
-		PortType.get(new QName(
-			"http://vcgr.cs.virginia.edu/genii/2010/08/notification/pull-point",
+		PortType.get(new QName("http://vcgr.cs.virginia.edu/genii/2010/08/notification/pull-point",
 			"GeniiPullPointPortType"));
 	
 	static public PortType JOB_MANAGEMENT_PORT_TYPE = 

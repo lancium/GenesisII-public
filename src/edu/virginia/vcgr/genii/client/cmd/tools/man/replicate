@@ -1,0 +1,19 @@
+Description:
+
+The replicate tool creates replicas. <source-path> is an RNS path to any resource. <container> is an RNS path to a container resource. The replica will be created in this container.
+
+If the source's EPR does not contain a resolver element, then the replicate tool will abort. (See the "resolver" tool.)
+
+The replicate tool returns immediately, but the new replica remains locked until it has downloaded all of the state data from the source. After the replica has finished downloading, it will accept read and write requests. The source and the replica use subscriptions to keep their states synchronized.
+
+The replicate tool tells the resolver that the new replica exists.
+
+The options are:
+
+-r | --recursive
+
+After replicating the given RNS directory, replicate every resource that's in the directory. Replicate subdirectories recursively.
+
+-p | --policy
+
+After replicating the given RNS directory, update the directory's policies. When the directory receives an update message which says that resource N has been added to some instance of the directory, it responds by both (1) replicating resource N in its own container, and (2) adding resource N to its contents. This option works well with the --recursive option.

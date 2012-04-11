@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+	xmlns="http://vcgr.cs.virginia.edu/genii/genii-resolver"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	xmlns:naming="http://schemas.ogf.org/naming/2006/08/naming"
+	xmlns:genii-resolver="http://vcgr.cs.virginia.edu/genii/genii-resolver"
+	targetNamespace="http://vcgr.cs.virginia.edu/genii/genii-resolver"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"
+		schemaLocation="./wsrf/basefaults.xsd"/>
+
+	<xsd:import
+		namespace="http://www.w3.org/2005/08/addressing"
+		schemaLocation="./ws-addr.xsd"/>
+
+	<xsd:import
+		namespace="http://schemas.ogf.org/naming/2006/08/naming"
+		schemaLocation="./naming.xsd"/>
+
+	<xsd:complexType name="CountRequestType">
+		<xsd:sequence>
+			<xsd:element
+			    ref="naming:EndpointIdentifier"
+				minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="CountRequest"
+		type="genii-resolver:CountRequestType"/>
+
+	<xsd:complexType name="CountResponseType">
+		<xsd:sequence>
+			<xsd:element
+				name="targetID" type="xsd:int" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="CountResponse"
+		type="genii-resolver:CountResponseType"/>
+
+	<xsd:complexType name="UpdateRequestType">
+		<xsd:sequence>
+			<xsd:element
+				name="new_EPR" type="wsa:EndpointReferenceType"
+				minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="UpdateRequest"
+		type="genii-resolver:UpdateRequestType"/>
+
+	<xsd:complexType name="UpdateResponseType">
+		<xsd:sequence>
+			<xsd:element
+				name="new_EPR" type="wsa:EndpointReferenceType"
+				minOccurs="1" maxOccurs="1"/>
+			<xsd:element
+				name="targetID" type="xsd:int"
+				minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="UpdateResponse"
+		type="genii-resolver:UpdateResponseType"/>
+
+	<xsd:complexType name="extResolveRequestType">
+		<xsd:sequence>
+			<xsd:element
+				name="EPI" type="xsd:anyURI"
+				minOccurs="1" maxOccurs="1"/>
+			<xsd:any namespace="##any" processContents="lax"
+				minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="extResolveRequest"
+		type="genii-resolver:extResolveRequestType"/>
+
+<!-- Fault Types -->
+	<xsd:complexType name="InvalidWSNameFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="wsbf:BaseFaultType">
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="InvalidWSNameFault"
+		type="genii-resolver:InvalidWSNameFaultType"/>
+
+</xsd:schema>

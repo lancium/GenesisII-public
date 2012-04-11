@@ -15,8 +15,6 @@
  */
 package edu.virginia.vcgr.genii.container.rns;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.Connection;
 import java.util.Arrays;
@@ -43,10 +41,6 @@ import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
-import edu.virginia.vcgr.genii.client.context.ContextManager;
-import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import edu.virginia.vcgr.genii.client.naming.EPRUtils;
-import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
@@ -452,38 +446,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 	static EndpointReferenceType prepareEPRToStore(EndpointReferenceType origEPR)
 		throws WriteNotPermittedFaultType, RNSEntryDoesNotExistFaultType
 	{
-		String resolvedEntryUnboundProperty = null;
-		
-		// check if calling context overrides default behavior (which is to make
-		// EPRs with resolvers have unbound addresses)
-
-		try
-		{
-			ICallingContext ctx = ContextManager.getCurrentContext();
-			resolvedEntryUnboundProperty = (String) 
-				ctx.getSingleValueProperty(RNSConstants.RESOLVED_ENTRY_UNBOUND_PROPERTY);
-		}
-		catch(FileNotFoundException fe)
-		{
-    		_logger.warn(fe.getLocalizedMessage(), fe);
-			throw FaultManipulator.fillInFault(
-				new RNSEntryDoesNotExistFaultType());
-		}
-		catch(IOException ie)
-		{
-    		_logger.warn(ie.getLocalizedMessage(), ie);
-			throw FaultManipulator.fillInFault(new WriteNotPermittedFaultType());
-		}
-		
-		if (resolvedEntryUnboundProperty != null && resolvedEntryUnboundProperty.equals("FALSE"))
-			return origEPR;
-		
-		WSName wsName = new WSName(origEPR);
-		
-		if (!wsName.hasValidResolver())
-			return origEPR;
-
-		return EPRUtils.makeUnboundEPR(origEPR);
+		return origEPR;
 	}
 
 	public static MessageElement getIndexedContent(Connection connection,

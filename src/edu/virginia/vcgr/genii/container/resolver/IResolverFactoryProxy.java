@@ -22,11 +22,11 @@ import org.ws.addressing.EndpointReferenceType;
 import org.apache.axis.message.MessageElement;
 
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.resolver.simple.InvalidWSNameFaultType;
+import edu.virginia.vcgr.genii.resolver.InvalidWSNameFaultType;
 
 public interface IResolverFactoryProxy
 {	
-	public Resolution createResolver(EndpointReferenceType targetEPR, Properties properties, 
+	public EndpointReferenceType createResolver(EndpointReferenceType targetEPR, Properties properties, 
 			MessageElement []creationProperties)
 		throws RemoteException,	ResourceException, InvalidWSNameFaultType;
 }

@@ -2,7 +2,7 @@ package edu.virginia.vcgr.genii.client.security.authz.acl;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import org.apache.axis.message.MessageElement;
 
@@ -23,13 +23,12 @@ import edu.virginia.vcgr.genii.common.security.*;
  */
 public class Acl implements Serializable
 {
-
 	static final long serialVersionUID = 0L;
 
 	public boolean requireEncryption = false;
-	public Collection<AclEntry> readAcl = new ArrayList<AclEntry>();
-	public Collection<AclEntry> writeAcl = new ArrayList<AclEntry>();
-	public Collection<AclEntry> executeAcl = new ArrayList<AclEntry>();
+	public List<AclEntry> readAcl = new ArrayList<AclEntry>();
+	public List<AclEntry> writeAcl = new ArrayList<AclEntry>();
+	public List<AclEntry> executeAcl = new ArrayList<AclEntry>();
 
 	public Acl()
 	{
@@ -57,10 +56,9 @@ public class Acl implements Serializable
 	 * @return
 	 * @throws AuthZSecurityException
 	 */
-	static private Collection<AclEntry> decodeIdentityList(
+	static public List<AclEntry> decodeIdentityList(
 			AclEntryListType identityList) throws AuthZSecurityException
 	{
-
 		ArrayList<AclEntry> retval = new ArrayList<AclEntry>();
 		if (identityList == null)
 			return retval;
@@ -94,8 +92,8 @@ public class Acl implements Serializable
 	 * @return
 	 * @throws AuthZSecurityException
 	 */
-	static private AclEntryListType encodeIdentityList(
-			Collection<AclEntry> acl, boolean sanitize) throws AuthZSecurityException
+	static public AclEntryListType encodeIdentityList(
+			List<AclEntry> acl, boolean sanitize) throws AuthZSecurityException
 	{
 		try
 		{
@@ -130,7 +128,6 @@ public class Acl implements Serializable
 	static public Acl decodeAcl(AuthZConfig config)
 			throws AuthZSecurityException
 	{
-
 		try
 		{
 			MessageElement aclMel = null;
@@ -204,7 +201,6 @@ public class Acl implements Serializable
 	 */
 	static public AuthZConfig encodeAcl(Acl acl, boolean sanitize) throws AuthZSecurityException
 	{
-
 		AclType gacl = new AclType();
 		gacl.setRequireEncryption(new Boolean(acl.requireEncryption));
 		gacl.setReadAcl(encodeIdentityList(acl.readAcl, sanitize));
@@ -219,5 +215,18 @@ public class Acl implements Serializable
 	static public AuthZConfig encodeAcl(Acl acl) throws AuthZSecurityException
 	{
 		return encodeAcl(acl, false);
+	}
+	
+	/**
+	 * Modify this ACL object.  Add or remove permissions (specified by modeString)
+	 * to the given entry.
+	 * 
+	 * Obviously, modifying this ACL object does not save the changes in the metadata
+	 * of any local or remote resource.
+	 */
+	public void chmod(String modeString, AclEntry entry)
+		throws AuthZSecurityException
+	{
+		AclAuthZClientTool.chmod(this, modeString, entry);
 	}
 }

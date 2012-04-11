@@ -36,6 +36,7 @@ import edu.virginia.vcgr.genii.client.context.*;
 import edu.virginia.vcgr.genii.common.security.*;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.*;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMessageContents;
 
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.security.authz.providers.*;
@@ -269,5 +270,20 @@ public class JNDIAuthZProvider implements IAuthZProvider
 		_gamlAclProvider.setAuthZConfig(config, resource);
 	}
 
-
+	public void sendAuthZConfig(AuthZConfig oldConfig, AuthZConfig newConfig,
+			IResource resource)
+		throws AuthZSecurityException, ResourceException
+	{
+		if ((resource instanceof IJNDIResource) && ((IJNDIResource) resource).isIdpResource())
+			return;
+		_gamlAclProvider.sendAuthZConfig(oldConfig, newConfig, resource);
+	}
+	
+	public void receiveAuthZConfig(NotificationMessageContents message, IResource resource)
+		throws ResourceException, AuthZSecurityException
+	{
+		if ((resource instanceof IJNDIResource) && ((IJNDIResource) resource).isIdpResource())
+			return;
+		_gamlAclProvider.receiveAuthZConfig(message, resource);
+	}
 }

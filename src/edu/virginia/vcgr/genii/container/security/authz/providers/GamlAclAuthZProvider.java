@@ -39,7 +39,12 @@ import edu.virginia.vcgr.genii.client.security.authz.acl.Acl;
 import edu.virginia.vcgr.genii.client.security.authz.acl.AclEntry;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXManager;
 import edu.virginia.vcgr.genii.client.security.authz.*;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMessageContents;
 import edu.virginia.vcgr.genii.container.resource.*;
+import edu.virginia.vcgr.genii.container.sync.VersionVector;
+import edu.virginia.vcgr.genii.container.sync.VersionedResourceUtils;
+import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.PublisherTopic;
+import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.TopicSet;
 import edu.virginia.vcgr.genii.client.resource.*;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.security.MessageLevelSecurityRequirements;
@@ -59,7 +64,7 @@ import edu.virginia.vcgr.genii.security.credentials.identity.*;
  * @author dmerrill
  * 
  */
-public class GamlAclAuthZProvider implements IAuthZProvider
+public class GamlAclAuthZProvider implements IAuthZProvider, GamlAclTopics
 {
 
 	static public final String GAML_ACL_PROPERTY_NAME =
@@ -403,7 +408,6 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 	public AuthZConfig getAuthZConfig(IResource resource, boolean sanitize)
 			throws AuthZSecurityException, ResourceException
 	{
-
 		try
 		{
 			// get ACL
@@ -428,10 +432,108 @@ public class GamlAclAuthZProvider implements IAuthZProvider
 	public void setAuthZConfig(AuthZConfig config, IResource resource)
 			throws AuthZSecurityException, ResourceException
 	{
-
 		Acl acl = Acl.decodeAcl(config);
 		resource.setProperty(GAML_ACL_PROPERTY_NAME, acl);
 		resource.commit();
 	}
+	
+	/**
+	 * Inform subscribers that one or more entries has been added or removed from
+	 * one or more ACLs.
+	 */
+	public void sendAuthZConfig(AuthZConfig oldConfig, AuthZConfig newConfig,
+			IResource resource)
+		throws AuthZSecurityException, ResourceException
+	{
+		if (resource.isServiceResource())
+			return;
+		Acl oldAcl = Acl.decodeAcl(oldConfig);
+		if (oldAcl == null)
+			oldAcl = new Acl();
+		Acl newAcl = Acl.decodeAcl(newConfig);
+		if (newAcl == null)
+			newAcl = new Acl();
+		List<AclEntry> entryList = new ArrayList<AclEntry>();
+		List<String> tagList = new ArrayList<String>();
+		findDeltas(entryList, tagList, newAcl.readAcl, oldAcl.readAcl, "r");
+		findDeltas(entryList, tagList, newAcl.writeAcl, oldAcl.writeAcl, "w");
+		findDeltas(entryList, tagList, newAcl.executeAcl, oldAcl.executeAcl, "x");
+		if (entryList.size() > 0)
+		{
+			VersionVector vvr = VersionedResourceUtils.incrementResourceVersion(resource);
+			TopicSet space = TopicSet.forPublisher(getClass());
+			PublisherTopic publisherTopic = space.createPublisherTopic(
+				GAML_ACL_CHANGE_TOPIC);
+			AclEntryListType entryArray = Acl.encodeIdentityList(entryList, false);
+			String[] tagArray = tagList.toArray(new String[0]);
+			publisherTopic.publish(new GamlAclChangeContents(entryArray, tagArray, vvr));
+		}
+	}
 
+	private static void findDeltas(List<AclEntry> entryList, List<String> tagList,
+			Collection<AclEntry> newAcl, Collection<AclEntry> oldAcl, String mode)
+	{
+		if (newAcl == null)
+			newAcl = new ArrayList<AclEntry>();
+		if (oldAcl == null)
+			oldAcl = new ArrayList<AclEntry>();
+		Iterator<AclEntry> newIter = newAcl.iterator();
+		while (newIter.hasNext())
+		{
+			AclEntry entry = newIter.next();
+			boolean found = false;
+			Iterator<AclEntry> oldIter = oldAcl.iterator();
+			while ((!found) && oldIter.hasNext())
+			{
+				AclEntry oldEntry = oldIter.next();
+				if (((entry == null) && (oldEntry == null)) ||
+					((entry != null) && entry.equals(oldEntry)))
+				{
+					found = true;
+					oldIter.remove();
+				}
+			}
+			if (!found)
+			{
+				_logger.debug("entryList.add " + entry);
+				entryList.add(entry);
+				tagList.add("+"+mode);
+			}
+		}
+		Iterator<AclEntry> oldIter = oldAcl.iterator();
+		while (oldIter.hasNext())
+		{
+			AclEntry oldEntry = oldIter.next();
+			_logger.debug("entryList.del " + oldEntry);
+			entryList.add(oldEntry);
+			tagList.add("-" + mode);
+		}
+	}
+	
+	/**
+	 * Update the resource ACLs with the changes that have been applied to a replica.
+	 */
+	public void receiveAuthZConfig(NotificationMessageContents message, IResource resource)
+		throws ResourceException, AuthZSecurityException
+	{
+		Acl acl = (Acl) resource.getProperty(GAML_ACL_PROPERTY_NAME);
+		GamlAclChangeContents contents = (GamlAclChangeContents) message;
+		AclEntryListType encodedList = contents.aclEntryList();
+		List<AclEntry> entryList = Acl.decodeIdentityList(encodedList);
+		int length = entryList.size();
+		if (length == 0)
+			return;
+		String[] tagList = contents.tagList();
+		if ((tagList == null) || (tagList.length != length))
+			throw new AuthZSecurityException("GamlAclChangeContents " +
+					"entry list does not match tag list");
+		for (int idx = 0; idx < length; idx++)
+		{
+			AclEntry entry = entryList.get(idx);
+			String tag = tagList[idx];
+			acl.chmod(tag, entry);
+		}
+		resource.setProperty(GAML_ACL_PROPERTY_NAME, acl);
+		resource.commit();
+	}
 }

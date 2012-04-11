@@ -84,12 +84,7 @@
 		<description>Container</description>
 	</portType>
 
-	<portType name="{http://vcgr.cs.virginia.edu/container/2006/12/simple-resolver-factory}SimpleResolverFactoryPortType">
-		<display-rank>100</display-rank>
-		<description>ResolverFactory</description>
-	</portType>
-
-	<portType name="{http://vcgr.cs.virginia.edu/container/2006/12/simple-resolver}SimpleResolverPortType">
+	<portType name="{http://vcgr.cs.virginia.edu/genii/genii-resolver}GeniiResolverPortType">
 		<display-rank>100</display-rank>
 		<description>Resolver</description>
 	</portType>
@@ -358,7 +353,7 @@
 		<display-rank>100</display-rank>
 		<description>Iterator</description>
 	</portType>
-	
+
 	<portType name="{http://vcgr.cs.virginia.edu/genii/job-management}JobManagementPortType">
 		<display-rank>100</display-rank>
 		<description>JobManagement</description>

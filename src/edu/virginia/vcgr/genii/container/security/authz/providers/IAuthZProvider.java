@@ -25,6 +25,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.client.security.authz.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.security.authz.PermissionDeniedException;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMessageContents;
 import edu.virginia.vcgr.genii.common.security.AuthZConfig;
 import edu.virginia.vcgr.genii.security.MessageLevelSecurityRequirements;
 import edu.virginia.vcgr.genii.security.RWXCategory;
@@ -97,4 +98,16 @@ public interface IAuthZProvider
 	public void setAuthZConfig(AuthZConfig config, IResource resource)
 			throws AuthZSecurityException, ResourceException;
 
+	/**
+	 * Inform subscribers that the AuthZ configuration was changed.
+	 */
+	public void sendAuthZConfig(AuthZConfig oldConfig, AuthZConfig newConfig,
+			IResource resource)
+		throws AuthZSecurityException, ResourceException;
+	
+	/**
+	 * Update the resource AuthZ configuration with the changes that were applied to a replica.
+	 */
+	public void receiveAuthZConfig(NotificationMessageContents message, IResource resource)
+		throws ResourceException, AuthZSecurityException;
 }

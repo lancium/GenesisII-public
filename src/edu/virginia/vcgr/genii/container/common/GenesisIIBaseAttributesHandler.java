@@ -234,7 +234,9 @@ public class GenesisIIBaseAttributesHandler
 		}
 		
 		// config the authZ handler
+		AuthZConfig oldConfig = authZHandler.getAuthZConfig(resource);
 		authZHandler.setAuthZConfig(config, resource);
+		authZHandler.sendAuthZConfig(oldConfig, config, resource);
 	}
 
 	public MessageElement getCurrentTimeAttr()

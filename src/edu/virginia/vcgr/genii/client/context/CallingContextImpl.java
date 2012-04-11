@@ -31,7 +31,6 @@ import java.util.*;
 
 import org.morgan.util.io.StreamUtils;
 
-import edu.virginia.vcgr.genii.client.cache.LRUCache;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.client.ser.Base64;
@@ -42,48 +41,36 @@ public class CallingContextImpl implements ICallingContext, Serializable
 {
 	static final long serialVersionUID = 0L;
 	
-	// serialization caches and ultility functions
-	static protected int SERIALIZATION_CACHE_SIZE = 64;
-
-	static protected LRUCache<String, Serializable> incomingBase64cache = 
-		new LRUCache<String, Serializable>(SERIALIZATION_CACHE_SIZE);
-
 	protected static final String CLIENT_KEY_MATERIAL_CALL_CONTEXT_DATA = 
 		"edu.virginia.vcgr.genii.client.security.client-key-material-call-context-data";
 	
-	static protected Serializable retrieveBase64Decoded(String encoded) throws IOException {
-		synchronized (incomingBase64cache) {
-			Serializable retval = incomingBase64cache.get(encoded);
-			if (retval == null) {
-				ObjectInputStream ois = new ObjectInputStream(
-					new ByteArrayInputStream(Base64.base64ToByteArray(encoded)));
-
-				try {
-					retval = (Serializable) ois.readObject();
-				} catch (ClassNotFoundException e) { 
-					throw new IOException(e.getMessage());
-				}
-				
-				incomingBase64cache.put(encoded, retval);
-			}
-			return retval;
+	static private Serializable retrieveBase64Decoded(String encoded) throws IOException
+	{
+		ObjectInputStream ois = new ObjectInputStream(
+				new ByteArrayInputStream(Base64.base64ToByteArray(encoded)));
+		try
+		{
+			return (Serializable) ois.readObject();
+		}
+		catch (ClassNotFoundException e)
+		{ 
+			throw new IOException(e.getMessage());
 		}
 	}
-
-	static protected LRUCache<Serializable, String> outgoingBase64cache = 
-		new LRUCache<Serializable, String>(SERIALIZATION_CACHE_SIZE);
 	
-	static protected String retrieveBase64Encoded(Serializable obj) throws IOException {
-		synchronized (outgoingBase64cache) {
-			String retval = outgoingBase64cache.get(obj);
-			if (retval == null) {
+	static private String retrieveBase64Encoded(Serializable obj) throws IOException
+	{
+		synchronized (EncodedPropertyCache.cache)
+		{
+			String retval = EncodedPropertyCache.cache.get(obj);
+			if (retval == null)
+			{
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		 		ObjectOutputStream oos = new ObjectOutputStream(baos);
 		 		oos.writeObject(obj);
 		 		oos.close();
-
 				retval = Base64.byteArrayToBase64(baos.toByteArray());
-				outgoingBase64cache.put(obj, retval);
+				EncodedPropertyCache.cache.put(obj, retval);
 			}
 			return retval;
 		}
@@ -120,7 +107,6 @@ public class CallingContextImpl implements ICallingContext, Serializable
 						multiValue = new ArrayList<Serializable>();
 						_properties.put(name, multiValue);
 					}
-					
 					multiValue.add(retrieveBase64Decoded(pair.getValue()));
 				}
 			}
@@ -152,7 +138,6 @@ public class CallingContextImpl implements ICallingContext, Serializable
 	    if ((multiValue != null) && (multiValue.isEmpty())) {
 	    	throw new IllegalArgumentException("Illegal empty multiValue, use null instead");
 	    }
-
 		_properties.put(name, multiValue);
 	}
 
@@ -226,9 +211,7 @@ public class CallingContextImpl implements ICallingContext, Serializable
 		 * it shouldn't be fixed here.
 		 */
 		// removeProperty(CURRENT_PATH_KEY);
-		ArrayList<Serializable> multiValue = new ArrayList<Serializable>();
-		multiValue.add(newPath);
-		_properties.put(CURRENT_PATH_KEY, multiValue);
+		setSingleValueProperty(CURRENT_PATH_KEY, newPath);
 	}
 
 	public ContextType getSerialized() throws IOException {

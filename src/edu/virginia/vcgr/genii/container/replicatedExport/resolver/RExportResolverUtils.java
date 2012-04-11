@@ -32,10 +32,10 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.DefaultSubscriptionFact
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscribeException;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscriptionFactory;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.GenesisIIBaseTopics;
+import edu.virginia.vcgr.genii.replicatedExport.resolver.CreateResolverRequestType;
+import edu.virginia.vcgr.genii.replicatedExport.resolver.CreateResolverResponseType;
 import edu.virginia.vcgr.genii.replicatedExport.resolver.InvalidWSNameFaultType;
 import edu.virginia.vcgr.genii.replicatedExport.resolver.RExportResolverFactoryPortType;
-import edu.virginia.vcgr.genii.resolver.simple.CreateResolverRequestType;
-import edu.virginia.vcgr.genii.resolver.simple.CreateResolverResponseType;
 import edu.virginia.vcgr.genii.replicatedExport.resolver.RExportResolverPortType;
 import edu.virginia.vcgr.genii.replicatedExport.RExportDirPortType;
 import edu.virginia.vcgr.genii.exportdir.ExportedFilePortType;

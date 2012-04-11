@@ -15,83 +15,70 @@
  */
 package edu.virginia.vcgr.genii.client.comm;
 
-import org.apache.axis.types.URI;
-import java.util.ListIterator;
-
-import org.ws.addressing.AttributedURIType;
+import java.rmi.RemoteException;
 import org.ws.addressing.EndpointReferenceType;
-
-import edu.virginia.vcgr.genii.client.naming.ResolverDescription;
-import edu.virginia.vcgr.genii.client.naming.WSName;
+import edu.virginia.vcgr.genii.client.naming.ResolverUtils;
 
 public class ResolutionContext
 {
-	private EndpointReferenceType _origEPR = null;
-	private WSName _origName = null;
-	private URI _epi = null;
-	private ListIterator<ResolverDescription> _resolversIter = null;
-	private boolean _triedCache = false;
-	private boolean _triedOriginalEPR = false;
-	private Throwable _errorToReport = null;
+	private EndpointReferenceType _origEPR;
+	private boolean _triedOriginalEPR;
 	private boolean _rebindAllowed;
-	
+	private EndpointReferenceType _resolvedEPR;
+	private int _knownEndpoints;
+	private int _endpointCount;
+
 	public ResolutionContext(EndpointReferenceType origEPR, boolean rebindAllowed)
 	{
 		_origEPR = origEPR;
-		_origName = new WSName(_origEPR);
-		_epi = _origName.getEndpointIdentifier();
-		_resolversIter = _origName.getResolvers().listIterator();
-		_errorToReport = null;
 		_rebindAllowed = rebindAllowed;
+		// We know about the original EPR.
+		_knownEndpoints = 1;
 	}
-	
-	public AttributedURIType getOriginalAddress()
+
+	public EndpointReferenceType getOriginalEPR()
 	{
-		return _origName.getEndpoint().getAddress();
+		return _origEPR;
 	}
 	
 	public boolean rebindAllowed()
 	{
 		return _rebindAllowed;
 	}
-	
-	public boolean triedCache()
-	{
-		return _triedCache;
-	}
-	
+
 	public boolean triedOriginalEPR()
 	{
 		return _triedOriginalEPR;
-	}
-	
-	public URI getEPI()
-	{
-		return _epi;
-	}
-	
-	public ListIterator<ResolverDescription> getResolversIter()
-	{
-		return _resolversIter;
-	}
-	
-	public void setTriedCache()
-	{
-		_triedCache = true;
 	}
 	
 	public void setTriedOriginalEPR()
 	{
 		_triedOriginalEPR = true;
 	}
-	
-	public Throwable getErrorToReport()
-	{
-		return _errorToReport;
-	}
 
-	public void setErrorToReport(Throwable errorToReport)
+	public EndpointReferenceType resolve()
+		throws RemoteException
 	{
-		_errorToReport = errorToReport;
+		// If this is the first call to resolve(), then resolve the original EPR.
+		if (_resolvedEPR == null)
+		{
+			_resolvedEPR = ResolverUtils.resolve(_origEPR);
+			_knownEndpoints++;
+			return _resolvedEPR;
+		}
+		// The client has already tried origEPR and resolvedEPR, and neither worked.
+		// Are there more endpoints to resolve?
+		if (_endpointCount == 0)
+		{
+			_endpointCount = ResolverUtils.getEndpointCount(_origEPR);
+		}
+		if (_knownEndpoints < _endpointCount)
+		{
+			_resolvedEPR = ResolverUtils.resolve(_resolvedEPR);
+			_knownEndpoints++;
+			return _resolvedEPR;
+		}
+		// There are no more endpoints to resolve.
+		return null;
 	}
 }

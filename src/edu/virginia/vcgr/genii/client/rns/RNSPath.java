@@ -36,6 +36,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
+import edu.virginia.vcgr.genii.client.context.EncodedPropertyCache;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
@@ -492,6 +493,15 @@ public class RNSPath implements Serializable, Cloneable
 	static public void clearCacheEntry(String fullPath)
 	{
 		RNSLookupCache.remove(fullPath);
+	}
+	
+	/**
+	 * Remove all cached paths from the lookup cache.
+	 */
+	static public void clearCache()
+	{
+		RNSLookupCache.clear();
+		EncodedPropertyCache.clear();
 	}
 	
 	/**

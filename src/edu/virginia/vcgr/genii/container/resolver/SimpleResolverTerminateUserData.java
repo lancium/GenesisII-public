@@ -1,12 +1,10 @@
 package edu.virginia.vcgr.genii.container.resolver;
 
-import java.net.URI;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
-import org.apache.axis.types.URI.MalformedURIException;
+import org.apache.axis.types.URI;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.AdditionalUserData;
@@ -15,51 +13,40 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.AdditionalUserData;
 class SimpleResolverTerminateUserData extends AdditionalUserData
 {
 	static final long serialVersionUID = 0L;
+
+	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS,
+			name = "targetEPI", required = true, nillable = false)
+	private String _targetEPI = null;
 	
 	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS,
-		name = "epi", required = true, nillable = false)
-	private URI _epi = null;
-	
-	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS,
-		name = "version", required = true, nillable = false)
-	private int _version = -1;
-	
-	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS,
-		name = "guid", required = true, nillable = false)
-	private String _guid = null;
+			name = "targetID", required = true, nillable = false)
+	private int _targetID = -1;
 	
 	@SuppressWarnings("unused")
 	private SimpleResolverTerminateUserData()
 	{
 	}
 	
-	public SimpleResolverTerminateUserData(URI epi, int version, String guid)
+	public SimpleResolverTerminateUserData(URI targetEPI, int targetID)
 	{
-		_epi = epi;
-		_version = version;
-		_guid = guid;
+		_targetEPI = targetEPI.toString();
+		_targetID = targetID;
 	}
 	
-	public org.apache.axis.types.URI getEPI()
+	public URI getTargetEPI()
 	{
 		try
 		{
-			return new org.apache.axis.types.URI(_epi.toString());
-		} 
-		catch (MalformedURIException e)
+			return new URI(_targetEPI);
+		}
+		catch (Exception exception)
 		{
-			throw new RuntimeException(
-				"This shouldn't have happend.", e);
+			return null;
 		}
 	}
 	
-	public int getVersion()
+	public int getTargetID()
 	{
-		return _version;
-	}
-
-	public String getSubscriptionGUID()
-	{
-		return _guid;
+		return _targetID;
 	}
 }

@@ -267,8 +267,7 @@
 		<ant antfile="${wsdl.dir}/authn/x509-authn.build.xml"/>
 		<ant antfile="${wsdl.dir}/authn/jndi-authn.build.xml"/>
 		<ant antfile="${wsdl.dir}/authn/kerb-authn.build.xml"/>
-		<ant antfile="${wsdl.dir}/resolver/simple-resolver.build.xml"/>
-		<ant antfile="${wsdl.dir}/resolver/simple-resolver-factory.build.xml"/>
+		<ant antfile="${wsdl.dir}/resolver/genii-resolver.build.xml"/>
 		<ant antfile="${wsdl.dir}/queue/queue.build.xml"/>
 		<ant antfile="${wsdl.dir}/certGenerator/certGenerator.build.xml"/>
 		<ant antfile="${wsdl.dir}/tty/tty.build.xml"/>

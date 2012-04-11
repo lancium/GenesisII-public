@@ -202,6 +202,8 @@ public class BasicDBResource implements IResource
 			stmt.executeUpdate();
 			stmt.close();
 			stmt = null;
+			if (value == null)
+				return;
 			stmt = connection.prepareStatement(_INSERT_PROPERTY_STMT);
 			stmt.setString(1, resourceKey);
 			stmt.setString(2, propertyName);

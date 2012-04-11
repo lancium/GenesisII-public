@@ -27,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.virginia.vcgr.genii.client.context.*;
 import edu.virginia.vcgr.genii.client.security.authz.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.security.authz.PermissionDeniedException;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMessageContents;
 import edu.virginia.vcgr.genii.common.security.*;
 import edu.virginia.vcgr.genii.container.resource.*;
 import edu.virginia.vcgr.genii.client.resource.*;
@@ -66,7 +67,6 @@ public class OpenAuthZProvider implements IAuthZProvider
 			IResource resource, X509Certificate[] serviceCertChain)
 			throws AuthZSecurityException, ResourceException
 	{
-
 	}
 	
 	public boolean checkAccess(
@@ -90,7 +90,6 @@ public class OpenAuthZProvider implements IAuthZProvider
 			IResource resource) throws AuthZSecurityException,
 			ResourceException
 	{
-
 		return _defaultMinMsgSec;
 	}
 
@@ -110,7 +109,16 @@ public class OpenAuthZProvider implements IAuthZProvider
 	public void setAuthZConfig(AuthZConfig config, IResource resource)
 			throws AuthZSecurityException, ResourceException
 	{
-
 	}
-
+	
+	public void sendAuthZConfig(AuthZConfig oldConfig, AuthZConfig newConfig,
+			IResource resource)
+		throws AuthZSecurityException, ResourceException
+	{
+	}
+	
+	public void receiveAuthZConfig(NotificationMessageContents message, IResource resource)
+		throws ResourceException, AuthZSecurityException
+	{
+	}
 }

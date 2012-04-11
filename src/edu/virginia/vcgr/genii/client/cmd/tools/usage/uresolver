@@ -1,0 +1,1 @@
+resolver [-r] <source-path> <resolver-path> | resolver -q <source-path> [-l filename]

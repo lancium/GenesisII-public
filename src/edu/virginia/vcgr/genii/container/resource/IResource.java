@@ -56,6 +56,8 @@ public interface IResource extends Closeable
 		new QName(GenesisIIConstants.GENESISII_NS, "endpoint-identifier");
 	static public QName IS_SERVICE_CONSTRUCTION_PARAM =
 		new QName(GenesisIIConstants.GENESISII_NS, "is-service");
+	static public QName PRIMARY_EPR_CONSTRUCTION_PARAM =
+		new QName(GenesisIIConstants.GENESISII_NS, "primary-epr");
 	
 	/**
 	 * Initialize the resource (construct a new one) using the given construction

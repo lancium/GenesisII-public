@@ -15,8 +15,7 @@
 {http://vcgr.cs.virginia.edu/bes/2006/06/bes-activity}BESActivityPortType
 {http://vcgr.cs.virginia.edu/byteio/2006/08/exported-file}ExportedFilePortType
 {http://vcgr.cs.virginia.edu/container/2006/07/container}VCGRContainerPortType
-{http://vcgr.cs.virginia.edu/container/2006/12/simple-resolver-factory}SimpleResolverFactoryPortType
-{http://vcgr.cs.virginia.edu/container/2006/12/simple-resolver}SimpleResolverPortType
+{http://vcgr.cs.virginia.edu/genii/genii-resolver}GeniiResolverPortType
 {http://vcgr.cs.virginia.edu/container/2007/11/jndi-authn}JNDIAuthnPortType
 {http://vcgr.cs.virginia.edu/container/2007/11/x509-authn}X509AuthnPortType
 {http://vcgr.cs.virginia.edu/container/2007/11/kerb-authn}KerbAuthnPortType

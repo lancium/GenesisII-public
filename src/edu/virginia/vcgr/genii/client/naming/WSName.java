@@ -34,8 +34,10 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.GUID;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
+import org.ws.addressing.AttributedURIType;
 import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.MetadataType;
+import org.ws.addressing.ReferenceParametersType;
 
 import edu.virginia.vcgr.genii.client.naming.ResolverDescription.ResolverType;
 
@@ -129,7 +131,8 @@ public class WSName implements Comparable<WSName>, Serializable
 	
 	public boolean hasValidResolver()
 	{
-		return (getResolvers().size() > 0);
+		doExtraction();
+		return((_resolvers != null) && (_resolvers.size() > 0));
 	}
 	
 	public String toString()
@@ -254,106 +257,98 @@ public class WSName implements Comparable<WSName>, Serializable
 		doExtraction();
 		ResolverDescription newResolverDesc = new ResolverDescription(
 				_endpointIdentifier, resolverEPR, ResolverType.REFERENCE_RESOLVER);
-		_epr = addResolverToEPR(_epr, newResolverDesc);
+		_epr = createEPRWithResolvers(_epr, resolverEPR, ResolverType.REFERENCE_RESOLVER, null);
 		_resolvers.add(newResolverDesc);
 	}
 	
 	public void addEndpointIdentifierReferenceResolver(EndpointReferenceType resolverEPR)
 	{
+		doExtraction();
 		ResolverDescription newResolverDesc = new ResolverDescription(
 				_endpointIdentifier, resolverEPR, ResolverType.EPI_RESOLVER);
-		_epr = addResolverToEPR(_epr, newResolverDesc);
+		_epr = createEPRWithResolvers(_epr, resolverEPR, ResolverType.EPI_RESOLVER, null);
 		_resolvers.add(newResolverDesc);
 	}
 	
 	public void removeAllResolvers()
 	{
-		_epr = removeAllResolversFromEPR(_epr);
-		_resolvers = new ArrayList<ResolverDescription>();
-	}
-	
-	private EndpointReferenceType addResolverToEPR(EndpointReferenceType origEPR, ResolverDescription resolverDesc)
-	{
-		doExtraction();
-		org.ws.addressing.AttributedURIType origAddress = origEPR.getAddress();
-		org.ws.addressing.ReferenceParametersType origRefParams = origEPR.getReferenceParameters();
-		org.ws.addressing.MetadataType origMetadata = origEPR.getMetadata();
-		org.apache.axis.message.MessageElement [] origMessageElements = origEPR.get_any();
-		
-		org.ws.addressing.MetadataType newMetadata = null;
-		org.apache.axis.message.MessageElement newResolverElement = null;
-		if (resolverDesc.getType() == ResolverType.REFERENCE_RESOLVER)
-		{
-			newResolverElement = new org.apache.axis.message.MessageElement(WSName.REFERENCE_RESOLVER_QNAME, resolverDesc.getEPR());
-		} 
-		else if (resolverDesc.getType() == ResolverType.EPI_RESOLVER)
-		{
-			newResolverElement = new org.apache.axis.message.MessageElement(WSName.ENDPOINT_IDENTIFIER_RESOLVER_QNAME, resolverDesc.getEPR());
-		}
-		
-		if (origMetadata == null)
-		{
-			origMetadata = new org.ws.addressing.MetadataType();
-		}
-
-		int numMetadataElements = 0;
-		org.apache.axis.message.MessageElement [] origMetadataElements = origMetadata.get_any();
-		if (origMetadataElements != null)
-		{
-			numMetadataElements = origMetadataElements.length;
-		}
-		
-		org.apache.axis.message.MessageElement [] newMetadataElements = new org.apache.axis.message.MessageElement[numMetadataElements+1];
-		
-		for (int i = 0; i < numMetadataElements; i++)
-		{
-			newMetadataElements[i] = origMetadataElements[i];
-		}
-		newMetadataElements[numMetadataElements] = newResolverElement;
-		newMetadata = new org.ws.addressing.MetadataType(newMetadataElements);
-		
-		EndpointReferenceType newEPR = new EndpointReferenceType(origAddress, origRefParams, newMetadata, origMessageElements);
-		
-		return newEPR;
-	}
-
-	private EndpointReferenceType removeAllResolversFromEPR(EndpointReferenceType origEPR)
-	{
 		doExtraction();
 		if (_resolvers.size() == 0)
-			return origEPR;
-		org.ws.addressing.AttributedURIType origAddress = origEPR.getAddress();
-		org.ws.addressing.ReferenceParametersType origRefParams = origEPR.getReferenceParameters();
-		org.ws.addressing.MetadataType origMetadata = origEPR.getMetadata();
-		org.apache.axis.message.MessageElement [] origMessageElements = origEPR.get_any();
-		
-		org.ws.addressing.MetadataType newMetadata = null;
-		
-		if (origMetadata == null)
-			return origEPR;
+			return;
+		setResolvers(new ArrayList<ResolverDescription>());
+	}
+	
+	public void setResolvers(List<ResolverDescription> resolvers)
+	{
+		doExtraction();
+		_epr = createEPRWithResolvers(_epr, null, null, resolvers);
+		_resolvers = resolvers;
+	}
 
-		org.apache.axis.message.MessageElement [] origMetadataElements = origMetadata.get_any();
-		if (origMetadataElements == null)
-			return origEPR;
+	private static EndpointReferenceType createEPRWithResolvers(EndpointReferenceType origEPR,
+			EndpointReferenceType resolverEPR, ResolverType resolverType,
+			List<ResolverDescription> resolvers)
+	{
+		AttributedURIType address = origEPR.getAddress();
+		ReferenceParametersType referenceParameters = origEPR.getReferenceParameters();
+		MetadataType metadata = origEPR.getMetadata();
+		MessageElement[] any = origEPR.get_any();
 		
-		org.apache.axis.message.MessageElement [] newMetadataElements = new org.apache.axis.message.MessageElement [origMetadataElements.length - _resolvers.size()];
-		
-		int currentSlot = 0;
-		for (MessageElement element : origMetadataElements)
+		if (metadata == null)
 		{
-			if (!(element.getQName().equals(WSName.ENDPOINT_IDENTIFIER_RESOLVER_QNAME)) && 
-					!(element.getQName().equals(WSName.REFERENCE_RESOLVER_QNAME)))
+			metadata = new MetadataType();
+		}
+		MessageElement[] metadataElements = metadata.get_any();
+		List<MessageElement> newMetadataElements = new ArrayList<MessageElement>();
+
+		// Copy the metadata elements from the original array to the new list.
+		// If we are adding a single new resolver, then include the original resolvers.
+		// If we are replacing the list of resolvers, then skip the original resolvers.
+		if (metadataElements != null)
+		{
+			for (MessageElement element : metadataElements)
 			{
-				newMetadataElements[currentSlot] = element;
-				currentSlot++;
+				if ((resolverEPR == null) && isResolverElement(element))
+					continue;
+				newMetadataElements.add(element);
 			}
 		}
+		
+		// Add the single new resolver.
+		if (resolverEPR != null)
+		{
+			newMetadataElements.add(makeResolverMessageElement(resolverEPR, resolverType));
+		}
+		// Add the new list of resolvers.
+		if (resolvers != null)
+		{
+			for (ResolverDescription resolver : resolvers)
+			{
+				newMetadataElements.add(makeResolverMessageElement(resolver.getEPR(), resolver.getType()));
+			}
+		}
+		
+		MetadataType newMetadata = new MetadataType(newMetadataElements.toArray(new MessageElement[0]));
+		return new EndpointReferenceType(address, referenceParameters, newMetadata, any);
+	}
 
-		newMetadata = new org.ws.addressing.MetadataType(newMetadataElements);
-		
-		EndpointReferenceType newEPR = new EndpointReferenceType(origAddress, origRefParams, newMetadata, origMessageElements);
-		
-		return newEPR;
+	private static boolean isResolverElement(MessageElement element)
+	{
+		return(element.getQName().equals(WSName.ENDPOINT_IDENTIFIER_RESOLVER_QNAME) ||
+			   element.getQName().equals(WSName.REFERENCE_RESOLVER_QNAME));
+	}
+
+	private static MessageElement makeResolverMessageElement(EndpointReferenceType resolverEPR, ResolverType resolverType)
+	{
+		if (resolverType == ResolverType.REFERENCE_RESOLVER)
+		{
+			return new MessageElement(WSName.REFERENCE_RESOLVER_QNAME, resolverEPR);
+		}
+		if (resolverType == ResolverType.EPI_RESOLVER)
+		{
+			return new MessageElement(WSName.ENDPOINT_IDENTIFIER_RESOLVER_QNAME, resolverEPR);
+		}
+		return null;
 	}
 	
 	private void writeObject(ObjectOutputStream out)
