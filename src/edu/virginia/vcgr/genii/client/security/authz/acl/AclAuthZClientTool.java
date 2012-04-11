@@ -342,7 +342,7 @@ public class AclAuthZClientTool
 		}
 		else if (cLine.hasOption("username"))
 		{
-			if (!cLine.hasOption("password"))
+			if (!(cLine.hasOption("password") || cLine.hasOption("hashedpass")))
 			{
 				return false;
 			}
@@ -384,9 +384,17 @@ public class AclAuthZClientTool
 		} 
 		else if (cLine.hasOption("username")) 
 		{
+			String password = cLine.getOptionValue("password");
+			boolean doHash = true;
+			if (password == null)
+			{
+				// It's already hashed.  Don't re-hash it.
+				password = cLine.getOptionValue("hashedpass");
+				doHash = false;
+			}
 			newEntry = new UsernamePasswordIdentity(
-					cLine.getOptionValue("username"), 
-					cLine.getOptionValue("password"));
+					cLine.getOptionValue("username"),
+					password, doHash);
 		}
 		else
 		{

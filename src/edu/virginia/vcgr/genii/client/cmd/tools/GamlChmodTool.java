@@ -29,6 +29,7 @@ public class GamlChmodTool extends BaseGridTool
 
 	private String _username;
 	private String _password;
+	private String _hashedpass;
 	private boolean _everyone;
 	private String _pattern;
 	
@@ -51,6 +52,12 @@ public class GamlChmodTool extends BaseGridTool
 		_password = arg;
 	}
 
+	@Option({"hahsedpass"})
+	public void setHashedpass(String arg)
+	{
+		_hashedpass = arg;
+	}
+	
 	@Option({"everyone"})
 	public void setEveryone()
 	{
@@ -66,8 +73,11 @@ public class GamlChmodTool extends BaseGridTool
 	@Override
 	protected void verify() throws ToolException
 	{
-		if (((_username != null) && (_password == null)) ||
-			((_username == null) && (_password != null)))
+		boolean haveUsername = (_username != null);
+		boolean havePassword = (_password != null || _hashedpass != null);
+		if (haveUsername != havePassword)
+			throw new InvalidToolUsageException();
+		if (_password != null && _hashedpass != null)
 			throw new InvalidToolUsageException();
 		int reqArgs = 2;
 		if ((_username == null) && (!_everyone))
@@ -95,7 +105,10 @@ public class GamlChmodTool extends BaseGridTool
 		}
 		else if (_username != null) 
 		{
-			newEntry = new UsernamePasswordIdentity(_username, _password);
+			if (_password != null)
+				newEntry = new UsernamePasswordIdentity(_username, _password, true);
+			else
+				newEntry = new UsernamePasswordIdentity(_username, _hashedpass, false);
 		}
 		else
 		{
