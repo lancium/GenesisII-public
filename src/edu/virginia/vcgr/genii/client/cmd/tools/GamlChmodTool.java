@@ -89,7 +89,7 @@ public class GamlChmodTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
-		String path = getArgument(0);
+		GeniiPath gPath = new GeniiPath(getArgument(0));
 		String modeString = getArgument(1);
 		String certificate = null;
 		if ((_username == null) && (!_everyone))
@@ -121,8 +121,7 @@ public class GamlChmodTool extends BaseGridTool
 		}
 		
 		// Get the resource's current AuthZConfig.
-		RNSPath current = RNSPath.getCurrent();
-		RNSPath pathRNS = current.lookup(path, RNSPathQueryFlags.MUST_EXIST);
+		RNSPath pathRNS = lookup(gPath, RNSPathQueryFlags.MUST_EXIST);
 		GenesisIIBaseRP rp = (GenesisIIBaseRP) ResourcePropertyManager.createRPInterface(
 				pathRNS.getEndpoint(), GenesisIIBaseRP.class);
 		AuthZConfig config = rp.getAuthZConfig();
