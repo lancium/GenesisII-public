@@ -400,7 +400,7 @@ public class RExportResolverServiceImpl extends GenesisIIBase
 			IRExportResolverResource resource = (IRExportResolverResource) rKey.dereference();
 			RExportResolverEntry thisEntry = resource.getEntry();
 			
-			specificOp = contents.responsibleOperation();
+			specificOp = contents.operation();
 			
 			if (specificOp == ByteIOOperations.Write)
 			{	

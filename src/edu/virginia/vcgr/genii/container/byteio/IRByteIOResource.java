@@ -38,4 +38,6 @@ public interface IRByteIOResource extends IResource
 	public Calendar getModTime() throws ResourceException;
 	public void setAccessTime(Calendar tm) throws ResourceException;
 	public Calendar getAccessTime()	throws ResourceException;
+	public void setBitmapFilePath(String path) throws ResourceException;
+	public String getBitmapFilePath() throws ResourceException;
 }

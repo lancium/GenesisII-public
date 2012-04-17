@@ -26,7 +26,6 @@ public abstract class ByteIOAttributePreFetcher<Type extends IResource>
 	protected abstract QName getModificationTimeAttributeName();
 	
 	protected abstract Long getSize() throws Throwable;
-	protected abstract URI[] getTransferMechanisms() throws Throwable;
 	protected abstract Calendar getAccessTime() throws Throwable;
 	protected abstract Calendar getModificationTime() throws Throwable;
 	protected abstract Calendar getCreateTime() throws Throwable;
@@ -56,7 +55,7 @@ public abstract class ByteIOAttributePreFetcher<Type extends IResource>
 	{
 		try
 		{
-			URI[] xferMechs = getTransferMechanisms();
+			URI[] xferMechs = TransferAgent.getTransferMechs();
 			if (xferMechs != null)
 			{
 				QName attrName = getTransferMechanismAttributeName();

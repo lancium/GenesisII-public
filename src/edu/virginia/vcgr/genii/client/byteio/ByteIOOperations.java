@@ -5,5 +5,6 @@ public enum ByteIOOperations
 	Read(),
 	Write(),
 	Append(),
-	TruncAppend();
+	TruncAppend(),
+	Destroy();
 }

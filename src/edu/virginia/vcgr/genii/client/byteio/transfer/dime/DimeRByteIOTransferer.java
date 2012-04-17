@@ -14,6 +14,7 @@ import org.ggf.rbyteio.Write;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.byteio.transfer.AbstractByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransferer;
+import edu.virginia.vcgr.genii.client.byteio.transfer.TransfererResolver;
 import edu.virginia.vcgr.genii.client.comm.attachments.AttachmentType;
 
 /**
@@ -64,15 +65,23 @@ public class DimeRByteIOTransferer
 			long stride) throws RemoteException
 	{
 		/* Create a request SOAP message of the appropriate type */
-		TransferInformationType holder =
-			new TransferInformationType(null,
-				ByteIOConstants.TRANSFER_TYPE_DIME_URI);
-		
-		_clientStub.read(
-			new Read(startOffset, bytesPerBlock, numBlocks, stride, holder));
-		
-		/* Extract the attachment data from the message */
-		return receiveResponseAttachmentData(_clientStub);
+		TransferInformationType holder;
+		holder = new TransferInformationType(null, ByteIOConstants.TRANSFER_TYPE_DIME_URI);
+		_clientStub.read(new Read(startOffset, bytesPerBlock, numBlocks, stride, holder));
+		try
+		{
+			return receiveResponseAttachmentData(_clientStub);
+		}
+		catch (RemoteException exception)
+		{
+			RandomByteIOPortType newClientStub = TransfererResolver.resolveClientStub(_clientStub);
+			if (newClientStub == null)
+				throw exception;
+			_clientStub = newClientStub;
+			holder = new TransferInformationType(null, ByteIOConstants.TRANSFER_TYPE_DIME_URI);
+			_clientStub.read(new Read(startOffset, bytesPerBlock, numBlocks, stride, holder));
+			return receiveResponseAttachmentData(_clientStub);
+		}
 	}
 
 	/**

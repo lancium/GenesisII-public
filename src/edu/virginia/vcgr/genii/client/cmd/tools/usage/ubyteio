@@ -1,0 +1,1 @@
+byteio [-r offset length] | [-w offset text] | [-a text]

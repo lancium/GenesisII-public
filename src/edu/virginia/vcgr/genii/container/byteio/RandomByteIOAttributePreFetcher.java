@@ -6,7 +6,7 @@ import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public abstract class RandomByteIOAttributePreFetcher<Type extends IResource>
-	extends DefaultByteIOAttributePreFetcher<Type>
+	extends ByteIOAttributePreFetcher<Type>
 {
 	static final private QName XFER_MECHS_ATTR_NAME = new QName(
 		ByteIOConstants.RANDOM_BYTEIO_NS, "TransferMechanism");

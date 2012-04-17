@@ -289,6 +289,8 @@
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ResolverTool</mconf:class>
 		<mconf:class name="replicate"
 			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ReplicateTool</mconf:class>
+		<mconf:class name="byteio"
+			base="edu.virginia.vcgr.genii.client.cmd.ITool">edu.virginia.vcgr.genii.client.cmd.tools.ByteIOTool</mconf:class>
 	</genii:tools>
 	
 	<genii:client-pipeline>

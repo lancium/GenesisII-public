@@ -42,13 +42,11 @@ public class RByteIOResource extends BasicDBResource implements IRByteIOResource
 		"edu.virginia.vcgr.genii.byteio.rbyteio.file-path";
 	static private final String _INTERNAL_CREATE_TIME_PROP_NAME=
 		"edu.virginia.vcgr.genii.byteio.rbyteio.create-time";
-	static private final String _INTERNAL_MOD_TIME_PROP_NAME=
-		"edu.virginia.vcgr.genii.byteio.rbyteio.mod-time";
 	static private final String _INTERNAL_ACCESS_TIME_PROP_NAME=
 		"edu.virginia.vcgr.genii.byteio.rbyteio.access-time";
-	static public QName OPERATION = new QName(
-			GenesisIIConstants.GENESISII_NS, "operation");
-	
+	static protected final String _INTERNAL_BITMAP_FILE_PATH_PROP_NAME =
+		"edu.virginia.vcgr.genii.byteio.rbyteio.bitmap-path";
+
 	static private Log _logger = LogFactory.getLog(RByteIOResource.class);
 	
 	protected RByteIOResource(
@@ -101,22 +99,10 @@ public class RByteIOResource extends BasicDBResource implements IRByteIOResource
 
 	public File getCurrentFile() throws ResourceException
 	{
-		try
-		{
-			String file = (String)getProperty(_INTERNAL_FILE_PATH_PROP_NAME);
-			if (file == null)
-				return chooseFile(null);
-			
-			return new File(file);
-		}
-		catch (ResourceException re)
-		{
-			throw re;
-		}
-		catch (Exception ioe)
-		{
-			throw new ResourceException(ioe.getMessage(), ioe);
-		}
+		String file = (String)getProperty(_INTERNAL_FILE_PATH_PROP_NAME);
+		if (file == null)
+			return chooseFile(null);
+		return new File(file);
 	}
 	
 	public void destroy() throws ResourceException
@@ -161,13 +147,15 @@ public class RByteIOResource extends BasicDBResource implements IRByteIOResource
 	public void setModTime(Calendar tm)
 		throws ResourceException
 	{
-		setProperty(_INTERNAL_MOD_TIME_PROP_NAME, tm);
+		getCurrentFile().setLastModified(tm.getTimeInMillis());
 	}
 
 	public Calendar getModTime()
 		throws ResourceException
 	{
-		return (Calendar) getProperty(_INTERNAL_MOD_TIME_PROP_NAME);
+		Calendar c = Calendar.getInstance();
+		c.setTimeInMillis(getCurrentFile().lastModified());
+		return c;
 	}
 	
 	public void setAccessTime(Calendar tm)
@@ -180,5 +168,17 @@ public class RByteIOResource extends BasicDBResource implements IRByteIOResource
 		throws ResourceException
 	{
 		return (Calendar) getProperty(_INTERNAL_ACCESS_TIME_PROP_NAME);
+	}
+	
+	public void setBitmapFilePath(String path)
+		throws ResourceException
+	{
+		setProperty(_INTERNAL_BITMAP_FILE_PATH_PROP_NAME, path);
+	}
+
+	public String getBitmapFilePath()
+		throws ResourceException
+	{
+		return (String) getProperty(_INTERNAL_BITMAP_FILE_PATH_PROP_NAME);
 	}
 }

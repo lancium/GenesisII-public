@@ -181,9 +181,13 @@ public class VersionedResourceUtils
 		}
 		int remoteUid = remoteVector.getLocalID();
 		int remoteVersion = remoteVector.getLocalVersion();
-		if (localVector == null)
-			localVector = new VersionVector();
-		int localVersion = localVector.getVersion(remoteUid);
+		int localUid = 0;
+		int localVersion = 0;
+		if (localVector != null)
+		{
+			localUid = localVector.getLocalID();
+			localVersion = localVector.getVersion(remoteUid);
+		}
 		if (localVersion >= remoteVersion)
 		{
 			_logger.debug("validateNotification: have " + localVersion + " received " + remoteVersion);
@@ -198,9 +202,8 @@ public class VersionedResourceUtils
 			flags.status = NotificationConstants.TRYAGAIN;
 			return flags;
 		}
-		int localUid = localVector.getLocalID();
-		localVersion = localVector.getLocalVersion();
 		remoteVersion = remoteVector.getVersion(localUid);
+		localVersion = (localVector == null ? 0 : localVector.getLocalVersion());
 		if (remoteVersion > localVersion)
 		{
 			_logger.debug("validateNotification: at " + localVersion + " received " + remoteVersion);
@@ -211,7 +214,7 @@ public class VersionedResourceUtils
 		{
 			if (item.uid == localUid || item.uid == remoteUid)
 				continue;
-			int lv = localVector.getVersion(item.uid);
+			int lv = (localVector == null ? 0 : localVector.getVersion(item.uid));
 			if (item.version > lv)
 			{
 				_logger.debug("validateNotification: uid " + item.uid +
@@ -243,7 +246,10 @@ public class VersionedResourceUtils
 		throws ResourceException
 	{
 		if (localVector == null)
+		{
 			localVector = new VersionVector();
+			localVector.setVersion(0, 0);
+		}
 		localVector.setVersion(remoteVector.getLocalID(), remoteVector.getLocalVersion());
 		resource.setProperty(SyncProperty.VERSION_VECTOR_PROP_NAME, localVector);
 		resource.commit();

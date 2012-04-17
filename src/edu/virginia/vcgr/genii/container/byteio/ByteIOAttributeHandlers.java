@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.Collection;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.axis.types.URI;
 import org.morgan.util.io.StreamUtils;
 
 import javax.xml.namespace.QName;
@@ -187,15 +188,7 @@ public abstract class ByteIOAttributeHandlers
 		if (resource.isServiceResource()) {
 			return null;
 		}
-		File f = resource.getCurrentFile();
-		if (f.exists())
-		{
-			Calendar c = Calendar.getInstance();
-			c.setTimeInMillis(f.lastModified());
-			return c;
-		}
-		
-		return null;
+		return resource.getModTime();
 	}
 	
 	private void setModificationTime(Calendar c)
@@ -206,9 +199,7 @@ public abstract class ByteIOAttributeHandlers
 		if (resource.isServiceResource())
 			return;
 		
-		File f = resource.getCurrentFile();
-		if (f.exists())
-			f.setLastModified(c.getTimeInMillis());
+		resource.setModTime(c);
 	}
 	
 	private Calendar getAccessTime()
@@ -263,14 +254,11 @@ public abstract class ByteIOAttributeHandlers
 	public Collection<MessageElement> getTransferMechsAttr()
 	{
 		ArrayList<MessageElement> ret = new ArrayList<MessageElement>();
-		
-		ret.add(new MessageElement(GetTransferMechanismNamespace(),
-			ByteIOConstants.TRANSFER_TYPE_SIMPLE_URI));
-		ret.add(new MessageElement(GetTransferMechanismNamespace(),
-			ByteIOConstants.TRANSFER_TYPE_DIME_URI));
-		ret.add(new MessageElement(GetTransferMechanismNamespace(),
-			ByteIOConstants.TRANSFER_TYPE_MTOM_URI));
-		
+		URI[] mechArr = TransferAgent.getTransferMechs();
+		for (URI mech : mechArr)
+		{
+			ret.add(new MessageElement(GetTransferMechanismNamespace(), mech));
+		}
 		return ret;
 	}
 	
