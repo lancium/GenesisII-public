@@ -1,1 +1,1 @@
-replicate <source-path> <container>
+replicate [-p] <source-path> <container>

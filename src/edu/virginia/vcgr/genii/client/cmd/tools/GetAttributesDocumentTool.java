@@ -9,6 +9,7 @@ import javax.xml.namespace.QName;
 import org.apache.axis.message.MessageElement;
 import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyDocument;
 import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyDocumentResponse;
+import org.w3c.dom.NodeList;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
@@ -71,7 +72,14 @@ public class GetAttributesDocumentTool extends BaseGridTool
 			for (MessageElement child : resp.get_any())
 			{
 				String name = (_local ? child.getName() : child.getQName().toString());
-				sortMap.put(name, child.getValue());
+				String value = child.getValue();
+				if (value == null)
+				{
+					NodeList nodeList = child.getChildNodes();
+					if (nodeList != null)
+						value = "<" + nodeList.getLength() + ">";
+				}
+				sortMap.put(name, value);
 			}
 			for (Map.Entry<String, String> entry : sortMap.entrySet())
 			{

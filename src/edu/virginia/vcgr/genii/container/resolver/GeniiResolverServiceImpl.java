@@ -69,6 +69,7 @@ import edu.virginia.vcgr.genii.container.sync.GamlAclChangeNotificationHandler;
 import edu.virginia.vcgr.genii.container.sync.MessageFlags;
 import edu.virginia.vcgr.genii.container.sync.ReplicationItem;
 import edu.virginia.vcgr.genii.container.sync.ReplicationThread;
+import edu.virginia.vcgr.genii.container.sync.ResourceSyncRunner;
 import edu.virginia.vcgr.genii.container.sync.SyncProperty;
 import edu.virginia.vcgr.genii.container.sync.VersionVector;
 import edu.virginia.vcgr.genii.container.sync.VersionedResourceAttributeHandlers;
@@ -162,7 +163,7 @@ public class GeniiResolverServiceImpl extends GenesisIIBase
 			constructionParameters.get(TARGET_EPR_PARAMETER);
 		if (primaryEPR != null)
 		{
-			VersionedResourceUtils.initializeReplica(resource, primaryEPR);
+			VersionedResourceUtils.initializeReplica(resource, primaryEPR, 0);
 			WorkingContext context = WorkingContext.getCurrentWorkingContext();
 			ReplicationThread thread = new ReplicationThread(context);
 			thread.add(new ReplicationItem(new GeniiResolverSyncRunner(), myEPR));
@@ -559,6 +560,11 @@ public class GeniiResolverServiceImpl extends GenesisIIBase
 			WriteNotPermittedFaultType
 	{
 		throw new RemoteException("setMetadata operation not supported!");
+	}
+	
+	public ResourceSyncRunner getClassResourceSyncRunner()
+	{
+		return new GeniiResolverSyncRunner();
 	}
 	
 	@Override

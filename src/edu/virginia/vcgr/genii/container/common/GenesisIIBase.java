@@ -182,6 +182,7 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceProvider;
 import edu.virginia.vcgr.genii.container.resource.db.query.ResourceSummary;
 import edu.virginia.vcgr.genii.container.security.authz.providers.GamlAclAuthZProvider;
 import edu.virginia.vcgr.genii.container.serializer.MessageElementSerializer;
+import edu.virginia.vcgr.genii.container.sync.ResourceSyncRunner;
 import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.PublisherTopic;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.TopicSet;
@@ -1625,6 +1626,16 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 		}
 	}
 
+	/**
+	 * This should be a class annotation (GeniiServiceConfiguration.resourceSyncRunner),
+	 * but annotations cannot default to null?
+	 */
+	public ResourceSyncRunner getClassResourceSyncRunner()
+	{
+		return null;
+	}
+
+	
 	private abstract class GenesisIIBaseAbstractIteratorBuilder<SourceType>
 		extends AbstractIteratorBuilder<SourceType>
 	{

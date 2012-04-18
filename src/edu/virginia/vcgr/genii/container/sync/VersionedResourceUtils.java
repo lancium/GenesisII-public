@@ -36,15 +36,16 @@ public class VersionedResourceUtils
 	/**
 	 * Setup the state of a new resource before invoking ReplicationThread.
 	 */
-	public static void initializeReplica(IResource resource, EndpointReferenceType primaryEPR)
+	public static void initializeReplica(IResource resource, EndpointReferenceType primaryEPR, int targetID)
 		throws ResourceException
 	{
 		resource.setProperty(SyncProperty.PRIMARY_EPR_PROP_NAME, EPRUtils.toBytes(primaryEPR));
 		resource.setProperty(SyncProperty.ERROR_STATE_PROP_NAME, "unsubscribed");
-		// resource.setProperty(SyncProperty.TARGET_ID_PROP_NAME, new Integer(targetID));
+		if (targetID > 0)
+			resource.setProperty(SyncProperty.TARGET_ID_PROP_NAME, new Integer(targetID));
 		resource.commit();
 	}
-	
+
 	/**
 	 * Ask the resolver for the complete list of physical resources (with targetIDs)
 	 * that make up this logical resource.
@@ -136,8 +137,7 @@ public class VersionedResourceUtils
 		throws RemoteException
 	{
 		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, epr);
-		QName property = new QName(SyncProperty.RESOURCE_SYNC_NS, "VersionVector");
-		MessageElement response = getResourceProperty(common, property);
+		MessageElement response = getResourceProperty(common, SyncProperty.VERSION_VECTOR_QNAME);
 		if ((response == null) || (response.getValue() == null))
 			return null;
 		return VersionVector.fromString(response.getValue());

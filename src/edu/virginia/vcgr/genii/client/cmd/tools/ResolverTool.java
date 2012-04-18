@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Stack;
 
 import org.apache.axis.message.MessageElement;
+import org.oasis_open.docs.wsrf.rp_2.InsertResourceProperties;
+import org.oasis_open.docs.wsrf.rp_2.InsertType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
@@ -22,8 +24,10 @@ import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
+import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
+import edu.virginia.vcgr.genii.container.rns.GeniiDirPolicy;
 import edu.virginia.vcgr.genii.resolver.GeniiResolverPortType;
 import edu.virginia.vcgr.genii.resolver.UpdateResponseType;
 
@@ -39,6 +43,7 @@ public class ResolverTool extends BaseGridTool
 	private boolean _query = false;
 	private boolean _recursive = false;
 	private String _link = null;
+	private boolean _policy = false;
 	
 	public ResolverTool()
 	{
@@ -65,12 +70,18 @@ public class ResolverTool extends BaseGridTool
 		_recursive = true;
 	}
 	
+	@Option({"policy", "p"})
+	public void setP()
+	{
+		_policy = true;
+	}
+	
 	@Override
 	protected void verify() throws ToolException
 	{
 		if (_query)
 		{
-			if ((numArguments() != 1) || _recursive)
+			if ((numArguments() != 1) || _policy || _recursive)
 				throw new InvalidToolUsageException();
 		}
 		else
@@ -144,6 +155,14 @@ public class ResolverTool extends BaseGridTool
 		UpdateResponseType response = ResolverUtils.updateResolver(resolverEPR, sourceEPR);
 		EndpointReferenceType finalEPR = response.getNew_EPR();
 		TypeInformation type = new TypeInformation(sourceEPR);
+		if (type.isRNS() && _policy)
+		{
+			GeniiCommon dirService = ClientUtils.createProxy(GeniiCommon.class, sourceEPR);
+			MessageElement[] elementArr = new MessageElement[1];
+			elementArr[0] = new MessageElement(GeniiDirPolicy.RESOLVER_POLICY_QNAME, resolverEPR);
+			InsertResourceProperties insertReq = new InsertResourceProperties(new InsertType(elementArr));
+			dirService.insertResourceProperties(insertReq);
+		}
 		if (sourceRNS.isRoot())
 		{
 			stdout.println("Added resolver to root directory.");

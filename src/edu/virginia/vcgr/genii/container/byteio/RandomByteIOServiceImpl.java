@@ -83,6 +83,7 @@ import edu.virginia.vcgr.genii.container.sync.GamlAclChangeNotificationHandler;
 import edu.virginia.vcgr.genii.container.sync.MessageFlags;
 import edu.virginia.vcgr.genii.container.sync.ReplicationItem;
 import edu.virginia.vcgr.genii.container.sync.ReplicationThread;
+import edu.virginia.vcgr.genii.container.sync.ResourceSyncRunner;
 import edu.virginia.vcgr.genii.container.sync.SyncProperty;
 import edu.virginia.vcgr.genii.container.sync.VersionVector;
 import edu.virginia.vcgr.genii.container.sync.VersionedResourceAttributeHandlers;
@@ -146,7 +147,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 				creationParameters.get(IResource.PRIMARY_EPR_CONSTRUCTION_PARAM);
 		if (primaryEPR != null)
 		{
-			VersionedResourceUtils.initializeReplica(resource, primaryEPR);
+			VersionedResourceUtils.initializeReplica(resource, primaryEPR, 0);
 			WorkingContext context = WorkingContext.getCurrentWorkingContext();
 			ReplicationThread thread = new ReplicationThread(context);
 			thread.add(new ReplicationItem(new GeniiFileSyncRunner(), newEPR));
@@ -543,6 +544,11 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 		}
 	}
 
+	public ResourceSyncRunner getClassResourceSyncRunner()
+	{
+		return new GeniiFileSyncRunner();
+	}
+	
 	@Override
 	protected void registerNotificationHandlers(NotificationMultiplexer multiplexer)
 	{

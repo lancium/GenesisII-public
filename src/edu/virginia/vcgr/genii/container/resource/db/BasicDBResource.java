@@ -574,6 +574,31 @@ public class BasicDBResource implements IResource
 		}
 	}
 
+	/**
+	 * The inverse of getEPI().
+	 */
+	static public String getResourceID(Connection connection, String epi)
+		throws SQLException
+	{
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try
+		{
+			stmt = connection.prepareStatement(
+				"SELECT resourceid FROM resources2 WHERE epi = ?");
+			stmt.setString(1, epi);
+			rs = stmt.executeQuery();
+			if (rs.next())
+				return rs.getString(1);
+		}
+		finally
+		{
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+		return null;
+	}
+
 	@Override
 	public Calendar createTime() throws ResourceException
 	{

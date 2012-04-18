@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
+import org.oasis_open.docs.wsrf.rp_2.InsertResourceProperties;
+import org.oasis_open.docs.wsrf.rp_2.InsertType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
@@ -21,6 +23,7 @@ import edu.virginia.vcgr.genii.common.GeniiCommon;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
 import edu.virginia.vcgr.genii.container.resource.IResource;
+import edu.virginia.vcgr.genii.container.rns.GeniiDirPolicy;
 
 public class ReplicateTool extends BaseGridTool
 {
@@ -31,11 +34,19 @@ public class ReplicateTool extends BaseGridTool
 	static final private String _MANPAGE = 
 		"edu/virginia/vcgr/genii/client/cmd/tools/man/replicate";
 
+	private boolean _policy;
+
 	public ReplicateTool()
 	{
 		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE),
 				false, ToolCategory.ADMINISTRATION);
 		addManPage(new FileResource(_MANPAGE));
+	}
+	
+	@Option({"policy", "p"})
+	public void setP()
+	{
+		_policy = true;
 	}
 
 	@Override
@@ -85,7 +96,14 @@ public class ReplicateTool extends BaseGridTool
 		{
 			linkRNS = current.lookup(linkPath, RNSPathQueryFlags.MUST_NOT_EXIST);
 		}
-		
+		if (type.isRNS() && _policy)
+		{
+			GeniiCommon dirService = ClientUtils.createProxy(GeniiCommon.class, sourceEPR);
+			MessageElement[] elementArr = new MessageElement[1];
+			elementArr[0] = new MessageElement(GeniiDirPolicy.REPLICATION_POLICY_QNAME, "true");
+			InsertResourceProperties insertReq = new InsertResourceProperties(new InsertType(elementArr));
+			dirService.insertResourceProperties(insertReq);
+		}
 		MessageElement[] elementArr = new MessageElement[2];
 		elementArr[0] = new MessageElement(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM,
 				endpointIdentifier);

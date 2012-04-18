@@ -8,8 +8,8 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.WSNTopic;
 
 public interface RNSTopics
 {
-	@WSNTopic(contentsType = RNSEntryAddedContents.class)
-	static final public TopicPath RNS_ENTRY_ADDED_TOPIC = 
+	@WSNTopic(contentsType = RNSOperationContents.class)
+	static final public TopicPath RNS_OPERATION_TOPIC = 
 		TopicPath.createTopicPath(new QName(
-			RNSConstants.GENII_RNS_NS, "RNSEntryAdded", "genii-rns"));
+			RNSConstants.GENII_RNS_NS, "RNSOperation", "genii-rns"));
 }

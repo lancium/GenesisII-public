@@ -1,5 +1,7 @@
 package edu.virginia.vcgr.genii.container.sync;
 
+import javax.xml.namespace.QName;
+
 public class SyncProperty
 {
 	static public final String RESOURCE_SYNC_NS = "http://vcgr.cs.virginia.edu/genii/resource-sync";
@@ -14,4 +16,9 @@ public class SyncProperty
 		"edu.virginia.vcgr.genii.sync.error-state";
 	static public final String IS_DESTROYED_PROP_NAME =
 		"edu.virginia.vcgr.genii.sync.is-destroyed";
+	
+	static public final QName VERSION_VECTOR_QNAME =
+		new QName(RESOURCE_SYNC_NS, "VersionVector");
+	static public final QName REPLICATION_STATUS_QNAME =
+		new QName(RESOURCE_SYNC_NS, "ReplicationStatus");
 }

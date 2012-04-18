@@ -1,7 +1,5 @@
 package edu.virginia.vcgr.genii.container.sync;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axis.message.MessageElement;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 
@@ -20,29 +18,27 @@ public class VersionedResourceAttributeHandlers extends AbstractAttributeHandler
 		super(pkg);
 	}
 
-	private QName GetVersionVectorNamespace()
-	{
-		return new QName(SyncProperty.RESOURCE_SYNC_NS, "VersionVector");
-	}
-
-	private String getVersionVector()
-		throws ResourceException, ResourceUnknownFaultType
+	public MessageElement getVersionVectorAttr()
+		throws ResourceUnknownFaultType, ResourceException
 	{
 		ResourceKey rKey = ResourceManager.getCurrentResource();
 		IResource resource = (IResource)rKey.dereference();
 		VersionVector vector = (VersionVector) resource.getProperty(SyncProperty.VERSION_VECTOR_PROP_NAME);
-		return(vector == null ? "" : vector.toString());
+		String text = (vector == null ? "" : vector.toString());
+		return new MessageElement(SyncProperty.VERSION_VECTOR_QNAME, text);
 	}
 
-	public MessageElement getVersionVectorAttr()
+	public MessageElement getReplicationStatusAttr()
 		throws ResourceUnknownFaultType, ResourceException
 	{
-		return new MessageElement(GetVersionVectorNamespace(), getVersionVector());
+		return new MessageElement(SyncProperty.REPLICATION_STATUS_QNAME, "true");
 	}
-
+	
 	@Override
 	protected void registerHandlers() throws NoSuchMethodException
 	{
-		addHandler(GetVersionVectorNamespace(), "getVersionVectorAttr");
+		addHandler(SyncProperty.VERSION_VECTOR_QNAME, "getVersionVectorAttr");
+		addHandler(SyncProperty.REPLICATION_STATUS_QNAME, "getReplicationStatusAttr");
+
 	}
 }
