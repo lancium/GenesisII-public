@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -35,6 +36,7 @@ import org.morgan.utils.gui.tearoff.TearoffHandler;
 
 import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.rp.ResourcePropertyException;
 import edu.virginia.vcgr.genii.client.rp.ResourcePropertyManager;
 import edu.virginia.vcgr.genii.client.security.authz.acl.Acl;
 import edu.virginia.vcgr.genii.client.security.authz.acl.AclAuthZClientTool;
@@ -53,6 +55,7 @@ import edu.virginia.vcgr.genii.ui.progress.TaskProgressListener;
 import edu.virginia.vcgr.genii.ui.rns.RNSTreeNode;
 import edu.virginia.vcgr.genii.ui.rns.dnd.RNSListTransferData;
 import edu.virginia.vcgr.genii.ui.rns.dnd.RNSListTransferable;
+import edu.virginia.vcgr.genii.ui.utils.LoggingTarget;
 import edu.virginia.vcgr.genii.ui.utils.SimplePanel;
 
 class ACLPanel extends JPanel implements LazyLoadTabHandler
@@ -343,9 +346,28 @@ class ACLPanel extends JPanel implements LazyLoadTabHandler
 				(GenesisIIBaseRP)ResourcePropertyManager.createRPInterface(
 					_uiContext.callingContext(), _targetPath.getEndpoint(), 
 					GenesisIIBaseRP.class);
-			AuthZConfig config = rp.getAuthZConfig();
-			if (config == null)
+			AuthZConfig config = null;
+			try
+			{
+				config = rp.getAuthZConfig();
+			}
+			catch (UndeclaredThrowableException cause)
+			{
+				Throwable t = cause.getUndeclaredThrowable();
+				if (t.getClass() == ResourcePropertyException.class) {
+					String msg = "No authorization info for target path: " + _targetPath.getName(); 
+					_logger.info(msg);
+					LoggingTarget.logInfo(msg, cause);
+				} else {
+					// not sure what this one is.  cannot just rethrow blindly.
+					String msg = "Unknown exception: " + t.getClass().getCanonicalName();
+					_logger.error(msg);
+					LoggingTarget.logInfo(msg, cause);
+				}
+			}
+			if (config == null) {
 				config = AclAuthZClientTool.getEmptyAuthZConfig();
+			}
 
 			return config;
 		}
@@ -475,7 +497,7 @@ class ACLPanel extends JPanel implements LazyLoadTabHandler
 			}
 			catch (Throwable cause)
 			{
-				_logger.warn("Unable to check for DnD capability.", cause);
+				_logger.debug("Unsupported DnD capability.");
 			}
 			
 			return false;

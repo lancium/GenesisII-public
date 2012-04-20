@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.prefs.BackingStoreException;
 
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -25,6 +26,7 @@ import org.morgan.utils.gui.GUIUtils;
 import org.morgan.utils.gui.tearoff.TearoffPanel;
 
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
+import edu.virginia.vcgr.genii.ui.LoggingLinkage.LoggingListModel;
 import edu.virginia.vcgr.genii.ui.login.CredentialManagementButton;
 import edu.virginia.vcgr.genii.ui.plugins.EndpointDescription;
 import edu.virginia.vcgr.genii.ui.plugins.LazilyLoadedTab;
@@ -48,7 +50,9 @@ public class ClientApplication extends UIFrame
 	private Object _joinLock = new Object();
 	private boolean _exit = false;
 	private RNSTree _browserTree;
-	private JTabbedPane _tabbedPane = new JTabbedPane();
+	private JTabbedPane _tabbedPane = new JTabbedPane();	
+	private JList _debugTarget;  // text area that is targeted for informative updates.
+	private LoggingLinkage _debugLinkage;  // connects our debugging target to logging. 
 	
 	private void setupMacApplication()
 	{
@@ -120,17 +124,27 @@ public class ClientApplication extends UIFrame
 		splitPane.setRightComponent(_tabbedPane);
 		
 		content.add(splitPane,
-			new GridBagConstraints(0, 0, 2, 1, 1.0, 1.0, 
+			new GridBagConstraints(0, 0, 3, 1, 1.0, 1.0, 
 				GridBagConstraints.CENTER,
 				GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));
+
 		content.add(new CredentialManagementButton(_uiContext), 
 			new GridBagConstraints(
 				0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.WEST,
 				GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 5, 5));
-		content.add(new TrashCanWidget(_context, _uiContext),
-			new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0,
-				GridBagConstraints.EAST, GridBagConstraints.NONE,
-				new Insets(5, 5, 5, 5), 5, 5));
+				
+                content.add(new TrashCanWidget(_context, _uiContext),
+                        new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0,
+                            GridBagConstraints.EAST, GridBagConstraints.NONE,
+                            new Insets(5, 5, 5, 5), 5, 5));
+            
+		// new code to add a diagnostics logging view.
+		LoggingListModel listModel = new LoggingListModel();
+		_debugTarget = new JList(listModel);
+		JScrollPane debugScroller = new JScrollPane(_debugTarget);
+		content.add(debugScroller, new GridBagConstraints(
+				0, 2, 3, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+				GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 5, 5));		
 		
 		UIPlugins plugins = new UIPlugins(
 			new UIPluginContext(_uiContext, _browserTree, _browserTree));
@@ -143,6 +157,9 @@ public class ClientApplication extends UIFrame
 		
 		if (launchShell)
 			plugins.fireMenuAction(GridShellPlugin.class);
+		
+		_debugLinkage = new LoggingLinkage(_debugTarget);
+		_debugLinkage.consumeLogging("Application Started", new Exception("All is well."));
 		
 		/*
 		try
@@ -176,6 +193,10 @@ public class ClientApplication extends UIFrame
 			while (!_exit)
 				_joinLock.wait();
 		}
+	}
+	
+	public UIContext getContext() {
+	    return _uiContext;
 	}
 	
 	private class ApplicationEventListenerImpl implements ApplicationEventListener

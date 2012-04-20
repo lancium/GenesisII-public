@@ -18,7 +18,7 @@ public class TrashCanWidget extends JComponent
 	
 	private ApplicationContext _appContext;
 	private UIContext _context;
-	
+        
 	public TrashCanWidget(ApplicationContext appContext,
 		UIContext context)
 	{
@@ -82,9 +82,10 @@ public class TrashCanWidget extends JComponent
 			repaint();
 		}
 	}
-	
+
 	private class MouseClickListener extends MouseAdapter
 	{
+
 		@Override
 		public void mouseClicked(MouseEvent e)
 		{
@@ -92,4 +93,5 @@ public class TrashCanWidget extends JComponent
 				TrashDialog.popupTrashDialog(TrashCanWidget.this, _appContext, _context);
 		}
 	}
+
 }

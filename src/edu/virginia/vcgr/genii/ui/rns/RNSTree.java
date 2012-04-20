@@ -52,9 +52,8 @@ import edu.virginia.vcgr.genii.ui.utils.CommonKeyStrokes;
 public class RNSTree extends JTree implements EndpointRetriever
 {
 	static final long serialVersionUID = 0L;
-	
-	static final public Dimension DESIRED_BROWSER_SIZE = new Dimension(
-		300, 300);
+
+	static final public Dimension DESIRED_BROWSER_SIZE = new Dimension(300, 300);
 	
 	private Collection<RNSTreeListener> _listeners = new LinkedList<RNSTreeListener>();
 	
@@ -62,8 +61,8 @@ public class RNSTree extends JTree implements EndpointRetriever
 	{
 		iMap.put(CommonKeyStrokes.REFRESH,
 			_refreshAction.getValue(Action.NAME));
-		iMap.put(CommonKeyStrokes.BACKSPACE,
-			_deleteAction.getValue(Action.NAME));
+//hmmm: should be converted to 'go up one level'. ==> iMap.put(CommonKeyStrokes.BACKSPACE,
+//			_deleteAction.getValue(Action.NAME));
 		iMap.put(CommonKeyStrokes.DELETE,
 			_deleteAction.getValue(Action.NAME));
 		/* for now, we ignore cut/copy/paste */
@@ -141,11 +140,11 @@ public class RNSTree extends JTree implements EndpointRetriever
 		
 		setupInputMap(getInputMap());
 		setupActionMap(getActionMap());
-		
+
 		setTransferHandler(new RNSTransferHandler(model.uiContext()));
 		setDragEnabled(true);
 		setDropMode(DropMode.ON_OR_INSERT);
-		
+
 		addAncestorListener(new AncestorListenerImpl());
 		
 		addMouseListener(new MouseAdapter()
@@ -164,6 +163,9 @@ public class RNSTree extends JTree implements EndpointRetriever
 				}
 			}
 		});
+		
+		// expand the top-level node so that we can see the tree a bit better.
+		this.expandRow(0);
 	}
 	
 	private void fireRNSTreePathClicked(RNSFilledInTreeObject fObj)
@@ -324,7 +326,7 @@ public class RNSTree extends JTree implements EndpointRetriever
 		new HashMap<String, RNSTreeNode>();
 	
 	private class TreeWillExpandListenerImpl implements TreeWillExpandListener
-	{
+	{		
 		@Override
 		public void treeWillCollapse(TreeExpansionEvent event)
 				throws ExpandVetoException
@@ -554,4 +556,6 @@ public class RNSTree extends JTree implements EndpointRetriever
 			}
 		}
 	}
+
 }
+

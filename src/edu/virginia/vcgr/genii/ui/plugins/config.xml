@@ -1,10 +1,14 @@
 <plugins>
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.EditPlugin">
 		<top-menu menu-name="Edit" group="Basic File" item-name="Edit"/>
-		
 		<popup-menu group="Basic File" item-name="Edit"/>
 	</plugin>
 	
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.SaveToDialog">
+		<top-menu menu-name="File" group="Basic File" item-name="Save To..."/>
+		<popup-menu group="Basic File" item-name="Save To..."/>
+	</plugin>
+
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.fsproxy.CreateFSProxyPlugin">
 		<popup-menu menu-name="FSProxy" item-name="Create Filesystem Proxy"/>
 	</plugin>
@@ -19,8 +23,11 @@
 	
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.MakeDirectoryPlugin">
 		<top-menu menu-name="File" group="Basic File" item-name="Make Directory"/>
-		
 		<popup-menu group="Basic File" item-name="Make Directory"/>
+	</plugin>
+	
+	<plugin class="edu.virginia.vcgr.genii.ui.plugins.view.RefreshPlugin">
+		<top-menu menu-name="View" group="Basic File" item-name="Refresh (F5)"/>
 	</plugin>
 	
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.jobs.JobHistoryPlugin">
@@ -35,13 +42,11 @@
 	
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.files.MakeFilePlugin">
 		<top-menu menu-name="File" group="Basic File" item-name="Create New File"/>
-		
 		<popup-menu group="Basic File" item-name="Create New File"/>
 	</plugin>
 	
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.groups.CreateGroupPlugin">
 		<top-menu menu-name="Security" group="Security" item-name="Create Security Group"/>
-		
 		<popup-menu group="Security" item-name="Create Security Group"/>
 	</plugin>
 	
@@ -73,8 +78,6 @@
 		<tab name="EPR Display"/>
 	</plugin>
 	
-
-	
 	<!--
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.debug.DebugPlugin">
 		<top-menu menu-name="Debug" group="Debug"
@@ -94,12 +97,11 @@
 	
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.jsdltool.JSDLToolPlugin">
 		<top-menu menu-name="Jobs" group="Queue" item-name="Create Job"/>
-		
 		<popup-menu group="Queue" item-name="Create Job"/>
 	</plugin>
 	
 	<plugin class="edu.virginia.vcgr.genii.ui.plugins.shell.GridShellPlugin">
 		<top-menu menu-name="Tools" group="Shell" item-name="Launch Grid Shell"/>
 	</plugin>
-	
+
 </plugins>

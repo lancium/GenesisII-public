@@ -42,7 +42,7 @@ class TrashCanTransferHandler extends TransferHandler
 	
 	TrashCanTransferHandler(UIContext uiContext)
 	{
-		_uiContext = uiContext;
+	  _uiContext = uiContext;
 	}
 	
 	@Override

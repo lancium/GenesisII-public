@@ -32,7 +32,7 @@ class ACLList extends JList
 		iMap.put(CommonKeyStrokes.COPY, copy.getValue(Action.NAME));
 		iMap.put(CommonKeyStrokes.PASTE, paste.getValue(Action.NAME));
 		iMap.put(CommonKeyStrokes.DELETE, _delete.getValue(Action.NAME));
-		iMap.put(CommonKeyStrokes.BACKSPACE, _delete.getValue(Action.NAME));
+//hmmm: remap to "go up a level" --> iMap.put(CommonKeyStrokes.BACKSPACE, _delete.getValue(Action.NAME));
 	}
 	
 	private void setupActionMap(ActionMap aMap)
@@ -89,6 +89,9 @@ class ACLList extends JList
 		model.removeAllElements();
 		for (AclEntry entry : entries)
 			model.addElement(new ACLEntryWrapper(context, entry));
+		if (entries.isEmpty()) {
+			model.addElement("<no permissions>");
+		}
 		setEnabled(true);
 	}
 	

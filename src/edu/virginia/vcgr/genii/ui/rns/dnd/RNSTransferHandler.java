@@ -21,6 +21,7 @@ import org.morgan.util.Pair;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.ui.UIContext;
+import edu.virginia.vcgr.genii.ui.dragdrop.ListTransferable;
 import edu.virginia.vcgr.genii.ui.errors.ErrorHandler;
 import edu.virginia.vcgr.genii.ui.rns.RNSFilledInTreeObject;
 import edu.virginia.vcgr.genii.ui.rns.RNSTree;
@@ -34,258 +35,247 @@ import edu.virginia.vcgr.genii.ui.rns.RNSTreeOperator;
 
 public class RNSTransferHandler extends TransferHandler
 {
-	static final long serialVersionUID = 0L;
+    static final long serialVersionUID = 0L;
 
-	static private Log _logger = LogFactory.getLog(RNSTransferHandler.class);
-	
-	private UIContext _uiContext;
-	
-	public RNSTransferHandler(UIContext uiContext)
-	{
-		_uiContext = uiContext;
-	}
-	
-	@Override
-	public boolean canImport(TransferSupport support)
-	{
-		Component comp = support.getComponent();
-		
-		if (comp instanceof RNSTree)
-		{
-			// Accept only drag-and-drop, no cut/copy/paste
-			if (!support.isDrop())
-				return false;
-			
-			JTree.DropLocation dl = (JTree.DropLocation)support.getDropLocation();
-			if (dl == null)
-				return false;
-			
-			if (dl.getPath() == null)
-				return false;
-			
-			RNSTreeNode node = (RNSTreeNode)dl.getPath().getLastPathComponent();
-			if (((RNSTreeObject)node.getUserObject()).objectType() 
-				!= RNSTreeObjectType.ENDPOINT_OBJECT)
-				return false;
-			
-			RNSPath targetParent =
-				((RNSFilledInTreeObject)node.getUserObject()).path();
-			
-			TypeInformation tInfo;
-			
-			try
-			{
-				tInfo = new TypeInformation(targetParent.getEndpoint());
-			}
-			catch (Throwable cause)
-			{
-				return false;
-			}
-			
-			if (!tInfo.isRNS())
-				return false;
-			
-			if (tInfo.isExport())
-				support.setDropAction(COPY);
-			
-			if (support.isDataFlavorSupported(
-				RNSListTransferable.RNS_PATH_LIST_FLAVOR))
-			{
-				try
-				{
-					Collection<Pair<RNSTreeNode, RNSPath>> paths = null;	
-					Transferable t = support.getTransferable();
-					
-					RNSListTransferData data = 
-						(RNSListTransferData)t.getTransferData(
-							RNSListTransferable.RNS_PATH_LIST_FLAVOR);
-					paths = data.paths();
-					
-					for (Pair<RNSTreeNode, RNSPath> path : paths)
-					{
-						if (path.second().equals(targetParent))
-							return false;
-						
-						if (path.second().getParent().equals(targetParent))
-							return false;
-					}
-				}
-				catch (Exception e)
-				{
-					// Do nothing
-				}
-				
-				if (support.getDropAction() == COPY)
-					return true;
-				
-				if ( (support.getDropAction() == LINK || 
-						support.getDropAction() == MOVE) &&
-						!tInfo.isExport())
-					return true;
-				
-				if ( (support.getSourceDropActions() & COPY) > 0)
-					return true;
-				
-				if (tInfo.isExport())
-					return false;
-				
-				boolean actionSupported = 
-					(support.getSourceDropActions() & 
-						(LINK | MOVE | COPY)) > 0;
-				if (actionSupported)
-					return true;
-			} else if (support.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
-			{
-				if (support.getDropAction() == COPY)
-					return true;
-				
-				if ((support.getSourceDropActions() & COPY) > 0)
-				{
-					support.setDropAction(COPY);
-					return true;
-				}
-			}
-		}
-		
-		return false;
-	}
+    static private Log _logger = LogFactory.getLog(RNSTransferHandler.class);
 
-	@Override
-	protected Transferable createTransferable(JComponent c)
-	{
-		if (c instanceof RNSTree)
-		{
-			RNSTree tree = (RNSTree)c;
-			TreePath []paths = tree.getSelectionPaths();
-			if (paths != null)
-			{
-				Collection<Pair<RNSTreeNode, RNSPath>> rnsPaths =
-					new Vector<Pair<RNSTreeNode, RNSPath>>(
-					paths.length);
-				for (TreePath path : paths)
-				{
-					TreePath parentPath = path.getParentPath();
-					RNSTreeNode parentNode = 
-						(parentPath == null) ? null :
-							(RNSTreeNode)parentPath.getLastPathComponent();
-					
-					RNSTreeNode node =
-						(RNSTreeNode)path.getLastPathComponent();
-					RNSTreeObject obj = (RNSTreeObject)node.getUserObject();
-					if (obj.objectType() == RNSTreeObjectType.ENDPOINT_OBJECT)
-					{
-						RNSFilledInTreeObject rnsEndpointObject =
-							(RNSFilledInTreeObject)obj;
-						rnsPaths.add(new Pair<RNSTreeNode, RNSPath>(
-							parentNode,
-							rnsEndpointObject.path()));
-					}
-				}
-				
-				if (rnsPaths.size() > 0)
-					return new RNSListTransferable((RNSTree)c, _uiContext, rnsPaths);
-			}
-		}
-		
-		return super.createTransferable(c);
-	}
+    private UIContext _uiContext;
 
-	@Override
-	protected void exportDone(JComponent source, Transferable data, int action)
-	{
-		// We ignore this because the operations take too long
-		// in general and we will get notified through an out-of-bounds
-		// mechanism.
-	}
+    public RNSTransferHandler(UIContext uiContext)
+    {
+        _uiContext = uiContext;
+    }
 
-	@Override
-	public int getSourceActions(JComponent c)
-	{
-		if (c instanceof RNSTree)
-			return COPY | MOVE | LINK;
-		
-		return super.getSourceActions(c);
-	}
+    @Override
+    public boolean canImport(TransferSupport support)
+    {
+        Component comp = support.getComponent();
+        _logger.debug("into can import...");
+        if (!(comp instanceof RNSTree)) {
+            _logger.debug("false return in canImport because not an RNSTree.");
+            return false;
+        }
 
-	@Override
-	public boolean importData(TransferSupport support)
-	{
-		RNSTreeOperator operator = null;
-	
-		try
-		{
-			Component comp = support.getComponent();
-			Transferable t = support.getTransferable();
-			
-			if (comp instanceof RNSTree)
-			{
-				JTree.DropLocation dl = 
-					(JTree.DropLocation)support.getDropLocation();
-				
-				if (support.isDataFlavorSupported(
-					RNSListTransferable.RNS_PATH_LIST_FLAVOR))
-				{
-					RNSListTransferData data = 
-						(RNSListTransferData)t.getTransferData(
-							RNSListTransferable.RNS_PATH_LIST_FLAVOR);
-					
-					int action = support.getDropAction();
-					switch (action)
-					{
-						case MOVE :
-							operator = RNSTreeMover.move(data.tree(), (RNSTree)comp,
-								dl.getPath(), data.sourceContext(), data.paths());
-							break;
-						case LINK :
-							operator = RNSTreeLinker.link(data.tree(), (RNSTree)comp,
-								dl.getPath(), data.sourceContext(), data.paths());
-							break;
-						case COPY :
-							operator = RNSTreeCopier.copy(data.tree(), (RNSTree)comp,
-								dl.getPath(), data.sourceContext(), data.paths());
-							break;
-						default :
-							return false;
-					}
-				} else if (support.isDataFlavorSupported(
-					DataFlavor.javaFileListFlavor))
-				{
-					List<?> files = (List<?>)t.getTransferData(
-						DataFlavor.javaFileListFlavor);
-					
-					int action = support.getDropAction();
-					switch (action)
-					{
-						case COPY :
-							operator = RNSTreeCopier.copy((RNSTree)comp,
-								dl.getPath(), _uiContext, files);
-							break;
-						default :
-							return false;
-					}
-				}
-				
-				if (operator != null)
-					return operator.performOperation();
-			}
-		}
-		catch (IOException ioe)
-		{
-			_logger.warn(
-				"Unable to perform drag-and-drop or cut/copy/paste action.", 
-				ioe);
-			ErrorHandler.handleError(_uiContext,
-				(JComponent)support.getComponent(), ioe);
-		}
-		catch (UnsupportedFlavorException e)
-		{
-			_logger.warn(
-				"Unable to perform drag-and-drop or cut/copy/paste action.", 
-				e);
-			ErrorHandler.handleError(_uiContext,
-				(JComponent)support.getComponent(), e);
-		}
-		
-		return false;
-	}
+        // Accept only drag-and-drop, no cut/copy/paste
+        if (!support.isDrop())
+            return false;
+
+        JTree.DropLocation dl = (JTree.DropLocation) support.getDropLocation();
+        if (dl == null) {
+            _logger.debug("failed to cast to expected type for drop location.");
+            return false;
+        }
+
+        if (dl.getPath() == null) {
+            _logger.debug("drop location had no associated path.");
+            return false;
+        }
+
+        RNSTreeNode node = (RNSTreeNode) dl.getPath().getLastPathComponent();
+        if (((RNSTreeObject) node.getUserObject()).objectType() != RNSTreeObjectType.ENDPOINT_OBJECT) {
+            _logger.debug("node found is not an endpoint object.");
+            return false;
+        }
+
+        RNSPath targetParent = ((RNSFilledInTreeObject) node.getUserObject()).path();
+
+        _logger.debug("operating on rns path: " + targetParent.toString());
+
+        TypeInformation tInfo;
+
+        try {
+            tInfo = new TypeInformation(targetParent.getEndpoint());
+        } catch (Throwable cause) {
+            _logger.debug("failed to get type info for target.");
+            return false;
+        }
+
+        if (tInfo.isExport())
+            support.setDropAction(COPY);
+
+        if (support.isDataFlavorSupported(ListTransferable.getURIListFlavor1())
+                || support.isDataFlavorSupported(ListTransferable.getURIListFlavor2())) {
+            _logger.debug("rns handler found a URI list flavor in canImport");
+            if (support.getDropAction() == COPY)
+                return true;
+            if ((support.getSourceDropActions() & COPY) > 0) {
+                support.setDropAction(COPY);
+                return true;
+            }
+        } else if (support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+            _logger.debug("rns handler found a java file list flavor in canImport");
+            if (support.getDropAction() == COPY)
+                return true;
+
+            if ((support.getSourceDropActions() & COPY) > 0) {
+                support.setDropAction(COPY);
+                return true;
+            }
+        } else if (support.isDataFlavorSupported(RNSListTransferable.RNS_PATH_LIST_FLAVOR)) {
+            _logger.debug("can import checking last chance for rns path flavor...");
+            try {
+                _logger.debug("processing rns path flavor in canImport.");
+                Collection<Pair<RNSTreeNode, RNSPath>> paths = null;
+                Transferable t = support.getTransferable();
+
+                RNSListTransferData data = (RNSListTransferData) t
+                        .getTransferData(RNSListTransferable.RNS_PATH_LIST_FLAVOR);
+                paths = data.paths();
+
+                for (Pair<RNSTreeNode, RNSPath> path : paths) {
+                    if (path.second().equals(targetParent))
+                        return false;
+
+                    if (path.second().getParent().equals(targetParent))
+                        return false;
+                }
+            } catch (Exception e) {
+                _logger.debug("caught exception in rns path flavor in canImport.", e);
+                // Do nothing
+            }
+
+            if (support.getDropAction() == COPY)
+                return true;
+
+            if ((support.getDropAction() == LINK || support.getDropAction() == MOVE)
+                    && !tInfo.isExport())
+                return true;
+
+            if ((support.getSourceDropActions() & COPY) > 0)
+                return true;
+
+            if (tInfo.isExport()) {
+                _logger.debug("not allowing since target is not export in canImport.");
+                return false;
+            }
+
+            boolean actionSupported = (support.getSourceDropActions() & (LINK | MOVE | COPY)) > 0;
+            if (actionSupported)
+                return true;
+        }
+        _logger.debug("fall through to final false return in canImport.");
+        return false;
+    }
+
+    @Override
+    protected Transferable createTransferable(JComponent c)
+    {
+        if ((c == null) || (_uiContext == null))
+            return null;
+        if (c instanceof RNSTree) {
+            RNSTree tree = (RNSTree) c;
+            TreePath[] paths = tree.getSelectionPaths();
+            if (paths != null) {
+                Collection<Pair<RNSTreeNode, RNSPath>> rnsPaths = new Vector<Pair<RNSTreeNode, RNSPath>>(
+                        paths.length);
+                for (TreePath path : paths) {
+                    TreePath parentPath = path.getParentPath();
+                    RNSTreeNode parentNode = (parentPath == null) ? null : (RNSTreeNode) parentPath
+                            .getLastPathComponent();
+
+                    RNSTreeNode node = (RNSTreeNode) path.getLastPathComponent();
+                    RNSTreeObject obj = (RNSTreeObject) node.getUserObject();
+                    if (obj.objectType() == RNSTreeObjectType.ENDPOINT_OBJECT) {
+                        RNSFilledInTreeObject rnsEndpointObject = (RNSFilledInTreeObject) obj;
+                        rnsPaths.add(new Pair<RNSTreeNode, RNSPath>(parentNode, rnsEndpointObject
+                                .path()));
+                    }
+                }
+
+                if (rnsPaths.size() > 0)
+                    return new RNSListTransferable((RNSTree) c, _uiContext, rnsPaths);
+            }
+        }
+        return super.createTransferable(c);
+    }
+
+    @Override
+    protected void exportDone(JComponent source, Transferable data, int action)
+    {
+        // We ignore this because the operations take too long
+        // in general and we will get notified through an out-of-bounds
+        // mechanism.
+        _logger.info("got to exportDone for RNS Transfer Handler.");
+    }
+
+    @Override
+    public int getSourceActions(JComponent c)
+    {
+        if (c instanceof RNSTree)
+            return COPY | MOVE | LINK;
+        return super.getSourceActions(c);
+    }
+
+    @Override
+    public boolean importData(TransferSupport support)
+    {
+        if ( (support == null) || (_uiContext == null) )
+            return false;
+        RNSTreeOperator operator = null;
+
+        try {
+            _logger.debug("into importData...");
+
+            Component comp = support.getComponent();
+            Transferable t = support.getTransferable();
+
+            if (comp instanceof RNSTree) {
+                JTree.DropLocation dl = (JTree.DropLocation) support.getDropLocation();
+
+                if (support.isDataFlavorSupported(RNSListTransferable.RNS_PATH_LIST_FLAVOR)) {
+                    RNSListTransferData data = (RNSListTransferData) t
+                            .getTransferData(RNSListTransferable.RNS_PATH_LIST_FLAVOR);
+
+                    int action = support.getDropAction();
+                    switch (action) {
+                        case MOVE:
+                            operator = RNSTreeMover.move(data.tree(), (RNSTree) comp, dl.getPath(),
+                                    data.sourceContext(), data.paths());
+                            break;
+                        case LINK:
+                            operator = RNSTreeLinker.link(data.tree(), (RNSTree) comp,
+                                    dl.getPath(), data.sourceContext(), data.paths());
+                            break;
+                        case COPY:
+                            operator = RNSTreeCopier.copy(data.tree(), (RNSTree) comp,
+                                    dl.getPath(), data.sourceContext(), data.paths());
+                            break;
+                        default:
+                            return false;
+                    }
+                } else if (support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)
+                        || support.isDataFlavorSupported(ListTransferable.getURIListFlavor1())
+                        || support.isDataFlavorSupported(ListTransferable.getURIListFlavor2())) {
+                    _logger.debug("importing data with java file list, or URI list, or delayed copier flavor");
+
+                    List<Object> files = ListTransferable.extractData(support.getTransferable());
+                    if ((files == null) || (files.size() == 0)) {
+                        _logger.warn("importData failed to retrieve any files from the Transferable.");
+                        return false;
+                    }
+
+                    int action = support.getDropAction();
+                    switch (action) {
+                        case COPY:
+                            operator = RNSTreeCopier.copy((RNSTree) comp, dl.getPath(), _uiContext,
+                                    files);
+                            break;
+                        default:
+                            return false;
+                    }
+                }
+
+                if (operator != null)
+                    return operator.performOperation();
+            }
+        } catch (IOException ioe) {
+            _logger.warn("Unable to perform drag-and-drop or cut/copy/paste action.", ioe);
+            ErrorHandler.handleError(_uiContext, (JComponent) support.getComponent(), ioe);
+        } catch (UnsupportedFlavorException e) {
+            _logger.warn("Unable to perform drag-and-drop or cut/copy/paste action.", e);
+            ErrorHandler.handleError(_uiContext, (JComponent) support.getComponent(), e);
+        }
+
+        return false;
+    }
 }
