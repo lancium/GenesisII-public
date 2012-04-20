@@ -1,222 +1,158 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
 
-import org.apache.axis.types.URI;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
-import edu.virginia.vcgr.genii.client.naming.WSName;
-import edu.virginia.vcgr.genii.client.resource.TypeInformation;
-import edu.virginia.vcgr.genii.client.rns.RNSException;
+import edu.virginia.vcgr.genii.client.rns.JavaFileHierarchyHelper;
+import edu.virginia.vcgr.genii.client.rns.PathDisposal;
+import edu.virginia.vcgr.genii.client.rns.PathOutcome;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.client.rns.RNSPathHierarchyHelper;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.gpath.GeniiPathType;
 import edu.virginia.vcgr.genii.client.io.FileResource;
+
 public class RmTool extends BaseGridTool
 {
-	static private final String _DESCRIPTION =
-			"edu/virginia/vcgr/genii/client/cmd/tools/description/drm";
-	static private final String _USAGE =
-			"edu/virginia/vcgr/genii/client/cmd/tools/usage/urm";
-	static private final String _MANPAGE =
-			"edu/virginia/vcgr/genii/client/cmd/tools/man/rm";
+    static private final String _DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/drm";
+    static private final String _USAGE = "edu/virginia/vcgr/genii/client/cmd/tools/usage/urm";
+    static private final String _MANPAGE = "edu/virginia/vcgr/genii/client/cmd/tools/man/rm";
 
-	private boolean _recursive = false;
-	private boolean _force = false;
+    static private Log _logger = LogFactory.getLog(RmTool.class);
 
-	private HashSet<URI> _epiSet = null;
-	
-	@Option({"recursive", "r"})
-	public void setRecursive()
-	{
-		_recursive = true;
-	}
+    private boolean _recursive = false;
+    private boolean _force = false;
 
-	@Option({"force", "f"})
-	public void setForce()
-	{
-		_force = true;
-	}
+    @Option({ "recursive", "r" })
+    public void setRecursive()
+    {
+        _recursive = true;
+    }
 
-	public RmTool()
-	{
-		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), 
-				false, ToolCategory.DATA);
-		addManPage(new FileResource(_MANPAGE));
-	}
+    @Option({ "force", "f" })
+    public void setForce()
+    {
+        _force = true;
+    }
 
-	@Override
-	protected int runCommand() throws Throwable
-	{
-		boolean recursive = _recursive;
-		boolean force = _force;
+    public RmTool()
+    {
+        super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), false, ToolCategory.DATA);
+        addManPage(new FileResource(_MANPAGE));
+    }
 
-		_epiSet = new HashSet<URI>();
-	
-		RNSPath path = RNSPath.getCurrent();
-		int toReturn=0;
-		for (int lcv = 0; lcv < numArguments(); lcv++)
-		{
-			GeniiPath gPath = new GeniiPath(getArgument(lcv));
-			if(gPath.pathType() == GeniiPathType.Grid)
-				rm(path, gPath.path(), recursive, force);
-			else
-			{
-				File fPath = new File(gPath.path());
-				toReturn+=rm(fPath, recursive, force);
-			}
-		}
+    /**
+     * implements the actual activity of rm, once all parameters have been grabbed.
+     */
+    @Override
+    protected int runCommand() throws Throwable
+    {
+        boolean recursive = _recursive;
+        boolean force = _force;
 
-		return toReturn;
-	}
+        RNSPath path = RNSPath.getCurrent();
+        int toReturn = 0;
+        for (int lcv = 0; lcv < numArguments(); lcv++) {
+            GeniiPath gPath = new GeniiPath(getArgument(lcv));
+            PathOutcome ret = PathOutcome.OUTCOME_ERROR; 
+            if (gPath.pathType() == GeniiPathType.Grid) {
+                ret = rm(path, gPath.path(), recursive, force); 
+            } else {
+                File fPath = new File(gPath.path());
+                ret = rm(fPath, recursive, force);
+            }
+            if (ret.differs(PathOutcome.OUTCOME_SUCCESS)) {
+                String msg = "Failed to remove " + gPath.toString()
+                        + " because " + PathOutcome.outcomeText(ret) + ".";
+                stderr.println(msg);
+                _logger.error(msg);
+                toReturn = 1;
+            }
+        }
 
-	@Override
-	protected void verify() throws ToolException
-	{
-		if (numArguments() < 1)
-			throw new InvalidToolUsageException();
-	}
+        return toReturn;
+    }
 
-	private int rm(File path, boolean recursive, boolean force)
-	{
-		if ( ! path.exists())
-		{
-			if ( !force)
-			{
-				stderr.println(path.getName() + " does not exist.");
-				return 1;
-			}
-			return 0;
-		}
-		if ((!recursive) && path.isDirectory())
-		{
-			if(force)
-				return 1;
-			stderr.println(path.getName() + " is a directory; Use -r to delete a local directory.");
-			return 1;
-		}
-		if(path.isDirectory())
-		{
-			File[] files = path.listFiles();
-			if (recursive)
-			{
-				for(File cur : files)
-				{
-					rm(cur, recursive, force);
-				}
-			}
-			else
-			{
-				if (files.length != 0)
-				{
-					if (force)
-						return 1;
-					stderr.println(path.getName() + ": attempt to remove nonempty directory.");
-					return 1;
-				}
-			}
-		}
-		boolean success = path.delete();
-		if(!success && !force)
-			return 1;
-		return 0;
-	}
+    /**
+     * checks that the arguments seem appropriate.
+     */
+    @Override
+    protected void verify() throws ToolException
+    {
+        if (numArguments() < 1)
+            throw new InvalidToolUsageException();
+    }
 
-	public void rm(RNSPath currentPath, String filePath,
-			boolean recursive, boolean force) throws RNSException, IOException
-	{
-		for (RNSPath file : currentPath.expand(filePath))
-			rm(file, recursive, force);
-	}
+    /**
+     * removes a path pointed at by a java File object. 
+     */
+    private PathOutcome rm(File path, boolean recursive, boolean force)
+    {
+        if (path == null) return PathOutcome.OUTCOME_NOTHING;
+        _logger.debug("entered into rm on Java File: path=" + path.toString() + " recurs=" + recursive + " force=" + force);
+        if (!path.exists()) {
+            if (force)
+                return PathOutcome.OUTCOME_SUCCESS; // no error for this case with force enabled.
+            stderr.println(path.getName() + " does not exist.");
+            return PathOutcome.OUTCOME_NOTHING;
+        }
+        if (recursive)
+            // recursive case will traverse into directories and eat all contents.
+            return PathDisposal.recursiveDelete(path);
+        else
+            // not recursive, just remove the thing itself, if we can.
+            return PathDisposal.removeAppropriately(path, new JavaFileHierarchyHelper(), null);
+    }
 
-	public void rm(RNSPath path, boolean recursive, 
-			boolean force) throws RNSException
-			{
+    /**
+     * removes a "filePath" in RNS space using the "currentPath" as an entre.
+     */
+    public PathOutcome rm(RNSPath currentPath, String filePath, boolean recursive, boolean force)
+    {
+        if ( (currentPath == null) || (filePath == null) ) return PathOutcome.OUTCOME_NOTHING;
+        _logger.debug("entered into rm on RNSPath + String: currpath=" + currentPath.toString() + " filepath=" + filePath.toString() + " recurs=" + recursive + " force=" + force);
+        for (RNSPath file : currentPath.expand(filePath)) {
+            PathOutcome ret = rm(file, recursive, force);
+            if (ret.differs(PathOutcome.OUTCOME_SUCCESS))
+                return ret;
+        }
+        return PathOutcome.OUTCOME_SUCCESS;
+    }
 
-
-		TypeInformation info = new TypeInformation(path.getEndpoint());
-
-		if (recursive)
-			recursiveDelete(path);
-		else{
-			try
-			{
-
-				if (info.isEnhancedRNS() && !info.isResourceFork()){
-					if (path.listContents().size() > 0)
-						throw new RNSException("Unable to delete a non-empty directory");
-				}
-				path.delete();
-			}
-			catch (RNSException re)
-			{
-				if (force)
-				{
-					stderr.println("Forcing removal after exception");
-
-					path.unlink();
-				} else
-					throw re;
-			}
-
-
-		}
-
-
-
-			}
-
-
-	private void recursiveDelete(RNSPath path) throws RNSException{
-
-		try{
-			WSName endpointName = new WSName(path.getEndpoint());
-
-			if (!hasVisited(endpointName.getEndpointIdentifier())){
-
-				TypeInformation info = new TypeInformation(path.getEndpoint());
-
-
-				if (info.isEnhancedRNS() && !info.isResourceFork() && !info.isExport()){
-					Collection<RNSPath> contents = path.listContents();
-					for (RNSPath tPath : contents){
-						recursiveDelete(tPath);
-					}
-					//Delete me, only if empty
-					if (!(path.listContents().size() > 0))
-						rm(path, false, _force);
-				}
-				else if(info.isByteIO()){
-					//I am a bytio, delete
-					rm(path, false, _force);
-				}
-				else
-					stdout.println("Did not delete: " + path.toString());
-				
-			}
-			else{
-				stdout.println("Already visited " + path.toString());
-			}
-
-		}
-		catch (RNSException e){
-			stdout.println("Failed to clean up: " + path.toString());
-		}
-	}
-
-	private boolean hasVisited(URI epi){
-		if (_epiSet.contains(epi))
-			return true;
-		else{
-			_epiSet.add(epi);
-			return false;
-		}
-	}
-
+    /**
+     * removes an RNS "path" from RNS space.
+     */
+    public PathOutcome rm(RNSPath path, boolean recursive, boolean force)
+    {
+        if (path == null) return PathOutcome.OUTCOME_NOTHING;
+        _logger.debug("entered into rm on RNSPath: path=" + path.toString() + " recurs=" + recursive + " force=" + force);
+        PathOutcome ret = PathOutcome.OUTCOME_ERROR;
+        if (recursive) {
+            // do directory traversal into rns space and destroy contents.
+            ret = PathDisposal.recursiveDelete(path);
+        } else {
+            // not recursive, so just clean the item itself.
+            ret = PathDisposal.removeAppropriately(path, new RNSPathHierarchyHelper(), null);
+        }
+        if (ret.same(PathOutcome.OUTCOME_SUCCESS)) return ret;
+        if (force) {
+            String msg = "Forcing removal via unlink after exception.";
+            stderr.println(msg);
+            _logger.warn(msg);
+            try {
+                path.unlink();
+                return PathOutcome.OUTCOME_SUCCESS;
+            } catch (Throwable cause) {
+//hmmm: would be convenient to have an rns exception (and others) translator to outcomes.
+                _logger.error("Failed to unlink path: " + path.pwd(), cause);
+                return ret;
+            }
+        } else {
+            return ret;
+        }
+    }
 }
-
-

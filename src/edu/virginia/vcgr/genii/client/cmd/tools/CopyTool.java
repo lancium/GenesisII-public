@@ -1,91 +1,88 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.PrintWriter;
 
-import org.morgan.util.io.StreamUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
-import edu.virginia.vcgr.genii.client.gpath.GeniiPath;
 import edu.virginia.vcgr.genii.client.io.FileResource;
+import edu.virginia.vcgr.genii.client.rns.CopyMachine;
+import edu.virginia.vcgr.genii.client.rns.PathOutcome;
 
 public class CopyTool extends BaseGridTool
 {
-	static private final String _DESCRIPTION =
-		"edu/virginia/vcgr/genii/client/cmd/tools/description/dcp";
-	static private final String _USAGE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/usage/ucp";
-	static private final String _MANPAGE =
-		"edu/virginia/vcgr/genii/client/cmd/tools/man/cp";
+    static private final String _DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/dcp";
+    static private final String _USAGE = "edu/virginia/vcgr/genii/client/cmd/tools/usage/ucp";
+    static private final String _MANPAGE = "edu/virginia/vcgr/genii/client/cmd/tools/man/cp";
+    static private Log _logger = LogFactory.getLog(CopyTool.class);
 
-	public CopyTool()
-	{
-		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), 
-				false, ToolCategory.DATA);
-		addManPage(new FileResource(_MANPAGE));
-	}
-	
-	@Override
-	protected int runCommand() throws Throwable
-	{
-		copy(getArgument(0), getArgument(1));
-		return 0;
-	}
+    boolean isRecursive = false;
+    boolean isForced = false;
 
-	@Override
-	protected void verify() throws ToolException
-	{
-		if (numArguments() != 2)
-			throw new InvalidToolUsageException();
-	}
-	
-	static private void copy(InputStream in, OutputStream out)
-		throws IOException
-	{
-		StreamUtils.copyStream(in, out);
-	}
-	
-	public static void copy(String sourcePath, String targetPath)
-		throws FileNotFoundException, IOException
-	{
-		String sourceName = null;
-		OutputStream out = null;
-		InputStream in = null;
-		
-		try
-		{
-			GeniiPath source = new GeniiPath(sourcePath);
-			if (!source.exists())
-				throw new FileNotFoundException(String.format(
-					"Unable to find source file %s!", source));
-			if (!source.isFile())
-				throw new IOException(String.format(
-					"Source path %s is not a file!", source));
-			
-			int index = sourcePath.lastIndexOf('/');
-			if (index >= 0)
-				sourceName = sourcePath.substring(index + 1);
-			else
-				sourceName = sourcePath;
-			
-			GeniiPath target = new GeniiPath(targetPath);
-			if (target.exists() && !target.isFile())
-					target = new GeniiPath(String.format(
-						"%s/%s", target, sourceName));
+    @Option({ "recursive", "r" })
+    public void setRecursive()
+    {
+        isRecursive = true;
+    }
 
-			in = source.openInputStream();
-			out = target.openOutputStream();
-			
-			copy(in, out);
-			out.flush();
-		}
-		finally
-		{
-			StreamUtils.close(in);
-			StreamUtils.close(out);
-		}
-	}		
+    @Option({ "force", "f" })
+    public void setForce()
+    {
+        isForced = true;
+    }
+
+    public CopyTool()
+    {
+        super(new FileResource(_DESCRIPTION), new FileResource(_USAGE), false, ToolCategory.DATA);
+        addManPage(new FileResource(_MANPAGE));
+    }
+
+    @Override
+    protected int runCommand() throws Throwable
+    {
+        // we want the last argument extracted, because that's the target.
+        String argLast = getArgument(numArguments() - 1);
+        int toReturn = 0;
+        for (int i = 0; i < numArguments() - 1; i++) {
+            _logger.debug("CopyTool: copying from " + getArgument(i) + " to " + argLast);
+            PathOutcome ret = copy(getArgument(i), argLast, isRecursive, isForced, stderr);
+            if (ret.differs(PathOutcome.OUTCOME_SUCCESS)) {
+                String msg = "Failed to copy from " + getArgument(i) + " to " + argLast
+                        + " because " + PathOutcome.outcomeText(ret) + ".";
+                stderr.println(msg);
+                _logger.error(msg);
+                toReturn = 1;
+            }
+        }
+        return toReturn;
+    }
+
+    @Override
+    protected void verify() throws ToolException
+    {
+        if (numArguments() < 2)
+            throw new InvalidToolUsageException();
+    }
+
+    /**
+     * performs a copy operation from a source to a target.  if the source or target mention
+     * grid: or local:, then those are used.  otherwise this assumes both are in grid: space.
+     */
+    public static PathOutcome copy(String sourcePath, String targetPath, boolean recursive, boolean force,
+            PrintWriter stderr)
+    {
+        if ( (sourcePath == null) || (targetPath == null) ) return PathOutcome.OUTCOME_NOTHING;        
+        PathOutcome toReturn = PathOutcome.OUTCOME_ERROR;  // until we know more specifically.        
+        if (!recursive) {
+            toReturn = CopyMachine.copyOneFile(sourcePath, targetPath);
+        } else {
+            // do a recursive copy by traversing source.
+            CopyMachine mimeo = new CopyMachine(sourcePath, targetPath, null, force, stderr);
+            toReturn = mimeo.copyTree();
+        }            
+        return toReturn;
+    }
 }
+

@@ -20,8 +20,8 @@ public class LRUList<Type extends LRUList.LRUNode>
 	 */
 	static public class LRUNode
 	{
-		private LRUNode _next = null;
-		private LRUNode _previous = null;
+		protected LRUNode _next = null;
+		protected LRUNode _previous = null;
 	}
 	
 	private int _size = 0;

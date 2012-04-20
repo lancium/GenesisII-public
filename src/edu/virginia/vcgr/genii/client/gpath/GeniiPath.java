@@ -188,6 +188,32 @@ public class GeniiPath implements Serializable
 		
 		return false;
 	}
+
+    /**
+     * returns the last component of the path.
+     * this doesn't include local: or grid: in the returned string.
+     */
+    final public String getName()
+    {
+        String basename = path();
+        int slash_posn = basename.lastIndexOf('/');
+        if (slash_posn >= 0)
+            basename = basename.substring(slash_posn + 1);
+        return basename;
+    }
+
+    /**
+     * returns everything but the last component of the path.
+     * this does not include grid: or local: in the returned string.
+     */
+    final public String getParent()
+    {
+        String dirname = path();
+        int slash_posn = dirname.lastIndexOf('/');
+        if (slash_posn >= 1)
+            dirname = dirname.substring(0, slash_posn);
+        return dirname;
+    }
 	
 	final public InputStream openInputStream() throws IOException
 	{
