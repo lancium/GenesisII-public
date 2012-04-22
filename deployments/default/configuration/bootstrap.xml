@@ -3,12 +3,13 @@
 	xmlns:gsh="http://vcgr.cs.virginia.edu/genii/xsh/script"
 	xmlns:geniix="http://vcgr.cs.virginia.edu/genii/xsh/grid">
 
-
 	<gsh:define name="BOOT_SRVS"
 		source="/containers/BootstrapContainer/Services"/>
 	
 	<gsh:default name="GENII_INSTALL_DIR" value="."/>
 	<gsh:default name="DEPLOYMENT_NAME" value="default"/>
+	<gsh:default name="SECURITY_DIR" value="${DEPLOYMENT_NAME}/security"/>
+	<gsh:default name="PORT" value="18080"/>
 	
 	<gsh:echo
 		message="GENII_INSTALL_DIR is ${GENII_INSTALL_DIR}"/>
@@ -22,13 +23,13 @@
 	</geniix:set-user-config>
 	
 	<gsh:echo
-		message="Logging in as ${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/keys.pfx."/>
+		message="Logging in as ${GENII_INSTALL_DIR}/deployments/${SECURITY_DIR}/keys.pfx."/>
 	<geniix:keystoreLogin>
 		<gsh:param>--no-gui</gsh:param>
 		<gsh:param>--password=keys</gsh:param>
 		<gsh:param>--pattern=skynet</gsh:param>
 		<gsh:param>--storetype=PKCS12</gsh:param>
-		<gsh:param>local:${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/keys.pfx</gsh:param>
+		<gsh:param>local:${GENII_INSTALL_DIR}/deployments/${SECURITY_DIR}/keys.pfx</gsh:param>
 	</geniix:keystoreLogin>
 	
 	<gsh:echo
@@ -36,7 +37,7 @@
 	<geniix:create-rns-root>
 		<gsh:param>--protocol=https</gsh:param>
 		<gsh:param>--host=localhost</gsh:param>
-		<gsh:param>--port=18080</gsh:param>
+		<gsh:param>--port=${PORT}</gsh:param>
 		<gsh:param>context.xml</gsh:param>
 	</geniix:create-rns-root>
 
@@ -49,7 +50,7 @@
 	</geniix:mkdir>
 	
 	<geniix:ln>
-		<gsh:param>--service-url=https://localhost:18080/axis/services/VCGRContainerPortType</gsh:param>
+		<gsh:param>--service-url=https://localhost:${PORT}/axis/services/VCGRContainerPortType</gsh:param>
 		<gsh:param>/containers/BootstrapContainer</gsh:param>
 	</geniix:ln>
 
@@ -107,7 +108,7 @@
 	</geniix:chmod>
 
 	<gsh:echo message="Adding groups"/>
-	<gsh:foreach param-name="FILE" source-dir="${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/certs/groups"
+	<gsh:foreach param-name="FILE" source-dir="${GENII_INSTALL_DIR}/deployments/${SECURITY_DIR}/certs/groups"
 		filter="^.*\.cer$">
 
 		<gsh:define name="GROUP" source="${FILE}"
@@ -116,7 +117,7 @@
 		<gsh:echo message="Adding group ${GROUP}"/>
 		<geniix:cp>
 			<gsh:param>--local-src</gsh:param>
-			<gsh:param>${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/certs/groups/${FILE}</gsh:param>
+			<gsh:param>${GENII_INSTALL_DIR}/deployments/${SECURITY_DIR}/certs/groups/${FILE}</gsh:param>
 			<gsh:param>/groups/${GROUP}</gsh:param>
 		</geniix:cp>
 
@@ -129,7 +130,7 @@
 		<gsh:echo message="Adding group BootstrapX509AuthN"/>
 		<geniix:cp>
 			<gsh:param>--local-src</gsh:param>
-			<gsh:param>${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/certs/groups/${FILE}</gsh:param>
+			<gsh:param>${GENII_INSTALL_DIR}/deployments/${SECURITY_DIR}/certs/groups/${FILE}</gsh:param>
 			<gsh:param>/groups/${GROUP}</gsh:param>
 		</geniix:cp>
 
@@ -151,7 +152,7 @@
 	</geniix:ln>
 
 	<gsh:echo message="Adding users"/>
-	<gsh:foreach param-name="FILE" source-dir="${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/certs/users"
+	<gsh:foreach param-name="FILE" source-dir="${GENII_INSTALL_DIR}/deployments/${SECURITY_DIR}/certs/users"
 		filter="^.*\.cer$">
 		
 		<gsh:define name="USER" source="${FILE}"
@@ -160,7 +161,7 @@
 		<gsh:echo message="Adding user ${USER}"/>
 		<geniix:cp>
 			<gsh:param>--local-src</gsh:param>
-			<gsh:param>${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/certs/users/${FILE}</gsh:param>
+			<gsh:param>${GENII_INSTALL_DIR}/deployments/${SECURITY_DIR}/certs/users/${FILE}</gsh:param>
 			<gsh:param>/users/${USER}</gsh:param>
 		</geniix:cp>
 
@@ -260,7 +261,7 @@
 	<geniix:cert-generator>
 		<gsh:param>--create-generator</gsh:param>
 		<gsh:param>${BOOT_SRVS}/CertGeneratorPortType</gsh:param>
-		<gsh:param>--ks-path=${GENII_INSTALL_DIR}/deployments/${DEPLOYMENT_NAME}/security/keys.pfx</gsh:param>
+		<gsh:param>--ks-path=${GENII_INSTALL_DIR}/deployments/${SECURITY_DIR}/keys.pfx</gsh:param>
 		<gsh:param>--ks-pword=keys</gsh:param>
 		<gsh:param>--ks-alias=VCGR Container</gsh:param>
 		<gsh:param>/etc/ContainerGroupCertGenerator</gsh:param>
