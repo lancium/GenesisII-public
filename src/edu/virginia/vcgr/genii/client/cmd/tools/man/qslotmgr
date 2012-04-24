@@ -1,0 +1,32 @@
+Definitions:
+
+queue-path
+	The GFFS path to a Queue resource, e.g. "/queues/grid-queue"
+
+maxfile
+	The path of a file (preferably on the GFFS, though the "local:" prefix is allowed) that contains maximum slot counts allowed for each BES linked to the target Queue.
+
+polling_period
+	The time (in minutes) between iterations of the rescheduling loop. A time less than 5 minutes is not recommended, as the Queue only updates job statuses in 5 minute intervals.
+
+threshold
+	The maximum time (in minutes) a job should be in a "waiting" state before rescheduling.
+
+runtime
+	The time (in hours) the tool should continue running. If --runonce is invoked, it will supersede any value used here.
+
+runonce
+	Informs the tool to execute the rescheduling algorithm exactly once and then exit.
+
+
+Description:
+
+This tool is used as an external optimizer for a Genesis II job queue. It periodically queries the queue, and determines whether any jobs scheduled to a BES are "stuck" in a waiting state. Any jobs that are found to be waiting beyond some threshold time will be rescheduled, and the BES where they were scheduled will have its slot count reduced to avoid other jobs becoming stuck there as well.
+
+If a BES is hosting as many jobs as it has slots available, and none of those jobs are in a waiting state, that BES may have its slot count increased (assuming it has not reached its maximum slot allocation). The maximum slot allocation for each BES is defined in the "max file", which is read when the tool is initially launched. The user can specify a file for this purpose using the "--maxfile=<path>" flag, or the tool will attempt to read from a default location at "/etc/queue-slots/<queue-path>".
+
+
+Code:
+
+Implementing Class
+	edu.virginia.vcgr.genii.client.cmd.tools.queue.QSlotManagerTool

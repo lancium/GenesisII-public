@@ -33,7 +33,7 @@ public class ActivityState implements Serializable, Cloneable
 {
 	static final long serialVersionUID = 0L;
 
-	static final private String _GENII_NS = 
+	static final public String _GENII_NS = 
 		"http://vcgr.cs.virginia.edu/genesisII/bes/activity-states";
 	
 	static final private String _GENII_SUS_NS =

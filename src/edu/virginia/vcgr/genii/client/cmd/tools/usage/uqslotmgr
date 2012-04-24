@@ -1,0 +1,4 @@
+qslotmgr <queue-path> [--maxfile=<filepath>] 
+	[--polling_period=<time_in_minutes>] 
+	[--threshold=<time_in_minutes>]
+	[--runtime=<time_in_hours>] [--runonce]
