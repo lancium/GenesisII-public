@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.client.naming;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.axis.types.URI;
@@ -12,6 +13,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.naming.EndpointIdentifierResolver;
 import edu.virginia.vcgr.genii.naming.ReferenceResolver;
@@ -126,5 +128,30 @@ public class ResolverUtils {
 		throw firstException;
 	}
 
-	
+	/**
+	 * Call primaryName.getResolvers().
+	 * Also, deal with the special case where primaryName does not have a resolver element
+	 * because it can resolve itself.
+	 * 
+	 * Perhaps all of the calls to wsname.getResolvers() throughout ResolverUtils should
+	 * be changed to calls to getResolvers(wsname)?
+	 */
+	public static List<ResolverDescription> getResolvers(WSName primaryName)
+	{
+		List<ResolverDescription> resolverList = primaryName.getResolvers();
+		if (resolverList.size() == 0)
+		{
+			// A resolver resource that is not registered with any resolvers can resolve itself.
+			TypeInformation type = new TypeInformation(primaryName.getEndpoint());
+			if (type.isEpiResolver())
+			{
+				URI epi = primaryName.getEndpointIdentifier();
+				ResolverDescription rd = new ResolverDescription(epi, primaryName.getEndpoint(),
+						ResolverDescription.ResolverType.EPI_RESOLVER);
+				resolverList = new ArrayList<ResolverDescription>();
+				resolverList.add(rd);
+			}
+		}
+		return resolverList;
+	}
 }

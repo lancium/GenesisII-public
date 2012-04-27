@@ -13,6 +13,7 @@ import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.naming.ResolverDescription;
+import edu.virginia.vcgr.genii.client.naming.ResolverUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
@@ -75,13 +76,13 @@ public class ReplicateTool extends BaseGridTool
 			stdout.println("replicate error: " + sourceRNS + ": EndpointIdentifier not found");
 			return(-1);
 		}
-		TypeInformation type = new TypeInformation(sourceEPR);
-		List<ResolverDescription> resolverList = sourceName.getResolvers();
-		if ((resolverList.size() == 0) &&  (!type.isEpiResolver()))
+		List<ResolverDescription> resolverList = ResolverUtils.getResolvers(sourceName);
+		if ((resolverList == null) || (resolverList.size() == 0))
 		{
 			stdout.println("replication error: " + sourceRNS + ": Resource has no resolver element");
 			return(-1);
 		}
+		TypeInformation type = new TypeInformation(sourceEPR);
 		String serviceName = type.getBestMatchServiceName();
 		if (serviceName == null)
 		{
@@ -127,13 +128,6 @@ public class ReplicateTool extends BaseGridTool
 			// even if the user did not delegate his identity to the resource.
 			newSP.addResource(oldSP);
 			oldSP.addResource(newSP);
-			// Allow the new resource to update the resolver without user delegation.
-			if (resolverList.size() > 0)
-			{
-				ResourceSecurityPolicy resolverSP = new ResourceSecurityPolicy(
-						resolverList.get(0).getEPR());
-				resolverSP.addResource(newSP);
-			}
 		}
 		*/
 		return 0;

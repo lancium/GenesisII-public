@@ -20,6 +20,8 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.ResolverDescription;
+import edu.virginia.vcgr.genii.client.naming.ResolverUtils;
+import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
@@ -50,10 +52,13 @@ public class VersionedResourceUtils
 	 * Ask the resolver for the complete list of physical resources (with targetIDs)
 	 * that make up this logical resource.
 	 */
-	public static EndpointReferenceType[] getTargetEPRs(List<ResolverDescription> resolvers,
-			URI targetEPI)
+	public static EndpointReferenceType[] getTargetEPRs(WSName wsname)
 		throws RemoteException
 	{
+		URI targetEPI = wsname.getEndpointIdentifier();
+		List<ResolverDescription> resolvers = ResolverUtils.getResolvers(wsname);
+		if ((targetEPI == null) || (resolvers == null))
+			return null;
 		int[] targetIDList = null;
 		GeniiResolverPortType proxy = null;
 		for (ResolverDescription resolver : resolvers)

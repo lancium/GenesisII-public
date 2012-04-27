@@ -1,11 +1,9 @@
 package edu.virginia.vcgr.genii.container.sync;
 
-import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.List;
 import java.util.Stack;
 
-import org.apache.axis.types.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
@@ -15,7 +13,6 @@ import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.ResolverDescription;
 import edu.virginia.vcgr.genii.client.naming.ResolverUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
-import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.AbstractSubscriptionFactory;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.DefaultSubscriptionFactory;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscribeRequest;
@@ -120,7 +117,7 @@ public class ReplicationThread extends Thread
 			Integer idValue = (Integer) resource.getProperty(SyncProperty.TARGET_ID_PROP_NAME);
 			if (idValue == null)
 			{
-				List<ResolverDescription> resolverList = getResolvers(primaryName);
+				List<ResolverDescription> resolverList = ResolverUtils.getResolvers(primaryName);
 				if ((resolverList == null) || (resolverList.size() == 0))
 				{
 					_logger.debug("ReplicationThread: primaryEPR has no resolver element");
@@ -151,8 +148,7 @@ public class ReplicationThread extends Thread
 				TopicQueryExpression secondFilter = secondTopic.asConcreteQueryExpression();
 				SubscriptionPolicy policy = new PersistentNotificationSubscriptionPolicy();
 				SubscriptionFactory factory = new DefaultSubscriptionFactory(myEPR);
-				EndpointReferenceType[] replicaList = VersionedResourceUtils.getTargetEPRs(
-						getResolvers(primaryName), primaryName.getEndpointIdentifier());
+				EndpointReferenceType[] replicaList = VersionedResourceUtils.getTargetEPRs(primaryName);
 				if (replicaList == null)
 				{
 					_logger.debug("ReplicationThread: failed to get list of replicas");
@@ -227,33 +223,5 @@ public class ReplicationThread extends Thread
 			}
 		}
 		// _logger.debug("ReplicationThread: done");
-	}
-	
-	/**
-	 * Return the list of resolvers for the given resource.
-	 * In general, this list will contain exactly one resolver.
-	 * ReplicationThread uses this resolver in two ways:
-	 * 1. Send an "update" request to the resolver.
-	 *    Add this resource to the list of replicas for its EPI.
-	 * 2. Get the list of other replicas of this EPI.
-	 *    Send a "subscribe" request to each replica.
-	 */
-	private List<ResolverDescription> getResolvers(WSName primaryName)
-	{
-		List<ResolverDescription> resolverList = primaryName.getResolvers();
-		if ((resolverList == null) || (resolverList.size() == 0))
-		{
-			// A resolver resource that is not registered with any resolvers can resolve itself.
-			TypeInformation type = new TypeInformation(primaryName.getEndpoint());
-			if (type.isEpiResolver())
-			{
-				URI epi = primaryName.getEndpointIdentifier();
-				ResolverDescription rd = new ResolverDescription(epi, primaryName.getEndpoint(),
-						ResolverDescription.ResolverType.EPI_RESOLVER);
-				resolverList = new ArrayList<ResolverDescription>();
-				resolverList.add(rd);
-			}
-		}
-		return resolverList;
 	}
 }
