@@ -79,6 +79,7 @@ import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceLock;
 import edu.virginia.vcgr.genii.container.security.authz.providers.GamlAclTopics;
+import edu.virginia.vcgr.genii.container.sync.DestroyFlags;
 import edu.virginia.vcgr.genii.container.sync.GamlAclChangeNotificationHandler;
 import edu.virginia.vcgr.genii.container.sync.MessageFlags;
 import edu.virginia.vcgr.genii.container.sync.ReplicationItem;
@@ -96,7 +97,7 @@ import edu.virginia.vcgr.genii.security.RWXCategory;
 @GeniiServiceConfiguration(
 	resourceProvider=RByteIOResourceProvider.class)
 public class RandomByteIOServiceImpl extends GenesisIIBase
-	implements RandomByteIOPortType, ByteIOTopics
+	implements RandomByteIOPortType, ByteIOTopics, GamlAclTopics
 {
 	static private Log _logger = LogFactory.getLog(RandomByteIOServiceImpl.class);
 	static private final int VALID_BLOCK_SIZE = 1024;
@@ -166,15 +167,18 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 	protected void preDestroy() throws RemoteException, ResourceException
 	{
 		super.preDestroy();
-		if (_resource.getProperty(SyncProperty.IS_DESTROYED_PROP_NAME) == null)
+		
+		DestroyFlags flags = VersionedResourceUtils.preDestroy(_resource);
+		if (flags != null)
 		{
-			VersionVector vvr = VersionedResourceUtils.incrementResourceVersion(_resource);
 			_logger.debug("RandomByteIOServiceImpl: publish destroy notification");
 			TopicSet space = TopicSet.forPublisher(getClass());
 			PublisherTopic publisherTopic = space.createPublisherTopic(
 				BYTEIO_CONTENTS_CHANGED_TOPIC);
+			ByteIOOperations operation = (flags.isUnlinked ?
+					ByteIOOperations.Unlink : ByteIOOperations.Destroy);
 			publisherTopic.publish(new ByteIOContentsChangedContents(
-				ByteIOOperations.Destroy, 0, 0, 0, 0, vvr));
+				operation, 0, 0, 0, 0, flags.vvr));
 		}
 	}
 	
@@ -584,7 +588,8 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 			if (!(operation.equals(ByteIOOperations.Write) ||
 				  operation.equals(ByteIOOperations.Append) ||
 				  operation.equals(ByteIOOperations.TruncAppend) ||
-				  operation.equals(ByteIOOperations.Destroy)))
+				  operation.equals(ByteIOOperations.Destroy) ||
+				  operation.equals(ByteIOOperations.Unlink)))
 			{
 				_logger.debug("RandomByteIOServiceImpl.notify: invalid parameters");
 				return NotificationConstants.FAIL;
@@ -616,16 +621,22 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 			try
 			{
 				_resourceLock.lock();
+				if (operation.equals(ByteIOOperations.Destroy))
+				{
+					resource.setProperty(SyncProperty.IS_DESTROYED_PROP_NAME, "true");
+					destroy(new Destroy());
+					return NotificationConstants.OK;
+				}
 				VersionVector localVector = (VersionVector) resource.getProperty(
 						SyncProperty.VERSION_VECTOR_PROP_NAME);
 				MessageFlags flags = VersionedResourceUtils.validateNotification(
 						resource, localVector, remoteVector);
 				if (flags.status != null)
 					return flags.status;
-				if (operation.equals(ByteIOOperations.Destroy))
+				if (operation.equals(ByteIOOperations.Unlink))
 				{
-					resource.setProperty(SyncProperty.IS_DESTROYED_PROP_NAME, "true");
-					destroy(new Destroy());
+					// TODO - Destroy subscription from sender.
+					// Also, remove outcalls to sender from persistent queue?
 					return NotificationConstants.OK;
 				}
 				String bitmapFilename = resource.getBitmapFilePath();

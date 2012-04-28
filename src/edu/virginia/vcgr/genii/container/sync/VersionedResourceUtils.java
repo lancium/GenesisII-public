@@ -260,4 +260,38 @@ public class VersionedResourceUtils
 		resource.commit();
 		_logger.debug("updateVersionVector: vv=" + localVector);
 	}
+	
+	/**
+	 * Replicated resources should call this before they are destroyed.
+	 * If the resource should send an update message indicating that it has been destroyed,
+	 * then this returns the VersionVector for the update message.
+	 * Otherwise, it returns null.
+	 * 
+	 * Also, check if the resource has been "unlinked" from the other replicas,
+	 * meaning that they should be unaffected (other then destroying the unlinked
+	 * replica's subscription).
+	 */
+	public static DestroyFlags preDestroy(IResource resource)
+		throws ResourceException
+	{
+		if (resource.getProperty(SyncProperty.IS_DESTROYED_PROP_NAME) != null)
+			return null;
+		DestroyFlags flags = new DestroyFlags();
+		flags.vvr = incrementResourceVersion(resource);
+		if (resource.getProperty(SyncProperty.UNLINKED_REPLICA_PROP_NAME) != null)
+			flags.isUnlinked = true;
+		return flags;
+	}
+	
+	/**
+	 * Given a local resource and a remote resource:
+	 * The remote resource was subscribed to the local resource.
+	 * The remote resource has been destroyed.
+	 * Search the local subscription database for the subscription from the remote resource,
+	 * and destroy the subscription.
+	 */
+	public static void destroySubscription(IResource publisher, EndpointReferenceType consumerEPR)
+	{
+		// TODO - implement destroySubscription()
+	}
 }

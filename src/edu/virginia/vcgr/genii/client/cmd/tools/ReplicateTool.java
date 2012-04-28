@@ -4,8 +4,11 @@ import java.util.List;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
+import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.oasis_open.docs.wsrf.rp_2.InsertResourceProperties;
 import org.oasis_open.docs.wsrf.rp_2.InsertType;
+import org.oasis_open.docs.wsrf.rp_2.UpdateResourceProperties;
+import org.oasis_open.docs.wsrf.rp_2.UpdateType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
@@ -25,6 +28,7 @@ import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreateResponse;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.rns.GeniiDirPolicy;
+import edu.virginia.vcgr.genii.container.sync.SyncProperty;
 
 public class ReplicateTool extends BaseGridTool
 {
@@ -36,7 +40,8 @@ public class ReplicateTool extends BaseGridTool
 		"edu/virginia/vcgr/genii/client/cmd/tools/man/replicate";
 
 	private boolean _policy;
-
+	private boolean _destroy;
+	
 	public ReplicateTool()
 	{
 		super(new FileResource(_DESCRIPTION), new FileResource(_USAGE),
@@ -50,9 +55,21 @@ public class ReplicateTool extends BaseGridTool
 		_policy = true;
 	}
 
+	@Option({"destroy"})
+	public void setDestroy()
+	{
+		_destroy = true;
+	}
+	
 	@Override
 	protected void verify() throws ToolException
 	{
+		if (_destroy)
+		{
+			if (numArguments() != 1)
+				throw new InvalidToolUsageException();
+			return;
+		}
 		if ((numArguments() < 2) || (numArguments() > 3))
 			throw new InvalidToolUsageException();
 	}
@@ -63,6 +80,10 @@ public class ReplicateTool extends BaseGridTool
 	@Override
 	protected int runCommand() throws Throwable
 	{
+		if (_destroy)
+		{
+			return destroyReplica();
+		}
 		String sourcePath = getArgument(0);
 		String containerPath = getArgument(1);
 		String linkPath = (numArguments() < 3 ? null : getArgument(2));
@@ -130,6 +151,40 @@ public class ReplicateTool extends BaseGridTool
 			oldSP.addResource(newSP);
 		}
 		*/
+		return 0;
+	}
+	
+	/**
+	 * Destroy a single replica without destroying the entire virtual resource.
+	 * (Note -- "rm file" destroys all replicas.)
+	 *
+	 * Be careful!  If you specify a pathname that refers to an EPR with a resolver
+	 * element, then this may failover and destroy the wrong replica.
+	 * 
+	 * Ideally, specify a pathname of an EPR with no resolver.
+	 */
+	private int destroyReplica() throws Throwable
+	{
+		String replicaPath = getArgument(0);
+		RNSPath current = RNSPath.getCurrent();
+		RNSPath replicaRNS = current.lookup(replicaPath, RNSPathQueryFlags.MUST_EXIST);
+		EndpointReferenceType replicaEPR = replicaRNS.getEndpoint();
+		
+		MessageElement[] elementArr = new MessageElement[1];
+		elementArr[0] = new MessageElement(SyncProperty.UNLINKED_REPLICA_QNAME, "true");
+		UpdateType update = new UpdateType(elementArr);
+		UpdateResourceProperties request = new UpdateResourceProperties(update);
+		
+		GeniiCommon common = ClientUtils.createProxy(GeniiCommon.class, replicaEPR);
+		common.updateResourceProperties(request);
+		common.destroy(new Destroy());
+		
+		// Leave directory entry unchanged.
+		// In the ideal case, maybe the directory entry should be replaced with an
+		// equivalent entry with a different default address?
+		// If the entry had no resolver element, or if this was the last replica,
+		// then the entry should be removed?
+		
 		return 0;
 	}
 }

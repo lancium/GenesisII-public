@@ -8,6 +8,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
+import edu.virginia.vcgr.genii.client.rns.RNSOperations;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMessageContents;
 import edu.virginia.vcgr.genii.container.sync.VersionVector;
 
@@ -19,7 +20,7 @@ public class RNSOperationContents extends NotificationMessageContents
 	
 	@XmlElement(namespace = RNSConstants.GENII_RNS_NS,
 			name = "operation", nillable = false, required = true)
-	private String _operation;
+	private RNSOperations _operation;
 		
 	@XmlElement(namespace = RNSConstants.GENII_RNS_NS,
 			name = "EntryName", nillable = false, required = true)
@@ -37,7 +38,7 @@ public class RNSOperationContents extends NotificationMessageContents
 	{
 	}
 	
-	public RNSOperationContents(String operation, String entryName, 
+	public RNSOperationContents(RNSOperations operation, String entryName, 
 			EndpointReferenceType entryReference, VersionVector versionVector)
 		throws ResourceException
 	{
@@ -48,7 +49,7 @@ public class RNSOperationContents extends NotificationMessageContents
 		_versionVector = versionVector;
 	}
 
-	final public String operation()
+	final public RNSOperations operation()
 	{
 		return _operation;
 	}

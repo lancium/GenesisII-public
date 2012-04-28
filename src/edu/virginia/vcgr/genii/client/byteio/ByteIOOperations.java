@@ -6,5 +6,6 @@ public enum ByteIOOperations
 	Write(),
 	Append(),
 	TruncAppend(),
-	Destroy();
+	Destroy(),
+	Unlink();
 }

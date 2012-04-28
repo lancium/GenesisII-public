@@ -88,7 +88,7 @@ import edu.virginia.vcgr.genii.security.RWXCategory;
 @GeniiServiceConfiguration(
 	resourceProvider=GeniiResolverDBResourceProvider.class)
 public class GeniiResolverServiceImpl extends GenesisIIBase
-	implements GeniiResolverPortType, ResolverTopics
+	implements GeniiResolverPortType, ResolverTopics, GamlAclTopics
 {	
 	static private Log _logger = LogFactory.getLog(GeniiResolverServiceImpl.class);
 

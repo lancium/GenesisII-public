@@ -52,6 +52,7 @@ import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
+import edu.virginia.vcgr.genii.client.rns.RNSOperations;
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.AbstractNotificationHandler;
@@ -80,6 +81,7 @@ import edu.virginia.vcgr.genii.container.resource.ResourceLock;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.security.authz.providers.GamlAclTopics;
 import edu.virginia.vcgr.genii.container.serializer.MessageElementSerializer;
+import edu.virginia.vcgr.genii.container.sync.DestroyFlags;
 import edu.virginia.vcgr.genii.container.sync.GamlAclChangeNotificationHandler;
 import edu.virginia.vcgr.genii.container.sync.MessageFlags;
 import edu.virginia.vcgr.genii.container.sync.ReplicationItem;
@@ -101,7 +103,7 @@ import edu.virginia.vcgr.genii.security.RWXCategory;
 @GeniiServiceConfiguration(
 	resourceProvider=RNSDBResourceProvider.class)
 public class EnhancedRNSServiceImpl extends GenesisIIBase
-	implements EnhancedRNSPortType, RNSTopics
+	implements EnhancedRNSPortType, RNSTopics, GamlAclTopics
 {	
 	static private Log _logger = LogFactory.getLog(EnhancedRNSServiceImpl.class);
 	
@@ -163,15 +165,18 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 	protected void preDestroy() throws RemoteException, ResourceException
 	{
 		super.preDestroy();
-		if (_resource.getProperty(SyncProperty.IS_DESTROYED_PROP_NAME) == null)
+		
+		DestroyFlags flags = VersionedResourceUtils.preDestroy(_resource);
+		if (flags != null)
 		{
-			VersionVector vvr = VersionedResourceUtils.incrementResourceVersion(_resource);
 			_logger.debug("EnhancedRNSServiceImpl: publish destroy notification");
 			TopicSet space = TopicSet.forPublisher(getClass());
 			PublisherTopic topic = space.createPublisherTopic(RNS_OPERATION_TOPIC);
 			EndpointReferenceType myEPR = (EndpointReferenceType) WorkingContext.getCurrentWorkingContext().
 				getProperty(WorkingContext.EPR_PROPERTY_NAME);
-			topic.publish(new RNSOperationContents("destroy", ".", myEPR, vvr));
+			RNSOperations operation = (flags.isUnlinked ?
+					RNSOperations.Unlink : RNSOperations.Destroy);
+			topic.publish(new RNSOperationContents(operation, ".", myEPR, flags.vvr));
 		}
 	}
 	
@@ -522,7 +527,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 	{
 		TopicSet space = TopicSet.forPublisher(getClass());
 		PublisherTopic topic = space.createPublisherTopic(RNS_OPERATION_TOPIC);
-		topic.publish(new RNSOperationContents("add", name, entry, vvr));;
+		topic.publish(new RNSOperationContents(RNSOperations.Add, name, entry, vvr));;
 	}
 	
 	private void fireRNSEntryRemoved(VersionVector vvr, String name)
@@ -530,7 +535,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 	{
 		TopicSet space = TopicSet.forPublisher(getClass());
 		PublisherTopic topic = space.createPublisherTopic(RNS_OPERATION_TOPIC);
-		topic.publish(new RNSOperationContents("remove", name, null, vvr));
+		topic.publish(new RNSOperationContents(RNSOperations.Remove, name, null, vvr));
 	}
 	
 	// TODO setResourceProperties() does not send "policy" update.
@@ -654,17 +659,17 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 				RNSOperationContents contents) throws Exception
 		{
 			boolean validParams = false;
-			String operation = contents.operation();
+			RNSOperations operation = contents.operation();
 			String entryName = contents.entryName();
 			EndpointReferenceType entryReference = contents.entryReference();
 			VersionVector remoteVector = contents.versionVector();
 			if (operation != null)
 			{
-				if (operation.equals("add") && (entryName != null) && (entryReference != null))
+				if (operation.equals(RNSOperations.Add) && (entryName != null) && (entryReference != null))
 					validParams = true;
-				if (operation.equals("remove") && (entryName != null))
+				if (operation.equals(RNSOperations.Remove) && (entryName != null))
 					validParams = true;
-				if (operation.equals("destroy"))
+				if (operation.equals(RNSOperations.Destroy) || operation.equals(RNSOperations.Unlink))
 					validParams = true;
 			}
 			if (!validParams)
@@ -686,14 +691,21 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 			try
 			{
 				_resourceLock.lock();
+				if (operation.equals(RNSOperations.Destroy))
+				{
+					resource.setProperty(SyncProperty.IS_DESTROYED_PROP_NAME, "true");
+					destroy(new Destroy());
+					return NotificationConstants.OK;
+				}
 				VersionVector localVector = (VersionVector) resource.getProperty(
 						SyncProperty.VERSION_VECTOR_PROP_NAME);
 				MessageFlags flags = VersionedResourceUtils.validateNotification(
 						resource, localVector, remoteVector);
 				if (flags.status != null)
+				{
 					return flags.status;
-
-				if (operation.equals("add"))
+				}
+				if (operation.equals(RNSOperations.Add))
 				{
 					entryName = processAddEntryName(entryName, flags.replay, resource);
 					try
@@ -708,14 +720,13 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 							(item != null ? item.localEPR : entryReference), null);
 					resource.addEntry(entry);
 				}
-				else if (operation.equals("remove"))
+				else if (operation.equals(RNSOperations.Remove))
 				{
 					resource.removeEntries(entryName);
 				}
-				else if (operation.equals("destroy"))
+				else if (operation.equals(RNSOperations.Unlink))
 				{
-					resource.setProperty(SyncProperty.IS_DESTROYED_PROP_NAME, "true");
-					destroy(new Destroy());
+					VersionedResourceUtils.destroySubscription(resource, producerReference);
 					return NotificationConstants.OK;
 				}
 				VersionedResourceUtils.updateVersionVector(resource, localVector, remoteVector);
