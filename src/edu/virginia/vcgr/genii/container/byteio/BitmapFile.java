@@ -1,6 +1,7 @@
 package edu.virginia.vcgr.genii.container.byteio;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Map;
@@ -12,11 +13,11 @@ public class BitmapFile implements Closeable
 	private long _bitNum;
 	private Map<Long, Integer> _byteMap;
 	
-	public BitmapFile(String filename, boolean write)
+	public BitmapFile(File file, boolean write)
 		throws IOException
 	{
 		String mode = (write ? "rw" : "r");
-		_raf = new RandomAccessFile(filename, mode);
+		_raf = new RandomAccessFile(file, mode);
 		_bitNum = 0;
 		_byteMap = new TreeMap<Long, Integer>();
 	}

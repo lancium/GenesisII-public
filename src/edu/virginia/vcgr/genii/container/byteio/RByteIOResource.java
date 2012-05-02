@@ -60,6 +60,7 @@ public class RByteIOResource extends BasicDBResource implements IRByteIOResource
 	public File chooseFile(HashMap<QName, Object> creationProperties)
 		throws ResourceException
 	{
+		File userDir = Container.getConfigurationManager().getUserDirectory();
 		File file = null;
 		try
 		{
@@ -69,8 +70,7 @@ public class RByteIOResource extends BasicDBResource implements IRByteIOResource
 					FILE_PATH_PROPERTY);
 				if (any != null)
 				{
-					File superDir = Container.getConfigurationManager().getUserDirectory();
-					file = new File(superDir, any.getAsString());
+					file = new File(userDir, any.getAsString());
 				}
 			}
 		}
@@ -86,23 +86,25 @@ public class RByteIOResource extends BasicDBResource implements IRByteIOResource
 		{
 			if (file == null)
 			{
-				file = ByteIOFileCreator.createFile();
+				file = ByteIOFileCreator.createFile(userDir);
 			}
 		}
 		catch (IOException ioe)
 		{
 			throw new ResourceException(ioe.getLocalizedMessage(), ioe);
 		}
-		setProperty(_INTERNAL_FILE_PATH_PROP_NAME, file.getAbsolutePath());
+		String path = ByteIOFileCreator.getRelativePath(userDir, file);
+		setProperty(_INTERNAL_FILE_PATH_PROP_NAME, path);
 		return file;
 	}
 
 	public File getCurrentFile() throws ResourceException
 	{
-		String file = (String)getProperty(_INTERNAL_FILE_PATH_PROP_NAME);
-		if (file == null)
+		String path = (String)getProperty(_INTERNAL_FILE_PATH_PROP_NAME);
+		if (path == null)
 			return chooseFile(null);
-		return new File(file);
+		File userDir = Container.getConfigurationManager().getUserDirectory();
+		return ByteIOFileCreator.getAbsoluteFile(userDir, path);
 	}
 	
 	public void destroy() throws ResourceException
@@ -118,12 +120,6 @@ public class RByteIOResource extends BasicDBResource implements IRByteIOResource
 		}
 		
 		super.destroy();
-	}
-	
-	public void setFilePath(String path)
-		throws ResourceException
-	{
-		setProperty(_INTERNAL_FILE_PATH_PROP_NAME, path);
 	}
 	
 	public String getFilePath()
@@ -176,9 +172,13 @@ public class RByteIOResource extends BasicDBResource implements IRByteIOResource
 		setProperty(_INTERNAL_BITMAP_FILE_PATH_PROP_NAME, path);
 	}
 
-	public String getBitmapFilePath()
+	public File getBitmapFile()
 		throws ResourceException
 	{
-		return (String) getProperty(_INTERNAL_BITMAP_FILE_PATH_PROP_NAME);
+		String path = (String) getProperty(_INTERNAL_BITMAP_FILE_PATH_PROP_NAME);
+		if (path == null)
+			return null;
+		File userDir = Container.getConfigurationManager().getUserDirectory();
+		return ByteIOFileCreator.getAbsoluteFile(userDir, path);
 	}
 }

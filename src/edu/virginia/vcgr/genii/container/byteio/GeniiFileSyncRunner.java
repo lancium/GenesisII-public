@@ -111,7 +111,7 @@ public class GeniiFileSyncRunner implements ResourceSyncRunner
 	private void setBitmapFilename(IRByteIOResource resource)
 		throws IOException
 	{
-		if (resource.getBitmapFilePath() == null)
+		if (resource.getBitmapFile() == null)
 		{
 			String filename = resource.getFilePath();
 			int idx = filename.lastIndexOf('.');

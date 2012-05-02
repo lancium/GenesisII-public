@@ -28,6 +28,7 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.DBSerializer;
+import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.byteio.ByteIOFileCreator;
 import edu.virginia.vcgr.genii.container.db.DatabaseTableUtils;
 
@@ -249,8 +250,9 @@ class PersistentOutcallDatabase
 		String attachmentPath = null;
 		try
 		{
-			File attachmentFile = ByteIOFileCreator.createFile();
-			attachmentPath = attachmentFile.getAbsolutePath();
+			File userDir = Container.getConfigurationManager().getUserDirectory();
+			File attachmentFile = ByteIOFileCreator.createFile(userDir);
+			attachmentPath = ByteIOFileCreator.getRelativePath(userDir, attachmentFile);
 			ostream = new FileOutputStream(attachmentFile);
 			ostream.write(attachment.getData());
 		}
@@ -311,7 +313,8 @@ class PersistentOutcallDatabase
 	{
 		if (attachmentPath == null)
 			return null;
-		File file = new File(attachmentPath);
+		File userDir = Container.getConfigurationManager().getUserDirectory();
+		File file = ByteIOFileCreator.getAbsoluteFile(userDir, attachmentPath);
 		int length = (int) file.length();
 		byte[] data = new byte[length];
 		FileInputStream istream = null;
@@ -368,7 +371,9 @@ class PersistentOutcallDatabase
 				if (attachmentPath != null)
 				{
 					_logger.info("PersistentOutcallDatabase: delete " + attachmentPath);
-					new File(attachmentPath).delete();
+					File userDir = Container.getConfigurationManager().getUserDirectory();
+					File attachmentFile = ByteIOFileCreator.getAbsoluteFile(userDir, attachmentPath);
+					attachmentFile.delete();
 				}
 			}
 		}

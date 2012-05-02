@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Random;
 import org.morgan.util.io.GuaranteedDirectory;
-import edu.virginia.vcgr.genii.container.Container;
 
 public class ByteIOFileCreator
 {
@@ -15,10 +14,9 @@ public class ByteIOFileCreator
 	/**
 	 * Create a new file in the user directory for saving byteIO data.
 	 */
-	synchronized public static File createFile()
+	synchronized public static File createFile(File userDir)
 		throws IOException
 	{
-		File userDir = Container.getConfigurationManager().getUserDirectory();
 		File baseDir = new GuaranteedDirectory(userDir, "rbyteio-data");
 		String filePrefix = "rbyteio";
 		String fileSuffix = ".dat";
@@ -28,5 +26,22 @@ public class ByteIOFileCreator
 			baseDir = new GuaranteedDirectory(baseDir, String.format("dir.%d", value));
 		}
 		return File.createTempFile(filePrefix, fileSuffix, baseDir);
+	}
+	
+	public static String getRelativePath(File userDir, File newFile)
+	{
+		String userPath = userDir.getAbsolutePath() + File.separator;
+		String path = newFile.getAbsolutePath();
+		if (path.startsWith(userPath))
+		{
+			return path.substring(userPath.length());
+		}
+		return path;
+	}
+	
+	public static File getAbsoluteFile(File userDir, String path)
+	{
+		File file = new File(path);
+		return(file.isAbsolute() ? file : new File(userDir, path));
 	}
 }

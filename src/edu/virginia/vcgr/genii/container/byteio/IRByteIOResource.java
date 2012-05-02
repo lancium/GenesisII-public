@@ -30,7 +30,6 @@ public interface IRByteIOResource extends IResource
 		throws ResourceException;
 	public File getCurrentFile() throws ResourceException;
 	public void destroy() throws ResourceException;
-	public void setFilePath(String path) throws ResourceException;
 	public String getFilePath()	throws ResourceException;
 	public void setCreateTime(Calendar tm) throws ResourceException;
 	public Calendar getCreateTime()	throws ResourceException;
@@ -39,5 +38,5 @@ public interface IRByteIOResource extends IResource
 	public void setAccessTime(Calendar tm) throws ResourceException;
 	public Calendar getAccessTime()	throws ResourceException;
 	public void setBitmapFilePath(String path) throws ResourceException;
-	public String getBitmapFilePath() throws ResourceException;
+	public File getBitmapFile() throws ResourceException;
 }

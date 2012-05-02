@@ -270,8 +270,8 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 	private void downloadIfNecessary(long startOffset, int validSize, File cacheFile)
 		throws IOException
 	{
-		String bitmapFilename = _resource.getBitmapFilePath();
-		if (bitmapFilename == null)
+		File file = _resource.getBitmapFile();
+		if (file == null)
 			return;
 		long fileSize = cacheFile.length();
 		long maxSize = fileSize - startOffset;
@@ -283,7 +283,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 		List<PrimaryFileSegment> segmentList = new ArrayList<PrimaryFileSegment>();
 		try
 		{
-			bitmapFile = new BitmapFile(bitmapFilename, false);
+			bitmapFile = new BitmapFile(file, false);
 			bitmapFile.seekBit(firstBlock);
 			while (firstBlock <= lastBlock)
 			{
@@ -340,7 +340,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 		try
 		{
 			raf = new RandomAccessFile(cacheFile, "rw");
-			bitmapFile = new BitmapFile(bitmapFilename, true);
+			bitmapFile = new BitmapFile(file, true);
 			for (PrimaryFileSegment segment : segmentList)
 			{
 				segment.write(bitmapFile, raf, VALID_BLOCK_SIZE);
@@ -518,8 +518,8 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 	private void updateBitmap(long firstByte, int size, long fileSize)
 		throws ResourceException, IOException
 	{
-		String bitmapFilename = _resource.getBitmapFilePath();
-		if (bitmapFilename == null)
+		File file = _resource.getBitmapFile();
+		if (file == null)
 			return;
 		long firstBlock = (long)(firstByte / VALID_BLOCK_SIZE);
 		long firstByteOfBlock = firstBlock * VALID_BLOCK_SIZE;
@@ -537,7 +537,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 		BitmapFile bitmapFile = null;
 		try
 		{
-			bitmapFile = new BitmapFile(bitmapFilename, true);
+			bitmapFile = new BitmapFile(file, true);
 			bitmapFile.seekBit(firstBlock);
 			for (long bnum = firstBlock; bnum <= lastBlock; bnum++)
 				bitmapFile.writeBit(1);
@@ -639,10 +639,10 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 					// Also, remove outcalls to sender from persistent queue?
 					return NotificationConstants.OK;
 				}
-				String bitmapFilename = resource.getBitmapFilePath();
+				File bitmapFile = resource.getBitmapFile();
 				if (size > 0)
 				{
-					if (((data == null) && (bitmapFilename == null)) ||
+					if (((data == null) && (bitmapFile == null)) ||
 						((data != null) && (data.length != size)))
 					{
 						_logger.debug("RandomByteIOServiceImpl.notify: attachment size failure, " +
@@ -654,8 +654,8 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 				raf = new RandomAccessFile(myFile, "rw");
 				if (operation.equals(ByteIOOperations.Append) || operation.equals(ByteIOOperations.TruncAppend))
 					raf.setLength(offset);
-				if (bitmapFilename != null)
-					updateBitmap(bitmapFilename, raf, offset, bytesPerBlock, stride, size);
+				if (bitmapFile != null)
+					updateBitmap(bitmapFile, raf, offset, bytesPerBlock, stride, size);
 				if (data != null)
 				{
 					int dataOffset = 0;
@@ -704,7 +704,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 		 * For each block that would be written, clear that block in the bitmap.
 		 * If this would write past the end of the file, then pad the file to its new length.
 		 */
-		private void updateBitmap(String bitmapFilename, RandomAccessFile raf,
+		private void updateBitmap(File file, RandomAccessFile raf,
 				long offset, int bytesPerBlock, long stride, int dataSize)
 			throws IOException
 		{
@@ -712,7 +712,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 			long fileSize = 0;
 			try
 			{
-				bitmapFile = new BitmapFile(bitmapFilename, true);
+				bitmapFile = new BitmapFile(file, true);
 				int dataOffset = 0;
 				while (dataOffset < dataSize)
 				{
