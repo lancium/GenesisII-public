@@ -7,8 +7,10 @@ import org.apache.commons.logging.LogFactory;
 import org.ggf.bes.factory.ActivityStateEnumeration;
 import org.morgan.util.io.GuaranteedDirectory;
 
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
 import edu.virginia.vcgr.genii.client.bes.ActivityState;
 import edu.virginia.vcgr.genii.client.history.HistoryEventCategory;
+import edu.virginia.vcgr.genii.client.io.FileSystemUtils;
 import edu.virginia.vcgr.genii.container.bes.execution.ExecutionContext;
 import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.BESWorkingDirectory;
 import edu.virginia.vcgr.genii.container.cservices.history.HistoryContext;
@@ -43,7 +45,20 @@ public class CreateWorkingDirectoryPhase extends AbstractExecutionPhase
 		_logger.info(String.format("Creating job working directory \"%s\".", _workingDirectory));
 		try
 		{
-			new GuaranteedDirectory(_workingDirectory);
+			File cwd = new GuaranteedDirectory(_workingDirectory);
+			
+			if (OperatingSystemType.getCurrent().isWindows())
+				cwd.setWritable(true, false);
+			
+			else 
+				FileSystemUtils.chmod(cwd.getAbsolutePath(), 
+						FileSystemUtils.MODE_USER_READ |
+						FileSystemUtils.MODE_USER_WRITE |
+						FileSystemUtils.MODE_USER_EXECUTE |
+						FileSystemUtils.MODE_GROUP_READ |
+						FileSystemUtils.MODE_GROUP_WRITE | 
+						FileSystemUtils.MODE_GROUP_EXECUTE );
+			
 		}
 		catch (Throwable cause)
 		{

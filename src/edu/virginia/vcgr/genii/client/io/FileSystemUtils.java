@@ -47,7 +47,7 @@ public class FileSystemUtils extends JNIClientBaseClass
 	static private Pattern _EXTENSION_PATTERN = Pattern.compile(
 		"\\.\\w{3}(?=\\.)");
 	
-	static private native void chmod(String filePath, int mode)
+	static public native void chmod(String filePath, int mode)
 		throws IOException;
 	
 	static private File makeWindowsExecutable(File file)
@@ -104,7 +104,9 @@ public class FileSystemUtils extends JNIClientBaseClass
 			if (!filepath.canExecute())
 			{
 				chmod(filepath.getAbsolutePath(),
-					MODE_USER_READ | MODE_USER_WRITE | MODE_USER_EXECUTE);
+					MODE_USER_READ | MODE_USER_WRITE | MODE_USER_EXECUTE | 
+					MODE_GROUP_READ | MODE_GROUP_EXECUTE
+					);
 			}
 			
 			return filepath;

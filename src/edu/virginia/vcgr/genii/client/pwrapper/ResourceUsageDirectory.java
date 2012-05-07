@@ -3,6 +3,9 @@ package edu.virginia.vcgr.genii.client.pwrapper;
 import java.io.File;
 import java.io.IOException;
 
+import edu.virginia.vcgr.appmgr.os.OperatingSystemType;
+import edu.virginia.vcgr.genii.client.io.FileSystemUtils;
+
 public class ResourceUsageDirectory
 {
 	private File _directory;
@@ -28,7 +31,19 @@ public class ResourceUsageDirectory
 	{
 		try
 		{
-			return File.createTempFile("rusage-", ".xml", _directory);
+			File tempFile = File.createTempFile("rusage-", ".xml", _directory);
+			
+			if (OperatingSystemType.getCurrent().isWindows())
+				tempFile.setWritable(true, false);
+			else 
+				FileSystemUtils.chmod(tempFile.getAbsolutePath(),
+						FileSystemUtils.MODE_USER_READ |
+						FileSystemUtils.MODE_USER_WRITE |
+						FileSystemUtils.MODE_GROUP_READ |
+						FileSystemUtils.MODE_GROUP_WRITE 
+						);
+			
+			return tempFile;
 		}
 		catch (IOException ioe)
 		{

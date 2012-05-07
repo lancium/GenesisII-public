@@ -68,7 +68,7 @@ public class ProcessWrapperFactory
 		}
 		
 		if (!targetPath.canExecute())
-			targetPath.setExecutable(true);
+			targetPath.setExecutable(true, false);
 		
 		return targetPath;
 	}
