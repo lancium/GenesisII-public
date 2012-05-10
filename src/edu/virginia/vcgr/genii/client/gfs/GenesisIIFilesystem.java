@@ -9,8 +9,6 @@ import java.util.Collection;
 
 import javax.xml.namespace.QName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.ggf.rbyteio.RandomByteIOPortType;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -35,12 +33,11 @@ import edu.virginia.vcgr.genii.client.byteio.RandomByteIORP;
 import edu.virginia.vcgr.genii.client.byteio.StreamableByteIORP;
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransfererFactory;
-import edu.virginia.vcgr.genii.client.cache.AttributeCache;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import edu.virginia.vcgr.genii.client.naming.EPRUtils;
-import edu.virginia.vcgr.genii.client.naming.WSName;
+import edu.virginia.vcgr.genii.client.fuse.DirectoryManager;
+import edu.virginia.vcgr.genii.client.fuse.MetadataManager;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
@@ -56,8 +53,6 @@ import edu.virginia.vcgr.genii.security.credentials.identity.Identity;
 
 public class GenesisIIFilesystem implements FSFilesystem
 {
-	static private Log _logger = LogFactory.getLog(GenesisIIFilesystem.class);
-	
 	private RNSPath _root;
 	private RNSPath _lastPath;
 	private Collection<Identity> _callerIdentities;
@@ -84,36 +79,6 @@ public class GenesisIIFilesystem implements FSFilesystem
 		Calendar c = Calendar.getInstance();
 		c.setTimeInMillis(time);
 		return c;
-	}
-	
-	final static private long generateInodeNumber(EndpointReferenceType target)
-	{
-		WSName name = new WSName(target);
-		if (name.isValidWSName())
-		{
-			return name.getEndpointIdentifier().toString().hashCode();
-		} else
-		{
-			_logger.warn("Trying to generate an INode number of a target which"
-				+ "does not implement the WS-Naming specification.");
-			
-			try
-			{
-				byte []array = EPRUtils.toBytes(target);
-				long result = 0;
-				for (byte d : array)
-				{
-					result ^= d;
-				}
-				
-				return result;
-			}
-			catch (ResourceException re)
-			{
-				_logger.fatal("Unexpected error while trying to serialize EPR.", re);
-				throw new RuntimeException(re);
-			}
-		}
 	}
 	
 	FilesystemStatStructure stat(String name, EndpointReferenceType target)
@@ -204,7 +169,7 @@ public class GenesisIIFilesystem implements FSFilesystem
 				permissions = new Permissions();
 			}
 			
-			int inode = (int)generateInodeNumber(target);
+			int inode = (int) MetadataManager.generateInodeNumber(target);
 			return new FilesystemStatStructure(inode, name,
 				type, size, created, modified, accessed, permissions);
 		}
@@ -278,7 +243,6 @@ public class GenesisIIFilesystem implements FSFilesystem
 			GenesisIIACLManager mgr = new GenesisIIACLManager(target.getEndpoint(),
 				_callerIdentities);
 			mgr.setPermissions(permissions);
-			flushAttributeCache(path);
 		}
 		catch (Throwable cause)
 		{
@@ -298,7 +262,6 @@ public class GenesisIIFilesystem implements FSFilesystem
 	{
 		GeniiOpenFile gof = lookup(fileHandle);
 		gof.flush();
-		flushAttributeCache(gof.getPath());
 	}
 
 	@Override
@@ -318,6 +281,7 @@ public class GenesisIIFilesystem implements FSFilesystem
 		try
 		{
 			target.link(source.getEndpoint());
+			DirectoryManager.addNewDirEntry(target, this, false);
 		}
 		catch (Throwable cause)
 		{
@@ -378,6 +342,7 @@ public class GenesisIIFilesystem implements FSFilesystem
 					target.getEndpoint(), _callerIdentities);
 				mgr.setCreatePermissions(initialPermissions);
 			}
+			DirectoryManager.addNewDirEntry(target, this, true);
 		}
 		catch (Throwable cause)
 		{
@@ -447,6 +412,7 @@ public class GenesisIIFilesystem implements FSFilesystem
 						epr, _callerIdentities)).setCreatePermissions(
 							initialPermissions);
 				
+				DirectoryManager.addNewDirEntry(target, this, true);
 				return open(path, true, target, epr, flags, mode);
 			}
 		}
@@ -509,8 +475,6 @@ public class GenesisIIFilesystem implements FSFilesystem
 							RandomByteIOPortType.class, target.getEndpoint()));
 				transferer.truncAppend(newSize, new byte[0]);
 				
-				//New size is 0, flush attribute cache
-				flushAttributeCache(path);				
 			} else if (info.isSByteIO())
 			{
 				// Can't do this.
@@ -541,8 +505,9 @@ public class GenesisIIFilesystem implements FSFilesystem
 		
 		try
 		{
+			MetadataManager.removeCachedAttributes(target);
 			target.delete();
-			flushAttributeCache(path);
+			DirectoryManager.removeDirEntry(target);
 		}
 		catch (Throwable cause)
 		{
@@ -577,7 +542,6 @@ public class GenesisIIFilesystem implements FSFilesystem
 				rp.setAccessTime(toCalendar(accessTime));
 				rp.setModificationTime(toCalendar(modificationTime));
 			}
-			flushAttributeCache(path);
 		}
 		catch (Throwable cause)
 		{
@@ -603,35 +567,11 @@ public class GenesisIIFilesystem implements FSFilesystem
 		{
 			to.link(from.getEndpoint());
 			from.unlink();
-			flushAttributeCache(fromPath);
 		}
 		catch (Throwable cause)
 		{
 			throw FSExceptions.translate(String.format(
 				"Unable to rename %s to %s.", from.pwd(), to.pwd()), cause);
-		}
-	}
-	
-	/**
-	 * flushAttributeCache takes in a path and if it exists in the
-	 * attribute cache will remove the entry corresponding to the that
-	 * path
-	 */
-	private void flushAttributeCache(String [] path) throws FSException
-	{
-		RNSPath rnsPath = lookup(path);
-		try
-		{
-			WSName wsName = new WSName(rnsPath.getEndpoint());
-			if (wsName.isValidWSName())
-			{
-				AttributeCache.flush(wsName);
-			}
-		}
-		catch(RNSPathDoesNotExistException rpe)
-		{
-			_logger.debug(String.format("Path does not exist unexpected for %s",
-					UnixFilesystemPathRepresentation.INSTANCE.toString(path)));
 		}
 	}
 }

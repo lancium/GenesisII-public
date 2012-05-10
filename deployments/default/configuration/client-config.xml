@@ -112,10 +112,13 @@
 			base="edu.virginia.vcgr.genii.client.comm.IProxyFactory"/>
 		<mconf:instance name="context-resolver" 
 			type="edu.virginia.vcgr.genii.client.context.ClientContextResolver"
-			base="edu.virginia.vcgr.genii.client.context.IContextResolver"/>		
+			base="edu.virginia.vcgr.genii.client.context.IContextResolver"/>
 		<mconf:instance name="attribute-cache"
-			type="edu.virginia.vcgr.genii.client.invoke.handlers.AttributeCacheHandler"
-			base="java.lang.Object"/>
+			type="edu.virginia.vcgr.genii.client.invoke.handlers.AttributeCacheHandler2"
+			base="java.lang.Object" />
+		<mconf:instance name="lookup-cache"
+			type="edu.virginia.vcgr.genii.client.invoke.handlers.LookupCacheHandler"
+			base="java.lang.Object" />
 	</genii:configured-instances>
 
 	<genii:tools>
@@ -297,5 +300,6 @@
 	
 	<genii:client-pipeline>
 		<genii:pipeline-handler>attribute-cache</genii:pipeline-handler>
+		<genii:pipeline-handler>lookup-cache</genii:pipeline-handler>
 	</genii:client-pipeline>
 </mconf:configuration>

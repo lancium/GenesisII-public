@@ -356,4 +356,12 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 			StreamUtils.close(stmt);
 		}
 	}
+	
+	@Override
+	public Object getProperty(String propertyName) throws ResourceException {
+		if (ELEMENT_COUNT_PROPERTY.equalsIgnoreCase(propertyName)) {
+			return retrieveOccurrenceCount();
+		}
+		return super.getProperty(propertyName);
+	}	
 }

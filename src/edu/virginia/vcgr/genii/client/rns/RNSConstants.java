@@ -1,5 +1,7 @@
 package edu.virginia.vcgr.genii.client.rns;
 
+import javax.xml.namespace.QName;
+
 public interface RNSConstants
 {
 	static public final String GENII_RNS_NS =
@@ -9,4 +11,6 @@ public interface RNSConstants
 		"rns-resolved-entry-unbound-property";
 	
 	static final public int PREFERRED_BATCH_SIZE = 100;
+	
+	static final public QName ELEMENT_COUNT_QNAME = new QName(GENII_RNS_NS, "elementCount");
 }

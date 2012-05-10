@@ -25,6 +25,9 @@ import edu.virginia.vcgr.genii.container.resource.IResource;
 
 public interface IRNSResource extends IResource
 {
+
+	static public final String ELEMENT_COUNT_PROPERTY = "edu.virginia.vcgr.genii.rns.elementCount";
+
 	public void addEntry(InternalEntry entry) 
 		throws ResourceException, RNSEntryExistsFaultType;
 	public Collection<String> listEntries(String name) throws ResourceException;

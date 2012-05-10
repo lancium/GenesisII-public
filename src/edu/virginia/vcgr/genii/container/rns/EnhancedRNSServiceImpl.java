@@ -120,6 +120,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 		super.setAttributeHandlers();
 		new VersionedResourceAttributeHandlers(getAttributePackage());
 		new GeniiDirAttributeHandlers(getAttributePackage());
+		new RNSAttributesHandler(getAttributePackage());
 	}
 	
 	public EnhancedRNSServiceImpl() throws RemoteException
@@ -317,8 +318,13 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 		{
 			_resourceLock.unlock();
 		}
+		MessageElement[] attributes = null;
+		AttributesPreFetcherFactory factory = new AttributesPreFetcherFactoryImpl();
+		attributes = Prefetcher.preFetch(entryReference, new MessageElement[] {}, factory);
+		RNSMetadataType returnedMetadata = RNSUtilities.createMetadata(entryReference, attributes);
+
 		fireRNSEntryAdded(vvr, name, entryReference);
-		return new RNSEntryResponseType(entryReference, mdt, null, name);
+		return new RNSEntryResponseType(entryReference, returnedMetadata, null, name);
 	}
 	
 	static private class AttributesPreFetcherFactoryImpl 
@@ -330,12 +336,12 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 		{
 			String targetAddress = target.getAddress().toString();
 			String rbyteioAddress = Container.getServiceURL("RandomByteIOPortType");
-			if (rbyteioAddress.equalsIgnoreCase(targetAddress))
-			{
+			if (rbyteioAddress.equalsIgnoreCase(targetAddress)) {
 				return new DefaultRandomByteIOAttributePreFetcher(target);
-			}
-			if (Container.onThisServer(target))
-			{
+			} else if (Container.getServiceURL(
+					"EnhancedRNSPortType").equalsIgnoreCase(targetAddress)) {
+				return new RNSAttributesPrefetcher(target);
+			} else if (Container.onThisServer(target)) {
 				return new DefaultGenesisIIAttributesPreFetcher<IResource>(target);
 			}
 			return null;

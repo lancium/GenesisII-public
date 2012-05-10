@@ -34,10 +34,13 @@ import org.morgan.util.io.StreamUtils;
 import org.oasis_open.docs.wsrf.rl_2.Destroy;
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
+import edu.virginia.vcgr.genii.client.cache.unified.WSResourceConfig;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
 import edu.virginia.vcgr.genii.client.context.EncodedPropertyCache;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.filters.FilePatternFilterFactory;
@@ -133,8 +136,10 @@ public class RNSPath implements Serializable, Cloneable
 						createProxy(parent, EnhancedRNSPortType.class));
 					RNSEntryResponseType []entries = proxy.lookup(
 						_nameFromParent);
-					if (entries != null && entries.length == 1)
+					if (entries != null && entries.length == 1) {
 						_cachedEPR = entries[0].getEndpoint();
+						storeResourceConfigInCache();
+					}
 				}
 			}
 		}
@@ -179,8 +184,15 @@ public class RNSPath implements Serializable, Cloneable
 		if (_parent == null && _cachedEPR == null)
 			throw new IllegalArgumentException("Cannot have a null EPR for the root.");
 		
-		if (_cachedEPR != null)
+		if (_cachedEPR == null) {
+			_cachedEPR = 
+				(EndpointReferenceType) CacheManager.getItemFromCache(
+						pwd(), EndpointReferenceType.class);
+		}
+		if (_cachedEPR != null) {
 			_attemptedResolve = true;
+			storeResourceConfigInCache();
+		}
 	}
 	
 	/**
@@ -377,6 +389,7 @@ public class RNSPath implements Serializable, Cloneable
 		{
 			_cachedEPR = proxy.add(_nameFromParent);
 			_attemptedResolve = true;
+			storeResourceConfigInCache();
 		}
 		catch (RemoteException re)
 		{
@@ -441,7 +454,7 @@ public class RNSPath implements Serializable, Cloneable
 		{
 			_cachedEPR = proxy.createFile(_nameFromParent);
 			_attemptedResolve = true;
-			
+			storeResourceConfigInCache();
 			return _cachedEPR;
 		}
 		catch (RemoteException re)
@@ -978,6 +991,27 @@ public class RNSPath implements Serializable, Cloneable
 		{
 			throw new RNSException("Unable to delete entry.", re);
 		}
+	}
+
+	/*
+	 * RNSPath is the class that links between the client-side code and the web services
+	 * endPoints residing on the containers. So when we resolve an EPR for RNSPath or 
+	 * creating an RNSPath from some already cached EPR, we should store the rnsPath to
+	 * endPointIdentifier mapping of the concerned EPR in a resource configuration instance.
+	 * This configuration will subsequently bridge/govern cache related settings of any
+	 * information related to the EPR. This method also puts the EPR in the cache in case
+	 * it is already not there.
+	 * */
+	private void storeResourceConfigInCache() {
+		if (_cachedEPR == null) return;
+		WSName wsName = new WSName(_cachedEPR);
+		// In future, we have to support EPRs that do not have any valid endPointIdentifier 
+		// to make our caching strategy robust.
+		if (wsName.isValidWSName()) {
+			WSResourceConfig resourceConfig = new WSResourceConfig(wsName, pwd());
+			CacheManager.putItemInCache(wsName.getEndpointIdentifier(), resourceConfig);
+		}
+		CacheManager.putItemInCache(pwd(), _cachedEPR);
 	}
 	
 	/**

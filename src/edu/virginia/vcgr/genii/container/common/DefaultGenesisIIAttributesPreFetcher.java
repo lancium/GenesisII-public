@@ -59,22 +59,25 @@ public class DefaultGenesisIIAttributesPreFetcher<Type extends IResource>
 		return GenesisIIACLManager.getPermissions(acl, 
 			QueueSecurity.getCallerIdentities(false));
 	}
+	
+	protected AuthZConfig getAuthZConfig() throws Throwable {
+		IResource resource = getResource();
+		IAuthZProvider authZHandler = AuthZProviders.getProvider(
+				resource.getParentResourceKey().getServiceName());
+		AuthZConfig config = null;
+		if (authZHandler != null)
+			config = authZHandler.getAuthZConfig(resource);
+		return config;
+	}
 		
-	protected void fillInAttributes(
-		Collection<MessageElement> attributes)
-	{
-		try
-		{
-			Permissions p = getPermissions();
-			if (p != null)
-			{
-				attributes.add(new MessageElement(
-					GenesisIIBaseRP.PERMISSIONS_STRING_QNAME,
-					p.toString()));
+	protected void fillInAttributes(Collection<MessageElement> attributes) {
+		try {
+			AuthZConfig authConfig = getAuthZConfig();
+			if (authConfig != null) {
+				attributes.add(new MessageElement(GenesisIIBaseRP.AUTHZ_CONFIG_QNAME, authConfig));
 			}
 		}
-		catch (Throwable cause)
-		{
+		catch (Throwable cause) {
 			_logger.warn("Unable to fill in permissions attribute.", cause);
 		}
 	}

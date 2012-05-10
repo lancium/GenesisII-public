@@ -11,14 +11,11 @@ import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.fsii.DirectoryHandle;
-import edu.virginia.vcgr.fsii.FilesystemEntryType;
 import edu.virginia.vcgr.fsii.FilesystemStatStructure;
 import edu.virginia.vcgr.fsii.file.OpenFlags;
 import edu.virginia.vcgr.fsii.file.OpenModes;
 import edu.virginia.vcgr.fsii.path.FilesystemPathRepresentation;
 import edu.virginia.vcgr.fsii.path.UnixFilesystemPathRepresentation;
-import edu.virginia.vcgr.fsii.security.PermissionBits;
-import edu.virginia.vcgr.fsii.security.Permissions;
 import edu.virginia.vcgr.genii.client.fuse.exceptions.FuseExceptions;
 import edu.virginia.vcgr.genii.client.fuse.exceptions.FuseFunctionNotImplementedException;
 import edu.virginia.vcgr.genii.client.gfs.GenesisIIFilesystem;
@@ -39,69 +36,6 @@ public class GeniiFuseMount implements Filesystem
 	static private FilesystemPathRepresentation PATHREP =
 		UnixFilesystemPathRepresentation.INSTANCE;
 	
-	static private Permissions permissionsFromMode(int mode)
-	{
-		Permissions p = new Permissions();
-		
-		p.set(PermissionBits.OWNER_READ,
-				(mode & FuseStat.OWNER_READ) > 0);
-		p.set(PermissionBits.OWNER_WRITE,
-				(mode & FuseStat.OWNER_WRITE) > 0);
-		p.set(PermissionBits.OWNER_EXECUTE, 
-			(mode & FuseStat.OWNER_EXECUTE) > 0);
-		
-		p.set(PermissionBits.GROUP_READ,
-				(mode & FuseStat.GROUP_READ) > 0);
-		p.set(PermissionBits.GROUP_WRITE,
-				(mode & FuseStat.GROUP_WRITE) > 0);
-		p.set(PermissionBits.GROUP_EXECUTE, 
-			(mode & FuseStat.GROUP_EXECUTE) > 0);
-		
-		p.set(PermissionBits.EVERYONE_READ,
-				(mode & FuseStat.OTHER_READ) > 0);
-		p.set(PermissionBits.EVERYONE_WRITE, 
-			(mode & FuseStat.OTHER_WRITE) > 0);
-		p.set(PermissionBits.EVERYONE_EXECUTE, 
-			(mode & FuseStat.OTHER_EXECUTE) > 0);
-		
-		return p;
-	}
-	
-	static private int getMode(FilesystemStatStructure statstruct)
-	{
-		int mode = 0x0;
-		
-		Permissions p = statstruct.getPermissions();
-		if (p.isSet(PermissionBits.OWNER_READ))
-			mode |= FuseStat.OWNER_READ;
-		if (p.isSet(PermissionBits.OWNER_WRITE))
-			mode |= FuseStat.OWNER_WRITE;
-		if (p.isSet(PermissionBits.OWNER_EXECUTE))
-			mode |= FuseStat.OWNER_EXECUTE;
-		
-		if (p.isSet(PermissionBits.GROUP_READ))
-			mode |= FuseStat.GROUP_READ;
-		if (p.isSet(PermissionBits.GROUP_WRITE))
-			mode |= FuseStat.GROUP_WRITE;
-		if (p.isSet(PermissionBits.GROUP_EXECUTE))
-			mode |= FuseStat.GROUP_EXECUTE;
-		
-		if (p.isSet(PermissionBits.EVERYONE_READ))
-			mode |= FuseStat.OTHER_READ;
-		if (p.isSet(PermissionBits.EVERYONE_WRITE))
-			mode |= FuseStat.OTHER_WRITE;
-		if (p.isSet(PermissionBits.EVERYONE_EXECUTE))
-			mode |= FuseStat.OTHER_EXECUTE;
-		
-		FilesystemEntryType entryType = statstruct.getEntryType();
-		if (entryType == FilesystemEntryType.DIRECTORY)
-			mode |= FuseStat.TYPE_DIR;
-		else
-			mode |= FuseStat.TYPE_FILE;
-		
-		return mode;
-	}
-	
 	private int _uid;
 	private GenesisIIFilesystem _fs;
 	
@@ -121,7 +55,7 @@ public class GeniiFuseMount implements Filesystem
 		try
 		{
 			_fs.chmod(PATHREP.parse(null, path),
-				permissionsFromMode(mode));
+				MetadataManager.permissionsFromMode(mode));
 		}
 		catch (Throwable cause)
 		{
@@ -166,11 +100,12 @@ public class GeniiFuseMount implements Filesystem
 	public FuseStat getattr(String path) throws FuseException
 	{
 		_logger.trace(String.format("getattr(%s)", path));
-		
+		FilesystemStatStructure statstruct = MetadataManager.retrieveStat(path);
 		try
 		{
-			FilesystemStatStructure statstruct = _fs.stat(PATHREP.parse(
-				null, path));
+			if (statstruct == null) {
+				statstruct = _fs.stat(PATHREP.parse(null, path));
+			}
 			FuseStat ret = new FuseStat();
 			
 			ret.atime = (int)(statstruct.getLastAccessed() / 1000L);
@@ -178,7 +113,7 @@ public class GeniiFuseMount implements Filesystem
 			ret.mtime = (int)(statstruct.getLastModified() / 1000L);
 			ret.gid = 0;
 			ret.uid = _uid;
-			ret.mode = getMode(statstruct);
+			ret.mode = MetadataManager.getMode(statstruct);
 			ret.nlink = 1;
 			ret.size = statstruct.getSize();
 			ret.blocks = (int)(ret.size + (BLOCK_SIZE - 1)) / BLOCK_SIZE;
@@ -195,6 +130,9 @@ public class GeniiFuseMount implements Filesystem
 	public FuseDirEnt[] getdir(String path) throws FuseException
 	{
 		_logger.trace(String.format("getdir(%s)", path));
+		FuseDirEnt[] dirEntries = DirectoryManager.getDir(path);
+		if (dirEntries != null) return dirEntries;
+
 		DirectoryHandle dHandle = null;
 		LinkedList<FuseDirEnt> entries = new LinkedList<FuseDirEnt>();
 		
@@ -205,14 +143,10 @@ public class GeniiFuseMount implements Filesystem
 			while (iterator.hasNext())
 			{
 				FilesystemStatStructure struct = iterator.next();
-				FuseDirEnt entry = new FuseDirEnt();
-				entry.inode = struct.getINode();
-				entry.mode = getMode(struct);
-				entry.name = struct.getName();
-				
+				FuseDirEnt entry = DirectoryManager.createDirEntry(struct);
 				entries.add(entry);
 			}
-			
+			DirectoryManager.createDir(path, entries);
 			return entries.toArray(new FuseDirEnt[0]);
 		}
 		catch (Throwable cause)
@@ -247,7 +181,7 @@ public class GeniiFuseMount implements Filesystem
 		
 		try
 		{
-			_fs.mkdir(PATHREP.parse(null, path), permissionsFromMode(mode));
+			_fs.mkdir(PATHREP.parse(null, path), MetadataManager.permissionsFromMode(mode));
 		}
 		catch (Throwable cause)
 		{
@@ -266,7 +200,7 @@ public class GeniiFuseMount implements Filesystem
 			{
 				long fileHandle = _fs.open(PATHREP.parse(null, path), 
 					new OpenFlags(true, false, false, true),
-					OpenModes.READ_WRITE, permissionsFromMode(mode));
+					OpenModes.READ_WRITE, MetadataManager.permissionsFromMode(mode));
 				
 				// We don't close the file now because it's about to be opened
 				// and later released.  Instead, we put it into a table of

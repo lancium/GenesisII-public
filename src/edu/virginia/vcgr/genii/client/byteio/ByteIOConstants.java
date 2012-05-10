@@ -116,5 +116,16 @@ public class ByteIOConstants
 		new QName(STREAMABLE_BYTEIO_NS, "DestroyOnClose");
 	
 	static public int numThreads = 4;
-	 
+
+	static public QName rxferMechs = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.XFER_MECHS_ATTR_NAME);
+	static public QName rsize = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.SIZE_ATTR_NAME);
+	static public QName raccessTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.ACCESSTIME_ATTR_NAME);
+	static public QName rmodTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME);
+	static public QName rcreatTime = new QName(ByteIOConstants.RANDOM_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME);
+
+	static public QName sxferMechs = new QName(ByteIOConstants.STREAMABLE_BYTEIO_NS, ByteIOConstants.XFER_MECHS_ATTR_NAME);
+	static public QName ssize = new QName(ByteIOConstants.STREAMABLE_BYTEIO_NS, ByteIOConstants.SIZE_ATTR_NAME);
+	static public QName saccessTime = new QName(ByteIOConstants.STREAMABLE_BYTEIO_NS, ByteIOConstants.ACCESSTIME_ATTR_NAME);
+	static public QName smodTime = new QName(ByteIOConstants.STREAMABLE_BYTEIO_NS, ByteIOConstants.MODTIME_ATTR_NAME);
+	static public QName screatTime = new QName(ByteIOConstants.STREAMABLE_BYTEIO_NS, ByteIOConstants.CREATTIME_ATTR_NAME);
 }

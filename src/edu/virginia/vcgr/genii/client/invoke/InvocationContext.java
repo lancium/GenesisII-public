@@ -50,6 +50,14 @@ public class InvocationContext
 		return _callingContext;
 	}
 	
+	public Object[] getParams() {
+		return _params;
+	}
+
+	public void updateParams(Object[] newParams) {
+		_params = newParams;
+	}
+	
 	public Object proceed() throws Throwable
 	{
 		InvocationContext nextStage = new InvocationContext(this);

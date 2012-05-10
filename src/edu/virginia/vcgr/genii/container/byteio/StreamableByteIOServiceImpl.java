@@ -267,6 +267,7 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase
 			transType);
 		File myFile = null;
 		RandomAccessFile raf = null;
+		MessageElement[] byteIOAttrs = null;
 		
 		myFile = _resource.getCurrentFile();
 		try
@@ -281,6 +282,8 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase
 			raf.write(data);
 			_resource.setProperty(ISByteIOResource.POSITION_PROPERTY,
 				new Long(offset + data.length));
+			
+			byteIOAttrs = getByteIOAttributes(myFile, _resource);
 		}
 		catch (IOException ioe)
 		{
@@ -296,8 +299,8 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase
 			_resourceLock.unlock();
 		}
 		
-		return new SeekWriteResponse(new TransferInformationType(null,
-				transType.getTransferMechanism()));
+		return new SeekWriteResponse(new TransferInformationType(byteIOAttrs,
+                transType.getTransferMechanism()));
 	}
 	
 	static private int readFully(RandomAccessFile raf,
@@ -353,4 +356,20 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase
 		publisherTopic.publish(new ResourceTerminationContents(
 			Calendar.getInstance()));
 	}
+	
+	private MessageElement[] getByteIOAttributes(File currentFile, 
+			ISByteIOResource resource) throws ResourceException {
+
+		MessageElement[] attributes = new MessageElement[4];
+
+		long fileSize = currentFile.length();
+		attributes[0] = new MessageElement(ByteIOConstants.ssize, fileSize);
+		Calendar createTime = resource.getCreateTime();
+		attributes[1] = new MessageElement(ByteIOConstants.screatTime, createTime);
+		Calendar modTime = resource.getModTime();
+		attributes[2] = new MessageElement(ByteIOConstants.smodTime, modTime);
+		Calendar accessTime = resource.getAccessTime();
+		attributes[3] = new MessageElement(ByteIOConstants.saccessTime, accessTime);
+		return attributes;
+	}	
 }

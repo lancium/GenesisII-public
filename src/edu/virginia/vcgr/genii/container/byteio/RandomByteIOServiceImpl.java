@@ -54,6 +54,7 @@ import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.WellKnownPortTypes;
+import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.byteio.ByteIOOperations;
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransferer;
 import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransfererFactory;
@@ -71,7 +72,6 @@ import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ByteIOContentsChangedContents;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ByteIOTopics;
 import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver;
-import edu.virginia.vcgr.genii.container.byteio.TransferAgent;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
@@ -370,6 +370,8 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 		TransferInformationType transferInformation = write.getTransferInformation();
 		byte[] data = TransferAgent.receiveData(transferInformation);
 		RandomAccessFile raf = null;
+		MessageElement[] byteIOAttrs = null;
+		
 		try
 		{
 			_resourceLock.lock();
@@ -399,6 +401,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 			publisherTopic.publish(new ByteIOContentsChangedContents(
 				ByteIOOperations.Write, startOffset, bytesPerBlock, stride, data.length, vvr),
 				attachment);
+			byteIOAttrs = getByteIOAttributes(myFile, _resource);
 		}
 		catch (IOException ioe)
 		{
@@ -409,8 +412,8 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 			StreamUtils.close(raf);
 			_resourceLock.unlock();
 		}
-		return new WriteResponse(new TransferInformationType(null,
-			transferInformation.getTransferMechanism()));
+		return new WriteResponse(new TransferInformationType(byteIOAttrs,
+                transferInformation.getTransferMechanism()));
 	}
 
 	@RWXMapping(RWXCategory.WRITE)
@@ -428,6 +431,8 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 		TransferInformationType transferInformation = append.getTransferInformation();
 		byte[] data = TransferAgent.receiveData(transferInformation);
 		RandomAccessFile raf = null;
+		MessageElement[] byteIOAttrs = null;
+		
 		try
 		{
 			_resourceLock.lock();
@@ -448,6 +453,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 			publisherTopic.publish(new ByteIOContentsChangedContents(
 				ByteIOOperations.Append, startOffset, data.length, 0, data.length, vvr),
 				attachment);
+			byteIOAttrs = getByteIOAttributes(myFile, _resource);
 		}
 		catch (IOException ioe)
 		{
@@ -458,8 +464,8 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 			StreamUtils.close(raf);
 			_resourceLock.unlock();
 		}
-		return new AppendResponse(new TransferInformationType(null,
-			append.getTransferInformation().getTransferMechanism()));
+		return new AppendResponse(new TransferInformationType(byteIOAttrs,
+                append.getTransferInformation().getTransferMechanism()));
 	}
 
 	@RWXMapping(RWXCategory.WRITE)
@@ -477,6 +483,8 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 		TransferInformationType transferInformation = truncAppend.getTransferInformation();
 		byte[] data = TransferAgent.receiveData(transferInformation);
 		RandomAccessFile raf = null;
+		MessageElement[] byteIOAttrs = null;
+		
 		try
 		{
 			_resourceLock.lock();
@@ -497,6 +505,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 			publisherTopic.publish(new ByteIOContentsChangedContents(
 				ByteIOOperations.TruncAppend, startOffset, data.length, 0, data.length, vvr),
 				attachment);
+			byteIOAttrs = getByteIOAttributes(myFile, _resource);
 		}
 		catch (IOException ioe)
 		{
@@ -507,8 +516,8 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 			StreamUtils.close(raf);
 			_resourceLock.unlock();
 		}
-		return new TruncAppendResponse(new TransferInformationType(null,
-				truncAppend.getTransferInformation().getTransferMechanism()));
+		return new TruncAppendResponse(new TransferInformationType(byteIOAttrs,
+                truncAppend.getTransferInformation().getTransferMechanism()));
 	}
 	
 	/**
@@ -737,5 +746,20 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 			if (raf.length() < fileSize)
 				raf.setLength(fileSize);
 		}
+	}
+	
+	private MessageElement[] getByteIOAttributes(File currentFile, 
+			IRByteIOResource resource) throws ResourceException {
+
+		MessageElement[] attributes = new MessageElement[4];
+		long fileSize = currentFile.length();
+		attributes[0] = new MessageElement(ByteIOConstants.rsize, fileSize);
+		Calendar createTime = resource.getCreateTime();
+		attributes[1] = new MessageElement(ByteIOConstants.rcreatTime, createTime);
+		Calendar modTime = resource.getModTime();
+		attributes[2] = new MessageElement(ByteIOConstants.rmodTime, modTime);
+		Calendar accessTime = resource.getAccessTime();
+		attributes[3] = new MessageElement(ByteIOConstants.raccessTime, accessTime);
+		return attributes;
 	}
 }
