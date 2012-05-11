@@ -177,7 +177,7 @@ public class AttributeCacheHandler2 {
 		Object[] originalParameters = ctxt.getParams();
 		
 		for (QName orig : getMultipleResourcePropertiesRequest) {
-			_logger.info("Reqested parameter: " + orig);
+			_logger.trace("Reqested parameter: " + orig);
 		}
 		
 		List<QName> addedAttributeNames = 
@@ -200,7 +200,7 @@ public class AttributeCacheHandler2 {
 		if (result != null) {
 			return new GetResourcePropertyResponse(result.toArray(new MessageElement[0]));
 		}
-		_logger.info("Reqested resource property: " + getResourcePropertyRequest);
+		_logger.trace("Reqested resource property: " + getResourcePropertyRequest);
 		
 		GetResourcePropertyResponse response = 
 			(GetResourcePropertyResponse)ctxt.proceed();

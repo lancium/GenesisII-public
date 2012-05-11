@@ -37,7 +37,7 @@ public class CacheManager {
 				}
 				return cachedItem;
 			} catch (Exception ex) {
-				_logger.info("problem while retrieving objects from the cache", ex);
+				_logger.debug("problem while retrieving objects from the cache", ex);
 			}
 		}
 		return null;
@@ -57,7 +57,7 @@ public class CacheManager {
 				if (!cache.supportRetrievalByWildCard()) return null;
 				return cache.getWildCardMatches(target, cacheKeyWithWildCard);
 			} catch (Exception ex) {
-				_logger.info("problem while retrieving objects from the cache", ex);
+				_logger.debug("problem while retrieving objects from the cache", ex);
 			}
 		}
 		return null;
@@ -86,7 +86,7 @@ public class CacheManager {
 					putItemInCache(targetObject, cacheKey, value);
 				}
 			} catch (Exception ex) {
-				_logger.info("Cache: failed to process information", ex);
+				_logger.debug("Cache: failed to process information", ex);
 			}
 		}
 	}
@@ -105,7 +105,7 @@ public class CacheManager {
 					_logger.trace("Cache: failed to cache item " + cacheKey);
 				}
 			} catch (Exception ex) {
-				_logger.info("failed to cache item", ex);
+				_logger.debug("failed to cache item", ex);
 			}
 		}
 	}
@@ -141,7 +141,7 @@ public class CacheManager {
 					}
 				}
 			} catch (Exception ex) {
-				_logger.info("Could not remove cached item", ex);
+				_logger.debug("Could not remove cached item", ex);
 			}
 		}
 	}
@@ -169,7 +169,7 @@ public class CacheManager {
 					}
 				}
 			} catch (Exception ex) {
-				_logger.info("Could not update the lifetime of some cached items", ex);
+				_logger.debug("Could not update the lifetime of some cached items", ex);
 			}
 		}
 	}
@@ -184,7 +184,7 @@ public class CacheManager {
 					}
 				}
 			} catch (Exception ex) {
-				_logger.info("Could not remove cached item", ex);
+				_logger.debug("Could not remove cached item", ex);
 			}
 		}
 	}
