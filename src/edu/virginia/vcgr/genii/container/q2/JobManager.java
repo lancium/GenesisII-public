@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,6 +57,7 @@ import edu.virginia.vcgr.genii.client.queue.QueueConstants;
 import edu.virginia.vcgr.genii.client.queue.QueueStates;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.client.security.SecurityUtils;
 import edu.virginia.vcgr.genii.client.security.authz.AuthZSecurityException;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.AbstractSubscriptionFactory;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.BESActivityTopics;
@@ -112,6 +114,7 @@ public class JobManager implements Closeable
 	private JobStatusChecker _statusChecker;
 	private DatabaseConnectionPool _connectionPool;
 	private BESManager _besManager;
+	private String _lastUserScheduled;
 	
 	/**
 	 * A map of all jobs in the queue based off of the job's key in 
@@ -132,6 +135,13 @@ public class JobManager implements Closeable
 	 */
 	private TreeMap<SortableJobKey, JobData> _queuedJobs = 
 		new TreeMap<SortableJobKey, JobData>();
+	
+	/**
+	 * All jobs in the queue, separated into lists for each user. Each user
+	 * map is sorted like the full map above. 
+	 */
+	private HashMap<String, TreeMap<SortableJobKey, JobData>> _usersWithJobs =
+		new HashMap<String, TreeMap<SortableJobKey, JobData>>();
 	
 	/**
 	 * A map of all jobs currently running (or starting) in the queue.
@@ -216,9 +226,42 @@ public class JobManager implements Closeable
 				if (jobState.equals(QueueStates.QUEUED) || 
 					jobState.equals(QueueStates.REQUEUED))
 				{
-					_queuedJobs.put(new SortableJobKey(
-						job.getJobID(), job.getPriority(), 
-						job.getSubmitTime()), job);
+					// Get owner identities, and extract username of primary 
+					Collection<Long> jobID = new ArrayList<Long>();
+					jobID.add(job.getJobID());
+					
+					HashMap<Long, PartialJobInfo> jobInfo = 
+							_database.getPartialJobInfos(connection, jobID);
+					
+					Collection<Identity> identities = SecurityUtils.filterCredentials(
+							jobInfo.get(job.getJobID()).getOwners(), 
+							SecurityUtils.GROUP_TOKEN_PATTERN);
+					
+					identities = SecurityUtils.filterCredentials(identities, 
+							SecurityUtils.CLIENT_IDENTITY_PATTERN);
+					
+					String username = identities.iterator().next().toString();
+					
+					SortableJobKey jobKey = new SortableJobKey(
+							job.getJobID(), job.getPriority(), 
+							job.getSubmitTime());
+					
+					_queuedJobs.put(jobKey, job);
+					
+					// Also re-insert into user list
+					if (_usersWithJobs.containsKey(username))
+					{
+						_usersWithJobs.get(username).put(jobKey, job);
+					}
+					else 
+					{
+						TreeMap<SortableJobKey, JobData> userJobs = 
+								new TreeMap<SortableJobKey, JobData>();
+						
+						userJobs.put(jobKey, job);
+						_usersWithJobs.put(username, userJobs);
+					}
+					
 				} else if (jobState.equals(QueueStates.RUNNING) || job.getBESID() != null)
 				{
 					if (!jobState.equals(QueueStates.RUNNING))
@@ -357,9 +400,13 @@ public class JobManager implements Closeable
 		// is that we can't afford to forget that the BES container has a job
 		// on it that it's managing.  If we do, we will eventually leak memory
 		// on that container.
+		SortableJobKey jobKey = new SortableJobKey(job);
 		_runningJobs.remove(new Long(jobID));
-		_queuedJobs.remove(new SortableJobKey(job));
-
+		_queuedJobs.remove(jobKey);
+		for (TreeMap<SortableJobKey, JobData> user : _usersWithJobs.values()) {
+			user.remove(jobKey);
+		}
+		
 		/* In order to fail a job that was running, we need to make an outcall
 		 * to this BES container.  This is because, unless we terminate the
 		 * activity through the bes container, the container will never garbage
@@ -436,8 +483,13 @@ public class JobManager implements Closeable
 		// is that we can't afford to forget that the BES container has a job
 		// on it that it's managing.  If we do, we will eventually leak memory
 		// on that container.
-		_queuedJobs.remove(new SortableJobKey(job));
+		SortableJobKey jobKey = new SortableJobKey(job);
+		_queuedJobs.remove(jobKey);
 		_runningJobs.remove(new Long(jobID));
+		for (TreeMap<SortableJobKey, JobData> user : _usersWithJobs.values()) {
+			user.remove(jobKey);
+		}
+		
 		job.incrementRunAttempts();
 		
 		/* See failJob for a complete discussion of why we enqueue an outcall
@@ -474,8 +526,13 @@ public class JobManager implements Closeable
 		// is that we can't afford to forget that the BES container has a job
 		// on it that it's managing.  If we do, we will eventually leak memory
 		// on that container.
-		_queuedJobs.remove(new SortableJobKey(job));
+		SortableJobKey jobKey = new SortableJobKey(job);
+		_queuedJobs.remove(jobKey);
 		_runningJobs.remove(new Long(jobID));
+		for (TreeMap<SortableJobKey, JobData> user : _usersWithJobs.values()) {
+			user.remove(jobKey);
+		}
+		
 		job.incrementRunAttempts();
 		
 		Long besID = job.getBESID();
@@ -581,10 +638,31 @@ public class JobManager implements Closeable
 				jobID, QueueUtils.getJobName(jsdl), ticket, priority, state, 
 				submitTime, (short)0, history);
 			
+			SortableJobKey jobKey = new SortableJobKey(jobID, priority, submitTime);
+			
 			_jobsByID.put(new Long(jobID), job);
 			_jobsByTicket.put(ticket, job);
-			_queuedJobs.put(new SortableJobKey(jobID, priority, submitTime),
-				job);
+			_queuedJobs.put(jobKey,	job);
+			
+			// As jobs are added to the primary list, they are also added to the 
+			//   appropriate user list (newly created, if needed)
+			identities = SecurityUtils.filterCredentials(identities, 
+					SecurityUtils.CLIENT_IDENTITY_PATTERN);
+			
+			String username = identities.iterator().next().toString();
+			if (!_usersWithJobs.keySet().contains(username))
+			{
+				// This user has no jobs in the queue, add a set for him
+				TreeMap<SortableJobKey, JobData> jobs = 
+						new TreeMap<SortableJobKey, JobData>();
+				jobs.put(jobKey, job);
+				_usersWithJobs.put(username, jobs);
+			}
+			else
+			{
+				// Add the job to this user's set
+				_usersWithJobs.get(username).put(jobKey, job);
+			}
 			
 			/* We've just added a new job to the queue, so we have a new scheduling
 			 * opportunity.
@@ -1113,11 +1191,14 @@ public class JobManager implements Closeable
 			JobData data = _jobsByID.remove(jobID);
 			if (data != null)
 			{
+				SortableJobKey jobKey = new SortableJobKey(data);
 				/* Remove the job from all lists */
 				_jobsByTicket.remove(data.getJobTicket());
-				_queuedJobs.remove(new SortableJobKey(
-					data));
+				_queuedJobs.remove(jobKey);
 				_runningJobs.remove(jobID);
+				for (TreeMap<SortableJobKey, JobData> user : _usersWithJobs.values()) {
+					user.remove(jobKey);
+				}
 				
 				HistoryContainerService service = ContainerServices.findService(
 					HistoryContainerService.class);
@@ -1591,7 +1672,64 @@ public class JobManager implements Closeable
 	 */
 	synchronized public Collection<JobData> getQueuedJobs()
 	{
-		return _queuedJobs.values();
+		/*
+		 *  Note: This method changes the meaning of the "Priority" of a
+		 *  job. Previously, setting a higher priority meant a user could 
+		 *  push his job to the head of the line. Now, a high priority 
+		 *  only moves the job to the head of the user's queue, but the 
+		 *  user will still be scheduled in turn with other user's. This 
+		 *  lets a user prioritize his own jobs without compromising the 
+		 *  fairness of the overall queue scheduling.
+		 */
+		if (_usersWithJobs.size() > 1)
+		{
+			Collection<JobData> jobs = new ArrayList<JobData>();
+			
+			// Make a linked list to cycle through user names 
+			LinkedList<String> users = 
+					new LinkedList<String>(_usersWithJobs.keySet());
+			
+			// Move lastUserScheduled to the front
+			if (users.indexOf(_lastUserScheduled) > 0) {
+				while (!users.peekFirst().equals(_lastUserScheduled)) { 
+					users.addLast(users.removeFirst());
+				}
+				users.addLast(users.removeFirst());
+				_lastUserScheduled = users.getFirst();
+			}
+			else
+				_lastUserScheduled = users.getFirst();
+			
+			// Get a copy of the current job lists
+			HashMap<String, Iterator<JobData>> userJobs
+					= new HashMap<String, Iterator<JobData>>();
+			for (String user : users) {
+				userJobs.put(user, _usersWithJobs.get(user).values().iterator());
+			}
+			
+			while (!users.isEmpty()) {
+				// Get the next username from the list
+				String thisUser = users.removeFirst();
+				
+				// If the user has more jobs to schedule...
+				if (userJobs.get(thisUser).hasNext()) {
+					// take the first one for this user, then put him back in line
+					JobData nextJob = userJobs.get(thisUser).next();
+					jobs.add(nextJob);
+					users.addLast(thisUser);
+				}
+				else
+				{
+					// otherwise, take him out of the list
+					users.remove(thisUser);
+					userJobs.remove(thisUser);
+				}
+			}
+			
+			return jobs;
+		}
+		else
+			return _queuedJobs.values();
 	}
 	
 	/**
@@ -1628,7 +1766,11 @@ public class JobManager implements Closeable
 			/* Get the job off of the queued list and instead put him on the
 			 * running list.  Also, note which bes the jobs is assigned to.
 			 */
-			_queuedJobs.remove(new SortableJobKey(data));
+			SortableJobKey jobKey = new SortableJobKey(data);
+			_queuedJobs.remove(jobKey);
+			for (TreeMap<SortableJobKey, JobData> user : _usersWithJobs.values()) {
+				user.remove(jobKey);
+			}
 			data.setBESID(match.getBESID());
 			data.setJobState(QueueStates.STARTING);
 			_runningJobs.put(new Long(data.getJobID()), data);
@@ -2335,7 +2477,25 @@ public class JobManager implements Closeable
 					{
 						_logger.debug(String.format(
 							"Re-queuing job %s in the JobKiller.", _jobData));
-						_queuedJobs.put(new SortableJobKey(_jobData), _jobData);
+						
+						// Retrieve owner identities and extract primary username
+						Collection<Long> jobID = new ArrayList<Long>();
+						jobID.add(_jobData.getJobID());
+						HashMap<Long, PartialJobInfo> jobInfo = 
+								_database.getPartialJobInfos(connection, jobID);
+						
+						Collection<Identity> identities = SecurityUtils.filterCredentials( 
+								jobInfo.get(_jobData.getJobID()).getOwners(), 
+								SecurityUtils.GROUP_TOKEN_PATTERN);
+						identities = SecurityUtils.filterCredentials(identities, 
+								SecurityUtils.CLIENT_IDENTITY_PATTERN);
+						
+						String username = 
+								identities.iterator().next().toString();
+						
+						SortableJobKey jobKey = new SortableJobKey(_jobData);
+						_queuedJobs.put(jobKey, _jobData);
+						_usersWithJobs.get(username).put(jobKey, _jobData);
 					}
 				} else
 				{
