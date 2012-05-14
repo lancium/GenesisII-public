@@ -153,7 +153,13 @@
 	<import file="${src.dir}/jni/vcgrJniLibs.build.xml"/>
 
 	<!-- Build Targets -->
-	<target name="build" depends="jars,scripts,deployments"/>
+	<target name="build" depends="announce,jars,scripts,deployments"/>
+
+	<target name="announce"  >
+		<exec executable="java">
+		<arg value="-version"/>
+		</exec>
+	</target>
 
 	<target name="jars" depends="genii.container.jar,genii.client.jar,ogrsh.jar,genii.ws.jar,genii.wsdl.jar,morgan.utilities.jar,genii.dpages.jars"/>
 
@@ -375,6 +381,7 @@
 		<delete file="${basedir}/runContainer.sh"/>
 		<delete file="${basedir}/runContainer.bat"/>
 		<delete file="${basedir}/grid"/>
+		<delete file="${basedir}/context.xml"/>
 		<delete file="${basedir}/grid.bat"/>
 		<delete file="${basedir}/cert-tool"/>
 		<delete file="${basedir}/cert-tool.bat"/>
@@ -383,6 +390,14 @@
 		<delete>
 			<fileset dir="${basedir}/ApplicationWatcher"
 				includes="**/*.properties"/>
+		</delete>
+		<delete>
+			<fileset dir="${basedir}"
+				includes="**/*.log"/>
+		</delete>
+		<delete>
+			<fileset dir="${basedir}"
+				includes="**/*.log.*"/>
 		</delete>
         <antcall target="clean-all-scripts" />
 	</target>
@@ -469,16 +484,16 @@
 	</target>
 
 	<target name="register-ifs">
-		<copy file="${basedir}/jni-lib/IFS/nulmrx.sys"
+		<copy file="${basedir}/jni-libs/win32/IFS/nulmrx.sys"
 			tofile="${env.SystemRoot}/system32/drivers/nulmrx.sys"/>
-		<copy file="${basedir}/jni-lib/IFS/nulmrxnp.dll"
+		<copy file="${basedir}/jni-libs/win32/IFS/nulmrxnp.dll"
 			tofile="${env.SystemRoot}/system32/nulmrxnp.dll"/>
-		<copy file="${basedir}/jni-lib/IFS/GenesisIFSServer.exe"
+		<copy file="${basedir}/jni-libs/win32/IFS/GenesisIFSServer.exe"
 			tofile="${basedir}/GenesisIFSServer.exe"/>
 
 		<exec executable="cmd">
 			<arg value="/c"/>
-			<arg value="&quot;${basedir}/jni-lib/IFS/editRegistry.bat&quot;"/>
+			<arg value="&quot;${basedir}/jni-libs/win32/IFS/editRegistry.bat&quot;"/>
 			<arg value="&quot;${basedir}&quot;"/>
   		</exec>
 	</target>
