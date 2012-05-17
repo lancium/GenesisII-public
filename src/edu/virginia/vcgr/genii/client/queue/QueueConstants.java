@@ -23,4 +23,6 @@ public interface QueueConstants
 		"Attempt Number";
 	static final public String QUEUE_STARTED_HISTORY_PROPERTY =
 		"Queue Started";
+	
+	static final public int PREFERRED_BATCH_SIZE = 100;
 }

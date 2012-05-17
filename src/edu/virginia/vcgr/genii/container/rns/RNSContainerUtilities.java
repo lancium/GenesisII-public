@@ -3,13 +3,12 @@ package edu.virginia.vcgr.genii.container.rns;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.ggf.rns.LookupResponseType;
 import org.ggf.rns.RNSEntryResponseType;
 
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
-import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorEntry;
+import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorWrapper;
 import edu.virginia.vcgr.genii.container.iterator.IteratorBuilder;
 import edu.virginia.vcgr.genii.iterator.IterableElementType;
 import edu.virginia.vcgr.genii.iterator.IteratorInitializationType;
@@ -24,18 +23,18 @@ public class RNSContainerUtilities
 		return indexedTranslate(entries, builder, null);
 	}
 
+	
 	public static LookupResponseType indexedTranslate(
 			Iterable<RNSEntryResponseType> entries,
 			IteratorBuilder<Object> builder,
-			List<InMemoryIteratorEntry> indices) throws RemoteException
+			InMemoryIteratorWrapper imiw) throws RemoteException
 	{
 		
-		if(indices == null || indices.size()==0)
-			indices = null;
-		
+			
 		builder.preferredBatchSize(RNSConstants.PREFERRED_BATCH_SIZE);
 		builder.addElements(entries);
-		IteratorInitializationType iit = builder.create(indices);
+
+		IteratorInitializationType iit = builder.create(imiw);
 		Collection<RNSEntryResponseType> batch = null;
 		IterableElementType []iet = iit.getBatchElement();
 		if (iet != null && iet.length > 0)

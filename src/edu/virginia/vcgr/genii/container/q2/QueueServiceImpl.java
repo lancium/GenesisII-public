@@ -5,10 +5,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.rmi.RemoteException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
@@ -72,6 +74,7 @@ import edu.virginia.vcgr.genii.client.queue.QueueConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.ser.AnyHelper;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
@@ -86,10 +89,13 @@ import edu.virginia.vcgr.genii.container.bes.GeniiBESServiceImpl;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorEntry;
+import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorWrapper;
 import edu.virginia.vcgr.genii.container.iterator.IteratorBuilder;
 import edu.virginia.vcgr.genii.container.q2.forks.JobFork;
 import edu.virginia.vcgr.genii.container.q2.forks.JobInformationFork;
 import edu.virginia.vcgr.genii.container.q2.forks.RootRNSFork;
+import edu.virginia.vcgr.genii.container.q2.iterator.QueueInMemoryIteratorEntry;
 import edu.virginia.vcgr.genii.container.q2.resource.IQueueResource;
 import edu.virginia.vcgr.genii.container.q2.resource.QueueDBResourceFactory;
 import edu.virginia.vcgr.genii.container.q2.resource.QueueDBResourceProvider;
@@ -208,21 +214,21 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		}
 	}
 
-	private JobInformationType[] getStatus(String[] getStatusRequest)
-			throws RemoteException
+	private QueueInMemoryIteratorEntry getIterableStatus(String[] getStatusRequest)
+	throws RemoteException
+{
+
+	try
 	{
-		Collection<JobInformationType> jobs;
-		
-		try
-		{
-			jobs = _queueMgr.getJobStatus(getStatusRequest);
-			return jobs.toArray(new JobInformationType[0]);
-		}
-		catch (SQLException sqe)
-		{
-			throw new RemoteException("Unable to list jobs in queue.", sqe);
-		}
+		QueueInMemoryIteratorEntry qmie = _queueMgr.getIterableJobStatus(getStatusRequest);
+		return qmie;
 	}
+	
+	catch (SQLException sqe)
+	{
+		throw new RemoteException("Unable to list jobs in queue.", sqe);
+	}
+}
 	
 	@Override
 	@RWXMapping(RWXCategory.OPEN)
@@ -230,14 +236,25 @@ public class QueueServiceImpl extends ResourceForkBaseService
 			throws RemoteException
 	{
 		Collection<MessageElement> col = new LinkedList<MessageElement>();
+		QueueInMemoryIteratorEntry qmie = getIterableStatus(iterateStatusRequest);
+		List<InMemoryIteratorEntry> indices = new LinkedList<InMemoryIteratorEntry>();
 		
-		for (JobInformationType jit : getStatus(iterateStatusRequest))
+		for(JobInformationType jit : qmie.getReturnables())
 			col.add(AnyHelper.toAny(jit));
 		
+		if(qmie.isIterable())
+		{
+			for(String jobID: qmie.getIterableIDs())
+			{
+				indices.add(new InMemoryIteratorEntry(null, jobID, true));
+			}
+		}
+		
+		InMemoryIteratorWrapper imiw = new InMemoryIteratorWrapper(this.getClass().getName(), indices, _queueMgr);
 		IteratorBuilder<MessageElement> builder = iteratorBuilder();
-		builder.preferredBatchSize(100);
+		builder.preferredBatchSize(QueueConstants.PREFERRED_BATCH_SIZE);
 		builder.addElements(col);
-		return new IterateStatusResponseType(builder.create());
+		return new IterateStatusResponseType(builder.create(imiw));
 	}
 	
 	@Override
@@ -824,5 +841,36 @@ public class QueueServiceImpl extends ResourceForkBaseService
 	{
 		_resource.isAcceptingNewActivites(true);
 		return new StartAcceptingNewActivitiesResponseType();
+	}
+	
+	/*Do not change the name or signature of the below method. It is used in WSIteratorDBResource
+	 * using java-reflection.
+	 * 
+	 * If modifying: edit in WSIteratorDBResource.java and EnhancedRNSServiceImpl.java.
+	 * */
+	
+	public static MessageElement getIndexedContent(Connection connection,
+			InMemoryIteratorEntry entry, Object queueManager) throws ResourceException
+	{
+		if(queueManager == null || entry == null || connection == null)
+			throw new ResourceException("Unable to stat jobs in queue");
+			
+		QueueManager qMgr = (QueueManager)queueManager;
+		JobInformationType jit;
+		try
+		{
+			jit = qMgr.getStatusFromID(Long.parseLong(entry.getId()), connection);
+		}		
+		catch(GenesisIISecurityException gse)
+		{
+			throw new ResourceException("Unable to stat jobs in queue.", gse);
+		}
+		catch (SQLException sqe)
+		{
+			throw new ResourceException("Unable to stat jobs in queue.", sqe);
+		}
+		return AnyHelper.toAny(jit);
+		
+		
 	}
 }

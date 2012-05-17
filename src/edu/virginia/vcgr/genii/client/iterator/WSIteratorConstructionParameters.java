@@ -14,6 +14,7 @@ import org.morgan.util.GUID;
 
 import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorEntry;
+import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorWrapper;
 
 public class WSIteratorConstructionParameters extends ConstructionParameters implements Closeable
 {
@@ -29,8 +30,8 @@ public class WSIteratorConstructionParameters extends ConstructionParameters imp
 	transient private String _key;
 	
 	transient private boolean _isIndexedIterator;
-	
-	transient private List<InMemoryIteratorEntry> _indices;
+		
+	transient private InMemoryIteratorWrapper _imiw;
 	
 	/* For JAXB Only */
 	@SuppressWarnings("unused")
@@ -57,8 +58,8 @@ public class WSIteratorConstructionParameters extends ConstructionParameters imp
 				"Can't find original construction parameters!");
 		
 		_isIndexedIterator = original._isIndexedIterator;
-		_indices = original._indices;
 		_contentsIterator = original._contentsIterator;
+		_imiw = original._imiw;
 	}
 	
 	@Override
@@ -74,9 +75,9 @@ public class WSIteratorConstructionParameters extends ConstructionParameters imp
 	}
 	
 	public WSIteratorConstructionParameters(Iterator<MessageElement> contentsIterator,
-			int preferredBlockSize, List<InMemoryIteratorEntry> indices) 
+			int preferredBlockSize, InMemoryIteratorWrapper imiw) 
 	{
-	
+	//List<InMemoryIteratorEntry> indices
 		synchronized(this)
 		{
 			_key = new GUID().toString();
@@ -95,23 +96,24 @@ public class WSIteratorConstructionParameters extends ConstructionParameters imp
 		
 		_preferredBatchSize = preferredBlockSize;
 		
-		if(indices == null || (indices.size()==0))
+		if(imiw == null || imiw.getIndices() == null || imiw.getIndices().size() == 0)
 		{
 			_isIndexedIterator = false;
-			_indices = null;	
+			_imiw = null;
 		}
 		
+			
 		else
 		{
 			if(_contentsIterator == null)
 			{
 				_isIndexedIterator = true;
-				_indices = indices;
+				_imiw = imiw;
 			}
 			else
 			{
 				_isIndexedIterator = false;
-				_indices = null; //only serialized or id-based !
+				_imiw = null; ////only serialized or id-based !
 			}
 		}				
 		
@@ -153,6 +155,11 @@ public class WSIteratorConstructionParameters extends ConstructionParameters imp
 
 	public List <InMemoryIteratorEntry> getIndices() 
 	{
-		return _indices;
+		return _imiw.getIndices();
+	}
+	
+	public InMemoryIteratorWrapper getWrapper()
+	{
+		return _imiw;
 	}
 }

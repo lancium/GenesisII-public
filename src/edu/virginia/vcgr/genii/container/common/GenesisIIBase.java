@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -140,7 +139,6 @@ import edu.virginia.vcgr.genii.common.IterateHistoryEventsRequestType;
 import edu.virginia.vcgr.genii.common.IterateHistoryEventsResponseType;
 import edu.virginia.vcgr.genii.common.MatchingParameter;
 import edu.virginia.vcgr.genii.common.RemoveMatchingParameterResponseType;
-
 import edu.virginia.vcgr.genii.common.notification.NotifyResponseType;
 import edu.virginia.vcgr.genii.common.rfactory.ResourceCreationFaultType;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
@@ -170,7 +168,7 @@ import edu.virginia.vcgr.genii.container.invoker.SoapHeaderHandler;
 import edu.virginia.vcgr.genii.container.invoker.inject.MInjectionInvoker;
 import edu.virginia.vcgr.genii.container.invoker.timing.TimingHandler;
 import edu.virginia.vcgr.genii.container.iterator.AbstractIteratorBuilder;
-import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorEntry;
+import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorWrapper;
 import edu.virginia.vcgr.genii.container.iterator.IteratorBuilder;
 import edu.virginia.vcgr.genii.container.iterator.WSIteratorServiceImpl;
 import edu.virginia.vcgr.genii.container.resolver.IResolverFactoryProxy;
@@ -1647,8 +1645,10 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 		}
 		
 		@Override
-		final public IteratorInitializationType create(List<InMemoryIteratorEntry> indices) throws RemoteException
+		final public IteratorInitializationType create (InMemoryIteratorWrapper imiw) 
+		throws RemoteException
 		{
+			
 			IterableElementType []batchElements = null;
 			EndpointReferenceType iteratorEndpoint = null;
 			
@@ -1665,7 +1665,7 @@ public abstract class GenesisIIBase implements GeniiCommon, IContainerManaged,
 				
 			WSIteratorConstructionParameters consParms = 
 				new WSIteratorConstructionParameters(iterator(), 
-					preferredBatchSize(), indices);
+					preferredBatchSize(), imiw);
 			
 			try
 			{

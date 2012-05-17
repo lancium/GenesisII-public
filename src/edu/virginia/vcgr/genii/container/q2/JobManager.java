@@ -70,6 +70,7 @@ import edu.virginia.vcgr.genii.container.cservices.history.HistoryEventWriter;
 import edu.virginia.vcgr.genii.container.cservices.history.InMemoryHistoryEventSink;
 import edu.virginia.vcgr.genii.container.cservices.history.NullHistoryContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.q2.iterator.QueueInMemoryIteratorEntry;
 import edu.virginia.vcgr.genii.container.q2.summary.SlotSummary;
 import edu.virginia.vcgr.genii.container.rns.LegacyEntryType;
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
@@ -1102,6 +1103,461 @@ public class JobManager implements Closeable
 			throw new ResourceException(
 				"Unable to serialize owner information.", ioe);
 		}
+	}
+	
+	synchronized public JobInformationType getStatusFromID(Connection conn, Long jobID) throws ResourceException, SQLException, GenesisIISecurityException
+	{
+		
+		if(conn == null || jobID == null)
+			throw new ResourceException("Unable to query job status");
+		
+		JobData jobData = _jobsByID.get(jobID.longValue());
+		
+		if (jobData == null)
+			throw new ResourceException("A queried job has been removed from the queue");
+		
+		BESData besData = _besManager.findBES(jobData.getBESID());
+		String scheduledOn = null;
+		if (besData != null)
+			scheduledOn = besData.getName();
+		
+		Collection<Long> jobIDs = new LinkedList<Long>();
+		
+		jobIDs.add(jobID);
+		
+		HashMap<Long, PartialJobInfo> ownerMap = _database.getPartialJobInfos(conn, 
+				jobIDs);
+		
+		PartialJobInfo pji = ownerMap.get(jobID);
+		if(pji == null)
+			throw new ResourceException("A queried job has been removed from the queue");
+		
+		boolean isAdmin = QueueSecurity.isQueueAdmin();
+		Collection<Identity> callers = QueueSecurity.getCallerIdentities(true);
+		
+		try
+		{
+		
+			if(isAdmin || (QueueSecurity.isOwner(pji.getOwners(), callers)) )
+			{
+				return(new JobInformationType(
+					jobData.getJobTicket(),
+					QueueSecurity.convert(pji.getOwners()),
+					JobStateEnumerationType.fromString(
+						jobData.getJobState().name()),
+					(byte)jobData.getPriority(),
+					QueueUtils.convert(jobData.getSubmitTime()),
+					QueueUtils.convert(pji.getStartTime()),
+					QueueUtils.convert(pji.getFinishTime()),
+					new UnsignedShort(jobData.getRunAttempts()),
+					scheduledOn, jobData.getBESActivityStatus(),
+					jobData.jobName()));
+			}
+			
+			else
+				throw new GenesisIISecurityException(
+						"Not permitted to get status of job \"" 
+						+ jobData.getJobTicket() + "\".");
+			
+		}	
+		
+		catch(IOException ioe)
+		{
+			throw new ResourceException(
+					"Unable to serialize owner information.", ioe);			
+	
+		}
+				
+	}
+	
+	synchronized public QueueInMemoryIteratorEntry getIterableJobStatus(Connection connection, String[] jobs)
+	throws GenesisIISecurityException, ResourceException, SQLException 
+	{
+		if(connection == null)
+			throw new ResourceException("Unable to query job status");
+		
+		if(jobs == null || jobs.length == 0)
+		{
+			return(getIterableJobStatus(connection));			
+		}
+		
+		boolean isAdmin = QueueSecurity.isQueueAdmin();
+		Collection<JobInformationType> ret = new LinkedList<JobInformationType>();
+		Collection<String> toIterate = new LinkedList<String>();
+		
+		/* First, get the job IDs of all jobs requested by the
+		 * user.
+		 */
+		Collection<Long> jobIDs = new LinkedList<Long>();
+		
+		for (String ticket : jobs)
+		{
+			JobData data = _jobsByTicket.get(ticket);
+			if (data == null)
+				throw new ResourceException("Job \"" + ticket 
+					+ "\" does not exist in queue.");
+			
+			jobIDs.add(new Long(data.getJobID()));
+		}
+		
+				
+		if(isAdmin)
+		{
+			Collection<Long> batchSubset = new LinkedList<Long>();
+			Iterator<Long> it = jobIDs.iterator();
+			
+			HashMap<Long, PartialJobInfo> ownerMap;
+			
+			if(jobIDs.size() > QueueConstants.PREFERRED_BATCH_SIZE) //iterator has to be built
+			{				
+				for(int lcv=0; lcv< QueueConstants.PREFERRED_BATCH_SIZE; lcv++)
+				{
+					batchSubset.add(it.next());
+				}
+				
+				/* Now ask the database to fill in information about the subset
+				 * jobs that we don't have in memory (like owner).
+				 */
+				ownerMap = _database.getPartialJobInfos(connection, 
+						batchSubset);								
+			}
+			else
+			{
+				/* Now ask the database to fill in information about all
+				 * jobs that we don't have in memory (like owner).
+				 */
+				 ownerMap = _database.getPartialJobInfos(connection, jobIDs);
+			}
+				
+			
+			for (Long jobID : ownerMap.keySet())
+			{
+					JobData jobData = _jobsByID.get(jobID.longValue());
+					BESData besData = _besManager.findBES(jobData.getBESID());
+					String scheduledOn = null;
+					if (besData != null)
+						scheduledOn = besData.getName();
+					
+					PartialJobInfo pji = ownerMap.get(jobID);
+					try
+					{
+						ret.add(new JobInformationType(
+							jobData.getJobTicket(),
+							QueueSecurity.convert(pji.getOwners()),
+							JobStateEnumerationType.fromString(
+								jobData.getJobState().name()),
+							(byte)jobData.getPriority(),
+							QueueUtils.convert(jobData.getSubmitTime()),
+							QueueUtils.convert(pji.getStartTime()),
+							QueueUtils.convert(pji.getFinishTime()),
+							new UnsignedShort(jobData.getRunAttempts()),
+							scheduledOn, jobData.getBESActivityStatus(),
+							jobData.jobName()));
+					}
+					catch (IOException ioe)
+					{
+						throw new ResourceException(
+							"Unable to serialize owner information.", ioe);
+					}
+					
+				}	
+			
+			if(jobIDs.size() > QueueConstants.PREFERRED_BATCH_SIZE)
+			{
+				while(it.hasNext())
+				{
+					toIterate.add(it.next().toString());
+				}
+			}
+			
+			if(toIterate.size() == 0) //no iterator
+				return new QueueInMemoryIteratorEntry(false, ret, toIterate);
+			
+			else	//iterator needed
+				return new QueueInMemoryIteratorEntry(true, ret, toIterate);
+							
+			}
+			
+		
+		else //NotAdmin
+		{
+			HashMap<Long, PartialJobInfo> ownerMap =
+				_database.getPartialJobInfos(connection, jobIDs);
+			Iterator<Long> it = ownerMap.keySet().iterator();
+			Collection<Identity> callers = QueueSecurity.getCallerIdentities(true);
+			
+			try
+			{
+	
+				for(int lcv=0; lcv < QueueConstants.PREFERRED_BATCH_SIZE;lcv++)									
+				{
+					
+					if(it.hasNext())
+					{
+						Long jobID = it.next();
+						
+						JobData jobData = _jobsByID.get(jobID.longValue());
+						BESData besData = _besManager.findBES(jobData.getBESID());
+						String scheduledOn = null;
+						if (besData != null)
+							scheduledOn = besData.getName();
+						
+						PartialJobInfo pji = ownerMap.get(jobID);
+						
+						if (QueueSecurity.isOwner(pji.getOwners(), callers))
+						{
+							ret.add(new JobInformationType(
+							jobData.getJobTicket(),
+							QueueSecurity.convert(pji.getOwners()),
+							JobStateEnumerationType.fromString(
+								jobData.getJobState().name()),
+							(byte)jobData.getPriority(),
+							QueueUtils.convert(jobData.getSubmitTime()),
+							QueueUtils.convert(pji.getStartTime()),
+							QueueUtils.convert(pji.getFinishTime()),
+							new UnsignedShort(jobData.getRunAttempts()),
+							scheduledOn, jobData.getBESActivityStatus(),
+							jobData.jobName()));							
+							
+						}
+						
+						else
+						{
+							/* If the caller did not own a job, then we throw a
+							 * security exception.
+							 */
+							throw new GenesisIISecurityException(
+							"Not permitted to get status of job \"" 
+							+ jobData.getJobTicket() + "\".");
+						}
+						
+					}
+					
+					else	//There are less than first batch-size # of jobs 
+						break;
+				}
+			}
+			
+			catch(IOException ioe)
+			{
+				throw new ResourceException(
+					"Unable to serialize owner information.", ioe);
+			}
+			
+			
+			while(it.hasNext())	//we might have to build iterator
+			{
+					
+					Long jobID = it.next();
+					PartialJobInfo pji = ownerMap.get(jobID);
+					
+					if (QueueSecurity.isOwner(pji.getOwners(), callers)) //is the caller the owner of this job?
+					{
+						toIterate.add(jobID.toString());							
+					}
+					
+					else
+						throw new GenesisIISecurityException(
+								"Not permitted to get status of job \"" 
+								+ _jobsByID.get(jobID.longValue()).getJobTicket() + "\".");
+					
+			}
+				
+			
+			if(toIterate.size() == 0) //no iterator
+				return new QueueInMemoryIteratorEntry(false, ret, toIterate);
+			else	//iterator needed
+				return new QueueInMemoryIteratorEntry(true, ret, toIterate);
+			
+		}
+		
+		
+	}
+	
+	
+	
+	synchronized public QueueInMemoryIteratorEntry getIterableJobStatus(Connection connection) throws GenesisIISecurityException, ResourceException, SQLException 
+	{
+		
+		HashMap<Long, PartialJobInfo> ownerMap;
+		Collection<JobInformationType> ret = new LinkedList<JobInformationType>();
+		Collection<String> toIterate = new LinkedList<String>();
+		
+		if(connection == null)
+			throw new ResourceException("Unable to query job status");
+		
+		boolean isAdmin = QueueSecurity.isQueueAdmin();		
+		
+		if(isAdmin) //is the caller qAdmin ?
+		{
+			
+			Iterator<Long> it = _jobsByID.keySet().iterator();			
+			Collection<Long> batchSubset = new LinkedList<Long>();
+			
+			if(_jobsByID.size() > QueueConstants.PREFERRED_BATCH_SIZE)	//iterator will be built
+			{
+				for(int lcv=0; lcv< QueueConstants.PREFERRED_BATCH_SIZE; lcv++)
+				{
+					batchSubset.add(it.next()); //grabs the first batch-size amount of jobs
+				}
+				
+				//gets database-stored info of these subset jobs
+				ownerMap = _database.getPartialJobInfos(connection, 
+						batchSubset);
+			}
+			
+			
+			else //iterator will not be built
+			{
+				//grabs database-stored info of all jobs
+				ownerMap = _database.getPartialJobInfos(connection, 
+						_jobsByID.keySet());
+			}
+			
+						
+			for (Long jobID : ownerMap.keySet())
+			{
+				/* Get the in-memory information for this job */
+				String scheduledOn = null;
+				JobData jobData = _jobsByID.get(jobID);
+				BESData besData = _besManager.findBES(jobData.getBESID());
+				if (besData != null)
+					scheduledOn = besData.getName();
+					
+				try
+				{
+					/* Get the database information for this job */
+					PartialJobInfo pji = ownerMap.get(jobID);
+					
+					ret.add(new JobInformationType(
+							jobData.getJobTicket(),
+							QueueSecurity.convert(pji.getOwners()),
+							JobStateEnumerationType.fromString(
+								jobData.getJobState().name()),
+							(byte)jobData.getPriority(),
+							QueueUtils.convert(jobData.getSubmitTime()),
+							QueueUtils.convert(pji.getStartTime()),
+							QueueUtils.convert(pji.getFinishTime()),
+							new UnsignedShort(jobData.getRunAttempts()),
+							scheduledOn, jobData.getBESActivityStatus(),
+							jobData.jobName()));
+				}
+				
+				catch (IOException ioe)
+				{
+					throw new ResourceException(
+						"Unable to get job status for job \"" +
+						jobData.getJobTicket() + "\".", ioe);
+							
+				}
+					
+			}
+			
+			if(_jobsByID.size() > QueueConstants.PREFERRED_BATCH_SIZE)
+			{
+				while(it.hasNext())
+				{
+					toIterate.add(it.next().toString());
+				}
+			}
+			
+			if(toIterate.size() == 0) //no iterator
+				return new QueueInMemoryIteratorEntry(false, ret, toIterate);
+			
+			else	//iterator needed
+				return new QueueInMemoryIteratorEntry(true, ret, toIterate);
+			
+			
+		}
+		
+		else
+		{
+			
+			/* We need to get a few pieces of information that only the database
+			 * has, such as job owner.
+			 */
+			ownerMap = _database.getPartialJobInfos(connection, 
+					_jobsByID.keySet());
+			
+			Collection<Identity> callers = QueueSecurity.getCallerIdentities(true);
+			Set<Long> jobIDs = ownerMap.keySet();
+			Iterator<Long> it = jobIDs.iterator();
+			
+			for(int lcv=0; lcv<QueueConstants.PREFERRED_BATCH_SIZE;)
+			{
+				
+				if(it.hasNext()) //are there more jobs to look at ?
+				{
+					Long jobID = it.next(); //get the next job
+					
+					/* Get the in-memory information for this job */
+					String scheduledOn = null;
+					JobData jobData = _jobsByID.get(jobID);
+					BESData besData = _besManager.findBES(jobData.getBESID());
+					if (besData != null)
+						scheduledOn = besData.getName();
+					
+					
+					try
+					{
+						/* Get the database information for this job */
+						PartialJobInfo pji = ownerMap.get(jobID);
+						
+						if (QueueSecurity.isOwner(pji.getOwners(), callers)) //is the caller the owner of this job?
+						{
+							ret.add(new JobInformationType(
+									jobData.getJobTicket(),
+									QueueSecurity.convert(pji.getOwners()),
+									JobStateEnumerationType.fromString(
+									jobData.getJobState().name()),
+									(byte)jobData.getPriority(),
+									QueueUtils.convert(jobData.getSubmitTime()),
+									QueueUtils.convert(pji.getStartTime()),
+									QueueUtils.convert(pji.getFinishTime()),
+									new UnsignedShort(jobData.getRunAttempts()),
+									scheduledOn, jobData.getBESActivityStatus(),
+									jobData.jobName()));
+							lcv++;
+						}
+						
+					}
+					
+					catch (IOException ioe)
+					{
+						throw new ResourceException(
+							"Unable to get job status for job \"" +
+							jobData.getJobTicket() + "\".", ioe);
+							
+					}
+					
+				}
+				else	//no more jobs
+					break;
+				
+			}
+			
+			
+			while(it.hasNext())
+			{
+					
+				Long jobID = it.next(); //get the next job												
+				/* Get the database information for this job */
+				PartialJobInfo pji = ownerMap.get(jobID);
+						
+				if (QueueSecurity.isOwner(pji.getOwners(), callers)) //is the caller the owner of this job?
+				{
+					toIterate.add(jobID.toString());							
+				}
+			
+			}
+			
+			if(toIterate.size() == 0) //no iterator
+				return new QueueInMemoryIteratorEntry(false, ret, toIterate);
+			else	//iterator needed
+				return new QueueInMemoryIteratorEntry(true, ret, toIterate);
+		}
+		
+		
 	}
 	
 	synchronized public JobErrorPacket[] queryErrorInformation(

@@ -1,5 +1,7 @@
 package edu.virginia.vcgr.genii.container.iterator.resource;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -26,14 +28,14 @@ import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorEntry;
+import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorWrapper;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
-import edu.virginia.vcgr.genii.container.rns.EnhancedRNSServiceImpl;
 
 public class WSIteratorDBResource extends BasicDBResource
 	implements WSIteratorResource
 {
-	static Map<String,List<InMemoryIteratorEntry>> mapper = new HashMap<String,List<InMemoryIteratorEntry>>();
+	static Map<String,InMemoryIteratorWrapper> mapper = new HashMap<String,InMemoryIteratorWrapper>();
 	static Map<String, Boolean> type = new HashMap<String, Boolean>();
 	static Object _lock = new Object();
 	
@@ -122,21 +124,22 @@ public class WSIteratorDBResource extends BasicDBResource
 		
 		else
 		{
-			List<InMemoryIteratorEntry> imieList = consParms.getIndices();
-			if(imieList.size() > 0 )
+			InMemoryIteratorWrapper imiw = consParms.getWrapper();
+			
+			if(imiw == null || imiw.getIndices() == null || imiw.getIndices().size() == 0)
 			{
 				synchronized(_lock)
 				{
-					mapper.put(getKey(), imieList);
-					type.put(getKey(), true);
+					type.put(getKey(), false);
 				}
 			
 			}
 			else
 			{
 				synchronized (_lock)
-				{
-					type.put(getKey(), false);
+				{					
+					mapper.put(getKey(), imiw);
+					type.put(getKey(), true);
 				}
 			}
 			
@@ -152,7 +155,8 @@ public class WSIteratorDBResource extends BasicDBResource
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		Boolean isIndexed = false;
-		List<InMemoryIteratorEntry> imieList = null;
+		InMemoryIteratorWrapper imiw = null;
+	
 		
 		synchronized (_lock) 
 		{
@@ -163,7 +167,7 @@ public class WSIteratorDBResource extends BasicDBResource
 			}
 			if(isIndexed == true)
 			{
-				imieList = mapper.get(getKey());				
+				imiw = mapper.get(getKey());				
 			}	
 		}
 		
@@ -210,6 +214,26 @@ public class WSIteratorDBResource extends BasicDBResource
 		{
 			firstElement = Math.max(firstElement, 0);
 			numElements = Math.max(numElements, 0);
+			List<InMemoryIteratorEntry> imieList = imiw.getIndices();
+			Object commonObj = imiw.getCommonMember();//loop-invariant
+			String invokee = imiw.getClassName();
+			Class<?> clazz;
+			Method meth;
+			
+			try
+			{
+				clazz = Class.forName(invokee);
+				meth = clazz.getMethod("getIndexedContent", new Class[] {Connection.class, InMemoryIteratorEntry.class, Object.class});
+			}
+			catch(ClassNotFoundException e)
+			{
+				throw new ResourceException("Unable to retrieve entries!", e);
+			}
+			catch (NoSuchMethodException e)
+			{
+				throw new ResourceException("Unable to retrieve entries!", e);
+			}
+			
 			int lastElement = Math.min(firstElement + numElements -1, imieList.size()-1);
 			
 			
@@ -218,9 +242,29 @@ public class WSIteratorDBResource extends BasicDBResource
 				InMemoryIteratorEntry entry = imieList.get(lcv);
 				if(entry!=null)
 				{
-					//call function in RNS. We will make this generic later when we extend it to Q
-					MessageElement me = EnhancedRNSServiceImpl.getIndexedContent(getConnection(),entry);
-					ret.add(new Pair<Long, MessageElement>((long)lcv, me));
+					
+					try 
+					{
+						
+						MessageElement me = (MessageElement)meth.invoke(null, getConnection(),entry, commonObj);
+						ret.add(new Pair<Long, MessageElement>((long)lcv, me));
+					}
+					
+					
+					 
+					catch (IllegalArgumentException e) 
+					{
+						throw new ResourceException("Unable to retrieve entries!", e);
+					}
+					catch (IllegalAccessException e) 
+					{
+						throw new ResourceException("Unable to retrieve entries!", e);
+					}
+					catch (InvocationTargetException e) 
+					{
+						throw new ResourceException("Unable to retrieve entries!", e);
+					}														
+					
 				}
 			}
 			return ret;
@@ -235,7 +279,8 @@ public class WSIteratorDBResource extends BasicDBResource
 		ResultSet rs = null;
 		
 		Boolean isIndexed;	
-		List<InMemoryIteratorEntry> imieList = null;
+		
+		InMemoryIteratorWrapper imiw = null;
 		
 		synchronized (_lock) 
 		{
@@ -245,13 +290,14 @@ public class WSIteratorDBResource extends BasicDBResource
 				"Unable to query iterator for it's size!");
 			
 			if(isIndexed == true)
-			{
-				imieList = mapper.get(getKey());
-				if(imieList==null)
+			{			
+				imiw = mapper.get(getKey());
+				
+				if(imiw==null)
 					throw new ResourceException(
 						"Unable to query iterator for it's size!");
 				else
-					return imieList.size();
+					return imiw.getIndices().size();
 			}	
 		}
 		

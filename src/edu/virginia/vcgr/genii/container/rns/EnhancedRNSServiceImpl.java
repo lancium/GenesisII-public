@@ -75,6 +75,7 @@ import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.invoker.timing.Timer;
 import edu.virginia.vcgr.genii.container.invoker.timing.TimingSink;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorEntry;
+import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorWrapper;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceLock;
@@ -464,10 +465,11 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 		Timer createTimer = tSink.getTimer("Create Iterator");
 		try
 		{
-		
+			InMemoryIteratorWrapper imiw = new InMemoryIteratorWrapper(this.getClass().getName(), indices, null);
+			
 			return RNSContainerUtilities.indexedTranslate(
 					resultEntries, iteratorBuilder(
-						RNSEntryResponseType.getTypeDesc().getXmlType()), indices);
+						RNSEntryResponseType.getTypeDesc().getXmlType()), imiw);
 		}
 		finally
 		{
@@ -579,10 +581,17 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 		return entryReference;
 	}
 
+	/*Do not change the name or signature of the below method. It is used in WSIteratorDBResource
+	 * using java-reflection.
+	 * 
+	 * If modifying: edit in WSIteratorDBResource.java and QueueServiceImpl.java .
+	 * */
 	public static MessageElement getIndexedContent(Connection connection,
-			InMemoryIteratorEntry entry) throws ResourceException
+			InMemoryIteratorEntry entry, Object obj) throws ResourceException
 	{
-	
+		if(connection == null || entry == null)	//obj will be null as it is unused
+			throw new ResourceException("Unable to list directory contents"); 
+			
 		RNSEntryResponseType resp = null;
 		
 		if(!entry.isExistent())

@@ -44,6 +44,7 @@ import edu.virginia.vcgr.genii.container.cservices.infomgr.InformationPortal;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 import edu.virginia.vcgr.genii.container.q2.besinfo.BESInformation;
 import edu.virginia.vcgr.genii.container.q2.besinfo.BESInformationResolver;
+import edu.virginia.vcgr.genii.container.q2.iterator.QueueInMemoryIteratorEntry;
 import edu.virginia.vcgr.genii.container.q2.summary.HostDescription;
 import edu.virginia.vcgr.genii.container.q2.summary.ResourceSummary;
 import edu.virginia.vcgr.genii.container.q2.summary.SlotSummary;
@@ -545,6 +546,28 @@ public class QueueManager implements Closeable
 		throws SQLException
 	{
 		_jobManager.checkJobStatus(jobID);
+	}
+	
+	public JobInformationType getStatusFromID(Long jobID, Connection conn) 
+	throws ResourceException, GenesisIISecurityException, SQLException
+	{
+		return(_jobManager.getStatusFromID(conn, jobID));
+	}
+	
+	public QueueInMemoryIteratorEntry getIterableJobStatus(String []jobs)
+	throws SQLException, ResourceException, GenesisIISecurityException
+	{
+		Connection connection = null;
+	
+		try
+		{
+			connection = _connectionPool.acquire(true); 
+			return _jobManager.getIterableJobStatus(connection, jobs);
+		}
+		finally
+		{
+			_connectionPool.release(connection);
+		}
 	}
 	
 	public Collection<JobInformationType> getJobStatus(String []jobs)
