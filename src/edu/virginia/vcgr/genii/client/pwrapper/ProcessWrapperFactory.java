@@ -9,6 +9,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.configuration.Installation;
@@ -17,6 +19,8 @@ import edu.virginia.vcgr.jsdl.ProcessorArchitecture;
 
 public class ProcessWrapperFactory
 {
+    static private Log _logger = LogFactory.getLog(ProcessWrapperFactory.class);
+    
 	static private class ProcessThreadFactory implements ThreadFactory
 	{
 		@Override
@@ -92,8 +96,10 @@ public class ProcessWrapperFactory
 		
 		File binDir = Installation.getProcessWrapperBinPath();
 		File pwrapperPath = null;
+
+		_logger.info("ProcessWrapperFactory: arch is " + desiredArch + ", OS is " + desiredOSName);		
 		
-		if (desiredOSName == OperatingSystemNames.Windows_XP)
+		if (desiredOSName.isWindows())
 		{
 			if (desiredArch == null || 
 				desiredArch == ProcessorArchitecture.x86 ||
