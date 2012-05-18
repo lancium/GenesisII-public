@@ -381,7 +381,6 @@
 		<delete file="${basedir}/runContainer.sh"/>
 		<delete file="${basedir}/runContainer.bat"/>
 		<delete file="${basedir}/grid"/>
-		<delete file="${basedir}/context.xml"/>
 		<delete file="${basedir}/grid.bat"/>
 		<delete file="${basedir}/cert-tool"/>
 		<delete file="${basedir}/cert-tool.bat"/>

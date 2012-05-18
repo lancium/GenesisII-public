@@ -75,7 +75,6 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements
 	private MessageSecurity _messageSec = null;
 	private ICallingContext _callContext = null;
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
 	protected boolean checkReceiverResults(Vector wsResult, Vector actions)
 	{
 		// checks to see if the security operations performed are the

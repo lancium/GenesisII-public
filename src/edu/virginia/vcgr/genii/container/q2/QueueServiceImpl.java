@@ -444,7 +444,7 @@ public class QueueServiceImpl extends ResourceForkBaseService
 				(QueueDBResourceFactory)ResourceManager.getServiceResource(_serviceName
 					).getProvider().getFactory()).getConnectionPool();
 			
-			_logger.debug("Restarting all BES Managers.");
+			_logger.info("Restarting all BES Managers.");
 			QueueManager.startAllManagers(connectionPool);
 		}
 		catch (Exception e)

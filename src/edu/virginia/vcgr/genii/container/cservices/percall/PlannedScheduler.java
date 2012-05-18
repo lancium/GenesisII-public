@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.morgan.util.Pair;
 
 public class PlannedScheduler implements AttemptScheduler
@@ -13,6 +16,8 @@ public class PlannedScheduler implements AttemptScheduler
 	
 	private List<Long> _schedule;
 	
+	static private Log _logger = LogFactory.getLog(PlannedScheduler.class);
+
 	private void addToSchedule(Long value)
 	{
 		if (value <= 0L)
@@ -48,13 +53,16 @@ public class PlannedScheduler implements AttemptScheduler
 	@Override
 	final public Calendar nextAttempt(Calendar now, int numFailedAttempts)
 	{
-		if (numFailedAttempts > _schedule.size())
+		if (numFailedAttempts > _schedule.size()) {
+			_logger.debug("PlanSched: scheduler says item failed too many times.");
 			return null;
+		}
 		
 		Calendar then = Calendar.getInstance();
 		then.setTimeInMillis(now.getTimeInMillis() + 
 			_schedule.get(numFailedAttempts - 1));
 		
+		_logger.debug("PlanSched: scheduler says item must wait until " + then);
 		return then;
 	}
 }

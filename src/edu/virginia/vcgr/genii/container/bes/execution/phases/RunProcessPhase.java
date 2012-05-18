@@ -220,9 +220,14 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 			{
 				if (_countAsFailedAttempt)
 				{
-					history.warn("Process Forcably Killed");
-					throw new ContinuableExecutionException(
-						"The process was forcably killed.");
+				    String msg = "The process was forceably killed";
+					history.warn(msg);
+					_logger.warn(msg);
+					throw new ContinuableExecutionException(msg);
+				}
+				else
+				{
+					_logger.debug("hard terminate was true, but this is not to count as failed attempt.  ignoring.");
 				}
 				
 				return;
@@ -258,7 +263,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 		{
 			synchronized(_processLock)
 			{
-				history.debug("Process Interrupted - Killing");
+				history.warn("Process Interrupted - Killing");
 				destroyProcess(_process);
 				_process = null;
 			}

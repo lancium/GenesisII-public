@@ -183,7 +183,7 @@ public class QueueManager implements Closeable
 	 * Get the queue manager for a given queue key (create it if it 
 	 * doesn't already exist).
 	 * 
-	 * @param queueid THe queue key to acquire a manager for.
+	 * @param queueid The queue key to acquire a manager for.
 	 * 
 	 * @return The queue manager with the given key.
 	 * 

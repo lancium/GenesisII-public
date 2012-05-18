@@ -3,6 +3,9 @@ package edu.virginia.vcgr.genii.container.cservices.percall;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class PeriodicScheduler implements AttemptScheduler
 {
 	static final long serialVersionUID = 0L;
@@ -11,6 +14,8 @@ public class PeriodicScheduler implements AttemptScheduler
 	private Integer _maxFailedAttempts;
 	private long _period;
 	
+	static private Log _logger = LogFactory.getLog(PeriodicScheduler.class);
+
 	public PeriodicScheduler(Calendar lifetime, Integer maxFailedAttempts,
 		long period, TimeUnit periodUnits)
 	{	
@@ -49,12 +54,17 @@ public class PeriodicScheduler implements AttemptScheduler
 	@Override
 	final public Calendar nextAttempt(Calendar now, int numFailedAttempts)
 	{
-		if (_lifetime != null && now.after(_lifetime))
+		if (_lifetime != null && now.after(_lifetime)) {
+			_logger.debug("PerioSched: scheduler says item lifetime has passed.");
 			return null;
-		if (_maxFailedAttempts != null && numFailedAttempts >= _maxFailedAttempts)
+		}
+		if (_maxFailedAttempts != null && numFailedAttempts >= _maxFailedAttempts) {
+			_logger.debug("PerioSched: scheduler says item failed too many times.");
 			return null;
+		}
 		
 		Calendar next = Calendar.getInstance();
+		_logger.debug("PerioSched: scheduler says item must wait " + _period + " milliseconds.");
 		next.setTimeInMillis(System.currentTimeMillis() + _period);
 		return next;
 	}

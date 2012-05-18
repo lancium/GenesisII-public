@@ -111,13 +111,11 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 			}
 			
 			entry.numAttempts(entry.numAttempts() + 1);
-			Calendar nextAttempt = 
-				entry.scheduler().nextAttempt(
-						Calendar.getInstance(), entry.numAttempts());
+                        _logger.debug("entry " + entry.entryID() + " now at " + entry.numAttempts() + " attempts.");
+			Calendar nextAttempt = entry.scheduler().nextAttempt(Calendar.getInstance(), entry.numAttempts());
 			if (nextAttempt == null)
 			{
-				_logger.warn(
-					"Giving up on persistent outcall that we could never make.");
+				_logger.warn("Giving up on persistent outcall that we could never make.");
 				PersistentOutcallDatabase.remove(connection, entry);
 			} else
 			{
@@ -171,7 +169,14 @@ public class PersistentOutcallContainerService extends AbstractContainerService
 			_logger.warn(
 				"Persistent outcall service tried to make outcall, but " +
 				"got an exception -- putting it back in the list.", cause);
-			reAdd(connection, entry);
+                        try
+                        {
+                            reAdd(connection, entry);
+                        }
+                        catch (Throwable inner_cause)
+                        {
+                                _logger.error("Unexpected exception--unable to re-add outcall to list.", inner_cause);
+                        }
 			try
 			{
 				connection.commit();

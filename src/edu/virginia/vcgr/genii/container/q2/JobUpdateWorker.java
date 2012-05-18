@@ -100,10 +100,16 @@ public class JobUpdateWorker implements OutcallHandler
 			 * database.
 			 */
 			connection = _connectionPool.acquire(false);
-			EndpointReferenceType jobEndpoint = _jobEndpointResolver.getJobEndpoint(
-				connection, _jobInfo.getJobID());
+			EndpointReferenceType jobEndpoint = null;
+			try {
+				jobEndpoint = _jobEndpointResolver.getJobEndpoint(connection, _jobInfo.getJobID());
+			} catch (Throwable cause) {
+				String message = String.format("Failure to get job endpoint on job %s with connection=%s jobId=%s", _data, connection, _jobInfo.getJobID()); 
+				_logger.error(message);
+				history.error(message);
+                                throw cause;
+			}
 			besID = _jobInfo.getBESID();
-			// String besName = _clientStubResolver.getBESName(besID);
 			GeniiBESPortType clientStub = _clientStubResolver.createClientStub(
 				connection, besID);
 			try { connection.commit(); } catch (Throwable c) {}

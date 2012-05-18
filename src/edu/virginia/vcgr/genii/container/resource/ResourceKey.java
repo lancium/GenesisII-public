@@ -127,7 +127,7 @@ public class ResourceKey implements Closeable
 		{
 			if (!noExceptions)
 			{
-				_logger.warn("An exception occured, so closing the resource.");
+				_logger.warn("ResourceKey: An exception occured in ctor(string,map), so closing the resource.");
 				StreamUtils.close(_cachedResource);
 			}
 		}	
@@ -164,6 +164,7 @@ public class ResourceKey implements Closeable
 		{
 			if (!noExceptions)
 			{
+				_logger.debug("ResourceKey: An exception occured in ctor(string,addrParms), so closing the resource.");
 				StreamUtils.close(_cachedResource);
 			}
 		}

@@ -9,6 +9,7 @@ import java.security.GeneralSecurityException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -117,6 +118,10 @@ public class JobManager implements Closeable
 	private BESManager _besManager;
 	private String _lastUserScheduled;
 	
+        private volatile ArrayList<Long> _pendingChecks;  // pending job status checks, performed during slack time.
+        private volatile Calendar _whenToProcessNotifications;  // the time when we should check all the pending status notifications.
+        private final int NOTIFICATION_CHECKING_DELAY = 5 * 1000;  // how frequently to check for notifications.
+	
 	/**
 	 * A map of all jobs in the queue based off of the job's key in 
 	 * the database.
@@ -164,9 +169,11 @@ public class JobManager implements Closeable
 		
 		loadFromDatabase(connection);
 		
-	ContainerServices.findService(
-			HistoryContainerService.class).loadQueue(connection);
+		ContainerServices.findService(HistoryContainerService.class).loadQueue(connection);
 		 
+                _whenToProcessNotifications = Calendar.getInstance();
+                _whenToProcessNotifications.add(Calendar.MILLISECOND, NOTIFICATION_CHECKING_DELAY);
+	        _pendingChecks = new ArrayList<Long>();
 		_statusChecker = new JobStatusChecker(connectionPool, this, _STATUS_CHECK_FREQUENCY);
 	}
 	
@@ -304,8 +311,8 @@ public class JobManager implements Closeable
 	 * @param connection The database connection to use.
 	 * @param jobID The ID of the job to fail.
 	 * @param countAsAnAttempt Indicate whether or not this failure should
-	 * cound against the job's maximum attempt count.
-	 * @return True if the job was requed, false otherwise.
+	 * count against the job's maximum attempt count.
+	 * @return True if the job was requeued, false otherwise.
 	 * @throws SQLException
 	 * @throws ResourceException
 	 */
@@ -517,6 +524,9 @@ public class JobManager implements Closeable
 		if (job == null)
 		{
 			// don't know where it went, but it's no longer our responsibility.
+			_logger.debug(String.format(
+				"Couldn't find job for id %d, so I can't kill it.",
+				jobID));
 			return;
 		}
 		
@@ -580,6 +590,11 @@ public class JobManager implements Closeable
 		JobDefinition_Type jsdl, short priority) 
 		throws SQLException, ResourceException
 	{
+                // bump out the notification checking time, because this is a real queue job that we
+                // want to give precedence.
+                _whenToProcessNotifications = Calendar.getInstance();
+                _whenToProcessNotifications.add(Calendar.MILLISECOND, NOTIFICATION_CHECKING_DELAY);
+
 		try
 		{
 			/* First, generate a new ticket for the job.  If we were being 
@@ -674,6 +689,7 @@ public class JobManager implements Closeable
 		}
 		catch (IOException ioe)
 		{	
+			_logger.debug("Failed to submit job from jsdl: " + jsdl.toString());
 			throw new ResourceException("Unable to submit job.", ioe);
 		}
 	}
@@ -1866,7 +1882,29 @@ public class JobManager implements Closeable
 		rescheduleJobs(connection, jobsToReschedule);
 	}
 	
-	synchronized public void checkJobStatus(long jobID)
+        synchronized public void checkJobStatus(long jobID) {
+            _logger.debug("adding record to check on job status for: " + jobID);
+            _pendingChecks.add(jobID);
+        }
+
+        // tends to notifications we've already heard about for jobs that may be complete.
+        synchronized public void handlePendingJobStatusChecks()
+        {
+            if (_whenToProcessNotifications.after(Calendar.getInstance()))
+                return;  // not time yet.
+            while (_pendingChecks.size() > 0) {
+                long jobId = _pendingChecks.get(0);
+                _pendingChecks.remove(0);
+                _logger.debug("JobManager: scheduling job status check on: " + jobId);
+                scheduleAJobStatusCheck(jobId);
+            }
+            // reset for the next time to check notified statuses.
+            _whenToProcessNotifications = Calendar.getInstance();
+            _whenToProcessNotifications.add(Calendar.MILLISECOND, NOTIFICATION_CHECKING_DELAY);
+        }
+    
+        // adds an item to the queue to later perform a job status check on jobID. 
+	synchronized public void scheduleAJobStatusCheck(long jobID)
 	{
 		int originalCount = _outcallThreadPool.size();
 		
@@ -1879,14 +1917,18 @@ public class JobManager implements Closeable
 		history.createTraceWriter("Checking Running Job Status").format(
 			"Checking job status as the result of a received" +
 			" asynchronous notification.").close();
-		
-		/* For convenience, we bundle together the id's of the
-		 * job to check, and the bes container on which it is
-		 * running.
-		 */
-		JobCommunicationInfo info = new JobCommunicationInfo(
-			job.getJobID(), job.getBESID().longValue());
-		
+
+		JobCommunicationInfo info = null;
+		try {
+			/* For convenience, we bundle together the id's of the
+		 	* job to check, and the bes container on which it is
+		 	* running.
+		 	*/
+			info = new JobCommunicationInfo(job.getJobID(), job.getBESID().longValue());
+		} catch (Throwable cause) {
+			_logger.error("Saw unexpected exception when creating job communication info for job: " + jobID, cause);
+			return;
+		}
 		/* As in other places, we use a callback mechanism to
 		 * allow outcall threads to late bind "large" information
 		 * at the last minute.  This keeps us from putting too
@@ -1901,13 +1943,13 @@ public class JobManager implements Closeable
 		/* Enqueue the worker into the outcall thread pool */
 		_outcallThreadPool.enqueue(new JobUpdateWorker(
 			this, resolver, resolver, _connectionPool, info, job));
-	
-	int newCount = _outcallThreadPool.size();
-	
-	_logger.debug(String.format(
-		"Just finished enqueing a bunch of jobs into the thread pool " +
-		"and the thread pool size grew from %d jobs to %d jobs.", 
-		originalCount, newCount));
+
+		int newCount = _outcallThreadPool.size();
+
+		_logger.debug(String
+				.format("Just finished enqueing a bunch of jobs into the thread pool "
+						+ "and the thread pool size grew from %d jobs to %d jobs.",
+						originalCount, newCount));
 	}
 	
 	synchronized public Map<String, Long> summarizeToMap()
@@ -1955,7 +1997,7 @@ public class JobManager implements Closeable
 	
 	/**
 	 * This method is called periodically by a watcher thread to check on the
-	 * current statuses of all jobs running in the queue (the poll'ing method
+         * current statuses of all jobs running in the queue (the polling method
 	 * of checking whether or not a job has run to completion or failed or is
 	 * still running).
 	 * 
@@ -1970,6 +2012,9 @@ public class JobManager implements Closeable
 		throws SQLException, ResourceException,
 			GenesisIISecurityException
 	{
+	        // reset any stored notifications, since we're checking everything.
+                _pendingChecks = new ArrayList<Long>();
+
 		int originalCount = _outcallThreadPool.size();
 		
 		/* Iterate through all running jobs and enqueue a worker to
@@ -2821,6 +2866,10 @@ public class JobManager implements Closeable
 					"Attempted to kill activity %s which was " +
 					"already undergoing another action:  %s", 
 					_jobData, oldAction));
+				// we cannot arbitrarily decide to keep going;
+				// that's a violation of trust for the other actors
+				// who check/use the action flag.
+				return null;
 			}
 			
 			try
@@ -2976,8 +3025,5 @@ public class JobManager implements Closeable
 				_connectionPool.release(connection);
 			}
 		}
-	}
-	
-	
-	
+	}	
 }

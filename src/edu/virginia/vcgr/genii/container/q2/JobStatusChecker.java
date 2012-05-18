@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.container.q2;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.util.Calendar;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,14 +22,20 @@ public class JobStatusChecker
 	volatile private boolean _closed = false;
 	private DatabaseConnectionPool _connectionPool;
 	private JobManager _manager;
-	private long _updateFrequency;
+	private long _updateFrequency;  // provided by caller for the slower status checking interval.
+	private int STATUS_THREAD_PERIOD = 5 * 1000;  // notified status update checking interval, in milliseconds.
+	// tracks when the next long running status check should occur.
+	private volatile Calendar _nextSlowCheck;
 	
 	public JobStatusChecker(DatabaseConnectionPool connectionPool,
 		JobManager manager, long updateFrequency)
 	{
+	        _logger.debug("creating JobStatusChecker object.");
 		_connectionPool = connectionPool;
 		_manager = manager;
 		_updateFrequency = updateFrequency;
+    		_nextSlowCheck = Calendar.getInstance();
+    		_nextSlowCheck.add(Calendar.MILLISECOND, (int) updateFrequency);
 	
 		/* Start the thread */
 		Thread thread = new Thread(new UpdaterWorker());
@@ -52,46 +59,53 @@ public class JobStatusChecker
 		
 		_closed = true;
 	}
-	
+
 	/**
 	 * This is an internal class that actually does the work for the thread.
 	 * @author mmm2a
 	 */
 	private class UpdaterWorker implements Runnable
 	{
+                private void performSlowRunningCheck()
+                {
+                    _logger.debug("performing the periodic and slow running check for all job statuses");                    
+                    Connection connection = null;
+                    try {
+                        /*
+                         * Acquire a connection from the connection pool and ask the manager to check the
+                         * job statuses.
+                         */
+                        connection = _connectionPool.acquire(true);
+                        _manager.checkJobStatuses(connection);
+                    } catch (Throwable cause) {
+                        _logger.warn("Unable to check job statuses in queue.", cause);
+                    } finally {
+                        _connectionPool.release(connection);
+                    }
+                }
+                
+                private void performNotifiedStatusChecks() {
+                    _manager.handlePendingJobStatusChecks();                        
+                }
+	    
 		public void run()
 		{
 			while (!_closed)
 			{
-				Connection connection = null;
-				
-				try
-				{
-					/* Acquire a connection from the connection pool and ask
-					 * the manager to check the job statuses.
-					 */
-					connection = _connectionPool.acquire(true);
-					_manager.checkJobStatuses(connection);
-				}
-				catch (Throwable cause)
-				{
-					_logger.warn(
-						"Unable to check job statuses in queue.", cause);
-				}
-				finally
-				{
-					_connectionPool.release(connection);
-				}
-				
-				try
-				{
-					/* Now, wait an update cycle and repeat. */
-					Thread.sleep(_updateFrequency);
-				}
-				catch (InterruptedException ie)
-				{
-					Thread.interrupted();
-				}
+			    // we do the checks on notifications every time through the loop.
+			    performNotifiedStatusChecks();
+			    // we only do the periodic status check every so often, as controlled by the update frequency.
+			    if (_nextSlowCheck.before(Calendar.getInstance())) {
+			        performSlowRunningCheck();
+                                _nextSlowCheck = Calendar.getInstance();
+                                _nextSlowCheck.add(Calendar.MILLISECOND, (int) _updateFrequency);
+			    }
+	                    try {
+	                        /* Now, wait an update cycle and repeat. */
+	                        Thread.sleep(STATUS_THREAD_PERIOD);
+	                    } catch (InterruptedException ie) {
+	                        Thread.interrupted();
+	                    }
 			}
 		}
 	}

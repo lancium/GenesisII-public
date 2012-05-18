@@ -4,6 +4,9 @@ import java.util.Calendar;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * A type of scheduler that implements an exponential backoff on scheduling
  * (with the possibility of a random jitter or twitter added to the schedule).
@@ -21,6 +24,8 @@ public class ExponentialBackoffScheduler implements AttemptScheduler
 	private long _backoffBase;
 	private Long _backoffTwitterBase = null;
 	private Integer _exponentAttemptCap = null;
+
+	static private Log _logger = LogFactory.getLog(ExponentialBackoffScheduler.class);
 	
 	public ExponentialBackoffScheduler(
 		Calendar lifetime, Integer maxFailedAttempts,
@@ -79,10 +84,15 @@ public class ExponentialBackoffScheduler implements AttemptScheduler
 			(countedFailedAttempts > _exponentAttemptCap))
 				countedFailedAttempts = _exponentAttemptCap;
 		
-		if (_lifetime != null && now.after(_lifetime))
+		if (_lifetime != null && now.after(_lifetime)) {
+			_logger.debug("ExpBacOSched: scheduler says item lifetime has passed.");
 			return null;
-		if (_maxFailedAttempts != null && numFailedAttempts >= _maxFailedAttempts)
+		}
+		if (_maxFailedAttempts != null && numFailedAttempts >= _maxFailedAttempts) {
+			_logger.debug("ExpBacOSched: scheduler says item failed too many times.");
 			return null;
+		}
+
 		
 		long delay = _backoffBase << (countedFailedAttempts - 1);
 		if (_backoffTwitterBase != null)
@@ -97,6 +107,7 @@ public class ExponentialBackoffScheduler implements AttemptScheduler
 			delay = 0L;
 		
 		Calendar next = Calendar.getInstance();
+		_logger.debug("ExpBacOSched: scheduler says item must wait " + delay + " milliseconds.");
 		next.setTimeInMillis(now.getTimeInMillis() + delay);
 		return next;
 	}
