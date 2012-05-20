@@ -1,6 +1,9 @@
 package edu.virginia.vcgr.genii.client.cmd.tools;
 
+import java.rmi.RemoteException;
+import java.util.Collection;
 import java.util.List;
+import java.util.Stack;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
@@ -19,6 +22,7 @@ import edu.virginia.vcgr.genii.client.naming.ResolverDescription;
 import edu.virginia.vcgr.genii.client.naming.ResolverUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
+import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 import edu.virginia.vcgr.genii.client.security.authz.acl.ResourceSecurityPolicy;
@@ -118,13 +122,16 @@ public class ReplicateTool extends BaseGridTool
 		{
 			linkRNS = current.lookup(linkPath, RNSPathQueryFlags.MUST_NOT_EXIST);
 		}
+		// Setup existing resource tree before creating new resources.
 		if (type.isRNS() && _policy)
 		{
-			GeniiCommon dirService = ClientUtils.createProxy(GeniiCommon.class, sourceEPR);
-			MessageElement[] elementArr = new MessageElement[1];
-			elementArr[0] = new MessageElement(GeniiDirPolicy.REPLICATION_POLICY_QNAME, "true");
-			InsertResourceProperties insertReq = new InsertResourceProperties(new InsertType(elementArr));
-			dirService.insertResourceProperties(insertReq);
+			Stack<RNSPath> stack = new Stack<RNSPath>();
+			stack.push(sourceRNS);
+			while (stack.size() > 0)
+			{
+				RNSPath currentRNS = stack.pop();
+				addPolicy(currentRNS, stack);
+			}
 		}
 		MessageElement[] elementArr = new MessageElement[2];
 		elementArr[0] = new MessageElement(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM,
@@ -154,6 +161,25 @@ public class ReplicateTool extends BaseGridTool
 		return 0;
 	}
 	
+	private void addPolicy(RNSPath currentRNS, Stack<RNSPath> stack)
+		throws RemoteException, RNSException
+	{
+		stdout.println("addPolicy " + currentRNS);
+		GeniiCommon dirService = ClientUtils.createProxy(GeniiCommon.class, currentRNS.getEndpoint());
+		MessageElement[] elementArr = new MessageElement[1];
+		elementArr[0] = new MessageElement(GeniiDirPolicy.REPLICATION_POLICY_QNAME, "true");
+		InsertResourceProperties insertReq = new InsertResourceProperties(new InsertType(elementArr));
+		dirService.insertResourceProperties(insertReq);
+
+		Collection<RNSPath> contents = currentRNS.listContents();
+		for (RNSPath child : contents)
+		{
+			TypeInformation type = new TypeInformation(child.getEndpoint());
+			if (type.isRNS())
+				stack.push(child);
+		}
+	}
+	
 	/**
 	 * Destroy a single replica without destroying the entire virtual resource.
 	 * (Note -- "rm file" destroys all replicas.)
@@ -162,6 +188,9 @@ public class ReplicateTool extends BaseGridTool
 	 * element, then this may failover and destroy the wrong replica.
 	 * 
 	 * Ideally, specify a pathname of an EPR with no resolver.
+	 *
+	 * Recursive destroy replica is not supported because of the risk of
+	 * destroying replicas on other containers or unreplicated resources.
 	 */
 	private int destroyReplica() throws Throwable
 	{

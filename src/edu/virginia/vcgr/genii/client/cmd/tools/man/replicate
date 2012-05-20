@@ -10,10 +10,6 @@ The replicate tool tells the resolver that the new replica exists.
 
 The options are:
 
--r | --recursive
-
-After replicating the given RNS directory, replicate every resource that's in the directory. Replicate subdirectories recursively.
-
 -p | --policy
 
-After replicating the given RNS directory, update the directory's policies. When the directory receives an update message which says that resource N has been added to some instance of the directory, it responds by both (1) replicating resource N in its own container, and (2) adding resource N to its contents. This option works well with the --recursive option.
+Set the given directory's policy to "auto-replicate". When an auto-replicating directory receives an update message which says that resource N has been added to some instance of the directory, it responds by replicating resource N in its own container before adding resource N to its contents. This option is recursive.  The replicate tool will find every subdirectory of the given directory, and it will set each one to auto-replicate.
