@@ -260,12 +260,9 @@ public class JobUpdateWorker implements OutcallHandler
 				ActivityState state = new ActivityState(
 					activityStatuses[0].getActivityStatus());
 				
-				//Only add to log/history if status changed
-				if (!oldState.equals(state)){
-					_logger.debug(String.format(
-							"Job %s has activity status %s.", _data, state));
-					history.trace("Job Status on BES:  %s", state);
-				}
+				_logger.debug(String.format(
+						"Job %s has activity status %s.", _data, state));
+				history.trace("Job Status on BES:  %s", state);
 				
 				if (state.isFailedState())
 				{
