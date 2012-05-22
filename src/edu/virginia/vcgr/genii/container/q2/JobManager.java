@@ -1912,12 +1912,6 @@ public class JobManager implements Closeable
 		if (job == null || job.getBESID() == null)
 			return;
 		
-		HistoryContext history = job.history(HistoryEventCategory.Checking);
-		
-		history.createTraceWriter("Checking Running Job Status").format(
-			"Checking job status as the result of a received" +
-			" asynchronous notification.").close();
-
 		JobCommunicationInfo info = null;
 		try {
 			/* For convenience, we bundle together the id's of the
@@ -2041,8 +2035,10 @@ public class JobManager implements Closeable
 			
 			HistoryContext history = job.history(HistoryEventCategory.Checking);
 			
-			history.trace("Checking Running Job Status");
-			
+			history.createTraceWriter("Checking Running Job Status").format(
+				"Checking job status as the result of a received" +
+				" asynchronous notification.").close();
+
 			/* For convenience, we bundle together the id's of the
 			 * job to check, and the bes container on which it is
 			 * running.
