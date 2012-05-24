@@ -24,12 +24,21 @@ import edu.virginia.vcgr.genii.client.naming.ResolverUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.notification.NotificationConstants;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.AdditionalUserData;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.AbstractSubscriptionFactory;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.subscribe.SubscribeRequest;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicQueryExpression;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.GenesisIIBaseTopics;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
+import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.resolver.GeniiResolverServiceImpl;
+import edu.virginia.vcgr.genii.container.resolver.SimpleResolverTerminateUserData;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.resolver.CountRequestType;
 import edu.virginia.vcgr.genii.resolver.ExtResolveRequestType;
 import edu.virginia.vcgr.genii.resolver.GeniiResolverPortType;
+import edu.virginia.vcgr.genii.resolver.UpdateRequestType;
+import edu.virginia.vcgr.genii.resolver.UpdateResponseType;
 
 public class VersionedResourceUtils
 {
@@ -293,5 +302,75 @@ public class VersionedResourceUtils
 	public static void destroySubscription(IResource publisher, EndpointReferenceType consumerEPR)
 	{
 		// TODO - implement destroySubscription()
+	}
+	
+	/**
+	 * A new replica calls this function to tell a resolver that the replica exists.
+	 * The resolver responds with the replica's targetID.
+	 * Then, the replica updates its own state so that it will tell the resolver when
+	 * it is terminated.
+	 */
+	public static UpdateResponseType updateResolver(List<ResolverDescription> resolverList,
+			EndpointReferenceType myEPR, String resourceKey)
+		throws RemoteException
+	{
+		// We only need to successfully update one resolver, since the resolver is a replicated
+		// resource that uses persistent notifications to keep the replicas in sync.
+		RemoteException firstException = null;
+		for (ResolverDescription resolver : resolverList)
+		{
+			try
+			{
+				return updateResolver(resolver.getEPR(), myEPR, resolver.getEPI(), resourceKey);
+			}
+			catch (RemoteException exception)
+			{
+				if (firstException == null)
+					firstException = exception;
+			}
+		}
+		throw firstException;
+	}
+	
+	private static UpdateResponseType updateResolver(EndpointReferenceType resolverEPR,
+			EndpointReferenceType myEPR, URI targetEPI, String resourceKey)
+		throws RemoteException
+	{
+		GeniiResolverPortType resolverService = ClientUtils.createProxy(
+				GeniiResolverPortType.class, resolverEPR);
+		UpdateResponseType response = resolverService.update(new UpdateRequestType(myEPR));
+
+		if (targetEPI == null)
+		{
+			WSName myName = new WSName(myEPR);
+			targetEPI = myName.getEndpointIdentifier();
+		}
+		int targetID = response.getTargetID();
+		AdditionalUserData userData = new SimpleResolverTerminateUserData(targetEPI, targetID);
+		userData = fixAdditionalUserData(userData);
+		TopicQueryExpression topicFilter = GenesisIIBaseTopics.RESOURCE_TERMINATION_TOPIC.
+				asConcreteQueryExpression();
+		// SubscriptionPolicy policy = new PersistentNotificationSubscriptionPolicy();
+		SubscribeRequest request = AbstractSubscriptionFactory.createRequest(
+				resolverEPR, topicFilter, null, userData);
+		GenesisIIBase.processSubscribeRequest(resourceKey, request);
+		
+		return response;
+	}
+	
+	/**
+	 * I have absolutely no idea why this is necessary or what it does.
+	 */
+	private static AdditionalUserData fixAdditionalUserData(AdditionalUserData userData)
+	{
+		try
+		{
+			MessageElement me = AdditionalUserData.toMessageElement(userData);
+			return AdditionalUserData.fromElement(AdditionalUserData.class, me);
+		}
+		catch (Exception exception)
+		{
+			return userData;
+		}
 	}
 }

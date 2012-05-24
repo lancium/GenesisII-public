@@ -344,7 +344,17 @@ public class GeniiResolverServiceImpl extends GenesisIIBase
 		}
 		resource.addTargetEPR(targetEPI, targetID, targetEPR);
 		GeniiResolverUtils.updateNextTargetID(resource, targetEPI, targetID);
-		GeniiResolverUtils.createTerminateSubscription(targetID, targetEPR, null, resource);
+		if (targetID == 0)
+		{
+			// With a new resource (targetID == 0), the resolver initiates the conversation.
+			// The resolver tells the resource, "tell me when you are terminated."
+			//
+			// With a replica (targetID > 0), the replica initiates the conversation.
+			// It tells the resolver, "I will tell you when I am terminated."
+			//
+			// Thus, only subscribe when targetID == 0.
+			GeniiResolverUtils.createTerminateSubscription(targetID, targetEPR, null, resource);
+		}
 		return targetID;
 	}
 	
@@ -605,9 +615,14 @@ public class GeniiResolverServiceImpl extends GenesisIIBase
 			try
 			{
 				_resourceLock.lock();
+				VersionVector vvr = VersionedResourceUtils.incrementResourceVersion(_resource);
 				_resource.removeTargetEPR(targetEPI, targetID);
 				_logger.debug("resolver: destroyed targetID=" + targetID);
 				_resource.commit();
+				
+				TopicSet space = TopicSet.forPublisher(GeniiResolverServiceImpl.class);
+				PublisherTopic publisherTopic = space.createPublisherTopic(RESOLVER_UPDATE_TOPIC);
+				publisherTopic.publish(new ResolverUpdateContents(targetEPI, targetID, vvr));
 			}
 			finally
 			{
@@ -643,7 +658,8 @@ public class GeniiResolverServiceImpl extends GenesisIIBase
 				return NotificationConstants.FAIL;
 			}
 			EndpointReferenceType targetEPR = contents.entryReference();
-			if (targetEPR == null)
+			URI targetEPI = contents.targetEPI();
+			if ((targetEPR == null) && (targetEPI == null))
 			{
 				_logger.warn("SimpleResolverServiceImpl.notify: targetEPR is null");
 				return NotificationConstants.FAIL;
@@ -651,7 +667,6 @@ public class GeniiResolverServiceImpl extends GenesisIIBase
 			VersionVector remoteVector = contents.versionVector();
 			
 			IGeniiResolverResource resource = _resource;
-			boolean replay = false;
 			try
 			{
 				_resourceLock.lock();
@@ -661,44 +676,35 @@ public class GeniiResolverServiceImpl extends GenesisIIBase
 						resource, localVector, remoteVector);
 				if (flags.status != null)
 					return flags.status;
-				WSName wsname = new WSName(targetEPR);
-				URI targetEPI = wsname.getEndpointIdentifier();
-				EndpointReferenceType currentEPR = resource.getTargetEPR(targetEPI, targetID);
-				if (currentEPR != null)
+				
+				// TODO - resolve add/add conflicts and add/delete conflicts.
+				
+				if (targetEPR == null)
 				{
-					if (flags.replay)
-					{
-						// Handle add/add conflict like a directory. The non-replayed entry
-						// remains at targetID, and the replayed entry gets a new targetID.
-						// BUG: This does not necessarily fix all third-parties.
-						int[] targetIDList = resource.getTargetIDList(targetEPI);
-						int maxTargetID = targetIDList[targetIDList.length-1];
-						targetID = maxTargetID + 1;
-					}
-					else
-					{
-						// TODO: Unsubscribe from currentEPR.  Replace currentEPR with targetEPR.
-						// currentEPR will be re-added by replay message.
-					}
+					_logger.debug("notify: remove targetID=" + targetID);
+					resource.removeTargetEPR(targetEPI, targetID);
 				}
-				_logger.debug("notify: add targetID=" + targetID);
-				resource.addTargetEPR(targetEPI, targetID, targetEPR);
-				GeniiResolverUtils.updateNextTargetID(resource, targetEPI, targetID);
-				GeniiResolverUtils.createTerminateSubscription(targetID, targetEPR, null, resource);
+				else
+				{
+					_logger.debug("notify: add targetID=" + targetID);
+					WSName wsname = new WSName(targetEPR);
+					targetEPI = wsname.getEndpointIdentifier();
+					resource.addTargetEPR(targetEPI, targetID, targetEPR);
+					GeniiResolverUtils.updateNextTargetID(resource, targetEPI, targetID);
+				}
 				VersionedResourceUtils.updateVersionVector(resource, localVector, remoteVector);
-				replay = flags.replay;
 			}
 			finally
 			{
 				_resourceLock.unlock();
 			}
-			if (replay)
+			
+			// TODO - replay one message after an add/add conflict?
+			
+			if (resource.getEntryCount() == 0)
 			{
-				VersionVector vvr = VersionedResourceUtils.incrementResourceVersion(resource);
-				_logger.debug("GeniiResolverServiceImpl.notify: replay message");
-				TopicSet space = TopicSet.forPublisher(GeniiResolverServiceImpl.class);
-				PublisherTopic publisherTopic = space.createPublisherTopic(topicPath);
-				publisherTopic.publish(new ResolverUpdateContents(targetID, targetEPR, vvr));
+				// Destroy this resolver resource.
+				destroy(new Destroy());
 			}
 			return NotificationConstants.OK;
 		}

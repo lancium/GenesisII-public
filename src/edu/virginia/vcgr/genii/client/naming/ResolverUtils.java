@@ -103,30 +103,6 @@ public class ResolverUtils {
 				GeniiResolverPortType.class, resolverEPR);
 		return resolverService.update(new UpdateRequestType(entryReference));
 	}
-	
-	/**
-	 * Register the given EPR with a resolver resource.
-	 * We only need to successfully update one resolver, since the resolver is a replicated
-	 * resource that uses persistent notifications to keep the replicas in sync.
-	 */
-	public static UpdateResponseType updateResolver(List<ResolverDescription> resolverList, EndpointReferenceType entryReference)
-		throws RemoteException
-	{
-		RemoteException firstException = null;
-		for (ResolverDescription resolver : resolverList)
-		{
-			try
-			{
-				return updateResolver(resolver.getEPR(), entryReference);
-			}
-			catch (RemoteException exception)
-			{
-				if (firstException == null)
-					firstException = exception;
-			}
-		}
-		throw firstException;
-	}
 
 	/**
 	 * Call primaryName.getResolvers().

@@ -123,7 +123,8 @@ public class ReplicationThread extends Thread
 					_logger.debug("ReplicationThread: primaryEPR has no resolver element");
 					return;
 				}
-				UpdateResponseType response = ResolverUtils.updateResolver(resolverList, myEPR);
+				UpdateResponseType response = VersionedResourceUtils.updateResolver(resolverList, myEPR,
+						rKey.getResourceKey());
 				// myEPR = response.getNew_EPR();
 				idValue = new Integer(response.getTargetID());
 				_logger.debug("ReplicationThread: my targetID=" + idValue);

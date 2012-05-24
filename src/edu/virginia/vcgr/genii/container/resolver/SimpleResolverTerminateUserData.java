@@ -10,7 +10,7 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.AdditionalUserData;
 
 @XmlAccessorType(XmlAccessType.NONE)
-class SimpleResolverTerminateUserData extends AdditionalUserData
+public class SimpleResolverTerminateUserData extends AdditionalUserData
 {
 	static final long serialVersionUID = 0L;
 

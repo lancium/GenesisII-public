@@ -16,7 +16,6 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.ResolverDescription;
-import edu.virginia.vcgr.genii.client.naming.ResolverUtils;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
@@ -114,19 +113,19 @@ public class AutoReplicate
 		elementArr[0] = new MessageElement(IResource.ENDPOINT_IDENTIFIER_CONSTRUCTION_PARAM,
 				endpointIdentifier);
 		EndpointReferenceType localEPR = service.CreateEPR(elementArr, serviceURL);
+		AddressingParameters ap = new AddressingParameters(localEPR.getReferenceParameters());
+		String rkString = ap.getResourceKey();
 		
 		// Update the resolver and get a local EPR with a resolver element.
 		// Unfortunately, this step sends an RPC.  It would be nice if we could avoid
 		// sending any RPCs at this time, because the local directory replica is locked,
 		// and the primary directory instance is still waiting for a response.
-		UpdateResponseType response = ResolverUtils.updateResolver(resolverList, localEPR);
+		UpdateResponseType response = VersionedResourceUtils.updateResolver(resolverList, localEPR, rkString);
 		localEPR = response.getNew_EPR();
 		int targetID = response.getTargetID();
 		
 		// Get the DBResource that corresponds to the new resource.
 		// Store the primary EPR in the replica resource.
-		AddressingParameters ap = new AddressingParameters(localEPR.getReferenceParameters());
-		String rkString = ap.getResourceKey();
 		ResourceKey replicaKey = ResourceManager.getTargetResource(serviceName, rkString);
 		IResource replicaResource = (IResource) replicaKey.dereference();
 		VersionedResourceUtils.initializeReplica(replicaResource, primaryEPR, targetID);
