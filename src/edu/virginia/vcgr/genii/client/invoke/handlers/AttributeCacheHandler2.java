@@ -39,6 +39,7 @@ import org.oasis_open.docs.wsrf.rp_2.SetResourcePropertiesResponse;
 import org.oasis_open.docs.wsrf.rp_2.UpdateResourceProperties;
 import org.oasis_open.docs.wsrf.rp_2.UpdateResourcePropertiesResponse;
 import org.ws.addressing.EndpointReferenceType;
+import org.ws.addressing.MetadataType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOConstants;
 import edu.virginia.vcgr.genii.client.cache.AttributeCache;
@@ -50,6 +51,7 @@ import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.fuse.MetadataManager;
 import edu.virginia.vcgr.genii.client.invoke.InvocationContext;
 import edu.virginia.vcgr.genii.client.invoke.PipelineProcessor;
+import edu.virginia.vcgr.genii.client.naming.WSAddressingConstants;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSConstants;
@@ -177,7 +179,7 @@ public class AttributeCacheHandler2 {
 		Object[] originalParameters = ctxt.getParams();
 		
 		for (QName orig : getMultipleResourcePropertiesRequest) {
-			_logger.trace("Reqested parameter: " + orig);
+			_logger.debug("Reqested parameter: " + orig);
 		}
 		
 		List<QName> addedAttributeNames = 
@@ -396,8 +398,8 @@ public class AttributeCacheHandler2 {
 
 		EndpointReferenceType target = ctxt.getTarget();
 		TypeInformation typeInformation = new TypeInformation(target);
-		if (typeInformation.isResourceFork()) return null;
-		if (!typeInformation.isByteIO() && !typeInformation.isEnhancedRNS()) return null;
+	
+		if (!isSafePortTypeForCallAggregation(typeInformation, target)) return null;
 		
 		List<QName> potentialToBeAddedAttributes = new ArrayList<QName>();
 		potentialToBeAddedAttributes.add(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME);
@@ -462,5 +464,46 @@ public class AttributeCacheHandler2 {
 			}
 		}
 		response.set_any(baseResponse.toArray(new MessageElement[baseResponse.size()]));
+	}
+	
+	/*
+	 * Ideally any port-type that extends byteIO or enhanced-RNS port-types should have the additional attributes
+	 * that we chunk with a request for retrieving resource properties. Unfortunately, this is not the case. For 
+	 * many port-types in our system we don't have the required attributes of byteIOs or enhanced-RNSes, depending 
+	 * on which one is applicable. Therefore, this method is used to explicitly validate that the target is a ByteIO 
+	 * or Enhanced-RNS, where our property aggregation operation is safe to do.
+	 * */
+	private boolean isSafePortTypeForCallAggregation(TypeInformation typeInfo, EndpointReferenceType target) {
+		
+		if (typeInfo.isResourceFork()) return false;
+		if (!typeInfo.isRNS() && !typeInfo.isByteIO()) return false;
+	
+		try {
+			MetadataType metaData = target.getMetadata();
+			if (metaData != null && metaData.get_any() != null) {
+
+				QName portTypeAttributeName = new QName(WSAddressingConstants.WSA_NS,"PortType");
+				String portTypeValue = null;
+				for (MessageElement element : metaData.get_any()) {
+					if (element.getQName().equals(portTypeAttributeName)) {
+						portTypeValue = element.getValue();
+						break;
+					}
+				}
+				if (portTypeValue != null) {
+					if (portTypeValue.endsWith("RandomByteIOPortType") 
+							|| portTypeValue.endsWith("StreamableByteIOPortType")) {
+						_logger.debug("matching ByteIO port-type has been found");
+						return true;
+					} else if (portTypeValue.endsWith("EnhancedRNSPortType")) {
+						_logger.debug("matching RNS port-type has been found");
+						return true;
+					}
+				}
+			}
+		} catch (Exception ex) {
+			_logger.debug("Failed to parse EPR to retrieve port-type information" + ex.getMessage());
+		}
+		return false;
 	}
 }
