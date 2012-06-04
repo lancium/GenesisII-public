@@ -187,7 +187,7 @@ public class CopyMachine
             // we have to take the result from above as good enough (that there was no exception
             // from running the copy), because even if there were zero bytes copied, that might
             // be right, for a zero length file.
-            _logger.debug("Transferred " + stat.bytesTransferred() + " from input stream to output.");
+            _logger.debug("Transferred " + stat.bytesTransferred() + " bytes from input stream to output.");
             return PathOutcome.OUTCOME_SUCCESS;
         } catch (Throwable cause) {
             _logger.error("failed to copy the input stream to the output stream", cause);
