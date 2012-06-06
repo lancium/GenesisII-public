@@ -82,7 +82,7 @@ public class QStatTool extends BaseGridTool
 	{
 		stdout.println(String.format(
 			"%1$-36s   %2$-21s   %3$-4s   %4$-8s", 
-			"Ticket", "Submit Time", "Trys", "State"));
+			"Ticket", "Submit Time", "Tries", "State"));
 	}
 	
 	static private final String _FORMAT =

@@ -165,7 +165,7 @@ public class EC2Manager implements CloudManager{
 
 	@Override
 	public boolean shrink() throws Exception {
-		//Trys to kill all idle resources
+		//Tries to kill all idle resources
 		boolean result = false;
 		try{
 			vmLock.lock();
