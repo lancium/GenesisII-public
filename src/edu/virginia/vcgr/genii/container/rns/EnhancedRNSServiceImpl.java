@@ -58,6 +58,7 @@ import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.AbstractNotificationHandler;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.RNSContentChangeNotification;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.RNSOperationContents;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.RNSTopics;
 import edu.virginia.vcgr.genii.common.rfactory.VcgrCreate;
@@ -220,6 +221,14 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 			_resource.addEntry(new InternalEntry(filename, entryReference, attributes));
 			VersionVector vvr = VersionedResourceUtils.incrementResourceVersion(_resource);
 			fireRNSEntryAdded(vvr, filename, entryReference);
+			
+			MessageElement[] prefetchedAttributes = null;
+			AttributesPreFetcherFactory factory = new AttributesPreFetcherFactoryImpl();
+			prefetchedAttributes = Prefetcher.preFetch(entryReference, new MessageElement[] {}, factory);
+			RNSOperation operation = 
+				new RNSOperation(RNSOperation.OperationType.ENTRY_CREATE, filename);
+			notifyChangeInContent(operation, entryReference, prefetchedAttributes);
+			
 			return new CreateFileResponseType(entryReference);
 		}
 		finally
@@ -325,6 +334,11 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 		RNSMetadataType returnedMetadata = RNSUtilities.createMetadata(entryReference, attributes);
 
 		fireRNSEntryAdded(vvr, name, entryReference);
+		
+		RNSOperation operation = 
+				new RNSOperation(RNSOperation.OperationType.ENTRY_ADD, name);
+		notifyChangeInContent(operation, entryReference, attributes);
+
 		return new RNSEntryResponseType(entryReference, returnedMetadata, null, name);
 	}
 	
@@ -518,6 +532,9 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 			ret[idx] = new RNSEntryResponseType(null, null, null, name);
 			fireRNSEntryRemoved(vvr, name);
 		}
+		RNSOperation operation = 
+				new RNSOperation(RNSOperation.OperationType.ENTRY_REMOVE, removeRequest);
+		notifyChangeInContent(operation, null, null);
 		return ret;
 	}
 	
@@ -658,6 +675,16 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 				GamlAclTopics.GAML_ACL_CHANGE_TOPIC.asConcreteQueryExpression(),
 				new GamlAclChangeNotificationHandler());
 	}
+	
+	private void notifyChangeInContent(RNSOperation operation, EndpointReferenceType entry, 
+    		MessageElement[] attributes) 
+    		throws ResourceUnknownFaultType, ResourceException {
+    	TopicSet space = TopicSet.forPublisher(getClass());
+    	PublisherTopic topic = space.createPublisherTopic(RNS_CONTENT_CHANGE_TOPIC);
+    	Integer elementCount = (Integer) _resource.getProperty(IRNSResource.ELEMENT_COUNT_PROPERTY);
+    	topic.publish(new RNSContentChangeNotification(operation, 
+    			entry, elementCount, attributes));
+    }
 	
 	private class RNSOperationNotificationHandler
 		extends AbstractNotificationHandler<RNSOperationContents>

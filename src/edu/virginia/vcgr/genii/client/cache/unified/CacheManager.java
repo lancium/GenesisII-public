@@ -7,7 +7,10 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.virginia.vcgr.genii.client.cache.ResourceAccessMonitor;
 import edu.virginia.vcgr.genii.client.cache.unified.WSResourceConfig.IdentifierType;
+import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.NotificationBrokerDirectory;
+import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.SubscriptionDirectory;
 
 /*
  * This is the facet that mediates all cache related operation issued from other places of the code.
@@ -24,20 +27,37 @@ public class CacheManager {
 	}
 	
 	public static Object getItemFromCache(Object target, Object cacheKey, Class<?> itemType) {
+	
 		if (CacheConfigurer.isCachingEnabled()) {
+			
+			// Before accessing the cache, this tries to assess the freshness of cached information by 
+			// investigating the target, whenever possible. This helps to reduce load on cache management
+			// module and to ensure freshness of information when nothing can be inferred from the
+			// retrieved cached item.
+			if (ResourceAccessMonitor.isMonitoredObject(target) 
+					&& !ResourceAccessMonitor.isCachedContentGuaranteedToBeFresh(target)) return null;
 			try {
 				CommonCache cache = findCacheForObject(target, cacheKey, itemType);
 				if (cache == null) return null;
-
 				Object cachedItem = cache.getItem(cacheKey, target);
 				if (cachedItem != null) {
 					_logger.trace("request is satisfied from the cache: " + cacheKey);
 				} else {
 					_logger.trace("not in cache: " + cacheKey);
 				}
-				return cachedItem;
+				if (cache.isMonitoringEnabled()) {
+					ResourceAccessMonitor.reportResourceUsage(cachedItem);
+				}
+				
+				// Returns item from cache only when the system is satisfied about its freshness.
+				if (ResourceAccessMonitor.isCachedContentGuaranteedToBeFresh(cachedItem)) {
+					return cachedItem;
+				} else {
+					_logger.debug("Access to cached item has been denied");
+					return null;
+				}
 			} catch (Exception ex) {
-				_logger.debug("problem while retrieving objects from the cache", ex);
+				_logger.info("problem while retrieving objects from the cache", ex);
 			}
 		}
 		return null;
@@ -186,6 +206,18 @@ public class CacheManager {
 			} catch (Exception ex) {
 				_logger.debug("Could not remove cached item", ex);
 			}
+		}
+	}
+	
+	public static void resetCachingSystem() {
+		try {
+			CacheConfigurer.resetCaches();
+			NotificationBrokerDirectory.clearDirectory();
+			SubscriptionDirectory.clearDirectory();
+		} catch (Exception ex) {
+			_logger.info("Alarm: couldn't reset the caching system after a failure. " +
+				"To avoid seeing, possibly, stale contents, " +
+				"restart the grid client: " + ex.getMessage());
 		}
 	}
 	

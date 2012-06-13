@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns="http://vcgr.cs.virginia.edu/container/2011/07/enhanced-notification-broker"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:wsbf="http://docs.oasis-open.org/wsrf/bf-2"
+	xmlns:wsn="http://docs.oasis-open.org/wsn/b-2"
+	xmlns:wsa="http://www.w3.org/2005/08/addressing" elementFormDefault="qualified"
+	attributeFormDefault="unqualified"
+	targetNamespace="http://vcgr.cs.virginia.edu/container/2011/07/enhanced-notification-broker">
+
+	<xsd:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="./ws-addr.xsd" />
+	<xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2" schemaLocation="./wsrf/basefaults.xsd"/>
+	<xsd:import namespace="http://docs.oasis-open.org/wsn/b-2" schemaLocation="./wsrf/wsBaseNotification.xsd"/>
+
+	<xsd:element name="ActiveMode" type="xsd:boolean" default="false"/>
+	<xsd:element name="MessageIndex" type="xsd:integer"/>
+
+	<xsd:element name="UpdateModeResponse"><xsd:complexType/></xsd:element>
+
+	<xsd:element name="TestNotificationRequest"><xsd:complexType/></xsd:element>
+	<xsd:element name="TestNotificationResponse"><xsd:complexType/></xsd:element>
+	
+	<xsd:element name="UpdateForwardingPortRequest" type="wsa:EndpointReferenceType"/>
+	<xsd:element name="UpdateForwardingPortResponse"><xsd:complexType/></xsd:element>
+	
+	<xsd:complexType name="IndirectSubscriptionType">
+		<xsd:sequence>
+			<xsd:element name="publisher" type="wsa:EndpointReferenceType" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="duration" type="xsd:long" minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType> 
+	<xsd:element name="IndirectSubscribeRequest" type="IndirectSubscriptionType"/>
+	
+	<xsd:complexType name="IndirectSubscriptionEntryType">
+		<xsd:sequence>
+			<xsd:any namespace="##other" processContents="lax" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="SubscriptionReference" type="wsa:EndpointReferenceType" minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="IndirectSubscriptionResponseType">
+		<xsd:sequence>
+			<xsd:element name="SubscriptionEntry" type="IndirectSubscriptionEntryType" minOccurs="1" maxOccurs="3"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="IndirectSubscriptionResponse" type="IndirectSubscriptionResponseType"/>
+	
+	<!-- Fault Types -->
+	<xsd:complexType name="EnhancedNotificationBrokerFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="wsbf:BaseFaultType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="EnhancedNotificationBrokerFaultType" type="EnhancedNotificationBrokerFaultType"/>
+
+	<xsd:complexType name="MessageMissedFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="EnhancedNotificationBrokerFaultType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="MessageMissedFault" type="MessageMissedFaultType"/>
+	
+	<xsd:complexType name="SubscriptionFailedFaultType">
+		<xsd:complexContent>
+			<xsd:extension base="EnhancedNotificationBrokerFaultType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="SubscriptionFailedFault" type="SubscriptionFailedFaultType"/>
+
+</xsd:schema>

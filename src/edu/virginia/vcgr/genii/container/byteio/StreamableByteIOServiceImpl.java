@@ -29,6 +29,7 @@ import org.ggf.sbyteio.SeekWriteResponse;
 import org.ggf.sbyteio.StreamableByteIOPortType;
 import org.morgan.inject.MInject;
 import org.morgan.util.io.StreamUtils;
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.wsn.base.Subscribe;
 import org.oasis_open.wsrf.basefaults.BaseFaultType;
 import org.oasis_open.wsrf.basefaults.BaseFaultTypeDescription;
@@ -41,11 +42,10 @@ import edu.virginia.vcgr.genii.client.common.ConstructionParameters;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ByteIOAttributesUpdateNotification;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ByteIOTopics;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ResourceTerminationContents;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.SByteIOTopics;
-
-import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
@@ -283,7 +283,7 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase
 			_resource.setProperty(ISByteIOResource.POSITION_PROPERTY,
 				new Long(offset + data.length));
 			
-			byteIOAttrs = getByteIOAttributes(myFile, _resource);
+			byteIOAttrs = notifyAttributesUpdateAndGetMetadata(myFile, _resource);
 		}
 		catch (IOException ioe)
 		{
@@ -357,19 +357,38 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase
 			Calendar.getInstance()));
 	}
 	
-	private MessageElement[] getByteIOAttributes(File currentFile, 
+	/*
+	 * This method publish attributes update notification message and also return the updated attributes
+	 * as set of MessageElements. We use a single function instead of two for this two operations in order
+	 * to reduce the number of database access.
+	 * */
+	private MessageElement[] notifyAttributesUpdateAndGetMetadata(File currentFile, 
 			ISByteIOResource resource) throws ResourceException {
 
 		MessageElement[] attributes = new MessageElement[4];
 
+		TopicSet space = TopicSet.forPublisher(getClass());
+		PublisherTopic publisherTopic = space.createPublisherTopic(
+				BYTEIO_ATTRIBUTES_UPDATE_TOPIC);
+		ByteIOAttributesUpdateNotification message = new ByteIOAttributesUpdateNotification();
+
 		long fileSize = currentFile.length();
+		message.setSize(fileSize);
 		attributes[0] = new MessageElement(ByteIOConstants.ssize, fileSize);
+
 		Calendar createTime = resource.getCreateTime();
+		message.setCreateTime(createTime);
 		attributes[1] = new MessageElement(ByteIOConstants.screatTime, createTime);
+
 		Calendar modTime = resource.getModTime();
+		message.setModificationTime(modTime);
 		attributes[2] = new MessageElement(ByteIOConstants.smodTime, modTime);
+
 		Calendar accessTime = resource.getAccessTime();
+		message.setAccessTime(accessTime);
 		attributes[3] = new MessageElement(ByteIOConstants.saccessTime, accessTime);
+
+		publisherTopic.publish(message);
 		return attributes;
-	}	
+	}
 }

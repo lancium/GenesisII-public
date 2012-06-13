@@ -14,6 +14,7 @@ import javax.xml.soap.SOAPException;
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.types.URI;
 import org.apache.axis.types.URI.MalformedURIException;
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.fsii.security.Permissions;
@@ -30,18 +31,20 @@ import edu.virginia.vcgr.genii.client.utils.units.Duration;
 import edu.virginia.vcgr.genii.client.wsrf.WSRFConstants;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicQueryDialects;
-
-import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
-
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.AuthZConfigUpdateNotification;
 import edu.virginia.vcgr.genii.common.MatchingParameter;
 import edu.virginia.vcgr.genii.common.security.AuthZConfig;
+import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.attrs.AbstractAttributeHandler;
 import edu.virginia.vcgr.genii.container.attrs.AttributePackage;
 import edu.virginia.vcgr.genii.container.attrs.IAttributeManipulator;
+import edu.virginia.vcgr.genii.container.notification.EnhancedNotificationBrokerFactoryServiceImpl;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
-import edu.virginia.vcgr.genii.container.security.authz.providers.*;
+import edu.virginia.vcgr.genii.container.security.authz.providers.AuthZProviders;
+import edu.virginia.vcgr.genii.container.security.authz.providers.IAuthZProvider;
+import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.PublisherTopic;
 import edu.virginia.vcgr.genii.container.wsrf.wsn.topic.TopicSet;
 
 public class GenesisIIBaseAttributesHandler 
@@ -237,6 +240,10 @@ public class GenesisIIBaseAttributesHandler
 		AuthZConfig oldConfig = authZHandler.getAuthZConfig(resource);
 		authZHandler.setAuthZConfig(config, resource);
 		authZHandler.sendAuthZConfig(oldConfig, config, resource);
+		
+		TopicSet space = TopicSet.forPublisher(GenesisIIBase.class);
+		PublisherTopic topic = space.createPublisherTopic(GenesisIIBase.AUTHZ_CONFIG_UPDATE_TOPIC);
+		topic.publish(new AuthZConfigUpdateNotification(config));
 	}
 
 	public MessageElement getCurrentTimeAttr()
@@ -305,6 +312,14 @@ public class GenesisIIBaseAttributesHandler
 		return set.describe(WSRFConstants.TOPIC_SET_RP);
 	}
 	
+	public MessageElement getNotificationBrokerFactoryAddress() throws SOAPException 
+	{
+		String brokerFactoryUrl = Container.getServiceURL(
+				EnhancedNotificationBrokerFactoryServiceImpl.SERVICE_URL);
+		return new MessageElement(GenesisIIConstants.NOTIFICATION_BROKER_FACTORY_ADDRESS, 
+				brokerFactoryUrl);
+	}
+	
 	@Override
 	protected void registerHandlers() throws NoSuchMethodException
 	{
@@ -353,5 +368,10 @@ public class GenesisIIBaseAttributesHandler
 		addHandler(
 			GenesisIIConstants.CACHE_COHERENCE_WINDOW_ATTR_QNAME,
 			"getCacheCoherenceWindow", "setCacheCoherenceWindow");
+		
+		addHandler(
+			GenesisIIConstants.NOTIFICATION_BROKER_FACTORY_ADDRESS, 
+			"getNotificationBrokerFactoryAddress");
+		
 	}
 }

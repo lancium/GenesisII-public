@@ -178,4 +178,17 @@ public class WellKnownPortTypes
 	static public PortType JOB_MANAGEMENT_PORT_TYPE = 
 		PortType.get(new QName("http://vcgr.cs.virginia.edu/genii/job-management", 
 			"JobManagementPortType"));
+
+	static public PortType NOTIFICATION_PRODUCER_PORT_TYPE =
+			PortType.get(new QName("http://docs.oasis-open.org/wsn/bw-2", "NotificationProducer"));
+
+	static public PortType ENHANCED_NOTIFICATION_BROKER_FACTORY__PORT =
+			PortType.get(new QName(
+					"http://vcgr.cs.virginia.edu/container/2011/07/enhanced-notification-broker-factory",
+					"EnhancedNotificationBrokerFactoryPortType"));
+
+	static public PortType ENHANCED_NOTIFICATION_BROKER_PORT =
+			PortType.get(new QName(
+					"http://vcgr.cs.virginia.edu/container/2011/07/enhanced-notification-broker",
+					"EnhancedNotificationBrokerPortType"));
 }

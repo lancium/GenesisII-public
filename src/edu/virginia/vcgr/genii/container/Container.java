@@ -11,7 +11,11 @@ import java.security.KeyStoreException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,18 +39,20 @@ import org.morgan.dpage.ScratchSpaceManager;
 import org.morgan.util.GUID;
 import org.morgan.util.configuration.XMLConfiguration;
 import org.morgan.util.io.GuaranteedDirectory;
-import org.mortbay.jetty.*;
-import org.mortbay.jetty.handler.*;
-import org.mortbay.jetty.webapp.*;
-import org.mortbay.jetty.security.SslSocketConnector;
+import org.mortbay.jetty.Server;
 import org.mortbay.jetty.bio.SocketConnector;
+import org.mortbay.jetty.handler.ContextHandler;
+import org.mortbay.jetty.security.SslSocketConnector;
 import org.mortbay.jetty.servlet.ServletHolder;
-
+import org.mortbay.jetty.webapp.WebAppContext;
 import org.ws.addressing.AttributedURIType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.ApplicationBase;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.cache.unified.CacheConfigurer;
+import edu.virginia.vcgr.genii.client.comm.axis.security.VcgrSslSocketFactory;
+import edu.virginia.vcgr.genii.client.comm.jetty.TrustAllSslSocketConnector;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.GridEnvironment;
@@ -56,8 +62,6 @@ import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.Security;
 import edu.virginia.vcgr.genii.client.configuration.SecurityConstants;
 import edu.virginia.vcgr.genii.client.container.ContainerIDFile;
-import edu.virginia.vcgr.genii.client.comm.axis.security.VcgrSslSocketFactory;
-import edu.virginia.vcgr.genii.client.comm.jetty.TrustAllSslSocketConnector;
 import edu.virginia.vcgr.genii.client.install.InstallationState;
 import edu.virginia.vcgr.genii.client.mem.LowMemoryExitHandler;
 import edu.virginia.vcgr.genii.client.mem.LowMemoryWarning;
@@ -66,13 +70,13 @@ import edu.virginia.vcgr.genii.client.security.x509.CertTool;
 import edu.virginia.vcgr.genii.client.stats.ContainerStatistics;
 import edu.virginia.vcgr.genii.client.utils.barrier.BarrieredWorkQueue;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
+import edu.virginia.vcgr.genii.container.alarms.AlarmManager;
+import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver;
+import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllSender;
 import edu.virginia.vcgr.genii.container.configuration.ContainerConfiguration;
 import edu.virginia.vcgr.genii.container.cservices.ContainerServices;
 import edu.virginia.vcgr.genii.container.deployment.ServiceDeployer;
 import edu.virginia.vcgr.genii.container.invoker.GAroundInvokerFactory;
-import edu.virginia.vcgr.genii.container.alarms.AlarmManager;
-import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver;
-import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllSender;
 import edu.virginia.vcgr.secrun.SecureRunnableHooks;
 import edu.virginia.vcgr.secrun.SecureRunnerManager;
 
@@ -313,6 +317,8 @@ public class Container extends ApplicationBase
 					"Unable to configure service:  %s.", service), cause);
 			}
 		}
+		
+		CacheConfigurer.disableSubscriptionBasedCaching();
 		
 		for (IContainerManaged service : containerServiceObjects)
 		{

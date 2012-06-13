@@ -5,9 +5,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,7 +41,7 @@ public class SubscriptionsDatabase
 			"topicquery BLOB(2G)," +
 			"policies BLOB(2G)," +
 			"additionaluserdata BLOB(2G)," +
-			"paused SMALLINT NOT NULL DEFAULT 0)",
+			"paused SMALLINT NOT NULL WITH DEFAULT 0)",
 		"CREATE INDEX wsnsubscriptionspubreskeyidx ON wsnsubscriptions(publisherresourcekey)"
 	};
 	
@@ -175,7 +179,6 @@ public class SubscriptionsDatabase
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	static public Collection<WSNSubscriptionInformation> 
 		subscriptionsForPublisher(Connection connection, String publisherKey,
 			TopicPath topic) throws SQLException
@@ -195,38 +198,43 @@ public class SubscriptionsDatabase
 			stmt.setString(1, publisherKey);
 			rs = stmt.executeQuery();
 			
-			while (rs.next())
-			{
-				try
-				{
-					EndpointReferenceType subscriptionReference =
-						EPRUtils.fromBlob(rs.getBlob(1));
-					EndpointReferenceType consumerReference =
-						EPRUtils.fromBlob(rs.getBlob(2));
-					TopicQueryExpression topicFilter =
-						(TopicQueryExpression)DBSerializer.fromBlob(rs.getBlob(3));
-					Map<SubscriptionPolicyTypes, SubscriptionPolicy> policies =
-						(Map<SubscriptionPolicyTypes, SubscriptionPolicy>)DBSerializer.fromBlob(rs.getBlob(4));
-					AdditionalUserData additionalUserData =
-						(AdditionalUserData)DBSerializer.fromBlob(rs.getBlob(5));
-					
-					if (topic == null || topicFilter == null || 
-						topicFilter.matches(topic))
-					{
-						subscriptions.add(new WSNSubscriptionInformation(
-							subscriptionReference,
-							consumerReference, topicFilter, policies, 
-							additionalUserData));
-					}
-				}
-				catch (ResourceException e)
-				{
-					_logger.warn("Error trying to load subscription from database.", e);
-				}
+			while (rs.next()) {
+				addSubscriptionFromResults(topic, subscriptions, rs);
 			}
 		}
 		finally
 		{
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+		
+		return subscriptions;
+	}
+
+	@SuppressWarnings("unchecked")
+	static public Collection<WSNSubscriptionInformation> getSubscriptionsForIndirectPublishers(
+			Connection connection, Collection<String> publishers, TopicPath topic) 
+			throws SQLException {
+		
+		if (publishers == null || publishers.isEmpty()) return Collections.EMPTY_LIST;
+		
+		Collection<WSNSubscriptionInformation> subscriptions = new ArrayList<WSNSubscriptionInformation>();
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try {
+			String sql = "SELECT subscriptionreference, consumerreference, topicquery, " +
+				"policies, additionaluserdata FROM wsnsubscriptions " +
+			"WHERE paused = 0 and publisherresourcekey in (" + joinStringsForInClause(publishers) + ")";
+			
+			stmt = connection.prepareStatement(sql);
+			rs = stmt.executeQuery();
+			
+			while (rs.next()) {
+				addSubscriptionFromResults(topic, subscriptions, rs);
+			}
+		}
+		finally {
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
 		}
@@ -253,5 +261,69 @@ public class SubscriptionsDatabase
 		{
 			StreamUtils.close(stmt);
 		}
+	}
+	
+	static public Set<String> getIndirectPublishersKeys(String originalPublisher, String query, Connection connection) {
+
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		Set<String> indirectPublishers= new HashSet<String>();
+		try {
+			stmt = connection.prepareStatement(query);
+			stmt.setString(1, originalPublisher);
+			rs = stmt.executeQuery();
+			while (rs.next()) {
+				indirectPublishers.add(rs.getString(1));
+			}
+		} catch (SQLException e) {
+			_logger.warn("failed to load indirect publisher keys for notification", e);
+		} finally {
+			StreamUtils.close(rs);
+			StreamUtils.close(stmt);
+		}
+		return indirectPublishers;
+	}
+	
+
+	private static void addSubscriptionFromResults(TopicPath topic,
+			Collection<WSNSubscriptionInformation> subscriptions, ResultSet rs) throws SQLException {
+		try {
+			EndpointReferenceType subscriptionReference =
+				EPRUtils.fromBlob(rs.getBlob(1));
+			EndpointReferenceType consumerReference =
+				EPRUtils.fromBlob(rs.getBlob(2));
+			TopicQueryExpression topicFilter =
+				(TopicQueryExpression)DBSerializer.fromBlob(rs.getBlob(3));
+			
+			@SuppressWarnings("unchecked")
+			Map<SubscriptionPolicyTypes, SubscriptionPolicy> policies =
+				(Map<SubscriptionPolicyTypes, SubscriptionPolicy>)DBSerializer.fromBlob(rs.getBlob(4));
+		
+			AdditionalUserData additionalUserData =
+				(AdditionalUserData)DBSerializer.fromBlob(rs.getBlob(5));
+			
+			if (topic == null || topicFilter == null || 
+				topicFilter.matches(topic))
+			{
+				subscriptions.add(new WSNSubscriptionInformation(
+					subscriptionReference,
+					consumerReference, topicFilter, policies, 
+					additionalUserData));
+			}
+		} catch (ResourceException e) {
+			_logger.warn("Error trying to load subscription from database.", e);
+		}
+	}
+	
+	private static String joinStringsForInClause(Collection<String> listOfStrings) {
+		StringBuilder buffer = new StringBuilder();
+		for (String resourceId : listOfStrings) {
+			buffer.append("'");
+			buffer.append(resourceId);
+			buffer.append("'").append(',');
+		}
+		int positionOfLastComma = buffer.length() - 1;
+		buffer.deleteCharAt(positionOfLastComma);
+		return buffer.toString();
 	}
 }

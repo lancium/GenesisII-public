@@ -25,6 +25,7 @@
 			<parameter name="action" value="Signature Encrypt"/>
 		-->
 		</handler>
+		<handler type="java:edu.virginia.vcgr.genii.container.axis.ClientConfigHandler"/>
   	</chain>
   </requestFlow>
   <responseFlow>
@@ -41,6 +42,7 @@
 	  	<handler type="java:edu.virginia.vcgr.genii.container.axis.WorkingContextHandler">
 	   		<parameter name="flow-side" value="response"/>
 	   	</handler>
+	   	<handler type="java:edu.virginia.vcgr.genii.container.axis.NotificationMessageIndexPropagator"/>
    	</chain>
   </responseFlow>
  </globalConfiguration>

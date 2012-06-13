@@ -5,7 +5,7 @@ import org.ggf.rns.RNSEntryResponseType;
 import org.ggf.rns.RNSEntryType;
 import org.ws.addressing.EndpointReferenceType;
 
-import edu.virginia.vcgr.genii.client.cache.unified.RNSNotificationHandler;
+import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.RNSNotificationHandler;
 import edu.virginia.vcgr.genii.client.invoke.InvocationContext;
 import edu.virginia.vcgr.genii.client.invoke.PipelineProcessor;
 import edu.virginia.vcgr.genii.enhancedrns.CreateFileRequestType;

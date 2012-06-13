@@ -363,5 +363,17 @@
 		<display-rank>100</display-rank>
 		<description>JobManagement</description>
 	</portType>
+
+	<portType
+		name="{http://vcgr.cs.virginia.edu/container/2011/07/enhanced-notification-broker-factory}EnhancedNotificationBrokerFactoryPortType">
+		<display-rank>100</display-rank>
+		<description>EnhancedNotificationBrokerFactory</description>
+	</portType>
+
+	<portType
+		name="{http://vcgr.cs.virginia.edu/container/2011/07/enhanced-notification-broker}EnhancedNotificationBrokerPortType">
+		<display-rank>100</display-rank>
+		<description>EnhancedNotificationBroker</description>
+	</portType>
 	
 </known-porttypes>

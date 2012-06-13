@@ -75,7 +75,7 @@ public class CacheConfigurer {
 		SUBSCRIPTION_BASED_CACHING_ENABLED = false;
 		LIST_OF_CACHES.clear();
 		CACHEABLE_ITEMS_GENERATORS.clear();
-		_logger.info("Caching has been disabled");	
+		_logger.debug("Caching has been disabled");	
 	}
 	
 	public static void disableSubscriptionBasedCaching() {
@@ -83,12 +83,16 @@ public class CacheConfigurer {
 		_logger.info("Subscription based caching has been disabled");
 	}
 	
+	public static void setSubscriptionBasedCaching(boolean state) {
+		SUBSCRIPTION_BASED_CACHING_ENABLED = state;
+	}
+	
 	public static void enableCaching() {
 		initializeCaches();
 		initializeGenerators();
 		CACHING_ENABLED = true;
 		SUBSCRIPTION_BASED_CACHING_ENABLED = true;
-		_logger.info("Caching has been enabled");
+		_logger.debug("Caching has been enabled");
 	}
 	
 	public static Collection<CommonCache> getCaches() {
@@ -97,5 +101,19 @@ public class CacheConfigurer {
 	
 	public static Collection<CacheableItemsGenerator> getGenerators() {
 		return Collections.unmodifiableCollection(CACHEABLE_ITEMS_GENERATORS);
+	}
+	
+	public static void resetCaches() {
+		try {
+			boolean subscriptionState = isSubscriptionEnabled();
+			
+			disableCaching();
+			enableCaching();
+			
+			setSubscriptionBasedCaching(subscriptionState);
+			
+		} catch (Exception ex) {
+			_logger.info("Exception occurred while resetting the cache management system " + ex.getMessage());
+		}
 	}
 }

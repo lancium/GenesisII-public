@@ -31,7 +31,7 @@ public interface RandomByteIORP
 	@ResourceProperty(namespace = RANDOM_BYTEIO_NS, localname = "Writeable")
 	public Boolean getWriteable();
 	
-	@ResourceProperty(namespace = RANDOM_BYTEIO_NS, localname = "TransferMechanism")
+	@ResourceProperty(namespace = RANDOM_BYTEIO_NS, localname = "TransferMechanism", max = "unbounded")
 	public Collection<QName> getTransferMechanisms();
 	
 	@ResourceProperty(namespace = RANDOM_BYTEIO_NS, localname = "CreateTime")

@@ -9,12 +9,15 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.fsii.security.Permissions;
+import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.common.GenesisIIBaseRP;
 import edu.virginia.vcgr.genii.client.gfs.GenesisIIACLManager;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.security.authz.acl.Acl;
 import edu.virginia.vcgr.genii.common.security.AuthZConfig;
+import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.container.attrs.AbstractAttributePreFetcher;
+import edu.virginia.vcgr.genii.container.notification.EnhancedNotificationBrokerFactoryServiceImpl;
 import edu.virginia.vcgr.genii.container.q2.QueueSecurity;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
@@ -76,6 +79,10 @@ public class DefaultGenesisIIAttributesPreFetcher<Type extends IResource>
 			if (authConfig != null) {
 				attributes.add(new MessageElement(GenesisIIBaseRP.AUTHZ_CONFIG_QNAME, authConfig));
 			}
+			String brokerFactoryUrl = Container.getServiceURL(EnhancedNotificationBrokerFactoryServiceImpl.SERVICE_URL);
+			MessageElement notificationBrokerFactoryElement = 
+					new MessageElement(GenesisIIConstants.NOTIFICATION_BROKER_FACTORY_ADDRESS, brokerFactoryUrl);
+			attributes.add(notificationBrokerFactoryElement);
 		}
 		catch (Throwable cause) {
 			_logger.warn("Unable to fill in permissions attribute.", cause);

@@ -69,6 +69,7 @@ import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.AbstractNotificationHandler;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.NotificationMultiplexer;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.TopicPath;
+import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ByteIOAttributesUpdateNotification;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ByteIOContentsChangedContents;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.topic.wellknown.ByteIOTopics;
 import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver;
@@ -401,7 +402,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 			publisherTopic.publish(new ByteIOContentsChangedContents(
 				ByteIOOperations.Write, startOffset, bytesPerBlock, stride, data.length, vvr),
 				attachment);
-			byteIOAttrs = getByteIOAttributes(myFile, _resource);
+			byteIOAttrs = notifyAttributesUpdateAndGetMetadata(myFile, _resource);
 		}
 		catch (IOException ioe)
 		{
@@ -453,7 +454,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 			publisherTopic.publish(new ByteIOContentsChangedContents(
 				ByteIOOperations.Append, startOffset, data.length, 0, data.length, vvr),
 				attachment);
-			byteIOAttrs = getByteIOAttributes(myFile, _resource);
+			byteIOAttrs = notifyAttributesUpdateAndGetMetadata(myFile, _resource);
 		}
 		catch (IOException ioe)
 		{
@@ -505,7 +506,7 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 			publisherTopic.publish(new ByteIOContentsChangedContents(
 				ByteIOOperations.TruncAppend, startOffset, data.length, 0, data.length, vvr),
 				attachment);
-			byteIOAttrs = getByteIOAttributes(myFile, _resource);
+			byteIOAttrs = notifyAttributesUpdateAndGetMetadata(myFile, _resource);
 		}
 		catch (IOException ioe)
 		{
@@ -748,18 +749,38 @@ public class RandomByteIOServiceImpl extends GenesisIIBase
 		}
 	}
 	
-	private MessageElement[] getByteIOAttributes(File currentFile, 
+	/*
+	 * This method publish attributes update notification message and also return the updated attributes
+	 * as set of MessageElements. We use a single function instead of two for this two operations in order
+	 * to reduce the number of database access.
+	 * */
+	private MessageElement[] notifyAttributesUpdateAndGetMetadata(File currentFile, 
 			IRByteIOResource resource) throws ResourceException {
 
 		MessageElement[] attributes = new MessageElement[4];
+
+		TopicSet space = TopicSet.forPublisher(getClass());
+		PublisherTopic publisherTopic = space.createPublisherTopic(
+				BYTEIO_ATTRIBUTES_UPDATE_TOPIC);
+		ByteIOAttributesUpdateNotification message = new ByteIOAttributesUpdateNotification();
+
 		long fileSize = currentFile.length();
+		message.setSize(fileSize);
 		attributes[0] = new MessageElement(ByteIOConstants.rsize, fileSize);
+
 		Calendar createTime = resource.getCreateTime();
+		message.setCreateTime(createTime);
 		attributes[1] = new MessageElement(ByteIOConstants.rcreatTime, createTime);
+
 		Calendar modTime = resource.getModTime();
+		message.setModificationTime(modTime);
 		attributes[2] = new MessageElement(ByteIOConstants.rmodTime, modTime);
+
 		Calendar accessTime = resource.getAccessTime();
+		message.setAccessTime(accessTime);
 		attributes[3] = new MessageElement(ByteIOConstants.raccessTime, accessTime);
+
+		publisherTopic.publish(message);
 		return attributes;
 	}
 }

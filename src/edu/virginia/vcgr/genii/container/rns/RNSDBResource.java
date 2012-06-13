@@ -6,12 +6,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.apache.axis.message.MessageElement;
 import org.ggf.rns.RNSEntryExistsFaultType;
 import org.morgan.util.GUID;
 import org.morgan.util.io.StreamUtils;
+import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
+import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
@@ -24,15 +29,16 @@ import edu.virginia.vcgr.genii.container.util.FaultManipulator;
 public class RNSDBResource extends BasicDBResource implements IRNSResource
 {
 	static private final String _ADD_ENTRY_STATEMENT =
-		"INSERT INTO entries VALUES(?, ?, ?, ?, ?)";
+	    "INSERT INTO entries (resourceid, name, endpoint, id, attrs, endpoint_id) " +
+	    "VALUES(?, ?, ?, ?, ?, ?)";	
 	static private final String _SELECT_ENTRIES_STMT =
 		"SELECT name FROM entries WHERE resourceid = ?";
 	static private final String _SELECT_SINGLETON_ENTRY_STMT =
 		"SELECT name FROM entries WHERE resourceid = ? AND name = ?";
 	static private final String _RETRIEVE_ONE_STMT =
-		"SELECT name, endpoint, id, attrs FROM entries WHERE resourceid = ? AND name = ?";
+		"SELECT name, endpoint, id, attrs, endpoint_id FROM entries WHERE resourceid = ? AND name = ?";
 	static private final String _RETRIEVE_ALL_STMT =
-		"SELECT name, endpoint, id, attrs FROM entries WHERE resourceid = ?";
+		"SELECT name, endpoint, id, attrs, endpoint_id FROM entries WHERE resourceid = ?";
 	static private final String _REMOVE_ENTRIES_STMT =
 		"DELETE FROM entries WHERE resourceid = ? AND name = ?";
 	static private String _RETRIEVE_COUNT_STMT =
@@ -43,6 +49,8 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 		"SELECT name, id FROM entries WHERE resourceid = ? ";
 	static private String _RETRIEVE_ENTRY_FROM_ID =
 		"SELECT name, endpoint, id, attrs FROM entries WHERE id = ?";
+	static private final String _ENTRY_ID_UPDATE_STMT = "UPDATE entries SET endpoint_id = ? " +
+		"WHERE resourceid = ? AND name = ?";
 	
 	public RNSDBResource(
 			ResourceKey parentKey, 
@@ -58,6 +66,14 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 		PreparedStatement stmt = null;
 		String attrKey = (new GUID()).toString();
 		
+		String entryId = null;
+		try {
+			entryId = new AddressingParameters(
+					entry.getEntryReference().getReferenceParameters()).getResourceKey();
+		} catch (Exception ex) {
+			// failed to extract resource-key of the entry.
+		}
+		
 		try
 		{
 			stmt = _connection.prepareStatement(_ADD_ENTRY_STATEMENT);
@@ -67,6 +83,7 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 				"entries", "endpoint"));
 			stmt.setString(4, attrKey);
 			stmt.setBytes(5, ObjectSerializer.anyToBytes(entry.getAttributes()));
+			stmt.setString(6, entryId);
 			if (stmt.executeUpdate() != 1)
 				throw new ResourceException("Unable to update resource");
 			_connection.commit();
@@ -152,70 +169,84 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 		}
 	}
 
-	public Collection<InternalEntry> retrieveEntries(String entryName)
-			throws ResourceException
-	{
+	public Collection<InternalEntry> retrieveEntries(String entryName) throws ResourceException {
+		
 		ArrayList<InternalEntry> ret = new ArrayList<InternalEntry>();
-		
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		
+		PreparedStatement stmt1 = null;
+		ResultSet rs1 = null;
+		PreparedStatement stmt2 = null;
+		ResultSet rs2 = null;
 		boolean isBatch = true; //batch denotes entryName is null
-		
-		try
-		{
-			if (entryName == null)
-				stmt = _connection.prepareStatement(_RETRIEVE_ALL_STMT);
-			else
-			{
-				stmt = _connection.prepareStatement(_RETRIEVE_ONE_STMT);
-				stmt.setString(2, entryName);
+
+		try {
+			if (entryName == null) {
+				stmt1 = _connection.prepareStatement(_RETRIEVE_ALL_STMT);
+			} else {
+				stmt1 = _connection.prepareStatement(_RETRIEVE_ONE_STMT);
+				stmt1.setString(2, entryName);
 				isBatch = false;
 			}
-			
-			stmt.setString(1, _resourceKey);
-			rs = stmt.executeQuery();
-			
-			if(isBatch)
-			{
-				while (rs.next())
-				{
-					InternalEntry entry = new InternalEntry(
-						rs.getString(1), EPRUtils.fromBlob(rs.getBlob(2)),
-						ObjectDeserializer.anyFromBytes(rs.getBytes(4)), true);
+
+			stmt1.setString(1, _resourceKey);
+			rs1 = stmt1.executeQuery();
+
+			Map<String, EndpointReferenceType> entriesWithMissingResourceKeys = 
+					new HashMap<String, EndpointReferenceType>();
+
+			if(isBatch) {
+				while (rs1.next()) {
+					String entryNameFromDB = rs1.getString(1);
+					EndpointReferenceType entryEPR = EPRUtils.fromBlob(rs1.getBlob(2));
+					MessageElement[] entryAttributes = ObjectDeserializer.anyFromBytes(rs1.getBytes(4));
+					String entryResourceKey = rs1.getString("endpoint_id");
+					InternalEntry entry = new InternalEntry(entryNameFromDB, entryEPR, entryAttributes);
 					ret.add(entry);
+					if (entryResourceKey == null) {
+						entriesWithMissingResourceKeys.put(entryNameFromDB, entryEPR);
+					}
 				}
-				
-			}
-			
-			else
-			{
-				if(rs.next())
-				{
-					InternalEntry entry = new InternalEntry(
-							rs.getString(1), EPRUtils.fromBlob(rs.getBlob(2)),
-							ObjectDeserializer.anyFromBytes(rs.getBytes(4)), true);
-						ret.add(entry);
-				}
-				
-				else
-				{
+			} else {
+				if (rs1.next()) {
+					String entryNameFromDB = rs1.getString(1);
+					EndpointReferenceType entryEPR = EPRUtils.fromBlob(rs1.getBlob(2));
+					MessageElement[] entryAttributes = ObjectDeserializer.anyFromBytes(rs1.getBytes(4));
+					String entryResourceKey = rs1.getString("endpoint_id");
+					InternalEntry entry = new InternalEntry(entryNameFromDB, entryEPR, entryAttributes);
+					ret.add(entry);
+					if (entryResourceKey == null) {
+						entriesWithMissingResourceKeys.put(entryNameFromDB, entryEPR);
+					}
+				} else {
 					InternalEntry entry = new InternalEntry(entryName, null, null, false); //signifying that the entry name does not exist
 					ret.add(entry);
 				}
 			}
-			
-			
+			if (!entriesWithMissingResourceKeys.isEmpty()) {
+				Map<String, String> entryNameToResourceKeyMappings = 
+						getEntryNameToResourceKeyMappings(entriesWithMissingResourceKeys);
+				if (!entryNameToResourceKeyMappings.isEmpty()) {
+					stmt2 = _connection.prepareStatement(_ENTRY_ID_UPDATE_STMT);
+					for (Map.Entry<String, String> entry : entryNameToResourceKeyMappings.entrySet()) {
+						String entryEndpointId = entry.getValue();
+						String tobeUpdatedEntryName = entry.getKey();
+						stmt2.setString(1, entryEndpointId);
+						stmt2.setString(2, _resourceKey);
+						stmt2.setString(3, tobeUpdatedEntryName);
+						stmt2.addBatch();
+					}
+					stmt2.executeBatch();
+				}
+			}
 			return ret;
-		}
-		catch (SQLException sqe)
-		{
+			
+		} catch (SQLException sqe) {
 			throw new ResourceException(sqe.getLocalizedMessage(), sqe);
-		}
-		finally
-		{
-			StreamUtils.close(rs);
-			StreamUtils.close(stmt);
+	
+		} finally {
+			StreamUtils.close(rs1);
+			StreamUtils.close(stmt1);
+			StreamUtils.close(rs2);
+			StreamUtils.close(stmt2);
 		}
 	}
 
@@ -364,4 +395,21 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 		}
 		return super.getProperty(propertyName);
 	}	
+	
+	private Map<String, String> getEntryNameToResourceKeyMappings(Map<String, EndpointReferenceType> nameToEPRMappings) {
+		Map<String, String> nameToResourceIdMappings = new HashMap<String, String>();
+		for (Map.Entry<String, EndpointReferenceType> entry : nameToEPRMappings.entrySet()) {
+			EndpointReferenceType entryEPR = entry.getValue();
+			try {
+				String resourceKey = new AddressingParameters(entryEPR.getReferenceParameters()).getResourceKey();
+				if (resourceKey != null) {
+					String entryName = entry.getKey();
+					nameToResourceIdMappings.put(entryName, resourceKey);
+				}
+			} catch (Exception e) {
+				// entry reference-parameters section did not match GenesisII convention. 
+			} 
+		}
+		return nameToResourceIdMappings;
+	}
 }

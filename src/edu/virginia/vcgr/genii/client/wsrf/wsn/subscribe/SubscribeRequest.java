@@ -90,7 +90,7 @@ public class SubscribeRequest
 		return new SubscriptionPolicyType(any);
 	}
 	
-	SubscribeRequest(EndpointReferenceType consumerReference,
+	public SubscribeRequest(EndpointReferenceType consumerReference,
 		TopicQueryExpression topicFilter,
 		TerminationTimeType terminationTime,
 		AdditionalUserData additionalUserData,

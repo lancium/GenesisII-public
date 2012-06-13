@@ -12,4 +12,9 @@ public interface RNSTopics
 	static final public TopicPath RNS_OPERATION_TOPIC = 
 		TopicPath.createTopicPath(new QName(
 			RNSConstants.GENII_RNS_NS, "RNSOperation", "genii-rns"));
+
+	@WSNTopic(contentsType = RNSContentChangeNotification.class)
+	static final public TopicPath RNS_CONTENT_CHANGE_TOPIC = 
+	TopicPath.createTopicPath(new QName(
+			RNSConstants.GENII_RNS_NS, "RNSContentChanged", "genii-rns"));
 }

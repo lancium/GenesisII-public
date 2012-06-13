@@ -27,7 +27,15 @@ import java.net.URL;
 import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+
+import javax.activation.DataHandler;
+import javax.mail.util.ByteArrayDataSource;
+import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
 
 import org.apache.axis.SimpleChain;
 import org.apache.axis.attachments.AttachmentPart;
@@ -40,38 +48,43 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
-import javax.activation.DataHandler;
-import javax.mail.util.ByteArrayDataSource;
-import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPException;
-
 import edu.virginia.cs.vcgr.genii._2006._12.resource_simple.TryAgainFaultType;
 import edu.virginia.vcgr.appmgr.version.Version;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cache.LRUCache;
+import edu.virginia.vcgr.genii.client.cache.ResourceAccessMonitor;
+import edu.virginia.vcgr.genii.client.cache.unified.CacheManager;
+import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.NotificationMessageIndexProcessor;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.CommConstants;
 import edu.virginia.vcgr.genii.client.comm.GenesisIIEndpointInformation;
 import edu.virginia.vcgr.genii.client.comm.GeniiSOAPHeaderConstants;
 import edu.virginia.vcgr.genii.client.comm.MethodDescription;
 import edu.virginia.vcgr.genii.client.comm.ResolutionContext;
-import edu.virginia.vcgr.genii.client.configuration.*;
-import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.comm.attachments.AttachmentType;
+import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
+import edu.virginia.vcgr.genii.client.comm.axis.security.ISecurityRecvHandler;
+import edu.virginia.vcgr.genii.client.comm.axis.security.ISecuritySendHandler;
+import edu.virginia.vcgr.genii.client.comm.axis.security.MessageSecurity;
+import edu.virginia.vcgr.genii.client.comm.axis.security.VcgrSslSocketFactory;
+import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
+import edu.virginia.vcgr.genii.client.configuration.ConfigurationUnloadedListener;
+import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
+import edu.virginia.vcgr.genii.client.configuration.Installation;
+import edu.virginia.vcgr.genii.client.configuration.SecurityConstants;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
-import edu.virginia.vcgr.genii.client.resource.ResourceException;
-import edu.virginia.vcgr.genii.client.resource.TypeInformation;
-import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
-import edu.virginia.vcgr.genii.client.security.SecurityUtils;
-import edu.virginia.vcgr.genii.client.security.x509.*;
+import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.invoke.IFinalInvoker;
 import edu.virginia.vcgr.genii.client.invoke.InvocationInterceptorManager;
 import edu.virginia.vcgr.genii.client.naming.EPRUtils;
 import edu.virginia.vcgr.genii.client.naming.NameResolutionFailedException;
 import edu.virginia.vcgr.genii.client.naming.WSName;
-import edu.virginia.vcgr.genii.client.comm.attachments.AttachmentType;
-import edu.virginia.vcgr.genii.client.comm.attachments.GeniiAttachment;
-import edu.virginia.vcgr.genii.client.comm.axis.security.*;
-
+import edu.virginia.vcgr.genii.client.resource.ResourceException;
+import edu.virginia.vcgr.genii.client.resource.TypeInformation;
+import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
+import edu.virginia.vcgr.genii.client.security.SecurityUtils;
+import edu.virginia.vcgr.genii.client.security.x509.CertTool;
+import edu.virginia.vcgr.genii.container.notification.NotificationBrokerConstants;
 import edu.virginia.vcgr.genii.context.ContextType;
 import edu.virginia.vcgr.genii.security.MessageLevelSecurityRequirements;
 
@@ -485,6 +498,8 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		int timeout = (_timeout != null) ? _timeout.intValue() : _DEFAULT_TIMEOUT;
 		TypeInformation type = null;
 		
+		ResourceAccessMonitor.reportResourceUsage(origEPR);
+		
 		while (true)
 		{
 			attempt++;
@@ -502,6 +517,9 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 					_logger.debug("Unable to communicate with endpoint " +
 							"(not a retryable-exception).");
 					throw cause;
+				} else {
+					// Presumably, here I need to invalidate the cache for all entries that 
+					// belongs to that particular container.
 				}
 				if (type == null)
 					type = new TypeInformation(_epr);
@@ -595,6 +613,26 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 					if (firstException == null)
 						firstException = throwable;
 					tryAgain = false;
+					
+					_logger.debug("failed method: " + calledMethod.getName());
+					
+					// Resetting the client cache as the original EPR holding container might be 
+					// down, which will invalidate existing subscriptions and the notification broker.
+					String methodName = calledMethod.getName();
+					if (!"destroy".equalsIgnoreCase(methodName) 
+							&& !"createIndirectSubscriptions".equalsIgnoreCase(methodName) 
+							&& !"createNotificationBrokerWithForwardingPort".equalsIgnoreCase(methodName)
+							&& !"getMessages".equalsIgnoreCase(methodName)
+							&& !"updateMode".equalsIgnoreCase(methodName)) {
+						
+						// If the method is not the destroy method or any notification management method 
+						// only then cache has been refreshed. Destroy method is ignored because otherwise 
+						// there is a chance of cycle formation as the cache management system itself use 
+						// WS-resources that are destroyed with a cache refresh and invocation of destroy 
+						// on those resources can fail too. Meanwhile, notification management methods are
+						// ignored to avoid redundant cache refreshes.
+						CacheManager.resetCachingSystem();
+					}
 				}
 			}
 		}
@@ -688,6 +726,10 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 						}
 					}
 				}
+			} else if (name.equals(NotificationBrokerConstants.MESSAGE_INDEX_QNAME)) {
+				EndpointReferenceType target = getTargetEPR();
+				int messageIndex = Integer.parseInt(elem.getValue());
+				NotificationMessageIndexProcessor.processMessageIndexValue(target, messageIndex);
 			}
 		}
 		

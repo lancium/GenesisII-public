@@ -10,6 +10,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import org.apache.axis.message.MessageElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Element;
@@ -65,7 +66,7 @@ public class DefaultNotificationMultiplexer implements NotificationMultiplexer
 	@Override
 	final public String notify(TopicPath path, EndpointReferenceType producerReference,
 		EndpointReferenceType subscriptionReference,
-		Element messageContents)
+		Element messageContents, MessageElement[] additionalAttributes)
 	{
 		String status = NotificationConstants.UNPROCESSED;
 		
@@ -86,12 +87,16 @@ public class DefaultNotificationMultiplexer implements NotificationMultiplexer
 					Unmarshaller u = context.createUnmarshaller();
 					JAXBElement<? extends NotificationMessageContents> jaxbe =
 						u.unmarshal(messageContents, handler.contentsType());
-					
+	
+					NotificationMessageContents messageContent = jaxbe.getValue();
+					messageContent.setAdditionalAttributes(additionalAttributes);
+
 					// What if a message is handled by multiple handlers?
 					// Should we combine the status so far with the new status?
 					// Should we abort the loop if the new status is "try again"?
 					status = handler.handleNotification(path, producerReference,
-						subscriptionReference, jaxbe.getValue());
+							subscriptionReference, messageContent);
+
 				}
 				catch (JAXBException e)
 				{

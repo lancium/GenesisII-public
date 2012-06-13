@@ -53,4 +53,26 @@ public class DatabaseTableUtils
 			StreamUtils.close(stmt);
 		}
 	}
+
+	static public void addColumns(Connection connection, boolean failOnExists, 
+			String...addColumnStatements) throws SQLException {
+
+		Statement stmt = null;
+		try {
+			stmt = connection.createStatement();
+			for (String updateStatement : addColumnStatements) {
+				try {
+					stmt.executeUpdate(updateStatement);
+				}
+				catch (SQLException sqe) {
+					if (sqe.getSQLState().equals("X0Y32")) {
+						if (failOnExists) throw sqe;
+						else _logger.debug("Received an SQL Exception for a column that already exists.", sqe);
+					} else throw sqe;
+				}
+			}
+		} finally {
+			StreamUtils.close(stmt);
+		}
+	}
 }

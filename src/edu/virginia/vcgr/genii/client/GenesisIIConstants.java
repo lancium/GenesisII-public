@@ -85,4 +85,17 @@ public class GenesisIIConstants
 	static final public QName COMMAND_FUNCTION_QNAME = new QName(
 		WellKnownPortTypes.VCGR_COMMON_PORT_TYPE.getQName().getNamespaceURI(),
 		COMMAND_FUNCTION_NAME);
+	
+	static public QName NOTIFICATION_MESSAGE_ATTRIBUTES_SEPARATOR =
+			new QName(GENESISII_NS, "notification-message-attributes-separator");
+
+	static public final QName NOTIFICATION_BROKER_FACTORY_ADDRESS = 
+			new QName(GenesisIIConstants.GENESISII_NS, "NotificationBrokerFactory");
+
+	static public final String ENHANCED_NOTIFICATION_BROKER_NS = 
+			"http://vcgr.cs.virginia.edu/container/2011/07/enhanced-notification-broker";
+
+	static public final String CLIENT_ID_ATTRIBUTE_NAME = "ClientID";
+	static public final QName CLIENT_ID_QNAME = new QName(GENESISII_NS, 
+			CLIENT_ID_ATTRIBUTE_NAME);	
 }

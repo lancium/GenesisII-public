@@ -104,6 +104,10 @@
 			locator-type="edu.virginia.vcgr.genii.jndiauthn.JNDIAuthnServiceLocator"/>
 		<locator interface="edu.virginia.vcgr.genii.tty.TTYPortType"
 			locator-type="edu.virginia.vcgr.genii.tty.TTYServiceLocator"/>
+        <locator interface="edu.virginia.vcgr.genii.notification.factory.EnhancedNotificationBrokerFactoryPortType"
+            locator-type="edu.virginia.vcgr.genii.notification.factory.EnhancedNotificationBrokerFactoryServiceLocator"/>
+        <locator interface="edu.virginia.vcgr.genii.notification.broker.EnhancedNotificationBrokerPortType"
+            locator-type="edu.virginia.vcgr.genii.notification.broker.EnhancedNotificationBrokerServiceLocator"/> 
 	</genii:locator-registry>
 	
 	<genii:configured-instances>
@@ -119,6 +123,9 @@
 		<mconf:instance name="lookup-cache"
 			type="edu.virginia.vcgr.genii.client.invoke.handlers.LookupCacheHandler"
 			base="java.lang.Object" />
+        <mconf:instance name="subscription-processor"
+            type="edu.virginia.vcgr.genii.client.invoke.handlers.SubscriptionInfoProcessor"
+            base="java.lang.Object"/>
 	</genii:configured-instances>
 
 	<genii:tools>
@@ -301,5 +308,6 @@
 	<genii:client-pipeline>
 		<genii:pipeline-handler>attribute-cache</genii:pipeline-handler>
 		<genii:pipeline-handler>lookup-cache</genii:pipeline-handler>
+		<genii:pipeline-handler>subscription-processor</genii:pipeline-handler>
 	</genii:client-pipeline>
 </mconf:configuration>

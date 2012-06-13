@@ -33,7 +33,7 @@ public interface StreamableByteIORP
 	@ResourceProperty(namespace = STREAMABLE_BYTEIO_NS, localname = "Writeable")
 	public Boolean getWriteable();
 	
-	@ResourceProperty(namespace = STREAMABLE_BYTEIO_NS, localname = "TransferMechanism")
+	@ResourceProperty(namespace = STREAMABLE_BYTEIO_NS, localname = "TransferMechanism", max = "unbounded")
 	public Collection<QName> getTransferMechanisms();
 	
 	@ResourceProperty(namespace = STREAMABLE_BYTEIO_NS, localname = "CreateTime")

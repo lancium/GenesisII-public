@@ -16,8 +16,8 @@
 
 package edu.virginia.vcgr.genii.client.comm.axis;
 
-import java.security.GeneralSecurityException;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -33,15 +33,17 @@ import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.security.WSEncryptionPart;
 import org.morgan.util.GUID;
 import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.ReferenceParametersType;
-import org.apache.ws.security.WSEncryptionPart;
 
 import edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher;
 import edu.virginia.vcgr.appmgr.launcher.ApplicationLauncherConsole;
 import edu.virginia.vcgr.appmgr.version.Version;
+import edu.virginia.vcgr.genii.client.ClientIdGenerator;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
+import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.CommConstants;
 import edu.virginia.vcgr.genii.client.comm.GeniiSOAPHeaderConstants;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
@@ -51,7 +53,6 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.context.ContextType;
-import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 
 public class AxisClientHeaderHandler extends BasicHandler
 {
@@ -309,6 +310,18 @@ public class AxisClientHeaderHandler extends BasicHandler
 		}
 	}
 	
+	private void setClientID(MessageContext msgContext) throws AxisFault {
+		SOAPHeaderElement clientId = new SOAPHeaderElement(
+				GenesisIIConstants.CLIENT_ID_QNAME, ClientIdGenerator.getClientId());
+		clientId.setActor(null);
+		clientId.setMustUnderstand(false);
+		try {
+			msgContext.getMessage().getSOAPHeader().addChildElement(clientId);
+		} catch (SOAPException se) {
+			throw new AxisFault(se.getLocalizedMessage());
+		}
+	}
+	
 	public void invoke(MessageContext msgContext) throws AxisFault
 	{
 		setMessageID(msgContext);
@@ -316,5 +329,6 @@ public class AxisClientHeaderHandler extends BasicHandler
 		setWSAddressingHeaders(msgContext);
 		setCallingContextHeaders(msgContext);
 		setGenesisIIHeaders(msgContext);
+		setClientID(msgContext);
 	}
 }

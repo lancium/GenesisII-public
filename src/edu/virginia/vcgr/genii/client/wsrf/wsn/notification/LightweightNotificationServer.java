@@ -26,6 +26,7 @@ import org.ws.addressing.AttributedURIType;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
+import edu.virginia.vcgr.genii.client.configuration.Hostname;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.AdditionalUserData;
 import edu.virginia.vcgr.genii.client.wsrf.wsn.DefaultNotificationMultiplexer;
@@ -152,14 +153,18 @@ public class LightweightNotificationServer
 	private Set<LightweightSubscription> _subscriptions =
 		new HashSet<LightweightSubscription>();
 	
-	private EndpointReferenceType getEPR() throws IOException
+	public void setMultiplexer(NotificationMultiplexer multiplexer) {
+		this._multiplexer = multiplexer;
+	}
+	
+	public EndpointReferenceType getEPR() throws IOException
 	{
 		if (!_httpServer.isStarted())
 			throw new IOException("Server not started!");
 		
 		return new EndpointReferenceType(
 			new AttributedURIType(String.format(URL_PATTERN,
-				_protocol, "127.0.0.1",
+				_protocol, Hostname.getMostGlobal().getCanonicalHostName(),
 				_httpServer.getConnectors()[0].getLocalPort())),
 				null, null, null);
 	}

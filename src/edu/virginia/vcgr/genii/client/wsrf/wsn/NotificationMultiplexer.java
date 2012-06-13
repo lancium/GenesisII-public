@@ -1,5 +1,6 @@
 package edu.virginia.vcgr.genii.client.wsrf.wsn;
 
+import org.apache.axis.message.MessageElement;
 import org.w3c.dom.Element;
 import org.ws.addressing.EndpointReferenceType;
 
@@ -14,5 +15,6 @@ public interface NotificationMultiplexer
 	public String notify(TopicPath path,
 		EndpointReferenceType producerReference,
 		EndpointReferenceType subscriptionReference,
-		Element messageContents);
+		Element messageContents,
+		MessageElement[] additionalAttributes);
 }

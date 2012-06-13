@@ -12,4 +12,9 @@ public interface ByteIOTopics
 	static final public TopicPath BYTEIO_CONTENTS_CHANGED_TOPIC =
 		TopicPath.createTopicPath(new QName(ByteIOConstants.BYTEIO_NS,
 			"ContentsChanged", "byteio"));
+
+	@WSNTopic(contentsType = ByteIOAttributesUpdateNotification.class)
+	static final public TopicPath BYTEIO_ATTRIBUTES_UPDATE_TOPIC =
+		TopicPath.createTopicPath(new QName(ByteIOConstants.BYTEIO_NS,
+			"AttributesUpdated", "byteio"));
 }
