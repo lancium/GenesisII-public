@@ -1,5 +1,3 @@
 #!/bin/sh
 
-_CT_GENII_INSTALL_DIR="%{INSTALL_PATH}"
-
-"$JAVA_HOME/bin/java" -classpath "%{INSTALL_PATH}/lib:%{INSTALL_PATH}/ApplicationWatcher/app-manager.jar" "-Dlog4j.configuration=%{LOG4JCONFIG}" "-Djava.library.path=%{INSTALL_PATH}/%{GENII_JNI_PATH}" edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher "%{INSTALL_PATH}/ApplicationWatcher/genii-certtool-application.properties" "$@"
+"$JAVA_HOME/bin/java" -classpath "%{INSTALL_PATH}/lib:%{INSTALL_PATH}/ApplicationWatcher/app-manager.jar" "-Dlog4j.configuration=%{CLIENT_LOG4JCONFIG}" "-Djava.library.path=%{INSTALL_PATH}/%{GENII_JNI_PATH}" edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher "%{INSTALL_PATH}/ApplicationWatcher/genii-certtool-application.properties" "$@"

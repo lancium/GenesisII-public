@@ -4,7 +4,7 @@ set "OLD_JAVA_HOME=%JAVA_HOME%"
 set "OLD_PATH=%PATH%"
 
 set "JAVA_HOME=${installer:sys.preferredJre}"
-set "PATH=%PATH%;${installer:sys.installationDir}\jni-lib;%JAVA_HOME%\bin\client"
+set "PATH=%PATH%;${installer:sys.installationDir}\jni-libs\win32;%JAVA_HOME%\bin\client"
 
 "${installer:sys.installationDir}\GenesisIFSServer.exe"
 
