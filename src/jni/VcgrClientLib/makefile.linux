@@ -4,7 +4,8 @@ CFLAGS	=		-Wall -I$(JAVA_HOME)/include								\
 LFLAGS	=
 
 OBJDIR	=		Release
-LIBDIR	=		$(INSTALL_PATH)/jni-lib
+LIBDIR	=		$(INSTALL_PATH)/jni-libs/lin32
+#note that we need to support lin64 too.
 
 OBJECTS	=		$(OBJDIR)/ExceptionUtils.o									\
 				$(OBJDIR)/FileSystemUtils.o								\

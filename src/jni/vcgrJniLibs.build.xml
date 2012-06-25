@@ -4,7 +4,8 @@
 	<import file="../../init.build.xml"/>
 
 	<target name="jni-dirs" depends="init">
-		<mkdir dir="${basedir}/jni-lib"/>
+		<mkdir dir="${basedir}/jni-libs"/>
+		<mkdir dir="${basedir}/jni-libs/win32"/>
 		<mkdir dir="${src.dir}/jni/VcgrClientLib/Release"/>
 		<mkdir dir="${src.dir}/jni/VcgrContainerLib/Release"/>
 	</target>

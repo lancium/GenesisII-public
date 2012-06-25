@@ -63,7 +63,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="CToGenesisCalls.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(ProjectDir)\..\..\..\jni-lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(ProjectDir)\..\..\..\jni-libs\win32&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -95,7 +95,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="C:\GenesisIIDevelopment\GenesisII\jni-lib\IFS"
+			OutputDirectory="C:\GenesisIIDevelopment\GenesisII\jni-libs\win32\IFS"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
@@ -143,7 +143,7 @@
 				UseLibraryDependencyInputs="true"
 				AdditionalDependencies="CToGenesisCalls.lib User32.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;C:\GenesisIIDevelopment\GenesisII\jni-lib&quot;"
+				AdditionalLibraryDirectories="&quot;C:\GenesisIIDevelopment\GenesisII\jni-libs\win32&quot;"
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="true"
 				SubSystem="1"

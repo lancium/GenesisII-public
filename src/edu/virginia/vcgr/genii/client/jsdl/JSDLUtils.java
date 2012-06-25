@@ -85,6 +85,10 @@ public class JSDLUtils extends JNIContainerBaseClass
 		
 		_logger.debug("Determined that the local OS Type is \""
 			+ os + "\".");
+		if (os.equals(OperatingSystemType.Windows_7) || os.equals(OperatingSystemType.Windows_VISTA)) {
+		    _logger.debug("Considering " + os + " as roughly equivalent to XP.");
+		    os = OperatingSystemType.Windows_XP;
+		}
 		return new OperatingSystemType_Type(
 			OperatingSystemTypeEnumeration.fromString(os.name()), null);
 	}

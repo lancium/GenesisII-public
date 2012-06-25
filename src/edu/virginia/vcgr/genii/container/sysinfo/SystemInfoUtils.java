@@ -26,7 +26,9 @@ public class SystemInfoUtils
 
 		if (osType == OperatingSystemType.LINUX)
 			_provider = new ProcFilesystemProvider();
-		else if (osType == OperatingSystemType.Windows_XP)
+		else if ( (osType == OperatingSystemType.Windows_XP)
+			|| (osType == OperatingSystemType.Windows_VISTA)
+			|| (osType == OperatingSystemType.Windows_7) )
 			_provider = new WindowsProvider();
 		else if (osType == OperatingSystemType.MACOS)
 			_provider = new MacOSXProvider();

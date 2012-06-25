@@ -279,7 +279,7 @@ DllExport int initializeJavaVM(char * genesis_directory, PGII_JNI_INFO newInfo){
 
 	sprintf_s(op0, 512, "-Djava.class.path=%s/ext/bouncycastle/bcprov-jdk15-133.jar;%s/lib/GenesisII-security.jar;%s/lib/morgan-utilities.jar;%s/lib;%s/security;", genesis_directory, genesis_directory, genesis_directory, genesis_directory, genesis_directory);	
 	sprintf_s(op1, 255, "-Dlog4j.configuration=genesisII.log4j.properties");
-	sprintf_s(op2, 255, "-Djava.library.path=%s/jni-lib", genesis_directory);
+	sprintf_s(op2, 255, "-Djava.library.path=%s/jni-libs/win32", genesis_directory);
 	sprintf_s(op3, 255, "-Dedu.virginia.vcgr.genii.install-base-dir=%s", genesis_directory);	
 
 	options[0].optionString = op0;

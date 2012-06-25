@@ -4,7 +4,7 @@ CFLAGS	=		-Wall -I$(JNI_HEADERS) -fPIC -m64
 LFLAGS	=
 
 OBJDIR	=		Release
-LIBDIR	=		$(INSTALL_PATH)/jni-lib
+LIBDIR	=		$(INSTALL_PATH)/jni-libs/osx64
 
 OBJECTS	=		$(OBJDIR)/ExceptionUtils.o									\
 				$(OBJDIR)/FileSystemUtils.o								\

@@ -1,9 +1,9 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual C++ Express 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VcgrClientLib", "VcgrClientLib\VcgrClientLib.vcproj", "{F127023B-8F78-4E18-9107-3153355F1DCA}"
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VcgrClientLib", "VcgrClientLib\VcgrClientLib.vcxproj", "{F127023B-8F78-4E18-9107-3153355F1DCA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VcgrContainerLib", "VcgrContainerLib\VcgrContainerLib.vcproj", "{A31C70DA-8D17-4479-8354-39135AC999D0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VcgrContainerLib", "VcgrContainerLib\VcgrContainerLib.vcxproj", "{A31C70DA-8D17-4479-8354-39135AC999D0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
