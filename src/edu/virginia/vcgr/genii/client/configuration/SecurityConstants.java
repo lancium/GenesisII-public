@@ -22,6 +22,8 @@ public interface SecurityConstants
 			"edu.virginia.vcgr.genii.client.security.ssl.trust-store-type";
 		static public final String SSL_TRUST_STORE_PASSWORD_PROP =
 			"edu.virginia.vcgr.genii.client.security.ssl.trust-store-password";
+		static public final String SSL_TRUSTED_CERTIFICATES_LOCATION_PROP = 
+			"edu.virginia.vcgr.genii.client.security.ssl.trusted-certificates.location";
 	}
 
 	public interface Container

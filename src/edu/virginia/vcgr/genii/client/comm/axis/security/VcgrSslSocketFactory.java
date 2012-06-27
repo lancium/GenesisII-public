@@ -16,21 +16,35 @@
 
 package edu.virginia.vcgr.genii.client.comm.axis.security;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+import java.security.SecureRandom;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
 import javax.net.SocketFactory;
-
-import java.security.*;
-import java.security.cert.X509Certificate;
-import java.util.Date;
-import java.util.Properties;
-
-import javax.net.ssl.*;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSessionContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,10 +54,16 @@ import edu.virginia.vcgr.genii.client.cache.LRUCache;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.comm.socket.SocketConfigurer;
-import edu.virginia.vcgr.genii.client.configuration.*;
+import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
+import edu.virginia.vcgr.genii.client.configuration.ConfigurationUnloadedListener;
+import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
+import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.configuration.Security;
+import edu.virginia.vcgr.genii.client.configuration.SecurityConstants;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
-import edu.virginia.vcgr.genii.client.security.x509.*;
+import edu.virginia.vcgr.genii.client.security.x509.CertTool;
+import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
+import edu.virginia.vcgr.genii.client.security.x509.SingleSSLX509KeyManager;
 
 /**
  * Wrapper for the generic SSLSocketFactory.
@@ -170,6 +190,7 @@ public class VcgrSslSocketFactory
 
 			// open the trust store and init the trust manager factory, if possible
 			Security sslProps = getSSLProperties();
+			KeyStore trustStore = null;
 			
 			String trustStoreLoc = sslProps.getProperty(
 				SecurityConstants.Client.SSL_TRUST_STORE_LOCATION_PROP);
@@ -186,16 +207,119 @@ public class VcgrSslSocketFactory
 			}
 			
 			if (trustStoreLoc != null) {
-				KeyStore ks = CertTool.openStoreDirectPath(
-					Installation.getDeployment(new DeploymentName()).security(
-						).getSecurityFile(trustStoreLoc),
-					trustStoreType, trustStorePassChars);
-		    	tmf.init(ks);
+				try {
+					trustStore = CertTool.openStoreDirectPath(
+						Installation.getDeployment(new DeploymentName()).security(
+							).getSecurityFile(trustStoreLoc),
+						trustStoreType, trustStorePassChars);
+				} catch (Throwable cause) {
+					_logger.info("Trust store failed to load from file " + trustStoreLoc + "; will attempt to load trusted certificates from directory.", cause);
+				}
+			}
+			
+			String trustedCertificatesDirectory = sslProps.getProperty(
+					SecurityConstants.Client.SSL_TRUSTED_CERTIFICATES_LOCATION_PROP);
+			if (trustedCertificatesDirectory == null) {
+				if (trustStore == null) {
+					_logger.warn("Complete failure to load trust store from file and no trusted certificate directory is set.");
+				}
+			} else {
+				try {
+					File certificatesDirectory = Installation.getDeployment(new DeploymentName()).security(
+							).getSecurityFile(trustedCertificatesDirectory);
+					List<Certificate> certificateList = loadCertificatesFromDirectory(certificatesDirectory);
+					if (certificateList != null && !certificateList.isEmpty()) {
+						if (trustStore == null) {
+							trustStore = createTrustStoreFromCertificates(trustStoreType, 
+									trustStorePass, certificateList);
+						} else {
+							int certificateIndex = 0;
+							for (Certificate certificate : certificateList) {
+								final String alias = "trusted_certificate_" + certificateIndex;
+								trustStore.setCertificateEntry(alias, certificate);
+								certificateIndex++;
+							}
+						}
+					}
+				} catch (Throwable cause) {
+					_logger.info("Trust store failed to load trusted certificates from directory.", cause);
+				}
+			}
+			
+			if (trustStore != null) {
+				Enumeration<String> aliases = trustStore.aliases();
+				if (aliases != null) {
+					while (aliases.hasMoreElements()) {
+						_logger.debug("Trust-Store alias: " + aliases.nextElement());
+					}
+				}
+				tmf.init(trustStore);
 		    	_trustManagers = tmf.getTrustManagers();
 			}
+			
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+	
+	private List<Certificate> loadCertificatesFromDirectory(File directory) {
+		
+		if (directory == null || !directory.isDirectory()) return Collections.emptyList();
+		
+		List<Certificate> certificateList = new ArrayList<Certificate>();
+		File[] certificateFiles = directory.listFiles();
+
+		_logger.info("Loading Trusted Certificates ... ");
+		
+		for (File certificateFile : certificateFiles) {
+			try {
+				// skip hidden files, i.e. those that start with a dot.
+				char testHidden = certificateFile.getName().charAt(0);
+				if (testHidden == '.') continue;
+				FileInputStream fis = new FileInputStream(certificateFile);
+				BufferedInputStream bis = new BufferedInputStream(fis);
+				CertificateFactory cf = CertificateFactory.getInstance("X.509");
+				while (bis.available() > 0) {
+					Certificate certificate = cf.generateCertificate(bis);
+					certificateList.add(certificate);
+				}
+				fis.close();
+				_logger.debug("Loaded trusted certificate(s) from file: " + certificateFile.getName());
+			} catch (Exception ex) {
+				_logger.warn("Failed to load certificates from file: " + certificateFile.getName(), ex);
+			}
+		}
+		
+		return certificateList;
+	}
+	
+	private KeyStore createTrustStoreFromCertificates(String proposedTrustStoreType, 
+			String password, List<Certificate> certificateList) {
+		
+		KeyStore trustStore = null;
+		char[] trustStorePassword = (password == null) 
+				? "genesisII".toCharArray() : password.toCharArray();
+		
+		Set<String> trustStoreTypes = new HashSet<String>();
+		trustStoreTypes.add(proposedTrustStoreType);
+		trustStoreTypes.add("JKS");
+		trustStoreTypes.add(KeyStore.getDefaultType());
+
+		for (String type : trustStoreTypes) {
+			try {
+				trustStore = KeyStore.getInstance(type);
+				trustStore.load(null, trustStorePassword);
+				int certificateIndex = 0;
+				for (Certificate certificate : certificateList) {
+					final String alias = "trusted_certificate_" + certificateIndex;
+					trustStore.setCertificateEntry(alias, certificate);
+					certificateIndex++;
+				}
+				break; // Successfully loaded all the certificates.
+				       // Don't have to try the other options.
+			} catch (Exception ex) {}
+		}
+		return trustStore;
 	}
 	
 	public static SocketFactory getDefault()
