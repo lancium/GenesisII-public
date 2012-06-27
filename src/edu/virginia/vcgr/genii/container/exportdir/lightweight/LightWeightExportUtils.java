@@ -9,15 +9,20 @@ import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 
-class LightWeightExportUtils
+public class LightWeightExportUtils
 {
 	static private String _lastRootDirString = null;
 	static private VExportRoot _lastExportRoot = null;
 	
-	static VExportRoot getRoot()
+	static VExportRoot getRoot(ResourceKey myKey)
 		throws IOException
 	{
-		ResourceKey rKey = ResourceManager.getCurrentResource();
+		ResourceKey rKey;
+		if(myKey != null)
+			rKey = myKey;
+		else
+			rKey = ResourceManager.getCurrentResource();
+		
 		if (rKey != null)
 		{
 			IResource resource = rKey.dereference();
@@ -80,13 +85,37 @@ class LightWeightExportUtils
 	static VExportEntry getEntry(String forkPath)
 		throws IOException
 	{
-		VExportRoot root = getRoot();
+		VExportRoot root = getRoot(null);
+		return root.lookup(forkPath);
+	}
+	
+	static VExportEntry getEntry(String forkPath, ResourceKey rKey)
+		throws IOException
+	{
+		if(rKey == null)
+			return getEntry(forkPath);
+		
+		VExportRoot root = getRoot(rKey);
 		return root.lookup(forkPath);
 	}
 	
 	static VExportDir getDirectory(String forkPath) throws IOException
 	{
 		VExportEntry ret = getEntry(forkPath);
+		if (!ret.isDirectory())
+			throw new IOException(String.format(
+				"Entry \"%s\" is not a directory.", forkPath));
+		
+		return (VExportDir)ret;
+	}
+	
+	static public VExportDir getDirectory(String forkPath, ResourceKey rKey) throws IOException
+	{
+		if(rKey == null)
+			return getDirectory(forkPath);
+		
+		VExportEntry ret = getEntry(forkPath, rKey);
+		
 		if (!ret.isDirectory())
 			throw new IOException(String.format(
 				"Entry \"%s\" is not a directory.", forkPath));
@@ -104,5 +133,18 @@ class LightWeightExportUtils
 		return (VExportFile)ret;
 	}
 	 
+	static public VExportFile getFile(String forkPath, ResourceKey rKey) throws IOException
+	{
+		if(rKey == null)
+			return getFile(forkPath);
+		
+		VExportEntry ret = getEntry(forkPath, rKey);
+		
+		if (!ret.isFile())
+			throw new IOException(String.format(
+				"Entry \"%s\" is not a file.", forkPath));
+		
+		return (VExportFile)ret;
+	}
 	
 }

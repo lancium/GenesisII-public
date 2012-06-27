@@ -69,6 +69,7 @@ import edu.virginia.vcgr.genii.client.ogsa.OGSAWSRFBPConstants;
 import edu.virginia.vcgr.genii.client.resource.AddressingParameters;
 import edu.virginia.vcgr.genii.client.resource.PortType;
 import edu.virginia.vcgr.genii.client.resource.ResourceException;
+
 import edu.virginia.vcgr.genii.client.rns.RNSUtilities;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.*;
 import edu.virginia.vcgr.genii.client.utils.IterableIterable;
@@ -82,12 +83,16 @@ import edu.virginia.vcgr.genii.container.common.AttributesPreFetcherFactory;
 import edu.virginia.vcgr.genii.container.common.DefaultGenesisIIAttributesPreFetcher;
 import edu.virginia.vcgr.genii.container.common.GenesisIIBase;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
+
 import edu.virginia.vcgr.genii.container.invoker.timing.Timer;
 import edu.virginia.vcgr.genii.container.invoker.timing.TimingSink;
+import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorWrapper;
+import edu.virginia.vcgr.genii.container.iterator.IterableSnapshot;
 import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
 import edu.virginia.vcgr.genii.container.rfork.cmd.CommandChannelManager;
+import edu.virginia.vcgr.genii.container.rfork.iterator.InMemoryIterableFork;
 import edu.virginia.vcgr.genii.container.rfork.sd.SimpleStateResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.sd.StateDescription;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
@@ -652,7 +657,8 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 	{
 		TimingSink tSink = TimingSink.sink();
 		Timer timer = null;
-		Iterable<InternalEntry> entries;
+		Iterable<InternalEntry> entries = null;
+		InMemoryIteratorWrapper wrapper = null;
 		ResourceFork tFork = getResourceFork();
 		if (!(tFork instanceof RNSResourceFork))
 			throw new RemoteException(
@@ -660,45 +666,118 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 		
 		RNSResourceFork fork = (RNSResourceFork)tFork;
 		AttributesPreFetcherFactory factory = 
-			new AttributesPreFetcherFactoryImpl();
+			new AttributesPreFetcherFactoryImpl();				
 		
 		try
 		{
+			/*Complete listing !*/
 			if (lookupRequest == null || lookupRequest.length == 0)
 			{
-				timer = tSink.getTimer("Retrieve Entries");
-				entries = fork.list(getExemplarEPR(), null);
+				timer = tSink.getTimer("Retrieve Entries");				
+				
+				if(fork.isInMemoryIterable())
+				{
+					InMemoryIterableFork iFork = fork.getInMemoryIterableFork();
+					
+					if(iFork == null)
+						entries = fork.list(getExemplarEPR(), null);
+					
+					else
+					{
+												
+						IterableSnapshot snapshot =
+							 iFork.splitAndList(getExemplarEPR(), getResourceKey());
+						
+						entries = snapshot.getReturns();
+						wrapper = snapshot.getWrapper();						
+						
+					}	
+				}
+								
+				//Not in-memory iterable
+				else
+					entries = fork.list(getExemplarEPR(), null);
+				
 				timer.noteTime();
-			} else
+			}
+			
+			//Specific listing!
+			else
 			{
-				IterableIterable<InternalEntry> entryConglomerate =
-					new IterableIterable<InternalEntry>();
+				boolean inMemoryIterable = false;
 				timer = tSink.getTimer("Retrieve Entries");
-				for (String request : lookupRequest)
-					entryConglomerate.add(
-						fork.list(getExemplarEPR(), request));
-				timer.noteTime();
-				entries = entryConglomerate;
+				
+				if(fork.isInMemoryIterable())
+				{
+					
+					InMemoryIterableFork iFork = fork.getInMemoryIterableFork();
+					
+					if(iFork != null)
+					{				
+						inMemoryIterable = true;
+					}
+					
+					if(inMemoryIterable)
+					{
+						
+						IterableSnapshot snapshot =
+							 iFork.splitAndList(lookupRequest, getExemplarEPR(), getResourceKey());
+						entries = snapshot.getReturns();
+						wrapper = snapshot.getWrapper();
+					}
+					
+				}
+				
+				if(!inMemoryIterable)
+				{					
+					IterableIterable<InternalEntry> entryConglomerate =
+						new IterableIterable<InternalEntry>();					
+					for (String request : lookupRequest)
+						entryConglomerate.add(
+								fork.list(getExemplarEPR(), request));					
+					entries = entryConglomerate;
+					
+				}
+					timer.noteTime();
 			}
 			
 			Collection<RNSEntryResponseType> resultEntries = 
 				new LinkedList<RNSEntryResponseType>();
 			timer = tSink.getTimer("Prepare Entries");
+			
 	    	for (InternalEntry internalEntry : entries)
 	    	{
-	    		EndpointReferenceType epr = internalEntry.getEntryReference();
-	    		RNSEntryResponseType entry = new RNSEntryResponseType(
-	    			epr, RNSUtilities.createMetadata(epr, 
-	    				Prefetcher.preFetch(epr, internalEntry.getAttributes(), factory)),
-	    			null, internalEntry.getName());
-	    		resultEntries.add(entry);
+	    		if(internalEntry.isExistent())
+	    		{
+	    			EndpointReferenceType epr = internalEntry.getEntryReference();
+		    		RNSEntryResponseType entry = new RNSEntryResponseType(
+		    			epr, RNSUtilities.createMetadata(epr, 
+		    				Prefetcher.preFetch(epr, internalEntry.getAttributes(), factory, null, null)),
+		    			null, internalEntry.getName());
+		    		resultEntries.add(entry);
+	    		}
+	    		else
+	    		{
+	    			String name = internalEntry.getName();
+					RNSEntryResponseType entry = new RNSEntryResponseType(null, null, 
+							FaultManipulator.fillInFault(
+									new RNSEntryDoesNotExistFaultType(
+									null, null, null, null, 
+									new BaseFaultTypeDescription[] 
+									{
+											new BaseFaultTypeDescription(String.format("Entry" +
+											" %s does not exist!", name))
+									},null, name)), name);
+					resultEntries.add(entry);
+	    		}
+	    		
 	    	}
 	    	timer.noteTime();
 			
 	    	timer = tSink.getTimer("Create Iterator");
-	    	return RNSContainerUtilities.translate(
+	    	return RNSContainerUtilities.indexedTranslate(
 	    		resultEntries, iteratorBuilder(
-	    			RNSEntryResponseType.getTypeDesc().getXmlType()));
+	    			RNSEntryResponseType.getTypeDesc().getXmlType()), wrapper);
 		}
 		catch (IOException ioe)
 		{
@@ -1127,7 +1206,10 @@ public abstract class ResourceForkBaseService extends GenesisIIBase
 		implements AttributesPreFetcherFactory
 	{
 		@Override
-		public AttributePreFetcher getPreFetcher(EndpointReferenceType epr)
+		/*The last two parameters are unused!*/
+		public AttributePreFetcher getPreFetcher(EndpointReferenceType epr,
+				ResourceKey rKey,
+				ResourceForkService service)
 				throws Throwable
 		{
 			ResourceFork fork = null;

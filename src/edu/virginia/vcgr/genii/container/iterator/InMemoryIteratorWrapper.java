@@ -7,10 +7,10 @@ public class InMemoryIteratorWrapper
 {
 	private String _className;
 	private List<InMemoryIteratorEntry> _indices = new LinkedList<InMemoryIteratorEntry>();
-	private Object _commonMember;
+	private Object[] _commonMember;
 	
 	public InMemoryIteratorWrapper(String className, List<InMemoryIteratorEntry> indices, 
-			Object commonMember) 
+			Object[] commonMember) 
 	{
 		_className = className;
 		if(indices!=null)
@@ -26,7 +26,7 @@ public class InMemoryIteratorWrapper
 		return _indices;
 	}
 
-	public Object getCommonMember() {
+	public Object[] getCommonMembers() {
 		return _commonMember;
 	}
 }

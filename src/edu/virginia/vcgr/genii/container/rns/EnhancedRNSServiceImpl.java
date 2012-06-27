@@ -81,6 +81,7 @@ import edu.virginia.vcgr.genii.container.resource.IResource;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.ResourceLock;
 import edu.virginia.vcgr.genii.container.resource.ResourceManager;
+import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.container.security.authz.providers.GamlAclTopics;
 import edu.virginia.vcgr.genii.container.serializer.MessageElementSerializer;
 import edu.virginia.vcgr.genii.container.sync.DestroyFlags;
@@ -224,7 +225,8 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 			
 			MessageElement[] prefetchedAttributes = null;
 			AttributesPreFetcherFactory factory = new AttributesPreFetcherFactoryImpl();
-			prefetchedAttributes = Prefetcher.preFetch(entryReference, new MessageElement[] {}, factory);
+			prefetchedAttributes = Prefetcher.preFetch(entryReference, new MessageElement[] {}, factory,
+					null, null);
 			RNSOperation operation = 
 				new RNSOperation(RNSOperation.OperationType.ENTRY_CREATE, filename);
 			notifyChangeInContent(operation, entryReference, prefetchedAttributes);
@@ -330,7 +332,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 		}
 		MessageElement[] attributes = null;
 		AttributesPreFetcherFactory factory = new AttributesPreFetcherFactoryImpl();
-		attributes = Prefetcher.preFetch(entryReference, new MessageElement[] {}, factory);
+		attributes = Prefetcher.preFetch(entryReference, new MessageElement[] {}, factory, null, null);
 		RNSMetadataType returnedMetadata = RNSUtilities.createMetadata(entryReference, attributes);
 
 		fireRNSEntryAdded(vvr, name, entryReference);
@@ -346,7 +348,10 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 		implements AttributesPreFetcherFactory
 	{
 		@Override
-		public AttributePreFetcher getPreFetcher(EndpointReferenceType target)
+		//service is unused
+		//forkPath is unused
+		public AttributePreFetcher getPreFetcher(EndpointReferenceType target,
+				ResourceKey rKey, ResourceForkService service)
 				throws Throwable
 		{
 			String targetAddress = target.getAddress().toString();
@@ -468,7 +473,8 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 				EndpointReferenceType epr = internalEntry.getEntryReference();
 				RNSEntryResponseType entry = new RNSEntryResponseType(
 						epr, RNSUtilities.createMetadata(epr, 
-							Prefetcher.preFetch(epr, internalEntry.getAttributes(), factory)),
+							Prefetcher.preFetch(epr, internalEntry.getAttributes(), factory, null,
+									null)),
 						null, internalEntry.getName());
 				resultEntries.add(entry);
 			}			
@@ -601,10 +607,11 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 	/*Do not change the name or signature of the below method. It is used in WSIteratorDBResource
 	 * using java-reflection.
 	 * 
-	 * If modifying: edit in WSIteratorDBResource.java and QueueServiceImpl.java .
+	 * If modifying: edit in WSIteratorDBResource.java and QueueServiceImpl.java and
+	 * LightWeightExportDirFork.java.
 	 * */
 	public static MessageElement getIndexedContent(Connection connection,
-			InMemoryIteratorEntry entry, Object obj) throws ResourceException
+			InMemoryIteratorEntry entry, Object[] obj) throws ResourceException
 	{
 		if(connection == null || entry == null)	//obj will be null as it is unused
 			throw new ResourceException("Unable to list directory contents"); 
@@ -651,7 +658,7 @@ public class EnhancedRNSServiceImpl extends GenesisIIBase
 				EndpointReferenceType epr = ie.getEntryReference();
 				resp = new RNSEntryResponseType(
 						epr, RNSUtilities.createMetadata(epr, 
-						Prefetcher.preFetch(epr, ie.getAttributes(), factory)),
+						Prefetcher.preFetch(epr, ie.getAttributes(), factory, null, null)),
 						null, ie.getName());					
 			}
 		}

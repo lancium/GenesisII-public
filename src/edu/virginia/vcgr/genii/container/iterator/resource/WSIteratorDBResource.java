@@ -215,7 +215,7 @@ public class WSIteratorDBResource extends BasicDBResource
 			firstElement = Math.max(firstElement, 0);
 			numElements = Math.max(numElements, 0);
 			List<InMemoryIteratorEntry> imieList = imiw.getIndices();
-			Object commonObj = imiw.getCommonMember();//loop-invariant
+			Object[] commonObjs = imiw.getCommonMembers();//loop-invariant
 			String invokee = imiw.getClassName();
 			Class<?> clazz;
 			Method meth;
@@ -223,7 +223,7 @@ public class WSIteratorDBResource extends BasicDBResource
 			try
 			{
 				clazz = Class.forName(invokee);
-				meth = clazz.getMethod("getIndexedContent", new Class[] {Connection.class, InMemoryIteratorEntry.class, Object.class});
+				meth = clazz.getMethod("getIndexedContent", new Class[] {Connection.class, InMemoryIteratorEntry.class, Object[].class});
 			}
 			catch(ClassNotFoundException e)
 			{
@@ -244,12 +244,10 @@ public class WSIteratorDBResource extends BasicDBResource
 				{
 					
 					try 
-					{
-						
-						MessageElement me = (MessageElement)meth.invoke(null, getConnection(),entry, commonObj);
+					{						
+						MessageElement me = (MessageElement)meth.invoke(null, getConnection(),entry, commonObjs);
 						ret.add(new Pair<Long, MessageElement>((long)lcv, me));
 					}
-					
 					
 					 
 					catch (IllegalArgumentException e) 

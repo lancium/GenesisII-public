@@ -17,6 +17,7 @@ import edu.virginia.vcgr.genii.container.exportdir.lightweight.VExportDir;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.VExportEntry;
 import edu.virginia.vcgr.genii.container.exportdir.lightweight.VExportFile;
 
+
 class SVNExportEntry extends AbstractVExportEntry 
 	implements VExportFile, VExportDir
 {
@@ -178,4 +179,12 @@ class SVNExportEntry extends AbstractVExportEntry
 	{
 		throw new IOException("SVN Exports are read-only.");
 	}
+
+	@Override
+	public Collection<VExportEntry> list() throws IOException 
+	{	
+		return list(null);
+	}
+
+
 }

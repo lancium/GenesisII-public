@@ -89,6 +89,7 @@ import edu.virginia.vcgr.genii.container.bes.GeniiBESServiceImpl;
 import edu.virginia.vcgr.genii.container.configuration.GeniiServiceConfiguration;
 import edu.virginia.vcgr.genii.container.context.WorkingContext;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.iterator.FileOrDir;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorEntry;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorWrapper;
 import edu.virginia.vcgr.genii.container.iterator.IteratorBuilder;
@@ -246,11 +247,13 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		{
 			for(String jobID: qmie.getIterableIDs())
 			{
-				indices.add(new InMemoryIteratorEntry(null, jobID, true));
+				indices.add(new InMemoryIteratorEntry(null, jobID, true,
+						FileOrDir.UNKNOWN));
 			}
 		}
 		
-		InMemoryIteratorWrapper imiw = new InMemoryIteratorWrapper(this.getClass().getName(), indices, _queueMgr);
+		InMemoryIteratorWrapper imiw = new InMemoryIteratorWrapper(this.getClass().getName(), indices, 
+				new Object[]{_queueMgr});
 		IteratorBuilder<MessageElement> builder = iteratorBuilder();
 		builder.preferredBatchSize(QueueConstants.PREFERRED_BATCH_SIZE);
 		builder.addElements(col);
@@ -843,20 +846,25 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		return new StartAcceptingNewActivitiesResponseType();
 	}
 	
-	/*Do not change the name or signature of the below method. It is used in WSIteratorDBResource
-	 * using java-reflection.
+	/*Do not change the name or signature of the below method.
+	 *  It is used in WSIteratorDBResource using java-reflection.
 	 * 
-	 * If modifying: edit in WSIteratorDBResource.java and EnhancedRNSServiceImpl.java.
+	 * If modifying: edit in WSIteratorDBResource.java and EnhancedRNSServiceImpl.java
+	 * and LightWeightExportDirFork.java .
 	 * */
 	
 	public static MessageElement getIndexedContent(Connection connection,
-			InMemoryIteratorEntry entry, Object queueManager) throws ResourceException
+			InMemoryIteratorEntry entry, Object[] queueManager) throws ResourceException
 	{
 		if(queueManager == null || entry == null || connection == null)
 			throw new ResourceException("Unable to stat jobs in queue");
+		
+		if(queueManager[0] == null)
+			throw new ResourceException("Unable to stat jobs in queue");
 			
-		QueueManager qMgr = (QueueManager)queueManager;
+		QueueManager qMgr = (QueueManager)queueManager[0];
 		JobInformationType jit;
+		
 		try
 		{
 			jit = qMgr.getStatusFromID(Long.parseLong(entry.getId()), connection);

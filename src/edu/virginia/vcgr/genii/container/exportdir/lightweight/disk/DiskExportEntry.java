@@ -209,6 +209,41 @@ public class DiskExportEntry extends AbstractVExportEntry
 		  }
 		  return !canon.getCanonicalFile().equals(canon.getAbsoluteFile());
 	}
+
+	
+	public int getTotalSize(String name) throws IOException {
+		
+		int numEntries = 0;
+		for (File entry : _target.listFiles())
+		{
+			if (name == null || name.equals(entry.getName()))
+				if (!isLink(_target))
+					numEntries++;
+		}
+		return numEntries;
+	}
+
+	
+	public Collection<String> getListing() throws IOException 
+	{
+		return null;
+	}
+
+	@Override
+	public Collection<VExportEntry> list() throws IOException 
+	{
+		Collection<VExportEntry> entries = new LinkedList<VExportEntry>();
+
+		for (File entry : _target.listFiles())
+		{
+			if (!isLink(_target))
+				entries.add(new DiskExportEntry(entry));
+		}
+
+		return entries;
+		
+	}
+
 	
 	
 }

@@ -5,12 +5,15 @@ public class InMemoryIteratorEntry {
 	private String entryName;
 	private String id;
 	private boolean isExists;
+	private FileOrDir fd;
 	
-	public InMemoryIteratorEntry(String entryName, String id, boolean isExists)
+	public InMemoryIteratorEntry(String entryName, String id, boolean isExists,
+			FileOrDir fd)
 	{
 		this.entryName = entryName;
 		this.id = id;
 		this.isExists = isExists;
+		this.fd = fd;
 	}
 
 	public String getEntryName() {
@@ -25,6 +28,9 @@ public class InMemoryIteratorEntry {
 		return isExists;
 	}
 	
-	
+	public FileOrDir getType()
+	{
+		return fd;
+	}
 
 }

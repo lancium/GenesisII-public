@@ -281,13 +281,31 @@ public class BasicDBResource implements IResource
 	
 	public Object getProperty(String propertyName) throws ResourceException
 	{
+		boolean exceptionOccurred = true;
+		
 		try
 		{
+			if(_connection == null)
+			{
+				_connection = _connectionPool.acquire(false);
+				exceptionOccurred = false;
+			}
+			
 			return getProperty(_connection, _resourceKey, propertyName);
 		}
+		
 		catch (SQLException sqe)
 		{
 			throw new ResourceException("Unable to get property.", sqe);
+		}
+		
+		finally
+		{
+			if(exceptionOccurred == false)
+			{
+				_connectionPool.release(_connection);
+				_connection = null;
+			}
 		}
 	}
 

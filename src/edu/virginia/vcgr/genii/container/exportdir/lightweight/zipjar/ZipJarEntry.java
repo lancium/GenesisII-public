@@ -251,4 +251,11 @@ class ZipJarEntry extends AbstractVExportEntry implements VExportDir,
 		throw new IOException(
 			"Not allowed to modify entries in a Zip/Jar export.");
 	}
+
+	@Override
+	public Collection<VExportEntry> list() throws IOException 
+	{		
+		return list(null);
+	}
+
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.ws.addressing.EndpointReferenceType;
 
+import edu.virginia.vcgr.genii.container.rfork.iterator.InMemoryIterableFork;
 import edu.virginia.vcgr.genii.container.rns.InternalEntry;
 
 public interface RNSResourceFork extends ResourceFork
@@ -18,4 +19,9 @@ public interface RNSResourceFork extends ResourceFork
 		String newFileName) throws IOException;
 	public EndpointReferenceType mkdir(EndpointReferenceType exemplarEPR,
 		String newDirectoryName) throws IOException;
+	public boolean isInMemoryIterable() throws IOException;
+	
+	/*This method returns an InMemoryIterableFork object / null if it
+	 * does not permit in-memoryiteration */
+	public InMemoryIterableFork getInMemoryIterableFork() throws IOException;
 }

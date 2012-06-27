@@ -21,6 +21,7 @@ import edu.virginia.vcgr.genii.client.resource.ResourceException;
 import edu.virginia.vcgr.genii.client.ser.ObjectDeserializer;
 import edu.virginia.vcgr.genii.client.ser.ObjectSerializer;
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
+import edu.virginia.vcgr.genii.container.iterator.FileOrDir;
 import edu.virginia.vcgr.genii.container.iterator.InMemoryIteratorEntry;
 import edu.virginia.vcgr.genii.container.resource.ResourceKey;
 import edu.virginia.vcgr.genii.container.resource.db.BasicDBResource;
@@ -314,7 +315,8 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 			{
 				while(rs.next())
 				{
-					InMemoryIteratorEntry imie = new InMemoryIteratorEntry(rs.getString(1), rs.getString(2), true);	//entry exists
+					InMemoryIteratorEntry imie = new InMemoryIteratorEntry(rs.getString(1), rs.getString(2),
+							true, FileOrDir.UNKNOWN);	//entry exists
 					ret.add(imie);
 				}
 			}
@@ -323,13 +325,15 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 			{
 				if(rs.next())
 				{
-					InMemoryIteratorEntry imie = new InMemoryIteratorEntry(rs.getString(1), rs.getString(2), true);	//entry exists
+					InMemoryIteratorEntry imie = new InMemoryIteratorEntry(rs.getString(1), 
+							rs.getString(2), true, FileOrDir.UNKNOWN);	//entry exists
 					ret.add(imie);
 				}
 				
 				else
 				{
-					InMemoryIteratorEntry imie = new InMemoryIteratorEntry(rs.getString(1), new String(""), false);	//entry does not exist
+					InMemoryIteratorEntry imie = new InMemoryIteratorEntry(rs.getString(1), 
+							new String(""), false, FileOrDir.UNKNOWN);	//entry does not exist
 					ret.add(imie);
 				}
 				
