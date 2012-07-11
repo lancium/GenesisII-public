@@ -25,11 +25,10 @@
 		<mconf:property
 			name="edu.virginia.vcgr.genii.container.bes.worker-dir.allow-override"
 			value="true"/>
-			<!--
+<!-- please leave the name and value on same line for hostname below or some scripts may break. -->
 		<mconf:property
-			name="edu.virginia.vcgr.genii.container.external-hostname-override"
-			value="127.0.0.1"/>
-			-->
+			name="edu.virginia.vcgr.genii.container.external-hostname-override" value="${installer:genii.hostname}"
+		/>
 	</genii:global-properties>
 
 	<genii:configured-instances>

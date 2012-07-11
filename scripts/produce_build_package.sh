@@ -10,7 +10,7 @@ build_folder="$1"; shift
 storage_folder="$1"; shift
 additional_tag="$1"; shift  # optional
 if [ ! -d "$build_folder" -o ! -d "$storage_folder" ]; then
-  echo This script packs up a build folder after an GenesisII build.
+  echo This script packs up a build folder after a GenesisII build.
   echo It needs two folders: the first pointing at where the build resides, and
   echo the second specifying where to store the archive.
   exit 1

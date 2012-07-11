@@ -59,6 +59,7 @@ public class GeniiFuseMount implements Filesystem
 		}
 		catch (Throwable cause)
 		{
+			_logger.info("chmod exception:", cause);
 			throw FuseExceptions.translate("Unable to chmod target.", cause);
 		}
 	}
@@ -82,6 +83,7 @@ public class GeniiFuseMount implements Filesystem
 		}
 		catch (Throwable cause)
 		{
+			_logger.info("flush exception:", cause);
 			throw FuseExceptions.translate("Unable to flush target.", cause);
 		}
 	}
@@ -122,7 +124,8 @@ public class GeniiFuseMount implements Filesystem
 		}
 		catch (Throwable cause)
 		{
-			throw FuseExceptions.translate("Unable to flush target.", cause);
+			_logger.trace("getattr exception:", cause);
+			throw FuseExceptions.translate("Unable to getattr target.", cause);
 		}
 	}
 
@@ -151,6 +154,7 @@ public class GeniiFuseMount implements Filesystem
 		}
 		catch (Throwable cause)
 		{
+			_logger.info("getdir exception:", cause);
 			throw FuseExceptions.translate("Unable to list directory.", cause);
 		}
 		finally
@@ -170,6 +174,7 @@ public class GeniiFuseMount implements Filesystem
 		}
 		catch (Throwable cause)
 		{
+			_logger.info("link exception:", cause);
 			throw FuseExceptions.translate("Unable to create link.", cause);
 		}
 	}
@@ -185,6 +190,7 @@ public class GeniiFuseMount implements Filesystem
 		}
 		catch (Throwable cause)
 		{
+			_logger.info("mkdir exception:", cause);
 			throw FuseExceptions.translate("Unable to make directory.", cause);
 		}
 	}
@@ -211,6 +217,7 @@ public class GeniiFuseMount implements Filesystem
 		}
 		catch (Throwable cause)
 		{
+			_logger.info("mknod exception:", cause);
 			throw FuseExceptions.translate("Unable to make node.", cause);
 		}
 		
@@ -244,6 +251,7 @@ public class GeniiFuseMount implements Filesystem
 		}
 		catch (Throwable cause)
 		{
+			_logger.info("open exception:", cause);
 			throw FuseExceptions.translate("Unable to open files.", cause);
 		}
 	}
@@ -261,6 +269,7 @@ public class GeniiFuseMount implements Filesystem
 		}
 		catch (Throwable cause)
 		{
+			_logger.info("read exception:", cause);
 			throw FuseExceptions.translate("Unable to read from file.", cause);
 		}
 	}
@@ -287,6 +296,7 @@ public class GeniiFuseMount implements Filesystem
 		}
 		catch (Throwable cause)
 		{
+			_logger.info("release exception:", cause);
 			throw FuseExceptions.translate("Unable to release file.", cause);
 		}
 	}
@@ -302,6 +312,7 @@ public class GeniiFuseMount implements Filesystem
 		}
 		catch (Throwable cause)
 		{
+			_logger.info("rename exception:", cause);
 			throw FuseExceptions.translate("Unable to rename.", cause);
 		}
 	}
@@ -317,6 +328,7 @@ public class GeniiFuseMount implements Filesystem
 		}
 		catch (Throwable cause)
 		{
+			_logger.info("rmdir exception:", cause);
 			throw FuseExceptions.translate("Unable to remove directory.", 
 				cause);
 		}
@@ -358,6 +370,7 @@ public class GeniiFuseMount implements Filesystem
 		}
 		catch (Throwable cause)
 		{
+			_logger.info("truncate exception:", cause);
 			throw FuseExceptions.translate("Unable to truncate file.", 
 				cause);
 		}
@@ -374,6 +387,7 @@ public class GeniiFuseMount implements Filesystem
 		}
 		catch (Throwable cause)
 		{
+			_logger.info("unlink exception:", cause);
 			throw FuseExceptions.translate("Unable to unlink file.", 
 				cause);
 		}
@@ -391,6 +405,7 @@ public class GeniiFuseMount implements Filesystem
 		}
 		catch (Throwable cause)
 		{
+			_logger.info("utime exception:", cause);
 			throw FuseExceptions.translate("Unable to update times.", 
 				cause);
 		}
@@ -409,6 +424,7 @@ public class GeniiFuseMount implements Filesystem
 		}
 		catch (Throwable cause)
 		{
+			_logger.info("write exception:", cause);
 			throw FuseExceptions.translate("Unable to write to file.", 
 				cause);
 		}

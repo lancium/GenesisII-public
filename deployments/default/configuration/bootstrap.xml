@@ -75,6 +75,7 @@
 		<gsh:param>/groups</gsh:param>
 		<gsh:param>/home</gsh:param>
 		<gsh:param>/etc</gsh:param>
+		<gsh:param>/queues</gsh:param>
 	</geniix:mkdir>
 
 	<geniix:chmod>
@@ -103,6 +104,12 @@
 
 	<geniix:chmod>
 		<gsh:param>/etc</gsh:param>
+		<gsh:param>+r</gsh:param>
+		<gsh:param>--everyone</gsh:param>
+	</geniix:chmod>
+
+	<geniix:chmod>
+		<gsh:param>/queues</gsh:param>
 		<gsh:param>+r</gsh:param>
 		<gsh:param>--everyone</gsh:param>
 	</geniix:chmod>
@@ -271,4 +278,5 @@
 	<geniix:logout>
 		<gsh:param>--all</gsh:param>
 	</geniix:logout>
+
 </gsh:script>

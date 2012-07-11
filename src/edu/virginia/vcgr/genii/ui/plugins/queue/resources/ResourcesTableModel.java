@@ -101,7 +101,7 @@ class ResourcesTableModel extends RowTableModel<QueueResourceInformation>
 			{
 				_uiContext.uiContext().progressMonitorFactory().createMonitor(
 					row.parent(), "Modifying Slot Count", String.format(
-						"Chaning %s's slots to %d", row.name(), column),
+						"Changing %s's slots to %d", row.name(), column),
 						100L, new SlotChangerTask(row, column),
 						new RefreshCompletionListener(row.parent())).start();
 			}
