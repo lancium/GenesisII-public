@@ -63,7 +63,12 @@ public class JSDLUtils extends JNIContainerBaseClass
 					ProcessorArchitectureEnumeration.x86, null);
 			else if (arch.equals(ProcessorArchitectureEnumeration._x86_64))
 				return new CPUArchitecture_Type(
-					ProcessorArchitectureEnumeration.x86_64, null);
+					ProcessorArchitectureEnumeration.x86, null);
+			// this clause was added because we often are told the arch is amd64, but the
+			// arch enum from the org.ggf.jsdl spec doesn't have that listed.
+			else if (arch.equals("amd64"))
+				return new CPUArchitecture_Type(
+					ProcessorArchitectureEnumeration.x86, null);
 		}
 		
 		return new CPUArchitecture_Type(
