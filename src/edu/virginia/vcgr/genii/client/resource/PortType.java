@@ -19,8 +19,13 @@ import org.w3c.dom.NodeList;
 import edu.virginia.vcgr.genii.client.io.FileResource;
 import edu.virginia.vcgr.genii.client.utils.bvm.BitVectorMap;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class PortType
 {
+	static private Log _logger = LogFactory.getLog(PortType.class);
+
 	static private final FileResource KNOWN_PORT_TYPES_RESOURCE =
 		new FileResource("edu/virginia/vcgr/genii/client/resource/known-porttypes.xml");
 	
@@ -100,7 +105,7 @@ public class PortType
 		}
 		catch (Throwable cause)
 		{
-			cause.printStackTrace(System.err);
+			_logger.info("exception occurred in static init", cause);
 			System.exit(1);
 		}
 		finally

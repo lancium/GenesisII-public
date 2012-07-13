@@ -20,10 +20,14 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class MenuDialog<EntryType> extends JDialog 
 	implements ActionListener, ListSelectionListener
 {
-static final long serialVersionUID = 0L;
+	static final long serialVersionUID = 0L;
+	static private Log _logger = LogFactory.getLog(MenuDialog.class);
 	
 	static private final String _OK_ACTION = "OK";
 	static private final String _CANCEL_ACTION = "CANCEL";
@@ -99,7 +103,7 @@ static final long serialVersionUID = 0L;
 			else
 				waitingQueue.put((EntryType)_list.getSelectedValue());
 		}catch(InterruptedException e){
-			e.printStackTrace();
+			_logger.info("exception occurred in actionPerformed", e);
 		}
 		
 		setVisible(false);
@@ -138,7 +142,7 @@ static final long serialVersionUID = 0L;
 				return (EntryType)toReturn;
 			}
 		} catch (InterruptedException e1) {			
-			e1.printStackTrace();
+			_logger.info("exception occurred in run", e1);
 			return null;
 		}
 	}

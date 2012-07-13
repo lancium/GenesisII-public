@@ -23,9 +23,15 @@ import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.dialog.YesNoDialog;
 import edu.virginia.vcgr.genii.client.dialog.YesNoSelection;
 import edu.virginia.vcgr.genii.client.io.FileResource;
+import edu.virginia.vcgr.genii.client.jni.giilibmirror.cache.CachedFile;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class UserPreferencesTool extends BaseGridTool
-{
+{	
+    static private Log _logger = LogFactory.getLog(UserPreferencesTool.class);
+
 	static private final String _DESCRIPTION = 
 		"edu/virginia/vcgr/genii/client/cmd/tools/description/duser-preferences";
 	static private final String _USAGE =
@@ -159,7 +165,7 @@ public class UserPreferencesTool extends BaseGridTool
 			}
 			catch (BackingStoreException bse)
 			{
-				bse.printStackTrace(System.err);
+				_logger.info("exception occurred in run", bse);
 				throw new RuntimeException(
 					"Unable to store user preferences.", bse);
 			}
@@ -189,7 +195,7 @@ public class UserPreferencesTool extends BaseGridTool
 			}
 			catch (BackingStoreException bse)
 			{
-				bse.printStackTrace(System.err);
+				_logger.info("exception occurred in run", bse);
 				throw new RuntimeException(
 					"Unable to store user preferences.", bse);
 			}
@@ -218,7 +224,7 @@ public class UserPreferencesTool extends BaseGridTool
 			}
 			catch (BackingStoreException bse)
 			{
-				bse.printStackTrace(System.err);
+				_logger.info("exception occurred in run", bse);
 				throw new RuntimeException(
 					"Unable to store user preferences.", bse);
 			}

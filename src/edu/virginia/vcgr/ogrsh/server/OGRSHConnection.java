@@ -267,7 +267,7 @@ public class OGRSHConnection implements Runnable
 		}
 		catch (IOException ioe)
 		{
-			ioe.printStackTrace(System.err);
+			_logger.info("exception occurred in connectNetFromStoredContext", ioe);
 			throw new OGRSHException(OGRSHException.IO_EXCEPTION,
 				"An IO Exception occured while trying to acquire root RNS EPR.");
 		}
@@ -302,7 +302,7 @@ public class OGRSHConnection implements Runnable
 		}
 		catch (IOException ioe)
 		{
-			ioe.printStackTrace(System.err);
+			_logger.info("exception occurred in connectNet", ioe);
 			throw new OGRSHException(OGRSHException.IO_EXCEPTION,
 				"An IO Exception occured while trying to acquire root RNS EPR.");
 		}

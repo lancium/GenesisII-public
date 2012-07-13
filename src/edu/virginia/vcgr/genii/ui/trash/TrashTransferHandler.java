@@ -12,10 +12,15 @@ import javax.swing.TransferHandler;
 
 import org.morgan.util.configuration.ConfigurationException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 class TrashTransferHandler extends TransferHandler
 {
 	static final long serialVersionUID = 0L;
-	
+
+	static private Log _logger = LogFactory.getLog(TrashTransferHandler.class);
+
 	TrashTransferHandler()
 	{
 	}
@@ -139,7 +144,7 @@ class TrashTransferHandler extends TransferHandler
 				}
 				catch (Throwable cause)
 				{
-					cause.printStackTrace(System.err);
+					_logger.info("exception occurred in importData", cause);
 				}
 			}
 		}

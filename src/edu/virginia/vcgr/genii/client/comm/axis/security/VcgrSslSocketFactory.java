@@ -258,7 +258,7 @@ public class VcgrSslSocketFactory
 			}
 			
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			_logger.info("exception occurred in notifyUnloaded", ex);
 		}
 	}
 	
@@ -436,7 +436,7 @@ public class VcgrSslSocketFactory
 		try {
 			return getSSLSocketFactory().getSupportedCipherSuites();
 		} catch (Exception e) {
-			e.printStackTrace();
+			_logger.info("exception occurred in getDefaultCipherSuites", e);
 			return null;
 		}
 	}
@@ -446,7 +446,7 @@ public class VcgrSslSocketFactory
 		try {
 			return getSSLSocketFactory().getSupportedCipherSuites();
 		} catch (Exception e) {
-			e.printStackTrace();
+			_logger.info("exception occurred in getSupportedCipherSuites", e);
 			return null;
 		}
 	}

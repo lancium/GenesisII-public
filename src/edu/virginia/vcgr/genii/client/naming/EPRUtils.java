@@ -113,7 +113,7 @@ public class EPRUtils
 		}
 		catch (Throwable t)
 		{
-			t.printStackTrace();
+			_logger.info("exception occurred in makeEPR", t);
 			return epr;
 		}
 	}
@@ -293,7 +293,7 @@ public class EPRUtils
 				}
 				catch (Exception e)
 				{
-					e.printStackTrace(System.err);
+					_logger.info("exception occurred in extractMinMessageSecurity", e);
 					return null;
 				}
 			}

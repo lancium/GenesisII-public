@@ -37,11 +37,15 @@ import org.bouncycastle.asn1.x509.X509Name;
 
 import java.util.Random;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * A simple example that generates an attribute certificate.
  */
 public class CertTool
 {
+	static private Log _logger = LogFactory.getLog(CertTool.class);
 
 	static boolean loaded = false;
 
@@ -540,7 +544,7 @@ public class CertTool
 			}
 			catch (NoSuchElementException e)
 			{
-				e.printStackTrace();
+				_logger.info("exception occurred in main", e);
 				usage();
 				return;
 			}

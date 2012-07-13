@@ -4,6 +4,10 @@ package edu.virginia.vcgr.genii.client.jni.giilibmirror.io.handles;
 
 import java.io.IOException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import edu.virginia.vcgr.genii.client.cmd.tools.UserPreferencesTool;
 import edu.virginia.vcgr.genii.client.jni.giilibmirror.ResourceInformation;
 import edu.virginia.vcgr.genii.client.jni.giilibmirror.cache.CacheManager;
 import edu.virginia.vcgr.genii.client.jni.giilibmirror.cache.CachedDir;
@@ -18,6 +22,7 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 public class WindowsFileHandle extends WindowsResourceHandle {	
 	
 	CachedFile fileInCache;
+    static private Log _logger = LogFactory.getLog(WindowsFileHandle.class);
 	
 	public WindowsFileHandle(){
 		fileHandle = INVALID_HANDLE;
@@ -291,7 +296,7 @@ public class WindowsFileHandle extends WindowsResourceHandle {
 			//Unlink to finish the move
 			oldRNSPath.unlink();
 		}catch(Exception e){
-			e.printStackTrace();
+			_logger.info("exception occurred in rename", e);
 			return false;
 		}		
 		return true;
@@ -312,7 +317,7 @@ public class WindowsFileHandle extends WindowsResourceHandle {
 					cachedParent.removeEntry(filename);
 				}
 			}catch(RNSException re){
-				re.printStackTrace();
+				_logger.info("exception occurred in close", re);
 			}
 		}else{
 			fileInCache.detatch(this);

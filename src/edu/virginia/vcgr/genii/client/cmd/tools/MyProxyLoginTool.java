@@ -110,7 +110,6 @@ public class MyProxyLoginTool extends BaseLoginTool{
 		}
 		catch(Exception e){
 			stdout.println("Unable to login via myproxy");
-			//e.printStackTrace();
 		}
 		
 		mp.logon();

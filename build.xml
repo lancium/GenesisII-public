@@ -344,6 +344,7 @@
 			<src path="${src.dir}"/>
 			<classpath refid="junit.classpath"/>
 			<classpath refid="log4j.classpath"/>
+			<classpath refid="project.classpath"/>
 			<classpath refid="MorganU.classpath"/>
 			<include name="org/morgan/**/*.java"/>
 		</javac>

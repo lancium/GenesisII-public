@@ -40,9 +40,14 @@ import edu.virginia.vcgr.genii.ui.rns.RNSTreeObject;
 import edu.virginia.vcgr.genii.ui.rns.RNSTreeObjectType;
 import edu.virginia.vcgr.genii.ui.trash.TrashCanWidget;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class ClientApplication extends UIFrame
 {
 	static final long serialVersionUID = 0L;
+
+	static private Log _logger = LogFactory.getLog(ClientApplication.class);
 
 	static final private Dimension TABBED_PANE_SIZE =
 		new Dimension(700, 500);
@@ -174,7 +179,7 @@ public class ClientApplication extends UIFrame
 		}
 		catch (ContainerNotRunningException cnre)
 		{
-			cnre.printStackTrace(System.err);
+			_logger.info("exception in ClientApplication", cnre);
 		}
 		*/
 	}

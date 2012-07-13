@@ -5,6 +5,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import edu.virginia.vcgr.genii.client.jni.giilibmirror.io.handles.WindowsResourceHandle;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /** 
  * This class manages the cache for g-icing
  */
@@ -15,6 +18,7 @@ public class CacheManager {
 	private ReentrantLock handleLock;
 	private Hashtable <String, CachedResource> _cache = null;
 	private Hashtable <Integer, WindowsResourceHandle> _handleMap;
+	static private Log _logger = LogFactory.getLog(CacheManager.class);
 
 	//Number of seconds before Cache entry is removed
 	private static final int CACHE_LIFE = 30; 
@@ -54,8 +58,9 @@ public class CacheManager {
 				else{
 					try{
 						((CachedFile)resource).reconnectToEpr(false);
-					}catch(Exception e)
-					{e.printStackTrace();}
+					}catch(Exception e) {
+						_logger.info("exception occurred in getResource", e);
+					}
 				}
 				resource.setTimeOfEntry(System.currentTimeMillis());
 			}						

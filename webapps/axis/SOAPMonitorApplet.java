@@ -45,6 +45,8 @@ public class SOAPMonitorApplet extends JApplet {
     private int         port = 0;
     private Vector      pages = null;
 
+    static private Log _logger = LogFactory.getLog(SOAPMonitorApplet.class);
+
     /**
      * Constructor
      */
@@ -364,8 +366,7 @@ public class SOAPMonitorApplet extends JApplet {
                     // Exceptions here are unexpected, but we can't
                     // really do anything (so just write it to stdout
                     // in case someone cares and then ignore it)
-                    System.out.println("Exception! "+e.toString());
-                    e.printStackTrace();
+                    _logger.info("exception in start", e);
                     setErrorStatus(STATUS_NOCONNECT);
                     socket = null;
                 }

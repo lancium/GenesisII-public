@@ -225,17 +225,17 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		}
 		catch (ResourceException e)
 		{
-			e.printStackTrace(System.err);
+			_logger.info("ResourceException occurred in checkReceiverResults", e);
 			return false;
 		}
 		catch (AuthZSecurityException e)
 		{
-			e.printStackTrace(System.err);
+			_logger.info("AuthZException occurred in checkReceiverResults", e);
 			return false;
 		}
 		catch (AxisFault e)
 		{
-			e.printStackTrace(System.err);
+			_logger.info("AxisFault occurred in checkReceiverResults", e);
 			return false;
 		}
 

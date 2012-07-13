@@ -57,6 +57,9 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.security.x509.KeyAndCertMaterial;
 import edu.virginia.vcgr.genii.container.axis.ServerWSDoAllReceiver;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Client-side X.509 message-level security handler for incoming 
  * (response) messages.   
@@ -67,6 +70,8 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements
 		ISecurityRecvHandler
 {
 	static final long serialVersionUID = 0L;
+
+	static private Log _logger = LogFactory.getLog(ClientMessageSecurityReceiver.class);
 
 	public static final String CRYPTO_ALIAS = "RECEIVER_CRYPTO_ALIAS";
 	private static final String CRYTO_PASS = "pwd";
@@ -408,7 +413,7 @@ public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements
 			}
 			catch (WSSecurityException ex)
 			{
-				ex.printStackTrace();
+				_logger.info("exception occurred in superinvoke", ex);
 				throw new AxisFault(
 						"WSDoAllReceiver: security processing failed", ex);
 			}

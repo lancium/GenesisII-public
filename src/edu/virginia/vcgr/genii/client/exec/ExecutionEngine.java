@@ -50,8 +50,7 @@ public class ExecutionEngine
 				}
 				catch (IOException ioe)
 				{
-					System.err.println("Unable to copy streams.");
-					ioe.printStackTrace(System.err);
+					_logger.info("Unable to copy streams (IOException for input)", ioe);
 				}
 			}
 			
@@ -62,8 +61,7 @@ public class ExecutionEngine
 			}
 			catch (IOException ioe)
 			{
-				System.err.println("Unable to copy streams.");
-				ioe.printStackTrace(System.err);
+				_logger.info("Unable to copy streams (IOException for output)", ioe);
 			}
 		}
 	}

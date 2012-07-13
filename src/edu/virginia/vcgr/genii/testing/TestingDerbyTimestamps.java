@@ -11,9 +11,14 @@ import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.container.db.DatabaseConnectionPool;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class TestingDerbyTimestamps
 {
 	static private DatabaseConnectionPool _pool;
+
+	static private Log _logger = LogFactory.getLog(TestingDerbyTimestamps.class);
 	
 	static private void runTest() throws Throwable
 	{
@@ -65,7 +70,7 @@ public class TestingDerbyTimestamps
 		}
 		catch (Throwable t)
 		{
-			t.printStackTrace(System.err);
+			_logger.info("exception occurred in main", t);
 			throw t;
 		}
 		finally

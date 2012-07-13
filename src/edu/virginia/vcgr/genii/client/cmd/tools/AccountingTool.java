@@ -579,7 +579,7 @@ public class AccountingTool extends BaseGridTool
 					stderr.format(
 						"Unable to collect accounting information from container %s:  %s.\n",
 						_path, cause);
-					cause.printStackTrace(stderr);
+					_logger.info("exception occurred in run", cause);
 				}
 				finally
 				{

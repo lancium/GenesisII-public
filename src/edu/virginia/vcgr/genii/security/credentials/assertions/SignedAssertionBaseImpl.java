@@ -25,10 +25,15 @@ import java.util.*;
 import edu.virginia.vcgr.genii.client.ser.Base64;
 import edu.virginia.vcgr.genii.security.credentials.GIICredential;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public abstract class SignedAssertionBaseImpl implements SignedAssertion,
 		Externalizable, GIICredential
 {
 	static public final long serialVersionUID = 0L;
+
+	static private Log _logger = LogFactory.getLog(SignedAssertionBaseImpl.class);
 
 	/** Cached serialized value for comparison checking * */
 	protected transient String _encodedValue = null;
@@ -52,7 +57,7 @@ public abstract class SignedAssertionBaseImpl implements SignedAssertion,
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			_logger.info("exception occurred in hashCode", e);
 		}
 		return 0;
 	}
@@ -74,7 +79,7 @@ public abstract class SignedAssertionBaseImpl implements SignedAssertion,
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			_logger.info("exception occurred in equals", e);
 		}
 
 		return false;

@@ -303,7 +303,6 @@ public class TypeInformation
 		}
 		catch (Throwable t)
 		{
-			// t.printStackTrace(System.err);
 			return -1L;
 		}
 	}

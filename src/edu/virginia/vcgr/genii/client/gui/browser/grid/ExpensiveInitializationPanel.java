@@ -27,7 +27,7 @@ import javax.swing.SwingUtilities;
 public abstract class ExpensiveInitializationPanel extends JPanel
 {
 	static final long serialVersionUID = 0L;
-	
+
 	/**
 	 * Construct a new ExpensiveInitializationPanel panel.
 	 */

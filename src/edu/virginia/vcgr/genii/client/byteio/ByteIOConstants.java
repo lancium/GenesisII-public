@@ -21,6 +21,9 @@ import org.apache.axis.types.URI;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * This is a list of constants common to the ByteIO specification.
  * 
@@ -28,6 +31,8 @@ import edu.virginia.vcgr.genii.client.GenesisIIConstants;
  */
 public class ByteIOConstants
 {
+	static private Log _logger = LogFactory.getLog(ByteIOConstants.class);
+
 	static final public String BYTEIO_NS =
 		"http://schemas.ggf.org/byteio/2005/10";
 	
@@ -101,7 +106,7 @@ public class ByteIOConstants
 		}
 		catch (Throwable t)
 		{
-			t.printStackTrace(System.err);
+			_logger.info("exception occurred in static init", t);
 		}
 	}
 	

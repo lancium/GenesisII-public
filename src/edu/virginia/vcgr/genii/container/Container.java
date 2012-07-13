@@ -162,7 +162,7 @@ public class Container extends ApplicationBase
 		}
 		catch (Throwable t)
 		{
-			t.printStackTrace(System.err);
+			_logger.warn("exception occurred in main", t);
 			System.exit(1);
 		}
 		/* We have decided not to do this.

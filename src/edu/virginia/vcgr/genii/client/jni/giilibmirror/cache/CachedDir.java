@@ -18,6 +18,9 @@ import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /** 
  * This class is responsible for caching all information obtained from RNS for a directory
  * This class has optimized synchronization and assume that all dirHandles access this from 
@@ -25,6 +28,8 @@ import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
  * reading the entries versus modifying the list.
  */
 public class CachedDir extends CachedResource {		
+
+	static private Log _logger = LogFactory.getLog(CachedDir.class);
 
 	/*
 	 * Lock used to protect access to directory entries list
@@ -168,9 +173,7 @@ public class CachedDir extends CachedResource {
 		}catch(RNSPathDoesNotExistException rnse){
 			//No entries
 		}catch(Exception e){
-			System.out.println("G-ICING:  Error reading directory: " + 
-					rnsPath.pwd());
-			e.printStackTrace();
+			_logger.info("exception occurred in g-icing: Error reading directory: " + rnsPath.pwd(), e);
 		}finally{
 			dirEntriesLock.writeLock().unlock();
 		}	

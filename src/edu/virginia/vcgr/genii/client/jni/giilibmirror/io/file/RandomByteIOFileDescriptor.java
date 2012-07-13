@@ -11,10 +11,15 @@ import edu.virginia.vcgr.genii.client.byteio.transfer.RandomByteIOTransfererFact
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class RandomByteIOFileDescriptor extends IFSFile
 {		
 	private RandomByteIOTransferer _transferer;
 	private long _offset = 0;
+
+	static private Log _logger = LogFactory.getLog(RandomByteIOFileDescriptor.class);
 	
 	public RandomByteIOFileDescriptor(RNSPath path, 
 			EndpointReferenceType epr, boolean isReadable, 
@@ -78,7 +83,7 @@ public class RandomByteIOFileDescriptor extends IFSFile
 		}
 		catch (RemoteException re)
 		{
-			re.printStackTrace();
+			_logger.info("exception occurred in doWrite", re);
 			throw new IOException(re.getMessage());
 		}
 	}

@@ -13,9 +13,14 @@ import org.apache.axis.handlers.BasicHandler;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.container.context.ClientConfig;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class ClientConfigHandler extends BasicHandler {
 
 	private static final long serialVersionUID = 0L;
+
+	static private Log _logger = LogFactory.getLog(ClientConfigHandler.class);
 
 	@Override
 	public void invoke(MessageContext msgContext) throws AxisFault {
@@ -32,7 +37,7 @@ public class ClientConfigHandler extends BasicHandler {
 				} else continue;
 			}
 		} catch (SOAPException e) {
-			e.printStackTrace();
+			_logger.info("exception occurred in invoke", e);
 		}
 	}
 }

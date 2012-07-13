@@ -17,8 +17,13 @@ import edu.virginia.vcgr.genii.client.gfs.GenesisIIFilesystem;
 import edu.virginia.vcgr.genii.client.gfs.cache.GenesisIICachedFilesystem;
 import edu.virginia.vcgr.genii.client.jni.gIIlib.io.handles.FilesystemHandle;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public abstract class JNILibraryBase extends ApplicationBase
 {
+	static private Log _logger = LogFactory.getLog(JNILibraryBase.class);
+
 	public static boolean USE_CACHE_FS = false;
 	public static boolean isInitialized = false;
 	public static final boolean DEBUG = true;
@@ -62,8 +67,7 @@ public abstract class JNILibraryBase extends ApplicationBase
 		}
 		catch (Exception e) 
 		{
-			System.err.println("JNILibraryError:  Problem with relogin");
-			e.printStackTrace(System.err);
+			_logger.info("JNILibraryError:  Problem with relogin", e);
 		}
 	}
 	
@@ -76,8 +80,7 @@ public abstract class JNILibraryBase extends ApplicationBase
 		}
 		catch(RuntimeException e)
 		{
-			System.err.println("Application already started");
-			e.printStackTrace(System.err);
+			_logger.info("Application already started", e);
 		}
 	}
 	

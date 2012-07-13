@@ -31,7 +31,7 @@ import edu.virginia.vcgr.genii.client.queue.QueueManipulator;
 public class LogDisplay extends JDialog
 {
 	static final long serialVersionUID = 0L;
-	
+
 	private EndpointReferenceType _queue;
 	private JobTicket _job;
 	private JTextPane _text;

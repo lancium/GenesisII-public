@@ -20,12 +20,16 @@ import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.security.GenesisIISecurityException;
 import edu.virginia.vcgr.genii.common.GeniiCommon;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class ByteIOPerformanceTool extends BaseGridTool
 {
 	static final private String _DESCRIPTION =
 		"edu/virginia/vcgr/genii/client/cmd/tools/description/dbyteioperf";
 	static final private FileResource _USAGE =
 		new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/usage/ubyteioperf");
+	static private Log _logger = LogFactory.getLog(ByteIOPerformanceTool.class);
 	
 	static final private FileResource _MANPAGE = new FileResource("edu/virginia/vcgr/genii/client/cmd/tools/man/byteioperf");
 	
@@ -115,7 +119,7 @@ public class ByteIOPerformanceTool extends BaseGridTool
 			}
 			catch (Throwable cause)
 			{
-				cause.printStackTrace(System.err);
+				_logger.info("exception occurred in run", cause);
 			}
 		}
 	}

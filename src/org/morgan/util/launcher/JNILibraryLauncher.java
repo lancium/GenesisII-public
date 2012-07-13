@@ -19,6 +19,9 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class JNILibraryLauncher
 {
 	private static boolean isLoaded = false;
@@ -27,6 +30,7 @@ public class JNILibraryLauncher
 		"edu.virginia.vcgr.genii.client.jni.gIIlib.io";
 	private final static String JNI_MISCELLANEOUS_PACKAGE = 
 		"edu.virginia.vcgr.genii.client.jni.gIIlib.miscellaneous";
+	static private Log _logger = LogFactory.getLog(JNILibraryLauncher.class);
 	
 	/*
 	 * Note:
@@ -50,7 +54,7 @@ public class JNILibraryLauncher
 				isLoaded = true;
 			}
 		}catch(Exception e){
-			e.printStackTrace();
+			_logger.info("exception occurred in initialize", e);
 		}
 	}	
 	
@@ -211,8 +215,7 @@ public class JNILibraryLauncher
 		}
 		catch (Throwable t)
 		{
-			System.err.println("Unable to invoke method.");
-			t.printStackTrace(System.err);
+			_logger.info("exception occurred; unable to invoke method", t);
 			return null;
 		}
 	}

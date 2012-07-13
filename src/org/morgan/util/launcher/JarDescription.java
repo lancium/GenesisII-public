@@ -37,9 +37,14 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class JarDescription
 {
 	static private final String _NAMESPACE = "http://vcgr.cs.virginia.edu";
+
+	static private Log _logger = LogFactory.getLog(JarDescription.class);
 	
 	static private final String _BASEDIR_ATTR_NAME = "basedir";
 	static private final String _BASEDIR_ATTR_DEFAULT = ".";
@@ -227,7 +232,7 @@ public class JarDescription
 			return sysloader;
 		} catch (Throwable t)
 		{
-			t.printStackTrace(System.err);
+			_logger.info("exception occurred in createClassLoader", t);
 			throw new IOException("Unable to modify system class loader.");
 		}
 	}

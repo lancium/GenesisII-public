@@ -15,9 +15,13 @@
  */
 package edu.virginia.vcgr.genii.client.jni;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class JNIClientBaseClass
 {
 	static public final String VCGR_CLIENT_LIB_NAME = "VcgrClientLib";
+	static private Log _logger = LogFactory.getLog(JNIClientBaseClass.class);
 	
 	static 
 	{
@@ -27,8 +31,8 @@ public class JNIClientBaseClass
 		}
 		catch (UnsatisfiedLinkError e)
 		{
-			System.err.println(e.getMessage());
-			e.printStackTrace();
+			_logger.info("exception occurred in static init", e);
 		}
 	}
 }
+

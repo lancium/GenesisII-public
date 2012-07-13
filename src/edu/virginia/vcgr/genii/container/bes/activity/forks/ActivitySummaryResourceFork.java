@@ -15,9 +15,14 @@ import edu.virginia.vcgr.genii.container.rfork.AbstractStreamableByteIOFactoryRe
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.security.RWXCategory;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class ActivitySummaryResourceFork
 	extends AbstractStreamableByteIOFactoryResourceFork
 {
+	static private Log _logger = LogFactory.getLog(ActivitySummaryResourceFork.class);
+
 	public ActivitySummaryResourceFork(
 		ResourceForkService service, String forkPath)
 	{
@@ -59,7 +64,7 @@ public class ActivitySummaryResourceFork
 			catch (SQLException sqe)
 			{
 				ps.format("Unable to open data base to get list of faults.");
-				sqe.printStackTrace(ps);
+				_logger.info("exception occurred in snapshotState", sqe);
 			}
 		}
 		

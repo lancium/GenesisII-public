@@ -19,8 +19,13 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class Launcher
 {
+	static private Log _logger = LogFactory.getLog(Launcher.class);
+
 	static public void main(String []args) 
 		throws IOException, ClassNotFoundException, NoSuchMethodException,
 			IllegalAccessException
@@ -45,7 +50,7 @@ public class Launcher
 		}
 		catch (InvocationTargetException ite)
 		{
-			ite.getCause().printStackTrace(System.err);
+			_logger.info("exception occurred in main", ite);
 			System.exit(1);
 		}
 	}

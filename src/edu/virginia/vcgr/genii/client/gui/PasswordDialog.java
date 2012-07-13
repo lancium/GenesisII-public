@@ -1,5 +1,8 @@
 package edu.virginia.vcgr.genii.client.gui;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -16,6 +19,8 @@ import javax.swing.JPasswordField;
 public class PasswordDialog extends JDialog implements ActionListener
 {
 	static final long serialVersionUID = 0L;
+
+	static private Log _logger = LogFactory.getLog(PasswordDialog.class);
 	
 	static private final String _OK_ACTION = "OK";
 	static private final String _CANCEL_ACTION = "CANCEL";
@@ -76,7 +81,7 @@ public class PasswordDialog extends JDialog implements ActionListener
 				setVisible(false);
 			} 
 		}catch (InterruptedException e) {
-			e.printStackTrace();			
+			_logger.info("exception occurred in actionPerformed", e);
 		}		
 	}
 	
@@ -108,7 +113,7 @@ public class PasswordDialog extends JDialog implements ActionListener
 				return ((String)toReturn).toCharArray();
 			}			
 		} catch (InterruptedException e) {			
-			e.printStackTrace();
+			_logger.info("exception occurred in getPassword::run", e);
 			return null;
 		}
 	}

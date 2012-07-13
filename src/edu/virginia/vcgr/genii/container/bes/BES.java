@@ -164,7 +164,7 @@ public class BES implements Closeable
 					try {
 						CloudMonitor.loadCloudInstance(besid, cParam.getCloudConfiguration());
 					} catch (Exception e) {
-						e.printStackTrace();
+						_logger.info("exception occurred in loadAllInstances", e);
 					}
 				}
 				

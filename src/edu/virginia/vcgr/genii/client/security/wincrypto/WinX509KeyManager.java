@@ -22,6 +22,9 @@ import java.security.*;
 import java.security.cert.*;
 import javax.net.ssl.X509KeyManager;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Responsible for managing the key material which is used to authenticate the
  * local SSLSocket to its peer. If no key material is available, the socket will
@@ -34,6 +37,7 @@ import javax.net.ssl.X509KeyManager;
  */
 public class WinX509KeyManager implements X509KeyManager
 {
+	static private Log _logger = LogFactory.getLog(WinX509KeyManager.class);
 
 	static WinCryptoLib cryptoLib = new WinCryptoLib();
 
@@ -81,7 +85,7 @@ public class WinX509KeyManager implements X509KeyManager
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			_logger.info("exception occurred in chooseClientAlias", e);
 		}
 
 		return alias;
@@ -124,7 +128,7 @@ public class WinX509KeyManager implements X509KeyManager
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			_logger.info("exception occurred in chooseServerAlias", e);
 		}
 
 		return alias;

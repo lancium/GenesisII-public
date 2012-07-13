@@ -11,9 +11,13 @@ import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.client.jni.giilibmirror.JNILibraryBase;
 import edu.virginia.vcgr.genii.security.credentials.TransientCredentials;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class JNILoginTool extends JNILibraryBase 
 {	
+	static private Log _logger = LogFactory.getLog(JNILoginTool.class);
+
 	public static Boolean login(String keystorePath, String password, String certPattern){		
 		tryToInitialize();
 		if(ENABLE_LOCAL_TEST){
@@ -42,7 +46,7 @@ public class JNILoginTool extends JNILibraryBase
 				return false;
 			}		
 		}catch(Throwable e){
-			e.printStackTrace();
+			_logger.info("exception occurred in login", e);
 			return false;			
 		}
 	}		

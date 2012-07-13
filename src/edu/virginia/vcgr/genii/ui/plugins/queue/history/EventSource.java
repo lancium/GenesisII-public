@@ -31,10 +31,15 @@ import edu.virginia.vcgr.genii.ui.plugins.UIPluginContext;
 import edu.virginia.vcgr.genii.ui.plugins.UIPlugins;
 import edu.virginia.vcgr.genii.ui.rns.RNSIcons;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 class EventSource extends JLabel
 {
 	static final long serialVersionUID = 0L;
-	
+
+	static private Log _logger = LogFactory.getLog(EventSource.class);
+
 	static final private Color _highlightColor1 = new Color(
 		255, 255, 255, 64);
 	static final private Color _highlightColor2 = new Color(
@@ -216,7 +221,7 @@ class EventSource extends JLabel
 			catch (Throwable cause)
 			{
 				// Ignore
-				cause.printStackTrace(System.err);
+				_logger.info("exception in actionPerformed", cause);
 			}
 		}
 	}

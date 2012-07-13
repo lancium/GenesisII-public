@@ -18,11 +18,16 @@ import edu.virginia.vcgr.genii.client.rns.RNSException;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathDoesNotExistException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /** 
  * This class is responsible for caching all information obtained from RNS for a file
  */
 public class CachedFile extends CachedResource {
-	
+
+    static private Log _logger = LogFactory.getLog(CachedFile.class);
+
 	private ReentrantReadWriteLock informationLock = new ReentrantReadWriteLock(true);
 
 	private long fileSize = 0;
@@ -157,7 +162,7 @@ public class CachedFile extends CachedResource {
 				toReturn = byteIOHandler.read(length);
 			}			
 		}catch(IOException ioe){
-			ioe.printStackTrace();
+			_logger.info("exception occurred in read", ioe);
 		}
 		return toReturn;		
 	}
@@ -171,7 +176,7 @@ public class CachedFile extends CachedResource {
 				fileSize = Math.max(fileSize, offset + bytesWritten);
 			}
 		}catch(IOException ioe){
-			ioe.printStackTrace();
+			_logger.info("exception occurred in write", ioe);
 		}		
 		return bytesWritten;		
 	}	
@@ -183,7 +188,7 @@ public class CachedFile extends CachedResource {
 				fileSize = offset;
 				return write(data, offset);
 			}catch(Exception e){
-				e.printStackTrace();
+				_logger.info("exception occurred in truncateAppend", e);
 				return 0;
 			} 
 		}
@@ -233,8 +238,7 @@ public class CachedFile extends CachedResource {
 				createTime = typeInfo.getByteIOCreateTime();
 				fileSize = typeInfo.getByteIOSize();
 			}catch(RNSPathDoesNotExistException rpdnee){
-				System.err.println("G-ICING:  Error refresing information");
-				rpdnee.printStackTrace();
+				_logger.info("exception occurred in refreshInformation", rpdnee);
 			}finally{
 				setDirty(false);
 				informationLock.writeLock().unlock();			

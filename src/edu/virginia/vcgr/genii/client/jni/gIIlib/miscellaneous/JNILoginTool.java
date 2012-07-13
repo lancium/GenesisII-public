@@ -49,7 +49,7 @@ public class JNILoginTool extends JNILibraryBase
 		}
 		catch(Throwable e)
 		{
-			e.printStackTrace(System.err);
+			_logger.info("exception occurred in login", e);
 			return false;			
 		}
 	}		

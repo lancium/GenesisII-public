@@ -7,7 +7,11 @@ import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 import edu.virginia.vcgr.genii.client.rns.RNSPath;
 import edu.virginia.vcgr.genii.client.rns.RNSPathQueryFlags;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class JNICdTool extends JNILibraryBase {
+	static private Log _logger = LogFactory.getLog(JNICdTool.class);
 	
 	public static Boolean changeDirectory(String targetDirectory){
 		tryToInitialize();
@@ -24,7 +28,7 @@ public class JNICdTool extends JNILibraryBase {
 			ctxt.setCurrentPath(path);
 			ContextManager.storeCurrentContext(ctxt);
 		}catch(Exception e){
-			e.printStackTrace();
+			_logger.info("exception occurred in changeDirectory", e);
 			return false;
 		}
 		return true;

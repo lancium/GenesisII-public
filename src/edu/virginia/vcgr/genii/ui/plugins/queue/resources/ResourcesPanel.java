@@ -37,13 +37,18 @@ import edu.virginia.vcgr.genii.ui.progress.Task;
 import edu.virginia.vcgr.genii.ui.progress.TaskCompletionListener;
 import edu.virginia.vcgr.genii.ui.progress.TaskProgressListener;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class ResourcesPanel extends JPanel implements LazyLoadTabHandler
 {
 	static final long serialVersionUID = 0L;
 	
 	static final private Dimension TABLE_SIZE = new Dimension(
 		1400, 600);
-		
+
+	static private Log _logger = LogFactory.getLog(ResourcesPanel.class);
+
 	private class BESUpdaterCompletionListener
 		implements TaskCompletionListener<Boolean>
 	{
@@ -190,7 +195,7 @@ public class ResourcesPanel extends JPanel implements LazyLoadTabHandler
 			catch (Throwable cause)
 			{
 				// Ignore
-				cause.printStackTrace(System.err);
+				_logger.info("exception occurred in actionPerformed", cause);
 			}
 		}
 	}
