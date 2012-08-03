@@ -46,8 +46,8 @@ public class IdpTool extends BaseLoginTool {
 	public IdpTool() {
 		super(_DESCRIPTION, _USAGE_RESOURCE, false);
 		addManPage(new FileResource(_MANPAGE));
-		// set valid millis to 180 days
-		_validMillis = 1000L * 60 * 60 * 24 * 180;		
+		// set valid millis to 10 years by default.
+		_validMillis = 1000L * 60 * 60 * 24 * 360 * 10;
 	}
 
 	@Override
@@ -242,5 +242,18 @@ public class IdpTool extends BaseLoginTool {
 	{
 		_type = type;
 	}
-	
+
+        /**
+         * Set the valid duration of the certificate for the new IDP instance.
+         * 
+         * @param validDuration The valid duration for this tool.  This string is
+         * a formatted duration string.  See Genesis II wiki page for a 
+         * description.
+         */
+        @Option({"validDuration"})
+        public void setValidDuration(String validDuration)
+        {
+                _durationString = validDuration;
+        }
 }
+

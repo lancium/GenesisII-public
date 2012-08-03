@@ -1,0 +1,5 @@
+#!/bin/sh
+
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:%{INSTALL_PATH}/%{GENII_JNI_PATH}"
+
+"$JAVA_HOME/bin/java" -Xms128M -Xmx512M -classpath "%{INSTALL_PATH}/lib:%{INSTALL_PATH}/ApplicationWatcher/app-manager.jar" -Dedu.virginia.vcgr.appwatcher.update-frequency=604800000 "-Dlog4j.configuration=%{CLIENT_LOG4JCONFIG}" "-agentpath:/usr/local/yjp-11.0.8/bin/linux-x86-64/libyjpagent.so" "-Djava.library.path=%{INSTALL_PATH}/%{GENII_JNI_PATH}" "-Dedu.virginia.vcgr.genii.install-base-dir=%{INSTALL_PATH}" edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher "%{INSTALL_PATH}/ApplicationWatcher/genii-client-application.properties" "$@"

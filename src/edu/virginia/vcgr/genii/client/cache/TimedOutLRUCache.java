@@ -2,6 +2,7 @@ package edu.virginia.vcgr.genii.client.cache;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -164,7 +165,7 @@ public class TimedOutLRUCache<KeyType, DataType>
 	{
 		synchronized(_map)
 		{
-			return _map.keySet();
+			return new HashSet<KeyType>(_map.keySet());
 		}
 	}
 	

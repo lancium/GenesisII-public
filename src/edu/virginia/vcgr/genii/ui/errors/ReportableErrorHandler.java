@@ -72,7 +72,7 @@ public class ReportableErrorHandler extends JDialog
 	static void handleError(UIContext uiContext,
 		JComponent responsibleComponent, Throwable cause)
 	{
-	    if (cause == null) return;
+		if (cause == null) return;
 		String msg = "Unexpected Error: " + cause.getMessage() + " -- " + cause.getMessage(); 
 		_logger.error(msg, cause);
 		LoggingTarget.logInfo(msg, cause);

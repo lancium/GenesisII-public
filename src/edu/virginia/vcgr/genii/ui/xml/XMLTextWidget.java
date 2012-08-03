@@ -61,7 +61,7 @@ public class XMLTextWidget extends JTextPane
 	{
 		createStyles(getStyledDocument());
 		
-		setFocusable(false);
+		setFocusable(true);
 		setEditable(false);
 	}
 	

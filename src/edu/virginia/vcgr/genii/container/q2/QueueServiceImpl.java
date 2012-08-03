@@ -457,6 +457,7 @@ public class QueueServiceImpl extends ResourceForkBaseService
 		finally
 		{
 			WorkingContext.setCurrentWorkingContext(null);
+			_logger.info("Done restarting all BES Managers.");
 		}
 	}
 

@@ -147,8 +147,10 @@ public class QueueManager implements Closeable
 		
 		try
 		{
+			_logger.debug("acquiring connection from pool...");
 			/* Acquire a new connection to access the database with. */
 			connection = _connectionPool.acquire(true);
+			_logger.debug("acquired connection from pool.");
 			
 			/* We look through the resources table to find all queueid's
 			 * indicated.  We could equally have used the jobs table, but
@@ -160,22 +162,29 @@ public class QueueManager implements Closeable
 			 * from the old one, we may have unnecessary queues running, but
 			 * that is a very unlikely case.
 			 */
+			_logger.debug("running db query for managers...");
 			stmt = connection.createStatement();
 			rs = stmt.executeQuery("SELECT queueid FROM q2resources");
+			_logger.debug("ran db query for managers.");
 			
 			while (rs.next())
 			{
 				/* Simplly accessing the manager in question causes it to
 				 * get created and started if it isn't already.
 				 */
-				getManager(rs.getString(1));
+				String rsName = rs.getString(1);
+				_logger.debug("starting manager called " + rsName + "...");
+				getManager(rsName);
+				_logger.debug("started manager called " + rsName + ".");
 			}
 		}
 		finally
 		{
+			_logger.debug("cleaning up after starting all managers...");
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
 			_connectionPool.release(connection);
+			_logger.debug("done cleaning up after starting all managers.");
 		}
 	}
 	

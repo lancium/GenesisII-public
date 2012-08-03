@@ -103,6 +103,7 @@ public class GamlAclAuthZProvider implements IAuthZProvider, GamlAclTopics
 				
 				for (File ownerFile : ownerFiles)
 				{
+					_logger.debug("adding " + ownerFile + " as admin certificate file.");
 					X509Certificate ownerCert = _defaultCertCache.get(
 						ownerFile.getName());
 					if (ownerCert == null)

@@ -12,8 +12,10 @@ alias
 pattern 
     The pattern option allows the user to specify a substring of either an alias, or CN for the desired certificate. If this option is given, then the keystore indicated will be searched for a certificate whose CN, or alias, matches the pattern (contains the pattern as a substring). If this option is not given, then the command will list all certificates available and prompt the user to pick one. 
 
-validMillis
-    This option allows the user to specify, in milliseconds, the duration of time for which the new identity provider resource will be valid. The default value is 180 days. 
+validDuration
+    This option allows the user to specify how long the created IDP should be considered valid.
+It takes a user-friendly form of durations, such as "1year", "5years", "8days", "3min", and
+so on.  The default value is 10 years.
 
 keystore URL 
     The keystore URL argument is a valid URI which describes the path to the keystore to use for loading the source credential. This URI can be any valid URI that describes a file to be read in, or it can be simply a local file system path. If the URI has a protocol of rns:, then RNS space is used to located the keystore. Further, if the path given is an RNS path, then the target indicated may either be a ByteIO compliant file whose contents are an appropriately formatted keystore, or the target resource can be an existing IDP resource. 

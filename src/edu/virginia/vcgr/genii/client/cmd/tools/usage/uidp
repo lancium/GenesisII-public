@@ -4,7 +4,7 @@ idp
 		+ [--password=<keystore-password>]  
 		+ [--alias] 
 		+ [--pattern=<certificate/token pattern>] 
-		+ [--validMillis=<valid milliseconds>]  
+		+ [--validDuration=<duration-string>]  
 		+ [<authentication source URL>] 
 		+ <IDP service path> 
 		+ <new IDP name>
@@ -12,5 +12,6 @@ idp
 idp
 		+ [--kerbRealm=<Kerberos realm>] 
 		+ [--kerbKdc=<Kerberos KDC>]  
+		+ [--validDuration=<duration-string>]  
 		+ <Kerberos IDP service path> 
 		+ <Kerberos Id>		

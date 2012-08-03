@@ -49,7 +49,7 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 	static private String _RETRIEVE_PART_ENTRY_ALL_STMT =
 		"SELECT name, id FROM entries WHERE resourceid = ? ";
 	static private String _RETRIEVE_ENTRY_FROM_ID =
-		"SELECT name, endpoint, id, attrs FROM entries WHERE id = ?";
+		"SELECT name, endpoint, id, attrs, resourceid, endpoint_id FROM entries WHERE id = ?";
 	static private final String _ENTRY_ID_UPDATE_STMT = "UPDATE entries SET endpoint_id = ? " +
 		"WHERE resourceid = ? AND name = ?";
 	
@@ -366,6 +366,7 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 		InternalEntry ie = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
+		PreparedStatement stmt2 = null;
 		
 		try
 		{
@@ -374,10 +375,30 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 			stmt.setString(1,id);
 			rs = stmt.executeQuery();
 			
-			if(rs.next())
-				ie = new InternalEntry(rs.getString(1), EPRUtils.fromBlob(rs.getBlob(2)),
-						ObjectDeserializer.anyFromBytes(rs.getBytes(4)), true);
-			
+			if(rs.next()) {
+				
+				final EndpointReferenceType entryEPR = EPRUtils.fromBlob(rs.getBlob(2));
+				final String entryName = rs.getString(1);
+				ie = new InternalEntry(entryName, entryEPR, ObjectDeserializer.anyFromBytes(rs.getBytes(4)), true);
+				
+				String endpointId = rs.getString("endpoint_id");
+				String resourceId = rs.getString("resourceid");
+
+				if (endpointId == null) {
+					try {
+						endpointId = new AddressingParameters(entryEPR.getReferenceParameters()).getResourceKey();
+					} catch (Exception e) {
+						// entry reference-parameters section did not match GenesisII convention. 
+					}
+				}
+				if (endpointId != null) {
+					stmt2 = connection.prepareStatement(_ENTRY_ID_UPDATE_STMT);
+					stmt2.setString(1, endpointId);
+					stmt2.setString(2, resourceId);
+					stmt2.setString(3, entryName);
+					stmt2.executeUpdate();
+				}
+			}
 			return ie;
 		}
 		
@@ -389,6 +410,7 @@ public class RNSDBResource extends BasicDBResource implements IRNSResource
 		{
 			StreamUtils.close(rs);
 			StreamUtils.close(stmt);
+			StreamUtils.close(stmt2);
 		}
 	}
 	

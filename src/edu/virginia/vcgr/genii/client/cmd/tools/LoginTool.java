@@ -138,6 +138,12 @@ public class LoginTool  extends BaseLoginTool {
 				if (signedAssertions == null) {
 					return 0;
 				}
+else
+{
+  for (GIICredential q : signedAssertions) {
+    TransientCredentials._logger.info("login cred: " + q);
+  }
+}
 
 				// insert the assertion into the calling context's transient creds
 				transientCredentials._credentials.addAll(signedAssertions);

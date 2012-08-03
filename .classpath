@@ -39,8 +39,6 @@
 	<classpathentry kind="lib" path="ext/jndi/nis.jar"/>
 	<classpathentry kind="lib" path="ext/bouncycastle/bcprov-jdk16-139.jar" sourcepath="D:/Dev/bcprov-jdk16-139/src.zip"/>
 	<classpathentry kind="lib" path="ext/jetty/lib/servlet-api-2.5-20081211.jar"/>
-	<classpathentry kind="lib" path="ext/jetty/lib/jetty-6.1.17.jar"/>
-	<classpathentry kind="lib" path="ext/jetty/lib/jetty-util-6.1.17.jar"/>
 	<classpathentry kind="lib" path="ext/jsch/jsch-0.1.42.jar"/>
 	<classpathentry kind="lib" path="ext/junit/junit-4.8.2.jar"/>
 	<classpathentry kind="lib" path="lib/GenesisII-ws.jar" sourcepath="genned-src"/>
@@ -58,5 +56,9 @@
 	<classpathentry kind="lib" path="ext/myproxy/MyProxyLogon.jar"/>
 	<classpathentry kind="lib" path="ext/axis/lib/commons-logging-1.1.1.jar"/>
 	<classpathentry kind="lib" path="ext/axis/lib/log4j-1.2.16.jar"/>
+	<classpathentry kind="lib" path="ext/jetty/lib/jetty-6.1.26.jar"/>
+	<classpathentry kind="lib" path="ext/jetty/lib/jetty-util-6.1.26.jar"/>
+	<classpathentry kind="lib" path="ext/jetty/lib/slf4j-api-1.6.6.jar"/>
+	<classpathentry kind="lib" path="ext/jetty/lib/slf4j-log4j12-1.6.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
