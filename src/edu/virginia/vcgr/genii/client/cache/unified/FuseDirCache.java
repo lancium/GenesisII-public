@@ -16,7 +16,6 @@ public class FuseDirCache extends CommonCache {
 	public FuseDirCache(int priorityLevel, int capacity, long cacheLifeTime, boolean monitoingEnabled) {
 		super(priorityLevel, capacity, cacheLifeTime, monitoingEnabled);
 		cache = new TimedOutLRUCache<String, UnixDirectory>(capacity, cacheLifeTime);
-		cache.activelyTimeoutElements(true);
 	}
 
 	@Override

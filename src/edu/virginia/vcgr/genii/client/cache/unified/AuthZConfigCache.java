@@ -33,9 +33,7 @@ public class AuthZConfigCache extends CommonAttributeCache {
 		super(priorityLevel, capacity, cacheLifeTime, monitoingEnabled);
 		
 		authZCache = new TimedOutLRUCache<String, AuthZConfig>(capacity, cacheLifeTime);
-		authZCache.activelyTimeoutElements(true);
 		permissionCache = new TimedOutLRUCache<String, Permissions>(capacity, cacheLifeTime);
-		permissionCache.activelyTimeoutElements(true);
 		
 		authZTranslator =  new DefaultSingleResourcePropertyTranslator();
 		permissionTranslator = new PermissionsStringTranslator();

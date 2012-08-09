@@ -25,11 +25,9 @@ public class RNSLookupCache extends CommonCache {
 
 		fileLookupCache = new TimedOutLRUCache<String, EndpointReferenceType>(
 				fileLookupCacheCapacity, cacheLifeTime);
-		fileLookupCache.activelyTimeoutElements(true);
 		
 		directoryLookupCache = new TimedOutLRUCache<String, EndpointReferenceType>(
 				directoryLookupCacheCapacity, cacheLifeTime);
-		directoryLookupCache.activelyTimeoutElements(true);
 	}
 
 	@Override
