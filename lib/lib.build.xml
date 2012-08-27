@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="lib-setup" name="GenesisII.runtime.setup">
+
+	<target name="log4j-properties">
+
+		<concat destfile="${lib.dir}/genesisII.container.log4j.properties">
+  			<filelist dir="${lib.dir}">
+				<file name="genesisII.container.log4j.properties.template" />
+				<file name="genesisII.shared.log4j.properties" />
+			</filelist>
+		</concat>
+
+		<concat destfile="${lib.dir}/genesisII.client.log4j.properties">
+  			<filelist dir="${lib.dir}">
+				<file name="genesisII.client.log4j.properties.template" />
+				<file name="genesisII.shared.log4j.properties" />
+			</filelist>
+		</concat>
+
+		<replace file="${lib.dir}/genesisII.container.log4j.properties"
+			token="%{INSTALL_PATH}" value="${basedir}" summary="no" />
+		<replace file="${lib.dir}/genesisII.client.log4j.properties"
+			token="%{INSTALL_PATH}" value="${basedir}" summary="no" />
+	</target>
+	
+	<target name="lib-setup" depends="log4j-properties" >
+	</target>
+
+</project>

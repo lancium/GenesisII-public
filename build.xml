@@ -150,12 +150,13 @@
 	<!-- Imports -->	
 	<import file="${basedir}/init.build.xml"/>
 	<import file="${scripts.dir}/scripts.build.xml"/>
+	<import file="${lib.dir}/lib.build.xml"/>
 	<import file="${src.dir}/jni/vcgrJniLibs.build.xml"/>
 
 	<!-- Build Targets -->
-	<target name="build" depends="announce,jars,scripts,deployments"/>
+	<target name="build" depends="announce,jars,lib-setup,scripts,deployments"/>
 
-	<target name="announce"  >
+	<target name="announce" >
 		<exec executable="java">
 		<arg value="-version"/>
 		</exec>
@@ -401,7 +402,7 @@
 			<fileset dir="${basedir}"
 				includes="**/*.log.*"/>
 		</delete>
-        <antcall target="clean-all-scripts" />
+		<antcall target="clean-all-scripts" />
 	</target>
 	
 	<target name="wipestate">
@@ -510,11 +511,11 @@
 		</javadoc>
 	</target>
 	
-	<target name="clean-scripts">
+<!--	<target name="clean-scripts">
 		<antcall target="clean-all-scripts" />
-	</target>
+	</target> -->
 	
-	<target name="build-scripts">
+<!--	<target name="build-scripts">
 		<antcall target="scripts" />
-	</target>
+	</target> -->
 </project>

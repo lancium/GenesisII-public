@@ -7,7 +7,6 @@ import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.virginia.vcgr.genii.client.cmd.tools.UserPreferencesTool;
 import edu.virginia.vcgr.genii.client.jni.giilibmirror.ResourceInformation;
 import edu.virginia.vcgr.genii.client.jni.giilibmirror.cache.CacheManager;
 import edu.virginia.vcgr.genii.client.jni.giilibmirror.cache.CachedDir;

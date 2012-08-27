@@ -20,6 +20,8 @@ import java.util.Date;
 import java.util.Enumeration;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 import org.bouncycastle.asn1.x509.X509Name;
 
@@ -50,6 +52,8 @@ public class CertGeneratorTool extends BaseGridTool
 		"edu/virginia/vcgr/genii/client/cmd/tools/description/dcert-generator";
 	static private final String _USAGE_RESOURCE =
 		"edu/virginia/vcgr/genii/client/cmd/tools/usage/ucert-generator";
+
+	static private Log _logger = LogFactory.getLog(CertGeneratorTool.class);
 	
 	static private final String _LOCAL_MACHINE_NAME_CN = "LOCAL_MACHINE_NAME";
 	static private final String _LOCAL_MACHINE_IP_CN = "LOCAL_MACHINE_IP";
@@ -370,21 +374,21 @@ public class CertGeneratorTool extends BaseGridTool
 			entryPassChars = entryPassword.toCharArray();
 		}
 		
-        KeyStore ks = KeyStore.getInstance(keyStoreType, "BC");
+		KeyStore ks = KeyStore.getInstance(keyStoreType, "BC");
 		File outFile = new File(keyStorePath);
 		if (outFile.exists()) {
-		    FileInputStream fis = new FileInputStream(keyStorePath);
-	        ks.load(fis, keyStorePassChars);
-	        fis.close();
+			FileInputStream fis = new FileInputStream(keyStorePath);
+			ks.load(fis, keyStorePassChars);
+			fis.close();
 		} else {
-	        ks.load(null, keyStorePassChars);
+			ks.load(null, keyStorePassChars);
 		}
             
-        ks.setKeyEntry(keyAlias, keyPair.getPrivate(), entryPassChars, certChain);
+		ks.setKeyEntry(keyAlias, keyPair.getPrivate(), entryPassChars, certChain);
 
-        FileOutputStream fos = new FileOutputStream(keyStorePath);
-        ks.store(fos, keyStorePassChars);
-        fos.close();
+		FileOutputStream fos = new FileOutputStream(keyStorePath);
+		ks.store(fos, keyStorePassChars);
+		fos.close();
 	}
 	
 	

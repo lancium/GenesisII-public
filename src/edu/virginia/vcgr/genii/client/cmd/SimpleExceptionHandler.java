@@ -38,19 +38,26 @@ public class SimpleExceptionHandler implements IExceptionHandler
 				errorStream.print(builder);
 				errorStream.flush();
 				return 1;
-			}
-			if (cause instanceof NullPointerException)
+			} else if (cause instanceof java.lang.OutOfMemoryError) {
+				builder.append(tab + "The client has run out of memory.  This could be fixed by increasing\n"
+						+ "the maximum memory allowed for the JVM.  On Linux, try changing -Xmx512M\n"
+						+ "to -Xmx1G or more.  On Windows, pass the memory to the grid launcher with a\n"
+						+ "-J flag first, e.g. grid.exe -J-Xmx1G");
+				errorStream.print(builder);
+				errorStream.flush();
+				// re-throw to cause the grid client to exit.
+				throw new java.lang.OutOfMemoryError();
+			} else if (cause instanceof NullPointerException) {
 				builder.append(tab + 
 					"Internal Genesis II Error -- Null Pointer Exception\n");
-			else if (cause instanceof FileNotFoundException)
+			} else if (cause instanceof FileNotFoundException) {
 				builder.append(tab + "File Not Found:  " +
 					cause.getLocalizedMessage() + "\n");
-			else if (cause instanceof BaseFaultType)
+			} else if (cause instanceof BaseFaultType) {
 				builder.append(tab + 
 					((BaseFaultType)cause).getDescription(0).get_value() +
 					"\n");
-			else if (cause instanceof AxisFault)
-			{
+			} else if (cause instanceof AxisFault) {
 				String message = cause.getLocalizedMessage();
 				
 				/* Check to see if it's a permission denied exception */

@@ -2596,7 +2596,7 @@ public class JobManager implements Closeable
 				{
 					_logger.error(
 						"We're trying to create an activity for a job that " +
-						"is already under going some action:  " + oldAction);
+						"is already undergoing some action:  " + oldAction);
 					return;
 				}
 				
@@ -2655,8 +2655,7 @@ public class JobManager implements Closeable
 					resp = bes.createActivity(
 						new CreateActivityType(adt, null));
 					
-					history.debug(
-						"CreateActivity Outcall Succeeded");
+					history.debug("CreateActivity Outcall Succeeded");
 					
 					SequenceNumber parentNumber = historyToken.retrieve();
 					historyToken = InMemoryHistoryEventSink.wrapEvents(

@@ -725,7 +725,7 @@ public class QueueManager implements Closeable
 		}
 		catch (SQLException sqe)
 		{
-			_logger.warn("Unable to acqurie total job finished count.", sqe);
+			_logger.warn("Unable to acquire total job finished count.", sqe);
 			return 0L;
 		}
 		finally

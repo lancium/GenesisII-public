@@ -23,7 +23,6 @@ import edu.virginia.vcgr.genii.client.dialog.UserCancelException;
 import edu.virginia.vcgr.genii.client.dialog.YesNoDialog;
 import edu.virginia.vcgr.genii.client.dialog.YesNoSelection;
 import edu.virginia.vcgr.genii.client.io.FileResource;
-import edu.virginia.vcgr.genii.client.jni.giilibmirror.cache.CachedFile;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

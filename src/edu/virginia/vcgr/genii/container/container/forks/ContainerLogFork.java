@@ -8,8 +8,8 @@ import java.util.Calendar;
 
 import org.morgan.util.io.StreamUtils;
 
-import edu.virginia.vcgr.genii.client.configuration.Installation;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
+import edu.virginia.vcgr.genii.client.utils.Log4jHelper;
 import edu.virginia.vcgr.genii.container.rfork.AbstractRandomByteIOResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.security.RWXCategory;
@@ -18,7 +18,9 @@ public class ContainerLogFork extends AbstractRandomByteIOResourceFork
 {
 	static private File getContainerLogFile()
 	{
-		return new File(Installation.getInstallDirectory(), "container.log");
+		// the name LOGFILE is in synch with our log4j configuration file's appender name,
+		// and must be kept in synch for this to continue working.
+		return new File(Log4jHelper.queryLog4jFile("LOGFILE"));
 	}
 	
 	public ContainerLogFork(ResourceForkService service, String forkPath)

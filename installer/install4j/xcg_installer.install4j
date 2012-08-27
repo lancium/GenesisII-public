@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="5.0.11" transformSequenceNumber="3">
-  <directoryPresets config="../../deployments" />
+  <directoryPresets config="../unlimited_jce_java7/US_export_policy.jar" />
   <application name="Genesis II" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:genii.bitSize}_v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genii" publisher="University of Virginia" publisherWeb="genesisII.virginia.edu" version="2.6.0" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.6">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
@@ -48,6 +48,7 @@
       <mountPoint id="502" root="" location="deployments" mode="755" />
       <mountPoint id="1606" root="" location="deployments/default" mode="755" />
       <mountPoint id="3421" root="" location="deployments/current_grid" mode="755" />
+      <mountPoint id="3944" root="" location="jre-addin" mode="755" />
       <mountPoint id="34" root="" location="" mode="755" />
       <mountPoint id="35" root="20" location="jni-lib" mode="755" />
       <mountPoint id="251" root="20" location="JavaServiceWrapper" mode="755" />
@@ -79,9 +80,11 @@
           <entry location="security/skynet.cer" fileType="regular" />
         </exclude>
       </dirEntry>
-      <dirEntry mountPoint="3421" file="../../deployments/installer_base" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes="" dirMode="755" overrideDirMode="true">
+      <dirEntry mountPoint="3421" file="../../deployments/installer_base/xcg3" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes="" dirMode="755" overrideDirMode="true">
         <exclude />
       </dirEntry>
+      <fileEntry mountPoint="3944" file="../unlimited_jce_java7/US_export_policy.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
+      <fileEntry mountPoint="3944" file="../unlimited_jce_java7/local_policy.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <dirEntry mountPoint="34" file="../.." overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes=".svn, derby.log, context.xml" dirMode="755" overrideDirMode="true">
         <exclude>
           <entry location="hess.xml" fileType="regular" />
@@ -366,31 +369,32 @@
       <component name="Genesis II Core" id="28" customizedId="" displayDescription="true" hideHelpButton="false" selected="true" changeable="false" downloadable="false" hidden="false">
         <description>The core set of libraries and files necessary to run Genesis II clients and servers.</description>
         <include all="false">
-          <entry location="updates" fileType="regular" />
+          <entry location="webapps" fileType="regular" />
           <entry location="ApplicationWatcher/genii-base-application.properties" fileType="regular" />
           <entry location="ApplicationWatcher/genii-client-application.properties" fileType="regular" />
           <entry location="ApplicationWatcher/genii-update-application.properties" fileType="regular" />
           <entry location="ApplicationWatcher/app-manager.jar" fileType="regular" />
-          <entry location="webapps" fileType="regular" />
-          <entry location="RELEASE" fileType="regular" />
-          <entry location="License.txt" fileType="regular" />
           <entry location="deployments/default" fileType="regular" />
           <entry location="deployments/current_grid" fileType="regular" />
-          <entry location="ext" fileType="regular" />
           <entry location="lib" fileType="regular" />
+          <entry location="ext" fileType="regular" />
+          <entry location="RELEASE" fileType="regular" />
+          <entry location="License.txt" fileType="regular" />
+          <entry location="updates" fileType="regular" />
           <entry location="jar-desc.xml" fileType="regular" />
+          <entry location="jre-addin" fileType="regular" />
           <entry location="grid" fileType="launcher" />
           <entry location="grid-update" fileType="launcher" />
           <entry location="client-ui" fileType="launcher" />
-          <entry location=".i4j_external_20/jni-lib/msvcr71.dll" fileType="regular" />
-          <entry location=".i4j_external_20/jni-lib/libdb_java45.dll" fileType="regular" />
-          <entry location=".i4j_external_20/jni-lib/GeniiProcessMgmt.dll" fileType="regular" />
-          <entry location=".i4j_external_20/jni-lib/libdb_java45d.dll" fileType="regular" />
-          <entry location=".i4j_external_20/jni-lib/VcgrContainerLib.dll" fileType="regular" />
           <entry location=".i4j_external_20/jni-lib/libdbxml_java23.dll" fileType="regular" />
-          <entry location=".i4j_external_20/jni-lib/CToGenesisCalls.dll" fileType="regular" />
           <entry location=".i4j_external_20/jni-lib/VcgrClientLib.dll" fileType="regular" />
+          <entry location=".i4j_external_20/jni-lib/msvcr71.dll" fileType="regular" />
           <entry location=".i4j_external_20/jni-lib/nulmrxnp.dll" fileType="regular" />
+          <entry location=".i4j_external_20/jni-lib/libdb_java45.dll" fileType="regular" />
+          <entry location=".i4j_external_20/jni-lib/VcgrContainerLib.dll" fileType="regular" />
+          <entry location=".i4j_external_20/jni-lib/libdb_java45d.dll" fileType="regular" />
+          <entry location=".i4j_external_20/jni-lib/CToGenesisCalls.dll" fileType="regular" />
+          <entry location=".i4j_external_20/jni-lib/GeniiProcessMgmt.dll" fileType="regular" />
           <entry location=".i4j_external_22/jni-lib" fileType="regular" />
           <entry location=".i4j_external_24/jni-lib" fileType="regular" />
           <entry location=".i4j_fileset_25" fileType="regular" />
@@ -459,7 +463,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=XCG&quot; &quot;-Dedu.virginia.vcgr.appwatcher.update-frequency=604800000&quot; &quot;-Dlog4j.configuration=production.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ApplicationWatcher/genii-client-application.properties&quot; -Xmx512m" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=XCG&quot; &quot;-Dedu.virginia.vcgr.appwatcher.update-frequency=604800000&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ApplicationWatcher/genii-client-application.properties&quot; -Xmx512m" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
         <classPath>
           <directory location="lib" failOnError="false" />
           <archive location="ApplicationWatcher/app-manager.jar" failOnError="false" />
@@ -488,7 +492,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.appwatcher.update-frquency=604800000&quot; &quot;-Dlog4j.configuration=production.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ApplicationWatcher/genii-update-application.properties&quot;" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.appwatcher.update-frquency=604800000&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ApplicationWatcher/genii-update-application.properties&quot;" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
         <classPath>
           <directory location="lib" failOnError="false" />
           <archive location="ApplicationWatcher/app-manager.jar" failOnError="false" />
@@ -518,7 +522,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.appwatcher.update-frequency=604800000&quot; &quot;-Dlog4j.configuration=production.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ApplicationWatcher/genii-client-application.properties&quot; -Xmx512m" arguments="export" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.appwatcher.update-frequency=604800000&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ApplicationWatcher/genii-client-application.properties&quot; -Xmx512m" arguments="export" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
         <classPath>
           <directory location="lib" failOnError="false" />
           <archive location="ApplicationWatcher/app-manager.jar" failOnError="false" />
@@ -547,7 +551,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dlog4j.configuration=production.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ApplicationWatcher/genii-container-application.properties&quot; -Xmx1024m" arguments="" allowVMPassthroughParameters="true" preferredVM="server" bundleRuntime="true">
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dlog4j.configuration=production.container.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ApplicationWatcher/genii-container-application.properties&quot; -Xmx1024m" arguments="" allowVMPassthroughParameters="true" preferredVM="server" bundleRuntime="true">
         <classPath>
           <directory location="lib" failOnError="false" />
           <archive location="ApplicationWatcher/app-manager.jar" failOnError="false" />
@@ -576,7 +580,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=XCG&quot; &quot;-Dedu.virginia.vcgr.appwatcher.update-frequency=604800000&quot; &quot;-Dlog4j.configuration=production.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ApplicationWatcher/genii-client-application.properties&quot; -Xmx512m" arguments="client-ui" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=XCG&quot; &quot;-Dedu.virginia.vcgr.appwatcher.update-frequency=604800000&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ApplicationWatcher/genii-client-application.properties&quot; -Xmx512m" arguments="client-ui" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
         <classPath>
           <directory location="lib" failOnError="false" />
           <archive location="ApplicationWatcher/app-manager.jar" failOnError="false" />
@@ -1148,7 +1152,7 @@ return true;</string>
                     </serializedBean>
                     <condition />
                   </action>
-                  <action name="Patch production.log4j.properties" id="231" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="Patch production.client.log4j.properties" id="4154" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
@@ -1162,7 +1166,31 @@ return true;</string>
                             <array class="java.io.File" length="1">
                               <void index="0">
                                 <object class="java.io.File">
-                                  <string>lib/production.log4j.properties</string>
+                                  <string>lib/production.client.log4j.properties</string>
+                                </object>
+                              </void>
+                            </array>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
+                  <action name="Patch production.container.log4j.properties" id="231" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction">
+                          <void property="escapeForPropertyFile">
+                            <boolean>true</boolean>
+                          </void>
+                          <void property="failIfNoReplacement">
+                            <boolean>true</boolean>
+                          </void>
+                          <void property="files">
+                            <array class="java.io.File" length="1">
+                              <void index="0">
+                                <object class="java.io.File">
+                                  <string>lib/production.container.log4j.properties</string>
                                 </object>
                               </void>
                             </array>
@@ -1499,6 +1527,40 @@ Hostnames should be globally resolvable via DNS.</string>
                 <preActivation />
                 <postActivation />
                 <actions>
+                  <action name="Copy JCE Unlimited Jars" id="3949" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Could not copy unlimited JCE jars into jre">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
+                          <void property="destinationFile">
+                            <object class="java.io.File">
+                              <string>${installer:sys.installationDir}/jre/lib/security</string>
+                            </object>
+                          </void>
+                          <void property="files">
+                            <array class="java.io.File" length="2">
+                              <void index="0">
+                                <object class="java.io.File">
+                                  <string>jre-addin/US_export_policy.jar</string>
+                                </object>
+                              </void>
+                              <void index="1">
+                                <object class="java.io.File">
+                                  <string>jre-addin/local_policy.jar</string>
+                                </object>
+                              </void>
+                            </array>
+                          </void>
+                          <void property="overwriteMode">
+                            <object class="com.install4j.api.context.OverwriteMode" field="ALWAYS" />
+                          </void>
+                          <void property="showProgress">
+                            <boolean>true</boolean>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
                   <action name="Create container.properties file" id="1015" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.WriteTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="Unable to create container.properties file">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
@@ -1664,7 +1726,7 @@ return !ownerCer.exists();</string>
                             </serializedBean>
                             <condition />
                           </action>
-                          <action name="" id="1915" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="">
+                          <action name="copy in unlimited jce jars" id="1915" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="">
                             <serializedBean>
                               <java class="java.beans.XMLDecoder">
                                 <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
@@ -1681,6 +1743,9 @@ return !ownerCer.exists();</string>
                                         </object>
                                       </void>
                                     </array>
+                                  </void>
+                                  <void property="overwriteMode">
+                                    <object class="com.install4j.api.context.OverwriteMode" field="ALWAYS" />
                                   </void>
                                 </object>
                               </java>
@@ -1892,6 +1957,32 @@ return !ownerCer.exists();</string>
                                         <object class="java.io.File">
                                           <string>.</string>
                                         </object>
+                                      </void>
+                                    </object>
+                                  </java>
+                                </serializedBean>
+                                <condition />
+                              </action>
+                              <action name="copy tls to signing cert" id="3952" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.CopyFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="Failed to copy tls cert to signing cert.">
+                                <serializedBean>
+                                  <java class="java.beans.XMLDecoder">
+                                    <object class="com.install4j.runtime.beans.actions.files.CopyFileAction">
+                                      <void property="destinationFile">
+                                        <object class="java.io.File">
+                                          <string>deployments/${installer:genii.deployment}/security/signing-cert.pfx</string>
+                                        </object>
+                                      </void>
+                                      <void property="files">
+                                        <array class="java.io.File" length="1">
+                                          <void index="0">
+                                            <object class="java.io.File">
+                                              <string>deployments/${installer:genii.deployment}/security/tls-cert.pfx</string>
+                                            </object>
+                                          </void>
+                                        </array>
+                                      </void>
+                                      <void property="overwriteMode">
+                                        <object class="com.install4j.api.context.OverwriteMode" field="NEVER" />
                                       </void>
                                     </object>
                                   </java>
@@ -3647,7 +3738,7 @@ return startService;</string>
         <content />
       </installerScript>
     </unixInstaller>
-    <windows name="windows_client_32" id="2081" customizedId="" mediaFileName="genesis2_client_windows${compiler:genii.bitSize}_v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-x86-1.7.0_04_us_only" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" verifyIntegrity="true">
+    <windows name="windows_client_32" id="2081" customizedId="" mediaFileName="genesis2_client_windows${compiler:genii.bitSize}_v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-x86-1.7.0_04" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" verifyIntegrity="true">
       <excludedLaunchers>
         <launcher id="264" />
         <launcher id="1450" />
@@ -3674,7 +3765,7 @@ return startService;</string>
       </excludedComponents>
       <includedDownloadableComponents />
     </windows>
-    <windows name="windows_container_32" id="2084" customizedId="" mediaFileName="genesis2_container_windows${compiler:genii.bitSize}_v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-x86-1.7.0_04_us_only" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" verifyIntegrity="true">
+    <windows name="windows_container_32" id="2084" customizedId="" mediaFileName="genesis2_container_windows${compiler:genii.bitSize}_v${compiler:sys.version}" installDir="GenesisII" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-x86-1.7.0_04" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="http://vcgr.cs.virginia.edu/XCG/2.0/downloads" verifyIntegrity="true">
       <excludedLaunchers>
         <launcher id="1450" />
       </excludedLaunchers>
@@ -3787,7 +3878,7 @@ return startService;</string>
     </unixInstaller>
   </mediaSets>
   <buildIds buildAll="false">
-    <mediaSet refId="2078" />
+    <mediaSet refId="3416" />
   </buildIds>
   <buildOptions verbose="true" faster="false" debug="false" />
 </install4j>
