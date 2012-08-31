@@ -11,6 +11,7 @@ import edu.virginia.vcgr.genii.client.filesystems.FilesystemManager;
 import edu.virginia.vcgr.genii.client.filesystems.FilesystemUsageInformation;
 import edu.virginia.vcgr.genii.client.security.authz.rwx.RWXMapping;
 import edu.virginia.vcgr.genii.client.utils.units.Size;
+import edu.virginia.vcgr.genii.client.utils.units.SizeUnits;
 import edu.virginia.vcgr.genii.container.rfork.AbstractStreamableByteIOFactoryResourceFork;
 import edu.virginia.vcgr.genii.container.rfork.ResourceForkService;
 import edu.virginia.vcgr.genii.security.RWXCategory;
@@ -45,10 +46,9 @@ public class FilesystemUsageFork
 		{
 			Filesystem fs = mgr.lookup(fsName);
 			FilesystemUsageInformation usageInfo = fs.currentUsage();
-			
 			ps.format("Filesystem \"%s\" at %s:  %s (%.2f%%) space free.\n", 
 				fsName, fs.filesystemRoot(),
-				new Size(usageInfo.spaceUsable()),
+				new Size(usageInfo.spaceUsable(), SizeUnits.Megabytes).toString(2),
 				usageInfo.percentAvailable());
 		}
 		

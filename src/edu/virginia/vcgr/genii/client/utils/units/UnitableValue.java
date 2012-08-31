@@ -82,7 +82,7 @@ public abstract class UnitableValue<U extends Enum<U>>
 	
 	final public String toString(int floatingPrecision)
 	{
-		String formatString = String.format("%%.%df %s",
+		String formatString = String.format("%%.%df %%s",
 			floatingPrecision);
 		return String.format(formatString, _value, _units);
 	}
