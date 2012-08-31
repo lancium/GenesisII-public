@@ -198,7 +198,7 @@ class HistoryEventDisplayDialog extends JDialog
 			setTitle(event.eventData().toString());
 			
 			_headerLabel.setText(String.format(
-				"Event %1$s occurred at %2$tr on %2$tD", event.eventNumber(), 
+				"Event %1$s occurred at %2$tr on %2$tF", event.eventNumber(), 
 				event.eventTimestamp()));
 			_titleField.setText(event.eventData().toString());
 			_levelLabel.setText(event.eventLevel().toString());

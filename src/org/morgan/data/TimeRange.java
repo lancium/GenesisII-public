@@ -71,7 +71,7 @@ public class TimeRange
 	public String toString()
 	{
 		return String.format(
-			"[%1$tD %1$tT, %2$tD %2$tT)",
+			"[%1$tF %1$tT, %2$tF %2$tT)",
 			_start, _stop);
 	}
 }

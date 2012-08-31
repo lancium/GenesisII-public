@@ -147,12 +147,12 @@ public class BESUpdateInformation
 			responsiveString = "not responsive";
 		
 		if (nextUpdate == null)	
-			return String.format("%s (misses = %d, last-updated = %3$tT %3$tD, \n" +
-				"\tlast-responsive = %4$tT %4$tD, next-update = none scheduled)",
+			return String.format("%s (misses = %d, last-updated = %3$tT %3$tF, \n" +
+				"\tlast-responsive = %4$tT %4$tF, next-update = none scheduled)",
 				responsiveString, _misses, _lastUpdated, _lastResponsive);
 		else
-			return String.format("%s (misses = %d, last-updated = %3$tT %3$tD, \n" +
-				"\tlast-responsive = %4$tT %4$tD, next-update = %5$tT %5$tD)",
+			return String.format("%s (misses = %d, last-updated = %3$tT %3$tF, \n" +
+				"\tlast-responsive = %4$tT %4$tF, next-update = %5$tT %5$tF)",
 				responsiveString, _misses, _lastUpdated, _lastResponsive,
 				nextUpdate);
 	}

@@ -140,14 +140,14 @@ public class X509Identity implements HolderOfKeyIdentity, SignedAssertion
 	{
 		switch (verbosity) {
 		case HIGH:
-			return String.format("(X509Identity) \"%s\"  [%2$tD %2$tT, %3$tD %3$tT]", 
+			return String.format("(X509Identity) \"%s\"  [%2$tF %2$tT, %3$tF %3$tT]", 
 					X500PrincipalUtilities.describe(
 						_identity[0].getSubjectX500Principal(), verbosity),
 					_identity[0].getNotBefore(), 
 					_identity[0].getNotAfter());
 
 		case MEDIUM:
-			return String.format("\"%s\"  [%2$tD %2$tT, %3$tD %3$tT]", 
+			return String.format("\"%s\"  [%2$tF %2$tT, %3$tF %3$tT]", 
 					X500PrincipalUtilities.describe(
 						_identity[0].getSubjectX500Principal(), verbosity),
 					_identity[0].getNotBefore(), 

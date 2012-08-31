@@ -110,7 +110,7 @@ public class BasicConstraints implements AttributeConstraints, Renewable
 		Date before = new Date(_notValidBeforeMillis);
 		Date after = new Date(_notValidBeforeMillis + _durationValidMillis);
 		
-		return String.format("[%1$tD %1$tT, %2$tD %2$tT]",
+		return String.format("[%1$tF %1$tT, %2$tF %2$tT]",
 			before, after);
 	}
 	@Override

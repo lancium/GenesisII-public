@@ -149,7 +149,7 @@ public class HistoryEvent implements Serializable
 	
 	final public String title()
 	{
-		return String.format("[%1$tD %1$tr]  %2$s",
+		return String.format("[%1$tF %1$tr]  %2$s",
 			_eventTimestamp, _eventData);
 	}
 }
