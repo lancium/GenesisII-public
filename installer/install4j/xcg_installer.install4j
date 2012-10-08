@@ -1857,7 +1857,7 @@ return !ownerCer.exists();</string>
                             <preActivation />
                             <postActivation />
                             <actions>
-                              <action name="login" id="2597" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="Failed to login">
+                              <action name="login" id="2597" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="false" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="Failed to login">
                                 <serializedBean>
                                   <java class="java.beans.XMLDecoder">
                                     <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
@@ -1989,7 +1989,7 @@ return !ownerCer.exists();</string>
                                 </serializedBean>
                                 <condition />
                               </action>
-                              <action name="logout" id="2718" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                              <action name="logout" id="2718" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" enabled="false" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                                 <serializedBean>
                                   <java class="java.beans.XMLDecoder">
                                     <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
@@ -2050,22 +2050,6 @@ return !ownerCer.exists();</string>
                                       </void>
                                       <void property="variableName">
                                         <string>genii.cert-generator-path</string>
-                                      </void>
-                                    </object>
-                                  </java>
-                                </serializedBean>
-                                <initScript />
-                                <visibilityScript />
-                              </formComponent>
-                              <formComponent name="user name" id="2711" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.TextfieldComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
-                                <serializedBean>
-                                  <java class="java.beans.XMLDecoder">
-                                    <object class="com.install4j.runtime.beans.formcomponents.TextfieldComponent">
-                                      <void property="labelText">
-                                        <string>Grid User Name</string>
-                                      </void>
-                                      <void property="variableName">
-                                        <string>genii.cert-username</string>
                                       </void>
                                     </object>
                                   </java>
