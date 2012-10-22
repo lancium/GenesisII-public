@@ -1559,7 +1559,10 @@ Hostnames should be globally resolvable via DNS.</string>
                         </object>
                       </java>
                     </serializedBean>
-                    <condition />
+                    <condition>
+String medium = context.getMediaName();
+return ! medium.startsWith("genesis2_client_macosx");
+</condition>
                   </action>
                   <action name="Create container.properties file" id="1015" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.WriteTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="Unable to create container.properties file">
                     <serializedBean>
@@ -3862,7 +3865,7 @@ return startService;</string>
     </unixInstaller>
   </mediaSets>
   <buildIds buildAll="false">
-    <mediaSet refId="3416" />
+    <mediaSet refId="2088" />
   </buildIds>
   <buildOptions verbose="true" faster="false" debug="false" />
 </install4j>
