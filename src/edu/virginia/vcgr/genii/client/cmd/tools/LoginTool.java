@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
-
-
+import java.util.List;
 
 import org.ws.addressing.EndpointReferenceType;
+
 import edu.virginia.vcgr.genii.client.cmd.InvalidToolUsageException;
 import edu.virginia.vcgr.genii.client.cmd.ToolException;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
@@ -31,6 +31,9 @@ import edu.virginia.vcgr.genii.security.credentials.identity.UsernamePasswordIde
 
 public class LoginTool  extends BaseLoginTool {
 
+	private static final String USER_NAME_TERMINATOR = "@";
+	private static final String DOMAIN_NAME_SEPARATOR = "\\.";
+	private static final String PATH_COMPONENT_SEPARATOR = "/";
 
 	static private final String _DESCRIPTION = "edu/virginia/vcgr/genii/client/cmd/tools/description/dlogin";
 	static private final String _USAGE_RESOURCE = 
@@ -53,6 +56,12 @@ public class LoginTool  extends BaseLoginTool {
 	private static Collection<String> getDefaultIDPPaths(String username){
 		LinkedList<String> idpList = new LinkedList<String>();
 	
+		String constructedPath = constructPathFromLoginName(null, username);
+		if (constructedPath != null) {
+			idpList.add("rns:/users/" + constructedPath);
+			idpList.add("rns:/users/demo/" + constructedPath);
+		}
+			
 		//Checks this lists of idp paths, in order
 		//If one is not passed on the command line
 		idpList.add("rns:/users/" + username);
@@ -73,7 +82,6 @@ public class LoginTool  extends BaseLoginTool {
 		
 		
 		aquireUsername();
-				
 
 		//Determine IDP path
 		if (numArguments() == 1){
@@ -138,12 +146,12 @@ public class LoginTool  extends BaseLoginTool {
 				if (signedAssertions == null) {
 					return 0;
 				}
-else
-{
-  for (GIICredential q : signedAssertions) {
-    TransientCredentials._logger.info("login cred: " + q);
-  }
-}
+				else
+				{
+					for (GIICredential q : signedAssertions) {
+						TransientCredentials._logger.info("login cred: " + q);
+					}
+				}
 
 				// insert the assertion into the calling context's transient creds
 				transientCredentials._credentials.addAll(signedAssertions);
@@ -160,9 +168,9 @@ else
 
 		}
 
-
 		ContextManager.storeCurrentContext(callContext);
-
+		jumpToUserHomeIfExists(_username);
+		
 		return 0;
 	}
 
@@ -187,6 +195,61 @@ else
 		}
 
 	}
+	
+	private static void jumpToUserHomeIfExists(String loginName) {
+		
+		if (loginName == null) return;
+		
+		List<String> candidateHomeDirs = new ArrayList<String>();
+		String constructedPathToHome = constructPathFromLoginName(null, loginName);
+		
+		if (constructedPathToHome != null)  {
+			candidateHomeDirs.add("rns:/home/" + constructedPathToHome);
+			candidateHomeDirs.add("rns:/home/demo/" + constructedPathToHome);
+		} 
+		candidateHomeDirs.add("rns:/home/" + loginName);
+		candidateHomeDirs.add("rns:/home/demo/" + loginName);
+		candidateHomeDirs.add("rns:/");
+		
+		for (String userHome : candidateHomeDirs) {
+			try {
+				CdTool.chdir(userHome);
+				break;
+			} catch (Throwable e) {}
+		}
+	}
 
+	public static String constructPathFromLoginName(String pathPrefix, String loginName) {
 
+		if (loginName == null) return null;
+
+		try {
+			if (loginName.contains(USER_NAME_TERMINATOR)) {
+
+				String[] parts = loginName.split(USER_NAME_TERMINATOR);
+				if (parts.length != 2) return null;
+				String user = parts[0];
+				String domain = parts[1];
+				String[] domainParts = domain.split(DOMAIN_NAME_SEPARATOR);
+
+				StringBuilder buffer = new StringBuilder();
+				if (pathPrefix != null) {
+					buffer.append(pathPrefix);
+					if (!pathPrefix.endsWith(PATH_COMPONENT_SEPARATOR)) {
+						buffer.append(PATH_COMPONENT_SEPARATOR);
+					}
+				}
+				int domainLength = domainParts.length;
+				for (int i = domainLength - 1; i >= 0; i--) {
+					buffer.append(domainParts[i]).append(PATH_COMPONENT_SEPARATOR);
+				}
+				buffer.append(user);
+
+				return buffer.toString();
+			} else return null;
+
+		} catch (Throwable e) {
+			return null;
+		}
+	}
 }
