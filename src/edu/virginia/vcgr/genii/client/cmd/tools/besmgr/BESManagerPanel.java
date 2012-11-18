@@ -29,6 +29,7 @@ import org.ws.addressing.EndpointReferenceType;
 import edu.virginia.vcgr.genii.client.context.ICallingContext;
 import edu.virginia.vcgr.genii.container.bes.BESPolicy;
 
+@SuppressWarnings("rawtypes")
 public class BESManagerPanel extends JPanel
 {
 	static final long serialVersionUID = 0L;
@@ -43,9 +44,11 @@ public class BESManagerPanel extends JPanel
 	private ManagementData _data;
 	
 	private String _lastThresholdString = "";
-	private JComboBox _screenSaverInactiveCombo = new JComboBox(
+	@SuppressWarnings("unchecked")
+    private JComboBox _screenSaverInactiveCombo = new JComboBox(
 		BESPolicyActionWrapper.values());
-	private JComboBox _userLoggedInCombo = new JComboBox(
+	@SuppressWarnings("unchecked")
+    private JComboBox _userLoggedInCombo = new JComboBox(
 		BESPolicyActionWrapper.values());
 	private JTextField _thresholdField = new JTextField(8);
 	private JCheckBox _isAccepting = new JCheckBox("Accept New Activities");

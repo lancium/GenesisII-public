@@ -47,7 +47,7 @@ public class IdpTool extends BaseLoginTool {
 		super(_DESCRIPTION, _USAGE_RESOURCE, false);
 		addManPage(new FileResource(_MANPAGE));
 		// set valid millis to 10 years by default.
-		_validMillis = 1000L * 60 * 60 * 24 * 360 * 10;
+		_validMillis = 1000L * 60 * 60 * 24 * 365 * 10;
 	}
 
 	@Override
