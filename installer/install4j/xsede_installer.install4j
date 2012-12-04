@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="5.0.11" transformSequenceNumber="3">
-  <directoryPresets config="../unlimited_jce_java7/US_export_policy.jar" />
-  <application name="Genesis II" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:genii.bitSize}_v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genii" publisher="University of Virginia" publisherWeb="genesisII.virginia.edu" version="2.6.0" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.6">
+  <directoryPresets config="" />
+  <application name="Genesis II" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:genii.bitSize}_v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genii" publisher="University of Virginia" publisherWeb="genesisII.virginia.edu" version="2.6.2" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.6">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -12,7 +12,7 @@
       <envVar name="JDK_HOME" />
     </searchSequence>
     <variables>
-      <variable name="genii.build-number" value="2600" description="" category="" />
+      <variable name="genii.build-number" value="4371" description="" category="" />
       <variable name="genii.xcg-port" value="18443" description="" category="" />
       <variable name="genii.container-memory.fraction" value="0.25" description="" category="" />
       <variable name="genii.container-memory.upper-limit" value="4096" description="" category="" />
@@ -369,32 +369,33 @@
       <component name="Genesis II Core" id="28" customizedId="" displayDescription="true" hideHelpButton="false" selected="true" changeable="false" downloadable="false" hidden="false">
         <description>The core set of libraries and files necessary to run Genesis II clients and servers.</description>
         <include all="false">
-          <entry location="webapps" fileType="regular" />
+          <entry location="jre-addin" fileType="regular" />
+          <entry location="updates" fileType="regular" />
+          <entry location="bundles" fileType="regular" />
           <entry location="ApplicationWatcher/genii-base-application.properties" fileType="regular" />
           <entry location="ApplicationWatcher/genii-client-application.properties" fileType="regular" />
           <entry location="ApplicationWatcher/genii-update-application.properties" fileType="regular" />
           <entry location="ApplicationWatcher/app-manager.jar" fileType="regular" />
-          <entry location="deployments/default" fileType="regular" />
-          <entry location="deployments/current_grid" fileType="regular" />
-          <entry location="lib" fileType="regular" />
-          <entry location="ext" fileType="regular" />
+          <entry location="webapps" fileType="regular" />
           <entry location="RELEASE" fileType="regular" />
           <entry location="License.txt" fileType="regular" />
-          <entry location="updates" fileType="regular" />
+          <entry location="deployments/default" fileType="regular" />
+          <entry location="deployments/current_grid" fileType="regular" />
+          <entry location="ext" fileType="regular" />
+          <entry location="lib" fileType="regular" />
           <entry location="jar-desc.xml" fileType="regular" />
-          <entry location="jre-addin" fileType="regular" />
           <entry location="grid" fileType="launcher" />
           <entry location="grid-update" fileType="launcher" />
           <entry location="client-ui" fileType="launcher" />
-          <entry location=".i4j_external_20/jni-lib/libdbxml_java23.dll" fileType="regular" />
-          <entry location=".i4j_external_20/jni-lib/VcgrClientLib.dll" fileType="regular" />
           <entry location=".i4j_external_20/jni-lib/msvcr71.dll" fileType="regular" />
-          <entry location=".i4j_external_20/jni-lib/nulmrxnp.dll" fileType="regular" />
           <entry location=".i4j_external_20/jni-lib/libdb_java45.dll" fileType="regular" />
-          <entry location=".i4j_external_20/jni-lib/VcgrContainerLib.dll" fileType="regular" />
-          <entry location=".i4j_external_20/jni-lib/libdb_java45d.dll" fileType="regular" />
-          <entry location=".i4j_external_20/jni-lib/CToGenesisCalls.dll" fileType="regular" />
           <entry location=".i4j_external_20/jni-lib/GeniiProcessMgmt.dll" fileType="regular" />
+          <entry location=".i4j_external_20/jni-lib/libdb_java45d.dll" fileType="regular" />
+          <entry location=".i4j_external_20/jni-lib/VcgrContainerLib.dll" fileType="regular" />
+          <entry location=".i4j_external_20/jni-lib/libdbxml_java23.dll" fileType="regular" />
+          <entry location=".i4j_external_20/jni-lib/CToGenesisCalls.dll" fileType="regular" />
+          <entry location=".i4j_external_20/jni-lib/VcgrClientLib.dll" fileType="regular" />
+          <entry location=".i4j_external_20/jni-lib/nulmrxnp.dll" fileType="regular" />
           <entry location=".i4j_external_22/jni-lib" fileType="regular" />
           <entry location=".i4j_external_24/jni-lib" fileType="regular" />
           <entry location=".i4j_fileset_25" fileType="regular" />
@@ -965,6 +966,27 @@ if (selected){
             <preActivation />
             <postActivation />
             <actions>
+              <action name="" id="4309" customizedId="" beanClass="com.install4j.runtime.beans.actions.files.DeleteFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.files.DeleteFileAction">
+                      <void property="files">
+                        <array class="java.io.File" length="1">
+                          <void index="0">
+                            <object class="java.io.File">
+                              <string>ext</string>
+                            </object>
+                          </void>
+                        </array>
+                      </void>
+                      <void property="recursive">
+                        <boolean>true</boolean>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
               <action name="" id="8" customizedId="" beanClass="com.install4j.runtime.beans.actions.InstallFilesAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="${i18n:FileCorrupted}">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
@@ -1559,7 +1581,10 @@ Hostnames should be globally resolvable via DNS.</string>
                         </object>
                       </java>
                     </serializedBean>
-                    <condition />
+                    <condition>
+String medium = context.getMediaName();
+return ! medium.startsWith("genesis2_client_macosx");
+</condition>
                   </action>
                   <action name="Create container.properties file" id="1015" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.WriteTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="Unable to create container.properties file">
                     <serializedBean>
@@ -3862,7 +3887,7 @@ return startService;</string>
     </unixInstaller>
   </mediaSets>
   <buildIds buildAll="false">
-    <mediaSet refId="3416" />
+    <mediaSet refId="2088" />
   </buildIds>
   <buildOptions verbose="true" faster="false" debug="false" />
 </install4j>
