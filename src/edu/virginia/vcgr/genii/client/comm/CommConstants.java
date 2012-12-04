@@ -10,5 +10,10 @@ public class CommConstants
 		"edu.virginia.vcgr.genii.client.comm.message-sec-call-data";
 	static public final String MESSAGE_SEC_SIGN_PARTS = 
 		"edu.virginia.vcgr.genii.client.comm.message-sec-signParts";
-	
+
+	// added here because the wss4j 1.5.4 library no longer has getType on the
+	// X509Security class.
+	static public final String X509_SECURITY_TYPE =
+		"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3";
+
 }

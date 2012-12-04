@@ -49,7 +49,6 @@ public class JAXBGenesisIIServiceConfiguration
 		}
 	}
 	
-	@SuppressWarnings("unused")
 	@XmlAttribute(name = "resource-provider", required = false)
 	private void setResourceProviderClass(String className) throws Throwable
 	{
@@ -63,7 +62,6 @@ public class JAXBGenesisIIServiceConfiguration
 			null : _resourceProvider.getClass().getName();
 	}
 	
-	@SuppressWarnings("unused")
 	@XmlAttribute(name = "default-authz-provider", required = false)
 	private void setDefaultAuthZProviderClass(String className) 
 		throws Throwable
@@ -78,7 +76,6 @@ public class JAXBGenesisIIServiceConfiguration
 			null : _defaultAuthZProvider.getClass().getName();
 	}
 	
-	@SuppressWarnings("unused")
 	@XmlAttribute(name = "default-resolver-factory-proxy", required = false)
 	private void setDefaultResolverFactoryProxyClass(String className)
 		throws Throwable

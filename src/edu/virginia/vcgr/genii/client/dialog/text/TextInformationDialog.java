@@ -2,6 +2,8 @@ package edu.virginia.vcgr.genii.client.dialog.text;
 
 import java.io.PrintWriter;
 
+import org.morgan.util.io.StreamUtils;
+
 import edu.virginia.vcgr.genii.client.dialog.InformationDialog;
 import edu.virginia.vcgr.genii.client.dialog.InputValidator;
 import edu.virginia.vcgr.genii.client.dialog.TextContent;
@@ -34,7 +36,7 @@ public class TextInformationDialog extends TextInputDialog
 		stream.println();
 		stream.println(_content);
 		stream.println();
-		
+		StreamUtils.close(stream);
 		super.showContent();
 	}
 	

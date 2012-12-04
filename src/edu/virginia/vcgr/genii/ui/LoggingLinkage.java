@@ -21,6 +21,7 @@ import edu.virginia.vcgr.genii.ui.utils.LoggingTarget;
  * @license This file is free software; you can modify and redistribute it under the terms of the
  *          Apache License v2.0: http://www.apache.org/licenses/LICENSE-2.0
  */
+@SuppressWarnings("rawtypes")
 public class LoggingLinkage implements ILoggingRecipient
 {
 	private JList _appLoggingTarget;
@@ -46,7 +47,8 @@ public class LoggingLinkage implements ILoggingRecipient
 	    
 	    public ArrayList<Throwable> getCauses() { return causes; }
 	    
-	    public void addWithCause(int index, Object element, Throwable cause) {
+	    @SuppressWarnings("unchecked")
+        public void addWithCause(int index, Object element, Throwable cause) {
 	        causes.add(cause);
 	        super.add(index, element);
 	    }

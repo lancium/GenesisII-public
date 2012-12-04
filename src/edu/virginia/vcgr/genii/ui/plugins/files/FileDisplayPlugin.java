@@ -65,8 +65,9 @@ public class FileDisplayPlugin extends AbstractUITabPlugin
 	
 	static private class DocumentRetriever implements Runnable
 	{
-		static final private int BUFFER_SIZE = 1024 * 8;
-		static final private int MAX_STRING_SIZE = 1024 * 8;
+		// a large buffer size so as not to get trapped in a perpetual log file reading scenario.
+		static final private int BUFFER_SIZE = 1024 * 1024 * 2;
+//		static final private int MAX_STRING_SIZE = 1024 * 8;
 		
 		private RNSPath _path;
 		private FileDisplayWidget _widget;
@@ -93,13 +94,13 @@ public class FileDisplayPlugin extends AbstractUITabPlugin
 			{
 				in = ByteIOStreamFactory.createInputStream(_path);
 				Reader reader = new InputStreamReader(in);
-				int remaining = MAX_STRING_SIZE - builder.length();
-				while (
-					(remaining > 0) &&
-					((read = reader.read(data, 0,
-						Math.min(BUFFER_SIZE, remaining))) > 0))
+				while ((read = reader.read(data, 0, BUFFER_SIZE)) > 0)
 				{
 					builder.append(data, 0, read);
+					if (!reader.ready()) {
+						// if we finally got to the end of the file once, we break out.
+						break;
+					}
 				}
 				
 				SwingUtilities.invokeLater(new DocumentUpdater(

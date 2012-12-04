@@ -199,6 +199,10 @@ public class CreateUserTool extends BaseGridTool
 			idpTool.setValidDuration(_durationString);
 		idpTool.run(stdout, stderr, stdin);
 		
+		stdout.println(String.format("\tLifetime:     %.2f days / %.2f years.",
+			BaseLoginTool.millisToDays(idpTool.getValidMillis()),
+			BaseLoginTool.millisToYears(idpTool.getValidMillis())));
+		
 		String fullPath = idpServicePath + "/" + idpName;
 		RNSPath.clearCacheEntry(fullPath);
 		

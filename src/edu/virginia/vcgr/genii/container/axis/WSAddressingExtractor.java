@@ -60,7 +60,7 @@ public class WSAddressingExtractor extends BasicHandler
 	public void invoke(MessageContext ctxt) throws AxisFault
 	{
 		Vector<MessageElement> refParams = new Vector<MessageElement>();
-		_logger.debug("WSAddressingExtractor extracting EPR from header.");
+		_logger.trace("WSAddressingExtractor extracting EPR from header.");
 
 		EndpointReferenceType epr = new EndpointReferenceType();
 
@@ -89,9 +89,7 @@ public class WSAddressingExtractor extends BasicHandler
 			{
 				epr.setAddress(new AttributedURIType(he.getFirstChild()
 						.getNodeValue()));
-				_logger
-						.debug("WSAddressingExtractor found target address of \""
-								+ epr.getAddress().get_value() + "\".");
+				_logger.debug("WSAddressingExtractor found target: \"" + epr.getAddress().get_value() + "\".");
 			}
 			else
 			{
@@ -123,15 +121,14 @@ public class WSAddressingExtractor extends BasicHandler
 		{
 			epr.setAddress(new AttributedURIType(Container
 					.getCurrentServiceURL(ctxt)));
-			_logger.debug("WSAddressingExtractor setting target address to \""
+			_logger.trace("WSAddressingExtractor setting target address to \""
 					+ epr.getAddress().get_value() + "\".");
 		}
 		
 		String shortParameterName = EPRUtils.getEPIShortParameter(epr);
 		if (shortParameterName != null)
 		{
-			_logger.debug(String.format(
-				"Found a shorthand epi of %s.  Looking it up.",
+			_logger.trace(String.format("Found a shorthand epi of %s.  Looking it up.",
 				shortParameterName));
 			epr = EPRMapperService.lookup(shortParameterName);
 		}

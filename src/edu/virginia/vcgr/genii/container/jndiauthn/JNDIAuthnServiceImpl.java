@@ -501,7 +501,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 									{
 										if (subElement.getAttributeValue(
 												"ValueType").equals(
-												X509Security.getType()))
+												edu.virginia.vcgr.genii.client.comm.CommConstants.X509_SECURITY_TYPE))
 										{
 											X509Security bstToken =
 													new X509Security(subElement);
@@ -511,9 +511,11 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 											delegateToChain =
 													new X509Certificate[] { delegateTo };
 										}
+										//hmmm: this appears to be wrong code; the condition is identical, even in the version
+										// still calling getType on X509Security class.
 										else if (subElement.getAttributeValue(
 												"ValueType").equals(
-												X509Security.getType()))
+												edu.virginia.vcgr.genii.client.comm.CommConstants.X509_SECURITY_TYPE))
 										{
 											PKIPathSecurity bstToken =
 													new PKIPathSecurity(element);

@@ -5,6 +5,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+@SuppressWarnings("rawtypes")
 class FontFamilyList extends JList
 {
 	static final long serialVersionUID = 0L;
@@ -23,7 +24,8 @@ class FontFamilyList extends JList
 		}	
 	}
 	
-	FontFamilyList(FontModel model)
+	@SuppressWarnings("unchecked")
+    FontFamilyList(FontModel model)
 	{
 		super(new FontFamilyListModel());
 		

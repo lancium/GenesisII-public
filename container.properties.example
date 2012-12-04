@@ -1,2 +1,6 @@
-#edu.virginia.vcgr.genii.container.user-dir=/home/mmm2a/.gstate
-edu.virginia.vcgr.genii.container.deployment-name=GeniiNetFullContainer
+#edu.virginia.vcgr.genii.container.user-dir=env-GENII_USER_DIR
+  # the env-GENII_USER_DIR value above will be translated into the value of
+  # the GENII_USER_DIR variable in the environment.
+
+edu.virginia.vcgr.genii.container.deployment-name=xcg3
+  # this should be changed to the actual deployment name in use.

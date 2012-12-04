@@ -20,6 +20,7 @@ import org.morgan.utils.gui.GUIUtils;
 
 import edu.virginia.vcgr.genii.client.resource.JavaCommandFunction;
 
+@SuppressWarnings("rawtypes")
 class CommandFunctionChoiceDialog extends JDialog
 {
 	static final long serialVersionUID = 0L;
@@ -27,7 +28,8 @@ class CommandFunctionChoiceDialog extends JDialog
 	private JComboBox _functions;
 	private JavaCommandFunction _selectedFunction = null;
 	
-	private CommandFunctionChoiceDialog(Component ownerComponent,
+	@SuppressWarnings("unchecked")
+    private CommandFunctionChoiceDialog(Component ownerComponent,
 		Collection<JavaCommandFunction> functions)
 	{
 		super(SwingUtilities.getWindowAncestor(ownerComponent),

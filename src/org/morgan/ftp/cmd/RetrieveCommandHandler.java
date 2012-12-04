@@ -72,6 +72,7 @@ public class RetrieveCommandHandler extends AbstractCommandHandler
 		}
 		finally
 		{
+			StreamUtils.close(pHandler);
 			StreamUtils.close(in);
 			StreamUtils.close(out2);
 			StreamUtils.close(channel);

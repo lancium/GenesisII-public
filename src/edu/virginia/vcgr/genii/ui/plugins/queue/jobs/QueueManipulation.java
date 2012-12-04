@@ -144,8 +144,11 @@ class QueueManipulation
 				{
 					ret.add((HistoryEvent)DBSerializer.deserialize(
 						bundle.getData()));
-					if (wasCancelled())
-						return null;
+					if (wasCancelled()) break;
+				}
+				if (wasCancelled()) {
+					StreamUtils.close(iterable);
+					return null;
 				}
 				
 				return ret;

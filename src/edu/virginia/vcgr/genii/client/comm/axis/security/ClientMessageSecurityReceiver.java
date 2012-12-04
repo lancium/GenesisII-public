@@ -66,6 +66,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author dgm4d
  */
+@SuppressWarnings("rawtypes")
 public class ClientMessageSecurityReceiver extends WSDoAllReceiver implements
 		ISecurityRecvHandler
 {

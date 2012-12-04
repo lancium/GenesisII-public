@@ -170,6 +170,7 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 		performAuthz();		
 	}
 
+	@SuppressWarnings("rawtypes")
 	protected boolean checkReceiverResults(Vector wsResult, Vector actions)
 	{
 
@@ -471,11 +472,9 @@ public class ServerWSDoAllReceiver extends WSDoAllReceiver
 			Object transport = req.getConnection().getEndPoint().getTransport();
 			if (transport instanceof SSLSocket) 
 			{
-				SSLSocket socket = (SSLSocket) transport;
-				
 				try { 
 					X509Certificate[] clientSslCertChain = 
-						(X509Certificate[]) socket.getSession().getPeerCertificates();
+						(X509Certificate[]) ((SSLSocket) transport).getSession().getPeerCertificates();
 					if (clientSslCertChain != null) {
 						authenticatedCertChains.add(clientSslCertChain);
 					}

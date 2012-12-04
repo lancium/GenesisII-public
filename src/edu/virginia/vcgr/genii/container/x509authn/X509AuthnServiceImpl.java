@@ -507,7 +507,7 @@ public class X509AuthnServiceImpl extends GenesisIIBase
 									{
 										if (subElement.getAttributeValue(
 											"ValueType").equals(
-											X509Security.getType()))
+											edu.virginia.vcgr.genii.client.comm.CommConstants.X509_SECURITY_TYPE))
 										{
 											X509Security bstToken =
 													new X509Security(subElement);
@@ -519,7 +519,7 @@ public class X509AuthnServiceImpl extends GenesisIIBase
 										}
 										else if (subElement.getAttributeValue(
 												"ValueType").equals(
-												X509Security.getType()))
+												edu.virginia.vcgr.genii.client.comm.CommConstants.X509_SECURITY_TYPE))
 										{
 											PKIPathSecurity bstToken =
 													new PKIPathSecurity(element);

@@ -173,8 +173,12 @@ public class AccountingTool extends BaseGridTool
 			while (rs.next())
 			{
 				query = (Identity)DBSerializer.fromBlob(rs.getBlob(2));
-				if (query.equals(credential))
-					return rs.getLong(1);
+				if (query.equals(credential)) {
+					long to_return = rs.getLong(1);
+					rs.close();
+					rs = null;
+					return to_return;
+				}
 			}
 			rs.close();
 			rs = null;

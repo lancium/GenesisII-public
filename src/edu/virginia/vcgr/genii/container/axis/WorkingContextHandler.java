@@ -40,6 +40,8 @@ public class WorkingContextHandler extends BasicHandler
 
 	private Boolean _isRequest = null;
 
+	public void init() { super.init(); }
+	
 	private boolean isRequest() throws AxisFault
 	{
 		synchronized (this)
@@ -89,7 +91,7 @@ public class WorkingContextHandler extends BasicHandler
 
 	protected void handleRequest(MessageContext ctxt) throws AxisFault
 	{
-		_logger.debug("Setting the working context for an incoming message.");
+		_logger.trace("Setting the working context for an incoming message.");
 
 		WorkingContext newContext = new WorkingContext();
 		WorkingContext.setCurrentWorkingContext(newContext);
@@ -137,7 +139,7 @@ public class WorkingContextHandler extends BasicHandler
 
 	protected void handleResponse(MessageContext ctxt)
 	{
-		_logger.debug("Clearing the working context for a message.");
+		_logger.trace("Clearing the working context for a message.");
 
 		cleanupWorkingContext(ctxt);
 	}

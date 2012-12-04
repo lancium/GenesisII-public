@@ -31,7 +31,7 @@ public class JNIClientBaseClass
 		}
 		catch (UnsatisfiedLinkError e)
 		{
-			_logger.info("exception occurred in static init", e);
+			_logger.warn("linking in library " + VCGR_CLIENT_LIB_NAME + " failed", e);
 		}
 	}
 }

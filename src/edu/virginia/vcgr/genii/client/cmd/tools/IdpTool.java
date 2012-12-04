@@ -8,6 +8,8 @@ import java.security.cert.X509Certificate;
 import java.util.*;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.byteio.ByteIOStreamFactory;
@@ -38,16 +40,19 @@ public class IdpTool extends BaseLoginTool {
 	protected String _kerbRealm = null;
 	protected String _kerbKdc = null;
 	protected IdentityType _type = null;
+	
+    static private Log _logger = LogFactory.getLog(IdpTool.class);
 
 	protected IdpTool(String description, String usage, boolean isHidden) {
 		super(description, usage, isHidden);
 	}
 
-	public IdpTool() {
+	public IdpTool()
+	{
 		super(_DESCRIPTION, _USAGE_RESOURCE, false);
 		addManPage(new FileResource(_MANPAGE));
-		// set valid millis to 10 years by default.
-		_validMillis = 1000L * 60 * 60 * 24 * 365 * 10;
+		_logger.trace(String.format("idptool--valid millis default: %.2f days / %.2f years.",
+			BaseLoginTool.millisToDays(getValidMillis()), BaseLoginTool.millisToYears(getValidMillis())));
 	}
 
 	@Override

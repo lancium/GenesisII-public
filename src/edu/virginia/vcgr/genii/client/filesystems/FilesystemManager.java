@@ -115,6 +115,8 @@ public class FilesystemManager
 		{
 			Filesystem fs = new FilesystemImpl(this, fsConf.name(),
 				fsConf);
+			_logger.info(String.format("adding filesystem at: " + fsConf.path()
+				+ " (%.2f%% used)", fs.currentUsage().percentUsed()));
 			_filesystems.put(fsConf.name(), fs);
 		}
 		
@@ -122,6 +124,7 @@ public class FilesystemManager
 		{
 			Filesystem fs = new FilesystemAliasImpl(
 				this, aliasConf.name(), aliasConf);
+			_logger.info("adding alias named \"" + aliasConf.name() + "\" for path " + fs.filesystemRoot());
 			_filesystems.put(aliasConf.name(), fs);
 		}
 		
@@ -147,7 +150,8 @@ public class FilesystemManager
 						config.handlerClass(),
 						config.configurationContent()));
 				}
-				
+
+				_logger.debug("constructor watching filesystem \"" + filesystemName + "\" with path " + filesystem.filesystemRoot().getPath());
 				FilesystemWatcher watcher = new FilesystemWatcher(
 					(long)watcherConfig.checkPeriod().as(DurationUnits.Milliseconds),
 					filesystemName, filesystem,
@@ -175,6 +179,7 @@ public class FilesystemManager
 		FilesystemWatchCallback callback = new FilesystemWatchCallback(
 			callLimit, handler);
 		callbacks.add(callback);
+		_logger.debug("addWatch on filesystem " + filesystemName + " with object " + filesystem.toString());
 		
 		FilesystemWatcher watcher = new FilesystemWatcher(
 			checkPeriodUnits.toMillis(checkPeriod),
@@ -271,7 +276,7 @@ public class FilesystemManager
 		}
 	}
 	
-	static public void main(String []args) throws Throwable
+	static public void testingMain(String []args) throws Throwable
 	{
 		InputStream in = FilesystemManager.class.getResourceAsStream("myFilesystems.xml");
 		FilesystemManager mgr = new FilesystemManager(in);

@@ -44,7 +44,6 @@ public class SubscriptionConstructionParameters extends ConstructionParameters
 		name = "additional-user-data", nillable = true, required = false)
 	private AdditionalUserData _additionalUserData = null;
 	
-	@SuppressWarnings("unused")
 	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS,
 		name = "topic-query", nillable = true, required = false)
 	@XmlJavaTypeAdapter(HexBinaryAdapter.class)
@@ -61,7 +60,6 @@ public class SubscriptionConstructionParameters extends ConstructionParameters
 			topicQuery);
 	}
 	
-	@SuppressWarnings("unused")
 	@XmlElement(namespace = GenesisIIConstants.GENESISII_NS,
 		name = "subscription-policies", 
 		nillable = true, required = false)

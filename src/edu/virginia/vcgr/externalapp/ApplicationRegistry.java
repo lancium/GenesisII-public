@@ -17,7 +17,6 @@ class ApplicationRegistry
 	private Map<String, Map<ApplicationRegistrationTypes, ExternalApplication>>
 		_registeredApplications = new HashMap<String, Map<ApplicationRegistrationTypes,ExternalApplication>>();
 	
-	@SuppressWarnings("unused")
 	@XmlElement(name = "mime-type", required = false)
 	private void setMimeTypeRegistration(
 		MimeTypeRegistration []registrations)
@@ -29,7 +28,6 @@ class ApplicationRegistry
 		}
 	}
 	
-	@SuppressWarnings("unused")
 	@XmlElement(name = "default-mime-type", required = false)
 	private void setDefaultRegistration(
 		DefaultRegistration registration)

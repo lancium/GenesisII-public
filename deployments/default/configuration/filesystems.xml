@@ -1,5 +1,7 @@
 <filesystems xmlns="http://vcgr.cs.virginia.edu/filesystems">
-	<filesystem name="local" path="${user.home}/.genesisII-2.0">
+	<filesystem name="local" path="env-GENII_USER_DIR">
+		<!-- the special phrase 'env-GENII_USER_DIR' used above is replaced with that
+			environment variable before returning the property. -->
 		<filesystem-property>Local</filesystem-property>
 		<filesystem-property>Shared</filesystem-property>
 		<filesystem-sandbox name="database" relative-path="derby-db"

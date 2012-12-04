@@ -79,14 +79,18 @@ public class ProcFilesystemProvider implements ISystemInfoProvider
 		{
 			reader = new BufferedReader(new FileReader(file));
 			String line;
+			String toReturn = null;
 			
 			while ( (line = reader.readLine()) != null)
 			{
 				Matcher matcher = p.matcher(line);
-				if (matcher.matches())
-					return matcher.group(group);
+				if (matcher.matches()) {
+					toReturn = matcher.group(group);
+					break;
+				}
 			}
-			
+			StreamUtils.close(reader);
+			if (toReturn != null) return toReturn; 
 			throw new RuntimeException("Couldn't find attribute");
 		}
 		catch (IOException ioe)

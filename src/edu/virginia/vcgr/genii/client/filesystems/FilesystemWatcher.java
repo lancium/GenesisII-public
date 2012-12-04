@@ -43,6 +43,7 @@ class FilesystemWatcher
 		Collection<FilesystemWatchCallback> callbacks)
 	{
 		_checkPeriod = checkPeriod;
+		_logger.trace(String.format("using fs check interval of %d seconds.", _checkPeriod / 1000));
 		_filesystemName = filesystemName;
 		_filesystem = filesystem;
 		_filter = filter;

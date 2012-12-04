@@ -11,6 +11,8 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.utils.gui.GUIUtils;
 
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
@@ -18,6 +20,7 @@ import edu.virginia.vcgr.genii.security.VerbosityLevel;
 public class SecurityUIPreferenceSetEditor extends JPanel
 {
 	static final long serialVersionUID = 0L;
+	static private Log _logger = LogFactory.getLog(SecurityUIPreferenceSetEditor.class);
 	
 	private VerbosityLevel _level;
 	
@@ -79,7 +82,7 @@ public class SecurityUIPreferenceSetEditor extends JPanel
 			JRadioButton button = (JRadioButton)event.getSource();
 			if (button.isSelected())
 			{
-				System.err.format("Setting level to \"%s\".\n", _level);
+				_logger.info(String.format("Setting level to \"%s\".\n", _level));
 				SecurityUIPreferenceSetEditor.this._level = _level;
 			}
 		}

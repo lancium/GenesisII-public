@@ -3,4 +3,5 @@
 	xmlns:vcgr="http://vcgr.cs.virginia.edu">
 	<vcgr:jar-dir recursive="true">$INSTALL_PATH/lib</vcgr:jar-dir>
 	<vcgr:jar-dir recursive="true">$INSTALL_PATH/ext</vcgr:jar-dir>
+	<vcgr:jar-dir recursive="true">$INSTALL_PATH/bundles</vcgr:jar-dir>
 </vcgr:jars>

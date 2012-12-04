@@ -42,6 +42,7 @@ import org.morgan.util.io.GuaranteedDirectory;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.handler.ContextHandler;
+import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.security.SslSocketConnector;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.jetty.webapp.WebAppContext;
@@ -153,7 +154,7 @@ public class Container extends ApplicationBase
 			
 			ContainerIDFile.containerID(getContainerID());
 			
-			System.out.println("Container Started");
+			_logger.info("Container Started");
 			_secRunManager.run(SecureRunnableHooks.CONTAINER_POST_STARTUP, 
 				secRunProperties);
 			AlarmManager.initializeAlarmManager();
@@ -162,7 +163,7 @@ public class Container extends ApplicationBase
 		}
 		catch (Throwable t)
 		{
-			_logger.warn("exception occurred in main", t);
+			_logger.error("exception occurred in main", t);
 			System.exit(1);
 		}
 		/* We have decided not to do this.
@@ -243,20 +244,19 @@ public class Container extends ApplicationBase
 			_containerConfiguration.getMaxAcceptorThreads()));
 		socketConnector.setAcceptors(_containerConfiguration.getMaxAcceptorThreads());
 		server.addConnector(socketConnector);
-		
-		ContextHandler context = new ContextHandler("/axis");
-		server.addHandler(context);
-		webAppCtxt = new WebAppContext(
-				Installation.axisWebApplicationPath().getAbsolutePath(),
-				"/");
-		context.addHandler(webAppCtxt);
-		
+
+		ContextHandler context1 = new ContextHandler("/axis");
+		webAppCtxt = new WebAppContext(Installation.axisWebApplicationPath().getAbsolutePath(), "/");
+		context1.setHandler(webAppCtxt);
+
 		Server dServer = loadDynamicPages(_containerConfiguration.getDPagesPort());
+
+		ContextHandler context2 = new ContextHandler("/");
+		context2.setHandler(new ResourceFileHandler("edu/virginia/vcgr/genii/container"));
 		
-		context = new ContextHandler("/");
-		server.addHandler(context);
-		context.addHandler(new ResourceFileHandler(
-			"edu/virginia/vcgr/genii/container"));
+		ContextHandlerCollection contexts = new ContextHandlerCollection();
+        contexts.setHandlers(new ContextHandler[] { context1, context2 });
+        server.setHandler(contexts);
 		
 		try
 		{

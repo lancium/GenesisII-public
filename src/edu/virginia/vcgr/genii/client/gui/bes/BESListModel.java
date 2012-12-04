@@ -10,6 +10,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.naming.WSName;
 
+@SuppressWarnings("rawtypes")
 public class BESListModel extends AbstractListModel
 {
 	static final long serialVersionUID = 0L;

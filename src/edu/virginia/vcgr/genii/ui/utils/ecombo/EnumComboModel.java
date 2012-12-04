@@ -7,6 +7,7 @@ import java.util.Vector;
 import javax.swing.AbstractListModel;
 import javax.swing.ComboBoxModel;
 
+@SuppressWarnings("rawtypes")
 class EnumComboModel<Type extends Enum<Type>> extends AbstractListModel
 	implements ComboBoxModel
 {

@@ -20,8 +20,6 @@ import java.util.Date;
 import java.util.Enumeration;
 
 import org.apache.axis.message.MessageElement;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.ws.addressing.EndpointReferenceType;
 import org.bouncycastle.asn1.x509.X509Name;
 
@@ -53,7 +51,7 @@ public class CertGeneratorTool extends BaseGridTool
 	static private final String _USAGE_RESOURCE =
 		"edu/virginia/vcgr/genii/client/cmd/tools/usage/ucert-generator";
 
-	static private Log _logger = LogFactory.getLog(CertGeneratorTool.class);
+//	static private Log _logger = LogFactory.getLog(CertGeneratorTool.class);
 	
 	static private final String _LOCAL_MACHINE_NAME_CN = "LOCAL_MACHINE_NAME";
 	static private final String _LOCAL_MACHINE_IP_CN = "LOCAL_MACHINE_IP";

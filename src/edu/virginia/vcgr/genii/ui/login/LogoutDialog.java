@@ -24,6 +24,7 @@ import edu.virginia.vcgr.genii.client.gui.GuiUtils;
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.credentials.GIICredential;
 
+@SuppressWarnings("rawtypes")
 class LogoutDialog extends JDialog
 {
 	static final long serialVersionUID = 0L;
@@ -72,7 +73,8 @@ class LogoutDialog extends JDialog
 			evaluateStatus();
 		}
 		
-		@Override
+		@SuppressWarnings("deprecation")
+        @Override
 		final public void actionPerformed(ActionEvent e)
 		{
 			int answer = JOptionPane.showConfirmDialog(
@@ -122,7 +124,8 @@ class LogoutDialog extends JDialog
 	
 	private JList _credentialList;
 	
-	LogoutDialog(Window owner, CredentialManagementContext context)
+	@SuppressWarnings("unchecked")
+    LogoutDialog(Window owner, CredentialManagementContext context)
 	{
 		super(owner, "Logout Dialog", ModalityType.DOCUMENT_MODAL);
 		_context = context;

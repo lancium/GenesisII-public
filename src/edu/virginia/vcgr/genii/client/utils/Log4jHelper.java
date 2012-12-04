@@ -1,5 +1,9 @@
 package edu.virginia.vcgr.genii.client.utils;
 
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+
 import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
@@ -16,17 +20,32 @@ import org.apache.log4j.Logger;
 
 public class Log4jHelper
 {
-	private static final Logger _logger = Logger.getLogger(Log4jHelper.class);
-	
+	private static String log4jFileStatic = null;
+
+	@SuppressWarnings("unchecked")
+	static public List<String> queryAppenders()
+	{
+		ArrayList<String> ted = new ArrayList<String>();
+		Enumeration<Appender> apps = Logger.getRootLogger().getAllAppenders();
+		while (apps.hasMoreElements()) {
+			Appender a = (Appender) apps.nextElement();
+			ted.add(a.getName());
+		}
+		return ted;
+	}
+
 	// retrieves the file used for logging on the appender called "appenderName".
 	// this only works if the appenderName exists, and if it is derived from FileAppender.
 	static public String queryLog4jFile(String appenderName)
 	{
-		Appender appender = _logger.getAppender(appenderName);
-		if (appender instanceof FileAppender)
-			return ((FileAppender) appender).getFile();
-		else
-			return null;
+		// re-use the answer from last time, if there was an answer.  the log file will
+		// currently not change during runtime.
+		if (log4jFileStatic == null) {
+			Appender appender = Logger.getRootLogger().getAppender(appenderName);
+			if (appender instanceof FileAppender)
+				log4jFileStatic = ((FileAppender) appender).getFile();
+		}
+		return log4jFileStatic;
 	}
 
 }

@@ -11,44 +11,31 @@ import edu.virginia.vcgr.genii.container.context.WorkingContext;
 public class DatabaseHandler implements IAroundInvoker
 {
 	static private Log _logger = LogFactory.getLog(DatabaseHandler.class);
-	
+
 	public Object invoke(InvocationContext invocationContext) throws Exception
 	{
 		Object result;
 		boolean succeeded = false;
-		
-		MethodDataPoint mdp = ContainerStatistics.instance(
-			).getMethodStatistics().startMethod(
-				invocationContext.getTarget().getClass(),
-				invocationContext.getMethod());
-		MethodHistogramStatistics mhs = ContainerStatistics.instance(
-			).getMethodHistogramStatistics();
-		
+
+		MethodDataPoint mdp = ContainerStatistics.instance().getMethodStatistics()
+			.startMethod(invocationContext.getTarget().getClass(), invocationContext.getMethod());
+		MethodHistogramStatistics mhs = ContainerStatistics.instance().getMethodHistogramStatistics();
+
 		mhs.addActiveMethod();
-		try
-		{
+		try {
 			result = invocationContext.proceed();
 			mdp.complete(true);
 			succeeded = true;
 			return result;
-		}
-		finally
-		{
+		} finally {
 			mhs.removeActiveMethod();
-			
-			if (!succeeded)
-			{
-				_logger.warn(
-					"An error occurred while invoking method.  " +
-					"Setting the context to failed.");
-				
+
+			if (!succeeded) {
+				_logger.warn("An error occurred while invoking method " + mdp.toString() + ".  Setting the context to failed.");
 				mdp.complete(false);
-				try
-				{		
+				try {
 					WorkingContext.getCurrentWorkingContext().setFailed();
-				}
-				catch (Throwable t)
-				{
+				} catch (Throwable t) {
 				}
 			}
 		}

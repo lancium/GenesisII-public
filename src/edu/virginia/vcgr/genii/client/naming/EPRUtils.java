@@ -34,7 +34,6 @@ import org.ws.addressing.EndpointReferenceType;
 import org.ws.addressing.MetadataType;
 import org.xml.sax.InputSource;
 
-import edu.virginia.vcgr.genii.common.security.*;
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.container.ContainerConstants;
 import edu.virginia.vcgr.genii.client.ogsa.OGSARP;
@@ -220,8 +219,6 @@ public class EPRUtils
 		if (elements == null || elements.length == 0)
 			return null;
 
-		RequiredMessageSecurityType minSec = null;
-		
 		for (MessageElement element : elements)
 		{
 
@@ -299,11 +296,18 @@ public class EPRUtils
 			}
 		}
 
-		if (minSec == null)
-		{
-			return null;
-		}
-
+		return null;  // simplifying by removing dead code.
+/* dead code, saved for analysis...
+        RequiredMessageSecurityType minSec = null;  // was at top of function.
+        
+        //current implementation was at this point.
+        
+        //then these checks, which made the rest of the function dead code, since
+        // minSec was never set anywhere in the rest of the function...
+        if (minSec == null)
+        {
+            return null;
+        }
 		RequiredMessageSecurityTypeMin minType = minSec.getMin();
 		if (minType == null)
 		{
@@ -311,6 +315,7 @@ public class EPRUtils
 		}
 
 		return new MessageLevelSecurityRequirements(minType.getValue());
+*/
 	}
 
 	static private Pattern _SERVICE_NAME_PATTERN =

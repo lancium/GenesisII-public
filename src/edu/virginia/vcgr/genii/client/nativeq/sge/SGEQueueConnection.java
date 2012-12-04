@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.morgan.util.Pair;
+import org.morgan.util.io.StreamUtils;
 
 import edu.virginia.vcgr.genii.client.bes.ResourceOverrides;
 import edu.virginia.vcgr.genii.client.nativeq.ApplicationDescription;
@@ -253,9 +254,12 @@ public class SGEQueueConnection extends ScriptBasedQueueConnection<SGEQueueConfi
 			reader = new BufferedReader(new FileReader(
 				new File(getWorkingDirectory(), QUEUE_SCRIPT_RESULT_FILENAME)));
 			String line = reader.readLine();
-			if (line == null)
+			if (line == null) {
+				StreamUtils.close(reader);
 				throw new NativeQueueException(
 					"Unable to determine application exit status.");
+			}
+			StreamUtils.close(reader);
 			return Integer.parseInt(line.trim());
 		}
 		catch (FileNotFoundException ioe)

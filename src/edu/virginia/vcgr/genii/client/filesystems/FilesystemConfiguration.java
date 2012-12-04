@@ -10,6 +10,8 @@ import javax.xml.bind.annotation.XmlElement;
 
 import org.morgan.util.macro.MacroUtils;
 
+import edu.virginia.vcgr.genii.client.ApplicationBase;
+
 class FilesystemConfiguration extends FilesystemSandboxContainerConfiguration
 {
 	@XmlAttribute(name = "path", required = true)
@@ -24,6 +26,9 @@ class FilesystemConfiguration extends FilesystemSandboxContainerConfiguration
 	private void afterUnmarshal(Unmarshaller u, Object parent)
 	{
 		_path = MacroUtils.replaceMacros(System.getProperties(), _path);
+		if (_path.equals(ApplicationBase.USER_DIR_PROPERTY_VALUE)) {
+			_path = ApplicationBase.getUserDirFromEnvironment();
+		}
 	}
 	
 	final String path()

@@ -24,12 +24,12 @@ import java.util.Date;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPHeader;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.axis.message.MessageElement;
+import org.apache.axis.message.SOAPHeader;
 import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -68,7 +68,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 		
 		try
 		{
-			header = msgContext.getMessage().getSOAPHeader();
+			header = (SOAPHeader)msgContext.getMessage().getSOAPHeader();
 		
 			Version currentVersion;
 			ApplicationLauncherConsole console = ApplicationLauncher.getConsole();
@@ -156,7 +156,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 		try
 		{
 			String WSA_NS = EndpointReferenceType.getTypeDesc().getXmlType().getNamespaceURI();
-			SOAPHeader header = msgContext.getMessage().getSOAPHeader();
+			SOAPHeader header = (SOAPHeader)msgContext.getMessage().getSOAPHeader();
 			
 			SOAPHeaderElement to = new SOAPHeaderElement(
 				new QName(WSA_NS, "To"), target.getAddress().get_value().toString());
@@ -271,9 +271,9 @@ public class AxisClientHeaderHandler extends BasicHandler
 		
 		try
 		{
-			if (_logger.isDebugEnabled())
+			if (_logger.isTraceEnabled())
 			{
-				_logger.debug(String.format("Calling Context:\n%s",
+				_logger.trace(String.format("Calling Context:\n%s",
 					callContext.describe()));
 			}
 		}
@@ -284,7 +284,7 @@ public class AxisClientHeaderHandler extends BasicHandler
 		
 		try
 		{
-			SOAPHeader header = msgContext.getMessage().getSOAPHeader();
+			SOAPHeader header = (SOAPHeader)msgContext.getMessage().getSOAPHeader();
 			SOAPHeaderElement context = new SOAPHeaderElement(
 				ObjectSerializer.toElement(callContext.getSerialized(),
 					GenesisIIConstants.CONTEXT_INFORMATION_QNAME));

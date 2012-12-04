@@ -9,16 +9,31 @@ import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 
 public class ApplicationBase
 {
-	static public final String USER_DIR_ENVIRONMENT_VARIABLE =
-		"GENII_USER_DIR";
+	// the name of the environment variable whose value points at our state directory.
+	static public final String USER_DIR_ENVIRONMENT_VARIABLE = "GENII_USER_DIR";
+	// the value that can be used in property files (in select places) and is translated into the
+	// value of the user state directory variable (see above).
+	static public final String USER_DIR_PROPERTY_VALUE = "env-GENII_USER_DIR";
 
-	static private String getUserDirFromEnvironment()
+	// environment variable name that contains OSGI storage; might not be set.
+	static public final String OSGI_DIR_ENVIRONMENT_VARIABLE = "GENII_OSGI_DIR";
+
+	// loads the value for the genesis user state directory from the environment.
+	static public String getUserDirFromEnvironment()
 	{
 		String value = System.getenv(USER_DIR_ENVIRONMENT_VARIABLE);
-		if (value == null || value.length() == 0)
-			return null;
-		
+		// make this decision across the board, so we don't get caught short without
+		// a default user state directory.
+		if (value == null || value.length() == 0) {
+			value = String.format("%s/%s", System.getProperty("user.home"), GenesisIIConstants.GENESISII_STATE_DIR_NAME);
+		}
 		return value;
+	}
+
+	// loads the value for the OSGI storage area from the environment or returns null if undefined.
+	static public String getOSGIDirFromEnvironment()
+	{
+		return System.getenv(OSGI_DIR_ENVIRONMENT_VARIABLE);
 	}
 	
 	static private void setupUserDir(File userdir)
@@ -86,11 +101,6 @@ public class ApplicationBase
 		if (userDir == null)
 			userDir = getUserDirFromEnvironment();
 		
-		if (userDir == null) 
-			userDir = String.format("%s/%s",
-				System.getProperty("user.home"), 
-				GenesisIIConstants.GENESISII_STATE_DIR_NAME);
-
 		try
 		{
 			File userDirFile = new GuaranteedDirectory(userDir);

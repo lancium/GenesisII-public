@@ -234,7 +234,7 @@ public class QueueDatabase
 			stmt = connection.prepareStatement(
 				"SELECT resourceendpoint FROM q2resources " +
 				"WHERE resourceid = ?");
-			
+			String failPlace = null;
 			for (Long key : entries.keySet())
 			{
 				LegacyEntryType entry = entries.get(key);
@@ -243,14 +243,18 @@ public class QueueDatabase
 				rs = stmt.executeQuery();
 				if (!rs.next())
 				{
-					throw new SQLException("Unable to locate BES resource \"" +
-						entry.getEntry_name() + "\".");
+					failPlace = entry.getEntry_name();
+					break;
 				}
 				
 				entry.setEntry_reference(EPRUtils.fromBlob(rs.getBlob(1)));
 				
 				StreamUtils.close(rs);
 				rs = null;
+			}
+			if (failPlace != null) {
+				throw new SQLException("Unable to locate BES resource \"" +
+					 failPlace + "\".");
 			}
 		}
 		finally
@@ -599,13 +603,16 @@ public class QueueDatabase
 			stmt = connection.prepareStatement(
 				"SELECT owners, starttime, finishtime FROM q2jobs WHERE jobid = ?");
 			
+			Long failId = null;
 			for (Long jobID : jobIDs)
 			{
 				stmt.setLong(1, jobID.longValue());
 				rs = stmt.executeQuery();
 				
-				if (!rs.next())
-					throw new ResourceException("Unable to find job " + jobID + " in queue.");
+				if (!rs.next()) {
+					failId = jobID;
+					break;
+				}
 				
 				ret.put(jobID, new PartialJobInfo(
 					(Collection<Identity>)DBSerializer.fromBlob(rs.getBlob(1)),
@@ -613,6 +620,9 @@ public class QueueDatabase
 				
 				rs.close();
 				rs = null;
+			}
+			if (failId != null) {
+				throw new ResourceException("Unable to find job " + failId + " in queue.");
 			}
 			
 			return ret;

@@ -133,7 +133,7 @@ public class IDPLoginTool extends BaseLoginTool{
 		if (delegateeIdentity != null) {
 			MessageElement binaryToken = new MessageElement(
 					BinarySecurity.TOKEN_BST);
-			binaryToken.setAttributeNS(null, "ValueType", X509Security.getType());
+			binaryToken.setAttributeNS(null, "ValueType", edu.virginia.vcgr.genii.client.comm.CommConstants.X509_SECURITY_TYPE);
 			binaryToken.addTextNode("");
 			BinarySecurity bstToken = new X509Security(binaryToken);
 			((X509Security) bstToken).setX509Certificate(delegateeIdentity[0]);

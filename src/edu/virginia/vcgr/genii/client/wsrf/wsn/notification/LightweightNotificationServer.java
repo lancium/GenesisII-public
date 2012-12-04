@@ -84,7 +84,8 @@ public class LightweightNotificationServer
 	private class NotificationJettyHandler extends AbstractHandler
 	{
 		@Override
-		public void handle(String target, HttpServletRequest request,
+		public void handle(String target, 
+			HttpServletRequest request,
 			HttpServletResponse response, int dispatch) 
 				throws IOException, ServletException
 		{
@@ -173,7 +174,7 @@ public class LightweightNotificationServer
 	{
 		ContextHandler handler = new ContextHandler();
 		handler.setContextPath("/");
-		handler.addHandler(new NotificationJettyHandler());
+		handler.setHandler(new NotificationJettyHandler());
 		return handler;
 	}
 	
@@ -185,7 +186,7 @@ public class LightweightNotificationServer
 		_httpServer = new Server();
 		
 		_httpServer.addConnector(listener);
-		_httpServer.addHandler(createContext());
+		_httpServer.setHandler(createContext());
 	}
 	
 	private LightweightNotificationServer(Integer port)

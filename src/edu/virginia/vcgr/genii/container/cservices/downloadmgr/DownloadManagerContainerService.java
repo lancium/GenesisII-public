@@ -110,7 +110,7 @@ public class DownloadManagerContainerService extends AbstractContainerService
 	@Override
 	protected void loadService() throws Throwable
 	{
-		_logger.info("Loading DownloadManager Constainer Service.");
+		_logger.info("Loading DownloadManager Container Service.");
 		
 		getContainerServicesProperties().addPropertyChangeListener(
 			Pattern.compile("^" + 
@@ -123,7 +123,7 @@ public class DownloadManagerContainerService extends AbstractContainerService
 	@Override
 	protected void startService() throws Throwable
 	{
-		_logger.info("Starting DownloadManager Constainer Service.");
+		_logger.info("Starting DownloadManager Container Service.");
 	}
 	
 	public DataTransferStatistics download(URI source, File target,

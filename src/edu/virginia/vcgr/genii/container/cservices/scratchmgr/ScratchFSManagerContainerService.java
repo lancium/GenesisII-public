@@ -55,7 +55,7 @@ public class ScratchFSManagerContainerService extends AbstractContainerService
 	@Override
 	protected void loadService() throws Throwable
 	{
-		_logger.info("Loading SwapFSManager Constainer Service.");
+		_logger.info("Loading SwapFSManager Container Service.");
 		
 		Connection conn = null;
 		
@@ -81,7 +81,7 @@ public class ScratchFSManagerContainerService extends AbstractContainerService
 	@Override
 	protected void startService() throws Throwable
 	{
-		_logger.info("Starting SwapFSManager Constainer Service.");
+		_logger.info("Starting SwapFSManager Container Service.");
 		
 		Collection<File> directoriesToDelete;
 		

@@ -47,7 +47,6 @@ public class BESConstructionParameters
 		name = "environment-export", nillable = true, required = false)
 	private EnvironmentExport _environmentExport = null;
 	
-	@SuppressWarnings("unused")
 	@XmlElement(namespace = BES_CONS_PARMS_NS, name = "pre-execution-delay",
 		required = false, nillable = true)
 	final private String getPreExecutionDelayString() 
@@ -67,7 +66,6 @@ public class BESConstructionParameters
 			_preExecutionDelay = new Duration(value);
 	}
 	
-	@SuppressWarnings("unused")
 	@XmlElement(namespace = BES_CONS_PARMS_NS, name = "post-execution-delay",
 		required = false, nillable = true)
 	final private String getPostExecutionDelayString() 

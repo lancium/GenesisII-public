@@ -106,7 +106,8 @@ public class ServiceDeployer extends Thread
 		{
 			try
 			{
-				Thread.sleep(1000);
+				//hmmm: seems too long.  Thread.sleep(1000);
+				Thread.sleep(20);
 				attemptDeployment();
 			}
 			catch (Throwable t)
@@ -310,7 +311,7 @@ public class ServiceDeployer extends Thread
 			_axisEngine.refreshGlobalOptions();
 		}
 
-		_logger.info("Deployed \"" + className + "\".");
+		_logger.info("Deploying \"" + className + "\".");
 		return className;
 	}
 	

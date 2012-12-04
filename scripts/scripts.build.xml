@@ -163,7 +163,7 @@
 		<replace file="${basedir}/ApplicationWatcher/genii-base-application.properties"
 			token="\" value="\\" summary="no"/>
 		<replace file="${basedir}/ApplicationWatcher/genii-base-application.properties"
-			token="${installer:genii.deployment}" value="GeniiNetBootstrapContainer" summary="no"/>
+			token="${installer:genii.deployment}" value="unspecified" summary="no"/>
 		<replace file="${basedir}/ApplicationWatcher/genii-base-application.properties"
 			token="${installer:genii.patch-url}" value="http://www.tempuri.org" summary="no"/>
 

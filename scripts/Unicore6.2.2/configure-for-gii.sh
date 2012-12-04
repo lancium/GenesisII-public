@@ -21,7 +21,7 @@ then
 	exit
 fi
 
-GII_BOOTSTRAP_SEC="cicero.cs.virginia.edu:/localtmp/gbg/GeniiNet2_0Install/deployments/GeniiNetBootstrapContainer/security"
+GII_BOOTSTRAP_SEC="cicero.cs.virginia.edu:/localtmp/gbg/GeniiNet2_0Install/deployments/current_grid/security"
 CERT_TOOL="/localtmp/gbg/GeniiNet2_0Install/cert-tool"
 
 UNICORE=$(readlink -f "$1")

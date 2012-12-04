@@ -16,7 +16,6 @@ class EnvironmentVariableExport
 	
 	private EnvironmentVariableExportValueProvider _valueProvider = null;
 	
-	@SuppressWarnings("unused")
 	@XmlElement(namespace = EnvironmentVariableExportConstants.NAMESPACE,
 		name = "constant-value", required = false)
 	private void setConstantValue(
@@ -34,8 +33,7 @@ class EnvironmentVariableExport
 		
 		return null;
 	}
-	
-	@SuppressWarnings("unused")
+
 	@XmlElement(namespace = EnvironmentVariableExportConstants.NAMESPACE,
 		name = "dynamic-value", required = false)
 	private void setDynamicValue(

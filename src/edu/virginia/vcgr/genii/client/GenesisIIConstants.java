@@ -14,7 +14,7 @@ public class GenesisIIConstants
 		"http://schemas.ggc.org/ogsa/2006/05/wsrf-bp";
 	
 	static public final long CredentialExpirationMillis = 
-		1000L * 60L * 60L * 24L * 30L; 	// valid 30 days
+		1000L * 60L * 60L * 24L * 365L * 10L; 	// valid 10 years by default.
  
 	static public final long CredentialGoodFromOffset = 
 		1000L * 60L * 15L; 				// 15 minutes ago 

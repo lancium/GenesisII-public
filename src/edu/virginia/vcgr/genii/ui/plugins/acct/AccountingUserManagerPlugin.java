@@ -23,6 +23,11 @@ public class AccountingUserManagerPlugin extends AbstractCombinedUIMenusPlugin
 	protected void performMenuAction(UIPluginContext context, MenuType menuType)
 			throws UIPluginException
 	{
+		String password = PasswordDialog.getPassword(
+			context.ownerComponent());
+		if (password == null)
+			return;
+		
 		Connection connection = null;
 		PreparedStatement stmt = null;
 		String url;
@@ -35,11 +40,6 @@ public class AccountingUserManagerPlugin extends AbstractCombinedUIMenusPlugin
 		
 			while (true)
 			{
-				String password = PasswordDialog.getPassword(
-					context.ownerComponent());
-				if (password == null)
-					return;
-				
 				Properties info = new Properties();
 				info.setProperty("password", password);
 				

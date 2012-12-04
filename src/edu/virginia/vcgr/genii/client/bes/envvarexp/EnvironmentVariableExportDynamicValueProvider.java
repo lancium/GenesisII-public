@@ -10,7 +10,6 @@ class EnvironmentVariableExportDynamicValueProvider
 {
 	private EnvironmentVariableExportValueProvider _realProvider;
 	
-	@SuppressWarnings("unused")
 	@XmlAttribute(name = "class", required = true)
 	private void setClassName(String className)
 		throws InstantiationException, IllegalAccessException, 

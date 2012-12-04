@@ -17,6 +17,7 @@ import edu.virginia.vcgr.genii.client.install.ContainerInformation;
 import edu.virginia.vcgr.genii.client.install.InstallationState;
 import edu.virginia.vcgr.genii.client.utils.flock.FileLockException;
 
+@SuppressWarnings("rawtypes")
 public class DeploymentsWidget extends JComponent
 {
 	static final long serialVersionUID = 0L;
@@ -26,7 +27,8 @@ public class DeploymentsWidget extends JComponent
 	private JComboBox _comboBox;
 	private Collection<IInformationListener> _listeners = new ArrayList<IInformationListener>();
 	
-	public DeploymentsWidget() throws FileLockException, NoContainersException
+	@SuppressWarnings("unchecked")
+    public DeploymentsWidget() throws FileLockException, NoContainersException
 	{
 		super();
 		

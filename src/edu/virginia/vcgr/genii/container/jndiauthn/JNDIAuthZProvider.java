@@ -31,6 +31,7 @@ import javax.naming.directory.InitialDirContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mortbay.jetty.security.UnixCrypt;
 
 import edu.virginia.vcgr.genii.client.context.*;
 import edu.virginia.vcgr.genii.common.security.*;
@@ -192,7 +193,7 @@ public class JNDIAuthZProvider implements IAuthZProvider
 						ypPassword = ypPassword.substring("{crypt}".length());
 						String utPassword = utIdentity.getPassword();
 
-						if (org.mortbay.jetty.security.UnixCrypt.crypt(utPassword,
+						if (UnixCrypt.crypt(utPassword,
 								ypPassword).equals(ypPassword))
 						{
 							return true;

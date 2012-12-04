@@ -24,11 +24,12 @@ public class OwnerInfo
 			new DeploymentName()).security().getSecurityFile("owner.info");
 		
 		FileReader reader = null;
+		BufferedReader bReader = null;
 		
 		try
 		{
 			reader = new FileReader(_ownerInfoFile);
-			BufferedReader bReader = new BufferedReader(reader);
+			bReader = new BufferedReader(reader);
 			_userPath = bReader.readLine();
 			_userName = bReader.readLine();
 			_userPassword = bReader.readLine();
@@ -38,6 +39,7 @@ public class OwnerInfo
 		}
 		finally
 		{
+			StreamUtils.close(bReader);
 			StreamUtils.close(reader);
 		}
 	}

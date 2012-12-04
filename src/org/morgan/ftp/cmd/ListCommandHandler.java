@@ -67,6 +67,7 @@ public class ListCommandHandler extends AbstractCommandHandler
 		}
 		finally
 		{
+			StreamUtils.close(pHandler);
 			StreamUtils.close(out2);
 			StreamUtils.close(channel);
 		}

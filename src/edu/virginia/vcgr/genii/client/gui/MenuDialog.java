@@ -23,6 +23,7 @@ import javax.swing.event.ListSelectionListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+@SuppressWarnings("rawtypes")
 public class MenuDialog<EntryType> extends JDialog 
 	implements ActionListener, ListSelectionListener
 {
@@ -51,7 +52,8 @@ public class MenuDialog<EntryType> extends JDialog
 		return ret;
 	}
 	
-	private MenuDialog(String title, String prompt, 
+	@SuppressWarnings("unchecked")
+    private MenuDialog(String title, String prompt, 
 		Collection<?> entries)
 	{
 		super();

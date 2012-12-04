@@ -8,6 +8,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
+@SuppressWarnings("rawtypes")
 class EnumComboBoxRenderer<Type extends Enum<Type>>
 	extends JLabel implements ListCellRenderer 
 {
@@ -24,7 +25,7 @@ class EnumComboBoxRenderer<Type extends Enum<Type>>
 		setVerticalAlignment(CENTER);
 	}
 
-	public Component getListCellRendererComponent(
+    public Component getListCellRendererComponent(
 		JList list, Object value, int index, boolean isSelected, 
 		boolean cellHasFocus) 
 	{

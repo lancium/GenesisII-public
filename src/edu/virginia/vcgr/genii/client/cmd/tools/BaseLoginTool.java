@@ -76,6 +76,16 @@ public abstract class BaseLoginTool extends BaseGridTool{
 		_pattern = pattern;
 	}
 
+	//hmmm: temporary location
+	//is there no better set of classes for time in base java stuff?
+	//converts a number of milliseconds to a number of days.
+	public static double millisToDays(double milliseconds) {
+		return milliseconds / 1000.0 / 60.0 / 60.0 / 24.0;
+	}
+	public static double millisToYears(double milliseconds) {
+		return milliseconds / 1000.0 / 60.0 / 60.0 / 24.0 / 365.25;
+	}
+	
 	@Option({"validDuration"})
 	public void setValidDuration(String durationString) 
 		throws ParseException
@@ -88,6 +98,10 @@ public abstract class BaseLoginTool extends BaseGridTool{
 		throws ParseException
 	{
 		_validMillis = validMillis;
+	}
+
+	public long getValidMillis() {
+		return _validMillis;
 	}
 	
 	//Copys t1's creds to t2

@@ -49,6 +49,7 @@ import edu.virginia.vcgr.genii.client.resource.*;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.security.MessageLevelSecurityRequirements;
 import edu.virginia.vcgr.genii.security.RWXCategory;
+import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.credentials.GIICredential;
 import edu.virginia.vcgr.genii.security.credentials.TransientCredentials;
 import edu.virginia.vcgr.genii.security.credentials.assertions.*;
@@ -233,6 +234,8 @@ public class GamlAclAuthZProvider implements IAuthZProvider, GamlAclTopics
 				return true;
 			case CLOSED:
 				return false;
+			case INHERITED:
+				_logger.warn("unprocessed case for inherited attribute.");
 		}
 		if (trustList == null)
 		{
@@ -278,7 +281,7 @@ public class GamlAclAuthZProvider implements IAuthZProvider, GamlAclTopics
 			IResource resource, RWXCategory category)
 		throws PermissionDeniedException, AuthZSecurityException, ResourceException
 	{
-		_logger.debug("GamlAclAuthZProvider.checkAccess(" + category + ")");
+		String messagePrefix = "checkAccess for " + category + " on " + resource.getProperty(IResource.ENDPOINT_IDENTIFIER_PROPERTY_NAME) + " ";
 		try
 		{
 			ICallingContext callContext = ContextManager.getCurrentContext(false);
@@ -287,7 +290,7 @@ public class GamlAclAuthZProvider implements IAuthZProvider, GamlAclTopics
 			// pre-emptive check of the wildcard access
 			if ((acl == null) || checkAclAccess(null, category, acl))
 			{
-				_logger.debug("access granted to everyone");
+				_logger.debug(messagePrefix + "granted to everyone.");
 				return true;
 			}
 			
@@ -302,7 +305,8 @@ public class GamlAclAuthZProvider implements IAuthZProvider, GamlAclTopics
 						{
 							if (checkAclAccess((Identity) cred, category, acl))
 							{
-								_logger.debug("access granted to signed assertion");
+								if (_logger.isDebugEnabled())
+									_logger.debug(messagePrefix + "granted to identity bearing signed assertion: " + cred.describe(VerbosityLevel.LOW));
 								return true;
 							}
 						}
@@ -310,7 +314,8 @@ public class GamlAclAuthZProvider implements IAuthZProvider, GamlAclTopics
 					// straight-up identity (username/password)
 					else if (checkAclAccess((Identity) cred, category, acl))
 					{
-						_logger.debug("access granted to identity");
+						if (_logger.isDebugEnabled())
+							_logger.debug(messagePrefix + "access granted to identity: " + cred.describe(VerbosityLevel.LOW));
 						return true;
 					}
 				}
@@ -325,7 +330,8 @@ public class GamlAclAuthZProvider implements IAuthZProvider, GamlAclTopics
 							IdentityAttribute ia = (IdentityAttribute) sa.getAttribute();
 							if (checkAclAccess(ia.getIdentity(), category, acl))
 							{
-								_logger.debug("access granted to signed assertion");
+								if (_logger.isDebugEnabled())
+									_logger.debug(messagePrefix + "granted to signed assertion: "+ sa.describe(VerbosityLevel.LOW));
 								return true;
 							}
 						}
@@ -336,7 +342,7 @@ public class GamlAclAuthZProvider implements IAuthZProvider, GamlAclTopics
 			// Check Administrator Access
 			if (Security.isAdministrator(callContext))
 			{
-				_logger.info("Method call made as admin.");
+				_logger.info(messagePrefix + "granted because caller is admin.");
 				return true;
 			}			
 
@@ -352,15 +358,15 @@ public class GamlAclAuthZProvider implements IAuthZProvider, GamlAclTopics
 		catch (IOException e)
 		{
 			throw new AuthZSecurityException(
-					"Error processing GAML credential.", e);
+					messagePrefix + ": Error processing GAML credential.", e);
 		}
 		catch (ConfigurationException e)
 		{
 			throw new AuthZSecurityException(
-					"Error processing GAML credential.", e);
+					messagePrefix + ": Error processing GAML credential.", e);
 		} catch (GeneralSecurityException e) {
 			throw new AuthZSecurityException(
-					"Credential not authorized for" +
+					messagePrefix + ": Credential not authorized for" +
 					" this type of operation.", e);
 		}
 	}

@@ -16,7 +16,7 @@ import edu.virginia.vcgr.genii.security.RWXCategory;
 
 public class ContainerLogFork extends AbstractRandomByteIOResourceFork
 {
-	static private File getContainerLogFile()
+	private File getContainerLogFile()
 	{
 		// the name LOGFILE is in synch with our log4j configuration file's appender name,
 		// and must be kept in synch for this to continue working.
@@ -33,16 +33,19 @@ public class ContainerLogFork extends AbstractRandomByteIOResourceFork
 	public void read(long offset, ByteBuffer dest) throws IOException
 	{
 		RandomAccessFile raf = null;
+		File containerLog = null;
 		
 		try
 		{
-			raf = new RandomAccessFile(getContainerLogFile(), "r");
+			containerLog = getContainerLogFile();
+			raf = new RandomAccessFile(containerLog, "r");
 			raf.seek(offset);
 			raf.getChannel().read(dest);
 		}
 		finally
 		{
 			StreamUtils.close(raf);
+			containerLog = null;
 		}
 	}
 

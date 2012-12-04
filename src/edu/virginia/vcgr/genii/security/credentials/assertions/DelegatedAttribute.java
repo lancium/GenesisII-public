@@ -173,7 +173,7 @@ public class DelegatedAttribute implements Attribute
 			else
 			{
 				if (verbosity.compareTo(VerbosityLevel.LOW) >= 0)
-					return String.format("%s (%s->) %s",
+					return String.format("%s (%s)-> %s",
 							_assertion.describe(verbosity),
 							_constraints.describe(verbosity),
 						X500PrincipalUtilities.describe(

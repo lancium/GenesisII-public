@@ -72,6 +72,8 @@ public class InstallationState implements Serializable
 			// Corrupt state
 			_logger.error("Corrupt state found in installation description -- continuing with empty state.", ioe);
 			return new InstallationState();
+		} finally {
+			StreamUtils.close(fin);
 		}
 	}
 	

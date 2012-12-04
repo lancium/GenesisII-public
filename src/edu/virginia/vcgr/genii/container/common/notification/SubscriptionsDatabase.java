@@ -51,6 +51,7 @@ public class SubscriptionsDatabase
 		DBSubscriptionResource resource = new DBSubscriptionResource(
 			subscriptionkey, connection);
 		resource.destroy();
+		StreamUtils.close(resource);
 	}
 	
 	static void createTables(Connection connection) throws SQLException

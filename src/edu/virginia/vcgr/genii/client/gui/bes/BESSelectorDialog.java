@@ -24,13 +24,15 @@ import javax.swing.event.ListSelectionListener;
 import org.morgan.util.GraphicsUtils;
 import org.ws.addressing.EndpointReferenceType;
 
+@SuppressWarnings("rawtypes")
 public class BESSelectorDialog extends JDialog
 {
 	static final long serialVersionUID = 0L;
 	
 	private boolean _cancelled = true;
 	private BESListModel _model = new BESListModel();
-	private JList _besList = new JList(_model);
+	@SuppressWarnings("unchecked")
+    private JList _besList = new JList(_model);
 	
 	private BESSelectorDialog(Window owner)
 	{

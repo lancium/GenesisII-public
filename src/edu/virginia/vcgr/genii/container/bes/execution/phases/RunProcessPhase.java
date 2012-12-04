@@ -149,6 +149,7 @@ public class RunProcessPhase extends AbstractRunProcessPhase
 					File f = new File(
 						workingDirectory, geniiUserDir);
 					_environment.put("GENII_USER_DIR", f.getAbsolutePath());
+					_logger.info("rewrote GENII_USER_DIR to be: " + _environment.get("GENII_USER_DIR"));
 				}
 				
 				_environment = overloadEnvironment(_environment);

@@ -20,10 +20,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.morgan.util.io.StreamUtils;
-import org.mortbay.jetty.*;
-import org.mortbay.jetty.handler.*;
-import javax.servlet.http.*;
+import org.mortbay.jetty.HttpException;
+import org.mortbay.jetty.handler.AbstractHandler;
 
 public class ResourceFileHandler extends AbstractHandler
 {
@@ -42,7 +45,7 @@ public class ResourceFileHandler extends AbstractHandler
 	
 	public void handle(String target, HttpServletRequest arg2, 
 			HttpServletResponse arg3, int dispatch) 
-			throws HttpException, IOException
+			throws HttpException, IOException, ServletException
 	{
 		InputStream in = null;
 		OutputStream out = null;

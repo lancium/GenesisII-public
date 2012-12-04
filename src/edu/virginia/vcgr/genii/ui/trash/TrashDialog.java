@@ -47,6 +47,7 @@ import edu.virginia.vcgr.genii.ui.progress.Task;
 import edu.virginia.vcgr.genii.ui.progress.TaskCompletionListener;
 import edu.virginia.vcgr.genii.ui.progress.TaskProgressListener;
 
+@SuppressWarnings("rawtypes")
 public class TrashDialog extends UIFrame
 {
 	static final long serialVersionUID = 0L;
@@ -54,8 +55,10 @@ public class TrashDialog extends UIFrame
 	static private Log _logger = LogFactory.getLog(TrashDialog.class);
 	
 	private JList _unsortedList;
-	private JList _unlinkList = new JList(new DefaultListModel());
-	private JList _removeList = new JList(new DefaultListModel());
+	@SuppressWarnings("unchecked")
+    private JList _unlinkList = new JList(new DefaultListModel());
+	@SuppressWarnings("unchecked")
+    private JList _removeList = new JList(new DefaultListModel());
 	
 	private UndeleteAction _undeleteAction = new UndeleteAction();
 	private EnactAction _enactAction = new EnactAction();
@@ -72,6 +75,7 @@ public class TrashDialog extends UIFrame
 		list.setDropMode(DropMode.INSERT);
 	}
 	
+	@SuppressWarnings("unchecked")
 	private TrashDialog(TrashCanWidget widget, 
 		ApplicationContext appContext, UIContext uiContext)
 	{
@@ -246,7 +250,8 @@ public class TrashDialog extends UIFrame
 			setEnabled(false);
 		}
 		
-		@Override
+		@SuppressWarnings("deprecation")
+        @Override
 		public void actionPerformed(ActionEvent e)
 		{
 			Collection<TrashCanEntryWrapper> wrappers;
@@ -268,7 +273,8 @@ public class TrashDialog extends UIFrame
 				new UndeleteTask(wrappers), new UndeleteTaskCompleter()).start();
 		}
 
-		@Override
+		@SuppressWarnings("deprecation")
+        @Override
 		public void valueChanged(ListSelectionEvent e)
 		{
 			JList source = (JList)e.getSource();

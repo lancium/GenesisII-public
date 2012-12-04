@@ -16,6 +16,7 @@ import edu.virginia.vcgr.genii.ui.UIContext;
 import edu.virginia.vcgr.genii.ui.plugins.acls.ACLPanel.DeleteAction;
 import edu.virginia.vcgr.genii.ui.utils.CommonKeyStrokes;
 
+@SuppressWarnings("rawtypes")
 class ACLList extends JList
 {
 	static final long serialVersionUID = 0L;
@@ -48,7 +49,8 @@ class ACLList extends JList
 		aMap.put(_delete.getValue(Action.NAME), _delete);
 	}
 	
-	ACLList(DeleteAction deleteAction)
+	@SuppressWarnings("unchecked")
+    ACLList(DeleteAction deleteAction)
 	{
 		super(new DefaultListModel());
 		deleteAction.setACLList(this);
@@ -64,6 +66,7 @@ class ACLList extends JList
 		setEnabled(false);
 	}
 	
+	@SuppressWarnings("unchecked")
 	void cancel()
 	{
 		DefaultListModel model = (DefaultListModel)getModel();
@@ -71,7 +74,8 @@ class ACLList extends JList
 		model.addElement("Cancelled!");
 	}
 	
-	void error()
+	@SuppressWarnings("unchecked")
+    void error()
 	{
 		DefaultListModel model = (DefaultListModel)getModel();
 		model.removeAllElements();
@@ -83,7 +87,8 @@ class ACLList extends JList
 		setEnabled(false);
 	}
 	
-	void set(UIContext context, Collection<AclEntry> entries)
+	@SuppressWarnings("unchecked")
+    void set(UIContext context, Collection<AclEntry> entries)
 	{
 		DefaultListModel model = (DefaultListModel)getModel();
 		model.removeAllElements();
@@ -107,7 +112,8 @@ class ACLList extends JList
 	
 	Transferable createTransferable()
 	{
-		Object []values = getSelectedValues();
+		@SuppressWarnings("deprecation")
+        Object []values = getSelectedValues();
 		if (values == null || values.length == 0)
 			return null;
 		

@@ -30,6 +30,7 @@ import edu.virginia.vcgr.genii.container.q2.matching.MatchingParamEnum;
 import edu.virginia.vcgr.genii.ui.utils.ShapeIcons;
 import edu.virginia.vcgr.genii.ui.utils.SimpleIconButton;
 
+@SuppressWarnings("rawtypes")
 class MatchingParameterDialog extends JDialog
 {
 	static final long serialVersionUID = 0L;
@@ -38,7 +39,8 @@ class MatchingParameterDialog extends JDialog
 	private JTable _table;
 	private boolean _committed = false;
 	
-	MatchingParameterDialog(Component ownerComponent,
+	@SuppressWarnings("unchecked")
+    MatchingParameterDialog(Component ownerComponent,
 		Collection<Pair<String, String>> parameters)
 	{
 		super(SwingUtilities.getWindowAncestor(ownerComponent),

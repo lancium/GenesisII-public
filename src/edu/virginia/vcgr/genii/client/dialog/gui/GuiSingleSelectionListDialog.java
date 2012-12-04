@@ -17,6 +17,7 @@ import javax.swing.event.ListSelectionListener;
 import edu.virginia.vcgr.genii.client.dialog.ComboBoxDialog;
 import edu.virginia.vcgr.genii.client.dialog.MenuItem;
 
+@SuppressWarnings("rawtypes")
 public class GuiSingleSelectionListDialog extends AbstractGuiDialog
 	implements ComboBoxDialog
 {
@@ -35,7 +36,8 @@ public class GuiSingleSelectionListDialog extends AbstractGuiDialog
 			_okAction.setEnabled(true);
 	}
 	
-	@Override
+	@SuppressWarnings("unchecked")
+    @Override
 	protected JComponent createBody(Object[] parameters)
 	{
 		String prompt = (String)parameters[0];

@@ -79,25 +79,36 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 				
 				in = ByteIOStreamFactory.createInputStream(_sourcePath);
 				
-				if (wasCancelled())
+				if (wasCancelled()) {
+					StreamUtils.close(in);
 					return null;
+				}
 				
 				out = new FileOutputStream(tmpFile);
 				
-				if (wasCancelled())
+				if (wasCancelled()) {
+					StreamUtils.close(in);
+					StreamUtils.close(out);
 					return null;
+				}
 				
 				byte []data = new byte[BUFFER_SIZE];
 				int read;
 				while ( (read = in.read(data)) > 0)
 				{
-					if (wasCancelled())
-						return null;
+					if (wasCancelled()) 
+						break;
 					
 					out.write(data, 0, read);
 					
 					if (wasCancelled())
-						return null;
+						break;
+				}
+
+				if (wasCancelled()) {
+					StreamUtils.close(in);
+					StreamUtils.close(out);
+					return null;
 				}
 				
 				EndpointReferenceType epr = _sourcePath.getEndpoint();
@@ -252,9 +263,14 @@ public class EditPlugin extends AbstractCombinedUIMenusPlugin
 				while ( (read = in.read(data)) > 0)
 				{
 					if (wasCancelled())
-						return null;
+						break;
 					
 					out.write(data, 0, read);
+				}
+				if (wasCancelled()) {
+					StreamUtils.close(in);
+					StreamUtils.close(out);
+					return null;
 				}
 				
 				return 0;

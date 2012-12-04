@@ -16,7 +16,7 @@ public class DatabaseTableUtils
 		boolean failOnExists, String...tableStatements) throws SQLException
 	{
 		Statement stmt = null;
-		
+		SQLException catchFail = null;
 		try
 		{
 			stmt = connection.createStatement();
@@ -37,15 +37,22 @@ public class DatabaseTableUtils
 						(sqe.getSQLState().equals("42000") && tableStatement.toUpperCase().startsWith("CREATE INDEX ")))
 					{
 						// The table already exists.
-						if (failOnExists)
-							throw sqe;
-						else
+						if (failOnExists) {
+							catchFail = sqe;
+							break;
+						} else {
 							_logger.debug(
 								"Received an SQL Exception for a table " +
 								"that already exists.", sqe);
-					} else
-						throw sqe;
+						}
+					} else {
+						catchFail = sqe;
+						break;
+					}
 				}
+			}
+			if (catchFail != null) {
+				throw catchFail;
 			}
 		}
 		finally
@@ -54,23 +61,31 @@ public class DatabaseTableUtils
 		}
 	}
 
-	static public void addColumns(Connection connection, boolean failOnExists, 
-			String...addColumnStatements) throws SQLException {
-
+	static public void addColumns(Connection connection, boolean failOnExists, String... addColumnStatements)
+		throws SQLException
+	{
 		Statement stmt = null;
+		SQLException catchFail = null;
 		try {
 			stmt = connection.createStatement();
 			for (String updateStatement : addColumnStatements) {
 				try {
 					stmt.executeUpdate(updateStatement);
-				}
-				catch (SQLException sqe) {
+				} catch (SQLException sqe) {
 					if (sqe.getSQLState().equals("X0Y32")) {
-						if (failOnExists) throw sqe;
-						else _logger.debug("Received an SQL Exception for a column that already exists.", sqe);
-					} else throw sqe;
+						if (failOnExists) {
+							catchFail = sqe;
+							break;
+						} else {
+							_logger.debug("Received an SQL Exception for a column that already exists.", sqe);
+						}
+					} else {
+						sqe = catchFail;
+						break;
+					}
 				}
 			}
+			if (catchFail != null) throw catchFail;
 		} finally {
 			StreamUtils.close(stmt);
 		}

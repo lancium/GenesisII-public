@@ -370,14 +370,19 @@ public class RExportDBResource extends BasicDBResource implements IRExportResour
 			if (attrs != null && attrs.length > 0)
 			{
 				stmt = _connection.prepareStatement(_ADD_DIR_ATTR_STMT);
-				
+				boolean failed = false;
 				for (MessageElement nextAttr : attrs)
 				{
 					stmt.setString(1, entryID);
 					stmt.setBytes(2, MessageElementUtils.toBytes(nextAttr));
-					if (stmt.executeUpdate() != 1)
-						throw new ResourceException(
-							"Unable to update attributes for RNS resource.");
+					if (stmt.executeUpdate() != 1) {
+						failed = true;
+						break;
+					}
+				}
+				if (failed) {
+					throw new ResourceException(
+						"Unable to update attributes for RNS resource.");
 				}
 			}
 		}

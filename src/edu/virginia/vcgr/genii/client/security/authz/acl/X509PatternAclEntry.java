@@ -7,21 +7,22 @@ import java.security.KeyStore;
 import java.security.cert.PKIXBuilderParameters;
 import java.security.cert.X509CertSelector;
 import java.security.cert.X509Certificate;
+import java.util.Vector;
 
 import javax.net.ssl.CertPathTrustManagerParameters;
 import javax.net.ssl.ManagerFactoryParameters;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 import javax.security.auth.x500.X500Principal;
-import java.util.Vector;
 
-import org.bouncycastle.asn1.DERObjectIdentifier;
-import org.bouncycastle.jce.X509Principal;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.jce.PrincipalUtil;
+import org.bouncycastle.jce.X509Principal;
 
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.X500PrincipalUtilities;
-import edu.virginia.vcgr.genii.security.credentials.identity.*;
+import edu.virginia.vcgr.genii.security.credentials.identity.Identity;
+import edu.virginia.vcgr.genii.security.credentials.identity.X509Identity;
 
 /**
  * This ACL rule provides a chain of trust that callers must chain to, 
@@ -122,8 +123,8 @@ public class X509PatternAclEntry implements AclEntry, Serializable {
 		
 		// attempt to match each pattern oid with one in the caller's DN
 		initPattern();
-		Vector<DERObjectIdentifier> oids = _bcPattern.getOIDs();
-		for (DERObjectIdentifier oid : oids) {
+		Vector<ASN1ObjectIdentifier> oids = _bcPattern.getOIDs();
+		for (ASN1ObjectIdentifier oid : oids) {
 			Vector<String> patternValues = _bcPattern.getValues(oid);
 			Vector<String> userValues = userPrincipal.getValues(oid);
 			if ((userValues == null) || (!userValues.containsAll(patternValues))) {

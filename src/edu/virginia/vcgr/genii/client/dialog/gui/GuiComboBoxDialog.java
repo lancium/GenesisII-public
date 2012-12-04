@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import edu.virginia.vcgr.genii.client.dialog.ComboBoxDialog;
 import edu.virginia.vcgr.genii.client.dialog.MenuItem;
 
+@SuppressWarnings("rawtypes")
 public class GuiComboBoxDialog extends AbstractGuiDialog implements
 		ComboBoxDialog
 {
@@ -26,7 +27,8 @@ public class GuiComboBoxDialog extends AbstractGuiDialog implements
 		super(title, prompt, defaultItem, items);
 	}
 	
-	@Override
+	@SuppressWarnings("unchecked")
+    @Override
 	protected JComponent createBody(Object []parameters)
 	{
 		_label = new JLabel((String)parameters[0]);

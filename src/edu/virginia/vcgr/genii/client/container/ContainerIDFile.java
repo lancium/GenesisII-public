@@ -30,12 +30,13 @@ public class ContainerIDFile
 		
 		FileLock lock = null;
 		FileReader reader = null;
+		BufferedReader bReader = null;
 		
 		try
 		{
 			lock = new FileLock(target, 5, 1000L);
 			reader = new FileReader(target);
-			BufferedReader bReader = new BufferedReader(reader);
+			bReader = new BufferedReader(reader);
 			String line;
 			if ( (line = bReader.readLine()) != null)
 				return GUID.fromString(line.trim());
@@ -46,6 +47,7 @@ public class ContainerIDFile
 		}
 		finally
 		{
+			StreamUtils.close(bReader);
 			StreamUtils.close(reader);
 			StreamUtils.close(lock);
 		}

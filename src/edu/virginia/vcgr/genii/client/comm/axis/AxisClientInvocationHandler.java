@@ -264,9 +264,10 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			}
 		} catch (Exception e) {
 			if (minClientMessageSec.isWarn()) {
-				Exception ex = new GenesisIISecurityException(
-						"Cannot confirm trusted identity for " + _epr.getAddress().toString() + ": " + e.getMessage(), e);
-				_logger.debug(ex.getMessage());
+				// the security level is set to just warning, and this is as
+				// loud of a warning as we want to emit.  otherwise we're just
+				// constantly complaining that the level was set to warn only.
+				_logger.trace("Cannot confirm trusted identity for " + _epr.getAddress().toString());
 			} else {
 				throw new GenesisIISecurityException("EPR for " + _epr.getAddress().toString() + " is untrusted: " + e.getMessage(), e);
 			}
@@ -674,7 +675,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		/* Set calling context so that the socket factory has access to
 		 * it.
 		 */
-		_logger.debug(String.format(
+		_logger.trace(String.format(
 			"Starting an outcall for %s on thread [%x]%s.",
 			calledMethod.getName(), Thread.currentThread().getId(), Thread.currentThread()));
 		long start = System.currentTimeMillis();
@@ -682,7 +683,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 		Object ret = calledMethod.invoke(stubInstance, arguments);
 		VcgrSslSocketFactory.threadCallingContext.set(null);
 		start = System.currentTimeMillis() - start;
-		_logger.debug(String.format(
+		_logger.trace(String.format(
 			"Finished an outcall for %s on thread [%x]%s (duration was %d ms).",
 			calledMethod.getName(), Thread.currentThread().getId(), Thread.currentThread(), start));
 

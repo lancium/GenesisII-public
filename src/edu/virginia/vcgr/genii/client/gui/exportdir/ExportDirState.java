@@ -66,6 +66,8 @@ public class ExportDirState
 			// Corrupt state
 			_logger.error("Corrupt state found in installation description -- continuing with empty state.", ioe);
 			return new HashMap<String, Collection<ExportDirInformation>>();
+		} finally {
+			StreamUtils.close(fin);
 		}
 	}
 	

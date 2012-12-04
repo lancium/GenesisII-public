@@ -17,9 +17,9 @@ public class ContainerProperties extends Properties
 	static final private String CONTAINER_PROPERTIES_FILENAME =
 		"container.properties";
 	
-	static final public String GENII_USER_DIR_PROPERTY_NAME =
+	static final private String GENII_USER_DIR_PROPERTY_NAME =
 		"edu.virginia.vcgr.genii.container.user-dir";
-	static final public String GENII_DEPLOYMENT_NAME_PROPERTY_NAME =
+	static final private String GENII_DEPLOYMENT_NAME_PROPERTY_NAME =
 		"edu.virginia.vcgr.genii.container.deployment-name";
 	
 	static public ContainerProperties containerProperties = 
@@ -67,7 +67,10 @@ public class ContainerProperties extends Properties
 	
 	public String getUserDirectory()
 	{
-		return getProperty(GENII_USER_DIR_PROPERTY_NAME);
+		String val = getProperty(GENII_USER_DIR_PROPERTY_NAME);
+		if ( (val == null) || val.equals(ApplicationBase.USER_DIR_PROPERTY_VALUE))
+			val = ApplicationBase.getUserDirFromEnvironment();
+		return val;
 	}
 	
 	public String getDeploymentName()

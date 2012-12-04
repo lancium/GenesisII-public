@@ -150,6 +150,7 @@
 
 	<gsh:echo message="Adding uva-idp-group"/>
 	<geniix:idp>
+		<gsh:param>--validDuration=10years</gsh:param>
 		<gsh:param>/containers/BootstrapContainer/Services/X509AuthnPortType</gsh:param>
 		<gsh:param>uva-idp-group</gsh:param>
 	</geniix:idp>

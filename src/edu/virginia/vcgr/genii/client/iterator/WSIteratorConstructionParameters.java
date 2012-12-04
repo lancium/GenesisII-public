@@ -39,7 +39,6 @@ public class WSIteratorConstructionParameters extends ConstructionParameters imp
 	{
 	}
 	
-	@SuppressWarnings("unused")
 	@XmlElement(namespace = IteratorConstants.ITERATOR_NS,
 		name = "iterator-key", nillable = false, required = true)
 	private String getKey()

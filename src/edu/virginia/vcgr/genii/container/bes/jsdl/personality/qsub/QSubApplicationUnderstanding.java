@@ -7,6 +7,9 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Vector;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.virginia.vcgr.genii.client.bes.BESConstructionParameters;
 import edu.virginia.vcgr.genii.client.configuration.Deployment;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
@@ -24,6 +27,8 @@ import edu.virginia.vcgr.genii.container.bes.jsdl.personality.common.StringOrPat
 class QSubApplicationUnderstanding 
 	extends PosixLikeApplicationUnderstanding
 {
+    static private Log _logger = LogFactory.getLog(QSubApplicationUnderstanding.class);
+
 	public QSubApplicationUnderstanding(FilesystemManager fsManager,
 		BESWorkingDirectory workingDirectory)
 	{
@@ -47,10 +52,9 @@ class QSubApplicationUnderstanding
 			fsManager, getExecutable()));
 		
 		Map<String, StringOrPath> env = getEnvironment();
-		env.put("GENII_DEPLOYMENT_NAME", 
-			new StringOrPath(depName.toString()));
-		env.put("GENII_USER_DIR", 
-			new StringOrPath(".genesisII-bes-state"));
+		env.put("GENII_DEPLOYMENT_NAME", new StringOrPath(depName.toString()));
+		env.put("GENII_USER_DIR", new StringOrPath(".genesisII-bes-state"));
+		_logger.info("rewrote GENII_USER_DIR to be: " + env.get("GENII_USER_DIR"));
 		
 		Map<String, String> stringEnv = new HashMap<String, String>();
 		for (String key : env.keySet())

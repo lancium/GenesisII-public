@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import javax.swing.AbstractListModel;
 
+@SuppressWarnings("rawtypes")
 class FontFamilyListModel extends AbstractListModel
 {
 	static final long serialVersionUID = 0L;

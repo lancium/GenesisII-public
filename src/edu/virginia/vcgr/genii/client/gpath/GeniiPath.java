@@ -83,8 +83,9 @@ public class GeniiPath implements Serializable
 		{
 			case Grid:
 				return lookup();
+			default:
+				return null;
 		}
-		return null;
 	}
 	
 	@Override

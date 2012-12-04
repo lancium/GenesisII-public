@@ -133,6 +133,7 @@ class AccountingDatabase
 			stmt = conn.prepareStatement(
 				"INSERT INTO credentials(credentialhash, credential) VALUES (?, ?)",
 				Statement.RETURN_GENERATED_KEYS);
+			boolean failure = false;
 			for (Identity identity : identities)
 			{
 				stmt.setInt(1, identity.hashCode());
@@ -140,12 +141,18 @@ class AccountingDatabase
 					"credentials", "credential"));
 				stmt.execute();
 				rs = stmt.getGeneratedKeys();
-				if (!rs.next())
-					throw new SQLException(
-						"Unable to get generated key.");
+				if (!rs.next()) {
+					failure = true;
+					break;
+				}
 				keys.add(new Long(rs.getLong(1)));
 				rs.close();
 				rs = null;
+			}
+			StreamUtils.close(stmt);
+			if (failure) {
+				throw new SQLException(
+					"Unable to get generated key.");
 			}
 			
 			stmt2 = conn.prepareStatement(

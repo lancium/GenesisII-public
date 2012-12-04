@@ -86,19 +86,27 @@ public class PortType
 			Element docElement = doc.getDocumentElement();
 			NodeList list = docElement.getChildNodes();
 			int length = list.getLength();
+			boolean badPortType = false;
+			Node n = null;
 			for (int lcv = 0; lcv < length; lcv++)
 			{
-				Node n = list.item(lcv);
+				n = list.item(lcv);
 				if (n.getNodeType() == Node.ELEMENT_NODE)
 				{
-					if (!n.getNodeName().equals("portType"))
-						throw new IOException(
-							"Invalid entry found in known-porttypes.xml file.\n" +
-							"Expected <portType> but saw <" + n.getNodeName() + ">");
+					if (!n.getNodeName().equals("portType")) {
+						badPortType = true;
+						break;
+					}
 					
 					PortType pt = parsePortType((Element)n);
 					_knownPortTypes.put(pt.getQName(), pt);
 				}
+			}
+			if (badPortType == true) {
+				StreamUtils.close(in);
+				throw new IOException(
+					"Invalid entry found in known-porttypes.xml file.\n" +
+					"Expected <portType> but saw <" + n.getNodeName() + ">");
 			}
 			
 			_vectorMap = new BitVectorMap<PortType>(_knownPortTypes.values());

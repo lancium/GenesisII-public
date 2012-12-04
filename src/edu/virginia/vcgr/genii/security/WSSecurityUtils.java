@@ -260,8 +260,7 @@ public class WSSecurityUtils
 
 			MessageElement binaryToken =
 					new MessageElement(BinarySecurity.TOKEN_BST);
-			binaryToken.setAttributeNS(null, "ValueType", X509Security
-					.getType());
+			binaryToken.setAttributeNS(null, "ValueType", edu.virginia.vcgr.genii.client.comm.CommConstants.X509_SECURITY_TYPE);
 			binaryToken.addTextNode("");
 			X509Security bstToken = new X509Security(binaryToken);
 			bstToken.setX509Certificate(cert);

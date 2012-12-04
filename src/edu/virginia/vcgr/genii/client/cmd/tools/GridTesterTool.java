@@ -42,8 +42,7 @@ public class GridTesterTool extends BaseGridTool
 	*/
 	
 	private boolean _showStackTraces = false;
-	
-	@SuppressWarnings("unused")
+
 	@Option("show-stack-traces")
 	private void setShowStackTraces()
 	{

@@ -15,6 +15,7 @@ import org.morgan.util.configuration.ConfigurationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+@SuppressWarnings("rawtypes")
 class TrashTransferHandler extends TransferHandler
 {
 	static final long serialVersionUID = 0L;
@@ -25,7 +26,8 @@ class TrashTransferHandler extends TransferHandler
 	{
 	}
 
-	@Override
+	@SuppressWarnings("deprecation")
+    @Override
 	protected Transferable createTransferable(JComponent c)
 	{
 		if (c instanceof JList)
@@ -104,7 +106,8 @@ class TrashTransferHandler extends TransferHandler
 		return false;
 	}
 
-	@Override
+	@SuppressWarnings("unchecked")
+    @Override
 	public boolean importData(TransferSupport support)
 	{
 		if (!support.isDrop())

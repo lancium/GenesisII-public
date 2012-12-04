@@ -18,6 +18,7 @@ import edu.virginia.vcgr.genii.client.history.HistoryEventLevel;
 import edu.virginia.vcgr.genii.ui.utils.ecombo.EnumComboBox;
 import edu.virginia.vcgr.genii.ui.utils.ecombo.EnumComboSort;
 
+@SuppressWarnings("rawtypes")
 class FilterPanel extends JPanel
 {
 	static final long serialVersionUID = 0l;

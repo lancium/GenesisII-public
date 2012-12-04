@@ -17,6 +17,7 @@ import edu.virginia.vcgr.genii.ui.plugins.UIPopupMenuPlugin;
 import edu.virginia.vcgr.genii.ui.plugins.UITabPlugin;
 import edu.virginia.vcgr.genii.ui.plugins.UITopMenuPlugin;
 
+@SuppressWarnings("rawtypes")
 public class DebugPlugin extends AbstractCombinedUIPlugin
 	implements UITopMenuPlugin, UIPopupMenuPlugin, UITabPlugin
 {
@@ -39,7 +40,8 @@ public class DebugPlugin extends AbstractCombinedUIPlugin
 		return selectedDescriptions.size() > 0;
 	}
 
-	@Override
+	@SuppressWarnings("unchecked")
+    @Override
 	public JComponent getComponent(UIPluginContext context)
 	{
 		Vector<String> vector = new Vector<String>();

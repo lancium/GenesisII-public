@@ -122,7 +122,7 @@ public class WSResourceConfig {
 		// A posterior update on the flag when a query about callback is made.
 		// This is done to ensure correctness as otherwise we would need something
 		// like a cronjob to reset the flags of cached configurations.
-		if (callbackExpiryTime.before(new Date())) {
+		if ((callbackExpiryTime != null) && callbackExpiryTime.before(new Date())) {
 			hasRegisteredCallback = false;
 		}
 		

@@ -188,11 +188,9 @@ public class JobUpdateWorker implements OutcallHandler
 				_logger.debug(String.format(
 					"Successfully got status of job %s.", _data));
 				List<String> faults = null;
-				
-					
-							
+
 				oldState = new ActivityState(_data.getBESActivityStatus());
-						
+				_logger.debug("do we need this oldState object due to side effects?  contains: " + oldState);
 				
 				_data.setBESActivityStatus(
 					activityStatuses[0].getActivityStatus());

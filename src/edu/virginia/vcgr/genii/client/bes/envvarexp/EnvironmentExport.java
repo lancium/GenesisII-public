@@ -32,7 +32,6 @@ public class EnvironmentExport
 	private Map<String, EnvironmentVariableExport> _variables =
 		new HashMap<String, EnvironmentVariableExport>();
 	
-	@SuppressWarnings("unused")
 	@XmlElement(namespace = EnvironmentVariableExportConstants.NAMESPACE,
 		name = "environment-variable", required = false, nillable = false)
 	private void setEnvironmentVariables(
