@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsdl:JobDefinition xmlns="http://www.example.org/"
+	xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
+	xmlns:jsdl-posix="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	
+	<jsdl:JobDescription>
+
+		<jsdl:JobIdentification>
+			<jsdl:JobName>Hostname invocation</jsdl:JobName>
+			<jsdl:Description>Runs the local hostname binary</jsdl:Description>
+		</jsdl:JobIdentification>
+		
+		<jsdl:Application>
+			<jsdl:ApplicationName>hostname</jsdl:ApplicationName>
+			<jsdl-posix:POSIXApplication>
+				<jsdl-posix:Executable>/bin/hostname -f</jsdl-posix:Executable>
+				<jsdl-posix:Output>hostout</jsdl-posix:Output>
+			</jsdl-posix:POSIXApplication>
+		</jsdl:Application>
+
+		<jsdl:DataStaging>
+			<jsdl:FileName>hostout</jsdl:FileName>
+			<jsdl:CreationFlag>overwrite</jsdl:CreationFlag>
+			<jsdl:Target>
+				<jsdl:URI>RBYTEIO:https://sulla.cs.virginia.edu:8080/XCG/services/StorageManagement?res=b623d2c0-ae5d-4a64-8493-db83a6734a29#/tmp/hostout</jsdl:URI>
+			</jsdl:Target>
+		</jsdl:DataStaging>
+	</jsdl:JobDescription>
+	
+</jsdl:JobDefinition>

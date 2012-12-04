@@ -1,0 +1,13 @@
+<cp:construction-parameters
+	xmlns:cp="http://vcgr.cs.virginia.edu/construction-parameters">
+	<fsp:connection-information
+		xmlns:fsp="http://genesisII.virginia.edu/fsproxy"
+		xmlns:fsv="http://genesisII.virginia.edu/fsview"
+		read-only="false">
+		<fsv:connection-uri>smb://athena.cs.virginia.edu/mmm2a/samba-mount</fsv:connection-uri>
+		<fsv:domain-username-password
+			domain="CSDOM"
+			username="mmm2a"
+			password="password"/>
+	</fsp:connection-information>
+</cp:construction-parameters>
