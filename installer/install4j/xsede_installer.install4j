@@ -464,7 +464,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=XCG&quot; &quot;-Dedu.virginia.vcgr.appwatcher.update-frequency=604800000&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ApplicationWatcher/genii-client-application.properties&quot; -Xmx512m" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=grid&quot; &quot;-Dedu.virginia.vcgr.appwatcher.update-frequency=604800000&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ApplicationWatcher/genii-client-application.properties&quot; -Xmx768m" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
         <classPath>
           <directory location="lib" failOnError="false" />
           <archive location="ApplicationWatcher/app-manager.jar" failOnError="false" />
@@ -581,7 +581,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=XCG&quot; &quot;-Dedu.virginia.vcgr.appwatcher.update-frequency=604800000&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ApplicationWatcher/genii-client-application.properties&quot; -Xmx512m" arguments="client-ui" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+      <java mainClass="edu.virginia.vcgr.appmgr.launcher.ApplicationLauncher" vmParameters="&quot;-Dedu.virginia.vcgr.genii.net-name=grid&quot; &quot;-Dedu.virginia.vcgr.appwatcher.update-frequency=604800000&quot; &quot;-Dlog4j.configuration=production.client.log4j.properties&quot; &quot;-Dedu.virginia.vcgr.genii.install-base-dir=${launcher:sys.launcherDirectory}&quot; &quot;-Dedu.virginia.vcgr.appwatch.application-description=${launcher:sys.launcherDirectory}/ApplicationWatcher/genii-client-application.properties&quot; -Xmx768m" arguments="client-ui" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
         <classPath>
           <directory location="lib" failOnError="false" />
           <archive location="ApplicationWatcher/app-manager.jar" failOnError="false" />

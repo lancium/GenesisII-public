@@ -106,6 +106,8 @@ public class FileDisplayPlugin extends AbstractUITabPlugin
 						// if we finally got to the end of the file once, we break out.
 						break;
 					}
+					// attempt to not be so huge.
+					System.gc();
 					// yield the thread to the gui updater.
 					Thread.sleep(200);
 				}
