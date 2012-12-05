@@ -17,10 +17,26 @@
 			</filelist>
 		</concat>
 
-		<replace file="${lib.dir}/genesisII.container.log4j.properties"
+		<concat destfile="${lib.dir}/production.container.log4j.properties">
+  			<filelist dir="${lib.dir}">
+				<file name="production.container.log4j.properties.template" />
+				<file name="genesisII.shared.log4j.properties" />
+			</filelist>
+		</concat>
+
+		<concat destfile="${lib.dir}/production.client.log4j.properties">
+  			<filelist dir="${lib.dir}">
+				<file name="production.client.log4j.properties.template" />
+				<file name="genesisII.shared.log4j.properties" />
+			</filelist>
+		</concat>
+
+<!--should not be needed?		<replace file="${lib.dir}/genesisII.container.log4j.properties"
 			token="%{INSTALL_PATH}" value="${basedir}" summary="no" />
 		<replace file="${lib.dir}/genesisII.client.log4j.properties"
 			token="%{INSTALL_PATH}" value="${basedir}" summary="no" />
+-->
+
 	</target>
 	
 	<target name="lib-setup" depends="log4j-properties" >

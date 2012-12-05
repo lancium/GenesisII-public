@@ -65,9 +65,9 @@ public class FileDisplayPlugin extends AbstractUITabPlugin
 	
 	static private class DocumentRetriever implements Runnable
 	{
-		// a large buffer size so as not to get trapped in a perpetual log file reading scenario.
-		static final private int BUFFER_SIZE = 1024 * 1024 * 2;
-//		static final private int MAX_STRING_SIZE = 1024 * 8;
+		// large buffer size to help us jump ahead of all possible writes and arrive
+		// at the end before log4j can add more lines.
+		static final private int BUFFER_SIZE = 1024 * 1024 * 1;
 		
 		private RNSPath _path;
 		private FileDisplayWidget _widget;
@@ -81,7 +81,7 @@ public class FileDisplayPlugin extends AbstractUITabPlugin
 		@Override
 		public void run()
 		{
-			SwingUtilities.invokeLater(new DocumentUpdater(
+			SwingUtilities.invokeLater(new DocumentUpdater(false,
 				_widget.UPDATING_STYLE,
 				"Reading file contents...", _widget));
 			
@@ -97,18 +97,23 @@ public class FileDisplayPlugin extends AbstractUITabPlugin
 				while ((read = reader.read(data, 0, BUFFER_SIZE)) > 0)
 				{
 					builder.append(data, 0, read);
+					if (builder.length() > 0) {
+						SwingUtilities.invokeLater(new DocumentUpdater(true,
+							_widget.PLAIN_STYLE, builder.toString(), _widget));
+						builder.delete(0, builder.length());
+					}
 					if (!reader.ready()) {
 						// if we finally got to the end of the file once, we break out.
 						break;
 					}
+					// yield the thread to the gui updater.
+					Thread.sleep(200);
 				}
 				
-				SwingUtilities.invokeLater(new DocumentUpdater(
-					_widget.PLAIN_STYLE, builder.toString(), _widget));
 			}
 			catch (Throwable e)
 			{
-				SwingUtilities.invokeLater(new DocumentUpdater(
+				SwingUtilities.invokeLater(new DocumentUpdater(false,
 					_widget.ERROR_STYLE,
 					"Unable to read file contents:  " + e, _widget));
 			}
@@ -124,22 +129,27 @@ public class FileDisplayPlugin extends AbstractUITabPlugin
 		private String _content;
 		private Style _style;
 		private FileDisplayWidget _widget;
+		private boolean _append;
 		
-		private DocumentUpdater(Style style,
+		private DocumentUpdater(boolean append, Style style,
 			String content, FileDisplayWidget widget)
 		{
 			_style = style;
 			_content = content;
 			_widget = widget;
+			_append = append;
 		}
 		
 		@Override
 		public void run()
 		{
-			_widget.clear();
+			if (!_append) _widget.clear();
 			
 			_widget.append(_style, _content);
-			_widget.setCaretPosition(0);
+			if (!_append)
+				_widget.setCaretPosition(0);
+			else
+				_widget.setCaretPosition(_widget.getDocument().getLength() - 1);
 		}
 	}
 }

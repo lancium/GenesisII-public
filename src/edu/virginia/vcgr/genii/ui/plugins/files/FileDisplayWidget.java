@@ -38,7 +38,7 @@ public class FileDisplayWidget extends JTextPane
 	{
 		createStyles(getStyledDocument());
 		
-		setFocusable(false);
+		setFocusable(true);
 		setEditable(false);
 	}
 	
