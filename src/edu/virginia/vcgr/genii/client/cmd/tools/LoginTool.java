@@ -196,7 +196,7 @@ public class LoginTool  extends BaseLoginTool {
 
 	}
 	
-	private static void jumpToUserHomeIfExists(String loginName) {
+	public static void jumpToUserHomeIfExists(String loginName) {
 		
 		if (loginName == null) return;
 		

@@ -19,6 +19,7 @@ import org.ws.addressing.EndpointReferenceType;
 
 import edu.virginia.vcgr.genii.client.GenesisIIConstants;
 import edu.virginia.vcgr.genii.client.cmd.tools.IDPLoginTool;
+import edu.virginia.vcgr.genii.client.cmd.tools.LoginTool;
 import edu.virginia.vcgr.genii.client.comm.ClientUtils;
 import edu.virginia.vcgr.genii.client.comm.SecurityUpdateResults;
 import edu.virginia.vcgr.genii.client.context.ContextManager;
@@ -107,6 +108,9 @@ final class IDPLoginPanel extends LoginPanel
 						GenesisIIConstants.CredentialExpirationMillis, 
 						clientKeyMaterial._clientCertChain);
 
+				// try to leave the user in the right current directory.
+				LoginTool.jumpToUserHomeIfExists(_username.getText());
+				
 				return signedAssertions;
 			} finally 
 			{
