@@ -513,6 +513,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 										}
 										//hmmm: this appears to be wrong code; the condition is identical, even in the version
 										// still calling getType on X509Security class.
+										/*
 										else if (subElement.getAttributeValue(
 												"ValueType").equals(
 												edu.virginia.vcgr.genii.client.comm.CommConstants.X509_SECURITY_TYPE))
@@ -525,6 +526,7 @@ public class JNDIAuthnServiceImpl extends GenesisIIBase implements
 																	false,
 																	new edu.virginia.vcgr.genii.client.comm.axis.security.GIIBouncyCrypto());
 										}
+										*/
 										else
 										{
 											if (delegateToChain == null)

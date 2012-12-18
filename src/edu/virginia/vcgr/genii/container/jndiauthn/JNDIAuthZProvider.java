@@ -106,7 +106,7 @@ public class JNDIAuthZProvider implements IAuthZProvider
 		}
 		if (!checkJndiAccess(jndiResource))
 		{
-			throw new PermissionDeniedException(operation.getName());
+			throw new PermissionDeniedException(operation.getName(), jndiResource.getIdpName());
 		}
 	}
 	

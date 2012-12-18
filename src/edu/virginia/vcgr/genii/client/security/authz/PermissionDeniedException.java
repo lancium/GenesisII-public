@@ -8,22 +8,31 @@ public class PermissionDeniedException extends AuthZSecurityException
 	static final long serialVersionUID = 0L;
 	
 	static final private String PERMISSION_DENIED_MESSAGE_FORMAT =
-		"Access denied for method %s.";
+		"Access denied on %s (in method %s).";
 	
-	static final private Pattern EXTRACTOR_PATTERN = Pattern.compile(
-		"^.*Access denied for method ([^ .]+)\\..*$", Pattern.DOTALL);
+	static final private Pattern METHOD_EXTRACTOR_PATTERN = Pattern.compile(
+		"^.*Access denied on .*.in method ([^ )]+).\\..*$", Pattern.DOTALL);
+	static final private Pattern ASSET_EXTRACTOR_PATTERN = Pattern.compile(
+		"^.*Access denied on (.+) .in method .*\\..*$", Pattern.DOTALL);
 	
-	public PermissionDeniedException(String methodName)
+	public PermissionDeniedException(String methodName, String assetDenied)
 	{
-		super(String.format(PERMISSION_DENIED_MESSAGE_FORMAT, methodName));
+		super(String.format(PERMISSION_DENIED_MESSAGE_FORMAT, assetDenied, methodName));
 	}
 	
 	static public String extractMethodName(String message)
 	{
-		Matcher matcher = EXTRACTOR_PATTERN.matcher(message);
+		Matcher matcher = METHOD_EXTRACTOR_PATTERN.matcher(message);
 		if (matcher.matches())
 			return matcher.group(1);
-		
+		return null;
+	}
+
+	static public String extractAssetDenied(String message)
+	{
+		Matcher matcher = ASSET_EXTRACTOR_PATTERN.matcher(message);
+		if (matcher.matches())
+			return matcher.group(1);
 		return null;
 	}
 }

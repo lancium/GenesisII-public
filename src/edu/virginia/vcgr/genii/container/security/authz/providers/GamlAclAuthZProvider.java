@@ -49,6 +49,7 @@ import edu.virginia.vcgr.genii.client.resource.*;
 import edu.virginia.vcgr.genii.container.Container;
 import edu.virginia.vcgr.genii.security.MessageLevelSecurityRequirements;
 import edu.virginia.vcgr.genii.security.RWXCategory;
+import edu.virginia.vcgr.genii.security.SecurityConstants;
 import edu.virginia.vcgr.genii.security.VerbosityLevel;
 import edu.virginia.vcgr.genii.security.credentials.GIICredential;
 import edu.virginia.vcgr.genii.security.credentials.TransientCredentials;
@@ -272,7 +273,7 @@ public class GamlAclAuthZProvider implements IAuthZProvider, GamlAclTopics
 		RWXCategory category = RWXManager.lookup(serviceClass, operation);
 		if (!checkAccess(authenticatedCallerCredentials, resource, category))
 		{
-			throw new PermissionDeniedException(operation.getName());
+			throw new PermissionDeniedException(operation.getName(), (String)resource.getProperty(SecurityConstants.NEW_IDP_NAME_QNAME.getLocalPart()));
 		}
 	}
 	

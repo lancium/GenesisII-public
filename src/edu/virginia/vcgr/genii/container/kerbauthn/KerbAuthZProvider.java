@@ -160,7 +160,7 @@ public class KerbAuthZProvider extends GamlAclAuthZProvider
 			}
 	
 			// Nobody appreciates us
-			throw new PermissionDeniedException(operation.getName());
+			throw new PermissionDeniedException(operation.getName(), (String)resource.getProperty(SecurityConstants.NEW_IDP_NAME_QNAME.getLocalPart()));
 		}
 	}
 }

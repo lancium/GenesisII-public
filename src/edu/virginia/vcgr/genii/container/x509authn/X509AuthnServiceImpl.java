@@ -37,7 +37,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.CredentialException;
 import org.apache.ws.security.message.token.BinarySecurity;
-import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.X509Security;
 
 import org.ggf.rns.LookupResponseType;
@@ -517,6 +516,8 @@ public class X509AuthnServiceImpl extends GenesisIIBase
 											delegateToChain =
 													new X509Certificate[] { delegateTo };
 										}
+										//hmmm: one more case of dead code checking the exact same condition...
+										/*
 										else if (subElement.getAttributeValue(
 												"ValueType").equals(
 												edu.virginia.vcgr.genii.client.comm.CommConstants.X509_SECURITY_TYPE))
@@ -528,6 +529,7 @@ public class X509AuthnServiceImpl extends GenesisIIBase
 													false, 
 													new GIIBouncyCrypto());
 										}
+										*/
 										else
 										{
 											if (delegateToChain == null)

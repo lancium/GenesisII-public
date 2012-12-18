@@ -37,7 +37,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.CredentialException;
 import org.apache.ws.security.message.token.BinarySecurity;
-import org.apache.ws.security.message.token.PKIPathSecurity;
 import org.apache.ws.security.message.token.X509Security;
 
 import org.ggf.rns.LookupResponseType;
@@ -488,6 +487,8 @@ public class KerbAuthnServiceImpl extends GenesisIIBase
 											delegateToChain =
 													new X509Certificate[] { delegateTo };
 										}
+										//hmmm: similar dead code here.  was this supposed to match something else?
+										/*
 										else if (subElement.getAttributeValue(
 												"ValueType").equals(
 												edu.virginia.vcgr.genii.client.comm.CommConstants.X509_SECURITY_TYPE))
@@ -499,6 +500,7 @@ public class KerbAuthnServiceImpl extends GenesisIIBase
 													false, 
 													new GIIBouncyCrypto());
 										}
+										*/
 										else
 										{
 											if (delegateToChain == null)

@@ -61,13 +61,14 @@ public class SimpleExceptionHandler implements IExceptionHandler
 				String message = cause.getLocalizedMessage();
 				
 				/* Check to see if it's a permission denied exception */
-				String operation = PermissionDeniedException.extractMethodName(message);
-				if (operation != null)
-				{
-					builder.append(tab + "Permission denied for method \"" + 
-						operation + "\".\n");
-				} else
-				{
+				String operation = null;
+				String failedAsset = null;
+				operation = PermissionDeniedException.extractMethodName(cause.getMessage());
+				failedAsset = PermissionDeniedException.extractAssetDenied(cause.getMessage());
+				if ( (operation != null) && (failedAsset != null) ) {
+					builder.append(tab + "Permission denied on \"" + failedAsset + "\" (in method \"" + 
+						operation + "\").\n");
+				} else {
 					MinimumVersionException mve =
 						MinimumVersionException.reformException(message);
 					if (mve != null)
