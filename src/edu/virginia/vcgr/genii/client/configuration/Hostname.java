@@ -69,7 +69,10 @@ public class Hostname
 	
 	static private String getHostnameOverride()
 	{
-		return getGlobalProperty(_EXTERNAL_HOSTNAME_OVERRIDE_PROPERTY);
+		String toReturn = getGlobalProperty(_EXTERNAL_HOSTNAME_OVERRIDE_PROPERTY);
+		// consider a blank name to be a non-established one.
+		if ((toReturn != null) && (toReturn.length() == 0)) return null;
+		return toReturn;
 	}
 	
 	static private String getEPRAddressingMode()
