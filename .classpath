@@ -60,5 +60,5 @@
 	<classpathentry kind="lib" path="ext/jetty/lib/jetty-util-6.1.26.jar"/>
 	<classpathentry kind="lib" path="ext/jetty/lib/slf4j-api-1.6.6.jar"/>
 	<classpathentry kind="lib" path="ext/jetty/lib/slf4j-log4j12-1.6.6.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="output" path="bin.eclipse"/>
 </classpath>
