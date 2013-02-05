@@ -11,6 +11,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.virginia.vcgr.genii.client.ApplicationBase;
+import edu.virginia.vcgr.genii.client.ContainerProperties;
 import edu.virginia.vcgr.genii.client.comm.axis.security.VcgrSslSocketFactory;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.configuration.GridEnvironment;
@@ -31,7 +32,7 @@ public class Driver extends ApplicationBase
 
 	static private SecureRunnerManager _secRunManager;
 	
-	static public void main(String []args)
+	static public void loadClientState() 
 	{
 		GridEnvironment.loadGridEnvironment();
 		String deploymentName = System.getenv("GENII_DEPLOYMENT_NAME");
@@ -50,7 +51,10 @@ public class Driver extends ApplicationBase
 		//Set Trust Store Provider
 		java.security.Security.setProperty("ssl.SocketFactory.provider", 
 				VcgrSslSocketFactory.class.getName());
-		
+	}
+	
+	static public void loadSecureRunner()
+	{	
 		_secRunManager = SecureRunnerManager.createSecureRunnerManager(
 			Driver.class.getClassLoader(),
 			Installation.getDeployment(new DeploymentName()));
@@ -58,26 +62,64 @@ public class Driver extends ApplicationBase
 		_secRunManager.run(SecureRunnableHooks.CLIENT_PRE_STARTUP, 
 			secRunProperties);
 		_secRunManager.run(SecureRunnableHooks.CLIENT_POST_STARTUP, 
-			secRunProperties);
+			secRunProperties);		
+	}
+	
+	static public void main(String []args)
+	{
+
+		// first run through, go ahead and try to load the state.
+		loadClientState();
+		
+		if ( (args.length > 1) && (args[0].equals("connect")) ) {
+			_logger.debug("not trying auto-connect as this is a connect command.");
+		} else {
+			//hmmm: is it possible the establish grid conn could eat things in input stream that we need?
+			ApplicationBase.GridStates gridOkay = establishGridConnection(new PrintWriter(System.out, true),
+				new PrintWriter(System.err, true), new InputStreamReader(System.in));
+			switch (gridOkay) {
+				case CONNECTION_FAILED: {
+					// this means we are not on the grid when we think we should have been able to get on.
+					System.err.println("Failed to build a connection to the grid.");
+					System.err.println("You can try to connect manually using the configured command, e.g.:");
+					System.err.println("  grid connect " + ContainerProperties.containerProperties.getConnectionCommand());
+					break;
+				}
+				case CONNECTION_ALREADY_GOOD: {
+					// nothing was wrong, just proceed normally.
+					_logger.debug("grid connection was already present.");
+					break;
+				}
+				default:  // default should never be seen, but must be included as a case.
+				case CONNECTION_MEANS_UNKNOWN: {
+					// we are not going to get connected at this point.  we don't know how.  this had better be a bootstrap.
+					_logger.debug("steps for grid connection were not present; assuming bootstrap.");
+					break;
+				}
+				case CONNECTION_GOOD_NOW: {
+					// so we were not connected before, but we are now.
+					_logger.info("grid connection automatically created with: grid connect " + ContainerProperties.containerProperties.getConnectionCommand());
+					break;
+				}
+			}
+		}
+
+		loadSecureRunner();
 		
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-		
-		if (args.length == 0 || (
-			args.length == 1 && args[0].equals("shell")))
-			while(true) {
+
+		if (args.length == 0 || (args.length == 1 && args[0].equals("shell")))
+			while (true) {
 				try {
 					doShell(in);
 					break;
-				} catch (ReloadShellException e) {}
+				} catch (ReloadShellException e) {
+				}
 			}
-		else
-		{
-			try
-			{
+		else {
+			try {
 				doNonShell(in, args);
-			}
-			catch (ReloadShellException re) 
-			{
+			} catch (ReloadShellException re) {
 			}
 		}
 	}

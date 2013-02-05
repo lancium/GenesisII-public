@@ -21,6 +21,8 @@ public class ContainerProperties extends Properties
 		"edu.virginia.vcgr.genii.container.user-dir";
 	static final private String GENII_DEPLOYMENT_NAME_PROPERTY_NAME =
 		"edu.virginia.vcgr.genii.container.deployment-name";
+	static final private String GRID_CONNECTION_COMMAND =
+		"edu.virginia.vcgr.genii.gridInitCommand";
 	
 	static public ContainerProperties containerProperties = 
 		new ContainerProperties();
@@ -76,5 +78,14 @@ public class ContainerProperties extends Properties
 	public String getDeploymentName()
 	{
 		return getProperty(GENII_DEPLOYMENT_NAME_PROPERTY_NAME);
+	}
+	
+	/**
+	 * returns the command line for a grid connect command (minus 'grid' and 'connect').  if this property
+	 * has not been set, then this returns null.
+	 */
+	public String getConnectionCommand()
+	{
+		return getProperty(GRID_CONNECTION_COMMAND);
 	}
 }

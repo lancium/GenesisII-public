@@ -52,19 +52,12 @@ public class UserConfigUtils
 	{
 		Installation.reload();
 		
-		synchronized(UserConfigUtils.class)
+		synchronized (ConfigurationManager.class)
 		{
 			ConfigurationManager manager = ConfigurationManager.getCurrentConfiguration();
 			if (manager != null)
 			{
-				File userDirFile = manager.getUserDirectory();
-				boolean isClient = manager.isClientRole();
-				ConfigurationManager.reloadConfiguration(userDirFile.getAbsolutePath());
-				manager = ConfigurationManager.getCurrentConfiguration();
-				if (isClient)
-					manager.setRoleClient();
-				else
-					manager.setRoleServer();
+				ConfigurationManager.reloadConfiguration();
 			}
 		}
 	}

@@ -1,14 +1,28 @@
 package edu.virginia.vcgr.genii.client;
 
 import java.io.File;
+import java.io.Reader;
+import java.io.Writer;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.morgan.util.io.GuaranteedDirectory;
 
+import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
+import edu.virginia.vcgr.genii.client.cmd.tools.ConnectTool;
+import edu.virginia.vcgr.genii.client.comm.axis.AxisClientInvocationHandler.ConfigUnloadListener;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
+import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
+import edu.virginia.vcgr.genii.client.context.ContextManager;
+import edu.virginia.vcgr.genii.client.context.ICallingContext;
+import edu.virginia.vcgr.genii.client.rns.RNSPath;
+import edu.virginia.vcgr.genii.context.ContextType;
 
 public class ApplicationBase
 {
+	static private Log _logger = LogFactory.getLog(ApplicationBase.class);
+
 	// the name of the environment variable whose value points at our state directory.
 	static public final String USER_DIR_ENVIRONMENT_VARIABLE = "GENII_USER_DIR";
 	// the value that can be used in property files (in select places) and is translated into the
@@ -112,5 +126,49 @@ public class ApplicationBase
 			throw new RuntimeException(
 				"Unable to access or create state directory.", cause);
 		}
+	}
+	
+	public enum GridStates {
+		CONNECTION_FAILED,			// we were not connected, and we knew what to do, but that failed.
+		CONNECTION_MEANS_UNKNOWN,   // no breadcrumbs were left for how to get connected.
+		CONNECTION_ALREADY_GOOD,    // connection to the grid was already okay.
+		CONNECTION_GOOD_NOW         // there was no connection, but we have established one.  shell must reload.
+	}
+	static public GridStates establishGridConnection(Writer output, Writer error, Reader input)
+	{	
+		ICallingContext callContext = null;
+		try {
+			callContext = ContextManager.getCurrentContext(false);
+			if (callContext == null) callContext = new CallingContextImpl(new ContextType());
+		} catch (Throwable e) {
+		}
+		if (callContext == null) {
+			_logger.error("failed to build calling context.");
+			return GridStates.CONNECTION_FAILED;
+		}
+
+		RNSPath currdir = callContext.getCurrentPath();
+		if (currdir != null) return GridStates.CONNECTION_ALREADY_GOOD;
+
+		String connectCmd = ContainerProperties.containerProperties.getConnectionCommand();
+		if ( (connectCmd == null) || connectCmd.isEmpty() ) {
+			_logger.debug("Did not find grid connection property; unknown how to get on grid.");
+			return GridStates.CONNECTION_MEANS_UNKNOWN;
+		}
+		_logger.debug("trying grid connection with parameters: " + connectCmd);
+
+		String[] parameters = connectCmd.split(" ");
+		ConnectTool ct = new ConnectTool();
+		try {
+			for (int i = 0; i < parameters.length; i++)
+				ct.addArgument(parameters[i]);
+			ct.run(output, error, input);
+		} catch (ReloadShellException e) {
+			_logger.debug("got newly connected; reloading grid shell");
+			return GridStates.CONNECTION_GOOD_NOW;
+		} catch (Throwable e) {
+			_logger.error("failure during grid connection: " + e.getMessage(), e);
+		}
+		return GridStates.CONNECTION_FAILED;		
 	}
 }

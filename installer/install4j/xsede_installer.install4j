@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="5.0.11" transformSequenceNumber="3">
   <directoryPresets config="" />
-  <application name="Genesis II" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:genii.bitSize}_v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genii" publisher="University of Virginia" publisherWeb="genesisII.virginia.edu" version="2.6.2" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.6">
+  <application name="Genesis II" distributionSourceDir="" applicationId="6720-3221-4648-0706" mediaDir="./Media" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}${compiler:genii.bitSize}_v${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="genii" publisher="University of Virginia" publisherWeb="genesisII.virginia.edu" version="2.6.3" allPathsRelative="true" backupOnSave="true" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.6" javaMaxVersion="" allowBetaVM="false" jdkMode="jdk" jdkName="JDK 1.6">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -12,7 +12,7 @@
       <envVar name="JDK_HOME" />
     </searchSequence>
     <variables>
-      <variable name="genii.build-number" value="4371" description="" category="" />
+      <variable name="genii.build-number" value="4578" description="" category="" />
       <variable name="genii.xcg-port" value="18443" description="" category="" />
       <variable name="genii.container-memory.fraction" value="0.25" description="" category="" />
       <variable name="genii.container-memory.upper-limit" value="4096" description="" category="" />
@@ -734,11 +734,12 @@
                       <void property="script">
                         <object class="com.install4j.api.beans.ScriptProperty">
                           <void property="value">
-                            <string>if ((Integer)context.getVariable("genii.deployment-index") == 0){
-    context.setVariable("genii.deployment", "current_grid");
-    context.setVariable("genii.connect-url", "deployments/current_grid/xsede_context.xml");
+                            <string>if ((Integer)context.getVariable("genii.deployment-index") == 0) {
+    String depName = "current_grid";
+    context.setVariable("genii.deployment", depName);
+    String connUrl = "deployments/current_grid/xsede_context.xml";
+    context.setVariable("genii.connect-url", connUrl);
     context.setVariable("genii.patch-url", "DISABLED");
-    
 }
 
 return true;</string>
@@ -1599,7 +1600,9 @@ return ! medium.startsWith("genesis2_client_macosx");
                             </object>
                           </void>
                           <void property="text">
-                            <string>edu.virginia.vcgr.genii.container.deployment-name=${installer:genii.deployment}</string>
+                            <string>edu.virginia.vcgr.genii.container.deployment-name=${installer:genii.deployment}
+edu.virginia.vcgr.genii.gridInitCommand=local:${installer:sys.installationDir}/deployments/${installer:genii.deployment}/xcg3_context.xml ${installer:genii.deployment}
+</string>
                           </void>
                         </object>
                       </java>
@@ -3887,7 +3890,7 @@ return startService;</string>
     </unixInstaller>
   </mediaSets>
   <buildIds buildAll="false">
-    <mediaSet refId="2088" />
+    <mediaSet refId="2073" />
   </buildIds>
   <buildOptions verbose="true" faster="false" debug="false" />
 </install4j>

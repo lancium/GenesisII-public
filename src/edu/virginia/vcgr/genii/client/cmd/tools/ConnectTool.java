@@ -78,20 +78,11 @@ public class ConnectTool extends BaseGridTool
 			UserConfig userConfig = new UserConfig(deploymentName);
 			UserConfigUtils.setCurrentUserConfig(userConfig);
 			
-			// reload the configuration manager so that all
-			// config options are loaded from the specified deployment dir
-			// (instead of likely the "default" deployment)
+			/*
+			 * reload the configuration manager so that all config options are loaded from the
+			 * specified deployment dir (instead of likely the "default" deployment).
+			 */
 			UserConfigUtils.reloadConfiguration();
-/*			
-			File sessionDir = ConfigurationManager.getCurrentConfiguration().getUserDirectory();
-			boolean clientRole = ConfigurationManager.getCurrentConfiguration().isClientRole();
-			ConfigurationManager.reloadConfiguration(sessionDir.getPath());
-			if (clientRole) {
-				ConfigurationManager.getCurrentConfiguration().setRoleClient();
-			} else {
-				ConfigurationManager.getCurrentConfiguration().setRoleServer();
-			}
-*/			
 		}
 	}
 	

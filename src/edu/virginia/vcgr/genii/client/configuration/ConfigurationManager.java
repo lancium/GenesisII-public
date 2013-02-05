@@ -109,7 +109,7 @@ public class ConfigurationManager
 	 * Creates new configuration manager and sets it as new _manager using the role and user directory from the current manager 
 	 * @return
 	 */
-	static public ConfigurationManager reloadConfiguration(String userDir)
+	static public ConfigurationManager reloadConfiguration()
 	{
 		synchronized (ConfigurationManager.class)
 		{
@@ -122,7 +122,11 @@ public class ConfigurationManager
 				listener.notifyUnloaded();
 			}
 			
-			_manager = new ConfigurationManager(userDir);
+			boolean isClient = _manager.isClientRole();
+			File userDirFile = _manager.getUserDirectory();
+			_manager = new ConfigurationManager(userDirFile.getAbsolutePath());
+			if (isClient) _manager.setRoleClient();
+			else _manager.setRoleServer();
 			return _manager;
 		}
 	}		
