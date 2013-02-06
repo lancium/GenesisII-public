@@ -1595,7 +1595,7 @@ return ! medium.startsWith("genesis2_client_macosx");
                             <object class="com.install4j.api.beans.ScriptProperty">
                               <void property="value">
                                 <string>String instdir = (String)context.getVariable("sys.installationDir");
-instdir.replace('\\', '/');
+instdir = instdir.replace('\\', '/');
 context.setVariable("gen.fixedInstallDir", instdir);
 return true;</string>
                               </void>
