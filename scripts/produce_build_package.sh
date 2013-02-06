@@ -25,7 +25,7 @@ pushd $build_folder &>/dev/null
 date_string="$(date +"%Y_%b_%e_%H%M" | sed -e 's/ //g')"
 #echo date_string is $date_string
 
-EXCLUDES=(--exclude=".svn" --exclude="*.class" --exclude="*.log" --exclude="*.log.*" --exclude="installer_base")
+EXCLUDES=(--exclude=".svn" --exclude="*.class" --exclude="*.log" --exclude="*.log.*" --exclude="installer_base" --exclude="Gene*tar.gz")
 
 tar -czf "$storage_folder/GenesisII-build-${date_string}${additional_tag}.tar.gz" * ${EXCLUDES[*]}
 
