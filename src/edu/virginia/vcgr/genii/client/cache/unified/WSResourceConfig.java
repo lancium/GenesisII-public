@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.apache.axis.types.URI;
 
+import edu.virginia.vcgr.genii.client.cache.unified.subscriptionmanagement.SubscriptionDirectory;
 import edu.virginia.vcgr.genii.client.naming.WSName;
 import edu.virginia.vcgr.genii.client.resource.TypeInformation;
 
@@ -64,6 +65,19 @@ public class WSResourceConfig {
 		}
 		if (wsName.isValidWSName())  {
 			inodeNumber = wsIdentifier.toString().hashCode();
+			
+			// It can happen that a subscribed resource's resource configuration got evicted from the
+			// cache due to overload. In future, if we create another configuration for the resource 
+			// as we start reusing it (coming back to a previously visited directory, etc.) then we 
+			// should retrieve the subscription related information to ensure that cache contents related
+			// to this resource are given appropriate lifetimes.
+			String EPI = wsName.getEndpointIdentifier().toString();
+			Date subscriptionTimeoutTime = SubscriptionDirectory.getSubscriptionTimeoutTime(EPI);
+			if (subscriptionTimeoutTime != null 
+					&& subscriptionTimeoutTime.getTime() > System.currentTimeMillis()) {
+				hasRegisteredCallback = true;
+				callbackExpiryTime = subscriptionTimeoutTime;
+			}
 		}
 		rnsPaths = new HashSet<String>(3);
 		containerId = CacheUtils.getContainerId(wsName); 

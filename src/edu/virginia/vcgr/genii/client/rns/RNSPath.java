@@ -257,6 +257,17 @@ public class RNSPath implements Serializable, Cloneable
 	}
 	
 	/**
+	 * Get the EPR of the RNSPath if it exists in the cache. This is useful when
+	 * a call is made from some cache management subroutine where we don't want to
+	 * have any unaccounted outcall. 
+	 * 
+	 * @return the EPR of this entry if it exists in the cache
+	 * */
+	public EndpointReferenceType getCachedEPR() {
+		return _cachedEPR;
+	}
+	
+	/**
 	 * Return the full path to this entry starting at the root of the
 	 * namespace.
 	 * 

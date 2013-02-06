@@ -1,6 +1,8 @@
 package edu.virginia.vcgr.genii.client.cache.unified;
 
 import java.io.Closeable;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -50,6 +52,14 @@ public class RNSCacheLookupHandler {
 			WSName wsName = new WSName(target);
 			if (!wsName.isValidWSName()) return null;
 
+			// Opportunistically store root and current path's resource config in the cache to improve the
+			// chance of cache hit for looked up contents. This is useful sometimes as it can happen that
+			// the resources under a directory are already in the cache but we fail to use them as the parent's
+			// resource configuration is not there (either never saved or evicted). This opportunistic caching
+			// can only be applied when the concerned parent is on the path to current working directory.
+			// For all other directories, we don't have the path information saved anywhere beforehand.
+			storeRootAndCurrentPathsInTheCache();
+			
 			WSResourceConfig resourceConfig = (WSResourceConfig) CacheManager
 					.getItemFromCache(wsName.getEndpointIdentifier(), WSResourceConfig.class);
 			if (resourceConfig == null) {
@@ -63,9 +73,14 @@ public class RNSCacheLookupHandler {
 					CacheManager.putItemInCache(wsEndpointIdentifier, currentPathConfig);
 					resourceConfig = currentPathConfig;
 				} else {
+					_logger.trace("Lookup failed: no resource configuration in the cache.");
 					return null;
 				}
 			}
+			
+			// if there is no RNSPath mapping for the resource then it is not possible to construct a lookup
+			// response from cached contents.
+			if (!resourceConfig.isMappedToRNSPaths()) return null;
 			
 			// this is a safety checking as cache access may be blocked and we got the original null 
 			// return for the resource configuration object because of that, instead of absence of the 
@@ -80,6 +95,7 @@ public class RNSCacheLookupHandler {
 					.getItemFromCache(wsName, RNSConstants.ELEMENT_COUNT_QNAME, MessageElement.class);
 			if (element == null) {
 				processHotspot(resourceConfig, target);
+				_logger.trace("Lookup failed: element count property missing: " + resourceConfig.getRnsPath());
 				return null;
 			}
 
@@ -108,6 +124,7 @@ public class RNSCacheLookupHandler {
 					// blockage, we are removing all entry EPRS from the cache too. 
 					removePossiblyStaleEntries(matchings);
 					
+					_logger.trace("Lookup failed: element count does not match total cached contents: " + resourceConfig.getRnsPath());
 					return null;
 				}
 				// When the call is initiated from FUSE, most of the time it will be succeeded by a bunch o get-attributes
@@ -125,6 +142,7 @@ public class RNSCacheLookupHandler {
 				// cases where the client has made a directory listing for all elements in the 
 				// RNS directory before making the vein lookup call.
 				if ((filteredNames.length != entries.size()) && (totalCachedEntries < elementCount)) {
+					_logger.trace("Lookup failed: filtered search count mismatch: " + resourceConfig.getRnsPath());
 					return null;
 				}
 			}
@@ -137,6 +155,31 @@ public class RNSCacheLookupHandler {
 			_logger.debug("Exception occurred while looking up the cache", ex);
 		}
 		return null;
+	}
+
+	private static void storeRootAndCurrentPathsInTheCache() throws FileNotFoundException, IOException {
+		
+		RNSPath currentPath = ContextManager.getCurrentContext().getCurrentPath();
+		RNSPath rootPath = currentPath.getRoot();
+		
+		// save the root resource configuration if possible
+		EndpointReferenceType rootEpr = rootPath.getCachedEPR();
+		if (rootEpr != null) {
+			WSName rootPathWsName = new WSName(rootEpr);
+			WSResourceConfig rootConfig = new WSResourceConfig(rootPathWsName, rootPath.pwd());
+			CacheManager.putItemInCache(rootPathWsName.getEndpointIdentifier(), rootConfig);
+		}
+		
+		// retrace steps towards the root and store as many resource configurations as possible
+		while (!currentPath.pwd().equals(rootPath.pwd())) {
+			EndpointReferenceType currentPathEpr = currentPath.getCachedEPR();
+			if (currentPathEpr != null) {
+				WSName currentPathWsName = new WSName(currentPathEpr);
+				WSResourceConfig currentPathConfig = new WSResourceConfig(currentPathWsName, currentPath.pwd());
+				CacheManager.putItemInCache(currentPathConfig.getWsIdentifier(), currentPathConfig);
+			}
+			currentPath = currentPath.getParent();
+		}
 	}
 
 	private static void addMatchingEntriesInMap(List<RNSEntryResponseType> entries,
