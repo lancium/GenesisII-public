@@ -12,7 +12,7 @@
       <envVar name="JDK_HOME" />
     </searchSequence>
     <variables>
-      <variable name="genii.build-number" value="4578" description="" category="" />
+      <variable name="genii.build-number" value="4587" description="" category="" />
       <variable name="genii.xcg-port" value="18443" description="" category="" />
       <variable name="genii.container-memory.fraction" value="0.25" description="" category="" />
       <variable name="genii.container-memory.upper-limit" value="4096" description="" category="" />
@@ -1587,6 +1587,25 @@ String medium = context.getMediaName();
 return ! medium.startsWith("genesis2_client_macosx");
 </condition>
                   </action>
+                  <action name="fix installation dir" id="4474" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.control.RunScriptAction">
+                          <void property="script">
+                            <object class="com.install4j.api.beans.ScriptProperty">
+                              <void property="value">
+                                <string>String instdir = (String)context.getVariable("sys.installationDir");
+instdir.replace('\\', '/');
+context.setVariable("gen.fixedInstallDir", instdir);
+return true;</string>
+                              </void>
+                            </object>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition />
+                  </action>
                   <action name="Create container.properties file" id="1015" customizedId="" beanClass="com.install4j.runtime.beans.actions.text.WriteTextFileAction" enabled="true" commentSet="false" comment="" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="Unable to create container.properties file">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
@@ -1601,7 +1620,7 @@ return ! medium.startsWith("genesis2_client_macosx");
                           </void>
                           <void property="text">
                             <string>edu.virginia.vcgr.genii.container.deployment-name=${installer:genii.deployment}
-edu.virginia.vcgr.genii.gridInitCommand=local:${installer:sys.installationDir}/deployments/${installer:genii.deployment}/xcg3_context.xml ${installer:genii.deployment}
+edu.virginia.vcgr.genii.gridInitCommand=local:${installer:gen.fixedInstallDir}/deployments/${installer:genii.deployment}/xcg3_context.xml ${installer:genii.deployment}
 </string>
                           </void>
                         </object>
