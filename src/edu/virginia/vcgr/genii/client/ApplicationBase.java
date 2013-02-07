@@ -3,6 +3,7 @@ package edu.virginia.vcgr.genii.client;
 import java.io.File;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -10,7 +11,6 @@ import org.morgan.util.io.GuaranteedDirectory;
 
 import edu.virginia.vcgr.genii.client.cmd.ReloadShellException;
 import edu.virginia.vcgr.genii.client.cmd.tools.ConnectTool;
-import edu.virginia.vcgr.genii.client.comm.axis.AxisClientInvocationHandler.ConfigUnloadListener;
 import edu.virginia.vcgr.genii.client.configuration.ConfigurationManager;
 import edu.virginia.vcgr.genii.client.configuration.DeploymentName;
 import edu.virginia.vcgr.genii.client.context.CallingContextImpl;
@@ -152,12 +152,22 @@ public class ApplicationBase
 
 		String connectCmd = ContainerProperties.containerProperties.getConnectionCommand();
 		if ( (connectCmd == null) || connectCmd.isEmpty() ) {
-			_logger.debug("Did not find grid connection property; unknown how to get on grid.");
+			_logger.info("Did not find grid connection property; unknown how to get on grid.");
 			return GridStates.CONNECTION_MEANS_UNKNOWN;
 		}
 		_logger.debug("trying grid connection with parameters: " + connectCmd);
 
-		String[] parameters = connectCmd.split(" ");
+		// split up our line which is expected to be two quoted strings.  those are our arguments.
+		Pattern quoter = Pattern.compile("\" \"");
+		String[] parameters = quoter.split(connectCmd, 2);
+		if (parameters.length != 2) {
+			_logger.error("did not find the grid connection command line in the proper format.  bailing out.");
+			return GridStates.CONNECTION_MEANS_UNKNOWN;
+		}
+		parameters[0] = parameters[0].substring(1);  // take off initial quote on first parm.
+		parameters[1] = parameters[1].substring(0, parameters[1].length() - 1);  // take off last quote on second parm.
+_logger.debug("got arguments: [0]=" + parameters[0] + " [1]=" + parameters[1]);		
+		
 		ConnectTool ct = new ConnectTool();
 		try {
 			for (int i = 0; i < parameters.length; i++)

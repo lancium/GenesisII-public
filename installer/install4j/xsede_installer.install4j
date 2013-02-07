@@ -12,7 +12,7 @@
       <envVar name="JDK_HOME" />
     </searchSequence>
     <variables>
-      <variable name="genii.build-number" value="4587" description="" category="" />
+      <variable name="genii.build-number" value="4592" description="" category="" />
       <variable name="genii.xcg-port" value="18443" description="" category="" />
       <variable name="genii.container-memory.fraction" value="0.25" description="" category="" />
       <variable name="genii.container-memory.upper-limit" value="4096" description="" category="" />
@@ -1620,7 +1620,7 @@ return true;</string>
                           </void>
                           <void property="text">
                             <string>edu.virginia.vcgr.genii.container.deployment-name=${installer:genii.deployment}
-edu.virginia.vcgr.genii.gridInitCommand=local:${installer:gen.fixedInstallDir}/deployments/${installer:genii.deployment}/xcg3_context.xml ${installer:genii.deployment}
+edu.virginia.vcgr.genii.gridInitCommand="local:${installer:gen.fixedInstallDir}/deployments/${installer:genii.deployment}/xcg3_context.xml" "${installer:genii.deployment}"
 </string>
                           </void>
                         </object>
