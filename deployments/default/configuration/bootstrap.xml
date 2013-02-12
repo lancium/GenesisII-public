@@ -256,6 +256,12 @@
 			<gsh:param>--everyone</gsh:param>
 		</geniix:chmod>
 
+		<geniix:chmod>
+			<gsh:param>/containers/${CONTAINER}/Services/EnhancedNotificationBrokerFactoryPortType</gsh:param>
+			<gsh:param>+x</gsh:param>
+			<gsh:param>--everyone</gsh:param>
+		</geniix:chmod>
+
 		<gsh:foreach param-name="GROUP" source-rns="/groups">
 			<geniix:chmod>
 				<gsh:param>/bes-containers/${CONTAINER}</gsh:param>
