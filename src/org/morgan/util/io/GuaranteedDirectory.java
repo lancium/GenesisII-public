@@ -18,9 +18,6 @@ package org.morgan.util.io;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.attribute.PosixFilePermission;
-import java.util.EnumSet;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
