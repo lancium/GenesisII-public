@@ -54,14 +54,17 @@ public class ApplicationBase
 	{
 		if (!userdir.exists())
 		{
-			if (!userdir.mkdirs())
+			try {
+				File userDirFile = new GuaranteedDirectory(userdir.getAbsolutePath(), true);
+				if (!userDirFile.isDirectory()) {
+					throw new RuntimeException("Path \"" + userdir.getAbsolutePath()
+						+ "\" is not a directory.");
+				}
+			} catch (Throwable e) {
 				throw new RuntimeException("Unable to create directory \"" 
 					+ userdir.getAbsolutePath() + "\".");
+			}
 		}
-		
-		if (!userdir.isDirectory())
-			throw new RuntimeException("Path \"" + userdir.getAbsolutePath()
-				+ "\" is not a directory.");
 	}
 	
 	/**
@@ -117,7 +120,7 @@ public class ApplicationBase
 		
 		try
 		{
-			File userDirFile = new GuaranteedDirectory(userDir);
+			File userDirFile = new GuaranteedDirectory(userDir, true);
 			
 			return userDirFile.getCanonicalPath();
 		}

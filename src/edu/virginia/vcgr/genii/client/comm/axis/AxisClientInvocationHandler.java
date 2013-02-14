@@ -181,7 +181,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 	
 	private EndpointReferenceType _epr;
 	
-	static private final int _DEFAULT_TIMEOUT = 1000 * 120;
+	static final int _DEFAULT_TIMEOUT = 1000 * 360;  // default raised from 2 mins to 6.
 	private Integer _timeout = null;
 	
 	private ICallingContext _callContext;
@@ -329,8 +329,7 @@ public class AxisClientInvocationHandler implements InvocationHandler, IFinalInv
 			_callContext = callContext.deriveNewContext();
 			_callContext.setSingleValueProperty(GenesisIIConstants.NAMING_CLIENT_CONFORMANCE_PROPERTY, "true");
 			_locators = locators;
-			
-			
+						
 			// create the locator and add the methods
 			for (Class<?> locator : locators) {
 				Object locatorInstance = createLocatorInstance(locator);
