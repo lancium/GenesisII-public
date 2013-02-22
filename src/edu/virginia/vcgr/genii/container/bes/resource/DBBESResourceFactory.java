@@ -37,7 +37,7 @@ import edu.virginia.vcgr.genii.container.resource.db.BasicDBResourceFactory;
 
 public class DBBESResourceFactory extends BasicDBResourceFactory
 {
-	static private Log _logger = LogFactory.getLog(QueueDBResourceFactory.class);
+	static private Log _logger = LogFactory.getLog(DBBESResourceFactory.class);
 	
 	static private final String []_CREATE_STMTS = new String[] {
 		"CREATE TABLE bespolicytable (" +

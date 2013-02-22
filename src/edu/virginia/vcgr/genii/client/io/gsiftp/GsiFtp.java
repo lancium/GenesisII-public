@@ -18,7 +18,7 @@ public class GsiFtp
 	private String destinationFile = "";
 	private File workingDirectory;
 
-	static private Log _logger = LogFactory.getLog(RNSURIHandler.class);
+	static private Log _logger = LogFactory.getLog(GsiFtp.class);
 
 	public void setWorkingDirectory(File workingDirectory)
 	{

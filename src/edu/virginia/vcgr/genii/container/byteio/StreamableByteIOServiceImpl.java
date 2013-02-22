@@ -64,7 +64,7 @@ public class StreamableByteIOServiceImpl extends GenesisIIBase
 	/* One Hour Lifetime */
 	static private final long SBYTEIO_LIFETIME = 1000L * 60 * 60;
 	
-	static private Log _logger = LogFactory.getLog(RandomByteIOServiceImpl.class);
+	static private Log _logger = LogFactory.getLog(StreamableByteIOServiceImpl.class);
 	
 	@MInject(lazy = true)
 	private ISByteIOResource _resource;

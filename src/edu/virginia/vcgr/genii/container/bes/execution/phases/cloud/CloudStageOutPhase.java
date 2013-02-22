@@ -22,7 +22,7 @@ public class CloudStageOutPhase extends AbstractCloudExecutionPhase
 
 	private String _stageScript;
 
-	static private Log _logger = LogFactory.getLog(CloudStageInPhase.class);
+	static private Log _logger = LogFactory.getLog(CloudStageOutPhase.class);
 
 	public CloudStageOutPhase(String activityID, String besid,
 			String workingDir, String stageScript){

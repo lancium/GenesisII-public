@@ -89,7 +89,7 @@ import edu.virginia.vcgr.genii.security.credentials.identity.Identity;
  */
 public class JobManager implements Closeable
 {
-	static private Log _logger = LogFactory.getLog(BESManager.class);
+	static private Log _logger = LogFactory.getLog(JobManager.class);
 
 	/**
 	 * How often we poll a running job (ms) to see if it is completed/failed or not. It would be

@@ -23,7 +23,7 @@ import edu.virginia.vcgr.ogrsh.server.exceptions.OGRSHException;
 public class StreamableByteIOFileDescriptor extends AbstractFileDescriptor
 		implements IFileDescriptor 
 {
-	static private Log _logger = LogFactory.getLog(RandomByteIOFileDescriptor.class);
+	static private Log _logger = LogFactory.getLog(StreamableByteIOFileDescriptor.class);
 	
 	private EndpointReferenceType _epr;
 	private StreamableByteIOTransferer _transferer;
