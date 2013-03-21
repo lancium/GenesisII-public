@@ -75,10 +75,11 @@ public class DefaultGenesisIIAttributesPreFetcher<Type extends IResource>
 		
 	protected void fillInAttributes(Collection<MessageElement> attributes) {
 		try {
-			AuthZConfig authConfig = getAuthZConfig();
-			if (authConfig != null) {
-				attributes.add(new MessageElement(GenesisIIBaseRP.AUTHZ_CONFIG_QNAME, authConfig));
-			}
+			Permissions permissions = getPermissions();
+	        	if (permissions != null) {
+	            		attributes.add(new MessageElement(GenesisIIBaseRP.PERMISSIONS_STRING_QNAME, permissions.toString()));
+	        	}
+			
 			String brokerFactoryUrl = Container.getServiceURL(EnhancedNotificationBrokerFactoryServiceImpl.SERVICE_URL);
 			MessageElement notificationBrokerFactoryElement = 
 					new MessageElement(GenesisIIConstants.NOTIFICATION_BROKER_FACTORY_ADDRESS, brokerFactoryUrl);
